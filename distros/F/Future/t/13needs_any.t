@@ -197,4 +197,23 @@ use Future;
        '->get on empty needs_any is empty' );
 }
 
+# weakself retention (RT120468)
+{
+   my $f = Future->new;
+
+   my $wait;
+   $wait = Future->needs_any(
+      $f,
+      my $cancelled = Future->new->on_cancel( sub {
+         undef $wait;
+      }),
+   );
+
+   is( exception { $f->done(1) }, undef,
+      'no problems cancelling a Future which clears the original ->needs_any ref' );
+
+   ok( $cancelled->is_cancelled, 'cancellation occured as expected' );
+   ok( $f->is_done, '->needs_any is marked as done' );
+}
+
 done_testing;

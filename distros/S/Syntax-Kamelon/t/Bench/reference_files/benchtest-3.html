@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Keyword">&lt;%</font><font class="Normal">&nbsp;</font><font class="Comment">'kate:&nbsp;hl&nbsp;ASP;</font></br></div>
+<div id="2" class="line"><font class="ControlFlow">if</font><font class="Normal">&nbsp;</font><font class="Others">(</font><font class="Normal">&nbsp;</font><font class="Function">instr</font><font class="Others">(</font><font class="Function">request</font><font class="Normal">.</font><font class="Function">servervariables</font><font class="Others">(</font><font class="String">&quot;PATH_INFO&quot;</font><font class="Others">),</font><font class="String">&quot;login.asp&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;&lt;=&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;</font><font class="Keyword">and</font><font class="Normal">&nbsp;</font><font class="Function">instr</font><font class="Others">(</font><font class="Function">request</font><font class="Normal">.</font><font class="Function">servervariables</font><font class="Others">(</font><font class="String">&quot;PATH_INFO&quot;</font><font class="Others">),</font><font class="String">&quot;inset&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;&lt;=&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;</font><font class="Keyword">and</font><font class="Normal">&nbsp;</font><font class="Function">instr</font><font class="Others">(</font><font class="Function">request</font><font class="Normal">.</font><font class="Function">servervariables</font><font class="Others">(</font><font class="String">&quot;PATH_INFO&quot;</font><font class="Others">),</font><font class="String">&quot;Data&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;&lt;=&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;</font><font class="Keyword">and</font><font class="Normal">&nbsp;</font><font class="Function">instr</font><font class="Others">(</font><font class="Function">request</font><font class="Normal">.</font><font class="Function">servervariables</font><font class="Others">(</font><font class="String">&quot;PATH_INFO&quot;</font><font class="Others">),</font><font class="String">&quot;dropDown&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;&lt;=&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;</font><font class="Others">)</font><font class="Normal">&nbsp;</font><font class="ControlFlow">then</font></br></div>
+<div id="3" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">Session</font><font class="Others">(</font><font class="String">&quot;originalRequestedPage&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">Request</font><font class="Normal">.</font><font class="Function">ServerVariables</font><font class="Others">(</font><font class="String">&quot;PATH_INFO&quot;</font><font class="Others">)</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;</font><font class="Normal">&nbsp;</font><font class="String">&quot;?&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;</font><font class="Normal">&nbsp;</font><font class="Function">Request</font><font class="Normal">.</font><font class="Function">ServerVariables</font><font class="Others">(</font><font class="String">&quot;QUERY_STRING&quot;</font><font class="Others">)</font></br></div>
+<div id="4" class="line"><font class="ControlFlow">end&nbsp;if</font></br></div>
+<div id="5" class="line"></br></div>
+<div id="6" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;countRecords</font><font class="Others">(</font><font class="Normal">&nbsp;rsToCount&nbsp;</font><font class="Others">)</font></br></div>
+<div id="7" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;numRecs&nbsp;=&nbsp;</font><font class="Float">0</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">do</font><font class="Normal">&nbsp;</font><font class="ControlFlow">until</font><font class="Normal">&nbsp;rsToCount.</font><font class="Keyword">eof</font></br></div>
+<div id="10" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numRecs&nbsp;=&nbsp;numRecs&nbsp;+&nbsp;</font><font class="Float">1</font></br></div>
+<div id="11" class="line"></br></div>
+<div id="12" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rsToCount.</font><font class="Keyword">movenext</font></br></div>
+<div id="13" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">loop</font></br></div>
+<div id="14" class="line"></br></div>
+<div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;rsToCount.</font><font class="Keyword">close</font><font class="Normal">&nbsp;</font><font class="Comment">'&nbsp;just&nbsp;to&nbsp;make&nbsp;sure&nbsp;nobody</font></br></div>
+<div id="16" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">'&nbsp;tries&nbsp;to&nbsp;operate&nbsp;on&nbsp;the&nbsp;recordset,</font></br></div>
+<div id="17" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">'&nbsp;which&nbsp;has&nbsp;already&nbsp;reached&nbsp;eof</font></br></div>
+<div id="18" class="line"></br></div>
+<div id="19" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;countRecords&nbsp;=&nbsp;numRecs</font></br></div>
+<div id="20" class="line"><font class="Keyword">end&nbsp;function</font></br></div>
+<div id="21" class="line"></br></div>
+<div id="22" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;unique</font><font class="Others">(</font><font class="Normal">&nbsp;rs</font><font class="Others">,</font><font class="Normal">&nbsp;sortColumn&nbsp;</font><font class="Others">)</font><font class="Normal">&nbsp;</font><font class="Comment">'&nbsp;return&nbsp;unique&nbsp;instances&nbsp;of&nbsp;text&nbsp;in&nbsp;sortColumn&nbsp;within&nbsp;rs</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">dim</font><font class="Normal">&nbsp;sorted</font><font class="Others">()</font></br></div>
+<div id="24" class="line"></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">redim</font><font class="Normal">&nbsp;sorted</font><font class="Others">(</font><font class="Float">1</font><font class="Others">)</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">dim</font><font class="Normal">&nbsp;i</font></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;i&nbsp;=&nbsp;</font><font class="Float">0</font></br></div>
+<div id="28" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">do</font><font class="Normal">&nbsp;</font><font class="ControlFlow">until</font><font class="Normal">&nbsp;rs.</font><font class="Keyword">eof</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;</font><font class="Others">(</font><font class="Keyword">not</font><font class="Normal">&nbsp;find</font><font class="Others">(</font><font class="Normal">&nbsp;rs</font><font class="Others">(</font><font class="Normal">sortColumn</font><font class="Others">),</font><font class="Normal">&nbsp;sorted&nbsp;</font><font class="Others">))</font><font class="Normal">&nbsp;</font><font class="ControlFlow">then</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">redim</font><font class="Normal">&nbsp;</font><font class="Keyword">preserve</font><font class="Normal">&nbsp;sorted</font><font class="Others">(</font><font class="Normal">i+</font><font class="Float">1</font><font class="Others">)</font></br></div>
+<div id="31" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sorted</font><font class="Others">(</font><font class="Normal">i</font><font class="Others">)</font><font class="Normal">&nbsp;=&nbsp;rs</font><font class="Others">(</font><font class="Normal">sortColumn</font><font class="Others">)</font></br></div>
+<div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;=&nbsp;i&nbsp;+&nbsp;</font><font class="Float">1</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">end&nbsp;if</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rs.</font><font class="Keyword">MoveNext</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">loop</font></br></div>
+<div id="36" class="line"></br></div>
+<div id="37" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">redim</font><font class="Normal">&nbsp;</font><font class="Keyword">preserve</font><font class="Normal">&nbsp;sorted</font><font class="Others">(</font><font class="Normal">i-</font><font class="Float">1</font><font class="Others">)</font><font class="Normal">&nbsp;</font><font class="Comment">'&nbsp;the&nbsp;function&nbsp;will&nbsp;add&nbsp;an&nbsp;extra&nbsp;blank&nbsp;entry&nbsp;to&nbsp;the&nbsp;array</font></br></div>
+<div id="38" class="line"></br></div>
+<div id="39" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;rs.</font><font class="Keyword">Close</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">'&nbsp;close&nbsp;the&nbsp;recordset&nbsp;-&nbsp;we'll&nbsp;be&nbsp;using&nbsp;it&nbsp;again&nbsp;-&nbsp;and&nbsp;reset&nbsp;i&nbsp;-&nbsp;well&nbsp;be&nbsp;using&nbsp;it&nbsp;again,&nbsp;too</font></br></div>
+<div id="40" class="line"></br></div>
+<div id="41" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;unique&nbsp;=&nbsp;sorted</font></br></div>
+<div id="42" class="line"><font class="Keyword">end&nbsp;function</font></br></div>
+<div id="43" class="line"></br></div>
+<div id="44" class="line"><font class="Keyword">sub</font><font class="Normal">&nbsp;testSub</font><font class="Others">(</font><font class="Normal">&nbsp;variable&nbsp;</font><font class="Others">)</font><font class="Normal">&nbsp;</font><font class="Comment">'&nbsp;do&nbsp;nothing&nbsp;impressive...</font></br></div>
+<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">dim</font><font class="Normal">&nbsp;newVar</font></br></div>
+<div id="46" class="line"></br></div>
+<div id="47" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;newVar&nbsp;=&nbsp;variable</font></br></div>
+<div id="48" class="line"></br></div>
+<div id="49" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;</font><font class="Others">(</font><font class="Normal">&nbsp;variable&nbsp;=&nbsp;</font><font class="Keyword">true</font><font class="Normal">&nbsp;</font><font class="Others">)</font></br></div>
+<div id="50" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Function">response</font><font class="Normal">.</font><font class="Function">end</font></br></div>
+<div id="51" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">&nbsp;</font><font class="Keyword">%&gt;</font></br></div>
+<div id="52" class="line"></br></div>
+<div id="53" class="line"><font class="Attribute">&lt;p&gt;</font><font class="Normal">We&nbsp;are&nbsp;writing&nbsp;text.</font><font class="Attribute">&lt;/p&gt;</font></br></div>
+<div id="54" class="line"><font class="Attribute">&lt;p</font><font class="Others">&nbsp;class=</font><font class="DataType">&quot;stuff&quot;</font><font class="Attribute">&gt;</font><font class="Keyword">&lt;%</font><font class="Normal">=newVar</font><font class="Keyword">%&gt;</font><font class="Attribute">&lt;/p&gt;</font></br></div>
+<div id="55" class="line"><font class="Attribute">&lt;p&gt;</font><font class="Normal">We&nbsp;have&nbsp;written&nbsp;text&nbsp;and&nbsp;outputted&nbsp;a&nbsp;variable.</font><font class="Attribute">&lt;/p&gt;</font></br></div>
+<div id="56" class="line"></br></div>
+<div id="57" class="line"><font class="Keyword">&lt;%</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">end&nbsp;if</font></br></div>
+<div id="58" class="line"><font class="Keyword">end&nbsp;sub</font><font class="Normal">&nbsp;</font><font class="Keyword">%&gt;</font></br></div>
+</div>
+</body>
+</html>
+

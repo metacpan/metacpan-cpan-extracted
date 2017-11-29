@@ -1,14 +1,23 @@
 package Test::WWW::Mechanize::Catalyst::WithContext;
 use 5.008001;
 use Moose;
+use MooseX::Aliases;
 use HTTP::Request;
 use Carp 'croak';
 
 require Catalyst::Test;
 extends 'Test::WWW::Mechanize::Catalyst';
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 $VERSION = eval $VERSION;
+
+has ctx => (
+    is      => 'ro',
+    isa     => 'Maybe[Catalyst]',
+    writer  => '_set_ctx',
+    alias   => 'c',
+    default => undef,
+);
 
 # this stores the ctx_request function as a code reference
 has _get_context => (
@@ -36,18 +45,59 @@ sub _build__get_context {
     );
 }
 
+# this is deprecated
 sub get_context {
     my ( $self, $url ) = @_;
 
+    warnings::warn( 'deprecated',
+        'get_context is deprecated and will be removed in a future release' );
+
     croak 'url is required' unless $url;
 
-    my $request = HTTP::Request->new( GET => URI->new_abs( $url, $self->base || 'http://localhost' ) );
+    my $request =
+        HTTP::Request->new( GET => URI->new_abs( $url, $self->base || 'http://localhost' ) );
     $self->cookie_jar->add_cookie_header($request);
 
     my ( $res, $c ) = $self->_get_context->($request);
 
     return $res, $c;
 }
+
+# This code is based on the method for Test::WWW::Mechanize::Catalyst
+# and overwrites it.
+sub _do_catalyst_request {
+    my ( $self, $request ) = @_;
+
+    my $uri = $request->uri;
+    $uri->scheme('http')    unless defined $uri->scheme;
+    $uri->host('localhost') unless defined $uri->host;
+
+    $request = $self->prepare_request($request);
+    $self->cookie_jar->add_cookie_header($request) if $self->cookie_jar;
+
+    # Woe betide anyone who unsets CATALYST_SERVER
+    return $self->_do_remote_request($request)
+        if $ENV{CATALYST_SERVER};
+
+    $self->_set_host_header($request);
+
+    my $res = $self->_check_external_request($request);
+    return $res if $res;
+
+    my @creds = $self->get_basic_credentials( "Basic", $uri );
+    $request->authorization_basic(@creds) if @creds;
+
+    my ( $response, $c ) = $self->_get_context->($request);
+
+    $self->_set_ctx($c);
+
+    # LWP would normally do this, but we don't get down that far.
+    $response->request($request);
+
+    return $response;
+}
+
+__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 
 1;
 __END__
@@ -63,13 +113,14 @@ Test::WWW::Mechanize::Catalyst::WithContext - T::W::M::C can now give you $c
 <p>
 <a href="https://travis-ci.org/simbabque/Test-WWW-Mechanize-Catalyst-WithContext"><img src="https://travis-ci.org/simbabque/Test-WWW-Mechanize-Catalyst-WithContext.svg?branch=master"></a>
 <a href='https://coveralls.io/github/simbabque/Test-WWW-Mechanize-Catalyst-WithContext?branch=master'><img src='https://coveralls.io/repos/github/simbabque/Test-WWW-Mechanize-Catalyst-WithContext/badge.svg?branch=master' alt='Coverage Status' /></a>
+<a href='https://kritika.io/users/simbabque/repos/6965918834838520/heads/master/'><img src='https://kritika.io/users/simbabque/repos/6965918834838520/heads/master/status.svg' alt='Kritika Analysis Status' /></a>
 </p>
 
 =end html
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -77,11 +128,11 @@ Version 0.02
 
     my $mech = Test::WWW::Mechanize::Catalyst::WithContext->new( catalyst_app => 'Catty' );
 
-    my ($res, $c) = $mech->get_context("/"); # $c is a Catalyst context
-    is $c->stash->{foo}, "bar", "foo got set to bar";
+    $mech->get_ok("/");
+    is $mech->ctx->stash->{foo}, "bar", "foo got set to bar";
 
     $mech->post_ok("login", { u => "test", p => "secret" });
-    my ($res, $c) = $mech->get_context("/");
+    my $c = $mech->ctx; # $c is a Catalyst context
     is $c->session->{stuff}, "something", "things are in the session";
 
 =head1 DESCRIPTION
@@ -94,12 +145,40 @@ on them. Since the cookie jar of your C<$mech> will be used to fetch the context
 like being logged into your app will be taken into account.
 
 Besides that, it's just the same as L<Test::WWW::Mechanize::Catalyst>. It inherits everything
-and does not overwrite any functionality. See the docs of L<Test::WWW::Mechanize::Catalyst> for
-more details.
+and does not overwrite any other functionality than the request making. See the docs of
+L<Test::WWW::Mechanize::Catalyst> for more details.
+
+=head1 ATTRIBUTES
+
+=head2 ctx
+
+=head2 c
+
+Contains the context object for the most recent request. C<ctx> and C<c> are equivalent. Pick
+the one you feel more comfortable with.
+
+    is $mech->ctx->stash->{foo}, "bar", "foo got set to bar";
+    is $mech->c->stash->{foo}, "bar", "foo got set to bar";   # equivalent
+    
+If you need to keep an old context around to compare things before and after a request,
+assign it to a variable. The below example is contrived, but illustrates the idea.
+
+    $mech->get_ok("/cart");
+    my $first_c = $mech->ctx;
+
+    $mech->get_ok("/cart/add/some_product");
+    isnt $first_c->cart->sum_total, $mech->ctx->cart->sum_total, "total cart value changed";
+
+If you call this before you have made any requests, it will return C<undef>. It will also
+return C<undef> if there was no Catalyst context, which is the case if the request
+was handled by the Plack layer directly.
 
 =head1 METHODS
 
 =head2 get_context($url)
+
+This method was B<DEPRECATED!> in version 0.03 and will likely be removed in a future version.
+Use L<C<< $mech->ctx >>|/ctx> instead.
 
 Does a GET request on C<$url> and returns the L<HTTP::Response> and the request context C<$c>.
 
@@ -120,8 +199,8 @@ C<content_like>, you can just look at the template name in the stash. Of course 
 you if it got rendered successfully, but it does tell you which template the controller decided
 should be rendered.
 
-    my ( $res, $c ) = $mech->get_context('/hard/to/verify/page);
-    is $c->stash->{template}, 'hard_to_verify.tt2', 'the right template got selected';
+    $mech->get_ok('/hard/to/verify/page);
+    is $mech->ctx->stash->{template}, 'hard_to_verify.tt2', 'the right template got selected';
 
 =head2 Checking what's in the session without talking to the store
 
@@ -135,9 +214,11 @@ your unit tests, but maybe you don't want to do that.
 Enter Test::WWW::Mechanize::Catalyst::WithContext. Just grab the context before and after you
 perform your action and look at the sessions.
 
-    # we don't need the response object for this request
-    (undef, my $c_before) = $mech->get_context('/'); # or some other url
-    my ( $res, $c_after ) = $mech->get_context('/change/session');
+    $mech->get('/'); # or some other url
+    my $c_before = $mech->ctx;
+
+    $mech->get('/change/session');
+    my $c_after = $mech->ctx;
     isnt $c_before->session->{foo}, $c_after->session->{foo}, 'foo got changed';
 
 Of course this could be arbitrarily complex.
@@ -175,10 +256,20 @@ L<Catalyst>
 =head1 ATTRIBUTION
 
 This module borrows parts of its test suite from L<Test::WWW::Mechanize::Catalyst>.
-    
+
 =head1 AUTHOR
 
 simbabque <simbabque@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Robert Rothenberg
+
+=back
 
 =head1 LICENSE
 

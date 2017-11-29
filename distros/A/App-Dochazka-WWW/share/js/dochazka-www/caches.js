@@ -166,49 +166,60 @@ define ([
         },
 
         masqEmployee = function (obj) {
-            console.log("Entering masqEmployee() with object", obj);
+            var cu, priv;
+
             // if obj is empty, dA was selected from menu
             // if obj is full, it contains the employee to masquerade as
+            console.log("Entering masqEmployee() with object", obj);
         
             if (currentEmployeeStashed) {
                 endTheMasquerade();
-                return;
+                return null;
             }
 
-            var cu = currentUser('obj');
+            if (coreLib.isObjEmpty(obj)) {
+                // let the admin pick which user to masquerade as
+                stack.push('searchEmployee', {}, {
+                    "masquerade": true,
+                });
+                return null;
+            }
 
-            if (! coreLib.isObjEmpty(obj)) {
-                if (obj.nick === cu.nick) {
-                    coreLib.displayResult('Request to masquerade as self makes no sense');
-                    return;
+            // check the masquerade object
+            cu = currentUser('obj');
+            priv = currentUser('priv');
+            if (obj.nick === cu.nick) {
+                coreLib.displayError('Request to masquerade as self makes no sense');
+                return null;
+            }
+            if (priv !== 'admin') {
+                if (obj.supervisor !== cu.eid) {
+                    coreLib.displayError(obj.nick + " is not your supervisee");
+                    return null;
                 }
-                // let the masquerade begin
-                currentEmployeeStashed = $.extend({}, cu);
-                backgroundColorStashed = $('body').css("background-color");
-                currentUser('obj', obj);
-                currentUser('flag1', 1); // turn on masquerade flag
-                populate.bootstrap([
-                    populateFullEmployeeProfileCache,
-                    populateScheduleBySID,
-                ]);
-                appLib.fillUserBox(); // reset userbox
-                $('body').css("background-color", "#669933");
-                stack.unwindToType('dmenu'); // return to most recent dmenu
-                return;
             }
-        
-            // let the admin pick which user to masquerade as
-            stack.push('searchEmployee', {}, {
-                "masquerade": true,
-            });
+
+            // let the masquerade begin
+            currentEmployeeStashed = $.extend({}, cu);
+            backgroundColorStashed = $('body').css("background-color");
+            currentUser('obj', obj);
+            currentUser('flag1', 1); // turn on masquerade flag
+            populate.bootstrap([
+                populateFullEmployeeProfileCache,
+                populateScheduleBySID,
+            ]);
+            appLib.fillUserBox(); // reset userbox
+            $('body').css("background-color", "#669933");
+            stack.unwindToType('dmenu'); // return to most recent dmenu
         },
 
         populateActivityCache = function (populateArray) {
             var ao, rest, sc, fc, populateContinue;
             console.log("Entering populateActivityCache()");
             populateContinue = populate.shift(populateArray);
-            if (activityCache) {
+            if (coreLib.isArray(activityCache) && activityCache.length > 0) {
                 console.log("populateActivityCache(): noop, cache already populated");
+                console.log("Activity Cache contents", activityCache);
                 populateContinue(populateArray);
                 return null;
             }

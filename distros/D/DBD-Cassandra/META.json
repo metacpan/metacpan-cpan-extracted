@@ -1,40 +1,44 @@
 {
-   "abstract" : "Database driver for Cassandra's CQL3",
+   "abstract" : "DBI database backend for Cassandra",
    "author" : [
       "Tom van der Woerdt <tvdw@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBD-Cassandra",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Cassandra::Client" : "0.10",
             "DBI" : "1.621",
-            "perl" : "5.01"
+            "Devel::GlobalDestruction" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Ref::Util" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
          }
       }
    },
@@ -42,9 +46,12 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/tvdw/perl-DBD-Cassandra.git",
-         "web" : "https://github.com/tvdw/perl-DBD-Cassandra"
+         "url" : "https://github.com/tvdw/perl-dbd-cassandra.git",
+         "web" : "https://github.com/tvdw/perl-dbd-cassandra"
       }
    },
-   "version" : "0.56"
+   "version" : "0.57",
+   "x_authority" : "cpan:TVDW",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
+

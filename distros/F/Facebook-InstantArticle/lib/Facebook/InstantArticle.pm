@@ -17,7 +17,7 @@ use Facebook::InstantArticle::List;
 use Facebook::InstantArticle::Map;
 use Facebook::InstantArticle::Paragraph;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =encoding utf-8
 
@@ -92,7 +92,13 @@ external API are subject to change in upcoming releases, so use with care.
       caption => 'Nice video, eh?',
   );
 
-  say $ia->to_string;
+  if ( $ia->is_valid ) {
+      say $ia->to_string;
+  }
+  else {
+      # There's probably something wrong with the Instant Article you
+      # tried to create.
+  }
 
 =cut
 
@@ -447,6 +453,27 @@ sub add_analytics {
     $self->_log->warn( 'Failed to add analytics/tracking to article body!' );
 }
 
+=head2 is_valid
+
+Returns true if the Instant Article _seems_ valid. At the moment this method
+performs very simple checkes, so don't rely 100% on it.
+
+NOTE: Validation is also performed when you create an IA object, because its
+constructor requires a lot of attributes, and it will barf if you leave anyone
+of them out.
+
+=cut
+
+sub is_valid {
+    my $self = shift;
+
+    unless ( @{$self->_body_elements} ) {
+        return 0;
+    }
+
+    return 1;
+}
+
 =head2 to_string
 
 Generates the instant article and returns it as a string.
@@ -504,7 +531,7 @@ Tore Aursand E<lt>toreau@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2016 - Tore Aursand
+Copyright 2016-2017 – Tore Aursand
 
 =head1 LICENSE
 

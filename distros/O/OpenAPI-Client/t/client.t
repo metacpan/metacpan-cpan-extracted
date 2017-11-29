@@ -33,7 +33,7 @@ is +ref($client), 'OpenAPI::Client::main_test_json', 'generated class';
 isa_ok($client, 'OpenAPI::Client');
 can_ok($client, 'addPet');
 
-# Sync testing
+note 'Sync testing';
 $tx = $client->listPets;
 is $tx->res->code, 400, 'sync invalid listPets';
 is $tx->error->{message}, 'Invalid input', 'sync invalid message';
@@ -47,6 +47,7 @@ is $i, 1, 'one request';
 $tx = $client->addPet({type => 'dog', name => 'Pluto', 'x-dummy' => true});
 is_deeply $tx->res->json, {dummy => true, type => 'dog', name => 'Pluto'}, 'sync addPet';
 
+note 'Async testing';
 $i = 0;
 is $client->listPets(sub { ($obj, $tx) = @_; Mojo::IOLoop->stop }), $client, 'async request';
 Mojo::IOLoop->start;
@@ -66,12 +67,17 @@ __DATA__
   "host": "api.example.com",
   "basePath": "/v1",
   "paths": {
+    "x-whatever": [],
     "/pets": {
+      "x-whatever": [],
+      "parameters": [
+        { "$ref": "#/parameters/name" }
+      ],
       "post": {
+        "x-whatever": [],
         "operationId": "addPet",
         "parameters": [
           { "in": "header", "name": "x-dummy", "type": "boolean" },
-          { "in": "formData", "name": "name", "type": "string" },
           { "in": "formData", "name": "type", "type": "string" }
         ],
         "responses": {
@@ -88,15 +94,22 @@ __DATA__
         "x-mojo-to": "listPets",
         "parameters": [
           { "in": "path", "name": "type", "type": "string", "required": true },
-          { "in": "query", "name": "p", "type": "integer" }
+          { "$ref": "#/parameters/p" }
         ],
         "responses": {
           "200": {
             "description": "pet response",
-            "schema": { "type": "array" }
+            "schema": { "$ref": "#/definitions/ok" }
           }
         }
       }
     }
+  },
+  "parameters": {
+    "name": { "in": "formData", "name": "name", "type": "string" },
+    "p": { "in": "query", "name": "p", "type": "integer" }
+  },
+  "definitions": {
+    "ok": { "type": "array" }
   }
 }

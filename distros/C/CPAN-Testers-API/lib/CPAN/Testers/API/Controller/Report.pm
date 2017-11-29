@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Report;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: Work with raw test reports
 
 #pod =head1 DESCRIPTION
@@ -93,7 +93,7 @@ CPAN::Testers::API::Controller::Report - Work with raw test reports
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001035';
+our $VERSION = '0.001036';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -277,6 +277,18 @@ Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to '.
 =item --default-search t
 
 Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
+
+=item --email foo@example.com
+
+Email the test results (and any log file) to the specified email address(es)
+
+=item --email-from foo@example.com
+
+If any email is sent, this is who it will be from
+
+=item --email-owner
+
+Email the owner of broken tests files upon failure. Add `# HARNESS-META-OWNER foo@example.com` to the top of a test file to give it an owner
 
 =item --fork
 

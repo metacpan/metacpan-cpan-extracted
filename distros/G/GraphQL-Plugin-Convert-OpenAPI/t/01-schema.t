@@ -136,7 +136,7 @@ type Perl5 implements Language {
   commit_id: String
   name: LanguageName!
   variables: [LanguageVariables]
-  version: String
+  version: String!
 }
 
 # Language data for Perl 6 reports

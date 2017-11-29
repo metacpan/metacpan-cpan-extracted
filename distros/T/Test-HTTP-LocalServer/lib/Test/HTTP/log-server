@@ -10,9 +10,11 @@ $|++;
 
 GetOptions(
     'e=s' => \my $expression,
+    'f=s' => \my $url_filename,
 );
 
-my $host = 'localhost';
+#my $host = 'localhost';
+my $host = '127.0.0.1';
 my $d = HTTP::Daemon->new(
     LocalAddr => $host,
 ) or die;
@@ -21,7 +23,17 @@ my $d = HTTP::Daemon->new(
 # for LocalAddr => 'localhost'. This causes the
 # tests to fail of many machines.
 ( my $url = URI->new($d->url) )->host($host);
-print "$url\n";
+{
+    my $fh;
+    if( $url_filename ) {
+        open $fh, '>', $url_filename
+            or die "Couldn't write URL to tempfile '$url_filename': $!";
+    } else {
+        $fh = \*STDOUT;
+    };
+    print {$fh} "$url\n";
+    close $fh unless $url_filename;
+}
 
 my ($filename,$logfile) = @ARGV[0,1];
 if ($filename) {
@@ -40,7 +52,7 @@ sub debug($) {
     if $ENV{TEST_HTTP_VERBOSE};
 };
 
-my $multi_param = $CGI::VERSION >= 4.21 ? 'multi_param' : 'param';
+my $multi_param = eval { CGI->can('multi_param') } ? 'multi_param' : 'param';
 
 SERVERLOOP: {
   my $quitserver;
@@ -69,6 +81,7 @@ SERVERLOOP: {
         if ($location =~ m!^/redirect/(.*)$!) {
             $res = HTTP::Response->new(302);
             $res->header('location', $d->url . $1);
+
         } elsif ($location =~ m!^/local/(.*)$!) {
             my $rbody= do { open my $fh, '<', $1; binmode $fh; local $/; <$fh> };
             $res = HTTP::Response->new(200, "OK", [
@@ -78,14 +91,28 @@ SERVERLOOP: {
                   'Connection' => 'close',
                   'Content-Length' => length($rbody),
             ], $rbody);
+
+        } elsif ($location =~ m!^/download/([\w.-]+)$!) {
+            my $rbody= do { open my $fh, '<', $0; binmode $fh; local $/; <$fh> };
+            $res = HTTP::Response->new(200, "OK", [
+                  'Cache-Control' => 'no-cache',
+                  'Pragma' => 'no-cache',
+                  'Max-Age' => 0,
+                  'Connection' => 'close',
+                  'Content-Length' => length($rbody),
+				  'Content-Disposition' => 'attachment; name="$1"',
+            ], $rbody);
+
         } elsif ($location =~ m!^/error/notfound/(.*)$! or $location =~ m!^/favicon.ico!) {
             $res = HTTP::Response->new(404, "Not found", [Connection => 'close']);
         } elsif ($location =~ m!^/error/timeout/(\d+)$!) {
             sleep $1;
             $res = HTTP::Response->new(599, "Timeout reached", [Connection => 'close']);
+
         } elsif ($location =~ m!^/error/close/(\d+)$!) {
             sleep $1;
             $res = undef;
+
         } elsif ( $location =~ m!^/chunks!) {
             my $count = 5;
             $res = HTTP::Response->new(200, "OK", undef, sub {
@@ -94,6 +121,7 @@ SERVERLOOP: {
                return $buf if $count-- > 0;
                return undef; # done
             });
+
         } elsif ($location =~ m!^/error/after_headers$!) {
             my $count = 2;
             $res = HTTP::Response->new(200, "OK", undef, sub {
@@ -102,6 +130,43 @@ SERVERLOOP: {
                return $buf if $count-- > 0;
                die "Planned error after headers";
             });
+
+        } elsif ($location =~ m!^/large/bzip/16M$!) {
+            my $headers = HTTP::Headers->new(
+                Content_Type => "application/xml",
+                Content_Encoding => 'bzip2,bzip2,bzip2', # say my name three times
+            );
+            # 16M bzip triple-encoded, see gen-bzipbomb.pl
+            $body = join "",
+                "BZh11AY&SY\tPFN\0\0'\177\377\355\e\177v\363\267|\344?\226]pVbW\25\313|F",
+                "]h0\30\303\305i\272CF9fS\260\0\271\b\32\32h\323\32414\304ddbh4\304h4\304z\231\6h",
+                "#\32\2154\310\365=\4`\32 fQ\341O)\371Q\6L\0\230\0\t\200#L#\0\0\0\4\311\246&\203",
+                "\0#\0\0\0\0\203&\322a11\240\0&\21\200\320\232`\1\0310\4\323\0#4\20d\300L\4d`\34",
+                "\370I\21o\f\304\0\205b\344\365u\326\334O\301\0054}\306\274\215\246\240\351\247\240",
+                "M\252\333Je)\25\217\231\230\00046\236)\4(R\301\370\363\371\350\277\b0\26\275\16&",
+                "W\260\2\2151\272\177\301\366}\327b\213\374\t\264g~\245\203\225\220\2660,\226\213",
+                "\247\246l\351\303\304\300\$z0Hg\272;\31\226B\244\266\376\301\364\355I~\222\273",
+                "\226*S\"\3\263\360\200Iv\241}|\344\227q\1I\6\217I\30\302\2\261\207\224h\305\16\17",
+                "\324\1779\1\247\\R{\335\$pM8cL\"\201\311 \374\364P\274\227p\237\300\320`\36pJ\264",
+                "\21\277\305\334\221N\24\$\2T\21\223\200"
+                ;
+            $res = HTTP::Response->new(200, "OK", $headers, $body);
+
+        } elsif ($location =~ m!^/large/gzip/16M$!) {
+            my $headers = HTTP::Headers->new(
+                Content_Type => "application/xml",
+                Content_Encoding => 'gzip,gzip,gzip', # say my name three times
+            );
+            # 16M bzip triple-encoded, see gen-gzipbomb.pl
+            $body = join "",
+                "\37\213\b\0\0\0\0\0\0\377\223\357\346`\0\203\377o/l\344mr`h}h\235\321\341",
+                "- T^\300^\225-\276p\307\221Km\242>/b\31\237%\260>\346\220S7\2760\243&\376\363",
+                "\277_[\373\325\336|\252\356\334\230#\265\177\275\1771\27\304\f\206\3\363\275_",
+                "\357]Ww\361\351\355\247o\370\241b\26\aj\336\316?\34\242\224\27a\347\24\270",
+                "\336\236\201\1\0!\203w\217s\0\0\0",
+                ;
+            $res = HTTP::Response->new(200, "OK", $headers, $body);
+
         } else {
             my $q = $r->content
                     ? CGI->new($r->content )
@@ -117,8 +182,9 @@ SERVERLOOP: {
             %cat = map { $_ => 1 } ( @cats ? @cats : qw( cat_foo cat_bar ));
             my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
             my $headers = CGI::escapeHTML( $r->headers->as_string );
-            
-            my $rbody = sprintf $body,$headers, $location,$session,$query,$botcheck_query,$query2,@categories;
+
+            my $rbody = sprintf $body,$headers, $location,
+			                          $session,$query,$botcheck_query,$query2,@categories;
             $res = HTTP::Response->new(200, "OK", [
                   'Set-Cookie' => $q->cookie(-name => 'log-server-httponly',-value=>'supersecret', -discard => 1, -httponly=>1),
                   'Set-Cookie' => $q->cookie(-name => 'log-server',-value=>'shazam2', -discard=>1,),
@@ -157,7 +223,7 @@ SERVERLOOP: {
   };
   undef $d;
 };
-END { debug "Server stopped" };
+END { debug "Server $$ stopped" };
 
 # The below <link> tag should stop the browser from requesting a favicon.ico, but we still see it...
 __DATA__
@@ -201,7 +267,12 @@ document.forms[0].navigator.value = window.navigator.userAgent;
      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAIAAAC2BqGFAAAAA3NCSVQICAjb4U/gAAAIcElEQVR4nO2c3XMT1xmHf+85uytpJRuBwcKxbA8lwBA6adqUzjBtSJpMOu0kM8lFbvO/9aK9aC/TTmnTSckE0pQkFAi1ScAUjLEty5Yl62u12t1zerF8OM1AsLU6ZzHnufBoxp6jo8ev3j2fL/32nIRh+DDdHXhWMKIVYUQrwohWhBGtCCNaEUa0IoxoRRjRijCiFWFEK8KIVoQRrQgjWhFGtCKMaEUY0YowohVhRCvCiFaEEa0II1oRlu4OfD+MgQhEIADxT0ACkJCAlJASQmjt4hOQXtGMgTEIgZWqt7rWW6/3G62g2Q37oSTAtmjUtYoj9v69TulAdmI8F/9xao1TCg/QMAbOcXfFm5tv3ljsMgJnRARGRPTwz6SEkFJKREIKiSNT7guHR8vP5aIojbrTFdFEsC38907300u1Zie0Lco5j3yKEIETAbA4AVhY8eYXu6N56+c/3veD6XwQQqYphFIU0RZHqxN+eH61Wu9nbLY1eJ8cKeEHYnyv86tflEbyVhgl3cudkhbRjo25G62PPl/P2sTYjhxvQQjZC+TrJ8dOHB3tB4l0cFBSkTpsG2c/W5u91XYzyQw3GSM3Q2e/rFVr/munDgQpcK1ftG3hzMeVhRXvMel4Z+Qc9vXttudHv3n1YBAm2/a20TxhcWx8eH51odJz7KH0xLHZQqX39/Orjj2M5reBTtG2hYtX6/OLXccaNCk/BseiG4vdL6/Wba3fXm2iGUNlzf/0Sj2bdMb4LlmH/fNKvbLmM31xpe2dCThzruJmuJq3czP8zLnKEL8434ce0RbHpdl6P5A7GyzvACL0A3lprm4p+s/+PxpEEyEIcWG2YQ8zNX8X26ILVxtBCGX/3a1oEM0YZq83uI6PyxnNXm9oydR6RF/+ZjNeoFCMxenyN5vPhGhGqFR9zxdavr9E8HxRqfoDT/K3jWrRxHBnuaMlnGMsTovLHVIe1Boi+m7FG3zZaOcdYLS42tv9ES2BykZfn2cwwkrNV79UrVQ0Edod/SvEBLS7keKHhOqI7nqhlsfgVojQ9VSv5qmO6CBIxXZeEKge9mjI0Wlgl+doAFzjc3ALXPn4UqloKZFxuPbNaSnhKO+G6ojOu5ZIgei8q3oXQHVE57KUc5hG1RLIOMzN0i6PaCFRHs8KfVEthJwqZdW/v/JRh8DURE7jkS0hMHUwJ5V3QENEz0wWglCb6SAUM5OFZyCiJfJ5NlXSkz3ivJHPs90/jgYQRXjpeLEfahDdD+VLx4uRjuUWDaKFwEzZLRYsxWElJYoFa6bsanlC6NkFjyKcPnnA6yv9xF5fvHrygJZwhi7RQmBqInuk7IaRoqgOI/l82S1PZHUNeLQdoAlC/PJUiTEVEwcpwRi9fqqk8aijNtFSgnO8+8aEggTi9cW7b0xwrvMOgM5DjkJgrOi8fbrU6Q0xcXZ60dunS2NFR+/FFs3HdsMIM2X3rVdKnV7y2VoCnV701iulmbKr/Y6F/gudYYhD0/n33pwMApngLEYIGQTyvTcnD03nQ92n0JEG0QDCEKX9mfffmS6O2H4Se11+IIoj9vvvTJf2Z9JgGem5LASACJaFuevNT/69QYBlbXtXTwJhKCVw+if7Xjg6GqbpBlyKRMdwjijCV9fqF69tRkJanJ5k9ysSMowkZ/Ty8T0vHt8bN5IqUic6hnMAWLjbvXmnPX+3K4RkjOLr4HGcy/sXweNfPV92D08XZsoukDrFMSkVHRNfBwdQbwQbm/1WO+h6URgJABZnbo6PFOx9e5y9RRtI9UVwpOH622N44G50xN4zasex/LC6wf3SBil53D2eVIt+QCz0qSYVw7tnASNaEUa0IoxoRaTxYfitCkoPRhr3Zy1bRx0PXm0tsfTwRZpIhWgisFguQxSh2Qqa7aDdCVudsOOFHS/y+6LrR0Eog1DEUxUiWIxsi2VsymV4LsvzWZ53rULeGsnbowU7n2eQEPLeiEW7d22i78llkBK1er+63lut9Srr/kYrZPe804PQjmspMULm20UQhJCeL7u+kJv9OJCFhJRSSHBGB8ec0r7M+Fh2fH92tMCFgNBXT0y1aCIwBs7QbEeLy52Fpe7tiiclOCPGwIi2VRtlS2LZuh5y7/V6o1/d6IsbrSiShRw/NOlOP+eWJ1zONUwj1U3BY79eT8wvtK7dbFUbgc2JM6i5oRWvikRCRhKHJ91jhwoz5TwBkVCUVVRENGOwOJYqvStfN24ueTYnzrcXuYNDBM4pPn++uOrdWu4yohePjPzwWHEkz8No6LqHG9GMYFm4tdj915WNjWZgW0+05qmMMJJ+II5N53/2o7HiHmuo69dDFG3bqK75Zy+s1ZrBjsurKSASstcXJw4VTr18IOPQkFZZhyI6rl557vPq3K12NpOqIH4kUSSDSL7207ETR0eHUZwwedGWhbVa/09nV+L9kWQbHza9viiPZ399eiIemSRIwk8kx8a1G80//PUu7leyfLrIOmx1w//dBwudbphstYkkG3NsfHGl/o8vavmslrInycAZSYnf/3mx2QoSdJ1YS7aFr65tXvhPQ/G4bRgQwbHYH/+21EuurkhSJSqxXO19fLGWe/otxxCBEz74aJknVOwqGS9S4i+frCqrraYGxmizHVyebSTiOgHRnOPyXD2K1NVWU4Zjs8+u1hM5t5dMRF+c21RcW00ZjGj+VpMP7GnQBhjDUsUT2pd7h4bFcHupO3gNpkEbIEJ1vfd0TP52BDFaqfmDZ8WBRQMdL9y1mgECPF8M/gETyNFCPNzQMzyKXTLsTT9GtCKMaEUY0YowohVhRCvCiFaEEa0II1oRRrQijGhFGNGKMKIVYUQrwohWhBGtCCNaEUa0IoxoRRjRijCiFWFEK8KIVoQRrYj/AQxTcgT19UdzAAAAAElFTkSuQmCC"
      onclick="storeCoordinates(event)" />
   </a>
-  <form name='f' action="/formsubmit" method="GET">
+  <pre id="fileupload">
+  Filename: %s
+  Filetype: %s
+  Content:  %s
+  </pre>
+  <form name='f' action="/formsubmit" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="session" value="%s"/>
     <input type="text" name="query" value="%s"/>
     <input type="text" name="botcheck_query" class="hidden" value="%s"/>
@@ -211,7 +282,7 @@ document.forms[0].navigator.value = window.navigator.userAgent;
     <input type="checkbox" name="cat" value="cat_foo" %s />
     <input type="checkbox" name="cat" value="cat_bar" %s />
     <input type="checkbox" name="cat" value="cat_baz" %s />
-    <input type="hidden" name="navigator" value="[JS disabled]" %s />
+    <input type="hidden" name="navigator" value="[JS disabled]" />
   </form>
 </p>
 </body>

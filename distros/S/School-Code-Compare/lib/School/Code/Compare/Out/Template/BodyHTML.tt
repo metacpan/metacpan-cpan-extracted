@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+      table, th, td {
+        border: 1px solid black;
+      }
+      .suspect1 {
+              background-color: yellow;
+      }
+      .suspect2 {
+              background-color: red;
+      }
+    </style>
+      <title>[% title %]</title>
+  </head>
+  <body>
+    <h1>[% title %]</h1>
+    <p>
+    [% description %]
+    </p>
+    <table>
+      <tr>
+        <th>ratio</th> <!-- distance/edits devided by length -->
+        <th>distance</th> <!-- edits/changes needed to come from file1 to file2 -->
+        <th>delta length</th> <!-- difference in length of file 1 to file2 -->
+        <th>file1</th> <!-- path to file1 -->
+        <th>file2</th> <!-- path to file2 -->
+        <th>comment</th> <!-- some reasoning -->
+      </tr>
+[% data %]
+    </table>
+  </body>
+</html>

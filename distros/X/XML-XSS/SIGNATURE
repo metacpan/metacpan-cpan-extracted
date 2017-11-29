@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,30 +15,32 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 b4cd99189e3f650770fd7925e2b6abaf0e1749e5 AUTHOR_PLEDGE
-SHA1 1be300158964316da8e898fcf32895f0b0c8ff11 Build.PL
-SHA1 6fe2ee022e219a8f81b84afdc8855a4b5aee875a CONTRIBUTORS
-SHA1 47a2e3c1d2d5e4de13ca94826f430ea2312dce73 Changes
-SHA1 a219d78ee3b4c9298cf0b77d64d3debe85534619 INSTALL
-SHA1 cf5dc9c929415cfa7133eed863def866ade9774d LICENSE
-SHA1 1c4b39b6e9b5e3d8cd81d34281d119947bdfc912 MANIFEST
-SHA1 b79c9c67c3f1d565332925134ea11abdf2adabf9 META.json
-SHA1 6f2647bce29fae01e6e2305fa1e9a5ba7cc76812 META.yml
-SHA1 697fd95397252d1d41cbfc2718f2f25a8bbfb74b README
-SHA1 8e0328b17936afd4199ca9ca17857f4d12941d81 README.mkdn
-SHA1 5dc4f0352ff94c70e52ce218c0d1c83f7a900799 bin/xss
-SHA1 6d206bb30d8d099aeed69ec0327e86a411959ec7 lib/XML/XSS.pm
-SHA1 e76181375ed8b38c105050370c4d09b5415fbcd4 lib/XML/XSS/Comment.pm
-SHA1 cec3c97bb068ef5beed0a9d16fbe83c1ee4ff242 lib/XML/XSS/Document.pm
-SHA1 f1f0c8be6f1fd593d322e0d0bc5f4158f9f2d09a lib/XML/XSS/Element.pm
-SHA1 10c4da6f004e571807498d46222ef126b2b7cf94 lib/XML/XSS/ProcessingInstruction.pm
-SHA1 f22e557f8e24b7fe806d33bb0bb81182bdfff1bc lib/XML/XSS/Role/Renderer.pm
-SHA1 86d341bc12e465f09974c32f067b9f15e0628a04 lib/XML/XSS/Role/StyleAttribute.pm
-SHA1 c88af979ffe44d8bd78f2bbb25a031bf8ca28552 lib/XML/XSS/StyleAttribute.pm
-SHA1 1c05bf4986d1cfbc01c596be012df4ff116386bf lib/XML/XSS/Stylesheet/HTML2TD.pm
-SHA1 85c9374a21c59c818f0d8634c1bb8aa95ce4ea59 lib/XML/XSS/Template.pm
-SHA1 eb76f41547fad3886827dfb61cc6646e85d64e07 lib/XML/XSS/Text.pm
-SHA1 b922b7fe4a1e903f9f297f8a31bb07029d8f9fa1 t/00-compile.t
-SHA1 6d55494fa413ab709752a41beaf7027cafc416b1 t/000-report-versions-tiny.t
+SHA1 107a13db0b6dec14c6676d3aac913575cbbae309 CONTRIBUTORS
+SHA1 dcb9b2aafc71817fad137b771164ee9bea113829 Changes
+SHA1 a118606d26a4863fa266ebd4d79f8a13da84c10a INSTALL
+SHA1 8a74d5e3a6bd752f7135230726ff64624d336951 LICENSE
+SHA1 81854a00c3a16e5a3070186782dad3ceb6c75f2d MANIFEST
+SHA1 311f8db370f3a624c1ff812b882efe47022dfeb5 META.json
+SHA1 d96aee21256a9816da84da62c561809905ec5473 META.yml
+SHA1 75b6be597439a2c0f097c046742f500b5ac7dfcf Makefile.PL
+SHA1 babdd9665b7c2b2b5f47770589f41388106adcf9 README.mkdn
+SHA1 17b4b8cb0e65d819cede21ef958d82a50bb72c6b bin/xss
+SHA1 9bb948d3f13557d6ef128d24aa3af05a1d68bcd6 cpanfile
+SHA1 23301525b9512fbc726898dbefb83bf1c78805a1 doap.xml
+SHA1 a9b7244b33ae9e29c856ad054a8aa5d22982dcf9 lib/XML/XSS.pm
+SHA1 0db9555fb8243b53a04038a27895354b1768611d lib/XML/XSS/Comment.pm
+SHA1 ca66ca4c70875d91ad6b7677a11da1f28b475d93 lib/XML/XSS/Document.pm
+SHA1 e048a13a07867a572ddd0e0213dc384556a86433 lib/XML/XSS/Element.pm
+SHA1 d8f1b2eba070b47517b387df1cc8c355a57bff2c lib/XML/XSS/ProcessingInstruction.pm
+SHA1 9dc5a89f5d3bc7908442a498e054fbfc3823f24d lib/XML/XSS/Role/Renderer.pm
+SHA1 7d96986ab2ef9e4f578ee3a6e0f0d7ebf18f929c lib/XML/XSS/Role/StyleAttribute.pm
+SHA1 8921a871d909a2b0f9cb26bbdc55f2ba2cf584a2 lib/XML/XSS/StyleAttribute.pm
+SHA1 b76912a3a526c4b3606184c0771a2ed3a43e6053 lib/XML/XSS/Stylesheet/HTML2TD.pm
+SHA1 7de36cbc36d74a25790d5b828394210d7de3c74d lib/XML/XSS/Template.pm
+SHA1 9002f2b62af375ecfdbe6d6ec427325b052e374a lib/XML/XSS/Text.pm
+SHA1 880b6ac1823fe649a0f03221253847567e0ebaa7 t/00-compile.t
+SHA1 2132ed597cd64e3717235b3bc0d16688cd168b6d t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 1a99df7f79abc404866fa763e780cfb5f45cff64 t/basic.t
 SHA1 6500536031608e0623e5993ffe95188f4fd78fb7 t/cdata.t
 SHA1 633c5ef3422387c50e03cf2baf04110e31ac688a t/document.t
@@ -63,11 +65,10 @@ SHA1 5c716d63d1e568bb9814c67f6149c58d3202912e t/set.t
 SHA1 7b3ae580d5d5143fd28bcd1efad5912a5c9069df t/style_attributes.t
 SHA1 3342b1bdb5de20a2835d95316d830d9566debe63 t/test-class.t
 SHA1 7f3b8094b4b1aec7b56d91ae2efed50e03dcab76 t/text.t
-SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAlI/cycACgkQ34Hwf+GwC4zRjgCgnHtBLBLphaDmtq1Vc6ynrWd6
-iY4AoMYnKnu2AfOoonEtWejlV08ZgDDw
-=tko0
+iEYEARECAAYFAlod83YACgkQ34Hwf+GwC4zOlwCeKIIDCYFNAkRlolojWHvpu/j1
+hG4AoJh8GRtW9C09sgJamqy2Z/wtBhwK
+=JwfP
 -----END PGP SIGNATURE-----

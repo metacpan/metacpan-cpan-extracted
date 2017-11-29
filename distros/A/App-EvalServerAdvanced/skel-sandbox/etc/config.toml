@@ -13,6 +13,8 @@ min_deadline = 100 # minimum number of milliseconds to allow a deadline to reque
 # target path's are absolute and only exist in the sandbox
 home_dir = "/eval"
 mount_base = "/path/to/system"
+plugin_base = "/path/to/plugins" # TODO is this good?
+plugins = ["Perlbot", "PerlbotEggs"]
 
 # Be careful with these, if you mount stuff under an existing directory on your
 # system a directory will be created there in order to facilitate the private
@@ -26,6 +28,9 @@ bind_mounts = [
 	{src = "usr/bin",         target = "/usr/bin"},
 	{src = "opt/perlbrew/",   target = "/opt/perlbrew/"},
 ]
+
+[sandbox.seccomp]
+yaml = "etc/seccomp.yml"
 
 [sandbox.devices]
 # Entries in /dev that must exist

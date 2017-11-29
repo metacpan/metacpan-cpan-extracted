@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::GeneInsertSites;
-$Bio::Tradis::Bin::GeneInsertSites::VERSION = '1.3.3';
+$Bio::Tradis::Bin::GeneInsertSites::VERSION = '1.4.0';
 # ABSTRACT: Generate insertion site details from TraDIS pipeline plots
 
 # PODNAME: tradis_gene_insert_sites
@@ -111,7 +111,7 @@ for my $insert_sites ( @ins_list ){
 
         my $count = 0;
         my $inserts = 0;
-        for(my $j=$read_start;$j < $read_end; $j++){
+        for(my $j=$read_start;$j <= $read_end; $j++){
             $count += $insert_sites->[$j];
             $inserts += 1 if $insert_sites->[$j] > 0;
         }
@@ -319,7 +319,7 @@ tradis_gene_insert_sites - Generate insertion site details from TraDIS pipeline 
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

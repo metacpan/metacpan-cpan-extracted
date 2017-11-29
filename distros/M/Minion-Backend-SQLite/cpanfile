@@ -7,3 +7,4 @@ requires 'Sys::Hostname';
 requires 'Time::HiRes';
 suggests 'Mojo::JSON::MaybeXS';
 test_requires 'Test::More' => '0.88';
+author_requires 'Minion' => '8.02';

@@ -1,4 +1,8 @@
 package DBD::Cassandra::dr;
+our $AUTHORITY = 'cpan:TVDW';
+$DBD::Cassandra::dr::VERSION = '0.57';
+# ABSTRACT: DBD::Cassandra driver handle
+
 use 5.010;
 use strict;
 use warnings;
@@ -79,3 +83,28 @@ sub disconnect_all {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+DBD::Cassandra::dr - DBD::Cassandra driver handle
+
+=head1 VERSION
+
+version 0.57
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

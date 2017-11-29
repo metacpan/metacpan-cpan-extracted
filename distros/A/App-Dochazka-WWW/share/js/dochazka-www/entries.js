@@ -40,15 +40,15 @@ define ([
     'app/caches',
     'app/act-lib',
     'app/int-lib',
+    'app/priv-lib',
     'datetime',
 ], function (
     appCaches,
     actLib,
     intLib,
+    privLib,
     datetime,
 ) {
-
-    console.log("appCaches", appCaches);
 
     return {
 
@@ -219,8 +219,8 @@ define ([
         },
         iNact: {
             name: 'iNact',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Activity',
             prop: 'code',
             maxlen: 32,
@@ -228,7 +228,7 @@ define ([
         },
         iNactHidden: {
             name: 'iNact',
-            aclProfileRead: 'active',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Activity',
             prop: 'iNact',
@@ -237,8 +237,8 @@ define ([
         },
         iNdate: {
             name: 'iNdate',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Date',
             prop: 'iNdate',
             maxlen: 20,
@@ -246,7 +246,7 @@ define ([
         },
         iNdateHidden: {
             name: 'iNdate',
-            aclProfileRead: 'active',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Date',
             prop: 'iNdate',
@@ -255,8 +255,8 @@ define ([
         },
         iNdaterange: {
             name: 'iNdaterange',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Date range',
             prop: 'iNdaterange',
             maxlen: 30,
@@ -264,7 +264,7 @@ define ([
         },
         iNdaterangeBegin: {
             name: 'iNdaterangeBegin',
-            aclProfileRead: 'active',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Date',
             prop: 'iNdaterangeBegin',
@@ -273,7 +273,7 @@ define ([
         },
         iNdaterangeEnd: {
             name: 'iNdaterangeEnd',
-            aclProfileRead: 'active',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Date',
             prop: 'iNdaterangeEnd',
@@ -282,8 +282,8 @@ define ([
         },
         iNdaylist: {
             name: 'iNdaylist',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Day(s)',
             prop: 'iNdaylist',
             maxlen: 120,
@@ -301,16 +301,16 @@ define ([
         },
         iNdesc: {
             name: 'iNdesc',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Description',
             prop: 'long_desc',
             maxlen: 60,
         },
         iNshortDesc: {
             name: 'iNshortDesc',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
             text: 'Description',
             prop: 'long_desc',
             maxlen: 30,
@@ -352,8 +352,8 @@ define ([
         },
         iNmonth: {
             name: 'iNmonth',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Month',
             prop: 'iNmonth',
             maxlen: 20,
@@ -397,8 +397,8 @@ define ([
         },
         iNtimerange: {
             name: 'iNtimerange',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Time range',
             prop: 'iNtimerange',
             maxlen: 20,
@@ -406,8 +406,8 @@ define ([
         },
         iNtimerangeNoOffset: {
             name: 'iNtimerangeNoOffset',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Time range',
             prop: 'iNtimerange',
             maxlen: 20,
@@ -419,8 +419,8 @@ define ([
         },
         iNyear: {
             name: 'iNyear',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Year',
             prop: 'iNyear',
             maxlen: 5,
@@ -428,8 +428,8 @@ define ([
         },
         iNyearHidden: {
             name: 'iNyear',
-            aclProfileRead: 'active',
-            aclProfileWrite: 'active',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'inactive',
             text: 'Year',
             prop: 'iNyear',
             hidden: true,
@@ -439,7 +439,7 @@ define ([
         lOintvl: {
             name: 'lOintvl',
             aclProfileRead: 'inactive',
-            aclProfileWrite: 'active',
+            aclProfileWrite: 'inactive',
             text: 'Interval',
             prop: 'intvl',
             maxlen: 40,
@@ -467,6 +467,7 @@ define ([
             text: 'Priv',
             prop: 'priv',
             maxlen: 10,
+            vetter: privLib.vetPrivLevel,
         },
         pHeffective: {
             name: 'pHeffective',

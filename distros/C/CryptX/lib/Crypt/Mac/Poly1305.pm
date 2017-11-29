@@ -4,7 +4,7 @@ package Crypt::Mac::Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( poly1305 poly1305_hex poly1305_b64 poly1305_b64u )] );
@@ -147,10 +147,8 @@ Logically joins all arguments into a single string, and returns its Poly1305 mes
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://www.ietf.org/rfc/rfc7539.txt|https://www.ietf.org/rfc/rfc7539.txt>
+=item * L<https://www.ietf.org/rfc/rfc7539.txt>
 
 =back
 
 =cut
-
-__END__

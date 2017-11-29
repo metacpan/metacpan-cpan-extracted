@@ -1,7 +1,7 @@
 package Neovim::RPC::Plugin::FileToPackageName;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: turns a path into a package name
-$Neovim::RPC::Plugin::FileToPackageName::VERSION = '1.0.0';
+$Neovim::RPC::Plugin::FileToPackageName::VERSION = '1.0.1';
 use 5.20.0;
 
 use strict;
@@ -82,7 +82,7 @@ Neovim::RPC::Plugin::FileToPackageName - turns a path into a package name
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

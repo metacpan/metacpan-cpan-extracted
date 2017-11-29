@@ -1,3 +1,5 @@
+2017-11-28T21:43:28+08:00 : 发布0.1.16版本到cpan.org
+2017-11-28T21:42:41+08:00 : 添加mydan.encryption判断,如果安装了mydan.encryption则从mydan.encryption获取权限
 2017-11-24T23:04:06+08:00 : 发布0.1.17版本到cpan.org
 2017-11-24T23:02:39+08:00 : Makefile.PL 删除Makefile.PL 中dan和box依赖的模块的标识
 2017-11-24T23:01:02+08:00 : INSTALL.PL 删除编译安装时候通过cpan命令安装依赖模块部分，这样的方式兼容性不好，cpan命令参数不一样。如需编译安装，需要先用cpan命令安装一个最新版本的MYDan来完成依赖的安装

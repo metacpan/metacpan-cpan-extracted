@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Timer;
-$ZMQ::Raw::Loop::Timer::VERSION = '0.17';
+$ZMQ::Raw::Loop::Timer::VERSION = '0.19';
 use strict;
 use warnings;
 use Carp;
@@ -34,7 +34,7 @@ ZMQ::Raw::Loop::Timer - Timer class
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,18 @@ Create a new loop timer.
 
 Cancel the underlying timer.
 
+=head2 reset( )
+
+Reset the underlying timer.
+
+=head2 expire( )
+
+Expire the underlying timer.
+
+=head2 running( )
+
+Check if the timer is running.
+
 =cut
 
 sub new
@@ -111,8 +123,40 @@ sub cancel
 	if ($this->loop)
 	{
 		$this->loop->remove ($this);
-		$this->loop (undef);
 	}
+}
+
+
+
+sub reset
+{
+	my ($this) = @_;
+
+	$this->timer->reset;
+
+	if ($this->loop)
+	{
+		$this->loop->remove ($this);
+		$this->loop->add ($this);
+	}
+}
+
+
+
+sub expire
+{
+	my ($this) = @_;
+
+	$this->timer->expire;
+}
+
+
+
+sub running
+{
+	my ($this) = @_;
+
+	return $this->timer->running;
 }
 
 =for Pod::Coverage timer loop on_timeout

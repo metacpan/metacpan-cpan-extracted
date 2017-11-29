@@ -2,7 +2,7 @@ package MVC::Neaf::Request::PSGI;
 
 use strict;
 use warnings;
-our $VERSION = 0.19;
+our $VERSION = 0.1901;
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ eval { require FileHandle }
 # NOTE HACK - prevent load-time warnings from Cookie::Baker
 #     which we aren't even using
 eval {
-    $SIG{__WARN__} = sub {};
+    local $SIG{__WARN__} = sub {};
     require Cookie::Baker;
 };
 

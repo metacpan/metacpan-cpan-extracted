@@ -4,7 +4,7 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "build" : {
          "requires" : {
             "Test::More" : "0.88",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0.026"
          }
       },
       "configure" : {
@@ -37,7 +37,7 @@
             "Class::Accessor::Fast" : "0",
             "JSON::XS" : "0",
             "Path::Tiny" : "0",
-            "perl" : "5.006",
+            "perl" : "5.01",
             "version" : "0"
          }
       }
@@ -45,23 +45,23 @@
    "provides" : {
       "App::PS1" : {
          "file" : "lib/App/PS1.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Daemon" : {
          "file" : "lib/App/PS1/Daemon.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Branch" : {
          "file" : "lib/App/PS1/Plugin/Branch.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Date" : {
          "file" : "lib/App/PS1/Plugin/Date.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Directory" : {
          "file" : "lib/App/PS1/Plugin/Directory.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Env" : {
          "file" : "lib/App/PS1/Plugin/Env.pm",
@@ -69,27 +69,27 @@
       },
       "App::PS1::Plugin::Face" : {
          "file" : "lib/App/PS1/Plugin/Face.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Node" : {
          "file" : "lib/App/PS1/Plugin/Node.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Perl" : {
          "file" : "lib/App/PS1/Plugin/Perl.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Processes" : {
          "file" : "lib/App/PS1/Plugin/Processes.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Ruby" : {
          "file" : "lib/App/PS1/Plugin/Ruby.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::PS1::Plugin::Uptime" : {
          "file" : "lib/App/PS1/Plugin/Uptime.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "url" : "http://github.com/ivanwills/App-PS1"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

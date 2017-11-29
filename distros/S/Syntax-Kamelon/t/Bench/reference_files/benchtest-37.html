@@ -1,0 +1,642 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Import">from</font><font class="Normal">&nbsp;sources&nbsp;</font><font class="Import">import</font><font class="Normal">&nbsp;</font><font class="Operator">*</font></br></div>
+<div id="2" class="line"><font class="Import">from</font><font class="Normal">&nbsp;content&nbsp;</font><font class="Import">import</font><font class="Normal">&nbsp;</font><font class="Operator">*</font></br></div>
+<div id="3" class="line"><font class="Import">from</font><font class="Normal">&nbsp;formatter&nbsp;</font><font class="Import">import</font><font class="Normal">&nbsp;</font><font class="Operator">*</font></br></div>
+<div id="4" class="line"></br></div>
+<div id="5" class="line"><font class="Import">import</font><font class="Normal">&nbsp;time</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"><font class="Comment">#&nbsp;The&nbsp;following&nbsp;defines&nbsp;the&nbsp;HTML&nbsp;header&nbsp;used&nbsp;by&nbsp;all&nbsp;generated&nbsp;pages.</font></br></div>
+<div id="8" class="line"><font class="Comment">#</font></br></div>
+<div id="9" class="line"><font class="Normal">html_header_1&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;&quot;\</font></br></div>
+<div id="10" class="line"><font class="String">&lt;html&gt;</font></br></div>
+<div id="11" class="line"><font class="String">&lt;header&gt;</font></br></div>
+<div id="12" class="line"><font class="String">&lt;title&gt;&quot;&quot;&quot;</font></br></div>
+<div id="13" class="line"></br></div>
+<div id="14" class="line"><font class="Normal">html_header_2</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;&quot;&nbsp;API&nbsp;Reference&lt;/title&gt;</font></br></div>
+<div id="15" class="line"><font class="String">&lt;basefont&nbsp;face=&quot;Verdana,Geneva,Arial,Helvetica&quot;&gt;</font></br></div>
+<div id="16" class="line"><font class="String">&lt;style&nbsp;content=&quot;text/css&quot;&gt;</font></br></div>
+<div id="17" class="line"><font class="String">&nbsp;&nbsp;P&nbsp;{&nbsp;text-align=justify&nbsp;}</font></br></div>
+<div id="18" class="line"><font class="String">&nbsp;&nbsp;H1&nbsp;{&nbsp;text-align=center&nbsp;}</font></br></div>
+<div id="19" class="line"><font class="String">&nbsp;&nbsp;LI&nbsp;{&nbsp;text-align=justify&nbsp;}</font></br></div>
+<div id="20" class="line"><font class="String">&lt;/style&gt;</font></br></div>
+<div id="21" class="line"><font class="String">&lt;/header&gt;</font></br></div>
+<div id="22" class="line"><font class="String">&lt;body&nbsp;text=#000000</font></br></div>
+<div id="23" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bgcolor=#FFFFFF</font></br></div>
+<div id="24" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;link=#0000EF</font></br></div>
+<div id="25" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vlink=#51188E</font></br></div>
+<div id="26" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alink=#FF0000&gt;</font></br></div>
+<div id="27" class="line"><font class="String">&lt;center&gt;&lt;h1&gt;&quot;&quot;&quot;</font></br></div>
+<div id="28" class="line"></br></div>
+<div id="29" class="line"><font class="Normal">html_header_3</font><font class="Operator">=</font><font class="String">&quot;&quot;&quot;&nbsp;API&nbsp;Reference&lt;/h1&gt;&lt;/center&gt;</font></br></div>
+<div id="30" class="line"><font class="String">&quot;&quot;&quot;</font></br></div>
+<div id="31" class="line"></br></div>
+<div id="32" class="line"></br></div>
+<div id="33" class="line"></br></div>
+<div id="34" class="line"><font class="Comment">#&nbsp;The&nbsp;HTML&nbsp;footer&nbsp;used&nbsp;by&nbsp;all&nbsp;generated&nbsp;pages.</font></br></div>
+<div id="35" class="line"><font class="Comment">#</font></br></div>
+<div id="36" class="line"><font class="Normal">html_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;&quot;\</font></br></div>
+<div id="37" class="line"><font class="String">&lt;/body&gt;</font></br></div>
+<div id="38" class="line"><font class="String">&lt;/html&gt;&quot;&quot;&quot;</font></br></div>
+<div id="39" class="line"></br></div>
+<div id="40" class="line"><font class="Comment">#&nbsp;The&nbsp;header&nbsp;and&nbsp;footer&nbsp;used&nbsp;for&nbsp;each&nbsp;section.</font></br></div>
+<div id="41" class="line"><font class="Comment">#</font></br></div>
+<div id="42" class="line"><font class="Normal">section_title_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;h1&gt;&quot;</font></br></div>
+<div id="43" class="line"><font class="Normal">section_title_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/h1&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="44" class="line"></br></div>
+<div id="45" class="line"><font class="Comment">#&nbsp;The&nbsp;header&nbsp;and&nbsp;footer&nbsp;used&nbsp;for&nbsp;code&nbsp;segments.</font></br></div>
+<div id="46" class="line"><font class="Comment">#</font></br></div>
+<div id="47" class="line"><font class="Normal">code_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;font&nbsp;color=blue&gt;&lt;pre&gt;&quot;</font></br></div>
+<div id="48" class="line"><font class="Normal">code_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/pre&gt;&lt;/font&gt;&quot;</font></br></div>
+<div id="49" class="line"></br></div>
+<div id="50" class="line"><font class="Comment">#&nbsp;Paragraph&nbsp;header&nbsp;and&nbsp;footer.</font></br></div>
+<div id="51" class="line"><font class="Comment">#</font></br></div>
+<div id="52" class="line"><font class="Normal">para_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;p&gt;&quot;</font></br></div>
+<div id="53" class="line"><font class="Normal">para_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/p&gt;&quot;</font></br></div>
+<div id="54" class="line"></br></div>
+<div id="55" class="line"><font class="Comment">#&nbsp;Block&nbsp;header&nbsp;and&nbsp;footer.</font></br></div>
+<div id="56" class="line"><font class="Comment">#</font></br></div>
+<div id="57" class="line"><font class="Normal">block_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;width=75%&gt;&lt;tr&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="58" class="line"><font class="Normal">block_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;hr&nbsp;width=75%&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="59" class="line"></br></div>
+<div id="60" class="line"><font class="Comment">#&nbsp;Description&nbsp;header/footer.</font></br></div>
+<div id="61" class="line"><font class="Comment">#</font></br></div>
+<div id="62" class="line"><font class="Normal">description_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;width=87%&gt;&lt;tr&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="63" class="line"><font class="Normal">description_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/center&gt;&lt;br&gt;&quot;</font></br></div>
+<div id="64" class="line"></br></div>
+<div id="65" class="line"><font class="Comment">#&nbsp;Marker&nbsp;header/inter/footer&nbsp;combination.</font></br></div>
+<div id="66" class="line"><font class="Comment">#</font></br></div>
+<div id="67" class="line"><font class="Normal">marker_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;width=87</font><font class="SpecialChar">%&nbsp;c</font><font class="String">ellpadding=5&gt;&lt;tr&nbsp;bgcolor=#EEEEFF&gt;&lt;td&gt;&lt;em&gt;&lt;b&gt;&quot;</font></br></div>
+<div id="68" class="line"><font class="Normal">marker_inter&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/b&gt;&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="69" class="line"><font class="Normal">marker_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="70" class="line"></br></div>
+<div id="71" class="line"><font class="Comment">#&nbsp;Source&nbsp;code&nbsp;extracts&nbsp;header/footer.</font></br></div>
+<div id="72" class="line"><font class="Comment">#</font></br></div>
+<div id="73" class="line"><font class="Normal">source_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;width=87%&gt;&lt;tr&nbsp;bgcolor=#D6E8FF&nbsp;width=100%&gt;&lt;td&gt;&lt;pre&gt;</font><font class="Char">\n</font><font class="String">&quot;</font></br></div>
+<div id="74" class="line"><font class="Normal">source_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;</font><font class="Char">\n</font><font class="String">&lt;/pre&gt;&lt;/table&gt;&lt;/center&gt;&lt;br&gt;&quot;</font></br></div>
+<div id="75" class="line"></br></div>
+<div id="76" class="line"><font class="Comment">#&nbsp;Chapter&nbsp;header/inter/footer.</font></br></div>
+<div id="77" class="line"><font class="Comment">#</font></br></div>
+<div id="78" class="line"><font class="Normal">chapter_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;br&gt;&lt;center&gt;&lt;table&nbsp;width=75%&gt;&lt;tr&gt;&lt;td&gt;&lt;h2&gt;&quot;</font></br></div>
+<div id="79" class="line"><font class="Normal">chapter_inter&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/h2&gt;&lt;ul&gt;&quot;</font></br></div>
+<div id="80" class="line"><font class="Normal">chapter_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/ul&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="81" class="line"></br></div>
+<div id="82" class="line"></br></div>
+<div id="83" class="line"><font class="Comment">#&nbsp;source&nbsp;language&nbsp;keyword&nbsp;coloration/styling</font></br></div>
+<div id="84" class="line"><font class="Comment">#</font></br></div>
+<div id="85" class="line"><font class="Normal">keyword_prefix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">'&lt;font&nbsp;color=&quot;darkblue&quot;&gt;'</font></br></div>
+<div id="86" class="line"><font class="Normal">keyword_suffix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/font&gt;'</font></br></div>
+<div id="87" class="line"></br></div>
+<div id="88" class="line"><font class="Normal">section_synopsis_header&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">'&lt;h2&gt;Synopsys&lt;/h2&gt;&lt;font&nbsp;color=&quot;cyan&quot;&gt;'</font></br></div>
+<div id="89" class="line"><font class="Normal">section_synopsis_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/font&gt;'</font></br></div>
+<div id="90" class="line"></br></div>
+<div id="91" class="line"><font class="Comment">#&nbsp;Translate&nbsp;a&nbsp;single&nbsp;line&nbsp;of&nbsp;source&nbsp;to&nbsp;HTML.&nbsp;&nbsp;This&nbsp;will&nbsp;convert</font></br></div>
+<div id="92" class="line"><font class="Comment">#&nbsp;a&nbsp;&quot;&lt;&quot;&nbsp;into&nbsp;&quot;&amp;lt.&quot;,&nbsp;&quot;&gt;&quot;&nbsp;into&nbsp;&quot;&amp;gt.&quot;,&nbsp;etc.</font></br></div>
+<div id="93" class="line"><font class="Comment">#</font></br></div>
+<div id="94" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;html_quote(&nbsp;line&nbsp;):</font></br></div>
+<div id="95" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;string.replace(&nbsp;line,&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;&amp;&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;&amp;amp;&quot;</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="96" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;string.replace(&nbsp;result,&nbsp;</font><font class="String">&quot;&lt;&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;&amp;lt;&quot;</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="97" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;string.replace(&nbsp;result,&nbsp;</font><font class="String">&quot;&gt;&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;&amp;gt;&quot;</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="98" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;result</font></br></div>
+<div id="99" class="line"></br></div>
+<div id="100" class="line"></br></div>
+<div id="101" class="line"><font class="Comment">#&nbsp;same&nbsp;as&nbsp;'html_quote',&nbsp;but&nbsp;ignores&nbsp;left&nbsp;and&nbsp;right&nbsp;brackets</font></br></div>
+<div id="102" class="line"><font class="Comment">#</font></br></div>
+<div id="103" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;html_quote0(&nbsp;line&nbsp;):</font></br></div>
+<div id="104" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;string.replace(&nbsp;line,&nbsp;</font><font class="String">&quot;&amp;&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;&amp;amp;&quot;</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="105" class="line"></br></div>
+<div id="106" class="line"></br></div>
+<div id="107" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;dump_html_code(&nbsp;lines,&nbsp;prefix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="108" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;clean&nbsp;the&nbsp;last&nbsp;empty&nbsp;lines</font></br></div>
+<div id="109" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;l&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(&nbsp;</font><font class="Variable">self</font><font class="Normal">.lines&nbsp;)</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">while</font><font class="Normal">&nbsp;l&nbsp;</font><font class="Operator">&gt;</font><font class="Normal">&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;</font><font class="Keyword">and</font><font class="Normal">&nbsp;string.strip(&nbsp;</font><font class="Variable">self</font><font class="Normal">.lines[l&nbsp;</font><font class="Operator">-</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">]&nbsp;)&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font><font class="Normal">:</font></br></div>
+<div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;l&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;l&nbsp;</font><font class="Operator">-</font><font class="Normal">&nbsp;</font><font class="Float">1</font></br></div>
+<div id="113" class="line"></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;The&nbsp;code&nbsp;footer&nbsp;should&nbsp;be&nbsp;directly&nbsp;appended&nbsp;to&nbsp;the&nbsp;last&nbsp;code</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;line&nbsp;to&nbsp;avoid&nbsp;an&nbsp;additional&nbsp;blank&nbsp;line.</font></br></div>
+<div id="116" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="117" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;code_header,</font></br></div>
+<div id="118" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.lines[</font><font class="Float">0</font><font class="Normal">&nbsp;:&nbsp;l</font><font class="Operator">+</font><font class="Float">1</font><font class="Normal">]:</font></br></div>
+<div id="119" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">'</font><font class="Char">\n</font><font class="String">'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_quote(line),</font></br></div>
+<div id="120" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;code_footer,</font></br></div>
+<div id="121" class="line"></br></div>
+<div id="122" class="line"></br></div>
+<div id="123" class="line"></br></div>
+<div id="124" class="line"><font class="Keyword">class</font><font class="Normal">&nbsp;HtmlFormatter(Formatter):</font></br></div>
+<div id="125" class="line"></br></div>
+<div id="126" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;</font><font class="Function">__init__</font><font class="Normal">(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;processor,&nbsp;project_title,&nbsp;file_prefix&nbsp;):</font></br></div>
+<div id="127" class="line"></br></div>
+<div id="128" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Formatter.</font><font class="Function">__init__</font><font class="Normal">(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;processor&nbsp;)</font></br></div>
+<div id="129" class="line"></br></div>
+<div id="130" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">global</font><font class="Normal">&nbsp;html_header_1,&nbsp;html_header_2,&nbsp;html_header_3,&nbsp;html_footer</font></br></div>
+<div id="131" class="line"></br></div>
+<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;file_prefix:</font></br></div>
+<div id="133" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file_prefix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;-&quot;</font></br></div>
+<div id="134" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="135" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file_prefix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font></br></div>
+<div id="136" class="line"></br></div>
+<div id="137" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.project_title&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;project_title</font></br></div>
+<div id="138" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;file_prefix</font></br></div>
+<div id="139" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_header&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;html_header_1&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;project_title&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_header_2&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Operator">\</font></br></div>
+<div id="140" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;project_title&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_header_3</font></br></div>
+<div id="141" class="line"></br></div>
+<div id="142" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_footer&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;p&gt;&lt;center&gt;&lt;font&nbsp;size=&quot;&quot;-2&quot;&quot;&gt;generated&nbsp;on&nbsp;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Operator">\</font></br></div>
+<div id="143" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time.asctime(&nbsp;time.localtime(&nbsp;time.time()&nbsp;)&nbsp;)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Operator">\</font></br></div>
+<div id="144" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&lt;/font&gt;&lt;/p&gt;&lt;/center&gt;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_footer</font></br></div>
+<div id="145" class="line"></br></div>
+<div id="146" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.columns&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Float">3</font></br></div>
+<div id="147" class="line"></br></div>
+<div id="148" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_section_url(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;section&nbsp;):</font></br></div>
+<div id="149" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;section.name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;.html&quot;</font></br></div>
+<div id="150" class="line"></br></div>
+<div id="151" class="line"></br></div>
+<div id="152" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_block_url(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;block&nbsp;):</font></br></div>
+<div id="153" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_section_url(&nbsp;block.section&nbsp;)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;#&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;block.name</font></br></div>
+<div id="154" class="line"></br></div>
+<div id="155" class="line"></br></div>
+<div id="156" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_html_words(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;words&nbsp;):</font></br></div>
+<div id="157" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&quot;&quot;&nbsp;convert&nbsp;a&nbsp;series&nbsp;of&nbsp;simple&nbsp;words&nbsp;into&nbsp;some&nbsp;HTML&nbsp;text&nbsp;&quot;&quot;&quot;</font></br></div>
+<div id="158" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font></br></div>
+<div id="159" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;words:</font></br></div>
+<div id="160" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;html_quote(&nbsp;words[</font><font class="Float">0</font><font class="Normal">]&nbsp;)</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;w&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;words[</font><font class="Float">1</font><font class="Normal">:]:</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_quote(&nbsp;w&nbsp;)</font></br></div>
+<div id="163" class="line"></br></div>
+<div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;line</font></br></div>
+<div id="165" class="line"></br></div>
+<div id="166" class="line"></br></div>
+<div id="167" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_html_word(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;word&nbsp;):</font></br></div>
+<div id="168" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&quot;&quot;analyze&nbsp;a&nbsp;simple&nbsp;word&nbsp;to&nbsp;detect&nbsp;cross-references&nbsp;and&nbsp;styling&quot;&quot;&quot;</font></br></div>
+<div id="169" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;look&nbsp;for&nbsp;cross-references</font></br></div>
+<div id="170" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="171" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;re_crossref.match(&nbsp;word&nbsp;)</font></br></div>
+<div id="172" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;m:</font></br></div>
+<div id="173" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">try</font><font class="Normal">:</font></br></div>
+<div id="174" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;m.group(</font><font class="Float">1</font><font class="Normal">)</font></br></div>
+<div id="175" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;block&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.identifiers[&nbsp;name&nbsp;]</font></br></div>
+<div id="176" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_block_url(&nbsp;block&nbsp;)</font></br></div>
+<div id="177" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;href=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;url&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/a&gt;'</font></br></div>
+<div id="178" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">except</font><font class="Normal">:</font></br></div>
+<div id="179" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="String">'?'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'?'</font></br></div>
+<div id="180" class="line"></br></div>
+<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;look&nbsp;for&nbsp;italics&nbsp;and&nbsp;bolds</font></br></div>
+<div id="182" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;re_italic.match(&nbsp;word&nbsp;)</font></br></div>
+<div id="183" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;m:</font></br></div>
+<div id="184" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;m.group(</font><font class="Float">1</font><font class="Normal">)</font></br></div>
+<div id="185" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="String">'&lt;i&gt;'</font><font class="Operator">+</font><font class="Normal">name</font><font class="Operator">+</font><font class="String">'&lt;/i&gt;'</font></br></div>
+<div id="186" class="line"></br></div>
+<div id="187" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;re_bold.match(&nbsp;word&nbsp;)</font></br></div>
+<div id="188" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;m:</font></br></div>
+<div id="189" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;m.group(</font><font class="Float">1</font><font class="Normal">)</font></br></div>
+<div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="String">'&lt;b&gt;'</font><font class="Operator">+</font><font class="Normal">name</font><font class="Operator">+</font><font class="String">'&lt;/b&gt;'</font></br></div>
+<div id="191" class="line"></br></div>
+<div id="192" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;html_quote(word)</font></br></div>
+<div id="193" class="line"></br></div>
+<div id="194" class="line"></br></div>
+<div id="195" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_html_para(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;words&nbsp;):</font></br></div>
+<div id="196" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&quot;&quot;&nbsp;convert&nbsp;a&nbsp;paragraph's&nbsp;words&nbsp;into&nbsp;tagged&nbsp;HTML&nbsp;text,&nbsp;handle&nbsp;xrefs&nbsp;&quot;&quot;&quot;</font></br></div>
+<div id="197" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font></br></div>
+<div id="198" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;words:</font></br></div>
+<div id="199" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_word(&nbsp;words[</font><font class="Float">0</font><font class="Normal">]&nbsp;)</font></br></div>
+<div id="200" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;word&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;words[</font><font class="Float">1</font><font class="Normal">:]:</font></br></div>
+<div id="201" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_word(&nbsp;word&nbsp;)</font></br></div>
+<div id="202" class="line"></br></div>
+<div id="203" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;p&gt;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/p&gt;&quot;</font></br></div>
+<div id="204" class="line"></br></div>
+<div id="205" class="line"></br></div>
+<div id="206" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_html_code(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;lines&nbsp;):</font></br></div>
+<div id="207" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&quot;&quot;&nbsp;convert&nbsp;a&nbsp;code&nbsp;sequence&nbsp;to&nbsp;HTML&nbsp;&quot;&quot;&quot;</font></br></div>
+<div id="208" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;code_header&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'</font><font class="Char">\n</font><font class="String">'</font></br></div>
+<div id="209" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;l&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;lines:</font></br></div>
+<div id="210" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_quote(&nbsp;l&nbsp;)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'</font><font class="Char">\n</font><font class="String">'</font></br></div>
+<div id="211" class="line"></br></div>
+<div id="212" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;code_footer</font></br></div>
+<div id="213" class="line"></br></div>
+<div id="214" class="line"></br></div>
+<div id="215" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;make_html_items(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;items&nbsp;):</font></br></div>
+<div id="216" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">&quot;&quot;&quot;&nbsp;convert&nbsp;a&nbsp;field's&nbsp;content&nbsp;into&nbsp;some&nbsp;valid&nbsp;HTML&nbsp;&quot;&quot;&quot;</font></br></div>
+<div id="217" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lines&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;[]</font></br></div>
+<div id="218" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;item&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;items:</font></br></div>
+<div id="219" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;item.lines:</font></br></div>
+<div id="220" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lines.append(&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_code(&nbsp;item.lines&nbsp;)&nbsp;)</font></br></div>
+<div id="221" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="222" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lines.append(&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_para(&nbsp;item.words&nbsp;)&nbsp;)</font></br></div>
+<div id="223" class="line"></br></div>
+<div id="224" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;string.join(&nbsp;lines,&nbsp;</font><font class="String">'</font><font class="Char">\n</font><font class="String">'</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="225" class="line"></br></div>
+<div id="226" class="line"></br></div>
+<div id="227" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;print_html_items(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;items&nbsp;):</font></br></div>
+<div id="228" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_items(&nbsp;items&nbsp;)</font></br></div>
+<div id="229" class="line"></br></div>
+<div id="230" class="line"></br></div>
+<div id="231" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;print_html_field(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;field&nbsp;):</font></br></div>
+<div id="232" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;field.name:</font></br></div>
+<div id="233" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;table&nbsp;valign=top&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&quot;</font><font class="Operator">+</font><font class="Normal">field.name</font><font class="Operator">+</font><font class="String">&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="234" class="line"></br></div>
+<div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_items(&nbsp;field.items&nbsp;)</font></br></div>
+<div id="236" class="line"></br></div>
+<div id="237" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;field.name:</font></br></div>
+<div id="238" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&quot;</font></br></div>
+<div id="239" class="line"></br></div>
+<div id="240" class="line"></br></div>
+<div id="241" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;html_source_quote(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;line,&nbsp;block_name&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font></br></div>
+<div id="243" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">while</font><font class="Normal">&nbsp;line:</font></br></div>
+<div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;re_source_crossref.match(&nbsp;line&nbsp;)</font></br></div>
+<div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;m:</font></br></div>
+<div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;m.group(</font><font class="Float">2</font><font class="Normal">)</font></br></div>
+<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prefix&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;html_quote(&nbsp;m.group(</font><font class="Float">1</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="248" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;length&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(&nbsp;m.group(</font><font class="Float">0</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="249" class="line"></br></div>
+<div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;block_name:</font></br></div>
+<div id="251" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;this&nbsp;is&nbsp;the&nbsp;current&nbsp;block&nbsp;name,&nbsp;if&nbsp;any</font></br></div>
+<div id="252" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;result&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;b&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/b&gt;'</font></br></div>
+<div id="253" class="line"></br></div>
+<div id="254" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">elif</font><font class="Normal">&nbsp;re_source_keywords.match(name):</font></br></div>
+<div id="255" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;this&nbsp;is&nbsp;a&nbsp;C&nbsp;keyword</font></br></div>
+<div id="256" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;result&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;keyword_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;keyword_suffix</font></br></div>
+<div id="257" class="line"></br></div>
+<div id="258" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">elif</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.identifiers.has_key(name):</font></br></div>
+<div id="259" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;this&nbsp;is&nbsp;a&nbsp;known&nbsp;identifier</font></br></div>
+<div id="260" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;block&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.identifiers[name]</font></br></div>
+<div id="261" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;result&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;href=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Operator">\</font></br></div>
+<div id="262" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_block_url(block)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/a&gt;'</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="264" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;result&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_quote(line[&nbsp;:&nbsp;length&nbsp;])</font></br></div>
+<div id="265" class="line"></br></div>
+<div id="266" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line[&nbsp;length&nbsp;:&nbsp;]</font></br></div>
+<div id="267" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="268" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;result&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;html_quote(line)</font></br></div>
+<div id="269" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;[]</font></br></div>
+<div id="270" class="line"></br></div>
+<div id="271" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Normal">&nbsp;result</font></br></div>
+<div id="272" class="line"></br></div>
+<div id="273" class="line"></br></div>
+<div id="274" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;print_html_field_list(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;fields&nbsp;):</font></br></div>
+<div id="275" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;table&nbsp;valign=top&nbsp;cellpadding=3&gt;&quot;</font></br></div>
+<div id="276" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;field&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;fields:</font></br></div>
+<div id="277" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;tr&nbsp;valign=top&gt;&lt;td&gt;&lt;b&gt;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;field.name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="278" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.print_html_items(&nbsp;field.items&nbsp;)</font></br></div>
+<div id="279" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&quot;</font></br></div>
+<div id="280" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/table&gt;&quot;</font></br></div>
+<div id="281" class="line"></br></div>
+<div id="282" class="line"></br></div>
+<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;print_html_markup(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;markup&nbsp;):</font></br></div>
+<div id="284" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table_fields&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;[]</font></br></div>
+<div id="285" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;field&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;markup.fields:</font></br></div>
+<div id="286" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;field.name:</font></br></div>
+<div id="287" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;we&nbsp;begin&nbsp;a&nbsp;new&nbsp;series&nbsp;of&nbsp;field&nbsp;or&nbsp;value&nbsp;definitions,&nbsp;we</font></br></div>
+<div id="288" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;will&nbsp;record&nbsp;them&nbsp;in&nbsp;the&nbsp;'table_fields'&nbsp;list&nbsp;before&nbsp;outputting</font></br></div>
+<div id="289" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;all&nbsp;of&nbsp;them&nbsp;as&nbsp;a&nbsp;single&nbsp;table</font></br></div>
+<div id="290" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="291" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table_fields.append(&nbsp;field&nbsp;)</font></br></div>
+<div id="292" class="line"></br></div>
+<div id="293" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="294" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;table_fields:</font></br></div>
+<div id="295" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.print_html_field_list(&nbsp;table_fields&nbsp;)</font></br></div>
+<div id="296" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;table_fields&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;[]</font></br></div>
+<div id="297" class="line"></br></div>
+<div id="298" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.print_html_items(&nbsp;field.items&nbsp;)</font></br></div>
+<div id="299" class="line"></br></div>
+<div id="300" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;table_fields:</font></br></div>
+<div id="301" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.print_html_field_list(&nbsp;table_fields&nbsp;)</font></br></div>
+<div id="302" class="line"></br></div>
+<div id="303" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="304" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;&nbsp;Formatting&nbsp;the&nbsp;index</font></br></div>
+<div id="305" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="306" class="line"></br></div>
+<div id="307" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;index_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="308" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_header</font></br></div>
+<div id="309" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.index_items&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;{}</font></br></div>
+<div id="310" class="line"></br></div>
+<div id="311" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;index_name_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;name&nbsp;):</font></br></div>
+<div id="312" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;block&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.identifiers[&nbsp;name&nbsp;]</font></br></div>
+<div id="313" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_block_url(&nbsp;block&nbsp;)</font></br></div>
+<div id="314" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.index_items[&nbsp;name&nbsp;]&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;url</font></br></div>
+<div id="315" class="line"></br></div>
+<div id="316" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;index_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="317" class="line"></br></div>
+<div id="318" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;block_index&nbsp;already&nbsp;contains&nbsp;the&nbsp;sorted&nbsp;list&nbsp;of&nbsp;index&nbsp;names</font></br></div>
+<div id="319" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(&nbsp;</font><font class="Variable">self</font><font class="Normal">.block_index&nbsp;)</font></br></div>
+<div id="320" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rows&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;(count&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.columns&nbsp;</font><font class="Operator">-</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">)</font><font class="Operator">/</font><font class="Variable">self</font><font class="Normal">.columns</font></br></div>
+<div id="321" class="line"></br></div>
+<div id="322" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;border=0&nbsp;cellpadding=0&nbsp;cellspacing=0&gt;&quot;</font></br></div>
+<div id="323" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;r&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="BuiltIn">range</font><font class="Normal">(rows):</font></br></div>
+<div id="324" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;tr&gt;&quot;</font></br></div>
+<div id="325" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;c&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="BuiltIn">range</font><font class="Normal">(</font><font class="Variable">self</font><font class="Normal">.columns):</font></br></div>
+<div id="326" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;r&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;c</font><font class="Operator">*</font><font class="Normal">rows</font></br></div>
+<div id="327" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Operator">&lt;</font><font class="Normal">&nbsp;count:</font></br></div>
+<div id="328" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bname&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.block_index[&nbsp;r&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;c</font><font class="Operator">*</font><font class="Normal">rows&nbsp;]</font></br></div>
+<div id="329" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.index_items[&nbsp;bname&nbsp;]</font></br></div>
+<div id="330" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;td&gt;&lt;a&nbsp;href=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;url&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;bname&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/a&gt;&lt;/td&gt;'</font></br></div>
+<div id="331" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="332" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;td&gt;&lt;/td&gt;'</font></br></div>
+<div id="333" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/tr&gt;&quot;</font></br></div>
+<div id="334" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;line</font></br></div>
+<div id="335" class="line"></br></div>
+<div id="336" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/table&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="337" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_footer</font></br></div>
+<div id="338" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.index_items&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;{}</font></br></div>
+<div id="339" class="line"></br></div>
+<div id="340" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;index_dump(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;index_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="341" class="line"></br></div>
+<div id="342" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;index_filename&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">:</font></br></div>
+<div id="343" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;index_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;index.html&quot;</font></br></div>
+<div id="344" class="line"></br></div>
+<div id="345" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Formatter.index_dump(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;index_filename&nbsp;)</font></br></div>
+<div id="346" class="line"></br></div>
+<div id="347" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="348" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;&nbsp;Formatting&nbsp;the&nbsp;table&nbsp;of&nbsp;content</font></br></div>
+<div id="349" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="350" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="351" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_header</font></br></div>
+<div id="352" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;h1&gt;Table&nbsp;of&nbsp;Contents&lt;/h1&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="353" class="line"></br></div>
+<div id="354" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_chapter_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;chapter&nbsp;):</font></br></div>
+<div id="355" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;&nbsp;chapter_header&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;string.join(chapter.title)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;chapter_inter</font></br></div>
+<div id="356" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;table&nbsp;cellpadding=5&gt;&quot;</font></br></div>
+<div id="357" class="line"></br></div>
+<div id="358" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_section_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;section&nbsp;):</font></br></div>
+<div id="359" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;tr&nbsp;valign=top&gt;&lt;td&gt;&quot;</font></br></div>
+<div id="360" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;href=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_section_url(&nbsp;section&nbsp;)&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="Operator">\</font></br></div>
+<div id="361" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;section.title&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/a&gt;&lt;/td&gt;&lt;td&gt;'</font></br></div>
+<div id="362" class="line"></br></div>
+<div id="363" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_para(&nbsp;section.abstract&nbsp;)</font></br></div>
+<div id="364" class="line"></br></div>
+<div id="365" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_section_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;section&nbsp;):</font></br></div>
+<div id="366" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/td&gt;&lt;/tr&gt;&quot;</font></br></div>
+<div id="367" class="line"></br></div>
+<div id="368" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_chapter_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;chapter&nbsp;):</font></br></div>
+<div id="369" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/table&gt;&quot;</font></br></div>
+<div id="370" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;&nbsp;chapter_footer</font></br></div>
+<div id="371" class="line"></br></div>
+<div id="372" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_index(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;index_filename&nbsp;):</font></br></div>
+<div id="373" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;chapter_header&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;href=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;index_filename&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;Global&nbsp;Index&lt;/a&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;chapter_inter&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;chapter_footer</font></br></div>
+<div id="374" class="line"></br></div>
+<div id="375" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="376" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/table&gt;&lt;/center&gt;&quot;</font></br></div>
+<div id="377" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_footer</font></br></div>
+<div id="378" class="line"></br></div>
+<div id="379" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;toc_dump(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;toc_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">,&nbsp;index_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="380" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;toc_filename&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">:</font></br></div>
+<div id="381" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;toc_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;toc.html&quot;</font></br></div>
+<div id="382" class="line"></br></div>
+<div id="383" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;index_filename&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="Variable">None</font><font class="Normal">:</font></br></div>
+<div id="384" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;index_filename&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;index.html&quot;</font></br></div>
+<div id="385" class="line"></br></div>
+<div id="386" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Formatter.toc_dump(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;toc_filename,&nbsp;index_filename&nbsp;)</font></br></div>
+<div id="387" class="line"></br></div>
+<div id="388" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="389" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;&nbsp;Formatting&nbsp;sections</font></br></div>
+<div id="390" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="391" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;section_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;section&nbsp;):</font></br></div>
+<div id="392" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_header</font></br></div>
+<div id="393" class="line"></br></div>
+<div id="394" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;section_title_header</font></br></div>
+<div id="395" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;section.title</font></br></div>
+<div id="396" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;section_title_footer</font></br></div>
+<div id="397" class="line"></br></div>
+<div id="398" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;print&nbsp;section&nbsp;synopsys</font></br></div>
+<div id="399" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;section_synopsis_header</font></br></div>
+<div id="400" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;center&gt;&lt;table&nbsp;cellspacing=5&nbsp;cellpadding=0&nbsp;border=0&gt;&quot;</font></br></div>
+<div id="401" class="line"></br></div>
+<div id="402" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxwidth&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Float">0</font></br></div>
+<div id="403" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;b&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;section.blocks.values():</font></br></div>
+<div id="404" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(b.name)&nbsp;</font><font class="Operator">&gt;</font><font class="Normal">&nbsp;maxwidth:</font></br></div>
+<div id="405" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxwidth&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(b.name)</font></br></div>
+<div id="406" class="line"></br></div>
+<div id="407" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;width&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Float">70</font><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;XXX&nbsp;magic&nbsp;number</font></br></div>
+<div id="408" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;columns&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;width&nbsp;</font><font class="Operator">/</font><font class="Normal">&nbsp;maxwidth</font></br></div>
+<div id="409" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;columns&nbsp;</font><font class="Operator">&lt;</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">:</font></br></div>
+<div id="410" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;columns&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Float">1</font></br></div>
+<div id="411" class="line"></br></div>
+<div id="412" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="BuiltIn">len</font><font class="Normal">(section.block_names)</font></br></div>
+<div id="413" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rows&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;(count&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;columns</font><font class="Operator">-</font><font class="Float">1</font><font class="Normal">)</font><font class="Operator">/</font><font class="Normal">columns</font></br></div>
+<div id="414" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;r&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="BuiltIn">range</font><font class="Normal">(rows):</font></br></div>
+<div id="415" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;tr&gt;&quot;</font></br></div>
+<div id="416" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;c&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="BuiltIn">range</font><font class="Normal">(columns):</font></br></div>
+<div id="417" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;r&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;c</font><font class="Operator">*</font><font class="Normal">rows</font></br></div>
+<div id="418" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;td&gt;&lt;/td&gt;&lt;td&gt;'</font></br></div>
+<div id="419" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Operator">&lt;</font><font class="Normal">&nbsp;count:</font></br></div>
+<div id="420" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;section.block_names[i]</font></br></div>
+<div id="421" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;href=&quot;#'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/a&gt;'</font></br></div>
+<div id="422" class="line"></br></div>
+<div id="423" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&lt;/td&gt;'</font></br></div>
+<div id="424" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;line&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;line&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/tr&gt;&quot;</font></br></div>
+<div id="425" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;line</font></br></div>
+<div id="426" class="line"></br></div>
+<div id="427" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/table&gt;&lt;/center&gt;&lt;br&gt;&lt;br&gt;&quot;</font></br></div>
+<div id="428" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;section_synopsis_footer</font></br></div>
+<div id="429" class="line"></br></div>
+<div id="430" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;description_header</font></br></div>
+<div id="431" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.make_html_items(&nbsp;section.description&nbsp;)</font></br></div>
+<div id="432" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;description_footer</font></br></div>
+<div id="433" class="line"></br></div>
+<div id="434" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;block_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;block&nbsp;):</font></br></div>
+<div id="435" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;block_header</font></br></div>
+<div id="436" class="line"></br></div>
+<div id="437" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;place&nbsp;html&nbsp;anchor&nbsp;if&nbsp;needed</font></br></div>
+<div id="438" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;block.name:</font></br></div>
+<div id="439" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">'&lt;a&nbsp;name=&quot;'</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;block.name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'&quot;&gt;'</font></br></div>
+<div id="440" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;h4&gt;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;block.name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/h4&gt;&quot;</font></br></div>
+<div id="441" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;/a&gt;&quot;</font></br></div>
+<div id="442" class="line"></br></div>
+<div id="443" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;dump&nbsp;the&nbsp;block&nbsp;C&nbsp;source&nbsp;lines&nbsp;now</font></br></div>
+<div id="444" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;block.code:</font></br></div>
+<div id="445" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;source_header</font></br></div>
+<div id="446" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;l&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;block.code:</font></br></div>
+<div id="447" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.html_source_quote(&nbsp;l,&nbsp;block.name&nbsp;)</font></br></div>
+<div id="448" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;source_footer</font></br></div>
+<div id="449" class="line"></br></div>
+<div id="450" class="line"></br></div>
+<div id="451" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;markup_enter(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;markup,&nbsp;block&nbsp;):</font></br></div>
+<div id="452" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;markup.tag&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;description&quot;</font><font class="Normal">:</font></br></div>
+<div id="453" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;description_header</font></br></div>
+<div id="454" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="455" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;marker_header&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;markup.tag&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;marker_inter</font></br></div>
+<div id="456" class="line"></br></div>
+<div id="457" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.print_html_markup(&nbsp;markup&nbsp;)</font></br></div>
+<div id="458" class="line"></br></div>
+<div id="459" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;markup_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;markup,&nbsp;block&nbsp;):</font></br></div>
+<div id="460" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;markup.tag&nbsp;</font><font class="Operator">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;description&quot;</font><font class="Normal">:</font></br></div>
+<div id="461" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;description_footer</font></br></div>
+<div id="462" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font><font class="Normal">:</font></br></div>
+<div id="463" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;marker_footer</font></br></div>
+<div id="464" class="line"></br></div>
+<div id="465" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;block_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;block&nbsp;):</font></br></div>
+<div id="466" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;block_footer</font></br></div>
+<div id="467" class="line"></br></div>
+<div id="468" class="line"></br></div>
+<div id="469" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;&nbsp;section_exit(&nbsp;</font><font class="Variable">self</font><font class="Normal">,&nbsp;section&nbsp;):</font></br></div>
+<div id="470" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">print</font><font class="Normal">&nbsp;html_footer</font></br></div>
+<div id="471" class="line"></br></div>
+<div id="472" class="line"></br></div>
+<div id="473" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;section_dump_all(&nbsp;</font><font class="Variable">self</font><font class="Normal">&nbsp;):</font></br></div>
+<div id="474" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">for</font><font class="Normal">&nbsp;section&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="Variable">self</font><font class="Normal">.sections:</font></br></div>
+<div id="475" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Variable">self</font><font class="Normal">.section_dump(&nbsp;section,&nbsp;</font><font class="Variable">self</font><font class="Normal">.file_prefix&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;section.name&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">'.html'</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="476" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+</div>
+</body>
+</html>
+

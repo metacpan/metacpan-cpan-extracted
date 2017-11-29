@@ -2,7 +2,7 @@ package Test2::Compare::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/blessed/;
@@ -94,7 +94,7 @@ sub run {
     my $got = $exists ? $params{got} : undef;
 
     # Prevent infinite cycles
-    if ($got && ref $got) {
+    if (defined($got) && ref $got) {
         die "Cycle detected in comparison, aborting"
             if $seen->{$got} && $seen->{$got} >= MAX_CYCLES;
         $seen->{$got}++;
@@ -103,7 +103,7 @@ sub run {
     my $ok = $self->verify(%params);
     my @deltas = $ok ? $self->deltas(%params) : ();
 
-    $seen->{$got}-- if $got && ref $got;
+    $seen->{$got}-- if defined $got && ref $got;
 
     return if $ok && !@deltas;
 

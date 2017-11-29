@@ -12,16 +12,17 @@ do { my $x = {
                       'requires' => {
                                       'Alien::SwaggerUI' => '0',
                                       'Beam::Minion' => '0.007',
-                                      'CPAN::Testers::Schema' => '0.014',
+                                      'CPAN::Testers::Schema' => '0.021',
                                       'File::Share' => '0',
                                       'Import::Base' => '0.012',
+                                      'JSON::Validator' => '1.07',
                                       'Log::Any' => '1.045',
                                       'Log::Any::Adapter::MojoLog' => '0.02',
                                       'Mercury' => '0.015',
                                       'Minion::Backend::mysql' => '0.08',
                                       'Mojolicious' => '7.40',
                                       'Mojolicious::Plugin::Config' => '0',
-                                      'Mojolicious::Plugin::OpenAPI' => '1.13',
+                                      'Mojolicious::Plugin::OpenAPI' => '1.21',
                                       'perl' => '5.024'
                                     }
                     },

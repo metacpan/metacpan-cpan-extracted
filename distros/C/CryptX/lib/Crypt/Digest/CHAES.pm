@@ -4,7 +4,7 @@ package Crypt::Digest::CHAES;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u )] );
@@ -216,12 +216,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/Cryptographic_hash_function#Hash_functions_based_on_block_ciphers|http://en.wikipedia.org/wiki/Cryptographic_hash_function#Hash_functions_based_on_block_ciphers>
+=item * L<https://en.wikipedia.org/wiki/Cryptographic_hash_function#Hash_functions_based_on_block_ciphers>
 
 =back
 
 =cut
-
-__END__

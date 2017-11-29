@@ -1,6 +1,6 @@
 package Catmandu::Store::File::MediaHaven::Index;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Catmandu::Sane;
 use Moo;
@@ -18,9 +18,9 @@ sub generator {
 
     my $searcher = Catmandu::Store::File::MediaHaven::Searcher->new(
                         bag   => $self ,
-                        limit => undef ,
+                        limit => $self->store->search_limit ,
                         start => 0 ,
-                        sort  => undef ,
+                        sort  => $self->store->search_sort ,
                         query => undef ,
                     );
 

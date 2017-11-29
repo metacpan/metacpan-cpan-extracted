@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -36,8 +36,10 @@ sub dequeue {
   unless ($job) {
     my $int = $self->dequeue_interval;
     my $end = steady_time + $wait;
-    usleep(min($int, $end - steady_time) * 1000000)
-      until steady_time >= $end or $job = $self->_try($id, $options);
+    my $remaining = $wait;
+    usleep(min($int, $remaining) * 1000000)
+      until ($remaining = $end - steady_time) <= 0
+      or $job = $self->_try($id, $options);
   }
   return $job || $self->_try($id, $options);
 }

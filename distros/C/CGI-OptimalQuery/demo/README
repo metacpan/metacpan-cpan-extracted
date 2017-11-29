@@ -22,6 +22,18 @@ Step 3) Configure Apache
   # add a script alias to view the demos
   ScriptAlias /OptimalQueryDemo/ /path/to/perl-CGI-OptimalQuery/demo/cgi-bin/
 
+  # configure file permissions so apache can access files
+  export OQBASEPATH=/path/to/perl-CGI-OptimalQuery
+  sudo chgrp -R apache $OQBASEPATH
+  sudo chmod -R u=rwX,go=rX $OQBASEPATH
+  sudo chmod -R ug+rwx $OQBASEPATH/demo/cgi-bin
+
+  # if SELinux is installed, set file contexts so apache process is not blocked
+  # run command: `sestatus` to determine if SELinux is enabled on your system
+  sudo chcon -R system_u:object_r:httpd_sys_content_t:s0 $OQBASEPATH/demo/cgi-bin
+  sudo chcon -R system_u:object_r:httpd_sys_rw_content_t:s0 $OQBASEPATH/demo/db
+  sudo chcon -R system_u:object_r:usr_t:s0 $OQBASEPATH/lib
+
   # restart apache
   sudo apachectl restart
 

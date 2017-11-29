@@ -4,8 +4,11 @@ use strict;
 use POSIX qw/strftime/;
 use Data::Dumper;
 use Mail::Sendmail();
-use CGI qw( escapeHTML );
+use CGI qw( escape );
 use JSON::XS;
+use CGI::OptimalQuery::Base();
+
+sub escapeHTML { CGI::OptimalQuery::Base::escapeHTML(@_) }
 
 # save a reference to the current saved save that is running via crontab right now
 our $current_saved_search;
@@ -62,6 +65,9 @@ sub on_init {
       # does the user want to set this as the default search, and if so do they have permission
       if($$o{schema}{canSaveDefaultSearches} && defined $$o{q}->param('save_search_default')) {
         $rec{is_default} = $$o{q}->param('save_search_default') || 0;
+
+        # delete existing default if it exists
+        $$o{dbh}->do('DELETE FROM oq_saved_search WHERE uri=? AND is_default=1', undef, $rec{uri}) if $rec{is_default};
       }
 
       # is saved search alerts enabled
@@ -85,12 +91,15 @@ sub on_init {
           forceFilter => $$o{schema}{forceFilter},
           hiddenFilter => scalar($$o{q}->param('hiddenFilter'))
         );
+        $sth->set_limit([1, $$o{schema}{savedSearchAlertMaxRecs} + 1]);
 
-        $sth->execute(limit => [1, $$o{schema}{savedSearchAlertMaxRecs} + 1]);
+        $sth->execute();
+
         while (my $h = $sth->fetchrow_hashref()) {
           push @uids, $$h{U_ID};
         }
-        die "MAX_ROWS_EXCEEDED - your report contains too many rows to send alerts via email. Reduce the total row count of your report by adding additional filters." if scalar(@uids) > $$o{schema}{savedSearchAlertMaxRecs};
+        die "MAX_ROWS_EXCEEDED - your report contains too many rows to send alerts via email. Reduce the total row count of your report by adding additional filters." if scalar(@uids) >= $$o{schema}{savedSearchAlertMaxRecs};
+
         $rec{alert_uids} = join('~', @uids);
       }
   
@@ -112,6 +121,7 @@ sub on_init {
             }
           }
           push @binds, $id;
+          local $$o{dbh}{PrintError}=0;
           $$o{dbh}->do("UPDATE oq_saved_search SET ".join(',', @cols)." WHERE id=?", undef, @binds);
           $rec{id} = $id;
         }
@@ -130,17 +140,10 @@ sub on_init {
             push @binds, ($val eq '') ? undef : $val;
           }
         }
+        local $$o{dbh}{PrintError}=0;
         $$o{dbh}->do("INSERT INTO oq_saved_search (".join(',',@cols).") VALUES (".join(',',@vals).")", undef, @binds);
         $rec{id} ||= $$o{dbh}->last_insert_id("","","","");
       }
-      
-      # ensure only one possible default saved search
-      eval {
-        if($$o{schema}{canSaveDefaultSearches} && $rec{is_default}) {
-          my $stmt = $$o{dbh}->prepare('UPDATE oq_saved_search SET is_default = 0 WHERE id <> ? AND uri = ?');
-          $stmt->execute($rec{id}, $rec{uri});
-        }
-      }; if($@) {}
       
       $$o{output_handler}->(CGI::header('application/json').encode_json({ status => "ok", msg => "search saved successfully", id => $rec{id} }));
     }; if ($@) {
@@ -148,12 +151,16 @@ sub on_init {
       $err =~ s/\ at\ .*//;
 
       if ($err =~ /unique\ constraint/i ||
+          $err =~ /are not unique/      ||
           $err =~ /duplicate\ entry/i   ||
           $err =~ /unique\_violation/i  ||
           $err =~ /unique\ key/i        ||
           $err =~ /duplicate\ key/i     ||
           $err =~ /constraint\_unique/i) {
         $err = 'Another record with this name already exists.';
+      }
+      else {
+        $$o{error_handler}->("err", $err);
       }
 
       $$o{output_handler}->(CGI::header('application/json').encode_json({ status => "error", msg => $err }));
@@ -195,7 +202,7 @@ sub on_open {
     $buf .= "
 <label>name <input type=text id=OQsaveSearchTitle value='".$o->escape_html($$rec{USER_TITLE})."'></label>
 <fieldset id=OQSaveReportEmailAlertOpts".($alerts_enabled?' class=opened':'').">
-  <legend><label class=ckbox style='width:12em;text-align:left;'><input type=checkbox id=OQalertenabled".($alerts_enabled?' checked':'')."> send email alert</label></legend>
+  <legend><label class='OQEmailAlertCkBox ckbox'><input type=checkbox id=OQalertenabled".($alerts_enabled?' checked':'')."> send email alert</label></legend>
 
   <p>
   <label>when records are:</label>
@@ -235,7 +242,7 @@ sub on_open {
   # include checkbox to allow user to set saved search as the default settings
   if($$o{schema}{canSaveDefaultSearches}) {
     my ($is_default_ss) = $$o{dbh}->selectrow_array("SELECT is_default FROM oq_saved_search WHERE id=? AND user_id=?", undef, scalar($$o{q}->param('OQss')), $$o{schema}{savedSearchUserID});
-    $buf .= "<label class=ckbox style='margin-left:17px;width:12em;text-align:left;'><input title='Set the filter, sort, and shown columns in this reports as the system default for all users' type=checkbox value=1 id=OQsave_search_default".($is_default_ss ? ' checked' : '').">set as system default</label>";
+    $buf .= "<br><label class='ckbox OQSavedSearchCkBox'><input title='Set the filter, sort, and shown columns in this reports as the system default for all users' type=checkbox value=1 id=OQsave_search_default".($is_default_ss ? ' checked' : '').">set as system default</label>";
   }
 
   $buf .= "<p>";
@@ -344,6 +351,7 @@ sub custom_output_handler {
       } elsif ($opts{editLink} ne '' && $$rec{U_ID} ne '') {
         $link = $opts{editLink}.(($opts{editLink} =~ /\?/)?'&':'?')."act=load&id=$$rec{U_ID}";
       }
+
       $buf .= "<tr";
 
       # if this record is first time visible
@@ -351,8 +359,7 @@ sub custom_output_handler {
       $buf .= "><td>";
       if ($link) {
         if ($link !~ /^https?\:\/\//i) {
-          $link .= '/'.$link unless $link =~ /^\//;
-          $link = $$current_saved_search{opts}{base_url}.$link;
+          $link = $$current_saved_search{opts}{base_url}.'/'.$link;
         }
         $buf .= "<a href='".escapeHTML($link)."'>open</a>";
       }
@@ -414,17 +421,14 @@ sub get_sysdate_sql {
   return $now;
 }
 
-
 sub execute_saved_search_alerts {
   my %opts = @_;
+
+  die "invalid base_url" unless $opts{base_url} =~ /^https?\:\/\//;
+  $opts{base_url} =~ s/\/$//g;
+
   my $sendmail_handler = $opts{sendmail_handler} ||= \&sendmail_handler;
 
-  if ($opts{base_url} =~ /^(https?\:\/\/[^\/]+)(.*)/i) {
-    $opts{server_url} = $1;
-    $opts{path_prefix} = $2;
-  } else {
-    die "invalid option base_url";
-  }
   die "missing option handler" unless ref($opts{handler}) eq 'CODE';
   my $dbh = $opts{dbh} or die "missing dbh";
   
@@ -549,7 +553,6 @@ AND ? BETWEEN alert_start_hour AND alert_end_hour";
     # and populate $$rec{buf}, $$rec{uids}, $$rec{err_msg}
     eval {
       $opts{handler}->($rec);
-      die "email_to not defined" if $$rec{email_to} eq ''; 
       $opts{error_handler}->("debug", "after OQ execution uids: ".Dumper(\%uids)) if $opts{debug};
     };
     if ($@) {
@@ -557,12 +560,16 @@ AND ? BETWEEN alert_start_hour AND alert_end_hour";
       $$rec{err_msg} =~ s/\ at\ .*//;
     }
 
+    # skip this search search alert if we could not get an email address
+    next unless $$rec{email_to} =~ /\@/;
+
     my @update_uids;
     # if there was an error processing saved search, send user an email
     if ($$rec{err_msg}) {
       $opts{error_handler}->("err", "Error: $@\n\nsaved search:\n".Dumper($rec)."\n\nENV:\n".Dumper(\%ENV)."\n\n");
       if ($$rec{email_to}) {
-        my %email = (
+        my %email;
+        %email = (
           to => $$rec{email_to},
           from => $$rec{email_from} || $opts{email_from},
           'Reply-To' => $$rec{'email_Reply-To'} || $opts{'email_Reply-To'},
@@ -572,7 +579,7 @@ AND ? BETWEEN alert_start_hour AND alert_end_hour";
 $$rec{err_msg}
 
 load report:
-".$opts{base_url}.$$rec{URI}.'?OQLoadSavedSearch='.$$rec{ID}.$$rec{state_param_args}."
+$opts{base_url}/$$rec{URI}?OQLoadSavedSearch=".escape($$rec{ID}).$$rec{state_param_args}."
 
 Please contact your administrator if you are unable to fix the problem."
         );
@@ -604,7 +611,8 @@ Please contact your administrator if you are unable to fix the problem."
       }
       $opts{error_handler}->("info", "total_new: $total_new; total_deleted: $total_deleted; total_count: $total_count");
 
-      my $should_send_email = 1 if
+      my $should_send_email;
+      $should_send_email = 1 if
         ( # alert when records are added
           ($$rec{ALERT_MASK} & 1 && $total_new > 0) ||
           # alert when records are deleted
@@ -671,7 +679,7 @@ $$rec{buf}
 <span class='ftv ib'>added: $total_new</span>
 <span class=ib>removed: $total_deleted</span>
 <p>
-<a href='".escapeHTML($opts{base_url}.$$rec{URI}.'?OQLoadSavedSearch='.$$rec{ID}.$$rec{state_param_args})."'>load report</a>
+<a href='".escapeHTML($opts{base_url}.'/'.$$rec{URI}.'?OQLoadSavedSearch='.escape($$rec{ID}).$$rec{state_param_args})."'>load report</a>
 </div>
 </body>
 </html>";
@@ -693,7 +701,7 @@ $$rec{buf}
     my $now = get_sysdate_sql($dbh);
 
     my $sql = "UPDATE oq_saved_search SET alert_last_dt=$now, alert_err=?";
-    if ($update_uids ne $$rec{ALERT_UIDS}) {
+    if (! $$rec{err_msg} && $update_uids ne $$rec{ALERT_UIDS}) {
       $sql .= ", alert_uids=?";
       push @binds, $update_uids;
     }

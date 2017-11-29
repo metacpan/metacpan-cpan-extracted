@@ -1,6 +1,6 @@
 package Cassandra::Client::Policy::Retry;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::Retry::VERSION = '0.13';
+$Cassandra::Client::Policy::Retry::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ Cassandra::Client::Policy::Retry
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

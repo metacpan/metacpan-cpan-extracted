@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 RSYNC_BIOX="rsync -avz ../BioX-Workflow-Command  gencore@dalma.abudhabi.nyu.edu:/home/gencore/hpcrunner-test/"
+
+$RSYNC_BIOX
+
 export DEV='DEV'
 inotify-hookable \
     --watch-directories lib \

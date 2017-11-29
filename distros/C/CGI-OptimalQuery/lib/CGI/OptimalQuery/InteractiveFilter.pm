@@ -203,7 +203,8 @@ my %translations = (
   'namedFilter' => sub {
     die "could not find named filter '$_[2]'" unless exists $_[0]{named_filters}{$_[2]};
     my $rv = { 'FUNCT' =>  $_[2].'()' };
-    my %args = @{ $_[4] } if ref($_[4]) eq 'ARRAY';
+    my %args;
+    %args = @{ $_[4] } if ref($_[4]) eq 'ARRAY';
     foreach my $key (keys %args) { $$rv{'ARG_'.$key} = $args{$key}; }
     return $rv;
   },
@@ -461,7 +462,8 @@ sub html_parent_update( $ ) {
     my $filter = $q->param('filter');
     $filter =~ s/\n/\ /g;
 
-    my $js = "
+    my $js;
+    $js = "
 	 if( window.opener
              && !window.opener.closed
              && window.opener.OQval ) {
@@ -834,5 +836,3 @@ sub html_filter_form( $ ) {
 
 
 1;
-
-

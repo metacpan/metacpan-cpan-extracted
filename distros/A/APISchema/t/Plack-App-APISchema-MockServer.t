@@ -44,3 +44,27 @@ sub serve_document_bmi : Tests {
          }
      };
 }
+
+sub when_encoding_is_specified : Tests {
+    my $schema = t::test::fixtures::prepare_bmi;
+    $schema->register_route(
+        method => 'POST',
+        route => '/bmi_force_json',
+        request_resource => {
+            encoding => 'json',
+            body => 'figure',
+        },
+        response_resource => {
+            encoding => 'json',
+            body => 'bmi',
+        },
+    );
+    my $app = Plack::App::APISchema::MockServer->new(schema => $schema)->to_app;
+    test_psgi $app => sub {
+        my $server = shift;
+        my $res = $server->(POST '/bmi_force_json');
+        is $res->code, 200;
+        is $res->header('content-type'), 'application/json; charset=utf-8';
+        is $res->content, q!{"value":19.5}!;
+    }
+}

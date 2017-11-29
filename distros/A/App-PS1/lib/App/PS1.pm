@@ -17,7 +17,7 @@ use base qw/Class::Accessor::Fast/;
 eval { require Term::Colour256 };
 my $t256 = !$EVAL_ERROR;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 __PACKAGE__->mk_accessors(qw/ ps1 cols plugins bw low exit parts safe theme verbose/);
 
@@ -207,7 +207,7 @@ sub load {
 sub surround {
     my ($self, $count, $text) = @_;
 
-    return if !defined $text;
+    return if !defined $text || !$count;
 
     my $left  = $self->safe ? '≺' : '<';
     my $right = $self->safe ? '≻' : '>';
@@ -236,7 +236,7 @@ App::PS1 - Module to load PS1 status line elements
 
 =head1 VERSION
 
-This documentation refers to App::PS1 version 0.05.
+This documentation refers to App::PS1 version 0.06.
 
 =head1 SYNOPSIS
 

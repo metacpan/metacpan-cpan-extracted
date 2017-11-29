@@ -4,7 +4,7 @@ package Crypt::Mac::F9;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( f9 f9_hex f9_b64 f9_b64u )] );
@@ -152,5 +152,3 @@ Logically joins all arguments into a single string, and returns its F9 message a
 =back
 
 =cut
-
-__END__

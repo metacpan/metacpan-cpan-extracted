@@ -10,7 +10,7 @@ use IO::String ();
 use Test::More ();
 
 our @EXPORT_OK = ('applify_ok', 'applify_subcommands_ok');
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $exited = 0;
 
 sub app {
@@ -155,7 +155,7 @@ sub run_instance_ok {
     tie *STDERR, 'IO::String', \$stderr;
 
     $exited = 0;
-    my $retval = eval { $instance->run() };
+    my $retval = eval { $instance->run(@_) };
 
     untie *STDOUT;
     untie *STDERR;
@@ -164,8 +164,13 @@ sub run_instance_ok {
 }
 
 sub run_ok {
-    my $self = shift;
-    $self->run_instance_ok($self->app_instance(@_));
+    my ($self, $app, @extra) = (shift);
+    {
+      local @ARGV = @_;
+      $app = ($self->app_script->app)[0];
+      @extra = @ARGV;
+    }
+    $self->run_instance_ok($app, @extra);
 }
 
 

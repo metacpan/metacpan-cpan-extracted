@@ -6,11 +6,12 @@ use JSON::Validator::OpenAPI::Mojolicious;
 use Mojo::UserAgent;
 use Mojo::Util;
 
-use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
+use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $BASE = __PACKAGE__;
+my $X_RE = qr{^x-};
 
 has base_url => sub {
   my $self    = shift;
@@ -57,7 +58,7 @@ sub validator { Carp::confess('No JSON::Validator::OpenAPI::Mojolicious object a
 
 sub _generate_class {
   my ($class, $validator) = @_;
-  my $paths = $validator->schema->get('/paths') || {};
+  my $paths = $validator->get('/paths') || {};
 
   eval <<"HERE" or Carp::confess("package $class: $@");
 package $class;
@@ -68,26 +69,31 @@ HERE
   Mojo::Util::monkey_patch($class, validator => sub {$validator});
 
   for my $path (keys %$paths) {
-    for my $http_method (keys %{$paths->{$path}}) {
-      my $op_spec = $paths->{$path}{$http_method};
-      my $method  = $op_spec->{operationId} or next;
-      my $code    = _generate_method(lc $http_method, $path, $op_spec);
+    next if $path =~ $X_RE;
+    my $path_parameters = $validator->get([paths => $path => 'parameters']) || [];
+
+    for my $http_method (keys %{$validator->get([paths => $path])}) {
+      next if $http_method =~ $X_RE or $http_method eq 'parameters';
+      my $op_spec = $validator->get([paths => $path => $http_method]);
+      my $method = $op_spec->{operationId} or next;
+      my @rules = (@$path_parameters, @{$op_spec->{parameters} || []});
+      my $code = _generate_method(lc $http_method, $path, \@rules);
 
       $method =~ s![^\w]!_!g;
-      warn "[$class] Add method $class\::$method()\n" if DEBUG;
+      warn "[$class] Add method $method() for $http_method $path\n" if DEBUG;
       Mojo::Util::monkey_patch($class, $method => $code);
     }
   }
 }
 
 sub _generate_method {
-  my ($http_method, $path, $op_spec) = @_;
+  my ($http_method, $path, $rules) = @_;
   my @path_spec = grep {length} split '/', $path;
 
   return sub {
     my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
     my $self = shift;
-    my $tx   = $self->_generate_tx($http_method, \@path_spec, $op_spec, @_);
+    my $tx   = $self->_generate_tx($http_method, \@path_spec, $rules, @_);
 
     if ($tx->error) {
       return $tx unless $cb;
@@ -105,14 +111,14 @@ sub _generate_method {
 }
 
 sub _generate_tx {
-  my ($self, $http_method, $path_spec, $op_spec, $params, %args) = @_;
+  my ($self, $http_method, $path_spec, $rules, $params, %args) = @_;
   my $v   = $self->validator;
   my $url = $self->base_url->clone;
   my (%headers, %req, @body, @errors);
 
   push @{$url->path}, map { local $_ = $_; s,\{(\w+)\},{$params->{$1}//''},ge; $_ } @$path_spec;
 
-  for my $p (@{$op_spec->{parameters} || []}) {
+  for my $p (@$rules) {
     my ($in, $name, $type) = @$p{qw(in name type)};
     my @e;
 
@@ -126,7 +132,7 @@ sub _generate_tx {
     }
 
     if (@e) {
-      warn "[OpenAPI] Invalid '$name' in '$in': @e\n" if DEBUG;
+      warn "[@{[ref $self]}] Validation for $url failed: @e\n" if DEBUG;
       push @errors, @e;
     }
     elsif (!exists $params->{$name} or $in eq 'path') {
@@ -145,13 +151,15 @@ sub _generate_tx {
       $req{body} = $params->{$name};
     }
     else {
-      warn "[OpenAPI] Unknown 'in' '$in' for parameter '$name'";
+      warn "[@{[ref $self]}] Unknown 'in' '$in' for parameter '$name'";
     }
   }
 
   # Valid input
-  warn "[OpenAPI] Input validation for '$url': @{@errors ? \@errors : ['Success']}\n" if DEBUG;
-  return $self->ua->build_tx($http_method, $url, $self->pre_processor->(\%headers, \%req)) unless @errors;
+  unless (@errors) {
+    warn "[@{[ref $self]}] Validation for $url was successful.\n" if DEBUG;
+    return $self->ua->build_tx($http_method, $url, $self->pre_processor->(\%headers, \%req));
+  }
 
   # Invalid input
   my $tx = Mojo::Transaction::HTTP->new;
@@ -283,13 +291,6 @@ parameters might be added to C<$req>, though it is unlikely.
 Returns a L<Mojo::UserAgent> object which is used to execute requests.
 
 =head1 METHODS
-
-=head2 local_app
-
-  $client = $client->local_app(Mojolicious->new);
-
-This method will modify L</ua> to run requests against the L<Mojolicious> or
-L<Mojolicious::Lite> application given as argument. (Useful for testing)
 
 =head2 new
 

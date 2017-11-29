@@ -21,7 +21,7 @@ sub output {
   my @buf = ();
   
   while(my $rec = $o->fetch()) {
-    push @buf, JSON::XS::encode_json($rec);
+    push @buf, JSON::XS->new->utf8->encode($rec);
   }
   
   $$o{output_handler}->('[' . join(',', @buf) . ']');

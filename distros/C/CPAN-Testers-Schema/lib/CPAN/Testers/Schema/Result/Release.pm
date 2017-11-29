@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Release;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: Collected test report stats about a single CPAN release
 
 #pod =head1 SYNOPSIS
@@ -221,7 +221,7 @@ CPAN::Testers::Schema::Result::Release - Collected test report stats about a sin
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

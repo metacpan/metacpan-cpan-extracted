@@ -1,5 +1,5 @@
 package Moose::Meta::Method::Delegation;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use strict;
 use warnings;
@@ -202,7 +202,7 @@ Moose::Meta::Method::Delegation - A Moose Method metaclass for delegation method
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 DESCRIPTION
 

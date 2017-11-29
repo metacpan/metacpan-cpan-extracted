@@ -1,5 +1,5 @@
 package ZMQ::Raw::Timer;
-$ZMQ::Raw::Timer::VERSION = '0.17';
+$ZMQ::Raw::Timer::VERSION = '0.19';
 use strict;
 use warnings;
 use Carp;
@@ -13,7 +13,7 @@ ZMQ::Raw::Timer - ZeroMQ Timer class
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,28 @@ sub new
 	return $class->_new ($ctx, $args{after} || 0, $args{interval});
 }
 
+
+
+sub cancel
+{
+	my ($this) = @_;
+	$this->_cancel();
+
+AGAIN:
+	goto AGAIN if (defined ($this->socket->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
+}
+
+
+
+sub reset
+{
+	my ($this) = @_;
+	$this->_reset();
+
+AGAIN:
+	goto AGAIN if (defined ($this->socket->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
+}
+
 =head2 id ()
 
 Get the timer's id
@@ -59,6 +81,10 @@ Reset the timer
 =head2 cancel( )
 
 Cancel the timer
+
+=head2 expire( )
+
+Expire the timer
 
 =head2 socket( )
 

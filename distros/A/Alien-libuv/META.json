@@ -88,7 +88,7 @@
    "provides" : {
       "Alien::libuv" : {
          "file" : "lib/Alien/libuv.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -103,10 +103,10 @@
          "web" : "https://github.com/genio/Alien-libuv"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.026000"
       },
       "plugins" : [
          {
@@ -247,7 +247,7 @@
                }
             },
             "name" : "@Starter/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.056"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -292,7 +292,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
-            "version" : "0.24"
+            "version" : "0.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
@@ -350,7 +350,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.13.6 (Apple Git-96)",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -380,7 +380,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.13.6 (Apple Git-96)",
                   "repo_root" : "."
                }
             },
@@ -403,7 +403,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.13.6 (Apple Git-96)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -420,12 +420,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.013",
+                  "tag" : "v0.014",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.13.6 (Apple Git-96)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -445,7 +445,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.13.6 (Apple Git-96)",
                   "repo_root" : "."
                }
             },
@@ -455,7 +455,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
             "name" : "CheckChangeLog",
-            "version" : "0.05"
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -585,29 +585,9 @@
          "version" : "6.010"
       }
    },
-   "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
-      "requires" : {
-         "share" : {
-            "Alien::Autotools" : "0",
-            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTML::LinkExtor" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
-            "IO::Zlib" : "0",
-            "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
-         },
-         "system" : {}
-      }
-   },
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

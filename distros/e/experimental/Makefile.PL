@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "experimental",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "experimental",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "feature" => 0,
     "strict" => 0,
     "version" => 0,
     "warnings" => 0
@@ -26,7 +24,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +34,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Test::More" => "0.89",
-  "feature" => 0,
   "strict" => 0,
   "version" => 0,
   "warnings" => 0

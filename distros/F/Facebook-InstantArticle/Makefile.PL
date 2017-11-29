@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "DateTime::TimeZone" => "2.01",
     "Test::More" => "1.302037"
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }

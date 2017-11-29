@@ -18,7 +18,7 @@ if ($tsa) {
     Term::Size::Any->import(qw/chars/);
 }
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -114,7 +114,7 @@ app-ps1 - Command prompt generator
 
 =head1 VERSION
 
-This documentation refers to app-ps1 version 0.05.
+This documentation refers to app-ps1 version 0.06.
 
 =head1 SYNOPSIS
 

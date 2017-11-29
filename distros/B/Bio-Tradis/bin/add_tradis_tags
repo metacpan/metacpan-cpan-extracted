@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::DetectTags;
-$Bio::Tradis::Bin::DetectTags::VERSION = '1.3.3';
+$Bio::Tradis::Bin::DetectTags::VERSION = '1.4.0';
 # ABSTRACT: check if tr tag is present
 # PODNAME: check_tags
 
@@ -26,7 +26,7 @@ check_tags - check if tr tag is present
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

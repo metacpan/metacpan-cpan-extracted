@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 use Moose::Role;
 use Carp 'confess';
@@ -50,7 +50,7 @@ Test::Class::Moose::Role::AutoUse - Automatically load the classes you're testin
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

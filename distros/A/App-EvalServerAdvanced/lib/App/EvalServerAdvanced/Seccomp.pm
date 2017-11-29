@@ -1,290 +1,107 @@
 package App::EvalServerAdvanced::Seccomp;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use strict;
 use warnings;
 
+use v5.20;
+
 use Data::Dumper;
 use List::Util qw/reduce uniq/;
 use Moo;
-use Linux::Clone;
-use POSIX ();
+#use Linux::Clone;
+#use POSIX ();
 use Linux::Seccomp;
 use Carp qw/croak/;
-use Permute::Named::Iter qw/permute_named_iter/;
-
-use constant {
-  CLONE_FILES => Linux::Clone::FILES,
-  CLONE_FS => Linux::Clone::FS,
-  CLONE_NEWNS => Linux::Clone::NEWNS,
-  CLONE_VM => Linux::Clone::VM,
-  CLONE_THREAD => Linux::Clone::THREAD,
-  CLONE_SIGHAND => Linux::Clone::SIGHAND,
-  CLONE_SYSVSEM => Linux::Clone::SYSVSEM,
-  CLONE_NEWUSER => Linux::Clone::NEWUSER,
-  CLONE_NEWPID => Linux::Clone::NEWPID,
-  CLONE_NEWUTS => Linux::Clone::NEWUTS,
-  CLONE_NEWIPC => Linux::Clone::NEWIPC,
-  CLONE_NEWNET => Linux::Clone::NEWNET,
-  CLONE_NEWCGROUP => Linux::Clone::NEWCGROUP,
-  CLONE_PTRACE => Linux::Clone::PTRACE,
-  CLONE_VFORK => Linux::Clone::VFORK,
-  CLONE_SETTLS => Linux::Clone::SETTLS,
-  CLONE_PARENT_SETTID => Linux::Clone::PARENT_SETTID,
-  CLONE_CHILD_SETTID => Linux::Clone::CHILD_SETTID,
-  CLONE_CHILD_CLEARTID => Linux::Clone::CHILD_CLEARTID,
-  CLONE_DETACHED => Linux::Clone::DETACHED,
-  CLONE_UNTRACED => Linux::Clone::UNTRACED,
-  CLONE_IO => Linux::Clone::IO,
-};
+use Module::Runtime qw/check_module_name require_module module_notional_filename/;
+use App::EvalServerAdvanced::Config;
+use App::EvalServerAdvanced::ConstantCalc;
+use App::EvalServerAdvanced::Seccomp::Profile;
+use App::EvalServerAdvanced::Seccomp::Syscall;
+use Function::Parameters;
+use YAML::XS (); # no imports
+use Path::Tiny;
 
 has exec_map => (is => 'ro', default => sub {+{}});
-has profiles => (is => 'ro'); # aref
+has profiles => (is => 'ro', default => sub {+{}});
+has constants => (is => 'ro', default => sub {App::EvalServerAdvanced::ConstantCalc->new()});
 
 has _rules => (is => 'rw');
 
-has seccomp => (is => 'ro', default => sub {Linux::Seccomp->new(SCMP_ACT_KILL)});
 has _permutes => (is => 'ro', default => sub {+{}});
-has _used_sets => (is => 'ro', default => sub {+{}});
+has _plugins => (is => 'ro', default => sub {+{}});
+has _fullpermutes => (is => 'ro', lazy => 1, builder => 'calculate_permutations');
+has _used_sets => (is => 'rw', default => sub {+{}});
+
+has _rendered_profiles => (is => 'ro', default => sub {+{}});
 
 has _finalized => (is => 'rw', default => 0); # TODO make this set once
 
 # Define some more open modes that POSIX doesn't have for us.
 my ($O_DIRECTORY, $O_CLOEXEC, $O_NOCTTY, $O_NOFOLLOW) = (00200000, 02000000, 00000400, 00400000);
 
-# TODO this needs some accessors to make it easier to define rulesets
-our %rule_sets = (
-  default => {
-    include => ['time_calls', 'file_readonly', 'stdio', 'exec_wrapper', 'file_write', 'file_tty', 'file_opendir', 'perlmod_file_temp'],
-    rules => [{syscall => 'mmap'},
-              {syscall => 'munmap'},
-              {syscall => 'mremap'},
-              {syscall => 'mprotect'},
-              {syscall => 'madvise'},
-              {syscall => 'brk'},
+method load_yaml($yaml_file) {
 
-              {syscall => 'exit'},
-              {syscall => 'exit_group'},
-              {syscall => 'rt_sigaction'},
-              {syscall => 'rt_sigprocmask'},
-              {syscall => 'rt_sigreturn'},
+  # TODO sanitize file name via Path::Tiny, ensure it's either in the module location, or next to the sandbox config
 
-              {syscall => 'getuid'},
-              {syscall => 'geteuid'},
-              {syscall => 'getcwd'},
-              {syscall => 'getpid'},
-              {syscall => 'gettid'},
-              {syscall => 'getgid'},
-              {syscall => 'getegid'},
-              {syscall => 'getgroups'},
-    
-              {syscall => 'access'}, # file_* instead?
-              {syscall => 'readlink'},
-              
-              {syscall => 'arch_prctl'},
-              {syscall => 'set_tid_address'},
-              {syscall => 'set_robust_list'},
-              {syscall => 'futex'},
-              {syscall => 'getrlimit'},
-      # TODO these should be defaults? locked down more?
-      {syscall => 'prctl',},
-      {syscall => 'poll',},
-      {syscall => 'uname',},
+  my $input = do {no warnings 'io'; local $/; open(my $fh, "<", $yaml_file) or die "Couldn't load seccomp YAML $yaml_file: $!"; <$fh>};
+  my $data = YAML::XS::Load($input);
 
-      {syscall => 'getrandom'},
-    ],
-  },
+  if (my $consts = $data->{constants}) {
+    for my $const_plugin (($consts->{plugins}//[])->@*) {
+      $self->load_plugin("Constants::$const_plugin");
+    }
 
-  perm_test => {
-    permute => {foo => [1, 2, 3], bar => [4, 5, 6]},
-    rules => [{syscall => 'permme', permute_rules => [[0, '==', \'foo'], [1, '==', \'bar']]}]
-  },
-
-  # File related stuff
-  stdio => {
-    rules => [{syscall => 'read', rules => [[qw|0 == 0|]]},  # STDIN
-              {syscall => 'write', rules => [[qw|0 == 1|]]}, # STDOUT
-              {syscall => 'write', rules => [[qw|0 == 2|]]},
-              ],
-  },
-  file_open => {
-    rules => [{syscall => 'open',   permute_rules => [['1', '==', \'open_modes']]}, 
-              {syscall => 'openat', permute_rules => [['2', '==', \'open_modes']]},
-              {syscall => 'close'},
-              {syscall => 'select'},
-              {syscall => 'read'},
-              {syscall => 'pread64'},
-              {syscall => 'lseek'},
-              {syscall => 'fstat'}, # default? not file_open?
-              {syscall => 'stat'},
-              {syscall => 'lstat'},
-              {syscall => 'fcntl'},
-              # 4352  ioctl(4, TCGETS, 0x7ffd10963820)  = -1 ENOTTY (Inappropriate ioctl for device)
-              # This happens on opened files for some reason? wtf
-              {syscall => 'ioctl', rules =>[[1, '==', 0x5401]]},
-              ],
-  },
-  file_opendir => {
-    rules => [{syscall => 'getdents'},
-              {syscall => 'open', rules => [['1', '==', $O_DIRECTORY|POSIX::O_RDONLY|POSIX::O_NONBLOCK|$O_CLOEXEC]]}, 
-             ],
-    include => ['file_open'],
-  },
-  file_tty => {
-    permute => {open_modes => [$O_NOCTTY]},
-    include => ['file_open'],
-  },
-  file_readonly => { 
-    permute => {open_modes => [POSIX::O_NONBLOCK, POSIX::O_EXCL, POSIX::O_RDONLY, $O_NOFOLLOW, $O_CLOEXEC]},
-    include => ['file_open'],
-  },
-  file_write => {
-    permute => {open_modes => [POSIX::O_CREAT,POSIX::O_WRONLY, POSIX::O_TRUNC, POSIX::O_RDWR]},
-    rules => [{syscall => 'write'},
-              {syscall => 'pwrite64'},
-              {syscall => 'mkdir'},
-              {syscall => 'chmod'}, # TODO file_meta profile?
-    ],
-    include => ['file_open', 'file_readonly'],
-  },
-
-  # time related stuff
-  time_calls => {
-    rules => [
-      {syscall => 'nanosleep'},
-      {syscall => 'clock_gettime'},
-      {syscall => 'clock_getres'},
-    ],
-  },
-
-  # ruby timer threads
-  ruby_timer_thread => {
-#    permute => {clone_flags => []},
-    rules => [
-      {syscall => 'clone', rules => [[0, '==', CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID]]},
-
-      # Only allow a new signal stack context to be created, and only with a size of 8192 bytes.  exactly what ruby does
-      # Have to allow it to be blind since i can't inspect inside the struct passed to it :(  I'm not sure how i feel about this one
-      {syscall => 'sigaltstack', }, #=> rules [[1, '==', 0], [2, '==', 8192]]},
-      {syscall => 'pipe2', },
-    ],
-  },
-
-  # perl module specific
-  perlmod_file_temp => {
-    rules => [
-      {syscall => 'chmod', rules => [[1, '==', 0600]]},
-      {syscall => 'unlink', },
-      ],
-  },
-
-  # exec wrapper
-  exec_wrapper => {
-    # we have to generate these at runtime, we can't know ahead of time what they will be
-    rules => sub {
-        my $seccomp = shift;
-        my $strptr = sub {unpack "Q", pack("p", $_[0])};
-        my @rules;
-
-        my $exec_map = $seccomp->exec_map;
-
-        for my $version (keys %$exec_map) {
-          push @rules, {syscall => 'execve', rules => [[0, '==', $strptr->($exec_map->{$version}{bin})]]};
-        }
-
-        return @rules;
-      }, # sub returns a valid arrayref.  given our $self as first arg.
-  },
-
-  # language master rules
-  lang_perl => {
-    rules => [],
-    include => ['default'],
-  },
-
-  lang_javascript => {
-    rules => [{syscall => 'pipe2'},
-              {syscall => 'epoll_create1'},
-              {syscall => 'eventfd2'},
-              {syscall => 'epoll_ctl'},
-              {syscall => 'epoll_wait'},
-              {syscall => 'ioctl', rules => [[1, '==', 0x5451]]}, # ioctl(0, FIOCLEX)
-              {syscall => 'clone', rules => [[0, '==', CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID]]},
-              {syscall => 'ioctl', rules => [[1, '==', 0x80045430]]},  #19348 ioctl(1, TIOCGPTN <unfinished ...>) = ?
-              {syscall => 'ioctl', rules => [[1, '==', 0x5421]]},  #ioctl(0, FIONBIO)
-              {syscall => 'ioctl', rules => [[0, '==', 1]]}, # just fucking let node do any ioctl to STDOUT
-              {syscall => 'ioctl', rules => [[0, '==', 2]]}, # just fucking let node do any ioctl to STDERR
-
-    ],
-    include => ['default'],
-  },
-
-  lang_ruby => {
-    rules => [
-      # Thread IPC writes, these might not be fixed but I don't know how to detect them otherwise 
-      {syscall => 'write', rules => [[0, '==', 5]]},
-      {syscall => 'write', rules => [[0, '==', 7]]},
-    ],
-    include => ['default', 'ruby_timer_thread'],
-  },
-);
-
-sub rule_add {
-  my ($self, $name, @rules) = @_;
-
-  $self->seccomp->rule_add(SCMP_ACT_ALLOW, Linux::Seccomp::syscall_resolve_name($name), @rules);
-}
-
-sub _rec_get_rules {
-  my ($self, $profile) = @_;
-
-  return () if ($self->_used_sets->{$profile});
-  $self->_used_sets->{$profile} = 1;
-
-  croak "Rule set $profile not found" unless exists $rule_sets{$profile};
-
-  my @rules;
-  #print "getting profile $profile\n";
-
-  if (ref $rule_sets{$profile}{rules} eq 'ARRAY') {
-    push @rules, @{$rule_sets{$profile}{rules}};
-  } elsif (ref $rule_sets{$profile}{rules} eq 'CODE') {
-    my @sub_rules = $rule_sets{$profile}{rules}->($self);
-    push @rules, @sub_rules;
-  } elsif (!exists $rule_sets{$profile}{rules}) { # ignore it if missing
-  } else {
-    croak "Rule set $profile defines an invalid set of rules";
-  }
-  
-  for my $perm (keys %{$rule_sets{$profile}{permute} // +{}}) {
-    push @{$self->_permutes->{$perm}}, @{$rule_sets{$profile}{permute}{$perm}};
-  }
-
-  for my $include (@{$rule_sets{$profile}{include}//[]}) {
-    push @rules, $self->_rec_get_rules($include);
-  }
-
-  return @rules;
-}
-
-sub build_seccomp {
-  my ($self) = @_;
-
-  croak "build_seccomp called more than once" if ($self->_finalized);
-
-  my %gathered_rules; # computed rules
-
-  for my $profile (@{$self->profiles}) {
-    my @rules = $self->_rec_get_rules($profile);
-
-    for my $rule (@rules) {
-      my $syscall = $rule->{syscall};
-      push @{$gathered_rules{$syscall}}, $rule;
+    for my $const_key (keys (($consts->{values}//{})->%*)) {
+      $self->constants->add_constant($const_key, $consts->{values}{$const_key})
     }
   }
 
-  # optimize phase
+
+  for my $profile_key (keys $data->{profiles}->%* ) {
+    my $profile_data = $data->{profiles}->{$profile_key};
+
+    my $profile_obj = App::EvalServerAdvanced::Seccomp::Profile->new(%$profile_data);
+
+    $profile_obj->load_permutes($self);
+    $self->profiles->{$profile_key} = $profile_obj;
+  }
+
+  #print Dumper($data);
+}
+
+sub get_profile_rules {
+  my ($self, $next_profile, $current_profile) = @_;
+
+  if ($self->_used_sets->{$next_profile}) {
+    #warn "Circular reference between $current_profile => $next_profile";
+    return (); # short circuit the loop
+  }
+
+  $self->_used_sets->{$next_profile} = 1;
+  die "No profile found [$next_profile]" unless $self->profiles->{$next_profile};
+  return $self->profiles->{$next_profile}->get_rules($self);
+}
+
+method build_seccomp() {
+  croak "build_seccomp called more than once" if ($self->_finalized);
+  $self->_finalized(1);
+
+  for my $profile_key (keys $self->profiles->%*) {
+    my $profile_obj = $self->profiles->{$profile_key};
+
+    $self->_used_sets({});
+    my @rules = $profile_obj->to_seccomp($self);
+    $self->_rendered_profiles->{$profile_key} = \@rules;
+  }
+}
+
+sub calculate_permutations {
+  my ($self) = @_;
+  # TODO this is possible to implement with bitwise checks in seccomp, producing fewer rules.  it should be faster, but is more annoying to implement currently
+
   my %full_permute;
+
   for my $permute (keys %{$self->_permutes}) {
     my @modes = @{$self->_permutes->{$permute}} = sort {$a <=> $b} uniq @{$self->_permutes->{$permute}};
 
@@ -295,7 +112,7 @@ sub build_seccomp {
       #printf "%04b: ", $b;
       do {
         if ($q & $bit) {
-          my $r = int(log($q)/log(2)+0.5); # get the thing
+          my $r = int(log($q)/log(2)+0.5); # get the position
 
           $mode |= $modes[$r];
 
@@ -304,75 +121,106 @@ sub build_seccomp {
         $q <<= 1;
       } while ($q <= $bit);
 
-      push @{$full_permute{$permute}}, $mode;
+      push $full_permute{$permute}->@*, $mode;
     }
   }
 
+  # This originally sorted the values, why? it shouldn't matter.  must have been for easier sanity checking?
   for my $k (keys %full_permute) {
-  @{$full_permute{$k}} = sort {$a <=> $b} uniq @{$full_permute{$k}} 
+    $full_permute{$k}->@* = uniq $full_permute{$k}->@*
   }
 
+  return \%full_permute;
+}
 
-  my %comp_rules;
+method apply_seccomp($profile_name) {
+  # TODO LOAD the rules
 
-  for my $syscall (keys %gathered_rules) {
-    my @rules = @{$gathered_rules{$syscall}};
-    for my $rule (@rules) {
+  my $seccomp = Linux::Seccomp->new(SCMP_ACT_KILL);
+
+  for my $rule ($self->_rendered_profiles->{$profile_name}->@* ) {
+      # TODO make this support raw syscall numbers?
       my $syscall = $rule->{syscall};
+      # If it looks like it's not a raw number, try to resolve.
+      $syscall = Linux::Seccomp::syscall_resolve_name($syscall) if ($syscall =~ /\D/);
+      my @rules = ($rule->{rules}//[])->@*;
 
-      if (exists ($rule->{permute_rules})) {
-        my @perm_on = ();
-        for my $prule (@{$rule->{permute_rules}}) {
-          if (ref $prule->[2]) {
-            push @perm_on, ${$prule->[2]};
-          }
-          if (ref $prule->[0]) {
-            croak "Permuation on argument number not supported using $syscall";
-          }
-        }
+      my %actions = (
+        ALLOW => SCMP_ACT_ALLOW,
+        KILL  => SCMP_ACT_KILL,
+        TRAP  => SCMP_ACT_TRAP,
+      );
 
-        croak "Permutation on syscall rule without actual permutation specified" if (!@perm_on);
+      my $action = $actions{$rule->{action}//""} // SCMP_ACT_ALLOW;
 
-        my %perm_hash = map {$_ => $full_permute{$_}} @perm_on;
-        my $iter = permute_named_iter(%perm_hash);
+       if ($rule->{action} && $rule->{action} =~ /^\s*ERRNO\((-?\d+)\)\s*$/ ) { # send errno() to the process
+         # TODO, support constants? keys from %! maybe? Errno module?
+         $action = SCMP_ACT_ERRNO($1 // -1);
+       } elsif ($rule->{action} && $rule->{action} =~ /^\s*TRACE\((-?\d+)?\)\s*$/) { # hit ptrace with msgnum
+         $action = SCMP_ACT_TRACE($1 // 0);
+       }
 
-        while (my $pvals = $iter->()) {
-
-          push @{$comp_rules{$syscall}}, 
-            [map {
-              my @r = @$_;
-              $r[2] = $pvals->{${$r[2]}};
-              \@r;
-            } @{$rule->{permute_rules}}];
-        }
-      } elsif (exists ($rule->{rules})) {
-        push @{$comp_rules{$syscall}}, $rule->{rules};
-      } else {
-        push @{$comp_rules{$syscall}}, [];
-      }
-    }
+  #    printf "%s => [%s]\n", $rule->{syscall}, join("", map {sprintf "\n    $_->[0] $_->[1] $_->[2]"} @rules);
+      $seccomp->rule_add($action, $syscall, @rules);
   }
 
-  # TODO optimize for permissive rules
-  # e.g. write => OR write => [0, '==', 1] OR write => [0, '==', 2] becomes write =>
-  for my $syscall (keys %comp_rules) {
-    for my $rule (@{$comp_rules{$syscall}}) {
-      $self->rule_add($syscall, @$rule);
-    }
-  }
-
-  $self->_finalized(1);
+  $seccomp->load;
 }
 
-sub apply_seccomp {
-  my $self = shift;
-  $self->seccomp->load;
-}
-
-sub engage {
-  my $self = shift;
+method engage($profile_name) {
   $self->build_seccomp();
-  $self->apply_seccomp();
+  $self->apply_seccomp($profile_name);
+}
+
+sub load_plugin {
+  my ($self, $plugin_name) = @_;
+
+  return $self->_plugins->{$plugin_name} if (exists $self->_plugins->{$plugin_name});
+
+  check_module_name($plugin_name);
+
+  if ($plugin_name !~ /^App::EvalServerAdvanced::Seccomp::Plugin::/) {
+    my $plugin;
+    if (config->sandbox->plugin_base) { # if we have a plugin base configured, use it first.
+      my $plugin_filename = module_notional_filename($plugin_name);
+      my $path = path(config->sandbox->plugin_base); # get the only path we'll load short stuff from by it's short name, otherwise deleting a file or a typo could load something we don't want
+
+      my $full_path = $path->child($plugin_filename);
+
+      $plugin = $plugin_name if (eval {require $full_path}); # TODO check if it was a failure to find, or a failure to compile.  failure to compile should still be fatal.
+  }
+
+    unless ($plugin) {
+      # we couldnt' load it from the plugin base, try from @INC with a fully qualified name
+      my $fullname = "App::EvalServerAdvanced::Seccomp::Plugin::$plugin_name";
+      $plugin = $fullname if (eval {require_module($fullname)});
+      # TODO log errors from module loading
+    }
+
+    die "Failed to find plugin $plugin_name" unless $plugin;
+
+    $self->_plugins->{$plugin_name} = $plugin;
+    $plugin->init_plugin($self);
+    return $plugin;
+  } else {
+    if (eval {require_module($plugin_name)}) {
+      $self->_plugins->{$plugin_name} = $plugin_name;
+      $plugin_name->init_plugin($self);
+      return $plugin_name;
+    }
+
+    die "Failed to find plugin $plugin_name";
+  }
+}
+
+sub BUILD {
+  my ($self) = @_;
+
+#  if (config->sandbox->seccomp->plugins) {
+#    for my $plugin_name (config->sandbox->seccomp->plugins->@*) {
+#      $self->load_plugin($plugin_name);
+#    }
+#  }
 }
 
 1;
@@ -387,54 +235,206 @@ __END__
 
 App::EvalServerAdvanced::Seccomp - Use of Seccomp to create a safe execution environment
 
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
-This is a rule generator for setting up Linux::Seccomp rules.
+This is a rule generator for setting up Linux::Seccomp rules.  It's used internally only, and it's API is not given any consideration for backwards compatibility.  It is however useful to look at the source directly.
+
+=head1 YAML
+
+The yaml config file for seccomp contains two main sections, C<profiles> and C<constants>
+
+=head2 CONSTANTS
+
+    constants:
+      plugins:
+        - 'POSIX'
+        - 'LinuxClone'
+      values:
+        TCGETS: 0x5401
+        FIOCLEX: 0x5451
+        FIONBIO: 0x5421
+        TIOCGPTN: 0x80045430
+
+This section is fairly simple with two sections of it's own C<plugins> and C<values>
+
+=over
+
+=item values
+
+Just a key value list of various names for constant values to be used later.  This lets you define anything not already coming from a plugin, and avoid undocumented magic numbers in your rules.  Ideally you should make sure that these come from the proper header files or documentation so that any architecture change doesn't cause the values to change.
+
+Valid ways to represent the values are as follows:
+
+=over
+
+=item hex
+
+Standard perl syntax 0x0123456789_ABCDEF.  Case insensitive, underscores allowed for readability.
+
+=item binary
+
+Standard perl syntax for binary values 0b1111_0000, case insensitive, underscores allowed for readability.
+
+=item octal
+
+Standard perl syntax, and YAML allowed syntax for octal values. 0777 and 0o777 are both valid.  underscores allowed for readability.
+
+=item decimal integers
+
+Normal base ten integers.  1234567890, cannot begin with a 0.  underscores allowed for readability.
+
+=back
+
+=item plugins
+
+Right now there's only two plugins provided with the distrobution, L<App::EvalServerAdvanced::Seccomp::Plugin::Constants::POSIX> and L<App::EvalServerAdvanced::Seccomp::Plugin::Constants::LinuxClone>.  These two plugins pull constants from the L<POSIX> and L<Linux::Clone> modules respectively.  This way things like O_EXCL and CLONE_NEWNS should always be correct for the platform you run on regardless of the kernel version.  That said, they're unlikely to ever change anyway.
+
+Plugins can be loaded by a short name as demonstrated above.  It will first attempt to load them from the configured plugin base in the App::EvalServerAdvanced configuration file.  If it finds it by the short name there (e.g. - 'MyPlugin' will become MyPlugin.pm) then all is fine.  If it's not found then it will try to load it from @INC under the fully qualified namespace C<App::EvalServerAdvanced::Seccomp::Plugin::Constants::$SHORTNAME>.  You can also specify the full name of the module under the namespace and it will only load it from @INC.
+
+=back
+
+=head2 profiles
+
+    profiles:
+      default:
+        include:
+          - time_calls
+          - file_readonly
+          - stdio
+          - exec_wrapper
+          - file_write
+          - file_tty
+          - file_opendir
+          - file_temp
+        rules:
+    # Memory related calls
+          - syscall: mmap
+          - syscall: munmap
+          - syscall: mremap
+          - syscall: mprotect
+          - syscall: madvise
+          - syscall: brk
+
+Profiles are the most important part of setting up seccomp.  They are a whitelist of what programs in the sandbox are allowed to do.  Anything not specified results in the termination of the process.  A profile consists of a name, child profiles, and a set of rules to follow.
+
+=over
+
+=item Profile name
+
+Name for the profile.  Any valid string can be used for the name.  C<default> is expected to exist, but if all languages in the config specify a profile then you can avoid having one named C<default>.  They are case sensitive, no other restrictions apply.
+
+=item includes
+
+A list of profiles that should be included into this one at runtime.  This is useful for organizing rules into basic actions and letting you compose them into a logical groups to handle programs.
+
+=item rules
+
+This is a list of the syscalls to be allowed.  See the L</Rule definitions> section for details.
+
+=item rule_generator
+
+Use a plugin to generate the rules at runtime.  Use a string such as C<"ExecWrapper::gen_exec_wrapper">.  It will then load the plugin C<ExecWrapper> and call the method C<gen_exec_wrapper> on it.  It will be passed the C<App::EvalServerAdvanced::Seccomp> object and be expected to return a set of rules to be used.  Best to see the source code of L<App::EvalServerAdvanced::Seccomp::Plugin::ExecWrapper> to see just how this works currently.
+
+This is useful for handling some edge cases with Seccomp.  Since Seccomp can't dereference pointers you can't actually handle system calls that contain them fully effectively.  But what you can do is limit the specific pointers that are allowed to be passed to the system calls instead.  In the C<ExecWrapper> plugin this gets used to setup rules for the C<execve> syscall to be allowed to be called with strings from the C<config> singleton object inside the server.  This lets you C<exec(...)> only to specific interpreters/binaries with very little security impact after the C<execve> call happens.  It does mean that you can put a new string at those addresses and run C<execve> again but with ASLR doing so is almost impossible as long as the C<seccomp> syscall is not allowed to be used to get the existing eBPF program for examination.
+
+=item permute
+
+    file_write:
+      include:
+       - 'file_open'
+      permute:
+        open_modes:
+          - 'O_CREAT'
+          - 'O_WRONLY'
+          - 'O_TRUNC'
+          - 'O_RDWR'
+    file_open:
+      rules:
+        - syscall: open
+          tests:
+            - [1, '==', '{{open_modes}}']
+
+This gets used to specify flags for a syscall to use.  In the example above for the C<file_write> profile, it says that the flags O_CREAT, O_WRONLY, O_TRUNC and O_RDWR should be allowed for the permutation named C<open_modes>.  In the C<file_open> profile, we define a syscall that C<open> that can take any combination of the flags from C<open_modes> by specifying the value with C<'{{open_modes}}'>.  See L</Rule definitions> for more information.
+
+
+=back
+
+=head1 Rule definitions
+
+    file_open:
+      rules:
+        - syscall: open
+          tests:
+            - [1, '==', '{{open_modes}}']
+        - syscall: openat
+          tests:
+            - [2, '==', '{{open_modes}}']
+        - syscall: close
+
+Rules consist of a few attributes that specify what you're allowed to do.
+
+=over
+
+=item syscall
+
+The most important part of a rule, without it you will end up with a fatal error.  Best practice is to specify the syscall by name, i.e. C<open> or C<openat>.  It will be resolved at runtime using the syscall map of the system automatically, so that you don't have to know the number of the syscalls.  If however there's a syscall that doesn't want to resolve for you, you can specify it by number, but this is not recommended as it will be architecture dependant and cause problems if you change architectures (i.e. from x86_64 to i386).
+
+=item action
+
+=item tests
+
+This is probably the least elegant part of the config file, but I couldn't come up with a better setup/syntax for it.  This is a list of tests, all of which must pass, for the given syscall.
+
+Each test is an array of three things, [argument, operator, value].
+
+=over
+
+=item argument
+
+Which argument to the syscall you want to test.  Starting from 0 being the first argument.
+
+=item operator
+
+What operator to use for the test: == != >= <= < > or =~
+
+The =~ operator takes the C<argument> to the syscall and uses the C<value> as a bit mask.  It passes if all the bits from the mask are set in the argument, ignoring any not present in the mask.
+
+=item value
+
+This is the value you want to test for.  It can be either a literal integer value or it can be a string containing a set of constants and bitwise operations.  It uses L<App::EvalServerAdvanced::ConstantCalc> to do the math and you should look at that for the exact operations supported.
+
+Some examples
+
+    'O_CLOEXEC|O_EXCL|O_RDWR'
+
+Also supported are using automatically permutated values by using a string like '{{ open_modes }}'.  In this case all possible values will be pre-generated and substituted into the rule to allow any valid set of flags in a syscall
+
+=back
+
+=back
 
 =head1 SECURITY
 
-This is an excercise in defense in depths.  The default rulesets 
+This is an excercise in defense in depths.  The default rulesets
 provide a bit of protection against accidentally running knowingly dangerous syscalls.
 
-This does not provide absolute security.  It relies on the fact that the syscalls allowed 
+This does not provide absolute security.  It relies on the fact that the syscalls allowed
 are likely to be safe, or commonly required for normal programs to function properly.
 
 In particular there are two syscalls that are allowed that are involved in the Dirty COW
 kernel exploit.  C<madvise> and C<mmap>, with these two you can actually trigger the Dirty COW
 exploit.  But because the default rules restrict you from creating threads, you can't create the race
-condition needed to actually accomplish it.  So you should still take some 
+condition needed to actually accomplish it.  So you should still take some
 other measures to protect yourself.
 
-=head1 USE
+=head1 KNOWN ISSUES
 
-You'll want to take a look at the 'etc' directory in the dist for an example config.  
-Future versions will include a script for generating a configuration and environment for running
-the server.
+=over
 
-Right now you probably don't actually want to actually install this, but instead just download the dist and run from it locally.
-It's a bit difficult to use and requires root.
-
-=head1 TODO
-
-=over 1
-
-=item Make a script to create a usable environment
-
-=item Create some kind of pluggable system for specifiying additional Seccomp rules
-
-=item Create another pluggable system for extending App::EvalServer::Sandbox::Internal with additional subs
-
-=item Finish enabling full configuration of the sandbox without having to edit any code
+=item Compilation errors when loading plugins from the plugin base directory will result in it attempting to load the fully qualified module name.  This will be fixed in future versions to be a fatal error
 
 =back
-
-=head1 SEE ALSO
-
-L<App::EvalServerAdvanced::REPL>, L<App::EvalServerAdvanced::Protocol>
 
 =head1 AUTHOR
 

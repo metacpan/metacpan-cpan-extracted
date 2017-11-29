@@ -71,7 +71,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MediaHaven"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_contributors" : [
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],

@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Normal">--&nbsp;test&nbsp;file&nbsp;for&nbsp;Haskell&nbsp;syntax&nbsp;highlighting&nbsp;in&nbsp;KDE's&nbsp;Kate</font></br></div>
+<div id="2" class="line"></br></div>
+<div id="3" class="line"><font class="Normal">--&nbsp;The&nbsp;test&nbsp;file&nbsp;for&nbsp;literate&nbsp;Haskell&nbsp;can&nbsp;be&nbsp;easily&nbsp;created&nbsp;like&nbsp;this:</font></br></div>
+<div id="4" class="line"><font class="Normal">--&nbsp;&nbsp;cat&nbsp;highlight.hs&nbsp;|&nbsp;sed&nbsp;-e&nbsp;&quot;s|^|&gt;&nbsp;|&quot;&nbsp;-e&nbsp;&quot;s|&gt;&nbsp;--&nbsp;||&quot;&nbsp;-e&nbsp;&quot;s|^&gt;&nbsp;$||&quot;&nbsp;&gt;&nbsp;highlight.lhs</font></br></div>
+<div id="5" class="line"><font class="Normal">--&nbsp;You&nbsp;only&nbsp;have&nbsp;to&nbsp;manually&nbsp;edit&nbsp;the&nbsp;multi-line&nbsp;comment&nbsp;below.</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"><font class="Normal">--&nbsp;this&nbsp;is&nbsp;a&nbsp;single-line&nbsp;comment</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Normal">{-&nbsp;this&nbsp;is&nbsp;a&nbsp;multi-line&nbsp;comment</font></br></div>
+<div id="10" class="line"></br></div>
+<div id="11" class="line"><font class="Normal">Things&nbsp;like&nbsp;&quot;a&nbsp;string&quot;&nbsp;or&nbsp;a&nbsp;'c'&nbsp;character&nbsp;shouldn't&nbsp;be&nbsp;highlighted&nbsp;in&nbsp;here.</font></br></div>
+<div id="12" class="line"></br></div>
+<div id="13" class="line"><font class="Normal">--&nbsp;I&nbsp;could&nbsp;even&nbsp;start&nbsp;a&nbsp;new</font></br></div>
+<div id="14" class="line"><font class="Normal">--&nbsp;one-line&nbsp;comment.</font></br></div>
+<div id="15" class="line"></br></div>
+<div id="16" class="line"><font class="Normal">-}</font></br></div>
+<div id="17" class="line"></br></div>
+<div id="18" class="line"><font class="Normal">--&nbsp;a&nbsp;data&nbsp;definition</font></br></div>
+<div id="19" class="line"></br></div>
+<div id="20" class="line"><font class="Normal">data&nbsp;Tree&nbsp;a&nbsp;=&nbsp;Br&nbsp;(Tree&nbsp;a)&nbsp;(Tree&nbsp;a)&nbsp;|&nbsp;Leaf&nbsp;a&nbsp;|&nbsp;Nil&nbsp;deriving&nbsp;(Show,&nbsp;Eq)</font></br></div>
+<div id="21" class="line"></br></div>
+<div id="22" class="line"></br></div>
+<div id="23" class="line"><font class="Normal">--&nbsp;function&nbsp;definition,&nbsp;&quot;funnyfunction::&quot;,&nbsp;&quot;Integer&quot;,&nbsp;&quot;Int&quot;,&nbsp;&quot;Bool&quot;&nbsp;should&nbsp;be&nbsp;highlighted</font></br></div>
+<div id="24" class="line"></br></div>
+<div id="25" class="line"><font class="Normal">funnyfunction::(Tree&nbsp;a)=&gt;[a]-&gt;Integer-&gt;Int-&gt;Bool</font></br></div>
+<div id="26" class="line"></br></div>
+<div id="27" class="line"></br></div>
+<div id="28" class="line"><font class="Normal">--&nbsp;strings&nbsp;and&nbsp;chars</font></br></div>
+<div id="29" class="line"><font class="Normal">--&nbsp;first&nbsp;line&nbsp;of&nbsp;function&nbsp;definitions&nbsp;(type&nbsp;declaration)&nbsp;should&nbsp;be&nbsp;highlighted</font></br></div>
+<div id="30" class="line"></br></div>
+<div id="31" class="line"><font class="Normal">strangefunction::Int-&gt;String</font></br></div>
+<div id="32" class="line"><font class="Normal">strangefunction&nbsp;1&nbsp;=&nbsp;&quot;hello&quot;</font></br></div>
+<div id="33" class="line"><font class="Normal">strangefunction&nbsp;2&nbsp;=&nbsp;&quot;what's&nbsp;up&quot;</font></br></div>
+<div id="34" class="line"><font class="Normal">strangefunction&nbsp;3&nbsp;=&nbsp;(strangefunction&nbsp;1)&nbsp;++&nbsp;&quot;,&nbsp;&quot;&nbsp;++&nbsp;(strangefunction&nbsp;2)</font></br></div>
+<div id="35" class="line"><font class="Normal">strangefunction&nbsp;4&nbsp;=&nbsp;'a':'b':'c':'&quot;':[]&nbsp;--&nbsp;will&nbsp;return&nbsp;&quot;abc&quot;</font></br></div>
+<div id="36" class="line"><font class="Normal">strangefunction&nbsp;5&nbsp;=&nbsp;'\n':[]</font></br></div>
+<div id="37" class="line"><font class="Normal">strangefunction&nbsp;6&nbsp;=&nbsp;'\invalidhaskell':[]</font></br></div>
+<div id="38" class="line"></br></div>
+<div id="39" class="line"><font class="Normal">--&nbsp;function&nbsp;name&nbsp;including&nbsp;the&nbsp;single&nbsp;quote&nbsp;character</font></br></div>
+<div id="40" class="line"><font class="Normal">--&nbsp;and&nbsp;infix&nbsp;operator&nbsp;(`div`)</font></br></div>
+<div id="41" class="line"></br></div>
+<div id="42" class="line"><font class="Normal">justtesting'::Int-&gt;Int</font></br></div>
+<div id="43" class="line"><font class="Normal">justtesting'&nbsp;2&nbsp;=&nbsp;2+1</font></br></div>
+<div id="44" class="line"><font class="Normal">justtesting'&nbsp;9&nbsp;=&nbsp;7&nbsp;`div`&nbsp;2</font></br></div>
+<div id="45" class="line"></br></div>
+<div id="46" class="line"><font class="Normal">--&nbsp;same&nbsp;definition&nbsp;as&nbsp;above,&nbsp;slightly&nbsp;different&nbsp;function&nbsp;name&nbsp;and&nbsp;a&nbsp;couple&nbsp;more&nbsp;whitespaces</font></br></div>
+<div id="47" class="line"></br></div>
+<div id="48" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;&nbsp;Int&nbsp;-&gt;&nbsp;Int</font></br></div>
+<div id="49" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;2&nbsp;=&nbsp;3</font></br></div>
+<div id="50" class="line"><font class="Normal">justtesting''&nbsp;&nbsp;&nbsp;9&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;3&nbsp;+&nbsp;9&nbsp;-&nbsp;9</font></br></div>
+<div id="51" class="line"></br></div>
+<div id="52" class="line"><font class="Normal">--&nbsp;the&nbsp;following&nbsp;lines&nbsp;are&nbsp;copied&nbsp;out&nbsp;of&nbsp;Haskell's&nbsp;&quot;Prelude.hs&quot;</font></br></div>
+<div id="53" class="line"></br></div>
+<div id="54" class="line"><font class="Normal">infixl&nbsp;7&nbsp;&nbsp;*,&nbsp;/,&nbsp;`quot`,&nbsp;`rem`,&nbsp;`div`,&nbsp;`mod`,&nbsp;:%,&nbsp;%</font></br></div>
+<div id="55" class="line"></br></div>
+<div id="56" class="line"></br></div>
+<div id="57" class="line"><font class="Normal">--&nbsp;everything&nbsp;highlighted&nbsp;except&nbsp;the&nbsp;&quot;a&quot;</font></br></div>
+<div id="58" class="line"></br></div>
+<div id="59" class="line"><font class="Normal">class&nbsp;Bounded&nbsp;a&nbsp;where</font></br></div>
+<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;minBound,&nbsp;maxBound&nbsp;::&nbsp;a</font></br></div>
+<div id="61" class="line"></br></div>
+<div id="62" class="line"><font class="Normal">class&nbsp;(Num&nbsp;a,&nbsp;Ord&nbsp;a)&nbsp;=&gt;&nbsp;Real&nbsp;a&nbsp;where</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;toRational&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::&nbsp;a&nbsp;-&gt;&nbsp;Rational</font></br></div>
+<div id="64" class="line"></br></div>
+<div id="65" class="line"><font class="Normal">--&nbsp;finally,&nbsp;some&nbsp;keyword&nbsp;lists</font></br></div>
+<div id="66" class="line"></br></div>
+<div id="67" class="line"><font class="Normal">--&nbsp;keywords</font></br></div>
+<div id="68" class="line"></br></div>
+<div id="69" class="line"><font class="Normal">case,&nbsp;class,&nbsp;data,&nbsp;deriving,&nbsp;do,&nbsp;else,&nbsp;if,&nbsp;in,&nbsp;infixl,&nbsp;infixr,&nbsp;instance,&nbsp;let,&nbsp;module,&nbsp;of,&nbsp;primitive,</font></br></div>
+<div id="70" class="line"><font class="Normal">then,&nbsp;type,&nbsp;where</font></br></div>
+<div id="71" class="line"></br></div>
+<div id="72" class="line"><font class="Normal">--&nbsp;infix&nbsp;operators</font></br></div>
+<div id="73" class="line"></br></div>
+<div id="74" class="line"><font class="Normal">quot,&nbsp;rem,&nbsp;div,&nbsp;mod,&nbsp;elem,&nbsp;notElem,&nbsp;seq</font></br></div>
+<div id="75" class="line"></br></div>
+<div id="76" class="line"><font class="Normal">--&nbsp;this&nbsp;stuff&nbsp;is&nbsp;not&nbsp;handled&nbsp;yet</font></br></div>
+<div id="77" class="line"></br></div>
+<div id="78" class="line"><font class="Normal">!!,&nbsp;%,&nbsp;&amp;&amp;,&nbsp;$!,&nbsp;$,&nbsp;*,&nbsp;**,&nbsp;-,.,&nbsp;/=,&nbsp;&lt;,&nbsp;&lt;=,&nbsp;=&lt;&lt;,&nbsp;==,&nbsp;&gt;,&nbsp;&gt;=,&nbsp;&gt;&gt;,&nbsp;&gt;&gt;=,&nbsp;^,&nbsp;^^,&nbsp;++,&nbsp;||</font></br></div>
+<div id="79" class="line"></br></div>
+<div id="80" class="line"><font class="Normal">--&nbsp;functions</font></br></div>
+<div id="81" class="line"></br></div>
+<div id="82" class="line"><font class="Normal">FilePath,&nbsp;IOError,&nbsp;abs,&nbsp;acos,&nbsp;acosh,&nbsp;all,&nbsp;and,&nbsp;any,&nbsp;appendFile,</font></br></div>
+<div id="83" class="line"><font class="Normal">approxRational,&nbsp;asTypeOf,&nbsp;asin,&nbsp;asinh,&nbsp;atan,&nbsp;atan2,&nbsp;atanh,&nbsp;basicIORun,</font></br></div>
+<div id="84" class="line"><font class="Normal">break,&nbsp;catch,&nbsp;ceiling,&nbsp;chr,&nbsp;compare,&nbsp;concat,&nbsp;concatMap,&nbsp;const,&nbsp;cos,&nbsp;cosh,</font></br></div>
+<div id="85" class="line"><font class="Normal">curry,&nbsp;cycle,&nbsp;decodeFloat,&nbsp;denominator,&nbsp;digitToInt,&nbsp;div,&nbsp;divMod,&nbsp;drop,</font></br></div>
+<div id="86" class="line"><font class="Normal">dropWhile,&nbsp;either,&nbsp;elem,&nbsp;encodeFloat,&nbsp;enumFrom,&nbsp;enumFromThen,</font></br></div>
+<div id="87" class="line"><font class="Normal">enumFromThenTo,&nbsp;enumFromTo,&nbsp;error,&nbsp;even,&nbsp;exp,&nbsp;exponent,&nbsp;fail,&nbsp;filter,&nbsp;flip,</font></br></div>
+<div id="88" class="line"><font class="Normal">floatDigits,&nbsp;floatRadix,&nbsp;floatRange,&nbsp;floor,&nbsp;fmap,&nbsp;foldl,&nbsp;foldl1,&nbsp;foldr,</font></br></div>
+<div id="89" class="line"><font class="Normal">foldr1,&nbsp;fromDouble,&nbsp;fromEnum,&nbsp;fromInt,&nbsp;fromInteger,&nbsp;fromIntegral,</font></br></div>
+<div id="90" class="line"><font class="Normal">fromRational,&nbsp;fst,&nbsp;gcd,&nbsp;getChar,&nbsp;getContents,&nbsp;getLine,&nbsp;head,&nbsp;id,&nbsp;inRange,</font></br></div>
+<div id="91" class="line"><font class="Normal">index,&nbsp;init,&nbsp;intToDigit,&nbsp;interact,&nbsp;ioError,&nbsp;isAlpha,&nbsp;isAlphaNum,&nbsp;isAscii,</font></br></div>
+<div id="92" class="line"><font class="Normal">isControl,&nbsp;isDenormalized,&nbsp;isDigit,&nbsp;isHexDigit,&nbsp;isIEEE,&nbsp;isInfinite,&nbsp;isLower,</font></br></div>
+<div id="93" class="line"><font class="Normal">isNaN,&nbsp;isNegativeZero,&nbsp;isOctDigit,&nbsp;isPrint,&nbsp;isSpace,&nbsp;isUpper,&nbsp;iterate,&nbsp;last,</font></br></div>
+<div id="94" class="line"><font class="Normal">lcm,&nbsp;length,&nbsp;lex,&nbsp;lexDigits,&nbsp;lexLitChar,&nbsp;lines,&nbsp;log,&nbsp;logBase,&nbsp;lookup,&nbsp;map,</font></br></div>
+<div id="95" class="line"><font class="Normal">mapM,&nbsp;mapM_,&nbsp;max,&nbsp;maxBound,&nbsp;maximum,&nbsp;maybe,&nbsp;min,&nbsp;minBound,&nbsp;minimum,&nbsp;mod,</font></br></div>
+<div id="96" class="line"><font class="Normal">negate,&nbsp;not,&nbsp;notElem,&nbsp;null,&nbsp;numerator,&nbsp;odd,&nbsp;or,&nbsp;ord,&nbsp;otherwise,&nbsp;pi,&nbsp;pred,</font></br></div>
+<div id="97" class="line"><font class="Normal">primExitWith,&nbsp;print,&nbsp;product,&nbsp;properFraction,&nbsp;putChar,&nbsp;putStr,&nbsp;putStrLn,</font></br></div>
+<div id="98" class="line"><font class="Normal">quot,&nbsp;quotRem,&nbsp;range,&nbsp;rangeSize,&nbsp;read,&nbsp;readDec,&nbsp;readFile,&nbsp;readFloat,</font></br></div>
+<div id="99" class="line"><font class="Normal">readHex,&nbsp;readIO,&nbsp;readInt,&nbsp;readList,&nbsp;readLitChar,&nbsp;readLn,&nbsp;readOct,&nbsp;readParen,</font></br></div>
+<div id="100" class="line"><font class="Normal">readSigned,&nbsp;reads,&nbsp;readsPrec,&nbsp;realToFrac,&nbsp;recip,&nbsp;rem,&nbsp;repeat,&nbsp;replicate,</font></br></div>
+<div id="101" class="line"><font class="Normal">return,&nbsp;reverse,&nbsp;round,&nbsp;scaleFloat,&nbsp;scanl,&nbsp;scanl1,&nbsp;scanr,&nbsp;scanr1,&nbsp;seq,</font></br></div>
+<div id="102" class="line"><font class="Normal">sequence,&nbsp;sequence_,&nbsp;show,&nbsp;showChar,&nbsp;showInt,&nbsp;showList,&nbsp;showLitChar,</font></br></div>
+<div id="103" class="line"><font class="Normal">showParen,&nbsp;showSigned,&nbsp;showString,&nbsp;shows,&nbsp;showsPrec,&nbsp;significand,&nbsp;signum,</font></br></div>
+<div id="104" class="line"><font class="Normal">sin,&nbsp;sinh,&nbsp;snd,&nbsp;span,&nbsp;splitAt,&nbsp;sqrt,&nbsp;subtract,&nbsp;succ,&nbsp;sum,&nbsp;tail,&nbsp;take,</font></br></div>
+<div id="105" class="line"><font class="Normal">either,&nbsp;elem,&nbsp;encodeFloat,&nbsp;enumFrom,&nbsp;enumFromThen,&nbsp;enumFromThenTo,</font></br></div>
+<div id="106" class="line"><font class="Normal">enumFromTo,&nbsp;error,&nbsp;even,&nbsp;exp,&nbsp;exponent,&nbsp;fail,&nbsp;filter,&nbsp;flip,&nbsp;floatDigits,</font></br></div>
+<div id="107" class="line"><font class="Normal">floatRadix,&nbsp;floatRange,&nbsp;floor,&nbsp;fmap,&nbsp;takeWhile,&nbsp;tan,&nbsp;tanh,&nbsp;threadToIOResult,</font></br></div>
+<div id="108" class="line"><font class="Normal">toEnum,&nbsp;toInt,&nbsp;toInteger,&nbsp;toLower,&nbsp;toRational,&nbsp;toUpper,&nbsp;truncate,&nbsp;uncurry,</font></br></div>
+<div id="109" class="line"><font class="Normal">undefined,&nbsp;unlines,&nbsp;until,&nbsp;unwords,&nbsp;unzip,&nbsp;unzip3,&nbsp;userError,&nbsp;words,</font></br></div>
+<div id="110" class="line"><font class="Normal">writeFile,&nbsp;zip,&nbsp;zip3,&nbsp;zipWith,&nbsp;zipWith3</font></br></div>
+<div id="111" class="line"></br></div>
+<div id="112" class="line"><font class="Normal">--&nbsp;type&nbsp;constructors</font></br></div>
+<div id="113" class="line"></br></div>
+<div id="114" class="line"><font class="Normal">Bool,&nbsp;Char,&nbsp;Double,&nbsp;Either,&nbsp;Float,&nbsp;IO,&nbsp;Integer,&nbsp;Int,&nbsp;Maybe,&nbsp;Ordering,&nbsp;Rational,&nbsp;Ratio,&nbsp;ReadS,</font></br></div>
+<div id="115" class="line"><font class="Normal">ShowS,&nbsp;String</font></br></div>
+<div id="116" class="line"></br></div>
+<div id="117" class="line"><font class="Normal">--&nbsp;classes</font></br></div>
+<div id="118" class="line"></br></div>
+<div id="119" class="line"><font class="Normal">Bounded,&nbsp;Enum,&nbsp;Eq,&nbsp;Floating,&nbsp;Fractional,&nbsp;Functor,&nbsp;Integral,&nbsp;Ix,&nbsp;Monad,&nbsp;Num,&nbsp;Ord,&nbsp;Read,&nbsp;RealFloat,</font></br></div>
+<div id="120" class="line"><font class="Normal">RealFrac,&nbsp;Real,&nbsp;Show</font></br></div>
+<div id="121" class="line"></br></div>
+<div id="122" class="line"><font class="Normal">--&nbsp;data&nbsp;constructors</font></br></div>
+<div id="123" class="line"></br></div>
+<div id="124" class="line"><font class="Normal">EQ,&nbsp;False,&nbsp;GT,&nbsp;Just,&nbsp;LT,&nbsp;Left,&nbsp;Nothing,&nbsp;Right,&nbsp;True</font></br></div>
+</div>
+</body>
+</html>
+

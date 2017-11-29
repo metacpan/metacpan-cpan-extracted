@@ -1,8 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.10.0'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
@@ -36,8 +35,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Parallel::ForkManager' => 'v0.7.6'
-                                      },
+                                      'Parallel::ForkManager' => 'v0.7.6'
+                                    },
                       'requires' => {
                                       'Benchmark' => '0',
                                       'Carp' => '0',
@@ -61,7 +60,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sub::Attribute' => '0',
                                       'TAP::Formatter::Color' => '3.29',
-                                      'Test2' => '1.302059',
+                                      'Test2' => '1.1302118',
                                       'Test2::API' => '0',
                                       'Test2::AsyncSubtest' => '0.000018',
                                       'Test2::IPC' => '0',
@@ -69,21 +68,20 @@ do { my $x = {
                                       'Test::Most' => '0',
                                       'Try::Tiny' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900',
-                                     'Test::Output' => '0.0005'
-                                   },
+                                   'CPAN::Meta' => '2.120900',
+                                   'Test::Output' => '0.0005'
+                                 },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'File::Temp' => '0',
-                                   'Test2::Bundle::Extended' => '0',
                                    'Test2::Tools::Basic' => '0',
                                    'Test2::Tools::Class' => '0',
                                    'Test2::Tools::Compare' => '0',
@@ -92,8 +90,7 @@ do { my $x = {
                                    'Test::More' => '1.302015',
                                    'Test::Requires' => '0',
                                    'Test::Warnings' => '0',
-                                   'lib' => '0',
-                                   'perl' => '5.010'
+                                   'lib' => '0'
                                  }
                  }
      };

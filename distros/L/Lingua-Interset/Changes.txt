@@ -1,7 +1,25 @@
+3.010     2017-11-27 21:11:31+01:00 Europe/Prague
+
+Drivers:
+* pt::freeling should not encode "PA*" (pronoun-article) and "DR*" (relative
+  determiner)
+
+
+
+3.009     2017-11-27 16:15:22+01:00 Europe/Prague
+
+Fixes:
+* A value encoded by Atom should be deterministic even if the
+  encoding map allows multiple paths.
+
+
+
 3.008     2017-11-18 16:44:01+01:00 Europe/Prague
 
 Features:
 * Added feature 'clusivity' (inclusive vs. exclusive pronoun "we").
+
+
 
 3.007     2017-10-25 18:03:12+02:00 Europe/Prague
 

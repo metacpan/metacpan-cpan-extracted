@@ -93,13 +93,15 @@ These methods return general information about the syntax definitions.
 
 =item B<Info>(I<$syntax>, I<$tag>);
 
-$tag can have the value: 'ext', 'mime', 'menu' or 'file'.
+$tag can have the value: 'ext', 'mime', 'menu', 'file' or 'version'.
 
 =item B<InfoExtensions>(I<$syntax>);
 
 =item B<InfoMimeType>(I<$syntax>);
 
 =item B<InfoSection>(I<$syntax>);
+
+=item B<InfoVersion>(I<$syntax>);
 
 =item B<InfoXMLFile>(I<$syntax>);
 

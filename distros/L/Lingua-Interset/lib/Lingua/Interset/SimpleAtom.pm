@@ -4,7 +4,7 @@
 package Lingua::Interset::SimpleAtom;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -83,7 +83,7 @@ Lingua::Interset::SimpleAtom - Atomic driver for a surface feature.
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

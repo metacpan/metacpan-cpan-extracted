@@ -1,5 +1,25 @@
 Revision history for Future
 
+0.37    2017/11/28 15:39:22
+        [CHANGES]
+         * Finally got around to removing the old Makefile.PL
+
+        [BUGFIXES]
+         * Fix for convergent futures that lose strong references during
+           cancellation (RT120468)
+         * ->without_cancel shouldn't retain the originating future after
+           completion (RT122920)
+
+0.36    2017/11/27 22:04:52
+        [CHANGES]
+         * Added ->retain method (RT123711)
+         * Fixed some typoes in docs (RT118309)
+         * Added ->state method (RT120759)
+        
+        [BUGFIXES]
+         * Ensure that ->without_cancel still strongly holds a reference to
+           its parent future (RT122920)
+
 0.35    2017/06/23 20:37:57
         [CHANGES]
          * Link to YAPC::EU talk video in SEE ALSO

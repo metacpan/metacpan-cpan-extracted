@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Test2::Util::HashBase qw/inref items/;
 
@@ -32,7 +32,7 @@ sub verify {
     my %params = @_;
 
     return 0 unless $params{exists};
-    my $got = $params{got} || return 0;
+    defined( my $got = $params{got} ) || return 0;
     return 0 unless ref($got);
     return 0 unless reftype($got) eq 'ARRAY';
     return 1;

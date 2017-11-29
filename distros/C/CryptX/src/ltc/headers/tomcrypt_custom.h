@@ -202,9 +202,13 @@
 #define LTC_KASUMI
 #define LTC_MULTI2
 #define LTC_CAMELLIA
+#define LTC_IDEA
+#define LTC_SERPENT
 
 /* stream ciphers */
 #define LTC_CHACHA
+#define LTC_SALSA20
+#define LTC_SOSEMANUK
 #define LTC_RC4_STREAM
 #define LTC_SOBER128_STREAM
 
@@ -442,6 +446,8 @@
 #define LTC_BASE64
 /* ... and it's URL safe version */
 #define LTC_BASE64_URL
+/* Base32 encoding/decoding */
+#define LTC_BASE32
 
 /* Keep LTC_NO_HKDF for compatibility reasons
  * superseeded by LTC_NO_MISC*/

@@ -22,3 +22,7 @@ Version 0.16 November 21, 2017
 	set use 5.006 in all pm's
 	
 
+Version 0.17 November 28, 2017
+
+	Refactored testing
+	Set license in Makefile.PL

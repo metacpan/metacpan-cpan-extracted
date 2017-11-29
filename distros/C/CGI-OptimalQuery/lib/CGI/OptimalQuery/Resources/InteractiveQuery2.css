@@ -16,27 +16,16 @@ form.OQform {
   margin: 0;
 }
 
-.OQhead { position: relative; background-color: #666; color: #fff; overflow: hidden; padding: .2em; }
+.OQhead { position: relative; background-color: #666; color: #fff; overflow: hidden; padding: .2em; border-bottom: 1px solid #444b54; }
 .OQtitle {
   width: 40%; float: left; padding: .3em 0;
   font-weight: bold;
 }
 .OQsummary { width: 30%; text-align: center; float: left; padding: .3em 0; }
-.OQcmds { width: 30%; text-align: right; float: left; }
-
-@media (max-width:600px) {
-  .OQtitle, .OQsummary, .OQcmds {
-    width: 95%;
-    text-align: left;
-  }
-  .OQcmds {
-  margin-bottom: 4px;
-  }
-}
+.OQcmds { text-align: right; float: right; }
 
 .OQcmds > * {
   font-size: .7em;
-  vertical-align: middle;
 }
 
 .OQinfo {
@@ -59,7 +48,7 @@ form.OQform {
   text-align: center;
   padding-left: 0;
   background-color: #ccc;
-  border: 1px solid #666;
+  border: 1px solid #bbb;
 }
 .OQFilterDescr {
   cursor: pointer;
@@ -98,7 +87,7 @@ form.OQform {
   color: #c4c600;
 }
 .OQHelpPanel {
-  top: 35px;
+  top: 150px;
   right: 2px;
   left: auto;
   height: 14em;
@@ -143,6 +132,7 @@ form.OQform {
   z-index:99999;
   top: 29px;
 }
+
 .OQToolsPanel * {
   vertical-align: middle;
 }
@@ -165,6 +155,11 @@ form.OQform {
   border-color: transparent;
   border-radius: 6px;
   margin-top: .5em;
+  margin-left: 0;
+}
+#OQSaveReportEmailAlertOpts > legend {
+  margin: 0;
+  padding: 0;
 }
 #OQSaveReportEmailAlertOpts > * {
   display: none;
@@ -407,9 +402,9 @@ table.OQdata {
   margin-bottom: 6px;
 }
 table.OQdata > tbody > tr:nth-child(odd) {
-  background-color: #ccc; 
+  background-color: #ddd;
 }
-table.OQdata > tbody > tr > td {
+table.OQdata > tbody > tr > td + td {
   border-left: 1px solid #999;
   padding-left: 6px;
 }
@@ -453,7 +448,8 @@ table.OQdata > thead td:last-child {
   background-color: #ddd;
   width: 1%;
 }
-table.OQdata > tbody tr.OQupdatedRow td {
+table.OQdata > tbody tr.OQupdatedRow td,
+table.OQdata > tbody tr.OQupdatedRow {
   background-color: #fdd;
 }
 
@@ -498,32 +494,20 @@ a.OQeditBut, a.OQnewBut {
   display: inline-block;
 }
 
-.OQRecViewCmds {
-  position: relative;
-  height: 0;
-}
-.OQRecViewCmds .OQAddColumnsBut {
-  padding: 10px;
-  padding-left: 34px;
-  color: black;
-  border-bottom: 1px solid #ddd;
-  background-repeat: no-repeat;
-  background-position: 6px 6px;
-  text-align: left;
-  position: absolute;
-  top: -50px;
-  right: 4px;
-}
-
-.OQnewBut,.OQrefreshBut,.OQToolsBut,.OQeditBut,.OQselectBut,.OQhelpBut {
+.OQcmds > button,
+.OQRecViewCmds > button,
+.OQeditBut {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
   width: 24px;
   height: 24px;
   margin: 0 0 0 20px;
   border: 0;
+}
+
+.OQAddColumnsBut,.OQFilterBut,.OQnewBut,.OQrefreshBut,.OQToolsBut,.OQeditBut,.OQhelpBut {
   background: transparent url(document-new-6.png) no-repeat center top;
-  font-size: 0 !important;
-  line-height: 0 !important;
-  color: transparent !important;
 }
 .OQhelpBut {
   background-image: url(help.png);
@@ -542,8 +526,9 @@ a.OQeditBut, a.OQnewBut {
   margin: 4px;
 }
 .OQselectBut {
-  background-image: url(list-add-5.png);
-  margin: 0;
+  background: transparent url(list-add-5.png) no-repeat left top;
+  background-position: 5px 7px;
+  padding-left: 23px;
 }
 .OQSortBut {
   background-image: url(view-sort-descending.png);
@@ -588,6 +573,17 @@ a.OQeditBut, a.OQnewBut {
 }
 .OQToolsCancelBut:hover {
   background-color: #ddd;
+}
+
+.OQRecViewCmds {
+  background-color: #ccc;
+  padding: 4px;
+  text-align: right;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #bbb;
+}
+.OQRecViewCmds > * {
+  vertical-align: middle;
 }
 
 .OQdialogs {
@@ -650,14 +646,13 @@ label.ckbox:hover {
   border-radius: 1px;
 }
 .OQrecview td {
+  padding: 0;
+  margin: 0;
   border: 0;
   background-color: transparent;
   font-size: .9em;
   width: auto !important;
 }
-.OQrecview tr + tr td {
-}
-
 .OQrecview td * {
   text-align: left;
 }
@@ -670,12 +665,93 @@ label.ckbox:hover {
   content:':';
 }
 .OQrecviewLabel {
+  margin-left: 4px;
   font-weight: bold;
+}
+.OQrecviewVal + .OQrecviewLabel {
   margin-top: 6px;
+  padding-top: 2px;
+  border-top: 1px solid #ccc;
 }
 .OQrecviewVal {
   margin-left: 6px;
 }
 .OQrecviewVal * {
   text-align: left;
+}
+.mode-recview .OQdata,
+.mode-recview .OQdata tbody,
+.mode-recview .OQdata tr {
+  display: block;
+}
+.mode-recview .OQdata td {
+  display: inline !important;
+  border: 0 !important;
+}
+.mode-recview .OQdata .OQeditBut,
+.mode-recview .OQdata .OQselectBut {
+  display: inline-block;
+  border: 1px outset #ccc !important;
+  background-position: 10px 10px;
+  color: #222 !important;
+  line-height: 40px !important;
+  width: 100px !important;
+  height: 40px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+  padding: 0 0 0 36px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.OQToolsPanel .OQSavedSearchCkBox {
+  position:relative;
+  left:-4px;
+  width:14em;
+  text-align:left;
+  font-size:11px;
+}
+.OQToolsPanel .OQEmailAlertCkBox {
+  width:14em;
+  text-align:left;
+  font-size:12px;
+  position:relative;
+  left:-20px;
+}
+
+
+@media (max-width: 600px) {
+  .OQtitle, .OQsummary {
+    width: 100%;
+    text-align: left;
+    color: #eee;
+    font-size: 14px;
+  }
+  .OQhead * {
+    float: none; 
+    font-weight: normal;
+    margin: 4px;
+    padding: 0;
+  }
+  .OQsummary {
+    font-size: 10px;
+  }
+  .OQFilterPanel table,
+  .OQFilterPanel tr {
+    display: block;
+  }
+  .OQFilterPanel td {
+    display: inline-block;
+  }
+  .OQToolsPanel-align-div {
+    width: 100%;
+  }
+
+  .OQPager select { display: none; }
+  .OQPager label input {
+    font-size: 12px !important;
+    border: 0;
+    background-color: transparent;
+    width: 3em;
+  }
 }

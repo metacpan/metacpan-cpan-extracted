@@ -2,12 +2,16 @@
 #define PERL_NO_GET_CONTEXT
 #include "perl.h"
 
-int32_t unpack_int(pTHX_ char *input, STRLEN len, STRLEN *pos);
-int unpack_short_nocroak(pTHX_ char *input, STRLEN len, STRLEN *pos, uint16_t *out);
-uint16_t unpack_short(pTHX_ char *input, STRLEN len, STRLEN *pos);
-int unpack_bytes(pTHX_ char *input, STRLEN len, STRLEN *pos, char **output, STRLEN *outlen);
-SV *unpack_bytes_sv(pTHX_ char *input, STRLEN len, STRLEN *pos);
-int unpack_string_nocroak(pTHX_ char *input, STRLEN len, STRLEN *pos, char **output, STRLEN *outlen);
-void unpack_string(pTHX_ char *input, STRLEN len, STRLEN *pos, char **output, STRLEN *outlen);
-SV *unpack_string_sv(pTHX_ char *input, STRLEN len, STRLEN *pos);
-SV *unpack_string_sv_hash(pTHX_ char *input, STRLEN len, STRLEN *pos, U32 *hashout);
+int32_t unpack_int(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos);
+int unpack_short_nocroak(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, uint16_t *out);
+uint16_t unpack_short(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos);
+int unpack_bytes(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, unsigned char **output, STRLEN *outlen);
+SV *unpack_bytes_sv(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos);
+int unpack_string_nocroak(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, char **output, STRLEN *outlen);
+void unpack_string(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, char **output, STRLEN *outlen);
+SV *unpack_string_sv(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos);
+SV *unpack_string_sv_hash(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, U32 *hashout);
+
+STRLEN pack_int(pTHX_ SV *dest, int32_t number);
+void set_packed_int(pTHX_ SV *dest, STRLEN pos, int32_t number);
+void pack_short(pTHX_ SV *dest, uint16_t number);

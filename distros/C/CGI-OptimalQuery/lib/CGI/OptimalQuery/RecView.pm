@@ -5,6 +5,8 @@ use warnings;
 no warnings qw( uninitialized redefine );
 use base 'CGI::OptimalQuery::Base';
 
+sub escapeHTML { CGI::OptimalQuery::Base::escapeHTML(@_) }
+
 sub output {
   my $o = shift;
 

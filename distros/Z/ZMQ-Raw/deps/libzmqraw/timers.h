@@ -9,8 +9,8 @@ void zmq_raw_timers_destroy (zmq_raw_timers *timers);
 
 zmq_raw_timer *zmq_raw_timers_start (zmq_raw_timers *timers, void *context, int after, int interval);
 void zmq_raw_timers_reset (zmq_raw_timer *timer);
-void zmq_raw_timers__stop (zmq_raw_timer *timer);
 void zmq_raw_timers_stop (zmq_raw_timer *timer);
+void zmq_raw_timers_expire (zmq_raw_timer *timer);
 void zmq_raw_timers_remove (zmq_raw_timer *timer);
 
 int zmq_raw_timer_id (zmq_raw_timer *timer);

@@ -1,5 +1,5 @@
 package Bio::Tradis::RemoveTags;
-$Bio::Tradis::RemoveTags::VERSION = '1.3.3';
+$Bio::Tradis::RemoveTags::VERSION = '1.4.0';
 # ABSTRACT: Remove tags from seqs a fastq file
 
 
@@ -95,7 +95,7 @@ Bio::Tradis::RemoveTags - Remove tags from seqs a fastq file
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

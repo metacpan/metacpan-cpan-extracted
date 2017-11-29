@@ -17,6 +17,7 @@ foreach my $order_by (qw(name commits))
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
@@ -24,7 +25,6 @@ foreach my $order_by (qw(name commits))
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
             },
-            tempdir_root => $tempdir->stringify,
         },
     );
 

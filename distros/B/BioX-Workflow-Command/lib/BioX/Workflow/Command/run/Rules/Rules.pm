@@ -496,13 +496,6 @@ sub template_process {
     my $self  = shift;
     my $texts = [];
 
-    #TODO we should not just spit this out as it compare_mtimes
-    #Instead save it as an object
-    #And process the object at the end to account for --auto_deps
-
-    ##TODO Add back in override_process
-
-    # $self->local_attr->{_modified} = 0;
     $self->process_obj->{ $self->rule_name } = {};
 
     my $dummy_sample = $self->dummy_sample;
@@ -518,7 +511,8 @@ sub template_process {
             }
         }
         $self->process_obj->{ $self->rule_name }->{text} = $texts;
-        $self->process_obj->{ $self->rule_name }->{run_stats} = $self->local_attr->run_stats;
+        $self->process_obj->{ $self->rule_name }->{run_stats} =
+          $self->local_attr->run_stats;
     }
     else {
         $self->process_obj->{ $self->rule_name }->{text} = $dummy_texts;
@@ -534,6 +528,10 @@ Check the global and local keys to see if we are using any iterables
 
   use_chroms: 1
   use_chunks: 1
+
+This is still here, but its use is discouraged
+
+Instead check out the Mustache Template for easier loops
 
 =cut
 
@@ -645,7 +643,7 @@ sub eval_process {
     $self->clear_files;
 
     ##Carry stash when not in template
-    $self->local_attr->stash(dclone($attr->stash));
+    $self->local_attr->stash( dclone( $attr->stash ) );
 
     return $text;
 }
@@ -665,18 +663,27 @@ sub eval_rule {
     my $process = $self->local_rule->{ $self->rule_name }->{process};
     my $text;
 
-    my $eval_rule = 'eval_rule_'.$self->rule_name;
-    if ( $attr->can( $eval_rule ) ) {
-      try {
-        $text = $attr->$eval_rule($process);
-      }
-      catch{
-        $self->app_log->warn('There was a problem evaluating rule. Error is:');
-        $self->app_log->warn($_);
-      };
+    my $eval_rule = 'eval_rule_' . $self->rule_name;
+    if ( $attr->can($eval_rule) ) {
+        try {
+            $text = $attr->$eval_rule($process);
+        }
+        catch {
+            $self->app_log->warn(
+                'There was a problem evaluating rule. Error is:');
+            $self->app_log->warn($_);
+        };
     }
     else {
         $text = $attr->interpol_directive($process);
+    }
+
+    if ( $attr->_ERROR == 1 ) {
+        $self->app_log->warn(
+                'There were 1 or more errors evaluating rule:  '
+              . $self->rule_name . '. '
+              . 'Please check the output file for details.' );
+        $attr->_ERROR(0);
     }
 
     return $text;

@@ -1,55 +1,165 @@
-Test-OpenLDAP
+NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+    Test::OpenLDAP - Creates a temporary instance of OpenLDAP's slapd
+    daemon to run tests against.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+VERSION
 
+    Version 0.07
 
-INSTALLATION
+SYNOPSIS
 
-To install this module, run the following commands:
+      my $slapd = Test::OpenLDAP->new(); # Test::OpenLDAP->new( suffix => 'dc=foobar,dc=com', 'debug' => '-1' );
+    
+      my $ldap = Net::LDAP->new($slapd->uri()) or Carp::croak("Failed to connect:$@");
+    
+      my $mesg = $ldap->bind($slapd->admin_user(), password => $slapd->admin_password());
+    
+      ... add / modify / search entries
+    
+      $slapd->stop();
+    
+      $slapd->start();
+    
+      $slapd->DESTROY();
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+DESCRIPTION
 
-SUPPORT AND DOCUMENTATION
+    This module allows easy creation and tear down of a OpenLDAP slapd
+    instance. When the variable goes out of scope, the slapd instance is
+    torn down and the file system objects it relies on are removed.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+SUBROUTINES/METHODS
 
-    perldoc Test::OpenLDAP
+ new
 
-You can also look for information at:
+    This method initialises and starts an OpenLDAP slapd instance,
+    listening on a unix socket. It then creates an admin user and password
+    and returns the slapd instance to the user. The method accepts a hash
+    of configuration options. The following keys are currently accepted;
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OpenLDAP
+      * suffix - specifies the suffix that subsequent LDAP queries will be
+      procesed under (e.g. 'dc=example,dc=org')
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Test-OpenLDAP
+      * debug - the debug level of the slapd instance. To see valid values
+      for debug, execute the command "slapd -d '?'". slapd will list all
+      the valid debug levels
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Test-OpenLDAP
+ skip
 
-    Search CPAN
-        http://search.cpan.org/dist/Test-OpenLDAP/
+    This method allows the user to skip tests requiring Test::OpenLDAP by
+    checking to see if the slapd binary exists AND that the OS uses fork
+    for process control.
 
+ start
+
+    This methods starts the slapd process
+
+ start
+
+    This method stops the slapd process
+
+ uri
+
+    This method gives the uri for the test code to connect to via a
+    Net::LDAP->new() call.
+
+ suffix
+
+    This method gives the dn used as the suffix for the slapd database.
+
+ admin_user
+
+    This method gives the admin user name for the slapd database.
+
+ admin_password
+
+    This method gives the admin password for the slapd database.
+
+ debug
+
+    This method gives the debug level that the slapd instance is reporting.
+
+ debug_handle
+
+    This method gives a handle to the slapd debug log.
+
+ new_db_directory
+
+    This method creates and returns a new database directory (for
+    subsequent use with the olcDbDirectory attribute)
+
+DIAGNOSTICS
+
+    slapd already started
+
+      Each instance of Test::OpenLDAP may only start one instance of slapd
+      at a time.
+
+CONFIGURATION AND ENVIRONMENT
+
+    Test::OpenLDAP requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+
+    Test::OpenLDAP requires the following non-core Perl modules
+
+      * Data::UUID
+
+      * File::Temp
+
+      * URI::Escape
+
+      * Net::LDAP
+
+INCOMPATIBILITIES
+
+    None reported
+
+AUTHOR
+
+    David Dick, <ddick at cpan.org>
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to bug-test-openldap at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-OpenLDAP. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::OpenLDAP
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OpenLDAP
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Test-OpenLDAP
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Test-OpenLDAP
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Test-OpenLDAP/
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 David Dick
+    Copyright 2017 David Dick.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+    See http://dev.perl.org/licenses/ for more information.
 

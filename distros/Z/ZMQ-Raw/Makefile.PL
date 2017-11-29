@@ -253,9 +253,10 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
+    "blib" => "1.01",
     "threads" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }

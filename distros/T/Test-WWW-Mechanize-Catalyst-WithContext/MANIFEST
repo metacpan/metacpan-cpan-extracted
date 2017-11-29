@@ -10,8 +10,10 @@ t/00_compile.t
 t/10_default.t
 t/11_used_first.t
 t/20_inherited.t
+t/catty.psgi
 t/lib/Catty.pm
 t/lib/Catty/Controller/Root.pm
 t/lib/Catty/Model/Foo.pm
+t/root/static/hello.txt
 META.yml
 MANIFEST

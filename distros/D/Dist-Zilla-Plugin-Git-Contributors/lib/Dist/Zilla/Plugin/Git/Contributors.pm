@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.029-3-g7e1af87
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.030-7-gc91f404
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -267,7 +267,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -415,13 +415,17 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Kent Fredric Klaus Eichner Matthew Horsfall Mohammad S Anwar
+=for stopwords Kent Fredric Ioan Rogers Klaus Eichner Matthew Horsfall Mohammad S Anwar
 
 =over 4
 
 =item *
 
 Kent Fredric <kentnl@cpan.org>
+
+=item *
+
+Ioan Rogers <ioan@dirtysoft.ca>
 
 =item *
 

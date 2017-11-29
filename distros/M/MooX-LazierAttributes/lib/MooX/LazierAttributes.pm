@@ -3,9 +3,9 @@ package MooX::LazierAttributes;
 use strict;
 use warnings;
 use Scalar::Util qw/reftype refaddr blessed/;
-use MooX::ReturnModifiers qw/return_modifiers/;
+use MooX::ReturnModifiers qw/return_has/;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -34,7 +34,7 @@ BEGIN {
 sub import {
     my ($package, @export) = @_;
     my $target    = caller;
-    my %modifiers = return_modifiers($target);
+    my $has = return_has($target);
 
     my $attributes = sub {
         my @attr = @_;
@@ -50,7 +50,7 @@ sub import {
             for (@names) {
                 unshift @spec, 'set' if $_ =~ m/^\+/ and ( !$spec[0] || $spec[0] ne 'set' );
                 unshift @spec, ro unless ref \$spec[0] eq 'SCALAR' and $spec[0] =~ m/^ro|rw|set$/;    
-                $modifiers{has}->( $_, construct_attribute(@spec) );
+                $has->( $_, construct_attribute(@spec) );
             }
         }
     };
@@ -117,7 +117,7 @@ MooX::LazierAttributes - Lazier Attributes.
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 

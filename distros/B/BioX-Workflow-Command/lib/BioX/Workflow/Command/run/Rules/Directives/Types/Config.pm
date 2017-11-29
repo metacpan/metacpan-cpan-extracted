@@ -17,7 +17,6 @@ after 'BUILD' => sub {
             builder => 'create_reg_attr',
             lookup  => [
                 '.*_json$',  '.*_yaml$', '.*_yml$', '.*_jsn$',
-                '.*_config', '.*_conf$'
             ]
         }
     );
@@ -27,13 +26,11 @@ after 'BUILD' => sub {
         {
             builder => 'process_directive_config',
             lookup  => [
-                '.*_json$',  '.*_yaml$', '.*_yml$', '.*_jsn$',
-                '.*_config', '.*_conf$'
-            ]
+                '.*_json$', '.*_yaml$', '.*_yml$', '.*_jsn$',
+            ],
         }
     );
 };
-
 
 =head3 process_directive_config
 
@@ -48,6 +45,8 @@ sub process_directive_config {
     my $self = shift;
     my $k    = shift;
     my $v    = shift;
+
+    return unless ref($v);
 
     my $file = $self->check_file_exists( $k, $v );
     return unless $file;

@@ -1,3 +1,14 @@
+0.60 20171127
+    + Add method to "download" a file
+	  This is in preparation for WWW::Mechanize::Chrome trying to download
+	  a file
+	! Rework IPC to launch the server
+	  The old method of a pipe-open was elegant but didn't really work out for
+	  cleanly shutting down the process. The new approach uses the same way
+	  we spawn and dissociate Chrome in WWW::Mechanize::Chrome.
+	. We are now more defensive about finding out whether CGI.pm can do
+	  ->multi_param or not
+
 0.59 20170617
     + Add support for checking Javascript properties if Javascript runs on the
       client

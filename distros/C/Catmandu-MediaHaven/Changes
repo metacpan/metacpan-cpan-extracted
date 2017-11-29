@@ -1,5 +1,11 @@
 Revision history for Catmandu-MediaHaven
 
+0.08  2017-11-28 11:21:33 CET
+   - adding support for rate limits when exporting data
+   
+0.07  2017-11-28 10:10:19 CET
+   - fixing search result list
+
 0.06  2017-11-21 13:54:35 CET
    - adding more support to change configuration of command line tool
 

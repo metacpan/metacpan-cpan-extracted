@@ -2,7 +2,7 @@ package Crypt::Digest::SHAKE;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
@@ -102,5 +102,3 @@ Provides an interface to the SHA3's sponge function SHAKE.
 =back
 
 =cut
-
-__END__

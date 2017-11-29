@@ -1,6 +1,6 @@
 package Bio::Tradis::Analysis::Exceptions;
 # ABSTRACT: Custom exceptions
-$Bio::Tradis::Analysis::Exceptions::VERSION = '1.3.3';
+$Bio::Tradis::Analysis::Exceptions::VERSION = '1.4.0';
 
 use Exception::Class (
     Bio::Tradis::Analysis::Exceptions::FailedToOpenAlignmentSlice => { description => 'Couldnt get reads from alignment slice. Error with Samtools or BAM' },
@@ -26,7 +26,7 @@ Bio::Tradis::Analysis::Exceptions - Custom exceptions
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

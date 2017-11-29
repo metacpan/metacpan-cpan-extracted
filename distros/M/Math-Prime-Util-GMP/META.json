@@ -1,0 +1,71 @@
+{
+   "abstract" : "Utilities related to prime numbers, using GMP",
+   "author" : [
+      "Dana A Jacobsen <dana@acm.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Prime-Util-GMP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::Prime::Util" : "0.68"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "Fcntl" : "0",
+            "XSLoader" : "0.01",
+            "base" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "1.88",
+            "Test::More" : "0.45"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Prime::Util::GMP" : {
+         "file" : "lib/Math/Prime/Util/GMP.pm",
+         "version" : "0.50"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/danaj/Math-Prime-Util-GMP",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/danaj/Math-Prime-Util-GMP"
+      }
+   },
+   "version" : "0.50",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

@@ -1,6 +1,6 @@
 package Cassandra::Client::Util;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Util::VERSION = '0.13';
+$Cassandra::Client::Util::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ Cassandra::Client::Util
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

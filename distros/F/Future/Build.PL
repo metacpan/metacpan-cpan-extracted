@@ -3,8 +3,6 @@ use warnings;
 
 use Module::Build;
 
-use constant HAVE_M_B_TEST_REQUIRES => $Module::Build::VERSION >= '0.4004';
-
 # This version of Future contains an important bugfix around weak references
 # in sequence Futures. Unfortunately, a lot of existing CPAN code is known to
 # rely on this behaviour, and will break if this module is upgraded.
@@ -51,17 +49,20 @@ if( $printed and -t STDIN ) {
 
 my $build = Module::Build->new(
    module_name => 'Future',
-   ( HAVE_M_B_TEST_REQUIRES ? "test_requires" : "configure_requires" ) => {
-      'Test::Identity' => 0,
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+   configure_requires => {
+      'Module::Build' => "0.4004", # test_requires
    },
    requires => {
       'perl' => '5.008', # fails on 5.6 smokers; no idea why
       'Carp' => '1.25', # new message format with trailing period
       'Test::Builder::Module' => 0,
       'Time::HiRes' => 0,
+   },
+   test_requires => {
+      'Test::Identity' => 0,
+      'Test::Fatal' => 0,
+      'Test::More' => '0.88', # done_testing
+      'Test::Refcount' => 0,
    },
    meta_merge => {
       # It's unlikely at the time of writing that any CPAN client actually
@@ -74,7 +75,6 @@ my $build = Module::Build->new(
    },
    auto_configure_requires => 0, # Don't add M::B
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
    meta_merge => {

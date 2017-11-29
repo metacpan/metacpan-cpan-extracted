@@ -13,7 +13,7 @@ Moose::Manual::MOP - The Moose (and Class::MOP) meta API
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 INTRODUCTION
 

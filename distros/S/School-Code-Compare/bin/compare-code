@@ -1,0 +1,359 @@
+#!/usr/bin/env perl
+# Autor: Boris Däppen, 2015-2017
+# No guarantee given, use at own risk and will
+
+# PODNAME: compare-code
+
+use strict;
+use warnings;
+no warnings 'experimental'; # disable warnings from given/when
+use v5.22;
+use utf8;
+use feature 'say';
+
+use File::Slurp;
+use Getopt::Args;
+use DateTime;
+use IO::Prompter;
+
+use School::Code::Compare;
+use School::Code::Simplify::Comments;
+use School::Code::Compare::Judge;
+use School::Code::Compare::Out;
+
+# Kombinatorisches Verhalten
+# -----------------------------------------------------------------------------
+#
+# Anzahl Vergleiche:
+# n! / ((n - m)! * m!)
+# wenn
+# n = Anzahl Elemente   (Anzahl Code-Dateien die zu Vergleichen sind)
+# m = gezogene Elemente (immer 2, da zwei Dateien miteinander verglichen werden)
+#
+# Bei 100 Skripte gibt das
+# 100! / (98! * 2!) = 4950
+#
+# Rechner: http://de.numberempire.com/combinatorialcalculator.php
+
+##################
+# OPTION PARSING #
+##################
+
+my $s = '                   ';
+my $opt_desc_lang =
+    "$s" . 'Supportet options are:'
+. "\n$s" . '  - hashy:  python, perl, bash'
+. "\n$s" . '  - slashy: php, js, c++, c#'
+. "\n$s" . '  - html'
+. "\n$s" . '  - txt';
+
+my $opt_desc_out =
+    "$s" . 'You can define an output format:'
+. "\n$s" . '  - tab'
+. "\n$s" . '  - csv';
+
+my $opt_desc_file =
+    "$s" . 'You can define a prefix to the filename:'
+. "\n$s" . '  - any string to identifiy the output suiting your needs.'
+. "\n$s" . '  - any path, to not store in local directory.';
+
+my $opt_desc_algo =
+    "$s" . 'Define one or more algorithms, used to compare the files:'
+. "\n$s" . '  - visibles'
+. "\n$s" . '  - signes'
+. "\n$s" . '  - signes_ordered'
+. "\n$s" . '  - any combination of above, comma separated';
+
+my $opt_desc_yes =
+    "$s" . 'Programm will start working without further confirmation.'
+. "\n$s" . '(Answer all user prompts with [yes])';
+
+arg lang => (
+    isa      => 'Str',
+    required => 1,
+    comment  => "language to parse\n" . $opt_desc_lang,
+);
+
+opt in => (
+    isa     => 'Str',
+    alias   => 'i',
+    comment => 'file to read from (containing filepaths)' . "\n$s" . 'otherwise read from STDIN',
+);
+
+opt out => (
+    isa     => 'Str',
+    alias   => 'o',
+    default => 'tab',
+    comment => "output format\n" . $opt_desc_out,
+);
+
+opt file => (
+    isa     => 'Str',
+    alias   => 'f',
+    default => '',
+    comment => "file prefix\n" . $opt_desc_file,
+);
+
+opt algo => (
+    isa     => 'Str',
+    alias   => 'a',
+    default => 'visibles,signes,signes_ordered',
+    comment => "algorithm\n" . $opt_desc_algo,
+);
+
+opt yes => (
+    isa     => 'Bool',
+    alias   => 'y',
+#default =>  0,
+    comment => "Don't prompt for questions\n" . $opt_desc_yes,
+);
+
+my $o = optargs;
+
+# try not to use outside interface further down in the code...
+my $lang          = $o->{lang};
+my $output_format = $o->{out};
+my $file_prefix   = $o->{file};
+my @algos         = split(',', $o->{algo});
+my $do_prompt     = !$o->{yes};
+
+# some input checking...
+for my $algo (@algos) {
+    if ($algo !~ /^visibles$|^signes$|^signes_ordered$/) {
+        die("algorithm not supported\n$opt_desc_algo\n");
+    }
+}
+if ($lang !~ /hashy|python|perl|bash|slashy|php|js|c\+\+|c#|html|txt/) {
+    die("lang not supported\n$opt_desc_lang\n");
+}
+
+##################
+# PREPARING DATA #
+##################
+
+my $comparer   = School::Code::Compare->new()
+                                      ->set_max_char_difference(400)
+                                      ->set_min_char_total     ( 20)
+                                      ->set_max_distance       (400);
+my $comparer2  = School::Code::Compare->new()
+                                      ->set_max_char_difference(800)
+                                      ->set_min_char_total     ( 20)
+                                      ->set_max_distance       (800);
+my $simplifier = School::Code::Simplify::Comments->new();
+
+my @FILE_LIST = ();
+if (defined $o->{in}) {
+    @FILE_LIST = read_file( $o->{in}, binmode => ':utf8' );
+}
+else {
+    @FILE_LIST = <STDIN>;
+}
+
+# Calulate how many comparisons will be needed
+# TODO: maybe use math insead of loop
+my $comparison_count = 0;
+for (my $i=0; $i < @FILE_LIST - 1; $i++) {
+    for (my $j=$i+1; $j < @FILE_LIST; $j++) {
+        $comparison_count++;
+    }
+}
+
+# (maybe) ask if job should be started with the current input
+if ($do_prompt) {
+    my $answer = prompt(scalar @algos . " x $comparison_count comparisons needed, continue? [y/n]: ");
+    exit 0 if ($answer =~ /n/);
+}
+
+say 'reading and preparing files...';
+
+# simplify all file content and store it together with the path
+my @files = ();
+
+foreach my $filepath ( @FILE_LIST ) {
+    chomp( $filepath );
+
+    my @content = read_file( $filepath, binmode => ':utf8' ) ;
+
+    my $cleaned;
+
+    if ($lang eq 'python'
+     or $lang eq 'perl'
+     or $lang eq 'bash'
+     or $lang eq 'hashy'
+     ) {
+        $cleaned = $simplifier->hashy ( \@content );
+    }
+    elsif ($lang eq 'php'
+     or $lang eq 'js'
+     or $lang eq 'c++'
+     or $lang eq 'c#'
+     or $lang eq 'slashy'
+     ) {
+        $cleaned = $simplifier->slashy ( \@content );
+    }
+    elsif ($lang eq 'html') {
+        $cleaned = $simplifier->html ( \@content );
+    }
+    elsif ($lang eq 'txt') {
+        $cleaned = $simplifier->txt ( \@content );
+    }
+
+    push @files, {  path                => $filepath,
+                    code_visibles       => $cleaned->{visibles},
+                    code_signes         => $cleaned->{signes},
+                    code_signes_ordered => $cleaned->{signes_ordered},
+    };
+}
+
+################################################
+# DO THE ACTUAL WORK... COMPARING ALL THE DATA #
+################################################
+
+my $now = DateTime->now;
+
+my %info = (
+    visibles =>
+        "All visible chars in normal order. Whitespace removed.",
+    signes =>
+        "Only special chars in normal order. Whitespace and english letters removed.",
+    signes_ordered =>
+        "Only special chars. Whitespace and english letters removed. Chars in lines keep order, but lines get ordered.",
+);
+
+# measure Levenshtein distance within all possible file combinations
+for my $algo ( @algos ) {
+
+    print "working on $algo... ";
+
+    my @result = ();
+    my $judge  = School::Code::Compare::Judge->new();
+    my $count  = 0;
+
+    for (my $i=0; $i < @files - 1; $i++) {
+        for (my $j=$i+1; $j < @files; $j++) {
+    
+            # Levenshtein
+            my $comparison = $comparer->measure( $files[$i]->{"code_$algo"},
+                                                 $files[$j]->{"code_$algo"}
+                                               );
+    
+            $comparison->{file1} = $files[$i]->{path};
+            $comparison->{file2} = $files[$j]->{path};
+    
+            $judge->look($comparison);
+    
+            push @result, $comparison;
+            $count++;
+        }
+    }
+    
+    print "\tdone";
+
+    ####################
+    # RENDERING OUTPUT #
+    ####################
+
+    print "\trendering...";
+    
+    my $format = 'CSV';
+    given ($output_format) {
+    	$format = 'CSV'  when /^csv/;
+    	$format = 'HTML' when /^html/;
+    	$format = 'TAB'  when /^tab/;
+    }
+    
+    my $filename =    $file_prefix
+                    . $now->ymd() . '_' 
+                    . $now->hms('-') . '_'
+                    . $algo
+                    . '.' 
+                    . lc $format;
+    
+    my $out = School::Code::Compare::Out->new();
+    
+    $out->set_name($filename)->set_format($format)->set_lines(\@result);
+    $out->set_title($algo)->set_description($info{$algo});
+    
+    $out->write();
+    
+    say "\tdone. See $filename";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+compare-code
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+This program is developed in an education/school environment.
+It's purpose is to help detect similiarities in the code of IT projects,
+and therefore making assessments (more) fair.
+
+The script compares files containing source code (or any plain text) to each other.
+The approach for comparison is simplistic:
+Whitespace and comments are removed, then the comparion is done using the Levenshtein algorithm.
+Future releases may bring more sophisticated techniques.
+
+This program is written in the Perl Programming Language.
+
+=head2 Example Usage
+
+ compare-code c++ -i list_of_filepaths.txt -o html
+
+ find path/to/projects -type f -name Cow.java | compare-code java -o tab
+
+=head2 Options
+
+ usage: compare-code LANG [OPTIONS...]
+ 
+   Arguments:
+     LANG         language to parse
+                    Supportet options are:
+                      - hashy:  python, perl, bash
+                      - slashy: php, js, c++, c#
+                      - html
+                      - txt
+ 
+   Options:
+     --in,   -i   file to read from (containing filepaths)
+                    otherwise read from STDIN
+     --out,  -o   output format
+                    You can define an output format:
+                      - tab
+                      - csv
+     --file, -f   file prefix
+                    You can define a prefix to the filename:
+                      - any string to identifiy the output suiting your needs.
+                      - any path, to not store in local directory.
+     --algo, -a   algorithm
+                    Define one or more algorithms, used to compare the files:
+                      - visibles
+                      - signes
+                      - signes_ordered
+                      - any combination of above, comma separated
+     --yes,  -y   Don't prompt for questions
+                    Programm will start working without further confirmation.
+                    (Answer all user prompts with [yes])
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

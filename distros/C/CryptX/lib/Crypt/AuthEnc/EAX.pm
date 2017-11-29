@@ -2,13 +2,15 @@ package Crypt::AuthEnc::EAX;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( eax_encrypt_authenticate eax_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 
@@ -22,7 +24,11 @@ use Crypt::Cipher;
 # - decrypt_done
 # - adata_add
 
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
+sub new {
+  my $class = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
+}
 
 sub eax_encrypt_authenticate {
   my $cipher_name = shift;
@@ -31,6 +37,7 @@ sub eax_encrypt_authenticate {
   my $adata = shift;
   my $plaintext = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->encrypt_add($plaintext);
@@ -46,6 +53,7 @@ sub eax_decrypt_verify {
   my $ciphertext = shift;
   my $tag = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->decrypt_add($ciphertext);
@@ -73,23 +81,23 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
  my $ae = Crypt::AuthEnc::EAX->new("AES", $key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $ct = $ae->encrypt_add('data1');
- $ct = $ae->encrypt_add('data2');
- $ct = $ae->encrypt_add('data3');
- $tag = $ae->encrypt_done();
+ my $ct = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::EAX->new("AES", $key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $pt = $ae->decrypt_add('ciphertext1');
- $pt = $ae->decrypt_add('ciphertext2');
- $pt = $ae->decrypt_add('ciphertext3');
- $tag = $ae->decrypt_done();
+ my $pt = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ my $tag = $ae->decrypt_done();
  die "decrypt failed" unless $tag eq $expected_tag;
 
  #or
- my $result = $ae->decrypt_done($expected_tag) die "decrypt failed";
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::EAX qw(eax_encrypt_authenticate eax_decrypt_verify);
@@ -100,7 +108,7 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
 =head1 DESCRIPTION
 
 EAX is a mode that requires a cipher, CTR and OMAC support and provides encryption and authentication.
-It is initialized with a random IV that can be shared publicly, additional authenticated data which can 
+It is initialized with a random IV that can be shared publicly, additional authenticated data which can
 be fixed and public, and a random secret symmetric key.
 
 =head1 EXPORT
@@ -124,9 +132,8 @@ You can export selected functions:
 
 =head2 eax_decrypt_verify
 
-  my $plaintext = eax_decrypt_verify($cipher, $key, $iv, $adata, $ciphertext, $tag);
-
-  # on error returns undef
+ my $plaintext = eax_decrypt_verify($cipher, $key, $iv, $adata, $ciphertext, $tag);
+ # on error returns undef
 
 =head1 METHODS
 
@@ -143,25 +150,25 @@ You can export selected functions:
 
 =head2 adata_add
 
- $ae->adata_add($adata);                          #can be called multiple times
+ $ae->adata_add($adata);                        # can be called multiple times
 
 =head2 encrypt_add
 
- $ciphertext = $ae->encrypt_add($data);         #can be called multiple times
+ $ciphertext = $ae->encrypt_add($data);         # can be called multiple times
 
 =head2 encrypt_done
 
- $tag = $ae->encrypt_done();
+ $tag = $ae->encrypt_done();                    # returns $tag value
 
 =head2 decrypt_add
 
- $plaintext = $ae->decrypt_add($ciphertext);    #can be called multiple times
+ $plaintext = $ae->decrypt_add($ciphertext);    # can be called multiple times
 
 =head2 decrypt_done
 
- my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
- #or
  my $tag = $ae->decrypt_done;           # returns $tag value
+ #or
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
 
 =head2 clone
 
@@ -176,3 +183,5 @@ You can export selected functions:
 =item * L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
 
 =back
+
+=cut

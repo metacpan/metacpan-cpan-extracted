@@ -16,6 +16,7 @@ with 'BioX::Workflow::Command::run::Rules::Directives::Types::Glob';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Config';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Mustache';
 with 'BioX::Workflow::Command::run::Rules::Directives::Interpolate';
+with 'BioX::Workflow::Command::run::Rules::Directives::Functions';
 with 'BioX::Workflow::Command::run::Rules::Directives::Sample';
 with 'BioX::Workflow::Command::run::Rules::Directives::Walk';
 with 'BioX::Workflow::Command::Utils::Log';
@@ -25,6 +26,11 @@ use Try::Tiny;
 =head2 Other Directives
 
 =cut
+
+has '_ERROR' => (
+    is      => 'rw',
+    default => 0,
+);
 
 has 'register_types' => (
     traits  => ['Hash'],
@@ -107,9 +113,8 @@ has 'override_process' => (
 has 'run_stats' => (
     is      => 'rw',
     isa     => 'Bool',
-    default => 1,
+    default => 0,
 );
-
 
 ##Add in support for chunks
 ##This is useful for features where we want to do things like
@@ -156,7 +161,6 @@ sub create_attr {
                     $self->merge_stash($v);
                 }
                 elsif ( $self->can($k) ) {
-                    ##Should this be next of just skip ?
                     next;
                 }
                 elsif ( $self->search_registered_types( $meta, $k, $v ) ) {
@@ -230,6 +234,8 @@ See BioX::Workflow::Command::run::Rules::Types::CSV for more information
 
 =cut
 
+##TODO Also lookup by type key
+
 sub search_registered_types {
     my $self = shift;
     my $meta = shift;
@@ -237,22 +243,53 @@ sub search_registered_types {
     my $v    = shift;
 
     foreach my $key ( keys %{ $self->register_types } ) {
+
         next unless exists $self->register_types->{$key}->{lookup};
         next unless exists $self->register_types->{$key}->{builder};
         my $lookup_ref = $self->register_types->{$key}->{lookup};
         my $builder    = $self->register_types->{$key}->{builder};
 
+
+        ## We look for keys one of two ways - either they have a pattern match or a declared type
         foreach my $lookup ( @{$lookup_ref} ) {
             if ( $k =~ m/$lookup/ ) {
                 $self->$builder( $meta, $k, $v );
                 return 1;
             }
         }
+
+        ##TODO This is kind of hacky....
+        if ( ref($v) eq 'HASH' ) {
+            if ( exists $v->{type} && !ref( $v->{type} ) ) {
+                next unless check_type($v);
+                $self->$builder( $meta, $k, $v );
+                return 1;
+            }
+        }
+        elsif ( ref($v) eq 'ARRAY' ) {
+            my $first = $v->[0];
+            if ( ref($first) && ref($first) eq 'HASH' ) {
+                next unless check_type($first);
+                $self->$builder( $meta, $k, $v );
+                return 1;
+            }
+        }
+
     }
 
     return 0;
 }
 
+sub check_type {
+    my $hash_ref = shift;
+
+    return unless exists $hash_ref->{type};
+    my $type = $hash_ref->{type};
+    return unless $type eq $hash_ref->{type};
+
+    return 1;
+
+}
 
 sub BUILD { }
 

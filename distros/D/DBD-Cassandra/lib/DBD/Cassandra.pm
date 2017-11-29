@@ -1,13 +1,17 @@
 package DBD::Cassandra;
+our $AUTHORITY = 'cpan:TVDW';
+$DBD::Cassandra::VERSION = '0.57';
+# ABSTRACT: DBI database backend for Cassandra
+
 use 5.010;
 use strict;
 use warnings;
+use DBI 1.621;
 
 use DBD::Cassandra::dr;
 use DBD::Cassandra::db;
 use DBD::Cassandra::st;
 
-our $VERSION= '0.56';
 our $drh= undef;
 
 sub driver {
@@ -19,7 +23,7 @@ sub driver {
     my ($class, $attr)= @_;
     $drh = DBI::_new_drh($class."::dr", {
             'Name' => 'Cassandra',
-            'Version' => $VERSION,
+            'Version' => $DBD::Cassandra::VERSION,
             'Attribution' => 'DBD::Cassandra by Tom van der Woerdt',
         }) or return undef;
 
@@ -36,11 +40,18 @@ __END__
 
 =pod
 
-=encoding utf8
-
 =head1 NAME
 
-DBD::Cassandra - Database driver for Cassandra's CQL3
+DBD::Cassandra - DBI database backend for Cassandra
+
+=head1 VERSION
+
+version 0.57
+
+=head1 DESCRIPTION
+
+B<DBD::Cassandra> is a Perl5 Database Interface driver for Cassandra,
+using the CQL3 query language.
 
 =head1 EXAMPLE
 
@@ -59,11 +70,6 @@ DBD::Cassandra - Database driver for Cassandra's CQL3
     );
 
     $dbh->disconnect;
-
-=head1 DESCRIPTION
-
-B<DBD::Cassandra> is a Perl5 Database Interface driver for Cassandra,
-using the CQL3 query language.
 
 =head2 Configuration
 
@@ -168,6 +174,24 @@ rows, as extra queries may be executed by the driver internally.
 =back
 
 =back
+
+=head1 COLLECTION TYPES
+
+Cassandra supports collection types natively, eg. C<list> and C<map>.
+B<DBD::Cassandra> translates them to native Perl types, eg. hashes and
+arrays.
+
+When doing queries, placeholders can be substituted by these collections.
+For example, inserting a map into a table is done by passing a Perl hash.
+
+    my $sth= $dbh->prepare('INSERT INTO some_table (id, value) VALUES (?,?);');
+    $sth->execute(5, { days => 15 });
+
+This will also work for C<IN> queries, which accept an array.
+
+    my $sth= $dbh->prepare('SELECT id, value FROM some_table WHERE id IN ?');
+    $sth->execute([1, 2, 3]);
+    my $rows= $sth->fetchall_arrayref();
 
 =head1 ASYNCHRONOUS QUERIES
 
@@ -315,10 +339,15 @@ the two formats is :
 If you never used a DBD::Cassandra version prior to 0.25, or do not use floats
 or doubles, this bug does not affect you and upgrading to 0.25 is safe.
 
-=head1 LICENSE
+=head1 AUTHOR
 
-This module is released under the same license as Perl itself.
+Tom van der Woerdt <tvdw@cpan.org>
 
-=head1 AUTHORS
+=head1 COPYRIGHT AND LICENSE
 
-Tom van der Woerdt, L<tvdw@cpan.org|mailto:tvdw@cpan.org>
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

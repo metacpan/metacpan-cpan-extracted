@@ -2,7 +2,7 @@ package Test2::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Scalar::Util qw/blessed/;
 use Test2::Util qw/try/;
@@ -118,7 +118,7 @@ sub _convert {
     return Test2::Compare::Undef->new()
         unless defined $thing;
 
-    if ($thing && blessed($thing) && $thing->isa('Test2::Compare::Base')) {
+    if (blessed($thing) && $thing->isa('Test2::Compare::Base')) {
         if ($config->{implicit_end} && $thing->can('set_ending') && !defined $thing->ending) {
             my $clone = $thing->clone;
             $clone->set_ending('implicit');

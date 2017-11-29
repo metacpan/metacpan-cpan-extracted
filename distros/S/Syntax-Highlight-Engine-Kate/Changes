@@ -1,5 +1,8 @@
 Revision history for Perl extension Syntax::Highlight::Engine::Kate.
 
+0.13  2017-11-28 MANWAR
+      - Applied the patch provided by the original author @HANJE.
+
 0.12  2017-10-26 MANWAR
       - Added META.yml back to MANIFEST file.
 

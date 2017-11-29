@@ -4,7 +4,7 @@ package Crypt::Digest::SHA384;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha384 sha384_hex sha384_b64 sha384_b64u sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u )] );
@@ -216,12 +216,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/SHA-2|http://en.wikipedia.org/wiki/SHA-2>
+=item * L<https://en.wikipedia.org/wiki/SHA-2>
 
 =back
 
 =cut
-
-__END__

@@ -4,7 +4,7 @@
 
 package Syntax::Highlight::Engine::Kate::Template;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use Carp qw(cluck);
@@ -34,7 +34,7 @@ sub new {
 	$self->{'deliminators'} = '';
 	$self->{'engine'} = '';
 	$self->{'format_table'} = $formattable;
-	$self->{'keywordcase'} = 1;
+	$self->{'keywordscase'} = 1;
 	$self->{'lastchar'} = '';
 	$self->{'linesegment'} = '';
 	$self->{'lists'} = {};
@@ -82,7 +82,7 @@ sub captured {
 
 sub capturedGet {
 	my ($self, $num) = @_;
-	my $s = $self->engine->stack;
+	my $s = $self->engine->{stack};
 	if (defined($s->[1])) {
 		my $c = $s->[1]->[2];
 		$num --;
@@ -171,7 +171,7 @@ sub capturedParse {
 
 sub column {
 	my $self = shift;
-	return length($self->linesegment);
+	return length($self->{linesegment});
 }
 
 sub contextdata {
@@ -182,8 +182,8 @@ sub contextdata {
 
 sub contextInfo {
 	my ($self, $context, $item) = @_;
-	if  (exists $self->contextdata->{$context}) {
-		my $c = $self->contextdata->{$context};
+	if  (exists $self->{contextdata}->{$context}) {
+		my $c = $self->{contextdata}->{$context};
 		if (exists $c->{$item}) {
 			return $c->{$item}
 		} else {
@@ -205,7 +205,7 @@ sub contextParse {
 		#don't do anything 
 	} elsif ($context =~ /^##(.+)/) {
 		my $new = $self->pluginGet($1);
-		$self->stackPush([$new, $new->basecontext]);
+		$self->stackPush([$new, $new->{basecontext}]);
 	} else {
 		$self->stackPush([$plug, $context]);
 	}
@@ -238,7 +238,7 @@ sub engine {
 
 sub firstnonspace {
 	my ($self, $string) = @_;
-	my $line = $self->linesegment;
+	my $line = $self->{linesegment};
 	if (($line =~ /^\s*$/) and ($string =~ /^[^\s]/)) {
 		return 1
 	}
@@ -254,7 +254,7 @@ sub formatTable {
 sub highlight {
 	my ($self, $text) = @_;
 	$self->snippet('');
-	my $out = $self->out;
+	my $out = $self->{out};
 	@$out = ();
 	while ($text ne '') {
 		my $top = $self->stackTop;
@@ -266,10 +266,10 @@ sub highlight {
 				if (defined($e)) {
 					$self->contextParse($plug, $e)
 				}
-				my $attr = $plug->attributes->{$plug->contextInfo($context, 'attribute')};
+				my $attr = $plug->{attributes}->{$plug->contextInfo($context, 'attribute')};
 				$self->snippetParse($1, $attr);
 				$self->snippetForce;
-				$self->linesegment('');
+				$self->{linesegment} = '';
 				my $b = $plug->contextInfo($context, 'linebeginning');
 				if (defined($b)) {
 					$self->contextParse($plug, $b)
@@ -283,7 +283,7 @@ sub highlight {
 						$self->contextParse($plug, $f);
 					} else {
 						$text =~ s/^(.)//;
-						my $attr = $plug->attributes->{$plug->contextInfo($context, 'attribute')};
+						my $attr = $plug->{attributes}->{$plug->contextInfo($context, 'attribute')};
 						$self->snippetParse($1, $attr);
 					}
 				}
@@ -305,7 +305,7 @@ sub highlightText {
 		my $f = shift @hl;
 		my $t = shift @hl;
 		unless (defined($t)) { $t = 'Normal' }
-		my $s = $self->substitutions;
+		my $s = $self->{substitutions};
 		my $rr = '';
 		while ($f ne '') {
 			my $k = substr($f , 0, 1);
@@ -330,10 +330,10 @@ sub highlightText {
 
 sub includePlugin {
 	my ($self, $language, $text) = @_;
-	my $eng = $self->engine;
+	my $eng = $self->{engine};
 	my $plug = $eng->pluginGet($language);
 	if (defined($plug)) {
-		my $context = $plug->basecontext;
+		my $context = $plug->{basecontext};
 		my $call = $plug->contextInfo($context, 'callback');
 		if (defined($call)) {
 			return &$call($plug, $text);
@@ -358,13 +358,13 @@ sub includeRules {
 sub initialize {
 	my $self = shift;
 	if ($self->engine eq $self) {
-		$self->stack([[$self, $self->basecontext]]);
+		$self->stack([[$self, $self->{basecontext}]]);
 	}
 }
 
 sub keywordscase {
 	my $self = shift;
-	if (@_) { $self->{'keywordcase'} = shift; }
+	if (@_) { $self->{'keywordscase'} = shift; }
 	return $self->{'keywordscase'}
 }
 
@@ -398,7 +398,7 @@ sub languagePlug {
 
 sub lastchar {
 	my $self = shift;
-	my $l = $self->linesegment;
+	my $l = $self->{linesegment};
 	if ($l eq '') { return "\n" } #last character was a newline
 	return substr($l, length($l) - 1, 1);
 }
@@ -441,7 +441,7 @@ sub out {
 sub listAdd {
 	my $self = shift;
 	my $listname = shift;
-	my $lst = $self->lists;
+	my $lst = $self->{lists};
 	if (@_) {
 		my @l = reverse sort @_;
 		$lst->{$listname} = \@l;
@@ -482,9 +482,9 @@ sub parseResult {
 		unless (defined($attr)) {
 			my $t = $eng->stackTop;
 			my ($plug, $ctext) = @$t;
-			$r = $plug->attributes->{$plug->contextInfo($ctext, 'attribute')};
+			$r = $plug->{attributes}->{$plug->contextInfo($ctext, 'attribute')};
 		} else {
-			$r = $self->attributes->{$attr};
+			$r = $self->{attributes}->{$attr};
 		}
 		$eng->snippetParse($string, $r);
 	}
@@ -521,7 +521,7 @@ sub pluginGet {
 
 sub reset {
 	my $self = shift;
-	$self->stack([[$self, $self->basecontext]]);
+	$self->stack([[$self, $self->{basecontext}]]);
 	$self->out([]);
 	$self->snippet('');
 }
@@ -538,7 +538,7 @@ sub snippetAppend {
 	return if not defined $ch;
 	$self->{'snippet'} = $self->{'snippet'} . $ch;
 	if ($ch ne '') {
-		$self->linesegment($self->linesegment . $ch);
+		$self->{linesegment} = $self->{linesegment} . $ch;
 	}
 	return;
 }
@@ -554,7 +554,7 @@ sub snippetForce {
 	my $parse = $self->snippet;
 	if ($parse ne '') {
 		my $out = $self->{'out'};
-		push(@$out, $parse, $self->snippetAttribute);
+		push(@$out, $parse, $self->{snippetattribute});
 		$self->snippet('');
 	}
 }
@@ -563,9 +563,9 @@ sub snippetParse {
 	my $self = shift;
 	my $snip = shift;
 	my $attr = shift;
-	if ((defined $attr) and ($attr ne $self->snippetAttribute)) { 
+	if ((defined $attr) and ($attr ne $self->{snippetattribute})) { 
 		$self->snippetForce;
-		$self->snippetAttribute($attr);
+		$self->{snippetattribute} = $attr;
 	}
 	$self->snippetAppend($snip);
 }
@@ -578,19 +578,19 @@ sub stack {
 
 sub stackPush {
 	my ($self, $val) = @_;
-	my $stack = $self->stack;
+	my $stack = $self->{stack};
 	unshift(@$stack, $val);
 }
 
 sub stackPull {
 	my ($self, $val) = @_;
-	my $stack = $self->stack;
+	my $stack = $self->{stack};
 	return shift(@$stack);
 }
 
 sub stackTop {
 	my $self = shift;
-	return $self->stack->[0];
+	return $self->{stack}->[0];
 }
 
 sub stateCompare {
@@ -603,13 +603,13 @@ sub stateCompare {
 
 sub stateGet {
 	my $self = shift;
-	my $s = $self->stack;
+	my $s = $self->{stack};
 	return @$s;
 }
 
 sub stateSet {
 	my $self = shift;
-	my $s = $self->stack;
+	my $s = $self->{stack};
 	@$s = (@_);
 }
 
@@ -771,15 +771,15 @@ sub testKeyword {
 	my $self = shift;
 	my $text = shift;
 	my $list = shift;
-	my $eng = $self->engine;
-	my $deliminators = $self->deliminators;
+	my $eng = $self->{engine};
+	my $deliminators = $self->{deliminators};
 	if (($eng->lastcharDeliminator)  and ($$text =~ /^([^$deliminators]+)/)) {
 		my $match = $1;
-		my $l = $self->lists->{$list};
+		my $l = $self->{lists}->{$list};
 		if (defined($l)) {
 			my @list = @$l;
 			my @rl = ();
-			unless ($self->keywordscase) {
+			unless ($self->{keywordscase}) {
 				@rl = grep { (lc($match) eq lc($_)) } @list;
 			} else {
 				@rl = grep { ($match eq $_) } @list;
@@ -830,23 +830,20 @@ sub testRegExpr {
 	if ($dynamic) {
 		$reg = $self->capturedParse($reg);
 	}
-	my $eng = $self->engine;
+	my $eng = $self->{engine};
 	if ($reg =~ s/^\^//) {
 		unless ($eng->linestart) {
 			return '';
 		}
 	} elsif ($reg =~ s/^\\(b)//i) {
-		my $lastchar = $self->engine->lastchar;
+		my $lastchar = $eng->lastchar;
 		if ($1 eq 'b') {
 			if ($lastchar =~ /\w/) { return '' }
 		} else {
 			if ($lastchar =~ /\W/) { return '' }
 		}
 	}
-#	$reg = "^($reg)";
-	$reg = "^$reg";
-	my $pos;
-#	my @cap = ();
+	$reg = "^($reg)";
 	my $sample = $$text;
 
 	# emergency measurements to avoid exception (szabgab)
@@ -855,48 +852,28 @@ sub testRegExpr {
 		warn $@;
 		return '';
 	}
+	my $match;
 	if ($insensitive) {
-		if ($sample =~ /$reg/ig) {
-			$pos = pos($sample);
-#			@cap = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
-#			my @cap = ();
+		if ($sample =~ /$reg/i) {
+			$match = $1;
 			if ($#-) {
 				no strict 'refs';
-				my @cap = map {$$_} 1 .. $#-;
+				my @cap = map {$$_} 2 .. $#-;
 				$self->captured(\@cap)
 			}
-#			my $r  = 1;
-#			my $c  = 1;
-#			my @cap = ();
-#			while ($r) {
-#				eval "if (defined\$$c) { push \@cap, \$$c } else { \$r = 0 }";
-#				$c ++;
-#			}
-#			if (@cap) { $self->captured(\@cap) };
 		}
 	} else {
-		if ($sample =~ /$reg/g) {
-			$pos = pos($sample);
-#			@cap = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
-#			my @cap = ();
+		if ($sample =~ /$reg/) {
+			$match = $1;
 			if ($#-) {
 				no strict 'refs';
-				my @cap = map {$$_} 1 .. $#-;
+				my @cap = map {$$_} 2 .. $#-;
 				$self->captured(\@cap);
 			}
-#			my $r  = 1;
-#			my $c  = 1;
-#			my @cap = ();
-#			while ($r) {
-#				eval "if (defined\$$c) { push \@cap, \$$c } else { \$r = 0 }";
-#				$c ++;
-#			}
-#			if (@cap) { $self->captured(\@cap) };
 		}
 	}
-	if (defined($pos) and ($pos > 0)) {
-		my $string = substr($$text, 0, $pos);
-		return $self->parseResult($text, $string, @_);
+	if ((defined($match)) and ($match ne '')) {
+		return $self->parseResult($text, $match, @_);
 	}
 	return ''
 }
@@ -963,7 +940,7 @@ Returns the $num'th element that was captured in the current context.
 If B<$mode> is specified, B<$string> should only be one character long and numeric.
 B<capturedParse> will return the Nth captured element of the current context.
 
-If B<$mode> is not specified, all occurences of %[1-9] will be replaced by the captured
+If B<$mode> is not specified, all occurrences of %[1-9] will be replaced by the captured
 element of the current context.
 
 =item B<column>
@@ -1009,7 +986,7 @@ sets and returns the instance variable B<format_table>. See also the option B<fo
 =item B<highlight>(I<$text>);
 
 highlights I<$text>. It does so by selecting the proper callback
-from the B<commands> hash and invoke it. It will do so untill
+from the B<commands> hash and invoke it. It will do so until
 $text has been reduced to an empty string. returns a paired list
 of snippets of text and the attribute with which they should be 
 highlighted.

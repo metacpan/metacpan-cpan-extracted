@@ -8,6 +8,8 @@ use Plack::Request;
 use APISchema::DSL;
 use APISchema::Generator::Router::Simple;
 use Plack::App::APISchema::Document;
+use Plack::App::APISchema::MockServer;
+use APISchema::Generator::Markdown;
 
 use JSON qw(decode_json encode_json);
 
@@ -42,6 +44,19 @@ builder {
     mount '/doc/' => Plack::App::APISchema::Document->new(
         schema => $schema,
     )->to_app;
+    mount '/mock/' => builder {
+        enable "APISchema::ResponseValidator", schema => $schema;
+        enable "APISchema::RequestValidator",  schema => $schema;
+
+        Plack::App::APISchema::MockServer->new(
+            schema => $schema,
+        )->to_app;
+    };
+    mount '/doc.md' => sub {
+        my $generator = APISchema::Generator::Markdown->new;
+        my $content = $generator->format_schema($schema);
+        [200, ['Content-Type' => 'text/plain; charset=utf-8;'], [$content]];
+    };
 
     mount '/' => $app;
 }

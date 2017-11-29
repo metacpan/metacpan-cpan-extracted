@@ -4,7 +4,7 @@ package Crypt::Digest::RIPEMD128;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( ripemd128 ripemd128_hex ripemd128_b64 ripemd128_b64u ripemd128_file ripemd128_file_hex ripemd128_file_b64 ripemd128_file_b64u )] );
@@ -216,12 +216,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/RIPEMD|http://en.wikipedia.org/wiki/RIPEMD>
+=item * L<https://en.wikipedia.org/wiki/RIPEMD>
 
 =back
 
 =cut
-
-__END__

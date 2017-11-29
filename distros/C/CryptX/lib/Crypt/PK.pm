@@ -2,7 +2,7 @@ package Crypt::PK;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use Carp;
 
@@ -24,7 +24,7 @@ sub _ssh_parse {
 
 1;
 
-__END__
+=pod
 
 =head1 NAME
 

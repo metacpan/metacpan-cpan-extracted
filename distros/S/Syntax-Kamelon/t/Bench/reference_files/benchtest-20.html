@@ -1,0 +1,451 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">;</font></br></div>
+<div id="2" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;Decodeur&nbsp;de&nbsp;trame&nbsp;pulsadis&nbsp;EJP&nbsp;et&nbsp;préavis&nbsp;EJP</font></br></div>
+<div id="3" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;(pic&nbsp;12C508&nbsp;ou&nbsp;509)</font></br></div>
+<div id="4" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;Alain&nbsp;Gibaud,&nbsp;20-2-2001</font></br></div>
+<div id="5" class="line"><font class="Comment">;</font></br></div>
+<div id="6" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
+<div id="7" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;list&nbsp;r=hex,p=p12c508</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;include&nbsp;</font><font class="String">&quot;p12c508.inc&quot;</font></br></div>
+<div id="10" class="line"><font class="Normal">GP0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">0</font></br></div>
+<div id="11" class="line"><font class="Normal">GP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font></br></div>
+<div id="12" class="line"><font class="Normal">GP2&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">2</font></br></div>
+<div id="13" class="line"><font class="Normal">GP3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">3</font></br></div>
+<div id="14" class="line"><font class="Normal">GP4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">4</font></br></div>
+<div id="15" class="line"><font class="Normal">GP5&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">5</font></br></div>
+<div id="16" class="line"><font class="Normal">TO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">4</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="17" class="line"><font class="Comment">;&nbsp;&nbsp;masques&nbsp;pour&nbsp;acceder&nbsp;aux&nbsp;pattes</font></br></div>
+<div id="18" class="line"><font class="Normal">GP0bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP0</font></br></div>
+<div id="19" class="line"><font class="Normal">GP1bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP1</font></br></div>
+<div id="20" class="line"><font class="Normal">GP2bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP2</font></br></div>
+<div id="21" class="line"><font class="Normal">GP3bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP3</font></br></div>
+<div id="22" class="line"><font class="Normal">GP4bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="23" class="line"><font class="Normal">GP5bit&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;GP5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="24" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
+<div id="25" class="line"><font class="Comment">;&nbsp;affectation&nbsp;des&nbsp;pattes</font></br></div>
+<div id="26" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="27" class="line"></br></div>
+<div id="28" class="line"><font class="Comment">;&nbsp;sorties:&nbsp;(actives&nbsp;niv&nbsp;bas)</font></br></div>
+<div id="29" class="line"><font class="Normal">NORMAL&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;GP0&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;LED&nbsp;verte</font></br></div>
+<div id="30" class="line"><font class="Normal">ALERTE&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;GP1&nbsp;</font><font class="Comment">;&nbsp;LED&nbsp;orange</font></br></div>
+<div id="31" class="line"><font class="Normal">EJP&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;GP2&nbsp;</font><font class="Comment">;&nbsp;LED&nbsp;rouge</font></br></div>
+<div id="32" class="line"><font class="Comment">;&nbsp;entrees:(&nbsp;actives&nbsp;niv&nbsp;bas)</font></br></div>
+<div id="33" class="line"><font class="Normal">SIGNAL&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="Normal">&nbsp;GP3&nbsp;</font><font class="Comment">;&nbsp;avec&nbsp;pull-up,&nbsp;en&nbsp;provenance&nbsp;filtre&nbsp;175&nbsp;Hz</font></br></div>
+<div id="34" class="line"><font class="Comment">;&nbsp;GP4-5&nbsp;sont&nbsp;utilisees&nbsp;par&nbsp;l'horloge</font></br></div>
+<div id="35" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
+<div id="36" class="line"><font class="Comment">;&nbsp;variables:</font></br></div>
+<div id="37" class="line"><font class="Normal">TICKS&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="BaseN">&nbsp;0x7&nbsp;</font><font class="Comment">;&nbsp;compteur&nbsp;de&nbsp;ticks&nbsp;(1&nbsp;tick&nbsp;=&nbsp;2/100&nbsp;s)</font></br></div>
+<div id="38" class="line"><font class="Normal">SLOT&nbsp;&nbsp;&nbsp;</font><font class="DataType">equ</font><font class="BaseN">&nbsp;0x8&nbsp;</font><font class="Comment">;&nbsp;numero&nbsp;slot&nbsp;dans&nbsp;la&nbsp;trame&nbsp;</font></br></div>
+<div id="39" class="line"><font class="Comment">;&nbsp;=======================================================</font></br></div>
+<div id="40" class="line"><font class="Comment">;&nbsp;Macros&nbsp;pour&nbsp;alleger&nbsp;le&nbsp;code&nbsp;...</font></br></div>
+<div id="41" class="line"><font class="Comment">;</font></br></div>
+<div id="42" class="line"><font class="Comment">;&nbsp;Teste&nbsp;si&nbsp;min&nbsp;&lt;=&nbsp;(var)&nbsp;&lt;&nbsp;max</font></br></div>
+<div id="43" class="line"><font class="Comment">;&nbsp;branche&nbsp;en&nbsp;&quot;in&quot;&nbsp;si&nbsp;oui,&nbsp;en&nbsp;&quot;out&quot;&nbsp;si&nbsp;non.</font></br></div>
+<div id="44" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="45" class="line"><font class="Normal">Lminmax&nbsp;&nbsp;&nbsp;macro&nbsp;var,min,max,outm,</font><font class="Keyword">in</font><font class="Normal">,outp</font></br></div>
+<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;min</font></br></div>
+<div id="47" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;var,W&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;(var)&nbsp;-&nbsp;min</font></br></div>
+<div id="48" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS,C</font></br></div>
+<div id="49" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;outm&nbsp;</font><font class="Comment">;&nbsp;C=0&nbsp;=&gt;&nbsp;resutat&nbsp;&lt;&nbsp;0&nbsp;=&gt;&nbsp;var&nbsp;&lt;&nbsp;min</font></br></div>
+<div id="50" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="51" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;max</font></br></div>
+<div id="52" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;var,W&nbsp;</font><font class="Comment">;&nbsp;(var)&nbsp;-&nbsp;max</font></br></div>
+<div id="53" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS,C</font></br></div>
+<div id="54" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;</font><font class="Keyword">in</font></br></div>
+<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;outp&nbsp;</font><font class="Comment">;&nbsp;C=1&nbsp;=&gt;&nbsp;resutat&nbsp;&gt;=&nbsp;0&nbsp;=&gt;&nbsp;var&nbsp;&gt;=&nbsp;min</font></br></div>
+<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="57" class="line"><font class="Comment">;</font></br></div>
+<div id="58" class="line"><font class="Comment">;&nbsp;Attend&nbsp;que&nbsp;le&nbsp;bit&nbsp;&quot;bit&quot;&nbsp;du&nbsp;registre&nbsp;&quot;reg&quot;&nbsp;soit&nbsp;a&nbsp;1</font></br></div>
+<div id="59" class="line"><font class="Comment">;</font></br></div>
+<div id="60" class="line"><font class="Normal">Waitbit1&nbsp;macro&nbsp;reg,bit</font></br></div>
+<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;local&nbsp;&nbsp;&nbsp;Wait1</font></br></div>
+<div id="62" class="line"><font class="Normal">Wait1&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;reg,bit</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;Wait1</font></br></div>
+<div id="64" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="65" class="line"><font class="Comment">;</font></br></div>
+<div id="66" class="line"><font class="Comment">;&nbsp;Attend&nbsp;que&nbsp;le&nbsp;bit&nbsp;&quot;bit&quot;&nbsp;du&nbsp;registre&nbsp;&quot;reg&quot;&nbsp;soit&nbsp;a&nbsp;0</font></br></div>
+<div id="67" class="line"><font class="Comment">;</font></br></div>
+<div id="68" class="line"><font class="Normal">Waitbit0&nbsp;macro&nbsp;reg,bit</font></br></div>
+<div id="69" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;local&nbsp;Wait0</font></br></div>
+<div id="70" class="line"><font class="Normal">Wait0&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;reg,bit</font></br></div>
+<div id="71" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;Wait0</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="73" class="line"><font class="Comment">;</font></br></div>
+<div id="74" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;==&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
+<div id="75" class="line"><font class="Comment">;</font></br></div>
+<div id="76" class="line"><font class="Normal">Beq&nbsp;&nbsp;&nbsp;macro&nbsp;label,reg,num</font></br></div>
+<div id="77" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;num</font></br></div>
+<div id="78" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;reg,W</font></br></div>
+<div id="79" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;STATUS,Z&nbsp;</font></br></div>
+<div id="80" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;label</font></br></div>
+<div id="81" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="82" class="line"><font class="Comment">;</font></br></div>
+<div id="83" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;!=&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
+<div id="84" class="line"><font class="Comment">;</font></br></div>
+<div id="85" class="line"><font class="Normal">Bne&nbsp;&nbsp;&nbsp;macro&nbsp;label,reg,num</font></br></div>
+<div id="86" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;num</font></br></div>
+<div id="87" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;reg,W</font></br></div>
+<div id="88" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;STATUS,Z&nbsp;</font></br></div>
+<div id="89" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;label</font></br></div>
+<div id="90" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="91" class="line"></br></div>
+<div id="92" class="line"><font class="Comment">;</font></br></div>
+<div id="93" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;&lt;&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
+<div id="94" class="line"><font class="Comment">;</font></br></div>
+<div id="95" class="line"><font class="Normal">Blt&nbsp;&nbsp;&nbsp;macro&nbsp;label,reg,num</font></br></div>
+<div id="96" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;num</font></br></div>
+<div id="97" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;reg,W&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;reg&nbsp;-&nbsp;W</font></br></div>
+<div id="98" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;STATUS,C&nbsp;</font></br></div>
+<div id="99" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;</font><font class="Comment">;&nbsp;C=0&nbsp;=&gt;&nbsp;&nbsp;reg&nbsp;-&nbsp;W&nbsp;&lt;&nbsp;0</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="101" class="line"></br></div>
+<div id="102" class="line"><font class="Comment">;</font></br></div>
+<div id="103" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;&gt;=&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
+<div id="104" class="line"><font class="Comment">;</font></br></div>
+<div id="105" class="line"><font class="Normal">Bge&nbsp;&nbsp;&nbsp;macro&nbsp;label,reg,num</font></br></div>
+<div id="106" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;num</font></br></div>
+<div id="107" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;subwf&nbsp;&nbsp;&nbsp;reg,W&nbsp;</font><font class="Comment">;&nbsp;reg&nbsp;-&nbsp;W</font></br></div>
+<div id="108" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;STATUS,C&nbsp;</font></br></div>
+<div id="109" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;</font><font class="Comment">;&nbsp;C=1&nbsp;=&gt;&nbsp;&nbsp;reg&nbsp;-&nbsp;W&nbsp;&gt;=&nbsp;0</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="111" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
+<div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;CONFIG&nbsp;word&nbsp;&nbsp;(&nbsp;en&nbsp;FFF&nbsp;)</font></br></div>
+<div id="113" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bits&nbsp;11:5&nbsp;&nbsp;&nbsp;don't&nbsp;care</font></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;4&nbsp;:&nbsp;&nbsp;&nbsp;MCLRE&nbsp;enabled&nbsp;=&nbsp;1,&nbsp;tied&nbsp;to&nbsp;Vdd&nbsp;=&nbsp;0</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;3&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;code&nbsp;protection&nbsp;off&nbsp;=&nbsp;1,&nbsp;on&nbsp;=&nbsp;0</font></br></div>
+<div id="116" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;2&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;no&nbsp;watchdog&nbsp;=&nbsp;0,&nbsp;watchdog&nbsp;=&nbsp;1</font></br></div>
+<div id="117" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;1-0&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;EXTRC&nbsp;=&nbsp;00,&nbsp;INTRC&nbsp;=&nbsp;10,&nbsp;XT&nbsp;=&nbsp;01,&nbsp;LP&nbsp;=&nbsp;00</font></br></div>
+<div id="118" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="119" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;__CONFIG&nbsp;B</font><font class="String">'000000001101'</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;(horloge&nbsp;a&nbsp;quartz,&nbsp;avec&nbsp;watchdog)&nbsp;&nbsp;</font></br></div>
+<div id="120" class="line"><font class="Comment">;&nbsp;========================================================&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="121" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">org</font><font class="Normal">&nbsp;</font><font class="Float">0</font></br></div>
+<div id="122" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;debut</font></br></div>
+<div id="123" class="line"><font class="Comment">;=========================================================</font></br></div>
+<div id="124" class="line"><font class="Comment">;&nbsp;sous-programmes</font></br></div>
+<div id="125" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
+<div id="126" class="line"><font class="Comment">;&nbsp;regarde&nbsp;si&nbsp;le&nbsp;timer&nbsp;est&nbsp;passe&nbsp;a&nbsp;0</font></br></div>
+<div id="127" class="line"><font class="Comment">;&nbsp;si&nbsp;oui,&nbsp;le&nbsp;compteur&nbsp;de&nbsp;ticks&nbsp;est&nbsp;incremente</font></br></div>
+<div id="128" class="line"><font class="Comment">;&nbsp;et&nbsp;on&nbsp;attend&nbsp;le&nbsp;repassage&nbsp;a&nbsp;1&nbsp;</font></br></div>
+<div id="129" class="line"><font class="Comment">;&nbsp;Cette&nbsp;routine&nbsp;DOIT&nbsp;etre&nbsp;appelee&nbsp;tout&nbsp;les&nbsp;2/100&nbsp;s&nbsp;ou&nbsp;plus&nbsp;souvent</font></br></div>
+<div id="130" class="line"><font class="Normal">tickcount</font></br></div>
+<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
+<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movf&nbsp;&nbsp;&nbsp;&nbsp;TMR0,W</font></br></div>
+<div id="133" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;STATUS,Z</font></br></div>
+<div id="134" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;retlw&nbsp;&nbsp;&nbsp;</font><font class="Float">0</font></br></div>
+<div id="135" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="136" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;incf&nbsp;&nbsp;&nbsp;TICKS,F</font></br></div>
+<div id="137" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;attendre&nbsp;que&nbsp;le&nbsp;timer&nbsp;ait&nbsp;depasse&nbsp;0</font></br></div>
+<div id="138" class="line"><font class="Normal">waitnoZ</font></br></div>
+<div id="139" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
+<div id="140" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movf&nbsp;&nbsp;&nbsp;&nbsp;TMR0,W</font></br></div>
+<div id="141" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;STATUS,Z</font></br></div>
+<div id="142" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;waitnoZ</font></br></div>
+<div id="143" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;retlw&nbsp;</font><font class="Float">0</font></br></div>
+<div id="144" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="145" class="line"><font class="Comment">;&nbsp;les&nbsp;2&nbsp;fct&nbsp;qui&nbsp;suivent&nbsp;maintiennent,&nbsp;le&nbsp;compteur&nbsp;de&nbsp;ticks</font></br></div>
+<div id="146" class="line"><font class="Comment">;&nbsp;(en&nbsp;plus&nbsp;de&nbsp;scruter&nbsp;une&nbsp;patte)</font></br></div>
+<div id="147" class="line"><font class="Comment">;&nbsp;attente&nbsp;d'un&nbsp;signal&nbsp;(logique&nbsp;negative)</font></br></div>
+<div id="148" class="line"><font class="Normal">waitsignal</font></br></div>
+<div id="149" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;tickcount</font></br></div>
+<div id="150" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;GPIO,SIGNAL</font></br></div>
+<div id="151" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;waitsignal</font></br></div>
+<div id="152" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;retlw&nbsp;</font><font class="Float">0</font></br></div>
+<div id="153" class="line"><font class="Comment">;&nbsp;attente&nbsp;fin&nbsp;signal</font></br></div>
+<div id="154" class="line"><font class="Normal">waitnosignal</font></br></div>
+<div id="155" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;tickcount</font></br></div>
+<div id="156" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;GPIO,SIGNAL</font></br></div>
+<div id="157" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;waitnosignal</font></br></div>
+<div id="158" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;retlw&nbsp;</font><font class="Float">0</font></br></div>
+<div id="159" class="line"><font class="Comment">;&nbsp;remet&nbsp;a&nbsp;zero&nbsp;le&nbsp;compteur&nbsp;de&nbsp;ticks&nbsp;et&nbsp;le&nbsp;timer&nbsp;et&nbsp;le&nbsp;watchdog</font></br></div>
+<div id="160" class="line"><font class="Normal">clearticks</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrw</font></br></div>
+<div id="163" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movwf&nbsp;&nbsp;&nbsp;TICKS</font></br></div>
+<div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movwf&nbsp;&nbsp;&nbsp;TMR0</font></br></div>
+<div id="165" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;pour&nbsp;eviter&nbsp;un&nbsp;timeout&nbsp;immediat,&nbsp;le&nbsp;timer&nbsp;est&nbsp;charge&nbsp;</font></br></div>
+<div id="166" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;a&nbsp;1,&nbsp;et&nbsp;le&nbsp;1er&nbsp;tick&nbsp;ne&nbsp;fait&nbsp;que&nbsp;0.019922s&nbsp;au&nbsp;lieu&nbsp;de&nbsp;0.2s</font></br></div>
+<div id="167" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;(ce&nbsp;n'est&nbsp;pas&nbsp;grave&nbsp;dans&nbsp;la&nbsp;mesure&nbsp;ou&nbsp;de&nbsp;toute&nbsp;facon,</font></br></div>
+<div id="168" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;le&nbsp;temps&nbsp;de&nbsp;traitement&nbsp;entre&nbsp;les&nbsp;different&nbsp;declenchements&nbsp;</font></br></div>
+<div id="169" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;de&nbsp;chrono&nbsp;n'est&nbsp;pas&nbsp;nul)</font></br></div>
+<div id="170" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;incf&nbsp;&nbsp;&nbsp;TMR0,F&nbsp;</font></br></div>
+<div id="171" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;retlw&nbsp;</font><font class="Float">0</font></br></div>
+<div id="172" class="line"></br></div>
+<div id="173" class="line"><font class="Comment">;</font></br></div>
+<div id="174" class="line"><font class="Comment">;&nbsp;==========================================================</font></br></div>
+<div id="175" class="line"><font class="Comment">;&nbsp;</font></br></div>
+<div id="176" class="line"><font class="Normal">debut&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="177" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;reset&nbsp;par&nbsp;Watchdog&nbsp;?</font></br></div>
+<div id="178" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;STATUS,TO</font></br></div>
+<div id="179" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;notimeout</font></br></div>
+<div id="180" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;TO&nbsp;==&nbsp;0&nbsp;:&nbsp;OUI</font></br></div>
+<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
+<div id="182" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto</font><font class="BaseN">&nbsp;&nbsp;&nbsp;&nbsp;0x1FF&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;recalibrage,&nbsp;&nbsp;0x3FF&nbsp;sur&nbsp;12C509</font></br></div>
+<div id="183" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="184" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;TO&nbsp;==&nbsp;1&nbsp;:&nbsp;NON</font></br></div>
+<div id="185" class="line"><font class="Normal">notimeout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="186" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movwf&nbsp;&nbsp;&nbsp;&nbsp;OSCCAL&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;recalibrer&nbsp;l'horloge</font></br></div>
+<div id="187" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrf&nbsp;&nbsp;&nbsp;TMR0&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;RAZ&nbsp;timer</font></br></div>
+<div id="188" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;GPWU=1&nbsp;:&nbsp;disable&nbsp;wake&nbsp;up&nbsp;on&nbsp;pin&nbsp;change</font></br></div>
+<div id="189" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;GPPU=0&nbsp;:&nbsp;enable&nbsp;pullups&nbsp;(a&nbsp;voir&nbsp;avec&nbsp;le&nbsp;hard&nbsp;..)</font></br></div>
+<div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;T0CS=0&nbsp;:&nbsp;timer&nbsp;connected&nbsp;to&nbsp;F/4</font></br></div>
+<div id="191" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;T0SE=x&nbsp;:&nbsp;dont't&nbsp;care</font></br></div>
+<div id="192" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;PSA=0&nbsp;&nbsp;:&nbsp;prescaler&nbsp;assigned&nbsp;to&nbsp;timer</font></br></div>
+<div id="193" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;PS2-0=&nbsp;:&nbsp;timer&nbsp;prescaler&nbsp;111=&nbsp;1/256,&nbsp;101&nbsp;=&nbsp;1/64,&nbsp;011&nbsp;=&nbsp;1/16</font></br></div>
+<div id="194" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;B</font><font class="String">'10010101'</font><font class="Normal">&nbsp;</font></br></div>
+<div id="195" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;option&nbsp;</font></br></div>
+<div id="196" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="197" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;config&nbsp;des&nbsp;pattes</font></br></div>
+<div id="198" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;B</font><font class="String">'00001000'</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;GP0-2&nbsp;en&nbsp;sortie,&nbsp;GP3&nbsp;entree</font></br></div>
+<div id="199" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;tris&nbsp;&nbsp;&nbsp;&nbsp;GPIO</font></br></div>
+<div id="200" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="201" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;se&nbsp;mettre&nbsp;en&nbsp;mode&nbsp;normal</font></br></div>
+<div id="202" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bcf&nbsp;&nbsp;&nbsp;GPIO,NORMAL</font></br></div>
+<div id="203" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,ALERTE</font></br></div>
+<div id="204" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,EJP</font></br></div>
+<div id="205" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="206" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="207" class="line"><font class="Normal">attendre_trame</font></br></div>
+<div id="208" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;waitnosignal&nbsp;</font><font class="Comment">;&nbsp;attendre&nbsp;...</font></br></div>
+<div id="209" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;waitsignal&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;...&nbsp;front&nbsp;montant&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="210" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;clearticks</font></br></div>
+<div id="211" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;&nbsp;&nbsp;waitnosignal</font></br></div>
+<div id="212" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;45&nbsp;tk&nbsp;=&nbsp;0.9s,&nbsp;55&nbsp;tk&nbsp;=&nbsp;1.1s</font></br></div>
+<div id="213" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Lminmax&nbsp;&nbsp;&nbsp;TICKS,D</font><font class="String">'45'</font><font class="Normal">,D</font><font class="String">'55'</font><font class="Normal">,attendre_trame,pulse1s,attendre_trame</font></br></div>
+<div id="214" class="line"><font class="Normal">pulse1s</font></br></div>
+<div id="215" class="line"></br></div>
+<div id="216" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;attendre&nbsp;162,5&nbsp;tk&nbsp;&nbsp;=&nbsp;2.75&nbsp;s&nbsp;+&nbsp;0.5&nbsp;s&nbsp;=&nbsp;3.25&nbsp;s</font></br></div>
+<div id="217" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;clearticks</font></br></div>
+<div id="218" class="line"><font class="Normal">again325</font></br></div>
+<div id="219" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;tickcount</font></br></div>
+<div id="220" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Lminmax&nbsp;&nbsp;&nbsp;TICKS,D</font><font class="String">'162'</font><font class="Normal">,D</font><font class="String">'162'</font><font class="Normal">,again325,again325,end325</font></br></div>
+<div id="221" class="line"><font class="Normal">end325</font></br></div>
+<div id="222" class="line"></br></div>
+<div id="223" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;on&nbsp;est&nbsp;maintenant&nbsp;au&nbsp;centre&nbsp;du&nbsp;1er&nbsp;bit</font></br></div>
+<div id="224" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;il&nbsp;suffit&nbsp;d'echantillonner&nbsp;toutes&nbsp;les&nbsp;2.5s</font></br></div>
+<div id="225" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movlw&nbsp;&nbsp;&nbsp;</font><font class="Float">1</font></br></div>
+<div id="226" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;movwf&nbsp;&nbsp;&nbsp;SLOT</font></br></div>
+<div id="227" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="228" class="line"><font class="Normal">sample&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;GPIO,SIGNAL&nbsp;</font><font class="Comment">;&nbsp;logique&nbsp;negative</font></br></div>
+<div id="229" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;slot40</font></br></div>
+<div id="230" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="231" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;signal&nbsp;detecte&nbsp;!!</font></br></div>
+<div id="232" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Bne&nbsp;&nbsp;&nbsp;not5,SLOT,D</font><font class="String">'5'</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;slot&nbsp;==&nbsp;5&nbsp;?</font></br></div>
+<div id="233" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;oui&nbsp;-&nbsp;5&nbsp;=&nbsp;passage&nbsp;en&nbsp;alerte</font></br></div>
+<div id="234" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,NORMAL&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,EJP&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="236" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bcf&nbsp;&nbsp;&nbsp;GPIO,ALERTE&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;0&nbsp;=&nbsp;LED&nbsp;allumee</font></br></div>
+<div id="237" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;nextslot</font></br></div>
+<div id="238" class="line"><font class="Normal">not5</font></br></div>
+<div id="239" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Bne&nbsp;&nbsp;&nbsp;not15,SLOT,D</font><font class="String">'15'</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;slot&nbsp;==&nbsp;15&nbsp;?</font></br></div>
+<div id="240" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;oui</font></br></div>
+<div id="241" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfsc&nbsp;&nbsp;&nbsp;GPIO,ALERTE&nbsp;</font><font class="Comment">;&nbsp;deja&nbsp;en&nbsp;alerte&nbsp;?</font></br></div>
+<div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;ende</font><font class="Keyword">jp</font></br></div>
+<div id="243" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;oui&nbsp;-&nbsp;5&nbsp;&amp;&nbsp;15&nbsp;=&nbsp;debut&nbsp;ejp&nbsp;</font></br></div>
+<div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,NORMAL&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,ALERTE&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bcf&nbsp;&nbsp;&nbsp;GPIO,EJP&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;0&nbsp;=&nbsp;LED&nbsp;allumee</font></br></div>
+<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;nextslot</font></br></div>
+<div id="248" class="line"><font class="Normal">ende</font><font class="Keyword">jp</font></br></div>
+<div id="249" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;non&nbsp;-&nbsp;15&nbsp;seul&nbsp;=&nbsp;fin&nbsp;ejp</font></br></div>
+<div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,EJP&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="251" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">bsf</font><font class="Normal">&nbsp;&nbsp;&nbsp;GPIO,ALERTE&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;1&nbsp;=&nbsp;LED&nbsp;eteinte</font></br></div>
+<div id="252" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bcf&nbsp;&nbsp;&nbsp;GPIO,NORMAL&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bit&nbsp;a&nbsp;0&nbsp;=&nbsp;LED&nbsp;allumee</font></br></div>
+<div id="253" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;nextslot</font></br></div>
+<div id="254" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="255" class="line"><font class="Normal">not15</font></br></div>
+<div id="256" class="line"><font class="Normal">slot40</font></br></div>
+<div id="257" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;slot&nbsp;40&nbsp;?</font></br></div>
+<div id="258" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Bne&nbsp;&nbsp;&nbsp;nextslot,SLOT,D</font><font class="String">'40'</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;slot&nbsp;==&nbsp;40&nbsp;?</font></br></div>
+<div id="259" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;et&nbsp;attendre&nbsp;une&nbsp;nouvelle&nbsp;trame</font></br></div>
+<div id="260" class="line"></br></div>
+<div id="261" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;&nbsp;attendre_trame</font></br></div>
+<div id="262" class="line"><font class="Normal">nextslot</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;incf&nbsp;&nbsp;&nbsp;SLOT,F</font></br></div>
+<div id="264" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="265" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;si&nbsp;le&nbsp;signal&nbsp;est&nbsp;a&nbsp;1,&nbsp;on&nbsp;en&nbsp;profite&nbsp;pour&nbsp;se&nbsp;resynchroniser</font></br></div>
+<div id="266" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;sur&nbsp;son&nbsp;front&nbsp;descendant,&nbsp;au&nbsp;cas&nbsp;ou&nbsp;l'emetteur&nbsp;ne&nbsp;soit&nbsp;pas</font></br></div>
+<div id="267" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bien&nbsp;conforme&nbsp;au&nbsp;protocole.</font></br></div>
+<div id="268" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;btfss&nbsp;&nbsp;&nbsp;GPIO,SIGNAL</font></br></div>
+<div id="269" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;goto&nbsp;&nbsp;&nbsp;resynchro</font></br></div>
+<div id="270" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;attendre&nbsp;125&nbsp;ticks&nbsp;=&nbsp;2.5s</font></br></div>
+<div id="271" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;clearticks</font></br></div>
+<div id="272" class="line"><font class="Normal">again125</font></br></div>
+<div id="273" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;tickcount</font></br></div>
+<div id="274" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Lminmax&nbsp;&nbsp;&nbsp;TICKS,D</font><font class="String">'125'</font><font class="Normal">,D</font><font class="String">'126'</font><font class="Normal">,again125,sample,again125</font></br></div>
+<div id="275" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="276" class="line"><font class="Normal">resynchro&nbsp;</font></br></div>
+<div id="277" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;waitnosignal</font></br></div>
+<div id="278" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;clearticks</font></br></div>
+<div id="279" class="line"><font class="Normal">again100&nbsp;</font><font class="Comment">;&nbsp;attente&nbsp;2&nbsp;s&nbsp;(100&nbsp;ticks)&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="280" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;tickcount</font></br></div>
+<div id="281" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Lminmax&nbsp;&nbsp;&nbsp;TICKS,D</font><font class="String">'100'</font><font class="Normal">,D</font><font class="String">'101'</font><font class="Normal">,again100,sample,again100</font></br></div>
+<div id="282" class="line"></br></div>
+<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;end</font></br></div>
+<div id="284" class="line"></br></div>
+<div id="285" class="line"></br></div>
+</div>
+</body>
+</html>
+

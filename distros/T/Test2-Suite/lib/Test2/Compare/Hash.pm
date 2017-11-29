@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Test2::Util::HashBase qw/inref ending items order for_each_key for_each_val/;
 
@@ -14,7 +14,7 @@ use Scalar::Util qw/reftype/;
 sub init {
     my $self = shift;
 
-    if(my $ref = $self->{+INREF}) {
+    if( defined( my $ref = $self->{+INREF} ) ) {
         croak "Cannot specify both 'inref' and 'items'" if $self->{+ITEMS};
         croak "Cannot specify both 'inref' and 'order'" if $self->{+ORDER};
         $self->{+ITEMS} = {%$ref};
@@ -49,7 +49,7 @@ sub verify {
     my ($got, $exists) = @params{qw/got exists/};
 
     return 0 unless $exists;
-    return 0 unless $got;
+    return 0 unless defined $got;
     return 0 unless ref($got);
     return 0 unless reftype($got) eq 'HASH';
     return 1;

@@ -7,12 +7,12 @@ use Mojo::Util qw ( decode encode url_unescape xml_escape);#encode
 use Time::Piece;# module replaces the standard localtime and gmtime functions with implementations that return objects
 use Mojo::Asset::File;
 
-has qw(plugin);
-has public_uploads => sub { !! shift->plugin->config->{public_uploads} };
+has plugin => sub {   shift->stash('plugin') };
+has public_uploads => sub { shift->plugin->public_uploads };
 has admin => sub {
   my $c = shift;
   return 
-    unless my $pass = $c->plugin->config->{admin_pass};
+    unless my $pass = $c->plugin->admin_pass;
   my $sess = $c->session;
   $sess->{StaticShare}{admin} = 1
     if $c->param('admin') && $c->param('admin') eq $pass;
@@ -83,7 +83,7 @@ sub post {
 
 sub _stash {
   my ($c) = @_;
-  $c->plugin($c->stash('plugin'));
+
   my $lang = HTTP::AcceptLanguage->new($c->req->headers->accept_language || 'en;q=0.5');
   $c->stash('language' => $lang);
   
@@ -100,6 +100,9 @@ sub _stash {
 
 sub dir {
   my ($c, $path) = @_;
+  
+  return $c->not_found
+    if ($c->plugin->render_dir // '') eq 0;
   
   my $ex = Mojo::Exception->new($c->i18n(qq{Cant open directory}));
   opendir(my $dir, $path)
@@ -136,7 +139,7 @@ sub dir {
   }
   closedir $dir;
   
-  for my $index ($c->plugin->config->{dir_index} ? @{$c->plugin->config->{dir_index}} : ()) {
+  for my $index ($c->plugin->dir_index ? @{$c->plugin->dir_index} : ()) {
     my $file = $path->child($index);
     next
       unless -f $file;
@@ -153,19 +156,18 @@ sub dir {
 
   }
   
-  return $c->render(ref $c->plugin->config->{render_dir} ? %{$c->plugin->config->{render_dir}} : $c->plugin->config->{render_dir},)
-    if $c->plugin->config->{render_dir}; 
+  return $c->render(ref $c->plugin->render_dir ? %{$c->plugin->render_dir} : $c->plugin->render_dir,)
+    if $c->plugin->render_dir; 
   
-  unless (defined($c->plugin->config->{render_dir}) && $c->plugin->config->{render_dir} eq 0) {
-    $c->render_maybe("Mojolicious-Plugin-StaticShare/$_/dir", format=>'html', handler=>'ep',)
-      and return
-      for $c->stash('language')->languages;
-    
-    return $c->render('Mojolicious-Plugin-StaticShare/dir', format=>'html', handler=>'ep',);
-  }
+  $c->render_maybe("Mojolicious-Plugin-StaticShare/$_/dir", format=>'html', handler=>'ep',)
+    and return
+    for $c->stash('language')->languages;
   
-  $c->render_maybe('Mojolicious-Plugin-StaticShare/exception', format=>'html', handler=>'ep', status=>500,exception=>Mojo::Exception->new(qq{Template rendering for dir content not found}))
-    or $c->reply->exception();
+  return $c->render('Mojolicious-Plugin-StaticShare/dir', format=>'html', handler=>'ep',);
+
+  
+  #~ $c->render_maybe('Mojolicious-Plugin-StaticShare/exception', format=>'html', handler=>'ep', status=>500,exception=>Mojo::Exception->new(qq{Template rendering for dir content not found}))
+    #~ or $c->reply->exception();
 }
 
 sub new_dir {
@@ -224,11 +226,11 @@ sub file {
   
   $c->_markdown($path)
     and return
-    unless ($c->plugin->config->{render_markdown} || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_markdown;
+    unless ($c->plugin->render_markdown || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_markdown;
   
   $c->_pod($path)
     and return
-    unless ($c->plugin->config->{render_pod} || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_pod;
+    unless ($c->plugin->render_pod || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_pod;
   
   $c->res->headers->content_disposition($c->param('attachment') ? "attachment; filename=$filename;" : "inline");
   my $type  =$c->plugin->mime->type(  ( $path =~ /\.([0-9a-zA-Z]+)$/)[0] || 'txt' ) || $c->plugin->mime->type('txt');#'application/octet-stream';
@@ -246,8 +248,8 @@ sub _markdown {# file
     or return $c->render_maybe('Mojolicious-Plugin-StaticShare/exception', format=>'html', handler=>'ep', status=>500,exception=>$ex)
         || $c->reply->exception($ex);
   
-  return $c->plugin->config->{render_markdown}
-    ? $c->render(ref $c->plugin->config->{render_markdown} ? %{$c->plugin->config->{render_markdown}} : $c->plugin->config->{render_markdown},)
+  return $c->plugin->render_markdown
+    ? $c->render(ref $c->plugin->render_markdown ? %{$c->plugin->render_markdown} : $c->plugin->render_markdown,)
     : $c->render('Mojolicious-Plugin-StaticShare/markdown', format=>'html', handler=>'ep',);
   
 }
@@ -264,6 +266,8 @@ sub _stash_markdown {
   $dom->find('script')->each(\&_sanitize_script);
   $dom->find('*')->each(\&_dom_attrs);
   $c->stash(markdown => $dom->at('body') || $dom);
+  #~ my $filename = $path->basename;
+  #~ $c->stash('title'=>$filename);
   
 }
 
@@ -330,8 +334,8 @@ sub _pod {# file
     or return;# $c->render_maybe('Mojolicious-Plugin-StaticShare/exception', format=>'html', handler=>'ep', status=>500,exception=>$ex)
         #~ || $c->reply->exception($ex);
   
-  return $c->plugin->config->{render_pod}
-    ? $c->render(ref $c->plugin->config->{render_pod} ? %{$c->plugin->config->{render_pod}} : $c->plugin->config->{render_pod},)
+  return $c->plugin->render_pod
+    ? $c->render(ref $c->plugin->render_pod ? %{$c->plugin->render_pod} : $c->plugin->render_pod,)
     : $c->render('Mojolicious-Plugin-StaticShare/pod', format=>'html', handler=>'ep',);
   
 }
@@ -347,6 +351,8 @@ sub _stash_pod {
   $dom->find('script')->each(\&_sanitize_script);
   $dom->find('*')->each(\&_dom_attrs);
   $c->stash(pod =>  $dom->at('body') || $dom);
+  #~ my $filename = $path->basename;
+  #~ $c->stash('title'=>$filename);
 }
 
 sub not_found {

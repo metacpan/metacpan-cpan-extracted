@@ -7,11 +7,11 @@ Win32::Shortkeys - A shortkeys perl script for windows
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut
 
@@ -20,9 +20,6 @@ use warnings;
 use Config::YAML::Tiny;
 use Win32::Clipboard;
 use  Win32::Shortkeys::Kbh  qw(:all);
-#require Win32::Shortkeys::Kbh;
-#import Win32::Shortkeys::Kbh  qw(:all);
-#use Win32::Process;
 use Win32::Shortkeys::Manager;
 use XML::Parser;
 #use Data::Dumper;
@@ -43,7 +40,6 @@ sub new {
 END
     die $usage unless ($file);
 
-    #die VK_RETURN;
     $self->{config} = Config::YAML::Tiny->new( config => $file );
     return $self;
 }
@@ -239,8 +235,14 @@ sub parse_raw_data {
             }
 
             #$com doit etre traduit par evmap \t
-            my $vkcode = $self->{com_map}->{$com};
-            send_cmd( $how_much, $vkcode );
+            if ( exists $self->{com_map}->{$com}) {
+                my $vkcode = $self->{com_map}->{$com};
+                send_cmd( $how_much, $vkcode );
+            } elsif ($com eq "z"){
+                usleep ( $how_much * 100_000 );
+            } else {
+                carp ("undefined command abreviation: ", $com);
+            }
         }
         if (defined $text) { # send the delkeys even is text is a zero length string
             if ($delkeys) {
@@ -509,6 +511,18 @@ When hitting <u, the text that will be subtitued will be Published version; http
 
 =item * the command itself, set by a character (only one character) listed in the map defined with the property vkcode_map
 
+    vkcode_map: 
+        t: VK_TAB
+        e: VK_RETURN
+        ...
+
+The character z is hardcoded to indicate a waiting time : in the shortkeys_utf8.xml file C<#z04>
+will calls the code
+
+    usleep ( 4 * 100_000 );
+
+If z is used to indicate a key in vkcode_map, this will be overriden.
+
 =item * how much you want to repeat that command,  on two position, with a padding 0 if necessary (01)
 
 =item * the next characters are treated as text (unless a new command keystroke is defined with #)
@@ -549,6 +563,11 @@ The following modules are required in order to use this module
   Time::HiRes => 1.9733,
   Carp => 1.40
 
+=head1 SEE ALSO
+
+L<Win32::Shortkeys::Ripper>
+
+L<Win32::Shortkeys::Kbh>
 
 =head1 SUPPORT
 

@@ -1,5 +1,5 @@
 package App::EvalServerAdvanced::Log;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use strict;
 use warnings;

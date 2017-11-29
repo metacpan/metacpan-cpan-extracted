@@ -16,6 +16,7 @@ use GitSetup;
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     {   # merge into root section
@@ -30,7 +31,6 @@ use GitSetup;
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
                 path(qw(source .mailmap)) => "Anon Nonny Moose <anonnonny\@moose.org> Anon Y. Moose <anon\@null.com>\n",
             },
-            tempdir_root => $tempdir->stringify,
         },
     );
 

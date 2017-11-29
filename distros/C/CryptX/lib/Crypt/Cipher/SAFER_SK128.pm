@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFER_SK128;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::SAFER_SK128 - Symetric cipher SAFER_SK128, key size: 128 bits (Crypt::CBC compliant)
+Crypt::Cipher::SAFER_SK128 - Symmetric cipher SAFER_SK128, key size: 128 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
@@ -110,12 +110,10 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher>
 
-=item * L<http://en.wikipedia.org/wiki/SAFER|http://en.wikipedia.org/wiki/SAFER>
+=item * L<https://en.wikipedia.org/wiki/SAFER>
 
 =back
 
 =cut
-
-__END__

@@ -2,7 +2,38 @@ package CGI::OptimalQuery::LoadSearchTool;
 
 use strict;
 use JSON::XS();
-use CGI qw(escapeHTML);
+use CGI::OptimalQuery::Base();
+
+sub escapeHTML { CGI::OptimalQuery::Base::escapeHTML(@_) }
+
+sub load_default_saved_search {
+  my ($o) = @_;
+  return undef unless exists $$o{canSaveDefaultSearches};
+  local $$o{dbh}{LongReadLen};
+  if ($$o{dbh}{Driver}{Name} eq 'Oracle') {
+    $$o{dbh}{LongReadLen} = 900000;
+    my ($readLen) = $$o{dbh}->selectrow_array("SELECT dbms_lob.getlength(params) FROM oq_saved_search WHERE uri=? AND is_default=1", undef, $$o{schema}{URI});
+    $$o{dbh}{LongReadLen} = $readLen if $readLen > $$o{dbh}{LongReadLen};
+  }
+  my ($params) = $$o{dbh}->selectrow_array("
+    SELECT params
+    FROM oq_saved_search
+    WHERE uri=?
+    AND is_default=1", undef, $$o{schema}{URI});
+
+  if ($params) {
+    $params = eval '{'.$params.'}'; 
+    if (ref($params) eq 'HASH') {
+      delete $$params{module};
+      while (my ($k,$v) = each %$params) {
+        if(!defined($$o{q}->param($k))) {
+          $$o{q}->param( -name => $k, -values => $v ); 
+        }
+      }
+    }
+  }
+  return undef;
+}
 
 
 sub load_saved_search {
@@ -15,14 +46,18 @@ sub load_saved_search {
   }
   my ($params) = $$o{dbh}->selectrow_array(
     "SELECT params FROM oq_saved_search WHERE id=?", undef, $id);
+
   if ($params) {
     $params = eval '{'.$params.'}'; 
     if (ref($params) eq 'HASH') {
       delete $$params{module};
-      while (my ($k,$v) = each %$params) { 
-        $$o{q}->param( -name => $k, -values => $v ); 
+      while (my ($k,$v) = each %$params) {
+        if(!defined($$o{q}->param($k))) {
+          $$o{q}->param( -name => $k, -values => $v ); 
+        }
       }
     }
+
     # remember saved search ID
     $$o{q}->param('OQss', $id);
   }
@@ -32,10 +67,11 @@ sub load_saved_search {
 sub on_init {
   my ($o) = @_;
 
+  my $delete_id = $$o{q}->param('OQDeleteSavedSearch') || $$o{q}->url_param('OQDeleteSavedSearch');
+
   # request to delete a saved search
-  if ($$o{q}->param('OQdeleteSavedSearch') =~ /^\d+$/) {
-    my $id = $$o{q}->param('OQdeleteSavedSearch');
-    $$o{dbh}->do("DELETE FROM oq_saved_search WHERE user_id=? AND id=?", undef, $$o{schema}{savedSearchUserID}, $id);
+  if ($delete_id) {
+    $$o{dbh}->do("DELETE FROM oq_saved_search WHERE user_id=? AND id=?", undef, $$o{schema}{savedSearchUserID}, $delete_id);
     $$o{output_handler}->(CGI::header('text/html')."report deleted");
     return undef;
   }
@@ -45,15 +81,9 @@ sub on_init {
     load_saved_search($o, $$o{q}->param('OQLoadSavedSearch'));
   }
 
-  # else if default saved searches are enabled and this isn't intial load, load default saved search if it exists
-  elsif (exists $$o{schema}{canSaveDefaultSearches} && ! defined $$o{q}->param('filter')) {
-    my ($id) = $$o{dbh}->selectrow_array("
-      SELECT id
-      FROM oq_saved_search
-      WHERE is_default=1
-      AND uri=?
-      LIMIT 1", undef, $$o{schema}{URI});
-    load_saved_search($o, $id) if $id;
+  # if intial request, load default saved search if it exists
+  elsif (! defined $$o{q}->param('module')) {
+    load_default_saved_search($o);
   }
 }
 

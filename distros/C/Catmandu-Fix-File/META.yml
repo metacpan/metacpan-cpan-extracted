@@ -35,7 +35,8 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Fix-File/issues
   homepage: https://github.com/LibreCat/Catmandu-Fix-File
   repository: https://github.com/LibreCat/Catmandu-Fix-File.git
-version: '0.011'
+version: '0.012'
 x_contributors:
+  - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

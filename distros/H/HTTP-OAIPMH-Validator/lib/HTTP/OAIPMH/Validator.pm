@@ -26,7 +26,7 @@ Typical use:
 
 use strict;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use base qw(Class::Accessor::Fast);
 use Data::UUID;
@@ -601,25 +601,32 @@ sub test_list_identifiers {
     # Note: $response will come back null if an error code was returned
     # An error code of "noRecordsMatch" comes back if specified set is
     # empty. In that case we should drop the set and try again.
-    if ( $set_spec and (! $response or $self->is_no_records_match ) ) {
-        $self->log->note("Empty set made ListIdentifiers fail - trying other sets...");
-        my $i=1;
-        my $m = scalar(@{$self->set_names});
-        while ($i<$m and not $response ) {
-            $set_spec = "&set=".$self->set_names->[$i];
+    if ($set_spec and (!$response or $self->is_no_records_match)) {
+        $self->log->note("Tried empty set, will look for set with items...");
+        foreach my $set_name (@{$self->set_names}) {
+            $set_spec = "&set=".$set_name;
+            if ($set_spec eq $self->example_set_spec) {
+                # This was the first one we tried, don't try again
+                next;
+            }
+            $self->log->note("Trying set ".$set_spec);
             $req = $self->base_url."?verb=ListIdentifiers&metadataPrefix=oai_dc".$set_spec;
             $response = $self->make_request_and_validate("ListIdentifiers", $req);
-            $self->log->note("Trying set ".$set_spec);
+            if ($response and not $self->is_no_records_match) {
+                last;
+            }
         }
         # If we were successful then set the example_set_spec for any future tests
-        if ($response) {
+        if ($response and not $self->is_no_records_match) {
             $self->example_set_spec( $set_spec );
+        } else {
+            $self->log->note("Failed to find non-empty set, expect failure");
         }
     }
 
     # None of the sets had any identifiers in them.  Try the whole entire
     # list of identifiers.
-    if ( $set_spec and !$response ) {
+    if ($set_spec and !$response) {
         $self->log->note("Last attempt is without any sets...");
         $req = $self->base_url."?verb=ListIdentifiers&metadataPrefix=oai_dc";
         $response = $self->make_request_and_validate("ListIdentifiers",$req);

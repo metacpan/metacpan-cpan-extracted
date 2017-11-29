@@ -1,6 +1,6 @@
 package Catmandu::Fix::File;
 use strict;
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 use parent 'Exporter';
 our @EXPORT;

@@ -1,6 +1,6 @@
 package Neovim::RPC::API;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::API::VERSION = '1.0.0';
+$Neovim::RPC::API::VERSION = '1.0.1';
 use 5.10.0;
 
 use strict;
@@ -127,7 +127,7 @@ Neovim::RPC::API
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 METHODS
 

@@ -1,0 +1,111 @@
+##############################################################################
+#            Configuration File for Literature Based Discovery
+##############################################################################
+# All the options in this file are parsed and used as parameters for
+# Literature Based Discovery
+# Options keys are in <>'s, and values follow directly after with no space. 
+# As as example, the line "<rankingMethod>ll" will set the 'rankingMethod' 
+# parameter with a value of 'll' for literature based discovery
+#
+# For parameters where no value is needed, just write the name of the
+# parameter in '<>' (e.g. '<debug>')
+# lines started with a # are skipped and may be used for comments
+
+#----- Time Slicing Specific Parameters ------------------------
+
+#Tell LBD to enter precision and recall mode (time slicing)
+<precisionAndRecall_implicit>
+
+# name of the file that contains a new line seperated list of cuis
+# each cui serves as a start term. The average of all cuis in this
+# file are what is reported for precision and recall
+<cuiListFileName>timeSliceCuiList
+
+# A list of starting accept types. This is used to randomly generate 100
+# starting terms if a cuiListFileName is not specified. All starting terms
+# will be of the types listed
+<startAcceptTypes>dsyn
+
+
+#--------------------------------------
+
+# The ranking procedure to use for LBD
+# valid ranking procedures are:
+#   allPairs (maxBC) - maximum B to C term value
+#   averageMinimumWeight (AMW) - average of minimum A to B and B to C values
+#   linkingTermCount* (LTC) - count of shared linking terms
+#   frequency* (freq) - sum of A to B co-occurrences of shared B terms
+#   ltcAssociation (LTA) - association measures that use linking terms as inputs
+#   ltc_AMW - linking term count with AMW as a tie-breaker
+#
+#   *all procedures require a measure to be specified except LTC and freq
+<rankingProcedure>averageMinimumWeight
+
+# The association measure to use as a value in the ranking procedure.
+# The string is passed directly to UMLS::Association, so as that gets
+# updated, new associatio measures will work automatically.
+# At the time of this writing, valid arguments are:
+# freq - Frequency
+# dice - Dice Coefficient
+# left - Fishers exact test - left sided 
+# right - Fishers exact test - right sided 
+# twotailed - Fishers twotailed test
+# jaccard - Jaccard Coefficient
+# ll - Log-likelihood ratio
+# tmi - Mutual Information
+# odds - Odds Ratio
+# pmi - Pointwise Mutual Information
+# phi - Phi Coefficient
+# chi - Pearson's Chi Squared Test
+# ps - Poisson Stirling Measure 
+# tscore - T-score
+<rankingMeasure>ll
+
+# a comma seperated list of linking (B) term accept semantic groups, which 
+# restricts the linking terms to the semantic groups specified. Group names
+# come directly from the UMLS. 
+# See https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt for a list
+#<linkingAcceptGroups>CHEM,DISO,GENE,PHYS,ANAT
+
+# similar to linking accept groups, this restricts the acceptable linking (B) 
+# terms to terms within the semantic types listed
+# See http://metampa.nlm.gov/Docs/SemanticTypes_2013AA.txt for a list
+#<linkingAcceptGroups>clnd,chem
+
+# a comma seperated list of target (C) term accept semantic groups, which 
+# restricts the linking terms to the semantic groups specified. Group names
+# come directly from the UMLS. 
+# See https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt for a list
+#<targetAcceptGroups>CHEM,GENE
+
+# similar to target termcept groups, this restricts the acceptable target (C) 
+# terms to terms within the semantic types listed
+# See http://metampa.nlm.gov/Docs/SemanticTypes_2013AA.txt for a list
+#<linkingAcceptGroups>clnd,chem
+
+# Input file path for the explicit co-occurrence matrix used in LBD
+<explicitInputFile>sampleExplicitMatrix
+
+# Input file path for the gold standard matrix (matrix of true predictions)
+# See utils/datasetCreator on how to make this
+<goldInputFile>sampleGoldMatrix
+
+# Input file path of the pre-computed predictions file
+# This is optional, but can speed up computation time, since computing the 
+# prediction matrix can be time consuming.
+# The prediction matrix is all predicted discoveries. It is easiest to generate
+# by running timeslicing first with the predictionsOutFile specified, then
+# in subsequent runs using that as an input
+# <predictionsInFile>predictionsMatrix
+
+# Output file path of the pre-computed predictions file
+# This is optional, but can speed up computation time, since computing the 
+# prediction matrix can be time consuming.
+# The prediction matrix is all predicted discoveries
+<predictionsOutFile>predictionsMatrix
+
+# A thresholded matrix to use for computing association measure values. The
+# user must specify a non-thresholded matrix in order to properly compute 
+# predictions. The thresholded matrix file is optional, and is used only
+# for the values in ranking procedures
+# <thresholdedMatrix>thresholdMatrix

@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Event;
-$ZMQ::Raw::Loop::Event::VERSION = '0.17';
+$ZMQ::Raw::Loop::Event::VERSION = '0.19';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ ZMQ::Raw::Loop::Event - Event class
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ Create a new loop event
 
 Set the event
 
+=head2 reset( )
+
+Reset the event
+
 =cut
 
 our $id = 0;
@@ -137,11 +141,23 @@ sub new
 	return bless $self, $class;
 }
 
+
+
 sub set
 {
 	my ($this) = @_;
 
-	$this->write_handle->send ('');
+	$this->write_handle->send ('', ZMQ::Raw->ZMQ_DONTWAIT);
+}
+
+
+
+sub reset
+{
+	my ($this) = @_;
+
+AGAIN:
+	goto AGAIN if (defined ($this->read_handle->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
 }
 
 =for Pod::Coverage read_handle write_handle loop timeout timer on_set on_timeout

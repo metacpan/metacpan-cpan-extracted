@@ -144,4 +144,23 @@ use Future;
    is_deeply( [ $f->get ], [], '->get on empty needs_all is empty' );
 }
 
+# weakself retention (RT120468)
+{
+   my $f = Future->new;
+
+   my $wait;
+   $wait = Future->needs_all(
+      $f,
+      my $cancelled = Future->new->on_cancel( sub {
+         undef $wait;
+      }),
+   );
+
+   is( exception { $f->fail("oopsie\n") }, undef,
+      'no problems cancelling a Future which clears the original ->needs_all ref' );
+
+   ok( $cancelled->is_cancelled, 'cancellation occured as expected' );
+   ok( $f->is_failed, '->needs_all is marked as done' );
+}
+
 done_testing;

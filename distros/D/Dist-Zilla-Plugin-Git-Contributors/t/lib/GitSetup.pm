@@ -46,13 +46,14 @@ sub no_git_tempdir
 }
 
 # adds --no-verify to all 'git commit' commands, to avoid triggering any
-# globally-configured pre-commit hooks.
+# globally-configured pre-commit hooks, and disable any globally configured
+# automatic gpg signing
 {
     package My::Git::Wrapper;
     use parent 'Git::Wrapper';
 
     sub commit {
-        return shift->RUN(commit => @_, { 'no-verify' => 1 });
+        return shift->RUN(commit => @_, { 'no-verify' => 1, '-c' => 'commit.gpgsign=false' });
     }
 }
 

@@ -4,7 +4,7 @@ package Crypt::Digest::MD5;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( md5 md5_hex md5_b64 md5_b64u md5_file md5_file_hex md5_file_b64 md5_file_b64u )] );
@@ -216,12 +216,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/MD5|http://en.wikipedia.org/wiki/MD5>
+=item * L<https://en.wikipedia.org/wiki/MD5>
 
 =back
 
 =cut
-
-__END__

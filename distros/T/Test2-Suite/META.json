@@ -21,22 +21,33 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
          }
       },
       "runtime" : {
          "requires" : {
             "B" : "0",
             "Carp" : "0",
+            "Exporter" : "0",
             "Importer" : "0.024",
             "Module::Pluggable" : "2.7",
             "Scalar::Util" : "0",
-            "Sub::Info" : "0.001",
+            "Scope::Guard" : "0",
+            "Sub::Info" : "0.002",
             "Term::Table" : "0.002",
-            "Test2" : "1.302102",
+            "Test2" : "1.302117",
+            "Time::HiRes" : "0",
             "overload" : "0",
             "perl" : "5.008001",
             "utf8" : "0"
+         },
+         "suggests" : {
+            "Sub::Name" : "0.11",
+            "Term::ReadKey" : "0",
+            "Term::Size::Any" : "0",
+            "Unicode::GCString" : "0",
+            "Unicode::LineBreak" : "0"
          }
       }
    },
@@ -50,7 +61,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000084",
+   "version" : "0.000092",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,7 +1,7 @@
 package MsgPack::Encoder;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Encode a structure into a MessagePack binary string
-$MsgPack::Encoder::VERSION = '2.0.0';
+$MsgPack::Encoder::VERSION = '2.0.1';
 
 use strict;
 use warnings;
@@ -489,7 +489,7 @@ MsgPack::Encoder - Encode a structure into a MessagePack binary string
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 SYNOPSIS
 

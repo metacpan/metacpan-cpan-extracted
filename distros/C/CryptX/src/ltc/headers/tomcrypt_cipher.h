@@ -154,6 +154,23 @@ struct camellia_key {
 };
 #endif
 
+#ifdef LTC_IDEA
+/* rounds */
+#define LTC_IDEA_ROUNDS 8
+/* key schedule length in # of unsigned shorts */
+#define LTC_IDEA_KEYLEN 6*LTC_IDEA_ROUNDS+4
+struct idea_key {
+   unsigned short int ek[LTC_IDEA_KEYLEN]; /* enc key */
+   unsigned short int dk[LTC_IDEA_KEYLEN]; /* dec key */
+};
+#endif
+
+#ifdef LTC_SERPENT
+struct serpent_key {
+   ulong32 k[33*4];
+};
+#endif
+
 typedef union Symmetric_key {
 #ifdef LTC_DES
    struct des_key des;
@@ -212,6 +229,12 @@ typedef union Symmetric_key {
 #endif
 #ifdef LTC_CAMELLIA
    struct camellia_key camellia;
+#endif
+#ifdef LTC_IDEA
+   struct idea_key     idea;
+#endif
+#ifdef LTC_SERPENT
+   struct serpent_key  serpent;
 #endif
    void   *data;
 } symmetric_key;
@@ -816,6 +839,26 @@ int camellia_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor camellia_desc;
 #endif
 
+#ifdef LTC_IDEA
+int idea_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
+int idea_ecb_encrypt(const unsigned char *pt, unsigned char *ct, symmetric_key *skey);
+int idea_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_key *skey);
+int idea_test(void);
+void idea_done(symmetric_key *skey);
+int idea_keysize(int *keysize);
+extern const struct ltc_cipher_descriptor idea_desc;
+#endif
+
+#ifdef LTC_SERPENT
+int serpent_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
+int serpent_ecb_encrypt(const unsigned char *pt, unsigned char *ct, symmetric_key *skey);
+int serpent_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_key *skey);
+int serpent_test(void);
+void serpent_done(symmetric_key *skey);
+int serpent_keysize(int *keysize);
+extern const struct ltc_cipher_descriptor serpent_desc;
+#endif
+
 #ifdef LTC_ECB_MODE
 int ecb_start(int cipher, const unsigned char *key,
               int keylen, int num_rounds, symmetric_ECB *ecb);
@@ -968,6 +1011,53 @@ int chacha_done(chacha_state *st);
 int chacha_test(void);
 
 #endif /* LTC_CHACHA */
+
+#ifdef LTC_SALSA20
+
+typedef struct {
+   ulong32 input[16];
+   unsigned char kstream[64];
+   unsigned long ksleft;
+   unsigned long ivlen;
+   int rounds;
+} salsa20_state;
+
+int salsa20_setup(salsa20_state *st, const unsigned char *key, unsigned long keylen, int rounds);
+int salsa20_ivctr64(salsa20_state *st, const unsigned char *iv, unsigned long ivlen, ulong64 counter);
+int salsa20_crypt(salsa20_state *st, const unsigned char *in, unsigned long inlen, unsigned char *out);
+int salsa20_keystream(salsa20_state *st, unsigned char *out, unsigned long outlen);
+int salsa20_done(salsa20_state *st);
+int salsa20_test(void);
+
+#endif /* LTC_SALSA20 */
+
+
+
+#ifdef LTC_SOSEMANUK
+
+typedef struct {
+    ulong32 kc[100];    /* key_context */
+    ulong32 s00, s01, s02, s03, s04, s05, s06, s07, s08, s09;
+    ulong32 r1, r2;
+    /*
+     * Buffering: the stream cipher produces output data by
+     * blocks of 640 bits. buf[] contains such a block, and
+     * "ptr" is the index of the next output byte.
+     */
+    unsigned char buf[80];
+    unsigned ptr;
+} sosemanuk_state;
+
+int sosemanuk_setup(sosemanuk_state *ss, unsigned char *key, unsigned long keylen);
+int sosemanuk_setiv(sosemanuk_state *ss, unsigned char *iv, unsigned long ivlen);
+int sosemanuk_crypt(sosemanuk_state *ss, const unsigned char *in, unsigned long datalen, unsigned char *out);
+int sosemanuk_keystream(sosemanuk_state *ss, unsigned char *out, unsigned long outlen);
+int sosemanuk_done(sosemanuk_state *ss);
+int sosemanuk_test(void);
+
+#endif /* LTC_SOSEMANUK */
+
+
 
 #ifdef LTC_RC4_STREAM
 

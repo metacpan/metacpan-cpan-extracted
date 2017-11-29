@@ -1,0 +1,12 @@
+NAME
+    ALBD CHANGES
+
+  Changes from version 0.00 to 0.01
+    First Release, leaving here to show how change log should be updated
+
+  Changes from version 0.01 to 0.03
+    CPAN problems, so rereleased. No major changes
+
+  Changes from version 0.01 to 0.05
+    CPAN problems, so changed LiteratureBasedDiscovery.pm to ALBD.pm
+

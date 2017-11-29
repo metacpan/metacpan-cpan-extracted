@@ -1,6 +1,6 @@
 package Neovim::RPC::Plugin::LoadPlugin;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::Plugin::LoadPlugin::VERSION = '1.0.0';
+$Neovim::RPC::Plugin::LoadPlugin::VERSION = '1.0.1';
 use 5.20.0;
 
 use strict;
@@ -63,7 +63,7 @@ Neovim::RPC::Plugin::LoadPlugin
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

@@ -11,7 +11,8 @@ unless ($ENV{CASSANDRA_HOST}) {
 plan tests => 2;
 
 my $tls= $ENV{CASSANDRA_TLS} // '';
-my $dbh= DBI->connect("dbi:Cassandra:host=$ENV{CASSANDRA_HOST};keyspace=dbd_cassandra_tests;read_timeout=1;connect_timeout=1;write_timeout=1;tls=$tls", $ENV{CASSANDRA_USER}, $ENV{CASSANDRA_AUTH}, {RaiseError => 1});
+my $port= $ENV{CASSANDRA_PORT} ? ";port=$ENV{CASSANDRA_PORT}" : "";
+my $dbh= DBI->connect("dbi:Cassandra:host=$ENV{CASSANDRA_HOST};keyspace=dbd_cassandra_tests;read_timeout=1;connect_timeout=1;write_timeout=1;tls=$tls$port", $ENV{CASSANDRA_USER}, $ENV{CASSANDRA_AUTH}, {RaiseError => 1});
 ok($dbh);
 
 $dbh->do('create table if not exists test_utf8 (id bigint primary key, str varchar)');

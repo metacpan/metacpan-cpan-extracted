@@ -2,7 +2,7 @@ package Crypt::PK::ECC;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
@@ -774,7 +774,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  $pk->generate_key($hashref_with_curve_params);
 
-The following pre-defined C<$curve_name> values are supported:
+The following predefined C<$curve_name> values are supported:
 
  # curves from http://www.ecc-brainpool.org/download/Domain-parameters.pdf
  'brainpoolp160r1'
@@ -1029,7 +1029,7 @@ Import raw public/private key - can load data exported by L</export_key_raw>.
  my $public_der = $pk->export_key_der('public');
 
 Since CryptX-0.36 C<export_key_der> can also export keys in a format
-that does not explicitely contain curve parameters but only curve OID.
+that does not explicitly contain curve parameters but only curve OID.
 
  my $private_der = $pk->export_key_der('private_short');
  #or
@@ -1042,7 +1042,7 @@ that does not explicitely contain curve parameters but only curve OID.
  my $public_pem = $pk->export_key_pem('public');
 
 Since CryptX-0.36 C<export_key_pem> can also export keys in a format
-that does not explicitely contain curve parameters but only curve OID.
+that does not explicitly contain curve parameters but only curve OID.
 
  my $private_pem = $pk->export_key_pem('private_short');
  #or
@@ -1395,3 +1395,5 @@ Load keys (Perl code):
 =item * L<https://en.wikipedia.org/wiki/ECDSA|https://en.wikipedia.org/wiki/ECDSA>
 
 =back
+
+=cut

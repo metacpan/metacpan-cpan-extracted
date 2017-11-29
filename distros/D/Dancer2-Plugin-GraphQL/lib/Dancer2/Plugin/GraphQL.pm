@@ -7,7 +7,7 @@ use Dancer2::Plugin;
 use GraphQL::Execution qw(execute);
 use Module::Runtime qw(require_module);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has graphiql => (
   is => 'ro',
@@ -85,7 +85,7 @@ plugin_keywords graphql => sub {
       $app->config->{layout} = undef;
       my $result = $app->template(\$TEMPLATE, {
         title            => 'GraphiQL',
-        graphiql_version => '0.11.2',
+        graphiql_version => 'latest',
         queryString      => _safe_serialize( $app->request->params->{query} ),
         operationName    => _safe_serialize( $app->request->params->{operationName} ),
         resultString     => _safe_serialize( $app->request->params->{result} ),

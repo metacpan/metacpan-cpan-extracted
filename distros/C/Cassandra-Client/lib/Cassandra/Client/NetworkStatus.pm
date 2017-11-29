@@ -1,6 +1,6 @@
 package Cassandra::Client::NetworkStatus;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::NetworkStatus::VERSION = '0.13';
+$Cassandra::Client::NetworkStatus::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -39,6 +39,8 @@ sub select_master {
     }
     push @{$self->{waiting_for_cb}}, $callback;
 
+    my $pool= $self->{pool}; # non-weak
+
     my $attempts= 0;
     whilst(
         sub { # condition
@@ -58,7 +60,7 @@ sub select_master {
                 },
                 sub {
                     my ($next)= @_;
-                    $self->{pool}->get_one_cb($next);
+                    $pool->get_one_cb($next);
                 },
                 sub {
                     my ($next, $connection)= @_;
@@ -166,7 +168,7 @@ Cassandra::Client::NetworkStatus
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Exception" : "0.38",
-            "Test::Pod" : "1.48",
-            "Test::Simple" : "1.001"
+            "Test::Pod" : "1.48"
          }
       },
       "configure" : {
@@ -53,5 +51,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.05"
+   "version" : "1.06"
 }

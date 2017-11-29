@@ -26,7 +26,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.0.1
+    version: v0.0.2
   App::optex::debug:
     file: lib/App/optex/debug.pm
   App::optex::help:
@@ -56,5 +56,5 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: git://github.com/kaz-utashiro/optex.git
-version: v0.0.1
+version: v0.0.2
 x_authority: cpan:UTASHIRO

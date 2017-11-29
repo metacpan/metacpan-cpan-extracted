@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::TradisBam;
-$Bio::Tradis::CommandLine::TradisBam::VERSION = '1.3.3';
+$Bio::Tradis::CommandLine::TradisBam::VERSION = '1.4.0';
 # ABSTRACT: Adds tags to sequences if tags are present
 
 
@@ -107,7 +107,7 @@ Bio::Tradis::CommandLine::TradisBam - Adds tags to sequences if tags are present
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Catmandu::Importer::MediaHaven;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Moo;
 use Cpanel::JSON::XS;
@@ -14,6 +14,8 @@ with 'Catmandu::Importer';
 has 'url'           => (is => 'ro' , required => 1);
 has 'username'      => (is => 'ro' , required => 1);
 has 'password'      => (is => 'ro' , required => 1);
+has 'search_limit'  => (is => 'ro');
+has 'search_sort'   => (is => 'ro');
 has 'mediahaven'    => (is => 'lazy');
 
 sub _build_mediahaven {
@@ -41,7 +43,12 @@ sub generator {
             return shift @$results;
         }
         elsif ($index < $total) {
-            my $res = $self->mediahaven->search(undef, start => $index+1);
+            my $res = $self->mediahaven->search(
+                            undef,
+                            start => $index+1,
+                            sort  => $self->search_sort,
+                            num   => $self->search_limit
+                    );
             $results = $res->{mediaDataList};
             $index++;
             return shift @$results;
@@ -99,6 +106,14 @@ Required. Username used to connect to MediaHaven.
 =item password
 
 Required. Password used to connect to MediaHaven.
+
+=item search_sort
+
+Optional. The sorting field used in imports.
+
+=item search_limit
+
+Optional. The maximum number of records to be return in each MediaHaven sort.
 
 =back
 

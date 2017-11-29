@@ -1,0 +1,20 @@
+##############################################################################
+#            Configuration File for Literature Based Discovery
+##############################################################################
+# All the options in this file are parsed and used as parameters for
+# Literature Based Discovery
+# Options keys are in <>'s, and values follow directly after with no space. 
+# As as example, the line "<rankingMethod>ll" will set the 'rankingMethod' 
+# parameter with a value of 'll' for literature based discovery
+#
+# For parameters where no value is needed, just write the name of the
+# parameter in '<>' (e.g. '<debug>')
+
+<rankingProcedure>averageMinimumWeight
+<rankingMethod>chi
+<implicitOutputFile>../samples/sampleLBDOutput
+
+<linkingAcceptGroups>CHEM,DISO,GENE,PHYS,ANAT
+<targetAcceptGroups>CHEM,GENE
+
+<startCuis>C0034734,C0034735

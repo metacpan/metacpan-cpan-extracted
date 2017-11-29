@@ -1,0 +1,2 @@
+SAB :: include UMLS_ALL
+REL :: include PAR, CHD

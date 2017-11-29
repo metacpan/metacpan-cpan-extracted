@@ -1,5 +1,9 @@
 Changelog for CPAN-Testers-Schema
 
+0.021     2017-11-28 13:43:34-06:00 America/Chicago
+
+    - Implement support for `maturity` search param for Release queries.
+
 0.020     2017-11-18 20:44:13-06:00 America/Chicago
 
     [Changed]

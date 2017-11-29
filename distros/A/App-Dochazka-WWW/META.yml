@@ -18,7 +18,7 @@ name: App-Dochazka-WWW
 provides:
   App::Dochazka::WWW:
     file: lib/App/Dochazka/WWW.pm
-    version: 0.166
+    version: 0.167
   App::Dochazka::WWW::Dispatch:
     file: lib/App/Dochazka/WWW/Dispatch.pm
     version: 0
@@ -33,4 +33,4 @@ resources:
   homepage: https://metacpan.org/pod/App::Dochazka::WWW
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/smithfarm/dochazka-www
-version: 0.166
+version: 0.167

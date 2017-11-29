@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "MsgPack::Encoder" => 0,
     "MsgPack::RPC" => 0,
     "MsgPack::Type::Ext" => 0,
-    "Promises" => 0,
+    "Promises" => "0.98",
     "Try::Tiny" => 0,
     "experimental" => 0,
     "strict" => 0,
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -88,7 +88,7 @@ my %FallbackPrereqs = (
   "MsgPack::RPC" => 0,
   "MsgPack::Type::Ext" => 0,
   "Net::EmptyPort" => 0,
-  "Promises" => 0,
+  "Promises" => "0.98",
   "Test::Class::Moose" => 0,
   "Test::Class::Moose::Load" => 0,
   "Test::Class::Moose::Runner" => 0,

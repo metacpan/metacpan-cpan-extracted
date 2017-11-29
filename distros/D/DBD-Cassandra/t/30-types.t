@@ -44,6 +44,10 @@ my $type_table= [
     ['time',        '24:00',      '0:00:00'],
     ['time',        '13:30:54.234', $input],
     ['time',        '14',         '14:00:00'], # Why would someone want that?
+    ['tuple<int,int>', [ 1, 2 ], $input],
+    ['tuple<text,int,frozen<tuple<int,int>>>', [ "test string", 15, [ 1, 2 ] ], $input],
+    ['frozen<address>', { street => "abc", city => "def", zip_code => 1234 }, $input ],
+    ['map<text,frozen<address>>', { tom => { street => "abc", zip_code => 5, city => "abc" }, someone_else => { street => "def", city => 15, zip_code => 15 } }, $input],
 
     # List types...
     ['list<int>', [1, 2], $input],
@@ -90,6 +94,10 @@ my $type_table= [
     ['date',        '-5877641-06-23', $input],
 ];
 
+my %udt= (
+    address => 'street text, city text, zip_code int',
+);
+
 unless ($ENV{CASSANDRA_HOST}) {
     plan skip_all => "CASSANDRA_HOST not set";
 }
@@ -97,8 +105,13 @@ unless ($ENV{CASSANDRA_HOST}) {
 plan tests => 2+@$type_table;
 
 my $tls= $ENV{CASSANDRA_TLS} // '';
-my $dbh= DBI->connect("dbi:Cassandra:host=$ENV{CASSANDRA_HOST};keyspace=dbd_cassandra_tests;tls=$tls", $ENV{CASSANDRA_USER}, $ENV{CASSANDRA_AUTH}, {RaiseError => 1});
+my $port= $ENV{CASSANDRA_PORT} ? ";port=$ENV{CASSANDRA_PORT}" : "";
+my $dbh= DBI->connect("dbi:Cassandra:host=$ENV{CASSANDRA_HOST};keyspace=dbd_cassandra_tests;tls=$tls$port", $ENV{CASSANDRA_USER}, $ENV{CASSANDRA_AUTH}, {RaiseError => 1});
 ok($dbh);
+
+for my $udt_name (keys %udt) {
+    $dbh->do('create type if not exists '.$udt_name.' ('.$udt{$udt_name}.')');
+}
 
 my $i= 0;
 for my $type (@$type_table) {
@@ -116,16 +129,16 @@ for my $type (@$type_table) {
         $dbh->do("insert into test_type_$tablename (id, test) values (?, ?)", undef, $random_id, $test_val);
         my $row= $dbh->selectrow_arrayref("select test from test_type_$tablename where id=$random_id", { async => 1 });
         if (!defined $output_val) {
-            ok(0);
+            ok(0, "defined $typename");
         } elsif (!is_ref($output_val) && $output_val eq $warn) {
-            ok($did_warn);
+            ok($did_warn, "warned $typename");
         } elsif (!is_ref($output_val) && $output_val eq $input) {
             is_deeply([$row->[0]], [$test_val], "input match $typename");
         } else {
             is_deeply([$row->[0]], [$output_val], "perfect match $typename");
         }
-        if ($did_warn && !is_ref($output_val) && $output_val ne $warn) {
-            diag("Warning: $did_warn");
+        if ($did_warn && !is_ref($output_val) && defined($output_val) && $output_val ne $warn) {
+            diag("Warning: $did_warn (input: $test_val)");
         }
         1;
     } or do {

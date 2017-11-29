@@ -4,7 +4,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -86,155 +86,159 @@
    "provides" : {
       "Statocles" : {
          "file" : "lib/Statocles.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App" : {
          "file" : "lib/Statocles/App.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Basic" : {
          "file" : "lib/Statocles/App/Basic.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Blog" : {
          "file" : "lib/Statocles/App/Blog.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Perldoc" : {
          "file" : "lib/Statocles/App/Perldoc.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Plain" : {
          "file" : "lib/Statocles/App/Plain.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Role::Store" : {
          "file" : "lib/Statocles/App/Role/Store.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::App::Static" : {
          "file" : "lib/Statocles/App/Static.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Base" : {
          "file" : "lib/Statocles/Base.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Command" : {
          "file" : "lib/Statocles/Command.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Deploy" : {
          "file" : "lib/Statocles/Deploy.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Deploy::File" : {
          "file" : "lib/Statocles/Deploy/File.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Deploy::Git" : {
          "file" : "lib/Statocles/Deploy/Git.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Document" : {
          "file" : "lib/Statocles/Document.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Event" : {
          "file" : "lib/Statocles/Event.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Event::Pages" : {
          "file" : "lib/Statocles/Event.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Image" : {
          "file" : "lib/Statocles/Image.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Link" : {
          "file" : "lib/Statocles/Link.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Link::Tree" : {
          "file" : "lib/Statocles/Link/Tree.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page" : {
          "file" : "lib/Statocles/Page.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page::Document" : {
          "file" : "lib/Statocles/Page/Document.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page::File" : {
          "file" : "lib/Statocles/Page/File.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page::List" : {
          "file" : "lib/Statocles/Page/List.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page::ListItem" : {
          "file" : "lib/Statocles/Page/ListItem.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Page::Plain" : {
          "file" : "lib/Statocles/Page/Plain.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Person" : {
          "file" : "lib/Statocles/Person.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Plugin" : {
          "file" : "lib/Statocles/Plugin.pm",
-         "version" : "0.086"
+         "version" : "0.087"
+      },
+      "Statocles::Plugin::Diagram::Mermaid" : {
+         "file" : "lib/Statocles/Plugin/Diagram/Mermaid.pm",
+         "version" : "0.087"
       },
       "Statocles::Plugin::HTMLLint" : {
          "file" : "lib/Statocles/Plugin/HTMLLint.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Plugin::Highlight" : {
          "file" : "lib/Statocles/Plugin/Highlight.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Plugin::LinkCheck" : {
          "file" : "lib/Statocles/Plugin/LinkCheck.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Site" : {
          "file" : "lib/Statocles/Site.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Store" : {
          "file" : "lib/Statocles/Store.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Store::File" : {
          "file" : "lib/Statocles/Store/File.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Template" : {
          "file" : "lib/Statocles/Template.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Test" : {
          "file" : "lib/Statocles/Test.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Theme" : {
          "file" : "lib/Statocles/Theme.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Types" : {
          "file" : "lib/Statocles/Types.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       },
       "Statocles::Util" : {
          "file" : "lib/Statocles/Util.pm",
-         "version" : "0.086"
+         "version" : "0.087"
       }
    },
    "release_status" : "stable",
@@ -250,7 +254,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#statocles"
    },
-   "version" : "0.086",
+   "version" : "0.087",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "djerius <djerius@cfa.harvard.edu>",
@@ -259,6 +263,7 @@
       "Kent Fredric <kentnl@cpan.org>",
       "Konrad Bucheli <kb@open.ch>",
       "perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>",
+      "Roy Storey <kiwiroy@users.noreply.github.com>",
       "tadegenban <tadegenban@gmail.com>",
       "Vladimir Lettiev <thecrux@gmail.com>",
       "William Lindley <wlindley@wlindley.com>"

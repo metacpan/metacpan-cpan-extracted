@@ -57,6 +57,8 @@
                 },
                 "parameters": [
                     { "$ref": "#/parameters/since" },
+                    { "$ref": "#/parameters/limit" },
+                    { "$ref": "#/parameters/maturity" },
                     {
                         "name": "dist",
                         "in": "path",
@@ -86,6 +88,8 @@
                 },
                 "parameters": [
                     { "$ref": "#/parameters/since" },
+                    { "$ref": "#/parameters/limit" },
+                    { "$ref": "#/parameters/maturity" },
                     {
                         "name": "author",
                         "in": "path",
@@ -115,7 +119,9 @@
                     "action": "get"
                 },
                 "parameters": [
-                    { "$ref": "#/parameters/since" }
+                    { "$ref": "#/parameters/since" },
+                    { "$ref": "#/parameters/limit" },
+                    { "$ref": "#/parameters/maturity" }
                 ],
                 "responses": {
                     "400": {
@@ -145,6 +151,8 @@
                 },
                 "parameters": [
                     { "$ref": "#/parameters/since" },
+                    { "$ref": "#/parameters/limit" },
+                    { "$ref": "#/parameters/maturity" },
                     {
                         "name": "dist",
                         "in": "path",
@@ -175,6 +183,8 @@
                 },
                 "parameters": [
                     { "$ref": "#/parameters/since" },
+                    { "$ref": "#/parameters/limit" },
+                    { "$ref": "#/parameters/maturity" },
                     {
                         "name": "author",
                         "in": "path",
@@ -201,6 +211,19 @@
             "type": "string",
             "format": "date-time",
             "description": "Only send records that have been updated since the given date/time"
+        },
+        "maturity": {
+            "name": "maturity",
+            "in": "query",
+            "type": "string",
+            "enum": ["stable", "dev"],
+            "description": "Only send records for distributions of the given maturity level"
+    },
+        "limit": {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Only send up to a maximum of the given number of records"
         }
     },
 

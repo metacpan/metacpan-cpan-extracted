@@ -17,7 +17,7 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 my $LAST_UPDATE = '2.031'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;

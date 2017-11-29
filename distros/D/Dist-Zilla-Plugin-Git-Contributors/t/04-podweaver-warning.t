@@ -25,6 +25,7 @@ foreach my $have_contributors (1, 0)
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
@@ -34,7 +35,6 @@ foreach my $have_contributors (1, 0)
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
                 path(qw(source weaver.ini)) => "[Contributors]\n",
             },
-            tempdir_root => $tempdir->stringify,
         },
     );
 

@@ -33,7 +33,9 @@ inc/CryptX_PK_RSA.xs.inc
 inc/CryptX_PRNG.xs.inc
 inc/CryptX_Stream_ChaCha.xs.inc
 inc/CryptX_Stream_RC4.xs.inc
+inc/CryptX_Stream_Salsa20.xs.inc
 inc/CryptX_Stream_Sober128.xs.inc
+inc/CryptX_Stream_Sosemanuk.xs.inc
 lib/Crypt/AuthEnc.pm
 lib/Crypt/AuthEnc/CCM.pm
 lib/Crypt/AuthEnc/ChaCha20Poly1305.pm
@@ -51,6 +53,7 @@ lib/Crypt/Cipher/Camellia.pm
 lib/Crypt/Cipher/CAST5.pm
 lib/Crypt/Cipher/DES.pm
 lib/Crypt/Cipher/DES_EDE.pm
+lib/Crypt/Cipher/IDEA.pm
 lib/Crypt/Cipher/KASUMI.pm
 lib/Crypt/Cipher/Khazad.pm
 lib/Crypt/Cipher/MULTI2.pm
@@ -64,6 +67,7 @@ lib/Crypt/Cipher/SAFER_SK128.pm
 lib/Crypt/Cipher/SAFER_SK64.pm
 lib/Crypt/Cipher/SAFERP.pm
 lib/Crypt/Cipher/SEED.pm
+lib/Crypt/Cipher/Serpent.pm
 lib/Crypt/Cipher/Skipjack.pm
 lib/Crypt/Cipher/Twofish.pm
 lib/Crypt/Cipher/XTEA.pm
@@ -129,7 +133,9 @@ lib/Crypt/PRNG/Sober128.pm
 lib/Crypt/PRNG/Yarrow.pm
 lib/Crypt/Stream/ChaCha.pm
 lib/Crypt/Stream/RC4.pm
+lib/Crypt/Stream/Salsa20.pm
 lib/Crypt/Stream/Sober128.pm
+lib/Crypt/Stream/Sosemanuk.pm
 lib/CryptX.pm
 lib/Math/BigInt/LTM.pm
 LICENSE
@@ -146,6 +152,7 @@ src/ltc/ciphers/blowfish.c
 src/ltc/ciphers/camellia.c
 src/ltc/ciphers/cast5.c
 src/ltc/ciphers/des.c
+src/ltc/ciphers/idea.c
 src/ltc/ciphers/kasumi.c
 src/ltc/ciphers/khazad.c
 src/ltc/ciphers/kseed.c
@@ -157,6 +164,7 @@ src/ltc/ciphers/rc6.c
 src/ltc/ciphers/safer/safer.c
 src/ltc/ciphers/safer/safer_tab.c
 src/ltc/ciphers/safer/saferp.c
+src/ltc/ciphers/serpent.c
 src/ltc/ciphers/skipjack.c
 src/ltc/ciphers/twofish/twofish.c
 src/ltc/ciphers/twofish/twofish_tab.c
@@ -296,6 +304,8 @@ src/ltc/math/rand_bn.c
 src/ltc/math/rand_prime.c
 src/ltc/math/tfm_desc.c
 src/ltc/misc/adler32.c
+src/ltc/misc/base32/base32_decode.c
+src/ltc/misc/base32/base32_encode.c
 src/ltc/misc/base64/base64_decode.c
 src/ltc/misc/base64/base64_encode.c
 src/ltc/misc/burn_stack.c
@@ -516,9 +526,15 @@ src/ltc/stream/chacha/chacha_ivctr32.c
 src/ltc/stream/chacha/chacha_ivctr64.c
 src/ltc/stream/chacha/chacha_keystream.c
 src/ltc/stream/chacha/chacha_setup.c
-src/ltc/stream/rc4/rc4.c
-src/ltc/stream/sober128/sober128.c
+src/ltc/stream/rc4/rc4_stream.c
+src/ltc/stream/salsa20/salsa20_crypt.c
+src/ltc/stream/salsa20/salsa20_done.c
+src/ltc/stream/salsa20/salsa20_ivctr64.c
+src/ltc/stream/salsa20/salsa20_keystream.c
+src/ltc/stream/salsa20/salsa20_setup.c
+src/ltc/stream/sober128/sober128_stream.c
 src/ltc/stream/sober128/sober128tab.c
+src/ltc/stream/sosemanuk/sosemanuk.c
 src/ltm/bn_error.c
 src/ltm/bn_fast_mp_invmod.c
 src/ltm/bn_fast_mp_montgomery_reduce.c
@@ -656,6 +672,8 @@ src/Makefile.nmake
 t/001_compile.t
 t/002_all_pm.t
 t/003_all_pm_pod.t
+t/004_all_pm_pod_spelling.t
+t/005_all_pm_pod_coverage.t
 t/auth_enc_ccm.t
 t/auth_enc_ccm_test_vector_ltc.t
 t/auth_enc_chacha20poly1305.t
@@ -674,6 +692,8 @@ t/cipher_camellia.t
 t/cipher_cast5.t
 t/cipher_des.t
 t/cipher_des_ede.t
+t/cipher_idea.t
+t/cipher_idea_compat.t
 t/cipher_kasumi.t
 t/cipher_khazad.t
 t/cipher_multi2.t
@@ -689,8 +709,11 @@ t/cipher_safer_sk64.t
 t/cipher_saferp.t
 t/cipher_seed.t
 t/cipher_seed_test_vectors_bc.t
+t/cipher_serpent.t
+t/cipher_serpent_compat.t
 t/cipher_skipjack.t
 t/cipher_stream.t
+t/cipher_stream_salsa20.t
 t/cipher_test_vectors_ltc.t
 t/cipher_test_vectors_openssl.t
 t/cipher_twofish.t
@@ -904,6 +927,7 @@ t/mac_blake2b.t
 t/mac_blake2s.t
 t/mac_f9.t
 t/mac_hmac.t
+t/mac_hmac_nist.t
 t/mac_hmac_test_vectors_ltc.t
 t/mac_omac.t
 t/mac_omac_test_vectors_ltc.t

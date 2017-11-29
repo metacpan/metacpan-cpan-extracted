@@ -14,6 +14,7 @@ lib/Catmandu/Fix/File.pm
 lib/Catmandu/Fix/basename.pm
 lib/Catmandu/Fix/dirname.pm
 lib/Catmandu/Fix/file_size.pm
+lib/Catmandu/Fix/file_stat.pm
 lib/Catmandu/Fix/human_byte_size.pm
 minil.toml
 t/Catmandu-Fix-Condition-file_test.t
@@ -21,6 +22,7 @@ t/Catmandu-Fix-File.t
 t/Catmandu-Fix-basename.t
 t/Catmandu-Fix-dirname.t
 t/Catmandu-Fix-file_size.t
+t/Catmandu-Fix-file_stat.t
 t/Catmandu-Fix-human_byte_size.t
 t/author-pod-syntax.t
 t/data/hello.txt

@@ -16,18 +16,18 @@ Hash: SHA1
 
 SHA1 9f0bb4288bdd0bf6cc3ecf82287999f5b192bbf1 AUTHOR_PLEDGE
 SHA1 49995296ce73e15b4c391ed802370cf4aadf465d CONTRIBUTORS
-SHA1 a0b89559051d88f1e7c253b71d61e2d4de15e073 Changes
+SHA1 a743531692df464a996e7b942743acc8407f6857 Changes
 SHA1 20acd1c8d2edc306404eb95a67387dc028fd0c4a INSTALL
 SHA1 87ca88d6d75efdd70d3d87f5a4075f5508bc8829 LICENSE
 SHA1 68b3ac7d8896057516f7b216278526c03746d44e MANIFEST
-SHA1 cf471fba059d42272acc5b01ea79e246f00565ff META.json
-SHA1 877be130c688158e1677184de2a12c4e649550a3 META.yml
-SHA1 c32537e644f3686bb88bef09fa23739e9263cb0f Makefile.PL
-SHA1 9a8f53ae7554d46bd3a6e6af436bd247318435d5 README.mkdn
-SHA1 b37d3ef4c3ad859d3cc037e8f4619db29f984ef4 bin/nvimx.pl
+SHA1 107489c771ab883f5da9db0b9a404ed4624945f4 META.json
+SHA1 4a0cac4d9868bd224797384892639d738ac96a12 META.yml
+SHA1 a5551ed20dc880a4a854770e28cd924a6b25137b Makefile.PL
+SHA1 d4b1d5632e5c2024793d2e839f690727dac896fa README.mkdn
+SHA1 1694f299447f1d7cebb51dffd8099a0a959803e9 bin/nvimx.pl
 SHA1 a1b3edc3b28bdcfc5778cee9975b26afe1591e0c contrib/init.vim
-SHA1 6bf7d7c37027ebea7218240354d5c807593a2d18 cpanfile
-SHA1 44050823145d0320cfd1f2a2c23b15d0f5ddd2f7 doap.xml
+SHA1 ba587f8dc34f621cd3f6358503a13bf7b7944bb3 cpanfile
+SHA1 d7f27dcd8d1bbae241981a3beb60194ece61aae2 doap.xml
 SHA1 ec5086c8d6212a77735993634c21a60afcf144b6 examples/channel.pl
 SHA1 d5c482fbcb06e4ea753b1dd65feec0af0bf0b98b examples/dsl.pl
 SHA1 9f6cacbb72f4f51a59aef77bce61f2477e876ed0 examples/load_plugins.pl
@@ -37,17 +37,17 @@ SHA1 92d4310499b7a6a7fa6920d6febf116abe8aff51 examples/push-channel.pl
 SHA1 542d9e6689568884920126cfda877b9a0403d6a4 examples/reply.pl
 SHA1 533d6632ed436e57e778d5bff7dee91b336922d6 examples/simple-1.pl
 SHA1 0185bce8b0e0671e650d1e22817aa0456e357ce2 flip_operator/aliases.vim
-SHA1 8a82c96d3ecffa4a9ed5aa8a03c35b32b4d6d1d3 lib/Neovim/RPC.pm
-SHA1 a6694fa3f56da3b76b3fc88dfb0829a84aa1c2f5 lib/Neovim/RPC/API.pm
-SHA1 a3697f3a55792922d5c5befdd7331fca4c52d108 lib/Neovim/RPC/API/AutoDiscover.pm
-SHA1 65e42d0c03df9434e7d16cb81b2a7a5b6953dc93 lib/Neovim/RPC/API/Command.pm
-SHA1 7e1c8a9d0e9ab1e2dac49413ae3cb0d50a6f6289 lib/Neovim/RPC/Plugin.pm
-SHA1 921d084d54523b27af3b4b6d291a2362cf35e0af lib/Neovim/RPC/Plugin/Echo.pm
-SHA1 ffda888c007c1ad88f0b900c64b2f000d697082b lib/Neovim/RPC/Plugin/FileToPackageName.pm
-SHA1 1a1c68a490b3c8ba93cdd91ccdc2229b366d2bd4 lib/Neovim/RPC/Plugin/FlipOperator.pm
-SHA1 14ba56b453f5f78ac1914d7c2921ffbe3b9fc59a lib/Neovim/RPC/Plugin/LoadPlugin.pm
+SHA1 9d2d067c5e2ad6ec6af0d151e15b7f382a42981b lib/Neovim/RPC.pm
+SHA1 26afdb61b6797a5292ee1a951766fbba8eb103b7 lib/Neovim/RPC/API.pm
+SHA1 dfe987c1e5fc59987bd9372400dfb0e888b36cdc lib/Neovim/RPC/API/AutoDiscover.pm
+SHA1 a4f7bc0ef78dfab1c9302931eb99a2af89981b64 lib/Neovim/RPC/API/Command.pm
+SHA1 a43a5645fa11c67f18b7f0b2b0ec207462239831 lib/Neovim/RPC/Plugin.pm
+SHA1 21387db837371a26bbcbb9a3cc0792bde56bf0e3 lib/Neovim/RPC/Plugin/Echo.pm
+SHA1 1550d18b6a34034b3995ae3b9e265f6fce130d54 lib/Neovim/RPC/Plugin/FileToPackageName.pm
+SHA1 f6db255c9431cf688fed5bd1ce4adc49784806bf lib/Neovim/RPC/Plugin/FlipOperator.pm
+SHA1 857994acc820e73bc30800d189297e1102aa632a lib/Neovim/RPC/Plugin/LoadPlugin.pm
 SHA1 a88c017c5e5e7692c1a64163fd07dd2ea544a17f t/00-compile.t
-SHA1 ac36f0fcc364c6b86e56a8b1a8b29631f4c59b8d t/00-report-prereqs.dd
+SHA1 fd936e95c1e101a41e69da829dbda74108ae4147 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 0b92d57bbf680c73871f530e7ed52ad9882c547f t/buffer.t
 SHA1 aed337ba99934f73e6be606abe5f8a91bc94985d t/lib/Test/Neovim.pm
@@ -57,7 +57,7 @@ SHA1 a22acea2146e69324247e9e464559b171705a279 taskwarrior/taskw.pl
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlobH4gACgkQ34Hwf+GwC4xlMACeMGD/kW1dmWv7uyHff3lAmg+w
-thUAoJ47mLdqijYP3gnE5aRhUz1pFF4y
-=MviL
+iEYEARECAAYFAloclfUACgkQ34Hwf+GwC4z34wCfa+U1iSQL97/wGdeHCA65qgvs
+bJcAoOiuNXstu2QbbUsvMDdAsHU+HwVv
+=dloe
 -----END PGP SIGNATURE-----

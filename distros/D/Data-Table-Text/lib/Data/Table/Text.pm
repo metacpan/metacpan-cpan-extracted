@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171124';
+our $VERSION = '20171126';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -160,7 +160,7 @@ sub filePathDir(@)                                                              
 
 sub filePathExt(@)                                                              # File name from file name components and extension.
  {my (@File) = @_;                                                              # File components and extension
-  my @file = grep{$_} @_;                                                       # Remove undefined and blank components
+  my @file = grep{defined and /\S/} @_;                                         # Remove undefined and blank components
   @file > 1 or confess "At least two non blank file name components required\n";
   my $x = pop @file;
   my $n = pop @file;
@@ -591,8 +591,8 @@ sub max(@)                                                                      
 
 #1 Format                                                                       # Format data structures as tables
 
-sub formatTableBasic($;$)                                                       # Tabularize text - basic version.
- {my ($data, $separator) = @_;                                                  # Data to be formatted, optional line separator
+sub formatTableBasic($;$)                                                       # Tabularize text
+ {my ($data, $separator) = @_;                                                  # Reference to an array of arrays of data to be formatted as a table, optional line separator to use instead of new line for each row.
   my $d = $data;
   ref($d) =~ /array/i or confess "Array reference required\n";
   my @D;
@@ -630,7 +630,7 @@ sub formatTableAA($;$$)                                                         
   return dump($data) unless ref($data) =~ /array/i and @$data;
   my $d;
   push @$d, ['', @$title] if $title;
-  push @$d, [$_, @{$data->[$_]}] for 1..$#$data;
+  push @$d, [$_, @{$data->[$_-1]}] for 1..@$data;
   formatTableBasic($d, $separator);
  }
 
@@ -702,8 +702,8 @@ sub formatTableH($;$$)                                                          
   formatTableBasic($d, $separator);
  }
 
-sub formatTable($;$$)                                                           # Format various data structures.
- {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional title, optional line separator
+sub formatTable($;$$)                                                           # Format various data structures as a table
+ {my ($data, $title, $separator) = @_;                                          # Data to be formatted, optional reference to an array of titles, optional line separator
   my ($a, $h, $o) = (0, 0, 0);
   my $checkStructure = sub
    {for(@_)
@@ -1388,11 +1388,11 @@ Print a hash of hashes:
 
 Print an array of scalars:
 
- say STDERR formatTable(["a", "bb", "ccc", 4444]);
+ say STDERR formatTable(["a", "bb", "ccc", 4]);
  # 0  a
  # 1  bb
  # 2  ccc
- # 3  4444
+ # 3    4
 
 Print a hash of scalars:
 
@@ -1435,27 +1435,31 @@ Various ways of processing commands
 
 Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
 
-  1  @cmd  Command to execute followed by an optional regular expression to test the results
+  1  Parameter  Description
+  2  @cmd       Command to execute followed by an optional regular expression to test the results
 
 =head2 XXX($)
 
 Execute a block of shell commands line by line after removing comments
 
-  1  $cmd  Commands to execute separated by new lines
+  1  Parameter  Description
+  2  $cmd       Commands to execute separated by new lines
 
 =head2 zzz($$)
 
-Execute lines of commands as one long command string separated by added &&'s and then check that the execution results match the specified regular expression, confess()ing to the error if they do not.
+Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
 
-  1  $cmd      Commands to execute - one per line with no trailing &&
-  2  $success  Regular expression to check the results
+  1  Parameter  Description
+  2  $cmd       Commands to execute - one per line with no trailing &&
+  3  $success   Optional regular expression to check the results
 
 =head2 parseCommandLineArguments(&@)
 
 Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by the sub
 
-  1  $sub   Sub to call
-  2  @args  List of arguments to parse
+  1  Parameter  Description
+  2  $sub       Sub to call
+  3  @args      List of arguments to parse
 
 =head1 Files and paths
 
@@ -1469,21 +1473,24 @@ Information about each file
 
 Get the size of a file.
 
-  1  $file  File name
+  1  Parameter  Description
+  2  $file      File name
 
 =head3 fileModTime($)
 
 Get the modified time of a file in seconds since the epoch.
 
-  1  $file  File name
+  1  Parameter  Description
+  2  $file      File name
 
 =head3 fileOutOfDate(&$@)
 
 Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist. The file name is passed to the sub each time in $_. Returns the files to be remade in the order they should be made.
 
-  1  $make    Make with this sub
-  2  $target  Target file
-  3  @source  Source files
+  1  Parameter  Description
+  2  $make      Make with this sub
+  3  $target    Target file
+  4  @source    Source files
 
 Example:
 
@@ -1497,56 +1504,65 @@ Create file names from file name components
 
 Create a file path from an array of file name components. If all the components are blank then a blank file name is returned.
 
-  1  @file  File components
+  1  Parameter  Description
+  2  @file      File components
 
 =head3 filePathDir(@)
 
 Directory from an array of file name components. If all the components are blank then a blank file name is returned.
 
-  1  @file  File components
+  1  Parameter  Description
+  2  @file      File components
 
 =head3 filePathExt(@)
 
 File name from file name components and extension.
 
-  1  @File  File components and extension
+  1  Parameter  Description
+  2  @File      File components and extension
 
 =head3 checkFile($)
 
 Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
 
-  1  $file  File to check
+  1  Parameter  Description
+  2  $file      File to check
 
 =head3 checkFilePath(@)
 
 L<Check|/checkFile> a folder name constructed from its L<components|/filePath>
 
-  1  @file  File components
+  1  Parameter  Description
+  2  @file      File components
 
 =head3 checkFilePathExt(@)
 
 L<Check|/checkFile> a file name constructed from its  L<components|/filePathExt>
 
-  1  @File  File components and extension
+  1  Parameter  Description
+  2  @File      File components and extension
 
 =head3 checkFilePathDir(@)
 
 L<Check|/checkFile> a folder name constructed from its L<components|/filePathDir>
 
-  1  @file  File components
+  1  Parameter  Description
+  2  @file      File components
 
 =head3 quoteFile($)
 
 Quote a file name.
 
-  1  $file  File name
+  1  Parameter  Description
+  2  $file      File name
 
 =head3 removeFilePrefix($@)
 
 Removes a file prefix from an array of files.
 
-  1  $prefix  File prefix
-  2  @files   Array of file names
+  1  Parameter  Description
+  2  $prefix    File prefix
+  3  @files     Array of file names
 
 =head2 Position
 
@@ -1555,11 +1571,6 @@ Position in the file system
 =head3 currentDirectory()
 
 Get the current working directory.
-
-
-=head3 userId()
-
-Get the current user id via whoami
 
 
 =head3 currentDirectoryAbove()
@@ -1571,13 +1582,15 @@ The path to the folder above the current working folder.
 
 Parse a file name into (path, name, extension)
 
-  1  $file  File name to parse
+  1  Parameter  Description
+  2  $file      File name to parse
 
 =head3 containingFolder($)
 
 Path to the folder that contains this file, or use L</parseFileName>
 
-  1  $file  File name
+  1  Parameter  Description
+  2  $file      File name
 
 =head3 fullFileName()
 
@@ -1616,38 +1629,44 @@ Find files and folders below a folder.
 
 Find all the files under a folder.
 
-  1  $dir  Folder to start the search with
+  1  Parameter  Description
+  2  $dir       Folder to start the search with
 
 =head3 findDirs($)
 
 Find all the folders under a folder.
 
-  1  $dir  Folder to start the search with
+  1  Parameter  Description
+  2  $dir       Folder to start the search with
 
 =head3 fileList($)
 
 File list.
 
-  1  $pattern  Search pattern
+  1  Parameter  Description
+  2  $pattern   Search pattern
 
 =head3 searchDirectoryTreesForMatchingFiles(@)
 
 Search the specified directory trees for files that match the specified extensions - the argument list should include at least one folder and one extension to be useful.
 
-  1  @foldersandExtensions  Mixture of folder names and extensions
+  1  Parameter              Description
+  2  @foldersandExtensions  Mixture of folder names and extensions
 
 =head3 matchPath($)
 
 Given an absolute path find out how much of the path actually exists.
 
-  1  $file  File name
+  1  Parameter  Description
+  2  $file      File name
 
 =head3 clearFolder($$)
 
 Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
 
-  1  $folder      Folder
-  2  $limitCount  Maximum number of files to remove to limit damage
+  1  Parameter    Description
+  2  $folder      Folder
+  3  $limitCount  Maximum number of files to remove to limit damage
 
 =head2 Read and write files
 
@@ -1657,40 +1676,46 @@ Read and write strings from and to files creating paths as needed
 
 Read a file containing unicode.
 
-  1  $file  Name of unicode file to read
+  1  Parameter  Description
+  2  $file      Name of unicode file to read
 
 =head3 readBinaryFile($)
 
 Read binary file - a file whose contents are not to be interpreted as unicode.
 
-  1  $file  File to read
+  1  Parameter  Description
+  2  $file      File to read
 
 =head3 makePath($)
 
 Make the path for the specified file name or folder.
 
-  1  $file  File
+  1  Parameter  Description
+  2  $file      File
 
 =head3 writeFile($$)
 
 Write a unicode string to a file after creating a path to the file if necessary.
 
-  1  $file    File to write to
-  2  $string  Unicode string to write
+  1  Parameter  Description
+  2  $file      File to write to
+  3  $string    Unicode string to write
 
 =head3 appendFile($$)
 
 Append a unicode string to a file after creating a path to the file if necessary.
 
-  1  $file    File to append to
-  2  $string  Unicode string to append
+  1  Parameter  Description
+  2  $file      File to append to
+  3  $string    Unicode string to append
 
 =head3 writeBinaryFile($$)
 
 Write a non unicode string to a file in after creating a path to the file if necessary.
 
-  1  $file    File to write to
-  2  $string  Non unicode string to write
+  1  Parameter  Description
+  2  $file      File to write to
+  3  $string    Non unicode string to write
 
 =head3 binModeAllUtf8()
 
@@ -1705,15 +1730,17 @@ Image operations
 
 Return (width, height) of an image obtained via imagemagick.
 
-  1  $image  File containing image
+  1  Parameter  Description
+  2  $image     File containing image
 
 =head2 convertImageToJpx($$$)
 
 Convert an image to jpx format.
 
-  1  $source  Source file
-  2  $target  Target folder (as multiple files will be created)
-  3  $size    Size of each tile
+  1  Parameter  Description
+  2  $source    Source file
+  3  $target    Target folder (as multiple files will be created)
+  4  $size      Size of each tile
 
 =head1 Encoding and Decoding
 
@@ -1723,31 +1750,36 @@ Encode and decode using Json and Mime
 
 Encode Perl to Json.
 
-  1  $string  Data to encode
+  1  Parameter  Description
+  2  $string    Data to encode
 
 =head2 decodeJson($)
 
 Decode Perl from Json.
 
-  1  $string  Data to decode
+  1  Parameter  Description
+  2  $string    Data to decode
 
 =head2 encodeBase64($)
 
 Encode a string in base 64.
 
-  1  $string  String to encode
+  1  Parameter  Description
+  2  $string    String to encode
 
 =head2 decodeBase64($)
 
 Decode a string in base 64.
 
-  1  $string  String to decode
+  1  Parameter  Description
+  2  $string    String to decode
 
 =head2 convertUnicodeToXml($)
 
 Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents
 
-  1  $s  String to convert
+  1  Parameter  Description
+  2  $s         String to convert
 
 =head1 Numbers
 
@@ -1757,7 +1789,8 @@ Numeric operations
 
 Test whether a number is a power of two, return the power if it is else B<undef>
 
-  1  $n  Number to check
+  1  Parameter  Description
+  2  $n         Number to check
 
 Use B<powerOfTwoX> to execute L<powerOfTwo|/powerOfTwo> but B<die> 'powerOfTwo' instead of returning B<undef>
 
@@ -1765,32 +1798,56 @@ Use B<powerOfTwoX> to execute L<powerOfTwo|/powerOfTwo> but B<die> 'powerOfTwo' 
 
 Find log two of the lowest power of two greater than or equal to a number.
 
-  1  $n  Number to check
+  1  Parameter  Description
+  2  $n         Number to check
 
 Use B<containingPowerOfTwoX> to execute L<containingPowerOfTwo|/containingPowerOfTwo> but B<die> 'containingPowerOfTwo' instead of returning B<undef>
 
-=head1 Arrays
+=head1 Sets
 
-Array operations
+Set operations
+
+=head2 setIntersectionOfTwoArraysOfWords($$)
+
+Intersection of two arrays of words
+
+  1  Parameter  Description
+  2  $a         Reference to first array of words
+  3  $b         Reference to second array of words
+
+=head2 setUnionOfTwoArraysOfWords($$)
+
+Union of two arrays of words
+
+  1  Parameter  Description
+  2  $a         Reference to first array of words
+  3  $b         Reference to second array of words
 
 =head2 contains($@)
 
-Returns the indices at which an item matches an array. If item is a regular expression then it is matched as one else it is a number it is matched as a number, else a string.
+Returns the indices at which an item matches elements of the specified array. If the item is a regular expression then it is matched as one, else it is a number it is matched as a number, else as a string.
 
-  1  $item   Item
-  2  @array  Array
+  1  Parameter  Description
+  2  $item      Item
+  3  @array     Array
+
+=head1 Minima and Maxima
+
+Find the smallest and largest elements of arrays
 
 =head2 min(@)
 
 Find the minimum number in a list.
 
-  1  @n  Numbers
+  1  Parameter  Description
+  2  @n         Numbers
 
 =head2 max(@)
 
 Find the maximum number in a list.
 
-  1  @n  Numbers
+  1  Parameter  Description
+  2  @n         Numbers
 
 =head1 Format
 
@@ -1798,25 +1855,28 @@ Format data structures as tables
 
 =head2 formatTableBasic($$)
 
-Tabularize text - basic version.
+Tabularize text
 
-  1  $data       Data to be formatted
-  2  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Reference to an array of arrays of data to be formatted as a table
+  3  $separator  Optional line separator to use instead of new line for each row.
 
 =head2 formatTable($$$)
 
-Format various data structures.
+Format various data structures as a table
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional reference to an array of titles
+  4  $separator  Optional line separator
 
 =head2 keyCount($$)
 
 Count keys down to the specified level.
 
-  1  $maxDepth  Maximum depth to count to
-  2  $ref       Reference to an array or a hash
+  1  Parameter  Description
+  2  $maxDepth  Maximum depth to count to
+  3  $ref       Reference to an array or a hash
 
 =head1 Lines
 
@@ -1826,32 +1886,37 @@ Load data structures from lines
 
 Load an array from lines of text in a string.
 
-  1  $string  The string of lines from which to create an array
+  1  Parameter  Description
+  2  $string    The string of lines from which to create an array
 
 =head2 loadHashFromLines($)
 
 Load a hash: first word of each line is the key and the rest is the value.
 
-  1  $string  The string of lines from which to create a hash
+  1  Parameter  Description
+  2  $string    The string of lines from which to create a hash
 
 =head2 loadArrayArrayFromLines($)
 
 Load an array of arrays from lines of text: each line is an array of words.
 
-  1  $string  The string of lines from which to create an array of arrays
+  1  Parameter  Description
+  2  $string    The string of lines from which to create an array of arrays
 
 =head2 loadHashArrayFromLines($)
 
 Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-  1  $string  The string of lines from which to create a hash of arrays
+  1  Parameter  Description
+  2  $string    The string of lines from which to create a hash of arrays
 
 =head2 checkKeys($$)
 
 Check the keys in a hash.
 
-  1  $test       The hash to test
-  2  $permitted  The permitted keys and their meanings
+  1  Parameter   Description
+  2  $test       The hash to test
+  3  $permitted  The permitted keys and their meanings
 
 =head1 LVALUE methods
 
@@ -1861,7 +1926,8 @@ Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing 
 
 Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.
 
-  1  @names  List of method names
+  1  Parameter  Description
+  2  @names     List of method names
 
 Example:
 
@@ -1871,7 +1937,8 @@ Example:
 
 Generate LVALUE scalar methods with default values in the current package. A reference to a method whose value has not yet been set will return a scalar whose value is the name of the method.
 
-  1  @names  List of method names
+  1  Parameter  Description
+  2  @names     List of method names
 
 Example:
 
@@ -1881,7 +1948,8 @@ Example:
 
 Generate LVALUE array methods in the current package. A reference to a method that has no yet been set will return a reference to an empty array.
 
-  1  @names  List of method names
+  1  Parameter  Description
+  2  @names     List of method names
 
 Example:
 
@@ -1891,7 +1959,8 @@ Example:
 
 Generate LVALUE hash methods in the current package. A reference to a method that has no yet been set will return a reference to an empty hash.
 
-  1  @names  Method names
+  1  Parameter  Description
+  2  @names     Method names
 
 Example:
 
@@ -1905,51 +1974,59 @@ Actions on strings
 
 Indent lines contained in a string or formatted table by the specified string.
 
-  1  $string  The string of lines to indent
-  2  $indent  The indenting string
+  1  Parameter  Description
+  2  $string    The string of lines to indent
+  3  $indent    The indenting string
 
 =head2 isBlank($)
 
 Test whether a string is blank.
 
-  1  $string  String
+  1  Parameter  Description
+  2  $string    String
 
 =head2 trim($)
 
 Trim off white space from from front and end of string.
 
-  1  $string  String
+  1  Parameter  Description
+  2  $string    String
 
 =head2 pad($$)
 
 Pad a string with blanks to a multiple of a specified length.
 
-  1  $string  String
-  2  $length  Tab width
+  1  Parameter  Description
+  2  $string    String
+  3  $length    Tab width
 
 =head2 nws($)
 
-Normalize white space in a string to make comparisons easier.
+Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of whitespace in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
 
-  1  $string  String to normalize
+  1  Parameter  Description
+  2  $string    String to normalize
 
 =head2 javaPackage($)
 
 Extract the package name from a java string or file.
 
-  1  $java  Java file if it exists else the string of java
+  1  Parameter  Description
+  2  $java      Java file if it exists else the string of java
 
 =head2 javaPackageAsFileName($)
 
 Extract the package name from a java string or file and convert it to a file name.
 
-  1  $java  Java file if it exists else the string of java
+  1  Parameter  Description
+  2  $java      Java file if it exists else the string of java
 
 =head2 perlPackage($)
 
 Extract the package name from a perl string or file.
 
-  1  $perl  Perl file if it exists else the string of perl
+  1  Parameter  Description
+  2  $perl      Perl file if it exists else the string of perl
 
 =head1 Cloud Cover
 
@@ -1959,7 +2036,18 @@ Useful for operating across the cloud
 
 Add a certificate to the current ssh session.
 
-  1  $file  File containing certificate
+  1  Parameter  Description
+  2  $file      File containing certificate
+
+=head2 hostName()
+
+The name of the host we are running on
+
+
+=head2 userId()
+
+The userid we are currently running under
+
 
 =head1 Documentation
 
@@ -2021,7 +2109,8 @@ Search for '#1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20170
 Parameters:
 
 
-  1  $perlModule  Optional file name with caller's file being the default
+  1  Parameter    Description
+  2  $perlModule  Optional file name with caller's file being the default
 
 
 =head1 Private Methods
@@ -2030,67 +2119,76 @@ Parameters:
 
 Remove any trailing folder separator from a folder name component.
 
-  1  $name  Name
+  1  Parameter  Description
+  2  $name      Name
 
 =head2 renormalizeFolderName($)
 
 Normalize a folder name component by adding a trailing separator.
 
-  1  $name  Name
+  1  Parameter  Description
+  2  $name      Name
 
 =head2 formatTableAA($$$)
 
 Tabularize an array of arrays.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 formatTableHA($$$)
 
 Tabularize a hash of arrays.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 formatTableAH($$$)
 
 Tabularize an array of hashes.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 formatTableHH($$$)
 
 Tabularize a hash of hashes.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 formatTableA($$$)
 
 Tabularize an array.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 formatTableH($$$)
 
 Tabularize a hash.
 
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
+  1  Parameter   Description
+  2  $data       Data to be formatted
+  3  $title      Optional title
+  4  $separator  Optional line separator
 
 =head2 extractTest($)
 
 Extract a line of a test.
 
-  1  $string  String containing test line
+  1  Parameter  Description
+  2  $string    String containing test line
 
 
 =head1 Index
@@ -2190,85 +2288,91 @@ Extract a line of a test.
 
 47 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-48 L<imageSize|/imageSize>
+48 L<hostName|/hostName>
 
-49 L<indentString|/indentString>
+49 L<imageSize|/imageSize>
 
-50 L<isBlank|/isBlank>
+50 L<indentString|/indentString>
 
-51 L<javaPackage|/javaPackage>
+51 L<isBlank|/isBlank>
 
-52 L<javaPackageAsFileName|/javaPackageAsFileName>
+52 L<javaPackage|/javaPackage>
 
-53 L<keyCount|/keyCount>
+53 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-54 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+54 L<keyCount|/keyCount>
 
-55 L<loadArrayFromLines|/loadArrayFromLines>
+55 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-56 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+56 L<loadArrayFromLines|/loadArrayFromLines>
 
-57 L<loadHashFromLines|/loadHashFromLines>
+57 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-58 L<makePath|/makePath>
+58 L<loadHashFromLines|/loadHashFromLines>
 
-59 L<matchPath|/matchPath>
+59 L<makePath|/makePath>
 
-60 L<max|/max>
+60 L<matchPath|/matchPath>
 
-61 L<min|/min>
+61 L<max|/max>
 
-62 L<nws|/nws>
+62 L<min|/min>
 
-63 L<pad|/pad>
+63 L<nws|/nws>
 
-64 L<parseCommandLineArguments|/parseCommandLineArguments>
+64 L<pad|/pad>
 
-65 L<parseFileName|/parseFileName>
+65 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-66 L<perlPackage|/perlPackage>
+66 L<parseFileName|/parseFileName>
 
-67 L<powerOfTwo|/powerOfTwo>
+67 L<perlPackage|/perlPackage>
 
-68 L<powerOfTwoX|/powerOfTwo>
+68 L<powerOfTwo|/powerOfTwo>
 
-69 L<printFullFileName|/printFullFileName>
+69 L<powerOfTwoX|/powerOfTwo>
 
-70 L<quoteFile|/quoteFile>
+70 L<printFullFileName|/printFullFileName>
 
-71 L<readBinaryFile|/readBinaryFile>
+71 L<quoteFile|/quoteFile>
 
-72 L<readFile|/readFile>
+72 L<readBinaryFile|/readBinaryFile>
 
-73 L<removeFilePrefix|/removeFilePrefix>
+73 L<readFile|/readFile>
 
-74 L<renormalizeFolderName|/renormalizeFolderName>
+74 L<removeFilePrefix|/removeFilePrefix>
 
-75 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+75 L<renormalizeFolderName|/renormalizeFolderName>
 
-76 L<temporaryDirectory|/temporaryDirectory>
+76 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-77 L<temporaryFile|/temporaryFile>
+77 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-78 L<temporaryFolder|/temporaryFolder>
+78 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-79 L<timeStamp|/timeStamp>
+79 L<temporaryDirectory|/temporaryDirectory>
 
-80 L<trim|/trim>
+80 L<temporaryFile|/temporaryFile>
 
-81 L<updateDocumentation|/updateDocumentation>
+81 L<temporaryFolder|/temporaryFolder>
 
-82 L<userId|/userId>
+82 L<timeStamp|/timeStamp>
 
-83 L<writeBinaryFile|/writeBinaryFile>
+83 L<trim|/trim>
 
-84 L<writeFile|/writeFile>
+84 L<updateDocumentation|/updateDocumentation>
 
-85 L<xxx|/xxx>
+85 L<userId|/userId>
 
-86 L<XXX|/XXX>
+86 L<writeBinaryFile|/writeBinaryFile>
 
-87 L<zzz|/zzz>
+87 L<writeFile|/writeFile>
+
+88 L<xxx|/xxx>
+
+89 L<XXX|/XXX>
+
+90 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2462,12 +2566,12 @@ if (1)                                                                          
 
 if (1)                                                                          # Format table and AA
  {my $t = [qw(aa bb cc)];
-  my $d = [[qw(1 A   B   C)],
-           [qw(2 AA  BB  CC)],
-           [qw(3 AAA BBB CCC)],
-           [qw(4 1   22  333)]];
-  ok formatTableBasic($d,   '|') eq '1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |';
-  ok formatTable($d, $t, '|') eq '   aa  bb   cc   |1   2  AA   BB   CC   |2   3  AAA  BBB  CCC  |3   4    1   22  333  |';
+  my $d = [[qw(A   B   C)],
+           [qw(AA  BB  CC)],
+           [qw(AAA BBB CCC)],
+           [qw(1   22  333)]];
+  ok formatTableBasic($d,     '|') eq                       'A    B    C    |AA   BB   CC   |AAA  BBB  CCC  |  1   22  333  |';
+  ok formatTable     ($d, $t, '|') eq '   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |';
  }
 
 if (1)                                                                          # AH
@@ -2577,9 +2681,9 @@ if (1)                                                                          
 
 if (1)                                                                          # indentString
  {my $t = [qw(aa bb cc)];
-  my $d = [[qw(1 A B C)], [qw(2 AA BB CC)], [qw(3 AAA BBB CCC)],  [qw(4 1 22 333)]];
+  my $d = [[qw(A B C)], [qw(AA BB CC)], [qw(AAA BBB CCC)],  [qw(1 22 333)]];
   my $s = indentString(formatTable($d), '  ') =~ s/\n/|/gr;
-  ok $s eq '  1  2  AA   BB   CC   |  2  3  AAA  BBB  CCC  |  3  4    1   22  333  ';
+  ok $s eq "  1  A    B    C    |  2  AA   BB   CC   |  3  AAA  BBB  CCC  |  4    1   22  333  ", "indent";
  }
 
 ok trim(" a b ") eq join ' ', qw(a b);                                          # Trim

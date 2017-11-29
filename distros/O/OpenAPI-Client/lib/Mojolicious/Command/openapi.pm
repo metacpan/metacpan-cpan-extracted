@@ -110,7 +110,7 @@ Mojolicious::Command::openapi - Perform Open API requests
 
   Usage: APPLICATION openapi SPECIFICATION OPERATION "{ARGUMENTS}" [SELECTOR|JSON-POINTER]
 
-    # Fetch /v1 from myapp.pl and validate the specification
+    # Fetch /api from myapp.pl and validate the specification
     ./myapp.pl openapi /api
 
     # Run an operation against a local application

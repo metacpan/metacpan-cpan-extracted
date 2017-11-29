@@ -74,8 +74,12 @@ share/CPAN-Testers-Schema-0.019-0.020-MySQL.sql
 share/CPAN-Testers-Schema-0.019-0.020-SQLite.sql
 share/CPAN-Testers-Schema-0.019-MySQL.sql
 share/CPAN-Testers-Schema-0.019-SQLite.sql
+share/CPAN-Testers-Schema-0.020-0.021-MySQL.sql
+share/CPAN-Testers-Schema-0.020-0.021-SQLite.sql
 share/CPAN-Testers-Schema-0.020-MySQL.sql
 share/CPAN-Testers-Schema-0.020-SQLite.sql
+share/CPAN-Testers-Schema-0.021-MySQL.sql
+share/CPAN-Testers-Schema-0.021-SQLite.sql
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

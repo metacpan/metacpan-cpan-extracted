@@ -1,5 +1,5 @@
 package Bio::Tradis::CombinePlots;
-$Bio::Tradis::CombinePlots::VERSION = '1.3.3';
+$Bio::Tradis::CombinePlots::VERSION = '1.4.0';
 # ABSTRACT: Combine multiple plotfiles and generate updated statistics for the combined files
 
 
@@ -309,7 +309,7 @@ Bio::Tradis::CombinePlots - Combine multiple plotfiles and generate updated stat
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ sub wait_for_promise ($) {
 }
 
 my $connect_args = {
-    user     => $::test_user,
+    user     => $::test_user || 'root',
     host     => '127.0.0.1',
     password => $::test_password || '',
 };
@@ -114,7 +114,7 @@ my $start_query = sub {
         fail("$sql: Broken query should never succeed");
     }, sub {
         my $error = $_[0];
-        like($error, $re, "$sql failed as expected");
+        like($error, $re, ($sql // '<undef>') . " failed as expected");
         $next_query_start->($conn, $tuples, $next_query_start);
     });
 };
@@ -125,6 +125,11 @@ my @broken_queries = (
     [ qr/\ANot enough bind params given/, "SELECT ?", [] ],
     [ qr/\AToo many bind params given for query! Got 2, query needed 1/, "SELECT ?", [1, 2] ],
     [ qr/\ANot enough bind params given/, "SELECT ?, ?", [1] ],
+    [ qr/Query was empty/, undef, [] ],
+    [ qr/Query was empty/, undef ],
+    [ qr/Query was empty/, '', [] ],
+    [ qr/Query was empty/, '' ],
+    [ qr/Query was empty/, '   ' ],
 );
 
 my @promises;

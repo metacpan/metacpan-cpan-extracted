@@ -1,7 +1,7 @@
 package MsgPack::Decoder;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Decode data from a MessagePack stream
-$MsgPack::Decoder::VERSION = '2.0.0';
+$MsgPack::Decoder::VERSION = '2.0.1';
 
 use 5.20.0;
 
@@ -15,7 +15,7 @@ use List::AllUtils qw/ reduce first first_index any /;
 use MsgPack::Type::Boolean;
 use MsgPack::Decoder::Generator::Any;
 
-use Log::Any;
+use Log::Any 1.701;
 
 use Moose;
 
@@ -126,7 +126,7 @@ MsgPack::Decoder - Decode data from a MessagePack stream
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 SYNOPSIS
 

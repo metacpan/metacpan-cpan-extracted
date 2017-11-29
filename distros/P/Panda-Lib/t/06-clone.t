@@ -144,6 +144,22 @@ $copy = clone($val, 1); # should behave like fclone
 shift @{$val->[0]{b}};
 cmp_deeply($copy->[0]{c}{c}{c}{c}{c}{c}{c}{c}{b}, [1,2,3]);
 
+# fclone with HOOK_CLONE and again clone inside - MUST NOT loose object dictionary inside
+{
+    package MyObj;
+    use Data::Dumper;
+    sub HOOK_CLONE { my $self = shift; my $ret = Panda::Lib::fclone($self); $ret->{copied} = 1; return $ret; }
+}
+$val = {obj => bless({a => 1}, 'MyObj')};
+$val->{obj}{top} = $val;
+$copy = fclone($val);
+$copy->{obj}{a}++;
+is($val->{obj}{a}, 1);
+cmp_deeply([$copy->{obj}{a}, $copy->{obj}{copied}], [2, 1]);
+isnt($val, $copy);
+isnt($val->{obj}, $copy->{obj});
+is($copy->{obj}{top}, $copy, 'same dictionary used');
+
 # code reference
 $val = sub { return 25 };
 $copy = clone($val);

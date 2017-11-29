@@ -1,6 +1,6 @@
 package Cassandra::Client::Metadata;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Metadata::VERSION = '0.13';
+$Cassandra::Client::Metadata::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -18,10 +18,9 @@ sub prepare_cache {
 }
 
 sub add_prepared {
-    my ($self, $query, $id, $input_metadata, $decoder, $encoder)= @_;
+    my ($self, $query, $id, $decoder, $encoder)= @_;
     $self->{prepare_cache}{$query}= {
         id => $id,
-        input_metadata => $input_metadata,
         decoder => $decoder,
         encoder => $encoder
     };
@@ -53,7 +52,7 @@ Cassandra::Client::Metadata
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

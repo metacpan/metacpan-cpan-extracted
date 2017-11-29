@@ -106,8 +106,20 @@ sub test_002 {
     $test->sample('Sample_01');
     my $attr = $test->walk_attr;
 
-    is_deeply( $attr->some_glob,
-        [ File::Spec->catdir($attr->root_dir, 'Sample_01'), File::Spec->catdir($attr->root_dir, 'Sample_02') ] );
+    is_deeply(
+        $test->sample_files,
+        [
+            File::Spec->catdir( $attr->root_dir, 'Sample_01' ),
+            File::Spec->catdir( $attr->root_dir, 'Sample_02' )
+        ]
+    );
+    is_deeply(
+        $attr->some_glob,
+        [
+            File::Spec->catdir( $attr->root_dir, 'Sample_01' ),
+            File::Spec->catdir( $attr->root_dir, 'Sample_02' )
+        ]
+    );
 
     $test->post_process_rules;
 }

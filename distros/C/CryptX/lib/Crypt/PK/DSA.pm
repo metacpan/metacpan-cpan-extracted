@@ -2,7 +2,7 @@ package Crypt::PK::DSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
@@ -280,7 +280,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  $pk->generate_key(\$dsa_param)
  # $dsa_param is the content of DER or PEM file with DSA params
  # e.g. openssl dsaparam 2048
- 
+
 =head2 import_key
 
 Loads private or public key in DER or PEM format.
@@ -473,7 +473,12 @@ Support for password protected PEM keys
 =head2 size
 
  my $size = $pk->size;
- # returns key size in bytes or undef if no key loaded
+ # returns key size (length of the prime p) in bytes or undef if key not loaded
+
+=head2 size_q
+
+ my $size = $pk->size_q;
+ # returns length of the prime q in bytes or undef if key not loaded
 
 =head2 key2hash
 
@@ -643,3 +648,5 @@ Load keys (Perl code):
 =item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm|https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
 
 =back
+
+=cut

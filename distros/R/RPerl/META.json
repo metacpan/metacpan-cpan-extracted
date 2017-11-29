@@ -107,6 +107,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "3.400000",
+   "version" : "3.402000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -4,7 +4,7 @@ Syntax::Kamelon::Syntaxes - List of available syntaxes
 
 =head1 LIST
 
-This is a list of all included syntax definition files in this release 0.16 of B<Syntax::Kamelon>.
+This is a list of all included syntax definition files in this release 0.17 of B<Syntax::Kamelon>.
 Please note that the names may contain spaces.
 
 =over 4

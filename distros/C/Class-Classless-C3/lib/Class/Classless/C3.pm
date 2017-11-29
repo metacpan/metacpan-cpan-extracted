@@ -2,7 +2,7 @@ package Class::Classless::C3;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Algorithm::C3;
 
@@ -73,11 +73,6 @@ sub NEXT
 	return unless $sub;	# do not die on NEXT
 	$$trace .= "NEXT $method from $class\n" if ref $trace eq 'SCALAR';
 	goto $sub;
-}
-
-sub VERSION
-{
-	# stub
 }
 
 sub isa
@@ -248,7 +243,11 @@ sub declassify
 	my $symtable = \%{$class.'::'};
 	for my $sym ( keys %$symtable ) {
 		next if $sym =~ m/^(AUTOLOAD|NEXT|can|isa|VERSION|meta|new)$/;
-		my $sub = *{$symtable->{$sym}}{CODE};
+		my $sub = ref \$symtable->{$sym} eq 'GLOB'
+		  ? *{$symtable->{$sym}}{CODE}
+		  : exists &{$class.'::'.$sym}
+                     ? \&{$class.'::'.$sym}
+                     : undef;
 		if (defined $sub) {
 			$self->meta->addmethod($sym => $sub);
 			delete ${$class.'::'}{$sym};  #deletes all glob-parts

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">#!&nbsp;/bin/env&nbsp;pike</font></br></div>
+<div id="2" class="line"></br></div>
+<div id="3" class="line"><font class="Comment">/*&nbsp;This&nbsp;file&nbsp;is&nbsp;a&nbsp;syntax&nbsp;highlight&nbsp;test&nbsp;for&nbsp;Kate.</font></br></div>
+<div id="4" class="line"><font class="Comment">&nbsp;*&nbsp;</font><font class="Alert">FIXME:</font><font class="Comment">&nbsp;Improve&nbsp;it&nbsp;to&nbsp;contain&nbsp;more&nbsp;(and&nbsp;more&nbsp;unusual)&nbsp;syntax&nbsp;examples.</font></br></div>
+<div id="5" class="line"><font class="Comment">&nbsp;*/</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"></br></div>
+<div id="8" class="line"><font class="Others">#define&nbsp;PIKE_ON_THE_WEB&nbsp;&nbsp;</font><font class="Comment">/*&nbsp;Is&nbsp;this&nbsp;address&nbsp;correct?&nbsp;*/</font><font class="Others">&nbsp;&nbsp;</font><font class="String">&quot;http://pike.ida.liu.se/&quot;</font></br></div>
+<div id="9" class="line"></br></div>
+<div id="10" class="line"></br></div>
+<div id="11" class="line"><font class="DataType">int</font><font class="Normal">&nbsp;main(</font><font class="DataType">int</font><font class="Normal">&nbsp;argc,&nbsp;</font><font class="DataType">array</font><font class="Normal">(</font><font class="DataType">string</font><font class="Normal">)&nbsp;args)</font></br></div>
+<div id="12" class="line"><font class="Normal">{</font></br></div>
+<div id="13" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">//&nbsp;Write&nbsp;funny&nbsp;things&nbsp;with&nbsp;Pike&nbsp;:)</font></br></div>
+<div id="14" class="line"><font class="Normal">&nbsp;&nbsp;write(</font><font class="Function">`+</font><font class="Normal">(</font><font class="String">&quot;Command&nbsp;line&nbsp;arguments&nbsp;(%d&nbsp;of&nbsp;them):&nbsp;&quot;</font><font class="Normal">,&nbsp;@map(args,&nbsp;</font><font class="Function">`+</font><font class="Normal">,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font><font class="Normal">))&nbsp;+&nbsp;</font><font class="String">&quot;</font><font class="Char">\n</font><font class="String">&quot;</font><font class="Normal">,&nbsp;argc);</font></br></div>
+<div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="16" class="line"><font class="Normal">&nbsp;&nbsp;write(</font><font class="String">&quot;</font><font class="Char">\n</font><font class="String">Visit&nbsp;Pike&nbsp;site&nbsp;at&nbsp;%s</font><font class="Char">\n\n</font><font class="String">&quot;</font><font class="Normal">,&nbsp;PIKE_ON_THE_WEB);</font></br></div>
+<div id="17" class="line"></br></div>
+<div id="18" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">for</font><font class="Normal">&nbsp;(</font><font class="DataType">int</font><font class="Normal">&nbsp;i&nbsp;=&nbsp;</font><font class="Float">1</font><font class="Normal">;&nbsp;i&nbsp;&lt;=&nbsp;</font><font class="Float">3</font><font class="Normal">;&nbsp;i++)</font></br></div>
+<div id="19" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;write(</font><font class="String">&quot;:&quot;</font><font class="Normal">&nbsp;+&nbsp;</font><font class="String">&quot;)&quot;</font><font class="Normal">&nbsp;*&nbsp;i&nbsp;+&nbsp;</font><font class="String">&quot;&nbsp;&nbsp;&nbsp;&quot;</font><font class="Normal">);</font></br></div>
+<div id="20" class="line"></br></div>
+<div id="21" class="line"><font class="Normal">&nbsp;&nbsp;write(</font><font class="String">&quot;</font><font class="Char">\n</font><font class="String">&quot;</font><font class="Normal">&nbsp;+&nbsp;({</font><font class="String">&quot;Bye&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;bye&quot;</font><font class="Normal">})&nbsp;*&nbsp;</font><font class="String">&quot;-&quot;</font><font class="Normal">&nbsp;+&nbsp;</font><font class="String">&quot;!</font><font class="Char">\n</font><font class="String">&quot;</font><font class="Normal">);</font></br></div>
+<div id="22" class="line"></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0</font><font class="Normal">;</font></br></div>
+<div id="24" class="line"><font class="Normal">}</font></br></div>
+</div>
+</body>
+</html>
+

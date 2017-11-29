@@ -1,6 +1,6 @@
 package Neovim::RPC::Plugin::FlipOperator;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::Plugin::FlipOperator::VERSION = '1.0.0';
+$Neovim::RPC::Plugin::FlipOperator::VERSION = '1.0.1';
 use 5.20.0;
 
 use strict;
@@ -115,7 +115,7 @@ Neovim::RPC::Plugin::FlipOperator
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

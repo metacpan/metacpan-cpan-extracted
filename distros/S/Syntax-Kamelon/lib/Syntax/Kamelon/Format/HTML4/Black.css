@@ -1,9 +1,9 @@
-#content {
-  width: 944px;
+.content {
   font-family: "Monospace";
   font-size: 1em;
   background: Black;
   color: White;
+  width: 944px;
   padding: 20px;
   height: 100%;
   margin-left: auto;

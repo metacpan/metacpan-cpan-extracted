@@ -118,6 +118,7 @@ sub find_sample_glob {
     }
 
     $self->global_attr->samples( dclone( $self->samples ) );
+    $self->global_attr->sample_files( dclone( $self->sample_files ) );
 }
 
 sub get_sample_rule {

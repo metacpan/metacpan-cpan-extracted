@@ -1,0 +1,56 @@
+{
+   "abstract" : "Helper class for generating Facebook Instant Article markup.",
+   "author" : [
+      "Tore Aursand <toreau@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Facebook-InstantArticle",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.06",
+            "Moose" : "2.1804",
+            "XML::Generator" : "1.04",
+            "namespace::autoclean" : "0.28"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "1.36",
+            "DateTime::Locale" : "1.05",
+            "DateTime::TimeZone" : "2.01",
+            "Test::More" : "1.302037"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/toreau/Facebook-InstantArticle/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/toreau/Facebook-InstantArticle"
+      }
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

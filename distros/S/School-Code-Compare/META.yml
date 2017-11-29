@@ -1,0 +1,32 @@
+---
+abstract: 'Calculate the difference between two strings'
+author:
+  - 'Boris Däppen <bdaeppen.perl@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: School-Code-Compare
+requires:
+  DateTime: '0'
+  File::Slurp: '0'
+  Getopt::Args: '0'
+  IO::Prompter: '0'
+  Template: '0'
+  Text::Levenshtein::XS: '0'
+  feature: '0'
+  perl: v5.22.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/borisdaeppen/School-Code-Compare
+  repository: git://github.com/borisdaeppen/School-Code-Compare.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.70'

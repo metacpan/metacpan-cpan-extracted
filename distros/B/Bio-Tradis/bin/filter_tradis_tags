@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::FilterTags;
-$Bio::Tradis::Bin::FilterTags::VERSION = '1.3.3';
+$Bio::Tradis::Bin::FilterTags::VERSION = '1.4.0';
 # ABSTRACT: filter tags at start of fastq sequences
 # PODNAME: filter_tags
 
@@ -26,7 +26,7 @@ filter_tags - filter tags at start of fastq sequences
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

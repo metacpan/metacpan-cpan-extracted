@@ -114,6 +114,7 @@ lib/Pcore/Dist/CLI/Id.pm
 lib/Pcore/Dist/CLI/Issues.pm
 lib/Pcore/Dist/CLI/Ls.pm
 lib/Pcore/Dist/CLI/PAR.pm
+lib/Pcore/Dist/CLI/Pause.pm
 lib/Pcore/Dist/CLI/Release.pm
 lib/Pcore/Dist/CLI/Setup.pm
 lib/Pcore/Dist/CLI/Smoke.pm

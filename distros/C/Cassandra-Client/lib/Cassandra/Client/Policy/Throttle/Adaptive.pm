@@ -1,11 +1,13 @@
 package Cassandra::Client::Policy::Throttle::Adaptive;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::Throttle::Adaptive::VERSION = '0.13';
+$Cassandra::Client::Policy::Throttle::Adaptive::VERSION = '0.14';
+use parent 'Cassandra::Client::Policy::Throttle::Default';
 use 5.010;
 use strict;
 use warnings;
 use Time::HiRes qw/CLOCK_MONOTONIC/;
 use Ref::Util qw/is_blessed_ref/;
+use Cassandra::Client::Error::ClientThrottlingError;
 
 sub new {
     my ($class, %args)= @_;
@@ -38,13 +40,16 @@ sub should_fail {
     return unless $fail;
 
     $self->count(undef, 1);
-    return 1;
+    return Cassandra::Client::Error::ClientThrottlingError->new;
 }
 
 sub count {
     my ($self, $error, $force_error)= @_;
+
+    return if is_blessed_ref($error) && $error->isa('Cassandra::Client::Error::ClientThrottlingError');
+
     $self->{window_total}++;
-    my $success= !(is_blessed_ref($error) && $error->{is_timeout}) && !$force_error;
+    my $success= !(is_blessed_ref($error) && $error->is_timeout) && !$force_error;
     push @{$self->{window}}, [ Time::HiRes::clock_gettime(CLOCK_MONOTONIC)+$self->{time}, $success ];
     $self->{window_success}++ if $success;
     return;
@@ -62,7 +67,7 @@ Cassandra::Client::Policy::Throttle::Adaptive
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

@@ -1,3 +1,5 @@
+1.3.3    28.11.2017
+           - when calling clone from HOOK_CLONE, use the same dictinary as top call
 1.3.2    11.05.2017
            - move C++ only parts to CPP::panda::lib, use CPP::panda::lib
            - move PXS_TRY, sv2string, sv2string_view to Panda::XS

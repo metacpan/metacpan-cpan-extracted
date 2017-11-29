@@ -6,7 +6,7 @@
 package Syntax::Highlight::Engine::Kate;
 
 use 5.006;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use strict;
 use warnings;
 use Carp qw(carp croak);
@@ -19,12 +19,12 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 	my %args = (@_);
-	
+
 	my $add = delete $args{'plugins'};
 	unless (defined($add)) { $add = [] };
 	my $language = delete $args{'language'};
 	unless (defined($language)) { $language = 'Off' };
-	
+
 	my $self = $class->SUPER::new(%args);
 
 	$self->{'plugins'} = {};
@@ -741,6 +741,11 @@ Syntax::Highlight::Engine::Kate - a port to Perl of the syntax highlight engine 
  print "</body>\n</html>\n";
 
 =head1 DESCRIPTION
+
+B<This module is now depricated>.
+
+It is superceded and replaced by B<Syntax::Kamelon>.
+Best use B<Syntax::Kamelon> for new projects.
 
 Syntax::Highlight::Engine::Kate is a port to Perl of the syntax highlight engine of the
 Kate text editor.

@@ -2,7 +2,8 @@ package CGI::OptimalQuery::Base;
 
 use strict;
 use warnings;
-no warnings qw( uninitialized ); 
+no warnings qw( uninitialized redefine );
+
 use CGI();
 use Carp('confess');
 use POSIX();
@@ -15,7 +16,15 @@ use CGI::OptimalQuery::SaveSearchTool();
 use CGI::OptimalQuery::LoadSearchTool();
 
 sub escapeHTML {
-  return defined $_[0] ? CGI::escapeHTML($_[0]) : '';
+  local ($_) = @_;
+  s{&}{&amp;}gso;
+  s{<}{&lt;}gso;
+  s{>}{&gt;}gso;
+  s{"}{&quot;}gso;
+  s{'}{&#39;}gso;
+  s{\x8b}{&#8249;}gso;
+  s{\x9b}{&#8250;}gso;
+  return $_;
 }
 
 sub can_embed { 0 }
@@ -158,24 +167,15 @@ sub new {
     $$v{on_init}->($o) if ref($$v{on_init}) eq 'CODE';
   }
 
-  # if schema params exist
-  if (ref($$o{schema}{params}) eq 'HASH') {
-    foreach my $k (qw( page rows_page show filter hiddenFilter queryDescr sort mode )) { 
-      $$o{$k} = $$o{schema}{params}{$k} if exists $$o{schema}{params}{$k};
-    }
-  }
-
-  # else use CGI params
-  else {
-    foreach my $k (qw( page rows_page show filter hiddenFilter queryDescr sort mode )) { 
-      next unless defined $$o{q}->param($k);
+  my $schemaparams = $$o{schema}{params} || {};
+  foreach my $k (qw( page rows_page show filter hiddenFilter queryDescr sort mode )) { 
+    if (exists $$schemaparams{$k}) {
+      $$o{$k} = $$schemaparams{$k};
+    } elsif (defined $$o{q}->param($k)) {
       $$o{$k} = $$o{q}->param($k);
+    } else {
+      $$o{$k} = $$o{schema}{$k};
     }
-  }
-
-  # use schema defaults when no user defaults are available
-  foreach my $k (qw( show filter hiddenFilter queryDescr sort mode)) {
-    $$o{$k} = $$o{schema}{$k} unless defined $$o{$k};
   }
 
   $$o{mode} ||= 'default';
@@ -385,7 +385,7 @@ sub default_html_formatter {
     $$o{_noEscapeColMap} = \%noEsc;
   }
   if ($$o{_noEscapeColMap}{$colAlias}) {
-    $val = join(' ', $val) if ref($val) eq 'ARRAY';
+    $val = join(' ', @$val) if ref($val) eq 'ARRAY';
   } elsif (ref($val) eq 'ARRAY') {
     $val = join(', ', map { escapeHTML($_) } @$val);
   } else {

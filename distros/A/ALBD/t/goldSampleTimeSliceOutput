@@ -1,0 +1,74 @@
+In timeSlicing_generatePrecisionAndRecall_implicit
+loading explicit
+generating starting
+inputting gold
+getting AB scores
+applying semantic filter to explicit matrix
+generating predictions
+Squaring Matrix
+Removing Known from Predictions
+Applying Semantic Filter to Predictions
+outputting predictions
+getting row ranks
+calculating precision and recall
+----- average precision at 10% recall intervals (i recall precision) ----> 
+      0 0.430555555555556 0.383928571428571
+      0.1 0.215277777777778 0.6125
+      0.2 0.243055555555556 0.425
+      0.3 0.458333333333333 0.404761904761905
+      0.4 0.486111111111111 0.412337662337662
+      0.5 0.701388888888889 0.414903846153846
+      0.6 0.729166666666667 0.425892857142857
+      0.7 0.756944444444444 0.421691176470588
+      0.8 0.972222222222222 0.440277777777778
+      0.9 1 0.426992753623188
+      1 1 0.426992753623188
+
+calculating mean average precision
+---------- mean average precision ---------------> 
+      MAP = 0.444285476421293
+
+calculating precision at k
+---------- mean precision at k intervals ---------------> 
+      1 0.5
+      2 0.25
+      3 0.25
+      4 0.25
+      5 0.3
+      6 0.333333333333333
+      7 0.321428571428571
+      8 0.34375
+      9 0.333333333333333
+      10 0.361111111111111
+      20 0.343589743589744
+      30 0.321175950486295
+      40 0.321175950486295
+      50 0.321175950486295
+      60 0.321175950486295
+      70 0.321175950486295
+      80 0.321175950486295
+      90 0.321175950486295
+      100 0.321175950486295
+
+calculating mean cooccurrences at k
+---------- mean cooccurrences at k intervals ---------------> 
+      1 0.5
+      2 0.5
+      3 1.25
+      4 2
+      5 3
+      6 4.5
+      7 5.25
+      8 6.25
+      9 7
+      10 8.25
+      20 12.75
+      30 13.5
+      40 13.5
+      50 13.5
+      60 13.5
+      70 13.5
+      80 13.5
+      90 13.5
+      100 13.5
+

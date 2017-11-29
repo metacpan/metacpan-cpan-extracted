@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.07    Tue Nov 28 06:57:33 GMT 2017
+ - use "latest" version of GraphiQL
+
 0.06    Wed Nov  1 04:04:22 GMT 2017
  - use convert plugin
 

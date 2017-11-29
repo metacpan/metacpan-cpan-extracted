@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">//=============================================================================</font></br></div>
+<div id="2" class="line"><font class="Comment">//&nbsp;Shield&nbsp;Gun</font></br></div>
+<div id="3" class="line"><font class="Comment">//=============================================================================</font></br></div>
+<div id="4" class="line"><font class="DataType">class</font><font class="Normal">&nbsp;ShieldGun&nbsp;</font><font class="Keyword">extends</font><font class="Normal">&nbsp;Weapon</font></br></div>
+<div id="5" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">config</font><font class="Normal">(user);</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"><font class="Others">#EXEC&nbsp;OBJ&nbsp;LOAD&nbsp;FILE=InterfaceContent.utx</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;</font><font class="DataType">Sound</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitSound;</font></br></div>
+<div id="10" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;</font><font class="DataType">String</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitForce;</font></br></div>
+<div id="11" class="line"></br></div>
+<div id="12" class="line"><font class="Keyword">replication</font></br></div>
+<div id="13" class="line"><font class="Normal">{</font></br></div>
+<div id="14" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">reliable</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(Role&nbsp;==&nbsp;ROLE_Authority)</font></br></div>
+<div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ClientTakeHit;</font></br></div>
+<div id="16" class="line"><font class="Normal">}</font></br></div>
+<div id="17" class="line"></br></div>
+<div id="18" class="line"><font class="Keyword">simulated</font><font class="Normal">&nbsp;</font><font class="Keyword">function</font><font class="Normal">&nbsp;DoAutoSwitch()</font></br></div>
+<div id="19" class="line"><font class="Normal">{</font></br></div>
+<div id="20" class="line"><font class="Normal">}</font></br></div>
+<div id="21" class="line"></br></div>
+<div id="22" class="line"><font class="Keyword">simulated</font><font class="Normal">&nbsp;</font><font class="Keyword">event</font><font class="Normal">&nbsp;RenderOverlays(&nbsp;Canvas&nbsp;Canvas&nbsp;)</font></br></div>
+<div id="23" class="line"><font class="Normal">{</font></br></div>
+<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">int</font><font class="Normal">&nbsp;m;</font></br></div>
+<div id="25" class="line"></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;((Hand&nbsp;&lt;&nbsp;</font><font class="DecVal">-1</font><font class="Normal">.</font><font class="Float">0</font><font class="Normal">)&nbsp;||&nbsp;(Hand&nbsp;&gt;&nbsp;</font><font class="Float">1.0</font><font class="Normal">))</font></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="28" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">for</font><font class="Normal">&nbsp;(m&nbsp;=&nbsp;</font><font class="Float">0</font><font class="Normal">;&nbsp;m&nbsp;&lt;&nbsp;NUM_FIRE_MODES;&nbsp;m++)</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(FireMode[m]&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)</font></br></div>
+<div id="31" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FireMode[m].DrawMuzzleFlash(Canvas);</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="36" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">Super</font><font class="Normal">.RenderOverlays(Canvas);</font></br></div>
+<div id="37" class="line"><font class="Normal">}</font></br></div>
+<div id="38" class="line"></br></div>
+<div id="39" class="line"><font class="Comment">//&nbsp;AI&nbsp;Interface</font></br></div>
+<div id="40" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;GiveTo(</font><font class="DataType">Pawn</font><font class="Normal">&nbsp;Other,&nbsp;</font><font class="Keyword">optional</font><font class="Normal">&nbsp;Pickup&nbsp;Pickup)</font></br></div>
+<div id="41" class="line"><font class="Normal">{</font></br></div>
+<div id="42" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">Super</font><font class="Normal">.GiveTo(Other,&nbsp;Pickup);</font></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;Bot(Other.Controller)&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bot(Other.Controller).bHasImpactHammer&nbsp;=&nbsp;</font><font class="Keyword">true</font><font class="Normal">;</font></br></div>
+<div id="46" class="line"><font class="Normal">}</font></br></div>
+<div id="47" class="line"></br></div>
+<div id="48" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">bool</font><font class="Normal">&nbsp;CanAttack(</font><font class="DataType">Actor</font><font class="Normal">&nbsp;Other)</font></br></div>
+<div id="49" class="line"><font class="Normal">{</font></br></div>
+<div id="50" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Keyword">true</font><font class="Normal">;</font></br></div>
+<div id="51" class="line"><font class="Normal">}</font></br></div>
+<div id="52" class="line"></br></div>
+<div id="53" class="line"><font class="Keyword">simulated</font><font class="Normal">&nbsp;</font><font class="Keyword">function</font><font class="Normal">&nbsp;Timer()</font></br></div>
+<div id="54" class="line"><font class="Normal">{</font></br></div>
+<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;Bot&nbsp;B;</font></br></div>
+<div id="56" class="line"></br></div>
+<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(ClientState&nbsp;==&nbsp;WS_BringUp)</font></br></div>
+<div id="58" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">//&nbsp;check&nbsp;if&nbsp;owner&nbsp;is&nbsp;bot&nbsp;waiting&nbsp;to&nbsp;do&nbsp;impact&nbsp;jump</font></br></div>
+<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B&nbsp;=&nbsp;Bot(Instigator.Controller);</font></br></div>
+<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(B&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;B.bPreparingMove&nbsp;&amp;&amp;&nbsp;(B.ImpactTarget&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="62" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B.ImpactJump();</font></br></div>
+<div id="64" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B&nbsp;=&nbsp;</font><font class="Keyword">None</font><font class="Normal">;</font></br></div>
+<div id="65" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="66" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="67" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">Super</font><font class="Normal">.Timer();</font></br></div>
+<div id="68" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(B&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;(B.Enemy&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="69" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BotFire(</font><font class="Keyword">false</font><font class="Normal">);</font></br></div>
+<div id="70" class="line"><font class="Normal">}</font></br></div>
+<div id="71" class="line"></br></div>
+<div id="72" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;FireHack(</font><font class="DataType">byte</font><font class="Normal">&nbsp;Mode)</font></br></div>
+<div id="73" class="line"><font class="Normal">{</font></br></div>
+<div id="74" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;Mode&nbsp;==&nbsp;</font><font class="Float">0</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="76" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FireMode[</font><font class="Float">0</font><font class="Normal">].PlayFiring();</font></br></div>
+<div id="77" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FireMode[</font><font class="Float">0</font><font class="Normal">].FlashMuzzleFlash();</font></br></div>
+<div id="78" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FireMode[</font><font class="Float">0</font><font class="Normal">].StartMuzzleSmoke();</font></br></div>
+<div id="79" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IncrementFlashCount(</font><font class="Float">0</font><font class="Normal">);</font></br></div>
+<div id="80" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="81" class="line"><font class="Normal">}</font></br></div>
+<div id="82" class="line"></br></div>
+<div id="83" class="line"><font class="Comment">/*&nbsp;BestMode()</font></br></div>
+<div id="84" class="line"><font class="Comment">choose&nbsp;between&nbsp;regular&nbsp;or&nbsp;alt-fire</font></br></div>
+<div id="85" class="line"><font class="Comment">*/</font></br></div>
+<div id="86" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">byte</font><font class="Normal">&nbsp;BestMode()</font></br></div>
+<div id="87" class="line"><font class="Normal">{</font></br></div>
+<div id="88" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;EnemyDist;</font></br></div>
+<div id="89" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;bot&nbsp;B;</font></br></div>
+<div id="90" class="line"></br></div>
+<div id="91" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;B&nbsp;=&nbsp;Bot(Instigator.Controller);</font></br></div>
+<div id="92" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(B&nbsp;==&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;||&nbsp;(B.Enemy&nbsp;==&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="93" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">;</font></br></div>
+<div id="94" class="line"></br></div>
+<div id="95" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;EnemyDist&nbsp;=&nbsp;VSize(B.Enemy.Location&nbsp;-&nbsp;Instigator.Location);</font></br></div>
+<div id="96" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;EnemyDist&nbsp;&gt;&nbsp;</font><font class="Float">2</font><font class="Normal">&nbsp;*&nbsp;Instigator.GroundSpeed&nbsp;)</font></br></div>
+<div id="97" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">;</font></br></div>
+<div id="98" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(B.MoveTarget&nbsp;!=&nbsp;B.Enemy)&nbsp;&amp;&amp;&nbsp;((EnemyDist&nbsp;&gt;&nbsp;</font><font class="Float">0.5</font><font class="Normal">&nbsp;*&nbsp;Instigator.GroundSpeed)&nbsp;</font></br></div>
+<div id="99" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;(((B.Enemy.Location&nbsp;-&nbsp;Instigator.Location)&nbsp;</font><font class="Keyword">Dot</font><font class="Normal">&nbsp;</font><font class="DataType">vector</font><font class="Normal">(Instigator.Rotation))&nbsp;&lt;=&nbsp;</font><font class="Float">0</font><font class="Normal">))&nbsp;)</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">;</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0</font><font class="Normal">;</font></br></div>
+<div id="102" class="line"><font class="Normal">}</font></br></div>
+<div id="103" class="line"></br></div>
+<div id="104" class="line"><font class="Comment">//&nbsp;super&nbsp;desireable&nbsp;for&nbsp;bot&nbsp;waiting&nbsp;to&nbsp;impact&nbsp;jump</font></br></div>
+<div id="105" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;GetAIRating()</font></br></div>
+<div id="106" class="line"><font class="Normal">{</font></br></div>
+<div id="107" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;Bot&nbsp;B;</font></br></div>
+<div id="108" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;EnemyDist;</font></br></div>
+<div id="109" class="line"></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;B&nbsp;=&nbsp;Bot(Instigator.Controller);</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;B&nbsp;==&nbsp;</font><font class="Keyword">None</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;AIRating;</font></br></div>
+<div id="113" class="line"></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;B.bPreparingMove&nbsp;&amp;&amp;&nbsp;(B.ImpactTarget&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">9</font><font class="Normal">;</font></br></div>
+<div id="116" class="line"></br></div>
+<div id="117" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;B.PlayerReplicationInfo.HasFlag&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="118" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="119" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;Instigator.Health&nbsp;&lt;&nbsp;</font><font class="Float">50</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="120" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;AIRating&nbsp;+&nbsp;</font><font class="Float">0.35</font><font class="Normal">;</font></br></div>
+<div id="121" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;AIRating&nbsp;+&nbsp;</font><font class="Float">0.25</font><font class="Normal">;</font></br></div>
+<div id="122" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="123" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="124" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;B.Enemy&nbsp;==&nbsp;</font><font class="Keyword">None</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="125" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;AIRating;</font></br></div>
+<div id="126" class="line"></br></div>
+<div id="127" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;EnemyDist&nbsp;=&nbsp;VSize(B.Enemy.Location&nbsp;-&nbsp;Instigator.Location);</font></br></div>
+<div id="128" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;B.Stopped()&nbsp;&amp;&amp;&nbsp;(EnemyDist&nbsp;&gt;&nbsp;</font><font class="Float">100</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="129" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0.1</font><font class="Normal">;</font></br></div>
+<div id="130" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(EnemyDist&nbsp;&lt;&nbsp;</font><font class="Float">750</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;(B.Skill&nbsp;&lt;=&nbsp;</font><font class="Float">2</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;!B.Enemy.IsA(</font><font class="String">'Bot'</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;(ShieldGun(B.Enemy.Weapon)&nbsp;!=&nbsp;</font><font class="Keyword">None</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;FClamp(</font><font class="Float">300</font><font class="Normal">/(EnemyDist&nbsp;+&nbsp;</font><font class="Float">1</font><font class="Normal">),&nbsp;</font><font class="Float">0.6</font><font class="Normal">,&nbsp;</font><font class="Float">0.75</font><font class="Normal">);</font></br></div>
+<div id="133" class="line"></br></div>
+<div id="134" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;EnemyDist&nbsp;&gt;&nbsp;</font><font class="Float">400</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="135" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0.1</font><font class="Normal">;</font></br></div>
+<div id="136" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;(Instigator.Weapon&nbsp;!=&nbsp;</font><font class="Keyword">self</font><font class="Normal">)&nbsp;&amp;&amp;&nbsp;(EnemyDist&nbsp;&lt;&nbsp;</font><font class="Float">120</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="137" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0.25</font><font class="Normal">;</font></br></div>
+<div id="138" class="line"></br></div>
+<div id="139" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(&nbsp;FMin(</font><font class="Float">0.6</font><font class="Normal">,&nbsp;</font><font class="Float">90</font><font class="Normal">/(EnemyDist&nbsp;+&nbsp;</font><font class="Float">1</font><font class="Normal">))&nbsp;);</font></br></div>
+<div id="140" class="line"><font class="Normal">}</font></br></div>
+<div id="141" class="line"></br></div>
+<div id="142" class="line"><font class="Comment">//&nbsp;End&nbsp;AI&nbsp;interface</font></br></div>
+<div id="143" class="line"></br></div>
+<div id="144" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;AdjustPlayerDamage(&nbsp;</font><font class="Keyword">out</font><font class="Normal">&nbsp;</font><font class="DataType">int</font><font class="Normal">&nbsp;Damage,&nbsp;</font><font class="DataType">Pawn</font><font class="Normal">&nbsp;InstigatedBy,&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;HitLocation,&nbsp;</font></br></div>
+<div id="145" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">out</font><font class="Normal">&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;Momentum,&nbsp;</font><font class="DataType">class</font><font class="Normal">&lt;DamageType&gt;&nbsp;DamageType)</font></br></div>
+<div id="146" class="line"><font class="Normal">{</font></br></div>
+<div id="147" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">int</font><font class="Normal">&nbsp;Drain;</font></br></div>
+<div id="148" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">vector</font><font class="Normal">&nbsp;Reflect;</font></br></div>
+<div id="149" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">vector</font><font class="Normal">&nbsp;HitNormal;</font></br></div>
+<div id="150" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;DamageMax;</font></br></div>
+<div id="151" class="line"></br></div>
+<div id="152" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;DamageMax&nbsp;=&nbsp;</font><font class="Float">100.0</font><font class="Normal">;</font></br></div>
+<div id="153" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;DamageType&nbsp;==&nbsp;class</font><font class="String">'Fell'</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="154" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DamageMax&nbsp;=&nbsp;</font><font class="Float">20.0</font><font class="Normal">;</font></br></div>
+<div id="155" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">(&nbsp;!DamageType.</font><font class="Keyword">default</font><font class="Normal">.bArmorStops&nbsp;||&nbsp;(DamageType&nbsp;==&nbsp;class</font><font class="String">'DamTypeShieldImpact'</font><font class="Normal">&nbsp;&amp;&amp;&nbsp;InstigatedBy&nbsp;==&nbsp;Instigator)&nbsp;)</font></br></div>
+<div id="156" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">;</font></br></div>
+<div id="157" class="line"></br></div>
+<div id="158" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;CheckReflect(HitLocation,&nbsp;HitNormal,&nbsp;</font><font class="Float">0</font><font class="Normal">)&nbsp;)</font></br></div>
+<div id="159" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="160" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Drain&nbsp;=&nbsp;Min(&nbsp;</font><font class="DataType">Ammo</font><font class="Normal">[</font><font class="Float">1</font><font class="Normal">].AmmoAmount*</font><font class="Float">2</font><font class="Normal">,&nbsp;Damage&nbsp;);</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Drain&nbsp;=&nbsp;Min(Drain,DamageMax);</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reflect&nbsp;=&nbsp;MirrorVectorByNormal(&nbsp;Normal(Location&nbsp;-&nbsp;HitLocation),&nbsp;</font><font class="DataType">Vector</font><font class="Normal">(Instigator.Rotation)&nbsp;);</font></br></div>
+<div id="163" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Damage&nbsp;-=&nbsp;Drain;</font></br></div>
+<div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Momentum&nbsp;*=&nbsp;</font><font class="Float">1.25</font><font class="Normal">;</font></br></div>
+<div id="165" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">Ammo</font><font class="Normal">[</font><font class="Float">1</font><font class="Normal">].UseAmmo(Drain/</font><font class="Float">2</font><font class="Normal">);</font></br></div>
+<div id="166" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DoReflectEffect(Drain/</font><font class="Float">2</font><font class="Normal">);</font></br></div>
+<div id="167" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="168" class="line"><font class="Normal">}</font></br></div>
+<div id="169" class="line"></br></div>
+<div id="170" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;DoReflectEffect(</font><font class="DataType">int</font><font class="Normal">&nbsp;Drain)</font></br></div>
+<div id="171" class="line"><font class="Normal">{</font></br></div>
+<div id="172" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PlaySound(ShieldHitSound,&nbsp;SLOT_None);</font></br></div>
+<div id="173" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ShieldAltFire(FireMode[</font><font class="Float">1</font><font class="Normal">]).TakeHit(Drain);</font></br></div>
+<div id="174" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ClientTakeHit(Drain);</font></br></div>
+<div id="175" class="line"><font class="Normal">}</font></br></div>
+<div id="176" class="line"></br></div>
+<div id="177" class="line"><font class="Keyword">simulated</font><font class="Normal">&nbsp;</font><font class="Keyword">function</font><font class="Normal">&nbsp;ClientTakeHit(</font><font class="DataType">int</font><font class="Normal">&nbsp;Drain)</font></br></div>
+<div id="178" class="line"><font class="Normal">{</font></br></div>
+<div id="179" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;ClientPlayForceFeedback(ShieldHitForce);</font></br></div>
+<div id="180" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ShieldAltFire(FireMode[</font><font class="Float">1</font><font class="Normal">]).TakeHit(Drain);</font></br></div>
+<div id="181" class="line"><font class="Normal">}</font></br></div>
+<div id="182" class="line"></br></div>
+<div id="183" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">bool</font><font class="Normal">&nbsp;CheckReflect(&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;HitLocation,&nbsp;</font><font class="Keyword">out</font><font class="Normal">&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;RefNormal,&nbsp;</font><font class="DataType">int</font><font class="Normal">&nbsp;AmmoDrain&nbsp;)</font></br></div>
+<div id="184" class="line"><font class="Normal">{</font></br></div>
+<div id="185" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;HitDir;</font></br></div>
+<div id="186" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">Vector</font><font class="Normal">&nbsp;FaceDir;</font></br></div>
+<div id="187" class="line"></br></div>
+<div id="188" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(!FireMode[</font><font class="Float">1</font><font class="Normal">].bIsFiring&nbsp;||&nbsp;</font><font class="DataType">Ammo</font><font class="Normal">[</font><font class="Float">0</font><font class="Normal">].AmmoAmount&nbsp;==&nbsp;</font><font class="Float">0</font><font class="Normal">)&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Keyword">false</font><font class="Normal">;</font></br></div>
+<div id="189" class="line"></br></div>
+<div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;FaceDir&nbsp;=&nbsp;</font><font class="DataType">Vector</font><font class="Normal">(Instigator.Controller.Rotation);</font></br></div>
+<div id="191" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;HitDir&nbsp;=&nbsp;Normal(Instigator.Location&nbsp;-&nbsp;HitLocation&nbsp;+&nbsp;Vect(</font><font class="Float">0</font><font class="Normal">,</font><font class="Float">0</font><font class="Normal">,</font><font class="Float">8</font><font class="Normal">));</font></br></div>
+<div id="192" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">//Log(self@&quot;HitDir&quot;@(FaceDir&nbsp;dot&nbsp;HitDir));</font></br></div>
+<div id="193" class="line"></br></div>
+<div id="194" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;RefNormal&nbsp;=&nbsp;FaceDir;</font></br></div>
+<div id="195" class="line"></br></div>
+<div id="196" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(&nbsp;FaceDir&nbsp;</font><font class="Keyword">dot</font><font class="Normal">&nbsp;HitDir&nbsp;&lt;&nbsp;</font><font class="DecVal">-0</font><font class="Normal">.</font><font class="Float">37</font><font class="Normal">&nbsp;)&nbsp;</font><font class="Comment">//&nbsp;68&nbsp;degree&nbsp;protection&nbsp;arc</font></br></div>
+<div id="197" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="198" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(AmmoDrain&nbsp;&gt;&nbsp;</font><font class="Float">0</font><font class="Normal">)</font></br></div>
+<div id="199" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">Ammo</font><font class="Normal">[</font><font class="Float">0</font><font class="Normal">].UseAmmo(AmmoDrain);</font></br></div>
+<div id="200" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Keyword">true</font><font class="Normal">;</font></br></div>
+<div id="201" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="202" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Keyword">false</font><font class="Normal">;</font></br></div>
+<div id="203" class="line"><font class="Normal">}</font></br></div>
+<div id="204" class="line"></br></div>
+<div id="205" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;AnimEnd(</font><font class="DataType">int</font><font class="Normal">&nbsp;channel)</font></br></div>
+<div id="206" class="line"><font class="Normal">{</font></br></div>
+<div id="207" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(FireMode[</font><font class="Float">0</font><font class="Normal">].bIsFiring)</font></br></div>
+<div id="208" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="209" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LoopAnim(</font><font class="String">'Charged'</font><font class="Normal">);</font></br></div>
+<div id="210" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="211" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(!FireMode[</font><font class="Float">1</font><font class="Normal">].bIsFiring)&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="212" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;{</font></br></div>
+<div id="213" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">Super</font><font class="Normal">.AnimEnd(channel);</font></br></div>
+<div id="214" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="215" class="line"><font class="Normal">}</font></br></div>
+<div id="216" class="line"></br></div>
+<div id="217" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;SuggestAttackStyle()</font></br></div>
+<div id="218" class="line"><font class="Normal">{</font></br></div>
+<div id="219" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Float">0.8</font><font class="Normal">;</font></br></div>
+<div id="220" class="line"><font class="Normal">}</font></br></div>
+<div id="221" class="line"></br></div>
+<div id="222" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;SuggestDefenseStyle()</font></br></div>
+<div id="223" class="line"><font class="Normal">{</font></br></div>
+<div id="224" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">-0</font><font class="Normal">.</font><font class="Float">8</font><font class="Normal">;</font></br></div>
+<div id="225" class="line"><font class="Normal">}</font></br></div>
+<div id="226" class="line"></br></div>
+<div id="227" class="line"><font class="Keyword">simulated</font><font class="Normal">&nbsp;</font><font class="Keyword">function</font><font class="Normal">&nbsp;</font><font class="DataType">float</font><font class="Normal">&nbsp;ChargeBar()</font></br></div>
+<div id="228" class="line"><font class="Normal">{</font></br></div>
+<div id="229" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;FMin(</font><font class="Float">1</font><font class="Normal">,FireMode[</font><font class="Float">0</font><font class="Normal">].HoldTime/ShieldFire(FireMode[</font><font class="Float">0</font><font class="Normal">]).FullyChargedTime);</font></br></div>
+<div id="230" class="line"><font class="Normal">}&nbsp;</font></br></div>
+<div id="231" class="line"></br></div>
+<div id="232" class="line"><font class="Keyword">defaultproperties</font></br></div>
+<div id="233" class="line"><font class="Normal">{</font></br></div>
+<div id="234" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ItemName=</font><font class="String">&quot;Shield&nbsp;Gun&quot;</font></br></div>
+<div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;IconMaterial=Material</font><font class="String">'InterfaceContent.Hud.SkinA'</font></br></div>
+<div id="236" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;IconCoords=(X1=</font><font class="Float">200</font><font class="Normal">,Y1=</font><font class="Float">281</font><font class="Normal">,X2=</font><font class="Float">321</font><font class="Normal">,Y2=</font><font class="Float">371</font><font class="Normal">)</font></br></div>
+<div id="237" class="line"></br></div>
+<div id="238" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bShowChargingBar=</font><font class="Keyword">true</font></br></div>
+<div id="239" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bCanThrow=</font><font class="Keyword">false</font></br></div>
+<div id="240" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;FireModeClass(</font><font class="Float">0</font><font class="Normal">)=ShieldFire</font></br></div>
+<div id="241" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;FireModeClass(</font><font class="Float">1</font><font class="Normal">)=ShieldAltFire</font></br></div>
+<div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;InventoryGroup=</font><font class="Float">1</font></br></div>
+<div id="243" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;Mesh=mesh</font><font class="String">'Weapons.ShieldGun_1st'</font></br></div>
+<div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;BobDamping=</font><font class="Float">2.2</font></br></div>
+<div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PickupClass=class</font><font class="String">'ShieldGunPickup'</font></br></div>
+<div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;EffectOffset=(X=</font><font class="Float">15.0</font><font class="Normal">,Y=</font><font class="Float">6.7</font><font class="Normal">,Z=</font><font class="Float">1.2</font><font class="Normal">)</font></br></div>
+<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bMeleeWeapon=</font><font class="Keyword">true</font></br></div>
+<div id="248" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitSound=Sound</font><font class="String">'WeaponSounds.ShieldGun.ShieldReflection'</font></br></div>
+<div id="249" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;DrawScale=</font><font class="Float">0.4</font></br></div>
+<div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PutDownAnim=PutDown</font></br></div>
+<div id="251" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;DisplayFOV=</font><font class="Float">60</font></br></div>
+<div id="252" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PlayerViewOffset=(X=</font><font class="Float">2</font><font class="Normal">,Y=</font><font class="DecVal">-0</font><font class="Normal">.</font><font class="Float">7</font><font class="Normal">,Z=</font><font class="DecVal">-2</font><font class="Normal">.</font><font class="Float">7</font><font class="Normal">)</font></br></div>
+<div id="253" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PlayerViewPivot=(Pitch=</font><font class="Float">500</font><font class="Normal">,Roll=</font><font class="Float">0</font><font class="Normal">,Yaw=</font><font class="Float">500</font><font class="Normal">)</font></br></div>
+<div id="254" class="line"></br></div>
+<div id="255" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;UV2Texture=Material</font><font class="String">'XGameShaders.WeaponEnvShader'</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="256" class="line"></br></div>
+<div id="257" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;AttachmentClass=class</font><font class="String">'ShieldAttachment'</font></br></div>
+<div id="258" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;SelectSound=Sound</font><font class="String">'WeaponSounds.ShieldGun_change'</font></br></div>
+<div id="259" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;SelectForce=</font><font class="String">&quot;ShieldGun_change&quot;</font></br></div>
+<div id="260" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;ShieldHitForce=</font><font class="String">&quot;ShieldReflection&quot;</font></br></div>
+<div id="261" class="line"></br></div>
+<div id="262" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;AIRating=</font><font class="Float">0.35</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;CurrentRating=</font><font class="Float">0.35</font></br></div>
+<div id="264" class="line"></br></div>
+<div id="265" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;DefaultPriority=</font><font class="Float">2</font></br></div>
+<div id="266" class="line"><font class="Normal">}</font></br></div>
+</div>
+</body>
+</html>
+

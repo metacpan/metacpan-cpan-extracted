@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::TradisAnalysis;
-$Bio::Tradis::CommandLine::TradisAnalysis::VERSION = '1.3.3';
+$Bio::Tradis::CommandLine::TradisAnalysis::VERSION = '1.4.0';
 # ABSTRACT: Perform full tradis analysis
 
 
@@ -276,7 +276,7 @@ Bio::Tradis::CommandLine::TradisAnalysis - Perform full tradis analysis
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

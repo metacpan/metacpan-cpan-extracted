@@ -17,7 +17,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;

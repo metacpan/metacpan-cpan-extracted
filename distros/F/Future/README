@@ -219,6 +219,59 @@ CONSTRUCTORS
     blessed Future reference, an immediate fail future is returned instead
     to complain about this fact.
 
+METHODS
+
+    As there are a lare number of methods on this class, they are
+    documented here in several sections.
+
+INSPECTION METHODS
+
+    The following methods query the internal state of a Future instance
+    without modifying it or otherwise causing side-effects.
+
+ is_ready
+
+       $ready = $future->is_ready
+
+    Returns true on a leaf future if a result has been provided to the done
+    method, failed using the fail method, or cancelled using the cancel
+    method.
+
+    Returns true on a convergent future if it is ready to yield a result,
+    depending on its component futures.
+
+ is_done
+
+       $done = $future->is_done
+
+    Returns true on a future if it is ready and completed successfully.
+    Returns false if it is still pending, failed, or was cancelled.
+
+ is_failed
+
+       $failed = $future->is_failed
+
+    Since version 0.26.
+
+    Returns true on a future if it is ready and it failed. Returns false if
+    it is still pending, completed successfully, or was cancelled.
+
+ is_cancelled
+
+       $cancelled = $future->is_cancelled
+
+    Returns true if the future has been cancelled by cancel.
+
+ state
+
+       $str = $future->state
+
+    Since version 0.36.
+
+    Returns a string describing the state of the future, as one of the
+    three states named above; namely done, failed or cancelled, or pending
+    if it is none of these.
+
 IMPLEMENTATION METHODS
 
     These methods would primarily be used by implementations of
@@ -281,27 +334,10 @@ IMPLEMENTATION METHODS
     cancelled when the original future is cancelled. This method does
     nothing if the future is already complete.
 
- is_cancelled
-
-       $cancelled = $future->is_cancelled
-
-    Returns true if the future has been cancelled by cancel.
-
 USER METHODS
 
     These methods would primarily be used by users of asynchronous
     interfaces, on objects returned by such an interface.
-
- is_ready
-
-       $ready = $future->is_ready
-
-    Returns true on a leaf future if a result has been provided to the done
-    method, failed using the fail method, or cancelled using the cancel
-    method.
-
-    Returns true on a convergent future if it is ready to yield a result,
-    depending on its component futures.
 
  on_ready
 
@@ -322,13 +358,6 @@ USER METHODS
     successfully, fails, or is cancelled respectively.
 
     Returns the $future.
-
- is_done
-
-       $done = $future->is_done
-
-    Returns true on a future if it is ready and completed successfully.
-    Returns false if it is still pending, failed, or was cancelled.
 
  get
 
@@ -385,15 +414,6 @@ USER METHODS
     done method invoked when the original future completes successfully.
 
     Returns the $future.
-
- is_failed
-
-       $failed = $future->is_failed
-
-    Since version 0.26.
-
-    Returns true on a future if it is ready and it failed. Returns false if
-    it is still pending, completed successfully, or was cancelled.
 
  failure
 
@@ -685,6 +705,32 @@ SEQUENCING METHODS
     operation that is being shared among multiple sequences; cancelling one
     should not prevent the others from running too.
 
+ retain
+
+       $f = $f->retain
+
+    Since version 0.36.
+
+    Creates a reference cycle which causes the future to remain in memory
+    until it completes. Returns the invocant future.
+
+    In normal situations, a Future instance does not strongly hold a
+    reference to other futures that it is feeding a result into, instead
+    relying on that to be handled by application logic. This is normally
+    fine because some part of the application will retain the top-level
+    Future, which then strongly refers to each of its components down in a
+    tree. However, certain design patterns, such as mixed Future-based and
+    legacy callback-based API styles might end up creating Futures simply
+    to attach callback functions to them. In that situation, without
+    further attention, the Future may get lost due to having no strong
+    references to it. Calling ->retain on it creates such a reference which
+    ensures it persists until it completes. For example:
+
+       Future->needs_all( $fA, $fB )
+          ->on_done( $on_done )
+          ->on_fail( $on_fail )
+          ->retain;
+
 CONVERGENT FUTURES
 
     The following constructors all take a list of component futures, and
@@ -834,10 +880,11 @@ TRACING METHODS
     Since version 0.28.
 
     Accessors that return the tracing timestamps from the instance. These
-    give the time the instance was contructed ("birth" time, btime) and the
-    time the result was determined (the "ready" time, rtime). Each result
-    is returned as a two-element ARRAY ref, containing the epoch time in
-    seconds and microseconds, as given by Time::HiRes::gettimeofday.
+    give the time the instance was constructed ("birth" time, btime) and
+    the time the result was determined (the "ready" time, rtime). Each
+    result is returned as a two-element ARRAY ref, containing the epoch
+    time in seconds and microseconds, as given by
+    Time::HiRes::gettimeofday.
 
     In order for these times to be captured, they have to be enabled by
     setting $Future::TIMES to a true value. This is initialised true at the
@@ -865,7 +912,7 @@ TRACING METHODS
 
     This method is invoked internally by various methods that are about to
     save a callback CODE reference supplied by the user, to be invoked
-    later. The default implementation simply returns the callback agument
+    later. The default implementation simply returns the callback argument
     as-is; the method is provided to allow users to provide extra
     behaviour. This can be done by applying a method modifier of the around
     kind, so in effect add a chain of wrappers. Each wrapper can then
@@ -1145,6 +1192,9 @@ KNOWN ISSUES
     (https://rt.cpan.org/Ticket/Display.html?id=96685).
 
 SEE ALSO
+
+      * Promises - an implementation of the "Promise/A+" pattern for
+      asynchronous programming
 
       * curry - Create automatic curried method call closures for any class
       or object

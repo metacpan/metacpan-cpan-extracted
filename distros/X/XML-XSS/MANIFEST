@@ -1,5 +1,4 @@
 AUTHOR_PLEDGE
-Build.PL
 CONTRIBUTORS
 Changes
 INSTALL
@@ -7,10 +6,12 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-README
+Makefile.PL
 README.mkdn
 SIGNATURE
 bin/xss
+cpanfile
+doap.xml
 lib/XML/XSS.pm
 lib/XML/XSS/Comment.pm
 lib/XML/XSS/Document.pm
@@ -23,7 +24,8 @@ lib/XML/XSS/Stylesheet/HTML2TD.pm
 lib/XML/XSS/Template.pm
 lib/XML/XSS/Text.pm
 t/00-compile.t
-t/000-report-versions-tiny.t
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
 t/basic.t
 t/cdata.t
 t/document.t

@@ -1,0 +1,6 @@
+0.02 2017-11-28
+-bugfix: croak on connection failure
+-bugfix: warnings emitted during global shutdown
+
+0.01 2017-11-28
+-Initial release

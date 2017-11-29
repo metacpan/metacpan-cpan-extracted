@@ -2,13 +2,14 @@ package CGI::OptimalQuery;
 
 use strict;
 use warnings;
-no warnings qw( uninitialized );
+no warnings qw( uninitialized redefine );
 use CGI();
+use CGI::OptimalQuery::SavedSearches();
 
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.22';
+    $VERSION     = '0.26';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw();
@@ -22,6 +23,7 @@ BEGIN {
 our $DEFAULT_MODULE = 'InteractiveQuery2';
 
 our %DEFAULT_MODULES = (
+  'SimpleQuery'       => 'CGI::OptimalQuery::SimpleQuery',
   'CustomOutput'      => 'CGI::OptimalQuery::CustomOutput',
   'PrinterFriendly'   => 'CGI::OptimalQuery::PrinterFriendly',
   'CSV'               => 'CGI::OptimalQuery::CSV',
@@ -80,64 +82,10 @@ sub new {
 
 sub escape_js { CGI::OptimalQuery::Base::escape_js(@_); }
 
+
 sub get_saved_search_list {
-  my $q = shift;
-  my $dbh = shift;
-  my $userid = shift;
-
-  if ($q->param('OQ_remove_saved_search_id') =~ /^\d+$/) {
-    $dbh->do("DELETE FROM oq_saved_search WHERE id = ? AND user_id = ?", undef, $q->param('OQ_remove_saved_search_id'), $userid);
-  }
-
-  my $oracleReadLen;
-  if ($$dbh{Driver}{Name} eq 'Oracle') {
-    ($oracleReadLen) = $dbh->selectrow_array("SELECT max(dbms_lob.getlength(params)) FROM oq_saved_search WHERE user_id = ?", undef, $userid);
-  }
-  local $dbh->{LongReadLen} = $oracleReadLen
-    if $oracleReadLen && $oracleReadLen > $dbh->{LongReadLen};
-
-  my $sth = $dbh->prepare("SELECT id, uri, oq_title, user_title, params FROM oq_saved_search WHERE user_id = ? ORDER BY oq_title, user_title");
-  $sth->execute($userid);
-  my $last_oq_title = '';
-  my $buffer = '';
-  while (my ($id, $uri, $oq_title, $user_title, $params) = $sth->fetchrow_array()) {
-    if ($last_oq_title ne $oq_title) {
-      $last_oq_title = $oq_title;
-      $buffer .= "</table>" if $buffer;
-      $buffer .= "<table class='OQ_ss'><tr><td colspan='2' class='OQ_ss_title'>".CGI::escapeHTML($oq_title)."</td></tr>";
-    }
-
-    my $stateArgs = '';
-    if ($params ne '') {
-      $params = eval '{'.$params.'}';
-      if (ref($params) eq 'HASH') {
-        delete $$params{show};
-        delete $$params{rows_page};
-        delete $$params{page};
-        delete $$params{hiddenFilter};
-        delete $$params{filter};
-        delete $$params{queryDescr};
-        delete $$params{sort};
-        delete $$params{module};
-        while (my ($k,$v) = each %$params) {
-          $stateArgs .= "&amp;$k=";
-          $stateArgs .= (ref($v) eq 'ARRAY') ? CGI::escape($$v[0]) : CGI::escape($v);
-        }
-      }
-    }
-    
-    $buffer .= "<tr><td class='OQ_ss_query_title'><a href=# onclick=\"opwin('$uri?OQLoadSavedSearch=$id".$stateArgs."#OQtop','OQLoadSavedSearch$id','resizable,scrollbars',1024,768); return false;\">".CGI::escapeHTML($user_title)."</a></td><td class='OQ_ss_cmds'><button onclick=\"this.form.OQ_remove_saved_search_id.value = '$id'; this.form.submit();\" type='button'>delete</button></td></tr>";
-  }
-  $sth->finish();
-  $buffer .= "</table><input type='hidden' name='OQ_remove_saved_search_id' />
-<script>
-if (! window.opwin) {
-  window.opwin = function(lnk,target,opts) {
-    window.open(lnk,target,opts);
-  };
-}
-</script>" if $buffer;
-  return $buffer;
+  my ($q, $dbh, $userid) = @_;
+  return CGI::OptimalQuery::SavedSearches::get_html($q, $dbh, $userid);
 }
 
 
@@ -303,6 +251,15 @@ sub {
 # Built in formatters to display all field/values specified in 'select' as html.
 \&CGI::OptimalQuery::Base::recview_html_formatter
 
+=item B<< db_formatter => CODEREF >>
+
+sub {
+  my ($val) = @_;
+  return $val;
+}
+
+# format a value before it is executed in the database
+
 =item B<< is_hidden => 1 >>
 
 hides the select field and data from being viewed by the user. Data for this select is still available in callbacks and can be included in the hiddenFilter.
@@ -362,6 +319,10 @@ This is deprecated. It was used to describe the SQL in the where clause that was
 The following KEY/VALUES below describe OPTIONS used by the joins configuration.
 
 =over
+
+=item B<< always_join => 1 >>
+
+tells OptimalQuery to always include join in query. Usfual when the join itself influences the number of results returned. Alternatively, an inline view could be constructed that performs the joins as part of the driving data set.
 
 =item B<< new_cursor => 1 >>
 
@@ -490,6 +451,12 @@ The default rows_page a user has when initially loading InteractiveQuery. Can al
         CGI::escapeHTML($$rec{NAME})."</A>";
     }
   };
+
+=item B<< canSaveDefaultSearches => 0 | 1 >>
+
+Indicate if user is allowed to set the default search using a saved search.
+This key/value must not be defined if default saved searches is not installed.
+To install this feature, add the is_default column to your oq_saved_search table.
 
 =item B<< savedSearchUserID => $user_id >>
 
@@ -712,7 +679,7 @@ Saved Searches are stored in a table in the database pointed to by the database 
 
 Replace XYZ(id) with the name of the user table and primary key id.
 
-Optimal Query also provides a canned "Show My Saved Searches" HTML form component that can be embedded inside an HTML form. It can be used in the following manner:
+Optimal Query also provides a canned "Show My Saved Searches" HTML form component that can be embedded inside a page. It can be used in the following manner:
 
   use use CGI::OptimalQuery();
 

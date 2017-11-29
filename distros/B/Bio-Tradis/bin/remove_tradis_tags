@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::RemoveTags;
-$Bio::Tradis::Bin::RemoveTags::VERSION = '1.3.3';
+$Bio::Tradis::Bin::RemoveTags::VERSION = '1.4.0';
 # ABSTRACT: remove user specified tags from start of fastq sequences
 # PODNAME: remove_tags
 
@@ -26,7 +26,7 @@ remove_tags - remove user specified tags from start of fastq sequences
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

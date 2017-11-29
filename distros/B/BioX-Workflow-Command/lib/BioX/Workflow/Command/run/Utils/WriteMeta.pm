@@ -197,6 +197,7 @@ sub decide_comment {
     my $self         = shift;
     my $current      = shift;
     my $comment_char = $self->comment_char;
+
     if ( $current =~ m/^$comment_char/ ) {
         return $current;
     }
@@ -221,6 +222,7 @@ sub write_hpc_meta {
     my $self = shift;
 
     ##TODO Fix this for mixed data types
+    ##TODO Just make them all a hash
 
     $self->local_attr->add_before_meta( ' ### HPC Directives' . "\n" );
     if ( ref( $self->local_attr->HPC ) eq 'HASH' ) {
@@ -396,25 +398,26 @@ sub write_pretty_meta {
     my $k    = shift;
     my $v    = shift;
 
-    my $t = '';
-    if ( !ref($v) ) {
-        $t = "$self->{comment_char}\t$k: " . $v . "\n";
+    $DB::single = 2;
+    my $t   = '';
+    my $ref = 0;
+    if(ref($v)){
+        $ref = 1;
+        $v   = Dump($v);
     }
-    else {
-        $v = Dump($v);
-        my %seen       = ();
-        my @uniq_array = ();
-        my @array      = split( "\n", $v );
-        shift(@array);
-        for ( my $x = 0 ; $x <= $#array ; $x++ ) {
-            my $t = $self->comment_char . "\t\t" . $array[$x];
-            next if $seen{$t};
-            push( @uniq_array, $t );
-            $seen{$t} = 1;
-        }
-        $v = join( "\n", @uniq_array );
-        $t = "$self->{comment_char}\t$k:\n" . $v . "\n";
+    my %seen       = ();
+    my @uniq_array = ();
+    my @array      = split( "\n", $v );
+    ##Get rid of the top '-----' line produced by the yaml dump
+    shift(@array) if $ref;
+    for ( my $x = 0 ; $x <= $#array ; $x++ ) {
+        my $t = $self->comment_char . "\t\t" . $array[$x];
+        next if $seen{$t};
+        push( @uniq_array, $t );
+        $seen{$t} = 1;
     }
+    $v = join( "\n", @uniq_array );
+    $t = "$self->{comment_char}\t$k:\n" . $v . "\n";
 
     return $t;
 }

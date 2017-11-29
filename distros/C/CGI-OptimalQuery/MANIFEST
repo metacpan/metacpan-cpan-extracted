@@ -21,7 +21,6 @@ lib/CGI/OptimalQuery/Base.pm
 lib/CGI/OptimalQuery/CSV.pm
 lib/CGI/OptimalQuery/CustomOutput.pm
 lib/CGI/OptimalQuery/ExportDataTool.pm
-lib/CGI/OptimalQuery/FilterParser.pm
 lib/CGI/OptimalQuery/InteractiveFilter.pm
 lib/CGI/OptimalQuery/InteractiveFilter2.pm
 lib/CGI/OptimalQuery/InteractiveQuery.pm
@@ -29,8 +28,6 @@ lib/CGI/OptimalQuery/InteractiveQuery2.pm
 lib/CGI/OptimalQuery/InteractiveQuery2Tools.pm
 lib/CGI/OptimalQuery/JSON.pm
 lib/CGI/OptimalQuery/LoadSearchTool.pm
-lib/CGI/OptimalQuery/OQFilterParser.grammar
-lib/CGI/OptimalQuery/OQFilterParser.pm
 lib/CGI/OptimalQuery/PrinterFriendly.pm
 lib/CGI/OptimalQuery/RecView.pm
 lib/CGI/OptimalQuery/Resources/add.gif
@@ -67,6 +64,7 @@ lib/CGI/OptimalQuery/Resources/view.gif
 lib/CGI/OptimalQuery/SavedSearches.pm
 lib/CGI/OptimalQuery/SaveSearchTool.pm
 lib/CGI/OptimalQuery/ShowColumns.pm
+lib/CGI/OptimalQuery/SimpleQuery.pm
 lib/CGI/OptimalQuery/XML.pm
 lib/DBIx/OptimalQuery.pm
 LICENSE

@@ -19,6 +19,7 @@ use Future;
    is_oneref( $future, '$future has refcount 1 initially' );
 
    ok( !$future->is_ready, '$future not yet ready' );
+   is( $future->state, "pending", '$future->state before done' );
 
    my @on_ready_args;
    identical( $future->on_ready( sub { @on_ready_args = @_ } ), $future, '->on_ready returns $future' );
@@ -38,6 +39,7 @@ use Future;
    ok( $future->is_ready, '$future is now ready' );
    ok( $future->is_done, '$future is done' );
    ok( !$future->is_failed, '$future is not failed' );
+   is( $future->state, "done", '$future->state after done' );
    is_deeply( [ $future->get ], [ result => "here" ], 'Results from $future->get' );
    is( scalar $future->get, "result", 'Result from scalar $future->get' );
 
@@ -124,6 +126,7 @@ use Future;
    ok( $future->is_ready, '$future->fail marks future ready' );
    ok( !$future->is_done, '$future->fail does not mark future done' );
    ok( $future->is_failed, '$future->fail marks future as failed' );
+   is( $future->state, "failed", '$future->state after fail' );
 
    is( scalar $future->failure, "Something broke", '$future->failure yields exception' );
    my $file = __FILE__;
@@ -257,6 +260,24 @@ use Future;
    is( $f->label, "the label", '->label returns the label' );
 
    $f->cancel;
+}
+
+# retain
+{
+   my @args;
+   foreach my $method (qw( cancel done fail )) {
+      my $f = Future->new;
+      is_oneref( $f, 'start with refcount 1' );
+
+      is( $f->retain, $f, '->retain returns original Future' );
+
+      is_refcount( $f, 2, 'refcount is now increased' );
+
+      ok( $f->$method( @args ), "can call ->$method" );
+      is_oneref( $f, 'refcount drops when completed' );
+
+      push @args, 'x';
+   }
 }
 
 done_testing;

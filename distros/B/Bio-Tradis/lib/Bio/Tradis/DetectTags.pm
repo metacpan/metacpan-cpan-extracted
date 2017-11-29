@@ -1,5 +1,5 @@
 package Bio::Tradis::DetectTags;
-$Bio::Tradis::DetectTags::VERSION = '1.3.3';
+$Bio::Tradis::DetectTags::VERSION = '1.4.0';
 # ABSTRACT: Detect tr tags in BAM file
 
 
@@ -42,7 +42,7 @@ Bio::Tradis::DetectTags - Detect tr tags in BAM file
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

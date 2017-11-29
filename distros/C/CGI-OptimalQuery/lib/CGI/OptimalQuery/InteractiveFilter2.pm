@@ -5,8 +5,7 @@ use warnings;
 no warnings qw( uninitialized );
 use base 'CGI::OptimalQuery::Base';
 
-use CGI::OptimalQuery::FilterParser;
-use CGI qw(escapeHTML);
+sub escapeHTML { CGI::OptimalQuery::Base::escapeHTML(@_) }
 
 sub output {
   my $o = shift;
@@ -27,10 +26,10 @@ sub output {
     }
     elsif (! $$s{$field}[3]{disable_filter}) {
       $filter .= " AND " if $filter;
-      if ($$types{$field} eq 'char') {
-        $filter .= "[$field] contains ''";
+      if ($$types{$field} eq 'char' || $$types{$field} eq 'clob') {
+        $filter .= "$field contains ''";
       } else {
-        $filter .= "[$field] = ''";
+        $filter .= "$field=''";
       }
     }
   }
@@ -41,11 +40,12 @@ sub output {
   } sort { $$s{$a}[2] cmp $$s{$b}[2] } keys %$s;
   my @op = (qw( = != < <= > >= like ), 'not like', 'contains', 'not contains');
 
-  my $parsedFilter = CGI::OptimalQuery::FilterParser::parseFilter($o, $filter);
+  my $parsedFilter = $$o{oq}->parseFilter($filter);
   foreach my $f (@$parsedFilter) {
-    $buf .= "<tr>";
+    $buf .= "<tr class=filterexp>";
 
-    my $typenum = $$f[0] if ref($f) eq 'ARRAY';
+    my $typenum;
+    $typenum = $$f[0] if ref($f) eq 'ARRAY';
 
     if (! $typenum) {
       $buf .= "<td colspan=6><select class=logicop><option>AND<option";
@@ -70,8 +70,8 @@ sub output {
       }
       $buf .= "</td><td><select class=lexp>";
       foreach my $c (@cols) {
-        $buf .= "<option value='[".escapeHTML($c)."]'";
-        $buf .= " data-type=".$$types{$c} if $$types{$c} ne 'char';
+        $buf .= "<option value='".escapeHTML($c)."'";
+        $buf .= " data-type=".$$types{$c} if $$types{$c} ne 'char' && $$types{$c} ne 'clob';
         $buf .= " selected" if $c eq $leftExp;
         $buf .= ">".escapeHTML($$o{schema}{select}{$c}[2]);
       }
@@ -82,9 +82,10 @@ sub output {
         $buf .= ">$op";
       }
       $buf .= "</select></td><td><div class=rexptypesel><select class=rexp><optgroup label='Either: '><option value=''> type in a value </optgroup><optgroup label='OR select another field'>";
-      my $rightSelectedField = $rightExp if $type == 3;
+      my $rightSelectedField;
+      $rightSelectedField = $rightExp if $type == 3;
       foreach my $c (@cols) {
-        $buf .= "<option value='[".escapeHTML($c)."]'";
+        $buf .= "<option value='".escapeHTML($c)."'";
         $buf .= " data-type=".$$types{$c} if $$types{$c} ne 'char';
         $buf .= " selected" if $c eq $rightSelectedField;
         $buf .= ">".escapeHTML($$o{schema}{select}{$c}[2]);
@@ -152,7 +153,12 @@ sub output {
             .$$nf{html_generator}->($$o{q}, '_nf_arg_')
             .'<input type=hidden value="'.escapeHTML(")").'">';
         } else {
-          my $title = $$nf{title} || $namedFilter;
+          my $title;
+          if (ref($$nf{sql_generator}) eq 'CODE') {
+            my $ar = $$nf{sql_generator}->(@$argArray);
+            $title = $$ar[2];
+          }
+          $title ||= $$nf{title} || $namedFilter;
           $buf .= '<span>'.escapeHTML($title).'</span>'
             .'<input type=hidden value="'
             .escapeHTML("$namedFilter("
@@ -189,7 +195,7 @@ sub output {
     # if there is a named filter for this field, skip it and make user use named filter instead
     next if exists $$o{schema}{named_filters}{$c};
 
-    $buf .= "<option value='".escapeHTML($c)."'";
+    $buf .= "<option value='".escapeHTML("$c")."'";
     $buf .= " data-type=".$$types{$c} if $$types{$c} ne 'char';
     $buf .= ">".escapeHTML($$o{schema}{select}{$c}[2]);
   }

@@ -2,11 +2,10 @@ package DBIx::OptimalQuery::sth;
 
 use strict;
 use warnings;
-no warnings qw( uninitialized once );
+no warnings qw( uninitialized once redefine );
 
 use DBI();
 use Carp;
-use Parse::RecDescent;
 use Data::Dumper();
 
 sub Dumper {
@@ -77,7 +76,7 @@ sub execute {
   # build SQL for main cursor
   { my $c = $sth->{cursors}->[0];
     my @all_deps = (@{$c->{select_deps}}, @{$c->{where_deps}}, @{$c->{order_by_deps}});
-    my ($order) = @{ $sth->{oq}->_order_deps(\@all_deps) }; 
+    my ($order) = $sth->{oq}->_order_deps(@all_deps); 
     my @from_deps; push @from_deps, @$_ for @$order;
 
     # create from_sql, from_binds
@@ -383,7 +382,7 @@ sub create_select {
   }
 
   # order and index deps into appropriate cursors
-  my ($dep_order, $dep_idx) = @{ $sth->{oq}->_order_deps(\@deps) };
+  my ($dep_order, $dep_idx) = $sth->{oq}->_order_deps(@deps);
 
   # look though select again and add all cols with is_hidden option
   # if all their deps have been fulfilled
@@ -451,7 +450,7 @@ sub create_select {
       } else {
         die "unsupported DB";
       }
-    } 
+    }
 
     # else just copy the select
     else {
@@ -523,382 +522,23 @@ sub _get_sub_cursor_template {
 
 # modify cursor and add where clause data
 sub create_where { 
-  my $sth = shift;
+  my ($sth) = @_;
 
-  #$$sth{oq}{error_handler}->("DEBUG: \$sth->create_where()\n") if $$sth{oq}{debug};
-  return undef if $sth->{'filter'} eq '' && $sth->{'hiddenFilter'} eq '' && $sth->{'forceFilter'} eq '';
-
-  # this sub glues together a parsed expression
-  # basically is glues statements that look like:
-  #  '(' { sql => '', binds => [], deps => [], name => '' } 'LIKE' 
-  #  { sql => '', binds => [], deps => [], name => '' } ')'
-  # and then returns a single hash
-  my $glue_exp = sub {
-    my @deps;
-    my $sql = '';
-    my @binds;
-    my $name;
-    foreach my $i (@_) {
-      if (! ref($i)) {
-        $sql .= $i.' ';
-        $name .= $i.' ';
-      } else {
-        push @deps, @{ $$i{deps} } if ref($$i{deps}) eq 'ARRAY';
-        push @binds, @{ $$i{binds} } if ref($$i{binds}) eq 'ARRAY';
-        $sql .= $$i{sql}.' ' if exists $$i{sql};
-        $name .= $$i{name}.' ' if exists $$i{name};
-      }
-    }
-    my $rv = { deps=> \@deps, sql => $sql, 
-             binds => \@binds, name => $name};
-    return $rv;
-  };
-
-  my %translations = (
-    '*default*' => sub { $_[2] },
-    'logicOp' => sub { "\n$_[2]" },
-    'compOp' => sub { 
-      my $rv = { name => lc($_[2]), sql => uc($_[2]) };
-      if (uc($_[2]) eq 'CONTAINS') { $$rv{sql} = 'LIKE'; }
-      elsif (uc($_[2]) eq 'NOT CONTAINS') { $$rv{sql} = 'NOT LIKE'; }
-      return $rv;
-    },
-
-    'colAlias' => sub { 
-      my $oq = $_[0];
-      my $colAlias = $_[3];
-      die "could not find colAlias $colAlias" unless exists $$oq{select}{$colAlias};
-      my $deps = $$oq{select}{$colAlias}[0];
-      my @tmp = @{ $$oq{select}{$colAlias}[3]{filter_sql} || $$oq{select}{$colAlias}[1] };
-      my $sql = shift @tmp;
-      my $binds = \ @tmp;
-      my $name = $$oq{select}{$colAlias}[2];
-      my $rv = { colAlias => $colAlias, deps => $deps, sql => $sql, binds => $binds, name => '['.$name.']'};
-      return $rv;
-    },
-
-    'bindVal' => sub {
-      my $val = $_[2];
-      my $nice = $val;
-      $nice = "'".$nice."'" if $nice !~ /^[\d\.\-]+/;
-      return { sql => '?', binds => [$val], name => $nice };      
-    },
-
-    'quotedString' => sub {
-      my ($v) = $_[2];
-      ($v=~s/^\'// && $v=~s/\'$//) || ($v=~s/^\"// && $v=~s/\"$//);
-      return $v;
-    },
-
-    'exp' => sub {
-      my $oq = shift;
-      my $rule = shift;
-      return $glue_exp->(@_);
-    },
-
-
-    'comparisonExp' => sub {
-      my $oq = shift;
-      my $rule = shift;
-      my @token = @_;
-
-      # if doing empty string comparison
-      if ($token[2]{sql} eq '?' && $token[2]{binds}[0] eq '') {
-        my $t0 = $oq->get_col_type($token[0]{colAlias},'filter');
-        my $op = $token[1]{sql};
-
-
-        # if character field coalesce to empty string
-        if ($t0 eq 'char' || $t0 eq 'clob') {
-          # oracle treats empty string as null so coalesce null to '_ _'
-          if ($$oq{dbtype} eq 'Oracle') {
-            if ($op =~ /NOT\ /i || $op =~ /\!/) {
-              $token[0]{sql} = "COALESCE(TO_CHAR($token[0]{sql}),'_ _')";
-              $token[1]{sql} = '!=';
-              $token[1]{name} = '!=';
-              $token[2]{binds}[0] = '_ _';
-              $token[2]{name} = '""';
-            } else {
-              $token[0]{sql} = "COALESCE(TO_CHAR($token[0]{sql}),'_ _')";
-              $token[1]{sql} = '=';
-              $token[1]{name} = '=';
-              $token[2]{binds}[0] = '_ _';
-              $token[2]{name} = '""';
-            }
-          }
-          else {
-            if ($op =~ /NOT\ /i || $op =~ /\!/) {
-              $token[0]{sql} = "COALESCE($token[0]{sql},'')";
-              $token[1]{sql} = '!=';
-              $token[1]{name} = '!=';
-              $token[2]{binds}[0] = '';
-              $token[2]{name} = '""';
-            } else {
-              $token[0]{sql} = "COALESCE($token[0]{sql},'')";
-              $token[1]{sql} = '=';
-              $token[1]{name} = '=';
-              $token[2]{binds}[0] = '';
-              $token[2]{name} = '""';
-            }
-          }
-        }
-
-        # else not char data so use IS NULL / IS NOT NULL operator
-        else {
-          pop @token;
-          if ($op =~ /NOT\ /i || $op =~ /\!/) {
-            $token[1]{sql} = "IS NOT NULL";
-            $token[1]{name} = '!=';
-            $token[2] = { name => '""' };
-          } else {
-            $token[1]{sql} = "IS NULL";
-            $token[1]{name} = '=';
-            $token[2] = { name => '""' };
-          }
-        }
-      }
-
-      # if we are comparing 2 cols
-      elsif ($token[0]{colAlias} && $token[2]{colAlias}) {
-        my $t0 = $oq->get_col_type($token[0]{colAlias},'filter');
-        my $t1 = $oq->get_col_type($token[2]{colAlias},'filter');
-
-        # if types are equal
-        if ($t0 ne $t1) {
-          if ($$oq{dbtype} eq 'Oracle') {
-            $token[0]{sql} = "TO_CHAR(".$token[0]{sql}.")" unless $t0 eq 'char';
-            $token[2]{sql} = "TO_CHAR(".$token[2]{sql}.")" unless $t1 eq 'char';
-          }
-        }
-        if ($token[1]{name} =~ /contains/) {
-          $token[0]{sql} = "UPPER(".$token[0]{sql}.")";
-          $token[2]{sql} = "UPPER(".$token[2]{sql}.")";
-
-          if ($$oq{dbtype} eq 'Oracle' || $$oq{dbtype} eq 'SQLite') {
-            $token[2]{sql} = "'%'||".$token[2]{sql}."||'%'";
-          } else {
-            $token[2]{sql} = "CONCAT('%',".$token[2]{sql}.",'%')";
-          }
-        }
-      }
-
-      # else we are comparing a column to a value
-      else {
-
-        # add some code to support contains operator
-        # basically rewritten as a fuzzy search
-        if ($token[1]{name} =~ /contains/) {
-          if (! exists $$oq{select}{$token[0]{colAlias}}[3]{date_format}) {
-            $token[0]{sql} = 'UPPER('.$token[0]{sql}.')';
-          }
-          if ($token[2]{sql} eq '?') {
-            $token[2]{binds}[0] =~ s/\*/\%/g; 
-            $token[2]{binds}[0] = '%'.uc($token[2]{binds}[0]).'%'; 
-            $token[2]{binds}[0] =~ s/\%\%/\%/g;
-          } else {
-            if (! exists $$oq{select}{$token[0]{colAlias}}[3]{date_format}) {
-              $token[2]{sql} = 'UPPER('.$token[2]{sql}.')';
-            }
-          }
-        } 
-
-        # if like search convert all * to wildcard %
-        elsif ($token[1]{sql} =~ /like/i && $token[2]{sql} eq '?') {
-          $token[2]{binds}[0] =~ s/\*/\%/g; 
-        }
-
-        # if lval is a date and we are doing a like comparison and rval is a value
-        # convert rval to a string using date_format
-        if (exists $$oq{select}{$token[0]{colAlias}}[3]{date_format} &&     
-            $token[1]{sql} =~ /like/i && $token[2]{sql} eq '?') {
-          if ($$oq{dbtype} eq 'Oracle') {
-            $token[0]{sql} = "to_char(".$token[0]{sql}.",'".$$oq{select}{$token[0]{colAlias}}[3]{date_format}."')";
-          } elsif ($$oq{dbtype} eq 'mysql') {
-            $token[0]{sql} = "date_format(".$token[0]{sql}.",'".$$oq{select}{$token[0]{colAlias}}[3]{date_format}."')";
-          }  
-        }
-     
-
-        # if lval is a date and we are doing a numerical comparison and rval is a value
-        # convert rval to a date using date_format
-        elsif (exists $$oq{select}{$token[0]{colAlias}}[3]{date_format} &&     
-            $token[1]{sql} !~ /like/i && $token[2]{sql} eq '?') {
-          if ($$oq{dbtype} eq 'Oracle') {
-            $token[2]{sql} = "to_date(?,'".$$oq{select}{$token[0]{colAlias}}[3]{date_format}."')";
-          } elsif ($$oq{dbtype} eq 'mysql') {
-            $token[2]{sql} = "str_to_date(?,'".$$oq{select}{$token[0]{colAlias}}[3]{date_format}."')";
-          }  
-        }
-
-        # if this is a numerical compare expression and the left side 
-        # is a number force the right side to also be a number
-        elsif ($token[1]{sql} =~ /\=|\<|\>/ &&
-          $oq->get_col_type($token[0]{colAlias},'filter') eq 'num') {
-          my $v = $token[2]{binds}[0];
-          $v =~ s/[^\d\.\-]//g;
-          $v = 0 unless $v =~ /^\-?(\d*\.\d+|\d+)$/;
-          $token[2]{binds}[0] = $v;
-          $token[2]{name} = $v;
-        }
-
-        # if numeric operator and field is an oracle clob, convert using to_char
-        elsif ($token[1]{sql} =~ /\=|\<|\>/ &&
-          $$oq{dbtype} eq 'Oracle' &&
-          $oq->get_col_type($token[0]{colAlias},'filter') eq 'clob') {
-          $token[0]{sql} = "to_char(".$token[0]{sql}.")";
-        }
-      }
-
-      # if this field comes from a dep with new_cursor => 1
-      # token 0 is the left side of the expression realized as a hashref:
-      # { sql => '', binds => [], deps => [], name => '' }
-      # we need to add additional tokens if a filter is done on a field 
-      # with an ancestor dependancy with option new_cursor => 1
-
-      # get ancestor path from newest to oldest new_cursor dep
-      my @path = ( $$oq{select}{$token[0]{colAlias}}[0][0] );
-      { my $joinDep = $path[0];
-        while (1) {
-          my $parentDep = $$oq{joins}{$joinDep}[0][0];
-          if ($parentDep) {
-            push @path, $parentDep;
-            $joinDep = $parentDep;
-          } else {
-            last;
-          }
-        }
-      }
-
-      # remove all oldest parents until we find a new_cursor (keep that one)
-      while (@path) { 
-        if ($$oq{joins}{$path[-1]}[3]{new_cursor}) {
-          last;
-        } else {
-          pop @path;
-        }
-      }
-
-      # if ancestors with new_cursor option exists
-      if (@path) {
-        @path = reverse @path;
-        my ($preSql, $postSql, @preBinds);
-        foreach my $joinDep (@path) {
-          my ($fromSql, @fromBinds) = @{ $$oq{joins}{$joinDep}[1] }; 
-
-          # unwrap SQL-92 join and add join to where
-          $fromSql =~ s/^\s+//;
-          $fromSql =~ s/^LEFT\s*//i;
-          $fromSql =~ s/^OUTER\s*//i;
-          $fromSql =~ s/^JOIN\s*//i;
-
-          my $corelatedJoin;
-          if ($fromSql =~ /^(.*)\bON\s*\((.*)\)\s*$/is) {
-            $fromSql = $1;
-            $corelatedJoin = $2;
-          } else {
-            die "could not parse for corelated join";
-          }
-
-          # in a one2many filter that has a negative operator, we need to use
-          # a NOT EXISTS and unnegate the operator
-          if ($token[2]{name} eq '""') {
-            if ($token[1]{sql} eq '=') {
-              $preSql .= "NOT ";
-              $token[1]{sql} = '!=';
-            }
-            elsif ($token[1]{sql} eq 'IS NULL') {
-              $preSql .= "NOT ";
-              $token[1]{sql} = 'IS NOT NULL';
-            }
-          }
-          elsif ($token[1]{sql} eq '!=') {
-            $token[1]{sql} = '=';
-            $preSql .= "NOT ";
-          }
-          elsif ($token[1]{sql} =~ s/NOT\ //) {
-            $preSql .= "NOT ";
-          }
-          $preSql .= "EXISTS (\n  SELECT 1\n  FROM $fromSql\n  WHERE ($corelatedJoin)\n  AND ";
-          $postSql .= ')';
-          push @preBinds, @fromBinds;
-        }
-
-        # update left expression deps and binds
-        $token[0]{deps} = $$oq{joins}{$path[0]}[0];
-        unshift @{ $token[0]{binds} }, @preBinds if @preBinds;
-
-        # add new pre/post sql tokens
-        unshift @token, { sql => $preSql, name => '' };
-        push @token, { sql => $postSql, name => '' };
-      }
-
-      return $glue_exp->(@token);
-    },
-
-    'namedFilter' => sub { 
-      my $oq = $_[0];
-      my $namedFilterAlias = $_[2];
-      my $args = $_[4];
-      die "was expecting that namedFilter args would be an array ref"
-        unless ref($args) eq 'ARRAY';
-      my $r = $$oq{named_filters}{$namedFilterAlias};
-      my ($deps, $sql, $binds, $name);
-      if (ref($r) eq 'ARRAY') {
-        $deps= $$r[0];   
-        my @tmp = @{ $$r[1] };
-        $sql = shift @tmp;
-        $binds = \@tmp;
-        $name = $$r[2];
-      } elsif (ref($r) eq 'HASH') {
-        die "could not find sql_generator for named_filter $namedFilterAlias"
-          unless ref($$r{sql_generator}) eq 'CODE';
-        ($deps, $binds, $name) = @{ $$r{sql_generator}->(@$args) }; 
-        $deps = [$deps] if ! ref $deps;
-        if (ref($binds) eq 'ARRAY') {
-          $sql = shift @$binds;
-        } else {
-          $sql = $binds;
-          $binds = [];
-        }
-      } else {
-        die "could not find named_filter $namedFilterAlias" unless ref $r;
-      }
-      return { deps => $deps, sql => '('.$sql.')', binds => $binds, name => $name };
-    }
-  );
-
-
+  # define cursor where_sql, where_deps, where_name where_binds from parsed filter types
   my $c = $sth->{cursors}->[0];
+  foreach my $filterType (qw( filter hiddenFilter forceFilter)) {
+    next if $$sth{$filterType} eq '';
+    my $filterArray = $$sth{oq}->parseFilter($$sth{$filterType});
+    my $filterSQL = $$sth{oq}->generateFilterSQL($filterArray);
 
-  # add filter parts to cursor's where parts
-  if ($sth->{'filter'} ne '') {
-    my $filter = $$sth{oq}->parse($DBIx::OptimalQuery::filterGrammar, $sth->{'filter'}, \%translations)
-      or die "could not parse filter: ".$sth->{'filter'};
-
-    push @{ $c->{where_deps} }, @{ $$filter{deps} };
-    $c->{where_sql}  = $$filter{sql};
-    push @{ $c->{where_binds} }, @{ $$filter{binds} };
-    $c->{where_name} = $$filter{name};
-  }
-
-  # add hidden filter parts to cursor's where parts
-  if ($sth->{'hiddenFilter'} ne '') {
-    my $hiddenFilter = $$sth{oq}->parse($DBIx::OptimalQuery::filterGrammar, $sth->{'hiddenFilter'}, \%translations)
-      or die "could not parse hiddenFilter: ".$sth->{'hiddenFilter'};
-    push @{ $c->{where_deps} }, @{ $$hiddenFilter{deps} };
-    $c->{where_sql}  = '('.$c->{where_sql}.")\nAND " if $c->{where_sql} ne '';
-    $c->{where_sql}  .= '('.$$hiddenFilter{sql}.')';
-    push @{ $c->{where_binds} }, @{ $$hiddenFilter{binds} };
-  }
-
-  # add system filter parts to cursor's where parts
-  if ($sth->{'forceFilter'} ne '') {
-    my $forceFilter = $$sth{oq}->parse($DBIx::OptimalQuery::filterGrammar, $sth->{'forceFilter'}, \%translations)
-      or die "could not parse forceFilter: ".$sth->{'forceFilter'};
-    push @{ $c->{where_deps} }, @{ $$forceFilter{deps} };
-    $c->{where_sql}  = '('.$c->{where_sql}.")\nAND " if $c->{where_sql} ne '';
-    $c->{where_sql}  .= '('.$$forceFilter{sql}.')';
-    push @{ $c->{where_binds} }, @{ $$forceFilter{binds} };
+    push @{ $$c{where_deps} }, @{ $$filterSQL{deps} };
+    if ($$c{where_sql}) {
+      $$c{where_sql} .= ' AND ('.$$filterSQL{sql}.')';
+    } else {
+      $$c{where_sql} = $$filterSQL{sql};
+    }
+    push @{ $$c{where_binds} }, @{ $$filterSQL{binds} };
+    $$c{where_name} = $$filterSQL{name} if $filterType eq 'filter';
   }
 
   return undef;
@@ -909,100 +549,14 @@ sub create_where {
 
 # modify cursor and add order by data
 sub create_order_by {
-  my $sth = shift;
+  my ($sth) = @_;
+  my $c = $sth->{cursors}->[0];
 
-  if ($sth->{'sort'} ne '') {
-    #$$sth{oq}{error_handler}->("DEBUG: \$sth->create_order_by()\n") if $$sth{oq}{debug};
-    my %translations = (
-      '*default*' => sub { $_[2] },
-
-      'expList' => sub { 
-        my ($oq) = @_;
-        my (%deps, @sql, @binds, @nice);
-        die "was expecting an array ref!" unless ref($_[2]) eq 'ARRAY';
-        foreach my $sort (@{ $_[2] }) {
-          die "was expecting a hash ref!" unless ref($sort) eq 'HASH';
-          $deps{$_} = 1 for @{ $$sort{deps} };
-          push @sql, $$sort{sql};
-          push @binds, @{ $$sort{binds} };
-          push @nice, $$sort{nice};
-        }
-        my @deps = keys %deps;
-        return [ \@deps, join(', ', @sql), \@binds, \@nice ];
-      },
-
-      'expression' => sub { 
-        my $oq = $_[0];
-        my $def = $_[2];
-        my $sql_sort_opts_to_append = lc(join(' ', @{$_[3]}));
-
-        if ($sql_sort_opts_to_append) {
-          $$def{sql} .= ' '.$sql_sort_opts_to_append;
-          $$def{nice} .= ($sql_sort_opts_to_append =~ /desc/) ?
-            ' (reverse)' : $sql_sort_opts_to_append;
-        } 
-        return $def;
-      },
-
-      'quotedString' => sub {
-        $_ = $_[2]; (s/^\'// && s/\'$//) || (s/^\"// && s/\"$//); $_;
-      },
-
-      'namedSort' => sub { 
-        my $oq = $_[0];
-        my $namedSortAlias = $_[2];
-        my $args = $_[4];
-        die "was expecting that namedSort args would be an array ref"
-          unless ref($args) eq 'ARRAY';
-        my $r = $$oq{named_sorts}{$namedSortAlias};
-        my ($deps, $sql, $binds, $nice);
-        if (ref($r) eq 'ARRAY') {
-          $deps = $$r[0];   
-          my @tmp = @{ $$r[1] };
-          $sql = shift @tmp;
-          $binds = \ @tmp;
-          $nice = $$r[3];
-        } elsif (ref($r) eq 'HASH') {
-          die "could not find sql_generator for named_sort $namedSortAlias"
-            unless ref($$r{sql_generator}) eq 'CODE';
-          ($deps, $binds, $nice) = @{ $$r{sql_generator}->(@$args) }; 
-          $deps = [$deps] if ! ref $deps;
-          $sql = shift @$binds;
-        } else {
-          die "could not find named_sort $namedSortAlias" unless ref $r;
-        }
-        return { deps => $deps, sql => $sql, binds => $binds, nice => $nice };
-      },
-
-      'colAlias' => sub { 
-        my $oq = $_[0];
-        my $colAlias = $_[3];
-        die "could not find colAlias $colAlias" 
-          unless exists $$oq{select}{$colAlias};
-        my $deps = $$oq{select}{$colAlias}[0];
-        my @tmp =  @{
-          $$oq{select}{$colAlias}[3]{sort_sql} || $$oq{select}{$colAlias}[1] };
-        my $sql = shift @tmp;
-        my $binds = \@tmp;
-        die "could not find nice name" if $$oq{select}{$colAlias}[2] eq '';
-        my $nice = '['.$$oq{select}{$colAlias}[2].']';
-
-        if ($$sth{oq}{dbtype} eq 'Oracle' &&
-            $sth->{oq}->get_col_types('select')->{$colAlias} eq 'clob' &&
-            $sql !~ /^cast\(/i) {
-          $sql = "cast($sql as varchar2(100))";
-        }
-        return { deps => $deps, sql => $sql, binds => $binds, nice => $nice };
-      }
-    );
-
-    my $result = $$sth{oq}->parse($DBIx::OptimalQuery::sortGrammar, $sth->{'sort'}, \%translations)
-      or die "could not parse sort: ".$sth->{'sort'};
-
-    my $c = $sth->{cursors}->[0];
-    ($c->{order_by_deps}, $c->{order_by_sql},
-     $c->{order_by_binds}, $c->{order_by_name}) = @$result;
-  }
+  my $s = $$sth{oq}->parseSort($$sth{'sort'});
+  $$c{order_by_deps} = $$s{deps};
+  $$c{order_by_sql} = join(',', @{ $$s{sql} });
+  $$c{order_by_binds} = $$s{binds};
+  $$c{order_by_name} = $$s{name};
   return undef;
 }
 
@@ -1018,7 +572,7 @@ sub create_order_by {
 
 
 # fetch next row or return undef when done
-sub fetchrow_hashref { 
+sub fetchrow_hashref {
   my ($sth) = @_;
   return undef unless $sth->count() > 0;
   $sth->execute(); # execute if not already existed
@@ -1069,7 +623,7 @@ sub fetchrow_hashref {
 }
 
 # finish sth
-sub finish { 
+sub finish {
   my ($sth) = @_;
   #$$sth{oq}{error_handler}->("DEBUG: \$sth->finish()\n") if $$sth{oq}{debug};
   foreach my $c (@{$$sth{cursors}}) {
@@ -1093,8 +647,7 @@ sub count {
 
     # only need to join in driving table with
     # deps used in where clause
-    my $deps = [ $drivingTable, @{$c->{where_deps}} ];
-    ($deps) = @{ $sth->{oq}->_order_deps($deps) };
+    my ($deps) = $sth->{oq}->_order_deps($drivingTable, @{$c->{where_deps}});
     my @from_deps; push @from_deps, @$_ for @$deps;
 
     # create from_sql, from_binds
@@ -1280,104 +833,737 @@ sub new {
 
 
 
+# returns [
+#  # type 1 - (selectalias operator literal)
+#    [1,$numLeftParen,$leftExpSelectAlias,$op,$rightExpLiteral,$numRightParen],
+#  # type 2 - (namedfilter, arguments)
+#    [2,$numLeftParen,$namedFilter,$argArray,$numRightParen]
+#  # type 3 - (selectalias operator selectalias)
+#    [3,$numLeftParen,$leftExpSelectAlias,$op,$rightExpSelectAlias,$numRightParen],
+#  # logic operator
+#    'AND'|'OR'
+# ]
+sub parseFilter {
+  my ($oq, $f) = @_; 
+  $f =~ /^\s+/; # trim leading spaces
 
+  my @rv;
+  return \@rv if $f eq '';
 
+  my $error;
 
+  my $parenthesis=0;
+ 
+  while (! $error) {
+    my $numLeftP=0;
+    my $numRightP=0;
 
+    # parse opening parenthesis
+    while ($f =~ /\G\(\s*/gc) { $numLeftP++; $parenthesis++;}
 
+    # if this looks like a named filter
+    if ($f=~/\G(\w+)\s*\(\s*/gc) {
+      my $namedFilter = $1;
 
+      if (! exists $$oq{named_filters}{$namedFilter}) {
+        $error = "invalid named filter: $namedFilter";
+        next;
+      }
 
+      # parse named filter arguments
+      my @args;
+      while (! $error) {
+        if ($f =~ /\G\)\s*/gc) {
+          last;
+        }
+        elsif ($f =~ /\G(\-?\d*\.\d+)\s*\,*\s*/gc ||
+               $f =~ /\G(\-?\d+)\s*\,*\s*/gc      ||
+               $f =~ /\G\'([^\']*)\'\s*\,*\s*/gc  ||
+               $f =~ /\G\"([^\"]*)\"\s*\,*\s*/gc  ||
+               $f =~ /\G(\w+)\s*\,*\s*/gc) {
+          push @args, $1;
+        } else {
+          $error = "could not parse named filter arguments";
+        }
+      }
+      next if $error;
 
-our $filterGrammar = <<'TILEND';
-start: exp /^$/
+      # parse closing parenthesis
+      while ($f =~ /\G\)\s*/gc) {
+        if ($parenthesis > 0) {
+          $parenthesis--;
+          $numRightP++;
+        }
+      }
 
-exp:
-   '(' exp ')' logicOp exp
- | '(' exp ')'
- | comparisonExp logicOp exp
- | comparisonExp
+      push @rv, [2,$numLeftP,$namedFilter,\@args,$numRightP];
+    }
 
-comparisonExp:
-   namedFilter
- | colAlias compOp colAlias
- | colAlias compOp bindVal
+    # else this is an expression
+    else {
+      my $lexp;
+      my $rexp;
+      my $typeNum = 1;
 
-bindVal: float | quotedString
+      # grab select alias used on the left side of the expression
+      if ($f=~/\G\[([^\]]+)\]\s*/gc) { $lexp = $1; }
+      elsif ($f=~/\G(\w+)\s*/gc) { $lexp = $1; }
+      else {
+        $error = "missing left expression";
+      }
 
-logicOp:
-   /and/i
- | /or/i
+      # make sure the select alias is valid
+      if (! $$oq{select}{$lexp}) {
+        $error = "invalid field $lexp";
+        next;
+      }
 
-namedFilter: /\w+/ '(' namedFilterArg(s? /,/) ')'
+      # parse the operator
+      my $op;
+      if ($f =~ /\G(\!\=|\=|\<\=|\>\=|\<|\>|like|not\ ?like|contains|not\ ?contains)\s*/igc) {
+        $op = lc($1);
+      }
+      else {
+        $error = "invalid operator";
+        next;
+      }
 
-namedFilterArg: quotedString | float | unquotedIdentifier
+      # if rexp is a select alias
+      if ($f=~/\G\[([^\]]+)\]\s*/gc) {
+        $rexp = $1;
+        $typeNum = 3;
+      }
 
-unquotedIdentifier: /\w+/
+      # else if rexp is a literal
+      elsif ($f =~ /\G\'([^\']*)\'\s*/gc  ||
+             $f =~ /\G\"([^\"]*)\"\s*/gc) {
+        $rexp = $1;
+      }
 
-colAlias: '[' /\w+/ ']'
+      # else if rexp is a word
+      elsif ($f =~ /\G(\S+)\s*/gc) {
+        $rexp = $1;
 
-float:
-   /\-?\d*\.?\d+/
- | /\-?\d+\.?\d*/
+        # is word a col alias?
+        if ($$oq{select}{$rexp}) {
+          $typeNum = 3;
+        }
+      }
 
-quotedString:
-   /'.*?'/
- | /".*?"/
+      else {
+        $error = "missing right expression";
+        next;
+      }
 
-compOp:
-   '<=' | '>=' | '=' | '!=' | '<' | '>' |
-   /contains/i | /not\ contains/i | /like/i | /not\ like/i
+      # parse closing parenthesis
+      while ($f =~ /\G\)\s*/gc) {
+        if ($parenthesis > 0) {
+          $parenthesis--;
+          $numRightP++;
+        }
+      }
 
-TILEND
+      push @rv, [$typeNum, $numLeftP, $lexp, $op, $rexp, $numRightP];
+    }
 
+    # parse logic operator
+    if ($f =~ /(AND|OR)\s*/gci) {
+      push @rv, uc($1);
+    }
+    else { 
+      last;
+    }
+  }
 
-our $sortGrammar = <<'TILEND';
-start: expList /^$/
+  if ($error) {
+    my $p = pos($f);
+    $error .= " at ".substr($f, 0, $p).'<*>'.substr($f, $p);
+    die $error."\n";
+  }
 
-expList: expression(s? /,/)
-
-expression:
-   namedSort opt(?)
- | colAlias  opt(?)
-
-opt: /desc/i
-
-namedSort: /\w+/ '(' namedSortArg(s? /,/) ')'
-namedSortArg: quotedString | float
-
-colAlias: '[' /\w+/ ']'
-
-float:
-   /\-?\d*\.?\d+/
- | /\-?\d+\.?\d*/
-
-quotedString:
-   /'.*?(?<!\\)'/
- | /".*?(?<!\\)"/
-
-TILEND
-
-our (%cached_parsers, $oq, $translations);
-sub translator_callback {
-  return $$translations{$_[0]}->($oq, @_) if exists $$translations{$_[0]};
-  return $$translations{'*default*'}->($oq, @_) if exists $$translations{'*default*'};
-  return 1;
+  return \@rv;
 }
 
-sub parse {
-  local $oq = shift;
-  my $grammar = shift;
-  my $string = shift;
-  local $translations = shift;
-  my $start_rule = shift || 'start';
-  local $::RD_AUTOACTION = 'DBIx::OptimalQuery::translator_callback(@item);';
-  $cached_parsers{$grammar} ||= Parse::RecDescent->new($grammar);
-  return $cached_parsers{$grammar}->$start_rule($string);
+
+# given a filter string, returns { sql => $sql, binds => \@binds, deps => \@deps, name => $name };
+sub generateFilterSQL {
+  my ($oq, $filterArray) = @_;
+
+  # build an array of sql tokens, bind vals, and used deps
+  # also build a formatted name
+  my @sql;
+  my @binds;
+  my %deps;
+  my @name;
+  my $parenthesis = 0;
+
+  foreach my $exp (@$filterArray) {
+
+    if ($exp eq 'AND') {
+      push @sql, "AND";
+      push @name, "AND";
+    } elsif ($exp eq 'OR') {
+      push @sql, "OR";
+      push @name, "OR";
+    }
+
+    # [COLALIAS] != "literal"
+    elsif ($$exp[0]==1) {
+      my ($type, $numLeftParen, $leftColAlias, $operatorName, $rval, $numRightParen) = @$exp;
+      $parenthesis+=$numLeftParen;
+      $parenthesis-=$numRightParen;
+
+      my $operator = uc($operatorName);
+
+      # handle left side of expression
+      my ($leftDeps, $leftSql, $leftName, $leftOpts, @leftBinds, $leftType);
+      ($leftDeps, $leftSql, $leftName, $leftOpts) = @{ $$oq{select}{$leftColAlias} };
+      $leftSql = $$leftOpts{filter_sql} if $$leftOpts{filter_sql};
+      ($leftSql, @leftBinds) = @$leftSql if ref($leftSql) eq 'ARRAY';
+      $leftType = $oq->get_col_type($leftColAlias, 'filter');
+      $leftName ||= $leftColAlias;
+
+      # handle right side of expression
+      my ($rightSql, $rightName, @rightBinds);
+      
+      $rightName = $rval;
+      if ($rightName eq '') {
+        $rightName = "''";
+      } elsif ($rightName =~ /\s/) {
+        $rightName = '"'.$rightName.'"';
+      }
+
+      $rval = $$leftOpts{db_formatter}->($rval) if $$leftOpts{db_formatter};
+
+      # if empty check
+      if ($rval eq '') {
+        if ($leftType eq 'char' || $leftType eq 'clob') {
+          if ($$oq{dbtype} eq 'Oracle') {
+            $leftSql = "COALESCE($leftSql,'_ _')";
+            $rightSql = "_ _";
+          } else {
+            $leftSql = "COALESCE($leftSql,'')";
+            $rightSql = "''";
+          }
+          $operator = ($operator =~ /\!|NOT/i) ? '!=' : '=';
+        } else {
+          $operator = ($operator =~ /\!|NOT/i) ? 'IS NOT NULL' : 'IS NULL';
+        }
+      }
+
+      # else check against literal value
+      else {
+        # if numeric operator
+        if ($operator =~ /\=|\<|\>/) {
+
+          # if we are doing a numeric date comparison, parse for the date in common formats
+          if ($leftType eq 'date' || $leftType eq 'datetime') {
+
+            # is this a calculated date?
+            if ($rval =~ /today\s*([\+\-])\s*(\d+)\s*(minute|hour|day|week|month|year|)s?/i) {
+              my $sign = $1;
+              my $num = $2;
+              my $unit = uc($3) || 'DAY';
+              $rightName = "today ".$sign.$num." ".lc($unit);
+              $rightName .= 's' if $num != 1;
+              $num *= -1 if $sign eq '-';
+
+              if ($$oq{dbtype} eq 'Oracle') {
+                my $now = $leftType eq 'datetime' ? 'SYSDATE' : 'TRUNC(SYSDATE)';
+                if ($unit eq 'MINUTE') {
+                  $rightSql = "$now+($num/1440)"
+                } elsif ($unit eq 'HOUR') {
+                  $rightSql = "$now+($num/24)"
+                } elsif ($unit eq 'WEEK') {
+                  $rightSql = "$now+($num*7)"
+                } elsif ($unit eq 'MONTH') {
+                  $rightSql = "ADD_MONTHS($now,$num)";
+                } elsif ($unit eq 'YEAR') {
+                  $rightSql = "ADD_MONTHS($now,$num*12)";
+                }
+              } else {
+                my $now = $leftType eq 'datetime' ? 'NOW()' : 'CURDATE()';
+                $rightSql = "DATE_ADD($now, INTERVAL $num $unit)";
+              }
+            }
+
+            elsif ($rval =~ /today\s*/i) {
+              $rightName = "today";
+              if ($$oq{dbtype} eq 'Oracle') {
+                $rightSql = $leftType eq 'datetime' ? 'SYSDATE' : 'TRUNC(SYSDATE)';
+              } else {
+                $rightSql = $leftType eq 'datetime' ? 'NOW()' : 'CURDATE()';
+              }
+            }
+
+            # else this is a date value
+            else {
+
+              my ($y,$m,$d,$h,$mi,$s,$hourType);
+              if ($rval =~ /^(\d\d\d\d)[\-\/](\d\d?)[\-\/](\d\d?)/) {
+                $y = $1;
+                $m = $2;
+                $d = $3;
+              } elsif ($rval =~ /^(\d\d?)[\-\/](\d\d?)[\-\/](\d\d\d\d)/) {
+                $m = $1;
+                $d = $2;
+                $y = $3;
+              } elsif ($rval =~ /^(\d\d?)[\-\/](\d\d?)[\-\/](\d\d)\b/) {
+                $m = $1;
+                $d = $2;
+                $y = int('20'.$3);
+              } elsif ($rval =~ /^(\d\d\d\d)[\-\/](\d\d?)/) {
+                $y = $1;
+                $m = $2;
+              }
+              elsif ($rval =~ /^(\d\d\d\d)/) {
+                $y = $1;
+              }
+              else {
+                die "could not parse date: $rval";
+              }
+
+              # extract time component if the type supports it
+              if ($leftType eq 'datetime') {
+                if ($rval =~ /\b(\d\d?)\:(\d\d?)[\:\.](\d\d?)/) {
+                  $h = $1;
+                  $mi = $2;
+                  $s = $3;
+                }
+                elsif ($rval =~ /\b(\d\d?)\:(\d\d?)/) {
+                  $h = $1;
+                  $mi = $2;
+                }
+                elsif ($rval =~ /\b(\d\d?)\s*(am|pm)/i) {
+                  $h = $1;
+                  $mi = '00'; 
+                }
+                if ($rval =~ /A/i) {
+                  $hourType='AM';
+                } elsif ($rval =~ /P/i) {
+                  $hourType='PM';
+                }
+              }
+
+              # format date expression for mysql
+              if ($$oq{dbtype} eq 'mysql') {
+                my $format = '%Y';
+                my $val = "$y";
+                if ($m) {
+                  $format .= '-%m';
+                  $val .= "-$m";
+                  if ($d) {
+                    $format .= '-%d';
+                    $val .= "-$d";
+                
+                    if ($mi ne '') {
+                      $format .= $hourType ? ' %h' : ' %H';
+                      $format .= ':%i';
+                      $val .= " $h:$mi";
+                      if ($s ne '') {
+                        $format .= ':%s';
+                        $val .= ":$s";
+                      }
+                      if ($hourType) {
+                        $format .= ' %p';
+                        $val    .= " $hourType";
+                      }
+                    }
+                  }
+                }
+                $rightSql = "STR_TO_DATE(?,'$format')";
+                push @rightBinds, $val;
+          
+                # remove lvalue time if rval doesn't use it
+                if ($leftType eq 'datetime' && $mi eq '') {
+                  $leftSql = "DATE($leftSql)";
+                }
+              }
+
+              # format date expression for oracle and postgres (use compatible to_date function)
+              else {
+                my $format = 'YYYY';
+                my $val = $y;
+                if ($m) {
+                  $format .= "-MM";
+                  $val .= "-$m";
+                  if ($d) {
+                    $format .= "-DD";
+                    $val .= "-$d";
+
+                    if ($mi ne '') {
+                      $format .= $hourType ? ' HH' : ' HH24';
+                      $format .= ':MI';
+                      $val .= " $h:$mi";
+                      if ($s ne '') {
+                        $format .= ':SS';
+                        $val .= ":$s";
+                      }
+                      if ($hourType) {
+                        $format .= " $hourType";
+                        $val    .= " $hourType";
+                      }
+                    }
+                  }
+                }
+
+                $rightSql = "TO_DATE(?,'$format')";
+                push @rightBinds, $val;
+
+                # remove lvalue time if rval doesn't use it
+                if ($leftType eq 'datetime' && $mi eq '') {
+                  $leftSql = "TRUNC($leftSql)";
+                }
+              }
+            }
+          }
+
+          # if this is a numeric comparison and rvalue is not a number, convert left side to text
+          elsif ($leftType eq 'num' && $rval !~ /^(\-?\d*\.\d+|\-?\d+)$/) {
+            if ($$oq{dbtype} eq 'mysql') {
+              $leftSql = "CONCAT('',$leftSql)";
+              $rightSql = '?';
+              push @rightBinds, $rval;
+            } else {
+              $leftSql = "TO_CHAR($leftSql)";
+              $rightSql = '?';
+              push @rightBinds, $rval;
+            }
+          }
+
+          # if numeric operator and field is an oracle clob, convert using to_char
+          elsif ($$oq{dbtype} eq 'Oracle' && $leftType eq 'clob') {
+            $leftSql = "TO_CHAR($leftSql)";
+            $rightSql = '?';
+            push @rightBinds, $rval;
+          }
+
+          else {
+            $rightSql = '?';
+            push @rightBinds, $rval;
+          }
+        }
+
+        # like operator
+        else {
+
+          # convert contains operator to like
+          if ($operatorName =~ /contains/i) {
+            $leftSql = "LOWER($leftSql)" if ! $leftType eq 'char' || $leftType eq 'clob';
+            $operator = $operatorName =~ /not/i ? "NOT LIKE" : "LIKE";
+            $rval = '%'.lc($rval).'%';
+          }
+
+          # allow * as wildcard
+          if ($operator =~ /like/i) {
+            $rval =~ s/\*/\%/g;
+          }
+
+          # remove redundant wildcards
+          $rval =~ s/\%\%+/\%/g;
+
+          # if left side is date, convert to text so like operator works as expected
+          if ($$leftOpts{date_format}) {
+            if ($$oq{dbtype} eq 'mysql') {
+              $leftSql = "DATE_FORMAT($leftSql,'$$leftOpts{date_format}')";
+            } else {
+              $leftSql = "TO_CHAR($leftSql,'$$leftOpts{date_format}')";
+            }
+          }
+
+          $rightSql = '?';
+          push @rightBinds, $rval;
+        }
+      }
+
+      # if the leftSql uses a new cursor we need to write an exists expression
+      # search dep path to see if a new_cursor is used
+      my @path = ($$leftDeps[0]);
+      my $i=0;
+      while (1) {
+        die "infinite dep loop detected" if ++$i==50;
+        my $parentDep = $$oq{joins}{$path[-1]}[0][0];
+        last unless $parentDep;
+        push @path, $parentDep;
+      }
+
+      # find the oldest parent new cursor if it exists
+      while (@path) {
+        if ($$oq{joins}{$path[-1]}[3]{new_cursor}) {
+          last;
+        } else {
+          pop @path; 
+        }
+      }
+      
+      # if @path has elements, this uses a new_cursor and we must construct an exists expression
+      if (@path) {
+        @path = reverse @path;
+        my ($preSql, $postSql, @preBinds);
+        foreach my $joinDep (@path) {
+          my ($fromSql, @fromBinds) = @{ $$oq{joins}{$joinDep}[1] }; 
+
+          # unwrap SQL-92 join and add join to where
+          $fromSql =~ s/^\s+//;
+          $fromSql =~ s/^LEFT\s*//i;
+          $fromSql =~ s/^OUTER\s*//i;
+          $fromSql =~ s/^JOIN\s*//i;
+
+          my $corelatedJoin;
+          if ($fromSql =~ /^(.*)\bON\s*\((.*)\)\s*$/is) {
+            $fromSql = $1;
+            $corelatedJoin = $2;
+          } else {
+            die "could not parse for corelated join\n";
+          }
+
+          # in a one2many filter that has a negative operator, we need to use
+          # a NOT EXISTS and unnegate the operator
+          if ($rightName eq "''") {
+            if ($operator eq '=') {
+              $preSql .= "NOT ";
+              $operator = '!=';
+            }
+            elsif ($operator eq 'IS NULL') {
+              $preSql .= "NOT ";
+              $operator = 'IS NOT NULL';
+            }
+          }
+          elsif ($operator eq '!=') {
+            $operator = '=';
+            $preSql .= "NOT ";
+          }
+          elsif ($operator =~ s/NOT\ //) {
+            $preSql .= "NOT ";
+          }
+          $preSql .= " EXISTS (\n  SELECT 1\n  FROM $fromSql\n  WHERE ($corelatedJoin)\n  AND ";
+          $postSql .= ')';
+          push @preBinds, @fromBinds;
+        }
+
+        # update left expression deps and binds
+        $leftDeps = $$oq{joins}{$path[0]}[0];
+        unshift @leftBinds, @preBinds if @preBinds;
+        $leftSql = $preSql.$leftSql;
+        $rightSql .= $postSql;
+      }
+
+      my $sql = '(' x $numLeftParen;
+      $sql .= $leftSql;
+      $sql .= ' '.$operator;
+      $sql .= ' '.$rightSql if $rightSql ne '';
+      $sql .= ')' x $numRightParen;
+
+      # glue expression
+      push @sql,   $sql;
+      push @binds, @leftBinds, @rightBinds;
+      push @name, $leftName,  $operatorName;
+      push @name, $rightName  if $rightName ne '';
+      $deps{$_}=1  for @$leftDeps;
+    }
+
+
+    # namedFilter(args)
+    elsif ($$exp[0]==2) {
+      my ($type, $numLeftParen,$namedFilterAlias,$argArray,$numRightParen) = @$exp;
+      $parenthesis+=$numLeftParen;
+      $parenthesis-=$numRightParen;
+
+      # generate filter sql, bind, name 
+      my $f = $$oq{named_filters}{$namedFilterAlias};
+      my ($filterDeps, $filterSql, @filterBinds, $filterLabel);
+      if (ref($f) eq 'ARRAY') {
+        ($filterDeps, $filterSql, $filterLabel) = @$f;
+      } elsif (ref($f) eq 'HASH') {
+        die "could not find sql_generator for named_filter $namedFilterAlias\n"
+          unless ref($$f{sql_generator}) eq 'CODE';
+        ($filterDeps, $filterSql, $filterLabel) = @{ $$f{sql_generator}->(@$argArray) };
+      } else {
+        die "invalid named_filter: $namedFilterAlias\n";
+      }
+      ($filterSql, @filterBinds) = @$filterSql if ref($filterSql) eq 'ARRAY'; 
+
+
+      my $sql = '(' x $numLeftParen;
+      $sql .= $filterSql;
+      $sql .= ')' x $numRightParen;
+
+      # glue expression
+      push @sql,   $sql;
+      push @binds, @filterBinds;
+      push @name, $filterLabel; 
+
+      if (ref($filterDeps) eq 'ARRAY') {
+        $deps{$_}=1 for @$filterDeps;
+      } elsif ($filterDeps) {
+        $deps{$filterDeps}=1;
+      }
+    }
+
+
+    # [COL] != [COL2]
+    elsif ($$exp[0]==3) {
+      my ($type, $numLeftParen,$leftColAlias,$operatorName,$rightColAlias,$numRightParen) = @$exp;
+      $parenthesis+=$numLeftParen;
+      $parenthesis-=$numRightParen;
+
+      my $operator = uc($operatorName);
+
+      # handle left side of expression
+      my ($leftDeps, $leftSql, $leftName, $leftOpts, @leftBinds, $leftType);
+      ($leftDeps, $leftSql, $leftName, $leftOpts) = @{ $$oq{select}{$leftColAlias} };
+      $leftSql = $$leftOpts{filter_sql} if $$leftOpts{filter_sql};
+      ($leftSql, @leftBinds) = @$leftSql if ref($leftSql) eq 'ARRAY';
+      $leftType = $oq->get_col_type($leftColAlias, 'filter');
+      $leftName ||= $leftColAlias;
+
+      # handle right side of expression
+      my ($rightDeps, $rightSql, $rightName, $rightOpts, @rightBinds, $rightType);
+      ($rightDeps, $rightSql, $rightName, $rightOpts) = @{ $$oq{select}{$rightColAlias} };
+      $rightSql = $$rightOpts{filter_sql} if $$rightOpts{filter_sql};
+      ($rightSql, @rightBinds) = @$rightSql if ref($rightSql) eq 'ARRAY';
+      $rightType = $oq->get_col_type($rightColAlias, 'filter');
+      $rightName ||= $rightColAlias;
+
+      # do type conversion to ensure types are the same
+      if ($leftType ne $rightType) {
+        if ($$oq{dbtype} eq 'mysql') {
+          $leftSql  = "CONCAT('', $leftSql)"  unless $leftType eq 'char';
+          $rightSql = "CONCAT('', $rightSql)" unless $rightType eq 'char';
+        } else {
+          $leftSql  = "TO_CHAR($leftSql)"  unless $leftType eq 'char';
+          $rightSql = "TO_CHAR($rightSql)" unless $rightType eq 'char';
+        }
+      }
+
+      # if char ensure NULL is turned into empty string so comparison works
+      if ($leftType eq 'char') {
+        my $nullVal = $$oq{dbtype} eq 'Oracle' ? "'_ _'" : "''";
+        $leftSql = "COALESCE($leftSql,$nullVal)";
+        $rightSql = "COALESCE($rightSql,$nullVal)";
+      }
+
+      # handle case insensitivity
+      if ($operatorName =~ /contains/i) {
+        $operator = $operatorName =~ /not/i ? "NOT LIKE" : "LIKE";
+        $leftSql  = "LOWER($leftSql)";
+        $rightSql = "LOWER($rightSql)";
+        $rightSql = $$oq{dbtype} eq 'Oracle' || $$oq{dbtype} eq 'SQLite'
+          ? "'%'||$leftSql||'%'"
+          : "CONCAT('%',$leftSql,'%')";
+      }
+
+      my $sql = '(' x $numLeftParen;
+      $sql .= "$leftSql $operator $rightSql";
+      $sql .= ')' x $numRightParen;
+
+      # glue expression
+      push @sql,   $sql;
+      push @binds, @leftBinds, @rightBinds;
+      push @name, $leftName,  $operatorName, $rightName;
+      $deps{$_}=1  for @$leftDeps;
+      $deps{$_}=1  for @$rightDeps;
+    }
+  }
+
+  my @deps  = grep { $_ } keys %deps;
+  my $sql   = join(' ', @sql);
+  my $name  = join(' ', @name);
+
+  # make sure parenthesis are balanced
+  if ($parenthesis > 0) {
+    my $p = ')' x $parenthesis;
+    $sql .= $p;
+    $name .= $p;
+  }
+
+  my %rv = ( sql => $sql, binds => \@binds, deps => \@deps, name => $name ); 
+  return \%rv;
 }
 
 
+sub parseSort {
+  my ($oq, $str) = @_;
+  $str =~ /^\s+/;
 
+  my (@sql, @binds, @name, %deps);
 
+  while (1) {
+
+    # parse named sort
+    if ($str =~ /\G(\w+)\(\s*/gc) {
+      my $namedSortAlias = $1;
+      my @args;
+      while (1) {
+        if ($str =~ /\G\)\s*/gc) {
+          last;
+        }
+        elsif ($str =~ /\G(\-?\d*\.\d+)\s*\,*\s*/gc ||
+               $str =~ /\G(\-?\d+)\s*\,*\s*/gc      ||
+               $str =~ /\G\'([^\']*)\'\s*\,*\s*/gc  ||
+               $str =~ /\G\"([^\"]*)\"\s*\,*\s*/gc  ||
+               $str =~ /\G(\w+)\s*\,*\s*/gc) {
+          push @args, $1;
+        } else {
+          die "could not parse named sort arguments\n";
+        }
+      }
+      my ($sortDeps, $sortSql, @sortBinds, $sortLabel);
+       
+      my $s = $$oq{named_sorts}{$namedSortAlias};
+      if (ref($s) eq 'ARRAY') {
+        ($sortDeps, $sortSql, $sortLabel) = @$s;
+      } elsif (ref($s) eq 'HASH') {
+        die "could not find sql_generator for named_srot $namedSortAlias\n"
+          unless ref($$s{sql_generator}) eq 'CODE';
+        ($sortDeps, $sortSql, $sortLabel) = @{ $$s{sql_generator}->(@args) };
+        ($sortSql, @sortBinds) = @$sortSql if ref($sortSql) eq 'ARRAY';
+      } else {
+        die "invalid named_filter: $namedSortAlias\n";
+      }
+
+      push @sql,   $sortSql;
+      push @binds, @sortBinds;
+      push @name, $sortLabel; 
+      $deps{$_} =1 for @$sortDeps;
+    }
+
+    # parse named sort
+    elsif ($str =~ /\G\[?(\w+)\]?\s*/gc) {
+      my $colAlias = $1;
+      die "missing sort col: $colAlias\n" unless $$oq{select}{$colAlias};
+      my @sortBinds;
+      my ($sortDeps, $sortSql, $sortLabel, $opts) = @{ $$oq{select}{$colAlias} };
+      $sortSql = $$opts{sort_sql} if $$opts{sort_sql};
+      ($sortSql, @sortBinds) = @$sortSql if ref($sortSql) eq 'ARRAY';
+      $sortLabel ||= $colAlias;
+
+      if ($str =~ /\Gdesc\s*/gci) {
+        $sortSql .= ' DESC';
+        $sortLabel .= ' (reverse)';
+      }
+
+      push @sql,   $sortSql;
+      push @binds, @sortBinds;
+      push @name, $sortLabel; 
+      $deps{$_} =1 for @$sortDeps;
+    }
+
+    elsif ($str =~ /\G$/gc) {
+      last;
+    }
+    elsif ($str =~ /\G\,\s*/gc) {
+      next;
+    }
+    else {
+      die "could not parse sort\n";
+    }
+  }
+
+  my @deps = grep { $_ } keys %deps;
+
+  return { sql => \@sql, binds => \@binds, deps => \@deps, name => \@name };
+}
 
 
 # normalize member variables
@@ -1589,7 +1775,7 @@ sub check_join_counts {
   my $drivingTableCount;
 
   foreach my $join (keys %{ $oq->{joins} }) {
-    my ($cursors) = @{ $oq->_order_deps($join) };
+    my ($cursors) = $oq->_order_deps($join);
     my @deps = map { @$_ } @$cursors; # flatten deps in cursors
     my $drivingTable = $deps[0];
 
@@ -1619,7 +1805,8 @@ sub check_join_counts {
       }
     }
 
-    my $where = 'WHERE '.join("\nAND ", @whereSql) if @whereSql;
+    my $where;
+    $where = 'WHERE '.join("\nAND ", @whereSql) if @whereSql;
 
     my $sql = "
 SELECT count(*)
@@ -1650,27 +1837,34 @@ sub type_map {
   my $oq = shift;
   return {
   -1 => 'char',
+  -2 => 'clob',
+  -3 => 'clob',
   -4 => 'clob',
   -5 => 'num',
   -6 => 'num',
+  -7 => 'num',
+  -8 => 'char',
   -9 => 'char',
   0 => 'char',
   1 => 'char',
+  2 => 'num',
   3 => 'num',    # is decimal type
   4 => 'num',
+  5 => 'num',
   6 => 'num',    # float
   7  => 'num',
   8 => 'num',
   9 => 'date',
+  10 => 'char',  # time (no date)
   11 => 'datetime',
-  10 => 'char',
   12 => 'char',
   16 => 'date',
   30 => 'clob',
   40 => 'clob',
   91 => 'date',
-  93 => 'date',
+  93 => 'datetime',
   95 => 'date',
+  'TIMESTAMP' => 'datetime',
   'INTEGER' => 'num',
   'TEXT' => 'char',
   'VARCHAR' => 'char',
@@ -1747,7 +1941,7 @@ sub get_col_types {
 
     # order and flatten deps
     my @deps = keys %deps;
-    my ($deps) = @{ $oq->_order_deps(\@deps) };
+    my ($deps) = $oq->_order_deps(@deps);
 
 
     @deps = ();
@@ -1853,10 +2047,13 @@ sub prepare {
 # order is [ [dep1,dep2,dep3], [dep4,dep5,dep6] ], # cursor/dep order
 # idx is { dep1 => 0, dep4 => 1, .. etc ..  } # index of what cursor dep is in
 sub _order_deps {
-  my $oq = shift;
+  my ($oq, @deps) = @_;
   #$$oq{error_handler}->("DEBUG: \$oq->_order_deps(".Dumper(\@_).")\n") if $$oq{debug};
-  my $deps = shift;
-  $deps = [$deps] unless ref($deps) eq 'ARRAY';
+
+  # add always_join deps
+  foreach my $joinAlias (keys %{ $$oq{joins} }) {
+    push @deps, $joinAlias if $$oq{joins}{$joinAlias}[3]{always_join};
+  }
 
   # @order is an array of array refs. Where each array ref represents deps
   # for a separate cursor
@@ -1874,7 +2071,7 @@ sub _order_deps {
   # modfies @order & %idx 
   my $place_missing_deps;
   $place_missing_deps = sub {
-    my $dep = shift;
+    my ($dep) = @_;
 
     # detect infinite recursion
     $maxRecurse--;
@@ -1910,9 +2107,9 @@ sub _order_deps {
     return undef;
   };
 
-  $place_missing_deps->($_) for @$deps;
+  $place_missing_deps->($_) for @deps;
 
-  return [\@order, \%idx];
+  return (\@order, \%idx);
 }
 
 

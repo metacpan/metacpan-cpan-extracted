@@ -4,7 +4,7 @@ package Crypt::Digest::Tiger192;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u )] );
@@ -216,12 +216,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/Tiger_(cryptography)|http://en.wikipedia.org/wiki/Tiger_(cryptography)>
+=item * L<https://en.wikipedia.org/wiki/Tiger_(cryptography)>
 
 =back
 
 =cut
-
-__END__

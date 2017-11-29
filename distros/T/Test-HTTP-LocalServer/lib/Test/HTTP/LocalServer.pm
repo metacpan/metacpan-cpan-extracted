@@ -19,7 +19,7 @@ use Cwd;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = '0.59';
+$VERSION = '0.60';
 
 =head1 NAME
 
@@ -90,6 +90,40 @@ The following entries will be removed from C<%ENV>:
 
 =cut
 
+sub spawn_child_win32 { my ( $self, @cmd ) = @_;
+    system(1, @cmd)
+}
+
+sub spawn_child_posix { my ( $self, @cmd ) = @_;
+    require POSIX;
+    POSIX->import("setsid");
+
+    # daemonize
+    defined(my $pid = fork())   || die "can't fork: $!";
+    if( $pid ) {    # non-zero now means I am the parent
+        return $pid;
+    };
+    #chdir("/")                  || die "can't chdir to /: $!";
+
+    # We are the child, close about everything, then exec
+    (setsid() != -1)            || die "Can't start a new session: $!";
+    #open(STDERR, ">&STDOUT")    || die "can't dup stdout: $!";
+    #open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
+    #open(STDOUT, "> /dev/null") || die "can't write to /dev/null: $!";
+    exec @cmd or warn $!;
+}
+
+sub spawn_child { my ( $self, @cmd ) = @_;
+    my ($pid);
+    if( $^O =~ /mswin/i ) {
+        $pid = $self->spawn_child_win32(@cmd)
+    } else {
+        $pid = $self->spawn_child_posix(@cmd)
+    };
+
+    return $pid
+}
+
 sub spawn {
   my ($class,%args) = @_;
   my $self = { %args };
@@ -110,8 +144,8 @@ sub spawn {
     push @{$self->{delete}},$tempfile;
     $args{file} = $tempfile;
   };
-  my ($fh,$logfile) = File::Temp::tempfile();
-  close $fh;
+  my ($tmpfh,$logfile) = File::Temp::tempfile();
+  close $tmpfh;
   push @{$self->{delete}},$logfile;
   $self->{logfile} = $logfile;
   my $web_page = delete $args{file} || "";
@@ -120,35 +154,26 @@ sub spawn {
   $file =~ s!::!/!g;
   $file .= '.pm';
   my $server_file = File::Spec->catfile( dirname( $INC{$file} ),'log-server' );
-  my @opts;
+  my ($fh,$url_file) = File::Temp::tempfile;
+  close $fh; # race condition, but oh well
+  my @opts = ("-f", $url_file);
   push @opts, "-e" => delete($args{ eval })
       if $args{ eval };
 
-  my @cmd=( "-|", $^X, $server_file, $web_page, $logfile, @opts );
-  if( $^O =~ /mswin/i ) {
-    # Windows Perl doesn't support pipe-open with list
-    shift @cmd; # remove pipe-open
-    @cmd= join " ", map {qq{"$_"}} @cmd;
-  };
+  my @cmd=( $^X, $server_file, $web_page, $logfile, @opts );
+  my $pid = $self->spawn_child(@cmd);
+  sleep 1; # overkill, but good enough for the moment
 
-  my ($pid,$server);
-  if( @cmd > 1 ) {
-    # We can do a proper pipe-open
-    my $mode = shift @cmd;
-    $pid = open $server, $mode, @cmd
-      or croak "Couldn't spawn local server $server_file : $!";
-  } else {
-            # We can't do a proper pipe-open, so do the single-arg open
-            # in the hope that everything has been set up properly
-    $pid = open $server, "$cmd[0] |"
-      or croak "Couldn't spawn local server $server_file : $!";
-  };
+  open my $server, '<', $url_file
+      or die "Couldn't read back URL from '$url_file': $!";
+
   my $url = <$server>;
+  close $server;
+  unlink $url_file;
   chomp $url;
   die "Couldn't read back local server url"
       unless $url;
 
-  $self->{_fh} = $server;
   $self->{_pid} = $pid;
   $self->{_server_url} = URI::URL->new($url);
 
@@ -188,9 +213,17 @@ url.
 =cut
 
 sub stop {
-  get( $_[0]->{_server_url} . "quit_server" );
-  close $_[0]->{_fh};
-  undef $_[0]->{_server_url}
+    get( $_[0]->{_server_url} . "quit_server" );
+    undef $_[0]->{_server_url};
+    wait;
+    #my $retries = 10;
+    #while(--$retries and CORE::kill( 0 => $_[0]->{ _pid } )) {
+        #warn "Waiting for '$_[0]->{ _pid }'";
+        #sleep 1; # to give the child a chance to go away
+    #};
+    #if( ! $retries ) {
+        #$_[0]->kill;
+    #};
 };
 
 =head2 C<< $server->kill >>
@@ -201,10 +234,9 @@ cannot be retrieved then.
 =cut
 
 sub kill {
-  CORE::kill( 'SIGKILL' => $_[0]->{ _pid } );
-  #print wait;
-  my $fh = delete $_[0]->{_fh};
-  close $fh;
+  CORE::kill( 'KILL' => $_[0]->{ _pid } )
+      or warn "Couldn't kill pid '$_[0]->{ _pid }'";
+  wait;
   undef $_[0]->{_server_url};
   undef $_[0]->{_pid};
 };
@@ -262,6 +294,11 @@ sub local {
 
 =head1 URLs implemented by the server
 
+=head2 download C<< $server->download($name) >>
+
+This URL will send a file with a C<Content-Disposition> header and indicate
+the suggested filename as passed in.
+
 =head2 302 redirect C<< $server->redirect($target) >>
 
 This URL will issue a redirect to C<$target>. No special care is taken
@@ -290,6 +327,14 @@ socket with an error after 2 blocks of 16 spaces have been sent.
 This URL will return 5 blocks of 16 spaces at a rate of one block per second
 in a chunked response.
 
+=head2 Surprisingly large bzip2 encoded response C<< $server->bzip2 >>
+
+This URL will return a short HTTP response that expands to 16M body.
+
+=head2 Surprisingly large gzip encoded response C<< $server->gzip >>
+
+This URL will return a short HTTP response that expands to 16M body.
+
 =head2 Other URLs
 
 All other URLs will echo back the cookies and query parameters.
@@ -304,7 +349,10 @@ use vars qw(%urls);
     'error_timeout' => 'error/timeout/%s',
     'error_close' => 'error/close/%s',
     'error_after_headers' => 'error/after_headers',
+    'gzip' => 'large/gzip/16M',
+    'bzip2' => 'large/bzip/16M',
     'chunked' => 'chunks',
+    'download' => 'download/%s',
 );
 for (keys %urls) {
     no strict 'refs';

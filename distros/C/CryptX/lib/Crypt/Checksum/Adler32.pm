@@ -2,8 +2,10 @@ package Crypt::Checksum::Adler32;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
+
 use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 sub addfile {

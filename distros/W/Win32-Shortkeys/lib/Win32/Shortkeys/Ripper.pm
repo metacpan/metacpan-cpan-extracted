@@ -28,7 +28,18 @@ my $keepsit;
 my $afterstarttag;
 my $beforestarttag;
 
-=head2 C<Win32::Shortkeys::Ripper::catch( shk_file => "shortkey_utf8.xml", tmp_file => "mytmp.txt", shk_old => "shortkeys_utf8.xml_old.txt", encoding => "UTF-8", properties => "ripper.properties")>
+=head1 SYNOPSIS
+
+        Win32::Shortkeys::Ripper::catch( 
+            shk_file => "shortkey_utf8.xml", 
+            tmp_file => "mytmp.txt", 
+            shk_old => "shortkeys_utf8.xml_old.txt", 
+            encoding => "UTF-8", 
+            properties => "ripper.properties"
+        );
+
+Make a backup of shortkeys_utf8.xml in shortkeys_utf8.xml_old.txt and remove the content of the data elememts in shortkeys_utf8.xml. 
+Other parameters are given in a properties file described below.
 
 Default values 
 
@@ -199,12 +210,6 @@ sub get_rtl {
 
     return $rtl;
 }
-=head1 SYNOPSIS
-
-     Win32::Shortkeys::Ripper::catch( shk_file => "shortkeys_utf8.xml", old_file => "shortkeys_utf8.xml_old.txt");
-
-Make a backup of shortkeys_utf8.xml in shortkeys_utf8.xml_old.txt and remove the content of the data elememts in shortkeys_utf8.xml. 
-Other parameters are given in a properties file described below.
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop;
-$ZMQ::Raw::Loop::VERSION = '0.17';
+$ZMQ::Raw::Loop::VERSION = '0.19';
 use strict;
 use warnings;
 use Carp;
@@ -18,6 +18,8 @@ BEGIN
 		promises
 		events
 		terminated
+
+		tevent
 	/;
 
 	no strict 'refs';
@@ -42,7 +44,7 @@ ZMQ::Raw::Loop - Loop class
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -96,22 +98,33 @@ sub new
 		promises => [],
 	};
 
-	return bless $self, $class;
+	my $obj = bless $self, $class;
+	$obj->tevent (ZMQ::Raw::Loop::Event->new ($context,
+			on_set => sub
+			{
+				$obj->terminated (1);
+			}
+		)
+	);
+	return $obj;
 }
+
+
 
 sub run
 {
 	my ($this) = @_;
 
 	$this->terminated (0);
-	while (!$this->terminated)
+	$this->tevent->reset();
+	$this->add ($this->tevent);
+
+	while (!$this->terminated && $this->poller->size > 1)
 	{
-		if (!$this->run_one)
-		{
-			# nothing left, terminate
-			$this->terminate();
-		}
+		$this->run_one;
 	}
+
+	$this->remove ($this->tevent);
 
 	$this->_cancel_timers();
 	$this->_cancel_events();
@@ -127,10 +140,10 @@ sub run_one
 
 	if ($this->poller->size)
 	{
-		if ($this->poller->wait (-1))
+		my $count = $this->poller->wait (-1);
+		if ($count)
 		{
 			$this->_dispatch_events() || $this->_dispatch_handles() || $this->_dispatch_timers();
-
 			$this->promises ([grep { $_->status == ZMQ::Raw::Loop::Promise->PLANNED } @{$this->promises}]);
 		}
 
@@ -176,6 +189,11 @@ sub _add_timer
 
 	$timer->loop ($this);
 	$this->poller->add ($timer->timer->socket, ZMQ::Raw->ZMQ_POLLIN);
+
+	if (!$timer->running)
+	{
+		$timer->reset();
+	}
 
 	push @{$this->timers}, $timer;
 }
@@ -303,7 +321,6 @@ sub _remove_handle
 			{
 				$this->poller->remove ($timer->socket);
 				$timer->cancel();
-				$timer->socket->recv (ZMQ::Raw->ZMQ_DONTWAIT);
 			}
 
 			next;
@@ -327,14 +344,12 @@ sub _remove_event
 		if ($e == $event)
 		{
 			$this->poller->remove ($event->read_handle);
-			$event->read_handle->recv (ZMQ::Raw->ZMQ_DONTWAIT);
 
 			my $timer = $event->timer;
 			if ($timer)
 			{
-				$timer->cancel();
-				$timer->socket->recv (ZMQ::Raw->ZMQ_DONTWAIT);
 				$this->poller->remove ($timer->socket);
+				$timer->cancel();
 			}
 
 			next;
@@ -402,6 +417,7 @@ sub _dispatch_events
 		my $events = $this->poller->events ($event->read_handle);
 		if ($events)
 		{
+			$event->reset();
 			$this->_remove_event ($event);
 
 			my $set = $event->on_set;
@@ -414,6 +430,7 @@ sub _dispatch_events
 			my $events = $this->poller->events ($event->timer->socket);
 			if ($events)
 			{
+				$event->reset();
 				$this->_remove_event ($event);
 
 				my $timeout = $event->on_timeout;
@@ -462,15 +479,12 @@ sub _cancel_timers
 {
 	my ($this) = @_;
 
+AGAIN:
 	foreach my $timer (@{$this->timers})
 	{
-		$timer->timer->cancel();
-
-		my $socket = $timer->timer->socket;
-		$this->poller->remove ($socket);
+		$timer->cancel();
+		goto AGAIN;
 	}
-
-	$this->timers ([]);
 }
 
 
@@ -528,10 +542,11 @@ sub _clear_promises
 sub terminate
 {
 	my ($this) = @_;
-	$this->terminated (1);
+
+	$this->tevent->set;
 }
 
-=for Pod::Coverage context handles events poller timers promises terminated
+=for Pod::Coverage context handles events poller timers promises terminated tevent
 
 =head1 AUTHOR
 

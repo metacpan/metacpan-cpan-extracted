@@ -11,15 +11,22 @@
         "x-mojo-to": "listPets",
         "parameters": [
           { "in": "path", "name": "type", "type": "string", "required": true },
-          { "in": "query", "name": "p", "type": "integer" }
+          { "$ref": "#/parameters/p" }
+
         ],
         "responses": {
           "200": {
             "description": "pet response",
-            "schema": { "type": "array" }
+            "schema": { "$ref": "#/definitions/r" }
           }
         }
       }
     }
+  },
+  "definitions": {
+    "r": { "type": "array" }
+  },
+  "parameters": {
+    "p": { "in": "query", "name": "p", "type": "integer" }
   }
 }

@@ -42,9 +42,9 @@
 // weekends/holidays and which are not.
 //
 // In the success function of that AJAX call, populate the haw ("holidays and
-// weekends") object from the AJAX payload. A function "isHolidayOrWeekend()"
-// will be implemented, which will take a date string, canonicalize it, and
-// look it up in the "haw" lookup object, and return true or false as
+// weekends") object from the AJAX payload. A function "holidayOrWeekend()"
+// takes each date string, canonicalizes it, and
+// looks it up in the "haw" lookup object, and return true or false as
 // appropriate.
 //
 // Next, the intervals-to-be-viewed array will be processed. First, to each
@@ -54,22 +54,13 @@
 // (e.g. "08:00-08:10") into a startTime-duration object (e.g. { "startTime":
 // "08:00", "duration": "10" } where "duration" is always in minutes.
 //
-// Now, haw contains all information needed to draw the canvases.
+// Now, haw contains all information needed to construct the SVG blocks.
 //
-// Iterate over haw, creating canvases. The first and last canvases created
-// should be scale canvases.  When a non-holiday/weekend date is detected
-// immediately following a holiday/weekend date (that means Monday), insert a
-// scale canvas unless it is the first or last date in haw. Populate the 
-// scale canvases with scales.
+// Iterate over haw, writing SVG blocks. When a non-holiday/weekend date is
+// detected immediately following a holiday/weekend date (that means Monday),
+// insert a scale SVG block unless it is the first or last date in haw.
 //
-// Iterate over haw again, populating the date canvases with attendance
-// intervals. For each interval, get the full activity object using
-// appCaches.getActivityByAID() and obtain the color from the "color" property.
-// 
-// Iterate over haw one last time, to draw dates.  Draw holiday/weekend dates
-// using strokeText, and the rest using fillText.
-//
-// At the end, draw a legend linking the colors to activity codes and writing
+// At the end, draw a legend linking the colors to activity codes and write
 // the total number of hours associated with each activity code.
 //
 //
@@ -102,7 +93,7 @@ define ([
                 date,
                 i,
                 r = '',
-                lwhow = false;
+                lwhow = false; // "Last [date] Was a Holiday Or Weekend"
             console.log("currentUserObject", cu);
             if (cu.fullname) {
                 r += '<b>' + cu.fullname + '</b>';
@@ -114,7 +105,7 @@ define ([
             r += '<br><br>';
             r += svgLib.dayViewerScale();
             for (i = 0; i < sortedDates.length; i += 1) {
-                // draw a new scale, if needed, for each week, more or less
+                // draw new scale if needed (for each week, more or less)
                 date = sortedDates[i];
                 if (lwhow && ! holidayOrWeekend(date) && i !== sortedDates.length - 1) {
                     r += svgLib.dayViewerScale();
@@ -150,7 +141,7 @@ define ([
                     } else if (st.code === 'DISPATCH_NO_SCHEDULED_INTERVALS_IDENTIFIED') {
                         // do nothing, for the time being
                     } else {
-                        console.log("CRITICAL ERROR: unexpected \"interval/scheduled\" status code " + st.code);
+                        throw "unexpected \"interval/scheduled\" status code " + st.code;
                     }
                     $('#dcallback').html(entryPoint(obj));
                 };
@@ -169,7 +160,7 @@ define ([
                     rv = true;
                 }
             } else {
-                console.log("CRITICAL ERROR: haw lookup failed (unexpectedly) for key " + d);
+                throw "haw lookup failed (unexpectedly) for key " + d;
             }
             return rv;
         },
@@ -211,7 +202,7 @@ define ([
                         }
                         addScheduledIntervals(obj);
                     } else {
-                        console.log("CRITICAL ERROR: unexpected holidays status code " + st.code);
+                        throw "unexpected holidays status code " + st.code;
                     }
                 };
             ajax(rest, sc);

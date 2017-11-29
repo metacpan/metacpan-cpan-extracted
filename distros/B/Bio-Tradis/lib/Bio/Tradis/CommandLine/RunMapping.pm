@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::RunMapping;
-$Bio::Tradis::CommandLine::RunMapping::VERSION = '1.3.3';
+$Bio::Tradis::CommandLine::RunMapping::VERSION = '1.4.0';
 # ABSTRACT: Perform mapping
 
 
@@ -123,7 +123,7 @@ Bio::Tradis::CommandLine::RunMapping - Perform mapping
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

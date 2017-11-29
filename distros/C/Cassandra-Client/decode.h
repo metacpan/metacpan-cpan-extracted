@@ -2,4 +2,4 @@
 #include "perl.h"
 #include "define.h"
 
-void decode_cell(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_type *type, SV *output);
+void decode_cell(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, struct cc_type *type, SV *output);

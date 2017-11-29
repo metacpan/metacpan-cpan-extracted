@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Handle;
-$ZMQ::Raw::Loop::Handle::VERSION = '0.17';
+$ZMQ::Raw::Loop::Handle::VERSION = '0.19';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ ZMQ::Raw::Loop::Handle - Handle class
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 

@@ -22,6 +22,7 @@ print CGI::header(),
 <html>
 <head>
 <title>CGI::OptimalQuery - dynamic SQL query viewer</title>
+<script src='/OptimalQuery/jquery.js'></script>
 </head>
 <body>
 <h1>Example App Dashboard</h1>

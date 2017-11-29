@@ -1,6 +1,6 @@
 package Neovim::RPC::API::AutoDiscover;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::API::AutoDiscover::VERSION = '1.0.0';
+$Neovim::RPC::API::AutoDiscover::VERSION = '1.0.1';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Neovim::RPC::API::AutoDiscover
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

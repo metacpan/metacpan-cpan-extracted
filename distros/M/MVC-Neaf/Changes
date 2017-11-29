@@ -1,5 +1,8 @@
 Revision history for MVC-Neaf
 
+0.1901  Wed Nov 29 2017
+        - BUG Fix local SIG{WARN} on load that caused havoc
+
 0.19    Fri Nov 24 2017
         - CLI Add --listen option to CLI interface
         - API Add exp. path_info_split method to fetch regex capture groups

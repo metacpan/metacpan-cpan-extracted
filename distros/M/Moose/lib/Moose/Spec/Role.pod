@@ -13,7 +13,7 @@ Moose::Spec::Role - Formal spec for Role behavior
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 DESCRIPTION
 

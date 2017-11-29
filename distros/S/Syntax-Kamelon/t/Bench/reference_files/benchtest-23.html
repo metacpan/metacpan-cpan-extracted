@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">/*&nbsp;test.js&nbsp;-&nbsp;test&nbsp;for&nbsp;javascript.xml&nbsp;syntax&nbsp;file&nbsp;*/</font></br></div>
+<div id="2" class="line"><font class="Comment">//&nbsp;Note:&nbsp;this&nbsp;script&nbsp;will&nbsp;not,&nbsp;and&nbsp;is&nbsp;not&nbsp;supposed&nbsp;to,&nbsp;comile&nbsp;in&nbsp;any&nbsp;js&nbsp;engine.</font></br></div>
+<div id="3" class="line"></br></div>
+<div id="4" class="line"><font class="Comment">/*&nbsp;</font></br></div>
+<div id="5" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;</font><font class="Alert">NOTE</font><font class="Comment">:&nbsp;The&nbsp;words&nbsp;&quot;todo&quot;,&nbsp;&quot;fixme&quot;&nbsp;and&nbsp;&quot;note&quot;&nbsp;should&nbsp;be&nbsp;rendered&nbsp;in&nbsp;a&nbsp;different&nbsp;style</font></br></div>
+<div id="6" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;within&nbsp;comments,&nbsp;match&nbsp;should&nbsp;be&nbsp;caseless&nbsp;(to&nbsp;test&nbsp;for&nbsp;regexp&nbsp;insensitive&nbsp;attribute).</font></br></div>
+<div id="7" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;The&nbsp;regex&nbsp;used&nbsp;for&nbsp;this&nbsp;rule&nbsp;is&nbsp;*/</font></br></div>
+<div id="8" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;String&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">\b(?</font><font class="SpecialString">:fixme</font><font class="SpecialChar">|</font><font class="SpecialString">todo</font><font class="SpecialChar">|</font><font class="SpecialString">note</font><font class="SpecialChar">)\b</font><font class="SpecialString">/</font></br></div>
+<div id="9" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">/*&nbsp;Thus,&nbsp;&nbsp;for&nbsp;example&nbsp;&quot;Notebook&quot;&nbsp;is&nbsp;not&nbsp;caught&nbsp;by</font></br></div>
+<div id="10" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;this&nbsp;rule.&nbsp;(the&nbsp;&quot;?:&quot;&nbsp;in&nbsp;the&nbsp;subpattern&nbsp;is&nbsp;there&nbsp;to&nbsp;avoid&nbsp;the&nbsp;regex&nbsp;engine&nbsp;wasting&nbsp;time</font></br></div>
+<div id="11" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;saving&nbsp;a&nbsp;backref,&nbsp;which&nbsp;is&nbsp;not&nbsp;used&nbsp;for&nbsp;anything.&nbsp;I&nbsp;do&nbsp;not&nbsp;know&nbsp;if&nbsp;the&nbsp;overhead&nbsp;of&nbsp;parsing</font></br></div>
+<div id="12" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;that&nbsp;is&nbsp;greater&nbsp;than&nbsp;the&nbsp;time&nbsp;saved&nbsp;by&nbsp;not&nbsp;capturing&nbsp;the&nbsp;text...)</font></br></div>
+<div id="13" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;The&nbsp;rule&nbsp;for&nbsp;catching&nbsp;these&nbsp;words&nbsp;is&nbsp;placed&nbsp;in&nbsp;a&nbsp;context&nbsp;&quot;Comment&nbsp;common&quot;,&nbsp;which&nbsp;is&nbsp;used</font></br></div>
+<div id="14" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;by&nbsp;both&nbsp;comment&nbsp;contexts&nbsp;(single&nbsp;line,&nbsp;multiline)&nbsp;using&nbsp;the&nbsp;new&nbsp;&quot;IncludeRules&quot;&nbsp;item.</font></br></div>
+<div id="15" class="line"><font class="Comment">*/</font></br></div>
+<div id="16" class="line"></br></div>
+<div id="17" class="line"><font class="Comment">//&nbsp;test&nbsp;if&nbsp;regex&nbsp;support&nbsp;works&nbsp;-&nbsp;nice&nbsp;with&nbsp;new&nbsp;fallthrough&nbsp;prop&nbsp;in&nbsp;context:)</font></br></div>
+<div id="18" class="line"><font class="Variable">somestring</font><font class="Normal">.</font><font class="Attribute">replace</font><font class="Normal">(&nbsp;</font><font class="SpecialString">/dooh/</font><font class="Normal">&nbsp;</font><font class="Operator">,</font><font class="Normal">&nbsp;</font><font class="String">&quot;bah!&quot;</font><font class="Normal">)</font><font class="Operator">;</font></br></div>
+<div id="19" class="line"><font class="Normal">re</font><font class="Operator">=</font><font class="SpecialString">/foo/ig</font><font class="Operator">;</font><font class="Normal">&nbsp;</font><font class="Comment">//&nbsp;hehe</font></br></div>
+<div id="20" class="line"></br></div>
+<div id="21" class="line"><font class="Variable">somestring</font><font class="Normal">.</font><font class="Attribute">search</font><font class="Normal">(</font></br></div>
+<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">^</font><font class="SpecialString">foo</font><font class="SpecialChar">\w+\s\d{0,15}$</font><font class="SpecialString">/</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</font><font class="Operator">;</font></br></div>
+<div id="24" class="line"></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;re&nbsp;</font><font class="Operator">=</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="SpecialString">/dooh/</font><font class="Operator">;</font></br></div>
+<div id="27" class="line"></br></div>
+<div id="28" class="line"><font class="Comment">//&nbsp;This&nbsp;is&nbsp;supposedly&nbsp;legal:</font></br></div>
+<div id="29" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;somebool&nbsp;</font><font class="Operator">?</font><font class="Normal">&nbsp;</font><font class="SpecialString">/foo/</font><font class="Normal">&nbsp;:&nbsp;</font><font class="SpecialString">/bar/</font><font class="Operator">;</font></br></div>
+<div id="30" class="line"></br></div>
+<div id="31" class="line"><font class="Comment">//&nbsp;</font><font class="Alert">NOTE</font><font class="Comment">&nbsp;-&nbsp;Special&nbsp;case:&nbsp;an&nbsp;empty&nbsp;regex,&nbsp;not&nbsp;a&nbsp;comment.</font></br></div>
+<div id="32" class="line"><font class="Comment">//&nbsp;The&nbsp;rule&nbsp;uses&nbsp;a&nbsp;positive&nbsp;lookahead&nbsp;assertion&nbsp;to&nbsp;catch&nbsp;it:&nbsp;&quot;//(?=;)&quot;.</font></br></div>
+<div id="33" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Comment">//;</font></br></div>
+<div id="34" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/a</font><font class="SpecialChar">|</font><font class="SpecialString">b/</font><font class="Operator">;</font></br></div>
+<div id="35" class="line"></br></div>
+<div id="36" class="line"><font class="Comment">/*</font></br></div>
+<div id="37" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;Tests&nbsp;for&nbsp;the&nbsp;regex&nbsp;parser.</font></br></div>
+<div id="38" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;It&nbsp;will&nbsp;parse&nbsp;classes,&nbsp;quanitfiers,&nbsp;special&nbsp;characters&nbsp;and&nbsp;regex&nbsp;operaters,</font></br></div>
+<div id="39" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;as&nbsp;specified&nbsp;in&nbsp;the&nbsp;netscape&nbsp;documentation&nbsp;for&nbsp;javascript.</font></br></div>
+<div id="40" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;Regexps&nbsp;are&nbsp;only&nbsp;parsed&nbsp;in&nbsp;their&nbsp;clean&nbsp;form,&nbsp;as&nbsp;the&nbsp;RegExp(string)&nbsp;constructor</font></br></div>
+<div id="41" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;is&nbsp;using&nbsp;a&nbsp;quoted&nbsp;string.</font></br></div>
+<div id="42" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;</font><font class="Alert">TODO</font><font class="Comment">:&nbsp;Find&nbsp;out&nbsp;if&nbsp;more&nbsp;regex&nbsp;feats&nbsp;should&nbsp;be&nbsp;supported.</font></br></div>
+<div id="43" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consider&nbsp;using&nbsp;more&nbsp;itemDatas&nbsp;-&nbsp;assertion,&nbsp;quantifier&nbsp;are&nbsp;options.</font></br></div>
+<div id="44" class="line"><font class="Comment">*/</font></br></div>
+<div id="45" class="line"></br></div>
+<div id="46" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">^</font><font class="SpecialString">text</font><font class="SpecialChar">\s+\d+\s*$</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="47" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/a&nbsp;pattern&nbsp;with&nbsp;caret&nbsp;</font><font class="SpecialChar">\(</font><font class="SpecialString">^</font><font class="SpecialChar">\)</font><font class="SpecialString">&nbsp;in&nbsp;it/</font><font class="Operator">;</font></br></div>
+<div id="48" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">(\d{0,4})\D</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="49" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">[a-zA-Z_]+</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="50" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">[^\d^]+</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="51" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">\s+?\w+\.$</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="52" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/</font><font class="SpecialChar">\/\/</font><font class="SpecialString">/</font><font class="Operator">;</font></br></div>
+<div id="53" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="SpecialString">/a</font><font class="SpecialChar">|</font><font class="SpecialString">b/</font><font class="Operator">;</font></br></div>
+<div id="54" class="line"></br></div>
+<div id="55" class="line"><font class="Comment">//&nbsp;a&nbsp;test&nbsp;if&nbsp;#pop&nbsp;back&nbsp;from&nbsp;a&nbsp;comment&nbsp;will&nbsp;work</font></br></div>
+<div id="56" class="line"><font class="Normal">re&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Comment">/*/foo/*/</font><font class="Normal">&nbsp;</font><font class="SpecialString">/bar/</font><font class="Operator">;</font></br></div>
+<div id="57" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;POP</font></br></div>
+<div id="58" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;we&nbsp;got&nbsp;back&nbsp;after&nbsp;pop&nbsp;in&nbsp;comment,&nbsp;if&nbsp;there&nbsp;is&nbsp;regexp&nbsp;attribs&nbsp;here&nbsp;:-)</font></br></div>
+<div id="59" class="line"></br></div>
+<div id="60" class="line"><font class="Comment">/*</font></br></div>
+<div id="61" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;Some&nbsp;tests&nbsp;if&nbsp;the&nbsp;fallthrough&nbsp;works.</font></br></div>
+<div id="62" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;The&nbsp;fallthrough&nbsp;happens&nbsp;if&nbsp;a&nbsp;regexp&nbsp;is&nbsp;not&nbsp;found&nbsp;in&nbsp;a&nbsp;possible&nbsp;(!)&nbsp;position,</font></br></div>
+<div id="63" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;which&nbsp;is&nbsp;after&nbsp;&quot;search(&quot;&nbsp;or&nbsp;&quot;replace(&quot;&nbsp;or&nbsp;&quot;=&quot;&nbsp;or&nbsp;&quot;?&quot;&nbsp;or&nbsp;&quot;:&quot;&nbsp;in&nbsp;version&nbsp;0.1&nbsp;of&nbsp;the&nbsp;xml&nbsp;file</font></br></div>
+<div id="64" class="line"><font class="Comment">*/</font></br></div>
+<div id="65" class="line"></br></div>
+<div id="66" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;foo&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="String">'bar'</font><font class="Operator">;</font></br></div>
+<div id="67" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;fallthrough!</font></br></div>
+<div id="68" class="line"></br></div>
+<div id="69" class="line"></br></div>
+<div id="70" class="line"><font class="Variable">somestring</font><font class="Normal">.</font><font class="Attribute">replace</font><font class="Normal">(&nbsp;</font><font class="Keyword">new</font><font class="Normal">&nbsp;</font><font class="Attribute">RegExp</font><font class="Normal">(</font><font class="String">&quot;\</font><font class="SpecialChar">\b</font><font class="String">\\w+\</font><font class="SpecialChar">\b</font><font class="String">&quot;</font><font class="Normal">)</font><font class="Operator">,</font><font class="Normal">&nbsp;</font><font class="String">&quot;word:&nbsp;$1&quot;</font><font class="Normal">)</font><font class="Operator">;</font></br></div>
+<div id="71" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;fallthrough&nbsp;expected.&nbsp;(&quot;new&quot;&nbsp;whould&nbsp;be&nbsp;bold)</font></br></div>
+<div id="72" class="line"></br></div>
+<div id="73" class="line"></br></div>
+<div id="74" class="line"><font class="Variable">something</font><font class="Normal">.</font><font class="Attribute">method</font><font class="Normal">&nbsp;</font><font class="Operator">=</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">function</font><font class="Normal">&nbsp;(&nbsp;a</font><font class="Operator">,</font><font class="Normal">&nbsp;b</font><font class="Operator">,</font><font class="Normal">&nbsp;c&nbsp;)&nbsp;</font><font class="Operator">{</font><font class="Normal">&nbsp;</font><font class="Comment">/*&nbsp;...&nbsp;*/</font><font class="Normal">&nbsp;</font><font class="Operator">}</font></br></div>
+<div id="76" class="line"><font class="Comment">//&nbsp;&nbsp;^&nbsp;fallthrough&nbsp;?!</font></br></div>
+<div id="77" class="line"></br></div>
+<div id="78" class="line"><font class="Variable">something</font><font class="Normal">.</font><font class="Attribute">other</font><font class="Normal">&nbsp;</font><font class="Operator">=</font></br></div>
+<div id="79" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;(&nbsp;d</font><font class="Operator">,</font><font class="Normal">&nbsp;e</font><font class="Operator">,</font><font class="Normal">&nbsp;f&nbsp;)&nbsp;</font><font class="Operator">{</font><font class="Normal">&nbsp;</font><font class="Comment">/*&nbsp;...&nbsp;*/</font><font class="Normal">&nbsp;</font><font class="Operator">}</font></br></div>
+<div id="80" class="line"><font class="Comment">//&nbsp;fallthrough&nbsp;expected&nbsp;at&nbsp;col&nbsp;0&nbsp;(&quot;function&quot;&nbsp;should&nbsp;be&nbsp;bold)</font></br></div>
+<div id="81" class="line"></br></div>
+<div id="82" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;ary&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;</font><font class="Keyword">new</font><font class="Normal">&nbsp;</font><font class="Attribute">Array</font><font class="Normal">(</font><font class="Float">5</font><font class="Normal">)</font><font class="Operator">;</font></br></div>
+<div id="83" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;fallthrough&nbsp;?&nbsp;(if&nbsp;keyword&nbsp;is&nbsp;correctly&nbsp;rendered)</font></br></div>
+<div id="84" class="line"></br></div>
+<div id="85" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;b&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;a&nbsp;</font><font class="Operator">?</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;:&nbsp;</font><font class="Float">0</font><font class="Operator">;</font></br></div>
+<div id="86" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^&nbsp;&nbsp;&nbsp;^&nbsp;fallthroughs.&nbsp;numbers&nbsp;must&nbsp;be&nbsp;rendered&nbsp;correctly.</font></br></div>
+<div id="87" class="line"></br></div>
+<div id="88" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;c&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;d&nbsp;</font><font class="Operator">?</font><font class="Normal">&nbsp;</font><font class="Keyword">true</font><font class="Normal">&nbsp;:&nbsp;</font><font class="Keyword">false</font><font class="Operator">;</font></br></div>
+<div id="89" class="line"></br></div>
+<div id="90" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;conditinalstring&nbsp;</font><font class="Operator">=</font><font class="Normal">&nbsp;b&nbsp;</font><font class="Operator">?</font></br></div>
+<div id="91" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="String">&quot;something&quot;</font><font class="Normal">&nbsp;:</font></br></div>
+<div id="92" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="String">&quot;something&nbsp;else&quot;</font><font class="Operator">;</font></br></div>
+<div id="93" class="line"><font class="Comment">//&nbsp;guess...</font></br></div>
+<div id="94" class="line"></br></div>
+<div id="95" class="line"></br></div>
+<div id="96" class="line"><font class="Comment">/*</font></br></div>
+<div id="97" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;Normal&nbsp;program&nbsp;flow...</font></br></div>
+<div id="98" class="line"><font class="Comment">*/</font></br></div>
+<div id="99" class="line"></br></div>
+<div id="100" class="line"><font class="ControlFlow">if</font><font class="Normal">&nbsp;(something)</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Attribute">dostuff</font><font class="Normal">()</font><font class="Operator">;</font></br></div>
+<div id="102" class="line"><font class="ControlFlow">else</font></br></div>
+<div id="103" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Attribute">dont</font><font class="Normal">()</font><font class="Operator">;</font></br></div>
+<div id="104" class="line"></br></div>
+<div id="105" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">return</font><font class="Operator">;</font></br></div>
+<div id="106" class="line"></br></div>
+<div id="107" class="line"><font class="ControlFlow">try</font><font class="Normal">&nbsp;</font><font class="Operator">{</font><font class="Normal">&nbsp;</font><font class="Attribute">bla</font><font class="Normal">()&nbsp;</font><font class="Operator">}</font><font class="Normal">&nbsp;</font><font class="ControlFlow">catch</font><font class="Normal">&nbsp;(e)&nbsp;</font><font class="Operator">{</font><font class="Normal">&nbsp;</font><font class="Attribute">alert</font><font class="Normal">(</font><font class="String">&quot;ERROR!&nbsp;:&nbsp;&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;e)&nbsp;</font><font class="Operator">}</font></br></div>
+<div id="108" class="line"></br></div>
+<div id="109" class="line"><font class="ControlFlow">for</font><font class="Normal">&nbsp;(int&nbsp;i</font><font class="Operator">=</font><font class="Float">0</font><font class="Operator">;</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Operator">&lt;</font><font class="Normal">&nbsp;j</font><font class="Operator">;</font><font class="Normal">&nbsp;i</font><font class="Operator">++</font><font class="Normal">)</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Variable">document</font><font class="Normal">.</font><font class="Attribute">write</font><font class="Normal">(</font><font class="String">&quot;i&nbsp;is&quot;</font><font class="Normal">&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Operator">+</font><font class="Normal">&nbsp;</font><font class="String">&quot;&lt;br&gt;&quot;</font><font class="Normal">)</font><font class="Operator">;</font></br></div>
+<div id="111" class="line"></br></div>
+<div id="112" class="line"><font class="ControlFlow">while</font><font class="Normal">&nbsp;(something)</font></br></div>
+<div id="113" class="line"><font class="Operator">{</font></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Attribute">block</font><font class="Normal">()</font><font class="Operator">;</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DataType">picky</font><font class="Operator">:</font></br></div>
+<div id="116" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">if</font><font class="Normal">&nbsp;(</font><font class="Operator">!</font><font class="Float">1</font><font class="Normal">)</font></br></div>
+<div id="117" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">break</font><font class="Operator">;</font></br></div>
+<div id="118" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">else</font></br></div>
+<div id="119" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="ControlFlow">continue</font><font class="Operator">;</font></br></div>
+<div id="120" class="line"><font class="Operator">}</font></br></div>
+<div id="121" class="line"></br></div>
+<div id="122" class="line"><font class="ControlFlow">with</font><font class="Normal">&nbsp;(a)&nbsp;</font><font class="Operator">{</font></br></div>
+<div id="123" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">do</font><font class="Normal">&nbsp;</font><font class="Operator">{</font></br></div>
+<div id="124" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Attribute">stuff</font><font class="Normal">(&nbsp;b&nbsp;)</font><font class="Operator">;</font><font class="Normal">&nbsp;</font><font class="Comment">//&nbsp;a.b&nbsp;if&nbsp;it&nbsp;exists</font></br></div>
+<div id="125" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Operator">}</font><font class="Normal">&nbsp;</font><font class="ControlFlow">while</font><font class="Normal">&nbsp;(itmakessense)</font><font class="Operator">;</font></br></div>
+<div id="126" class="line"><font class="Operator">}</font></br></div>
+<div id="127" class="line"></br></div>
+<div id="128" class="line"><font class="ControlFlow">switch</font><font class="Normal">&nbsp;(i)&nbsp;</font><font class="Operator">{</font></br></div>
+<div id="129" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">case</font><font class="Normal">&nbsp;</font><font class="Float">0</font><font class="Operator">:</font></br></div>
+<div id="130" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Attribute">f</font><font class="Normal">()</font><font class="Operator">;</font></br></div>
+<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">break</font><font class="Operator">;</font></br></div>
+<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DataType">default</font><font class="Operator">:</font></br></div>
+<div id="133" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">break</font><font class="Operator">;</font></br></div>
+<div id="134" class="line"><font class="Operator">}</font></br></div>
+</div>
+</body>
+</html>
+

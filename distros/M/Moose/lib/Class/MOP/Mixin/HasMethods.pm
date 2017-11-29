@@ -1,5 +1,5 @@
 package Class::MOP::Mixin::HasMethods;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use strict;
 use warnings;
@@ -240,7 +240,7 @@ Class::MOP::Mixin::HasMethods - Methods for metaclasses which have methods
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 DESCRIPTION
 

@@ -3,48 +3,48 @@ abstract: 'Perl library for accessing Cassandra using its binary network protoco
 author:
   - 'Tom van der Woerdt <tvdw@cpan.org>'
 build_requires:
-  AnyEvent: 0
-  Compress::LZ4: 0
-  Compress::Snappy: 0
-  Data::Dumper: 0
-  Devel::Cycle: 0
-  Test::More: 0
+  AnyEvent: '0'
+  Compress::LZ4: '0'
+  Compress::Snappy: '0'
+  Data::Dumper: '0'
+  Devel::Cycle: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Cassandra-Client
 requires:
-  Clone: 0.36
-  Devel::GlobalDestruction: 0.11
-  EV: 4
-  Encode: 0
-  Exporter: 0
-  IO::Socket::INET: 0
-  List::Util: 0
-  Math::BigInt: 0
-  Net::SSLeay: 1.63
-  POSIX: 0
-  Promises: 0.93
-  Ref::Util: 0.008
-  Scalar::Util: 0
-  Socket: 0
-  Sub::Current: 0
-  Time::HiRes: 0
-  XSLoader: 0
-  constant: 0
-  if: 0
-  overload: 0
-  perl: 5.010
-  strict: 0
-  vars: 0
-  warnings: 0
+  Clone: '0.36'
+  Devel::GlobalDestruction: '0.11'
+  EV: '4'
+  Encode: '0'
+  Exporter: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::INET6: '0'
+  List::Util: '0'
+  Net::SSLeay: '1.63'
+  Promises: '0.93'
+  Ref::Util: '0.008'
+  Scalar::Util: '0'
+  Socket: '0'
+  Sub::Current: '0'
+  Time::HiRes: '0'
+  XSLoader: '0'
+  constant: '0'
+  if: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/tvdw/perl-dbd-cassandra.git
-version: 0.13
+version: '0.14'
 x_authority: cpan:TVDW
-x_serialization_backend: 'YAML::Tiny version 1.41'
+x_serialization_backend: 'YAML::Tiny version 1.69'

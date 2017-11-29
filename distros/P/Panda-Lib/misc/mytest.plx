@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 use 5.012;
-use lib 'blib/lib', 'blib/arch';
 use feature 'say';
 use Benchmark qw/timethis timethese/;
 use Panda::Lib qw/hash_merge clone fclone crypt_xor compare :const/;

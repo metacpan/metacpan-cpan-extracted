@@ -44,7 +44,7 @@
    "provides" : {
       "MooX::LazierAttributes" : {
          "file" : "lib/MooX/LazierAttributes.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-LazierAttributes"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

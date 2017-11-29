@@ -63,7 +63,7 @@ unsupported options.
 
     % date -Iseconds
 
-Common configuration is stored in `~/.optex.d/optex.rc` file, and
+Common configuration is stored in `~/.optex.d/default.rc` file, and
 those rules are applied to all commands executed through **optex**.
 
 Actually, `--iso-8601` option can be defined simpler as this:

@@ -1,0 +1,199 @@
+NAME
+    ALBD Installation Guide
+
+TESTING PLATFORMS
+    ALBD has been developed and tested on Linux primarily using Perl.
+
+SYNOPSIS
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install
+
+DESCRIPTION
+    ALBD provides a system for performing ABC co-occurrence literature based
+    discovery using a variety of options, and association-based ranking
+    methods
+
+REQUIREMENTS
+    ALBD REQUIRES that the following software packages and data:
+
+  Programming Languages
+         Perl (version 5.16.3 or better)
+
+  CPAN Modules
+         UMLS::Association
+         UMLS::Interface
+
+  Required for some Methods:
+         MATLAB
+         MySQL (version 5 or better)
+
+INSTALLATION STAGES
+    The installation is broken into four stages:
+    Stage 1: Install Programming Languages If already installed you need at
+    minimum: - Perl version 5.16.3 or better
+    Stage 2: Install CPAN Modules
+    Stage 3: Install ALBD
+    Stage 4: Create an co-occurrence matrix
+
+  Stage 1: Install Programming Languages, if already installed go to Stage 2
+    Perl (version 5.16.3 or better) Perl is freely available at
+    <http://www.perl.org>. It is very likely that you will already have Perl
+    installed if you are using a Unix/Linux based system.
+
+  Stage 2 - Install CPAN modules, if already installed go to Stage 3
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install each of these via:
+
+         perl -MCPAN -e shell
+         > install <packageName>
+
+   UMLS::Interface
+    The core UMLS package provides a dictionary from content unqiue
+    identifiers (CUI) to their meanings in the Unified Medical Language
+    System. Refer to the UMLS::Interface documentation for how to install
+    the UMLS database on your system.
+
+    The package is freely available at:
+    <http://search.cpan.org/dist/UMLS-Interface/>
+
+   UMLS::Association
+    Use to calculate association scores used in most of the ranking method.
+
+    The package is freely available at:
+
+        <http://search.cpan.org/dist/UMLS-Association/>
+
+  Stage 3: Install ALBD package
+    The usual way to install the package is to run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    You will often need root access/superuser privileges to run make
+    install. The module can also be installed locally. To do a local
+    install, you need to specify a PREFIX option when you run 'perl
+    Makefile.PL'. For example,
+
+        perl Makefile.PL PREFIX=/home
+
+        or
+    
+        perl Makefile.PL LIB=/home/lib PREFIX=/home
+
+    will install UMLS-Interface into /home. The first method above will
+    install the modules in /home/lib/perl5/site_perl/5.16.3 (assuming you
+    are using version 5.16.3 of Perl; otherwise, the directory will be
+    slightly different). The second method will install the modules in
+    /home/lib. In either case the executable scripts will be installed in
+    /home/bin and the man pages will be installed in home/share.
+
+    Warning: do not put a dash or hyphen in front of PREFIX, or LIB
+
+    In your perl programs that you may write using the modules, you may need
+    to add a line like so
+
+       use lib '/home/lib/perl5/site_perl/5.16.3';
+
+    if you used the first method or
+
+       use lib '/home/lib';
+
+    if you used the second method. By doing this, the installed modules are
+    found by your program. To run the runDiscovery.pl program, you would
+    need to do
+
+       perl -I/home/lib/perl5/site_perl/5.16.3 runDiscovery.pl
+
+       or
+
+       perl -I/home/lib
+
+    Of course, you could also add the 'use lib' line to the top of the
+    program yourself, but you might not want to do that. You will need to
+    replace 5.8.3 with whatever version of Perl you are using. The preceding
+    instructions should be sufficient for standard and slightly non-standard
+    installations. However, if you need to modify other makefile options you
+    should look at the ExtUtils::MakeMaker documentation. Modifying other
+    makefile options is not recommended unless you really, absolutely, and
+    completely know what you're doing!
+
+    NOTE: If one (or more) of the tests run by 'make test' fails, you will
+    see a summary of the tests that failed, followed by a message of the
+    form "make: *** [test_dynamic] Error Y" where Y is a number between 1
+    and 255 (inclusive). If the number is less than 255, then it indicates
+    how many test failed (if more than 254 tests failed, then 254 will still
+    be shown). If one or more tests died, then 255 will be shown. For more
+    details, see:
+
+        <http://search.cpan.org/dist/Test-Simple/lib/Test/Builder.pm#EXIT_CODES>
+
+  Stage 4: Create an co-occurrence matrix
+    ALBD requires that a co-occurrence matrix of CUIs has been created. This
+    matrix is stored as a flat file, in a sparse matrix format such that
+    each line contains three tab seperated values, cui_1, cui_2, n_11 = the
+    count of their co-occurrences. Any matrix with that format is
+    acceptable, however the intended method of matrix generation is to
+    convert a UMLS::Association database into a flat matrix file. These
+    databases are created using the CUICollector tool of UMLS::Association,
+    and are run over the MetaMapped Medline baseline. With that file, run
+    utils/datasetCreator/fromMySQL/dbToTab.pl to convert the desired
+    database into a matrix file. Notice that code in dbToTab.pl is just a
+    sample mysql command. If the input database is created in another
+    method, a different command may be needed. As long as the resulting
+    co-occurrence matrix is in the correct format LBD may be run on it. This
+    allows flexibility in where co-occurrence information comes from.
+
+    Note: utils/datasetCreator/fromMySQL/removeQuotes.pl may need to be run
+    on the resulting tab seperated file, if quotes are inlcuded in the
+    resulting co-ocurrence matrix file.
+
+  Stage 5: Set up Dummy UMLS::Association Database
+    UMLS::Association requires that a database can be connected to that is
+    in the correct format. Although this database is not required for ALBD
+    (since co-occurrence data is loaded from a co-occurrence matrix), it is
+    required to run UMLS:Association. If you ran UMLS::Association to
+    generate a co-occurrence matrix, you should be fine. Otherwise you will
+    need to create a dummy database that it can connect to. This can be done
+    in a few steps:
+
+    1) open mysql type mysql at the terminal
+
+    2) create the default database in the correct format, type: CREATE
+    DATABASE cuicounts; use cuicounts; CREATE TABLE N_11(cui_1 CHAR(10),
+    cui_2 CHAR(10), n_11 BIGINT(20));
+
+CONTACT US
+    If you have any trouble installing and using ALBD, please contact us us
+    directly :
+
+        Sam Henry: henryst at vcu.edu
+
+        Bridget McInnes: btmcinnes at vcu.edu
+
+SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2017 Sam Henry & Bridget McInnes
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    'GPL.txt' that you should have received with this distribution.
+

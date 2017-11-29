@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/App/PS1.pm',
     requires          => {
-        'perl'                  => 5.006,
+        'perl'                  => 5.010,
         'Class::Accessor::Fast' => 0,
         'JSON::XS'              => 0,
         'Path::Tiny'            => 0,
@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     recommends => {
         'Term::Size::Any'    => 0,

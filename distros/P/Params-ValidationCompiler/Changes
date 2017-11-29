@@ -1,3 +1,11 @@
+0.26     2017-11-28
+
+- The exceptions.t test would fail if Sub::Util was not installed. Reported by
+  Paul Howarth. GH #19.
+
+- Fix test failures on Windows. GH #20.
+
+
 0.25     2017-11-23
 
 - All exceptions now include a stack trace by default when treated as a

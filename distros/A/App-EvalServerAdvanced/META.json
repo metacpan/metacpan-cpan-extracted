@@ -43,6 +43,7 @@
       },
       "runtime" : {
          "requires" : {
+            "App::EvalServerAdvanced::ConstantCalc" : "0",
             "App::EvalServerAdvanced::Protocol" : "0",
             "B::Deparse" : "0",
             "BSD::Resource" : "0",
@@ -60,7 +61,9 @@
             "Linux::Clone" : "0",
             "Linux::Seccomp" : "0",
             "List::Util" : "0",
+            "Module::Runtime" : "0",
             "Moo" : "0",
+            "Moo::Role" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
             "Perl::Tidy" : "0",
@@ -71,10 +74,11 @@
             "Sys::Linux::Namespace" : "0",
             "TOML" : "0",
             "Unix::Mknod" : "0",
+            "YAML::XS" : "0",
             "charnames" : "0",
-            "constant" : "0",
+            "feature" : "0",
             "overload" : "0",
-            "perl" : "v5.24.0",
+            "perl" : "v5.20.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -93,31 +97,59 @@
    "provides" : {
       "App::EvalServerAdvanced" : {
          "file" : "lib/App/EvalServerAdvanced.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::Config" : {
          "file" : "lib/App/EvalServerAdvanced/Config.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::JobManager" : {
          "file" : "lib/App/EvalServerAdvanced/JobManager.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::Log" : {
          "file" : "lib/App/EvalServerAdvanced/Log.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::Sandbox" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::Sandbox::Internal" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox/Internal.pm",
-         "version" : "0.020"
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Sandbox::Plugin::Perlbot" : {
+         "file" : "lib/App/EvalServerAdvanced/Sandbox/Plugin/Perlbot.pm",
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Sandbox::Plugin::PerlbotEggs" : {
+         "file" : "lib/App/EvalServerAdvanced/Sandbox/Plugin/PerlbotEggs.pm",
+         "version" : "0.021"
       },
       "App::EvalServerAdvanced::Seccomp" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp.pm",
-         "version" : "0.020"
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Seccomp::Plugin::Constants::LinuxClone" : {
+         "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/Constants/LinuxClone.pm",
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Seccomp::Plugin::Constants::POSIX" : {
+         "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/Constants/POSIX.pm",
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Seccomp::Plugin::ExecWrapper" : {
+         "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/ExecWrapper.pm",
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Seccomp::Profile" : {
+         "file" : "lib/App/EvalServerAdvanced/Seccomp/Profile.pm",
+         "version" : "0.021"
+      },
+      "App::EvalServerAdvanced::Seccomp::Syscall" : {
+         "file" : "lib/App/EvalServerAdvanced/Seccomp/Syscall.pm",
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -131,7 +163,7 @@
          "web" : "https://github.com/perlbot/evalserver-async"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -287,7 +319,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "^Seccomp.pod"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
@@ -308,12 +342,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.020",
+                  "tag" : "v0.021",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -338,7 +372,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                }
             },

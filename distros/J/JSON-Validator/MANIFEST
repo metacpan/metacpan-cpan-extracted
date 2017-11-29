@@ -85,6 +85,7 @@ t/jv-required.t
 t/jv-string.t
 t/load-and-validate-spec.t
 t/load-data.t
+t/load-from-app.t
 t/load-http.t
 t/load-json.t
 t/load-yaml.t

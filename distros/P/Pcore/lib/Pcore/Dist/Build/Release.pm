@@ -348,20 +348,12 @@ sub _upload_to_cpan ($self) {
 
     my $res = $pause->upload($tgz);
 
-    if ( $res->is_success ) {
-        say $res->reason;
+    say $res;
 
+    if ($res) {
         unlink $tgz or 1;
-
-        # print q[Removing old distributions from PAUSE ... ];
-        #
-        # $pause->clean;
-        #
-        # say 'done';
     }
     else {
-        say join q[ ], $res->status, $res->reason;
-
         goto REDO if P->term->prompt( 'Retry?', [qw[yes no]], enter => 1 ) eq 'yes';
 
         say qq[Upload to CPAN failed. You should upload manually: "$tgz"];
@@ -457,7 +449,7 @@ TXT
 ## |    2 | 143, 163, 218, 223,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## |      | 228, 233             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 388                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 380                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

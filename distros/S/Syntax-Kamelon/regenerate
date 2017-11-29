@@ -1,6 +1,7 @@
 #!/bin/bash
 
 make realclean
+perl tools/clean_up
 perl tools/generate_manifest > MANIFEST
 perl Makefile.PL
 make

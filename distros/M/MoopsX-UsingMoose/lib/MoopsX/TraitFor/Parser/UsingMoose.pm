@@ -4,8 +4,9 @@ use warnings;
 
 package MoopsX::TraitFor::Parser::UsingMoose;
 
-our $VERSION = '0.0101'; # VERSION:
 # ABSTRACT: A Moops::Parser traits that sets 'using Moose'
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.0102';
 
 use Moo::Role;
 
@@ -27,7 +28,7 @@ MoopsX::TraitFor::Parser::UsingMoose - A Moops::Parser traits that sets 'using M
 
 =head1 VERSION
 
-Version 0.0101, released 2015-03-19.
+Version 0.0102, released 2017-11-28.
 
 =head1 SYNOPSIS
 
@@ -59,7 +60,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+This software is copyright (c) 2016 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

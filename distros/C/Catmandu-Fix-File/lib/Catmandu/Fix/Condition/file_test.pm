@@ -2,7 +2,6 @@ package Catmandu::Fix::Condition::file_test;
 use Catmandu::Sane;
 use Moo;
 use Carp qw(confess);
-use Catmandu::Util qw();
 use namespace::clean;
 use Catmandu::Fix::Has;
 
@@ -12,11 +11,19 @@ has path  => (fix_arg => 1);
 has test => (fix_arg => 1);
 has _tests => ( is => 'ro', lazy => 1, builder => '_build_tests' );
 
+sub in_array {
+    my ( $array, $val ) = @_;
+    for ( @$array ) {
+        return 1 if $val eq $_;
+    }
+    0;
+}
+
 sub _build_tests {
     my $self = $_[0];
     my @vals = split( //o, $self->test );
     my $tests = [
-        grep { Catmandu::Util::array_includes( $allowed_tests, $_ ) or confess("invalid test $_"); } @vals
+        grep { in_array( $allowed_tests, $_ ) or confess("invalid test $_"); } @vals
     ];
     unless( @$tests ){
         confess "no valid tests supplied";

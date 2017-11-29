@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Test2::Util::HashBase qw/inref ending items order for_each/;
 
@@ -14,7 +14,7 @@ use Scalar::Util qw/reftype looks_like_number/;
 sub init {
     my $self = shift;
 
-    if(my $ref = $self->{+INREF}) {
+    if( defined( my $ref = $self->{+INREF}) ) {
         croak "Cannot specify both 'inref' and 'items'" if $self->{+ITEMS};
         croak "Cannot specify both 'inref' and 'order'" if $self->{+ORDER};
         croak "'inref' must be an array reference, got '$ref'" unless reftype($ref) eq 'ARRAY';
@@ -47,7 +47,8 @@ sub verify {
     my %params = @_;
 
     return 0 unless $params{exists};
-    my $got = $params{got} || return 0;
+    my $got = $params{got};
+    return 0 unless defined $got;
     return 0 unless ref($got);
     return 0 unless reftype($got) eq 'ARRAY';
     return 1;

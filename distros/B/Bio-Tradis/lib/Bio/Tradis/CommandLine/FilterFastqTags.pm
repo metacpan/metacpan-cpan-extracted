@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::FilterFastqTags;
-$Bio::Tradis::CommandLine::FilterFastqTags::VERSION = '1.3.3';
+$Bio::Tradis::CommandLine::FilterFastqTags::VERSION = '1.4.0';
 # ABSTRACT: Remove given tags from the start of the sequence
 
 
@@ -90,7 +90,7 @@ Bio::Tradis::CommandLine::FilterFastqTags - Remove given tags from the start of 
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

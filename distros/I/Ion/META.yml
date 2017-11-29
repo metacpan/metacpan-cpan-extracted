@@ -1,0 +1,34 @@
+---
+abstract: 'A clear and concise API for writing TCP servers and clients'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ion
+recommends:
+  Class::XSAccessor: '0'
+requires:
+  AnyEvent: '7.14'
+  Carp: '0'
+  Coro: '6.514'
+  Moo: '0'
+  Scalar::Util: '0'
+  common::sense: '0'
+resources:
+  bugtracker: https://github.com/sysread/Ion/issues
+  homepage: https://github.com/sysread/Ion
+  repository: https://github.com/sysread/Ion.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

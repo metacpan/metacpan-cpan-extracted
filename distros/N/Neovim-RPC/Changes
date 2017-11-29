@@ -1,5 +1,12 @@
 Revision history for Neovim-RPC
 
+1.0.1 2017-11-27
+  [ BUG FIXES ]
+    - Need Promises +v0.98. (GH#4, Slaven Rezić)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 16 insertions(+), 4 deletions(-)
+
 1.0.0 2017-11-26
   [ API CHANGES ]
     - Overhaul of the plugins architecture.

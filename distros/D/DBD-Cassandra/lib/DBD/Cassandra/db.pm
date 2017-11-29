@@ -1,7 +1,13 @@
 package DBD::Cassandra::db;
+our $AUTHORITY = 'cpan:TVDW';
+$DBD::Cassandra::db::VERSION = '0.57';
+# ABSTRACT: DBD::Cassandra database handle
+
 use 5.010;
 use strict;
 use warnings;
+
+use Devel::GlobalDestruction;
 
 # This cargocult comes straight from DBI::DBD docs. No idea what it does.
 $DBD::Cassandra::db::imp_data_size = 0;
@@ -71,6 +77,8 @@ sub disconnect {
     my ($dbh)= @_;
     $dbh->STORE('Active', 0);
 
+    return if in_global_destruction;
+
     $dbh->{cass_client}->shutdown;
 }
 
@@ -89,3 +97,28 @@ sub x_wait_for_schema_agreement {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+DBD::Cassandra::db - DBD::Cassandra database handle
+
+=head1 VERSION
+
+version 0.57
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,7 +1,7 @@
 package BioX::Workflow::Command;
 
 use v5.10;
-our $VERSION = '2.2.3';
+our $VERSION = '2.3.0';
 
 use MooseX::App qw(Color);
 

@@ -30,6 +30,22 @@ int base64url_strict_decode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
 #endif
 
+/* ---- BASE32 Routines ---- */
+#ifdef LTC_BASE32
+typedef enum {
+   BASE32_RFC4648   = 0,
+   BASE32_BASE32HEX = 1,
+   BASE32_ZBASE32   = 2,
+   BASE32_CROCKFORD = 3
+} base32_alphabet;
+int base32_encode(const unsigned char *in,  unsigned long inlen,
+                        unsigned char *out, unsigned long *outlen,
+                        base32_alphabet id);
+int base32_decode(const unsigned char *in,  unsigned long inlen,
+                        unsigned char *out, unsigned long *outlen,
+                        base32_alphabet id);
+#endif
+
 /* ===> LTC_HKDF -- RFC5869 HMAC-based Key Derivation Function <=== */
 #ifdef LTC_HKDF
 
@@ -73,14 +89,15 @@ int crypt_get_size(const char* namein, unsigned int *sizeout);
 int crypt_list_all_sizes(char *names_list, unsigned int *names_list_size);
 
 #ifdef LTM_DESC
-void init_LTM(void);
+LTC_DEPRECATED void init_LTM(void);
 #endif
 #ifdef TFM_DESC
-void init_TFM(void);
+LTC_DEPRECATED void init_TFM(void);
 #endif
 #ifdef GMP_DESC
-void init_GMP(void);
+LTC_DEPRECATED void init_GMP(void);
 #endif
+int crypt_mp_init(const char* mpi);
 
 #ifdef LTC_ADLER32
 typedef struct adler32_state_s

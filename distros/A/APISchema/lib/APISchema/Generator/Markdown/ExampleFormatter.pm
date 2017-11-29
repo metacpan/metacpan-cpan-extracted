@@ -28,7 +28,7 @@ sub header {
     return '' unless (ref $example) eq 'HASH';
     return '' unless scalar keys %$example;
 
-    return "\n" . join "\n", map {
+    return join "\n", map {
         sprintf '%s: %s', $_ =~ s/[_]/-/gr, $example->{$_};
     } sort keys %$example;
 }
@@ -57,7 +57,12 @@ sub body {
 
     return '' unless defined $example;
 
-    return "\n" . ( ref $example ? json($example) : $example );
+    return ref $example ? json($example) : $example;
+}
+
+sub header_and_body {
+    my ($self) = @_;
+    join("\n", grep { defined $_ && length $_ > 0 } $self->header, $self->body);
 }
 
 1;

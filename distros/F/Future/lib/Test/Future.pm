@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Test::Builder::Module );
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 our @EXPORT = qw(
    no_pending_futures

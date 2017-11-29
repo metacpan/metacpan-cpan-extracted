@@ -1,0 +1,646 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">#&nbsp;This&nbsp;file&nbsp;is&nbsp;a&nbsp;testcase&nbsp;for&nbsp;the&nbsp;highlighting&nbsp;of&nbsp;Ruby&nbsp;code</font></br></div>
+<div id="2" class="line"><font class="Comment">#&nbsp;It's&nbsp;not&nbsp;executable&nbsp;code,&nbsp;but&nbsp;a&nbsp;collection&nbsp;of&nbsp;code&nbsp;snippets</font></br></div>
+<div id="3" class="line"><font class="Comment">#</font></br></div>
+<div id="4" class="line"></br></div>
+<div id="5" class="line"><font class="Normal">require&nbsp;</font><font class="String">'Config'</font></br></div>
+<div id="6" class="line"><font class="Normal">require&nbsp;</font><font class="String">'DO/Clients'</font></br></div>
+<div id="7" class="line"><font class="Normal">require&nbsp;</font><font class="String">'DO/DBClients'</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;</font><font class="DataType">CGI</font><font class="Normal">::escapeElement(string,&nbsp;*elements)</font></br></div>
+<div id="10" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;elements&nbsp;=&nbsp;elements[</font><font class="DecVal">0</font><font class="Normal">]&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;elements[</font><font class="DecVal">0</font><font class="Normal">].kind_of?(</font><font class="DataType">Array</font><font class="Normal">)</font></br></div>
+<div id="11" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;elements.empty?</font></br></div>
+<div id="12" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string.gsub(</font><font class="Others">/&lt;\/?(?:#{</font><font class="Normal">elements.join(</font><font class="String">&quot;|&quot;</font><font class="Normal">)</font><font class="Others">})(?!\w)(?:.|\n)*?&gt;/ni</font><font class="Normal">)&nbsp;</font><font class="Keyword">do</font></br></div>
+<div id="13" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">CGI</font><font class="Normal">::escapeHTML(</font><font class="DataType">$&amp;</font><font class="Normal">)</font></br></div>
+<div id="14" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="16" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string</font></br></div>
+<div id="17" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="18" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="19" class="line"></br></div>
+<div id="20" class="line"><font class="Keyword">case</font><font class="Normal">&nbsp;inputLine</font></br></div>
+<div id="21" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="String">&quot;debug&quot;</font></br></div>
+<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;dumpDebugInfo</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;dumpSymbols</font></br></div>
+<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="Others">/p\s+(\w+)/</font></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;dumpVariable(</font><font class="DataType">$1</font><font class="Normal">)</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="String">&quot;quit&quot;</font><font class="Normal">,&nbsp;</font><font class="String">&quot;exit&quot;</font></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;exit</font></br></div>
+<div id="28" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;</font><font class="String">&quot;Illegal&nbsp;command:&nbsp;</font><font class="Others">#{</font><font class="Normal">inputLine</font><font class="Others">}</font><font class="String">&quot;</font></br></div>
+<div id="30" class="line"><font class="Keyword">end</font></br></div>
+<div id="31" class="line"></br></div>
+<div id="32" class="line"></br></div>
+<div id="33" class="line"><font class="Normal">kind&nbsp;=&nbsp;</font><font class="Keyword">case</font><font class="Normal">&nbsp;year&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">1850</font><font class="Normal">..</font><font class="DecVal">1889</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="String">&quot;Blues&quot;</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">1890</font><font class="Normal">..</font><font class="DecVal">1909</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="String">&quot;Ragtime&quot;</font></br></div>
+<div id="36" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">1910</font><font class="Normal">..</font><font class="DecVal">1929</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="String">&quot;New&nbsp;Orleans&nbsp;Jazz&quot;</font></br></div>
+<div id="37" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">1930</font><font class="Normal">..</font><font class="DecVal">1939</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="String">&quot;Swing&quot;</font></br></div>
+<div id="38" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">1940</font><font class="Normal">..</font><font class="DecVal">1950</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="String">&quot;Bebop&quot;</font></br></div>
+<div id="39" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;Jazz&quot;</font></br></div>
+<div id="40" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="41" class="line"></br></div>
+<div id="42" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;URL-encode&nbsp;a&nbsp;string.</font></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;&nbsp;&nbsp;url_encoded_string&nbsp;=&nbsp;CGI::escape(&quot;'Stop!'&nbsp;said&nbsp;Fred&quot;)</font></br></div>
+<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;=&gt;&nbsp;&quot;%27Stop%21%27+said+Fred&quot;</font></br></div>
+<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;</font><font class="DataType">CGI</font><font class="Normal">::escape(string)</font></br></div>
+<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;string.gsub(</font><font class="Others">/([^&nbsp;a-zA-Z0-9_.-]+)/n</font><font class="Normal">)&nbsp;</font><font class="Keyword">do</font></br></div>
+<div id="47" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Char">'%'</font><font class="Normal">&nbsp;+&nbsp;</font><font class="DataType">$1</font><font class="Normal">.unpack(</font><font class="String">'H2'</font><font class="Normal">&nbsp;*&nbsp;</font><font class="DataType">$1</font><font class="Normal">.size).join(</font><font class="Char">'%'</font><font class="Normal">).upcase</font></br></div>
+<div id="48" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font><font class="Normal">.tr(</font><font class="Char">'&nbsp;'</font><font class="Normal">,&nbsp;</font><font class="Char">'+'</font><font class="Normal">)</font></br></div>
+<div id="49" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="50" class="line"></br></div>
+<div id="51" class="line"></br></div>
+<div id="52" class="line"><font class="Comment">#&nbsp;Class&nbsp;ClientManager</font></br></div>
+<div id="53" class="line"><font class="Comment">#</font></br></div>
+<div id="54" class="line"><font class="Comment">#&nbsp;definition&nbsp;:&nbsp;Import,&nbsp;store&nbsp;and&nbsp;export&nbsp;the&nbsp;various&nbsp;data&nbsp;used&nbsp;by&nbsp;the&nbsp;application.</font></br></div>
+<div id="55" class="line"><font class="Comment">#&nbsp;This&nbsp;class&nbsp;is&nbsp;the&nbsp;sole&nbsp;interface&nbsp;between&nbsp;the&nbsp;application&nbsp;and&nbsp;the&nbsp;underlying&nbsp;database.</font></br></div>
+<div id="56" class="line"></br></div>
+<div id="57" class="line"><font class="Normal">mon,&nbsp;day,&nbsp;year&nbsp;=&nbsp;</font><font class="DataType">$1</font><font class="Normal">,&nbsp;</font><font class="DataType">$2</font><font class="Normal">,&nbsp;</font><font class="DataType">$3</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Others">/(\d\d)-(\d\d)-(\d\d)/</font></br></div>
+<div id="58" class="line"><font class="Normal">puts&nbsp;</font><font class="String">&quot;a&nbsp;=&nbsp;</font><font class="Others">#{</font><font class="Normal">a</font><font class="Others">}</font><font class="String">&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;fDebug</font></br></div>
+<div id="59" class="line"><font class="Normal">print&nbsp;total&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;total&nbsp;==&nbsp;</font><font class="DecVal">0</font></br></div>
+<div id="60" class="line"></br></div>
+<div id="61" class="line"><font class="Keyword">while</font><font class="Normal">&nbsp;gets</font></br></div>
+<div id="62" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">next</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Others">/^#/</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;Skip&nbsp;comments</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;parseLine&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;</font><font class="Others">/^$/</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;Don't&nbsp;parse&nbsp;empty&nbsp;lines</font></br></div>
+<div id="64" class="line"><font class="Keyword">end</font></br></div>
+<div id="65" class="line"></br></div>
+<div id="66" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;artist&nbsp;==&nbsp;</font><font class="String">&quot;John&nbsp;Coltrane&quot;</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="67" class="line"><font class="Normal">&nbsp;&nbsp;artist&nbsp;=&nbsp;</font><font class="String">&quot;'Trane&quot;</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="68" class="line"><font class="Keyword">end</font><font class="Normal">&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;nicknames&nbsp;==&nbsp;</font><font class="String">&quot;no&quot;</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="69" class="line"></br></div>
+<div id="70" class="line"><font class="Normal">handle&nbsp;</font><font class="Keyword">=&nbsp;if</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Gillespie&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="71" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;Dizzy&quot;</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">elsif</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Parker&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="73" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;Bird&quot;</font></br></div>
+<div id="74" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;unknown&quot;</font></br></div>
+<div id="76" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="77" class="line"></br></div>
+<div id="78" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Gillespie&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Dizzy&quot;</font></br></div>
+<div id="79" class="line"><font class="Keyword">elsif</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Parker&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Bird&quot;</font></br></div>
+<div id="80" class="line"><font class="Keyword">else</font><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;unknown&quot;</font></br></div>
+<div id="81" class="line"><font class="Keyword">end</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="82" class="line"></br></div>
+<div id="83" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Gillespie&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="84" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Dizzy&quot;</font></br></div>
+<div id="85" class="line"><font class="Keyword">elsif</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Parker&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="86" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Bird&quot;</font></br></div>
+<div id="87" class="line"><font class="Keyword">else</font></br></div>
+<div id="88" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;unknown&quot;</font></br></div>
+<div id="89" class="line"><font class="Keyword">end</font></br></div>
+<div id="90" class="line"></br></div>
+<div id="91" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Gillespie&quot;</font></br></div>
+<div id="92" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Dizzy&quot;</font></br></div>
+<div id="93" class="line"><font class="Keyword">elsif</font><font class="Normal">&nbsp;aSong.artist&nbsp;==&nbsp;</font><font class="String">&quot;Parker&quot;</font></br></div>
+<div id="94" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;Bird&quot;</font></br></div>
+<div id="95" class="line"><font class="Keyword">else</font></br></div>
+<div id="96" class="line"><font class="Normal">&nbsp;&nbsp;handle&nbsp;=&nbsp;</font><font class="String">&quot;unknown&quot;</font></br></div>
+<div id="97" class="line"><font class="Keyword">end</font></br></div>
+<div id="98" class="line"></br></div>
+<div id="99" class="line"><font class="Normal">&nbsp;</font><font class="Keyword">case</font><font class="Normal">&nbsp;line</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="Others">/title=(.*)/</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;Title&nbsp;is&nbsp;#$1&quot;</font></br></div>
+<div id="102" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="Others">/track=(.*)/</font></br></div>
+<div id="103" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;Track&nbsp;is&nbsp;#$1&quot;</font></br></div>
+<div id="104" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="Others">/artist=(.*)/</font></br></div>
+<div id="105" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;Artist&nbsp;is&nbsp;#$1&quot;</font></br></div>
+<div id="106" class="line"><font class="Keyword">end</font></br></div>
+<div id="107" class="line"></br></div>
+<div id="108" class="line"><font class="Keyword">case</font><font class="Normal">&nbsp;shape</font></br></div>
+<div id="109" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Square</font><font class="Normal">,&nbsp;</font><font class="DataType">Rectangle</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;...</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Circle</font></br></div>
+<div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;...</font></br></div>
+<div id="113" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Triangle</font></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;...</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="116" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;...</font></br></div>
+<div id="117" class="line"><font class="Keyword">end</font><font class="Normal">&nbsp;</font></br></div>
+<div id="118" class="line"></br></div>
+<div id="119" class="line"></br></div>
+<div id="120" class="line"><font class="Keyword">until</font><font class="Normal">&nbsp;playList.duration&nbsp;&gt;&nbsp;</font><font class="DecVal">60</font><font class="Normal">&nbsp;</font><font class="Comment">#hi&nbsp;there</font></br></div>
+<div id="121" class="line"><font class="Normal">&nbsp;&nbsp;playList.add(songList.pop)</font></br></div>
+<div id="122" class="line"><font class="Keyword">end</font></br></div>
+<div id="123" class="line"></br></div>
+<div id="124" class="line"><font class="DecVal">3</font><font class="Normal">.times&nbsp;</font><font class="Keyword">do</font></br></div>
+<div id="125" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;</font><font class="String">&quot;Ho!&nbsp;&quot;</font></br></div>
+<div id="126" class="line"><font class="Keyword">end</font></br></div>
+<div id="127" class="line"></br></div>
+<div id="128" class="line"><font class="Normal">loop&nbsp;{</font></br></div>
+<div id="129" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;block&nbsp;...</font></br></div>
+<div id="130" class="line"><font class="Normal">}</font></br></div>
+<div id="131" class="line"></br></div>
+<div id="132" class="line"><font class="Normal">songList.each&nbsp;</font><font class="Keyword">do</font><font class="Normal">&nbsp;|aSong|</font></br></div>
+<div id="133" class="line"><font class="Normal">&nbsp;&nbsp;aSong.play</font></br></div>
+<div id="134" class="line"><font class="Keyword">end</font></br></div>
+<div id="135" class="line"></br></div>
+<div id="136" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;aSong&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;songList</font></br></div>
+<div id="137" class="line"><font class="Normal">&nbsp;&nbsp;aSong.play</font></br></div>
+<div id="138" class="line"><font class="Keyword">end</font></br></div>
+<div id="139" class="line"></br></div>
+<div id="140" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;[</font><font class="String">'fee'</font><font class="Normal">,&nbsp;</font><font class="String">'fi'</font><font class="Normal">,&nbsp;</font><font class="String">'fo'</font><font class="Normal">,&nbsp;</font><font class="String">'fum'</font><font class="Normal">]</font></br></div>
+<div id="141" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;i,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font></br></div>
+<div id="142" class="line"><font class="Keyword">end</font></br></div>
+<div id="143" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font><font class="Normal">..</font><font class="DecVal">3</font></br></div>
+<div id="144" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;i,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font></br></div>
+<div id="145" class="line"><font class="Keyword">end</font></br></div>
+<div id="146" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="DataType">File</font><font class="Normal">.open(</font><font class="String">&quot;ordinal&quot;</font><font class="Normal">).find_all&nbsp;{&nbsp;|l|&nbsp;l&nbsp;=~&nbsp;</font><font class="Others">/d$/</font><font class="Normal">}</font></br></div>
+<div id="147" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;i.chomp,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font></br></div>
+<div id="148" class="line"><font class="Keyword">end</font></br></div>
+<div id="149" class="line"></br></div>
+<div id="150" class="line"><font class="Keyword">class</font><font class="Normal">&nbsp;</font><font class="DataType">Periods</font></br></div>
+<div id="151" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;each</font></br></div>
+<div id="152" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">yield</font><font class="Normal">&nbsp;</font><font class="String">&quot;Classical&quot;</font></br></div>
+<div id="153" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">yield</font><font class="Normal">&nbsp;</font><font class="String">&quot;Jazz&quot;</font></br></div>
+<div id="154" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">yield</font><font class="Normal">&nbsp;</font><font class="String">&quot;Rock&quot;</font></br></div>
+<div id="155" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="156" class="line"><font class="Keyword">end</font></br></div>
+<div id="157" class="line"></br></div>
+<div id="158" class="line"></br></div>
+<div id="159" class="line"><font class="Normal">periods&nbsp;=&nbsp;</font><font class="DataType">Periods</font><font class="Normal">.new</font></br></div>
+<div id="160" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;genre&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;periods</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;genre,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font></br></div>
+<div id="162" class="line"><font class="Keyword">end</font></br></div>
+<div id="163" class="line"></br></div>
+<div id="164" class="line"><font class="Keyword">while</font><font class="Normal">&nbsp;gets</font></br></div>
+<div id="165" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">next</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Others">/^\s*#/</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;skip&nbsp;comments</font></br></div>
+<div id="166" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">break</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Others">/^END/</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;stop&nbsp;at&nbsp;end</font></br></div>
+<div id="167" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;substitute&nbsp;stuff&nbsp;in&nbsp;backticks&nbsp;and&nbsp;try&nbsp;again</font></br></div>
+<div id="168" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">redo</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;gsub!(</font><font class="Others">/`(.*?)`/</font><font class="Normal">)&nbsp;{&nbsp;eval(</font><font class="DataType">$1</font><font class="Normal">)&nbsp;}</font></br></div>
+<div id="169" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;process&nbsp;line&nbsp;...</font></br></div>
+<div id="170" class="line"><font class="Keyword">end</font></br></div>
+<div id="171" class="line"></br></div>
+<div id="172" class="line"><font class="Normal">i=</font><font class="DecVal">0</font></br></div>
+<div id="173" class="line"><font class="Normal">loop&nbsp;</font><font class="Keyword">do</font></br></div>
+<div id="174" class="line"><font class="Normal">&nbsp;&nbsp;i&nbsp;+=&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="175" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">next</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;i&nbsp;&lt;&nbsp;</font><font class="DecVal">3</font></br></div>
+<div id="176" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;i</font></br></div>
+<div id="177" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">break</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;i&nbsp;&gt;&nbsp;</font><font class="DecVal">4</font></br></div>
+<div id="178" class="line"><font class="Keyword">end</font></br></div>
+<div id="179" class="line"></br></div>
+<div id="180" class="line"><font class="Keyword">for</font><font class="Normal">&nbsp;i&nbsp;</font><font class="Keyword">in</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font><font class="Normal">..</font><font class="DecVal">100</font></br></div>
+<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;</font><font class="String">&quot;Now&nbsp;at&nbsp;</font><font class="Others">#{</font><font class="Normal">i</font><font class="Others">}</font><font class="String">.&nbsp;Restart?&nbsp;&quot;</font></br></div>
+<div id="182" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">retry</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;gets&nbsp;=~&nbsp;</font><font class="Others">/^y/i</font></br></div>
+<div id="183" class="line"><font class="Keyword">end</font></br></div>
+<div id="184" class="line"></br></div>
+<div id="185" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;doUntil(cond)</font></br></div>
+<div id="186" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">yield</font></br></div>
+<div id="187" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">retry</font><font class="Normal">&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;cond</font></br></div>
+<div id="188" class="line"><font class="Keyword">end</font></br></div>
+<div id="189" class="line"></br></div>
+<div id="190" class="line"><font class="Normal">i&nbsp;=&nbsp;</font><font class="DecVal">0</font></br></div>
+<div id="191" class="line"><font class="Normal">doUntil(i&nbsp;&gt;&nbsp;</font><font class="DecVal">3</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="192" class="line"><font class="Normal">&nbsp;&nbsp;print&nbsp;i,&nbsp;</font><font class="String">&quot;&nbsp;&quot;</font></br></div>
+<div id="193" class="line"><font class="Normal">&nbsp;&nbsp;i&nbsp;+=&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="194" class="line"><font class="Normal">}</font></br></div>
+<div id="195" class="line"></br></div>
+<div id="196" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;system_call</font></br></div>
+<div id="197" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;...&nbsp;code&nbsp;which&nbsp;throws&nbsp;SystemCallError</font></br></div>
+<div id="198" class="line"><font class="Keyword">rescue</font><font class="Normal">&nbsp;</font><font class="DataType">SystemCallError</font></br></div>
+<div id="199" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$stderr</font><font class="Normal">.print&nbsp;</font><font class="String">&quot;IO&nbsp;failed:&nbsp;&quot;</font><font class="Normal">&nbsp;+&nbsp;</font><font class="DataType">$!</font></br></div>
+<div id="200" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;opFile.close</font></br></div>
+<div id="201" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">File</font><font class="Normal">.delete(opName)</font></br></div>
+<div id="202" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;raise</font></br></div>
+<div id="203" class="line"><font class="Keyword">end</font></br></div>
+<div id="204" class="line"></br></div>
+<div id="205" class="line"><font class="Keyword">class</font><font class="Normal">&nbsp;</font><font class="DataType">ClientManager</font></br></div>
+<div id="206" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="207" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;constructor</font></br></div>
+<div id="208" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;initialize(dbase)</font></br></div>
+<div id="209" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@dbClient</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">DBClient</font><font class="Normal">.new(dbase)</font></br></div>
+<div id="210" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@clients</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">Clients</font><font class="Normal">.new</font></br></div>
+<div id="211" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="212" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="213" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;prout(a,&nbsp;b,&nbsp;xy=</font><font class="String">&quot;jj&quot;</font><font class="Normal">)&nbsp;</font><font class="DecVal">24</font><font class="Normal">&nbsp;</font><font class="Keyword">end</font><font class="Normal">&nbsp;</font></br></div>
+<div id="214" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">###############################################################</font></br></div>
+<div id="215" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="216" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;CLIENTS&nbsp;SECTION</font></br></div>
+<div id="217" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#</font></br></div>
+<div id="218" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">###############################################################</font></br></div>
+<div id="219" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="220" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;update&nbsp;the&nbsp;clients&nbsp;object&nbsp;by&nbsp;retrieving&nbsp;the&nbsp;related&nbsp;data&nbsp;from&nbsp;the&nbsp;database</font></br></div>
+<div id="221" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;returns&nbsp;the&nbsp;number&nbsp;of&nbsp;clients</font></br></div>
+<div id="222" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;refreshClients</font></br></div>
+<div id="223" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@clients</font><font class="Normal">.clean</font></br></div>
+<div id="224" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.nil?&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="225" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.selectClient.each&nbsp;</font><font class="Keyword">do</font><font class="Normal">&nbsp;|row|</font></br></div>
+<div id="226" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@clients</font><font class="Normal">.addClient(row[</font><font class="DecVal">0</font><font class="Normal">],row[</font><font class="DecVal">1</font><font class="Normal">],row[</font><font class="DecVal">2</font><font class="Normal">],row[</font><font class="DecVal">3</font><font class="Normal">],row[</font><font class="DecVal">4</font><font class="Normal">],row[</font><font class="DecVal">5</font><font class="Normal">],&nbsp;row[</font><font class="DecVal">6</font><font class="Normal">],&nbsp;row[</font><font class="DecVal">7</font><font class="Normal">],&nbsp;row[</font><font class="DecVal">8</font><font class="Normal">])</font></br></div>
+<div id="227" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="228" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="229" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;SqlQuery&nbsp;wasn't&nbsp;created&nbsp;:&nbsp;cannot&nbsp;read&nbsp;data&nbsp;from&nbsp;database&quot;</font></br></div>
+<div id="230" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="231" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Others">@clients</font><font class="Normal">.length</font></br></div>
+<div id="232" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="233" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="234" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;insert&nbsp;a&nbsp;client&nbsp;in&nbsp;the&nbsp;database&nbsp;and&nbsp;refreshes&nbsp;the&nbsp;local&nbsp;clients&nbsp;object</font></br></div>
+<div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;we&nbsp;assume&nbsp;that&nbsp;none&nbsp;of&nbsp;the&nbsp;arguments&nbsp;is&nbsp;null</font></br></div>
+<div id="236" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;we&nbsp;assume&nbsp;that&nbsp;the&nbsp;client,&nbsp;identified&nbsp;by&nbsp;raison_sociale&nbsp;doesn't&nbsp;already&nbsp;exists</font></br></div>
+<div id="237" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;addClient(raison_sociale,&nbsp;division,&nbsp;departement,&nbsp;adresse,&nbsp;cp,&nbsp;ville,&nbsp;nom_contact,&nbsp;tel_contact)</font></br></div>
+<div id="238" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;=&nbsp;</font><font class="String">&quot;0&quot;</font></br></div>
+<div id="239" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.nil?&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="240" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;=&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.insertClient(raison_sociale,&nbsp;division,&nbsp;departement,&nbsp;adresse,&nbsp;cp,&nbsp;ville,&nbsp;nom_contact,tel_contact)</font></br></div>
+<div id="241" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;SqlQuery&nbsp;wasn't&nbsp;created&nbsp;:&nbsp;database&nbsp;update&nbsp;cannot&nbsp;be&nbsp;performed&quot;</font></br></div>
+<div id="243" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@clients</font><font class="Normal">.addClient(id,&nbsp;raison_sociale,&nbsp;division,&nbsp;departement,&nbsp;adresse,&nbsp;cp,&nbsp;ville,&nbsp;nom_contact,&nbsp;tel_contact)&nbsp;</font><font class="Comment">#&nbsp;synchronize&nbsp;local&nbsp;object&nbsp;with&nbsp;DB</font></br></div>
+<div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;deletes&nbsp;a&nbsp;client&nbsp;from&nbsp;the&nbsp;database&nbsp;and&nbsp;updates&nbsp;the&nbsp;local&nbsp;Clients&nbsp;object&nbsp;accordingly</font></br></div>
+<div id="248" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;delClient(nomclient_brut)</font></br></div>
+<div id="249" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;raison_sociale,&nbsp;div,&nbsp;dep&nbsp;=&nbsp;</font><font class="DataType">Clients</font><font class="Normal">.getIdentifiers(nomclient_brut)</font></br></div>
+<div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listeContratsExp,&nbsp;listeContratsSup,&nbsp;listeContratsProd,&nbsp;listePropositionsExp,&nbsp;listePropositionsSup&nbsp;=&nbsp;[]</font></br></div>
+<div id="251" class="line"></br></div>
+<div id="252" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listeContratsExp&nbsp;=&nbsp;</font><font class="Others">@contratsExpertise</font><font class="Normal">.getContratsFromClient(nomclient_brut)</font></br></div>
+<div id="253" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listeContratsSup&nbsp;=&nbsp;</font><font class="Others">@contratsSupport</font><font class="Normal">.getContratsFromClient(nomclient_brut)</font></br></div>
+<div id="254" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listeContratsProd&nbsp;=&nbsp;</font><font class="Others">@contratsProduits</font><font class="Normal">.getContratsFromClient(nomclient_brut)</font></br></div>
+<div id="255" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listePropositionsExp&nbsp;=&nbsp;</font><font class="Others">@propositionsExpertise</font><font class="Normal">.getPropositionsFromClient(nomclient_brut)</font></br></div>
+<div id="256" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;listePropositionsSup&nbsp;=&nbsp;</font><font class="Others">@propositionsSupport</font><font class="Normal">.getPropositionsFromClient(nomclient_brut)</font></br></div>
+<div id="257" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="258" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.nil?&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="259" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deleteClient(raison_sociale,&nbsp;div,&nbsp;dep)</font></br></div>
+<div id="260" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="261" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deleteContracts(</font><font class="DataType">Config</font><font class="Normal">::</font><font class="DataType">EXPERTISE</font><font class="Normal">,listeContratsExp)&nbsp;</font></br></div>
+<div id="262" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deleteContracts(</font><font class="DataType">Config</font><font class="Normal">::</font><font class="DataType">SUPPORT</font><font class="Normal">,listeContratsSup)</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deleteContracts(</font><font class="DataType">Config</font><font class="Normal">::</font><font class="DataType">PRODUIT</font><font class="Normal">,listeContratsProd)</font></br></div>
+<div id="264" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deletePropositions(</font><font class="DataType">Config</font><font class="Normal">::</font><font class="DataType">EXPERTISE</font><font class="Normal">,listePropositionsExp)</font></br></div>
+<div id="265" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@sqlQuery</font><font class="Normal">.deletePropositions(</font><font class="DataType">Config</font><font class="Normal">::</font><font class="DataType">SUPPORT</font><font class="Normal">,listePropositionsSup)</font></br></div>
+<div id="266" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="267" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;puts&nbsp;</font><font class="String">&quot;SqlQuery&nbsp;wasn't&nbsp;created&nbsp;:&nbsp;database&nbsp;update&nbsp;cannot&nbsp;be&nbsp;performed&quot;</font></br></div>
+<div id="268" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="269" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@clients</font><font class="Normal">.delClient(raison_sociale,div,dep)</font></br></div>
+<div id="270" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="271" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@contratsExpertise</font><font class="Normal">.deleteContracts(listeContratsExp)</font></br></div>
+<div id="272" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@contratsSupport</font><font class="Normal">.deleteContracts(listeContratsSup)</font></br></div>
+<div id="273" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@contratsProduits</font><font class="Normal">.deleteContracts(listeContratsProd)</font></br></div>
+<div id="274" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@propositionsExpertise</font><font class="Normal">.deletePropositions(listePropositionsExp)</font></br></div>
+<div id="275" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Others">@propositionsSupport</font><font class="Normal">.deletePropositions(listePropositionsSup)</font></br></div>
+<div id="276" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="277" class="line"><font class="Keyword">end</font></br></div>
+<div id="278" class="line"></br></div>
+<div id="279" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">#&nbsp;Mixin&nbsp;module&nbsp;for&nbsp;HTML&nbsp;version&nbsp;3&nbsp;generation&nbsp;methods.</font></br></div>
+<div id="280" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">module</font><font class="Normal">&nbsp;</font><font class="DataType">Html3</font><font class="Normal">&nbsp;</font><font class="Comment">#&nbsp;:nodoc:</font></br></div>
+<div id="281" class="line"></br></div>
+<div id="282" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;The&nbsp;DOCTYPE&nbsp;declaration&nbsp;for&nbsp;this&nbsp;version&nbsp;of&nbsp;HTML</font></br></div>
+<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;doctype</font></br></div>
+<div id="284" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%|</font><font class="String">&lt;!DOCTYPE</font><font class="Others">&nbsp;</font><font class="DataType">HTML</font><font class="Normal">&nbsp;</font><font class="DataType">PUBLIC</font><font class="Normal">&nbsp;</font><font class="String">&quot;-//W3C//DTD&nbsp;HTML&nbsp;3.2&nbsp;Final//EN&quot;</font><font class="Normal">&gt;|</font></br></div>
+<div id="285" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="286" class="line"></br></div>
+<div id="287" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;Initialise&nbsp;the&nbsp;HTML&nbsp;generation&nbsp;methods&nbsp;for&nbsp;this&nbsp;version.</font></br></div>
+<div id="288" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">def</font><font class="Normal">&nbsp;element_init</font></br></div>
+<div id="289" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extend&nbsp;</font><font class="DataType">TagMaker</font></br></div>
+<div id="290" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;=&nbsp;</font><font class="String">&quot;&quot;</font></br></div>
+<div id="291" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;-&nbsp;-</font></br></div>
+<div id="292" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">for</font><font class="Normal">&nbsp;element&nbsp;</font><font class="Keyword">in</font><font class="Others">&nbsp;%w[</font><font class="String">&nbsp;A&nbsp;TT&nbsp;I&nbsp;B&nbsp;U&nbsp;STRIKE&nbsp;BIG&nbsp;SMALL&nbsp;SUB&nbsp;SUP&nbsp;EM&nbsp;STRONG</font></br></div>
+<div id="293" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DFN&nbsp;CODE&nbsp;SAMP&nbsp;KBD&nbsp;VAR&nbsp;CITE&nbsp;FONT&nbsp;ADDRESS&nbsp;DIV&nbsp;center&nbsp;MAP</font></br></div>
+<div id="294" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;APPLET&nbsp;PRE&nbsp;XMP&nbsp;LISTING&nbsp;DL&nbsp;OL&nbsp;UL&nbsp;DIR&nbsp;MENU&nbsp;SELECT&nbsp;table&nbsp;TITLE</font></br></div>
+<div id="295" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STYLE&nbsp;SCRIPT&nbsp;H1&nbsp;H2&nbsp;H3&nbsp;H4&nbsp;H5&nbsp;H6&nbsp;TEXTAREA&nbsp;FORM&nbsp;BLOCKQUOTE</font></br></div>
+<div id="296" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CAPTION&nbsp;</font><font class="Others">]</font></br></div>
+<div id="297" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;+=&nbsp;&lt;&lt;-</font><font class="Keyword">BEGIN</font><font class="Others">&nbsp;+&nbsp;nn_element_def(element)&nbsp;+&nbsp;&lt;&lt;-END</font></br></div>
+<div id="298" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;#{</font><font class="Normal">element.downcase</font><font class="Others">}(attributes&nbsp;=&nbsp;{})</font></br></div>
+<div id="299" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">BEGIN</font></br></div>
+<div id="300" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="301" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">END</font></br></div>
+<div id="302" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="303" class="line"></br></div>
+<div id="304" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;-&nbsp;O&nbsp;EMPTY</font></br></div>
+<div id="305" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">for</font><font class="Normal">&nbsp;element&nbsp;</font><font class="Keyword">in</font><font class="Others">&nbsp;%w[</font><font class="String">&nbsp;IMG&nbsp;BASE&nbsp;BASEFONT&nbsp;BR&nbsp;AREA&nbsp;LINK&nbsp;PARAM&nbsp;HR&nbsp;INPUT</font></br></div>
+<div id="306" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ISINDEX&nbsp;META&nbsp;</font><font class="Others">]</font></br></div>
+<div id="307" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;+=&nbsp;&lt;&lt;-</font><font class="Keyword">BEGIN</font><font class="Others">&nbsp;+&nbsp;nOE_element_def(element)&nbsp;+&nbsp;&lt;&lt;-END</font></br></div>
+<div id="308" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;#{</font><font class="Normal">element.downcase</font><font class="Others">}(attributes&nbsp;=&nbsp;{})</font></br></div>
+<div id="309" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">BEGIN</font></br></div>
+<div id="310" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="311" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">END</font></br></div>
+<div id="312" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="313" class="line"></br></div>
+<div id="314" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;O&nbsp;O&nbsp;or&nbsp;-&nbsp;O</font></br></div>
+<div id="315" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">for</font><font class="Normal">&nbsp;element&nbsp;</font><font class="Keyword">in</font><font class="Others">&nbsp;%w[</font><font class="String">&nbsp;HTML&nbsp;HEAD&nbsp;BODY&nbsp;P&nbsp;PLAINTEXT&nbsp;DT&nbsp;DD&nbsp;LI&nbsp;OPTION&nbsp;tr</font></br></div>
+<div id="316" class="line"><font class="String">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;th&nbsp;td&nbsp;</font><font class="Others">]</font></br></div>
+<div id="317" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;methods&nbsp;+=&nbsp;&lt;&lt;-</font><font class="Keyword">BEGIN</font><font class="Others">&nbsp;+&nbsp;nO_element_def(element)&nbsp;+&nbsp;&lt;&lt;-END</font></br></div>
+<div id="318" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;#{</font><font class="Normal">element.downcase</font><font class="Others">}(attributes&nbsp;=&nbsp;{})</font></br></div>
+<div id="319" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">BEGIN</font></br></div>
+<div id="320" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="321" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">END</font></br></div>
+<div id="322" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="323" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;eval(methods)</font></br></div>
+<div id="324" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="325" class="line"></br></div>
+<div id="326" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="327" class="line"></br></div>
+<div id="328" class="line"><font class="Comment">#&nbsp;following&nbsp;snippet&nbsp;from&nbsp;Webrick's&nbsp;log.rb</font></br></div>
+<div id="329" class="line"><font class="Comment">#&nbsp;notice&nbsp;the&nbsp;erronous&nbsp;handling&nbsp;of&nbsp;the&nbsp;query&nbsp;method&nbsp;is_a?</font></br></div>
+<div id="330" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;format(arg)</font></br></div>
+<div id="331" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;str&nbsp;</font><font class="Keyword">=&nbsp;if</font><font class="Normal">&nbsp;arg.is_a?(</font><font class="DataType">Exception</font><font class="Normal">)</font></br></div>
+<div id="332" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="String">&quot;</font><font class="Others">#{</font><font class="Normal">arg.class</font><font class="Others">}</font><font class="String">:&nbsp;</font><font class="Others">#{</font><font class="Normal">arg.message</font><font class="Others">}</font><font class="String">\n\t&quot;</font><font class="Normal">&nbsp;&lt;&lt;</font></br></div>
+<div id="333" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg.backtrace.join(</font><font class="String">&quot;\n\t&quot;</font><font class="Normal">)&nbsp;&lt;&lt;&nbsp;</font><font class="String">&quot;\n&quot;</font></br></div>
+<div id="334" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">elsif</font><font class="Normal">&nbsp;arg.respond_to?(</font><font class="String">:to_str</font><font class="Normal">)</font></br></div>
+<div id="335" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg.to_str</font></br></div>
+<div id="336" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="337" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg.inspect</font></br></div>
+<div id="338" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="339" class="line"><font class="Keyword">end</font></br></div>
+<div id="340" class="line"></br></div>
+<div id="341" class="line"><font class="Comment">#&nbsp;following&nbsp;snippet&nbsp;from&nbsp;Webrick's&nbsp;httputils.rb</font></br></div>
+<div id="342" class="line"><font class="Comment">#&nbsp;Splitting&nbsp;regexps&nbsp;on&nbsp;several&nbsp;lines&nbsp;might&nbsp;be&nbsp;bad&nbsp;form,</font></br></div>
+<div id="343" class="line"><font class="Comment">#&nbsp;but&nbsp;not&nbsp;illegal&nbsp;in&nbsp;Ruby.&nbsp;</font></br></div>
+<div id="344" class="line"><font class="Comment">#&nbsp;This&nbsp;should&nbsp;probably&nbsp;be&nbsp;supported&nbsp;in&nbsp;the&nbsp;highlighting</font></br></div>
+<div id="345" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;split_header_value(str)</font></br></div>
+<div id="346" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;str.scan(</font><font class="Others">/((?:&quot;(?:\\.|[^&quot;])+?&quot;|[^&quot;,]+)+)</font></br></div>
+<div id="347" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(?:,\s*|\Z)/xn</font><font class="Normal">).collect{|v|&nbsp;v[</font><font class="DecVal">0</font><font class="Normal">]&nbsp;}</font></br></div>
+<div id="348" class="line"><font class="Keyword">end</font></br></div>
+<div id="349" class="line"></br></div>
+<div id="350" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Net::Telnet</font></br></div>
+<div id="351" class="line"><font class="Normal">string.gsub(</font><font class="Others">/#{</font><font class="DataType">IAC</font><font class="Others">}(</font></br></div>
+<div id="352" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[#{</font><font class="DataType">IAC</font><font class="Others">}#{</font><font class="DataType">AO</font><font class="Others">}#{</font><font class="DataType">AYT</font><font class="Others">}#{</font><font class="DataType">DM</font><font class="Others">}#{</font><font class="DataType">IP</font><font class="Others">}#{</font><font class="DataType">NOP</font><font class="Others">}]|</font></br></div>
+<div id="353" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[#{</font><font class="DataType">DO</font><font class="Others">}#{</font><font class="DataType">DONT</font><font class="Others">}#{</font><font class="DataType">WILL</font><font class="Others">}#{</font><font class="DataType">WONT</font><font class="Others">}]</font></br></div>
+<div id="354" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[#{</font><font class="DataType">OPT_BINARY</font><font class="Others">}-#{</font><font class="DataType">OPT_NEW_ENVIRON</font><font class="Others">}#{</font><font class="DataType">OPT_EXOPL</font><font class="Others">}]|</font></br></div>
+<div id="355" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#{</font><font class="DataType">SB</font><font class="Others">}[^#{</font><font class="DataType">IAC</font><font class="Others">}]*#{</font><font class="DataType">IAC</font><font class="Others">}#{</font><font class="DataType">SE</font><font class="Others">}</font></br></div>
+<div id="356" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)/xno</font><font class="Normal">)</font></br></div>
+<div id="357" class="line"></br></div>
+<div id="358" class="line"><font class="Comment">#&nbsp;following&nbsp;snippet&nbsp;from&nbsp;Webrick's&nbsp;httpresponse.rb</font></br></div>
+<div id="359" class="line"><font class="Comment">#&nbsp;the&nbsp;HEREDOC&nbsp;is&nbsp;not&nbsp;recognized&nbsp;as&nbsp;such</font></br></div>
+<div id="360" class="line"><font class="Others">@body</font><font class="Normal">&nbsp;&lt;&lt;&nbsp;&lt;&lt;-</font><font class="Keyword">_end_of_html_</font></br></div>
+<div id="361" class="line"><font class="Others">&lt;!DOCTYPE&nbsp;HTML&nbsp;PUBLIC&nbsp;&quot;-//W3C//DTD&nbsp;HTML&nbsp;4.0//EN&quot;&gt;</font></br></div>
+<div id="362" class="line"><font class="Others">&lt;HTML&gt;</font></br></div>
+<div id="363" class="line"><font class="Others">&nbsp;&nbsp;&lt;HEAD&gt;&lt;TITLE&gt;#{</font><font class="DataType">HTMLUtils</font><font class="Normal">::escape(</font><font class="Others">@reason_phrase</font><font class="Normal">)</font><font class="Others">}&lt;/TITLE&gt;&lt;/HEAD&gt;</font></br></div>
+<div id="364" class="line"><font class="Others">&nbsp;&nbsp;&lt;BODY&gt;</font></br></div>
+<div id="365" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&lt;H1&gt;#{</font><font class="DataType">HTMLUtils</font><font class="Normal">::escape(</font><font class="Others">@reason_phrase</font><font class="Normal">)</font><font class="Others">}&lt;/H1&gt;</font></br></div>
+<div id="366" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;#{</font><font class="DataType">HTMLUtils</font><font class="Normal">::escape(ex.message)</font><font class="Others">}</font></br></div>
+<div id="367" class="line"><font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&lt;HR&gt;</font></br></div>
+<div id="368" class="line"><font class="Keyword">_end_of_html_</font></br></div>
+<div id="369" class="line"></br></div>
+<div id="370" class="line"></br></div>
+<div id="371" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Webrick's&nbsp;httpproxy.rb</font></br></div>
+<div id="372" class="line"><font class="Comment">#&nbsp;here&nbsp;we&nbsp;should&nbsp;make&nbsp;sure&nbsp;that&nbsp;the&nbsp;symbol&nbsp;definition&nbsp;':'&nbsp;doesn't&nbsp;override</font></br></div>
+<div id="373" class="line"><font class="Comment">#&nbsp;the&nbsp;module&nbsp;operator&nbsp;'::'</font></br></div>
+<div id="374" class="line"><font class="DataType">Net</font><font class="Normal">::</font><font class="DataType">HTTP</font><font class="Normal">::version_1_2&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="DataType">RUBY_VERSION</font><font class="Normal">&nbsp;&lt;&nbsp;</font><font class="String">&quot;1.7&quot;</font></br></div>
+<div id="375" class="line"></br></div>
+<div id="376" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Webrick's&nbsp;cookie.rb</font></br></div>
+<div id="377" class="line"><font class="Comment">#&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;regexp&nbsp;is&nbsp;erronously&nbsp;highlighted&nbsp;like&nbsp;an&nbsp;operator</font></br></div>
+<div id="378" class="line"><font class="Normal">key,&nbsp;val&nbsp;=&nbsp;x.split(</font><font class="Others">/=/</font><font class="Normal">,</font><font class="DecVal">2</font><font class="Normal">)</font></br></div>
+<div id="379" class="line"></br></div>
+<div id="380" class="line"><font class="Comment">#&nbsp;the&nbsp;following&nbsp;are&nbsp;division&nbsp;operators</font></br></div>
+<div id="381" class="line"><font class="Comment">#&nbsp;it's&nbsp;a&nbsp;bit&nbsp;tricky&nbsp;to&nbsp;keep&nbsp;the&nbsp;operator&nbsp;apart&nbsp;from&nbsp;the&nbsp;regexp</font></br></div>
+<div id="382" class="line"><font class="Comment">#&nbsp;we&nbsp;currently&nbsp;require&nbsp;a&nbsp;space&nbsp;after&nbsp;the&nbsp;operator,&nbsp;but&nbsp;that&nbsp;is&nbsp;not&nbsp;quite&nbsp;right&nbsp;either</font></br></div>
+<div id="383" class="line"><font class="Normal">result&nbsp;=&nbsp;</font><font class="DecVal">8</font><font class="Normal">&nbsp;/&nbsp;</font><font class="DecVal">4</font></br></div>
+<div id="384" class="line"><font class="Normal">result&nbsp;/=&nbsp;divisor</font></br></div>
+<div id="385" class="line"></br></div>
+<div id="386" class="line"><font class="Comment">#&nbsp;test&nbsp;cases&nbsp;for&nbsp;general&nbsp;delimited&nbsp;input</font></br></div>
+<div id="387" class="line"><font class="Comment">#&nbsp;quoted&nbsp;strings</font></br></div>
+<div id="388" class="line"><font class="Others">%Q|</font><font class="String">this</font><font class="Others">&nbsp;</font><font class="Normal">is&nbsp;a&nbsp;string|</font></br></div>
+<div id="389" class="line"><font class="Others">%Q{</font><font class="String">this&nbsp;is&nbsp;a&nbsp;string</font><font class="Others">}</font></br></div>
+<div id="390" class="line"><font class="Others">%Q(</font><font class="String">this&nbsp;is&nbsp;a&nbsp;string</font><font class="Others">)</font></br></div>
+<div id="391" class="line"><font class="Others">%Q&lt;</font><font class="String">this&nbsp;is&nbsp;a&nbsp;string</font><font class="Others">&gt;</font></br></div>
+<div id="392" class="line"><font class="Others">%Q[</font><font class="String">this&nbsp;is&nbsp;a&nbsp;string</font><font class="Others">]</font></br></div>
+<div id="393" class="line"></br></div>
+<div id="394" class="line"><font class="Others">%|</font><font class="String">also</font><font class="Others">&nbsp;</font><font class="Normal">a&nbsp;string|</font></br></div>
+<div id="395" class="line"><font class="Others">%{</font><font class="String">also&nbsp;a&nbsp;string</font><font class="Others">}</font></br></div>
+<div id="396" class="line"><font class="Others">%(</font><font class="String">also&nbsp;a&nbsp;string</font><font class="Others">)</font></br></div>
+<div id="397" class="line"><font class="Others">%&lt;</font><font class="String">also&nbsp;a&nbsp;string</font><font class="Others">&gt;</font></br></div>
+<div id="398" class="line"><font class="Others">%[</font><font class="String">also&nbsp;a&nbsp;string</font><font class="Others">]</font></br></div>
+<div id="399" class="line"></br></div>
+<div id="400" class="line"><font class="Comment">#&nbsp;apostrophed&nbsp;strings</font></br></div>
+<div id="401" class="line"><font class="Others">%q|</font><font class="String">apostrophed|</font></br></div>
+<div id="402" class="line"><font class="String">%q{apostrophed}</font></br></div>
+<div id="403" class="line"><font class="String">%q(apostrophed)</font></br></div>
+<div id="404" class="line"><font class="String">%q&lt;apostrophed&gt;</font></br></div>
+<div id="405" class="line"><font class="String">%q[apostrophed]</font></br></div>
+<div id="406" class="line"></br></div>
+<div id="407" class="line"><font class="String">#</font><font class="Others">&nbsp;</font><font class="Normal">regular&nbsp;expressions</font></br></div>
+<div id="408" class="line"><font class="Others">%r{expression}</font></br></div>
+<div id="409" class="line"><font class="Others">%r(expression)</font></br></div>
+<div id="410" class="line"><font class="Others">%r&lt;expression&gt;</font></br></div>
+<div id="411" class="line"><font class="Others">%r[expression]</font></br></div>
+<div id="412" class="line"><font class="Others">%r|expression|</font></br></div>
+<div id="413" class="line"></br></div>
+<div id="414" class="line"><font class="Others">#&nbsp;</font><font class="Normal">shell&nbsp;commands</font></br></div>
+<div id="415" class="line"><font class="Others">%x{</font><font class="String">ls&nbsp;-l</font><font class="Others">}</font></br></div>
+<div id="416" class="line"><font class="Others">%x(</font><font class="String">ls&nbsp;-l</font><font class="Others">)</font></br></div>
+<div id="417" class="line"><font class="Others">%x&lt;</font><font class="String">ls&nbsp;-l</font><font class="Others">&gt;</font></br></div>
+<div id="418" class="line"><font class="Others">%x[</font><font class="String">ls&nbsp;-l</font><font class="Others">]</font></br></div>
+<div id="419" class="line"></br></div>
+<div id="420" class="line"><font class="Comment">#&nbsp;sometimes&nbsp;it's&nbsp;useful&nbsp;to&nbsp;have&nbsp;the&nbsp;command&nbsp;on&nbsp;multiple&nbsp;lines</font></br></div>
+<div id="421" class="line"><font class="Others">%x{</font><font class="String">ls&nbsp;-l&nbsp;|</font></br></div>
+<div id="422" class="line"><font class="String">grep&nbsp;test&nbsp;</font><font class="Others">}</font></br></div>
+<div id="423" class="line"></br></div>
+<div id="424" class="line"><font class="Comment">#&nbsp;token&nbsp;array</font></br></div>
+<div id="425" class="line"><font class="Others">%w{</font><font class="String">one&nbsp;two&nbsp;three</font><font class="Others">}</font></br></div>
+<div id="426" class="line"><font class="Others">%w(</font><font class="String">one&nbsp;two&nbsp;three</font><font class="Others">)</font></br></div>
+<div id="427" class="line"><font class="Others">%w&lt;</font><font class="String">one&nbsp;two&nbsp;three</font><font class="Others">&gt;</font></br></div>
+<div id="428" class="line"><font class="Others">%w[</font><font class="String">one&nbsp;two&nbsp;three</font><font class="Others">]</font></br></div>
+<div id="429" class="line"></br></div>
+<div id="430" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Net::IMAP</font></br></div>
+<div id="431" class="line"><font class="Comment">#&nbsp;I&nbsp;object&nbsp;to&nbsp;putting&nbsp;String,&nbsp;Integer&nbsp;and&nbsp;Array&nbsp;into&nbsp;kernel&nbsp;methods.</font></br></div>
+<div id="432" class="line"><font class="Comment">#&nbsp;While&nbsp;these&nbsp;classes&nbsp;are&nbsp;builtin&nbsp;in&nbsp;Ruby,&nbsp;this&nbsp;is&nbsp;an&nbsp;implementation&nbsp;detail</font></br></div>
+<div id="433" class="line"><font class="Comment">#&nbsp;that&nbsp;should&nbsp;not&nbsp;be&nbsp;exposed&nbsp;to&nbsp;the&nbsp;user.</font></br></div>
+<div id="434" class="line"><font class="Comment">#&nbsp;If&nbsp;we&nbsp;want&nbsp;to&nbsp;handle&nbsp;all&nbsp;std-lib&nbsp;classes,&nbsp;fine.&nbsp;But&nbsp;then&nbsp;they&nbsp;should&nbsp;be&nbsp;in&nbsp;their</font></br></div>
+<div id="435" class="line"><font class="Comment">#&nbsp;own&nbsp;std-lib&nbsp;keyword&nbsp;category.</font></br></div>
+<div id="436" class="line"></br></div>
+<div id="437" class="line"><font class="Keyword">def</font><font class="Normal">&nbsp;send_data(data)</font></br></div>
+<div id="438" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">case</font><font class="Normal">&nbsp;data</font></br></div>
+<div id="439" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DecVal">nil</font></br></div>
+<div id="440" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;put_string(</font><font class="String">&quot;NIL&quot;</font><font class="Normal">)</font></br></div>
+<div id="441" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">String</font></br></div>
+<div id="442" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_string_data(data)</font></br></div>
+<div id="443" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Integer</font></br></div>
+<div id="444" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_number_data(data)</font></br></div>
+<div id="445" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Array</font></br></div>
+<div id="446" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_list_data(data)</font></br></div>
+<div id="447" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Time</font></br></div>
+<div id="448" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_time_data(data)</font></br></div>
+<div id="449" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">when</font><font class="Normal">&nbsp;</font><font class="DataType">Symbol</font></br></div>
+<div id="450" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_symbol_data(data)</font></br></div>
+<div id="451" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="452" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data.send_data(</font><font class="DecVal">self</font><font class="Normal">)</font></br></div>
+<div id="453" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">end</font></br></div>
+<div id="454" class="line"><font class="Keyword">end</font></br></div>
+<div id="455" class="line"></br></div>
+<div id="456" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Net::POP</font></br></div>
+<div id="457" class="line"><font class="Comment">#&nbsp;class&nbsp;names&nbsp;can&nbsp;have&nbsp;numbers&nbsp;in&nbsp;them&nbsp;as&nbsp;long&nbsp;as&nbsp;they&nbsp;don't&nbsp;begin&nbsp;with&nbsp;numbers</font></br></div>
+<div id="458" class="line"><font class="Comment">#&nbsp;Ruby&nbsp;doesn't&nbsp;internally&nbsp;really&nbsp;make&nbsp;much&nbsp;of&nbsp;a&nbsp;difference&nbsp;between&nbsp;a&nbsp;class&nbsp;name&nbsp;and&nbsp;a&nbsp;constant</font></br></div>
+<div id="459" class="line"></br></div>
+<div id="460" class="line"><font class="Comment">#&nbsp;class&nbsp;aliases</font></br></div>
+<div id="461" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DataType">POP</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">POP3</font></br></div>
+<div id="462" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DataType">POPSession</font><font class="Normal">&nbsp;&nbsp;=&nbsp;</font><font class="DataType">POP3</font></br></div>
+<div id="463" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DataType">POP3Session</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">POP3</font></br></div>
+<div id="464" class="line"></br></div>
+<div id="465" class="line"><font class="Comment">#&nbsp;&quot;member&nbsp;access&quot;</font></br></div>
+<div id="466" class="line"><font class="DataType">POP</font><font class="Normal">::</font><font class="DataType">Session</font><font class="Normal">.</font><font class="DataType">COUNT</font><font class="Normal">.attribute.calc_with(</font><font class="DecVal">2</font><font class="Normal">){&nbsp;|arg|&nbsp;puts&nbsp;arg&nbsp;}</font></br></div>
+<div id="467" class="line"></br></div>
+<div id="468" class="line"><font class="Comment">#&nbsp;snippet&nbsp;from&nbsp;Net::SMTP</font></br></div>
+<div id="469" class="line"><font class="Comment">#&nbsp;This&nbsp;breaks&nbsp;the&nbsp;code&nbsp;folding.&nbsp;I&nbsp;think&nbsp;we&nbsp;would&nbsp;need&nbsp;to</font></br></div>
+<div id="470" class="line"><font class="Comment">#&nbsp;handle&nbsp;the&nbsp;'\'&nbsp;that&nbsp;continues&nbsp;the&nbsp;statement&nbsp;to&nbsp;the&nbsp;next&nbsp;line</font></br></div>
+<div id="471" class="line"><font class="Comment">#&nbsp;in&nbsp;some&nbsp;way&nbsp;to&nbsp;make&nbsp;these&nbsp;kind&nbsp;of&nbsp;things&nbsp;not&nbsp;break&nbsp;something.</font></br></div>
+<div id="472" class="line"><font class="Normal">raise&nbsp;</font><font class="DataType">ArgumentError</font><font class="Normal">,&nbsp;</font><font class="String">'both&nbsp;user&nbsp;and&nbsp;secret&nbsp;are&nbsp;required'</font><font class="Normal">\</font></br></div>
+<div id="473" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;user&nbsp;</font><font class="Keyword">and</font><font class="Normal">&nbsp;secret</font></br></div>
+<div id="474" class="line"><font class="Normal">&nbsp;</font></br></div>
+<div id="475" class="line"><font class="Comment">#&nbsp;string&nbsp;escapes&nbsp;must&nbsp;detect&nbsp;escaping&nbsp;the&nbsp;escape&nbsp;char</font></br></div>
+<div id="476" class="line"><font class="Normal">str&nbsp;=&nbsp;</font><font class="String">&quot;\\&quot;</font></br></div>
+<div id="477" class="line"><font class="Normal">str&nbsp;=&nbsp;</font><font class="String">&quot;\\\\&quot;</font></br></div>
+<div id="478" class="line"><font class="Comment">#&nbsp;this&nbsp;is&nbsp;not&nbsp;part&nbsp;of&nbsp;the&nbsp;string</font></br></div>
+<div id="479" class="line"><font class="Others">%x{</font><font class="String">echo&nbsp;\\\}\\</font><font class="Others">}</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;prints&nbsp;\}\</font></br></div>
+<div id="480" class="line"><font class="Comment">#&nbsp;this&nbsp;is&nbsp;not&nbsp;part&nbsp;of&nbsp;the&nbsp;command</font></br></div>
+</div>
+</body>
+</html>
+

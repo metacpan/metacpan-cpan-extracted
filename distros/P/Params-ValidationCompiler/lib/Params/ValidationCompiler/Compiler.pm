@@ -3,7 +3,7 @@ package Params::ValidationCompiler::Compiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Carp qw( croak );
 use Eval::Closure qw( eval_closure );
@@ -921,7 +921,7 @@ Params::ValidationCompiler::Compiler - Object that implements the check subrouti
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =for Pod::Coverage .*
 

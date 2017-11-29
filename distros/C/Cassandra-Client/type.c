@@ -9,7 +9,7 @@
 #include "type.h"
 #include "proto.h"
 
-int unpack_type_nocroak(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_type *output)
+int unpack_type_nocroak(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, struct cc_type *output)
 {
     if (UNLIKELY(unpack_short_nocroak(aTHX_ input, len, pos, &output->type_id) != 0))
         return -1;
@@ -179,7 +179,7 @@ int unpack_type_nocroak(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_ty
     return 0;
 }
 
-void unpack_type(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_type *output)
+void unpack_type(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, struct cc_type *output)
 {
     if (UNLIKELY(unpack_type_nocroak(aTHX_ input, len, pos, output) != 0)) {
         cc_type_destroy(aTHX_ output);

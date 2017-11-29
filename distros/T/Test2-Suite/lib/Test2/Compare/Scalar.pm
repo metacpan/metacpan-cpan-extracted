@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Test2::Util::HashBase qw/item/;
 
@@ -14,7 +14,7 @@ use Scalar::Util qw/reftype blessed/;
 sub init {
     my $self = shift;
     croak "'item' is a required attribute"
-        unless $self->{+ITEM};
+        unless defined $self->{+ITEM};
 
     $self->SUPER::init();
 }

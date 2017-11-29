@@ -1,0 +1,735 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Sections</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Keyword">package</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">;</font></br></div>
+<div id="2" class="line"></br></div>
+<div id="3" class="line"><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">strict</font><font class="Normal">;</font></br></div>
+<div id="4" class="line"><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">warnings</font><font class="Normal">;</font></br></div>
+<div id="5" class="line"><font class="Function">use</font><font class="Normal">&nbsp;Carp;</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">vars</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">$VERSION</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="8" class="line"><font class="DataType">$VERSION</font><font class="Normal">=</font><font class="Operator">&quot;</font><font class="SpecialString">0.01</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="9" class="line"></br></div>
+<div id="10" class="line"><font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;:textctrl&nbsp;:font&nbsp;:colour&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="11" class="line"><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::DND</font><font class="Normal">;</font></br></div>
+<div id="12" class="line"><font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;wxTheClipboard&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="13" class="line"><font class="Function">use</font><font class="Normal">&nbsp;base&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;Wx::TextCtrl&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="14" class="line"><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::Event</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;EVT_CHAR&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="15" class="line"></br></div>
+<div id="16" class="line"><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">KeyEchoes</font><font class="Normal">;</font></br></div>
+<div id="17" class="line"><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">UndoRedo</font><font class="Normal">;</font></br></div>
+<div id="18" class="line"><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">Highlighter</font><font class="Normal">;</font></br></div>
+<div id="19" class="line"></br></div>
+<div id="20" class="line"><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$defaultfont</font><font class="Normal">&nbsp;=&nbsp;[</font><font class="DecVal">10</font><font class="Normal">,&nbsp;wxFONTFAMILY_MODERN,&nbsp;wxFONTSTYLE_NORMAL,&nbsp;wxFONTWEIGHT_NORMAL,&nbsp;</font><font class="DecVal">0</font><font class="Normal">];</font></br></div>
+<div id="21" class="line"></br></div>
+<div id="22" class="line"><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$debug</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="23" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="24" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Data::Dumper</font><font class="Normal">;</font></br></div>
+<div id="26" class="line"><font class="Normal">}</font></br></div>
+<div id="27" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="28" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">new</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$class</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$class</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">new</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="31" class="line"></br></div>
+<div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK}&nbsp;=&nbsp;</font><font class="Keyword">sub&nbsp;</font><font class="Normal">{};</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}&nbsp;=&nbsp;{</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doremove</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doreplace</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br></div>
+<div id="36" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">dowrite</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br></div>
+<div id="37" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;};</font></br></div>
+<div id="38" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="39" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="40" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{OVRMODE}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="41" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS}&nbsp;=&nbsp;[];</font></br></div>
+<div id="42" class="line"></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetFont</font><font class="Normal">(&nbsp;</font><font class="Function">Wx::Font</font><font class="Normal">-&gt;new(</font><font class="DataType">@$defaultfont</font><font class="Normal">)&nbsp;);</font></br></div>
+<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;EVT_CHAR(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;\&amp;OnChar);</font></br></div>
+<div id="45" class="line"></br></div>
+<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">;</font></br></div>
+<div id="47" class="line"><font class="Normal">}</font></br></div>
+<div id="48" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="49" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">AppendText</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="50" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="51" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">append</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="52" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Append</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="53" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="54" class="line"><font class="Normal">}</font></br></div>
+<div id="55" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="56" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Broadcast</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="58" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plugs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">foreach</font><font class="Normal">&nbsp;(</font><font class="DataType">@$plugs</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Preprocessor">$_</font><font class="Normal">-&gt;</font><font class="DataType">Receive</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="62" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">1</font><font class="Normal">;</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="64" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="65" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$flag</font><font class="Normal">;</font></br></div>
+<div id="66" class="line"><font class="Normal">}</font></br></div>
+<div id="67" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="68" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Call2Remove</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="69" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$call</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="70" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$call</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="Others">.</font><font class="Char">*</font><font class="Others">remove</font><font class="Char">$</font><font class="Operator">/</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="71" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">))</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="73" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carp&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Call&nbsp;'</font><font class="DataType">$call</font><font class="Operator">'</font><font class="SpecialString">&nbsp;is&nbsp;not&nbsp;a&nbsp;remove&nbsp;type</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="74" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Function">undef</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="76" class="line"><font class="Normal">}</font></br></div>
+<div id="77" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="78" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Call2Replace</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="79" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$call</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$old</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DataType">$sel</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="80" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$call</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="Others">.</font><font class="Char">*</font><font class="Others">replace</font><font class="Char">$</font><font class="Operator">/</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="81" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$old</font><font class="Normal">),&nbsp;</font><font class="DataType">$txt</font><font class="Normal">)</font></br></div>
+<div id="82" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="83" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carp&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Call&nbsp;'</font><font class="DataType">$call</font><font class="Operator">'</font><font class="SpecialString">&nbsp;is&nbsp;not&nbsp;a&nbsp;replace&nbsp;type</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="84" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Function">undef</font></br></div>
+<div id="85" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="86" class="line"><font class="Normal">}</font></br></div>
+<div id="87" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="88" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Call2WriteText</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="89" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$call</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="90" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$call</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="Others">.</font><font class="Char">*</font><font class="Others">write</font><font class="Char">$</font><font class="Operator">/</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="91" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$txt</font></br></div>
+<div id="92" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="93" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carp&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Call&nbsp;'</font><font class="DataType">$call</font><font class="Operator">'</font><font class="SpecialString">&nbsp;is&nbsp;not&nbsp;a&nbsp;write&nbsp;type</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="94" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Function">undef</font></br></div>
+<div id="95" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="96" class="line"><font class="Normal">}</font></br></div>
+<div id="97" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="98" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Callback</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="99" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">@_</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK}&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;&nbsp;}</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK};</font></br></div>
+<div id="102" class="line"><font class="Normal">}</font></br></div>
+<div id="103" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="104" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">CanUndo</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="105" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="106" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">canundo</font><font class="Operator">'</font><font class="Normal">);</font></br></div>
+<div id="107" class="line"><font class="Normal">}</font></br></div>
+<div id="108" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="109" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">CanRedo</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">canredo</font><font class="Operator">'</font><font class="Normal">);</font></br></div>
+<div id="112" class="line"><font class="Normal">}</font></br></div>
+<div id="113" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="114" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Clear</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="116" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">clear</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="117" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Clear</font><font class="Normal">;</font></br></div>
+<div id="118" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="119" class="line"><font class="Normal">}</font></br></div>
+<div id="120" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="121" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">ClearSelection</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="122" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="123" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$ins</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetInsertionPoint</font><font class="Normal">;</font></br></div>
+<div id="124" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetSelection</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">,&nbsp;</font><font class="DataType">$ins</font><font class="Normal">);</font></br></div>
+<div id="125" class="line"><font class="Normal">}</font></br></div>
+<div id="126" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="127" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Command</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="128" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="129" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="130" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">@_</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}</font><font class="Operator">-</font><font class="Normal">&gt;{</font><font class="DataType">$name</font><font class="Normal">}&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}</font><font class="Operator">-</font><font class="Normal">&gt;{</font><font class="DataType">$name</font><font class="Normal">}</font></br></div>
+<div id="132" class="line"><font class="Normal">}</font></br></div>
+<div id="133" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="134" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Copy</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="135" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="136" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">copy</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="137" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Copy</font><font class="Normal">;</font></br></div>
+<div id="138" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="139" class="line"><font class="Normal">}</font></br></div>
+<div id="140" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="141" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Cut</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="142" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="143" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">cut</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="144" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Cut</font><font class="Normal">;</font></br></div>
+<div id="145" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="146" class="line"><font class="Normal">}</font></br></div>
+<div id="147" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="148" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">DoRemove</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="149" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="150" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DataType">$sel</font><font class="Normal">,&nbsp;</font><font class="DataType">$ins</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="151" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">ClearSelection</font><font class="Normal">;</font></br></div>
+<div id="152" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Remove</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">));</font></br></div>
+<div id="153" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="154" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetInsertionPoint</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">);</font></br></div>
+<div id="155" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="156" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="157" class="line"><font class="Normal">}</font></br></div>
+<div id="158" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="159" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">DoReplace</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="160" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$old</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DataType">$sel</font><font class="Normal">,&nbsp;</font><font class="DataType">$ins</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">ClearSelection</font><font class="Normal">;</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Replace</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$old</font><font class="Normal">),&nbsp;</font><font class="DataType">$txt</font><font class="Normal">);</font></br></div>
+<div id="163" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$sel</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetSelection</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">));</font></br></div>
+<div id="165" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="166" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="167" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetInsertionPoint</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">);</font></br></div>
+<div id="168" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="169" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="170" class="line"><font class="Normal">}</font></br></div>
+<div id="171" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="172" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">DoWrite</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="173" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DataType">$sel</font><font class="Normal">,&nbsp;</font><font class="DataType">$ins</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="174" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">ClearSelection</font><font class="Normal">;</font></br></div>
+<div id="175" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetInsertionPoint</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">);</font></br></div>
+<div id="176" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">WriteText</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">);</font></br></div>
+<div id="177" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$sel</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="178" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetSelection</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Function">length</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">));</font></br></div>
+<div id="179" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="180" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetInsertionPoint</font><font class="Normal">(</font><font class="DataType">$ins</font><font class="Normal">);</font></br></div>
+<div id="182" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="183" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="184" class="line"><font class="Normal">}</font></br></div>
+<div id="185" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="186" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">FindPluginId</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="187" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$name</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="188" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plgs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="189" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">foreach</font><font class="Normal">&nbsp;(</font><font class="DataType">@$plgs</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="191" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$name</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$plgs</font><font class="Normal">-&gt;[</font><font class="DataType">$index</font><font class="Normal">]</font><font class="Operator">-</font><font class="Normal">&gt;Name)&nbsp;{</font></br></div>
+<div id="192" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$index</font></br></div>
+<div id="193" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="194" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;++;</font></br></div>
+<div id="195" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="196" class="line"><font class="Comment">#&nbsp;&nbsp;&nbsp;carp&nbsp;&quot;Plugin&nbsp;$name&nbsp;is&nbsp;not&nbsp;loaded\n&quot;;</font></br></div>
+<div id="197" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Function">undef</font><font class="Normal">;</font></br></div>
+<div id="198" class="line"><font class="Normal">}</font></br></div>
+<div id="199" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="200" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">FindPlugin</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="201" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$name</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="202" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plgs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="203" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">foreach</font><font class="Normal">&nbsp;(</font><font class="DataType">@$plgs</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="204" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$name</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="Preprocessor">$_</font><font class="Normal">-&gt;</font><font class="DataType">Name</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="205" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Preprocessor">$_</font></br></div>
+<div id="206" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="207" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="208" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Function">undef</font><font class="Normal">;</font></br></div>
+<div id="209" class="line"><font class="Normal">}</font></br></div>
+<div id="210" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="211" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">GetClipboardText</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="212" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="213" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$txt</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">undef</font><font class="Normal">;</font></br></div>
+<div id="214" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(wxTheClipboard-&gt;Open)&nbsp;{</font></br></div>
+<div id="215" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Clipboard&nbsp;open</font><font class="Char">\n</font><font class="Operator">&quot;</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="216" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$textdata</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">Wx::TextDataObject</font><font class="Normal">-&gt;new;</font></br></div>
+<div id="217" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$ok</font><font class="Normal">&nbsp;=&nbsp;wxTheClipboard-&gt;GetData(&nbsp;</font><font class="DataType">$textdata</font><font class="Normal">&nbsp;);</font></br></div>
+<div id="218" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">(&nbsp;</font><font class="DataType">$ok</font><font class="Normal">&nbsp;)&nbsp;{</font></br></div>
+<div id="219" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$txt</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$textdata</font><font class="Normal">-&gt;</font><font class="DataType">GetText</font><font class="Normal">;</font></br></div>
+<div id="220" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="221" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">&nbsp;</font><font class="Operator">and</font><font class="Normal">&nbsp;</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$txt</font><font class="Normal">))&nbsp;{&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Clipboard&nbsp;text:&nbsp;</font><font class="DataType">$txt</font><font class="Char">\n</font><font class="Operator">&quot;</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="222" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wxTheClipboard-&gt;Close;</font></br></div>
+<div id="223" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="224" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$txt</font><font class="Normal">;</font></br></div>
+<div id="225" class="line"><font class="Normal">}</font></br></div>
+<div id="226" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="227" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">GetLineNumber</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="228" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$index</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="229" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">))&nbsp;{&nbsp;</font><font class="DataType">$index</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetInsertionPoint</font><font class="Normal">&nbsp;};</font></br></div>
+<div id="230" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$col</font><font class="Normal">,&nbsp;</font><font class="DataType">$line</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">PositionToXY</font><font class="Normal">(</font><font class="DataType">$index</font><font class="Normal">);</font></br></div>
+<div id="231" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$line</font><font class="Normal">;</font></br></div>
+<div id="232" class="line"><font class="Normal">}</font></br></div>
+<div id="233" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="234" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">HasSelection</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="236" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$selb</font><font class="Normal">,&nbsp;</font><font class="DataType">$sele</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetSelection</font><font class="Normal">;</font></br></div>
+<div id="237" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="DataType">$selb</font><font class="Normal">&nbsp;</font><font class="Operator">ne</font><font class="Normal">&nbsp;</font><font class="DataType">$sele</font><font class="Normal">)</font></br></div>
+<div id="238" class="line"><font class="Normal">}</font></br></div>
+<div id="239" class="line"></br></div>
+<div id="240" class="line"><font class="Comment">#&nbsp;</font><font class="Alert">TODO</font><font class="Comment">&nbsp;make&nbsp;this&nbsp;unicode&nbsp;compatible</font></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="241" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">IsWriteable</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$key</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="243" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(((</font><font class="DataType">$key</font><font class="Normal">&nbsp;&gt;=&nbsp;</font><font class="DecVal">32</font><font class="Normal">)&nbsp;</font><font class="Operator">and</font><font class="Normal">&nbsp;(</font><font class="DataType">$key</font><font class="Normal">&nbsp;&lt;&nbsp;</font><font class="DecVal">127</font><font class="Normal">))&nbsp;</font><font class="Operator">or</font><font class="Normal">&nbsp;((</font><font class="DataType">$key</font><font class="Normal">&nbsp;&gt;&nbsp;</font><font class="DecVal">127</font><font class="Normal">)&nbsp;</font><font class="Operator">and</font><font class="Normal">&nbsp;(</font><font class="DataType">$key</font><font class="Normal">&nbsp;&lt;&nbsp;</font><font class="DecVal">256</font><font class="Normal">)))&nbsp;{</font></br></div>
+<div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">1</font></br></div>
+<div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">0</font></br></div>
+<div id="247" class="line"><font class="Normal">}</font></br></div>
+<div id="248" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="249" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Listening</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="251" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">@_</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="252" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$new</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="253" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$new</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING})&nbsp;{</font></br></div>
+<div id="254" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plgs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="255" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$new</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="256" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Function">unshift</font><font class="Normal">&nbsp;</font><font class="DataType">@$plgs</font><font class="Normal">,&nbsp;</font><font class="DataType">$self</font></br></div>
+<div id="257" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="258" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Function">shift</font><font class="Normal">&nbsp;</font><font class="DataType">@$plgs</font></br></div>
+<div id="259" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="260" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}&nbsp;=&nbsp;</font><font class="DataType">$new</font></br></div>
+<div id="261" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="262" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}</font></br></div>
+<div id="264" class="line"><font class="Normal">}</font></br></div>
+<div id="265" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="266" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">LoadFile</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="267" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="268" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">load</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="269" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">LoadFile</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="270" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="271" class="line"><font class="Normal">}</font></br></div>
+<div id="272" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="273" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">LoadPlugin</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="274" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="275" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plug</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">undef</font><font class="Normal">;</font></br></div>
+<div id="276" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="277" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">#Does&nbsp;anybody&nbsp;have&nbsp;a&nbsp;better&nbsp;idea&nbsp;for&nbsp;this?</font></br></div>
+<div id="278" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">Syntax::Kamelon::Wx::PluggableTextCtrl::</font><font class="DataType">$name</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="279" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$plug</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$name</font><font class="Normal">-&gt;</font><font class="DataType">new</font><font class="Normal">(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="280" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Function">defined</font><font class="Normal">(</font><font class="DataType">$plug</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="281" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">RegisterPlugin</font><font class="Normal">(</font><font class="DataType">$plug</font><font class="Normal">);</font></br></div>
+<div id="282" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carp&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">unable&nbsp;to&nbsp;load&nbsp;plugin&nbsp;</font><font class="DataType">$name</font><font class="Char">\n</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="284" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="285" class="line"><font class="Normal">}</font></br></div>
+<div id="286" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="287" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Name</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="288" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="289" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">ref</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">;</font></br></div>
+<div id="290" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=~</font><font class="Operator">s/</font><font class="Others">.</font><font class="Char">*</font><font class="Others">::</font><font class="Operator">//</font><font class="Normal">;</font></br></div>
+<div id="291" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">plugin&nbsp;name&nbsp;is&nbsp;</font><font class="DataType">$name</font><font class="Char">\n</font><font class="Operator">&quot;</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="292" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$name</font></br></div>
+<div id="293" class="line"><font class="Normal">}</font></br></div>
+<div id="294" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="295" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">OnChar</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="296" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$event</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="297" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$k</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$event</font><font class="Normal">-&gt;</font><font class="DataType">GetKeyCode</font><font class="Normal">;</font></br></div>
+<div id="298" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$k</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DecVal">322</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="Comment">#Insert&nbsp;key&nbsp;pressed,&nbsp;record&nbsp;flip&nbsp;insert/ovr&nbsp;mode.</font></br></div>
+<div id="299" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">OvrMode</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="300" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">OvrMode</font><font class="Normal">(</font><font class="DecVal">0</font><font class="Normal">)</font></br></div>
+<div id="301" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</font><font class="Keyword">else</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="302" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">OvrMode</font><font class="Normal">(</font><font class="DecVal">1</font><font class="Normal">)</font></br></div>
+<div id="303" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="304" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="305" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">key</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">$event</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="306" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$event</font><font class="Normal">-&gt;</font><font class="DataType">Skip</font><font class="Normal">;</font></br></div>
+<div id="307" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="308" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$callback</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Callback</font><font class="Normal">;</font></br></div>
+<div id="309" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&amp;</font><font class="DataType">$callback</font><font class="Normal">;</font></br></div>
+<div id="310" class="line"><font class="Normal">}</font></br></div>
+<div id="311" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="312" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">OvrMode</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="313" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="314" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">@_</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{OVRMODE}&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;&nbsp;}</font></br></div>
+<div id="315" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{OVRMODE};</font></br></div>
+<div id="316" class="line"><font class="Normal">}</font></br></div>
+<div id="317" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="318" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Paste</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="319" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="320" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">paste</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="321" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Paste</font><font class="Normal">;</font></br></div>
+<div id="322" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="323" class="line"><font class="Normal">}</font></br></div>
+<div id="324" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="325" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Plugin</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="326" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="327" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$id</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="328" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plgs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="329" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$id</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="Char">^</font><font class="BaseN">\d</font><font class="Char">+$</font><font class="Operator">/</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="330" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$id</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">FindPluginId</font><font class="Normal">(</font><font class="DataType">$id</font><font class="Normal">);</font></br></div>
+<div id="331" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="332" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">@_</font><font class="Normal">)&nbsp;{&nbsp;</font></br></div>
+<div id="333" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS}</font><font class="Operator">-</font><font class="Normal">&gt;[</font><font class="DataType">$id</font><font class="Normal">]&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;&nbsp;</font></br></div>
+<div id="334" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="335" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS}</font><font class="Operator">-</font><font class="Normal">&gt;[</font><font class="DataType">$id</font><font class="Normal">];</font></br></div>
+<div id="336" class="line"><font class="Normal">}</font></br></div>
+<div id="337" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="338" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Receive</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="339" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="340" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$name</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="341" class="line"><font class="Comment">#&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;($debug)&nbsp;{&nbsp;print&nbsp;&quot;received&nbsp;$name\n&quot;;&nbsp;print&nbsp;Dumper&nbsp;$self-&gt;{COMMANDS}&nbsp;}</font></br></div>
+<div id="342" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Function">exists</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}</font><font class="Operator">-</font><font class="Normal">&gt;{</font><font class="DataType">$name</font><font class="Normal">})&nbsp;{</font></br></div>
+<div id="343" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">)&nbsp;{&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">executing&nbsp;</font><font class="DataType">$name</font><font class="Char">\n</font><font class="Operator">&quot;</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="344" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$cmd</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Command</font><font class="Normal">(</font><font class="DataType">$name</font><font class="Normal">);</font></br></div>
+<div id="345" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;&amp;</font><font class="DataType">$cmd</font><font class="Normal">(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="346" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="347" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DecVal">0</font></br></div>
+<div id="348" class="line"><font class="Normal">}</font></br></div>
+<div id="349" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="350" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Redo</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="351" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="352" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">redo</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="353" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Redo</font><font class="Normal">;</font></br></div>
+<div id="354" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="355" class="line"><font class="Normal">}</font></br></div>
+<div id="356" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="357" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">RegisterPlugin</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="358" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$plug</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="359" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$pl</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="360" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">push</font><font class="Normal">&nbsp;</font><font class="DataType">@$pl</font><font class="Normal">,&nbsp;</font><font class="DataType">$plug</font><font class="Normal">;</font></br></div>
+<div id="361" class="line"><font class="Normal">}</font></br></div>
+<div id="362" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="363" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Remove</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="364" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="365" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">@call</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Remove2Call</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="366" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="DataType">@call</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="367" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Remove</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="368" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="369" class="line"><font class="Normal">}</font></br></div>
+<div id="370" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="371" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Remove2Call</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="372" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$end</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="373" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$sel</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="374" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$selb</font><font class="Normal">,&nbsp;</font><font class="DataType">$sele</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetSelection</font><font class="Normal">;</font></br></div>
+<div id="375" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;((</font><font class="DataType">$selb</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$begin</font><font class="Normal">)&nbsp;</font><font class="Operator">and</font><font class="Normal">&nbsp;(</font><font class="DataType">$sele</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$end</font><font class="Normal">))&nbsp;{&nbsp;</font><font class="DataType">$sel</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">1</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="376" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="Operator">'</font><font class="String">remove</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetRange</font><font class="Normal">(</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$end</font><font class="Normal">),&nbsp;</font><font class="DataType">$sel</font><font class="Normal">)</font></br></div>
+<div id="377" class="line"><font class="Normal">}</font></br></div>
+<div id="378" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="379" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Replace</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="380" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="381" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">@call</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Replace2Call</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="382" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="DataType">@call</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="383" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Replace</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="384" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="385" class="line"><font class="Normal">}</font></br></div>
+<div id="386" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="387" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Replace2Call</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="388" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$end</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="389" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$sel</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="390" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$selb</font><font class="Normal">,&nbsp;</font><font class="DataType">$sele</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetSelection</font><font class="Normal">;</font></br></div>
+<div id="391" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;((</font><font class="DataType">$selb</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$begin</font><font class="Normal">)&nbsp;</font><font class="Operator">and</font><font class="Normal">&nbsp;(</font><font class="DataType">$sele</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="DataType">$end</font><font class="Normal">))&nbsp;{&nbsp;</font><font class="DataType">$sel</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">1</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="392" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="Operator">'</font><font class="String">replace</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetRange</font><font class="Normal">(</font><font class="DataType">$begin</font><font class="Normal">,&nbsp;</font><font class="DataType">$end</font><font class="Normal">),&nbsp;</font><font class="DataType">$sel</font><font class="Normal">)</font></br></div>
+<div id="393" class="line"><font class="Normal">}</font></br></div>
+<div id="394" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="395" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">SaveFile</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="396" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="397" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">save</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="398" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">SaveFile</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="399" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="400" class="line"><font class="Normal">}</font></br></div>
+<div id="401" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="402" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">NativePlugins</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="403" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="404" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="Operator">qw[</font><font class="Normal">&nbsp;Highlighter&nbsp;KeyEchoes&nbsp;UndoRedo&nbsp;&nbsp;&nbsp;</font><font class="Operator">]</font></br></div>
+<div id="405" class="line"><font class="Normal">}</font></br></div>
+<div id="406" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="407" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Syntax</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="408" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="409" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">syntax</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="410" class="line"><font class="Normal">}</font></br></div>
+<div id="411" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="412" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">Undo</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="413" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="414" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">undo</font><font class="Operator">'</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="415" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Undo</font><font class="Normal">;</font></br></div>
+<div id="416" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="417" class="line"><font class="Normal">}</font></br></div>
+<div id="418" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="419" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">WriteText</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="420" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="421" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">@call</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">WriteText2Call</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="422" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="DataType">@call</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="423" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">WriteText</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="424" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="425" class="line"><font class="Normal">}</font></br></div>
+<div id="426" class="line"></br></div>
+</div>
+<br>
+				<div class="content">
+<div id="427" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">WriteText2Call</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="428" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">)&nbsp;=&nbsp;</font><font class="DataType">@_</font><font class="Normal">;</font></br></div>
+<div id="429" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;(</font><font class="Operator">'</font><font class="String">write</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">GetInsertionPoint</font><font class="Normal">,&nbsp;</font><font class="DataType">$txt</font><font class="Normal">,&nbsp;</font><font class="DecVal">0</font><font class="Normal">);</font></br></div>
+<div id="430" class="line"><font class="Normal">}</font></br></div>
+<div id="431" class="line"></br></div>
+<div id="432" class="line"></br></div>
+<div id="433" class="line"><font class="DecVal">1</font><font class="Normal">;</font></br></div>
+<div id="434" class="line"><font class="Keyword">__END__</font></br></div>
+</div>
+</body>
+</html>
+

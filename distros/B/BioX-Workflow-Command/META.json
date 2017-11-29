@@ -60,6 +60,7 @@
             "File::Slurp" : "0",
             "File::Spec" : "0",
             "File::stat" : "0",
+            "JSON" : "0",
             "List::Util" : "0",
             "Log::Log4perl" : "0",
             "Memoize" : "0",
@@ -94,7 +95,7 @@
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
-            "JSON" : "0",
+            "IO::Interactive" : "0",
             "Test::Class::Moose" : "0",
             "Test::Class::Moose::Load" : "0",
             "Test::Class::Moose::Runner" : "0",
@@ -117,7 +118,7 @@
          "web" : "https://github.com/biosails/BioX-Workflow-Command"
       }
    },
-   "version" : "2.2.3",
+   "version" : "2.3.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

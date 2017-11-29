@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
@@ -9,6 +9,7 @@ our $VERSION = '0.020';
 #pod     $rs->by_dist( 'My-Dist' );
 #pod     $rs->by_author( 'PREACTION' );
 #pod     $rs->since( '2016-01-01T00:00:00' );
+#pod     $rs->maturity( 'stable' );
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -65,6 +66,21 @@ sub since( $self, $date ) {
     return $self->search( { 'report.fulldate' => { '>=', $fulldate } }, { join => 'report' } );
 }
 
+#pod =method maturity
+#pod
+#pod     $rs = $rs->maturity( 'stable' );
+#pod
+#pod Restrict results to only those dists that are stable. Also supported:
+#pod 'dev' to restrict to only development dists.
+#pod
+#pod =cut
+
+sub maturity( $self, $maturity ) {
+    my %map = ( 'stable' => 1, 'dev' => 2 );
+    $maturity = $map{ $maturity };
+    return $self->search( { 'me.distmat' => $maturity } );
+}
+
 1;
 
 __END__
@@ -77,7 +93,7 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -85,6 +101,7 @@ version 0.020
     $rs->by_dist( 'My-Dist' );
     $rs->by_author( 'PREACTION' );
     $rs->since( '2016-01-01T00:00:00' );
+    $rs->maturity( 'stable' );
 
 =head1 DESCRIPTION
 
@@ -114,6 +131,13 @@ constraints.
 
 Restrict results to only those that have been updated since the given
 ISO8601 date.
+
+=head2 maturity
+
+    $rs = $rs->maturity( 'stable' );
+
+Restrict results to only those dists that are stable. Also supported:
+'dev' to restrict to only development dists.
 
 =head1 SEE ALSO
 

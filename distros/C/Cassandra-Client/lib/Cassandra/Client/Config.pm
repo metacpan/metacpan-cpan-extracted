@@ -1,6 +1,6 @@
 package Cassandra::Client::Config;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Config::VERSION = '0.13';
+$Cassandra::Client::Config::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -23,12 +23,13 @@ sub new {
         timer_granularity       => 0.1,
         request_timeout         => 11,
         warmup                  => 0,
-        throttler               => undef,
-        throttler_config        => undef,
         max_concurrent_queries  => 1000,
-        command_queue           => "Default",
-        command_queue_config    => undef,
         tls                     => 0,
+
+        throttler               => undef,
+        command_queue           => undef,
+        retry_policy            => undef,
+        load_balancing_policy   => undef,
     }, $class;
 
     if (my $cp= $config->{contact_points}) {
@@ -57,17 +58,31 @@ sub new {
     }
 
     # Strings
-    for (qw/cql_version keyspace compression default_consistency throttler/) {
+    for (qw/cql_version keyspace compression default_consistency/) {
         if (exists($config->{$_})) {
             $self->{$_}= defined($config->{$_}) ? "$config->{$_}" : undef;
         }
     }
 
-    # Arbitrary hashes
-    for (qw/throttler_config command_queue_config/) {
-        if (exists($config->{$_})) {
-            $self->{$_}= $config->{$_};
-        }
+    if (exists($config->{throttler})) {
+        die "throttler must be a Cassandra::Client::Policy::Throttle::Default"
+            unless $config->{throttler}->isa("Cassandra::Client::Policy::Throttle::Default");
+        $self->{throttler}= $config->{throttler};
+    }
+    if (exists($config->{retry_policy})) {
+        die "retry_policy must be a Cassandra::Client::Policy::Retry::Default"
+            unless $config->{retry_policy}->isa("Cassandra::Client::Policy::Retry::Default");
+        $self->{retry_policy}= $config->{retry_policy};
+    }
+    if (exists($config->{command_queue})) {
+        die "command_queue must be a Cassandra::Client::Policy::Queue::Default"
+            unless $config->{command_queue}->isa("Cassandra::Client::Policy::Queue::Default");
+        $self->{command_queue}= $config->{command_queue};
+    }
+    if (exists($config->{load_balancing_policy})) {
+        die "load_balancing_policy must be a Cassandra::Client::Policy::LoadBalancing::Default"
+            unless $config->{load_balancing_policy}->isa("Cassandra::Client::Policy::LoadBalancing::Default");
+        $self->{load_balancing_policy}= $config->{load_balancing_policy};
     }
 
     $self->{username}= $config->{username};
@@ -88,7 +103,7 @@ Cassandra::Client::Config
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

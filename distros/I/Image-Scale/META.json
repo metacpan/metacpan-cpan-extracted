@@ -4,7 +4,7 @@
       "Andy Grundman <andy@hybridized.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -45,6 +45,6 @@
          "web" : "https://github.com/andygrundman/Image-Scale"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

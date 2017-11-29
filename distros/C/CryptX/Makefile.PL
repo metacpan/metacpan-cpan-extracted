@@ -13,6 +13,10 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
 my $myextlib = "src/liballinone$Config{lib_ext}";
 my $mycflags = "$Config{ccflags} $Config{cccdlflags} $Config{optimize}";
 
+#FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
+$mycflags .= " $ENV{CFLAGS}"   if $ENV{CFLAGS};
+$mycflags .= " $ENV{CPPFLAGS}" if $ENV{CPPFLAGS};
+
 #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
 $mycflags =~ s/-flto\b//g;
 
@@ -87,18 +91,22 @@ sub MY::postamble {
   my $version_patch = q{
 versionsync:
 	$(NOECHO) perl _generators/version_patch.pl sync
-
 versioninc:
 	$(NOECHO) perl _generators/version_patch.pl inc
-
 versionincdev:
 	$(NOECHO) perl _generators/version_patch.pl incdev
-
 versiondec:
 	$(NOECHO) perl _generators/version_patch.pl dec
-
 versiondecdev:
 	$(NOECHO) perl _generators/version_patch.pl decdev
+gencode:
+	$(NOECHO) perl _generators/gen.pl gencode
+gentest: all
+	$(NOECHO) perl _generators/gen.pl gentest
+openssltest: all
+	$(NOECHO) perl -Mblib t/openssl/dsa-test.pl
+	$(NOECHO) perl -Mblib t/openssl/ecc-test.pl
+	$(NOECHO) perl -Mblib t/openssl/rsa-test.pl
 };
 
   return "$myextlib\n$version_patch";

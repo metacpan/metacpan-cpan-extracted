@@ -1,5 +1,5 @@
 package Test::Moose;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use strict;
 use warnings;
@@ -98,7 +98,7 @@ Test::Moose - Test functions for Moose specific features
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 SYNOPSIS
 

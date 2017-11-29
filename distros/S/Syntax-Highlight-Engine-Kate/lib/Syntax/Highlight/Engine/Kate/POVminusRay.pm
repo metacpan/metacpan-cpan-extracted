@@ -11,7 +11,7 @@
 
 package Syntax::Highlight::Engine::Kate::POVminusRay;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;

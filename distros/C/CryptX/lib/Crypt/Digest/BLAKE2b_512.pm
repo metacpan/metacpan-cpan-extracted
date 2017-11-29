@@ -4,7 +4,7 @@ package Crypt::Digest::BLAKE2b_512;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2b_512 blake2b_512_hex blake2b_512_b64 blake2b_512_b64u blake2b_512_file blake2b_512_file_hex blake2b_512_file_b64 blake2b_512_file_b64u )] );
@@ -216,14 +216,12 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<https://blake2.net/|https://blake2.net/>
+=item * L<https://blake2.net/>
 
-=item * L<https://tools.ietf.org/html/rfc7693|https://tools.ietf.org/html/rfc7693>
+=item * L<https://tools.ietf.org/html/rfc7693>
 
 =back
 
 =cut
-
-__END__

@@ -2,6 +2,13 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.702     2017-11-28 15:18:40-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed log output disappearing when the `default_adapter` is set.
+      Thanks @dallaylaen! [Github #65]
+
 1.701     2017-10-02 14:36:51-05:00 America/Chicago
 
     [Fixed]
@@ -26,7 +33,7 @@ Revision history for Log-Any
 
     - LOG_ANY_DEFAULT_ADAPTER now correctly logs to the given adapter.
 
-      Previously, if no other adapter was set, Log::Any used it's
+      Previously, if no other adapter was set, Log::Any used its
       default, super-fast "Null" proxy that simply drops all messages
       without checking adapters. Now Log::Any will correctly detect the
       environment variable and create the correct, normal proxy object.

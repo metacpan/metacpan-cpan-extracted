@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.024000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -25,9 +25,10 @@ my %WriteMakefileArgs = (
     "script/evalserveradvanced"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.024000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "App::EvalServerAdvanced",
   "PREREQ_PM" => {
+    "App::EvalServerAdvanced::ConstantCalc" => 0,
     "App::EvalServerAdvanced::Protocol" => 0,
     "B::Deparse" => 0,
     "BSD::Resource" => 0,
@@ -45,7 +46,9 @@ my %WriteMakefileArgs = (
     "Linux::Clone" => 0,
     "Linux::Seccomp" => 0,
     "List::Util" => 0,
+    "Module::Runtime" => 0,
     "Moo" => 0,
+    "Moo::Role" => 0,
     "POSIX" => 0,
     "Path::Tiny" => 0,
     "Perl::Tidy" => 0,
@@ -56,8 +59,9 @@ my %WriteMakefileArgs = (
     "Sys::Linux::Namespace" => 0,
     "TOML" => 0,
     "Unix::Mknod" => 0,
+    "YAML::XS" => 0,
     "charnames" => 0,
-    "constant" => 0,
+    "feature" => 0,
     "overload" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -67,7 +71,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +79,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::EvalServerAdvanced::ConstantCalc" => 0,
   "App::EvalServerAdvanced::Protocol" => 0,
   "B::Deparse" => 0,
   "BSD::Resource" => 0,
@@ -94,7 +99,9 @@ my %FallbackPrereqs = (
   "Linux::Clone" => 0,
   "Linux::Seccomp" => 0,
   "List::Util" => 0,
+  "Module::Runtime" => 0,
   "Moo" => 0,
+  "Moo::Role" => 0,
   "POSIX" => 0,
   "Path::Tiny" => 0,
   "Perl::Tidy" => 0,
@@ -106,8 +113,9 @@ my %FallbackPrereqs = (
   "TOML" => 0,
   "Test::More" => 0,
   "Unix::Mknod" => 0,
+  "YAML::XS" => 0,
   "charnames" => 0,
-  "constant" => 0,
+  "feature" => 0,
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

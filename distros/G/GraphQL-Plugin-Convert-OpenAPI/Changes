@@ -1,4 +1,10 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.03	Tue Nov 28 07:52:54 GMT 2017
+ - make nullable not override non-null for allOf
+
+0.02	Tue Nov 28 06:25:04 GMT 2017
+ - implement talk to remote and local (Mojolicious) app
+
 0.01	Thu Nov 23 19:16:31 GMT 2017
  - first version

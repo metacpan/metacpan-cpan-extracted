@@ -188,6 +188,9 @@ In this case second C<lclone()> call won't call C<HOOK_CLONE> again and will clo
 Full clone: same as C<lclone()> but handles cross-references: references to the same data will be the same references.
 If a cycled reference is present in $source, it will remain cycled in cloned data.
 
+If and object being cloned via C<fclone()> and has C<HOOK_CLONE> which calls C<lclone($self)> / C<clone($self)> / C<fclone($self)>, then it will act
+like C<fclone($self)> with the same dictinonary as the top call.
+
 =head4 clone ($source, [$with_cross_checks])
 
 If C<$with_cross_checks> is false or omitted, behaves like C<lclone()>, otherwise like C<fclone()>

@@ -13,7 +13,7 @@ Moose::Manual::FAQ - Frequently asked questions about Moose
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 FREQUENTLY ASKED QUESTIONS
 

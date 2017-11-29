@@ -4,7 +4,7 @@ package Crypt::Cipher::Skipjack;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::Skipjack - Symetric cipher Skipjack, key size: 80 bits (Crypt::CBC compliant)
+Crypt::Cipher::Skipjack - Symmetric cipher Skipjack, key size: 80 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
@@ -110,12 +110,10 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher>
 
-=item * L<http://en.wikipedia.org/wiki/Skipjack_(cipher)|http://en.wikipedia.org/wiki/Skipjack_(cipher)>
+=item * L<https://en.wikipedia.org/wiki/Skipjack_(cipher)>
 
 =back
 
 =cut
-
-__END__

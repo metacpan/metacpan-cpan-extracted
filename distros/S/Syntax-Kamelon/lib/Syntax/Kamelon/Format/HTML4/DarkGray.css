@@ -3,6 +3,11 @@
   font-size: 1em;
   background: #3f3f3f;
   color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 font.Alert {
 	color: Yellow;

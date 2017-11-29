@@ -64,7 +64,7 @@ thead td {
   text-decoration: underline;
 }
 tbody td {
-  border-bottom: 1px solid #eee; 
+  border-bottom: 1px solid #ddd;
 }
 #OQdata {
   clear: both;

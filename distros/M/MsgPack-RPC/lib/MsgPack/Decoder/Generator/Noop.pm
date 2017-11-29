@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::Noop;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::Noop::VERSION = '2.0.0';
+$MsgPack::Decoder::Generator::Noop::VERSION = '2.0.1';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -22,7 +22,7 @@ MsgPack::Decoder::Generator::Noop
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

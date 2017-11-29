@@ -27,31 +27,31 @@ name: Neovim-RPC
 provides:
   Neovim::RPC:
     file: lib/Neovim/RPC.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::API:
     file: lib/Neovim/RPC/API.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::API::AutoDiscover:
     file: lib/Neovim/RPC/API/AutoDiscover.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::API::Command:
     file: lib/Neovim/RPC/API/Command.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::Plugin:
     file: lib/Neovim/RPC/Plugin.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::Plugin::Echo:
     file: lib/Neovim/RPC/Plugin/Echo.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::Plugin::FileToPackageName:
     file: lib/Neovim/RPC/Plugin/FileToPackageName.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::Plugin::FlipOperator:
     file: lib/Neovim/RPC/Plugin/FlipOperator.pm
-    version: v1.0.0
+    version: v1.0.1
   Neovim::RPC::Plugin::LoadPlugin:
     file: lib/Neovim/RPC/Plugin/LoadPlugin.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Class::Load: '0'
   Getopt::Long: '0'
@@ -70,7 +70,7 @@ requires:
   MsgPack::Encoder: '0'
   MsgPack::RPC: '0'
   MsgPack::Type::Ext: '0'
-  Promises: '0'
+  Promises: '0.98'
   Try::Tiny: '0'
   experimental: '0'
   perl: v5.20.0
@@ -80,7 +80,7 @@ resources:
   bugtracker: https://github.com/yanick/Neovim-RPC/issues
   homepage: https://github.com/yanick/Neovim-RPC
   repository: https://github.com/yanick/Neovim-RPC.git
-version: 1.0.0
+version: 1.0.1
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

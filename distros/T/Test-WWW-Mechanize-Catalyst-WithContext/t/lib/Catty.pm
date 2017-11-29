@@ -14,6 +14,7 @@ use Cwd;
 __PACKAGE__->config(
     name => 'Catty',
     root => cwd . '/t/root',
+    home => cwd . '/t',
 );
 __PACKAGE__->setup();
 __PACKAGE__->log->levels("fatal");

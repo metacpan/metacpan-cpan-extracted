@@ -3,83 +3,82 @@ abstract: 'XML stylesheet system'
 author:
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Module::Build: 0.3601
-  Test::Class: 0
-  Test::Class::Load: 0
-  Test::More: 0.94
-  base: 0
-  lib: 0
-  strict: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Class: '0'
+  Test::Class::Load: '0'
+  Test::More: '0.94'
+  base: '0'
+  lib: '0'
+  strict: '0'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-XSS
 provides:
   XML::XSS:
     file: lib/XML/XSS.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Comment:
     file: lib/XML/XSS/Comment.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Document:
     file: lib/XML/XSS/Document.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Element:
     file: lib/XML/XSS/Element.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::ProcessingInstruction:
     file: lib/XML/XSS/ProcessingInstruction.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Role::Renderer:
     file: lib/XML/XSS/Role/Renderer.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Role::StyleAttribute:
     file: lib/XML/XSS/Role/StyleAttribute.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::StyleAttribute:
     file: lib/XML/XSS/StyleAttribute.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Stylesheet::HTML2TD:
     file: lib/XML/XSS/Stylesheet/HTML2TD.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Template:
     file: lib/XML/XSS/Template.pm
-    version: v0.3.4
+    version: v0.3.5
   XML::XSS::Text:
     file: lib/XML/XSS/Text.pm
-    version: v0.3.4
+    version: v0.3.5
 requires:
-  Getopt::Long: 0
-  Moose: 0
-  Moose::Exporter: 0
-  Moose::Role: 0
-  MooseX::ClassAttribute: 0
-  MooseX::Clone: 0
-  MooseX::SemiAffordanceAccessor: 0
-  Perl::Tidy: 0
-  Scalar::Util: 0
-  XML::LibXML: 0
-  overload: 0
+  Getopt::Long: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::Clone: '0'
+  MooseX::SemiAffordanceAccessor: '0'
+  Perl::Tidy: '0'
+  Scalar::Util: '0'
+  XML::LibXML: '0'
+  experimental: '0'
+  overload: '0'
   perl: v5.10.0
-  warnings: 0
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=XML-XSS
-  homepage: http://search.cpan.org/dist/XML-XSS/
+  bugtracker: https://github.com/yanick/xml-xss/issues
+  homepage: https://github.com/yanick/xml-xss
   repository: https://github.com/yanick/xml-xss.git
-version: 0.3.4
+version: 0.3.5
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
 x_contributors:
-  - 'Alexandr Ciornii <chorny@cpan.org>'
   - 'Dave Rolsky <autarch@urth.org>'
-  - 'Karen Etheridge <ether@cpan.org>'
-  - 'Reini Urban <rurban@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

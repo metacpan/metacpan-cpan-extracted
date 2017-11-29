@@ -2,7 +2,7 @@ package Crypt::PK::DH;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( dh_shared_secret )] );
@@ -13,7 +13,6 @@ use Carp;
 use CryptX;
 use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile pem_to_der);
-use Scalar::Util 'looks_like_number';
 
 my %DH_PARAMS = (
   ike768  => { g => 2, p => 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'.
@@ -226,7 +225,7 @@ sub generate_key {
     # group name
     return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if $DH_PARAMS{$param};
     # size
-    return $self->_generate_key_size($param) if looks_like_number($param);
+    return $self->_generate_key_size($param) if $param && $param =~ /^[0-9]+/;
   }
   elsif (ref $param eq 'SCALAR') {
     my $data = $$param;
@@ -329,7 +328,7 @@ Uses Yarrow-based cryptographically strong random number generator seeded with
 random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($groupsize);
- ### $groupsize (in bytes) corresponds to DH params (p, g) predefined by libtomcrypt
+ ### $groupsize (in bytes) corresponds to DH parameters (p, g) predefined by libtomcrypt
  # 96   =>  DH-768
  # 128  =>  DH-1024
  # 192  =>  DH-1536
@@ -355,9 +354,9 @@ The following variants are available since CryptX-0.032
  $pk->generate_key($param_hash)
  # $param_hash is { g => $g, p => $p }
  # where $g is the generator (base) in a hex string and $p is the prime in a hex string
- 
+
  $pk->generate_key(\$dh_param)
- # $dh_param is the content of DER or PEM file with DH params
+ # $dh_param is the content of DER or PEM file with DH parameters
  # e.g. openssl dhparam 2048
 
 =head2 import_key
@@ -380,7 +379,7 @@ I<Since: CryptX-0.032>
 
 =head2 export_key
 
-B<BEWARE:> DH key format change - since v0.049 it is compatible with libtocrypt 1.18.
+B<BEWARE:> DH key format change - since v0.049 it is compatible with libtomcrypt 1.18.
 
  my $private = $pk->export_key('private');
  #or
@@ -481,3 +480,5 @@ The following functions/methods were removed in removed in v0.049:
 =item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange|https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
 
 =back
+
+=cut

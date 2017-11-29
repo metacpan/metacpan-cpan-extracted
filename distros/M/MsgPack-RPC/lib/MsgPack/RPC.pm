@@ -1,7 +1,7 @@
 package MsgPack::RPC;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: MessagePack RPC client
-$MsgPack::RPC::VERSION = '2.0.0';
+$MsgPack::RPC::VERSION = '2.0.1';
 
 use strict;
 use warnings;
@@ -282,7 +282,7 @@ MsgPack::RPC - MessagePack RPC client
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 SYNOPSIS
 

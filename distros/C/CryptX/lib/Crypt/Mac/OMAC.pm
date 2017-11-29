@@ -4,7 +4,7 @@ package Crypt::Mac::OMAC;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( omac omac_hex omac_b64 omac_b64u )] );
@@ -149,10 +149,8 @@ Logically joins all arguments into a single string, and returns its OMAC message
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://en.wikipedia.org/wiki/OMAC_%28cryptography%29|https://en.wikipedia.org/wiki/OMAC_%28cryptography%29>
+=item * L<https://en.wikipedia.org/wiki/OMAC_%28cryptography%29>
 
 =back
 
 =cut
-
-__END__

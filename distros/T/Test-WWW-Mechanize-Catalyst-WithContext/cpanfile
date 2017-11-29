@@ -6,10 +6,12 @@ requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Test';
 requires 'HTTP::Request';
 requires 'Moose';
+requires 'MooseX::Aliases';
 requires 'Test::WWW::Mechanize::Catalyst';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
     requires 'Test::Exception';
+    requires 'Test::Warn';
 };
 

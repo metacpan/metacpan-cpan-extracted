@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<script type="text/javascript" language="JavaScript"><!--
+function block_expand(b, e) {
+	var marker_e = b.concat('e');
+	var marker_f = b.concat('f');
+	document.getElementById(marker_e).style.display="none";
+	document.getElementById(marker_f).style.display="inline";
+	for (i = Number(b) + 1; i <= Number(e); ++i) {
+		document.getElementById(i).style.display="inline";
+		var im_e = i.toString().concat('e');
+		var im_f = i.toString().concat('f');
+		if (document.getElementById(im_f) !== null) {
+			document.getElementById(im_e).style.display="none";
+			document.getElementById(im_f).style.display="inline";
+		}
+	}
+}
+function block_fold(b, e) {
+	var marker_e = b.concat('e');
+	var marker_f = b.concat('f');
+	document.getElementById(marker_e).style.display="inline";
+	document.getElementById(marker_f).style.display="none";
+	for (i = Number(b) + 1; i <= Number(e); ++i) {
+		document.getElementById(i).style.display="none";
+	}
+}
+//--></script>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile template file with code folding</title>
+</head>
+<body>
+<div id="1" class="line"><div class="fold">&nbsp;</div><font class="Keyword">package</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">;</font></br></div>
+<div id="2" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="3" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">strict</font><font class="Normal">;</font></br></div>
+<div id="4" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">warnings</font><font class="Normal">;</font></br></div>
+<div id="5" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;Carp;</font></br></div>
+<div id="6" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="7" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Keyword">vars</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">$VERSION</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="8" class="line"><div class="fold">&nbsp;</div><font class="DataType">$VERSION</font><font class="Normal">=</font><font class="Operator">&quot;</font><font class="SpecialString">0.01</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="9" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="10" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;:textctrl&nbsp;:font&nbsp;:colour&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="11" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::DND</font><font class="Normal">;</font></br></div>
+<div id="12" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;Wx&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;wxTheClipboard&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="13" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;base&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;Wx::TextCtrl&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="14" class="line"><div class="fold">&nbsp;</div><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Wx::Event</font><font class="Normal">&nbsp;</font><font class="Operator">qw(</font><font class="Normal">&nbsp;EVT_CHAR&nbsp;</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="15" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="16" class="line"><div class="fold">&nbsp;</div><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">KeyEchoes</font><font class="Normal">;</font></br></div>
+<div id="17" class="line"><div class="fold">&nbsp;</div><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">UndoRedo</font><font class="Normal">;</font></br></div>
+<div id="18" class="line"><div class="fold">&nbsp;</div><font class="Function">require</font><font class="Normal">&nbsp;</font><font class="Function">Syntax::Kamelon</font><font class="Normal">::</font><font class="Function">Wx</font><font class="Normal">::</font><font class="Function">PluggableTextCtrl</font><font class="Normal">::</font><font class="Function">Highlighter</font><font class="Normal">;</font></br></div>
+<div id="19" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="20" class="line"><div class="fold">&nbsp;</div><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$defaultfont</font><font class="Normal">&nbsp;=&nbsp;[</font><font class="DecVal">10</font><font class="Normal">,&nbsp;wxFONTFAMILY_MODERN,&nbsp;wxFONTSTYLE_NORMAL,&nbsp;wxFONTWEIGHT_NORMAL,&nbsp;</font><font class="DecVal">0</font><font class="Normal">];</font></br></div>
+<div id="21" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="22" class="line"><div class="fold">&nbsp;</div><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$debug</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="23" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="24" class="line"><div id="24f" class="fold" onclick="block_fold('24', '26')">-</div><div id="24e" class="fold" onclick="block_expand('24', '26')" style="display:none;">+</div>
+	<font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="DataType">$debug</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="25" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">use</font><font class="Normal">&nbsp;</font><font class="Function">Data::Dumper</font><font class="Normal">;</font></br></div>
+<div id="26" class="line"><div class="fold">&nbsp;</div><font class="Normal">}</font></br></div>
+<div id="27" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="28" class="line"><div id="28f" class="fold" onclick="block_fold('28', '47')">-</div><div id="28e" class="fold" onclick="block_expand('28', '47')" style="display:none;">+</div>
+	<font class="Keyword">sub&nbsp;</font><font class="Function">new</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="29" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$class</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="30" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$class</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">new</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="31" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="32" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{CALLBACK}&nbsp;=&nbsp;</font><font class="Keyword">sub&nbsp;</font><font class="Normal">{};</font></br></div>
+<div id="33" class="line"><div id="33f" class="fold" onclick="block_fold('33', '37')">-</div><div id="33e" class="fold" onclick="block_expand('33', '37')" style="display:none;">+</div>
+	<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{COMMANDS}&nbsp;=&nbsp;{</font></br></div>
+<div id="34" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doremove</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoRemove,</font></br></div>
+<div id="35" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">doreplace</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoReplace,</font></br></div>
+<div id="36" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Operator">'</font><font class="String">dowrite</font><font class="Operator">'</font><font class="Normal">&nbsp;=&gt;&nbsp;\&amp;DoWrite,</font></br></div>
+<div id="37" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;};</font></br></div>
+<div id="38" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{LISTENING}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="39" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="40" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{OVRMODE}&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="41" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS}&nbsp;=&nbsp;[];</font></br></div>
+<div id="42" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="43" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SetFont</font><font class="Normal">(&nbsp;</font><font class="Function">Wx::Font</font><font class="Normal">-&gt;new(</font><font class="DataType">@$defaultfont</font><font class="Normal">)&nbsp;);</font></br></div>
+<div id="44" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;EVT_CHAR(</font><font class="DataType">$self</font><font class="Normal">,&nbsp;\&amp;OnChar);</font></br></div>
+<div id="45" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="46" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">;</font></br></div>
+<div id="47" class="line"><div class="fold">&nbsp;</div><font class="Normal">}</font></br></div>
+<div id="48" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="49" class="line"><div id="49f" class="fold" onclick="block_fold('49', '54')">-</div><div id="49e" class="fold" onclick="block_expand('49', '54')" style="display:none;">+</div>
+	<font class="Keyword">sub&nbsp;</font><font class="Function">AppendText</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="50" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="51" class="line"><div id="51f" class="fold" onclick="block_fold('51', '53')">-</div><div id="51e" class="fold" onclick="block_expand('51', '53')" style="display:none;">+</div>
+	<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">unless</font><font class="Normal">&nbsp;(</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">Broadcast</font><font class="Normal">(</font><font class="Operator">'</font><font class="String">append</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="52" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;</font><font class="DataType">SUPER</font><font class="Normal">::</font><font class="DataType">Append</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">);</font></br></div>
+<div id="53" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="54" class="line"><div class="fold">&nbsp;</div><font class="Normal">}</font></br></div>
+<div id="55" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="56" class="line"><div id="56f" class="fold" onclick="block_fold('56', '66')">-</div><div id="56e" class="fold" onclick="block_expand('56', '66')" style="display:none;">+</div>
+	<font class="Keyword">sub&nbsp;</font><font class="Function">Broadcast</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="57" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$self</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="58" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$plugs</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DataType">$self</font><font class="Normal">-&gt;{PLUGINS};</font></br></div>
+<div id="59" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">0</font><font class="Normal">;</font></br></div>
+<div id="60" class="line"><div id="60f" class="fold" onclick="block_fold('60', '64')">-</div><div id="60e" class="fold" onclick="block_expand('60', '64')" style="display:none;">+</div>
+	<font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">foreach</font><font class="Normal">&nbsp;(</font><font class="DataType">@$plugs</font><font class="Normal">)&nbsp;{</font></br></div>
+<div id="61" class="line"><div id="61f" class="fold" onclick="block_fold('61', '63')">-</div><div id="61e" class="fold" onclick="block_expand('61', '63')" style="display:none;">+</div>
+	<font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(</font><font class="Preprocessor">$_</font><font class="Normal">-&gt;</font><font class="DataType">Receive</font><font class="Normal">(</font><font class="DataType">@_</font><font class="Normal">))&nbsp;{</font></br></div>
+<div id="62" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">$flag</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">1</font><font class="Normal">;</font></br></div>
+<div id="63" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="64" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;}</font></br></div>
+<div id="65" class="line"><div class="fold">&nbsp;</div><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;</font><font class="DataType">$flag</font><font class="Normal">;</font></br></div>
+<div id="66" class="line"><div class="fold">&nbsp;</div><font class="Normal">}</font></br></div>
+<div id="67" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="68" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="69" class="line"><div class="fold">&nbsp;</div></br></div>
+<div id="70" class="line"><div class="fold">&nbsp;</div><font class="DecVal">1</font><font class="Normal">;</font></br></div>
+<div id="71" class="line"><div class="fold">&nbsp;</div><font class="Keyword">__END__</font></br></div>
+</body>
+</html>
+

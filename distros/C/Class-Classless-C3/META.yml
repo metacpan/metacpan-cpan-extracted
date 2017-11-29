@@ -1,10 +1,10 @@
 --- #YAML:1.0
 name:               Class-Classless-C3
-version:            1.00
+version:            1.01
 abstract:           Classless object system framework
 author:
     - John Williams <smailliw@gmail.com>
-license:            unknown
+license:            artistic/GPL
 distribution_type:  module
 configure_requires:
     ExtUtils::MakeMaker:  0

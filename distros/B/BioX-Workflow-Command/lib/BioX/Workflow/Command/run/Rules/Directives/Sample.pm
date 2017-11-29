@@ -194,7 +194,7 @@ Infiles to be processed
 
 has 'sample_files' => (
     is     => 'rw',
-    isa    => Paths,
+    isa    => AbsPaths,
     coerce => 1,
 );
 

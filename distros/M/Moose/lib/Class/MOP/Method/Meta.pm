@@ -1,5 +1,5 @@
 package Class::MOP::Method::Meta;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use strict;
 use warnings;
@@ -93,7 +93,7 @@ Class::MOP::Method::Meta - Method Meta Object for C<meta> methods
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 DESCRIPTION
 

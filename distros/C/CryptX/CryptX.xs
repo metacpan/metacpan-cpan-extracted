@@ -33,6 +33,9 @@ typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
 
 typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
   ccm_state state;
+  int direction;
+  int tag_len;
+  unsigned long pt_len;
   int id;
 } *Crypt__AuthEnc__CCM;
 
@@ -60,6 +63,16 @@ typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
   chacha_state state;
   int id;
 } *Crypt__Stream__ChaCha;
+
+typedef struct salsa20_struct {         /* used by Crypt::Stream::Salsa20 */
+  salsa20_state state;
+  int id;
+} *Crypt__Stream__Salsa20;
+
+typedef struct sosemanuk_struct {       /* used by Crypt::Stream::Sosemanuk */
+  sosemanuk_state state;
+  int id;
+} *Crypt__Stream__Sosemanuk;
 
 typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
   rc4_state state;
@@ -324,73 +337,10 @@ MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 PROTOTYPES: DISABLE
 
 BOOT:
-    if(register_cipher(&blowfish_desc)==-1)    { croak("FATAL: cannot register_cipher blowfish"); }
-    if(register_cipher(&rc5_desc)==-1)         { croak("FATAL: cannot register_cipher rc5"); }
-    if(register_cipher(&rc6_desc)==-1)         { croak("FATAL: cannot register_cipher rc6"); }
-    if(register_cipher(&rc2_desc)==-1)         { croak("FATAL: cannot register_cipher rc2"); }
-    if(register_cipher(&saferp_desc)==-1)      { croak("FATAL: cannot register_cipher saferp"); }
-    if(register_cipher(&safer_k64_desc)==-1)   { croak("FATAL: cannot register_cipher safer_k64"); }
-    if(register_cipher(&safer_k128_desc)==-1)  { croak("FATAL: cannot register_cipher safer_k128"); }
-    if(register_cipher(&safer_sk64_desc)==-1)  { croak("FATAL: cannot register_cipher safer_sk64"); }
-    if(register_cipher(&safer_sk128_desc)==-1) { croak("FATAL: cannot register_cipher safer_sk128"); }
-    if(register_cipher(&aes_desc)==-1)         { croak("FATAL: cannot register_cipher aes"); }
-    if(register_cipher(&xtea_desc)==-1)        { croak("FATAL: cannot register_cipher xtea"); }
-    if(register_cipher(&twofish_desc)==-1)     { croak("FATAL: cannot register_cipher twofish"); }
-    if(register_cipher(&des_desc)==-1)         { croak("FATAL: cannot register_cipher des"); }
-    if(register_cipher(&des3_desc)==-1)        { croak("FATAL: cannot register_cipher des3"); }
-    if(register_cipher(&cast5_desc)==-1)       { croak("FATAL: cannot register_cipher cast5"); }
-    if(register_cipher(&noekeon_desc)==-1)     { croak("FATAL: cannot register_cipher noekeon"); }
-    if(register_cipher(&skipjack_desc)==-1)    { croak("FATAL: cannot register_cipher skipjack"); }
-    if(register_cipher(&khazad_desc)==-1)      { croak("FATAL: cannot register_cipher khazad"); }
-    if(register_cipher(&anubis_desc)==-1)      { croak("FATAL: cannot register_cipher anubis"); }
-    if(register_cipher(&kseed_desc)==-1)       { croak("FATAL: cannot register_cipher kseed"); }
-    if(register_cipher(&kasumi_desc)==-1)      { croak("FATAL: cannot register_cipher kasumi"); }
-    if(register_cipher(&multi2_desc)==-1)      { croak("FATAL: cannot register_cipher multi2"); }
-    if(register_cipher(&camellia_desc)==-1)    { croak("FATAL: cannot register_cipher camellia"); }
-    /* --- */
-    if(register_hash(&chc_desc)==-1)           { croak("FATAL: cannot register_hash chc_hash"); }
-    if(register_hash(&md2_desc)==-1)           { croak("FATAL: cannot register_hash md2"); }
-    if(register_hash(&md4_desc)==-1)           { croak("FATAL: cannot register_hash md4"); }
-    if(register_hash(&md5_desc)==-1)           { croak("FATAL: cannot register_hash md5"); }
-    if(register_hash(&rmd128_desc)==-1)        { croak("FATAL: cannot register_hash rmd128"); }
-    if(register_hash(&rmd160_desc)==-1)        { croak("FATAL: cannot register_hash rmd160"); }
-    if(register_hash(&rmd256_desc)==-1)        { croak("FATAL: cannot register_hash rmd256"); }
-    if(register_hash(&rmd320_desc)==-1)        { croak("FATAL: cannot register_hash rmd320"); }
-    if(register_hash(&sha1_desc)==-1)          { croak("FATAL: cannot register_hash sha1"); }
-    if(register_hash(&sha224_desc)==-1)        { croak("FATAL: cannot register_hash sha224"); }
-    if(register_hash(&sha256_desc)==-1)        { croak("FATAL: cannot register_hash sha256"); }
-    if(register_hash(&sha384_desc)==-1)        { croak("FATAL: cannot register_hash sha384"); }
-    if(register_hash(&sha512_desc)==-1)        { croak("FATAL: cannot register_hash sha512"); }
-    if(register_hash(&sha512_224_desc)==-1)    { croak("FATAL: cannot register_hash sha512_224"); }
-    if(register_hash(&sha512_256_desc)==-1)    { croak("FATAL: cannot register_hash sha512_256"); }
-    if(register_hash(&sha3_224_desc)==-1)      { croak("FATAL: cannot register_hash sha3_224"); }
-    if(register_hash(&sha3_256_desc)==-1)      { croak("FATAL: cannot register_hash sha3_256"); }
-    if(register_hash(&sha3_384_desc)==-1)      { croak("FATAL: cannot register_hash sha3_384"); }
-    if(register_hash(&sha3_512_desc)==-1)      { croak("FATAL: cannot register_hash sha3_512"); }
-    if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
-    if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
-    if(register_hash(&blake2b_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_160"); }
-    if(register_hash(&blake2b_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_256"); }
-    if(register_hash(&blake2b_384_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_384"); }
-    if(register_hash(&blake2b_512_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_512"); }
-    if(register_hash(&blake2s_128_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_128"); }
-    if(register_hash(&blake2s_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_160"); }
-    if(register_hash(&blake2s_224_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_224"); }
-    if(register_hash(&blake2s_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_256"); }
-    /* --- */
-    if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
-    /* --- */
-    if(register_prng(&fortuna_desc)==-1)       { croak("FATAL: cannot register_prng fortuna"); }
-    if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
-    if(register_prng(&rc4_desc)==-1)           { croak("FATAL: cannot register_prng rc4"); }
-    if(register_prng(&sober128_desc)==-1)      { croak("FATAL: cannot register_prng sober128"); }
-    if(register_prng(&chacha20_prng_desc)==-1) { croak("FATAL: cannot register_prng chacha20"); }
-    /* --- */
-#ifdef TFM_DESC
-    ltc_mp = tfm_desc;
-#else
-    ltc_mp = ltm_desc;
-#endif
+    if(register_all_ciphers() != CRYPT_OK)     { croak("FATAL: register_all_ciphers failed"); }
+    if(register_all_hashes()  != CRYPT_OK)     { croak("FATAL: register_all_hashes failed"); }
+    if(register_all_prngs()   != CRYPT_OK)     { croak("FATAL: register_all_prngs failed"); }
+    if(crypt_mp_init("ltm")   != CRYPT_OK)     { croak("FATAL: crypt_mp_init failed"); }
 
 SV *
 CryptX__encode_base64url(SV * in)
@@ -399,16 +349,23 @@ CryptX__encode_base64url(SV * in)
         STRLEN in_len;
         unsigned long out_len;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-        Newz(0, out_data, out_len, unsigned char);
-        if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
-        rv = base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len);
-        RETVAL = (rv == CRYPT_OK) ? newSVpvn((char *)out_data, out_len) : newSVpvn(NULL, 0);
-        Safefree(out_data);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
     }
     OUTPUT:
         RETVAL
@@ -420,16 +377,23 @@ CryptX__decode_base64url(SV * in)
         STRLEN in_len;
         unsigned long out_len;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = (unsigned long)in_len;
-        Newz(0, out_data, out_len, unsigned char);
-        if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
-        rv = base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len);
-        RETVAL = (rv == CRYPT_OK) ? newSVpvn((char *)out_data, out_len) : newSVpvn(NULL, 0);
-        Safefree(out_data);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
     }
     OUTPUT:
         RETVAL
@@ -441,16 +405,23 @@ CryptX__encode_base64(SV * in)
         STRLEN in_len;
         unsigned long out_len;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-        Newz(0, out_data, out_len, unsigned char);
-        if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
-        rv = base64_encode(in_data, (unsigned long)in_len, out_data, &out_len);
-        RETVAL = (rv == CRYPT_OK) ? newSVpvn((char *)out_data, out_len) : newSVpvn(NULL, 0);
-        Safefree(out_data);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base64_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
     }
     OUTPUT:
         RETVAL
@@ -462,16 +433,91 @@ CryptX__decode_base64(SV * in)
         STRLEN in_len;
         unsigned long out_len;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base64_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__encode_b32(SV *in, unsigned idx)
+    CODE:
+    {
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (idx == 0) id = BASE32_RFC4648;
+        if (idx == 1) id = BASE32_BASE32HEX;
+        if (idx == 2) id = BASE32_ZBASE32;
+        if (idx == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = (unsigned long)in_len;
-        Newz(0, out_data, out_len, unsigned char);
-        if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
-        rv = base64_decode(in_data, (unsigned long)in_len, out_data, &out_len);
-        RETVAL = (rv == CRYPT_OK) ? newSVpvn((char *)out_data, out_len) : newSVpvn(NULL, 0);
-        Safefree(out_data);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)((8 * in_len + 4) / 5);
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__decode_b32(SV *in, unsigned idx)
+    CODE:
+    {
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (idx == 0) id = BASE32_RFC4648;
+        if (idx == 1) id = BASE32_BASE32HEX;
+        if (idx == 2) id = BASE32_ZBASE32;
+        if (idx == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
     }
     OUTPUT:
         RETVAL
@@ -484,20 +530,23 @@ CryptX__increment_octets_le(SV * in)
         unsigned char *out_data, *in_data;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, len);
+        in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) XSRETURN_UNDEF;
 
         RETVAL = NEWSV(0, len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, len);
-        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        out_data = (unsigned char *)SvPVX(RETVAL);
         Copy(in_data, out_data, len, unsigned char);
         while (i < len) {
           out_data[i]++;
           if (0 != out_data[i]) break;
           i++;
         }
-        if (i == len) croak("FATAL: increment_octets_le overflow");
+        if (i == len) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: increment_octets_le overflow");
+        }
     }
     OUTPUT:
         RETVAL
@@ -510,20 +559,23 @@ CryptX__increment_octets_be(SV * in)
         unsigned char *out_data, *in_data;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, len);
+        in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) XSRETURN_UNDEF;
 
         RETVAL = NEWSV(0, len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, len);
-        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        out_data = (unsigned char *)SvPVX(RETVAL);
         Copy(in_data, out_data, len, unsigned char);
         while (i < len) {
           out_data[len - 1 - i]++;
           if (0 != out_data[len - 1 - i]) break;
           i++;
         }
-        if (i == len) croak("FATAL: increment_octets_le overflow");
+        if (i == len) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: increment_octets_be overflow");
+        }
     }
     OUTPUT:
         RETVAL
@@ -537,7 +589,6 @@ CryptX__radix_to_bin(char *in, int radix)
         mp_int mpi;
 
         if (in == NULL || strlen(in) == 0)      XSRETURN_UNDEF;
-
         if (mp_init(&mpi) != CRYPT_OK)          XSRETURN_UNDEF;
 
         if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
@@ -545,7 +596,7 @@ CryptX__radix_to_bin(char *in, int radix)
           RETVAL = NEWSV(0, len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           mp_to_unsigned_bin(&mpi, out_data);
           mp_clear(&mpi);
         }
@@ -580,171 +631,22 @@ CryptX__bin_to_radix(SV *in, int radix)
           }
           mp_clear(&tmp);
 
-          RETVAL = NEWSV(0, digits + 1);
-          SvPOK_only(RETVAL);
-          out_data = SvPV_nolen(RETVAL);
-          mp_toradix(&mpi, out_data, radix);
-          SvCUR_set(RETVAL, digits);
+          if (digits == 0) {
+            RETVAL = newSVpvn("", 0);
+            mp_clear(&mpi);
+          }
+          else {
+            RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
+            SvPOK_only(RETVAL);
+            out_data = SvPVX(RETVAL);
+            mp_toradix(&mpi, out_data, radix);
+            SvCUR_set(RETVAL, strlen(out_data));
+            mp_clear(&mpi);
+          }
+        }
+        else {
           mp_clear(&mpi);
-        }
-        else {
           XSRETURN_UNDEF;
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__encode_b32(SV *bytes, unsigned idx)
-    CODE:
-    {
-        STRLEN inlen, outlen, i, leven;
-        unsigned char *out, *in, *codes;
-        char *alphabet[] = {
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",     /* rfc4648 */
-                "0123456789ABCDEFGHIJKLMNOPQRSTUV",     /* base32hex */
-                "ybndrfg8ejkmcpqxot1uwisza345h769",     /* zbase32 */
-                "0123456789ABCDEFGHJKMNPQRSTVWXYZ"      /* crockford */
-        };
-
-        if (!SvOK(bytes)) {
-          /* for undefined input return "" (empty string) */
-          RETVAL = newSVpv("", 0);
-        }
-        else {
-          if (!SvPOK(bytes) || idx > 3) XSRETURN_UNDEF;         /* error */
-          in = (unsigned char *) SvPVbyte(bytes, inlen);
-          if (in == NULL) XSRETURN_UNDEF;                       /* error */
-          if (inlen == 0) {
-            RETVAL = newSVpv("", 0);
-          }
-          else {
-            codes = (unsigned char*)alphabet[idx];
-            outlen = (8 * inlen + 4) / 5;
-            RETVAL = NEWSV(0, outlen);
-            SvPOK_only(RETVAL);
-            SvCUR_set(RETVAL, outlen);
-            out = (unsigned char *)SvPV_nolen(RETVAL);
-
-            leven = 5 * (inlen / 5);
-            for (i = 0; i < leven; i += 5) {
-              *out++ = codes[(in[0] >> 3) & 0x1F];
-              *out++ = codes[(((in[0] & 0x7) << 2) + (in[1] >> 6)) & 0x1F];
-              *out++ = codes[(in[1] >> 1) & 0x1F];
-              *out++ = codes[(((in[1] & 0x1) << 4) + (in[2] >> 4)) & 0x1F];
-              *out++ = codes[(((in[2] & 0xF) << 1) + (in[3] >> 7)) & 0x1F];
-              *out++ = codes[(in[3] >> 2) & 0x1F];
-              *out++ = codes[(((in[3] & 0x3) << 3) + (in[4] >> 5)) & 0x1F];
-              *out++ = codes[in[4] & 0x1F];
-              in += 5;
-            }
-            if (i < inlen) {
-              unsigned a = in[0];
-              unsigned b = (i+1 < inlen) ? in[1] : 0;
-              unsigned c = (i+2 < inlen) ? in[2] : 0;
-              unsigned d = (i+3 < inlen) ? in[3] : 0;
-              *out++ = codes[(a >> 3) & 0x1F];
-              *out++ = codes[(((a & 0x7) << 2) + (b >> 6)) & 0x1F];
-              if (i+1 < inlen) {
-                *out++ = codes[(b >> 1) & 0x1F];
-                *out++ = codes[(((b & 0x1) << 4) + (c >> 4)) & 0x1F];
-              }
-              if (i+2 < inlen) {
-                *out++ = codes[(((c & 0xF) << 1) + (d >> 7)) & 0x1F];
-                *out++ = codes[(d >> 2) & 0x1F];
-              }
-              if (i+3 < inlen) {
-                *out++ = codes[((d & 0x3) << 3) & 0x1F];
-              }
-            }
-          }
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__decode_b32(SV *base32, unsigned idx)
-    CODE:
-    {
-        STRLEN x, inlen, outlen;
-        int y = 0;
-        ulong64 t = 0;
-        unsigned char c, *in, *out, *map;
-        unsigned char tables[4][43] = {
-          {  /* rfc4648 ABCDEFGHIJKLMNOPQRSTUVWXYZ234567 */
-             99/*0*/,99/*1*/,26/*2*/,27/*3*/,28/*4*/,29/*5*/,30/*6*/,31/*7*/,99/*8*/,99/*9*/,
-             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
-              0/*A*/, 1/*B*/, 2/*C*/, 3/*D*/, 4/*E*/, 5/*F*/, 6/*G*/, 7/*H*/, 8/*I*/, 9/*J*/,10/*K*/,11/*L*/,12/*M*/,
-             13/*N*/,14/*O*/,15/*P*/,16/*Q*/,17/*R*/,18/*S*/,19/*T*/,20/*U*/,21/*V*/,22/*W*/,23/*X*/,24/*Y*/,25/*Z*/
-          },
-          {  /* base32hex 0123456789ABCDEFGHIJKLMNOPQRSTUV */
-               0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
-              99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
-              10/*A*/,11/*B*/,12/*C*/,13/*D*/,14/*E*/,15/*F*/,16/*G*/,17/*H*/,18/*I*/,19/*J*/,20/*K*/,21/*L*/,22/*M*/,
-              23/*N*/,24/*O*/,25/*P*/,26/*Q*/,27/*R*/,28/*S*/,29/*T*/,30/*U*/,31/*V*/,99/*W*/,99/*X*/,99/*Y*/,99/*Z*/
-          },
-          {  /* zbase32 YBNDRFG8EJKMCPQXOT1UWISZA345H769 */
-             99/*0*/,18/*1*/,99/*2*/,25/*3*/,26/*4*/,27/*5*/,30/*6*/,29/*7*/, 7/*8*/,31/*9*/,
-             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
-             24/*A*/, 1/*B*/,12/*C*/, 3/*D*/, 8/*E*/, 5/*F*/, 6/*G*/,28/*H*/,21/*I*/, 9/*J*/,10/*K*/,99/*L*/,11/*M*/,
-              2/*N*/,16/*O*/,13/*P*/,14/*Q*/, 4/*R*/,22/*S*/,17/*T*/,19/*U*/,99/*V*/,20/*W*/,15/*X*/, 0/*Y*/,23/*Z*/
-          },
-          {  /* crockford 0123456789ABCDEFGHJKMNPQRSTVWXYZ + O=>0 + IL=>1 */
-              0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
-             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
-             10/*A*/,11/*B*/,12/*C*/,13/*D*/,14/*E*/,15/*F*/,16/*G*/,17/*H*/, 1/*I*/,18/*J*/,19/*K*/, 1/*L*/,20/*M*/,
-             21/*N*/, 0/*O*/,22/*P*/,23/*Q*/,24/*R*/,25/*S*/,26/*T*/,99/*U*/,27/*V*/,28/*W*/,29/*X*/,30/*Y*/,31/*Z*/
-          }
-        };
-
-        if (!SvOK(base32)) {
-          /* for undefined input return "" (empty string) */
-          RETVAL = newSVpv("", 0);
-        }
-        else {
-          if (!SvPOK(base32) || idx > 3) XSRETURN_UNDEF;                /* error */
-          in = (unsigned char *) SvPVbyte(base32, inlen);
-          if (in == NULL) XSRETURN_UNDEF;                               /* error */
-
-          while (inlen>0 && in[inlen-1] == '=') inlen--;
-          if (inlen == 0) {
-            RETVAL = newSVpv("", 0);
-          }
-          else {
-            x = inlen % 8;
-            if (x == 1 || x == 3 || x == 6) XSRETURN_UNDEF;             /* error */
-            outlen = (inlen * 5) / 8;
-            RETVAL = NEWSV(0, outlen);
-            SvPOK_only(RETVAL);
-            SvCUR_set(RETVAL, outlen);
-            out = (unsigned char *)SvPV_nolen(RETVAL);
-            map = tables[idx];
-            for (x = 0; x < inlen; x++) {
-              c = in[x];
-              /* convert to upper case */
-              if ((c >= 'a') && (c <= 'z')) c -= 32;
-              /* '0' = 48 .. 'Z' = 90 */
-              if (c < 48 || c > 90 || map[c-48] > 31) XSRETURN_UNDEF;   /* error */
-              t = (t<<5)|map[c-48];
-              if (++y == 8) {
-                *out++ = (unsigned char)((t>>32) & 255);
-                *out++ = (unsigned char)((t>>24) & 255);
-                *out++ = (unsigned char)((t>>16) & 255);
-                *out++ = (unsigned char)((t>> 8) & 255);
-                *out++ = (unsigned char)( t      & 255);
-                y = 0;
-                t = 0;
-              }
-            }
-            if (y > 0) {
-              t = t << (5 * (8 - y));
-              if (y >= 2) *out++ = (unsigned char)((t>>32) & 255);
-              if (y >= 4) *out++ = (unsigned char)((t>>24) & 255);
-              if (y >= 5) *out++ = (unsigned char)((t>>16) & 255);
-              if (y >= 7) *out++ = (unsigned char)((t>> 8) & 255);
-            }
-          }
         }
     }
     OUTPUT:
@@ -787,8 +689,10 @@ INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
 INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
+INCLUDE: inc/CryptX_Stream_Sosemanuk.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc

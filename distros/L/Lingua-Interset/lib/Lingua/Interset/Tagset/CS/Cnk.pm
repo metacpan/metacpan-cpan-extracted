@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::CS::Cnk;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -121,7 +121,7 @@ Lingua::Interset::Tagset::CS::Cnk - Driver for the tagset of the Czech National 
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

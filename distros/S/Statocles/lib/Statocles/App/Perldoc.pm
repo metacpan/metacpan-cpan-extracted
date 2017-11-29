@@ -1,5 +1,5 @@
 package Statocles::App::Perldoc;
-our $VERSION = '0.086';
+our $VERSION = '0.087';
 # ABSTRACT: Render documentation for Perl modules
 
 use Statocles::Base 'Class';
@@ -194,9 +194,11 @@ sub pages {
 
         if ( $module eq $self->index_module ) {
             unshift @pages, Statocles::Page::Plain->new( %page_args );
+	          $self->_highlight_page( $pages[0], 'pre > code' );
         }
         else {
             push @pages, Statocles::Page::Plain->new( %page_args );
+	          $self->_highlight_page( $pages[-1], 'pre > code' );
         }
 
         # Add the source as a text file
@@ -212,10 +214,33 @@ sub pages {
                 crumbtrail => \@crumbtrail,
             },
         );
-
+        # unable to highlight source as source.html.ep uses <%== %> to escape html.
+        # $self->_highlight_page( $pages[-1], 'pre' );
     }
 
     return @pages;
+}
+
+sub _highlight_page {
+  my ( $self, $page, $sel ) = @_;
+  # highlight only if site-wide highlighting is available
+  return unless my $hl = $page->site->plugins->{highlight};
+  # this add the highlight stylesheet to $page->links (template logic)
+  $hl->highlight({page => $page}, Perl => '');
+  # $page->dom calls $page->render 'set/making fast' links in the dom.
+  my $codes = $page->dom->find($sel);
+  if ($codes->first) {
+    for my $node ($codes->each) {
+      my $parent = $node->tag eq 'code' ? $node->parent : $node;
+      $parent->replace($hl->highlight({}, Perl => $node->text));
+    }
+  } else {
+    # remove if not used. path from Statocles::Plugin::Highlight#L159
+    $page->dom->find('link[rel=stylesheet][href*=/plugin/highlight/]')
+      ->each(sub { $_->remove });
+  }
+
+  return $page;
 }
 
 sub _module_href {
@@ -251,7 +276,7 @@ sub _weave_module {
     # Pod::Weaver 4.014 shipped with a bug that causes problems unless
     # we have a LEGAL section, which we do not presently allow users to
     # set. So warn them to upgrade if they have this version
-    if ( $Pod::Weaver::VERSION == 4.014 ) {
+    if ( defined($Pod::Weaver::VERSION) and $Pod::Weaver::VERSION == 4.014 ) {
         $errors{ 'Pod::Weaver' } = q{Pod::Weaver version 4.014 has a bug that will cause a fatal error when a LEGAL section isn't available. Please upgrade to version 4.015 or later.};
     }
 
@@ -355,7 +380,7 @@ Statocles::App::Perldoc - Render documentation for Perl modules
 
 =head1 VERSION
 
-version 0.086
+version 0.087
 
 =head1 DESCRIPTION
 

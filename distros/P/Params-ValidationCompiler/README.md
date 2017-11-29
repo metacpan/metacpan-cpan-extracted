@@ -4,7 +4,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 # VERSION
 
-version 0.25
+version 0.26
 
 # SYNOPSIS
 

@@ -1,0 +1,19 @@
+##############################################################################
+#                Configuration File for UMLS::Association
+##############################################################################
+# All the options in this file are passed to put into an options hash and 
+# passed directly to UMLS::Association for initialization. Options hash keys 
+# are in <>'s, and values follow directly after with no space. As as example, 
+# the line "<database>bigrams" will pass the 'database' parameter with a 
+# value of 'bigrams' to the  UMLS::Association options hash for its 
+# initialization.
+#
+# For parameters where no value is needed, just write the name of the
+# parameter in '<>' (e.g. '<debug>')
+
+<database>CUI_Bigram
+<hostname>192.168.24.89
+<username>henryst
+<password>OhFaht3eique
+<socket>/var/run/mysqld.sock
+<t>

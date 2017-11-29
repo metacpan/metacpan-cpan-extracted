@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::Size;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::Size::VERSION = '2.0.0';
+$MsgPack::Decoder::Generator::Size::VERSION = '2.0.1';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -31,7 +31,7 @@ MsgPack::Decoder::Generator::Size
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

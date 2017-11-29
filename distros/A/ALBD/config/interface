@@ -1,0 +1,19 @@
+#############################################################################
+#                Configuration File for UMLS::Interface
+############################################################################
+# All the options in this file are passed to put into an options hash and 
+# passed directly to UMLS::Interface for initialization. Options hash keys 
+# are in <>'s, and values follow directly after with no space. As as example, 
+# the line "<database>umls" will pass the 'database' parameter with a value 
+# of 'umls' of UMLS::Interface options hash for its initialization.
+#
+# For parameters where no value is needed, just write the name of the
+# parameter in '<>' (e.g. '<debug>')
+
+<t>
+<config>interfaceConfig
+
+<hostname>192.168.24.89
+<username>henryst
+<password>OhFaht3eique
+<socket>/var/run/mysqld.sock

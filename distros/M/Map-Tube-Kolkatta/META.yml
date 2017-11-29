@@ -20,11 +20,11 @@ no_index:
     - inc
 requires:
   File::Share: '0.25'
-  Map::Tube: '3.37'
+  Map::Tube: '3.40'
   Moo: '2.000000'
   namespace::clean: '0.24'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-Kolkatta.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,22 +22,25 @@ sub call {
         return [404, ['Content-Type' => 'text/plain; charset=utf-8'], ['not found']];
     }
 
-    my $resource_root = $self->schema->get_resource_root;
+    my $root = $self->schema->get_resource_root;
 
     my $route = $self->schema->get_route_by_name($router_simple_route->name);
-    my $response_resource = $self->schema->get_resource_by_name($route->response_resource);
 
-    my $resolver = APISchema::Generator::Markdown::ResourceResolver->new(schema => $resource_root);
-    my $example = $resolver->example($response_resource->definition);
+    my $default_code = $route->default_responsible_code;
+    my $response_resource = $route->canonical_response_resource($root, [
+        $default_code
+    ]);
 
-    my $response_body;
-    if (ref $example) {
-        $response_body = encode_json_canonical($example);
-    } else {
-        $response_body = $example;
-    }
+    my $resolver = APISchema::Generator::Markdown::ResourceResolver->new(schema => $root);
 
-    return [200, ['Content-Type' => 'application/json; charset=utf-8'], [$response_body]];
+    my $formatter = APISchema::Generator::Markdown::ExampleFormatter->new(
+        resolver => $resolver,
+        spec     => $response_resource,
+    );
+
+    # TODO: serve all headers defined in example
+    # TODO: format body with encoding
+    return [200, ['Content-Type' => 'application/json; charset=utf-8'], [$formatter->body]];
 }
 
 sub router {

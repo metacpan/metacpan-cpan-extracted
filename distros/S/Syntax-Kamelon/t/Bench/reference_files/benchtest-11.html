@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">//&nbsp;Test&nbsp;file&nbsp;to&nbsp;test&nbsp;kate's&nbsp;clipper&nbsp;highlighting</font></br></div>
+<div id="2" class="line"></br></div>
+<div id="3" class="line"><font class="RegionMarker">//BEGIN&nbsp;INCLUDES</font></br></div>
+<div id="4" class="line"><font class="Preprocessor">#include&nbsp;</font><font class="Import">&lt;clip-ui.ch&gt;</font></br></div>
+<div id="5" class="line"><font class="Preprocessor">#include&nbsp;</font><font class="Import">&quot;logo.ch&quot;</font></br></div>
+<div id="6" class="line"></br></div>
+<div id="7" class="line"><font class="Preprocessor">#define&nbsp;PRGVERSION&nbsp;&nbsp;&nbsp;</font><font class="Import">&quot;0.0.1&quot;</font></br></div>
+<div id="8" class="line"><font class="RegionMarker">//END</font></br></div>
+<div id="9" class="line"></br></div>
+<div id="10" class="line"><font class="RegionMarker">//BEGIN&nbsp;CODE</font></br></div>
+<div id="11" class="line"><font class="Keyword">static</font><font class="Normal">&nbsp;ws,&nbsp;win</font></br></div>
+<div id="12" class="line"><font class="Keyword">static</font><font class="Normal">&nbsp;driver&nbsp;:=&nbsp;getDriver()</font></br></div>
+<div id="13" class="line"><font class="Comment">/*&nbsp;a&nbsp;multiline</font></br></div>
+<div id="14" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;comment</font></br></div>
+<div id="15" class="line"><font class="Comment">*/</font></br></div>
+<div id="16" class="line"></br></div>
+<div id="17" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;main(&nbsp;formName&nbsp;)</font></br></div>
+<div id="18" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;</font><font class="DataType">form</font></br></div>
+<div id="19" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;fileName</font></br></div>
+<div id="20" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="21" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Function">empty</font><font class="Normal">(formName)</font></br></div>
+<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">??</font><font class="Normal">&nbsp;</font><font class="String">&quot;Usage:&nbsp;./form_ui&nbsp;&lt;form.xfl&gt;&amp;</font><font class="SpecialChar">\n</font><font class="String">&quot;</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CANCEL</font></br></div>
+<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fileName&nbsp;:=&nbsp;formName</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">endif</font></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;ws&nbsp;&nbsp;:=&nbsp;UIWorkSpace()</font></br></div>
+<div id="28" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">form</font><font class="Normal">&nbsp;:=&nbsp;UIForm(&nbsp;fileName&nbsp;)</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;win&nbsp;&nbsp;:=&nbsp;</font><font class="DataType">form</font><font class="Normal">:parseFile()</font></br></div>
+<div id="31" class="line"><font class="Comment">//&nbsp;&nbsp;&nbsp;??&nbsp;valtype(win),chr(10)</font></br></div>
+<div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;win&nbsp;==&nbsp;</font><font class="Keyword">NIL</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CANCEL</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">endif</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;win:show()</font></br></div>
+<div id="36" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="37" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;ws:</font><font class="DataType">run</font><font class="Normal">()</font></br></div>
+<div id="38" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;ws:</font><font class="DataType">quit</font><font class="Normal">()</font></br></div>
+<div id="39" class="line"><font class="Keyword">return</font><font class="Normal">&nbsp;0</font></br></div>
+<div id="40" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="41" class="line"><font class="Comment">/*&nbsp;Setting&nbsp;dialog&nbsp;*/</font></br></div>
+<div id="42" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;settingsDialog()</font></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">??</font><font class="Normal">&nbsp;</font><font class="String">&quot;TODO:&nbsp;Settings&nbsp;dialog&amp;</font><font class="SpecialChar">\n</font><font class="String">&quot;</font></br></div>
+<div id="44" class="line"><font class="Keyword">return</font></br></div>
+<div id="45" class="line"></br></div>
+<div id="46" class="line"><font class="Comment">/*&nbsp;About&nbsp;dialog&nbsp;*/</font></br></div>
+<div id="47" class="line"><font class="Keyword">function</font><font class="Normal">&nbsp;aboutDialog()</font></br></div>
+<div id="48" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;dlg&nbsp;:=&nbsp;UIWindow(</font><font class="String">&quot;About&quot;</font><font class="Normal">,&nbsp;win,&nbsp;</font><font class="String">&quot;aboutDlg&quot;</font><font class="Normal">,&nbsp;</font><font class="Keyword">.F.</font><font class="Normal">)</font></br></div>
+<div id="49" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">local</font><font class="Normal">&nbsp;hl,&nbsp;lside,&nbsp;t,&nbsp;bb,&nbsp;bD</font></br></div>
+<div id="50" class="line"></br></div>
+<div id="51" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;hl&nbsp;&nbsp;:=&nbsp;UIHBox(,4,8)</font></br></div>
+<div id="52" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;lside&nbsp;:=&nbsp;UIVBox()</font></br></div>
+<div id="53" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;lside:add(UIImage(eas_logo_mini,</font><font class="Keyword">.T.</font><font class="Normal">))</font></br></div>
+<div id="54" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;hl:add(lside,</font><font class="Keyword">.F.</font><font class="Normal">,</font><font class="Keyword">.F.</font><font class="Normal">)</font></br></div>
+<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;dlg:userSpace:add(hl,</font><font class="Keyword">.T.</font><font class="Normal">,</font><font class="Keyword">.T.</font><font class="Normal">)</font></br></div>
+<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;t&nbsp;&nbsp;&nbsp;:=&nbsp;UIVBox()</font></br></div>
+<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;hl:add(t,</font><font class="Keyword">.T.</font><font class="Normal">,</font><font class="Keyword">.T.</font><font class="Normal">)</font></br></div>
+<div id="58" class="line"></br></div>
+<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;t:add(UILabel(</font><font class="String">&quot;License:&nbsp;GPL&nbsp;version&nbsp;2&nbsp;or&nbsp;later&quot;</font><font class="Normal">))</font></br></div>
+<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bb&nbsp;&nbsp;:=&nbsp;UIButtonBar()</font></br></div>
+<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;t:add(bb)</font></br></div>
+<div id="62" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bD&nbsp;:=&nbsp;UIButton(win,&nbsp;</font><font class="String">&quot;&amp;Close&quot;</font><font class="Normal">,&nbsp;</font><font class="Others">{|o,e|&nbsp;dlg:close()&nbsp;}</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bb:add(&nbsp;bD&nbsp;)</font></br></div>
+<div id="64" class="line"></br></div>
+<div id="65" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;dlg:setFocus(bD)</font></br></div>
+<div id="66" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;dlg:setDefault(bD)</font></br></div>
+<div id="67" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;dlg:setPlacement(&nbsp;</font><font class="Keyword">.T.</font><font class="Normal">&nbsp;)</font></br></div>
+<div id="68" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;dlg:show()</font></br></div>
+<div id="69" class="line"><font class="Keyword">return</font></br></div>
+<div id="70" class="line"><font class="RegionMarker">//END</font></br></div>
+</div>
+</body>
+</html>
+

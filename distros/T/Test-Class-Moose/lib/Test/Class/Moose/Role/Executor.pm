@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::Executor;
 
 use 5.10.0;
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -536,7 +536,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =for Pod::Coverage runtests test_classes
 

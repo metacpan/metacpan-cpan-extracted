@@ -4,7 +4,7 @@ package Crypt::Mac::BLAKE2s;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2s blake2s_hex blake2s_b64 blake2s_b64u )] );
@@ -147,10 +147,8 @@ Logically joins all arguments into a single string, and returns its BLAKE2s mess
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://tools.ietf.org/html/rfc7693|https://tools.ietf.org/html/rfc7693>
+=item * L<https://tools.ietf.org/html/rfc7693>
 
 =back
 
 =cut
-
-__END__

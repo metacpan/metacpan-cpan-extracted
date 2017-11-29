@@ -6,7 +6,9 @@ use Test::HTTP::LocalServer;
 
 use Test::More tests => 4;
 
-my $server = Test::HTTP::LocalServer->spawn;
+my $server = Test::HTTP::LocalServer->spawn(
+#    debug => 1
+);
 
 my $pid = $server->{_pid};
 my $res = kill 0, $pid;

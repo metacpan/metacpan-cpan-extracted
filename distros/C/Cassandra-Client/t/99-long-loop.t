@@ -16,7 +16,7 @@ if ($time_to_run == 1) {
 }
 my $time_to_finish= time() + $time_to_run;
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
 my $db= 'perl_cassandra_client_tests';
 SETUP: {
     $client->connect();

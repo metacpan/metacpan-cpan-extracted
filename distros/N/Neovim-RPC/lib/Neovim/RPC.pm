@@ -1,7 +1,7 @@
 package Neovim::RPC;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: RPC client for Neovim
-$Neovim::RPC::VERSION = '1.0.0';
+$Neovim::RPC::VERSION = '1.0.1';
 use strict;
 use warnings;
 
@@ -94,7 +94,7 @@ Neovim::RPC - RPC client for Neovim
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SEE ALSO
 

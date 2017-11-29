@@ -102,39 +102,15 @@ define ([
                     };
                 ajax(rest, sc, fc);
             };
-        };
-    
-    return {
-        "actionPrivHistory":     genPrivHistoryAction(
-                                     'privHistoryDtable'
-                                 ),
-        "actionPrivHistoryEdit": genPrivHistoryAction(
-                                     'privHistoryDrowselect'
-                                 ),
-        "privHistorySaveAction": function (obj) {
-            console.log("Entering privHistorySaveAction with obj", obj);
-            var rest = {
-                    "method": 'POST',
-                    "path": 'priv/history/nick/' + currentUser('obj').nick,
-                    "body": {
-                        "effective": $("#pHeffective").val(),
-                        "priv": $("#pHpriv").val()
-                    }
-                },
-                // success callback
-                sc = function (st) {
-                    if (st.code === 'DOCHAZKA_CUD_OK') {
-                        stack.unwindToTarget("actionPrivHistory");
-                        coreLib.displayError("Priv (status) history record successfully added");
-                    }
-                },
-                fc = function (st) {
-                    coreLib.displayError(st.payload.message);
-                };
-            ajax(rest, sc, fc);
-            // start.drowselectListen();
         },
-        "privHistoryDeleteAction": function () {
+        privHistoryAddRecordAction = function (obj) {
+            var cu = currentUser('obj');
+            console.log("Entering privHistoryAddRecordAction with nick " + cu.nick);
+            stack.push('privHistoryAddRecord', {
+                'nick': cu.nick
+            });
+        },
+        privHistoryDeleteAction = function (obj) {
             var phid,
                 set = coreLib.drowselectState.set,
                 pos = coreLib.drowselectState.pos,
@@ -164,14 +140,53 @@ define ([
             ajax(rest, sc, fc);
             // start.drowselectListen();
         },
-        "privHistoryAddRecordAction": function (obj) {
-            var cu = currentUser('obj');
-            console.log("Entering privHistoryAddRecordAction with nick " + cu.nick);
-            stack.push('privHistoryAddRecord', {
-                'nick': cu.nick
-            });
+        privHistorySaveAction = function (obj) {
+            console.log("Entering privHistorySaveAction with obj", obj);
+            var rest = {
+                    "method": 'POST',
+                    "path": 'priv/history/nick/' + currentUser('obj').nick,
+                    "body": {
+                        "effective": $("#pHeffective").val(),
+                        "priv": $("#pHpriv").val()
+                    }
+                },
+                // success callback
+                sc = function (st) {
+                    if (st.code === 'DOCHAZKA_CUD_OK') {
+                        stack.unwindToTarget("actionPrivHistory");
+                        coreLib.displayError("Priv (status) history record successfully added");
+                    }
+                },
+                fc = function (st) {
+                    coreLib.displayError(st.payload.message);
+                };
+            ajax(rest, sc, fc);
+            // start.drowselectListen();
+        },
+        vetPrivLevel = function (pl) {
+            var plm = String(pl).trim().toLowerCase().slice(0, 2);
+            if (plm === 'ad') {
+                return 'admin';
+            } else if (plm === 'ac') {
+                return 'active';
+            }
+            plm = plm.slice(0,1);
+            if (plm === 'i') {
+                return 'inactive';
+            } else if (plm == 'p') {
+                return 'passerby';
+            }
+            return null;
         }
+        ;
+    
+    return {
+        "actionPrivHistory": genPrivHistoryAction('privHistoryDtable'),
+        "actionPrivHistoryEdit": genPrivHistoryAction('privHistoryDrowselect'),
+        "privHistoryAddRecordAction": privHistoryAddRecordAction,
+        "privHistoryDeleteAction": privHistoryDeleteAction,
+        "privHistorySaveAction": privHistorySaveAction,
+        "vetPrivLevel": vetPrivLevel,
     };
 
 });
-

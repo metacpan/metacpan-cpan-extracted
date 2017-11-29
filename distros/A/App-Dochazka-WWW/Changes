@@ -445,3 +445,11 @@ Revision history for App-Dochazka-WWW
 - js: empProfile: call reports "Supervisees"
 - js: Always load employee profile from server
 
+0.167 2017-11-27 13:21 CET
+- js: caches: check more carefully if activityCache populated; refactor masqEmployee
+- js: allow inactives to view intervals
+- js: hide inaccessible functionality from passerbies
+- js: implement vetting of privlevels when adding/modifying status records
+- js: viewer: use throw for assert-like conditions
+- js: int-lib: use multi-date viewer even when no intervals in range
+

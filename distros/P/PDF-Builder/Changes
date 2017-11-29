@@ -1,6 +1,11 @@
 See also Changes-ver_2 for changes released for PDF::API2, and incorporated
 into PDF::Builder.
 
+3.009     2017-11-27  
+
+   lib/PDF/Builder.pm fix minor POD glitches, t/00-all-usable.t fix behavior
+     when Graphics::TIFF not installed (skip *_GT use tests).
+
 3.008     2017-11-26  
 
    examples/ShowFont.pl added to list out many font file glyphs.

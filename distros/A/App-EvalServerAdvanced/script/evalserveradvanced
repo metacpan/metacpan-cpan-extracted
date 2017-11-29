@@ -2,24 +2,16 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.020';
-
-use Getopt::Long;
-
-use App::EvalServerAdvanced;
-use App::EvalServerAdvanced::Config;
-
 my $debug;
+our $VERSION = '0.021';
 
-GetOptions(
-    "config-dir=s" => \$App::EvalServerAdvanced::Config::config_dir,
-    "debug" => \$debug,
-    "help", \&displayhelp,
-);
+BEGIN {
+    use App::EvalServerAdvanced::Config;
+    use Getopt::Long;
 
-sub displayhelp {
+    sub displayhelp {
     print <<'EOH';
-evalserveradvanced 
+evalserveradvanced
   A sophisticated sandbox for running arbitrary code in a mostly safe manner.
 
   Options
@@ -30,9 +22,20 @@ EOH
     exit(0);
 }
 
+
+    GetOptions(
+        "config-dir=s" => \$App::EvalServerAdvanced::Config::config_dir,
+        "debug" => \$debug,
+        "help", sub {displayhelp()},
+    );
+
+}
+
+use App::EvalServerAdvanced;
+
 unless (defined $App::EvalServerAdvanced::Config::config_dir) {
     print "config-dir must be set\n\n";
-    displayhelp; 
+    displayhelp;
 }
 
 my $es = App::EvalServerAdvanced->new();

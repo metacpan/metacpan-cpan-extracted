@@ -452,13 +452,21 @@ define ([
                     }
                 },
                 fc = function (st) {
-                    opts = { "resultLine": st.payload.message };
+                    var opts = { "resultLine": st.payload.message };
                     if (st.code === 'DISPATCH_NOTHING_IN_TSRANGE' ) {
-                        stack.push('viewIntervalsDrowselect', {
-                            'pos': 0,
-                            'set': []
-                        }, opts);
+                        if (multipleDates) {
+                            opts['xtarget'] = 'viewIntervalsPrep'; // so we don't land in viewIntervalsAction
+                            obj = {
+                                "beginDate": begin,
+                                "endDate": end,
+                                "intervals": [],
+                            };
+                            stack.push('multiDayViewer', obj, opts);
+                        } else {
+                            stack.pop(undefined, opts);
+                        }
                     } else {
+                        opts.resultLine += ' (unexpected status code ' + st.code + ')';
                         stack.pop(undefined, opts);
                     }
                 };

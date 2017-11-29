@@ -1,5 +1,8 @@
 Revision history for perl module Test::Applify
 
+0.06 2017-11-28T16:17:50+1300
+ - bug fix for run_ok and run_instance_ok extra argument passing
+
 0.05 2017-11-27T10:56:02+1300
  - run_instance_ok and run_ok
 

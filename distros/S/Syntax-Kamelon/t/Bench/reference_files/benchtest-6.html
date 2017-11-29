@@ -1,0 +1,366 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Comment">#!&nbsp;/bin/sh</font></br></div>
+<div id="2" class="line"><font class="Comment">#&nbsp;This&nbsp;is&nbsp;a&nbsp;test&nbsp;script&nbsp;for&nbsp;the&nbsp;Katepart&nbsp;Bash&nbsp;Syntax&nbsp;Highlighting&nbsp;by</font></br></div>
+<div id="3" class="line"><font class="Comment">#&nbsp;&nbsp;&nbsp;Wilbert&nbsp;Berendsen.&nbsp;&nbsp;This&nbsp;is&nbsp;not&nbsp;runnable&nbsp;!!!</font></br></div>
+<div id="4" class="line"></br></div>
+<div id="5" class="line"></br></div>
+<div id="6" class="line"><font class="Comment">#&nbsp;The&nbsp;highlighting&nbsp;recognizes&nbsp;basic&nbsp;types&nbsp;of&nbsp;input,&nbsp;and&nbsp;has&nbsp;a&nbsp;few&nbsp;special&nbsp;cases&nbsp;that</font></br></div>
+<div id="7" class="line"><font class="Comment">#&nbsp;are&nbsp;all&nbsp;in&nbsp;FindCommands.&nbsp;&nbsp;The&nbsp;main&nbsp;objective&nbsp;is&nbsp;to&nbsp;create&nbsp;really&nbsp;proper&nbsp;nesting&nbsp;of</font></br></div>
+<div id="8" class="line"><font class="Comment">#&nbsp;(multiline)&nbsp;strings,&nbsp;variables,&nbsp;expressions,&nbsp;etc.</font></br></div>
+<div id="9" class="line"></br></div>
+<div id="10" class="line"></br></div>
+<div id="11" class="line"></br></div>
+<div id="12" class="line"><font class="Comment">#&nbsp;==============&nbsp;Tests:&nbsp;===============</font></br></div>
+<div id="13" class="line"></br></div>
+<div id="14" class="line"><font class="Comment">#&nbsp;basic&nbsp;types:</font></br></div>
+<div id="15" class="line"><font class="String">'single&nbsp;quoted&nbsp;string'</font></br></div>
+<div id="16" class="line"><font class="String">&quot;double&nbsp;quoted&nbsp;string&quot;</font></br></div>
+<div id="17" class="line"><font class="String">$'string&nbsp;with&nbsp;esc</font><font class="DataType">\a</font><font class="String">pes</font><font class="DataType">\x0d</font><font class="String">in&nbsp;it'</font></br></div>
+<div id="18" class="line"><font class="String">$&quot;string&nbsp;meant&nbsp;to&nbsp;be&nbsp;translated&quot;</font></br></div>
+<div id="19" class="line"></br></div>
+<div id="20" class="line"></br></div>
+<div id="21" class="line"><font class="Comment">#&nbsp;comments:</font></br></div>
+<div id="22" class="line"><font class="Comment">#&nbsp;this&nbsp;is&nbsp;a&nbsp;comment</font></br></div>
+<div id="23" class="line"><font class="Comment">#this&nbsp;too</font></br></div>
+<div id="24" class="line"><font class="BuiltIn">echo</font><font class="Normal">&nbsp;this&nbsp;is#nt&nbsp;a&nbsp;comment</font></br></div>
+<div id="25" class="line"><font class="Function">dcop</font><font class="Normal">&nbsp;kate&nbsp;EditInterface#1&nbsp;</font><font class="Comment">#this&nbsp;is</font></br></div>
+<div id="26" class="line"></br></div>
+<div id="27" class="line"></br></div>
+<div id="28" class="line"><font class="Comment">#&nbsp;brace&nbsp;expansion</font></br></div>
+<div id="29" class="line"><font class="Function">mv</font><font class="Normal">&nbsp;my_file.</font><font class="DataType">{JPG,jpg}</font></br></div>
+<div id="30" class="line"></br></div>
+<div id="31" class="line"></br></div>
+<div id="32" class="line"><font class="Comment">#&nbsp;special&nbsp;characters&nbsp;are&nbsp;escaped:</font></br></div>
+<div id="33" class="line"><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="DataType">\(</font><font class="Normal">output</font><font class="DataType">\)</font><font class="Normal">&nbsp;</font><font class="DataType">\&amp;\|</font><font class="Normal">&nbsp;</font><font class="DataType">\&gt;</font><font class="Normal">&nbsp;</font><font class="DataType">\&lt;</font><font class="Normal">&nbsp;</font><font class="DataType">\&quot;</font><font class="Normal">&nbsp;</font><font class="DataType">\'</font><font class="Normal">&nbsp;</font><font class="DataType">\*</font></br></div>
+<div id="34" class="line"></br></div>
+<div id="35" class="line"></br></div>
+<div id="36" class="line"><font class="Comment">#&nbsp;variable&nbsp;substitution:</font></br></div>
+<div id="37" class="line"><font class="Variable">$filename</font><font class="Extension">.ext</font></br></div>
+<div id="38" class="line"><font class="Variable">$filename_ext</font></br></div>
+<div id="39" class="line"><font class="Variable">${filename}</font><font class="Extension">_ext</font></br></div>
+<div id="40" class="line"><font class="Extension">text</font><font class="Variable">${array[$subscript]}</font><font class="Normal">.text</font></br></div>
+<div id="41" class="line"><font class="Extension">text</font><font class="Variable">${array[</font><font class="String">&quot;string&quot;</font><font class="Variable">]}</font><font class="Normal">.text</font></br></div>
+<div id="42" class="line"><font class="Variable">${!prefix*}</font></br></div>
+<div id="43" class="line"><font class="Variable">${!redir}</font></br></div>
+<div id="44" class="line"><font class="Extension">short</font><font class="Normal">&nbsp;are&nbsp;</font><font class="Variable">$_</font><font class="Normal">,&nbsp;</font><font class="Variable">$$</font><font class="Normal">,&nbsp;</font><font class="Variable">$?</font><font class="Normal">,&nbsp;</font><font class="Variable">${@}</font><font class="Normal">,&nbsp;etc.</font></br></div>
+<div id="45" class="line"><font class="Variable">${variable//</font><font class="Normal">a</font><font class="Variable">/</font><font class="Normal">d</font><font class="Variable">}</font></br></div>
+<div id="46" class="line"><font class="Variable">${1:-</font><font class="Normal">default</font><font class="Variable">}</font></br></div>
+<div id="47" class="line"></br></div>
+<div id="48" class="line"></br></div>
+<div id="49" class="line"><font class="Comment">#&nbsp;expression&nbsp;subst:</font></br></div>
+<div id="50" class="line"><font class="Variable">$((</font><font class="Normal">&nbsp;cd&nbsp;&lt;&lt;&nbsp;ed&nbsp;+&nbsp;1&nbsp;</font><font class="Variable">))</font></br></div>
+<div id="51" class="line"></br></div>
+<div id="52" class="line"></br></div>
+<div id="53" class="line"><font class="Comment">#&nbsp;command&nbsp;subst:</font></br></div>
+<div id="54" class="line"><font class="Variable">$(</font><font class="Function">ls</font><font class="Normal">&nbsp;-l</font><font class="Variable">)</font></br></div>
+<div id="55" class="line"><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="Keyword">`</font><font class="Extension">cat</font><font class="Normal">&nbsp;myfile</font><font class="Keyword">`</font></br></div>
+<div id="56" class="line"></br></div>
+<div id="57" class="line"></br></div>
+<div id="58" class="line"><font class="Comment">#&nbsp;file&nbsp;subst:</font></br></div>
+<div id="59" class="line"><font class="Operator">$(&lt;</font><font class="Variable">$filename</font><font class="Operator">)</font></br></div>
+<div id="60" class="line"><font class="Operator">$(&lt;</font><font class="Normal">/path/to/myfile</font><font class="Operator">)</font></br></div>
+<div id="61" class="line"></br></div>
+<div id="62" class="line"><font class="Comment">#&nbsp;process&nbsp;subst:</font></br></div>
+<div id="63" class="line"><font class="Function">sort</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;(</font><font class="Extension">show_labels</font><font class="Operator">)</font><font class="Normal">&nbsp;</font><font class="Keyword">|</font><font class="Normal">&nbsp;</font><font class="Function">sed</font><font class="Normal">&nbsp;</font><font class="String">'s/a/bg'</font><font class="Normal">&nbsp;</font><font class="Operator">&gt;</font><font class="Normal">&nbsp;my_file.txt&nbsp;</font><font class="Operator">2&gt;&amp;1</font></br></div>
+<div id="64" class="line"></br></div>
+<div id="65" class="line"></br></div>
+<div id="66" class="line"><font class="Comment">#&nbsp;All&nbsp;substitutions&nbsp;also&nbsp;work&nbsp;in&nbsp;strings:</font></br></div>
+<div id="67" class="line"><font class="String">&quot;subst&nbsp;</font><font class="Variable">${in}</font><font class="String">side&nbsp;string&quot;</font><font class="Normal">&nbsp;&nbsp;</font><font class="String">'not&nbsp;$inside&nbsp;this&nbsp;ofcourse'</font></br></div>
+<div id="68" class="line"><font class="String">&quot;The&nbsp;result&nbsp;is&nbsp;</font><font class="Variable">$((</font><font class="Normal">&nbsp;</font><font class="Variable">$a</font><font class="Normal">&nbsp;+&nbsp;</font><font class="Variable">$b</font><font class="Normal">&nbsp;</font><font class="Variable">))</font><font class="String">.&nbsp;Thanks!&quot;</font></br></div>
+<div id="69" class="line"><font class="String">&quot;Your&nbsp;homedir&nbsp;contains&nbsp;</font><font class="Keyword">`</font><font class="Extension">ls</font><font class="Normal">&nbsp;</font><font class="Variable">$HOME</font><font class="Normal">&nbsp;</font><font class="Keyword">|</font><font class="Extension">wc</font><font class="Normal">&nbsp;-l</font><font class="Keyword">`</font><font class="String">&nbsp;files.&quot;</font></br></div>
+<div id="70" class="line"></br></div>
+<div id="71" class="line"></br></div>
+<div id="72" class="line"><font class="Comment">#&nbsp;Escapes&nbsp;in&nbsp;strings:</font></br></div>
+<div id="73" class="line"><font class="Variable">p=</font><font class="String">&quot;String&nbsp;</font><font class="DataType">\`</font><font class="String">&nbsp;with&nbsp;</font><font class="DataType">\$</font><font class="String">&nbsp;escapes&nbsp;</font><font class="DataType">\&quot;</font><font class="String">&nbsp;&quot;</font><font class="Normal">;</font></br></div>
+<div id="74" class="line"></br></div>
+<div id="75" class="line"></br></div>
+<div id="76" class="line"><font class="Comment">#&nbsp;keywords&nbsp;are&nbsp;black,&nbsp;builtins&nbsp;dark&nbsp;purple&nbsp;and&nbsp;common&nbsp;commands&nbsp;lighter&nbsp;purple</font></br></div>
+<div id="77" class="line"><font class="Keyword">set</font></br></div>
+<div id="78" class="line"><font class="BuiltIn">exit</font></br></div>
+<div id="79" class="line"><font class="Function">login</font></br></div>
+<div id="80" class="line"></br></div>
+<div id="81" class="line"></br></div>
+<div id="82" class="line"><font class="Comment">#&nbsp;Other&nbsp;colorings:</font></br></div>
+<div id="83" class="line"><font class="Function">error()</font><font class="Normal">&nbsp;</font><font class="Keyword">{</font></br></div>
+<div id="84" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">cat</font><font class="Normal">&nbsp;/usr/bin/lesspipe.sh</font></br></div>
+<div id="85" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Extension">runscript</font><font class="Normal">&nbsp;</font><font class="Operator">&gt;</font><font class="Keyword">&amp;</font><font class="Normal">&nbsp;</font><font class="Extension">redir.bak</font></br></div>
+<div id="86" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">exec</font><font class="Normal">&nbsp;</font><font class="Operator">3&gt;&amp;4</font></br></div>
+<div id="87" class="line"><font class="Keyword">}</font></br></div>
+<div id="88" class="line"></br></div>
+<div id="89" class="line"></br></div>
+<div id="90" class="line"><font class="Comment">#&nbsp;do&nbsp;-&nbsp;done&nbsp;make&nbsp;code&nbsp;blocks</font></br></div>
+<div id="91" class="line"><font class="Keyword">while</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font><font class="Normal">&nbsp;</font><font class="Others">-lt</font><font class="Normal">&nbsp;</font><font class="Variable">$q</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;</font></br></div>
+<div id="92" class="line"><font class="Keyword">do</font></br></div>
+<div id="93" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">chown</font><font class="Normal">&nbsp;0644&nbsp;</font><font class="Variable">$file</font><font class="Normal">.</font><font class="Variable">$p</font></br></div>
+<div id="94" class="line"><font class="Keyword">done</font></br></div>
+<div id="95" class="line"></br></div>
+<div id="96" class="line"></br></div>
+<div id="97" class="line"><font class="Comment">#&nbsp;braces&nbsp;as&nbsp;well</font></br></div>
+<div id="98" class="line"><font class="Extension">run_prog</font><font class="Normal">&nbsp;</font><font class="Keyword">|</font><font class="Normal">&nbsp;</font><font class="Function">sort</font><font class="Normal">&nbsp;-u&nbsp;</font><font class="Keyword">|</font></br></div>
+<div id="99" class="line"><font class="Keyword">{</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;Header</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">while</font><font class="Normal">&nbsp;</font><font class="BuiltIn">read</font><font class="Normal">&nbsp;</font><font class="Variable">a</font><font class="Normal">&nbsp;</font><font class="Variable">b</font><font class="Normal">&nbsp;</font><font class="Variable">d</font></br></div>
+<div id="102" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">do</font></br></div>
+<div id="103" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="Variable">$a</font><font class="Normal">/</font><font class="Variable">$b</font><font class="Normal">/</font><font class="Variable">$c</font></br></div>
+<div id="104" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">done</font></br></div>
+<div id="105" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;Footer</font></br></div>
+<div id="106" class="line"><font class="Keyword">}</font></br></div>
+<div id="107" class="line"></br></div>
+<div id="108" class="line"></br></div>
+<div id="109" class="line"><font class="Comment">#&nbsp;Any&nbsp;constructions&nbsp;can&nbsp;be&nbsp;nested:</font></br></div>
+<div id="110" class="line"><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;A&nbsp;long&nbsp;string&nbsp;with&nbsp;</font><font class="Variable">$(</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Variable">$count</font><font class="Normal">&nbsp;</font><font class="Others">-gt</font><font class="Normal">&nbsp;100</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;much&quot;</font></br></div>
+<div id="113" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
+<div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;not&nbsp;much&quot;</font></br></div>
+<div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">fi</font><font class="Normal">&nbsp;</font><font class="Variable">)</font><font class="String">&nbsp;substitutions.&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">;</font></br></div>
+<div id="116" class="line"></br></div>
+<div id="117" class="line"></br></div>
+<div id="118" class="line"><font class="Comment">#&nbsp;Even&nbsp;the&nbsp;case&nbsp;construct&nbsp;is&nbsp;correctly&nbsp;folded:</font></br></div>
+<div id="119" class="line"><font class="BuiltIn">test</font><font class="Normal">&nbsp;-f&nbsp;blaat&nbsp;</font><font class="Keyword">&amp;&amp;</font></br></div>
+<div id="120" class="line"><font class="Keyword">(</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Extension">do_something</font></br></div>
+<div id="121" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">case</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font><font class="Keyword">&nbsp;in</font></br></div>
+<div id="122" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*bak</font><font class="Keyword">)</font></br></div>
+<div id="123" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Extension">do_bak</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font></br></div>
+<div id="124" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">;;</font></br></div>
+<div id="125" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</font><font class="Keyword">)</font></br></div>
+<div id="126" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Extension">dont_bak</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font></br></div>
+<div id="127" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">;;</font></br></div>
+<div id="128" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">esac</font></br></div>
+<div id="129" class="line"><font class="Keyword">)</font><font class="Normal">&nbsp;</font><font class="Comment">#&nbsp;despite&nbsp;the&nbsp;extra&nbsp;parentheses&nbsp;in&nbsp;the&nbsp;case&nbsp;construction.</font></br></div>
+<div id="130" class="line"></br></div>
+<div id="131" class="line"></br></div>
+<div id="132" class="line"><font class="Comment">#&nbsp;variable&nbsp;assignments:</font></br></div>
+<div id="133" class="line"><font class="Variable">DIR=</font><font class="Normal">/dev</font></br></div>
+<div id="134" class="line"><font class="Variable">p=</font><font class="Keyword">`</font><font class="Extension">ls</font><font class="Keyword">`</font></br></div>
+<div id="135" class="line"><font class="Variable">LC_ALL=</font><font class="String">&quot;nl&quot;</font><font class="Normal">&nbsp;</font><font class="Function">dcop</font><font class="Normal">&nbsp;</font><font class="String">'kate*'</font></br></div>
+<div id="136" class="line"><font class="Variable">_VAR=</font><font class="Normal">val</font></br></div>
+<div id="137" class="line"><font class="Variable">ARR=(</font><font class="Normal">this&nbsp;is&nbsp;an&nbsp;array</font><font class="Variable">)</font></br></div>
+<div id="138" class="line"><font class="Variable">ARR2=([this]=</font><font class="Normal">too&nbsp;</font><font class="Variable">[and]=</font><font class="String">&quot;this&nbsp;too&quot;</font><font class="Variable">)</font></br></div>
+<div id="139" class="line"><font class="Variable">usage=</font><font class="String">&quot;</font><font class="Variable">$0</font><font class="String">&nbsp;--&nbsp;version&nbsp;</font><font class="Variable">$VERSION</font></br></div>
+<div id="140" class="line"><font class="String">Multiple&nbsp;lines&nbsp;of&nbsp;output</font></br></div>
+<div id="141" class="line"><font class="String">can&nbsp;be&nbsp;possible.&quot;</font></br></div>
+<div id="142" class="line"></br></div>
+<div id="143" class="line"></br></div>
+<div id="144" class="line"><font class="Comment">#&nbsp;Some&nbsp;commands&nbsp;expect&nbsp;variable&nbsp;names,&nbsp;these&nbsp;are&nbsp;colored&nbsp;correctly:</font></br></div>
+<div id="145" class="line"><font class="BuiltIn">export</font><font class="Normal">&nbsp;</font><font class="Variable">PATH=</font><font class="Normal">/my/bin:</font><font class="Variable">$PATH</font><font class="Normal">&nbsp;</font><font class="Variable">BLAAT</font></br></div>
+<div id="146" class="line"><font class="BuiltIn">export</font><font class="Normal">&nbsp;</font><font class="Variable">A</font><font class="Normal">&nbsp;</font><font class="Variable">B</font><font class="Normal">&nbsp;</font><font class="Variable">D</font></br></div>
+<div id="147" class="line"><font class="BuiltIn">local</font><font class="Normal">&nbsp;</font><font class="Variable">p=</font><font class="Normal">3&nbsp;&nbsp;</font><font class="Variable">x</font><font class="Normal">&nbsp;&nbsp;</font><font class="Variable">y=</font><font class="String">'\'</font></br></div>
+<div id="148" class="line"><font class="BuiltIn">read</font><font class="Normal">&nbsp;</font><font class="Variable">x</font><font class="Normal">&nbsp;</font><font class="Variable">y</font><font class="Normal">&nbsp;</font><font class="Variable">z</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;&lt;</font><font class="Normal">&nbsp;</font><font class="Variable">$hallo</font></br></div>
+<div id="149" class="line"><font class="BuiltIn">unset</font><font class="Normal">&nbsp;</font><font class="Variable">B</font></br></div>
+<div id="150" class="line"><font class="BuiltIn">declare</font><font class="Normal">&nbsp;-a&nbsp;</font><font class="Variable">VAR1</font><font class="Normal">&nbsp;</font><font class="Variable">VAR2</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;&amp;</font><font class="Normal">&nbsp;</font><font class="BuiltIn">exit</font></br></div>
+<div id="151" class="line"><font class="BuiltIn">declare</font><font class="Normal">&nbsp;</font><font class="Variable">less</font><font class="Normal">&nbsp;</font><font class="Variable">a</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;&amp;</font><font class="Normal">&nbsp;</font><font class="Extension">b</font><font class="Normal">&nbsp;</font></br></div>
+<div id="152" class="line"></br></div>
+<div id="153" class="line"><font class="Comment">#&nbsp;options&nbsp;are&nbsp;recoqnized:</font></br></div>
+<div id="154" class="line"><font class="Function">zip</font><font class="Normal">&nbsp;-f=file.zip</font></br></div>
+<div id="155" class="line"><font class="Extension">./configure</font><font class="Normal">&nbsp;&nbsp;--destdir=/usr</font></br></div>
+<div id="156" class="line"><font class="Function">make</font><font class="Normal">&nbsp;&nbsp;destdir=/usr/</font></br></div>
+<div id="157" class="line"></br></div>
+<div id="158" class="line"></br></div>
+<div id="159" class="line"><font class="Comment">#&nbsp;[[&nbsp;and&nbsp;[&nbsp;correctly&nbsp;need&nbsp;spaces&nbsp;to&nbsp;be&nbsp;regarded&nbsp;as&nbsp;structure,</font></br></div>
+<div id="160" class="line"><font class="Comment">#&nbsp;otherwise&nbsp;they&nbsp;are&nbsp;patterns&nbsp;(currently&nbsp;treated&nbsp;as&nbsp;normal&nbsp;text)</font></br></div>
+<div id="161" class="line"><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="String">&quot;</font><font class="Variable">$p</font><font class="String">&quot;</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">ls</font><font class="Normal">&nbsp;/usr/bin/[a-z]*</font></br></div>
+<div id="163" class="line"><font class="Keyword">elif&nbsp;[[</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;0</font><font class="Keyword">&nbsp;]]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">ls</font><font class="Normal">&nbsp;/usr/share/</font><font class="Variable">$p</font></br></div>
+<div id="165" class="line"><font class="Keyword">fi</font></br></div>
+<div id="166" class="line"></br></div>
+<div id="167" class="line"><font class="Comment">#&nbsp;Fixed:</font></br></div>
+<div id="168" class="line"><font class="Function">ls</font><font class="Normal">&nbsp;a[ab]*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;dont&nbsp;try&nbsp;to&nbsp;interprete&nbsp;as&nbsp;assignment&nbsp;with&nbsp;subscript&nbsp;(fixed)</font></br></div>
+<div id="169" class="line"><font class="Extension">a</font><font class="Normal">[ab]</font></br></div>
+<div id="170" class="line"><font class="Variable">a[ab]=</font><font class="Normal">sa</font></br></div>
+<div id="171" class="line"></br></div>
+<div id="172" class="line"></br></div>
+<div id="173" class="line"><font class="Comment">#&nbsp;Here&nbsp;documents&nbsp;are&nbsp;difficult&nbsp;to&nbsp;catch:</font></br></div>
+<div id="174" class="line"><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&gt;</font><font class="Normal">&nbsp;myfile&nbsp;</font><font class="Operator">&lt;&lt;&nbsp;__EOF__</font></br></div>
+<div id="175" class="line"><font class="Normal">You're&nbsp;right,&nbsp;this&nbsp;is&nbsp;definitely&nbsp;no&nbsp;bash&nbsp;code</font></br></div>
+<div id="176" class="line"><font class="Normal">But&nbsp;ls&nbsp;more&nbsp;</font><font class="Variable">$parameters</font><font class="Normal">&nbsp;should&nbsp;be&nbsp;expanded.</font></br></div>
+<div id="177" class="line"><font class="Operator">__EOF__</font></br></div>
+<div id="178" class="line"></br></div>
+<div id="179" class="line"></br></div>
+<div id="180" class="line"><font class="Comment">#&nbsp;quoted:</font></br></div>
+<div id="181" class="line"><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;&nbsp;&quot;EOF&quot;</font></br></div>
+<div id="182" class="line"><font class="Normal">You're&nbsp;right,&nbsp;this&nbsp;is&nbsp;definitely&nbsp;no&nbsp;bash&nbsp;code</font></br></div>
+<div id="183" class="line"><font class="Normal">But&nbsp;ls&nbsp;more&nbsp;$parameters&nbsp;should&nbsp;be&nbsp;expanded.</font></br></div>
+<div id="184" class="line"><font class="Operator">EOF</font></br></div>
+<div id="185" class="line"></br></div>
+<div id="186" class="line"></br></div>
+<div id="187" class="line"><font class="Comment">#&nbsp;indented:</font></br></div>
+<div id="188" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Function">true</font></br></div>
+<div id="189" class="line"><font class="Keyword">then</font></br></div>
+<div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;-&nbsp;EOF</font></br></div>
+<div id="191" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indented&nbsp;text&nbsp;with&nbsp;a&nbsp;</font><font class="Variable">$dollar</font><font class="Normal">&nbsp;or&nbsp;</font><font class="DataType">\$</font><font class="Normal">two</font></br></div>
+<div id="192" class="line"><font class="Operator">&nbsp;&nbsp;&nbsp;EOF</font></br></div>
+<div id="193" class="line"><font class="Keyword">elif</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Others">-d</font><font class="Normal">&nbsp;</font><font class="Variable">$file</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">;&nbsp;</font><font class="Keyword">then</font></br></div>
+<div id="194" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;-&nbsp;&quot;EOF&quot;</font></br></div>
+<div id="195" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indented&nbsp;text&nbsp;without&nbsp;a&nbsp;$dollar</font></br></div>
+<div id="196" class="line"><font class="Operator">&nbsp;&nbsp;&nbsp;EOF</font></br></div>
+<div id="197" class="line"><font class="Keyword">fi</font></br></div>
+<div id="198" class="line"></br></div>
+<div id="199" class="line"><font class="Comment">#&nbsp;the&nbsp;highlighting&nbsp;uses&nbsp;EOF&nbsp;and&nbsp;_{0,2}E[ON][A-Z_]+,&nbsp;quoted&nbsp;or&nbsp;not,&nbsp;indented&nbsp;or&nbsp;not.</font></br></div>
+<div id="200" class="line"><font class="Comment">#&nbsp;text&nbsp;is&nbsp;correctly&nbsp;substituted&nbsp;and&nbsp;escaped&nbsp;if&nbsp;the&nbsp;delimiter&nbsp;is&nbsp;not&nbsp;quoted.</font></br></div>
+</div>
+</body>
+</html>
+

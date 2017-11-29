@@ -1,5 +1,11 @@
 Revision history for Facebook-InstantArticle
 
+0.14    2017-11-28
+        - Merged pull request #1 (manwar), adding [MetaJSON] to dist.ini, for
+          generating META.json.
+        - Added 'is_valid' method. At the moment this only do very simple checks
+          to see if the Instant Article is valid or not.
+
 0.13    2017-10-13
         - The "fb:use_automatic_ad_placement" property's content is now set to
           "enable=true ad_density=default" instead of just "true".

@@ -2,7 +2,7 @@ package Math::BigInt::LTM;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use CryptX;
 
@@ -435,8 +435,6 @@ sub _log_int {
 }
 
 1;
-
-__END__
 
 =pod
 

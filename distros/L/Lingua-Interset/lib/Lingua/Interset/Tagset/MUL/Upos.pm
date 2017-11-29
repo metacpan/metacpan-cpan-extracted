@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::MUL::Upos;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -84,7 +84,7 @@ around BUILDARGS => sub
     (
         'pos' => { 'verb' => { 'verbtype' => { 'aux' => 'AUX',
                                                '@'   => 'VERB' }},
-                   'noun' => { 'prontype' => { ''  => { 'nountype' => { 'prop' => 'PROPN',
+                   'noun' => { 'prontype' => { ''  => { 'nountype' => { 'prop' => 'PROPN', ###!!! a co kdyz je to adj,noun???
                                                                         '@'    => 'NOUN' }},
                                                '@' => 'PRON' }},
                    'adj'  => { 'adjtype' => { 'pdt' => 'DET',
@@ -157,7 +157,7 @@ Lingua::Interset::Tagset::MUL::Upos - Driver for the Universal Part-of-Speech Ta
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

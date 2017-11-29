@@ -1,6 +1,6 @@
 package Catmandu::Store::File::MediaHaven;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Catmandu::Sane;
 use Moo;
@@ -17,7 +17,8 @@ has 'url'           => (is => 'ro' , required => 1);
 has 'username'      => (is => 'ro' , required => 1);
 has 'password'      => (is => 'ro' , required => 1);
 has 'record_query'  => (is => 'ro' , default => sub { "q=%%2B(MediaObjectFragmentId:%s)"; });
-
+has 'search_limit'  => (is => 'ro');
+has 'search_sort'   => (is => 'ro');
 has id_fixer        => (is => 'ro' , init_arg => 'record_id_fix', coerce => sub {Catmandu->fixer($_[0])},);
 has 'mh'            => (is => 'lazy');
 
@@ -129,6 +130,14 @@ Default: "q=%%2B(MediaObjectFragmentId:%s)"
 
 Optional. One or more L<Catmandu::Fix> commands or a Fix script used to
 extract the C<_id> bag identifier from the MediaHaven record.
+
+=item search_limit
+
+Optional. The maximum number of records to return for each Mediahaven search query.
+
+=item search_sort
+
+Optional. The sorting field used in queries.
 
 =back
 

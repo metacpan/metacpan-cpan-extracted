@@ -53,21 +53,12 @@ define ([
             'entries': ['ldapLookup', 'searchEmployee', 'restServerDetailsAction']
         });
 
-        target.push('mainEmpl', {
-            'name': 'mainEmpl',
-            'type': 'dmenu',
-            'menuText': 'Profile',
-            'title': 'Employee menu',
-            'aclProfile': 'passerby',
-            'entries': ['myProfileAction', 'ldapLookup', 'searchEmployee',]
-        });
-
         target.push('mainInt', {
             'name': 'mainInt',
             'type': 'dmenu',
             'menuText': 'Intervals',
             'title': 'Interval menu',
-            'aclProfile': 'passerby',
+            'aclProfile': 'inactive',
             'entries': ['viewIntervalsPrep', 'createSingleIntMenuItem', 'createMultipleInt',],
         });
 
@@ -76,7 +67,7 @@ define ([
             'type': 'dmenu',
             'menuText': 'Locks',
             'title': 'Lock menu',
-            'aclProfile': 'passerby',
+            'aclProfile': 'inactive',
             'entries': ['viewLocksPrep', 'createLock',],
         });
 

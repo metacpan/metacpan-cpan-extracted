@@ -17,16 +17,18 @@ typedef std::map<uint64_t, SV*> CloneMap;
 static const int CLONE_MAX_DEPTH = 5000;
 static MGVTBL clone_marker;
 
-static void _clone (pTHX_ SV* dest, SV* source, CloneMap* map, I32 depth);
+static void _clone (pTHX_ SV* dest, SV* source, CloneMap*& map, I32 depth);
 
 SV* clone (pTHX_ SV* source, bool cross) {
     SV* ret = newSV(0);
     try {
+        CloneMap* mapref = NULL;
         if (cross) {
             CloneMap map;
-            _clone(aTHX_ ret, source, &map, 0);
+            mapref = &map;
+            _clone(aTHX_ ret, source, mapref, 0);
         }
-        else _clone(aTHX_ ret, source, NULL, 0);
+        else _clone(aTHX_ ret, source, mapref, 0);
     } catch (int val) {
         SvREFCNT_dec(ret);
         croak("clone: max depth (%d) reached, it looks like you passed a cycled structure", CLONE_MAX_DEPTH);
@@ -34,7 +36,7 @@ SV* clone (pTHX_ SV* source, bool cross) {
     return ret;
 }
 
-static void _clone (pTHX_ SV* dest, SV* source, CloneMap* map, I32 depth) {
+static void _clone (pTHX_ SV* dest, SV* source, CloneMap*& map, I32 depth) {
     if (depth > CLONE_MAX_DEPTH) throw 1;
 
     if (SvROK(source)) { // reference
@@ -46,39 +48,43 @@ static void _clone (pTHX_ SV* dest, SV* source, CloneMap* map, I32 depth) {
             return;
         }
 
+        uint64_t id = PTR2UV(source_val);
         if (map) {
-            uint64_t id = PTR2UV(source_val);
             CloneMap::iterator it = map->find(id);
             if (it != map->end()) {
                 SvSetSV_nosteal(dest, it->second);
                 return;
             }
-            (*map)[id] = dest;
         }
 
         GV* cloneGV;
         bool is_object = SvOBJECT(source_val);
 
         // cloning an object with custom clone behavior
-        if (is_object && !mg_findext(source_val, PERL_MAGIC_ext, &clone_marker) &&
-            (cloneGV = gv_fetchmeth(SvSTASH(source_val), HOOK_METHOD, HOOK_METHLEN, 0)))
-        {
-            // set cloning flag into object's magic to prevent infinite loop if user calls 'clone' again from hook
-            sv_magicext(source_val, NULL, PERL_MAGIC_ext, &clone_marker, "", 0);
-            dSP; ENTER; SAVETMPS;
-            PUSHMARK(SP);
-            XPUSHs(source);
-            PUTBACK;
-            int count = call_sv((SV*)GvCV(cloneGV), G_SCALAR);
-            SPAGAIN;
-            SV* retval = NULL;
-            while (count--) retval = POPs;
-            if (retval) SvSetSV(dest, retval);
-            PUTBACK;
-            FREETMPS; LEAVE;
-            // remove cloning flag from object's magic
-            sv_unmagicext(source_val, PERL_MAGIC_ext, &clone_marker);
-            return;
+        if (is_object) {
+            auto mg = mg_findext(source_val, PERL_MAGIC_ext, &clone_marker);
+            if (mg) {
+                map = reinterpret_cast<CloneMap*>(mg->mg_ptr); // restore top-map after recursive clone() call
+            }
+            else if ((cloneGV = gv_fetchmeth(SvSTASH(source_val), HOOK_METHOD, HOOK_METHLEN, 0))) {
+                // set cloning flag into object's magic to prevent infinite loop if user calls 'clone' again from hook
+                sv_magicext(source_val, NULL, PERL_MAGIC_ext, &clone_marker, (const char*)map, 0);
+                dSP; ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(source);
+                PUTBACK;
+                int count = call_sv((SV*)GvCV(cloneGV), G_SCALAR);
+                SPAGAIN;
+                SV* retval = NULL;
+                while (count--) retval = POPs;
+                if (retval) SvSetSV(dest, retval);
+                PUTBACK;
+                FREETMPS; LEAVE;
+                // remove cloning flag from object's magic
+                sv_unmagicext(source_val, PERL_MAGIC_ext, &clone_marker);
+                if (map) (*map)[id] = dest;
+                return;
+            }
         }
 
         SV* refval = newSV(0);
@@ -87,6 +93,7 @@ static void _clone (pTHX_ SV* dest, SV* source, CloneMap* map, I32 depth) {
         SvROK_on(dest);
 
         if (is_object) sv_bless(dest, SvSTASH(source_val)); // cloning an object without any specific clone behavior
+        if (map) (*map)[id] = dest;
         _clone(aTHX_ refval, source_val, map, depth+1);
 
         return;

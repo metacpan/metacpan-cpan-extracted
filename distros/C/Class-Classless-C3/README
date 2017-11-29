@@ -1,4 +1,4 @@
-Class-Classless-C3 version 1.00
+Class-Classless-C3 version 1.01
 ===============================
 
 See the POD or Changes file for relevant information...
@@ -21,7 +21,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2010 by John Williams. All rights reserved.
+Copyright (C) 2008-2017 by John Williams. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

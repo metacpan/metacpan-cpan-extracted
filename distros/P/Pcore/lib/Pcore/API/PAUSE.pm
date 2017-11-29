@@ -2,6 +2,7 @@ package Pcore::API::PAUSE;
 
 use Pcore -class, -result;
 use Pcore::Util::Text qw[encode_utf8];
+use Pcore::Util::Scalar qw[is_coderef];
 
 has username => ( is => 'ro', isa => Str, required => 1 );
 has password => ( is => 'ro', isa => Str, required => 1 );
@@ -12,7 +13,15 @@ sub _build__auth_header ($self) {
     return 'Basic ' . P->data->to_b64_url( encode_utf8( $self->username ) . q[:] . encode_utf8( $self->password ) ) . q[==];
 }
 
-sub upload ( $self, $path ) {
+sub upload ( $self, $path, $cb = undef ) {
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
+
+    my $on_finish = sub ($res) {
+        $cb->($res) if $cb;
+
+        $blocking_cv->($res) if $blocking_cv;
+    };
+
     my $body;
 
     $path = P->path($path);
@@ -35,68 +44,107 @@ sub upload ( $self, $path ) {
 
     $body .= q[--] . $boundary . q[--] . $CRLF . $CRLF;
 
-    my $res = P->http->post(
+    P->http->post(
         'https://pause.perl.org/pause/authenquery',
         headers => {
             AUTHORIZATION => $self->_auth_header,
             CONTENT_TYPE  => qq[multipart/form-data; boundary=$boundary],
         },
         body => \$body,
+        sub ($res) {
+            $on_finish->( result [ $res->status, $res->reason ] );
+
+            return;
+        }
     );
 
-    return result [ $res->status, $res->reason ];
+    return defined $blocking_cv ? $blocking_cv->recv : ();
 }
 
-sub clean ( $self ) {
-    my $res = P->http->get( 'https://pause.perl.org/pause/authenquery?ACTION=delete_files', headers => { AUTHORIZATION => $self->_auth_header, }, );
+sub clean ( $self, @args ) {
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
 
-    if ( $res->status == 200 ) {
-        my $releases;
+    my $cb = is_coderef $args[-1] ? pop @args : undef;
 
-        while ( $res->body->$* =~ /input type="checkbox" name="pause99_delete_files_FILE" value="([[:alnum:]-]+)?-v([[:alnum:].]+)?[.]tar[.]gz"/smg ) {
-            $releases->{$1}->{$2} = undef;
-        }
+    my %args = (
+        keep => 2,
+        @args,
+    );
 
-        my $params = [
-            HIDDENNAME                         => encode_utf8( $self->username ),
-            SUBMIT_pause99_delete_files_delete => 'Delete',
-        ];
+    my $on_finish = sub ($status) {
+        $cb->($status) if $cb;
 
-        my $do_request;
+        $blocking_cv->($status) if $blocking_cv;
 
-        for my $release ( keys $releases->%* ) {
-            my $last_version = [ sort keys $releases->{$release}->%* ]->[-1];
+        return;
+    };
 
-            delete $releases->{$release}->{$last_version};
+    if ( !$args{keep} ) {
+        $on_finish->( result [ 400, q[Bad "keep" arument.] ] );
+    }
 
-            for my $version ( keys $releases->{$release}->%* ) {
-                $do_request = 1;
-
-                push $params->@*, pause99_delete_files_FILE => "$release-v$version.tar.gz";
-                push $params->@*, pause99_delete_files_FILE => "$release-v$version.meta";
-                push $params->@*, pause99_delete_files_FILE => "$release-v$version.readme";
+    P->http->get(
+        'https://pause.perl.org/pause/authenquery?ACTION=delete_files',
+        headers => { AUTHORIZATION => $self->_auth_header, },
+        sub ($res) {
+            if ( !$res ) {
+                $on_finish->( result [ $res->status, $res->reason ] );
             }
-        }
+            else {
+                my $releases;
 
-        if ($do_request) {
-            my $res1 = P->http->post(
-                'https://pause.perl.org/pause/authenquery',
-                headers => {
-                    AUTHORIZATION => $self->_auth_header,
-                    CONTENT_TYPE  => 'application/x-www-form-urlencoded',
-                },
-                body => P->data->to_uri($params),
-            );
+                while ( $res->body->$* =~ /input type="checkbox" name="pause99_delete_files_FILE" value="([[:alnum:]-]+)?-v([[:alnum:].]+)?[.]tar[.]gz"(.+?)<\/span>/smg ) {
+                    $releases->{$1}->{$2} = undef if $3 !~ m[Scheduled for deletion]smi;
+                }
 
-            return result [ $res1->status, $res1->reason ];
+                my $params = [
+                    HIDDENNAME                         => encode_utf8( $self->username ),
+                    SUBMIT_pause99_delete_files_delete => 'Delete',
+                ];
+
+                my $do_request;
+
+                for my $release ( keys $releases->%* ) {
+                    my $versions = [ map {"$_"} reverse sort map { version->new($_) } keys $releases->{$release}->%* ];
+
+                    splice $versions->@*, 0, $args{keep}, ();
+
+                    if ( $versions->@* ) {
+                        $do_request = 1;
+
+                        for my $version ( $versions->@* ) {
+                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.tar.gz";
+                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.meta";
+                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.readme";
+                        }
+                    }
+                }
+
+                if ( !$do_request ) {
+                    $on_finish->( result [ 200, 'Nothing to do' ] );
+                }
+                else {
+                    P->http->post(
+                        'https://pause.perl.org/pause/authenquery',
+                        headers => {
+                            AUTHORIZATION => $self->_auth_header,
+                            CONTENT_TYPE  => 'application/x-www-form-urlencoded',
+                        },
+                        body => P->data->to_uri($params),
+                        sub ($res) {
+                            $on_finish->( result [ $res->status, $res->reason ] );
+
+                            return;
+                        }
+                    );
+                }
+            }
+
+            return;
         }
-        else {
-            return result [ 200, 'Nothing to do' ];
-        }
-    }
-    else {
-        return result [ $res->status, $res->reason ];
-    }
+    );
+
+    return defined $blocking_cv ? $blocking_cv->recv : ();
 }
 
 sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = undef ) {
@@ -122,9 +170,9 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 56                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 96                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 102                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 150                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

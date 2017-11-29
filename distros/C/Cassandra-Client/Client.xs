@@ -9,9 +9,11 @@
 #include "type.h"
 #include "proto.h"
 #include "decode.h"
+#include "encode.h"
 
 typedef struct {
     int column_count;
+    int uniq_column_count;
     struct cc_column *columns;
 } Cassandra__Client__RowMeta;
 
@@ -19,18 +21,18 @@ MODULE = Cassandra::Client  PACKAGE = Cassandra::Client::Protocol
 PROTOTYPES: DISABLE
 
 void
-unpack_metadata2(data)
+unpack_metadata(data)
     SV *data
   PPCODE:
     STRLEN pos, size;
-    char *ptr;
-    int32_t flags, column_count;
+    unsigned char *ptr;
+    int32_t flags, column_count, uniq_column_count;
     Cassandra__Client__RowMeta *row_meta;
 
     ST(0) = &PL_sv_undef; /* Will have our RowMeta instance */
     ST(1) = &PL_sv_undef; /* Will have our paging state */
 
-    ptr = SvPV(data, size);
+    ptr = (unsigned char*)SvPV(data, size);
     pos = 0;
 
     if (UNLIKELY(!ptr))
@@ -52,6 +54,7 @@ unpack_metadata2(data)
     if (!(flags & CC_METADATA_FLAG_NO_METADATA)) {
         int i, have_global_spec;
         SV *global_keyspace, *global_table;
+        HV *name_hash;
 
         have_global_spec = flags & CC_METADATA_FLAG_GLOBAL_TABLES_SPEC;
 
@@ -72,6 +75,9 @@ unpack_metadata2(data)
         row_meta->column_count = column_count;
         Newxz(row_meta->columns, column_count, struct cc_column);
 
+        name_hash = (HV*)sv_2mortal( (SV*)newHV() );
+        uniq_column_count = 0;
+
         for (i = 0; i < column_count; i++) {
             struct cc_column *column = &(row_meta->columns[i]);
             if (have_global_spec) {
@@ -86,10 +92,16 @@ unpack_metadata2(data)
 
             column->name = unpack_string_sv_hash(aTHX_ ptr, size, &pos, &column->name_hash);
             unpack_type(aTHX_ ptr, size, &pos, &column->type);
+            if (!hv_exists_ent(name_hash, column->name, column->name_hash)) {
+                uniq_column_count++;
+                hv_store_ent(name_hash, column->name, &PL_sv_undef, column->name_hash);
+            }
         }
+
+        row_meta->uniq_column_count = uniq_column_count;
     }
 
-    sv_chop(data, ptr+pos);
+    sv_chop(data, (char*)ptr+pos);
 
     XSRETURN(2);
 
@@ -102,7 +114,7 @@ decode(self, data, use_hashes)
     int use_hashes
   CODE:
     STRLEN size, pos;
-    char *ptr;
+    unsigned char *ptr;
     int32_t row_count;
     int i, j, col_count;
     struct cc_column *columns;
@@ -110,7 +122,7 @@ decode(self, data, use_hashes)
     RETVAL = newAV();
     sv_2mortal((SV*)RETVAL); /* work around a bug in perl */
 
-    ptr = SvPV(data, size);
+    ptr = (unsigned char*)SvPV(data, size);
     pos = 0;
 
     if (UNLIKELY(!ptr))
@@ -121,9 +133,9 @@ decode(self, data, use_hashes)
 
     row_count = unpack_int(aTHX_ ptr, size, &pos);
 
-    // This came up while fuzzing: when we have 1000000 rows but no columns, we
-    // just flood the memory with empty arrays/hashes. Let's just reject this
-    // corner case. If you need this, please contact the author!
+    /* This came up while fuzzing: when we have 1000000 rows but no columns, we
+     * just flood the memory with empty arrays/hashes. Let's just reject this
+     * corner case. If you need this, please contact the author! */
     if (UNLIKELY(row_count > 1000 && !col_count))
         croak("Refusing to decode %d rows without known column information", row_count);
 
@@ -149,6 +161,75 @@ decode(self, data, use_hashes)
 
                 decode_cell(aTHX_ ptr, size, &pos, &columns[j].type, decoded);
             }
+        }
+    }
+
+  OUTPUT:
+    RETVAL
+
+SV*
+encode(self, row)
+    Cassandra::Client::RowMeta *self
+    SV* row
+  CODE:
+    int column_count, i, use_hash;
+    STRLEN size_estimate;
+    AV *row_a;
+    HV *row_h;
+
+    if (UNLIKELY(row == NULL))
+        croak("row must be passed");
+    if (UNLIKELY(!SvROK(row)))
+        croak("encode: argument must be a reference");
+
+    column_count = self->column_count;
+
+    if (SvTYPE(SvRV(row)) == SVt_PVAV) {
+        row_a = (AV*)SvRV(row);
+        use_hash = 0;
+        if (UNLIKELY((av_len(row_a)+1) != column_count))
+            croak("row encoder expected %d column(s), but got %d", column_count, ((int)av_len(row_a))+1);
+
+    } else if (SvTYPE(SvRV(row)) == SVt_PVHV) {
+        row_h = (HV*)SvRV(row);
+        use_hash = 1;
+        if (UNLIKELY(HvUSEDKEYS(row_h) != self->uniq_column_count))
+            croak("row encoder expected %d column(s), but got %d", self->uniq_column_count, (int)HvUSEDKEYS(row_h));
+
+    } else {
+        croak("encode: argument must be an ARRAY or HASH reference");
+    }
+
+    /* Rough estimate. We only use it to predict Sv size, we don't rely on it being accurate.
+       If we overshoot, we waste some memory, and if we undershoot we copy a bit too often. */
+    size_estimate = 2 + (column_count * 12);
+    if (size_estimate <= 0) /* overflows aren't impossible, I guess */
+        size_estimate = 0; /* wing it */
+
+    RETVAL = newSV(size_estimate);
+    sv_setpvn(RETVAL, "", 0);
+    pack_short(aTHX_ RETVAL, column_count);
+
+    if (!use_hash) {
+        for (i = 0; i < column_count; i++) {
+            SV **maybe_cell = av_fetch(row_a, i, 0);
+            if (UNLIKELY(maybe_cell == NULL))
+                croak("row encoder error. bailing out");
+            encode_cell(aTHX_ RETVAL, *maybe_cell, &self->columns[i].type);
+        }
+
+    } else {
+        for (i = 0; i < column_count; i++) {
+            struct cc_column *column;
+            HE *ent;
+
+            column = &self->columns[i];
+            ent = hv_fetch_ent(row_h, column->name, 0, column->name_hash);
+            if (UNLIKELY(!ent)) {
+                croak("missing value for required entry <%s>", SvPV_nolen(column->name));
+            }
+
+            encode_cell(aTHX_ RETVAL, HeVAL(ent), &column->type);
         }
     }
 

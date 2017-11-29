@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::EU::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -6458,7 +6458,7 @@ Lingua::Interset::Tagset::EU::Conll - Driver for the tagset of the Basque Depend
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

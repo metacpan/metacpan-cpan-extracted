@@ -10,13 +10,14 @@ build_requires:
   Test::More: '0'
   Test::Pod: '0.0'
   Test::Pod::Coverage: '0.0'
+  blib: '1.01'
   perl: '5.008'
   threads: '0'
 configure_requires:
   ExtUtils::MakeMaker: 6.63_03
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,49 +26,49 @@ name: ZMQ-Raw
 provides:
   ZMQ::Raw:
     file: lib/ZMQ/Raw.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Context:
     file: lib/ZMQ/Raw/Context.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Curve:
     file: lib/ZMQ/Raw/Curve.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Error:
     file: lib/ZMQ/Raw/Error.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Loop:
     file: lib/ZMQ/Raw/Loop.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Loop::Event:
     file: lib/ZMQ/Raw/Loop/Event.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Loop::Handle:
     file: lib/ZMQ/Raw/Loop/Handle.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Loop::Promise:
     file: lib/ZMQ/Raw/Loop/Promise.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Loop::Timer:
     file: lib/ZMQ/Raw/Loop/Timer.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Message:
     file: lib/ZMQ/Raw/Message.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Poller:
     file: lib/ZMQ/Raw/Poller.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Proxy:
     file: lib/ZMQ/Raw/Proxy.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Socket:
     file: lib/ZMQ/Raw/Socket.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Timer:
     file: lib/ZMQ/Raw/Timer.pm
-    version: '0.17'
+    version: '0.19'
   ZMQ::Raw::Z85:
     file: lib/ZMQ/Raw/Z85.pm
-    version: '0.17'
+    version: '0.19'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -77,11 +78,12 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://github.com//jacquesg/p5-ZMQ-Raw.git
-version: '0.17'
+  bugtracker: https://github.com/jacquesg/p5-ZMQ-Raw/issues
+  repository: git://github.com/jacquesg/p5-ZMQ-Raw.git
+version: '0.19'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.024000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -95,62 +97,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::ALEXBIO/GatherDir'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::ALEXBIO/PruneCruft'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::ALEXBIO/ManifestSkip'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ALEXBIO/MetaYAML'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::ALEXBIO/License'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::ALEXBIO/Readme'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::ALEXBIO/ExtraTests'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::ALEXBIO/ExecDir'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::ALEXBIO/ShareDir'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::ALEXBIO/Manifest'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ALEXBIO/TestRelease'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::ALEXBIO/ConfirmRelease'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@Author::ALEXBIO/@GitHub/GitHub::Meta'
-      version: '0.44'
+      version: '0.43'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::ALEXBIO/@GitHub/GitHub::Update'
-      version: '0.44'
+      version: '0.43'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -159,34 +161,34 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          'git --version': 2.15.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::NextVersion'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::ALEXBIO/MetaConfig'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::ALEXBIO/MetaJSON'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ALEXBIO/AutoPrereqs'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: '@Author::ALEXBIO/PodVersion'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Author::ALEXBIO/PkgVersion'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::ALEXBIO/NextRelease'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -204,7 +206,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::ALEXBIO/Test::Compile'
-      version: '2.057'
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::Test::CheckManifest
       name: '@Author::ALEXBIO/Test::CheckManifest'
@@ -212,11 +214,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ALEXBIO/PodSyntaxTests'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::ALEXBIO/PodCoverageTests'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -230,12 +232,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          'git --version': 2.15.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ALEXBIO/Git::Commit'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -243,16 +245,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.17
+          tag: v0.19
           tag_format: v%v
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          'git --version': 2.15.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ALEXBIO/Git::Tag'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -261,14 +263,14 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          'git --version': 2.15.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::Push'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ALEXBIO/UploadToCPAN'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::ALEXBIO/InstallRelease'
@@ -284,7 +286,7 @@ x_Dist_Zilla:
           phase: configure
           type: requires
       name: ConfigureRequires
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -292,7 +294,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -305,82 +307,78 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.010'
+              version: '6.008'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000031'
           version: '0.004'
       name: MetaProvides::Package
-      version: '2.004003'
+      version: '2.004002'
     -
       class: inc::MakeMaker
       config:
-        Dist::Zilla::Plugin::MakeMaker:
-          make_path: make
-          version: '6.010'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.39'
+          version: '0.38'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-          version: '6.010'
       name: MakeMaker
       version: ~
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.010'
+      version: '6.008'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+    version: '6.008'
+x_serialization_backend: 'YAML::Tiny version 1.69'

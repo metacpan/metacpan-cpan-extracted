@@ -17,9 +17,10 @@ prereqs:
 plugins:
  - +config: Author::CSSON
 
- - +add_plugin: TravisYML
-   +before: Git::Tag
-   perl_version: 5.14 5.16 5.20
+ - +extend_plugin: TravisYML
+   perl_version: 5.16 5.18 5.20 5.22
+
+ - +remove_plugin: Test::Kwalitee::Extra
 
 ---
 doctype: weaver
@@ -28,3 +29,14 @@ plugins:
   - +config: Author::CSSON
 
   - +remove_plugin: Splint
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+
+always:
+ - /MoopsX-UsingMoose-*

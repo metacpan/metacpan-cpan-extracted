@@ -3,7 +3,7 @@ NAME
     before releasing
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
       # in dist.ini
@@ -72,7 +72,7 @@ CONTRIBUTORS
     *   Randy Stauner <randy@magnificent-tears.com>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2016 by David Golden.
+    This software is Copyright (c) 2017 by David Golden.
 
     This is free software, licensed under:
 

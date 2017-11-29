@@ -1,5 +1,5 @@
 package App::EvalServerAdvanced::Sandbox;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use strict;
 use warnings;
@@ -21,8 +21,8 @@ use Data::Dumper;
 
 my %sig_map;
 do {
-  my @sig_names = split ' ', $Config{sig_name}; 
-  my @sig_nums = split ' ', $Config{sig_num}; 
+  my @sig_names = split ' ', $Config{sig_name};
+  my @sig_nums = split ' ', $Config{sig_num};
   @sig_map{@sig_nums} = map {'SIG' . $_} @sig_names;
   $sig_map{31} = "SIGSYS (Illegal Syscall)";
 };
@@ -39,6 +39,8 @@ sub _rel2abs {
   return "".$p
 }
 
+my $seccomp;
+
 sub run_eval {
   my $code = shift; # TODO this should be more than just code
   my $language = shift;
@@ -47,7 +49,20 @@ sub run_eval {
 
   chmod(0555, $work_path); # have to fix permissions on the new / or nobody can do anything!
 
+  unless ($seccomp) {
+    App::EvalServerAdvanced::Sandbox::Internal->load_plugins();
+    $seccomp = App::EvalServerAdvanced::Seccomp->new();
+    $seccomp->load_yaml(config->sandbox->seccomp->yaml); # TODO allow multiple yamls
+    $seccomp->build_seccomp;
+  }
+
   my @binds = config->sandbox->bind_mounts->@*;
+
+  # Setup SECCOMP for us
+  my $lang_config = config->language->$language;
+  die "Language $language not configured." unless $lang_config;
+
+  my $profile = $lang_config->seccomp_profile // "default";
 
 	# Get the nobody uid before we chroot, namespace and do other funky stuff.
 	my $nobody_uid = getpwnam("nobody");
@@ -61,18 +76,18 @@ sub run_eval {
     $|++;
     binmode STDOUT, ":encoding(utf8)"; # Enable utf8 output.
     binmode STDERR, ":encoding(utf8)"; # Enable utf8 output.
-    
+
     # This should end up actually reading from the IO::Async::Process stdin filehandle eventually
     # but I'm not ready to setup the protocol for that yet.
     # redirect STDIN to /dev/null, to avoid warnings in convoluted cases.
     close(STDIN);
     open STDIN, '<', '/dev/null' or die "Can't open /dev/null: $!";
 
-    my $tmpfs_size = config->sandbox->tmpfs_size // "16m";
+    my $tmpfs_size = config->sandbox->tmpfs_size // "16m"; # / # fix syntax in kate
 
     my $jail_path = $work_path . "/jail";
 
-    my $jail_home = $jail_path . (config->sandbox->home_dir // "/home");
+    my $jail_home = $jail_path . (config->sandbox->home_dir // "/home"); # " # ditto
     my $jail_tmp  = "$jail_path/tmp";
 
     mount("tmpfs", $work_path, "tmpfs", 0, {size => $tmpfs_size});
@@ -130,7 +145,7 @@ sub run_eval {
 
     chdir($jail_path) or die "Jail was not made"; # ensure it exists before we chroot. unnecessary?
     chroot($jail_path) or die $!;
-    chdir(config->sandbox->home_dir // "/home") or die "Couldn't chdir to the home";
+    chdir(config->sandbox->home_dir // "/home") or die "Couldn't chdir to the home"; #'
 
     # TODO Also look at making calls about dropping capabilities(2).  I don't think it's needed but it might be a good idea
     # Here's where we actually drop our root privilege
@@ -154,7 +169,7 @@ sub run_eval {
       if ($filename eq '__code') {
         $main_file = $file;
         next; # don't write it here
-      } 
+      }
       my $path = path($filename);
       $path->parent()->mkpath(); # try to create the directory needed.  If it fails, the eval fails
 
@@ -163,18 +178,13 @@ sub run_eval {
       close($fh);
     }
 
-    # Setup SECCOMP for us
-    my $lang_config = config->language->$language;
-    die "Language $language not configured." unless $lang_config;
+    # Enable seccomp
+    $seccomp->apply_seccomp($profile); # TODO Make this optional, somehow for testing
 
-    my $profile = $lang_config->seccomp_profile // "default";
-    my $esc = App::EvalServerAdvanced::Seccomp->new(profiles => [$profile], exec_map => config->language);
-    $esc->engage(); # TODO Make this optional, somehow for testing
-    
     # TODO make this accept a filename, that's already written instead of code
     run_code($language, $code, $main_file);
   });
-  
+
   rmdir($work_path) or warn "Couldn't remove tempdir";
 
   my ($exit, $signal) = (($exitcode&0xFF00)>>8, $exitcode&0xFF);
@@ -208,7 +218,7 @@ sub set_resource_limits {
   $srl->(RLIMIT_NOFILE, $cfg_rlimits->NOFILE) and
   $srl->(RLIMIT_OFILE, $cfg_rlimits->OFILE) and
   $srl->(RLIMIT_OPEN_MAX, $cfg_rlimits->OPEN_MAX) and
-  $srl->(RLIMIT_LOCKS, $cfg_rlimits->LOCKS) and 
+  $srl->(RLIMIT_LOCKS, $cfg_rlimits->LOCKS) and
   $srl->(RLIMIT_MEMLOCK, $cfg_rlimits->MEMLOCK) and
   $srl->(RLIMIT_CPU, $cfg_rlimits->CPU)
 		or die "Failed to set rlimit: $!";

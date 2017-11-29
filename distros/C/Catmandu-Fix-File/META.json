@@ -70,8 +70,9 @@
          "web" : "https://github.com/LibreCat/Catmandu-Fix-File"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
+      "Nicolas Franck <njfranck@ca20c526.ugent.be>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"

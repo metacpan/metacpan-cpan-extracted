@@ -1,7 +1,7 @@
 package Neovim::RPC::Plugin::Echo;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: echo back message to nvim
-$Neovim::RPC::Plugin::Echo::VERSION = '1.0.0';
+$Neovim::RPC::Plugin::Echo::VERSION = '1.0.1';
 use 5.20.0;
 
 use strict;
@@ -30,7 +30,7 @@ Neovim::RPC::Plugin::Echo - echo back message to nvim
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

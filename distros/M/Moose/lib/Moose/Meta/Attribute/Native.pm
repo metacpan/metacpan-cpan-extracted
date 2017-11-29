@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Moose::Meta::Attribute::Native;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use Module::Runtime 'require_module';
 
@@ -42,7 +42,7 @@ Moose::Meta::Attribute::Native - Delegate to native Perl types
 
 =head1 VERSION
 
-version 2.2008
+version 2.2009
 
 =head1 SYNOPSIS
 

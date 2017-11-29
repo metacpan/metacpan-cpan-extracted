@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -50,6 +50,6 @@
          "web" : "https://github.com/haje61/Kamelon"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

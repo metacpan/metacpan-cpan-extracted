@@ -3,3 +3,6 @@ Revision history for Perl extension Class::Classless::C3.
 1.00  20 Oct 2010
 	- original unleashing
 
+1.01  27 Nov 2017
+	- applied submitted patch to be compatible with perl 5.27
+

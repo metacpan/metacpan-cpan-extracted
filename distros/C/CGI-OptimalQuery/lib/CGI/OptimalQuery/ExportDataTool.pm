@@ -4,6 +4,8 @@ use strict;
 
 sub on_open {
   return "
+
+
 <label class=ckbox><input type=checkbox class=OQExportAllResultsInd checked> all pages</label>
 <p>
 <strong>download as..</strong><br>

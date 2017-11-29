@@ -5,18 +5,24 @@ use Mojolicious::Types;
 use Mojo::Path;
 use Mojo::Util qw(encode);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 my $PKG = __PACKAGE__;
 
 has [qw(app config)];
 has root_url => sub { Mojo::Path->new(encode('UTF-8', shift->config->{root_url}))->leading_slash(1)->trailing_slash(1) };
 has root_dir => sub { Mojo::Path->new(shift->config->{root_dir} // '.')->trailing_slash(1) };
-has markdown => sub {# parser
-  my $self = shift;
-   __internal__::Markdown->new($self->config->{markdown_pkg});
+has admin_pass => sub { shift->config->{admin_pass} };
+has public_uploads => sub { !! shift->config->{public_uploads} };
+has render_dir =>  sub { shift->config->{render_dir} };
+has dir_index => sub { shift->config->{dir_index} // [qw(README.md INDEX.md README.pod INDEX.pod)] };
+has render_pod =>  sub { shift->config->{render_pod} };
+has render_markdown =>  sub { shift->config->{render_markdown} };
+has markdown_pkg => sub { shift->config->{markdown_pkg} // 'Text::Markdown::Hoedown' };
+has markdown => sub {# parser object
+   __internal__::Markdown->new(shift->markdown_pkg);
 };
 has is_markdown => sub { qr{[.]m(?:d(?:own)?|kdn?|arkdown)$}i };
-has is_pod => sub { qr{p(?:od|m|l)} };
+has is_pod => sub { qr{[.]p(?:od|m|l)$} };
 has mime => sub { Mojolicious::Types->new };
 
 sub register {
@@ -27,12 +33,8 @@ sub register {
   require Mojolicious::Plugin::StaticShare::Templates
     and push @{$app->renderer->classes}, "$PKG\::Templates"
     and push @{$app->static->paths}, path(__FILE__)->sibling('StaticShare')->child('static') 
-    unless defined($args->{render_dir}) && $args->{render_dir} eq 0
-          && defined($args->{render_markdown}) && $args->{render_markdown} eq 0;
-  
-  $args->{markdown_pkg} //= 'Text::Markdown::Hoedown';
-  $args->{dir_index} //= [qw(README.md INDEX.md README.pod INDEX.pod)];
-  $args->{public_uploads} //= 0;
+    unless ($self->render_dir // '') eq 0
+          && ($self->render_markdown // '') eq 0;
   
   my $route = $self->root_url->clone->merge('*pth');#"$args->{root_url}/*pth";
   my $r = $app->routes;
@@ -45,7 +47,7 @@ sub register {
   
   #POD
   $self->app->plugin(PODRenderer => {no_perldoc => 1})
-    unless $self->app->renderer->helpers->{'pod_to_html'} || defined($args->{render_pod}) && $args->{render_pod} eq 0;
+    unless $self->app->renderer->helpers->{'pod_to_html'} && ($self->render_pod // '') eq 0 ;
   
   return $app;
 }
@@ -59,6 +61,7 @@ my %loc = (
     'Cant open directory'=>"Нет доступа в папку",
     'Share'=>'Обзор',
     'Index of'=>'Содержание',
+    'Dirs'=>'Папки',
     'Files'=>'Файлы',
     'Name'=>'Название файла',
     'Size'=>'Размер',
@@ -128,9 +131,9 @@ sub parse { my $self = shift; no strict 'refs'; ($self->{pkg}.'::markdown')->(@_
 
 Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete static files/dirs.
 
-=head VERSION
+=head1 VERSION
 
-0.02
+0.04
 
 =head1 SYNOPSIS
 
@@ -233,7 +236,7 @@ Same as B<render_dir> but for markdown files. Defaults to builtin things.
 
 =head2 markdown_pkg
 
-Module name for render markdown. Must contains C<sub markdown {}>. Defaults to L<Text::Markdown::Hoedown>.
+Module name for render markdown. Must contains sub C<markdown($str)> or method C<parse($str)>. Defaults to L<Text::Markdown::Hoedown>.
 
   markdown_pkg =>  'Foo::Markup';
 
@@ -257,13 +260,17 @@ Arrayref to match files to include to directory index page. Defaults to C<< [qw(
 
 =head2 public_uploads
 
-Boolean to disable/enable uploads for public users. Defaults to 0 (disable).
+Boolean to disable/enable uploads for public users. Defaults to undef (disable).
 
   public_uploads=>1, # enable
 
 =head1 UTF-8
 
 Everywhere  and everything: module, files, content.
+
+=head1 WINDOWS OS
+
+It was not tested but I hope you dont worry and have happy.
 
 =head1 METHODS
 

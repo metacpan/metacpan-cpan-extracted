@@ -122,9 +122,21 @@ const char *crypt_build_settings =
 #if defined(LTC_CAMELLIA)
    "   Camellia\n"
 #endif
+#if defined(LTC_IDEA)
+   "   IDEA\n"
+#endif
+#if defined(LTC_SERPENT)
+   "   Serpent\n"
+#endif
    "Stream ciphers built-in:\n"
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
+#endif
+#if defined(LTC_SALSA20)
+   "   Salsa20\n"
+#endif
+#if defined(LTC_SOSEMANUK)
+   "   Sosemanuk\n"
 #endif
 #if defined(LTC_RC4_STREAM)
    "   RC4\n"
@@ -392,6 +404,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_BASE64_URL)
     " BASE64-URL-SAFE "
+#endif
+#if defined(LTC_BASE32)
+    " BASE32 "
 #endif
 #if defined(LTC_CRC32)
     " CRC32 "

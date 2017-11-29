@@ -51,7 +51,7 @@ BEGIN {
 my @fd_sequence_init= get_fd_sequence(100);
 my @fd_sequence_init2= get_fd_sequence(100);
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
 $client->connect();
 
 my $db= 'perl_cassandra_client_tests';

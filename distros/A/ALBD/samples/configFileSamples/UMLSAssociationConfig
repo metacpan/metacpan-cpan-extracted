@@ -1,0 +1,29 @@
+##############################################################################
+#                Configuration File for UMLS::Association
+##############################################################################
+# All the options in this file are passed to put into an options hash and 
+# passed directly to UMLS::Association for initialization. Options hash keys 
+# are in <>'s, and values follow directly after with no space. As as example, 
+# the line "<database>bigrams" will pass the 'database' parameter with a 
+# value of 'bigrams' to the  UMLS::Association options hash for its 
+# initialization.
+#
+# For parameters where no value is needed, just write the name of the
+# parameter in '<>' (e.g. '<debug>')
+#
+#
+# See UMLS::Association for more detailed
+
+# Database of Association Scores. Not used, but required to initialize
+# UMLS::Association
+<database>CUI_Bigram
+
+# If the UMLS::Association Database is not installed on the local machine
+# The following parameters may be needed to connect to the server
+<hostname>192.168.00.00
+<username>username
+<password>password
+<socket>/var/run/mysqld.sock
+
+# makes the UMLS::Association not print to the command line
+<t>

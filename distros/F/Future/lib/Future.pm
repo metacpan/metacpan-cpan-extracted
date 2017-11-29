@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Future;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -466,7 +466,98 @@ sub _mark_ready
    }
 }
 
-sub _state
+=head1 METHODS
+
+As there are a lare number of methods on this class, they are documented here
+in several sections.
+
+=cut
+
+=head1 INSPECTION METHODS
+
+The following methods query the internal state of a Future instance without
+modifying it or otherwise causing side-effects.
+
+=cut
+
+=head2 is_ready
+
+   $ready = $future->is_ready
+
+Returns true on a leaf future if a result has been provided to the C<done>
+method, failed using the C<fail> method, or cancelled using the C<cancel>
+method.
+
+Returns true on a convergent future if it is ready to yield a result,
+depending on its component futures.
+
+=cut
+
+sub is_ready
+{
+   my $self = shift;
+   return $self->{ready};
+}
+
+=head2 is_done
+
+   $done = $future->is_done
+
+Returns true on a future if it is ready and completed successfully. Returns
+false if it is still pending, failed, or was cancelled.
+
+=cut
+
+sub is_done
+{
+   my $self = shift;
+   return $self->{ready} && !$self->{failure} && !$self->{cancelled};
+}
+
+=head2 is_failed
+
+   $failed = $future->is_failed
+
+I<Since version 0.26.>
+
+Returns true on a future if it is ready and it failed. Returns false if it is
+still pending, completed successfully, or was cancelled.
+
+=cut
+
+sub is_failed
+{
+   my $self = shift;
+   return $self->{ready} && !!$self->{failure}; # boolify
+}
+
+=head2 is_cancelled
+
+   $cancelled = $future->is_cancelled
+
+Returns true if the future has been cancelled by C<cancel>.
+
+=cut
+
+sub is_cancelled
+{
+   my $self = shift;
+   return $self->{cancelled};
+}
+
+=head2 state
+
+   $str = $future->state
+
+I<Since version 0.36.>
+
+Returns a string describing the state of the future, as one of the three
+states named above; namely C<done>, C<failed> or C<cancelled>, or C<pending>
+if it is none of these.
+
+=cut
+
+sub state
 {
    my $self = shift;
    return !$self->{ready}     ? "pending" :
@@ -502,7 +593,7 @@ sub done
 
    if( ref $self ) {
       $self->{cancelled} and return $self;
-      $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->_state." and cannot be ->done";
+      $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->state." and cannot be ->done";
       $self->{subs} and Carp::croak "${\$self->__selfstr} is not a leaf Future, cannot be ->done";
       $self->{result} = [ @_ ];
       $self->_mark_ready( "done" );
@@ -517,9 +608,12 @@ sub done
    return $self;
 }
 
+my $warned_done_cb;
 sub done_cb
 {
    my $self = shift;
+   $warned_done_cb or
+      $warned_done_cb++, warnings::warnif( deprecated => "Future->done_cb is now deprecated; use ->curry::done or sub {...}" );
    return sub { $self->done( @_ ) };
 }
 
@@ -549,7 +643,7 @@ sub fail
 
    if( ref $self ) {
       $self->{cancelled} and return $self;
-      $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->_state." and cannot be ->fail'ed";
+      $self->{ready} and Carp::croak "${\$self->__selfstr} is already ".$self->state." and cannot be ->fail'ed";
       $self->{subs} and Carp::croak "${\$self->__selfstr} is not a leaf Future, cannot be ->fail'ed";
       $self->{failure} = [ $exception, @details ];
       $self->_mark_ready( "fail" );
@@ -570,9 +664,12 @@ sub fail
    return $self;
 }
 
+my $warned_fail_cb;
 sub fail_cb
 {
    my $self = shift;
+   $warned_fail_cb or
+      $warned_fail_cb++, warnings::warnif( deprecated => "Future->fail_cb is now deprecated; use ->curry::fail or sub {...}" );
    return sub { $self->fail( @_ ) };
 }
 
@@ -637,45 +734,12 @@ sub on_cancel
    return $self;
 }
 
-=head2 is_cancelled
-
-   $cancelled = $future->is_cancelled
-
-Returns true if the future has been cancelled by C<cancel>.
-
-=cut
-
-sub is_cancelled
-{
-   my $self = shift;
-   return $self->{cancelled};
-}
-
 =head1 USER METHODS
 
 These methods would primarily be used by users of asynchronous interfaces, on
 objects returned by such an interface.
 
 =cut
-
-=head2 is_ready
-
-   $ready = $future->is_ready
-
-Returns true on a leaf future if a result has been provided to the C<done>
-method, failed using the C<fail> method, or cancelled using the C<cancel>
-method.
-
-Returns true on a convergent future if it is ready to yield a result,
-depending on its component futures.
-
-=cut
-
-sub is_ready
-{
-   my $self = shift;
-   return $self->{ready};
-}
 
 =head2 on_ready
 
@@ -722,21 +786,6 @@ sub on_ready
    }
 
    return $self;
-}
-
-=head2 is_done
-
-   $done = $future->is_done
-
-Returns true on a future if it is ready and completed successfully. Returns
-false if it is still pending, failed, or was cancelled.
-
-=cut
-
-sub is_done
-{
-   my $self = shift;
-   return $self->{ready} && !$self->{failure} && !$self->{cancelled};
 }
 
 =head2 get
@@ -856,23 +905,6 @@ sub on_done
    return $self;
 }
 
-=head2 is_failed
-
-   $failed = $future->is_failed
-
-I<Since version 0.26.>
-
-Returns true on a future if it is ready and it failed. Returns false if it is
-still pending, completed successfully, or was cancelled.
-
-=cut
-
-sub is_failed
-{
-   my $self = shift;
-   return $self->{ready} && !!$self->{failure}; # boolify
-}
-
 =head2 failure
 
    $exception = $future->failure
@@ -989,9 +1021,12 @@ sub cancel
    return $self;
 }
 
+my $warned_cancel_cb;
 sub cancel_cb
 {
    my $self = shift;
+   $warned_cancel_cb or
+      $warned_cancel_cb++, warnings::warnif( deprecated => "Future->cancel_cb is now deprecated; use ->curry::cancel or sub {...}" );
    return sub { $self->cancel };
 }
 
@@ -1487,7 +1522,43 @@ sub without_cancel
       }
    });
 
+   $new->{orig} = $self; # just to strongref it - RT122920
+   $new->on_ready( sub { undef $_[0]->{orig} } );
+
    return $new;
+}
+
+=head2 retain
+
+   $f = $f->retain
+
+I<Since version 0.36.>
+
+Creates a reference cycle which causes the future to remain in memory until
+it completes. Returns the invocant future.
+
+In normal situations, a C<Future> instance does not strongly hold a reference
+to other futures that it is feeding a result into, instead relying on that to
+be handled by application logic. This is normally fine because some part of
+the application will retain the top-level Future, which then strongly refers
+to each of its components down in a tree. However, certain design patterns,
+such as mixed Future-based and legacy callback-based API styles might end up
+creating Futures simply to attach callback functions to them. In that
+situation, without further attention, the Future may get lost due to having no
+strong references to it. Calling C<< ->retain >> on it creates such a
+reference which ensures it persists until it completes. For example:
+
+   Future->needs_all( $fA, $fB )
+      ->on_done( $on_done )
+      ->on_fail( $on_fail )
+      ->retain;
+
+=cut
+
+sub retain
+{
+   my $self = shift;
+   return $self->on_ready( sub { undef $self } );
 }
 
 =head1 CONVERGENT FUTURES
@@ -1570,13 +1641,13 @@ sub wait_all
 
    weaken( my $weakself = $self );
    my $sub_on_ready = sub {
-      return unless $weakself;
+      return unless my $self = $weakself;
 
       $pending--;
       $pending and return;
 
-      $weakself->{result} = [ @subs ];
-      $weakself->_mark_ready( "wait_all" );
+      $self->{result} = [ @subs ];
+      $self->_mark_ready( "wait_all" );
    };
 
    foreach my $sub ( @subs ) {
@@ -1643,26 +1714,26 @@ sub wait_any
 
    weaken( my $weakself = $self );
    my $sub_on_ready = sub {
-      return unless $weakself;
-      return if $weakself->{result} or $weakself->{failure}; # don't recurse on child ->cancel
+      return unless my $self = $weakself;
+      return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
       return if --$pending and $_[0]->{cancelled};
 
       if( $_[0]->{cancelled} ) {
-         $weakself->{failure} = [ "All component futures were cancelled" ];
+         $self->{failure} = [ "All component futures were cancelled" ];
       }
       elsif( $_[0]->{failure} ) {
-         $weakself->{failure} = [ $_[0]->failure ];
+         $self->{failure} = [ $_[0]->failure ];
       }
       else {
-         $weakself->{result}  = [ $_[0]->get ];
+         $self->{result}  = [ $_[0]->get ];
       }
 
       foreach my $sub ( @subs ) {
          $sub->{ready} or $sub->cancel;
       }
 
-      $weakself->_mark_ready( "wait_any" );
+      $self->_mark_ready( "wait_any" );
    };
 
    foreach my $sub ( @subs ) {
@@ -1738,29 +1809,29 @@ sub needs_all
 
    weaken( my $weakself = $self );
    my $sub_on_ready = sub {
-      return unless $weakself;
-      return if $weakself->{result} or $weakself->{failure}; # don't recurse on child ->cancel
+      return unless my $self = $weakself;
+      return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
       if( $_[0]->{cancelled} ) {
-         $weakself->{failure} = [ "A component future was cancelled" ];
+         $self->{failure} = [ "A component future was cancelled" ];
          foreach my $sub ( @subs ) {
             $sub->cancel if !$sub->{ready};
          }
-         $weakself->_mark_ready( "needs_all" );
+         $self->_mark_ready( "needs_all" );
       }
       elsif( my @failure = $_[0]->failure ) {
-         $weakself->{failure} = \@failure;
+         $self->{failure} = \@failure;
          foreach my $sub ( @subs ) {
             $sub->cancel if !$sub->{ready};
          }
-         $weakself->_mark_ready( "needs_all" );
+         $self->_mark_ready( "needs_all" );
       }
       else {
          $pending--;
          $pending and return;
 
-         $weakself->{result} = [ map { $_->get } @subs ];
-         $weakself->_mark_ready( "needs_all" );
+         $self->{result} = [ map { $_->get } @subs ];
+         $self->_mark_ready( "needs_all" );
       }
    };
 
@@ -1846,27 +1917,27 @@ sub needs_any
 
    weaken( my $weakself = $self );
    my $sub_on_ready = sub {
-      return unless $weakself;
-      return if $weakself->{result} or $weakself->{failure}; # don't recurse on child ->cancel
+      return unless my $self = $weakself;
+      return if $self->{result} or $self->{failure}; # don't recurse on child ->cancel
 
       return if --$pending and $_[0]->{cancelled};
 
       if( $_[0]->{cancelled} ) {
-         $weakself->{failure} = [ "All component futures were cancelled" ];
-         $weakself->_mark_ready( "needs_any" );
+         $self->{failure} = [ "All component futures were cancelled" ];
+         $self->_mark_ready( "needs_any" );
       }
       elsif( my @failure = $_[0]->failure ) {
          $pending and return;
 
-         $weakself->{failure} = \@failure;
-         $weakself->_mark_ready( "needs_any" );
+         $self->{failure} = \@failure;
+         $self->_mark_ready( "needs_any" );
       }
       else {
-         $weakself->{result} = [ $_[0]->get ];
+         $self->{result} = [ $_[0]->get ];
          foreach my $sub ( @subs ) {
             $sub->cancel if !$sub->{ready};
          }
-         $weakself->_mark_ready( "needs_any" );
+         $self->_mark_ready( "needs_any" );
       }
    };
 
@@ -1994,7 +2065,7 @@ sub __selfstr
 I<Since version 0.28.>
 
 Accessors that return the tracing timestamps from the instance. These give the
-time the instance was contructed ("birth" time, C<btime>) and the time the
+time the instance was constructed ("birth" time, C<btime>) and the time the
 result was determined (the "ready" time, C<rtime>). Each result is returned as
 a two-element ARRAY ref, containing the epoch time in seconds and
 microseconds, as given by C<Time::HiRes::gettimeofday>.
@@ -2048,7 +2119,7 @@ version.>
 
 This method is invoked internally by various methods that are about to save a
 callback CODE reference supplied by the user, to be invoked later. The default
-implementation simply returns the callback agument as-is; the method is
+implementation simply returns the callback argument as-is; the method is
 provided to allow users to provide extra behaviour. This can be done by
 applying a method modifier of the C<around> kind, so in effect add a chain of
 wrappers. Each wrapper can then perform its own wrapping logic of the
@@ -2335,6 +2406,11 @@ see the discussion on RT96685 for more information
 =head1 SEE ALSO
 
 =over 4
+
+=item *
+
+L<Promises> - an implementation of the "Promise/A+" pattern for asynchronous
+programming
 
 =item *
 

@@ -35,6 +35,7 @@ sub test_001 : Tags(req) {
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Roles::File');
     require_ok('BioX::Workflow::Command::run::Rules::Rules');
 
+    require_ok('BioX::Workflow::Command::run::Rules::Directives::Functions');
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Interpolate::Mustache');
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Interpolate::Text');
 

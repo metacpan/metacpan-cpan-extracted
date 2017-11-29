@@ -16,6 +16,7 @@ lib/BioX/Workflow/Command/add.pm
 lib/BioX/Workflow/Command/new.pm
 lib/BioX/Workflow/Command/run.pm
 lib/BioX/Workflow/Command/run/Rules/Directives.pm
+lib/BioX/Workflow/Command/run/Rules/Directives/Functions.pm
 lib/BioX/Workflow/Command/run/Rules/Directives/Interpolate.pm
 lib/BioX/Workflow/Command/run/Rules/Directives/Interpolate/Mustache.pm
 lib/BioX/Workflow/Command/run/Rules/Directives/Interpolate/Text.pm

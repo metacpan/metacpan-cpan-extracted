@@ -1,6 +1,6 @@
 package Cassandra::Client::Connection;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Connection::VERSION = '0.13';
+$Cassandra::Client::Connection::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -8,6 +8,7 @@ use vars qw/$BUFFER/;
 
 use Ref::Util qw/is_blessed_ref is_plain_arrayref/;
 use IO::Socket::INET;
+use IO::Socket::INET6;
 use Errno qw/EAGAIN/;
 use Socket qw/SOL_SOCKET IPPROTO_TCP SO_KEEPALIVE TCP_NODELAY/;
 use Scalar::Util qw/weaken/;
@@ -28,15 +29,11 @@ use Cassandra::Client::Protocol qw/
     unpack_inet
     unpack_int
     unpack_metadata
-    unpack_metadata2
     unpack_shortbytes
     unpack_string
     unpack_stringmultimap
 /;
-use Cassandra::Client::Encoder qw/
-    make_encoder
-/;
-use Cassandra::Client::Error;
+use Cassandra::Client::Error::Base;
 use Cassandra::Client::ResultSet;
 use Cassandra::Client::TLSHandling;
 
@@ -185,7 +182,7 @@ sub execute_prepared {
     my $row;
     if ($parameters) {
         eval {
-            $row= $prepared->{encoder}->($parameters);
+            $row= $prepared->{encoder}->encode($parameters);
             1;
         } or do {
             my $error= $@ || "??";
@@ -215,7 +212,7 @@ sub execute_prepared {
 
         if ($code != OPCODE_RESULT) {
             # This shouldn't ever happen...
-            return $callback->(Cassandra::Client::Error->new(
+            return $callback->(Cassandra::Client::Error::Base->new(
                 message         => "Expected a RESULT frame but got something else; considering the query failed",
                 request_error   => 1,
             ));
@@ -297,7 +294,7 @@ sub execute_batch {
 
     my $batch_frame= pack('Cn', $batch_type, (0+@prepared));
     for my $prep (@prepared) {
-        $batch_frame .= pack('C', 1).pack_shortbytes($prep->[0]{id}).$prep->[0]{encoder}->($prep->[1]);
+        $batch_frame .= pack('C', 1).pack_shortbytes($prep->[0]{id}).$prep->[0]{encoder}->encode($prep->[1]);
     }
     $batch_frame .= pack('nC', $consistency, 0);
 
@@ -314,7 +311,7 @@ sub execute_batch {
 
         if ($code != OPCODE_RESULT) {
             # This shouldn't ever happen...
-            return $callback->(Cassandra::Client::Error->new(
+            return $callback->(Cassandra::Client::Error::Base->new(
                 message         => "Expected a RESULT frame but got something else; considering the batch failed",
                 request_error   => 1,
             ));
@@ -380,23 +377,17 @@ sub prepare {
 
             my $id= unpack_shortbytes($body);
 
-            my $metadata= eval { unpack_metadata($body) } or return $next->("Unable to unpack query metadata: $@");
-
             my ($encoder, $decoder);
             eval {
-                ($decoder)= unpack_metadata2($body);
+                ($encoder)= unpack_metadata($body);
+                1;
+            } or return $next->("Unable to unpack query metadata: $@");
+            eval {
+                ($decoder)= unpack_metadata($body);
                 1;
             } or return $next->("Unable to unpack query result metadata: $@");
 
-            eval {
-                $encoder= make_encoder($metadata);
-                1;
-            } or do {
-                my $error= $@ || "??";
-                return $next->("Error while preparing query, couldn't compile encoder: $error");
-            };
-
-            $self->{metadata}->add_prepared($query, $id, $metadata, $decoder, $encoder);
+            $self->{metadata}->add_prepared($query, $id, $decoder, $encoder);
             return $next->();
         },
     ], sub {
@@ -414,7 +405,7 @@ sub decode_result {
     my $result_type= unpack('l>', substr($_[3], 0, 4, ''));
     if ($result_type == RESULT_ROWS) { # Rows
         my ($paging_state, $decoder);
-        eval { ($decoder, $paging_state)= unpack_metadata2($_[3]); 1 } or return $callback->("Unable to unpack query metadata: $@");
+        eval { ($decoder, $paging_state)= unpack_metadata($_[3]); 1 } or return $callback->("Unable to unpack query metadata: $@");
         $decoder= $prepared->{decoder} || $decoder;
 
         $callback->(undef,
@@ -675,12 +666,23 @@ sub connect {
     my $socket; {
         local $@;
 
-        $socket= IO::Socket::INET->new(
-            PeerAddr => $self->{host},
-            PeerPort => $self->{options}{port},
-            Proto    => 'tcp',
-            Blocking => 0,
-        );
+        if ($self->{host} =~ /:/) {
+            # IPv6
+            $socket= IO::Socket::INET6->new(
+                PeerAddr => $self->{host},
+                PeerPort => $self->{options}{port},
+                Proto    => 'tcp',
+                Blocking => 0,
+            );
+        } else {
+            # IPv6
+            $socket= IO::Socket::INET->new(
+                PeerAddr => $self->{host},
+                PeerPort => $self->{options}{port},
+                Proto    => 'tcp',
+                Blocking => 0,
+            );
+        }
 
         unless ($socket) {
             my $error= "Could not connect: $@";
@@ -720,7 +722,7 @@ sub connect {
 sub request {
     # my $body= $_[3] (let's avoid copying that blob). Yes, this code assumes ownership of the body.
     my ($self, $cb, $opcode)= @_;
-    return $cb->(Cassandra::Client::Error->new(
+    return $cb->(Cassandra::Client::Error::Base->new(
         message => "Connection shutting down",
         request_error => 1,
     )) if $self->{shutdown};
@@ -731,7 +733,7 @@ sub request {
     my $attempts= 0;
     while (exists($pending->{$stream_id}) || $stream_id >= STREAM_ID_LIMIT) {
         $stream_id= (++$stream_id) % STREAM_ID_LIMIT;
-        return $cb->(Cassandra::Client::Error->new(
+        return $cb->(Cassandra::Client::Error::Base->new(
             message => "Cannot find a stream ID to post query with",
             request_error => 1,
         )) if ++$attempts >= STREAM_ID_LIMIT;
@@ -787,7 +789,7 @@ sub request {
                     $self->shutdown($error);
 
                     # Now fail our stream properly, but include the retry notice
-                    $my_stream->[0]->(Cassandra::Client::Error->new(
+                    $my_stream->[0]->(Cassandra::Client::Error::Base->new(
                         message       => "Disconnected: $error",
                         do_retry      => 1,
                         request_error => 1,
@@ -817,7 +819,7 @@ sub request {
                 $self->shutdown($error);
 
                 # Now fail our stream properly, but include the retry notice
-                $my_stream->[0]->(Cassandra::Client::Error->new(
+                $my_stream->[0]->(Cassandra::Client::Error::Base->new(
                     message       => "Disconnected: $error",
                     do_retry      => 1,
                     request_error => 1,
@@ -992,7 +994,7 @@ sub can_timeout {
     my ($self, $id)= @_;
     my $stream= delete $self->{pending_streams}{$id};
     $self->{pending_streams}{$id}= [ sub{}, \(my $zero= 0) ]; # fake it
-    $stream->[0]->(Cassandra::Client::Error->new(
+    $stream->[0]->(Cassandra::Client::Error::Base->new(
         message         => "Request timed out",
         is_timeout      => 1,
         request_error   => 1,
@@ -1021,7 +1023,7 @@ sub shutdown {
     $self->{socket}->close;
 
     for (values %$pending) {
-        $_->[0]->(Cassandra::Client::Error->new(
+        $_->[0]->(Cassandra::Client::Error::Base->new(
             message       => "Disconnected: $shutdown_reason",
             request_error => 1,
         ));
@@ -1100,7 +1102,7 @@ Cassandra::Client::Connection
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

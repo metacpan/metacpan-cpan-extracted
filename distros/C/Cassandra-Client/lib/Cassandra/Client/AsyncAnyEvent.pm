@@ -1,6 +1,6 @@
 package Cassandra::Client::AsyncAnyEvent;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::AsyncAnyEvent::VERSION = '0.13';
+$Cassandra::Client::AsyncAnyEvent::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -145,6 +145,11 @@ sub timer {
     });
 }
 
+sub later {
+    my ($self, $callback)= @_;
+    &AE::postpone($callback);
+}
+
 # $something->($async->wait(my $w)); my ($error, $result)= $w->();
 sub wait {
     my ($self)= @_;
@@ -177,7 +182,7 @@ Cassandra::Client::AsyncAnyEvent
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

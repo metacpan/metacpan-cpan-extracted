@@ -149,4 +149,23 @@ use Future;
        '->get on empty wait_any is empty' );
 }
 
+# wait_any instance disappearing partway through cancellation (RT120468)
+{
+   my $f = Future->new;
+
+   my $wait;
+   $wait = Future->wait_any(
+      $f,
+      my $cancelled = Future->new->on_cancel( sub {
+         undef $wait;
+      }),
+   );
+
+   is( exception { $f->done(1) }, undef,
+      'no problems cancelling a Future which clears the original ->wait_any ref' );
+
+   ok( $cancelled->is_cancelled, 'cancellation occurred as expected' );
+   ok( $f->is_done, '->wait_any is marked as done' );
+}
+
 done_testing;

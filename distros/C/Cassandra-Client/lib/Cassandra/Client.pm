@@ -1,6 +1,6 @@
 package Cassandra::Client;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::VERSION = '0.13';
+$Cassandra::Client::VERSION = '0.14';
 # ABSTRACT: Perl library for accessing Cassandra using its binary network protocol
 
 use 5.010;
@@ -15,7 +15,8 @@ use Cassandra::Client::Metadata;
 use Cassandra::Client::Policy::Queue::Default;
 use Cassandra::Client::Policy::Retry::Default;
 use Cassandra::Client::Policy::Retry;
-use Cassandra::Client::Policy::Throttle::Adaptive;
+use Cassandra::Client::Policy::Throttle::Default;
+use Cassandra::Client::Policy::LoadBalancing::Default;
 use Cassandra::Client::Pool;
 use Cassandra::Client::TLSHandling;
 use Cassandra::Client::Util qw/series whilst/;
@@ -46,6 +47,12 @@ sub new {
     my $options= Cassandra::Client::Config->new(
         \%args
     );
+
+    $self->{throttler}= $options->{throttler} || Cassandra::Client::Policy::Throttle::Default->new();
+    $self->{retry_policy}= $options->{retry_policy} || Cassandra::Client::Policy::Retry::Default->new();
+    $self->{command_queue}= $options->{command_queue} || Cassandra::Client::Policy::Queue::Default->new();
+    $self->{load_balancing_policy}= $options->{load_balancing_policy} || Cassandra::Client::Policy::LoadBalancing::Default->new();
+
     my $async_class= $options->{anyevent} ? "Cassandra::Client::AsyncAnyEvent" : "Cassandra::Client::AsyncEV";
     my $async_io= $async_class->new(
         options => $options,
@@ -58,27 +65,15 @@ sub new {
         options  => $options,
         metadata => $metadata,
         async_io => $async_io,
+        load_balancing_policy => $self->{load_balancing_policy},
     );
-    my $command_queue= Cassandra::Client::Policy::Queue::Default->new(
-        %{ $options->{command_queue_config} || {} },
-    );
-    my $retry_policy= Cassandra::Client::Policy::Retry::Default->new();
     my $tls= $options->{tls} ? Cassandra::Client::TLSHandling->new() : undef;
 
     $self->{options}= $options;
     $self->{async_io}= $async_io;
     $self->{metadata}= $metadata;
     $self->{pool}= $pool;
-    $self->{command_queue}= $command_queue;
-    $self->{retry_policy}= $retry_policy;
     $self->{tls}= $tls;
-    if ($options->{throttler}) {
-        $options->{throttler}= 'Adaptive' if $options->{throttler} eq 'AdaptiveThrottler'; # Temporary.
-        my $throttler_class= "Cassandra::Client::Policy::Throttle::$options->{throttler}";
-        $options->{throttler}= $throttler_class->new(%{$options->{throttler_config}});
-    } else {
-        $self->{throttler}= undef;
-    }
 
     return $self;
 }
@@ -87,6 +82,11 @@ sub _connect {
     my ($self, $callback)= @_;
     return _cb($callback) if $self->{connected};
     return _cb($callback, 'Cannot connect: shutdown() has been called') if $self->{shutdown};
+
+    # This is ONLY useful if the user doesn't throw away the C::C object on connect errors.
+    if (!$self->{connecting} && (my $error= $self->{throttler}->should_fail())) {
+        return _cb($callback, $error);
+    }
 
     push @{$self->{connect_callbacks}||=[]}, $callback;
     if ($self->{connecting}++) {
@@ -125,6 +125,7 @@ sub _connect {
             },
         ], sub {
             my $error= shift;
+            $self->{throttler}->count($error);
             if ($error) {
                 $last_error= "On $contact_point: $error";
                 return $next_connect->();
@@ -232,9 +233,6 @@ sub _command {
         start_time => Time::HiRes::time(),
     };
 
-    # Handle overloads
-    goto FAILFAST if $self->{throttler} && $self->{throttler}->should_fail();
-
     goto OVERFLOW if $self->{active_queries} >= $self->{options}{max_concurrent_queries};
 
     goto SLOWPATH if !$self->{connected};
@@ -242,15 +240,17 @@ sub _command {
     my $connection= $self->{pool}->get_one;
     goto SLOWPATH if !$connection;
 
+    if (my $error= $self->{throttler}->should_fail()) {
+        return _cb($callback, $error);
+    }
+
     $self->{active_queries}++;
     $connection->$command(sub {
         my ($error, $result)= @_;
-        if (my $throttler= $self->{throttler}) {
-            $throttler->count($error);
-        }
+        $self->{throttler}->count($error);
 
         $self->{active_queries}--;
-        $self->_command_dequeue if $self->{command_queue}{has_any};
+        $self->_schedule_command_dequeue if $self->{command_queue}{has_any};
 
         return $self->_command_failed($command, $callback, $args, $command_info, $error) if $error;
         return _cb($callback, $error, $result);
@@ -260,9 +260,6 @@ sub _command {
 
 SLOWPATH:
     return $self->_command_slowpath($command, $callback, $args, $command_info);
-
-FAILFAST:
-    return _cb($callback, "Client-induced failure by throttling mechanism");
 
 OVERFLOW:
     return $self->_command_enqueue($command, $callback, $args, $command_info);
@@ -282,22 +279,17 @@ sub _command_slowpath {
             $self->{pool}->get_one_cb($next);
         }, sub {
             my ($next, $connection)= @_;
-            # Yes, if we immediately take the slow path, which we would if we're not connected, we're going to throttle twice
-            # For now, I'm okay with that, but let's mark it with a TODO anyway.
-            # XXX
-            if ($self->{throttler} && $self->{throttler}->should_fail()) {
-                return $next->("Client-induced failure by throttling mechanism");
+            if (my $error= $self->{throttler}->should_fail()) {
+                return $next->($error);
             }
             $connection->$command($next, @$args);
         }
     ], sub {
         my ($error, $result)= @_;
-        if (my $throttler= $self->{throttler}) {
-            $throttler->count($error);
-        }
+        $self->{throttler}->count($error);
 
         $self->{active_queries}--;
-        $self->_command_dequeue if $self->{command_queue}{has_any};
+        $self->_schedule_command_dequeue if $self->{command_queue}{has_any};
 
         return $self->_command_failed($command, $callback, $args, $command_info, $error) if $error;
         return _cb($callback, $error, $result);
@@ -326,16 +318,16 @@ sub _command_failed {
     return $callback->($error) unless is_ref($error);
 
     my $retry_decision;
-    if ($error->{do_retry}) {
+    if ($error->do_retry) {
         $retry_decision= Cassandra::Client::Policy::Retry::retry;
-    } elsif ($error->{request_error}) {
+    } elsif ($error->is_request_error) {
         $retry_decision= $self->{retry_policy}->on_request_error(undef, undef, $error, ($command_info->{retries}||0));
-    } elsif ($error->code == 0x1100) {
-        $retry_decision= $self->{retry_policy}->on_write_timeout(undef, @$error{qw/cl write_type blockfor received/}, ($command_info->{retries}||0));
-    } elsif ($error->code == 0x1200) {
-        $retry_decision= $self->{retry_policy}->on_read_timeout(undef, @$error{qw/cl blockfor received data_retrieved/}, ($command_info->{retries}||0));
-    } elsif ($error->code == 0x1000) {
-        $retry_decision= $self->{retry_policy}->on_unavailable(undef, @$error{qw/cl required alive/}, ($command_info->{retries}||0));
+    } elsif ($error->isa('Cassandra::Client::Error::WriteTimeoutException')) {
+        $retry_decision= $self->{retry_policy}->on_write_timeout(undef, $error->cl, $error->write_type, $error->blockfor, $error->received, ($command_info->{retries}||0));
+    } elsif ($error->isa('Cassandra::Client::Error::ReadTimeoutException')) {
+        $retry_decision= $self->{retry_policy}->on_read_timeout(undef, $error->cl, $error->blockfor, $error->received, $error->data_retrieved, ($command_info->{retries}||0));
+    } elsif ($error->isa('Cassandra::Client::Error::UnavailableException')) {
+        $retry_decision= $self->{retry_policy}->on_unavailable(undef, $error->cl, $error->required, $error->alive, ($command_info->{retries}||0));
     } else {
         $retry_decision= Cassandra::Client::Policy::Retry::rethrow;
     }
@@ -355,11 +347,18 @@ sub _command_enqueue {
     return;
 }
 
-sub _command_dequeue {
+sub _schedule_command_dequeue {
     my ($self)= @_;
-    my $item= $self->{command_queue}->dequeue or return;
-    $self->_command_slowpath(@$item);
-    return;
+    unless ($self->{command_callback_scheduled}++) {
+        $self->{async_io}->later(sub {
+            delete $self->{command_callback_scheduled};
+
+            while ($self->{command_queue}{has_any} && $self->{active_queries} < $self->{options}{max_concurrent_queries}) {
+                my $item= $self->{command_queue}->dequeue or return;
+                $self->_command_slowpath(@$item);
+            }
+        });
+    }
 }
 
 # Utility functions that wrap query functions
@@ -532,7 +531,7 @@ Cassandra::Client - Perl library for accessing Cassandra using its binary networ
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

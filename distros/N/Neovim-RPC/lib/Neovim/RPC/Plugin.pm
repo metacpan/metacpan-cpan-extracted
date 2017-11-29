@@ -1,7 +1,7 @@
 package Neovim::RPC::Plugin;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: base role for Neovim::RPC plugins
-$Neovim::RPC::Plugin::VERSION = '1.0.0';
+$Neovim::RPC::Plugin::VERSION = '1.0.1';
 
 
 
@@ -141,7 +141,7 @@ Neovim::RPC::Plugin - base role for Neovim::RPC plugins
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

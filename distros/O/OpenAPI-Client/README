@@ -96,12 +96,6 @@ ATTRIBUTES
     Returns a Mojo::UserAgent object which is used to execute requests.
 
 METHODS
-  local_app
-      $client = $client->local_app(Mojolicious->new);
-
-    This method will modify "ua" to run requests against the Mojolicious or
-    Mojolicious::Lite application given as argument. (Useful for testing)
-
   new
       $client = OpenAPI::Client->new($specification, \%attrs);
       $client = OpenAPI::Client->new($specification, %attrs);

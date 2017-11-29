@@ -11,7 +11,7 @@
 
 package Syntax::Highlight::Engine::Kate::CUE_Sheet;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;

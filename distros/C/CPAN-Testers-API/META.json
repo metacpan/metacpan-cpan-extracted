@@ -4,7 +4,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,16 +37,17 @@
          "requires" : {
             "Alien::SwaggerUI" : "0",
             "Beam::Minion" : "0.007",
-            "CPAN::Testers::Schema" : "0.014",
+            "CPAN::Testers::Schema" : "0.021",
             "File::Share" : "0",
             "Import::Base" : "0.012",
+            "JSON::Validator" : "1.07",
             "Log::Any" : "1.045",
             "Log::Any::Adapter::MojoLog" : "0.02",
             "Mercury" : "0.015",
             "Minion::Backend::mysql" : "0.08",
             "Mojolicious" : "7.40",
             "Mojolicious::Plugin::Config" : "0",
-            "Mojolicious::Plugin::OpenAPI" : "1.13",
+            "Mojolicious::Plugin::OpenAPI" : "1.21",
             "perl" : "5.024"
          }
       },
@@ -76,27 +77,27 @@
    "provides" : {
       "CPAN::Testers::API" : {
          "file" : "lib/CPAN/Testers/API.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "CPAN::Testers::API::Base" : {
          "file" : "lib/CPAN/Testers/API/Base.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "CPAN::Testers::API::Controller::Release" : {
          "file" : "lib/CPAN/Testers/API/Controller/Release.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "CPAN::Testers::API::Controller::Report" : {
          "file" : "lib/CPAN/Testers/API/Controller/Report.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "CPAN::Testers::API::Controller::Summary" : {
          "file" : "lib/CPAN/Testers/API/Controller/Summary.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "CPAN::Testers::API::Controller::Upload" : {
          "file" : "lib/CPAN/Testers/API/Controller/Upload.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -112,10 +113,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
-      "Breno G. de Oliveira <garu@cpan.org>"
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "mohawk2 <mohawk2@users.noreply.github.com>",
+      "Nick Tonkin <1nickt@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
 }

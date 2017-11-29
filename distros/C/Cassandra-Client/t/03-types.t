@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use Cassandra::Client;
-use Cassandra::Client::Protocol qw/:constants pack_int pack_long pack_metadata unpack_metadata2 unpack_metadata/;
-use Cassandra::Client::Encoder 'make_encoder';
+use Cassandra::Client::Protocol qw/:constants pack_int pack_long pack_metadata unpack_metadata/;
 
 # Add some junk into our Perl magic variables
 local $"= "junk join string ,";
@@ -18,19 +17,16 @@ sub check_encdec {
         $expected= $row unless defined $expected;
 
         my $metadata= pack_metadata($rowspec);
-        my ($decoder)= unpack_metadata2($metadata);
-        ok($decoder) or diag('No decoder');
+        my ($rowmeta)= unpack_metadata($metadata);
+        ok($rowmeta) or diag('No rowmeta');
 
-        my $encoder= make_encoder($rowspec);
-        ok($encoder) or diag('No encoder');
-
-        my $encoded= $encoder->($row);
+        my $encoded= $rowmeta->encode($row);
         ok(length $encoded) or diag('Encoding failed');
         HACK: { # Turns the encoded parameter list into something our decoders understand
             substr($encoded, 0, 2, '');
             $encoded= pack_int(1).$encoded;
         }
-        my $decoded= $decoder->decode($encoded, 0);
+        my $decoded= $rowmeta->decode($encoded, 0);
         is_deeply($decoded->[0], $expected);
 
         1;
@@ -58,9 +54,10 @@ sub check_enc {
         ]
     };
     eval {
-        my $encoder= make_encoder($meta);
-        ok($encoder) or diag('No encoder');
-        my $encoded= $encoder->([ $col ]);
+        my $metadata= pack_metadata($meta);
+        my ($rowmeta)= unpack_metadata($metadata);
+
+        my $encoded= $rowmeta->encode([ $col ]);
         my $rowcount= unpack('n', substr($encoded, 0, 2, ''));
         ok($rowcount == 1);
         my $col_length= unpack('l>', substr($encoded, 0, 4, ''));

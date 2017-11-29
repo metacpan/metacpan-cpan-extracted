@@ -7,7 +7,7 @@ use Mojo::JSON qw(decode_json to_json);
 use GraphQL::Execution qw(execute);
 use Module::Runtime qw(require_module);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my @DEFAULT_METHODS = qw(get post);
 my $EXECUTE = sub {
@@ -71,7 +71,7 @@ sub register {
         template => 'graphiql',
         layout => undef,
         title            => 'GraphiQL',
-        graphiql_version => '0.11.2',
+        graphiql_version => 'latest',
         queryString      => _safe_serialize( $c->req->query_params->param('query') ),
         operationName    => _safe_serialize( $c->req->query_params->param('operationName') ),
         resultString     => _safe_serialize( $c->req->query_params->param('result') ),

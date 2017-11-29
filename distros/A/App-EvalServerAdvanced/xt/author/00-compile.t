@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10;
+plan tests => 17;
 
 my @module_files = (
     'App/EvalServerAdvanced.pm',
@@ -15,7 +15,14 @@ my @module_files = (
     'App/EvalServerAdvanced/Log.pm',
     'App/EvalServerAdvanced/Sandbox.pm',
     'App/EvalServerAdvanced/Sandbox/Internal.pm',
-    'App/EvalServerAdvanced/Seccomp.pm'
+    'App/EvalServerAdvanced/Sandbox/Plugin/Perlbot.pm',
+    'App/EvalServerAdvanced/Sandbox/Plugin/PerlbotEggs.pm',
+    'App/EvalServerAdvanced/Seccomp.pm',
+    'App/EvalServerAdvanced/Seccomp/Plugin/Constants/LinuxClone.pm',
+    'App/EvalServerAdvanced/Seccomp/Plugin/Constants/POSIX.pm',
+    'App/EvalServerAdvanced/Seccomp/Plugin/ExecWrapper.pm',
+    'App/EvalServerAdvanced/Seccomp/Profile.pm',
+    'App/EvalServerAdvanced/Seccomp/Syscall.pm'
 );
 
 my @scripts = (

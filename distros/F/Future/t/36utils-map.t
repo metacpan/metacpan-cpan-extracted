@@ -44,6 +44,21 @@ use Future::Utils qw( fmap_concat fmap_scalar );
    is_deeply( [ $future->get ], [qw( A B C D E )], '$future->get for fmap_concat out of order' );
 }
 
+# fmap_concat concurrent above input
+{
+   my @subf;
+   my $future = fmap_concat {
+      return $subf[$_[0]] = Future->new;
+   } foreach => [ 0 .. 2 ],
+     concurrent => 5;
+
+   $subf[0]->done( "A" );
+   $subf[1]->done( "B" );
+   $subf[2]->done( "C" );
+
+   is_deeply( [ $future->get ], [qw( A B C )], '$future->get for fmap_concat concurrent more than input' );
+}
+
 # fmap_concat cancel
 {
    my $f = Future->new;

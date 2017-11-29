@@ -16,18 +16,16 @@ name: experimental
 provides:
   experimental:
     file: lib/experimental.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Carp: '0'
-  feature: '0'
-  perl: '5.010'
   strict: '0'
   version: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=experimental
   repository: git://github.com/Leont/experimental.git
-version: '0.017'
+version: '0.018'
 x_contributors:
   - 'Father Chrysostomos <sprout@cpan.org>'
   - 'Grant McLean <grant@catalyst.net.nz>'

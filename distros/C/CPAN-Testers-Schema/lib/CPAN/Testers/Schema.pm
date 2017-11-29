@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -104,7 +104,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Breno G. de Oliveira Joel Berger Mohammad S Anwar
+=for stopwords Breno G. de Oliveira Joel Berger Mohammad S Anwar Nick Tonkin
 
 =over 4
 
@@ -186,6 +186,10 @@ Joel Berger <joel.a.berger@gmail.com>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Nick Tonkin <1nickt@users.noreply.github.com>
 
 =back
 

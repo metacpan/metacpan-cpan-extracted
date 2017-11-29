@@ -1,6 +1,7 @@
 if (! window._OQAjaxQueryLoaded)
 (function(){
   window._OQAjaxQueryLoaded = true;
+  var IS_IOS = /iPhone|iPod|iPad/.test(navigator.userAgent);
 
   window.OQnotify = function(thing) {
     var $oqmsg;
@@ -20,12 +21,12 @@ if (! window._OQAjaxQueryLoaded)
     $oqnotify.appendTo('body').delay(6000).fadeOut(function(){ $(this).remove(); });
   };
 
-  $(document).delegate(".OQnotifyOkBut", "click", function(){
+  $(document).on('click',".OQnotifyOkBut", function(){
     $(this).closest('.OQnotify').remove();  
   });
 
   // show column panel when clicked
-  $(document).delegate('table.OQdata thead td', 'click', function(e) {
+  $(document).on('click','table.OQdata thead td', function(e) {
     var $t = $(this);
     var $form = $t.closest('form');
     var $menu = $form.children('.OQColumnCmdPanel');
@@ -69,7 +70,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQRemoveSortBut', 'click', function(e) {
+  $(document).on('click','.OQRemoveSortBut', function(e) {
     e.preventDefault();
     var $t = $(this);
     var idx = $t.prevAll().length;
@@ -85,7 +86,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQCloseBut', 'click', function(e) {
+  $(document).on('click','.OQCloseBut', function(e) {
     e.preventDefault();
     var $form = $(this).closest('form');
     var $menu = $form.children('.OQColumnCmdPanel');
@@ -100,7 +101,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQLeftBut', 'click', function(e) {
+  $(document).on('click','.OQLeftBut', function(e) {
     e.preventDefault();
     var $form = $(this).closest('form');
     var $menu = $form.children('.OQColumnCmdPanel');
@@ -118,7 +119,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQRightBut', 'click', function(e) {
+  $(document).on('click','.OQRightBut', function(e) {
     e.preventDefault();
     var $form = $(this).closest('form');
     var $menu = $form.children('.OQColumnCmdPanel');
@@ -136,7 +137,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQSortBut,.OQReverseSortBut', 'click', function(e) {
+  $(document).on('click','.OQSortBut,.OQReverseSortBut', function(e) {
     e.preventDefault();
     var $form = $(this).closest('form');
     var $menu = $form.children('.OQColumnCmdPanel');
@@ -159,7 +160,7 @@ if (! window._OQAjaxQueryLoaded)
   });
 
   var downloadCtr = 0;
-  $(document).delegate('.OQDownloadCSV,.OQDownloadHTML,.OQDownloadXML,.OQDownloadJSON','click', function(){
+  $(document).on('click','.OQDownloadCSV,.OQDownloadHTML,.OQDownloadXML,.OQDownloadJSON', function(){
     var target = 'download'+(downloadCtr++); 
     var $f = $('.OQform');
     var $panel = $(this).closest('.OQToolsPanel');
@@ -183,11 +184,11 @@ if (! window._OQAjaxQueryLoaded)
     $panel.find('.OQToolsCancelBut').click();
   });
 
-  $(document).delegate('.OQToolsCancelBut','click', function(){
+  $(document).on('click','.OQToolsCancelBut', function(){
     $(".OQToolsPanel").hide();
   });
 
-  $(document).delegate('.OQToolsBut','click', function(){
+  $(document).on('click','.OQToolsBut', function(){
     var $p = $(".OQToolsPanel").toggle();
 
     // open export by default
@@ -196,14 +197,14 @@ if (! window._OQAjaxQueryLoaded)
     }
   });
 
-  $(document).delegate('.OQDeleteSavedSearchBut','click', function(){
+  $(document).on('click','.OQDeleteSavedSearchBut', function(){
     var $but = $(this);
     var $tr = $(this).closest('tr');
     var id = $tr.find('[data-id]').attr('data-id');
     var $f = $('.OQform');
     var dat = buildParamMap($f);
     dat.module = 'InteractiveQuery2Tools';
-    dat.OQdeleteSavedSearch = id;
+    dat.OQDeleteSavedSearch = id;
     $.ajax({ url: $f[0].action, type: 'POST', dataType: 'json',
       data: dat,
       complete: function(jqXHR) {
@@ -301,15 +302,22 @@ if (! window._OQAjaxQueryLoaded)
     });
     return true;
   });
-  $(document).delegate('#OQalertenabled', 'click', function(e) {
+  $(document).on('click', '#OQalertenabled', function(e) {
     if (this.checked) {
       $("#OQSaveReportEmailAlertOpts").addClass('opened');
+      $("#OQsave_search_default").prop('checked',false);
     } else {
       $("#OQSaveReportEmailAlertOpts").removeClass('opened');
     }
   });
 
-  $(document).delegate('.OQEmailMergePreviewBut, .OQEmailMergeSendEmailBut', 'click', function(e) {
+  $(document).on("click", "#OQsave_search_default", function(){
+    if (this.checked) {
+      $("#OQalertenabled").prop('checked',false);
+    }
+  });
+
+  $(document).on('click','.OQEmailMergePreviewBut, .OQEmailMergeSendEmailBut', function(e) {
     var $f = $('.OQform');
     var dat = buildParamMap($f);
     dat.module = 'InteractiveQuery2Tools';
@@ -332,7 +340,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQRemoveAutoActionBut', 'click', function(e) {
+  $(document).on('click','.OQRemoveAutoActionBut', function(e) {
     var $f = $('.OQform');
     var $elem = $(this).closest(".AutoActionSummaryElem");
     var dat = buildParamMap($f);
@@ -345,7 +353,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQEmailMergeDeleteAutoActionBut', 'click', function(e) {
+  $(document).on('click','.OQEmailMergeDeleteAutoActionBut', function(e) {
     var $f = $('.OQform');
     var dat = buildParamMap($f);
     dat.module = 'InteractiveQuery2Tools';
@@ -356,7 +364,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQEmailMergeSaveAutoActionBut', 'click', function(e) {
+  $(document).on('click','.OQEmailMergeSaveAutoActionBut', function(e) {
     var $f = $('.OQform');
     var dat = buildParamMap($f);
     dat.module = 'InteractiveQuery2Tools';
@@ -370,13 +378,13 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQEmailMergePreviewBackBut', 'click', function(e) {
+  $(document).on('click','.OQEmailMergePreviewBackBut', function(e) {
     $(".OQemailmergeview").siblings().show();
     $(".OQemailmergeview").remove();
     return true;
   });
 
-  $(document).delegate('.OQAddColumnsBut', 'click', function(e) {
+  $(document).on('click','.OQAddColumnsBut', function(e) {
     e.preventDefault();
     var $f = $(this).closest('form');
     var $menu = $f.children('.OQColumnCmdPanel');
@@ -402,14 +410,14 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQAddColumnsCancelBut', 'click', function() {
+  $(document).on('click','.OQAddColumnsCancelBut', function() {
     var $f = $(this).closest('form');
     $f.children('.OQAddColumnsPanel').remove();
     $f.removeClass('OQAddColumnsMode');
     return true;
   });
 
-  $(document).delegate('.OQAddColumnsOKBut', 'click', function() {
+  $(document).on('click','.OQAddColumnsOKBut', function() {
     var $panel = $(this).closest('.OQAddColumnsPanel');
     var $f = $panel.closest('form');
     var $menu = $f.children('.OQColumnCmdPanel');
@@ -427,7 +435,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQToolExpander h3', 'click', function() {
+  $(document).on('click','.OQToolExpander h3', function() {
     var $newli = $(this).closest('li');
 
     var $oldcontent = $newli.closest('.OQToolsPanel').find('.OQToolContent');
@@ -447,7 +455,7 @@ if (! window._OQAjaxQueryLoaded)
     }
   });
 
-  $(document).delegate('.OQFilterDescr', 'click', function() {
+  $(document).on('click','.OQFilterDescr', function() {
     var $f = $(this).closest('form');
     var $menu = $f.children('.OQColumnCmdPanel');
     var fieldIdx = $menu.data('OQdataFieldIdxCtx');
@@ -468,7 +476,8 @@ if (! window._OQAjaxQueryLoaded)
           $f.removeClass('OQFilterMode');
         } else {
           $f.append($p);
-          $p.find('.newfilter').focus(); 
+          $p.find('.newfilter').focus();
+          
         }
       }
     });
@@ -476,7 +485,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('input.SaveReportNameInp', 'keydown', function(e){
+  $(document).on('keydown','input.SaveReportNameInp', function(e){
     if (e.which==13)
       $(this).closest('fieldset').find('button').click();
     return true;
@@ -487,7 +496,9 @@ if (! window._OQAjaxQueryLoaded)
     '.OQtitle', 'This is the title of the currently opened report.',
     '.OQsummary', 'This is the summary of records currently displayed and the total number of records.',
     '.OQnewBut','Click this button to create a new record.',
-    '.OQrefreshBut', 'Click to refresh data in the grid.',
+    '.OQrefreshBut', 'Click to refresh data in the report.',
+    '.OQAddColumnsBut', 'Click to add new fields to the report.',
+    '.OQFilterBut', 'Click to filter for matching records in the report.',
     '.OQToolsBut', 'Click to open options to load, save, or export reports.',
     '.OQFilterDescr td', 'This shows the currently enabled filter. Click to modify.',
     '.OQSortDescr td', 'This shows the currently enabled sort. Click a name to remove.',
@@ -497,7 +508,7 @@ if (! window._OQAjaxQueryLoaded)
     '', 'This concludes the help.'
   ];
   var $HelpHilight;
-  $(document).delegate('.OQNextHelpBut','click', function(){
+  $(document).on('click','.OQNextHelpBut', function(){
     if ($HelpHilight) {
       $HelpHilight.removeClass('OQHelpHilight');
       $HelpHilight = undefined;
@@ -520,12 +531,12 @@ if (! window._OQAjaxQueryLoaded)
     i+=2;
     $panel.data('i',i);
   });
-  $(document).delegate('.OQhelpBut','click', function(){
+  $(document).on('click','.OQhelpBut', function(){
     var $f = $(this).closest('form');
     $f.addClass('OQHelpMode');
     $('<div class=OQHelpPanel><h3>Help</h3><div class=OQHelpContent></div><button type=button class=OQCloseHelpBut>close</button><button type=button class=OQNextHelpBut>next tip</button></div>').data('i',0).appendTo($f).find('.OQNextHelpBut').click();
   });
-  $(document).delegate('.OQCloseHelpBut','click', function(){
+  $(document).on('click','.OQCloseHelpBut', function(){
     var $f = $(this).closest('form');
     $f.removeClass('OQHelpMode');
     $f.children('.OQHelpPanel').remove();
@@ -537,13 +548,13 @@ if (! window._OQAjaxQueryLoaded)
 
 
 
-  $(document).delegate('input.rexp', 'keydown', function(e){
+  $(document).on('keydown','input.rexp', function(e){
     if (e.which==13)
       $(this).closest('.OQFilterPanel').find('button.OKFilterBut').click();
     return true;
   });
 
-  $(document).delegate('.OQFilterBut', 'click', function(e) {
+  $(document).on('click','.OQFilterBut', function(e) {
     e.preventDefault();
     var $f = $(this).closest('form');
     var $menu = $f.children('.OQColumnCmdPanel');
@@ -567,7 +578,7 @@ if (! window._OQAjaxQueryLoaded)
           $f.removeClass('OQFilterMode');
         } else {
           $f.append($p);
-          $p.find('input.rexp:last').focus();
+          $p.find('input.rexp:last').focus().click();
         }
       }
     });
@@ -575,7 +586,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document.body).delegate('.OQeditBut,.OQnewBut', 'click', function(){
+  $(document.body).on('click','.OQeditBut,.OQnewBut', function(){
     var $t = $(this);
     var href = $t.attr('data-href') || $t.attr('href');
     var target = $t.attr('data-target') || $t.attr('target');
@@ -586,7 +597,7 @@ if (! window._OQAjaxQueryLoaded)
     return false;
   });
 
-  $(document.body).delegate('.OQselectBut', 'click', function(){
+  $(document.body).on('click','.OQselectBut', function(){
     var f = this.form;
     var args = $(this).attr('data-rv');
 
@@ -618,7 +629,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('.OQexportBut', 'click', function(e){
+  $(document).on('click','.OQexportBut', function(e){
     e.preventDefault();
     var $f = $(this.form);
     var $dialog = $f.next().children('.OQExportDialog');
@@ -626,43 +637,40 @@ if (! window._OQAjaxQueryLoaded)
   });
   
 
-  $(document).delegate('.OQrefreshBut', 'click', function(e) {
+  $(document).on('click', '.OQrefreshBut', function(e) {
     e.preventDefault();
     refreshDataGrid($(this.form));
     return true;
   });
 
-  $(document).delegate('.OQPager', 'change', function(e) {
+  $(document).on('change','.OQPager', function(e) {
     e.preventDefault();
     var $f = $(this).closest('form');
     refreshDataGrid($f);
-    $f[0].scrollIntoView();
     return true;
   });
-  $(document).delegate('.OQNextBut', 'click', function(e) {
+  $(document).on('click','.OQNextBut', function(e) {
     e.preventDefault();
     var $f = $(this.form);
     var n = parseInt($f[0].page.value,10);
     $f[0].page.value = n + 1;
     refreshDataGrid($f);
-    $f[0].scrollIntoView();
     return true;
   });
-  $(document).delegate('.OQPrevBut', 'click', function(e) {
+  $(document).on('click','.OQPrevBut', function(e) {
     e.preventDefault();
     var $f = $(this.form);
     var n = parseInt($f[0].page.value,10);
     $f[0].page.value = n - 1;
     refreshDataGrid($f);
-    $f[0].scrollIntoView();
     return true;
   });
 
-  $(document).delegate('form.OQform','submit', function(){
+  $(document).on('submit','form.OQform', function(){
     return false;
   });
 
-  $(document).delegate('select.rexp','change', function(){
+  $(document).on('change','select.rexp', function(){
     var $textbox = $(this).next();
     if (this.selectedIndex==0) {
       $textbox.show().focus();
@@ -672,7 +680,7 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('button.DeleteFilterElemBut','click', function(){
+  $(document).on('click','button.DeleteFilterElemBut', function(){
     var $tr = $(this).closest('tr');
     if ($tr.next().length==1) $tr.next().remove();
     else if ($tr.prev().length==1) $tr.prev().remove();
@@ -680,13 +688,23 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('button.CancelFilterBut','click', function(){
+  $(document).on('click','button.CancelFilterBut', function(){
     $(this).closest('form').removeClass('OQFilterMode');
     $(this).closest('.OQFilterPanel').remove();
     return true;
   });
 
-  $(document).delegate('button.OKFilterBut','click', function(){
+  $(document).on('click','tr.filterexp', function(){
+    $("#filterinlinehelp").remove();
+    var $tr = $(this);
+    var type = $tr.find("select.lexp option[selected]").attr('data-type');
+    var op = $tr.find("select.op").val();
+    if (/date/.test(type) && /\=|\<|\>/.test(op)) {
+      $tr.after("<tr id=filterinlinehelp><td colspan=6><small><strong>enter date in format:</strong> 2012-06-25, 2014-12-25 14:55, 2012-01-02 5:00PM<br><b>or calculation:</b> <em>today-60 days</em>, <em>today+1 month</em>, <em>today-5 years</em>, <em>today+ 200 minutes</em></small></td></tr>");
+    }
+  });
+
+  $(document).on('click','button.OKFilterBut', function(){
     var $filterpanel = $(this).closest('.OQFilterPanel');
     var score = 0;
     var err;
@@ -708,19 +726,19 @@ if (! window._OQAjaxQueryLoaded)
     return true;
   });
 
-  $(document).delegate('button.lp','click', function(){
+  $(document).on('click','button.lp', function(){
     $(this).replaceWith('<select class=lp><option></option><option selected>(<option>((<option>((</select>');
     return false;
   });
-  $(document).delegate('select.lp','change', function(){
+  $(document).on('change','select.lp', function(){
     if (this.selectedIndex==0) $(this).replaceWith('<button class=lp>(</button>');
     return true;
   });
-  $(document).delegate('button.rp','click', function(){
+  $(document).on('click','button.rp', function(){
     $(this).replaceWith('<select class=rp><option></option><option selected>)<option>))<option>))</select>');
     return false;
   });
-  $(document).delegate('select.rp','change', function(){
+  $(document).on('change','select.rp', function(){
     if (this.selectedIndex==0) $(this).replaceWith('<button class=rp>)</button>');
     return true;
   });
@@ -733,10 +751,11 @@ if (! window._OQAjaxQueryLoaded)
 
       if (this.name && /^\_nf\_arg\_(.*)/.test(this.name)) {
         var name = RegExp.$1;
-
-        // if not simple literal, we need to quote it
-        if (! /^\w+$/.test(val)) {
-          if (! /\'/.test(val)) val = "'"+val+"'";
+        if (val=='') {
+          val = "''";
+        } else if (/\s/.test(val)) {
+          if      (! /\"/.test(val)) val = '"'+val+'"';
+          else if (! /\'/.test(val)) val = "'"+val+"'";
           else val = '"'+val.replace(/\"/g,'')+'"';
         }
 
@@ -745,16 +764,23 @@ if (! window._OQAjaxQueryLoaded)
         newfilter += name + ',' + val;
       }
       else if ($(this).is('select.rexp')) {
-        if (val) newfilter += ' '+val;
+        if (/\S$/.test(newfilter)) newfilter += ' ';
+        newfilter += val;
       }
       else if ($(this).is('input.rexp') && $(this).is(':visible')) {
-        if (! /\'/.test(val)) val = "'"+val+"'";
-        else if (! /\"/.test(val)) val = '"'+val+'"';
-        else val = '"'+val.replace(/\"/g,'')+'"';
-        newfilter += ' '+val;
+        if (val=='') {
+          newfilter += "''";
+        } else if (/\s/.test(val)) {
+          if      (! /\"/.test(val)) val = '"'+val+'"';
+          else if (! /\'/.test(val)) val = "'"+val+"'";
+          else val = '"'+val.replace(/\"/g,'')+'"';
+        }
+        if (/\S$/.test(newfilter)) newfilter += ' ';
+        newfilter += val;
       }
       else if (val != '') {
-        newfilter += ' '+val;
+        if (/\S$/.test(newfilter)) newfilter += ' ';
+        newfilter += val;
       }
 
       return true;
@@ -764,15 +790,15 @@ if (! window._OQAjaxQueryLoaded)
 
   // when user select new filter element, add filter element to current fiter and
   // repaint filter panel
-  $(document).delegate('select.newfilter','change', function(){
+  $(document).on('change','select.newfilter', function(){
     var newexp = $(this).val();
     if (newexp=='') return true;
     this.selectedIndex = 0;
     if (! /\)$/.test(newexp)) newexp += '=""'; 
     var $filterpanel = $(this).closest('.OQFilterPanel');
     var newfilter = createFilterStr($filterpanel);
-    if (newfilter != '') newfilter += 'AND '+newexp;
-    else newfilter = newexp;
+    if (newfilter != '') newfilter += ' AND ';
+    newfilter += newexp;
     var $f = $(this).closest('form');
     var dat = buildParamMap($f);
     delete dat.show; delete dat.sort; delete dat.page; delete dat.rows_page;
@@ -818,79 +844,90 @@ if (! window._OQAjaxQueryLoaded)
     var dat={};
     $('input,select',$form[0]).each(function(){
       // ignore named filter arguments
-      if (this.name && ! /^\_nf\_arg\_/.test(this.name)) dat[this.name]=$(this).val();
+      if (this.name && ! /^\_nf\_arg\_/.test(this.name)) {
+        var n = this.name;
+        var v = $.trim($(this).val());
+        if (v=='' && !/^(show|filter|sort)$/.test(n)) {}
+        else if (v=='1' && n=='page'){}
+        else if (n=='mode' && v=='default'){}
+        else dat[n]=v;
+      }
     });
     return dat;
   };
 
-  var refreshDataGrid = function($f,dat) {
-    $f.addClass('LoadingData');
+  window.OQgetURL = function($f,dat) {
+    if (! $f) {
+      $f=$("form.OQform:first");
+    }
     if (! dat) dat = buildParamMap($f);
+    delete dat.module;
+    var args = [];
 
-    // load OQ data using ajax
-    if (window.OQuseAjax) {
-      dat.dataonly = 1;
-      dat.module = 'InteractiveQuery2';
-      return $.ajax({
-        url: $f[0].action, type: 'POST', data: dat, dataType: 'html',
-        error: function() {
-          alert('Could not load data for data grid after error.');
-          $f.removeClass('LoadingData');
-        },
-        success: function(d) {
-          try {
-            var $p = $('<div>').append(d).find('form.OQform');
-            if ($p.length!=1) throw(1);
-            $f.replaceWith($p);
-          } catch(e) {
-            alert('Could not load data for data grid after success.');
-            $f.removeClass('LoadingData');
-          }
-        }
-      });
+    var datKeys = Object.keys(dat).sort();
+    for (var i=0,l=datKeys.length;i<l;++i) {
+      var name=datKeys[i];
+      args.push(name+'='+escape(dat[name]));
     }
-
-    // reload data by reloading entire page
-    else {
-      // merge form get args
-      var urlargs = $f.attr('action').split(/\?/);
-      if (urlargs[1]) {
-        $.each(urlargs[1].split(/[\&\;]/), function() {
-          var kv = this.split(/\=/);
-          if (! dat[kv[0]]) dat[kv[0]]=kv[1];
-        });
-      }
-    
-      var newUrl = urlargs[0]+'?'+$.param(dat);
-      location = newUrl;
-    }
+    args = args.join('&').replace(/\%20/g,'+').replace(/\%2C/g,',');
+    var url = $f[0].action.replace(/\?.*/,'') + '?' + args;
+    return url;
   };
 
-  window.OQrefresh = function(updated_uid) {
+  var refreshDataGrid = function($f,dat,retainScroll) {
+    $f.addClass('LoadingData');
+
+    if (! dat) dat = buildParamMap($f);
+    delete dat.module;
+
+    history.replaceState(null, null, OQgetURL($f, dat));
+    parent.history.replaceState(null, null, OQgetURL($f, dat));
+    return $.ajax({
+      url: $f[0].action.replace(/\?.*/,''),
+      type: 'post',
+      data: dat,
+      error: function() {
+        alert('Could not load data for data grid after error.');
+        $f.removeClass('LoadingData');
+      },
+      success: function(d) {
+        var $OQdoc = $("<div />").append(d).find(".OQdoc");
+        if ($OQdoc.length != 1) {
+          alert('Could not load data for data grid after error.');
+          $f.removeClass('LoadingData');
+        } else {
+          $(".OQdoc").replaceWith($OQdoc);
+          if (! retainScroll) {
+            $(window).scrollTop($f.scrollTop());
+            if (IS_IOS) {
+              $(parent).scrollTop($f.scrollTop());
+            }
+          }
+        }
+      }
+    });
+  };
+
+  window.OQrefresh = function(updated_uid,p1,p2,p3,p4,p5,p6,p7,p8) {
     var $f = $('form.OQform').eq(0);
     var onSelFun = $f[0].on_select.value;
     var isClosed = false;
     if (updated_uid && onSelFun) {
+      onSelFun = onSelFun.toString().replace(/\,.*/,'');
       try {
         var wo = window.opener2 || window.opener;
-        wo[onSelFun](updated_uid);
-        wo.focus();
         var wc = window.close2 || window.close;
+        wo[onSelFun](updated_uid,p1,p2,p3,p4,p5,p6,p7,p8);
+        //wo.focus();
         wc();
         isClosed = true;
-      } catch(e) {}
+      } catch(e) {
+      }
     }
     if (! isClosed) {
       var dat = buildParamMap($f);
-      var $ajax = refreshDataGrid($f,dat);
-      if (updated_uid) $ajax.done(function(){
-        var $f = $('form.OQform').eq(0);
-        $('<div class="OQRecUpdateMsg">')
-          .attr('data-uid', updated_uid)
-          .text('record '+updated_uid+' saved')
-          .insertAfter($f.children('.OQinfo'));
-        $f.find('tr[data-uid="'+updated_uid+'"]').addClass('OQupdatedRow');
-      });
+      if (updated_uid) dat.updated_uid = updated_uid;
+      var $ajax = refreshDataGrid($f,dat,true);
     }
   };
 

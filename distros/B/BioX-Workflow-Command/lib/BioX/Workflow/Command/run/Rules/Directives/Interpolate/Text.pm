@@ -12,12 +12,14 @@ use Memoize;
 use File::Basename;
 
 our $c = new Safe;
+my $TEMPLATE_ERROR = 0;
 
 sub interpol_directive {
     my $self   = shift;
     my $source = shift;
     my $text   = '';
 
+    $TEMPLATE_ERROR = 0;
     #The $ is not always at the beginning
     if ( exists $self->interpol_directive_cache->{$source} && $source !~ m/{/ )
     {
@@ -37,17 +39,20 @@ sub interpol_directive {
 
     my $fill_in = { self => \$self };
 
-    #TODO reference keys by value instead of $self->
-    # my @keys = keys %{$self};
-    # $fill_in->{INPUT} = $self->INPUT;
     $fill_in->{sample} = $self->sample if $self->has_sample;
 
     $text = $template->fill_in(
         HASH    => $fill_in,
         BROKEN  => \&my_broken,
-        PREPEND => "use File::Glob; use File::Basename;\n"
+        PREPEND => "use File::Glob; use File::Slurp; use File::Basename;\n"
     );
 
+    if($TEMPLATE_ERROR){
+      $self->_ERROR(1);
+      if($source =~ m/self/ && $source !~ m/\$self/){
+        $text .= "######################################\nFound use of self without \$\n\n";
+      }
+    }
     $self->interpol_directive_cache->{$source} = $text;
     return $text;
 }
@@ -59,6 +64,8 @@ sub my_broken {
     my $err_ref = $args{arg};
     my $text    = $args{text};
     my $error   = $args{error};
+
+    $TEMPLATE_ERROR = 1;
     $error =~ s/via package.*//g;
     chomp($error);
     if ( $error =~ m/Can't locate object method/ ) {

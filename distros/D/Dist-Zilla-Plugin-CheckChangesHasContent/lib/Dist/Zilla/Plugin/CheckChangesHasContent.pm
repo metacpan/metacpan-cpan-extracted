@@ -2,14 +2,14 @@ use strict;
 use warnings;
 package Dist::Zilla::Plugin::CheckChangesHasContent;
 # ABSTRACT: Ensure Changes has content before releasing
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 # Dependencies
-use Dist::Zilla 2.100950 (); # XXX really the next release after this date
+use Dist::Zilla 6 (); # XXX really the next release after this date
 use autodie 2.00;
-use File::pushd 0 ();
-use Moose 0.99;
-use namespace::autoclean 0.09;
+use Moose 2;
+use List::Util 'first';
+use namespace::autoclean 0.28;
 
 # extends, roles, attributes, etc.
 
@@ -31,36 +31,30 @@ has trial_token => (
 
 sub before_release {
   my $self = shift;
-  my $changes_file = $self->changelog;
+  my $changes_filename = $self->changelog;
   my $newver = $self->zilla->version;
 
   $self->log("Checking Changes");
 
-  $self->zilla->ensure_built_in;
+  my $changes_file = first { $_->name eq $changes_filename } @{ $self->zilla->files };
 
-  # chdir in
-  my $wd = File::pushd::pushd($self->zilla->built_in);
-
-  if ( ! -e $changes_file ) {
-    $self->log_fatal("No $changes_file file found");
+  if ( ! $changes_file ) {
+    $self->log_fatal("No $changes_filename file found");
   }
-  elsif ( $self->_get_changes ) {
-    $self->log("$changes_file OK");
+  elsif ( $self->_get_changes($changes_file) ) {
+    $self->log("$changes_filename OK");
   }
   else {
-    $self->log_fatal("$changes_file has no content for $newver");
+    $self->log_fatal("$changes_filename has no content for $newver");
   }
 
   return;
 }
 
-# _get_changes copied and adapted from Dist::Zilla::Plugin::Git::Commit
-# by Jerome Quelin
 sub _get_changes {
-    my $self = shift;
+    my ($self, $changelog) = @_;
 
     # parse changelog to find commit message
-    my $changelog = Dist::Zilla::File::OnDisk->new( { name => $self->changelog } );
     my $newver    = $self->zilla->version;
     my $trial_token = $self->trial_token;
     my @content   =
@@ -90,7 +84,7 @@ Dist::Zilla::Plugin::CheckChangesHasContent - Ensure Changes has content before 
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -190,7 +184,7 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by David Golden.
+This software is Copyright (c) 2017 by David Golden.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/Corion/www-mechanize-phantomjs.svg?branch=master)](https://github.com/Corion/www-mechanize-phantomjs)
+[![Build Status](https://travis-ci.org/Corion/Test-HTTP-LocalServer.svg?branch=master)](https://github.com/Corion/Test-HTTP-LocalServer)
 
 # NAME
 
@@ -94,6 +94,11 @@ program.
 
 # URLs implemented by the server
 
+## download `$server->download($name)`
+
+This URL will send a file with a `Content-Disposition` header and indicate
+the suggested filename as passed in.
+
 ## 302 redirect `$server->redirect($target)`
 
 This URL will issue a redirect to `$target`. No special care is taken
@@ -121,6 +126,14 @@ socket with an error after 2 blocks of 16 spaces have been sent.
 
 This URL will return 5 blocks of 16 spaces at a rate of one block per second
 in a chunked response.
+
+## Surprisingly large bzip2 encoded response `$server->bzip2`
+
+This URL will return a short HTTP response that expands to 16M body.
+
+## Surprisingly large gzip encoded response `$server->gzip`
+
+This URL will return a short HTTP response that expands to 16M body.
 
 ## Other URLs
 

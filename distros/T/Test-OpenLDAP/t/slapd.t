@@ -20,7 +20,7 @@ SKIP: {
 	if (my $skipReason = Test::OpenLDAP->skip()) {
 		skip($skipReason, 4);
 	} else {
-		my $slapd = Test::OpenLDAP->new({ 'suffix' => 'dc=foobar,dc=example,dc=org' });
+		my $slapd = Test::OpenLDAP->new( 'suffix' => 'dc=foobar,dc=example,dc=org' );
 		my $ldap = Net::LDAP->new($slapd->uri());
 		ok($slapd->suffix() eq 'dc=foobar,dc=example,dc=org', "->suffix() returned correctly");
 		ok($slapd->admin_user() eq 'cn=root,dc=foobar,dc=example,dc=org', "->admin_user was correctly changed");

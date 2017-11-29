@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-CheckChangesHasContent
 
+0.011     2017-11-28 09:42:14-05:00 America/New_York
+
+    [FIXED]
+
+    - Improved handling of file encoding for the Changes file
+
 0.010     2016-05-25 15:10:26-04:00 America/New_York
 
     [FIXED]

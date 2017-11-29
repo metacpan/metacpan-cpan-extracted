@@ -1,4 +1,8 @@
 package DBD::Cassandra::st;
+our $AUTHORITY = 'cpan:TVDW';
+$DBD::Cassandra::st::VERSION = '0.57';
+# ABSTRACT: DBD::Cassandra statement handle
+
 use 5.010;
 use strict;
 use warnings;
@@ -122,3 +126,28 @@ sub FETCH {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+DBD::Cassandra::st - DBD::Cassandra statement handle
+
+=head1 VERSION
+
+version 0.57
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

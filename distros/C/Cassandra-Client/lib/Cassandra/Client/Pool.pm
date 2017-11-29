@@ -1,13 +1,12 @@
 package Cassandra::Client::Pool;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Pool::VERSION = '0.13';
+$Cassandra::Client::Pool::VERSION = '0.14';
 use 5.010;
 use strict;
 use warnings;
 
 use Scalar::Util 'weaken';
 use Cassandra::Client::Util;
-use Cassandra::Client::Policy::LoadBalancing::Default;
 use Cassandra::Client::NetworkStatus;
 
 sub new {
@@ -18,7 +17,7 @@ sub new {
         metadata => $args{metadata},
         max_connections => $args{options}{max_connections},
         async_io => $args{async_io},
-        policy => Cassandra::Client::Policy::LoadBalancing::Default->new(),
+        policy => $args{load_balancing_policy},
 
         shutdown => 0,
         pool => {},
@@ -47,6 +46,7 @@ sub init {
     $self->{policy}{datacenter} ||= $first_connection->{datacenter};
 
     $self->add($first_connection);
+    $self->{policy}->set_connecting($first_connection->ip_address);
     $self->{policy}->set_connected($first_connection->ip_address);
 
     # Master selection, warmup, etc
@@ -194,6 +194,7 @@ sub connect_if_needed {
 
             if ($done == $expect) {
                 $callback->() if $callback;
+                undef $callback;
             }
         });
     }
@@ -217,7 +218,7 @@ sub spawn_new_connection {
     );
 
     $self->{connecting}{$host}= $connection;
-    $self->{policy}->set_connected($host);
+    $self->{policy}->set_connecting($host);
 
     $connection->connect(sub {
         my ($error)= @_;
@@ -237,7 +238,7 @@ sub spawn_new_connection {
 
                 for my $waiter (@$waiters) {
                     if ((++$waiter->{attempts}) >= $max_attempts || !%{$self->{connecting}}) {
-                        $waiter->{callback}->("Failed to connect to server");
+                        $waiter->{callback}->("Failed to connect to server: $error");
                     } else {
                         push @{$self->{wait_connect} ||= []}, $waiter;
                     }
@@ -246,6 +247,8 @@ sub spawn_new_connection {
 
             $self->connect_if_needed;
         } else {
+            $self->{policy}->set_connected($host);
+
             $self->add($connection);
         }
 
@@ -293,7 +296,7 @@ Cassandra::Client::Pool
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 36 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Statocles.pm',
@@ -35,6 +35,7 @@ my @module_files = (
     'Statocles/Page/Plain.pm',
     'Statocles/Person.pm',
     'Statocles/Plugin.pm',
+    'Statocles/Plugin/Diagram/Mermaid.pm',
     'Statocles/Plugin/LinkCheck.pm',
     'Statocles/Site.pm',
     'Statocles/Store.pm',

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.02
+    0.03
 
 INSTALLATION
 
@@ -125,10 +125,12 @@ DESCRIPTION
       has to be enter has ##), next you have to give
 
       * the command itself, set by a character (only one character) listed
-      in the map defined with the property vkcode_map
+      in the map defined with the property vkcode_map, except z which is used
+      to induce a waiting time
 
       * how much you want to repeat that command, on two position, with a
-      padding 0 if necessary (01)
+      padding 0 if necessary (01), or how much you'll wait:
+      #z04 will call usleep( 4 * 100_000);
 
       * the next characters are treated as text (unless a new command
       keystroke is defined with #)

@@ -4,7 +4,7 @@
 package Lingua::Interset;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -314,7 +314,7 @@ Lingua::Interset - DZ Interset is a universal morphosyntactic feature set to whi
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

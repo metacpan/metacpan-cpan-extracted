@@ -24,7 +24,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -226,6 +226,10 @@ sub _load_schema {
     $file = $file->realpath;
     warn "[JSON::Validator] Loading schema from file: $file\n" if DEBUG;
     return $self->_load_schema_from_text(\$file->slurp), $url;
+  }
+  elsif ($file =~ m!^/!) {
+    warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
+    return $self->_load_schema_from_url(Mojo::URL->new($url)->fragment(undef)), "$url";
   }
 
   confess "Unable to load schema '$url'";
@@ -1005,7 +1009,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-1.06
+1.07
 
 =head1 SYNOPSIS
 

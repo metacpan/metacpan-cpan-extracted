@@ -1,5 +1,13 @@
 Revision history for Cassandra-Client
 
+0.14    unreleased
+
+      * Refactor a series of (for now) undocumented APIs
+      * Encoder rewritten in XS, for performance
+      * Support connecting to Cassandra via IPv6
+      * Implement exponential backoff for connection failures
+      * Avoid deep recursion when executing many queries concurrently
+
 0.13    2017/07/05
 
       * Fix a critical bug in the INET type decoder.

@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Keyword">#!/usr/bin/perl&nbsp;-w</font></br></div>
+<div id="2" class="line"><font class="Comment">#&nbsp;This&nbsp;is&nbsp;a&nbsp;pseudo&nbsp;Perl&nbsp;file&nbsp;to&nbsp;test&nbsp;Kate's&nbsp;Perl&nbsp;syntax&nbsp;highlighting.</font></br></div>
+<div id="3" class="line"><font class="Comment">#&nbsp;</font><font class="Alert">TODO</font><font class="Comment">:&nbsp;this&nbsp;is&nbsp;incomplete,&nbsp;add&nbsp;more&nbsp;syntax&nbsp;examples!&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="4" class="line"><font class="DataType">$VERSION</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">sprintf</font><font class="Normal">&nbsp;</font><font class="Operator">'</font><font class="String">4.%03d</font><font class="Operator">'</font><font class="Normal">,&nbsp;</font><font class="Operator">q$</font><font class="String">Revision:&nbsp;#24&nbsp;</font><font class="Operator">$</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="BaseN">\D</font><font class="Char">(</font><font class="BaseN">\d</font><font class="Char">+)</font><font class="BaseN">\s</font><font class="Char">*$</font><font class="Operator">/</font><font class="Normal">;</font></br></div>
+<div id="5" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">prg</font><font class="Normal">(</font><font class="DataType">$</font><font class="Normal">)</font></br></div>
+<div id="6" class="line"><font class="Normal">{</font></br></div>
+<div id="7" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">my</font><font class="Normal">&nbsp;</font><font class="DataType">$var</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Function">shift</font><font class="Normal">;</font></br></div>
+<div id="8" class="line"></br></div>
+<div id="9" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$var</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">s/</font><font class="Others">bla</font><font class="Operator">/</font><font class="SpecialString">foo</font><font class="Operator">/igs</font><font class="Normal">;</font></br></div>
+<div id="10" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$var</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">s!</font><font class="Others">bla</font><font class="Operator">!</font><font class="SpecialString">foo</font><font class="Operator">!igs</font><font class="Normal">;</font></br></div>
+<div id="11" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$var</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">s#</font><font class="Others">bla</font><font class="Operator">#</font><font class="SpecialString">foo</font><font class="Operator">#igs</font><font class="Normal">;</font></br></div>
+<div id="12" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$var</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">tr/</font><font class="Others">a-z</font><font class="Operator">/</font><font class="Normal">A-Z/;</font></br></div>
+<div id="13" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;(</font><font class="DataType">$match</font><font class="Normal">)&nbsp;=&nbsp;(</font><font class="DataType">$var</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">m/</font><font class="Char">(</font><font class="Others">.</font><font class="Char">*?)</font><font class="Operator">/igs</font><font class="Normal">);</font></br></div>
+<div id="14" class="line"></br></div>
+<div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$test</font><font class="Normal">&nbsp;=&nbsp;</font><font class="DecVal">2</font><font class="Normal">/</font><font class="Float">453453.21</font><font class="Normal">;</font></br></div>
+<div id="16" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$test</font><font class="Normal">&nbsp;/=&nbsp;</font><font class="DecVal">2</font><font class="Normal">;</font></br></div>
+<div id="17" class="line"></br></div>
+<div id="18" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Operator">qq~</font><font class="SpecialString">d&nbsp;fsd&nbsp;fsdf&nbsp;sdfl&nbsp;sd</font><font class="Operator">~</font></br></div>
+<div id="19" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="20" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">$&quot;</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Operator">'</font><font class="String">/</font><font class="Operator">'</font><font class="Normal">;</font></br></div>
+<div id="21" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$foo</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Operator">&lt;&lt;</font><font class="Keyword">__EOF;</font></br></div>
+<div id="23" class="line"><font class="SpecialString">d&nbsp;ahfdklf&nbsp;klsdfl&nbsp;sdf&nbsp;sd</font></br></div>
+<div id="24" class="line"><font class="SpecialString">fsd&nbsp;sdf&nbsp;sdfsdlkf&nbsp;sd</font></br></div>
+<div id="25" class="line"><font class="Keyword">__EOF</font></br></div>
+<div id="26" class="line"></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">$x</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">dasds</font><font class="Operator">&quot;</font><font class="Normal">;</font></br></div>
+<div id="28" class="line"></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">next</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">(&nbsp;</font><font class="DataType">$match</font><font class="Normal">&nbsp;</font><font class="Operator">eq</font><font class="Normal">&nbsp;</font><font class="Operator">&quot;</font><font class="SpecialString">two</font><font class="Operator">&quot;</font><font class="Normal">&nbsp;);</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">next</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">(&nbsp;</font><font class="DataType">$match</font><font class="Normal">&nbsp;=~&nbsp;</font><font class="Operator">/</font><font class="Others">go</font><font class="Operator">/i</font><font class="Normal">&nbsp;);</font></br></div>
+<div id="31" class="line"></br></div>
+<div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">@array</font><font class="Normal">&nbsp;=&nbsp;(</font><font class="DecVal">1</font><font class="Normal">,</font><font class="DecVal">2</font><font class="Normal">,</font><font class="DecVal">3</font><font class="Normal">);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Comment">#&nbsp;a&nbsp;comment</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">@array</font><font class="Normal">&nbsp;=&nbsp;</font><font class="Operator">qw(</font><font class="Normal">apple&nbsp;foo&nbsp;bar</font><font class="Operator">)</font><font class="Normal">;</font></br></div>
+<div id="34" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">push</font><font class="Normal">(</font><font class="DataType">@array</font><font class="Normal">,&nbsp;</font><font class="DecVal">4</font><font class="Normal">);</font></br></div>
+<div id="35" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DataType">%hash</font><font class="Normal">&nbsp;=&nbsp;(red&nbsp;=&gt;&nbsp;</font><font class="Operator">'</font><font class="String">rot</font><font class="Operator">'</font><font class="Normal">,</font></br></div>
+<div id="36" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blue&nbsp;=&gt;&nbsp;</font><font class="Operator">'</font><font class="String">blau</font><font class="Operator">'</font><font class="Normal">);</font></br></div>
+<div id="37" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">print</font><font class="Normal">&nbsp;</font><font class="Function">keys</font><font class="Normal">(</font><font class="DataType">%hash</font><font class="Normal">);</font></br></div>
+<div id="38" class="line"><font class="Normal">}</font></br></div>
+<div id="39" class="line"></br></div>
+<div id="40" class="line"><font class="Keyword">sub&nbsp;</font><font class="Function">blah</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="41" class="line"><font class="Normal">}</font></br></div>
+<div id="42" class="line"></br></div>
+<div id="43" class="line"><font class="Normal">&amp;blah;</font></br></div>
+<div id="44" class="line"><font class="Normal">prg(</font><font class="Operator">&quot;</font><font class="SpecialString">test</font><font class="Operator">&quot;</font><font class="Normal">);</font></br></div>
+<div id="45" class="line"></br></div>
+<div id="46" class="line"></br></div>
+</div>
+</body>
+</html>
+

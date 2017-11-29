@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::GraphQL
 
+0.06    Tue Nov 28 07:14:26 GMT 2017
+ - use "latest" GraphiQL
+
 0.05    Wed Nov  1 04:07:11 GMT 2017
  - use convert plugin
 

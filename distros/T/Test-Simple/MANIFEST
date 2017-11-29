@@ -186,6 +186,7 @@ t/Legacy/strays.t
 t/Legacy/subtest/args.t
 t/Legacy/subtest/bail_out.t
 t/Legacy/subtest/basic.t
+t/Legacy/subtest/callback.t
 t/Legacy/subtest/die.t
 t/Legacy/subtest/do.t
 t/Legacy/subtest/events.t
@@ -221,6 +222,7 @@ t/Test2/acceptance/try_it_threads.t
 t/Test2/acceptance/try_it_todo.t
 t/Test2/behavior/Formatter.t
 t/Test2/behavior/Subtest_buffer_formatter.t
+t/Test2/behavior/Subtest_callback.t
 t/Test2/behavior/Subtest_events.t
 t/Test2/behavior/Subtest_plan.t
 t/Test2/behavior/Subtest_todo.t

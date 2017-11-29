@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001035';
+our $VERSION = '0.001036';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -20,7 +20,7 @@ use Test2::Harness::Util qw/read_file open_file fqmod/;
 use Test2::Harness;
 use Test2::Harness::Run;
 
-use Test2::Harness::Util::HashBase qw/-settings -_my_opts -signal -args -plugins/;
+use Test2::Harness::Util::HashBase qw/-settings -_my_opts -signal -args -plugins -painted/;
 
 sub handle_list_args { () }
 sub feeder           { () }
@@ -214,6 +214,7 @@ sub pre_run {
 
 sub paint {
     my $self = shift;
+    push @{$self->{+PAINTED}} => @_;
     return if $self->{+SETTINGS}->{quiet};
     print @_;
 }

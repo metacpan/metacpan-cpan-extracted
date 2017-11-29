@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::Nil;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::Nil::VERSION = '2.0.0';
+$MsgPack::Decoder::Generator::Nil::VERSION = '2.0.1';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -26,7 +26,7 @@ MsgPack::Decoder::Generator::Nil
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

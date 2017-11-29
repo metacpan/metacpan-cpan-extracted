@@ -4,7 +4,7 @@
       "Tom van der Woerdt <tvdw@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -33,10 +33,9 @@
             "Encode" : "0",
             "Exporter" : "0",
             "IO::Socket::INET" : "0",
+            "IO::Socket::INET6" : "0",
             "List::Util" : "0",
-            "Math::BigInt" : "0",
             "Net::SSLeay" : "1.63",
-            "POSIX" : "0",
             "Promises" : "0.93",
             "Ref::Util" : "0.008",
             "Scalar::Util" : "0",
@@ -47,6 +46,7 @@
             "constant" : "0",
             "if" : "0",
             "overload" : "0",
+            "parent" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "vars" : "0",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/tvdw/perl-dbd-cassandra"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_authority" : "cpan:TVDW",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }

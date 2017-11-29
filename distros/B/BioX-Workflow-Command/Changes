@@ -1,5 +1,11 @@
 Revision history for BioX-Workflow-Command
 
+2.3.0  2017-11-28 09:07:04 GST
+	- Added fix for multiline variables
+	- Made sample_files full path
+	- Added some tests
+	- 2.3.0 milestone  - https://github.com/biosails/BioX-Workflow-Command/milestone/6
+
 2.2.3  2017-09-07 13:42:07 GST
 	- Fixed circular deps
 

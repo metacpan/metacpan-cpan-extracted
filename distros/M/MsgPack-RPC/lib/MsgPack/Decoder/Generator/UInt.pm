@@ -1,6 +1,6 @@
 package MsgPack::Decoder::Generator::UInt;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::Decoder::Generator::UInt::VERSION = '2.0.0';
+$MsgPack::Decoder::Generator::UInt::VERSION = '2.0.1';
 use Moose;
 use MooseX::MungeHas 'is_ro';
 
@@ -30,7 +30,7 @@ MsgPack::Decoder::Generator::UInt
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

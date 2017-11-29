@@ -2,17 +2,23 @@ package Crypt::AuthEnc::OCB;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( ocb_encrypt_authenticate ocb_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
+sub new {
+  my $class = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
+}
 
 sub ocb_encrypt_authenticate {
   my $cipher_name = shift;
@@ -22,6 +28,7 @@ sub ocb_encrypt_authenticate {
   my $tag_len = shift;
   my $plaintext = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, $tag_len);
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->encrypt_last($plaintext);
@@ -37,6 +44,7 @@ sub ocb_decrypt_verify {
   my $ciphertext = shift;
   my $tag = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, length($tag));
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->decrypt_last($ciphertext);
@@ -45,6 +53,7 @@ sub ocb_decrypt_verify {
 
 # obsolete, only for backwards compatibility
 sub aad_add { goto &adata_add }
+sub blocksize { return 16 }
 
 1;
 
@@ -63,21 +72,25 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $ct = $ae->encrypt_add('data1');
- $ct = $ae->encrypt_add('data2');
- $ct = $ae->encrypt_add('data3');
- $ct = $ae->encrypt_last('rest of data');
- ($ct,$tag) = $ae->encrypt_done();
+ my $ct = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ $ct .= $ae->encrypt_last('rest of data');
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $pt = $ae->decrypt_add('ciphertext1');
- $pt = $ae->decrypt_add('ciphertext2');
- $pt = $ae->decrypt_add('ciphertext3');
- $pt = $ae->decrypt_last('rest of data');
- ($pt,$tag) = $ae->decrypt_done();
+ my $pt = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ $pt .= $ae->decrypt_last('rest of data');
+ my $tag = $ae->decrypt_done();
+ die "decrypt failed" unless $tag eq $expected_tag;
+
+ #or
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::OCB qw(ocb_encrypt_authenticate ocb_decrypt_verify);
@@ -112,7 +125,6 @@ You can export selected functions:
 =head2 ocb_decrypt_verify
 
   my $plaintext = ocb_decrypt_verify($cipher, $key, $nonce, $adata, $ciphertext, $tag);
-
   # on error returns undef
 
 =head1 METHODS
@@ -132,7 +144,7 @@ You can export selected functions:
 
 =head2 encrypt_add
 
- $ciphertext = $ae->encrypt_add($data);         #can be called multiple times
+ $ciphertext = $ae->encrypt_add($data);         # can be called multiple times
 
  #BEWARE: size of $data has to be multiple of blocklen (16 for AES)
 
@@ -142,23 +154,23 @@ You can export selected functions:
 
 =head2 encrypt_done
 
- $tag = $ae->encrypt_done();
+ $tag = $ae->encrypt_done();                    # returns $tag value
 
 =head2 decrypt_add
 
- $plaintext = $ae->decrypt_add($ciphertext);    #can be called multiple times
+ $plaintext = $ae->decrypt_add($ciphertext);    # can be called multiple times
 
  #BEWARE: size of $ciphertext has to be multiple of blocklen (16 for AES)
 
-=head2 encrypt_last
+=head2 decrypt_last
 
  $plaintext = $ae->decrypt_last($data);
 
 =head2 decrypt_done
 
- my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
- #or
  my $tag = $ae->decrypt_done;           # returns $tag value
+ #or
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
 
 =head2 clone
 
@@ -175,3 +187,5 @@ You can export selected functions:
 =item * L<https://tools.ietf.org/html/rfc7253>
 
 =back
+
+=cut

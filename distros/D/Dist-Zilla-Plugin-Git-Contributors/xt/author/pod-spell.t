@@ -18,14 +18,17 @@ Etheridge
 Fredric
 Git
 Horsfall
+Ioan
 Karen
 Kent
 Klaus
 Matthew
 Mohammad
 Plugin
+Rogers
 Zilla
 ether
+ioan
 irc
 kentnl
 klaus03

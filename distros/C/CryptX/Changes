@@ -1,8 +1,14 @@
 Changes for CryptX
 
-TODO:
-        - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
-        - CCM interface new-add-add-done
+0.055   2017-11-28
+        - new Crypt::Cipher::IDEA
+        - new Crypt::Cipher::Serpent
+        - new Crypt::Stream::Salsa20
+        - new Crypt::Stream::Sosemanuk
+        - added CCM object oriented interface: new-add-add-done
+        - fix #39 accept CFLAGS and CPPFLAGS from the environment
+        - fix #40 typos in POD
+        - fix HMAC+SHA3 (now compliant with NIST test vectors)
 
 0.054   2017-10-12
         - fix Crypt::PK::DSA verify

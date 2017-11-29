@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::Music_Publisher;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;

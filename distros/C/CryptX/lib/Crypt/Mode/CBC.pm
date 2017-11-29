@@ -4,7 +4,7 @@ package Crypt::Mode::CBC;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';
@@ -48,12 +48,17 @@ This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 new
 
- my $m = Crypt::Mode::CBC->new('AES');
+ my $m = Crypt::Mode::CBC->new($name);
  #or
- my $m = Crypt::Mode::CBC->new('AES', $padding);
+ my $m = Crypt::Mode::CBC->new($name, $padding);
  #or
- my $m = Crypt::Mode::CBC->new('AES', $padding, $cipher_rounds);
+ my $m = Crypt::Mode::CBC->new($name, $padding, $cipher_rounds);
 
+ # $name ....... one of 'AES', 'Anubis', 'Blowfish', 'CAST5', 'Camellia', 'DES', 'DES_EDE',
+ #               'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
+ #               'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
+ #               'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
+ #               simply any <NAME> for which there exists Crypt::Cipher::<NAME>
  # $padding .... 0 no padding (plaintext size has to be myltiple of block length)
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
@@ -103,10 +108,12 @@ This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher>
 
-=item * L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
+=item * L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 
-=item * L<https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29|https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29>
+=item * L<https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29>
 
 =back
+
+=cut

@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.008';
+our $VERSION = '3.010';
 
 use utf8;
 use open ':utf8';
@@ -2948,7 +2948,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.008
+version 3.010
 
 =head1 SYNOPSIS
 

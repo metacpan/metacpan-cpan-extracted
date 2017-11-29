@@ -144,6 +144,18 @@ EOF
     is( $text, $expect, 'Mustache template matches' );
 }
 
+sub test_003 {
+    my ( $test, $test_dir, $rules ) = construct_tests;
+    my $rule = $rules->[0];
+    _init_rule( $test, $rule );
+
+    my $attr = $test->walk_attr;
+
+    my $json = $attr->serialize_to_json;
+
+    ok(1);
+}
+
 sub _init_rule {
     my $test = shift;
     my $rule = shift;

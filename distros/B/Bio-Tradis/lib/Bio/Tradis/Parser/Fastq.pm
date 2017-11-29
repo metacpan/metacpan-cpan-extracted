@@ -1,5 +1,5 @@
 package Bio::Tradis::Parser::Fastq;
-$Bio::Tradis::Parser::Fastq::VERSION = '1.3.3';
+$Bio::Tradis::Parser::Fastq::VERSION = '1.4.0';
 # ABSTRACT: Basic FastQ parser.
 
 
@@ -91,7 +91,7 @@ Bio::Tradis::Parser::Fastq - Basic FastQ parser.
 
 =head1 VERSION
 
-version 1.3.3
+version 1.4.0
 
 =head1 SYNOPSIS
 

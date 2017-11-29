@@ -1,18 +1,23 @@
 SINCE VERSION | TBD VERSION | COMMENT
     -- next --
     -- backlog --
-0.18    0.20    API neaf form => 'name' => { spec }; $req->from(name)
 0.18    0.20    API neaf prefix => '/path', $req->prefix to fetch, pop on run()
 0.17    0.20    MOD Add JSON body support w/form validation - pre-logic
 0.18    0.20    TPL pre_content TT-helper - populate title, root, etc
-0.18    0.30    TPL variables -> js module for TT
 0.17    0.20    TPL Predefined header/footer to spare user of boilerplate
 0.17    0.20    TPL More robust options for TPL view
 0.17    0.20    MOD Add well-known regexes from Regexp::Common to default Form
 0.16    0.20    MOD Oauth2 example/helper
 0.16    0.20    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
 0.16    0.20    TPL view default directory layout (./tpl or smth)
-0.15    0.20    DOC Make fun sugar main API, OO as backup
+0.19    0.20    API upload_utf8 with auto-decode
+0.19    0.30    API multiple uploads in some way
+0.19    0.30    MOD In-memory static files
+0.19    0.30    API Add any() analogue (method = '*'?)
+0.19    0.30    API Generate a catalog of public resources
+0.19    0.30    MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that
+0.19    0.30    API BREAK rename script_name, path_info => smth reasonable
+0.18    0.30    TPL variables -> js module for TT
 0.18    0.30    API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
 0.17    0.30    API Better and more robust exception handling
 0.18    0.30    NET deprecate apache backend
@@ -28,6 +33,7 @@ SINCE VERSION | TBD VERSION | COMMENT
 0.02    0.30    DOC HOWTO add dumper to TT view (pre-render)
 0.17    0.30    MOD form->data_hash instead of %{ form->data }
 0.07    0.30    MOD Add "cleanup" method to X::Session - for offline cleanups
+0.19    0.40    COR Anyevent support - start -continue sep. from pre-cleanup
 0.18    0.40    DEV last source file, complain if no run() at EOF
 0.10    0.40    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
 0.16    0.40    MOD rewrite performance stats

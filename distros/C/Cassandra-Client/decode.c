@@ -7,33 +7,34 @@
 #include "define.h"
 #include "cc_bignum.h"
 #include "proto.h"
+#include "swap.h"
 #include "decode.h"
 
 #ifdef CAN_64BIT
-static void decode_bigint  (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_bigint  (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
 #endif
-static void decode_blob    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_boolean (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_date    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_decimal (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_double  (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_float   (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_inet    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_int     (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_list    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_map     (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_smallint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_time    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_tinyint (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_tuple   (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_udt     (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_utf8    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_uuid    (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
-static void decode_varint  (pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_blob    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_boolean (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_date    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_decimal (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_double  (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_float   (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_inet    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_int     (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_list    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_map     (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_smallint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_time    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_tinyint (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_tuple   (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_udt     (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_utf8    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_uuid    (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
+static void decode_varint  (pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output);
 
-void decode_cell(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_type *type, SV *output)
+void decode_cell(pTHX_ unsigned char *input, STRLEN len, STRLEN *pos, struct cc_type *type, SV *output)
 {
-    char *bytes;
+    unsigned char *bytes;
     STRLEN bytes_len;
 
     if (unpack_bytes(aTHX_ input, len, pos, &bytes, &bytes_len) != 0) {
@@ -120,53 +121,11 @@ void decode_cell(pTHX_ char *input, STRLEN len, STRLEN *pos, struct cc_type *typ
     }
 }
 
-inline void bswap8(char *input)
-{
-    if (IS_BIG_ENDIAN)
-        return;
-
-    char tmp;
-
-    tmp = input[0];
-    input[0] = input[7];
-    input[7] = tmp;
-
-    tmp = input[1];
-    input[1] = input[6];
-    input[6] = tmp;
-
-    tmp = input[2];
-    input[2] = input[5];
-    input[5] = tmp;
-
-    tmp = input[3];
-    input[3] = input[4];
-    input[4] = tmp;
-}
-
-inline void bswap4(char *input)
-{
-    if (IS_BIG_ENDIAN)
-        return;
-
-    uint32_t *the_num= (uint32_t*)input;
-    *the_num= ntohl(*the_num);
-}
-
-inline void bswap2(char *input)
-{
-    if (IS_BIG_ENDIAN)
-        return;
-
-    uint16_t *the_num= (uint16_t*)input;
-    *the_num= ntohs(*the_num);
-}
-
 #ifdef CAN_64BIT
-void decode_bigint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_bigint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[8];
+        unsigned char bytes[8];
         int64_t bigint;
     } bytes_or_bigint;
 
@@ -179,15 +138,15 @@ void decode_bigint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outp
 }
 #endif
 
-void decode_blob(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_blob(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
-    sv_setpvn(output, input, len);
+    sv_setpvn(output, (char*)input, len);
 }
 
-void decode_double(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_double(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[8];
+        unsigned char bytes[8];
         double doub;
     } bytes_or_double;
 
@@ -199,10 +158,10 @@ void decode_double(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outp
     sv_setnv(output, bytes_or_double.doub);
 }
 
-void decode_float(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_float(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[4];
+        unsigned char bytes[4];
         float fl;
     } bytes_or_float;
 
@@ -214,10 +173,10 @@ void decode_float(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outpu
     sv_setnv(output, bytes_or_float.fl);
 }
 
-void decode_int(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_int(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[4];
+        unsigned char bytes[4];
         int32_t i;
     } bytes_or_int;
 
@@ -229,10 +188,10 @@ void decode_int(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
     sv_setiv(output, bytes_or_int.i);
 }
 
-void decode_smallint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_smallint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[2];
+        unsigned char bytes[2];
         int16_t i;
     } bytes_or_smallint;
 
@@ -244,7 +203,7 @@ void decode_smallint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *ou
     sv_setiv(output, bytes_or_smallint.i);
 }
 
-void decode_tinyint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_tinyint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     if (UNLIKELY(len != 1))
         croak("decode_tinyint: len != 1");
@@ -253,13 +212,13 @@ void decode_tinyint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *out
     sv_setiv(output, number);
 }
 
-void decode_utf8(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_utf8(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
-    sv_setpvn(output, input, len);
+    sv_setpvn(output, (char*)input, len);
     SvUTF8_on(output);
 }
 
-void decode_boolean(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_boolean(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     if (UNLIKELY(len != 1))
         croak("decode_boolean: len != 1");
@@ -270,16 +229,16 @@ void decode_boolean(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *out
         sv_setsv(output, &PL_sv_no);
 }
 
-void decode_inet(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_inet(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     if (len == 4) {
         char str[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, input, str, INET_ADDRSTRLEN);
+        inet_ntop(AF_INET, (char*)input, str, INET_ADDRSTRLEN);
         sv_setpv(output, str);
 
     } else if (len == 16) {
         char str[INET6_ADDRSTRLEN];
-        inet_ntop(AF_INET6, input, str, INET6_ADDRSTRLEN);
+        inet_ntop(AF_INET6, (char*)input, str, INET6_ADDRSTRLEN);
         sv_setpv(output, str);
 
     } else {
@@ -287,7 +246,7 @@ void decode_inet(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
     }
 }
 
-void decode_list(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_list(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     struct cc_type *inner_type;
     int i;
@@ -320,25 +279,22 @@ void decode_list(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
     }
 }
 
-void decode_uuid(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_uuid(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
-    unsigned char *uinput;
-
     if (UNLIKELY(len != 16))
         croak("decode_uuid: len != 16");
 
-    uinput = (unsigned char*)input;
     sv_setpvf(output, "%.2x%.2x%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x",
-        uinput[0],  uinput[1],  uinput[2],  uinput[3],
-        uinput[4],  uinput[5],  uinput[6],  uinput[7],
-        uinput[8],  uinput[9],  uinput[10], uinput[11],
-        uinput[12], uinput[13], uinput[14], uinput[15]);
+        input[0],  input[1],  input[2],  input[3],
+        input[4],  input[5],  input[6],  input[7],
+        input[8],  input[9],  input[10], input[11],
+        input[12], input[13], input[14], input[15]);
 }
 
-void decode_decimal(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_decimal(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     union {
-        char bytes[4];
+        unsigned char bytes[4];
         int32_t scale;
     } bytes_or_scale;
 
@@ -361,7 +317,7 @@ void decode_decimal(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *out
     }
 }
 
-void decode_varint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_varint(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     if (UNLIKELY(len <= 0)) {
         croak("decode_varint: len <= 0");
@@ -370,7 +326,7 @@ void decode_varint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outp
     } else if (len == 2) {
         decode_smallint(aTHX_ input, len, type, output);
     } else if (len == 3) {
-        char bytes[4];
+        unsigned char bytes[4];
         memcpy(bytes+1, input, 3);
         if (input[0] & 0x80) {
             bytes[0] = 0xff;
@@ -382,7 +338,7 @@ void decode_varint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outp
         decode_int(aTHX_ input, len, type, output);
 #ifdef CAN_64BIT
     } else if (len < 8) {
-        char bytes[8];
+        unsigned char bytes[8];
         memset(bytes, (input[0] & 0x80) ? 0xff : 0, 8);
         memcpy(bytes+8-len, input, len);
         decode_bigint(aTHX_ bytes, 8, type, output);
@@ -390,16 +346,17 @@ void decode_varint(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *outp
         decode_bigint(aTHX_ input, len, type, output);
 #endif
     } else {
-        char *tmp, *tmpout;
+        unsigned char *tmp;
+        char *tmpout;
         struct cc_bignum bn;
         int i;
 
         Newxz(tmpout, (len*4)+2, char);
 
         if (!IS_BIG_ENDIAN) {
-            Newxz(tmp, len, char);
+            Newxz(tmp, len, unsigned char);
             for (i = 0; i < len; i++) {
-                tmp[len-i-1] = input[i];
+                tmp[len-i-1] = (unsigned char)input[i];
             }
         } else {
             tmp = input;
@@ -427,7 +384,7 @@ double fmod_properly(double x, double y)
     return mod;
 }
 
-void decode_date(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_date(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     uint32_t ind;
     double f, e, J, h, g, Y, M, D;
@@ -453,14 +410,14 @@ void decode_date(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
 }
 
 #ifdef CAN_64BIT
-void decode_time(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_time(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     int64_t nano, seconds, hours, minutes;
     STRLEN pvlen;
     char *result;
 
     union {
-        char bytes[8];
+        unsigned char bytes[8];
         int64_t bigint;
     } bytes_or_bigint;
 
@@ -488,8 +445,8 @@ void decode_time(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
     SvCUR_set(output, pvlen);
 }
 #else
-//32bit compat
-void decode_time(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+/* 32bit compat */
+void decode_time(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     int32_t nano, seconds, hours, minutes;
     char *txt;
@@ -497,7 +454,7 @@ void decode_time(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
     STRLEN txt_len;
 
     decode_varint(aTHX_ input, len, type, output);
-    // output now contains a string represending the ns since midnight
+    /* output now contains a string represending the ns since midnight */
 
     txt = SvPV(output, txt_len);
     if (txt_len > 14) {
@@ -532,7 +489,7 @@ void decode_time(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output
 }
 #endif
 
-void decode_map(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_map(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     struct cc_type *key_type, *value_type;
     int i;
@@ -572,7 +529,7 @@ void decode_map(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
     }
 }
 
-void decode_udt(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_udt(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     struct cc_udt *udt;
     int i;
@@ -607,7 +564,7 @@ void decode_udt(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
     }
 }
 
-void decode_tuple(pTHX_ char *input, STRLEN len, struct cc_type *type, SV *output)
+void decode_tuple(pTHX_ unsigned char *input, STRLEN len, struct cc_type *type, SV *output)
 {
     SV *the_rv;
     AV *the_tuple;

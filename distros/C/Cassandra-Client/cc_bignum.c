@@ -7,7 +7,7 @@
 /* I needed a bignum library but couldn't use GMP because I can't assume it's installed everywhere.
    Since the amount of things I need to do is really small, I rolled my own. */
 
-void cc_bignum_init_bytes(struct cc_bignum *bn, char *bytes, size_t length)
+void cc_bignum_init_bytes(struct cc_bignum *bn, unsigned char *bytes, size_t length)
 {
     if (length > 0) {
         bn->number = malloc(length);
@@ -19,7 +19,7 @@ void cc_bignum_init_bytes(struct cc_bignum *bn, char *bytes, size_t length)
                 bn->number[i] = ~bn->number[i];
             }
             bn->is_negative = 1;
-            cc_bignum_add_1(bn);
+            cc_bignum_add(bn, 1);
         } else {
             bn->is_negative = 0;
         }
@@ -27,6 +27,27 @@ void cc_bignum_init_bytes(struct cc_bignum *bn, char *bytes, size_t length)
         bn->number = calloc(1, 1);
         bn->length = 1;
         bn->is_negative = 0;
+    }
+}
+
+void cc_bignum_init_string(struct cc_bignum *bn, char *string, size_t length)
+{
+    size_t pos = 0;
+
+    bn->number = calloc(1, 1);
+    bn->length = 1;
+    bn->is_negative = 0;
+
+    if (string[pos] == '-') {
+        pos++;
+        bn->is_negative = 1;
+    } else if (string[pos] == '+') {
+        pos++;
+    }
+
+    for (; pos < length; pos++) {
+        cc_bignum_mul(bn, 10);
+        cc_bignum_add(bn, string[pos]-'0');
     }
 }
 
@@ -79,20 +100,46 @@ uint32_t cc_bignum_divide_8bit(struct cc_bignum *n, uint8_t d, struct cc_bignum 
     return temp;
 }
 
-void cc_bignum_add_1(struct cc_bignum *n)
+void cc_bignum_mul(struct cc_bignum *n, uint8_t mul)
+{
+    size_t i;
+    uint32_t temp;
+
+    temp = 0;
+    i = 0;
+    while (i < n->length) {
+        temp += (n->number[i] * mul);
+        n->number[i] = temp % 256;
+        temp >>= 8;
+        i++;
+    }
+    if (temp) {
+        assert(temp < 256);
+        n->length++;
+        n->number = realloc(n->number, n->length);
+        n->number[i] = temp;
+    }
+}
+
+void cc_bignum_add(struct cc_bignum *n, uint8_t howmuch)
 {
     int i;
+    uint8_t carry;
+    carry = howmuch;
+    if (!carry)
+        return;
     for (i = 0; i < n->length; i++) {
-        if (n->number[i] != 255) {
-            n->number[i]++;
+        if (n->number[i] < 256-carry) {
+            n->number[i] += carry;
             return;
         } else {
-            n->number[i] = 0;
+            n->number[i] += carry;
+            carry = 1;
         }
     }
     n->number = realloc(n->number, n->length+1);
     n->length++;
-    n->number[i] = 1;
+    n->number[i] = carry;
 }
 
 int cc_bignum_is_zero(struct cc_bignum *n)
@@ -159,4 +206,41 @@ void cc_bignum_stringify(struct cc_bignum *bn, char *out, size_t outlen)
 
     free(tmp_buf);
     cc_bignum_destroy(&cur);
+}
+
+size_t cc_bignum_byteify(struct cc_bignum *bn, unsigned char *out, size_t outlen)
+{
+    struct cc_bignum copy;
+    size_t needed_bytes;
+    cc_bignum_copy(&copy, bn);
+
+    assert(copy.length < outlen);
+
+    if (copy.is_negative) {
+        int i;
+        for (i = 0; i < copy.length; i++) {
+            copy.number[i] = ~copy.number[i];
+        }
+        cc_bignum_add(&copy, 1);
+        out[copy.length] = 0xff;
+    } else {
+        out[copy.length] = 0;
+    }
+
+    memcpy(out, copy.number, copy.length);
+
+    needed_bytes = copy.length+1;
+    while (needed_bytes > 1) {
+        if (out[needed_bytes-1] == out[copy.length]) {
+            if ((out[needed_bytes-1]&0x80) == (out[needed_bytes-2]&0x80)) {
+                needed_bytes--;
+                continue;
+            }
+        }
+        break;
+    }
+
+    cc_bignum_destroy(&copy);
+
+    return needed_bytes;
 }

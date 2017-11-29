@@ -1214,6 +1214,9 @@ CODE:
     if ( maria->query_sv )
         croak("Attempted to start a query when this connection already has a query in flight");
 
+    if ( !SvOK(query) )
+        croak("Query was empty");
+
     if ( maria->current_state == STATE_QUERY ) {
         /*
          * How we get here:
@@ -1261,6 +1264,9 @@ CODE:
         const char* query_pv            = SvPV(query, max_size_of_query_string);
         char *d = NULL;
         IV num_bind_params;
+
+        if ( max_size_of_query_string == 0 )
+            croak("Query was empty");
 
         if ( !SvROK(bind) || SvTYPE(SvRV(bind)) != SVt_PVAV ) {
             croak("Query bind values should be passed in an arrayref!");

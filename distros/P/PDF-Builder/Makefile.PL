@@ -14,7 +14,7 @@ my %WriteMakefileArgs =
  NAME		=> "PDF::Builder",
  DISTNAME       => "PDF-Builder",
 # VERSION	 => $version,
- VERSION        => "3.008",
+ VERSION        => "3.009",
 # ABSTRACT_FROM	 => $master,
  ABSTRACT       => "Facilitates the creation and modification of PDF files",
 

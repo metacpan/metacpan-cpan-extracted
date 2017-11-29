@@ -31,6 +31,7 @@ is $stderr, '', 'no messages';
 #
 $code = applify_ok <<'DIES';
 use Applify;
+option flag => verbose => 'print messages';
 app {
     my ($self, @e) = @_;
     die "dies\n" unless @e;
@@ -44,6 +45,15 @@ is $exited, 0, 'successful run';
 is $retval, undef, 'return value undef';
 is $stdout, "dies\n", 'dies message';
 is $stderr, "dies\n", 'dies message';
+
+#
+# argv passing in run_ok
+#
+($retval, $stdout, $stderr, $exited) = $t->run_ok(qw{-verbose alpha});
+is $exited, 0, 'successful run';
+is $retval, 0, 'return value undef';
+is $stdout, '', 'no dies message';
+is $stderr, '', 'no dies message';
 
 #
 # stdout only
@@ -179,6 +189,84 @@ if ($^V lt v5.18.0) {
 } else {
     is $stderr, "try this - exiting\n", 'bye message';
 }
+
+#
+# argv passing
+#
+$code = applify_ok <<'ARGV';
+use feature ':5.10';
+use Applify;
+option flag => verbose => 'more messages';
+app {
+    my ($self, @e) = @_;
+    say "extra: @e" if @e;
+    say "verbosely: @e" if @e and $self->verbose;
+    say "verbose: 1" if $self->verbose;
+    return 0;
+};
+ARGV
+
+$t = new_ok('Test::Applify', [$code]);
+($retval, $stdout, $stderr, $exited) = $t->run_ok();
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, '', 'empty stdout';
+is $stderr, '', 'empty stderr';
+
+($retval, $stdout, $stderr, $exited) = $t->run_ok(qw{-verbose});
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+verbose: 1
+STDOUT
+is $stderr, '', 'empty stderr';
+
+($retval, $stdout, $stderr, $exited) = $t->run_ok(qw{-verbose here});
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+extra: here
+verbosely: here
+verbose: 1
+STDOUT
+is $stderr, '', 'empty stderr';
+
+($retval, $stdout, $stderr, $exited) = $t->run_ok(qw{here});
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+extra: here
+STDOUT
+is $stderr, '', 'empty stderr';
+
+$app = $t->app_instance(qw{-verbose});
+($retval, $stdout, $stderr, $exited) = $t->run_instance_ok($app);
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+verbose: 1
+STDOUT
+is $stderr, '', 'empty stderr';
+
+($retval, $stdout, $stderr, $exited) = $t->run_instance_ok($app, 'here');
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+extra: here
+verbosely: here
+verbose: 1
+STDOUT
+is $stderr, '', 'empty stderr';
+
+$app = $t->app_instance();
+($retval, $stdout, $stderr, $exited) = $t->run_instance_ok($app, qw{here});
+is $retval, 0, 'return value == 0';
+is $exited, 0, 'successful run';
+is $stdout, <<'STDOUT', 'empty stdout';
+extra: here
+STDOUT
+is $stderr, '', 'empty stderr';
+
 
 
 done_testing;

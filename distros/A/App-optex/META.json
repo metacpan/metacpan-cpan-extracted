@@ -55,7 +55,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "App::optex::debug" : {
          "file" : "lib/App/optex/debug.pm"
@@ -102,6 +102,6 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_authority" : "cpan:UTASHIRO"
 }

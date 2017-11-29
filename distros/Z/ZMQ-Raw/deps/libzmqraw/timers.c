@@ -138,10 +138,34 @@ static void zmq_raw_timer_destroy (zmq_raw_timer *timer)
 
 	zmq_close (timer->send);
 
-	if (timer->recv)
+	if (timer->recv && !timer->recv_sv)
 		zmq_close (timer->recv);
 
 	free (timer);
+}
+
+static void zmq_raw_timers__start (zmq_raw_timer *timer)
+{
+	zmq_raw_timers *timers;
+	assert (timer);
+	assert (timer->timers);
+
+	timers = timer->timers;
+
+	timer->id = zmq_timers_add (timers->timers, timer->after, timer_handler, timer);
+	timer->running = 1;
+
+	if (!timers->running)
+	{
+		/* start the timer thread */
+		timers->running = 1;
+		timers->thread = zmq_threadstart (timer_thread, timers);
+	}
+	else
+	{
+		/* wakeup the timer thread */
+		zmq_send_const (timers->wakeup_send, "", 1, ZMQ_DONTWAIT);
+	}
 }
 
 zmq_raw_timer *zmq_raw_timers_start (zmq_raw_timers *timers, void *context, int after, int interval)
@@ -161,21 +185,8 @@ zmq_raw_timer *zmq_raw_timers_start (zmq_raw_timers *timers, void *context, int 
 		return NULL;
 	}
 
-	timer->id = zmq_timers_add (timers->timers, timer->after, timer_handler, timer);
-	timer->running = 1;
 	timer->timers = timers;
-
-	if (!timers->running)
-	{
-		/* start the timer thread */
-		timers->running = 1;
-		timers->thread = zmq_threadstart (timer_thread, timers);
-	}
-	else
-	{
-		/* wakeup the timer thread */
-		zmq_send_const (timers->wakeup_send, "", 1, ZMQ_DONTWAIT);
-	}
+	zmq_raw_timers__start (timer);
 
 	zmq_raw_mutex_unlock (timers->mutex);
 
@@ -187,11 +198,16 @@ void zmq_raw_timers_reset (zmq_raw_timer *timer)
 	assert (timer);
 
 	zmq_raw_mutex_lock (timer->timers->mutex);
-	zmq_timers_reset (timer->timers->timers, timer->id);
+	if (timer->running)
+		zmq_timers_reset (timer->timers->timers, timer->id);
+	else
+		zmq_raw_timers__start (timer);
+
+	while (zmq_recv (timer->recv, NULL, 0, ZMQ_DONTWAIT) == 0);
 	zmq_raw_mutex_unlock (timer->timers->mutex);
 }
 
-void zmq_raw_timers__stop (zmq_raw_timer *timer)
+static void zmq_raw_timers__stop (zmq_raw_timer *timer)
 {
 	assert (timer);
 
@@ -200,6 +216,30 @@ void zmq_raw_timers__stop (zmq_raw_timer *timer)
 		timer->running = 0;
 		zmq_timers_cancel (timer->timers->timers, timer->id);
 	}
+}
+
+static void zmq_raw_timers__expire (zmq_raw_timer *timer)
+{
+	if (timer->running)
+	{
+		zmq_raw_timers__stop (timer);
+
+		timer->timers->last = NULL;
+		timer->timers->run_count = 0;
+
+		timer_handler (timer->id, timer);
+
+		free (timer->timers->last);
+	}
+}
+
+void zmq_raw_timers_expire (zmq_raw_timer *timer)
+{
+	assert (timer);
+
+	zmq_raw_mutex_lock (timer->timers->mutex);
+	zmq_raw_timers__expire (timer);
+	zmq_raw_mutex_unlock (timer->timers->mutex);
 }
 
 void zmq_raw_timers_stop (zmq_raw_timer *timer)
@@ -244,7 +284,6 @@ void zmq_raw_timer_set_sv (zmq_raw_timer *timer, void *sv)
 	assert (timer->recv_sv == NULL);
 
 	timer->recv_sv = sv;
-	timer->recv = NULL;
 }
 
 void *zmq_raw_timer_get_sv (zmq_raw_timer *timer)
@@ -303,7 +342,6 @@ void timer_handler (int timer_id, void *arg)
 	/* this is guaranteed to execute with the timers mutex locked */
 	zmq_raw_timer *timer = (zmq_raw_timer *)arg;
 
-	assert (timer->running);
 	assert (timer->id == timer_id);
 
 	zmq_send_const (timer->send, "", 1, ZMQ_DONTWAIT);

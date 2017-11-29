@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my @files = < t/* >;
+
+for (@files) {
+	if (-d $_) {
+		my $cleanuplist = "$_/CLEANUP";
+		my $outfolder = "$_/output";
+		if (-e $cleanuplist) {
+			unless (open CL, "<", $cleanuplist) {
+				die "cannot open $cleanuplist"
+			}
+			while (<CL>) {
+				my $deletefile = $_;
+				chomp $deletefile;
+				unlink "$outfolder/$deletefile";
+			}
+			close CL;
+			unlink $cleanuplist;
+		}
+		if (DirIsEmpty($outfolder)) {
+			rmdir $outfolder;
+		}
+	}
+}
+
+sub DirIsEmpty {
+	my $dir = shift;
+	my @content = < $dir/* >;
+	my @cleancontent = ();
+	for (@content) {
+		unless (($_ eq "$dir/.") or ($_ eq "$dir/..")) { push @cleancontent, $_ }
+	}
+	if (@cleancontent) { return 0 }
+	return 0
+}

@@ -70,6 +70,8 @@ $ia->add_map(
 $ia->add_credit( 'Tore Aursand' );
 $ia->add_copyright( 'Tore Aursand' );
 
+is( $ia->is_valid, 1, 'Instant Article looks OK!' );
+
 my $dom = Mojo::DOM->new( $ia->to_string );
 
 is( $dom->at('html')->attr('lang'), 'en', 'HTML language is OK' );
@@ -91,4 +93,16 @@ is( $dom->at('header > figure > img')->attr('src'), 'http://www.example.com/lead
 is( $dom->at('header > figure > figcaption')->text, 'Lead asset!', 'Lead asset caption is OK' );
 is( $dom->at('header > address > a')->text, 'Tore Aursand', 'Address is OK' );
 
+# Invalid article
+$ia = Facebook::InstantArticle->new(
+    language  => 'en',
+    url       => 'http://www.example.com/2016/08/17/some-article',
+    title     => 'Invalid article',
+    published => "$now",
+    modified  => "$now",
+);
+
+is( $ia->is_valid, 0, 'Instant Article does NOT look OK!' );
+
+# Done
 done_testing;

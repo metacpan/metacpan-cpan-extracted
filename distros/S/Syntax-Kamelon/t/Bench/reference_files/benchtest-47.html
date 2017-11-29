@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+<style>.content {
+  padding: 20px;
+  height: 100%;
+  width: 944px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.fold {
+  width: 20px;
+  float: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.number {
+  width: 45px;
+  float: left;
+  margin-right: 10px;
+  text-align: right;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.line {
+}
+.content {
+  font-family: "Monospace";
+  font-size: 1em;
+  background: #3f3f3f;
+  color: White;
+  width: 944px;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: LightPink;
+}
+font.BaseN {
+   color: Gold;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Cyan;
+}
+font.Comment {
+   color: Beige;
+	font-style: italic;
+}
+font.CommentVar {
+   color: LightBlue;
+	font-style: italic;
+}
+font.Constant {
+   color: White;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: DeepPink;
+}
+font.DataType {
+   color: CadetBlue;
+}
+font.DecVal {
+   color: MediumPurple;
+	font-weight: bold;
+}
+font.Documentation {
+   color: Gold;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: DarkViolet;
+	font-weight: bold;
+}
+font.Function {
+   color: RosyBrown;
+}
+font.Import {
+   color: PaleVioletRed;
+}
+font.Information {
+   color: LightGreen;
+	font-style: italic;
+}
+font.Keyword {
+   color: LightGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: White;
+}
+font.Operator {
+   color: Magenta;
+}
+font.Others {
+   color: GreenYellow;
+}
+font.Preprocessor {
+   color: DarkSeaGreen ;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Plum;
+}
+font.SpecialChar {
+   color: Plum;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: LightBlue;
+}
+font.String {
+   color: MediumAquaMarine;
+}
+font.Variable {
+   color: Turquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: LightSkyBlue;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+
+</style>
+<title>Kamelon output</title>
+</head>
+<body>
+
+<div class="content">
+<div id="1" class="line"><font class="Keyword">&lt;?xml</font><font class="Normal">&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;iso-8859-15&quot;</font><font class="Keyword">?&gt;</font></br></div>
+<div id="2" class="line"></br></div>
+<div id="3" class="line"><font class="Comment">&lt;!--</font></br></div>
+<div id="4" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;This&nbsp;file&nbsp;is&nbsp;freely&nbsp;distributable,&nbsp;created&nbsp;by&nbsp;Wilbert&nbsp;Berendsen&nbsp;(wbsoft@xs4all.nl)</font></br></div>
+<div id="5" class="line"></br></div>
+<div id="6" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;This&nbsp;is&nbsp;just&nbsp;a&nbsp;simple&nbsp;XSLT&nbsp;file&nbsp;that&nbsp;converts&nbsp;some&nbsp;HTML&nbsp;pages&nbsp;to&nbsp;a&nbsp;XBEL&nbsp;bookmarklist.</font></br></div>
+<div id="7" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;It&nbsp;is&nbsp;included&nbsp;here&nbsp;to&nbsp;test&nbsp;the&nbsp;new&nbsp;XSLT&nbsp;highlighting&nbsp;by&nbsp;Peter&nbsp;Lammich.</font></br></div>
+<div id="8" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;</font></br></div>
+<div id="9" class="line"><font class="Comment">&nbsp;&nbsp;&nbsp;</font><font class="Alert">TODO</font><font class="Comment">:&nbsp;add&nbsp;better&nbsp;test&nbsp;file.</font></br></div>
+<div id="10" class="line"><font class="Comment">--&gt;</font></br></div>
+<div id="11" class="line"></br></div>
+<div id="12" class="line"><font class="Keyword">&lt;xsl:stylesheet</font><font class="Others">&nbsp;xmlns:xsl</font><font class="Normal">=</font><font class="String">&quot;http://www.w3.org/1999/XSL/Transform&quot;</font><font class="Others">&nbsp;version</font><font class="Normal">=</font><font class="String">&quot;1.0&quot;</font></br></div>
+<div id="13" class="line"><font class="Others">xmlns:h</font><font class="Normal">=</font><font class="String">&quot;http://www.w3.org/1999/xhtml&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="14" class="line"><font class="Keyword">&lt;xsl:output</font><font class="Others">&nbsp;method</font><font class="Normal">=</font><font class="String">&quot;xml&quot;</font><font class="Others">&nbsp;encoding</font><font class="Normal">=</font><font class="String">&quot;iso-8859-15&quot;</font><font class="Others">&nbsp;indent</font><font class="Normal">=</font><font class="String">&quot;yes&quot;</font></br></div>
+<div id="15" class="line"><font class="Others">&nbsp;doctype-public</font><font class="Normal">=</font><font class="String">&quot;+//IDN&nbsp;python.org//DTD&nbsp;XML&nbsp;Bookmark&nbsp;Exchange&nbsp;Language&nbsp;1.0//EN//XML&quot;</font></br></div>
+<div id="16" class="line"><font class="Others">&nbsp;doctype-system</font><font class="Normal">=</font><font class="String">&quot;http://www.python.org/topics/xml/dtds/xbel-1.0.dtd&quot;</font></br></div>
+<div id="17" class="line"><font class="Keyword">/&gt;</font></br></div>
+<div id="18" class="line"></br></div>
+<div id="19" class="line"><font class="Comment">&lt;!--&nbsp;main&nbsp;--&gt;</font></br></div>
+<div id="20" class="line"><font class="Keyword">&lt;xsl:template</font><font class="Others">&nbsp;match</font><font class="Normal">=</font><font class="String">&quot;/&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="21" class="line"><font class="Keyword">&lt;xbel&gt;&lt;folder&gt;&lt;title&gt;</font><font class="Normal">Linux&nbsp;at&nbsp;Home&nbsp;Links</font><font class="Keyword">&lt;/title&gt;</font></br></div>
+<div id="22" class="line"><font class="Keyword">&lt;xsl:for-each</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;//*[@id='maincontents']//h:li&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:variable</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;f&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;document(h:a/@href)/h:html&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;folder&gt;</font></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;title&gt;&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;h:a/h:strong&quot;</font><font class="Keyword">/&gt;&lt;/title&gt;</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;desc&gt;&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;normalize-space(h:a/text())&quot;</font><font class="Keyword">/&gt;&lt;/desc&gt;</font></br></div>
+<div id="27" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:for-each</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;$f//h:div[@id='maincontents']&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="28" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:call-template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;getbookmarks&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="29" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:for-each&gt;</font></br></div>
+<div id="30" class="line"><font class="Normal">&nbsp;&nbsp;</font></br></div>
+<div id="31" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/folder&gt;</font></br></div>
+<div id="32" class="line"><font class="Keyword">&lt;/xsl:for-each&gt;</font></br></div>
+<div id="33" class="line"><font class="Keyword">&lt;/folder&gt;&lt;/xbel&gt;</font></br></div>
+<div id="34" class="line"><font class="Keyword">&lt;/xsl:template&gt;</font></br></div>
+<div id="35" class="line"><font class="Comment">&lt;!--&nbsp;end&nbsp;of&nbsp;main&nbsp;--&gt;</font></br></div>
+<div id="36" class="line"></br></div>
+<div id="37" class="line"><font class="Comment">&lt;!--&nbsp;get&nbsp;bookmarks&nbsp;from&nbsp;a&nbsp;page&nbsp;--&gt;</font></br></div>
+<div id="38" class="line"><font class="Keyword">&lt;xsl:template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;getbookmarks&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="39" class="line"></br></div>
+<div id="40" class="line"><font class="Keyword">&lt;xsl:choose&gt;</font></br></div>
+<div id="41" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Comment">&lt;!--&nbsp;harvest&nbsp;links&nbsp;from&nbsp;p&nbsp;or&nbsp;li&nbsp;elements&nbsp;--&gt;</font></br></div>
+<div id="42" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:when</font><font class="Others">&nbsp;test</font><font class="Normal">=</font><font class="String">&quot;self::h:li&nbsp;or&nbsp;self::h:p&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:variable</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;t&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;normalize-space()&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:for-each</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;.//h:a[1]&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:call-template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;bookmark&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:with-param</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;desc&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;$t&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="47" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:call-template&gt;</font></br></div>
+<div id="48" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:for-each&gt;</font></br></div>
+<div id="49" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:for-each</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;.//h:a[position()!=1]&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="50" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:call-template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;bookmark&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="51" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:for-each&gt;</font></br></div>
+<div id="52" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:when&gt;</font></br></div>
+<div id="53" class="line"></br></div>
+<div id="54" class="line"></br></div>
+<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:otherwise&gt;</font></br></div>
+<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:for-each</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;*&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:call-template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;getbookmarks&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="58" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:for-each&gt;</font></br></div>
+<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:otherwise&gt;</font></br></div>
+<div id="60" class="line"></br></div>
+<div id="61" class="line"><font class="Keyword">&lt;/xsl:choose&gt;</font></br></div>
+<div id="62" class="line"></br></div>
+<div id="63" class="line"><font class="Keyword">&lt;/xsl:template&gt;</font></br></div>
+<div id="64" class="line"></br></div>
+<div id="65" class="line"></br></div>
+<div id="66" class="line"><font class="Keyword">&lt;xsl:template</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;bookmark&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="67" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:param</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;href&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;@href&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="68" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:param</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;desc&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;''&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="69" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:param</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;title&quot;</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;normalize-space()&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="70" class="line"></br></div>
+<div id="71" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:variable</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;realdesc&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:choose&gt;</font></br></div>
+<div id="73" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:when</font><font class="Others">&nbsp;test</font><font class="Normal">=</font><font class="String">&quot;starts-with($desc,$title)&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="74" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:choose&gt;</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:when</font><font class="Others">&nbsp;test</font><font class="Normal">=</font><font class="String">&quot;starts-with(translate(substring-after($desc,$title),',.;','...'),'.')&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="76" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;substring($desc,string-length($title)&nbsp;+&nbsp;2)&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="77" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:when&gt;</font></br></div>
+<div id="78" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:otherwise&gt;</font></br></div>
+<div id="79" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;substring-after($desc,$title)&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="80" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:otherwise&gt;</font></br></div>
+<div id="81" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:choose&gt;</font></br></div>
+<div id="82" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:when&gt;</font></br></div>
+<div id="83" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:otherwise&gt;</font></br></div>
+<div id="84" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;$desc&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="85" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:otherwise&gt;</font></br></div>
+<div id="86" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:choose&gt;</font></br></div>
+<div id="87" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:variable&gt;</font></br></div>
+<div id="88" class="line"><font class="Normal">&nbsp;&nbsp;</font></br></div>
+<div id="89" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;bookmark&gt;</font></br></div>
+<div id="90" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:attribute</font><font class="Others">&nbsp;name</font><font class="Normal">=</font><font class="String">&quot;href&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="91" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:choose&gt;</font></br></div>
+<div id="92" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:when</font><font class="Others">&nbsp;test</font><font class="Normal">=</font><font class="String">&quot;starts-with($href,'http://')&nbsp;or&nbsp;starts-with($href,'ftp://')&nbsp;or&nbsp;starts-with($href,'mailto:')&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="93" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;$href&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="94" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:when&gt;</font></br></div>
+<div id="95" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:otherwise&gt;</font></br></div>
+<div id="96" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;concat('http://www.xs4all.nl/~wbsoft/linux/links/',$href)&quot;</font><font class="Keyword">/&gt;</font></br></div>
+<div id="97" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:otherwise&gt;</font></br></div>
+<div id="98" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:choose&gt;</font></br></div>
+<div id="99" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:attribute&gt;</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;title&gt;&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;normalize-space($title)&quot;</font><font class="Keyword">/&gt;&lt;/title&gt;</font></br></div>
+<div id="101" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;xsl:if</font><font class="Others">&nbsp;test</font><font class="Normal">=</font><font class="String">&quot;normalize-space($realdesc)&nbsp;!=&nbsp;''&quot;</font><font class="Keyword">&gt;</font></br></div>
+<div id="102" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;desc&gt;&lt;xsl:value-of</font><font class="Others">&nbsp;select</font><font class="Normal">=</font><font class="String">&quot;normalize-space($realdesc)&quot;</font><font class="Keyword">/&gt;&lt;/desc&gt;</font></br></div>
+<div id="103" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">&lt;/xsl:if&gt;</font></br></div>
+<div id="104" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Keyword">&lt;/bookmark&gt;</font></br></div>
+<div id="105" class="line"><font class="Keyword">&lt;/xsl:template&gt;</font></br></div>
+<div id="106" class="line"></br></div>
+<div id="107" class="line"></br></div>
+<div id="108" class="line"></br></div>
+<div id="109" class="line"><font class="Keyword">&lt;/xsl:stylesheet&gt;</font></br></div>
+</div>
+</body>
+</html>
+

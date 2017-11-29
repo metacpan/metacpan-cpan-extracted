@@ -1,5 +1,21 @@
 Revision history for ZMQ-Raw
 
+0.19      2017-11-29 07:13:35+02:00 Africa/Johannesburg
+
+ - Added Loop::Event methods:
+    + reset()
+ - Loop consistency fixes
+
+0.18      2017-11-27 19:12:58+02:00 Africa/Johannesburg
+
+ - Added Loop::Timer methods:
+    + reset()
+    + running()
+    + expire()
+ - Timer methods:
+    + expire()
+ - Loop timers are now restartable/reusable
+
 0.17      2017-11-21 14:03:13+02:00 Africa/Johannesburg
 
  - Added Loop methods:

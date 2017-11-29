@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use constant {
 	CMD_OK       => 2,
@@ -140,8 +140,9 @@ sub send {
 	push @steps, $self->_make_cmd_steps(0, @_);
 	
 	# non-blocking
-	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new(ioloop => $self->_ioloop)->steps(@steps)->catch(sub {
-		shift->emit(finish => $_[0]);
+	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new(ioloop => $self->_ioloop)->steps(@steps);
+	$delay->catch(sub {
+		$delay->emit(finish => $_[0]);
 	});
 	$delay->on(finish => sub {
 		if ($cb) {
@@ -792,7 +793,7 @@ C<$resp-E<gt>message> (string).
 
 For blocking usage C<$resp> will be returned as result of C<$smtp-E<gt>send> call. C<$resp> is the same as for
 non-blocking result. If L</autodie> attribute has true value C<send> will throw an exception on any error.
-Which will be one of C<Mojo::SMTP::Client::Exception::*> or an error throwed by the user inside L<start> or L<connect> callback.
+Which will be one of C<Mojo::SMTP::Client::Exception::*> or an error throwed by the user inside event handler.
 
 B<Note>. For SMTP protocol it is important to send commands in certain order. Also C<send> will send all commands in order you are
 specified. So, it is important to pass arguments to C<send> in right order. For basic usage this will always be:

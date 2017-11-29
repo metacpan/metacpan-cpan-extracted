@@ -1,6 +1,6 @@
 package MsgPack::RPC::Message::Response;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::RPC::Message::Response::VERSION = '2.0.0';
+$MsgPack::RPC::Message::Response::VERSION = '2.0.1';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ MsgPack::RPC::Message::Response
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

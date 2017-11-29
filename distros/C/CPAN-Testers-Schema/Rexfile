@@ -29,9 +29,11 @@ use Rex::Commands::Sync;
 #######################################################################
 # Groups
 
-# The current CPAN Testers database is not available for public SSH,
-# which means we use the API server to do this.
-group api => 'cpantesters3.dh.bytemark.co.uk';
+group all => qw(
+    cpantesters3.dh.bytemark.co.uk
+    cpantesters4.dh.bytemark.co.uk
+    cpantesters1.barnyard.co.uk
+);
 
 #######################################################################
 # Settings
@@ -46,7 +48,7 @@ set 'dist_name' => 'CPAN-Testers-Schema';
 # Environments
 # The Vagrant VM for development purposes
 environment vm => sub {
-    group api => '192.168.127.127'; # the Vagrant VM IP
+    group all => '192.168.127.127'; # the Vagrant VM IP
     set 'no_sudo_password' => 1;
 };
 
@@ -67,7 +69,7 @@ CPAN::Testers::Schema to CPAN.
 
 desc "Deploy the CPAN Testers Schema from CPAN";
 task deploy =>
-    group => 'api',
+    group => 'all',
     sub {
         run 'source ~/.profile; cpanm CPAN::Testers::Schema DBD::mysql';
         run_task 'upgrade_database', on => connection->server;
@@ -85,7 +87,7 @@ using `cpanm`.
 =cut
 
 task deploy_dev =>
-    group => 'api',
+    group => 'all',
     sub {
         my $dist_name = get 'dist_name';
         my $dist;
@@ -101,7 +103,7 @@ task deploy_dev =>
             source => $dist;
 
         Rex::Logger::info( 'Installing ' . $dist );
-        run 'source ~/.profile; cpanm ~/dist/' . $dist . ' DBD::mysql';
+        run 'source ~/.profile; cpanm --notest ~/dist/' . $dist . ' DBD::mysql';
 
         run_task 'upgrade_database', on => connection->server;
     };
@@ -117,7 +119,7 @@ the database version must match.
 =cut
 
 task upgrade_database =>
-    group => 'api',
+    group => 'all',
     sub {
         Rex::Logger::info( 'Upgrading database' );
         run 'source ~/.profile; cpantesters-schema upgrade';
@@ -136,7 +138,7 @@ database.
 =cut
 
 task install_database =>
-    group => 'api',
+    group => 'all',
     sub {
         Rex::Logger::info( 'Installing database' );
         run 'mysql --defaults-file=~/.cpanstats.cnf --database "" -e"create database cpanstats"';
@@ -157,7 +159,7 @@ running processes must get the new code by restarting.
 =cut
 
 task restart =>
-    group => 'api',
+    group => 'all',
     sub {
         Rex::Logger::info( 'Restating all services' );
         run 'sv restart ~/service/*';

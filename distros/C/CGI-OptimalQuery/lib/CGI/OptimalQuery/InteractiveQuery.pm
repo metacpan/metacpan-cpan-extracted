@@ -282,7 +282,8 @@ sub getPager {
 sub output {
   my $o = shift;
   my $current_pack = __PACKAGE__;
-  my %opts = %{ $$o{schema}{options}{$current_pack} } if exists $$o{schema}{options}{$current_pack};
+  my %opts;
+  %opts = %{ $$o{schema}{options}{$current_pack} } if exists $$o{schema}{options}{$current_pack};
 
   $opts{httpHeader} = $$o{q}->header('text/html') if ! exists $opts{httpHeader};
 

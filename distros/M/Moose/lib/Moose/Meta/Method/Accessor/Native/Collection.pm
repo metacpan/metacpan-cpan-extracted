@@ -1,12 +1,12 @@
 package Moose::Meta::Method::Accessor::Native::Collection;
-our $VERSION = '2.2008';
+our $VERSION = '2.2009';
 
 use strict;
 use warnings;
 
 use Moose::Role;
 
-requires qw( _adds_members );
+requires qw( _adds_members _new_members );
 
 sub _inline_coerce_new_values {
     my $self = shift;

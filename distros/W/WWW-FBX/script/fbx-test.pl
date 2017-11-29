@@ -5,7 +5,7 @@ use Scalar::Util "blessed";
 use Storable;
 use Data::Dumper;
 use Getopt::Long;
-use JSON;
+use JSON::MaybeXS;
 use WWW::FBX;
 
 my $fbx;

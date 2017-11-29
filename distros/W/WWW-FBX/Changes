@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-FBX
 
+0.20 2017-11-28T13:48:39Z
+    Use the required JSON package in script
+
 0.19 2017-03-26T13:40:34Z
     Updated script and associated documentation round 2
 

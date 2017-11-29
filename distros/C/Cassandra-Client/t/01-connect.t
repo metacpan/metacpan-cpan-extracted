@@ -17,7 +17,7 @@ plan tests => 4;
 {
     my $cv= AnyEvent->condvar;
 
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => 1, tls => $ENV{CASSANDRA_TLS});
+    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => 1, tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT});
     $client->async_connect->then(sub {
         $client->shutdown
 
@@ -35,7 +35,7 @@ plan tests => 4;
 
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
     eval {
         $client->connect;
         $client->shutdown;
@@ -47,7 +47,7 @@ plan tests => 4;
 }
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
     my ($error)= $client->call_connect;
     ok(!$error) or diag($error);
 
@@ -55,7 +55,7 @@ plan tests => 4;
 }
 
 {
-    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+    my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
     eval {
         my $cfuture= $client->future_connect;
         $cfuture->();

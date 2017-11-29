@@ -4,7 +4,7 @@ package Crypt::Mac::Pelican;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 pelican_b64u )] );
@@ -147,10 +147,8 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =item * L<CryptX|CryptX>
 
-=item * L<http://eprint.iacr.org/2005/088.pdf|http://eprint.iacr.org/2005/088.pdf>
+=item * L<http://eprint.iacr.org/2005/088.pdf>
 
 =back
 
 =cut
-
-__END__

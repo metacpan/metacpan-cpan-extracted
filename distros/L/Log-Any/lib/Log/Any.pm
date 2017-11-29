@@ -5,7 +5,7 @@ use warnings;
 package Log::Any;
 
 # ABSTRACT: Bringing loggers and listeners together
-our $VERSION = '1.701';
+our $VERSION = '1.702';
 
 use Log::Any::Manager;
 use Log::Any::Proxy::Null;
@@ -72,10 +72,8 @@ sub get_logger {
     my ( $class, %params ) = @_;
     no warnings 'once';
 
-    my $proxy_class = $class->_get_proxy_class( delete $params{proxy_class} );
     my $category =
       defined $params{category} ? delete $params{'category'} : caller;
-
     if ( my $default = delete $params{'default_adapter'} ) {
         my @default_adapter_params = ();
         if (ref $default eq 'ARRAY') {
@@ -90,6 +88,8 @@ sub get_logger {
             $category, $default, @default_adapter_params
         );
     }
+
+    my $proxy_class = $class->_get_proxy_class( delete $params{proxy_class} );
 
     my $adapter = $class->_manager->get_adapter( $category );
     my $context = $class->_manager->get_context();
@@ -134,7 +134,7 @@ Log::Any - Bringing loggers and listeners together
 
 =head1 VERSION
 
-version 1.701
+version 1.702
 
 =head1 SYNOPSIS
 
@@ -475,7 +475,7 @@ Stephen Thirlwall <sdt@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords bj5004 cm-perl Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Philipp Gortan Phill Legault
+=for stopwords bj5004 cm-perl Karen Etheridge Konstantin S. Uvarin Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Philipp Gortan Phill Legault
 
 =over 4
 
@@ -486,6 +486,14 @@ bj5004 <bartosz.jakubski@hurra.com>
 =item *
 
 cm-perl <cm-perl@users.noreply.github.com>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Konstantin S. Uvarin <khedin@gmail.com>
 
 =item *
 

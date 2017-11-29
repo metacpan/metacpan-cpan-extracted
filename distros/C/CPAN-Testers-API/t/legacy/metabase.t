@@ -38,7 +38,7 @@ ok !-f $t->app->home->child( 'tail.lock' ), 'lock not created';
 
 my $schema = $t->app->schema(
     CPAN::Testers::Schema->connect(
-        $mysqld->dsn(dbname => 'test')
+        $mysqld->dsn(dbname => 'test'), undef, undef, { ignore_version => 1 },
     )
 );
 $schema->deploy;

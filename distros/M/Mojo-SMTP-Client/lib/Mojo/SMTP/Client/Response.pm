@@ -87,7 +87,7 @@ C<Mojo::SMTP::Client::Response> implements the following attributes
 =head2 error
 
 Error for this response. Should be one of C<Mojo::SMTP::Client::Exception::*>
-defined in L<Mojo::SMTP::Client::Exception> or error throwed by the user from callback.
+defined in L<Mojo::SMTP::Client::Exception> or error throwed by the user from an event handler.
 Default is C<undef>.
 
 =head1 METHODS

@@ -1,5 +1,12 @@
 Revision history for App-PS1
 
+0.06   2017-11-29
+        Updating for release of version 0.06
+        Removing older perl support (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Adding newest plugin to default opens (Ivan Wills)
+        Fixing showing empty surround text (Ivan Wills)
+
 0.05   2017-06-11
         Updating for release of version 0.05
         Added missing file (Ivan Wills)

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub date {
     my ($self, $options) = @_;
@@ -36,7 +36,7 @@ App::PS1::Plugin::Date - Adds the current date to prompt
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Date version 0.05.
+This documentation refers to App::PS1::Plugin::Date version 0.06.
 
 =head1 SYNOPSIS
 

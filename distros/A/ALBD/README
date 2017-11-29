@@ -1,0 +1,237 @@
+NAME
+    ALBD README
+
+  SYNOPSIS
+        This package consists of Perl modules along with supporting Perl
+        programs that perform Literature Based Discovery (LBD). The core 
+        data from which LBD is performed are co-occurrences matrices 
+        generated from UMLS::Association. ALBD is based on the ABC
+        co-occurrence model. Many options can be specified, and many
+        ranking methods are available. The novel ranking methods that use
+        association measure are available as well as frequency based
+        ranking methods. See samples/lbd for more info. Can perform open and
+        closed LBD as well as time slicing evaluation.
+
+        ALBD requires UMLS::Association both to compute the co-occurrence
+        database that the co-occurrence matrix is derived from, but also for 
+        ranking the generated C terms.
+
+        UMLS::Association requires the UMLS::Interface module to access 
+        the Unified Medical Language System (UMLS) for semantic type filtering
+        and to determine if CUIs are valid.
+
+        The following sections describe the organization of this software
+        package and how to use it. A few typical examples are given to help
+        clearly understand the usage of the modules and the supporting
+        utilities.
+
+  INSTALL
+        To install the module, run the following magic commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the module in the standard location. You will, most
+        probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home/programs
+
+        It is possible to modify other parameters during installation. The
+        details of these can be found in the ExtUtils::MakeMaker documentation.
+        However, it is highly recommended not messing around with other
+        parameters, unless you know what you're doing.
+
+  CO-OCCURRENCE MATRIX SETUP
+    ALBD requires that a co-occurrence matrix of CUIs has been created. This
+    matrix is stored as a flat file, in a sparse matrix format such that
+    each line contains three tab seperated values, cui_1, cui_2, n_11 = the
+    count of their co-occurrences. Any matrix with that format is
+    acceptable, however the intended method of matrix generation is to
+    convert a UMLS::Association database into a flat matrix file. These
+    databases are created using the CUICollector tool of UMLS::Association,
+    and are run over the MetaMapped Medline baseline. With that file, run
+    utils/datasetCreator/fromMySQL/dbToTab.pl to convert the desired
+    database into a matrix file. Notice that code in dbToTab.pl is just a
+    sample mysql command. If the input database is created in another
+    method, a different command may be needed. As long as the resulting
+    co-occurrence matrix is in the correct format LBD may be run on it. This
+    allows flexibility in where co-occurrence information comes from.
+
+    Note: utils/datasetCreator/fromMySQL/removeQuotes.pl may need to be run
+    on the resulting tab seperated file, if quotes are inlcuded in the
+    resulting co-ocurrence matrix file.
+
+  Set Up Dummy UMLS::Association Database
+    UMLS::Association requires that a database can be connected to that is
+    in the correct format. Although this database is not required for ALBD
+    (since co-occurrence data is loaded from a co-occurrence matrix), it is
+    required to run UMLS:Association. If you ran UMLS::Association to
+    generate a co-occurrence matrix, you should be fine. Otherwise you will
+    need to create a dummy database that it can connect to. This can be done
+    in a few steps:
+
+    1) open mysql type mysql at the terminal
+
+    2) create the default database in the correct format, type: CREATE
+    DATABASE cuicounts; use cuicounts; CREATE TABLE N_11(cui_1 CHAR(10),
+    cui_2 CHAR(10), n_11 BIGINT(20));
+
+  INITIALIZING THE MODULE
+    To create an instance of the ALBD object, using default values for all
+    configuration options: %options = (); $options{'lbdConfig'} =
+    'configFile'; my $lbd = LiteratureBasedDiscovery->new(\%options);
+    $lbd->performLBD();
+
+    The following configuration options are also provided though:
+
+    'assocConfig' path to a UMLS::Association configuration file. Default
+    location is 'config/association'. Replace this file for your computer to
+    avoid having to specify each time
+
+    'interfaceConfig' path to a UMLS::Interface configuration file. Default
+    location is '../config/interface'. Replace this file for your computer
+    to avoid having to specify each time.
+
+    These are passed through a hash. For example:
+
+        my %options = ();
+        $options{'assocConfig'}   = '/home/share/ALBD/config/association';
+        $options{'interfaceConfig'} = '/home/shar/ALBD/config/interface';
+        $options{'lbdConfig'} = 'configFile'
+        my $lbd = LiteratureBasedDiscovery->new(\%options);
+        $lbd->performLBD();
+
+  CONTENTS
+    All the modules that will be installed in the Perl system directory are
+    present in the '/lib' directory tree of the package.
+
+    The package contains a utils/ directory that contain Perl utility
+    programs. These utilities use the modules or provide some supporting
+    functionality.
+
+    runDiscovery.pl -- runs LBD using the parameters specified in the input
+    file, and outputs to an output file.
+
+    The package contains a large selection of functions to manipulate CUI
+    Co-occurrence matrices in the utils/datasetCreator/ directory. These are
+    short scripts and generally require modifying the code at the top with
+    user input paramaters specific for each run. These scripts include:
+
+    applyMaxThreshold.pl -- applies a maximum co-occurrence threshold to the
+    co-occurrence matrix
+
+    applyMinThreshold.pl -- applies a minimum co-occurrence threshold to the
+    co-occurrence matrix
+
+    applySemanticFilter.pl -- applies a semantic type and/or group filter to
+    the co-occurrence matrix.
+
+    combineCooccurrenceMatrices.pl -- combines the co-occurrence counts of
+    multiple co-occurrence matrices
+
+    makeOrderNotMatter.pl -- makes the order of CUI co-occurrences not
+    matter by updating the co-occurrence matrix file. (UMLS::Association
+    generates co-occurrence files where order does matter, so the sentence
+    'cui1 cui2' will only mark a co-occurrence between cui1 and cui2, but
+    not between cui2 and cui1).
+
+    removeCUIPair.pl -- removes all occurrences of the specified CUI pair
+    from the co-occurrence matrix
+
+    removeExplicit.pl -- removes any keys that occur in an explicit
+    co-occurrence matrix from another co-occurrence matrix (typically the
+    squared explicit co-occurrence matrix itself, which generates a
+    prediction matrix, or the post cutoff matrix used in time slicing to
+    generate a gold standard file)
+
+    testMatrixEquality.pl -- checks to see if two co-occurrence matrix files
+    contain the same data
+
+    Also included are several subfolders with more specific purposes. Within
+    the dataStats subfolder are scripts to collect various statistics about
+    the co-occurrence matrices used in LBD. These scriptsinclude:
+
+    getCUICooccurrences.pl -- a data statistics file that gets the number of
+    co-occurrences, and number of unique co-occurrences for every CUI in the
+    dataset
+
+    getMatrixStats.pl -- determines the number of rows, columns, and entries
+    of a co-occurrence matrix
+
+    metaAnalysis.pl -- determines the number of rows, columns, vocabulary
+    size, and total number of co-occurrences of a co-occurrence file, or set
+    of co-occurrence files
+
+    There is another folder containing scripts to square co-occurrence
+    matrices. Squaring an explicit (A to B) co-occurrence matrix results in
+    a co-occurrence matrix containing all implicit (A to C) connections.
+    This is useful for time slicing and other analysis. Removal of the
+    original explicit matrix is an additional step that is required if you
+    wish to create a predictions matrix file for every CUI. This can be done
+    with the removeExplicit.pl script. Squaring a co-occurrence matrix can
+    be very computationally expensive, both in terms of ram and cpu. For
+    this reason MATLAB scripts are preferred over perl scripts. Even using
+    MATLAB ram can become an issue, and squaring sections of a matrix and
+    combining them into a single output matrix may be necassary, but takes
+    much longer. Scripts in the squaring folder include:
+
+    convertForSquaring_MATLAB.pl -- functions to convert to and from ALBD
+    and MATLAB sparse matrix formats
+
+    squareMatrix.m -- MATLAB script to square a matrix while holding
+    everything in ram. Faster, but requires more ram.
+
+    squareMatrix_partial.m -- MATLAB script to square a matrix in chunks.
+    Only loads parts of the matrix into ram at a time which makes squaring
+    any size matrix possible, but potentially take impracticle amounts of
+    time.
+
+    squareMatrix_perl.pl -- squares a matrix in perl, but requires the most
+    ram of any squaring method. The easiest method to use, but only
+    practical for small datasets.
+
+    The fromMySQL folder contains scripts that convery UMLS::Association
+    databases to ALBD co-occurrence matrices. The files contained are:
+
+    dbToTab.pl -- converts a UMLS::Association co-occurrence database to a
+    sparse format co-occurrence matrix used for ALBD
+
+    removeQuotes.pl -- removes quotes from lines in the co-occurrence matrix
+    file after converting from a database (sometimes needed)
+
+  REFERENCING
+        If you write a paper that has used UMLS-Association in some way, we'd 
+        certainly be grateful if you sent us a copy.
+
+  CONTACT US
+    If you have any trouble installing and using ALBD, please contact us
+    directly if you prefer :
+
+        Sam Henry: henryst at vcu.edu
+
+        Bridget McInnes: btmcinnes at vcu.edu
+
+  SOFTWARE COPYRIGHT AND LICENSE
+        Copyright (C) 2017 Sam Henry & Bridget McInnes
+
+        This suite of programs is free software; you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation; either version 2 of the License, or (at
+        your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+        Public License for more details.
+
+        You should have received a copy of the GNU General Public License along
+        with this program; if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+        Note: The text of the GNU General Public License is provided in the file
+        'GPL.txt' that you should have received with this distribution.
+

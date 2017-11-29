@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Test::Identity;
+use Test::Refcount;
 
 use Future;
 
@@ -40,6 +41,7 @@ use Future;
    ok( $ready_f->is_cancelled, 'on_ready chained future cnacelled after cancel' );
    ok( !$done_f->is_ready, 'on_done chained future not ready after cancel' );
    ok( !$fail_f->is_ready, 'on_fail chained future not ready after cancel' );
+   is( $future->state, "cancelled", '$future->state after ->cancel' );
 
    like( exception { $future->get }, qr/cancelled/, '$future->get throws exception by cancel' );
 
@@ -102,7 +104,10 @@ use Future;
 # without_cancel
 {
    my $f1 = Future->new;
+   is_oneref( $f1, '$f1 has single reference initially' );
+
    my $f2 = $f1->without_cancel;
+   is_refcount( $f1, 2, '$f1 has two references after ->without_cancel' );
 
    $f2->cancel;
    ok( !$f1->is_cancelled, '$f1 not cancelled just because $f2 is' );
@@ -112,6 +117,7 @@ use Future;
 
    ok( $f3->is_ready, '$f3 ready when $f1 is' );
    is_deeply( [ $f3->get ], [ "result" ], 'result of $f3' );
+   is_oneref( $f1, '$f1 has one reference after done' );
 }
 
 done_testing;

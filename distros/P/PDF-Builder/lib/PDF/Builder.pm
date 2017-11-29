@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.008'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.009'; # VERSION
+my $LAST_UPDATE = '3.009'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -2286,18 +2286,18 @@ Graphics::TIFF is available by examining C<< $tiff->usesLib() >>.
 
 =over
 
-=item -1 
+=item = -1 
 
 Graphics::TIFF I<is> installed, but your code has specified C<-nouseGT>, to 
 I<not> use it. The old, pure Perl, code (buggy!) will be used instead, as if 
 Graphics::TIFF was not installed.
 
-=item 0
+=item = 0
 
 Graphics::TIFF is I<not> installed. Not all systems are able to successfully
 install this package, as it requires libtiff.a.
 
-=item 1
+=item = 1
 
 Graphics::TIFF is installed and is being used.
 

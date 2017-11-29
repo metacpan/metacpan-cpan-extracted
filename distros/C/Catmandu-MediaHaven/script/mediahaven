@@ -6,7 +6,7 @@ mediahaven - a Zeticon MediaHaven command-line interface
 
 =head1 SYNOPSIS
 
-    usage: mediahaven [options] search [QUERY] [START] [NUM]
+    usage: mediahaven [options] search [QUERY] [START] [NUM] [SORT]
     usage: mediahaven [options] record ID
     usage: mediahaven [options] edit ID FIELD VALUE [VALUE...]
     usage: mediahaven [options] export ID [FILE]
@@ -71,21 +71,23 @@ else {
 }
 
 sub cmd_search {
-    my ($query,$start,$num) = @_;
+    my ($query,$start,$num,$sort) = @_;
 
     my $e = Catmandu->exporter($exporter);
 
-    my $count = 20;
-    my $start = 0;
+    my $count = $num;
+    my $start = $start;
     my $total;
 
     do {
-	my $result = $mh->search($query, start => $start , num => $count);
+	my $result = $mh->search($query, start => $start , num => $count, sort => $sort);
+        my $resSize = 0;
         for my $res (@{$result->{mediaDataList}}) {
             $e->add($res);
+            $resSize++;
         }
-	$total = $result->{totalNrOfResults};
-        $start += $count;
+	    $total = $result->{totalNrOfResults};
+        $start += $resSize;
     } while ($start < $total);
 
     $e->commit;
@@ -157,7 +159,7 @@ sub cmd_export {
 
 sub usage {
     print STDERR <<EOF;
-usage: $0 [options] search [QUERY] [START] [NUM]
+usage: $0 [options] search [QUERY] [START] [NUM] [SORT]
 usage: $0 [options] record ID
 usage: $0 [options] edit ID FIELD VALUE [VALUE...]
 usage: $0 [options] export ID [FILE]

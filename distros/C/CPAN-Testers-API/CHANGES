@@ -1,5 +1,23 @@
 Changelog for CPAN-Testers-API
 
+0.021     2017-11-28 14:08:07-06:00 America/Chicago
+
+    [Added]
+
+    - Implement `maturity` query parameter for Release queries,
+      constraining results returned to only stable or development
+      distributions. Thanks @1nickt!
+
+    - Implement `limit` query parameter for Release queries,
+      constraining total number of results returned. Thanks @1nickt!
+
+    [Fixed]
+
+    - "version" field is now required by all language reports
+
+    - Updated JSON::Validator version to fix some issues with the
+      generated OpenAPI specification
+
 0.020     2017-10-03 13:15:04-05:00 America/Chicago
 
     [Fixed]

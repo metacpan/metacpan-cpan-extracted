@@ -6,9 +6,9 @@ use Test::More;
 use Cassandra::Client;
 
 plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
-plan tests => 4;
+plan tests => 7;
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
+my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS}, port => $ENV{CASSANDRA_PORT} );
 $client->connect();
 
 my $db= 'perl_cassandra_client_tests';
@@ -29,4 +29,13 @@ $client->execute("delete from $db.test_int where id=?", { id => 6 });
     my ($result)= $client->execute("select id, value from $db.test_int where id=?", { id => 6 });
     my $rows= $result->rows;
     ok(@$rows == 0);
+}
+
+$client->execute("insert into $db.test_int (id, value) values (:num, :num)", { num => 9 });
+{
+    my ($result)= $client->execute("select id, value from $db.test_int where id=?", { id => 9 });
+    my $rows= $result->rows;
+    ok(@$rows == 1);
+    ok($rows->[0][0] == 9);
+    ok($rows->[0][1] == 9);
 }

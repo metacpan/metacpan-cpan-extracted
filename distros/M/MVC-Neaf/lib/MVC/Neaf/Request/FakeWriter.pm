@@ -2,7 +2,7 @@ package MVC::Neaf::Request::FakeWriter;
 
 use strict;
 use warnings;
-our $VERSION = 0.19;
+our $VERSION = 0.1901;
 
 =head1 NAME
 

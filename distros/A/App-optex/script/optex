@@ -147,7 +147,7 @@ exit 1;
 sub self_option {
     my $argv = shift;
 
-    my $rcloader = Getopt::EX::Loader->new(BASECLASS => "");
+    local $rcloader = Getopt::EX::Loader->new(BASECLASS => "");
     $rcloader->load(FILE => "$config_dir/$abs_name.rc");
     $rcloader->deal_with($argv);
 
@@ -373,7 +373,7 @@ unsupported options.
 
     % date -Iseconds
 
-Common configuration is stored in F<~/.optex.d/optex.rc> file, and
+Common configuration is stored in F<~/.optex.d/default.rc> file, and
 those rules are applied to all commands executed through B<optex>.
 
 Actually, C<--iso-8601> option can be defined simpler as this:

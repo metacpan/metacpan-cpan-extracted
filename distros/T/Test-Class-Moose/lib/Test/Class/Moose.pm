@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.10.0;
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 use Moose 2.0000;
 use Carp;
@@ -12,9 +12,9 @@ use namespace::autoclean;
 use Import::Into;
 use Sub::Attribute;
 
-# We don't use anything from this module, but we want to specify a specific
-# prereq version.
-use Test2 1.302059 ();
+# We don't use anything from this module in this one, but we want to require a
+# specific version.
+use Test2 1.1302118 ();
 
 use Test::Class::Moose::AttributeRegistry;
 use Test::Class::Moose::Config;
@@ -222,7 +222,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

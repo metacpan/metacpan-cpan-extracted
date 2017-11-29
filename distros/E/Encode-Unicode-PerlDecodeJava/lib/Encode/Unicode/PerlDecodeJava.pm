@@ -11,11 +11,11 @@ use strict;
 use Carp;
 use utf8;
 
-our $VERSION = '20170808';
+our $VERSION = '20171127';
 
-sub encode93($)                                                                 # Encode a string
- {my ($i) = @_;
-  my $s;
+sub encode93($)                                                                 # Return the encoded version of a string
+ {my ($i) = @_;                                                                 # String to encode
+  my $s = '';
   my $n = length($i);
   for(split //, $i)                                                             # Letters are passed straight through
    {$s .=  /[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '\(\)\[\]\{\}<>`!@#\$%^&*_\-+=,;:|.?\/]/ ? $_ : ord($_).'~';
@@ -23,9 +23,9 @@ sub encode93($)                                                                 
   $s =~ s/([0123456789])(~)([^0123456789]|\Z)/$1$3/gsr;                         # Remove redundant ~
  }
 
-sub decode93($)                                                                 # Decode a string
- {my ($i) = @_;
-  my $s;
+sub decode93($)                                                                 # Return the decode version of an encoded string
+ {my ($i) = @_;                                                                 # String to decode
+  my $s = '';
   my $n = '';
   for(split //, $i)                                                             # Letters are passed straight through
    {if (   /[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ '\(\)\[\]\{\}<>`!@#\$%^&*_\-+=,;:|.?\/]/)
@@ -40,19 +40,6 @@ sub decode93($)                                                                 
  }
 
 #-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
-sub test
- {eval join('', <Encode::Unicode::PerlDecodeJava::DATA>) || die $@
- }
-
-test unless caller();
-
-# Documentation
-#extractDocumentation unless caller;
-
-#-------------------------------------------------------------------------------
 # Export
 #-------------------------------------------------------------------------------
 
@@ -65,7 +52,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT_OK    = qw();
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
-1;
+# podDocumentation
 
 =pod
 
@@ -75,7 +62,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 Encode::Unicode::PerlDecodeJava - Encode a Unicode string in Perl and decode it in Java
 
-=head1 Synopsis                                                  𝝰
+=head1 Synopsis
 
  use Encode::Unicode::PerlDecodeJava;
 
@@ -83,58 +70,14 @@ Encode::Unicode::PerlDecodeJava - Encode a Unicode string in Perl and decode it 
 
 =head1 Description
 
- encode93($input)
 
-encodes any Perl string given as $input, even one containing Unicode
-characters, using only the 93 well known ASCII characters below:
+=head1 Index
 
- abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
- 0123456789 '()[]{}<>`!@#$%^&*_-+=,;:|.?\
-
-and returns the resulting encoded string.
-
-Such a string can be easily compressed and transported using software
-restricted to ASCII data and then reconstituted as a Unicode string in Perl by
-using decode93() or in Java by using the code reproduced further below.
-
- decode93($input)
-
-takes an $input string encoded by encode93() and returns the decoded string.
-
-The following Java code takes a string encoded by encode93() and (inefficiently)
-returns the decoded string to Java:
-
-  String decode93(String input)                                                 // Decode string encoded by encode93()
-   {final StringBuilder s = new StringBuilder();
-    final StringBuilder n = new StringBuilder();
-    final int           N = input.length();
-
-    for(int i = 0; i < N; ++i)                                                  // Decode each character
-     {char c = input.charAt(i);
-      if (Character.isDigit(c)) n.append(c);                                    // Digit to accumulate
-      else if (c == '~')                                                        // Decode number
-       {final int p = Integer.parseInt(n.toString());
-        s.appendCodePoint(p);
-        n.setLength(0);
-       }
-      else                                                                      // Letter
-       {if (n.length() > 0)                                                     // Number available for decode
-         {final int p = Integer.parseInt(n.toString());
-          s.appendCodePoint(p);
-          n.setLength(0);
-         }
-        s.append(c);                                                            // Add letter
-       }
-     }
-    if (n.length() > 0)                                                         // Trailing number available for decode
-     {final int p = Integer.parseInt(n.toString());
-      s.appendCodePoint(p);
-      n.setLength(0);
-     }
-    return s.toString();                                                        // Decoded string
-   }
 
 =head1 Installation
+
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -145,21 +88,36 @@ Standard Module::Build process for building and installing modules:
 
 =head1 Author
 
-philiprbrenan@gmail.com
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-http://www.appaapps.com
+L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2017 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
 
 =cut
 
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
 __DATA__
-use Test::More tests=>12;
+use Test::More tests=>22;
 
 my @t =                                                                         # Tests
  ([qw(𝝰                     120688)],
@@ -168,11 +126,16 @@ my @t =                                                                         
   [  'aaa𝝰𝝱𝝲aaa', 'aaa120688~120689~120690aaa'],
   [qw(yüz          y252z)],
   [  'aa,,;;𝝰""', 'aa,,;;120688~34~34'],
+  [  '',   ''],
+  [  ' ',  ' '],
+  [  '  ', '  '],
+  [  '0',   '48'],
+  [  '00',  '48~48'],
  );
 
 if (0)                                                                          # Intermediate results
  {binmode STDERR, ":utf8";
-  say STDERR encode93($$_[0]) for @t;
+  say STDERR "AAAA =", encode93($$_[0]), "=" for @t;
  }
 
 ok $$_[1] eq          encode93($$_[0])  for @t;                                 # Encode

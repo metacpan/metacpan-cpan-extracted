@@ -1,5 +1,8 @@
 Revision history for MariaDB-NonBlocking
 
+0.14    2017-11-27
+        * run_query_start(undef) will no longer segfault.
+
 0.13    2017-10-24
         * Prevent cyclic reference keeping connections alive
           when all other refs were gone.

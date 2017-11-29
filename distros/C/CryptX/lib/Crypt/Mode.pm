@@ -2,7 +2,7 @@ package Crypt::Mode;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 ### METHODS
 
@@ -63,8 +63,8 @@ sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 
-__END__
- 
+=pod
+
 =head1 NAME
 
 Crypt::Mode - [internal only]

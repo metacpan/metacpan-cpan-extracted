@@ -26,7 +26,7 @@ no_index:
 provides:
   Minion::Backend::SQLite:
     file: lib/Minion/Backend/SQLite.pm
-    version: '3.000'
+    version: '3.001'
 requires:
   List::Util: '0'
   Minion: '8.0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Minion-Backend-SQLite/issues
   homepage: https://github.com/Grinnz/Minion-Backend-SQLite
   repository: https://github.com/Grinnz/Minion-Backend-SQLite.git
-version: '3.000'
+version: '3.001'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -110,7 +110,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::DBOOK/CheckChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -139,7 +139,7 @@ x_Dist_Zilla:
           global: 0
           skip_version_provider: 0
       name: '@Author::DBOOK/RewriteVersion'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::DBOOK/NextRelease'
@@ -190,7 +190,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.000
+          tag: v3.001
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -210,7 +210,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 0
       name: '@Author::DBOOK/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:

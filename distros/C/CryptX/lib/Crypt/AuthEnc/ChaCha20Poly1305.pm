@@ -2,16 +2,22 @@ package Crypt::AuthEnc::ChaCha20Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub new { my $class = shift; _new(@_) }
+sub new {
+  my $class = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(@_);
+}
 
 sub chacha20poly1305_encrypt_authenticate {
   my $key = shift;
@@ -19,6 +25,7 @@ sub chacha20poly1305_encrypt_authenticate {
   my $adata = shift;
   my $plaintext = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
   $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
   my $ct = $m->encrypt_add($plaintext);
@@ -33,6 +40,7 @@ sub chacha20poly1305_decrypt_verify {
   my $ciphertext = shift;
   my $tag = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
   $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
   my $ct = $m->decrypt_add($ciphertext);
@@ -56,23 +64,23 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20-Poly1305
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $ct = $ae->encrypt_add('data1');
- $ct = $ae->encrypt_add('data2');
- $ct = $ae->encrypt_add('data3');
- $tag = $ae->encrypt_done();
+ my $ct = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $pt = $ae->decrypt_add('ciphertext1');
- $pt = $ae->decrypt_add('ciphertext2');
- $pt = $ae->decrypt_add('ciphertext3');
- $tag = $ae->decrypt_done();
+ my $pt = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ my $tag = $ae->decrypt_done();
  die "decrypt failed" unless $tag eq $expected_tag;
 
  #or
- my $result = $ae->decrypt_done($expected_tag) die "decrypt failed";
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);
@@ -105,7 +113,6 @@ You can export selected functions:
 =head2 chacha20poly1305_decrypt_verify
 
  my $plaintext = chacha20poly1305_decrypt_verify($key, $iv, $adata, $ciphertext, $tag);
-
  # on error returns undef
 
 =head1 METHODS
@@ -122,25 +129,25 @@ You can export selected functions:
 Add B<additional authenticated data>.
 Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
- $ae->adata_add($aad_data);                     #can be called multiple times
+ $ae->adata_add($aad_data);                     # can be called multiple times
 
 =head2 encrypt_add
 
- $ciphertext = $ae->encrypt_add($data);         #can be called multiple times
+ $ciphertext = $ae->encrypt_add($data);         # can be called multiple times
 
 =head2 encrypt_done
 
- $tag = $ae->encrypt_done();
+ $tag = $ae->encrypt_done();                    # returns $tag value
 
 =head2 decrypt_add
 
- $plaintext = $ae->decrypt_add($ciphertext);    #can be called multiple times
+ $plaintext = $ae->decrypt_add($ciphertext);    # can be called multiple times
 
 =head2 decrypt_done
 
- my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
- #or
  my $tag = $ae->decrypt_done;           # returns $tag value
+ #or
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
 
 =head2 set_iv
 
@@ -168,3 +175,5 @@ See L<https://tools.ietf.org/html/rfc7905>
 =item * L<https://tools.ietf.org/html/rfc7539>
 
 =back
+
+=cut

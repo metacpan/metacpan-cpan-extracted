@@ -4,7 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 use Carp;
-use List::Util 'any';
 
 use vars qw($VERSION);
 $VERSION="0.15";

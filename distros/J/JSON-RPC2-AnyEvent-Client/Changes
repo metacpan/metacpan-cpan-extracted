@@ -1,5 +1,22 @@
 Revision history for JSON-RPC2-AnyEvent-Client
 
-0.1.0	Wed Feb 26 20:15:54 2014
+0.03 2017-11-29T12:44:22Z
+	add url to error message
+
+v0.2.2 2016-07-21T07:53:59Z
+        make tests independent from used ports
+
+v0.2.1 2016-07-19T13:35:00Z
+        migrate to minilla
+
+0.02    Sun May 22 00:32:43 2016
+        add http/https transport support
+
+0.01    Wed Apr 13 17:13:23 2016 
+        remove double json decode/encode (and JSON::XS deps)
+        thanks @powerman for improve his JSON::RPC2 library
+        documentation additions
+
+0.001	Wed Feb 26 20:15:54 2014
 	Initial release.
 

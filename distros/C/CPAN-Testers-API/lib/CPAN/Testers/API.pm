@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -184,7 +184,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -277,11 +277,25 @@ L<http://www.cpantesters.org>
 
 Doug Bell <preaction@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Breno G. de Oliveira
+=for stopwords Breno G. de Oliveira mohawk2 Nick Tonkin
+
+=over 4
+
+=item *
 
 Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
+mohawk2 <mohawk2@users.noreply.github.com>
+
+=item *
+
+Nick Tonkin <1nickt@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

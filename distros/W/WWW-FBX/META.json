@@ -4,7 +4,7 @@
       "Laurent Kislaire <teebeenator@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "WWW::FBX" : {
          "file" : "lib/WWW/FBX.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "WWW::FBX::API" : {
          "file" : "lib/WWW/FBX/API.pm"
@@ -93,9 +93,9 @@
          "web" : "https://github.com/architek/WWW-FBX"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "root <root@debian-asus>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

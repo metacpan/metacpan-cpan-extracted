@@ -1,5 +1,10 @@
 Revision history for DBD-Cassandra
 
+0.57    unreleased
+
+      * Documentation and unit test changes
+      * Deal with unhandled error while disconnecting a dbh during global destruction
+
 0.56    2017/05/06
 
       * Unbreak bind_param

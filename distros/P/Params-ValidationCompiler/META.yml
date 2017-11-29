@@ -24,13 +24,13 @@ name: Params-ValidationCompiler
 provides:
   Params::ValidationCompiler:
     file: lib/Params/ValidationCompiler.pm
-    version: '0.25'
+    version: '0.26'
   Params::ValidationCompiler::Compiler:
     file: lib/Params/ValidationCompiler/Compiler.pm
-    version: '0.25'
+    version: '0.26'
   Params::ValidationCompiler::Exceptions:
     file: lib/Params/ValidationCompiler/Exceptions.pm
-    version: '0.25'
+    version: '0.26'
 recommends:
   Sub::Util: '1.40'
 requires:
@@ -48,10 +48,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/Params-ValidationCompiler/issues
   homepage: http://metacpan.org/release/Params-ValidationCompiler
   repository: git://github.com/houseabsolute/Params-ValidationCompiler.git
-version: '0.25'
+version: '0.26'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.024001'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
@@ -367,7 +367,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.15.0
+          git_version: 2.7.4
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -552,7 +552,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '0.88'
@@ -564,7 +564,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -589,7 +589,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.042'
@@ -611,7 +611,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -624,11 +624,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.25
+          tag: v0.26
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -642,7 +642,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.042'
@@ -656,7 +656,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@DROLSKY/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -671,7 +671,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -685,7 +685,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.042'

@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Release;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: API for test reports collected by CPAN release
 
 #pod =head1 DESCRIPTION
@@ -26,12 +26,14 @@ use CPAN::Testers::API::Base;
 #pod =method release
 #pod
 #pod     ### Requests:
-#pod     GET /v1/release
-#pod     GET /v1/release?since=2016-01-01T12:34:00Z
-#pod     GET /v1/release/dist/My-Dist
-#pod     GET /v1/release/dist/My-Dist?since=2016-01-01T12:34:00Z
-#pod     GET /v1/release/author/PREACTION
-#pod     GET /v1/release/author/PREACTION?since=2016-01-01T12:34:00Z
+#pod     GET /v3/release
+#pod     GET /v3/release/dist/My-Dist
+#pod     GET /v3/release/author/PREACTION
+#pod
+#pod     ### Optional query parameters (may be combined):
+#pod     # ?since=2016-01-01T12:34:00Z
+#pod     # ?maturity=stable
+#pod     # ?limit=2
 #pod
 #pod     ### Response:
 #pod     200 OK
@@ -48,9 +50,31 @@ use CPAN::Testers::API::Base;
 #pod         }
 #pod     ]
 #pod
-#pod Get release data. Results can be limited by distribution (with the
-#pod C<dist> key in the stash), by author (with the C<author> key in the
-#pod stash), and by date (with the C<since> query parameter).
+#pod Get release data. Results can be limited by:
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod distribution (with the C<dist> key in the stash)
+#pod
+#pod =item *
+#pod
+#pod author (with the C<author> key in the stash)
+#pod
+#pod =item *
+#pod
+#pod date (with the C<since> query parameter)
+#pod
+#pod =item *
+#pod
+#pod maturity (with the C<maturity> query parameter)
+#pod
+#pod =item *
+#pod
+#pod limit (limits the total number of results sent with the C<limit> query parameter)
+#pod
+#pod =back
 #pod
 #pod Release data contains a summary of the pass, fail, na, and unknown test
 #pod results created by stable Perls. Development Perls (odd-numbered 5.XX
@@ -83,22 +107,33 @@ sub release( $c ) {
         $rs = $rs->since( $since );
     }
 
+    if ( my $maturity = $c->param( 'maturity' ) ) {
+        $rs = $rs->maturity( $maturity );
+    }
+
     my @results;
+    my $limit = $c->param( 'limit' );
+    # OpenAPI spec doesn't support property "minimum" on parameters
+    if ( $limit and $limit < 1 ) {
+        return $c->render_error( 400 => 'The value for "limit" must be a positive integer' );
+    }
+
     if ( my $dist = $c->validation->param( 'dist' ) ) {
         $rs = $rs->by_dist( $dist );
-        @results = $rs->all;
+        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
         if ( !@results ) {
             return $c->render_error( 404, sprintf 'Distribution "%s" not found', $dist );
         }
     }
     elsif ( my $author = $c->validation->param( 'author' ) ) {
-        @results = $rs->by_author( $author )->all;
+        $rs = $rs->by_author( $author );
+        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
         if ( !@results ) {
             return $c->render_error( 404, sprintf 'Author "%s" not found', $author );
         }
     }
     else {
-        @results = $rs->all;
+        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
     }
 
     return $c->render(
@@ -118,7 +153,7 @@ CPAN::Testers::API::Controller::Release - API for test reports collected by CPAN
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 
@@ -131,12 +166,14 @@ has for each version released, this is the best API.
 =head2 release
 
     ### Requests:
-    GET /v1/release
-    GET /v1/release?since=2016-01-01T12:34:00Z
-    GET /v1/release/dist/My-Dist
-    GET /v1/release/dist/My-Dist?since=2016-01-01T12:34:00Z
-    GET /v1/release/author/PREACTION
-    GET /v1/release/author/PREACTION?since=2016-01-01T12:34:00Z
+    GET /v3/release
+    GET /v3/release/dist/My-Dist
+    GET /v3/release/author/PREACTION
+
+    ### Optional query parameters (may be combined):
+    # ?since=2016-01-01T12:34:00Z
+    # ?maturity=stable
+    # ?limit=2
 
     ### Response:
     200 OK
@@ -153,9 +190,31 @@ has for each version released, this is the best API.
         }
     ]
 
-Get release data. Results can be limited by distribution (with the
-C<dist> key in the stash), by author (with the C<author> key in the
-stash), and by date (with the C<since> query parameter).
+Get release data. Results can be limited by:
+
+=over
+
+=item *
+
+distribution (with the C<dist> key in the stash)
+
+=item *
+
+author (with the C<author> key in the stash)
+
+=item *
+
+date (with the C<since> query parameter)
+
+=item *
+
+maturity (with the C<maturity> query parameter)
+
+=item *
+
+limit (limits the total number of results sent with the C<limit> query parameter)
+
+=back
 
 Release data contains a summary of the pass, fail, na, and unknown test
 results created by stable Perls. Development Perls (odd-numbered 5.XX

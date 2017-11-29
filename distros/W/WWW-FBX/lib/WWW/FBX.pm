@@ -15,7 +15,7 @@ with 'WWW::FBX::Role::Auth';
  
 use namespace::autoclean;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 has base_url    => ( isa => 'Str', is => 'ro', default => 'http://mafreebox.free.fr' );
 has lwp_args    => ( isa => 'HashRef', is => 'ro', default => sub { {} } );

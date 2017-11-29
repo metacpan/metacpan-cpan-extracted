@@ -4,7 +4,7 @@ Neovim::RPC - RPC client for Neovim
 
 # VERSION
 
-version 1.0.0
+version 1.0.1
 
 # SEE ALSO
 

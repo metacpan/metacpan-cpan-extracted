@@ -2,7 +2,7 @@
 
 package Neovim::RPC::App;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::App::VERSION = '1.0.0';
+$Neovim::RPC::App::VERSION = '1.0.1';
 use Log::Any::Adapter;
 Log::Any::Adapter->set( 
     #{ category => 'MsgPack::Decoder' }, 
@@ -90,7 +90,7 @@ Neovim::RPC::App
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

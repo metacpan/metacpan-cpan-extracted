@@ -1,0 +1,5 @@
+Revision history for Perl extension Mailru::Cloud.
+
+0.01  Tue Nov  28 17:01:40 2017
+	- original version
+		-b 5.8.1 -XAn Mailru::Cloud

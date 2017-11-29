@@ -1,6 +1,6 @@
 package MsgPack::RPC::Event::Receive;
 our $AUTHORITY = 'cpan:YANICK';
-$MsgPack::RPC::Event::Receive::VERSION = '2.0.0';
+$MsgPack::RPC::Event::Receive::VERSION = '2.0.1';
 use Moose;
 
 extends 'Beam::Event';
@@ -37,7 +37,7 @@ MsgPack::RPC::Event::Receive
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

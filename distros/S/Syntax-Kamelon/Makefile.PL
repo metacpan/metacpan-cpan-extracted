@@ -15,6 +15,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
    NAME              => 'Syntax::Kamelon',
    VERSION_FROM      => $pmfile, # finds $VERSION, requires EU::MM from perl >= 5.5
+   LICENSE           => 'gpl_3',
    PREREQ_PM         => {
       'Data::Dumper' => 0,
       'Module::Load::Conditional' => 0,
@@ -37,4 +38,3 @@ WriteMakefile(
       : ()
     ),
 );
-

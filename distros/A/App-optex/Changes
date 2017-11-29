@@ -1,5 +1,11 @@
 Revision history for `optex' command.
 
+v0.0.2 2017-11-28T15:12:44Z
+
+    - Clean up test code.
+    - Localize $rcloader to work for self option.
+    - Document correction about default startup file.
+
 v0.0.1 2017-11-17T04:46:02Z
 
     - initial release

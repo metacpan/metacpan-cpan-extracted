@@ -2,7 +2,7 @@ package Test2::Plugin::ExitSummary;
 use strict;
 use warnings;
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000092';
 
 use Test2::API qw/test2_add_callback_exit/;
 
@@ -13,6 +13,9 @@ sub active { $ADDED_HOOK }
 
 sub summary {
     my ($ctx, $real, $new) = @_;
+
+    # Avoid double-printing diagnostics if Test::Builder already loaded.
+    return if $INC{'Test/Builder.pm'};
 
     my $hub    = $ctx->hub;
     my $plan   = $hub->plan;

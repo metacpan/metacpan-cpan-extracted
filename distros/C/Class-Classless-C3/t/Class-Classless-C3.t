@@ -36,6 +36,7 @@ sub test
 	my $self = shift;
 	return join ',','base',$self->NEXT();
 }
+use constant foo => 3;
 };
 
 my $t = Test::Inherit->Class::Classless::C3::Meta::declassify();
