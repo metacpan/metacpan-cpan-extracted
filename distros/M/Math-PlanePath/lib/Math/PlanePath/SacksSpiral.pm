@@ -32,7 +32,7 @@ use Math::PlanePath;
 use Math::PlanePath::MultipleRings;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 @ISA = ('Math::PlanePath');
 
 

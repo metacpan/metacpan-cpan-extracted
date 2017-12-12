@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::File::Video;
 use POSIX ();
@@ -107,7 +107,7 @@ sub command {
 =head4 Description
 
 Instantiiere Eingabe-Datei $i als Prty::File-Objekt und liefere
-dieses zurück. Das Objekt wird gecachted.
+dieses zurück. Das Objekt wird gecached.
 
 =cut
 
@@ -820,11 +820,6 @@ Die Angabe wird für den Suffix der Ausgabe-Datei genutzt.
 
     $cmd = $class->imagesToVideo($pattern,$output,@opt);
 
-=head4 Description
-
-Generiere ein ffmpeg-Kommando zum Zusammenfügen der Bilder
-$pattern zu Video $output und liefere dieses Kommando zurück.
-
 =head4 Arguments
 
 =over 4
@@ -892,6 +887,11 @@ Video-Bitrate in kbit/s.
 Framerate des Video.
 
 =back
+
+=head4 Description
+
+Generiere ein ffmpeg-Kommando zum Zusammenfügen der Bilder
+$pattern zu Video $output und liefere dieses Kommando zurück.
 
 =cut
 
@@ -1007,13 +1007,6 @@ sub imagesToVideo {
 
     $cmd = $ffm->videoToImages($input,$dir,@opt);
 
-=head4 Description
-
-Generiere ein ffmpeg-Kommando, das die Frames aus dem Video $input
-extrahiert und im Verzeichnis $dir speichert. Die Bilder haben
-das Format 'jpg'. Der Name der Dateien ist NNNNNN.jpg, von 1 an
-lückenlos aufsteigend.
-
 =head4 Options
 
 =over 4
@@ -1052,6 +1045,13 @@ Zeitpunkt in Sekunden (ggf. mit Nachkommastellen) vom Beginn
 des Video, an dem das Extrahieren der Frames endet.
 
 =back
+
+=head4 Description
+
+Generiere ein ffmpeg-Kommando, das die Frames aus dem Video $input
+extrahiert und im Verzeichnis $dir speichert. Die Bilder haben
+das Format 'jpg'. Der Name der Dateien ist NNNNNN.jpg, von 1 an
+lückenlos aufsteigend.
 
 =head4 Examples
 
@@ -1175,13 +1175,6 @@ sub videoToImages {
 
     $cmd = $class->extract($input,$output,@opt);
 
-=head4 Description
-
-Extrahiere von Position $start bis Position $stop einen Teil
-aus der Audio- oder Video-Datei $input und schreibe ihn auf Datei $output.
-
-Die Extraktion erfolgt ohne Transcoding, also ohne Qualitätsverlust.
-
 =head4 Arguments
 
 =over 4
@@ -1218,6 +1211,13 @@ Start-Position in Sekunden (mit Millisekunden als Nachkommastellen).
 Ende-Position in Sekunden (mit Millisekunden als Nachkommastellen).
 
 =back
+
+=head4 Description
+
+Extrahiere von Position $start bis Position $stop einen Teil
+aus der Audio- oder Video-Datei $input und schreibe ihn auf Datei $output.
+
+Die Extraktion erfolgt ohne Transcoding, also ohne Qualitätsverlust.
 
 =cut
 
@@ -1277,11 +1277,6 @@ sub extract {
 
     $cmd = $class->extract169To43($input,$output,@opt);
 
-=head4 Description
-
-Croppe 16:9-Video $input zum 4:3-Video $output. Die Crop-Operation
-schneidet links und rechts einen Teil des Video ab.
-
 =head4 Arguments
 
 =over 4
@@ -1327,6 +1322,11 @@ Ende-Position in Sekunden (mit Millisekunden als Nachkommastellen).
 Crop-Offset in x-Richtung. Per Default croppt der crop-Filter mittig.
 
 =back
+
+=head4 Description
+
+Croppe 16:9-Video $input zum 4:3-Video $output. Die Crop-Operation
+schneidet links und rechts einen Teil des Video ab.
 
 =cut
 
@@ -1374,8 +1374,11 @@ sub extract169To43 {
     # ** crop
     
     my ($width,$height) = $self->input(0)->size;
-    $width = $height/3*4;
-    push @filter,$self->cropFilter($width,$height,$xOffset,0);
+    my $newWidth = $height/3*4;
+    if (!defined $xOffset) {
+        $xOffset = ($width-$newWidth)/2;
+    }
+    push @filter,$self->cropFilter($newWidth,$height,$xOffset,0);
 
     # ** scale (im Falle von play)
     
@@ -1397,7 +1400,7 @@ sub extract169To43 {
     }
     else {
         $self->outName($name);
-        $self->outSize($width,$height);
+        $self->outSize($newWidth,$height);
         $self->outStart($start || 0);
         $self->outStop($stop || $self->input(0)->duration);
 
@@ -1417,12 +1420,6 @@ sub extract169To43 {
     $cmd = $class->videoInfo($input);
     $cmd = $class->videoInfo($input,$streamIndex);
 
-=head4 Description
-
-Erzeuge eine ffprobe-Kommandozeile, die Information über den
-Video-Stream $streamIndex in Datei $input liefert. Ist kein
-Stream-Index angegeben, wird der erste Stream (Index 0) genommen.
-
 =head4 Arguments
 
 =over 4
@@ -1436,6 +1433,12 @@ Eingabe-Datei.
 Index des Video-Stream.
 
 =back
+
+=head4 Description
+
+Erzeuge eine ffprobe-Kommandozeile, die Information über den
+Video-Stream $streamIndex in Datei $input liefert. Ist kein
+Stream-Index angegeben, wird der erste Stream (Index 0) genommen.
 
 =cut
 
@@ -1500,7 +1503,7 @@ sub execute {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

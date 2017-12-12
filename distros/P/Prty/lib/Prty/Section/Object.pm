@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 
@@ -82,11 +82,6 @@ Zeilennummer in Quelldatei.
     $sec = $class->new($type,$keyValH);
     $sec = $class->new($type,$keyValH,$keyA,$content,$source,$file,$line);
 
-=head4 Description
-
-Instantiiere ein Abschnittsobjekt und liefere eine Referenz
-auf das Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -126,6 +121,11 @@ Zeilennummer, an der der Abschnitt in der Datei beginnt.
 =head4 Returns
 
 Referenz auf Abschnitts-Objekt
+
+=head4 Description
+
+Instantiiere ein Abschnittsobjekt und liefere eine Referenz
+auf das Objekt zurück.
 
 =cut
 
@@ -185,14 +185,14 @@ sub new {
     $type = $sec->type;
     $type = $sec->type($type);
 
+=head4 Returns
+
+Abschnittsbezeichner (String)
+
 =head4 Description
 
 Liefere den Abschnittsbezeichner. Ist Parameter $type angegeben, setze
 den Abschnittsbezeichner auf diesen Wert.
-
-=head4 Returns
-
-Abschnittsbezeichner (String)
 
 =cut
 
@@ -218,15 +218,15 @@ sub type {
     $brackets = $sec->brackets;
     $brackets = $sec->brackets($brackets);
 
+=head4 Returns
+
+Klammerpaar (String)
+
 =head4 Description
 
 Liefere die Klammerung um den Abschnittsbezeichner, sofern vorhanden.
 Ist der Abschnittsbezeichner nicht geklammert, liefere einen Leerstring.
 Ist Parameter $brackets angegeben, setze die Klammerung auf diesen Wert.
-
-=head4 Returns
-
-Klammerpaar (String)
 
 =head4 Details
 
@@ -542,15 +542,15 @@ sub deleteSource {
 
     $sec->transferSource;
 
+=head4 Returns
+
+nichts
+
 =head4 Description
 
 Füge die Quelltexte aller Sub-Abschnitte von Abschnitt $sec zum
 Abschnitt hinzu. Die Quelltexte der Sub-Abschnitte werden von
 diesen gelöscht.
-
-=head4 Returns
-
-nichts
 
 =cut
 
@@ -607,11 +607,6 @@ sub removeEofMarker {
 
     $val = $sec->append($key=>$str);
 
-=head4 Description
-
-Füge Zeichenkette $str zum Wert des Schlüssels $key hinzu
-und liefere den resultierenden Wert zurück.
-
 =head4 Arguments
 
 =over 4
@@ -625,6 +620,11 @@ Schlüssel, dessen Wert ergänzt wird.
 =head4 Returns
 
 Wert (String)
+
+=head4 Description
+
+Füge Zeichenkette $str zum Wert des Schlüssels $key hinzu
+und liefere den resultierenden Wert zurück.
 
 =cut
 
@@ -646,13 +646,6 @@ sub append {
     $val = $sec->get($key);
     @vals = $sec->get(@keys);
 
-=head4 Description
-
-Liefere den Wert zu Schlüssel $key bzw. die liste der Werte zu den
-Schlüsseln @keys. Beginnt der $key mit einem Großbuchstaben, ist
-es ein fataler Fehler, wenn zu dem Schlüssel mehrere Werte existieren.
-Solche Schlüssel müssen mit $obj->L</getArray>() abgefragt werden.
-
 =head4 Arguments
 
 =over 4
@@ -666,6 +659,13 @@ Schlüssel, deren Wert geliefert wird.
 =head4 Returns
 
 Wert (Skalar-Kontext) oder Wertliste (Array-Kontext)
+
+=head4 Description
+
+Liefere den Wert zu Schlüssel $key bzw. die liste der Werte zu den
+Schlüsseln @keys. Beginnt der $key mit einem Großbuchstaben, ist
+es ein fataler Fehler, wenn zu dem Schlüssel mehrere Werte existieren.
+Solche Schlüssel müssen mit $obj->L</getArray>() abgefragt werden.
 
 =cut
 
@@ -701,10 +701,6 @@ sub get {
 
     $arr|@arr = $sec->getArray($key);
 
-=head4 Description
-
-Liefere die Wertliste von Schlüssel $key.
-
 =head4 Arguments
 
 =over 4
@@ -718,6 +714,10 @@ Schlüssel dessen Wertliste geliefert wird.
 =head4 Returns
 
 Wert bzw. Werte
+
+=head4 Description
+
+Liefere die Wertliste von Schlüssel $key.
 
 =cut
 
@@ -747,10 +747,6 @@ sub getArray {
     $bool = $sec->getBool($key);
     $bool = $sec->getBool($key,$default);
 
-=head4 Description
-
-Liefere boolschen Wert zu Schlüssel $key.
-
 =head4 Arguments
 
 =over 4
@@ -768,6 +764,10 @@ Defaultwert, wenn Attribut nicht gesetzt
 =head4 Returns
 
 Wert (Skalar)
+
+=head4 Description
+
+Liefere boolschen Wert zu Schlüssel $key.
 
 =cut
 
@@ -805,11 +805,6 @@ sub getBool {
 
     $val = $sec->getMandatory($key);
 
-=head4 Description
-
-Wie $sec->L</get>(), nur dass ein Wert existieren muss, sonst
-wird eine Exception geworfen.
-
 =head4 Arguments
 
 =over 4
@@ -823,6 +818,11 @@ Schlüssel, dessen Wert geliefert wird.
 =head4 Returns
 
 Wert (Skalar)
+
+=head4 Description
+
+Wie $sec->L</get>(), nur dass ein Wert existieren muss, sonst
+wird eine Exception geworfen.
 
 =cut
 
@@ -1046,11 +1046,6 @@ sub set {
 
     $sec->setDefault(@keyVal);
 
-=head4 Description
-
-Setze Schlüssel ohne Wert, d.h. wenn der Wert ein Leerstring ist,
-setze ihn auf den angegebenen Defaultwert.
-
 =head4 Arguments
 
 =over 4
@@ -1064,6 +1059,11 @@ Liste der Schlüssel/Wert-Paare.
 =head4 Returns
 
 I<nichts>
+
+=head4 Description
+
+Setze Schlüssel ohne Wert, d.h. wenn der Wert ein Leerstring ist,
+setze ihn auf den angegebenen Defaultwert.
 
 =head4 Example
 
@@ -1133,11 +1133,6 @@ sub add {
 
     $sec->push($key,$val);
 
-=head4 Description
-
-Füge Wert $val zur Arraykomponente $key hinzu. Die Methode liefert keinen
-Wert zurück.
-
 =head4 Arguments
 
 =over 4
@@ -1151,6 +1146,11 @@ Arraykomponente.
 Wert, der zum Array am Ende hinzugefügt wird.
 
 =back
+
+=head4 Description
+
+Füge Wert $val zur Arraykomponente $key hinzu. Die Methode liefert keinen
+Wert zurück.
 
 =cut
 
@@ -1193,6 +1193,25 @@ sub weaken {
 
     $sec->validate($contentAllowed,\@keys);
 
+=head4 Arguments
+
+=over 4
+
+=item $contentAllowed
+
+Wenn falsch, erlaubt der Abschnitt keinen Content (außer "# eof"
+als Dateiende-Markierung).
+
+=item @keys
+
+Liste der zulässigen Abschnittsattribute
+
+=back
+
+=head4 Returns
+
+Nichts
+
 =head4 Description
 
 Die Methode finalisiert das Abschnittsobjekt in folgender Weise:
@@ -1214,25 +1233,6 @@ Exception geworfen.
 Sie fügt Schlüssel aus @keys zum Objekt hinzu, die das Objekt nicht hat.
 
 =back
-
-=head4 Arguments
-
-=over 4
-
-=item $contentAllowed
-
-Wenn falsch, erlaubt der Abschnitt keinen Content (außer "# eof"
-als Dateiende-Markierung).
-
-=item @keys
-
-Liste der zulässigen Abschnittsattribute
-
-=back
-
-=head4 Returns
-
-Nichts
 
 =cut
 
@@ -1319,13 +1319,6 @@ sub lockKeys {
 
     $sec->error($msg,@keyVal);
 
-=head4 Description
-
-Die Methode wirft eine Exception mit dem Fehlertext $msg und den
-als Schlüssel/Wert-Paare angegebenen Informationen @keyVal. Ferner
-wird von der Methode der Dateiname und die Zeilennummer des
-Abschnitts ergnzt. Die Exception beinhaltet keinen Stacktrace.
-
 =head4 Arguments
 
 =over 4
@@ -1343,6 +1336,13 @@ Detailinformation zum Fehler.
 =head4 Returns
 
 Die Methode kehrt nicht zurück
+
+=head4 Description
+
+Die Methode wirft eine Exception mit dem Fehlertext $msg und den
+als Schlüssel/Wert-Paare angegebenen Informationen @keyVal. Ferner
+wird von der Methode der Dateiname und die Zeilennummer des
+Abschnitts ergnzt. Die Exception beinhaltet keinen Stacktrace.
 
 =cut
 
@@ -1431,7 +1431,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

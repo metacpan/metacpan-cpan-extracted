@@ -8,7 +8,7 @@ use Path::Tiny 0.012 qw(path); # cwd
 use lib 't/lib';
 use Test::More   tests => 3;
 
-use lib 't';
+use lib 't/lib';
 use Util qw(clean_environment init_repo);
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

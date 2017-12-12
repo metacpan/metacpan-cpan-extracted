@@ -10,6 +10,8 @@ use warnings;
 use base qw( Tangence::Object Circle::WindowItem Circle::Ruleable );
 __PACKAGE__->APPLY_Ruleable;
 
+our $VERSION = '0.173320';
+
 use constant NETTYPE => 'raw';
 
 use base qw( Circle::Rule::Store ); # for the attributes

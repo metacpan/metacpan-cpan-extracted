@@ -7,7 +7,7 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20171125';
+our $VERSION = '20171129';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -57,7 +57,6 @@ sub GitHub::Crud::Response::new($$)                                             
   my $r = xxx $request, qr(HTTP);
 
   $r =~ s/\r//gs;                                                               # Internet line ends
-
   my ($http, @r) = split /\n/, $r;
   while(@r > 2 and $http =~ "HTTP/1.1" and $http =~ /100/)                      # Continue messages
    {shift @r; $http = shift @r;

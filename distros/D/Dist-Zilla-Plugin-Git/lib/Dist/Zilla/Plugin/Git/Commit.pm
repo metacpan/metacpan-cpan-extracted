@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Commit;
 # ABSTRACT: Commit dirty files
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use namespace::autoclean;
 use File::Temp           qw{ tempfile };
@@ -54,6 +54,7 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         commit_msg => $self->commit_msg,
         add_files_in => [ sort @{ $self->add_files_in } ],
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -113,6 +114,7 @@ sub get_commit_message {
     return $self->_format_string($self->commit_msg);
 } # end get_commit_message
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -127,7 +129,7 @@ Dist::Zilla::Plugin::Git::Commit - Commit dirty files
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 SYNOPSIS
 
@@ -161,7 +163,7 @@ modified.  This option may appear multiple times.  The default
 list is F<dist.ini> and the changelog file given by C<changelog>.
 
 =item * allow_dirty_match - works the same as allow_dirty, but
-matching as a regular expression instead of an exact filename.
+matching as a regular expression(s) instead of an exact filename(s).
 
 =item * add_files_in - a path that will have its new files checked in.
 This option may appear multiple times. This is used to add files

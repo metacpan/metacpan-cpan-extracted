@@ -7,7 +7,7 @@ BEGIN {
     eval { DBD::SQLite->VERSION >= 1 }
         or plan skip_all => 'DBD::SQLite >= 1.00 required';
 
-    plan tests => 57;
+    plan tests => 60;
     use_ok('DBIx::Simple');
 }
 
@@ -15,7 +15,7 @@ BEGIN {
 # http://use.perl.org/~tomhukins/journal/31457 ++
 
 my $db = DBIx::Simple->connect('dbi:SQLite:dbname=:memory:');
-my $q = 'SELECT * FROM xyzzy ORDER BY foo';
+my $q = 'SELECT FOO, bar, baz FROM xyzzy ORDER BY foo';
 
 ok($db);
 
@@ -118,5 +118,13 @@ SKIP: {
     is_deeply(     [ $db->query($q)->objects('Mock', 42, 21) ], [ 1 ]);  # wantarray true
     is_deeply(scalar $db->query($q)->objects('Mock', 42, 21),   [ 1 ]);  # wantarray true
 }
+
+$db->query('INSERT INTO xyzzy (foo, bar, baz) VALUES (??)', 33, 66, 'c');
+$db->query('INSERT INTO xyzzy (foo, bar, baz) VALUES (??)', 44, 77, 'f');
+$db->query('INSERT INTO xyzzy (foo, bar, baz) VALUES (??)', 55, 88, 'h');
+
+is_deeply(scalar $db->query($q)->group_arrays(2), { c => [ [ qw(33 66) ], [ qw(a b) ] ], f => [ [ qw(44 77) ], [ qw(d e) ] ],  h => [ [ qw(55 88) ], [ qw(g (??)) ]  ] });
+is_deeply(scalar $db->query($q)->group_hashes('baz'), { c => [ { qw(foo 33 bar 66) }, { qw(foo a bar b) } ], f => [ { qw(foo 44 bar 77) }, { qw(foo d bar e) } ], h => [ { qw(foo 55 bar 88) }, { qw(foo g bar (??)) } ] });
+is_deeply(scalar $db->query('SELECT baz, foo FROM xyzzy ORDER BY foo')->group, { c => [ qw(33 a) ], f => [ qw(44 d) ], h => [ qw(55 g) ] });
 
 ok($db->disconnect);

@@ -142,6 +142,19 @@ Mojo::Promise - Promises/A+
     return $promise;
   }
 
+  # Perform non-blocking operations sequentially
+  get('http://mojolicious.org')->then(sub {
+    my $mojo = shift;
+    say $mojo->res->code;
+    return get('http://metacpan.org');
+  })->then(sub {
+    my $cpan = shift;
+    say $cpan->res->code;
+  })->catch(sub {
+    my $err = shift;
+    warn "Something went wrong: $err";
+  })->wait;
+
   # Synchronize non-blocking operations (all)
   my $mojo = get('http://mojolicious.org');
   my $cpan = get('http://metacpan.org');
@@ -268,26 +281,30 @@ Appends fulfillment and rejection handlers to the promise, and returns a new
 L<Mojo::Promise> object resolving to the return value of the called handler.
 
   # Pass along the fulfillment value or rejection reason
-  $promise->then(sub {
-    my @value = @_;
-    say "The result is $value[0]";
-    return @value;
-  },
-  sub {
-    my @reason = @_;
-    warn "Something went wrong: $reason[0]";
-    return @reason;
-  });
+  $promise->then(
+    sub {
+      my @value = @_;
+      say "The result is $value[0]";
+      return @value;
+    },
+    sub {
+      my @reason = @_;
+      warn "Something went wrong: $reason[0]";
+      return @reason;
+    }
+  );
 
   # Change the fulfillment value or rejection reason
-  $promise->then(sub {
-    my @value = @_;
-    return "This is good: $value[0]";
-  },
-  sub {
-    my @reason = @_;
-    return "This is bad: $reason[0]";
-  });
+  $promise->then(
+    sub {
+      my @value = @_;
+      return "This is good: $value[0]";
+    },
+    sub {
+      my @reason = @_;
+      return "This is bad: $reason[0]";
+    }
+  );
 
 =head2 wait
 

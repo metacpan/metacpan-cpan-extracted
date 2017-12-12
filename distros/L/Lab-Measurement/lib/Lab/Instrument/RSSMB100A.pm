@@ -1,6 +1,7 @@
 package Lab::Instrument::RSSMB100A;
+$Lab::Instrument::RSSMB100A::VERSION = '3.613';
 #ABSTRACT: Rohde & Schwarz SMB100A signal generator
-$Lab::Instrument::RSSMB100A::VERSION = '3.600';
+
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -18,7 +19,15 @@ our %fields = (
 
     device_settings => {},
 
+    device_cache => {
+        frq         => undef,
+        power       => undef,
+        pulselength => undef,
+        pulseperiod => undef,
+    },
+
 );
+
 
 sub new {
     my $proto = shift;
@@ -28,15 +37,18 @@ sub new {
     return $self;
 }
 
+
 sub id {
     my $self = shift;
     return $self->query('*IDN?');
 }
 
+
 sub reset {
     my $self = shift;
     $self->write('*RST');
 }
+
 
 sub set_frq {
     my $self = shift;
@@ -54,6 +66,7 @@ sub set_cw {
     $self->write("FREQuency:CW $freq Hz");
 }
 
+
 sub get_frq {
     my $self = shift;
 
@@ -63,11 +76,13 @@ sub get_frq {
 
 }
 
+
 sub set_power {
     my $self = shift;
     my ($power) = $self->_check_args( \@_, ['value'] );
     $self->write("POWer:LEVel $power DBM");
 }
+
 
 sub get_power {
     my $self = shift;
@@ -155,7 +170,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -163,27 +178,45 @@ Lab::Instrument::RSSMB100A - Rohde & Schwarz SMB100A signal generator
 
 =head1 VERSION
 
-version 3.600
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 CONSTRUCTOR
+version 3.613
 
 =head1 METHODS
 
-=head1 CAVEATS/BUGS
+=head2 id
 
-probably many
+ my $id = $smb->id();
 
-=head1 SEE ALSO
+Do C<*IDN?> query.
 
-=over 4
+=head2 reset
 
-=item * Lab::Instrument
+ $smb->reset();
 
-=back
+Reset with C<*RST> command.
+
+=head2 set_frq
+
+ $sms->set_frq(3.3e6);
+
+Set output frequency (Hz).
+
+=head2 get_frq
+
+ my $freq = $smb->get_frq({read_mode => 'cache'});
+
+Query output frequency (Hz).
+
+=head2 set_power
+
+ $smb->set_power(-20);
+
+Set output power (dBm).
+
+=head2 get_power
+
+ my $power = $smb->get_power();
+
+Query output power (dBm).
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -194,7 +227,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2013       Alois Dirnaichner, Andreas K. Huettel
             2014       Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

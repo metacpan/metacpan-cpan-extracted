@@ -29,7 +29,11 @@ BIGNUM* sv2bn( SV* sv )
 MODULE = Crypt::OpenSSL::Bignum      PACKAGE = Crypt::OpenSSL::Bignum   PREFIX = BN_
 
 BOOT:
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+    OPENSSL_init_crypto(0, NULL);
+#else
     ERR_load_crypto_strings();
+#endif
 
 void
 DESTROY(Crypt::OpenSSL::Bignum self)
@@ -92,7 +96,7 @@ BN_new(CLASS)
     BIGNUM* bn;
   CODE:
     checkOpenSslCall( bn = BN_new() );
-    checkOpenSslCall( BN_zero( bn ) );
+    checkOpenSslCall( BN_set_word( bn, 0 ) );
     RETVAL = bn;
   OUTPUT:
     RETVAL
@@ -103,7 +107,7 @@ BN_zero(CLASS)
     BIGNUM *bn;
   CODE:
     checkOpenSslCall( bn = BN_new() );
-    checkOpenSslCall( BN_zero( bn ) );
+    checkOpenSslCall( BN_set_word( bn, 0 ) );
     RETVAL = bn;
   OUTPUT:
     RETVAL

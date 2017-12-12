@@ -34,8 +34,8 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'Courriel' => [
-                           qr/^replace_body$/
-                         ]
+                             qr/^replace_body$/
+                           ]
            );
 
 my @also_private;

@@ -5,7 +5,7 @@ use Moo::Role;
 use namespace::autoclean;
 with qw(eris::role::dictionary);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 requires qw(hash);
@@ -47,7 +47,7 @@ eris::role::dictionary::hash - Simple dictionary implementation based off a hash
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

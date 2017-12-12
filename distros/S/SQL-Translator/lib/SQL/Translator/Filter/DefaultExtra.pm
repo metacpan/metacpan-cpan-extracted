@@ -67,12 +67,6 @@ if you want to set lots of things, use lots of filters!
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<SQL::Translator>
-
-=head1 BUGS
-
-=head1 TODO
-
-=head1 AUTHOR
+C<perl(1)>, L<SQL::Translator>
 
 =cut

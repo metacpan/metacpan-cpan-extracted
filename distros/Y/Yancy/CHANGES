@@ -1,0 +1,48 @@
+Changelog for Yancy
+
+0.004     2017-12-05 14:50:02-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed DBIx::Class backend test failing without SQL::Translator.
+      Now it skips the test without that required module.
+
+    [Docs]
+
+    - Added more docs to the test files to help new developers
+
+0.003     2017-12-05 13:16:44-06:00 America/Chicago
+
+    [Fixed]
+
+    - Raised minimum Mojolicious version to 7.15 (which adds
+      Mojo::File). Thanks CPAN Testers!
+
+0.002     2017-12-02 20:46:56-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed app trying to save readonly properties. The OpenAPI spec
+      prevents this, but that means we get an error and our data isn't
+      saved correctly.
+
+    - Fixed invalid spec URL. The spec only worked accidentally, which
+      was weird...
+
+    [Added]
+
+    - Added screenshot to documentation
+
+0.001     2017-12-02 18:49:56-06:00 America/Chicago
+
+    - Initial release
+
+    [Added]
+
+    - Basic OpenAPI spec generation
+    - Database editing web application
+    - Auto-generated form to edit database content
+    - Simple built-in CMS
+    - Mojolicious plugin to add Yancy to your Mojolicious app
+    - Database backends for MySQL, Postgres, and DBIx::Class
+

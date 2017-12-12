@@ -26,7 +26,7 @@ WriteMakefile(
         'Path::Tiny'              => 0,
         'Types::Path::Tiny'       => 0,
         'File::ShareDir'          => 0,
-        'Map::Metro'              => 0.2200, # earlier versions are too slow; really depends on Map::Metro::Plugin::Map, but version not defined here
+        'Map::Metro'              => 0.2403, # versions before 0.2200 are too slow; really depends on Map::Metro::Plugin::Map, but version not defined here; 0.2401 and 0.2402 had dependency bugs
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },

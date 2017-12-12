@@ -27,5 +27,5 @@ requires:
   Web::Scraper: '0'
 resources:
   repository: https://github.com/abbypan/Novel-Robot-Parser.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'YAML::Tiny version 1.70'

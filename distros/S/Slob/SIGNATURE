@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 46a85c31770f94790e018eaeb63d8b205f5839d9 Changes
+SHA1 02e94556ee59cd4c88066e6613bff2eb6366c333 MANIFEST
+SHA1 ae72a67306ab36195c7d7b3a115f24ae64f40ceb META.json
+SHA1 9f304590440c17c0436516279ea0457b14899462 META.yml
+SHA1 dcc2f989873af2af1dc3a8a28c2db7344fceb654 Makefile.PL
+SHA1 6a57a26a12c1b3ce2c47bc9772db366d2250b866 README
+SHA1 4e63beab0342db251eb8eb3bef31363112538bdf lib/Slob.pm
+SHA1 ae2e1b19a90f362277f9b058a967a7ae73ba7748 t/Slob.t
+SHA1 1073267018cbe4c23b9103ed2a67f81379991aae t/freedict-lzma2.slob
+SHA1 f8ba23041d6dfaaf4abeea83e0e3bb3fec8724ec t/freedict-uncompressed.slob
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEELM3sUPUHqnKs2Tozjt1KysMIYJAFAlosLd4QHG1hcml1c0Bp
+ZXZhbC5ybwAKCRCO3UrKwwhgkHO5EADeHtPFdnLPATNKgYpxeWsg/Yf74O+iclyj
+A5C/PflWS5mUNeN0Iu9Ta+ZVACMOcRqhRvXRixnr6CV3CBAZWx97L7s/VAmL1cVd
+Bj4l7uarMtsJXpo4K52+RcRteqULR3VEV9LbKGZdMekm7OdE79IwucVwv17VTfZd
+dk3iTG+R18TVGYvi9rCgk+KEoRzSf2IURir6YbaO0y314hPPsxz6UHSlibYG/XGk
+xDBySgEr7wF+cqIUOl9lsHcjoF0vvjc8c0hPNfnhDj1xKBDTSxCuQ1T84N7kSIgu
+8a0Z7Lv/hDK/DN9T1g2OY5YmqiET/lOdtlUEliUW4uKDipfY8GwtBqJI5Yu9eBPc
+A0HbNl2maud8EO3pMRg934Gt43NHEU5iHLLKdqKMP96tTAt8nMX+6YiWAxbhH3LS
+HQYIhkjsMFN191i8gMyQnKjCesDksKAbj0FwXV5wJczfejo1wEMfJeaktfzw9HkQ
+HbcgDPSUQ3gpleZZIGhuASGhZJ4N8UeCV2tjVaKUIyicmYXrOOBIt6x1iXKirPxF
+gsofE6Ypycw5o399DQRDtnk/h2Zdy9Cyz1xU7iY9ouXMiSSMTl+fHo9Vy5eyx7Ai
+EMWEeKd+olKY+oBfW5sRSXXsCuQlfefJcT4yFqbLuissTL6Jcajqwccic5Rg/M35
+d49tahxciw==
+=XHEb
+-----END PGP SIGNATURE-----

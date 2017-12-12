@@ -1,5 +1,5 @@
 {
-   "abstract" : "Messages, Interfaces and Contracts.",
+   "abstract" : "Simplified OOP with emphasis on modularity and loose coupling.",
    "author" : [
       "Arun Prasaad <arunbear@cpan.org>"
    ],
@@ -47,7 +47,6 @@
             "Module::Runtime" : "0.014",
             "Package::Stash" : "0.36",
             "Params::Validate" : "1.10",
-            "Readonly" : "2.00",
             "Sub::Name" : "0.09",
             "perl" : "5.008005"
          }
@@ -63,7 +62,7 @@
    "provides" : {
       "Mic" : {
          "file" : "lib/Mic.pm",
-         "version" : "0.000006"
+         "version" : "0.001003"
       },
       "Mic::ArrayImpl" : {
          "file" : "lib/Mic/ArrayImpl.pm"
@@ -79,9 +78,6 @@
       },
       "Mic::Contracts" : {
          "file" : "lib/Mic/Contracts.pm"
-      },
-      "Mic::HashImpl" : {
-         "file" : "lib/Mic/HashImpl.pm"
       },
       "Mic::Impl" : {
          "file" : "lib/Mic/Impl.pm"
@@ -104,7 +100,7 @@
          "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "0.000006",
+   "version" : "0.001003",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "arunbear <arunbear@gmail.com>"

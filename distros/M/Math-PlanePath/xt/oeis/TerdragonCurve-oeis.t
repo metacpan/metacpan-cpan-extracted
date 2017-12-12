@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -221,7 +221,8 @@ MyOEIS::compare_values
    });
 
 
-# A007283 boundary length is 3*2^k for points N <= 3^k
+# A007283 boundary length is 3*2^k for points N <= 3^k,
+#         except initial
 MyOEIS::compare_values
   (anum => 'A007283',
    max_value => 10_000,

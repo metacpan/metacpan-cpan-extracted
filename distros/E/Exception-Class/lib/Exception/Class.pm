@@ -5,7 +5,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 use Exception::Class::Base;
 use Scalar::Util qw( blessed reftype );
@@ -221,7 +221,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 

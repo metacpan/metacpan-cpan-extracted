@@ -119,3 +119,6 @@ Revision history for Sphinx-Search
 
 0.30   2017-11-23
        rt.cpan.org #123648 - fixed connectretries.
+
+0.31   2017-12-10
+       rt.cpan.org #123843 - fixed extraneous message.

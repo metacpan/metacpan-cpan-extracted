@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.600';
+$Lab::Moose::Connection::Socket::VERSION = '3.613';
 #ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
 
 use 5.010;
@@ -8,7 +8,7 @@ use Moose;
 use MooseX::Params::Validate;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::INET;
-use IO::Socket::Timeout;
+use IO::Select;
 use Carp;
 
 use Lab::Moose::Instrument qw/timeout_param read_length_param/;
@@ -19,6 +19,13 @@ has client => (
     is       => 'ro',
     isa      => 'IO::Socket::INET',
     writer   => '_client',
+    init_arg => undef,
+);
+
+has select => (
+    is       => 'ro',
+    isa      => 'IO::Select',
+    writer   => '_select',
     init_arg => undef,
 );
 
@@ -52,13 +59,14 @@ sub BUILD {
         Timeout  => $timeout,
     ) or croak "cannot open connection with $host on port $port: $!";
 
-    IO::Socket::Timeout->enable_timeouts_on($client);
-    $client->read_timeout($timeout);
-    $client->write_timeout($timeout);
-
     $client->setsockopt( IPPROTO_TCP, TCP_NODELAY, 1 )
-        or die "setsockopt: cannot enable TCP_NODELAY";
+        or croak "setsockopt: cannot enable TCP_NODELAY";
+
+    my $select = IO::Select->new($client)
+        or croak "cannot create IO::Select object: $!";
+
     $self->_client($client);
+    $self->_select($select);
 }
 
 sub Write {
@@ -73,12 +81,14 @@ sub Write {
     my $timeout        = $self->_timeout_arg(%args);
 
     my $client = $self->client();
-    $client->write_timeout($timeout);
 
     my $length  = length($command);
     my $written = 0;
-
+    my $select  = $self->select();
     while ($length) {
+        if ( !$select->can_write($timeout) ) {
+            croak "timeout in Socket connection Write";
+        }
         my $bytes_written = $client->syswrite( $command, $length, $written )
             or croak("Write: syswrite failed: $!");
         $written += $bytes_written;
@@ -95,8 +105,7 @@ sub Read {
     my $timeout     = $self->_timeout_arg(%args);
     my $read_length = $self->_read_length_arg(%args);
     my $client      = $self->client();
-
-    $client->read_timeout($timeout);
+    my $select      = $self->select();
 
     my $string;
     my $length = 0;
@@ -105,6 +114,9 @@ sub Read {
         # explicit read_length arg:
         # Keep reading until we have $read_length bytes.
         while ($read_length) {
+            if ( !$select->can_read($timeout) ) {
+                croak "timeout in connection Read";
+            }
             my $read_bytes
                 = $client->sysread( $string, $read_length, $length )
                 or croak "socket read error: $!";
@@ -113,6 +125,9 @@ sub Read {
         }
     }
     else {
+        if ( !$select->can_read($timeout) ) {
+            croak "timeout in connection Read";
+        }
         $client->sysread( $string, $read_length )
             or croak "socket read error: $!";
     }
@@ -145,7 +160,7 @@ Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 

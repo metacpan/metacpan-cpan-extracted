@@ -1,5 +1,11 @@
 Revision history for perl distribution App-git-ship
 
+0.25 2017-12-11T19:35:14+0100
+ - Set meta-spec to version 2
+ - Set dynamic_config to 0
+ - Changed BUILD_REQUIRES to TEST_REQUIRES
+ - Stop creating README and README.pod
+
 0.24 2017-06-24T09:37:25+0200
  - Fix failing unit tests after 406f32d
 

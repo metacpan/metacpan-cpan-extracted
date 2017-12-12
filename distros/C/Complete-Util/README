@@ -1,19 +1,334 @@
+NAME
+    Complete::Util - General completion routine
+
+VERSION
+    This document describes version 0.600 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2017-12-08.
+
 DESCRIPTION
+    This package provides some generic completion routines that follow the
+    Complete convention. (If you are looking for bash/shell tab completion
+    routines, take a look at the See Also section.) The main routine is
+    "complete_array_elem" which tries to complete a word using choices from
+    elements of supplied array. For example:
+
+     complete_array_elem(word => "a", array => ["apple", "apricot", "banana"]);
+
+    The routine will first try a simple substring prefix matching. If that
+    fails, will try some other methods like word-mode, character-mode, or
+    fuzzy matching. These methods can be disabled using settings.
+
+    There are other utility routines e.g. for converting completion answer
+    structure from hash to array/array to hash, combine or modify answer,
+    etc. These routines are usually used by the other more specific or
+    higher-level completion modules.
+
+FUNCTIONS
+  arrayify_answer
+    Usage:
+
+     arrayify_answer($arg) -> array
+
+    Make sure we return completion answer in array form.
+
+    This is the reverse of "hashify_answer". It accepts a hash or an array.
+    If it receives a hash, will return its "words" key.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $arg* => *array|hash*
+
+    Return value: (array)
+
+  combine_answers
+    Usage:
+
+     combine_answers($answers, ...) -> hash
+
+    Given two or more answers, combine them into one.
+
+    This function is useful if you want to provide a completion answer that
+    is gathered from multiple sources. For example, say you are providing
+    completion for the Perl tool cpanm, which accepts a filename (a tarball
+    like "*.tar.gz"), a directory, or a module name. You can do something
+    like this:
+
+     combine_answers(
+         complete_file(word=>$word),
+         complete_module(word=>$word),
+     );
+
+    But if a completion answer has a metadata "final" set to true, then that
+    answer is used as the final answer without any combining with the other
+    answers.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $answers* => *array[hash|array]*
+
+    Return value: (hash)
+
+    Return a combined completion answer. Words from each input answer will
+    be combined, order preserved and duplicates removed. The other keys from
+    each answer will be merged.
+
+  complete_array_elem
+    Usage:
+
+     complete_array_elem(%args) -> array
+
+    Complete from array.
+
+    Try to find completion from an array of strings. Will attempt several
+    methods, from the cheapest and most discriminating to the most expensive
+    and least discriminating.
+
+    First method is normal/exact string prefix matching (either
+    case-sensitive or insensitive depending on the $Complete::Common::OPT_CI
+    variable or the "COMPLETE_OPT_CI" environment variable). If at least one
+    match is found, return result. Else, proceed to the next method.
+
+    Word-mode matching (can be disabled by setting
+    $Complete::Common::OPT_WORD_MODE or "COMPLETE_OPT_WORD_MODE" environment
+    varialbe to false). Word-mode matching is described in Complete::Common.
+    If at least one match is found, return result. Else, proceed to the next
+    method.
+
+    Prefix char-mode matching (can be disabled by settings
+    $Complete::Common::OPT_CHAR_MODE or "COMPLETE_OPT_CHAR_MODE" environment
+    variable to false). Prefix char-mode matching is just like char-mode
+    matching (see next paragraph) except the first character must match. If
+    at least one match is found, return result. Else, proceed to the next
+    method.
+
+    Char-mode matching (can be disabled by settings
+    $Complete::Common::OPT_CHAR_MODE or "COMPLETE_OPT_CHAR_MODE" environment
+    variable to false). Char-mode matching is described in Complete::Common.
+    If at least one match is found, return result. Else, proceed to the next
+    method.
+
+    Fuzzy matching (can be disabled by setting $Complete::Common::OPT_FUZZY
+    or "COMPLETE_OPT_FUZZY" to false). Fuzzy matching is described in
+    Complete::Common. If at least one match is found, return result. Else,
+    return empty string.
+
+    Will sort the resulting completion list, so you don't have to presort
+    the array.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   array* => *array[str]*
+
+    *   exclude => *array*
+
+    *   replace_map => *hash*
+
+        You can supply correction entries in this option. An example is when
+        array if "['mount','unmount']" and "umount" is a popular "typo" for
+        "unmount". When someone already types "um" it cannot be completed
+        into anything (even the current fuzzy mode will return *both* so it
+        cannot complete immediately).
+
+        One solution is to add replace_map "{'unmount'=>['umount']}". This
+        way, "umount" will be regarded the same as "unmount" and when user
+        types "um" it can be completed unambiguously into "unmount".
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_comma_sep
+    Usage:
+
+     complete_comma_sep(%args) -> array
+
+    Complete a comma-separated list string.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   elems* => *array[str]*
+
+    *   exclude => *array*
+
+    *   remaining => *code*
+
+        What elements should remain for completion.
+
+        This is a more general mechanism if the "uniq" option does not
+        suffice. Suppose you are offering completion for sorting fields. The
+        elements are field names as well as field names prefixed with dash
+        ("-") to mean sorting with a reverse order. So for example "elems"
+        is "["name","-name","age","-age"]". When current word is "name", it
+        doesn't make sense to offer "name" nor "-name" again as the next
+        sorting field. So we can set "remaining" to this code:
+
+         sub {
+             my ($seen_elems, $elems) = @_;
+ 
+             my %seen;
+             for (@$seen_elems) {
+                 (my $nodash = $_) =~ s/^-//;
+                 $seen{$nodash}++;
+             }
+ 
+             my @remaining;
+             for (@$elems) {
+                 (my $nodash = $_) =~ s/^-//;
+                 push @remaining, $_ unless $seen{$nodash};
+             }
+ 
+             \@remaining;
+         }
+
+        As you can see above, the code is given $seen_elems and $elems as
+        arguments and is expected to return remaining elements to offer.
+
+    *   replace_map => *hash*
+
+        You can supply correction entries in this option. An example is when
+        array if "['mount','unmount']" and "umount" is a popular "typo" for
+        "unmount". When someone already types "um" it cannot be completed
+        into anything (even the current fuzzy mode will return *both* so it
+        cannot complete immediately).
+
+        One solution is to add replace_map "{'unmount'=>['umount']}". This
+        way, "umount" will be regarded the same as "unmount" and when user
+        types "um" it can be completed unambiguously into "unmount".
+
+    *   sep => *str* (default: ",")
+
+    *   uniq => *bool*
+
+        Whether list should contain unique elements.
+
+        When this option is set to true, if the formed list in the current
+        word already contains an element, the element will not be offered
+        again as completion answer. For example, if "elems" is "[1,2,3,4]"
+        and "word" is "2,3," then without "uniq" set to true the completion
+        answer is:
+
+         2,3,1
+         2,3,2
+         2,3,3
+         2,3,4
+
+        but with "uniq" set to true, the completion answer becomes:
+
+         2,3,1
+         2,3,4
+
+        See also the "remaining" option for a more general mechanism of
+        offering fewer elements.
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_hash_key
+    Usage:
+
+     complete_hash_key(%args) -> array
+
+    Complete from hash keys.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   hash* => *hash*
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  hashify_answer
+    Usage:
+
+     hashify_answer($arg, $meta) -> hash
+
+    Make sure we return completion answer in hash form.
+
+    This function accepts a hash or an array. If it receives an array, will
+    convert the array into `{words=>$ary}' first to make sure the completion
+    answer is in hash form.
+
+    Then will add keys from "meta" to the hash.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $arg* => *array|hash*
+
+    *   $meta => *hash*
+
+        Metadata (extra keys) for the hash.
+
+    Return value: (hash)
+
+  modify_answer
+    Usage:
+
+     modify_answer(%args) -> undef
+
+    Modify answer (add prefix/suffix, etc).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   answer* => *hash|array*
+
+    *   prefix => *str*
+
+    *   suffix => *str*
+
+    Return value: (undef)
+
+  ununiquify_answer
+    Usage:
+
+     ununiquify_answer(%args) -> undef
+
+    If answer contains only one item, make it two.
+
+    For example, if answer is "["a"]", then will make answer become "["a","a
+    "]". This will prevent shell from automatically adding space.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   answer* => *hash|array*
+
+    Return value: (undef)
 
 FAQ
-
- Why is fuzzy matching slow?
-
+  Why is fuzzy matching slow?
     Example:
 
      use Benchmark qw(timethis);
      use Complete::Util qw(complete_array_elem);
-    
+
      # turn off the other non-exact matching methods
      $Complete::Common::OPT_CI = 0;
      $Complete::Common::OPT_WORD_MODE = 0;
      $Complete::Common::OPT_CHAR_MODE = 0;
-    
+
      my @ary = ("aaa".."zzy"); # 17575 elems
      timethis(20, sub { complete_array_elem(array=>\@ary, word=>"zzz") });
 
@@ -30,30 +345,51 @@ FAQ
      timethis 20:  1 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU) @ 19.23/s (n=20)
 
 ENVIRONMENT
-
- COMPLETE_UTIL_TRACE => bool
-
+  COMPLETE_UTIL_TRACE => bool
     If set to true, will display more log statements for debugging.
 
- COMPLETE_UTIL_LEVENSHTEIN => str ('pp'|'xs'|'flexible')
-
+  COMPLETE_UTIL_LEVENSHTEIN => str ('pp'|'xs'|'flexible')
     Can be used to force which Levenshtein distance implementation to use.
-    pp means the included PP implementation, which is the slowest (1-2
-    orders of magnitude slower than XS implementations), xs which means
-    Text::Levenshtein::XS, or flexible which means
+    "pp" means the included PP implementation, which is the slowest (1-2
+    orders of magnitude slower than XS implementations), "xs" which means
+    Text::Levenshtein::XS, or "flexible" which means
     Text::Levenshtein::Flexible (performs best).
 
     If this is not set, the default is to use Text::Levenshtein::Flexible
     when it's available, then fallback to the included PP implementation.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Util>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Complete
 
     If you want to do bash tab completion with Perl, take a look at
     Complete::Bash or Getopt::Long::Complete or Perinci::CmdLine.
 
-    Other Complete::* modules.
+    Other "Complete::*" modules.
 
     Bencher::Scenarios::CompleteUtil
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

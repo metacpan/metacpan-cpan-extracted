@@ -1,4 +1,4 @@
-# Copyright 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use strict;
 use List::Util 'max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 

@@ -2,7 +2,7 @@ package Catmandu::Fix::LIDO::ID;
 
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Exporter qw(import);
 
@@ -20,9 +20,10 @@ our @EXPORT_OK = qw(emit_base_id);
 # @param $source
 # @param $label
 # @param $type
+# @param $pref
 # @return $fixer emit code
 sub emit_base_id {
-	my ($fixer, $root, $path, $id, $source, $label, $type) = @_;
+	my ($fixer, $root, $path, $id, $source, $label, $type, $pref) = @_;
 
 	my $new_path = $fixer->split_path($path);
     my $code = '';
@@ -52,6 +53,10 @@ sub emit_base_id {
 
 					if (defined($type)) {
 						$a_code .= "'type' => '".$type."',";
+					}
+
+					if (defined($pref)) {
+						$a_code .= "'pref' => '".$pref."',";
 					}
 
 					if (defined($source)) {

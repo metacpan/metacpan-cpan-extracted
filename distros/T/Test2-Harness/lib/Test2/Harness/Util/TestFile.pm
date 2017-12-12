@@ -2,7 +2,7 @@ package Test2::Harness::Util::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use Carp qw/croak/;
 
@@ -233,6 +233,18 @@ sub queue_item {
 
         @{$self->{+QUEUE_ARGS}},
     };
+}
+
+my %RANK = (
+    immiscible => 1,
+    long       => 2,
+    medium     => 3,
+    general    => 4,
+    isolation  => 5,
+);
+sub rank {
+    my $self = shift;
+    return $RANK{$self->check_category} || 1;
 }
 
 1;

@@ -1,4 +1,4 @@
-package Pcore v0.56.3;
+package Pcore v0.56.4;
 
 use v5.26.1;
 use common::header;
@@ -47,7 +47,6 @@ our $UTIL = {
     host     => 'Pcore::Util::URI::Host',
     http     => 'Pcore::HTTP',
     list     => 'Pcore::Util::List',
-    mail     => 'Pcore::Util::Mail',
     path     => 'Pcore::Util::Path',
     perl     => 'Pcore::Util::Perl',
     pm       => 'Pcore::Util::PM',
@@ -644,25 +643,25 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 65                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (22)                    |
+## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (22)                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 85                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 253                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 252                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 328                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 448                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 327                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 447                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 360, 389, 392, 396,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 430, 433, 438, 441,  |                                                                                                                |
-## |      | 466, 492, 628        |                                                                                                                |
+## |    3 | 359, 388, 391, 395,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 429, 432, 437, 440,  |                                                                                                                |
+## |      | 465, 491, 627        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 554                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 553                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 263                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 262                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 364                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 363                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

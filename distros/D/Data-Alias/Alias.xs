@@ -1,6 +1,7 @@
 /* Copyright (C) 2003, 2004, 2006, 2007  Matthijs van Duin <xmath@cpan.org>
  *
- * Copyright (C) 2010, 2011, 2013, 2015 Andrew Main (Zefram) <zefram@fysh.org>
+ * Copyright (C) 2010, 2011, 2013, 2015, 2017
+ * Andrew Main (Zefram) <zefram@fysh.org>
  *
  * Parts from perl, which is Copyright (C) 1991-2013 Larry Wall and others
  *
@@ -23,6 +24,10 @@
 #ifndef PERL_COMBI_VERSION
 #define PERL_COMBI_VERSION (PERL_REVISION * 1000000 + PERL_VERSION * 1000 + \
 				PERL_SUBVERSION)
+#endif
+
+#ifndef cBOOL
+#define cBOOL(x) ((bool)!!(x))
 #endif
 
 #if defined(USE_DTRACE) && defined(PERL_CORE)
@@ -142,6 +147,41 @@
 #define IS_PUSHMARK_OR_PADRANGE(op) ((op)->op_type == OP_PUSHMARK)
 #endif
 
+#if (PERL_COMBI_VERSION < 5010001)
+typedef unsigned Optype;
+#endif
+
+#ifndef OpMORESIB_set
+#define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+#define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+#define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif
+#ifndef OpSIBLING
+#define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+#define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif
+
+#if (PERL_COMBI_VERSION < 5009003)
+typedef OP *(*Perl_check_t)(pTHX_ OP *);
+#endif
+
+#ifndef wrap_op_checker
+#define wrap_op_checker(c,n,o) THX_wrap_op_checker(aTHX_ c,n,o)
+static void THX_wrap_op_checker(pTHX_ Optype opcode,
+	Perl_check_t new_checker, Perl_check_t *old_checker_p)
+{
+	if(*old_checker_p) return;
+	OP_REFCNT_LOCK;
+	if(!*old_checker_p) {
+		*old_checker_p = PL_check[opcode];
+		PL_check[opcode] = new_checker;
+	}
+	OP_REFCNT_UNLOCK;
+}
+#endif
+
+#define DA_HAVE_LEX_KNOWNEXT (PERL_COMBI_VERSION < 5025001)
+
 #if (PERL_COMBI_VERSION >= 5011000) && !defined(SVt_RV)
 #define SVt_RV SVt_IV
 #endif
@@ -179,7 +219,9 @@ static char const msg_no_symref[] =
 #ifdef PERL_MAD
 #error "Data::Alias doesn't support Misc Attribute Decoration yet"
 #endif
+#if DA_HAVE_LEX_KNOWNEXT
 #define PL_lex_defer		(PL_parser->lex_defer)
+#endif
 #if (PERL_COMBI_VERSION < 5021004)
 #define PL_lex_expect		(PL_parser->lex_expect)
 #endif
@@ -1292,23 +1334,25 @@ STATIC OP *DataAlias_pp_splice(pTHX) {
 STATIC OP *DataAlias_pp_leave(pTHX) {
 	dSP;
 	SV **newsp;
+#ifdef POPBLOCK
 	PMOP *newpm;
+#endif
 	I32 gimme;
 	PERL_CONTEXT *cx;
 	SV *sv;
 
 	if (PL_op->op_flags & OPf_SPECIAL)
 		cxstack[cxstack_ix].blk_oldpm = PL_curpm;
-	
-	POPBLOCK(cx, newpm);
 
-	gimme = OP_GIMME(PL_op, -1);
-	if (gimme == -1) {
-		if (cxstack_ix >= 0)
-			gimme = cxstack[cxstack_ix].blk_gimme;
-		else
-			gimme = G_SCALAR;
-	}
+#ifdef POPBLOCK
+	POPBLOCK(cx, newpm);
+	gimme = OP_GIMME(PL_op, (cxstack_ix >= 0) ? gimme : G_SCALAR);
+#else
+	cx = CX_CUR();
+	assert(CxTYPE(cx) == CXt_BLOCK);
+	gimme = cx->blk_gimme;
+	newsp = PL_stack_base + cx->blk_oldsp;
+#endif
 
 	if (gimme == G_SCALAR) {
 		if (newsp == SP) {
@@ -1324,8 +1368,14 @@ STATIC OP *DataAlias_pp_leave(pTHX) {
 				sv_2mortal(SvREFCNT_inc_simple_NN(sv));
 	}
 	PL_stack_sp = newsp;
+#ifdef POPBLOCK
 	PL_curpm = newpm;
 	LEAVE;
+#else
+	CX_LEAVE_SCOPE(cx);
+	cx_popblock(cx);
+	CX_POP(cx);
+#endif
 	return NORMAL;
 }
 
@@ -1336,7 +1386,9 @@ STATIC OP *DataAlias_pp_return(pTHX) {
 	bool clearerr = FALSE;
 	I32 gimme;
 	SV **newsp;
+#ifdef POPBLOCK
 	PMOP *newpm;
+#endif
 	I32 optype = 0, type = 0;
 	SV *sv = (MARK < SP) ? TOPs : &PL_sv_undef;
 	OP *retop;
@@ -1385,17 +1437,29 @@ STATIC OP *DataAlias_pp_return(pTHX) {
 	}
 #endif
 
+#ifdef POPBLOCK
 	POPBLOCK(cx, newpm);
+#else
+	cx = CX_CUR();
+	gimme = cx->blk_gimme;
+	newsp = PL_stack_base + cx->blk_oldsp;
+#endif
 	switch (type) {
 	case CXt_SUB:
 #if DA_FEATURE_RETOP
 		retop = cx->blk_sub.retop;
 #endif
+#ifdef POPBLOCK
 		cxstack_ix++; /* temporarily protect top context */
+#endif
 		break;
 	case CXt_EVAL:
 		clearerr = !(PL_in_eval & EVAL_KEEPERR);
+#ifdef POPBLOCK
 		POPEVAL(cx);
+#else
+		cx_popeval(cx);
+#endif
 #if DA_FEATURE_RETOP
 		retop = cx->blk_eval.retop;
 #endif
@@ -1411,7 +1475,11 @@ STATIC OP *DataAlias_pp_return(pTHX) {
 		}
 		break;
 	case CXt_FORMAT:
+#ifdef POPBLOCK
 		POPFORMAT(cx);
+#else
+		cx_popformat(cx);
+#endif
 #if DA_FEATURE_RETOP
 		retop = cx->blk_sub.retop;
 #endif
@@ -1439,15 +1507,22 @@ STATIC OP *DataAlias_pp_return(pTHX) {
 		}
 	}
 	PL_stack_sp = newsp;
+#ifdef POPBLOCK
 	LEAVE;
 	if (type == CXt_SUB) {
 		cxstack_ix--;
 		POPSUB(cx, sv);
-	} else {
-		sv = Nullsv;
+		LEAVESUB(sv);
 	}
 	PL_curpm = newpm;
-	LEAVESUB(sv);
+#else
+	if (type == CXt_SUB) {
+		cx_popsub(cx);
+	}
+	CX_LEAVE_SCOPE(cx);
+	cx_popblock(cx);
+	CX_POP(cx);
+#endif
 	if (clearerr)
 		sv_setpvn(ERRSV, "", 0);
 #if (!DA_FEATURE_RETOP)
@@ -1548,20 +1623,20 @@ STATIC void da_lvalue(pTHX_ OP *op, int list) {
 		op = (op->op_flags & OPf_KIDS) ? cUNOPx(op)->op_first : NULL;
 		while (op) {
 			da_lvalue(aTHX_ op, list);
-			op = op->op_sibling;
+			op = OpSIBLING(op);
 		}
 		break;
 	case OP_COND_EXPR:
 		op = cUNOPx(op)->op_first;
-		while ((op = op->op_sibling))
+		while ((op = OpSIBLING(op)))
 			da_lvalue(aTHX_ op, list);
 		break;
 	case OP_SCOPE:
 	case OP_LEAVE:
 	case OP_LINESEQ:
 		op = (op->op_flags & OPf_KIDS) ? cUNOPx(op)->op_first : NULL;
-		while (op->op_sibling)
-			op = op->op_sibling;
+		while (OpHAS_SIBLING(op))
+			op = OpSIBLING(op);
 		da_lvalue(aTHX_ op, list);
 		break;
 	case OP_PUSHMARK:
@@ -1602,13 +1677,13 @@ STATIC void da_aassign(OP *op, OP *right) {
 	int hash = FALSE, pad;
 
 	/* make sure it fits the model exactly */
-	if (!right || !(left = right->op_sibling) || left->op_sibling)
+	if (!right || !(left = OpSIBLING(right)) || OpHAS_SIBLING(left))
 		return;
 	if (left->op_type || !(left->op_flags & OPf_KIDS))
 		return;
 	if (!(left = cUNOPx(left)->op_first) || !IS_PUSHMARK_OR_PADRANGE(left))
 		return;
-	if (!(la = left->op_sibling) || la->op_sibling)
+	if (!(la = OpSIBLING(left)) || OpHAS_SIBLING(la))
 		return;
 	if (la->op_flags & OPf_PARENS)
 		return;
@@ -1634,7 +1709,7 @@ STATIC void da_aassign(OP *op, OP *right) {
 			right->op_ppaddr = DataAlias_pp_padrange_single;
 #endif
 	}
-	if (!(ra = right->op_sibling) || ra->op_sibling)
+	if (!(ra = OpSIBLING(right)) || OpHAS_SIBLING(ra))
 		return;
 	if (ra->op_flags & OPf_PARENS)
 		return;
@@ -1741,7 +1816,7 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 				da_lvalue(aTHX_ tmp, TRUE);
 			else
 #endif
-				da_lvalue(aTHX_ kid->op_sibling, TRUE);
+				da_lvalue(aTHX_ OpSIBLING(kid), TRUE);
 			break;
 		case OP_SASSIGN:
 
@@ -1749,7 +1824,7 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 			MOD(kid);
 			ksib = FALSE;
 			if (!(op->op_private & OPpASSIGN_BACKWARDS))
-				da_lvalue(aTHX_ kid->op_sibling, FALSE);
+				da_lvalue(aTHX_ OpSIBLING(kid), FALSE);
 			break;
 		case OP_ANDASSIGN:
 			op->op_ppaddr = DataAlias_pp_andassign;
@@ -1762,39 +1837,39 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 			op->op_ppaddr = DataAlias_pp_dorassign;
 #endif
 			da_lvalue(aTHX_ kid, FALSE);
-			kid = kid->op_sibling;
+			kid = OpSIBLING(kid);
 			break;
 		case OP_UNSHIFT:
-			if (!(tmp = kid->op_sibling)) break; /* array */
-			if (!(tmp = tmp->op_sibling)) break; /* first elem */
+			if (!(tmp = OpSIBLING(kid))) break; /* array */
+			if (!(tmp = OpSIBLING(tmp))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_unshift;
 			goto mod;
 		case OP_PUSH:
-			if (!(tmp = kid->op_sibling)) break; /* array */
-			if (!(tmp = tmp->op_sibling)) break; /* first elem */
+			if (!(tmp = OpSIBLING(kid))) break; /* array */
+			if (!(tmp = OpSIBLING(tmp))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_push;
 			goto mod;
 		case OP_SPLICE:
-			if (!(tmp = kid->op_sibling)) break; /* array */
-			if (!(tmp = tmp->op_sibling)) break; /* offset */
-			if (!(tmp = tmp->op_sibling)) break; /* length */
-			if (!(tmp = tmp->op_sibling)) break; /* first elem */
+			if (!(tmp = OpSIBLING(kid))) break; /* array */
+			if (!(tmp = OpSIBLING(tmp))) break; /* offset */
+			if (!(tmp = OpSIBLING(tmp))) break; /* length */
+			if (!(tmp = OpSIBLING(tmp))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_splice;
 			goto mod;
 		case OP_ANONLIST:
-			if (!(tmp = kid->op_sibling)) break; /* first elem */
+			if (!(tmp = OpSIBLING(kid))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_anonlist;
 			goto mod;
 		case OP_ANONHASH:
-			if (!(tmp = kid->op_sibling)) break; /* first elem */
+			if (!(tmp = OpSIBLING(kid))) break; /* first elem */
 			op->op_ppaddr = DataAlias_pp_anonhash;
-		 mod:	do MOD(tmp); while ((tmp = tmp->op_sibling));
+		 mod:	do MOD(tmp); while ((tmp = OpSIBLING(tmp)));
 		}
 
-		if (sib && op->op_sibling) {
+		if (sib && OpHAS_SIBLING(op)) {
 			if (kid)
 				hits += da_transform(aTHX_ kid, ksib);
-			op = op->op_sibling;
+			op = OpSIBLING(op);
 		} else {
 			op = kid;
 			sib = ksib;
@@ -1805,10 +1880,10 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 }
 
 STATIC void da_peep2(pTHX_ OP *o) {
-	OP *sib, *k, *fk;
+	OP *k, *lsop, *pmop, *argop, *cvop, *esop;
 	int useful;
 	while (o->op_ppaddr != da_tag_list) {
-		while ((sib = o->op_sibling)) {
+		while (OpHAS_SIBLING(o)) {
 			if ((o->op_flags & OPf_KIDS) && (k = cUNOPo->op_first)){
 				da_peep2(aTHX_ k);
 			} else switch (o->op_type ? o->op_type : o->op_targ) {
@@ -1817,35 +1892,37 @@ STATIC void da_peep2(pTHX_ OP *o) {
 			case OP_DBSTATE:
 				PL_curcop = (COP *) o;
 			}
-			o = sib;
+			o = OpSIBLING(o);
 		}
 		if (!(o->op_flags & OPf_KIDS) || !(o = cUNOPo->op_first))
 			return;
 	}
-	useful = o->op_private & OPpUSEFUL;
-	op_null(o);
-	o->op_ppaddr = PL_ppaddr[OP_NULL];
-	k = fk = cLISTOPo->op_first;
-	while ((sib = k->op_sibling))
-		k = sib;
-	if (!(sib = cUNOPx(fk)->op_first) || sib->op_ppaddr != da_tag_rv2cv) {
+	lsop = o;
+	useful = lsop->op_private & OPpUSEFUL;
+	op_null(lsop);
+	lsop->op_ppaddr = PL_ppaddr[OP_NULL];
+	pmop = cLISTOPx(lsop)->op_first;
+	argop = cLISTOPx(lsop)->op_last;
+	if (!(cvop = cUNOPx(pmop)->op_first) ||
+			cvop->op_ppaddr != da_tag_rv2cv) {
 		Perl_warn(aTHX_ "da peep weirdness 1");
-	} else {
-		k->op_sibling = sib;
-		cLISTOPo->op_last = sib;
-		if (!(k = sib->op_next) || k->op_ppaddr != da_tag_entersub) {
-			Perl_warn(aTHX_ "da peep weirdness 2");
-		} else {
-			k->op_type = OP_ENTERSUB;
-			if (sib->op_flags & OPf_SPECIAL) {
-				k->op_ppaddr = DataAlias_pp_copy;
-				da_peep2(aTHX_ fk);
-			} else if (!da_transform(aTHX_ fk, TRUE)
-					&& !useful && ckWARN(WARN_VOID)) {
-				Perl_warner(aTHX_ packWARN(WARN_VOID),
-						"Useless use of alias");
-			}
-		}
+		return;
+	}
+	OpMORESIB_set(argop, cvop);
+	OpLASTSIB_set(cvop, lsop);
+	cLISTOPx(lsop)->op_last = cvop;
+	if (!(esop = cvop->op_next) || esop->op_ppaddr != da_tag_entersub) {
+		Perl_warn(aTHX_ "da peep weirdness 2");
+		return;
+	}
+	esop->op_type = OP_ENTERSUB;
+	if (cvop->op_flags & OPf_SPECIAL) {
+		esop->op_ppaddr = DataAlias_pp_copy;
+		da_peep2(aTHX_ pmop);
+	} else if (!da_transform(aTHX_ pmop, TRUE)
+			&& !useful && ckWARN(WARN_VOID)) {
+		Perl_warner(aTHX_ packWARN(WARN_VOID),
+				"Useless use of alias");
 	}
 }
 
@@ -1868,7 +1945,9 @@ STATIC void da_peep(pTHX_ OP *o) {
 
 #define LEX_NORMAL		10
 #define LEX_INTERPNORMAL	 9
+#if DA_HAVE_LEX_KNOWNEXT
 #define LEX_KNOWNEXT             0
+#endif
 
 STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 	dDA;
@@ -1963,6 +2042,7 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 				SvCUR(PL_linestr)++;
 			}
 		}
+#if DA_HAVE_LEX_KNOWNEXT
 		if(PL_lex_state != LEX_KNOWNEXT) {
 			PL_lex_defer = PL_lex_state;
 #if (PERL_COMBI_VERSION < 5021004)
@@ -1970,6 +2050,7 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 #endif
 			PL_lex_state = LEX_KNOWNEXT;
 		}
+#endif
 		PL_yylval = yylval;
 		if ((shift = s - PL_bufptr)) { /* here comes deeper magic */
 			s = SvPVX(PL_linestr);
@@ -2010,52 +2091,56 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 	return o;
 }
 
-STATIC OP *da_ck_entersub(pTHX_ OP *o) {
+STATIC OP *da_ck_entersub(pTHX_ OP *esop) {
 	dDA;
-	OP *kid = cUNOPo->op_first;
-	OP *last, *tmp;
+	OP *lsop, *cvop, *pmop, *argop;
 	int inside;
-	if (!(kid->op_type == OP_LIST ||
-			(kid->op_type == OP_NULL && kid->op_targ == OP_LIST)))
-		return da_old_ck_entersub(aTHX_ o);
-	last = kLISTOP->op_last;
-	if (!DA_ACTIVE || !(kid->op_flags & OPf_KIDS)
-				|| last->op_ppaddr != da_tag_rv2cv)
-		return da_old_ck_entersub(aTHX_ o);
+	if (!(esop->op_flags & OPf_KIDS))
+		return da_old_ck_entersub(aTHX_ esop);
+	lsop = cUNOPx(esop)->op_first;
+	if (!(lsop->op_type == OP_LIST ||
+			(lsop->op_type == OP_NULL && lsop->op_targ == OP_LIST))
+			|| OpHAS_SIBLING(lsop) || !(lsop->op_flags & OPf_KIDS))
+		return da_old_ck_entersub(aTHX_ esop);
+	cvop = cLISTOPx(lsop)->op_last;
+	if (!DA_ACTIVE || cvop->op_ppaddr != da_tag_rv2cv)
+		return da_old_ck_entersub(aTHX_ esop);
 	inside = da_inside;
 	da_inside = SvIVX(*PL_stack_sp--);
 	SvPOK_off(inside ? da_cv : da_cvc);
-	op_clear(o);
-	RenewOpc(0, o, 1, LISTOP, OP);
-	o->op_type = inside ? OP_SCOPE : OP_LEAVE;
-	o->op_ppaddr = da_tag_entersub;
-	cLISTOPo->op_last = kid;
-	kid->op_type = OP_LIST;
-	kid->op_targ = 0;
-	kid->op_ppaddr = da_tag_list;
+	op_clear(esop);
+	RenewOpc(0, esop, 1, LISTOP, OP);
+	OpLASTSIB_set(lsop, esop);
+	esop->op_type = inside ? OP_SCOPE : OP_LEAVE;
+	esop->op_ppaddr = da_tag_entersub;
+	cLISTOPx(esop)->op_last = lsop;
+	lsop->op_type = OP_LIST;
+	lsop->op_targ = 0;
+	lsop->op_ppaddr = da_tag_list;
 	if (inside > 1)
-		kid->op_private |= OPpUSEFUL;
+		lsop->op_private |= OPpUSEFUL;
 	else
-		kid->op_private &= ~OPpUSEFUL;
-	tmp = kLISTOP->op_first;
+		lsop->op_private &= ~OPpUSEFUL;
+	pmop = cLISTOPx(lsop)->op_first;
 	if (inside)
-		op_null(tmp);
-	RenewOpc(0, tmp, 1, UNOP, OP);
+		op_null(pmop);
+	RenewOpc(0, pmop, 1, UNOP, OP);
+	cLISTOPx(lsop)->op_first = pmop;
 #if (PERL_COMBI_VERSION >= 5021006)
-	tmp->op_type = OP_CUSTOM;
+	pmop->op_type = OP_CUSTOM;
 #endif
-	tmp->op_next = tmp;
-	kLISTOP->op_first = tmp;
-	kid = tmp;
-	kUNOP->op_first = last;
-	while (kid->op_sibling != last)
-		kid = kid->op_sibling;
-	kid->op_sibling = Nullop;
-	cLISTOPx(cUNOPo->op_first)->op_last = kid;
-	if (kid->op_type == OP_NULL && inside)
-		kid->op_flags &= ~OPf_SPECIAL;
-	last->op_next = o;
-	return o;
+	pmop->op_next = pmop;
+	cUNOPx(pmop)->op_first = cvop;
+	OpLASTSIB_set(cvop, pmop);
+	argop = pmop;
+	while (OpSIBLING(argop) != cvop)
+		argop = OpSIBLING(argop);
+	cLISTOPx(lsop)->op_last = argop;
+	OpLASTSIB_set(argop, lsop);
+	if (argop->op_type == OP_NULL && inside)
+		argop->op_flags &= ~OPf_SPECIAL;
+	cvop->op_next = esop;
+	return esop;
 }
 
 #if (PERL_COMBI_VERSION >= 5021007)
@@ -2069,17 +2154,14 @@ PROTOTYPES: DISABLE
 
 BOOT:
 	{
-	static int initialized = 0;
 	dDA;
 	DA_INIT;
 	da_cv = get_cv("Data::Alias::alias", TRUE);
 	da_cvc = get_cv("Data::Alias::copy", TRUE);
-	if (!initialized++) {
-		da_old_ck_rv2cv = PL_check[OP_RV2CV];
-		PL_check[OP_RV2CV] = da_ck_rv2cv;
-		da_old_ck_entersub = PL_check[OP_ENTERSUB];
-		PL_check[OP_ENTERSUB] = da_ck_entersub;
+	wrap_op_checker(OP_RV2CV, da_ck_rv2cv, &da_old_ck_rv2cv);
+	wrap_op_checker(OP_ENTERSUB, da_ck_entersub, &da_old_ck_entersub);
 #if (PERL_COMBI_VERSION >= 5021007)
+	{
 		/*
 		 * The multideref peep-time optimisation, introduced in
 		 * Perl 5.21.7, is liable to incorporate into a multideref
@@ -2113,12 +2195,10 @@ BOOT:
 		 * then that change alone will be sufficient; failing
 		 * that the op_type can be changed to OP_CUSTOM.
 		 */
-		da_old_ck_aelem = PL_check[OP_AELEM];
-		PL_check[OP_AELEM] = da_ck_aelem;
-		da_old_ck_helem = PL_check[OP_HELEM];
-		PL_check[OP_HELEM] = da_ck_helem;
-#endif
+		wrap_op_checker(OP_AELEM, da_ck_aelem, &da_old_ck_aelem);
+		wrap_op_checker(OP_HELEM, da_ck_helem, &da_old_ck_helem);
 	}
+#endif
 	CvLVALUE_on(get_cv("Data::Alias::deref", TRUE));
 	da_old_peepp = PL_peepp;
 	PL_peepp = da_peep;

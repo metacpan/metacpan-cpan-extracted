@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "API interface to pakkelabels.dk",
+  "ABSTRACT" => "REST API interface",
   "AUTHOR" => "Kaare Rasmussen <kaare at cpan dot org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,17 +19,19 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Moo" => 0,
     "Role::REST::Client" => "0.22",
+    "Role::REST::Client::Auth::Basic" => "0.05",
     "constant" => 0
   },
   "TEST_REQUIRES" => {
     "File::Find" => 0,
     "File::Temp" => 0,
     "HTTP::Response" => 0,
+    "JSON" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,8 +42,10 @@ my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Temp" => 0,
   "HTTP::Response" => 0,
+  "JSON" => 0,
   "Moo" => 0,
   "Role::REST::Client" => "0.22",
+  "Role::REST::Client::Auth::Basic" => "0.05",
   "Test::More" => 0,
   "constant" => 0,
   "strict" => 0,

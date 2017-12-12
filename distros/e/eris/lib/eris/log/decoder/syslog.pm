@@ -10,7 +10,7 @@ with qw(
     eris::role::decoder
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 # Configure Parse::Syslog::Line
@@ -74,7 +74,7 @@ eris::log::decoder::syslog - Parse the syslog headers using Parse::Syslog::Line
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

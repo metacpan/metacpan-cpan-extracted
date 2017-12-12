@@ -1,7 +1,7 @@
 Set-IntSpan-Partition
 =====================
 
-Please see `perldoc lib/Parse/ABNF.pm` for details.
+Please see `perldoc lib/Set/IntSpan/Partition.pm` for details.
 
 INSTALLATION
 

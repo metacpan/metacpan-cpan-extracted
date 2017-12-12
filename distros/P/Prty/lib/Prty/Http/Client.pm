@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Url;
@@ -67,11 +67,6 @@ Siehe prty-http-client
 
     $rMsg = $class->sendReceive($op,$url,$sMsg,@opt);
 
-=head4 Description
-
-Führe HTTP Request vom Typ $op gegen URL $url mit HTTP-Nachricht $sMsg aus
-und liefere die vom Server gelieferte Antwort $rMsg zurück.
-
 =head4 Arguments
 
 =over 4
@@ -105,6 +100,11 @@ Gib die kommunizierten Daten (Request, Response) und Metainformation
 Führe Redirects automatisch aus.
 
 =back
+
+=head4 Description
+
+Führe HTTP Request vom Typ $op gegen URL $url mit HTTP-Nachricht $sMsg aus
+und liefere die vom Server gelieferte Antwort $rMsg zurück.
 
 =cut
 
@@ -214,11 +214,6 @@ sub sendReceive {
 
     $msg = $class->get($url,@opt);
 
-=head4 Description
-
-Führe HTTP POST-Request mit URL $url aus und liefere die vom Server
-gelieferte Antwort zurück.
-
 =head4 Arguments
 
 =over 4
@@ -237,6 +232,11 @@ Prty::Http::Message.
 =head4 Options
 
 Siehe Methode L</sendReceive>().
+
+=head4 Description
+
+Führe HTTP POST-Request mit URL $url aus und liefere die vom Server
+gelieferte Antwort zurück.
 
 =cut
 
@@ -262,11 +262,6 @@ sub get {
 
     $rMsg = $class->post($url,$sMsg,@opt);
 
-=head4 Description
-
-Führe HTTP POST-Request gegen URL $url und mit HTTP-Nachricht $sMsg aus
-und liefere die vom Server gelieferte Antwort zurück.
-
 =head4 Arguments
 
 =over 4
@@ -280,6 +275,11 @@ Der URL, gegen den der GET-Request ausgeführt wird.
 =head4 Options
 
 Siehe Methode L</sendReceive>().
+
+=head4 Description
+
+Führe HTTP POST-Request gegen URL $url und mit HTTP-Nachricht $sMsg aus
+und liefere die vom Server gelieferte Antwort zurück.
 
 =cut
 
@@ -298,7 +298,7 @@ sub post {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

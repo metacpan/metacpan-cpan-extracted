@@ -7,7 +7,7 @@ WriteMakefile(
   NAME         => 'Mojolicious::Plugin::RenderSteps',
   VERSION_FROM => 'lib/Mojolicious/Plugin/RenderSteps.pm',
   AUTHOR       => 'Marcus Ramberg <mramberg@cpan.org>',
-  PREREQ_PM    => {'Mojolicious' => '4.99'},
+  PREREQ_PM    => {'Mojolicious' => '6.10'},
   test         => {TESTS => 't/*.t'},
   META_MERGE   => {
     resources => {

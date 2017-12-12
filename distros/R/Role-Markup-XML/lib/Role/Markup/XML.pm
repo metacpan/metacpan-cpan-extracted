@@ -48,17 +48,27 @@ has _ATTRS => (
     default => sub { { } },
 );
 
+has _ACTUAL_XPC => (
+    is  => 'ro',
+    default => sub {
+        my $x = XML::LibXML::XPathContext->new;
+        $x->registerNs(html => XHTMLNS);
+        $x;
+    },
+);
+
+
 =head1 NAME
 
 Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -214,13 +224,41 @@ sub _ELEM {
         $elem->setNamespace($nsmap->{$k}, $k, $prefix eq $k);
     }
 
-    # add boilerplate attributes
-    if (my $a = $self->_ATTRS->{$tag}) {
+    # add boilerplate attributes (but only if we're an instance!)
+    if (ref $self and my $a = $self->_ATTRS->{$tag}) {
         map { $elem->setAttribute($_ => $a->{$_}) } keys %$a;
     }
 
     $elem;
 }
+
+=head2 _XPC [ %NS | \%NS ]
+
+Return an XPath context with the given (optional) namespaces
+registered.The XHTML namespace is registered by default with the
+prefix C<html>. This context will persist if called from an instance.
+
+=cut
+
+sub _XPC {
+    my $self = shift;
+    my %p = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+    my $xpc;
+    if (ref $self) {
+
+        $xpc = $self->_ACTUAL_XPC;
+    }
+    else {
+        # if calling from a class we'll just mint a new one
+        $xpc = XML::LibXML::XPathContext->new;
+        $p{html} ||= XHTMLNS;
+    }
+
+    map { $xpc->registerNs($_ => $p{$_}) } grep { defined $p{$_} } keys %p;
+
+    $xpc;
+}
+
 
 =head2 _XML $SPEC [, $PARENT, $DOC, \@ARGS | @ARGS ] | %PARAMS
 
@@ -679,7 +717,7 @@ sub _XML {
             }
 
             for my $k (keys %spec) {
-                next unless $k =~ /^xmlns(?::(.*))/;
+                next unless $k =~ /^xmlns(?::(.*))?/;
                 my $prefix = $1 || '';
 
                 my $v = delete $spec{$k};

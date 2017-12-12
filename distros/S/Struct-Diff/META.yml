@@ -3,6 +3,7 @@ abstract: 'Recursive diff for nested perl structures'
 author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
+  Clone: 0
   Data::Dumper: 0
   Test::More: 0
 configure_requires:
@@ -29,4 +30,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Diff.pm
-version: 0.92
+version: 0.93

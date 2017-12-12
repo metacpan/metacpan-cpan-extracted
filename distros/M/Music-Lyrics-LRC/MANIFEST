@@ -5,6 +5,9 @@ Makefile.PL
 MANIFEST
 README
 t/basic.t
+t/japh.lrc
+t/load.t
+t/save.t
 xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t

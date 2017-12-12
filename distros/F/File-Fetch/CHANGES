@@ -1,3 +1,7 @@
+0.56        Thu Nov 30 14:47:50 2017
+
+* Blacklist 'lftp' use on hpux
+
 0.54        Sun Sep 24 19:46:04 2017
 
 * Switch test URL from www.cpan.org to httpbin.org

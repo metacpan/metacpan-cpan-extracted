@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use base qw( Tangence::Object Circle::WindowItem );
 
+our $VERSION = '0.173320';
+
 sub new
 {
    my $class = shift;

@@ -69,6 +69,10 @@ sub _collect_example {
     my ($self, $path, $definition) = @_;
     return $definition->{example} if defined $definition->{example};
 
+    if (my $union = $definition->{oneOf} || $definition->{anyOf} || $definition->{allOf}) {
+        return $self->_collect_example($path, $union->[0]);
+    }
+
     my $ref = $definition->{'$ref'};
     if ($ref) {
         $ref = $ref =~ s/^#//r;

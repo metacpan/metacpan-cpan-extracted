@@ -1,5 +1,28 @@
 Revision history for Net-Async-WebSocket
 
+0.12    2017-12-08 17:50:04
+        [CHANGES]
+         * Fix documentation of ->send_TYPE_frame methods, noting they return
+           Futures
+         * Add ->send_close_frame method and on_close_frame event
+         * Set the SSL_hostname option when connecting over SSL
+         * Update for Protocol::WebSocket 0.22
+
+        [BUGFIXES]
+         * Clients must emit masked frames (RT88441, RT122052)
+         * Declare requires perl >= 5.010 because of // operator
+
+0.11    2017-12-08 13:38:45
+        [CHANGES]
+         * Add frametype-specific methods for sending and events for receving
+         * Updated documentation style
+
+        [BUGFIXES]
+         * Make sure to actually use SSL when connecting to 'wss' URLs
+         * Fix URI::ws/wss hackery
+         * Ensure NaWebSocket::Server respects subclasses overriding the
+           'handle_class' parameter
+
 0.10    2015/11/18 16:23:44
         [BUGFIXES]
          * Declare dependency on URI (RT103073)

@@ -1,0 +1,9 @@
+Revision history for Perl module Image::JPEG::Size
+
+0.02  2017-12-01 19:44:03+0000
+
+  * Fix package metadata
+
+0.01  2017-12-01
+
+  * Initial release

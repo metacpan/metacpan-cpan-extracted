@@ -11,7 +11,7 @@ use base qw( Tickit::Widget );
 use Tickit::Style;
 Tickit::Window->VERSION( '0.39' ); # expose_after_scroll default on
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Tickit::Utils qw( textwidth chars2cols cols2chars substrwidth );
 

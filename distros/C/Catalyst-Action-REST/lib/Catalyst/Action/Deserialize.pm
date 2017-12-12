@@ -1,5 +1,5 @@
 package Catalyst::Action::Deserialize;
-$Catalyst::Action::Deserialize::VERSION = '1.20';
+$Catalyst::Action::Deserialize::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 
@@ -116,6 +116,36 @@ Will work just fine.
 
 When you use this module, the request class will be changed to
 L<Catalyst::Request::REST>.
+
+=head1 RFC 7231 Compliance Mode
+
+To maintain backwards compatibility with the module's original functionality,
+where it was assumed the deserialize and serialize content types are the same,
+an optional compliance mode can be enabled to break this assumption.
+
+    __PACKAGE__->config(
+        'compliance_mode'    => 1,
+        'default'            => 'text/x-yaml',
+        'stash_key'          => 'rest',
+        'map'                => {
+            'text/x-yaml'        => 'YAML',
+            'text/x-data-dumper' => [ 'Data::Serializer', 'Data::Dumper' ],
+        },
+        'deserialize_default => 'application/json',
+        'deserialize_map'    => {
+            'application/json'   => 'JSON',
+        },
+    );
+
+Three extra keys are added to the controller configuration. compliance_mode, a
+boolean to enable the mode. And a parallel set of content type mappings
+'deserialize_default' and 'deserialize_map' to mirror the default/map
+configuration keys.
+
+The module will use the default/map keys when negotiating the serializing
+content type specified by the client in the Accept header. And will use the
+deserialize_default/deserialize_map in conjunction with the Content-Type
+header where the client is giving the content type being sent in the request.
 
 =head1 CUSTOM ERRORS
 

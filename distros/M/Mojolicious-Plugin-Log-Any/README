@@ -1,0 +1,104 @@
+NAME
+
+    Mojolicious::Plugin::Log::Any - Use other loggers in a Mojolicious
+    application
+
+SYNOPSIS
+
+      package MyApp;
+      use Mojo::Base 'Mojolicious';
+      
+      sub startup {
+        my $self = shift;
+        
+        # Log::Any (default)
+        use Log::Any::Adapter {category => 'MyApp'}, 'Syslog';
+        $self->plugin('Log::Any');
+        
+        # Log::Contextual
+        use Log::Contextual::WarnLogger;
+        use Log::Contextual -logger => Log::Contextual::WarnLogger->new({env_prefix => 'MYAPP'});
+        $self->plugin('Log::Any' => {logger => 'Log::Contextual});
+        
+        # Log::Dispatch
+        use Log::Dispatch;
+        my $logger = Log::Dispatch->new(outputs => ['File::Locked',
+          min_level => 'warning',
+          filename  => '/path/to/file.log',
+          mode      => 'append',
+          newline   => 1,
+          callbacks => sub { my %p = @_; '[' . localtime() . '] ' . $p{message} },
+        ]);
+        $self->plugin('Log::Any' => {logger => $logger});
+        
+        # Log::Dispatchouli
+        use Log::Dispatchouli;
+        my $logger = Log::Dispatchouli->new({ident => 'MyApp', facility => 'daemon', to_file => 1});
+        $self->plugin('Log::Any' => {logger => $logger});
+        
+        # Log::Log4perl
+        use Log::Log4perl;
+        Log::Log4perl->init($self->home->child('log.conf'));
+        $self->plugin('Log::Any' => {logger => 'Log::Log4perl'});
+      }
+      
+      # or in a Mojolicious::Lite app
+      use Mojolicious::Lite;
+      use Log::Any::Adapter {category => 'Mojolicious::Lite'}, File => app->home->child('myapp.log'), log_level => 'info';
+      plugin 'Log::Any';
+
+DESCRIPTION
+
+    Mojolicious::Plugin::Log::Any is a Mojolicious plugin that redirects
+    the application logger to pass its log messages to an external logging
+    framework using "attach_logger" in Mojo::Log::Role::AttachLogger. By
+    default, Log::Any is used, but a different framework or object may be
+    specified. For Log::Any or Log::Log4perl, log messages are dispatched
+    with a category of the application class name, which is
+    Mojolicious::Lite for lite applications.
+
+    The default behavior of the Mojo::Log object to filter messages by
+    level, keep history, prepend a timestamp, and write log messages to a
+    file or STDERR will be suppressed. It is expected that the logging
+    framework output handler will be configured to handle these details as
+    necessary.
+
+METHODS
+
+    Mojolicious::Plugin::Log::Any inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+      $plugin->register(Mojolicious->new, {logger => $logger});
+
+    Register logger in Mojolicious application. Takes the following
+    options:
+
+    logger
+
+      Logging framework or object to pass log messages to, of a type
+      recognized by "attach_logger" in Mojo::Log::Role::AttachLogger.
+      Defaults to Log::Any.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::Log, Mojo::Log::Role::AttachLogger
+

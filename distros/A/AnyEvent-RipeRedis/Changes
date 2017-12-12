@@ -1,5 +1,12 @@
 Revision history for AnyEvent::RipeRedis.
 
+0.46 Tue Dec 5 15:56:58 MSK 2017
+  - The client now disconnects if the E_NO_AUTH error was returned.
+
+0.44 Fri Dec 1 12:09:02 MSK 2017
+  - Made that the client do not reconnects on the error
+    "Client sent AUTH, but no password is set".
+
 0.42 Sat Apr 1 15:49:15 MSK 2017
   - README.pod replaced by README.md.
 

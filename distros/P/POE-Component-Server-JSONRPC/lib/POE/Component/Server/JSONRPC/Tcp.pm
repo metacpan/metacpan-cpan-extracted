@@ -3,13 +3,12 @@ use strict;
 use warnings;
 use base qw(POE::Component::Server::JSONRPC);
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 use POE qw/
     Component::Server::TCP
     Filter::Line
     /;
-use JSON::Any;
 
 =head1 NAME
 

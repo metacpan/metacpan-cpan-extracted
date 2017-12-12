@@ -24,6 +24,7 @@
 
 use 5.004;
 use strict;
+use File::Spec;
 use Test;
 plan tests => 1;
 
@@ -45,7 +46,7 @@ sub want_anum {
 }
 sub want_planepath {
   my ($planepath) = @_;
-  # return 0 unless $planepath =~ /ComplexMinus/;
+  # return 0 unless $planepath =~ /ComplexPlus/;
   # return 0 unless $planepath =~ /Flowsnake/;
   # return 0 unless $planepath =~ /Octag|Pent|Hept/;
   # return 0 unless $planepath =~ /Divis|DiagonalRationals|CoprimeCol/;
@@ -64,7 +65,7 @@ sub want_coordinate {
   # return 0 unless $type =~ /BitXor/;
   # return 0 unless $type =~ /^Abs[XY]/;
   # return 0 unless $type =~ /DiffYX/i;
-  # return 0 unless $type =~ /^Depth/;
+  # return 0 unless $type =~ /ExperimentalPairsYX/;
   # return 0 unless $type =~ /SLR|SRL|LSR/;
   return 1;
 }
@@ -378,8 +379,9 @@ MyTestHelpers::diag ("\"Other\" uncatalogued sequences:");
 {
   system("perl ../ns/tools/make-oeis-catalogue.pl --module=TempOther --other=only") == 0
     or die;
-  require 'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm';
-  unlink  'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm' or die;
+  my $filename = File::Spec->rel2abs('lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm');
+  require $filename;
+  unlink  $filename or die "cannot unlink $filename: $!";
 
   my $aref = Math::NumSeq::OEIS::Catalogue::Plugin::TempOther::info_arrayref();
   foreach my $info (@$aref) {

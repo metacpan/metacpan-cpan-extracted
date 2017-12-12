@@ -1,0 +1,60 @@
+NAME
+    Number::Format::BigFloat - Format Math::BigFloat number
+
+VERSION
+    This document describes version 0.001 of Number::Format::BigFloat (from
+    Perl distribution Number-Format-BigFloat), released on 2017-12-09.
+
+SYNOPSIS
+     use Number::Format::BigFloat qw(format_number);
+
+     format_number(1.1);                                             # => "1.10"
+     format_number(1.1, {decimal_digits=>20});                       # => "1.10000000000000000000"
+     format_number("1.123456789012345678901", {decimal_digits=>20}); # => "1.12345678901234567890"
+
+FUNCTIONS
+    None exported by default but all of them exportable.
+
+  format_number($num, \%opts) => STR
+    Format $num. $num will be converted to Math::BigFloat instance first.
+    Will return $num as-is if $num is not expressable as decimal notation
+    number.
+
+    Known options:
+
+    *   thousands_sep => str (default: ",")
+
+    *   decimal_point => str (default: ".")
+
+    *   decimal_digits => int (default: 2)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Number-Format-BigFloat>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Number-Format-BigFloat>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-BigFloa
+    t>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other number formatting modules: Number::Format.
+
+    Math::BigFloat
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

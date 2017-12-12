@@ -104,13 +104,14 @@ my %WriteMakefileArgs = (
     "feature" => 0,
     "forks" => "0.36",
     "namespace::autoclean" => "0.28",
+    "re" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.001014"
   },
-  "VERSION" => "1.017",
+  "VERSION" => "1.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -205,6 +206,7 @@ my %FallbackPrereqs = (
   "feature" => 0,
   "forks" => "0.36",
   "namespace::autoclean" => "0.28",
+  "re" => 0,
   "strict" => 0,
   "warnings" => 0
 );
@@ -218,9 +220,5 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-if ( $^O eq 'linux' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Linux::Prctl'} = '> 0';
-}
 
 WriteMakefile(%WriteMakefileArgs);

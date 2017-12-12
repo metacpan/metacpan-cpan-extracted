@@ -1,0 +1,11 @@
+ * Job sorting done when adding to queue, things done in queue order
+ * Workers iterate over queue grabbing jobs that they handle
+ * Slots are files in the run dir
+  * lock file
+  * write pid to file
+  * make job dir
+  * add job to jobs.jsonl
+  * wait for job to exit
+  * unlock file
+ * immiscible file for locking
+ * isolation file for locking

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.5');
+our $VERSION = version->new('0.6.6');
 
 requires 'repos';
 requires 'verbose';
@@ -27,7 +27,7 @@ my $opt = Getopt::Alt->new(
     ]
 );
 
-sub status_start {
+sub state_start {
     $opt->process;
 
     return;
@@ -51,6 +51,10 @@ sub state {
     return $branch . ($status ? ' *' : '');
 }
 
+sub state_end {
+    return "\n";
+}
+
 1;
 
 __END__
@@ -61,7 +65,7 @@ Group::Git::Cmd::State - Quick state of each repository (branch name and changes
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::State version 0.6.5.
+This documentation refers to Group::Git::Cmd::State version 0.6.6.
 
 =head1 SYNOPSIS
 
@@ -80,7 +84,7 @@ weather there are uncommitted changes) for each repository.
 
 Shows the repository branch and weather there are changes in it.
 
-=item C<status_start ()>
+=item C<state_start ()>
 
 Process the command line arguments for state
 

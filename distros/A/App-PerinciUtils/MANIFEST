@@ -11,6 +11,7 @@ lib/App/PerinciUtils.pm
 script/gen-getopt-long-spec-from-meta
 script/normalize-rinci-function-metadata
 script/peri-access
+script/peri-fmt-envres
 script/peri-htserve
 script/peri-run
 script/wrap-with-perinci-sub-wrapper

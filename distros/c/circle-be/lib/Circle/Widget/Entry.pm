@@ -6,8 +6,9 @@ package Circle::Widget::Entry;
 
 use strict;
 use warnings;
-
 use base qw( Circle::Widget );
+
+our $VERSION = '0.173320';
 
 sub new
 {
@@ -40,6 +41,23 @@ sub method_enter
 
       $self->push_prop_history( $text );
    }
+}
+
+sub set_on_typing
+{
+   my $self = shift;
+   my ( $on_typing ) = @_;
+
+   $self->{on_typing} = $on_typing;
+
+   $self->set_prop_want_typing( defined $self->{on_typing} );
+}
+
+sub method_typing
+{
+   my $self = shift;
+   my ( $ctx, $typing ) = @_;
+   $self->{on_typing}->( $typing ) if $self->{on_typing};
 }
 
 package Circle::Widget::Entry::CompleteGroup;

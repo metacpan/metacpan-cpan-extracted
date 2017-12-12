@@ -20,8 +20,10 @@ do { my $x = {
                                       'Data::UUID::MT' => '0',
                                       'Exporter' => '0',
                                       'MIME::Base64' => '0',
+                                      'PadWalker' => '2.3',
                                       'String::Escape' => '0',
                                       'Try::Catch' => '0',
+                                      'common::sense' => '3.74',
                                       'parent' => '0',
                                       'perl' => '5.010'
                                     }

@@ -2,6 +2,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -10,6 +11,9 @@ bin/compare-code
 code_examples/html/hello.html
 code_examples/html/hello_alternated.html
 code_examples/html/hello_copy.html
+code_examples/java/Factorial.java
+code_examples/java/Faktorial.java
+code_examples/java/HelloWorld.java
 code_examples/perl/rosetta_array/lazy_cheaters/2d.pl
 code_examples/perl/rosetta_array/lazy_cheaters/dynamic.pl
 code_examples/perl/rosetta_array/lazy_cheaters/inline.pl
@@ -27,13 +31,7 @@ code_examples/python/for-loops.py
 code_examples/python/for-loops_copy.py
 code_examples/python/for-loops_mutated.py
 dist.ini
-dist.ini_jiffy
-dist.ini_mobi
-doc/dependencies.txt
-doc/pic/signes.png
-doc/pic/signes_ordered.png
-doc/pic/visibles.png
-fail.txt
+doc/Windows.pod
 lib/School/Code/Compare.pm
 lib/School/Code/Compare/Judge.pm
 lib/School/Code/Compare/Out.pm

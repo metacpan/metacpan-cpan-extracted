@@ -4,7 +4,7 @@ use base qw/Prty::Section::Object Prty::ClassConfig/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ our $VERSION = 1.120;
 
 =head1 NAME
 
-Prty::ContentProcessor::BaseType - Basisklasse für ContentProcessor-Typen
+Prty::ContentProcessor::BaseType - Typ
 
 =head1 BASE CLASSES
 
@@ -35,7 +35,7 @@ ihrer Subklassen.
 
 =head1 METHODS
 
-=head2 Intern
+=head2 Interne Methoden
 
 =head3 attributes() - Liste der zulässigen Abschnitts-Attribute
 
@@ -43,16 +43,16 @@ ihrer Subklassen.
 
     @attributes | $attributeA = $class->attributes;
 
+=head4 Returns
+
+Liste der Namen der Abschnitts-Attribute. Im Skalar-Kontext wird
+eine Referenz auf die Liste geliefert.
+
 =head4 Description
 
 Ermittele die Liste der Namen der zulässigen Abschnitts-Attribute
 entlang der Klassenhierarchie und liefere diese zurück. Die
 Liste ist alphabetisch sortiert.
-
-=head4 Returns
-
-Liste der Namen der Abschnitts-Attribute. Im Skalar-Kontext wird
-eine Referenz auf die Liste geliefert.
 
 =cut
 
@@ -80,14 +80,14 @@ sub attributes {
 
     $bool = $class->contentAllowed;
 
+=head4 Returns
+
+Boolscher Wert
+
 =head4 Description
 
 Ermittele, ob Abschnitte des Entitätstyps einen Inhalt haben dürfen.
 Wenn ja, liefert die Methode 1, andernfalls 0.
-
-=head4 Returns
-
-Boolscher Wert
 
 =cut
 
@@ -106,7 +106,7 @@ sub contentAllowed {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

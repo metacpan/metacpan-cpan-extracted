@@ -4,7 +4,7 @@
       "Andrey Khozov, C<avkhozov@googlemail.com>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.33",
             "Mojolicious" : "5.80",
             "perl" : "5.010001"
          }
@@ -53,7 +54,7 @@
       },
       "Mojolicious::Plugin::Model" : {
          "file" : "lib/Mojolicious/Plugin/Model.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -67,12 +68,13 @@
          "web" : "https://github.com/avkhozov/Mojolicious-Plugin-Model"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_authority" : "cpan:AVKHOZOV",
    "x_contributors" : [
+      "Andrey Khozov <avkhozov@gmail.com>",
       "Denis Ibaev <dionys@gmail.com>",
       "Logioniz <logioniz@ya.ru>",
-      "Andrey Khozov <avkhozov@gmail.com>"
+      "ccn <ccnweb@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

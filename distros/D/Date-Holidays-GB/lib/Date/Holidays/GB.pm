@@ -1,8 +1,8 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
-# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2016
+# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2019
 
 use strict;
 use warnings;
@@ -174,7 +174,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2017-08-09' }
+sub date_generated { '2017-12-11' }
 
 1;
 
@@ -371,3 +371,30 @@ __DATA__
 2018-12-26	EAW	Boxing Day
 2018-12-26	NIR	Boxing Day
 2018-12-26	SCT	Boxing Day
+2019-01-01	EAW	New Year’s Day
+2019-01-01	NIR	New Year’s Day
+2019-01-01	SCT	New Year’s Day
+2019-01-02	SCT	2nd January
+2019-03-18	NIR	St Patrick’s Day
+2019-04-19	EAW	Good Friday
+2019-04-19	NIR	Good Friday
+2019-04-19	SCT	Good Friday
+2019-04-22	EAW	Easter Monday
+2019-04-22	NIR	Easter Monday
+2019-05-06	EAW	Early May bank holiday
+2019-05-06	NIR	Early May bank holiday
+2019-05-06	SCT	Early May bank holiday
+2019-05-27	EAW	Spring bank holiday
+2019-05-27	NIR	Spring bank holiday
+2019-05-27	SCT	Spring bank holiday
+2019-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2019-08-05	SCT	Summer bank holiday
+2019-08-26	EAW	Summer bank holiday
+2019-08-26	NIR	Summer bank holiday
+2019-12-02	SCT	St Andrew’s Day
+2019-12-25	EAW	Christmas Day
+2019-12-25	NIR	Christmas Day
+2019-12-25	SCT	Christmas Day
+2019-12-26	EAW	Boxing Day
+2019-12-26	NIR	Boxing Day
+2019-12-26	SCT	Boxing Day

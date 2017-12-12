@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::Time;;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -243,6 +245,105 @@ sub test_latitudeDistance : Test(4) {
 
     $km = sprintf '%.2f',Prty::Math->latitudeDistance(49);
     $self->is($km,'72.90');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_valueToPixelFactor : Test(2) {
+    my $self = shift;
+
+    my $fac = Prty::Math->valueToPixelFactor(100,0,10);
+    $self->is($fac,9.9);
+
+    $fac = Prty::Math->valueToPixelFactor(100,10,35);
+    $self->is($fac,3.96);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_interpolate : Test(3) {
+    my $self = shift;
+
+    my $y = Prty::Math->interpolate(0,0,2,2,1);
+    $self->is($y,1);
+
+    $y = Prty::Math->interpolate(2,2,1,1,1.5);
+    $self->is($y,1.5);
+
+    $y = Prty::Math->interpolate(1000,1,2000,2,1500);
+    $self->is($y,1.5);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isNumber : Test(10) {
+    my $self = shift;
+
+    my $bool = Prty::Math->isNumber(undef);
+    $self->is($bool,0);
+
+    $bool = Prty::Math->isNumber('');
+    $self->is($bool,0);
+
+    $bool = Prty::Math->isNumber('x');
+    $self->is($bool,0);
+
+    $bool = Prty::Math->isNumber('x1');
+    $self->is($bool,0);
+
+    $bool = Prty::Math->isNumber('1x');
+    $self->is($bool,0);
+
+    $bool = Prty::Math->isNumber(1);
+    $self->is($bool,1);
+
+    $bool = Prty::Math->isNumber(-1);
+    $self->is($bool,1);
+
+    $bool = Prty::Math->isNumber(+1);
+    $self->is($bool,1);
+
+    $bool = Prty::Math->isNumber(1.23);
+    $self->is($bool,1);
+
+    $bool = Prty::Math->isNumber(-1.23);
+    $self->is($bool,1);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_spikeValue : Test(39) {
+    my $self = shift;
+
+    my $csvFile = Prty::Test::Class->testPath(
+       't/data/csv/spike-test.csv');
+
+    my @arr;
+    my $fh = Prty::FileHandle->new('<',$csvFile);
+    while (<$fh>) {
+        chomp;
+        my $row = [split /;/];
+        my ($m,$d,$y,$h,$mi,$s) = split /\D+/,$row->[0];
+        $row->[0] = Prty::Time->new($y,$m,$d,$h,$mi,$s)->epoch;
+        push @arr,$row;
+    }
+    $fh->close;
+
+    for (my $i = 1; $i < @arr-1; $i++) {
+        my $v1 = $arr[$i-1]->[1]; # Messwert vor dem gesteten Messwert
+        my $v2 = $arr[$i]->[1];   # getesteter Messwert
+        my $v3 = $arr[$i+1]->[1]; # Messwert nach dem gesteten Messwert
+
+        my $t1 = $arr[$i-1]->[0]; # Zeitpunkt Messwert 1 in Sekunden
+        my $t3 = $arr[$i+1]->[0]; # Zeitpunkt Messwert 3 in Sekunden
+
+        my $v = Prty::Math->spikeValue($v1,$v2,$v3,$t1,$t3);
+        # MEMO: Die Werte in der Tabelle sind um Faktor 2 zu groß,
+        # daher multiplizieren wir $v mit 2.
+        $self->floatIs($v*2,$arr[$i]->[4],5);
+    }
+
+    return;
 }
 
 # -----------------------------------------------------------------------------

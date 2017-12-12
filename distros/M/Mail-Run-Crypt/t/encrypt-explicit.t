@@ -8,7 +8,7 @@ use Test::More tests => 2;
 
 use Mail::Run::Crypt;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my %opts = ( mailto => 'nobody@example.com', encrypt => 1 );
 my $mrc = Mail::Run::Crypt->new(%opts);

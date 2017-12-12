@@ -1,5 +1,11 @@
 Revision history for Map::Tube::CLI
 
+0.38  Tue Dec 12 11:50:00 2017
+      - Upgraded dependency on Map::Tube v3.42
+
+0.37  Mon Dec 11 19:30:00 2017
+      - Added support for map of Athens and Milan.
+
 0.36  Sat Nov 04 08:00:00 2017
       - Upgraded dependency on Map::Tube v3.36
 

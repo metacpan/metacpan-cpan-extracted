@@ -236,9 +236,9 @@ MUSE
     diag Dumper($header->tex_metadata);
     is_deeply($header->tex_metadata,
               {
-               'author' => 'my **fist, \\emph{"author"}',
+               'author' => 'my **fist, <em>"author"<\Slash{}em>',
                'title' => '\\textbackslash{}blah\\textbackslash{}',
-               'keywords' => 'bla; foo; try; >first, \\texttt{\\&\'last}<',
+               'keywords' => 'bla; foo; try; >first, =\\&\'last=<',
                'subject' => '\\Slash{}hullo\\textbackslash{}'
               });
 }

@@ -1,2 +1,2 @@
 #!/bin/sh
-PERL5OPT="-Mblib" exec blib/script/circle-be "$@"
+exec perl -Mblib blib/script/circle-be "$@"

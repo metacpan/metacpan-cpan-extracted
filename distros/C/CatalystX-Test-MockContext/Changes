@@ -1,0 +1,17 @@
+Revision history for CatalystX::Test::MockContext
+
+0.000003  2017-12-11 09:48:31+00:00 Europe/London
+  - Add missing version number to release
+
+0.000002  2017-12-11 09:37:45+00:00 Europe/London
+  [Bug Fixes]
+  - Load Catalyst::Middleware::Stash, RT#119477 (Robert Rothenberg)
+
+  [Documentation]
+  - Include Changes file in the distribution (Robert Rothenberg)
+
+  [Other Changes]
+  - Add explicit requirement for Catalyst (Robert Rothenberg)
+
+0.000001 2012-03-19
+  - Initial release.

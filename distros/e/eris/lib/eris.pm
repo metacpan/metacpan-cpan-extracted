@@ -4,7 +4,7 @@ package eris;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 
@@ -20,7 +20,7 @@ eris - Eris is the Greek Goddess of Chaos
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

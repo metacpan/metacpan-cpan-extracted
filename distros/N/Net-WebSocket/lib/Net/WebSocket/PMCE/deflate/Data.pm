@@ -7,6 +7,7 @@ use parent qw( Net::WebSocket::PMCE::Data );
 
 use Module::Load ();
 
+use Net::WebSocket::FrameTypeName ();
 use Net::WebSocket::Message ();
 use Net::WebSocket::PMCE::deflate::Constants ();
 
@@ -56,7 +57,7 @@ sub new {
 
 #----------------------------------------------------------------------
 
-=head2 $msg = I<OBJ>->create_message( FRAME_CLASS, PAYLOAD )
+=head2 $msg = I<OBJ>->create_message( FRAME_TYPE, PAYLOAD )
 
 Creates an unfragmented, compressed message. The message will be an
 instance of the class that C<Net::WebSocket::Message::create_from_frames()>
@@ -71,7 +72,7 @@ B<NOTE:> This function alters PAYLOAD.
 =cut
 
 sub create_message {
-    my ($self, $frame_class) = @_;    #$_[2] = payload
+    my ($self, $frame_type) = @_;    #$_[2] = payload
 
     die "A streamer is active!" if $self->{'_streamer_mode'};
 
@@ -79,9 +80,11 @@ sub create_message {
 
     my $payload_sr = \($self->$compress_func( $_[2] ));
 
+    my $frame_class = Net::WebSocket::FrameTypeName::get_module($frame_type);
+
     return Net::WebSocket::Message::create_from_frames(
         $frame_class->new(
-            payload_sr => $payload_sr,
+            payload => $payload_sr,
             rsv => $self->INITIAL_FRAME_RSV(),
             $self->FRAME_MASK_ARGS(),
         ),
@@ -90,7 +93,11 @@ sub create_message {
 
 #----------------------------------------------------------------------
 
-=head2 $msg = I<OBJ>->create_streamer( FRAME_CLASS )
+=head2 $msg = I<OBJ>->create_streamer( FRAME_TYPE )
+
+FRAME_TYPE can be either C<text> or C<binary> (for Net::WebSocket’s
+default frame classes) or full package names (e.g., to use a custom
+frame class).
 
 Returns an instance of L<Net::WebSocket::PMCE::deflate::Data::Streamer> based
 on this object.
@@ -98,11 +105,13 @@ on this object.
 =cut
 
 sub create_streamer {
-    my ($self, $frame_class) = @_;
+    my ($self, $frame_type) = @_;
 
     $self->{'_streamer_mode'} = 1;
 
     Module::Load::load('Net::WebSocket::PMCE::deflate::Data::Streamer');
+
+    my $frame_class = Net::WebSocket::FrameTypeName::get_module($frame_type);
 
     return Net::WebSocket::PMCE::deflate::Data::Streamer->new($self, $frame_class);
 }

@@ -1,5 +1,5 @@
 package Git::Database::Object::Commit;
-$Git::Database::Object::Commit::VERSION = '0.009';
+$Git::Database::Object::Commit::VERSION = '0.010';
 use Git::Database::Actor;
 use DateTime;
 use Encode qw( decode );
@@ -172,7 +172,7 @@ Git::Database::Object::Commit - A commit object in the Git object database
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

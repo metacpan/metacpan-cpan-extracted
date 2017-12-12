@@ -15,7 +15,7 @@ use Text::Balanced;
 
 require v5.8;
 
-$VERSION= 2.001;
+$VERSION= 2.002;
 
 @EXPORT_OK=qw(
     dbh
@@ -1072,10 +1072,11 @@ my %functor_prefix= ( # functors read in prefix notation:
 );
 
 my %functor_special= ( # looked up manually, not generically.
-    declare_op('ANY',     'prefixn'),  # n=no paren.  I know, it's lame.
-    declare_op('SOME',    'prefixn'),
-    declare_op('ALL',     'prefixn'),
-    declare_op('DEFAULT', 'funcall', accept => [ 'mysql' ], read_type => 'funcall1col'),
+    declare_op('ANY',      'prefixn'),  # n=no paren.  I know, it's lame.
+    declare_op('SOME',     'prefixn'),
+    declare_op('ALL',      'prefixn'),
+    declare_op('DISTINCT', 'prefixn'),
+    declare_op('DEFAULT',  'funcall', accept => [ 'mysql' ], read_type => 'funcall1col'),
         # Special functor because it collides with DEFAULT pseudo
         # constant, so it needs extra care during parsing.
 );
@@ -1999,8 +2000,22 @@ sub parse_table_as($)
     my ($lx)= @_;
     my $r= create ($lx, 'TableAs', qw(table as));
 
-    return unless
-        $r->{table}= parse_table($lx);
+    if (looking_at($lx, '(', SHIFT)) {
+        my $stmt;
+        return unless
+            $stmt= parse_select_stmt($lx)
+        and expect ($lx, ')', SHIFT);
+
+        my $s= create_Expr ($lx);
+        $s->{type}= 'subquery';
+        $s->{arg}=  $stmt;
+
+        $r->{table} = $s;
+    }
+    else {
+        return unless
+            $r->{table}= parse_table($lx);
+    }
 
     if (looking_at($lx, 'AS', SHIFT)) {
         return unless
@@ -2945,13 +2960,14 @@ sub parse_expr($;$$)
                 expect($lx, 'END', SHIFT);
         },
 
+        'DISTINCT' => 'SOME',
         'ALL' => 'SOME',
         'ANY' => 'SOME',
         'SOME' => sub {
-            if (!$functor || !$functor->{comparison} || !$right_mark) {
-                $lx->{error}= "$lx->{token}{kind} can only be used directly after a comparison.";
-                return;
-            }
+            #if (!$functor || !$functor->{comparison} || !$right_mark) {
+            #    $lx->{error}= "$lx->{token}{kind} can only be used directly after a comparison.";
+            #    return;
+            #}
             my $functor2= find_functor(\%functor_special, $lx->{token}{kind});
             unless ($functor2) {
                 $lx->{error}= "Unexpected $lx->{token}{kind} in expression.";
@@ -2959,14 +2975,21 @@ sub parse_expr($;$$)
             }
             lexer_shift($lx);
 
-            return unless
-                expect($lx, '(', SHIFT)
-            and my $q= parse_select_stmt ($lx)
-            and expect($lx, ')', SHIFT);
+            my $r2;
+            if (looking_at($lx, '(')) {
+                return unless
+                    expect($lx, '(', SHIFT)
+                and my $q= parse_select_stmt ($lx)
+                and expect($lx, ')', SHIFT);
 
-            my $r2= create_Expr($lx);
-            $r2->{type}= 'subquery';
-            $r2->{arg}=  $q;
+                $r2= create_Expr($lx);
+                $r2->{type}= 'subquery';
+                $r2->{arg}=  $q;
+
+            }
+            else {
+                $r2 = parse_expr($lx, $functor, $right_mark);
+            }
 
             set_expr_functor ($r, $functor2, $r2);
         },
@@ -4856,7 +4879,7 @@ sub str_append_thing($$$$)
                     if (my $col= $thing->{column}) {
                         str_append_list ($str, $col, NO_PARENS, prefix => ' (', suffix => ')');
                     }
-                                                
+
                     if (my $val= $thing->{value}) {
                         str_append_str  ($str, ' VALUES ');
                         str_append_list ($str, $val, NO_PARENS);
@@ -5076,7 +5099,7 @@ sub str_append_thing($$$$)
 
         'TableAs' => sub {
             if (my $x= $thing->{as}) {
-                # Oracle does not allows AS in table aliases.  But this module
+                # Oracle does not allow AS in table aliases.  But this module
                 # does not allow leaving it out.  To avoid generating what
                 # this module cannot read back in the default case, check for
                 # the write dialect.
@@ -5903,6 +5926,7 @@ FILTER_ONLY
     sub exprparen($)     { $_[0]->subquery(); }
     sub expr($)          { $_[0]->subquery(); }
     sub expr_or_check($) { $_[0]->subquery(); }
+    sub table1($)        { $_[0]->subquery(); }
 
     sub stmt($)          { return $_[0]; }
 
@@ -9434,7 +9458,7 @@ TABLE statements, that it was felt it should be tolerated.
        [ ALL | DISTINCT | DISTINCTROW ]
        [ <MyPreOption> , ... ]
        ( <ExprAs> , ... )
-       [ FROM ( <Table> , ... )
+       [ FROM ( <TableAs> , ... )
            [ <Join> ... ]
            [ WHERE Expr ]
            [ GROUP BY ( <Order> , ... ) [ WITH ROLLUP ] ]
@@ -9520,7 +9544,7 @@ L<"Expression List Interpolation">.
         [ ( LOW_PRIORITY | IGNORE | ONLY ) , ... ]
         ( <TableAs> , ... )
         SET ( <Column> '=' <Expr> , ... )
-        [ FROM ( <Table> , ... ) ]
+        [ FROM ( <TableAs> , ... ) ]
         [ WHERE <Expr> ]
         [ ORDER BY <Order> ]
         [ LIMIT <Count> ]
@@ -9545,8 +9569,8 @@ L<< "<TableAs>" >>.
 =head2 <DELETE Stmt>
 
     DELETE [ IGNORE ]
-        FROM [ ONLY ] ( <Table> , ... )
-        [ USING ( <Table> , ... ) ]
+        FROM [ ONLY ] ( <TableAs> , ... )
+        [ USING ( <TableAs> , ... ) ]
         [ WHERE <Expr> ]
         [ ORDER BY <Order> ]
         [ LIMIT <Count> ]
@@ -9559,7 +9583,7 @@ See also
 L<< "<Count>" >>,
 L<< "<Expr>" >>,
 L<< "<Order>" >>,
-L<< "<Table>" >>.
+L<< "<TableAs>" >>.
 
 
 =head2 <CREATE TABLE Stmt>
@@ -9734,7 +9758,7 @@ The alternatives are described under in the following sections:
 
 =item L<< "<CREATE TABLE Stmt>" >>
 
-=item L<< "<ALTOR TABLE Stmt>" >>
+=item L<< "<ALTER TABLE Stmt>" >>
 
 =item L<< "<DROP TABLE Stmt>" >>
 
@@ -9769,7 +9793,8 @@ See also L<"Statement Interpolation">.
 
 =item <TableAs>
 
- <Table> [ AS <TableName> ]
+   <Table> [ AS <TableName> ]
+ | '(' <SELECT Stmt> ')' AS <TableName>
 
 =back
 

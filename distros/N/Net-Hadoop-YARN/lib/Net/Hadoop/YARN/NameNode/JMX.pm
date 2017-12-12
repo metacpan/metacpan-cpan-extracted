@@ -1,5 +1,5 @@
 package Net::Hadoop::YARN::NameNode::JMX;
-$Net::Hadoop::YARN::NameNode::JMX::VERSION = '0.202';
+$Net::Hadoop::YARN::NameNode::JMX::VERSION = '0.203';
 use 5.10.0;
 use strict;
 use warnings;
@@ -119,7 +119,7 @@ Net::Hadoop::YARN::NameNode::JMX
 
 =head1 VERSION
 
-version 0.202
+version 0.203
 
 =head1 SYNOPSIS
 

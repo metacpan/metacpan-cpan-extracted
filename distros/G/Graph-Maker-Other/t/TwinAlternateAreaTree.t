@@ -36,7 +36,7 @@ require Graph::Maker::TwinAlternateAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 10;
   ok ($Graph::Maker::TwinAlternateAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwinAlternateAreaTree->VERSION,  $want_version,

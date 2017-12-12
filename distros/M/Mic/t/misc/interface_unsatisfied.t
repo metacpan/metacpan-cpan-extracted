@@ -32,7 +32,7 @@ use Test::Most;
 
     sub greet {
         my ($self) = @_;
-        return "Hello $self->[ $NAME ]";
+        return "Hello ".$self->[NAME];
     }
 }
 

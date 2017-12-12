@@ -31,6 +31,31 @@ use MyGraphs;
 
 
 {
+  my $graph = Graph::Maker->new('hex_grid', dims => [3,3,3],
+                                undirected => 1);
+  MyGraphs::Graph_xy_print_triangular($graph);
+  add_leaf_at_deg2($graph);
+  MyGraphs::Graph_view($graph);
+
+  exit 0;
+
+  sub add_leaf_at_deg2 {
+    my ($graph) = @_;
+    foreach my $v ($graph->vertices) {
+      my @neighbours = $graph->neighbours($v);
+      if (@neighbours == 2) {
+        my ($x,$y) = split /,/, $v;
+        my ($x1,$y1) = split /,/, $neighbours[0];
+        my ($x2,$y2) = split /,/, $neighbours[1];
+        my $new_x = $x + (($x-$x1) + ($x-$x2));
+        my $new_y = $y + (($y-$y1) + ($y-$y2));
+        $graph->add_edge($v, "$new_x,$new_y");
+      }
+    }
+  }
+}
+
+{
   # POD pictures
   my $graph = Graph::Maker->new('hex_grid', dims => [4,3,2],
                                 undirected => 1);

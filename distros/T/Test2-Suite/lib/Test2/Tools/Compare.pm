@@ -2,7 +2,7 @@ package Test2::Tools::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use Carp qw/croak/;
 use Scalar::Util qw/reftype/;
@@ -1664,7 +1664,7 @@ has custom diagnostics you will need to add checks for them.
 =head1 SOURCE
 
 The source code repository for Test2-Suite can be found at
-F<http://github.com/Test-More/Test2-Suite/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

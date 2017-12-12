@@ -1,6 +1,8 @@
 package School::Code::Compare::Out::Template::Path;
 # ABSTRACT: pseudo class to help locating the path of the template files
-$School::Code::Compare::Out::Template::Path::VERSION = '0.002';
+$School::Code::Compare::Out::Template::Path::VERSION = '0.006';
+use strict;
+use warnings;
 
 sub get {
     if (__FILE__ =~ m!^(.*)/[^/]+$!) {
@@ -25,7 +27,7 @@ School::Code::Compare::Out::Template::Path - pseudo class to help locating the p
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 AUTHOR
 

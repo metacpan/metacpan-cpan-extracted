@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Array;
 use Prty::Option;
@@ -104,12 +104,6 @@ sub decode {
     $queryStr = $class->queryEncode(@opt,@keyVal);
     $queryStr = $class->queryEncode($initialChar,@opt,@keyVal);
 
-=head4 Description
-
-Kodiere die Schlüssel/Wert-Paare in @keyVal gemäß MIME-Type
-"application/x-www-form-urlencoded" und füge sie zu einem Query String
-zusammen.
-
 =head4 Options
 
 =over 4
@@ -125,6 +119,12 @@ Verwende $char als Trennzeichen zwischen den Schlüssel/Wert-Paaren.
 Mögliche Werte sind ';' und '&'.
 
 =back
+
+=head4 Description
+
+Kodiere die Schlüssel/Wert-Paare in @keyVal gemäß MIME-Type
+"application/x-www-form-urlencoded" und füge sie zu einem Query String
+zusammen.
 
 =head4 Examples
 
@@ -274,6 +274,21 @@ sub queryDecode {
     ($schema,$user,$passw,$host,$port,$path,$query,$fragment,@opt) =
         $class->split($url);
 
+=head4 Options
+
+=over 4
+
+=item -defaultSchema => $schema (Default: undef)
+
+Füge Defaultschema hinzu, wenn keins angegeben ist.
+Beispiel: -defaultSchema=>'http://'
+
+=item -debug => $bool (Default: 0)
+
+Gib die Zerlegung auf STDOUT aus.
+
+=back
+
 =head4 Description
 
 Zerlege den URL $url in seine Komponenten und liefere diese zurück.
@@ -313,21 +328,6 @@ Die Funktion akzeptiert auch unvollständige HTTP URLs:
 
 Der Querystring ist alles zwischen '?' und '#', der konkrete Aufbau,
 wie Trennzeichen usw., spielt keine Rolle.
-
-=head4 Options
-
-=over 4
-
-=item -defaultSchema => $schema (Default: undef)
-
-Füge Defaultschema hinzu, wenn keins angegeben ist.
-Beispiel: -defaultSchema=>'http://'
-
-=item -debug => $bool (Default: 0)
-
-Gib die Zerlegung auf STDOUT aus.
-
-=back
 
 =cut
 
@@ -396,7 +396,7 @@ sub split {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

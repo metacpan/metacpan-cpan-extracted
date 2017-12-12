@@ -13,3 +13,7 @@ Revision history for WWW-Codeguard
         Added support for passing parameters through GET requests.
 0.05    Nov 7, 2017
         Version bump
+
+0.10    Dec 11, 2017
+        Added support for database_backup_commits endpoint
+        Fixed bug that prevented creating mappings between databases and websites

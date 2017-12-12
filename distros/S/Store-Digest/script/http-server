@@ -1,0 +1,115 @@
+#!perl
+
+# -*- perl -*-
+
+use strict;
+use warnings FATAL => 'all';
+
+use Store::Digest::Driver::FileSystem;
+
+use Plack::Request;
+
+my $app = sub {
+    my $env = shift;
+    my $req = Plack::Request->new($env);
+
+    my $res = $req->new_response(200);
+    $res->content_type('application/octet-stream');
+
+    my $method = $req->method;
+    if ($method eq 'POST') {
+        # can match a specified digest or endpoint URL
+
+        # have a special handler location for multipart/form-data, but
+        # otherwise store multipart/form-data as-is.
+    }
+    elsif ($method eq 'PUT') {
+        # digest MUST match content
+
+        # Date request header sets record mtime
+    }
+    elsif ($method eq 'DELETE') {
+        # location must match exactly
+    }
+    elsif ($method eq 'GET' or $method eq 'HEAD') {
+        # /.well-known/ni/{digest}/{whatever}
+
+        # use conneg for (X)HTML+RDFa, RDF/XML, Turtle
+
+        # /.well-known/ni/ should show stats and available digest algos
+
+        # /.well-known/ni/{digest}/ should list content somehow. the
+        # question is how? the lexical value of the digest is
+        # emphatically meaningless (that's kind of the point). plus
+        # this thing will eventually store millions, perhaps billions
+        # of objects (well, not this implementation, but still).
+
+        # tempted to go by ctime, mtime and type; dtime as well for
+        # completeness. deleted objects should not link.
+
+        # problem with going by time is we'd have to aggregate by day
+        # and there are these pesky things called time zones, which to
+        # date there is still no method for communicating via plain HTTP.
+
+        # and then on top of time zones there's daylight savings, so
+        # to make a functioning interface, the system will have to do
+        # datetime arithmetic to figure out what was done on what day
+        # in the right context.
+
+        # there is also the issue of limits, again this bastard is not
+        # going to be able to do hard numeric limits/offsets because
+        # we can't guarantee what state the system will be in across
+        # requests.
+
+        # although that might not be a problem if we sort lexically.
+        # ctimes will never change unless an object is deleted and
+        # re-added. mtime might change, so might type and encoding.
+        # dtime will only be set and cleared.
+
+        # also it will be hella useful to get a list of objects that
+        # have a broken type/charset/content-encoding/syntax, so we
+        # can either do something about them or nuke them.
+
+        # /.well-known/ni/{digest}/{whatever} should return a list in
+        # case of a partial match, 300 Multiple Choices.
+
+        # for all these objects we should generate an etag based on
+        # the state of the whole system. last-modified will be derived
+        # from the global stats or from the latest ctime of the
+        # selected collection. ugh but if you can change the metadata,
+        # including the mtime, that will cause havoc with caching.
+
+        # do we want a separate mtime field for metadata? ptime? (for
+        # properties) yup.
+
+        # it would be kind of rad to serve this up as an atom feed for
+        # replication, etc: N most recent ctime/mtime/ptime/dtime
+
+        # otherwise just return the object, or headers if HEAD.
+
+        # unless Accept: for the type is 0, then 406, or if the object
+        # is deleted, then 410
+
+        # what about ;meta gender bender to propfind? out of scope?
+
+        # ugh this looks like it's going to be a lot of work.
+    }
+    elsif ($method eq 'PROPFIND') {
+        # show metadata
+
+        # Accept: either RDF/whatever or DAV XML; prefer DAV XML
+    }
+    elsif ($method eq 'PROPPATCH') {
+        # update metadata: flags, type, encoding and mtime, but the
+        # client should have the right privileges. note that ACLs are
+        # out of scope for this module.
+    }
+    else {
+        $res->status(405);
+        $res->content_type('text/plain');
+        # it would be really nice to have conneg'd RDF(a) HTTP error
+        # response bodies.
+    }
+
+    $res->finalize;
+};

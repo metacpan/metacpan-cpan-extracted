@@ -4,6 +4,14 @@ use v5.10.1;
 
 use ExtUtils::MakeMaker '6.55_02';
 
+my $prereq_pm = {
+    'Dancer'                     => '1.31',
+    'JSON'                       => '2.0',
+    'Params::ValidationCompiler' => '0.24',
+    'RPC::XML'                   => '0.56',
+    'Types::Standard'            => '1.00',
+};
+
 WriteMakefile(
     NAME          => 'Dancer::Plugin::RPC',
     VERSION_FROM  => 'lib/Dancer/Plugin/RPC.pm',
@@ -11,22 +19,15 @@ WriteMakefile(
     AUTHOR        => 'Abe Timmerman <abeltje@cpan.org>',
     LICENSE       => 'perl',
 
-    PREREQ_PM => {
-        'Dancer'                     => '1.31',
-        'JSON'                       => '2.0',
-        'Params::ValidationCompiler' => '0.24',
-        'RPC::XML'                   => '0.56',
-        'Types::Standard'            => '1.00',
-    },
-
+    PREREQ_PM          => $prereq_pm,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.55_02',
     },
-
-    BUILD_REQUIRES => {
+    BUILD_REQUIRES     => {
         'Test::Fatal'      => '0.010',
         'Test::More'       => '0.88',    # done_testing()
         'Test::NoWarnings' => '1.00',
+        %$prereq_pm
     },
 
     MIN_PERL_VERSION => '5.010001',

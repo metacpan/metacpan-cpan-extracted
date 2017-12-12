@@ -35,8 +35,7 @@
             "Capture::Tiny" : "0",
             "Dist::Milla" : "v1.0.18",
             "Path::Tiny" : "0",
-            "Term::ANSIColor" : "4.06",
-            "Test2::Harness" : "0",
+            "Test::More" : "0.98",
             "Test::Pod" : "1.41"
          }
       },
@@ -83,7 +82,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "0.953",
+   "version" : "0.955",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",

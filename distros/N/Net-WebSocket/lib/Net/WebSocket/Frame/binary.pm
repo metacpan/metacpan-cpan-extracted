@@ -16,7 +16,7 @@ Net::WebSocket::Frame::binary
         #Optional, can be either empty (default) or four random bytes
         mask => q<>,
 
-        payload_sr => \$payload_text,
+        payload => $payload_octet_string,
     );
 
     $frm->get_type();           #"binary"

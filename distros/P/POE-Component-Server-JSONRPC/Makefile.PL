@@ -10,8 +10,6 @@ requires 'POE::Filter::Line';
 requires 'POE::Component::Server::SimpleHTTP';
 requires 'POE::Component::Server::TCP';
 requires 'JSON';
-requires 'JSON::Client::RPC';
 
-use_test_base;
 auto_include;
 WriteAll;

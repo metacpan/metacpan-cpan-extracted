@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -40,12 +40,6 @@ Methoden zur Manipulation des Arrays von Zeilen zur Verfügung.
     $doc = $class->new($file,@opt);
     $doc = $class->new(\$str,@opt);
     $doc = $class->new(\@lines,@opt);
-
-=head4 Description
-
-Instantiiere ein Dokument-Objekt aus Datei $file, aus Text
-$text oder aus den Zeilen @lines und liefere eine Referenz
-auf dieses Objekt zurück.
 
 =head4 Options
 
@@ -83,6 +77,12 @@ Backslash entfernt.
 Überlies Zeilen, die Regex $regex erfüllen.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Dokument-Objekt aus Datei $file, aus Text
+$text oder aus den Zeilen @lines und liefere eine Referenz
+auf dieses Objekt zurück.
 
 =cut
 
@@ -285,7 +285,7 @@ sub shiftLine {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

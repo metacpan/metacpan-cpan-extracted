@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use App::CISetup::Types qw( Str );
 

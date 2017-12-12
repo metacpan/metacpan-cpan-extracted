@@ -5,10 +5,10 @@ use v5.10.0;
 use strict;
 use warnings;
 
-use version 0.77; our $VERSION = version->declare('v0.5.3');
+use version; our $VERSION = version->declare('v0.6.2');
 
 use Carp qw/ croak /;
-use List::MoreUtils qw/ natatime /;
+use List::AllUtils qw/ natatime /;
 
 use namespace::autoclean;
 
@@ -25,7 +25,7 @@ modules:
 
 =over
 
-=item L<List::MoreUtils>
+=item L<List::AllUtils>
 
 =item L<namespace::autoclean>
 
@@ -229,12 +229,12 @@ sub _compile_match {
 }
 
 my %KEY2FN = (
-    '-all'	=> List::MoreUtils->can('all'),
-    '-and'	=> List::MoreUtils->can('all'),
-    '-any'	=> List::MoreUtils->can('any'),
-    '-notall'	=> List::MoreUtils->can('notall'),
-    '-notany'	=> List::MoreUtils->can('none'),
-    '-or'	=> List::MoreUtils->can('any'),
+    '-all'	=> List::AllUtils->can('all'),
+    '-and'	=> List::AllUtils->can('all'),
+    '-any'	=> List::AllUtils->can('any'),
+    '-notall'	=> List::AllUtils->can('notall'),
+    '-notany'	=> List::AllUtils->can('none'),
+    '-or'	=> List::AllUtils->can('any'),
 );
 
 sub _key2fn {
@@ -346,6 +346,10 @@ The following modules have similar functionality:
 
 Robert Rothenberg, C<< <rrwo at cpan.org> >>
 
+=head2 Contributors
+
+Mohammad S Anwar
+
 =head1 ACKNOWLEDGEMENTS
 
 =over
@@ -356,7 +360,7 @@ Robert Rothenberg, C<< <rrwo at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 Robert Rothenberg.
+Copyright 2017 Robert Rothenberg.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

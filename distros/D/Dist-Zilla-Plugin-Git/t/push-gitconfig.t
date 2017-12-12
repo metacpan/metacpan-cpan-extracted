@@ -8,7 +8,7 @@ use Test::Fatal qw(exception);
 
 use Devel::SimpleTrace;
 
-use lib 't';
+use lib 't/lib';
 use Util;
 
 eval { require Dist::Zilla::Plugin::Config::Git };

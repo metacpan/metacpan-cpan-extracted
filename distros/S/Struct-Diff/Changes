@@ -1,5 +1,14 @@
 Revision history for Struct-Diff
 
+0.93    2017-12-09
+        diff(): get rid of redundant I tokens in array's diffs
+        diff(): get rid of empty subdiffs in array's diffs (noU)
+        patch(): references patching fixed
+        patch(): arrays patching fixed for LCS noU diffs
+        diff() and patch() code refactored
+        tests refactored and significantly improved
+        docs improved
+
 0.92    2017-11-27
         diff fixed for emptied/filled subhashes
         patch fixed for cases when entire data type changed

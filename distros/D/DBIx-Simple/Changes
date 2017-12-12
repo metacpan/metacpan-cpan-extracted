@@ -3,15 +3,26 @@ Revision history for Perl extension DBIx::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
-1.35  Tue Jan 4 23:48 2010
+1.37  2017-12-08 23:49
+        - POD syntax fix
+
+1.36  2017-12-08 21:23
+        - $result->object and $result->objects now load any module on demand.
+          (Suggested by Krasimir Berov.)
+        - New: $result->group, $result->group_hashes, $result->group_arrays.
+          (Suggested by Mark Overmeer.)
+        - Fixed typo in 1.35 release date below. (Reported by Sjors Gielen.)
+        - Changed changelog date format from insane to ISO 8601-ish.
+
+1.35  2011-01-04 23:48
      !! - RaiseError is now enabled by default, as announced three years ago.
           Set PERL_DBIX_SIMPLE_NO_RAISEERROR=1 to get the old behavior.
 
-1.34  Mon Dec 12 16:28 2010
-        - Added missing documentation. (Reported by Krassimir Berov.)
+1.34  2010-12-12 16:28
+        - Added missing documentation. (Reported by Krasimir Berov.)
         - Fixed off-by-20 mistake in unit tests.
 
-1.33  Sat Dec 4 0:30 2010
+1.33  2010-12-04 00:30
         - New license: any(OSI).
         - Documentation overhaul.
         - New: $result->kv_list, $result->kv_array, $result->kv_flat,
@@ -23,34 +34,34 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
         - Please note that very probably RaiseError will be enabled by
           default in the next version.
 
-1.32  Mon Sep 17 14:58 2007
+1.32  2007-07-17 14:58
         - Test updated to conform to fixed bug in Test::More. See
           http://www.nntp.perl.org/group/perl.qa/2007/09/msg9269.html
 
-1.31  Sun Jul 15 0:29 2007
+1.31  2007-07-15 00:29
         - New: $db->iquery. This method loads SQL::Interp on demand. The
           feature was requested by several people. Thanks go out to David
           Manura for writing SQL::Interpolate, and to Mark Stosberg for
           improving it and releasing that as SQL::Interp.
 
-1.30  Sun Apr 8 2:29 2007
+1.30  2007-04-08 02:29
         - Fixed bug #18629. Apparently Want does not consider a method call in
           rvalue context. The premature optimization that used Want has simply
           been removed. (Reported by Tomi via RT.)
         - Fixed bug #22829. With connect($dbh) or new($dbh), DBIx::Simple no
           longer disconnects implicitly. (Reported by BORISZ via RT.)
 
-1.29  Web Apr 4 2:22 2007
+1.29  2007-04-04 02:22
         - Fixed documentation typo.
 
-1.28  Wed Apr 4 2:16 2007
+1.28  2007-04-04 02:16
         - New: $db->result_class. This allows using a custom subclass.
         - $result->flat now returns an array reference in scalar context.
         - Optimized: map (up to 15% faster).
         - The "map" method now really requires exactly two columns.
         - Minor documentation improvements.
 
-1.27  Sun Mar 18 21:14 2007
+1.27  2007-0318 21:14
      !! - Bugfix: (??) was replaced when quoted
      !! - Bugfix: \' escaping was assumed, but actually only MySQL uses that
         - New: support \' escaping only for DBD::mysql
@@ -58,15 +69,15 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
         - Removed dependency on Data::Swap
      !! - Removed compatibility package DBIx::Simple::SQE
 
-1.26  Tue Nov 30 14:25 2004
+1.26  2004-11-30 14:25
         - Removed documentation of emulate_subqueries.
         - Minor documentation fixes.
 
-1.25  Mon Jun 21 9:39 2004
+1.25  2004-06-21 09:39
         - New: $result->text.
         - This new method can use Anno Siegel's Text::Table (loaded on demand).
 
-1.24  Sun Jun 20 21:32 2004
+1.24  2004-06-20 21:32
         - New: $result->xto.
         - New: $result->html.
         - These new methods use Jeffrey Hayes Anderson's DBIx::XHTML_Table
@@ -74,7 +85,7 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
         - New: $result->text.
         - Documentation =~ s/ESQ/SQE/g. (Reported by Larry Kos)
 
-1.23  Thu Jun 10 0:00 2004
+1.23  2004-06-10 00:00
         - New: DBIx::Simple::SQE.
         - New: $db->abstract.
         - New: $db->select.
@@ -91,17 +102,17 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
           DBIx::Simple::SQE.)
      !! - Removed: $db->omniholder. (Now a constant: always "(??)".)
 
-1.22  Thu May 6 17:30 2004
+1.22  2004-05-06 17:30
         - Changed the declaration of a variable so that it doesn't blow up
           under 5.8.4's better strict. This should also fix a still
           undiscovered bug in the deprecated subquery emulation.
           (Reported and patched by Jos Boumans <irc>)
 
-1.21  Thu Apr 29 14:40 2004
+1.21  2004-04-29 14:40
         - Removed two nonsense entries from the changelog. $db->array and
           $db->hash do NOT reuse.
 
-1.20  Tue Apr 27 11:15 2004
+1.20  2004-04-27 11:15
         - Almost a complete rewrite :)
         - $db->emulate_subqueries is now deprecated. Use a better database
           engine instead.
@@ -133,14 +144,14 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
           order during global destruction better.
         - Rebuilt distribution with h2xs to get lib/ and t/.
 
-1.11  Tue Mar 26 19:05 2003
+1.11  2003-03-26 19:05
         - Documentation updates.
      !! - list() now returns the *last* element in scalar context (was: first).
         - hashes() and arrays() now return array references in scalar context.
         - Migrated two properties to Attribute::Properties. (new dependency)
         - $VERSION++.
 
-0.10  Thu Jan 9 10:03 2003
+0.10  2003-01-09 10:03
         - Documentation rewrite!
         - New: $db->error(). In an upcoming release, $db->{reason} will be
           removed.
@@ -158,13 +169,13 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
           instead of undef.
         - PrintError now defaults to 0
 
-0.09  Sun Dec 8 5:59 2002
+0.09  2002-12-08 05:59
         - $dbh->disconnect() only if the object's still there. This works
           around perl bug #18951. Something is killing objects during (or just
           before) global destruction. This bug was first found by Gerard Oskamp
           <gerard-perl@tuxje.nl>.
 
-0.08  Mon Dec 2 21:16 2002
+0.08  2002-12-02 21:16
         - Added $result->finish() method
         - The documentation was wrong: "undef $result" did nothing useful, as
           DBIx::Simple kept a copy internally, for garbage cleaning purposes.
@@ -174,35 +185,35 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
         - When finish() or disconnect() is used, attempts to use the database
           connection or statement handle now result in a verbose error message.
 
-0.07  Mon Sep 30 7:48 2002
+0.07  2002-09-30 07:48
         - Removed TraceLevel thing that caused DBI to output debugging info
         - Very minor documentation update (removed 2 characters)
 
-0.06  Fri Sep 20 10:55 2002
+0.06  2002-09-20 10:55
         - Oops: forgot to update the README file; nothing serious
 
-0.05  Thu Sep 19 14:32 2002
+0.05  2002-09-19 14:32
         - Added $db->begin_work
         - No longer expanding the (??) omniholder inside quoted SQL
         - Subquery emulation! Have subqueries in MySQL! YAY!
           (Not enabled by default. Use $db->esq(1) to enable)
         - This module now requires Perl >= 5.6
 
-0.04  Tue Sep 17 15:46 2002
+0.04  2002-09-17 15:46
         - Documentation updates only
 
-0.03  Thu Jun 13 09:50 2002
+0.03  2002-06-13 09:50
         - New: "(??)" and $db->omniholder() (like EZDBI's ??L placeholder)
         - Documentation updates
         - Code updates (now uses $_[0] directly for speed in many methods)
         - $result->list() in scalar context returns first value only
 
-0.02  Sat Mar 30 14:00 2002
+0.02  2002-03-30 14:00
         - New: $db->commit() and rollback().
           Suggested by tradez (perlmonks.org)
         - New: $result->map_hashes(), map_arrays(), map().
           Suggested by mattr (perlmonks.org)
         - New: $result->flat(), a plural form of list()
 
-0.01  Thu Mar 28 18:04 2002
+0.01  2002-03-28 18:04
         - Initial CPAN release

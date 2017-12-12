@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 
@@ -87,11 +87,6 @@ Extension
     $nam = $class->new($file);
     $nam = $class->new($n,$width,$height,$ext,@opt);
 
-=head4 Description
-
-Instantiiere Bilddateinamen-Objekt und liefere eine Referenz auf
-dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -131,6 +126,11 @@ Namenszusatz der Datei
 =head4 Returns
 
 Referenz auf das Bilddateinamen-Objekt
+
+=head4 Description
+
+Instantiiere Bilddateinamen-Objekt und liefere eine Referenz auf
+dieses Objekt zurück.
 
 =cut
 
@@ -198,13 +198,13 @@ sub new {
 
     $n = $nam->number;
 
-=head4 Description
-
-Liefere die Nummer der Bilddatei.
-
 =head4 Returns
 
 Integer > 0
+
+=head4 Description
+
+Liefere die Nummer der Bilddatei.
 
 =head3 width() - Breite
 
@@ -212,13 +212,13 @@ Integer > 0
 
     $width = $nam->width;
 
-=head4 Description
-
-Liefere die Breitenangabe aus dem Bilddateinamen.
-
 =head4 Returns
 
 Integer > 0
+
+=head4 Description
+
+Liefere die Breitenangabe aus dem Bilddateinamen.
 
 =head3 height() - Höhe
 
@@ -226,13 +226,13 @@ Integer > 0
 
     $height = $nam->height;
 
-=head4 Description
-
-Liefere die Höhenangabe aus dem Bilddateinamen.
-
 =head4 Returns
 
 Integer > 0
+
+=head4 Description
+
+Liefere die Höhenangabe aus dem Bilddateinamen.
 
 =head3 text() - Text
 
@@ -240,14 +240,14 @@ Integer > 0
 
     $str = $nam->text;
 
+=head4 Returns
+
+String
+
 =head4 Description
 
 Liefere den (optionalen) Text aus dem Bilddateinamen. Ist kein
 Text vorhanden, liefere einen Leerstring ('').
-
-=head4 Returns
-
-String
 
 =cut
 
@@ -265,13 +265,13 @@ sub text {
 
     $extension = $nam->extension;
 
-=head4 Description
-
-Liefere die Extension des Bilddateinamens.
-
 =head4 Returns
 
 String
+
+=head4 Description
+
+Liefere die Extension des Bilddateinamens.
 
 =head2 Objektmethoden
 
@@ -306,7 +306,7 @@ sub asString {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

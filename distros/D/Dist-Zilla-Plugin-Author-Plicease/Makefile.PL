@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"       => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm"     => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/NoUnsafeInc.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm"  => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "2.24",
+  "VERSION" => "2.25",
   "test"    => {
     "TESTS" => "t/*.t"
     }

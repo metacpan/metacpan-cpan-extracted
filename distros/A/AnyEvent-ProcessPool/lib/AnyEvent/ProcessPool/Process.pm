@@ -1,9 +1,7 @@
 package AnyEvent::ProcessPool::Process;
 # ABSTRACT: Manages an individual worker process
-$AnyEvent::ProcessPool::Process::VERSION = '0.06';
-use strict;
-use warnings;
-
+$AnyEvent::ProcessPool::Process::VERSION = '0.07';
+use common::sense;
 use Config;
 use AnyEvent;
 use AnyEvent::Open3::Simple;
@@ -139,7 +137,7 @@ AnyEvent::ProcessPool::Process - Manages an individual worker process
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

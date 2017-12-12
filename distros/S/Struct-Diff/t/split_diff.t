@@ -1,14 +1,15 @@
 #!perl -T
 
 use strict;
-use warnings;
+use warnings FATAL => 'all';
+
 use Storable qw(freeze);
 use Struct::Diff qw(diff split_diff);
 use Test::More tests => 15;
 
 local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
-my ($a, $b, $d, $frozen_d, $s);
+my ($x, $y, $d, $frozen_d, $s);
 
 ### garbage ###
 $s = split_diff({garbage_as_a_status => 'garbage'});
@@ -31,18 +32,18 @@ $s = split_diff(diff([ 0, 1 ], [ 0 ]));
 is_deeply($s, {a => [0,1],b => [0]}, "[0,1] vs [0]");
 
 my $sub_array = [ 0, [ 11, 12 ], 2 ];
-$a = [ 0, [[ 100 ]], [ 20, 'a' ], $sub_array, 4 ];
-$b = [ 0, [[ 100 ]], [ 20, 'b' ], $sub_array, 5 ];
+$x = [ 0, [[ 100 ]], [ 20, 'a' ], $sub_array, 4 ];
+$y = [ 0, [[ 100 ]], [ 20, 'b' ], $sub_array, 5 ];
 
-$d = diff($a, $b, noU => 0);
+$d = diff($x, $y, noU => 0);
 $frozen_d = freeze($d);
 
 $s = split_diff($d);
-is_deeply($s, {a => $a,b => $b}, "complex arrays, noU => 0");
+is_deeply($s, {a => $x,b => $y}, "complex arrays, noU => 0");
 
 is($frozen_d, freeze($d), "original struct must remain unchanged");
 
-$d = diff($a, $b, noU => 1);
+$d = diff($x, $y, noU => 1);
 $frozen_d = freeze($d);
 
 $s = split_diff($d);
@@ -52,27 +53,27 @@ is($frozen_d, freeze($d), "original struct must remain unchanged");
 
 ### hashes ###
 
-$a = { 'a' => 'a1', 'b' => { 'ba' => 'ba1', 'bb' => 'bb1' }, 'c' => 'c1' };
-$b = { 'a' => 'a1', 'b' => { 'ba' => 'ba2', 'bb' => 'bb1' }, 'd' => 'd1' };
+$x = { 'a' => 'a1', 'b' => { 'ba' => 'ba1', 'bb' => 'bb1' }, 'c' => 'c1' };
+$y = { 'a' => 'a1', 'b' => { 'ba' => 'ba2', 'bb' => 'bb1' }, 'd' => 'd1' };
 
-$d = diff($a, $b);
+$d = diff($x, $y);
 $frozen_d = freeze($d);
 
 $s = split_diff($d);
-is_deeply($s, {a => $a,b => $b}, "complex hashes, full diff");
+is_deeply($s, {a => $x,b => $y}, "complex hashes, full diff");
 
 is($frozen_d, freeze($d), "original struct must remain unchanged");
 
 ### mixed structures ###
 
-$a = {
+$x = {
     'ak' => 'av',
     'bk' => [ 'bav', 'bbv', 'bcv', 'bdv' ],
     'ck' => { 'ca' => 'cav', 'cb' => 'cbv', 'cc' => 'ccv', 'cd' => 'cdv', 'ce' => 'cev' },
     'dk' => 'dav',
     'ek' => 'eav'
 };
-$b = {
+$y = {
     'ak' => 'an',
     'bk' => [ 'bav', 'bbn', 'bcn', 'bdv' ],
     'ck' => { 'ca' => 'can', 'cb' => 'cbv', 'cc' => 'ccv', 'cd' => 'cdn', 'cf' => 'cef' },
@@ -80,15 +81,15 @@ $b = {
     'fk' => 'fav'
 };
 
-$d = diff($a, $b);
+$d = diff($x, $y);
 $frozen_d = freeze($d);
 
 $s = split_diff($d);
-is_deeply($s, {a => $a,b => $b}, "complex struct, full diff");
+is_deeply($s, {a => $x,b => $y}, "complex struct, full diff");
 
 is($frozen_d, freeze($d), "original struct must remain unchanged");
 
-$d = diff($a, $b, noU => 1);
+$d = diff($x, $y, noU => 1);
 $frozen_d = freeze($d);
 
 $s = split_diff($d);

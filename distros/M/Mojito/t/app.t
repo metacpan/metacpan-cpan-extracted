@@ -11,10 +11,10 @@ use Data::Dumper::Concise;
 
 # Monkey patch Auth::Digest during testing to let me in the door.
 BEGIN {
-    if ( !$ENV{RELEASE_TESTING} ) {
+    if ( !$ENV{AUTHORZ_TESTING} ) {
         require Test::More;
         Test::More::plan(
-            skip_all => 'these tests are for release candidate testing' );
+            skip_all => 'these tests are for author testing' );
     }
 
     use Plack::Middleware::Auth::Digest;

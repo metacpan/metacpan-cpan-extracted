@@ -7,7 +7,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_priority { 90; }
@@ -38,7 +38,7 @@ eris::dictionary::syslog - Contains fields extracted from syslog messages
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

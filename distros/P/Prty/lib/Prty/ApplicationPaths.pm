@@ -3,7 +3,7 @@ package Prty::ApplicationPaths;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Cwd ();
 use Hash::Util ();
@@ -94,10 +94,6 @@ Struktur im Home-Verzeichnis des Benutzers befinden
     $app = $class->new;
     $app = $class->new($depth);
 
-=head4 Description
-
-Instantiiere ein Objekt der Klasse und liefere dieses zurück.
-
 =head4 Arguments
 
 =over 4
@@ -108,6 +104,10 @@ Gibt an, wie viele Subverzeichnisse tief das Programm unterhalb des
 Applikations-Homedir (<prefix>/opt/<application>) angesiedelt ist.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere dieses zurück.
 
 =cut
 
@@ -360,7 +360,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

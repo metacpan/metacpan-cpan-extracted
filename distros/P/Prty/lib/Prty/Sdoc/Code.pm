@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Prty::Ipc;
@@ -351,7 +351,7 @@ sub dump {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

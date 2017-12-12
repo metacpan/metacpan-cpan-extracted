@@ -1,5 +1,5 @@
 ---
-abstract: 'browse, upload, copy, move, delete static files/dirs.'
+abstract: 'browse, upload, copy, move, delete static files and dirs.'
 author:
   - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
 build_requires:
@@ -24,5 +24,5 @@ requires:
   perl: '5.014'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-StaticShare.git
-version: '0.04'
+version: '0.056'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

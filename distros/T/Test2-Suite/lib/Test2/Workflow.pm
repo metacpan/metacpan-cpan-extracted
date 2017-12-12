@@ -2,7 +2,7 @@ package Test2::Workflow;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 our @EXPORT_OK = qw/parse_args current_build build root_build init_root build_stack/;
 use base 'Exporter';
@@ -257,7 +257,7 @@ L<Test2::Tools::Spec> is an implementation of RSPEC using this library.
 =head1 SOURCE
 
 The source code repository for Test2-Workflow can be found at
-F<http://github.com/Test-More/Test2-Workflow/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

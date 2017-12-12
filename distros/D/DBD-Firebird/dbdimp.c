@@ -294,6 +294,7 @@ int dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid,
     unsigned short ib_dialect, ib_cache;
     char *ib_role;
     char ISC_FAR *dpb_buffer, *dpb;
+    int connect_timeout = 0;
 
     char ISC_FAR *database;
 
@@ -409,6 +410,15 @@ int dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid,
             DPB_PREP_INTEGER(buflen);
     }
 
+    if ((svp = hv_fetch(hv, "timeout", 7, FALSE)))
+    {
+        int val = SvIV(*svp);
+        if (val <= 0) croak("Positive timeout required");
+
+        connect_timeout = val;
+        DPB_PREP_INTEGER(buflen);
+    }
+
     /* add length of other parameters to needed buflen */
     buflen += 1; /* dbpversion */
 
@@ -453,6 +463,11 @@ int dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid,
     if (ib_role)
     {
         DPB_FILL_STRING(dpb, isc_dpb_sql_role_name, ib_role);
+    }
+
+    if (connect_timeout)
+    {
+        DPB_FILL_INTEGER(dpb, isc_dpb_connect_timeout, connect_timeout);
     }
 
     dpb_length = dpb - dpb_buffer;
@@ -1057,30 +1072,31 @@ int dbd_st_finish_internal(SV *sth, imp_sth_t *imp_sth, int honour_auto_commit)
     }
 
     /* Close the cursor, not drop the statement! */
-    if (imp_sth->type != isc_info_sql_stmt_exec_procedure)
+    if (imp_sth->type != isc_info_sql_stmt_exec_procedure) {
         isc_dsql_free_statement(status, (isc_stmt_handle *)&(imp_sth->stmt), DSQL_close);
 
-    /* Ignore errors when closing already closed cursor (sqlcode -501).
-       May happen when closing "select * from sample" statement, which was
-       closed by the server because of a "drop table sample" statement.
-       There is no point to error-out here, since nothing bad has happened --
-       the statement is closed, just without we knowing. There is no resource
-       leak and the user can't and needs not do anything.
-     */
-    if ((status[0] == 1) && (status[1] > 0)) {
-        long sqlcode = isc_sqlcode(status);
+        /* Ignore errors when closing already closed cursor (sqlcode -501).
+           May happen when closing "select * from sample" statement, which was
+           closed by the server because of a "drop table sample" statement.
+           There is no point to error-out here, since nothing bad has happened --
+           the statement is closed, just without we knowing. There is no resource
+           leak and the user can't and needs not do anything.
+         */
+        if ((status[0] == 1) && (status[1] > 0)) {
+            long sqlcode = isc_sqlcode(status);
 
-        if (sqlcode != -501) {
-            if (ib_error_check(sth, status))
-                return FALSE;
+            if (sqlcode != -501) {
+                if (ib_error_check(sth, status))
+                    return FALSE;
+            }
+            else
+            {
+                DBI_TRACE_imp_xxh(imp_sth, 3, (DBIc_LOGPIO(imp_sth), "dbd_st_finish: ignoring error -501 from isc_dsql_free_statement.\n"));
+            }
         }
-        else
-        {
-            DBI_TRACE_imp_xxh(imp_sth, 3, (DBIc_LOGPIO(imp_sth), "dbd_st_finish: ignoring error -501 from isc_dsql_free_statement.\n"));
-        }
+
+        DBI_TRACE_imp_xxh(imp_sth, 3, (DBIc_LOGPIO(imp_sth), "dbd_st_finish: isc_dsql_free_statement passed.\n"));
     }
-
-    DBI_TRACE_imp_xxh(imp_sth, 3, (DBIc_LOGPIO(imp_sth), "dbd_st_finish: isc_dsql_free_statement passed.\n"));
 
     /* set statement to inactive - must be before ib_commit_transaction 'cos
        commit can call dbd_st_finish function again */
@@ -1660,15 +1676,15 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
                     };
                     long max_segment = -1L, total_length = -1L, t;
                     unsigned short seg_length;
-                    unsigned short blob_type = -1;
+                    short blob_type = -1;
 
                     /* Open the Blob according to the Blob id. */
                     isc_open_blob2(status, &(imp_dbh->db), &(imp_dbh->tr),
                                    &blob_handle, (ISC_QUAD *) var->sqldata,
 #if defined(INCLUDE_FB_TYPES_H) || defined(INCLUDE_TYPES_PUB_H)
                                    (ISC_USHORT) 0,
-                                   (ISC_UCHAR) 0);
-#else                                   
+                                   (ISC_UCHAR *) NULL);
+#else
                                    (short) 0,       /* no Blob filter */
                                    (char *) NULL);  /* no Blob filter */
 #endif
@@ -1743,19 +1759,6 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
                         break;
                     }
 
-                    if (total_length >= MAX_SAFE_BLOB_LENGTH)
-                    {
-                        do_error(sth, 1, "Blob exceeds maximum length.");
-
-                        sv_setpvn(sv, "** Blob exceeds maximum safe length **", 38);
-
-                        /* I deliberately don't set FAILURE based on this. */
-                        isc_close_blob(status, &blob_handle);
-                        if (ib_error_check(sth, status))
-                            return FALSE;
-                        break;
-                    }
-
                     /* Create a zero-length string. */
                     sv_setpv(sv, "");
 
@@ -1783,12 +1786,6 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
     /*
      * As long as the fetch was successful, concatenate the segment we fetched
      * into the growing Perl scalar.
-     */
-    /*
-     * This is dangerous if the Blob is enormous.  But Perl is supposed
-     * to be able to grow scalars indefinitely as far as resources allow,
-     * so what the heck.  Besides, I limited the max length of a Blob earlier
-     * to MAX_SAFE_BLOB_LENGTH.
      */
 
                         sv_catpvn(sv, blob_segment_buffer, seg_length);

@@ -1,5 +1,10 @@
 Revision history for Role-Markup-XML
 
+0.07    Tue, 12 Sep 2017 17:27:12 -0700
+        - added _XPC accessor for handy-dandy xpath context
+        - fixed a stupid one-character bug that was breaking namespace
+          assignment
+
 0.06    Sat,  9 Sep 2017 20:47:11 -0700
         added replace, before and after node parameters in addition
         to parent

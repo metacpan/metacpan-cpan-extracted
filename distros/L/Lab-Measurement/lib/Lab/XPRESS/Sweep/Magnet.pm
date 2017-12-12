@@ -1,6 +1,7 @@
 package Lab::XPRESS::Sweep::Magnet;
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.613';
 #ABSTRACT: Magnetic field sweep
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.600';
+
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -23,7 +24,8 @@ sub new {
             'Lab::Instrument::IPSWeiss1',
             'Lab::Instrument::IPSWeiss2',
             'Lab::Instrument::IPSWeissDillFridge',
-            'Lab::Instrument::IPSStrunkDillFridge'
+            'Lab::Instrument::IPSStrunkDillFridge',
+            'Lab::Moose::Instrument::OI_Mercury::Magnet',
         ],
         allowed_sweep_modes => [ 'continuous', 'list', 'step' ],
         use_persistentmode  => 0,
@@ -160,7 +162,7 @@ Lab::XPRESS::Sweep::Magnet - Magnetic field sweep
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -357,7 +359,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
   Copyright 2012       Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

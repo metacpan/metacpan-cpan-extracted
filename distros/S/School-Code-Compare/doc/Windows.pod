@@ -1,0 +1,31 @@
+=encoding utf8
+
+=head1 WINDOWS
+
+This program should work on dos/windows.
+But it is mainly designed and tested for GNU/Linux.
+
+Users who wan't to use this program and are not familiar with Perl, ar most likely going to try this on Windows.
+This assumption is the reason for this little guide.
+I hope it helps.
+
+=head2 INSTALLATION
+
+The program was tested using Strawberry Perl from L<http://strawberryperl.com/>.
+You can simply install e.g. the portable distribution, launch the Perl Shell and then type:
+
+ cpan School::Code::Compare
+
+=head2 CREATE A LIST OF FILES
+
+A simple way to create a file with the paths to other files:
+
+ dir /s /b C:\your\javaprojects > paths.txt
+
+=head2 RUN THE PROGRAM
+
+When you have a file containing your paths, you can run the program:
+
+ compare-code java -i paths.txt -o html
+
+You should the find some html files in your current directory.

@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Logger;
-$OTRS::OPM::Installer::Logger::VERSION = '0.02';
+$OTRS::OPM::Installer::Logger::VERSION = '0.03';
 # ABSTRACT: A simple logger for OTRS::OPM::Installer
 
 use strict;
@@ -25,7 +25,7 @@ sub print {
     my ($self, $tag, %attr) = @_;
 
     my $attrs   = join " ", map{
-        my $escaped = $attr{$_};
+        my $escaped = $attr{$_} // '';
         $escaped =~ s{\\}{\\\\}g;
         $escaped =~ s{"}{\\"}g;
 
@@ -64,7 +64,7 @@ OTRS::OPM::Installer::Logger - A simple logger for OTRS::OPM::Installer
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

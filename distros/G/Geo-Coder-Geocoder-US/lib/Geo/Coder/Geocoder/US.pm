@@ -11,18 +11,20 @@ use Text::CSV;
 use URI;
 # use URI::Escape qw{ uri_escape };
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
+use constant RETRACTION_MESSAGE =>
+	'Geo::Coder::Geocoder::US is being retracted, because the underlying web site no longer exists';
+
+Carp::cluck( RETRACTION_MESSAGE );
 {
 
 ##  my %valid_arg = map { $_ => 1 } qw{ debug interface ua };
     my %valid_arg = map { $_ => 1 } qw{ debug ua };
 
-    my $warned;
     sub new {
 	my ( $class, %args ) = @_;
-	$warned++
-	    or carp( 'Geo::Coder::Geocoder::US is being retracted, because the underlying web site no longer exists' );
+	carp( RETRACTION_MESSAGE );
 
 	ref $class
 	    and $class = ref $class;
@@ -320,7 +322,7 @@ Geo::Coder::Geocoder::US - Geocode a location using L<http://geocoder.us/>
      }
  }
 
-=head1 DEPRECATION NOTICE
+=head1 RETRACTION NOTICE
 
 This perl module makes use of the L<http://geocoder.us/> API to geocode
 addresses in the United States of America. This web site disappeared
@@ -328,14 +330,12 @@ late in 2015, and has not been seen since. Without the underlying web
 site, B<this code does nothing, and does it slowly since the query must
 time out.>
 
-Consequently, I am putting this module through a deprecation cycle.
-Currently, the installer warns when you install this module, as does the
-first call to L<new()|/new>.  With the first release on or after
-December 1 2017, every call to L<new()|/new> will warn with stack trace
-(i.e. C<Carp::cluck()>,) and it will warn when loaded. With the first
-release after June 1 2018, loading this module will produce a fatal
-error.  On or after the first of December 2018 I will delete this module
-from CPAN. It will still be available via BackPAN
+Consequently, I am putting this module through a retraction cycle.
+Currently, this module will warn with a stack trace when loaded, and on
+every call to C<new()|/new>. With the first release after June 1 2018,
+loading this module will produce a fatal error.  On or after the first
+of December 2018 I will delete this module from CPAN. It will still be
+available via BackPAN
 (L<http://backpan.perl.org/authors/id/W/WY/WYANT/>) or GitHub
 (L<https://github.com/trwyant/perl-Geo-Coder-Geocoder-US>.)
 
@@ -344,8 +344,8 @@ product key, you might try L<Geo::Coder::OSM|Geo::Coder::OSM>.
 
 =head1 DESCRIPTION
 
-B<This module is DEPRECATED.> See the
-L<DEPRECATION NOTICE|/DEPRECATION NOTICE> above.
+B<This module is RETRACTED.> See the
+L<RETRACTION NOTICE|/RETRACTION NOTICE> above.
 
 This package geocodes addresses by looking them up on the
 L<http://geocoder.us/> website. Because this site throttles access, this

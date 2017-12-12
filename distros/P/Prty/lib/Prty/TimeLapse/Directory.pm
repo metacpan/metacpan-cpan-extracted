@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Prty::TimeLapse::File;
@@ -110,13 +110,6 @@ Exception geworfen.
 
     $tdr = $class->new($dir);
 
-=head4 Description
-
-Instantiiere ein Bildverzeichnis-Objekt aus den Bildern in der
-Verzeichnisstruktur $dir und liefere eine Referenz auf dieses
-Objekt zurück. Die Verzeichnisstuktur wird per find() nach Bilddateien
-durchsucht und kann daher beliebig tief verschachtelt sein.
-
 =head4 Arguments
 
 =over 4
@@ -130,6 +123,13 @@ Wurzelverzeichnis.
 =head4 Returns
 
 Referenz auf Bildverzeichnis-Objekt
+
+=head4 Description
+
+Instantiiere ein Bildverzeichnis-Objekt aus den Bildern in der
+Verzeichnisstruktur $dir und liefere eine Referenz auf dieses
+Objekt zurück. Die Verzeichnisstuktur wird per find() nach Bilddateien
+durchsucht und kann daher beliebig tief verschachtelt sein.
 
 =cut
 
@@ -219,13 +219,13 @@ sub dir {
 
     $n = $tdr->count;
 
-=head4 Description
-
-Liefere die Anzahl der im Zeitraffer-Verzeichnis enthaltenen Bilder.
-
 =head4 Returns
 
 Integer >= 0
+
+=head4 Description
+
+Liefere die Anzahl der im Zeitraffer-Verzeichnis enthaltenen Bilder.
 
 =cut
 
@@ -244,14 +244,14 @@ sub count {
 
     $n = $tdr->minNumber;
 
+=head4 Returns
+
+Integer >= 0
+
 =head4 Description
 
 Liefere die niedrigste Bildnummer. Die niedrigste Bildnummer ist
 die Nummer des ersten Bildes. Ist die Liste leer, liefere 0.
-
-=head4 Returns
-
-Integer >= 0
 
 =cut
 
@@ -270,14 +270,14 @@ sub minNumber {
 
     $n = $tdr->maxNumber;
 
+=head4 Returns
+
+Integer >= 0
+
 =head4 Description
 
 Liefere die höchste Bildnummer. Die höchste Bildnummer ist die
 Nummer des letzten Bildes. Ist die Liste leer, liefere 0.
-
-=head4 Returns
-
-Integer >= 0
 
 =cut
 
@@ -298,14 +298,14 @@ sub maxNumber {
 
     @numbers|$numberA = $tdr->numbers($expr);
 
-=head4 Description
-
-Liefere die Liste der Bildnummern zu Bildnummern-Ausdruck $expr.
-
 =head4 Returns
 
 Liste von Bildnummern (Integer). Im Skalarkontext eine Referenz
 auf die Liste.
+
+=head4 Description
+
+Liefere die Liste der Bildnummern zu Bildnummern-Ausdruck $expr.
 
 =cut
 
@@ -381,14 +381,14 @@ sub numbers {
 
     $str = $tdr->resolveFunctionExpression($name,$args);
 
+=head4 Returns
+
+Zeichenkette
+
 =head4 Description
 
 Wende Funktion $func auf seine Argumente $args an und liefere die
 resultierende Zeichenkette (Bildnummern-Aufzählung) zurück.
-
-=head4 Returns
-
-Zeichenkette
 
 =cut
 
@@ -449,13 +449,13 @@ sub resolveFunctionExpression {
 
     $str = $tdr->resolveIdentifier($key);
 
-=head4 Description
-
-Liefere den Wert des Bezeichners $key.
-
 =head4 Returns
 
 Zeichenkette
+
+=head4 Description
+
+Liefere den Wert des Bezeichners $key.
 
 =cut
 
@@ -551,14 +551,14 @@ sub resolveIdentifier {
 
     $str = $tdr->resolveRange($n,$m);
 
+=head4 Returns
+
+Aufzählung von Bildnummern als Zeichenkette
+
 =head4 Description
 
 Überführe eine Bildnummern-Bereichsangabe ("N-M") in eine
 Nummern-Aufzählung ("N ... M").
-
-=head4 Returns
-
-Aufzählung von Bildnummern als Zeichenkette
 
 =cut
 
@@ -589,17 +589,6 @@ sub resolveRange {
     @images|$imageA = $tdr->images;
     @images|$imageA = $tdr->images($expr);
 
-=head4 Description
-
-Liefere eine Folge von Bilddatei-Objekten gemäß
-Bildfolgen-Ausdruck $expr. Ist kein Bildfolgen-Ausdruck angegeben,
-liefere alle Bilddatei-Objekte. Ist eine Range-Datei definiert,
-bedeutet "alle", alle I<genutzten> Bilder (= 'used'), ansonsten
-ausnahmslos alle Bilder des Zeitraffer-Verzeichnisses (= 'all').
-
-Die Methode cached ihre Ergebnisse, so dass jede Bildfolge nur
-einmal bestimmt wird.
-
 =head4 Arguments
 
 =over 4
@@ -614,6 +603,17 @@ Bildfolgen-Ausdruck.
 
 Liste von Bilddatei-Objekten. Im Skalarkontext liefere eine
 Referenz auf die Liste.
+
+=head4 Description
+
+Liefere eine Folge von Bilddatei-Objekten gemäß
+Bildfolgen-Ausdruck $expr. Ist kein Bildfolgen-Ausdruck angegeben,
+liefere alle Bilddatei-Objekte. Ist eine Range-Datei definiert,
+bedeutet "alle", alle I<genutzten> Bilder (= 'used'), ansonsten
+ausnahmslos alle Bilder des Zeitraffer-Verzeichnisses (= 'all').
+
+Die Methode cached ihre Ergebnisse, so dass jede Bildfolge nur
+einmal bestimmt wird.
 
 =cut
 
@@ -647,11 +647,6 @@ sub images {
 
     $img = $tdr->image($n);
 
-=head4 Description
-
-Liefere das Bild-Objekt mit Bild-Nummer $n. Existiert keine
-Bild-Objekt mit Nummer $n, liefere undef.
-
 =head4 Arguments
 
 =over 4
@@ -665,6 +660,11 @@ Bild-Nummer
 =head4 Returns
 
 Bild-Objekt oder C<undef>.
+
+=head4 Description
+
+Liefere das Bild-Objekt mit Bild-Nummer $n. Existiert keine
+Bild-Objekt mit Nummer $n, liefere undef.
 
 =cut
 
@@ -694,11 +694,6 @@ sub image {
 =head4 Synopsis
 
     $class->importImages($dir,$srcDir);
-
-=head4 Description
-
-Füge die Bilddateien aus Verzeichnisstruktur $srcDir zum
-Zeitraffer-Verzeichnis $dir hinzu.
 
 =head4 Arguments
 
@@ -742,6 +737,11 @@ Gibt Laufzeitinformation auf STDOUT aus.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Füge die Bilddateien aus Verzeichnisstruktur $srcDir zum
+Zeitraffer-Verzeichnis $dir hinzu.
 
 =cut
 
@@ -831,27 +831,6 @@ sub importImages {
 
     $class->reorganize($dir,@opt);
 
-=head4 Description
-
-Reorganisiere die Bilddateien des Zeitraffer-Verzeichnisses,
-indem sie nach ihrer Bildnummer auf Unterverzeichnisse mit
-je 500 Bilddateien verteilt werden.
-
-Es wird die Unterverzeichnisstruktur angelegt
-
-    000001  (für Bilder mit Bildnummer 1 bis Bildnummer 500)
-    000501  (Bildnummer 501 bis 1000)
-    001001  (Bildnummer 1001 bis 1500)
-    usw.
-
-und die Bilder in ihr Verzeichnis bewegt. Befindet sich eine Bilddatei
-bereits im richtigen Verzeichnis, wird sie nicht bewegt.
-
-Anschließend werden leere Verzeichnisse gelöscht.
-
-Die Operation kann wiederholt angewendet werden, an einem bereits
-reorganisierten Verzeichnis wird keine Änderung vorgenommen.
-
 =head4 Arguments
 
 =over 4
@@ -875,6 +854,27 @@ Zeige Änderungen, führe sie aber nicht aus.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Reorganisiere die Bilddateien des Zeitraffer-Verzeichnisses,
+indem sie nach ihrer Bildnummer auf Unterverzeichnisse mit
+je 500 Bilddateien verteilt werden.
+
+Es wird die Unterverzeichnisstruktur angelegt
+
+    000001  (für Bilder mit Bildnummer 1 bis Bildnummer 500)
+    000501  (Bildnummer 501 bis 1000)
+    001001  (Bildnummer 1001 bis 1500)
+    usw.
+
+und die Bilder in ihr Verzeichnis bewegt. Befindet sich eine Bilddatei
+bereits im richtigen Verzeichnis, wird sie nicht bewegt.
+
+Anschließend werden leere Verzeichnisse gelöscht.
+
+Die Operation kann wiederholt angewendet werden, an einem bereits
+reorganisierten Verzeichnis wird keine Änderung vorgenommen.
 
 =cut
 
@@ -945,7 +945,7 @@ sub reorganize {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

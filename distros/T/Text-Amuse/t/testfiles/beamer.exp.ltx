@@ -1,11 +1,11 @@
 
 This material is just ignored
 
-\part{Part}
+\part[{Part}]{Part\footnote{Footnote}}
 
-\chapter{Chapter}
+\chapter[{Chapter}]{Chapter\footnote{Footnote}}
 
-\section{Section}
+\section[{Section}]{Section\footnote{Footnote}}
 
 \subsection{Subsection}
 
@@ -35,7 +35,7 @@ list
 
 
 \end{itemize}
-\subsection{Another}
+\subsection[{Another}]{Another\footnote{There}}
 
 
 \begin{itemize}
@@ -55,13 +55,16 @@ the 1
 
 
 \item\relax 
-list 1
+list 1\footnoteB{Hey}
 
 
 
 
 \end{itemize}
-\section{Section}
+
+Hello\footnote{There}
+
+\section[{Section}]{Section\footnoteB{Section fn}}
 
 
 \begin{itemize}
@@ -71,7 +74,7 @@ Very
 
 
 \item\relax 
-Important
+Important\footnoteB{List fn}
 
 
 

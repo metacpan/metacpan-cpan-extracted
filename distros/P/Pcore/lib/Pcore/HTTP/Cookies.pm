@@ -1,6 +1,7 @@
 package Pcore::HTTP::Cookies;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_ref];
 
 has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
@@ -25,7 +26,7 @@ sub clear ($self) {
 # It appears that some browsers limit by bytes, while others limit the number of characters;
 
 sub parse_cookies ( $self, $url, $set_cookie_header ) {
-    $url = P->uri($url) if !ref $url;
+    $url = P->uri($url) if !is_ref $url;
 
   COOKIE: for ( $set_cookie_header->@* ) {
         my ( $kvp, @attrs ) = split /;/sm;
@@ -142,6 +143,11 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                     }
                 }
             }
+
+            # Number of seconds until the cookie expires.
+            # A zero or negative number will expire the cookie immediately.
+            # If both (Expires and Max-Age) are set, Max-Age will have precedence.
+            # TODO support negative value
             elsif ( $k eq 'max-age' ) {
                 if ( $v ne q[] ) {
                     if ( $v =~ /\A\d+\z/sm ) {
@@ -214,7 +220,7 @@ sub get_cookies ( $self, $url ) {
         return $cookies;
     };
 
-    $url = P->uri($url) if !ref $url;
+    $url = P->uri($url) if !is_ref $url;
 
     my $cookies;
 
@@ -274,10 +280,10 @@ sub remove_cookie ( $self, $domain, $path, $name ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 27                   | * Subroutine "parse_cookies" with high complexity score (38)                                                   |
-## |      | 175                  | * Subroutine "get_cookies" with high complexity score (23)                                                     |
+## |      | 28                   | * Subroutine "parse_cookies" with high complexity score (38)                                                   |
+## |      | 181                  | * Subroutine "get_cookies" with high complexity score (23)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 115, 135             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 116, 136             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -18,10 +18,7 @@ GraphQL - Perl implementation of GraphQL
     use GraphQL::Execution qw(execute);
 
     my $schema = GraphQL::Schema->from_doc(<<'EOF');
-    schema {
-      query: QueryRoot
-    }
-    type QueryRoot {
+    type Query {
       helloWorld: String
     }
     EOF
@@ -98,6 +95,10 @@ to update/create/delete data. This requires some thought for return types,
 to ensure you can get all the information you need to proceed to avoid
 extra round-trips.
 
+The easiest way to achieve these things is to make a
+[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert) subclass, to encapsulate the specifics of
+your system. See the documentation for further information.
+
 Finally, you should consider whether you need "subscriptions". These
 are designed to hook into WebSockets. Apollo has a [JavaScript
 module](https://github.com/apollographql/graphql-subscriptions) for this.
@@ -117,6 +118,14 @@ None yet.
 
 [SQL::Translator::Producer::GraphQL](https://metacpan.org/pod/SQL::Translator::Producer::GraphQL) - produce GraphQL schemas from a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) (or in fact any SQL database)
 
+[GraphQL::Plugin::Convert::DBIC](https://metacpan.org/pod/GraphQL::Plugin::Convert::DBIC) - produce working GraphQL schema from
+a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema)
+
+[GraphQL::Plugin::Convert::OpenAPI](https://metacpan.org/pod/GraphQL::Plugin::Convert::OpenAPI) - produce working GraphQL schema
+from an OpenAPI specification
+
+[Sample Mojolicious OpenAPI to GraphQL applet](https://github.com/graphql-perl/sample-mojolicious-openapi)
+
 [Sample Dancer 2 applet](https://github.com/graphql-perl/sample-dancer2)
 
 [Sample Mojolicious applet](https://github.com/graphql-perl/sample-mojolicious)
@@ -129,6 +138,8 @@ None yet.
 
 [http://graphql.org/graphql-js/](http://graphql.org/graphql-js/) - Tutorial on the JavaScript version,
 highly recommended.
+[Translation to
+graphql-perl](http://blogs.perl.org/users/ed_j/2017/10/graphql-perl---graphql-js-tutorial-translation-to-graphql-perl-and-mojoliciousplugingraphql.html).
 
 # AUTHOR
 

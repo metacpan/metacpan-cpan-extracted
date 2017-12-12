@@ -9,7 +9,7 @@ use Fcntl qw(O_RDONLY);
 use integer;
 use Carp qw(croak);
 
-$VERSION = '5.98';
+$VERSION = '6.00';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -951,7 +951,7 @@ sub addfile {
 	if ($BITS) {
 		my ($n, $buf) = (0, "");
 		while (($n = read(FH, $buf, 4096))) {
-			$buf =~ s/[^01]//g;
+			$buf =~ tr/01//cd;
 			$self->add_bits($buf);
 		}
 		_bail("Read failed") unless defined $n;

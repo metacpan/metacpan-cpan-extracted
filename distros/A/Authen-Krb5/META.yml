@@ -1,0 +1,44 @@
+---
+abstract: 'XS bindings for Kerberos 5'
+author:
+  - 'Jeff Horwitz <jeff@smashing.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  File::Which: '0'
+  Module::Build: '0.28'
+  PkgConfig: '0.17026'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-Krb5
+provides:
+  Authen::Krb5:
+    file: lib/Authen/Krb5.pm
+    version: '1.905'
+requires:
+  AutoLoader: '0'
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  perl: 5.008_008
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sophos/p5-Krb5/issues
+  repository: git://github.com/sophos/p5-Krb5.git
+version: '1.905'
+x_contributors:
+  - 'Damyan Ivanov <dam+cpan@ktnx.net>'
+  - 'Ioan Rogers <ioanr@cpan.org>'
+  - 'Ken Dreyer <ktdreyer@ktdreyer.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

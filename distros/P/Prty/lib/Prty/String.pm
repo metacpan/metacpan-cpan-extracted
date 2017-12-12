@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Encode::Guess ();
 use Encode ();
@@ -103,14 +103,6 @@ sub autoDecode {
     $str2 = $class->indent($str,$indentStr,@opt);
     $class->indent(\$str,$indentStr,@opt);
 
-=head4 Description
-
-Rücke den Text $str um Zeichenkette $indentStr ein und liefere
-das Resultat zurück.
-
-Die Einrück-Zeichenkette $indentStr wird jeder Zeile von $str
-hinzugefügt, außer Leerzeilen.
-
 =head4 Options
 
 =over 4
@@ -129,6 +121,14 @@ Entferne Newlines am Anfang und Whitespace am Ende. Per Default
 geschieht dies nicht.
 
 =back
+
+=head4 Description
+
+Rücke den Text $str um Zeichenkette $indentStr ein und liefere
+das Resultat zurück.
+
+Die Einrück-Zeichenkette $indentStr wird jeder Zeile von $str
+hinzugefügt, außer Leerzeilen.
 
 =head4 Example
 
@@ -299,6 +299,16 @@ sub reduceIndentation {
     $str = $class->removeIndentation($str,@opt); # [1]
     $class->removeIndentation(\$str,@opt);       # [2]
 
+=head4 Options
+
+=over 4
+
+=item -addNL => $bool (Default: 0)
+
+Nach dem Entfernen aller NEWLINEs am Ende füge ein NEWLINE hinzu.
+
+=back
+
 =head4 Description
 
 [1] Entferne Text-Einrückung aus Zeichenkette $str und liefere das
@@ -334,16 +344,6 @@ aller Zeilen von $str entfernt.
 =item *
 
 Eine Leerzeile ist eine Zeile, die nur aus Whitespace besteht.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -addNL => $bool (Default: 0)
-
-Nach dem Entfernen aller NEWLINEs am Ende füge ein NEWLINE hinzu.
 
 =back
 
@@ -603,6 +603,17 @@ sub removeComments {
 
     $text = $class->wrap($text,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -width => $n (Default: 70)
+
+Maximale Zeilenbreite des resultierenden Fließtextes (sofern kein
+einzelnes Wort länger als die Zeilenbreite ist).
+
+=back
+
 =head4 Description
 
 Umbreche Fließext $text, so dass die Zeilenlänge $width möglichst
@@ -628,17 +639,6 @@ Paragraphen:
 
 Ist der Text in Paragraphen organisiert und soll dies erhalten
 bleiben, muss jeder Paragraph einzeln umbrochen werden.
-
-=head4 Options
-
-=over 4
-
-=item -width => $n (Default: 70)
-
-Maximale Zeilenbreite des resultierenden Fließtextes (sofern kein
-einzelnes Wort länger als die Zeilenbreite ist).
-
-=back
 
 =head4 Example
 
@@ -706,7 +706,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

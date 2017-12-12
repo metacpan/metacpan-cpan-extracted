@@ -3,25 +3,13 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
 use Graphics::Raylib::Color;
 
 use Import::Into;
-
-sub import {
-    for (@_) {
-        if ($_ eq '+family') {
-            Graphics::Raylib::Color->import::into(scalar caller, ':all');
-            Graphics::Raylib::Shape->import::into(scalar caller);
-            Graphics::Raylib::Text ->import::into(scalar caller);
-            Graphics::Raylib::Mouse->import::into(scalar caller);
-        }
-    }
-}
-
 
 =pod
 
@@ -33,7 +21,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -74,11 +62,35 @@ This is a Perlish wrapper around L<Graphics::Raylib::XS>, but not yet feature co
 
 You can import L<Graphics::Raylib::XS> for any functions not yet exposed perlishly. Scroll down for an example.
 
+=head1 AUTOMATIC IMPORT
+
+C<use Graphics::Raylib '+family';> can be used as a shorthand for
+
+    use Graphics::Raylib::Color ':all';
+    use Graphics::Raylib::Shape;
+    use Graphics::Raylib::Text;
+    use Graphics::Raylib::Mouse;
+    use Graphics::Raylib::Keyboard ':all';
+
+=cut
+
+sub import {
+    for (@_) {
+        if ($_ eq '+family') {
+            Graphics::Raylib::Color   ->import::into(scalar caller, ':all');
+            Graphics::Raylib::Shape   ->import::into(scalar caller);
+            Graphics::Raylib::Text    ->import::into(scalar caller);
+            Graphics::Raylib::Mouse   ->import::into(scalar caller);
+            Graphics::Raylib::Keyboard->import::into(scalar caller, ':all');
+        }
+    }
+}
+
 =head1 METHODS/SUBS AND ARGUMENTS
 
 =over 4
 
-=item window($width, $height, $title)
+=item window($width, $height, [$title = $0])
 
 Constructs the Graphics::Raylib window. C<$title> is optional and defaults to C<$0>. Resources allocated for the window are freed when the handle returned by C<window> goes out of scope.
 
@@ -181,6 +193,10 @@ sub DESTROY {
     my $CELL_SIZE = 3;
 
     use Graphics::Raylib '+family'; # one use to rule them all
+    # Alternatively
+    use Graphics::Raylib::Color ':all';
+    use Graphics::Raylib::Shape;
+    use Graphics::Raylib::Text;
 
     use PDL;
     use PDL::Matrix;
@@ -204,7 +220,7 @@ sub DESTROY {
 
     my $bitmap = Graphics::Raylib::Shape->bitmap(
         matrix => unpdl($gen),
-        # color => GOLD; # commented-out, we are doing it fancy
+        # color => GOLD # commented-out, we are doing it fancy
     );
 
     my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
@@ -249,7 +265,10 @@ L<http://github.com/athreef/Graphics-Raylib>
 
 =head1 SEE ALSO
 
-L<Graphics::Raylib::XS>  L<Alien::raylib>
+L<Graphics::Raylib::Shape>
+
+L<Graphics::Raylib::XS>
+L<Alien::raylib>
 
 =head1 AUTHOR
 

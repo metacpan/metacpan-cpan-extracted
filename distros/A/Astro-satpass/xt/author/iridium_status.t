@@ -30,13 +30,12 @@ my $test = 0;
 my $ua = LWP::UserAgent->new(
 #    ssl_opts	=> { verify_hostname	=> 0 },	# Necessary until Perl recognizes McCants' cert.
 );
-my $asof = time_gm( 0, 0, 13, 23, 10, 2017 );
+my $asof = time_gm( 0, 0, 20, 29, 10, 2017 );
 foreach (
 	["T. S. Kelso's Iridium list",
 	'http://celestrak.com/SpaceTrack/query/iridium.txt',
 	$asof,
 	kelso => <<'KELSO'],
-24792IRIDIUM 8 [-]
 24793IRIDIUM 7 [+]
 24794IRIDIUM 6 [+]
 24795IRIDIUM 5 [-]
@@ -143,10 +142,13 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 23 November 2017 **</strong></p>
+<p align="center"><strong>** Updated 25 November 2017 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
+
+<p align="left">(24 November 2017) <strong>Iridium 8 (24792,
+1997-020A) decayed on 24 November 2017.</strong></p>
 
 <p align="left">(20 November 2017) The orbit of Iridium 6 (24794,
 1997-020C) has been lowered by 25km to the Engineering Orbit.</p>
@@ -254,7 +256,7 @@ Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>           	 	      
 Plane 3:  <a href="iridium28and95.htm">28</a>   29<font
 color="#FF0000">   </font><a href="iridium33collision.htm"><font
 color="#FF0000">33</font></a>t  57           		            27d  30d      (Iridium 30 deliberately de-orbited.)
-Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7    8   51   5                                      (Iridium  8, Iridium 51 and Iridium 5 deliberately de-orbited. Iridium 7 and Iridium 51 were probably already partial failures.)
+Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7   51   5                              8d           (Iridium  8, Iridium 51 and Iridium 5 deliberately de-orbited. Iridium 7 and Iridium 51 were probably already partial failures.)
 Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t          		            85d   <a
 href="iridium9and84.htm">9</a>d      (Iridium  9 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
 Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a

@@ -107,7 +107,7 @@ sub _create {
     $self->{'_frames_count'}++;
 
     return $class->new(
-        payload_sr => $payload_sr,
+        payload => $payload_sr,
         rsv => $rsv,
         $data_obj->FRAME_MASK_ARGS(),
     );

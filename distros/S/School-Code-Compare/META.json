@@ -1,0 +1,55 @@
+{
+   "abstract" : "'naive' metrics for code similarity",
+   "author" : [
+      "Boris D\u00e4ppen <bdaeppen.perl@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "School-Code-Compare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Args" : "0",
+            "IO::Prompt::Simple" : "0",
+            "Template" : "0",
+            "Text::Levenshtein::XS" : "0",
+            "feature" : "0",
+            "perl" : "v5.22.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/borisdaeppen/School-Code-Compare",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/borisdaeppen/School-Code-Compare.git",
+         "web" : "https://github.com/borisdaeppen/School-Code-Compare"
+      }
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

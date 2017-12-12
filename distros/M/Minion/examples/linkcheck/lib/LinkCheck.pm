@@ -10,9 +10,10 @@ sub startup {
 
   # Job queue (requires a background worker process)
   #
-  #   script/linkcheck minion worker
+  #   $ script/linkcheck minion worker
   #
   $self->plugin(Minion => {Pg => $config->{pg}});
+  $self->plugin('Minion::Admin');
   $self->plugin('LinkCheck::Task::CheckLinks');
 
   # Controller

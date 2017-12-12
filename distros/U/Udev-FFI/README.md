@@ -6,19 +6,14 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     use Udev::FFI;
 
-    #get udev version
-    my $udev_version = Udev::FFI::udev_version();
-    if(defined $udev_version) {
-        print $udev_version. "\n";
-    }
-    else {
-        warn "Can't get udev version: $@";
-    }
+    #get udev library version
+    my $udev_version = Udev::FFI::udev_version()
+        or die "Can't get udev library version: $@";
 
 
-    #create udev context
+    #create Udev::FFI object
     my $udev = Udev::FFI->new() or
-        die "Can't create udev context: $@";
+        die "Can't create Udev::FFI object: $@";
 
 
     #create udev monitor
@@ -117,14 +112,53 @@ Udev::FFI exposes OO interface to libudev.
 
     This is the constructor for a new Udev::FFI object.
 
-    If the constructor fails undef will be returned and an error message will be in $@.
+    If the constructor fails undef will be returned and an error message will be in
+    $@.
 
         my $udev = Udev::FFI->new() or
             die "Can't create udev context: $@";
 
+# METHODS
+
+- new\_monitor ( \[SOURCE\] )
+- new\_enumerate ()
+- new\_device\_from\_syspath ( SYSPATH )
+- new\_device\_from\_devnum ( TYPE, DEVNUM )
+- new\_device\_from\_subsystem\_sysname ( SUBSYSTEM, SYSNAME )
+- new\_device\_from\_device\_id ( ID )
+- new\_device\_from\_environment ()
+
+     
+
+- Udev::FFI::udev\_version ()
+
+    Return the version of the udev library. Because the udev library does not
+    provide a function to get the version number, this function runs the \`udevadm\`
+    utility. Return undef with the error in $@ on failure. Also you can check
+    $! value: ENOENT (\`udevadm\` not found) or EACCES (permission denied).
+
+        # simple
+        my $udev_version = Udev::FFI::udev_version()
+            or die "Can't get udev library version: $@";
+        
+        # or catch the error
+        use Errno qw( :POSIX );
+        my $udev_version = Udev::FFI::udev_version();
+        unless(defined $udev_version) {
+            if($!{ENOENT}) {
+                # udevadm not found
+            }
+            elsif($!{EACCES}) {
+                # permission denied
+            }
+        
+            die "Can't get udev library version: $@";
+        }
+
 # EXAMPLES
 
-Examples are provided with the Udev::FFI distribution in the "examples" directory.
+Examples are provided with the Udev::FFI distribution in the "examples"
+directory.
 
 # SEE ALSO
 
@@ -133,6 +167,15 @@ libudev
 [FFI::Platypus](https://metacpan.org/pod/FFI::Platypus) (Write Perl bindings to non-Perl libraries without C or XS)
 
 [FFI::CheckLib](https://metacpan.org/pod/FFI::CheckLib) (Check that a library is available for FFI)
+
+# BUGS AND LIMITATIONS
+
+Udev::FFI supports libudev 175 or newer. Older versions may work too, but it
+was not tested.
+
+Please report any bugs through the web interface at
+[https://github.com/Ilya33/udev-ffi/issues](https://github.com/Ilya33/udev-ffi/issues) or via email to the author.
+Patches are always welcome.
 
 # AUTHOR
 

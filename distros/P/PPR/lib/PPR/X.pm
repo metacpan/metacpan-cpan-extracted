@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000013';
+our $VERSION = '0.000014';
 use utf8;
 
 # Class for $PPR::X::ERROR objects...
@@ -256,6 +256,7 @@ our $GRAMMAR = qr{
             |   (?&PerlParenthesesList)
             |   (?&PerlArrayIndexer)
             |   (?&PerlHashIndexer)
+            |   \$\*
             )
 
             (?:
@@ -269,12 +270,13 @@ our $GRAMMAR = qr{
                     (?> (?&PerlParenthesesList)
                     |   (?&PerlArrayIndexer)
                     |   (?&PerlHashIndexer)
+                    |   \$\*
                     )
                 )
             )*+
             (?:
                 (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
-                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
         )?+
         (?: (?>(?&PerlOWS)) (?&PerlPostfixUnaryOperator) )?+
@@ -689,12 +691,12 @@ our $GRAMMAR = qr{
         )
         (?:
             (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
         )*+
         (?:
             (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
             [\@%]
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
         )?+
     )) # End of rule
 
@@ -702,12 +704,12 @@ our $GRAMMAR = qr{
         (?>(?&PerlVariableArray))
         (?:
             (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
         )*+
         (?:
             (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
             [\@%]
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
         )?+
     )) # End of rule
 
@@ -715,12 +717,12 @@ our $GRAMMAR = qr{
         (?>(?&PerlVariableArrayNoSpace))
         (?:
             (?: -> )?+
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
         )*+
         (?:
             ->
             [\@%]
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
         )?+
     )) # End of rule
 
@@ -735,12 +737,12 @@ our $GRAMMAR = qr{
         (?>(?&PerlVariableHash))
         (?:
             (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
         )*+
         (?:
             (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
             [\@%]
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
         )?+
     )) # End of rule
 
@@ -754,17 +756,17 @@ our $GRAMMAR = qr{
                     (?&PerlParenthesesList)
                 |
                     (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
                 )
                 (?:
                     (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
                 )*+
             )?+
             (?:
                 (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
                 [\@%]
-                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
         )?+
     )) # End of rule
@@ -778,17 +780,17 @@ our $GRAMMAR = qr{
                     (?&PerlParenthesesList)
                 |
                     (?: -> )?+
-                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
                 )
                 (?:
                     (?: -> )?+
-                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
                 )*+
             )?+
             (?:
                 ->
                 [\@%]
-                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
         )?+
     )) # End of rule
@@ -1744,7 +1746,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000013
+This document describes PPR::X version 0.000014
 
 
 =head1 SYNOPSIS

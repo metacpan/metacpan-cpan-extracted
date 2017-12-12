@@ -1,0 +1,5 @@
+NAME
+    MetaCPAN::Pod::XHTML - Format Pod as HTML for MetaCPAN
+
+ATTRIBUTES
+  link_mappings

@@ -1,7 +1,15 @@
+1.1.86  2017-12-09 (PERLANCAR)
+
+	- [Incompatible change] Revert 1.1.85's change: "Specify that example's
+	  result must always be in enveloped form, to remove ambiguity and to
+	  have the ability to specify status."
+
+
 1.1.85  2017-10-26 (PERLANCAR)
 
-	- Specify that example's result must always be in enveloped form,
-	  to remove ambiguity and to have the ability to specify status.
+	- Specify that example's result must always be in enveloped form, to
+	  remove ambiguity and to have the ability to specify status. [UPDATE
+	  2017-12-09: reverted in 1.1.86].
 
 
 1.1.84  2016-12-28 (PERLANCAR)

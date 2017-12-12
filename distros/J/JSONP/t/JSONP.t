@@ -5,6 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
+#use lib '/home/acanfora/Desktop/JSONP/lib';
 use strict;
 use warnings;
 
@@ -34,6 +35,18 @@ is($j->level1node->level2value, 3, 'setting level 2 value by Lvalue');
 $j->level1node->level2value++;
 
 is($j->level1node->level2value, 4, 'use increment on level 2 value by Lvalue');
+
+my $weirdkey = '§ߨ~ nobody+5@nowhere.net 䕨 has 64K €';
+
+$j->this->$weirdkey->that = 64;
+
+is($j->this->$weirdkey->that, 64, 'use exotic chars as keys');
+
+my $numerickey = 100;
+
+$j->that->$numerickey->index = 1000;
+
+is($j->that->$numerickey->index, 1000, 'use numbers as keys');
 
 $j->level1hash = {a => 1, b => 2};
 

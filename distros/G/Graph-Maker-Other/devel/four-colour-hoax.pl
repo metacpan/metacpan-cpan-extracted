@@ -47,6 +47,9 @@ $|=1;
 
   # http://www.logic-books.info/sites/default/files/k12-time_travel_and_other_matematical_bewilderments.pdf
 
+  # M500 magazine, Problem 198.8 "Four Colours" (drawn turned 90deg)
+  # M198WEB.pdf
+
   my $graph = graph();
   {
     my $num_vertices = $graph->vertices;

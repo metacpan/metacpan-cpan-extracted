@@ -6,7 +6,7 @@ use Carp;
 use Params::Validate qw(:all);
 use Mic::Assembler;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.001003';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
@@ -79,7 +79,7 @@ __END__
 
 =head1 NAME
 
-Mic - Messages, Interfaces and Contracts.
+Mic - Simplified OOP with emphasis on modularity and loose coupling.
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Mic is an OOP automation framework with the following features:
+Mic (Messages, Interfaces and Contracts) is a framework for simplifying the coding of OOP modules, with the following features:
 
 =over
 
@@ -218,7 +218,7 @@ Encourages self documenting code.
 
 =item *
 
-Encourages robustness via Eiffel style L<contracts|Mic::Contracts>.
+Simplifies code verification via Eiffel style L<contracts|Mic::Contracts>.
 
 =back
 

@@ -1,6 +1,7 @@
 package Lab::Moose::Connection::Mock;
+$Lab::Moose::Connection::Mock::VERSION = '3.613';
 #ABSTRACT: Mock connection
-$Lab::Moose::Connection::Mock::VERSION = '3.600';
+
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;
@@ -8,7 +9,6 @@ use namespace::autoclean;
 use Data::Dumper;
 use YAML::XS;
 use Carp;
-
 
 has log_file => (
     is        => 'ro',
@@ -121,14 +121,29 @@ Lab::Moose::Connection::Mock - Mock connection
 
 =head1 VERSION
 
-version 3.600
+version 3.613
+
+=head1 SYNOPSIS
+
+ use Lab::Moose;
+
+ my $instrument = instrument(
+    type => 'some_instrument',
+    connection_type => 'Mock',
+    connection_options => { log_file => 'log.yml' }, # or log_fh => $fh,
+ );
+
+=head1 DESCRIPTION
+
+Mock connection object for unit testing. Uses previously recorded log recorded
+with a real instrument using L<Lab::Instrument::Log>.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,5 +1,10 @@
 Revision history for Pg-Explain
 
+0.75    2017/11/29
+        - Change inclusive time calculation for parallel nodes to calculate
+          wall clock time, and not total time used.
+          Problem reported by Bricklen Anderson.
+
 0.74    2017/06/20
         - Fix extracting subquery name (problem reported by Jackson Popkin)
         - Switch from using Digest::SHA1 to Digest::SHA

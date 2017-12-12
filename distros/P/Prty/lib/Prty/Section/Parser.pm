@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 no bytes;
 use Prty::Section::Object;
@@ -122,15 +122,15 @@ Anzahl der geparsten Bytes. Das Attribut kann nur abgefragt werden.
 
     $par = $class->new(@keyVal);
 
+=head4 Returns
+
+Referenz auf Parser-Objekt
+
 =head4 Description
 
 Instantiiere ein Parser-Objekt mit den Parser-Attributen I<@keyVal>.
 In abgeleiteten Klassen kann der Konstruktor überschrieben und
 eine andere Attribut-Initialisierung vorgenommen werden.
-
-=head4 Returns
-
-Referenz auf Parser-Objekt
 
 =cut
 
@@ -171,13 +171,6 @@ sub new {
     $objA|@objs = $par->parse($file[,$sub]);
     $objA|@objs = $par->parse(\$text[,$sub]);
 
-=head4 Description
-
-Parse die Eingabe und liefere die Liste der Abschnittsobjekte zurück.
-Die Eingabe besteht aus einer Folge von 0 bis n
-L</Syntax>. Die Methode kann wiederholt mit
-verschiedenen Eingaben aufgerufen werden.
-
 =head4 Arguments
 
 =over 4
@@ -215,6 +208,13 @@ Default-Definition genutzt:
 
 Liste der Abschnittsobjekte (Array-Kontext) oder Referenz auf
 die Liste (Skalar-Kontext).
+
+=head4 Description
+
+Parse die Eingabe und liefere die Liste der Abschnittsobjekte zurück.
+Die Eingabe besteht aus einer Folge von 0 bis n
+L</Syntax>. Die Methode kann wiederholt mit
+verschiedenen Eingaben aufgerufen werden.
 
 =cut
 
@@ -495,11 +495,6 @@ sub parse {
 
     $obj = $par->section($identifier,$keyValH,$keyA,$content,$source,$file,$lineNumber);
 
-=head4 Description
-
-Die Methode wird vom Parser für jeden vollständig geparsten Abschnitt
-gerufen.
-
 =head4 Arguments
 
 =over 4
@@ -539,6 +534,11 @@ Die Zeilennummer, an der der Abschnitt in der Datei beginnt.
 
 Nichts oder Abschnitts-Objekt
 
+=head4 Description
+
+Die Methode wird vom Parser für jeden vollständig geparsten Abschnitt
+gerufen.
+
 =head4 Details
 
 Die Methode instantiiert per Default ein Objekt der Klasse
@@ -566,10 +566,6 @@ sub section {
 
     $par->error($@,$source,$file,$lineNumber);
 
-=head4 Description
-
-Die Methode wird vom Parser im Fehlerfall gerufen.
-
 =head4 Arguments
 
 =over 4
@@ -596,6 +592,10 @@ Die Zeilennummer, bei der die Exception ausgelöst wurde.
 =head4 Returns
 
 Die Methode kehrt nicht zurück
+
+=head4 Description
+
+Die Methode wird vom Parser im Fehlerfall gerufen.
 
 =head4 Details
 
@@ -727,7 +727,7 @@ Als Beispiel siehe prty-confluence:
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

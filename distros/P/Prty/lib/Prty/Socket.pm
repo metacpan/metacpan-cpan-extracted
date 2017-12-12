@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 
@@ -59,11 +59,6 @@ Sende GET-Request an Google und gib die Antwort aus:
 
     $sock = $class->new($host,$port,@opt);
 
-=head4 Description
-
-Baue eine TCP-Verbindung zu Host $host und Port $port auf
-und liefere eine Referenz auf das Socket-Objekt zurück.
-
 =head4 Options
 
 =over 4
@@ -74,6 +69,11 @@ Wirf keine Exception, wenn der Verbindungsaufbau fehlschlägt, sondern
 liefere C<undef>.
 
 =back
+
+=head4 Description
+
+Baue eine TCP-Verbindung zu Host $host und Port $port auf
+und liefere eine Referenz auf das Socket-Objekt zurück.
 
 =cut
 
@@ -157,7 +157,7 @@ sub close {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

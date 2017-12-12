@@ -15,11 +15,12 @@ use warnings;
 use parent qw( HiPi::Interface );
 use Carp;
 use HiPi qw( :lcd );
+use Time::HiRes;
 
-our $VERSION ='0.67';
+our $VERSION ='0.68';
 
 __PACKAGE__->create_accessors( qw(
-    width lines backlightcontrol positionmap devicename
+    width lines backlightcontrol positionmap devicename serialbuffermode
 ) );
 
 
@@ -48,12 +49,12 @@ sub new {
         }
         my (@pmap, @line1, @line2, @line3, @line4, @buffers);
         
-        if( $params{width} == 16 ) {
+        if( $params{width} == 16 && $params{serialbuffermode} ) {
             @line1 = (0..15);
             @line2 = (64..79);
             @line3 = (16..31);
             @line4 = (80..95);
-        } elsif( $params{width} == 20 ) {
+        } else {
             @line1 = (0..19);
             @line2 = (64..83);
             @line3 = (20..39);
@@ -99,7 +100,7 @@ sub move_cursor_right  {
 
 sub home  { $_[0]->send_command( HD44780_HOME_UNSHIFT ); }
 
-sub clear { $_[0]->send_command( HD44780_CLEAR_DISPLAY ); }
+sub clear { $_[0]->send_command( HD44780_CLEAR_DISPLAY ); Time::HiRes::usleep(2000); }
 
 sub set_cursor_mode { $_[0]->send_command( $_[1] ); }
 

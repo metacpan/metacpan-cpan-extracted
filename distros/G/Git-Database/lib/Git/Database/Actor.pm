@@ -1,5 +1,5 @@
 package Git::Database::Actor;
-$Git::Database::Actor::VERSION = '0.009';
+$Git::Database::Actor::VERSION = '0.010';
 use Moo;
 use namespace::clean;
 
@@ -27,7 +27,7 @@ Git::Database::Actor - An actor in Git::Database
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use File::Rsync ();
@@ -71,30 +71,6 @@ die statistische Ausgabe von rsync unterbleibt
 
     $class->exec($src,$dest,@opt);
 
-=head4 Description
-
-Führe rsync(1) für Quellpfad $src und Zielpfad $dest aus.
-Ohne Angabe von Optionen wird als Kommandozeile ausgeführt:
-
-    rsync --archive --verbose --delete SRC DEST
-
-D.h. $src und $dest werden als Verzeichnisse angesehen, wobei
-Verzeichnis $dest auf exakt den gleichen Stand wie $src gebracht wird.
-
-Schlägt das Kommando fehl, wird eine Exception geworfen.
-
-Die Ausgabe des rsync-Kommandos wird nach STDOUT geschrieben,
-wobei einige Zeilen entfernt werden, so dass eine Ausgabe nur
-dann erscheint, wenn Änderungen durchgeführt wurden, d.h. die
-Zeilen über und unter PROTOKOLL werden entfernt:
-
-    sending incremental file list
-    PROTOKOLL
-    sent X bytes  received X bytes  X.00 bytes/sec
-    total size is X speedup is X.X
-
-Im Dry-Run-Modus wird am Ende (DRY RUN) angezeigt.
-
 =head4 Arguments
 
 =over 4
@@ -124,6 +100,30 @@ werden.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Führe rsync(1) für Quellpfad $src und Zielpfad $dest aus.
+Ohne Angabe von Optionen wird als Kommandozeile ausgeführt:
+
+    rsync --archive --verbose --delete SRC DEST
+
+D.h. $src und $dest werden als Verzeichnisse angesehen, wobei
+Verzeichnis $dest auf exakt den gleichen Stand wie $src gebracht wird.
+
+Schlägt das Kommando fehl, wird eine Exception geworfen.
+
+Die Ausgabe des rsync-Kommandos wird nach STDOUT geschrieben,
+wobei einige Zeilen entfernt werden, so dass eine Ausgabe nur
+dann erscheint, wenn Änderungen durchgeführt wurden, d.h. die
+Zeilen über und unter PROTOKOLL werden entfernt:
+
+    sending incremental file list
+    PROTOKOLL
+    sent X bytes  received X bytes  X.00 bytes/sec
+    total size is X speedup is X.X
+
+Im Dry-Run-Modus wird am Ende (DRY RUN) angezeigt.
 
 =cut
 
@@ -202,7 +202,7 @@ sub exec {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

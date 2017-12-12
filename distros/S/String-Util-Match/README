@@ -1,0 +1,87 @@
+NAME
+    String::Util::Match - String utilities related to matching
+
+VERSION
+    This document describes version 0.002 of String::Util::Match (from Perl
+    distribution String-Util-Match), released on 2017-12-10.
+
+SYNOPSIS
+     use String::Util::Match qw(match_array_or_regex);
+
+     match_array_or_regex('bar',  ['foo', 'bar', qr/[xyz]/]); # true, matches string
+     match_array_or_regex('baz',  ['foo', 'bar', qr/[xyz]/]); # true, matches regex
+     match_array_or_regex('oops', ['foo', 'bar', qr/[xyz]/]); # false
+
+DESCRIPTION
+FUNCTIONS
+  match_array_or_regex
+    Usage:
+
+     match_array_or_regex($needle, $haystack) -> any
+
+    Check whether an item matches (list of) values/regexes.
+
+    Examples:
+
+    *   Example #1:
+
+         match_array_or_regex("abc", ["abc", "abd"]); # -> 1
+
+    *   Example #2:
+
+         match_array_or_regex("abc", qr/ab./); # -> 1
+
+    *   Example #3:
+
+         match_array_or_regex("abc", [qr/ab./, "abd"]); # -> 1
+
+    This routine can be used to match an item against a regex or a list of
+    strings/regexes, e.g. when matching against an ACL.
+
+    Since the smartmatch ("~~") operator can already match against a list of
+    strings or regexes, this function is currently basically equivalent to:
+
+     if (ref($haystack) eq 'ARRAY') {
+         return $needle ~~ @$haystack;
+     } else {
+         return $needle =~ /$haystack/;
+     }
+
+    except that the smartmatch operator covers more cases and is currently
+    deprecated in the current perl versions and might be removed in future
+    versions.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $haystack* => *re|str|array[re|str]*
+
+    *   $needle* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Util-Match>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Util-Match>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Util-Match>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

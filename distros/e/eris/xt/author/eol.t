@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -23,6 +23,7 @@ my @files = (
     'lib/eris/log/context/attacks/url.pm',
     'lib/eris/log/context/crond.pm',
     'lib/eris/log/context/dhcpd.pm',
+    'lib/eris/log/context/iptables.pm',
     'lib/eris/log/context/pfSense/filterlog.pm',
     'lib/eris/log/context/postfix.pm',
     'lib/eris/log/context/snort.pm',

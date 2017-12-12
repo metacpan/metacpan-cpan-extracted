@@ -11,10 +11,11 @@ package Circle::WindowItem;
 
 use strict;
 use warnings;
+use base qw( Circle::Commandable Circle::Configurable Circle::Loggable );
 
 use Carp;
 
-use base qw( Circle::Commandable Circle::Configurable Circle::Loggable );
+our $VERSION = '0.173320';
 
 use Circle::TaggedString;
 

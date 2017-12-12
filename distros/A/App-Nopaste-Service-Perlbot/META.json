@@ -35,6 +35,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "blib" : "1.01",
             "perl" : "5.006"
@@ -44,7 +45,7 @@
          "requires" : {
             "App::Nopaste" : "0",
             "App::Nopaste::Service" : "0",
-            "JSON" : "0",
+            "JSON::PP" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -64,32 +65,26 @@
    "provides" : {
       "App::Nopaste::Service::Perlbot" : {
          "file" : "lib/App/Nopaste/Service/Perlbot.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.002",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlbot/App-nopaste-perlbot/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlbot/App-nopaste-perlbot.git",
+         "web" : "https://github.com/perlbot/App-nopaste-perlbot"
+      }
+   },
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
       },
       "plugins" : [
-         {
-            "class" : "Dist::Zilla::Plugin::GatherDir",
-            "config" : {
-               "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
-                  "exclude_match" : [],
-                  "follow_symlinks" : 0,
-                  "include_dotfiles" : 0,
-                  "prefix" : "",
-                  "prune_directory" : [],
-                  "root" : "."
-               }
-            },
-            "name" : "@Starter/GatherDir",
-            "version" : "6.009"
-         },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Starter/PruneCruft",
@@ -151,11 +146,6 @@
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Starter/License",
             "version" : "6.009"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Pod2Readme",
-            "name" : "@Starter/Pod2Readme",
-            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
@@ -241,6 +231,107 @@
             "version" : "6.009"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [
+                     "^README.md"
+                  ],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : 0
+               }
+            },
+            "name" : "Git::GatherDir",
+            "version" : "2.042"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "v0.004",
+                  "tag_format" : "v%v",
+                  "tag_message" : "v%v"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.14.2",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "Git::Tag",
+            "version" : "2.042"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "GitHub::Meta",
+            "version" : "0.44"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.14.2",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "Git::Push",
+            "version" : "2.042"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme::Brief",
+            "name" : "Readme::Brief",
+            "version" : "0.003002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "skip_version_provider" : 0
+               }
+            },
+            "name" : "RewriteVersion",
+            "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               }
+            },
+            "name" : "BumpVersionAfterRelease",
+            "version" : "0.015"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.009"
@@ -255,6 +346,16 @@
             },
             "name" : "Prereqs",
             "version" : "6.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "CheckChangesHasContent",
+            "version" : "0.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

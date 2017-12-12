@@ -13,7 +13,7 @@ package main;
 
 use Test::More;
 
-plan tests => 7;
+plan tests => 10;
 
 
 my $obj = My::Test->new;
@@ -73,3 +73,24 @@ my $a = $obj->_XML(
 
 is($a->getAttributeNode('xlink:href')->namespaceURI,
    'http://www.w3.org/1999/xlink', 'xlink namespace propagates');
+
+my $xpc = $obj->_XPC(svg => 'http://www.w3.org/2000/svg');
+
+isa_ok($xpc, 'XML::LibXML::XPathContext', 'xpc successfully returned');
+
+is($xpc->lookupNs('svg'), 'http://www.w3.org/2000/svg', 'xpc registered ns');
+
+#diag($doc->toString(1));
+
+#my ($htref)  = $xpc->findnodes('//html:title', $doc);
+#my ($svgref) = $xpc->findnodes('//*[local-name() = "svg"]', $doc);
+
+#diag($htref);
+#diag($svgref->namespaceURI);
+
+
+my ($svg) = $xpc->findnodes('//svg:svg', $html);
+
+#diag($svg);
+
+ok($svg, 'xpc finds the node');

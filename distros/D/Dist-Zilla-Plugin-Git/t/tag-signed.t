@@ -10,7 +10,7 @@ use Path::Tiny 0.012 qw(path); # cwd
 use File::Which qw{ which };
 use Test::More;
 
-use lib 't';
+use lib 't/lib';
 use Util qw(clean_environment init_repo);
 
 which('gpg')

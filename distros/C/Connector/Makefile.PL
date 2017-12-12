@@ -10,7 +10,6 @@ requires    'Log::Log4perl';
 recommends 'Config::Versioned' => '0.5';
 recommends 'Config::Std';
 recommends 'Net::LDAP';
-#recommends 'Net::SSL';
 recommends 'YAML';
 
 recommends 'Text::CSV_XS';
@@ -30,7 +29,6 @@ test_requires 'YAML';
 test_requires 'Template';
 test_requires 'DBI';
 test_requires 'DBD::SQLite';
-#test_requires 'Net::SSL';
 
 auto_install;
 

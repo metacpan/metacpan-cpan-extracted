@@ -1,0 +1,39 @@
+Date-Holidays-KZ
+
+Determine Kazakhstan official holidays and business days 2018
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Or using cpanminus:
+
+	cpanm Date::Holidays::KZ
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Date::Holidays::KZ
+
+You can also look for information at:
+
+    GitHub https://github.com/nalobin/Date-Holidays-KZ
+    MetaCPAN https://metacpan.org/pod/Date::Holidays::KZ
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2017 Vladimir Varlamov <bes.internal@gmail.com>
+This module is adapted copy of Date-Holidays-RU:
+Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

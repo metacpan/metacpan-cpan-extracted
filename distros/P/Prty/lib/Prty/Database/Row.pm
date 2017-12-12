@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
 use Prty::Database::ResultSet::Object;
@@ -35,14 +35,14 @@ Ein Objekt der Klasse repräsentiert einen Datensatz.
 
     $tableClass = $this->tableClass;
 
+=head4 Returns
+
+Name der Tabellenklasse (String)
+
 =head4 Description
 
 Ermittele den Namen der Tabellenklasse zur Datensatzklasse
 und liefere diesen zurück.
-
-=head4 Returns
-
-Name der Tabellenklasse (String)
 
 =head4 Details
 
@@ -172,7 +172,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

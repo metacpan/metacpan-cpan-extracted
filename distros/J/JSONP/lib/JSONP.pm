@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.77';
+our $VERSION = '1.81';
 
 =encoding utf8
 
@@ -238,7 +238,7 @@ class constructor, it does not accept any parameter by user. The options have to
 sub new
 {
 	my ($class) = @_;
-	bless {_is_root_element => 1}, $class;
+	bless {_is_root_element => 1, error => \0}, $class;
 }
 
 =head3 run
@@ -624,7 +624,7 @@ call this method in order to return an error message to the calling page. You ca
 sub raiseError
 {
 	my ($self, $message) = @_;
-	$self->{error} = \1;
+	$self->error = \1;
 	push @{$self->{errors}}, $message;
 	$self;
 }
@@ -798,14 +798,14 @@ sub DESTROY{}
 sub AUTOLOAD : lvalue
 {
 	my $classname =  ref $_[0];
-	my $validname = '[\pL][\pL\pM\pN\pZ_]{0,2047}';
+	my $validname = q{(?:[^[:cntrl:][:space:][:punct:][:digit:]][^':[:cntrl:]]{0,1023}|\d{1,1024})};
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;
 	die "illegal key name, must be of $validname form\n$AUTOLOAD" unless $key;
 	my $miss = Want::want('REF OBJECT') ? {} : '';
 	my $retval = $_[0]->{$key};
 	my $isBool = Want::want('SCALAR BOOL') && ((reftype($retval) // '') eq 'SCALAR');
-	$retval = $$retval if $isBool;
+	return $$retval if $isBool;
 	$_[0]->{$key} = $_[1] // $retval // $miss;
 	$_[0]->_bless_tree($_[0]->{$key}) if ref $_[0]->{$key} eq 'HASH' || ref $_[0]->{$key} eq 'ARRAY';
 	$_[0]->{$key};
@@ -815,7 +815,7 @@ sub AUTOLOAD : lvalue
 
 =head2 NOTATION CONVENIENCE FEATURES
 
-In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always use use hash keys beginning with a letter of any Unicode script, followed from any combination of Unicode letters, numbers, and separators (see Unicode General Category documentation), plus the underscore. The total lenght of the key must be not bigger than 2048 Unicode chars, this is an artificial limit set for security purposes. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
+In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always usei hash keys beginning with any Unicode char different from a posix defined space, punctuation, control, or digit char classes, followed from any combination of Unicode codepoints different from posix control chars, ' (apostrophe) and : (colon) chars. If you use a key hold from a variable, you can either use keys composed of only digits. The total lenght of the key must be not bigger than 1024 Unicode chars, this is an artificial limit set for security purposes. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
 
 =head2 MINIMAL REQUIREMENTS
 

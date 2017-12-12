@@ -1,3 +1,11 @@
+1.3608: Wed Dec 06 2017
+   - xsawyerx removed Term::ANSIScreen ; Thanks! 
+     https://github.com/jettero/term--gentoofunctions/pull/5
+
+1.3608: Mon Oct 12 2015
+   - if we ewarn/einfo/edie during spinner, nothing is printed in the right place during the print or after.
+     this is my attempt to fix it.
+
 1.3607: Mon Nov 26 2012
    - updated test for 5.17.x
 

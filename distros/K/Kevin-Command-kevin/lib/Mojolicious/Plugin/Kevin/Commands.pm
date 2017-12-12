@@ -1,6 +1,6 @@
 
 package Mojolicious::Plugin::Kevin::Commands;
-$Mojolicious::Plugin::Kevin::Commands::VERSION = '0.4.0';
+$Mojolicious::Plugin::Kevin::Commands::VERSION = '0.4.1';
 # ABSTRACT: Mojolicious plugin for alternative minion commands
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -64,7 +64,7 @@ Mojolicious::Plugin::Kevin::Commands - Mojolicious plugin for alternative minion
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

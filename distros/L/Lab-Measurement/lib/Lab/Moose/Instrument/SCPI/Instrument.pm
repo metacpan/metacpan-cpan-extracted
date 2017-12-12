@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::SCPI::Instrument;
-#ABSTRACT: ???
-$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.600';
+$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.613';
+#ABSTRACT: Role for SCPI INSTrument subsystem.
+
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument qw/validated_getter validated_setter/;
@@ -37,18 +38,28 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Instrument::SCPI::Instrument - ???
+Lab::Moose::Instrument::SCPI::Instrument - Role for SCPI INSTrument subsystem.
 
 =head1 VERSION
 
-version 3.600
+version 3.613
+
+=head1 METHODS
+
+=head2 instrument_nselect_query
+
+=head2 instrument_nselect
+
+Query/Set instrument channel for multi-channel instruments.
+
+=head2
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

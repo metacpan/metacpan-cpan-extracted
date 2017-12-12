@@ -1833,7 +1833,7 @@ yyreduce:
 #line 52 "yacc/spvm_yacc.y"
     {
       (yyval.opval) = SPVM_OP_build_grammar(compiler, (yyvsp[(1) - (1)].opval));
-
+      
       // Syntax error
       if (compiler->error_count) {
         YYABORT;

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.5');
+our $VERSION = version->new('0.6.6');
 
 requires 'repos';
 requires 'verbose';
@@ -112,7 +112,7 @@ Group::Git::Cmd::Grep - Quick state of each repository (branch name and changes)
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Grep version 0.6.5.
+This documentation refers to Group::Git::Cmd::Grep version 0.6.6.
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ Initializes the command
 
 Shows the repository branch and weather there are changes in it.
 
-=item C<status_start ()>
+=item C<grep_start ()>
 
 Process the command line arguments for grep
 

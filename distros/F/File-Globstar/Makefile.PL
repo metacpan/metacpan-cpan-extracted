@@ -36,11 +36,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Git" => 0,
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::More" => 0,
-    "Test::Perl::Critic" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,10 +56,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "Locale::TextDomain" => 0,
   "Module::Build" => "0.28",
-  "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => "1.21",
   "Test::More" => 0,
-  "Test::Perl::Critic" => 0,
   "base" => 0,
   "constant" => 0,
   "strict" => 0,

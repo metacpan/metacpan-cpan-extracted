@@ -35,10 +35,16 @@ lib/Datahub/Factory/Importer/JSON.pm
 lib/Datahub/Factory/Importer/OAI.pm
 lib/Datahub/Factory/Importer/TMS.pm
 lib/Datahub/Factory/Importer/TMS/Index.pm
+lib/Datahub/Factory/Importer/YAML.pm
 lib/Datahub/Factory/Indexer.pm
 lib/Datahub/Factory/Indexer/Solr.pm
+lib/Datahub/Factory/Introduction.pod
 lib/Datahub/Factory/Logger.pm
 lib/Datahub/Factory/Pipeline.pm
+lib/Datahub/Factory/Pipeline/Exporter.pm
+lib/Datahub/Factory/Pipeline/Fixer.pm
+lib/Datahub/Factory/Pipeline/General.pm
+lib/Datahub/Factory/Pipeline/Importer.pm
 lib/Datahub/Factory/Pipeline/Index.pm
 lib/Datahub/Factory/Pipeline/Transport.pm
 lib/Datahub/Factory/Sane.pm

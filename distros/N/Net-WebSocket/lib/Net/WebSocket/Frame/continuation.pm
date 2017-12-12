@@ -15,7 +15,7 @@ Net::WebSocket::Frame::continuation
         #Optional, can be either empty (default) or four random bytes
         mask => q<>,
 
-        payload_sr => \$payload,
+        payload => $payload,
     );
 
     $frm->get_type();           #"continuation"

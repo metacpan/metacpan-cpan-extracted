@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -742,6 +742,10 @@ sub copy {
 
     $h = $h->join(\%hash);
 
+=head4 Returns
+
+Hash (für Method Chaining)
+
 =head4 Description
 
 Überschreibe die Schlüssel/Wert-Paare in Hash $h mit den
@@ -749,10 +753,6 @@ Schlüssel/Wert-Paaren aus Hash %hash. Schlüssel/Wert-Paare
 in Hash $h, die in Hash %hash nicht vorkommen, bleiben bestehen.
 Enthält %hash einen Schlüssel, der in $h nicht vorkommt, wird eine
 Exception geworfen.
-
-=head4 Returns
-
-Hash (für Method Chaining)
 
 =head4 Example
 
@@ -1047,16 +1047,52 @@ sub arraySize {
 
 # -----------------------------------------------------------------------------
 
-=head3 push() - Füge Element zu Arraykomponente hinzu
+=head3 push() - Füge Werte zu Arraykomponente hinzu
 
 =head4 Synopsis
 
-    $h->push($key,$val);
+    $h->push($key,@values);
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Arraykomponente.
+
+=item @values
+
+Werte, die zum Array hinzugefügt werden.
+
+=back
 
 =head4 Description
 
-Füge Wert $val zur Arraykomponente $key hinzu. Die Methode liefert
-keinen Wert zurück.
+Füge Werte @values zur Arraykomponente $key hinzu. Die Methode
+liefert keinen Wert zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub push {
+    my $self = shift;
+    my $key = shift;
+    # @_: @values
+
+    CORE::push @{$self->{$key}},@_;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 unshift() - Füge Element am Anfang zu Arraykomponente hinzu
+
+=head4 Synopsis
+
+    $h->unshift($key,$val);
 
 =head4 Arguments
 
@@ -1068,17 +1104,22 @@ Arraykomponente.
 
 =item $val
 
-Wert, der zum Array am Ende hinzugefügt wird.
+Wert, der zum Array hinzugefügt wird.
 
 =back
+
+=head4 Description
+
+Füge Wert $val am Anfang zur Arraykomponente $key hinzu. Die
+Methode liefert keinen Wert zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub push {
+sub unshift {
     my ($self,$key,$val) = @_;
-    CORE::push @{$self->{$key}},$val;
+    CORE::unshift @{$self->{$key}},$val;
     return;
 }
 
@@ -1106,6 +1147,32 @@ Alternative Formulierung:
 sub increment {
     my ($self,$key) = @_;
     return ++$self->{$key};
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 addNumber() - Addiere numerischen Wert
+
+=head4 Synopsis
+
+    $y = $h->addNumber($key,$x);
+
+=head4 Description
+
+Addiere numerischen Wert $x zum Wert des Schlüssels $key hinzu und
+liefere das Resultat zurück.
+
+Alternative Formulierung:
+
+    $y = $h->{$key} += $x;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub addNumber {
+    my ($self,$key,$x) = @_;
+    return $self->{$key} += $x;
 }
 
 # -----------------------------------------------------------------------------
@@ -1321,7 +1388,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

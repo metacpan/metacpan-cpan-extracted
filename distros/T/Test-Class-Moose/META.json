@@ -113,95 +113,95 @@
    "provides" : {
       "Test::Class::Moose" : {
          "file" : "lib/Test/Class/Moose.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::AttributeRegistry" : {
          "file" : "lib/Test/Class/Moose/AttributeRegistry.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::CLI" : {
          "file" : "lib/Test/Class/Moose/CLI.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Config" : {
          "file" : "lib/Test/Class/Moose/Config.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Deprecated" : {
          "file" : "lib/Test/Class/Moose/Deprecated.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Executor::Parallel" : {
          "file" : "lib/Test/Class/Moose/Executor/Parallel.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Executor::Sequential" : {
          "file" : "lib/Test/Class/Moose/Executor/Sequential.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Load" : {
          "file" : "lib/Test/Class/Moose/Load.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Report" : {
          "file" : "lib/Test/Class/Moose/Report.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Report::Class" : {
          "file" : "lib/Test/Class/Moose/Report/Class.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Report::Instance" : {
          "file" : "lib/Test/Class/Moose/Report/Instance.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Report::Method" : {
          "file" : "lib/Test/Class/Moose/Report/Method.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Report::Time" : {
          "file" : "lib/Test/Class/Moose/Report/Time.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role" : {
          "file" : "lib/Test/Class/Moose/Role.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::AutoUse" : {
          "file" : "lib/Test/Class/Moose/Role/AutoUse.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::CLI" : {
          "file" : "lib/Test/Class/Moose/Role/CLI.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::Executor" : {
          "file" : "lib/Test/Class/Moose/Role/Executor.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::HasTimeReport" : {
          "file" : "lib/Test/Class/Moose/Role/HasTimeReport.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::ParameterizedInstances" : {
          "file" : "lib/Test/Class/Moose/Role/ParameterizedInstances.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Role::Reporting" : {
          "file" : "lib/Test/Class/Moose/Role/Reporting.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Runner" : {
          "file" : "lib/Test/Class/Moose/Runner.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Tutorial" : {
          "file" : "lib/Test/Class/Moose/Tutorial.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Test::Class::Moose::Util" : {
          "file" : "lib/Test/Class/Moose/Util.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       }
    },
    "release_status" : "stable",
@@ -216,10 +216,10 @@
          "web" : "https://github.com/houseabsolute/test-class-moose"
       }
    },
-   "version" : "0.90",
+   "version" : "0.91",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.024001"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -997,7 +997,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.90",
+                  "tag" : "v0.91",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -1042,7 +1042,7 @@
                }
             },
             "name" : "@DROLSKY/BumpVersionAfterRelease",
-            "version" : "0.016"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1187,6 +1187,7 @@
       "Jonathan C. Otsuka <djgoku@gmail.com>",
       "Jonathan Stowe <jns@gellyfish.co.uk>",
       "Karen Etheridge <ether@cpan.org>",
+      "Larry Leszczynski <larryl@cpan.org>",
       "mark-5 <maflick88@gmail.com>",
       "mephinet <mephinet@gmx.net>",
       "Neil Bowers <neil@bowers.com>",
@@ -1201,6 +1202,6 @@
       "Tom Heady <tom@punch.net>",
       "Udo Oji <Velti@signor.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

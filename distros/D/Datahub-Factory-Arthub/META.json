@@ -43,19 +43,26 @@
       "runtime" : {
          "requires" : {
             "Authen::NTLM" : "0",
+            "Catmandu" : "0",
             "Catmandu::AAT" : "0",
             "Catmandu::Adlib" : "0",
             "Catmandu::Importer::DBI" : "0",
+            "Catmandu::Importer::OAI" : "0",
             "Catmandu::Store::DBI" : "0",
             "Catmandu::VIAF" : "0",
+            "Config::Simple" : "0",
             "DBD::SQLite" : "0",
             "DBD::mysql" : "0",
+            "DBI" : "0",
             "Datahub::Factory" : "1.70",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "Lido::XML" : "0",
+            "Moo" : "0",
             "Try::Tiny" : "0",
             "URI::Split" : "0",
             "WebService::Rackspace::CloudFiles" : "0",
+            "namespace::clean" : "0",
             "perl" : "5.008005"
          }
       },
@@ -77,9 +84,10 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub"
       }
    },
-   "version" : "0.94",
+   "version" : "0.96",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"
    ],

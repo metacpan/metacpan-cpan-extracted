@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016 Kevin Ryde
+# Copyright 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -27,6 +27,44 @@ $|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+
+{
+  # islands convex hull
+  # not in OEIS: 6,84,726,5448,39162,276948
+  # not in OEIS: 1,14,121,908,6527,46158
+
+  # [1,14,121,908,6527,46158] - [1, 8, 57, 404, 2839, 19884]
+  # not in OEIS: 0, 6, 64, 504, 3688, 26274
+  # v=[1,14,121,908,6527,46158]
+  # for(i=2,#v,print(v[i]-7*v[i-1]))
+  # 2*2839 + 2*404 - 6527
+
+  require Math::Geometry::Planar;
+  my $path = Math::PlanePath::GosperReplicate->new;
+  my @values;
+  foreach my $k (1 .. 6) {
+    my ($n_lo,$n_hi) = $path->level_to_n_range($k);
+    my $points = [ map{[$path->n_to_xy($_)]} $n_lo .. $n_hi ];
+
+    my $planar = Math::Geometry::Planar->new;
+    $planar->points($points);
+    if (@$points > 4) {
+      $planar = $planar->convexhull2;
+      $points = $planar->points;
+    }
+    my $area = $planar->area / 6;
+
+    my $whole_area = 7**$k;
+    my $f = $area / $whole_area;
+    my $num_points = scalar(@$points);
+    print "k=$k hull points $num_points area $area cf $whole_area ratio $f\n";
+    push @values,$area;
+  }
+  require Math::OEIS::Grep;
+  Math::OEIS::Grep->search(array => \@values, verbose=>1);
+  exit 0;
+}
 
 
 # GP-DEFINE  nearly_equal_epsilon = 1e-15;

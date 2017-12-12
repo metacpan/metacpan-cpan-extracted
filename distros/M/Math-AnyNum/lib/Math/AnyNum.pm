@@ -13,7 +13,7 @@ use Math::MPC qw();
 
 use POSIX qw(ULONG_MAX LONG_MIN);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -515,14 +515,6 @@ sub _str2frac {
 
         my $exp = substr($str, $i + 1);
 
-        # Handle specially numbers with very big exponents
-        # (not a very good solution, but this will happen very rarely, if ever)
-        if (CORE::abs($exp) >= 1000000) {
-            Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2($PREC)), "$sign$str", 10, $ROUND);
-            Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
-            return Math::GMPq::Rmpq_get_str($mpq, 10);
-        }
-
         my ($before, $after) = split(/\./, substr($str, 0, $i));
 
         if (!defined($after)) {    # return faster for numbers like "13e2"
@@ -678,6 +670,7 @@ sub _any2mpq {
         if (Math::MPFR::Rmpfr_number_p($x)) {
             my $q = Math::GMPq::Rmpq_init();
             Math::MPFR::Rmpfr_get_q($q, $x);
+            Math::GMPq::Rmpq_canonicalize($q);
             return $q;
         }
         return;
@@ -1392,7 +1385,7 @@ sub rat ($) {
 
     # Parse a decimal number as an exact fraction
     if ("$x" =~ /^([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)\z/) {
-        my $frac = _str2frac(lc($1));
+        my $frac = _str2frac(lc($1) =~ tr/_//dr);
         my $q    = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_str($q, $frac, 10);
         Math::GMPq::Rmpq_canonicalize($q) if (index($frac, '/') != -1);

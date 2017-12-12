@@ -7,6 +7,8 @@ package Circle::CommandInvocation;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Scalar::Util qw( weaken );
 
 sub new

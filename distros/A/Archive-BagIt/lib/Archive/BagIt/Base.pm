@@ -3,16 +3,21 @@ use warnings;
 
 package Archive::BagIt::Base;
 
+use Moose;
+use namespace::autoclean;
+
+use utf8;
+use open ':std', ':encoding(utf8)';
+use Encode qw(decode);
 use File::Find;
 use File::Spec;
 use Digest::MD5;
-
+use Class::Load qw(load_class);
 use Data::Printer;
 
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053.3'; # VERSION
 
 use Sub::Quote;
-use Moo;
 
 my $DEBUG=0;
 
@@ -22,69 +27,126 @@ has 'bag_path' => (
 );
 
 has 'bag_path_arr' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_bag_path_arr',
 );
 
 has 'metadata_path' => (
-    is=> 'rw',
-    default => sub { my ($self) = @_; return $self->bag_path; },
+    is=> 'ro',
+    lazy => 1,
+    builder => '_build_metadata_path',
 );
 
+sub _build_metadata_path { 
+    my ($self) = @_; 
+    return $self->bag_path; 
+}
+
+
 has 'metadata_path_arr' => (
-    is =>'lazy',
+    is =>'ro',
+    lazy => 1,
+    builder => '_build_metadata_path_arr',
 );
 
 has 'rel_metadata_path' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_rel_metadata_path',
 );
 
 has 'payload_path' => (
-    is => 'rw',
-    default => sub { my ($self) = @_; return $self->bag_path."/data"; },
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_path',
 );
 
+sub _build_payload_path { 
+    my ($self) = @_; 
+    return $self->bag_path."/data"; 
+}
+
 has 'payload_path_arr' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_path_arr',
 );
 
 has 'rel_payload_path' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_rel_payload_path',
 );
 
 has 'checksum_algos' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_checksum_algos',
 );
 
 has 'bag_version' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_bag_version',
 );
 
 has 'bag_checksum' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_bag_checksum',
 );
 
 has 'manifest_files' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_manifest_files',
 );
 
 has 'tagmanifest_files' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tagmanifest_files',
 );
 
 has 'manifest_entries' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_manifest_entries',
 );
 
 has 'tagmanifest_entries' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tagmanifest_entries',
 );
 
 has 'payload_files' => (
-    is => 'lazy',
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_files',
 );
 
 has 'non_payload_files' => (
-    is=>'lazy',
+    is=>'ro',
+    lazy => 1,
+    builder => '_build_non_payload_files',
+);
+
+has 'plugins' => (
+    is=>'rw',
+    isa=>'HashRef',
+);
+
+has 'manifests' => (
+    is=>'rw',
+    isa=>'HashRef',
+);
+
+has 'algos' => (
+    is=>'rw',
+    isa=>'HashRef',
+
 );
 
 
@@ -99,6 +161,10 @@ around 'BUILDARGS' , sub {
     }
 };
 
+sub BUILD {
+    my ($self, $args) = @_;
+    $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5"));
+}
 sub _build_bag_path_arr {
     my ($self) = @_;
     my @split_path = File::Spec->splitdir($self->bag_path);
@@ -138,8 +204,7 @@ sub _build_checksum_algos {
 sub _build_bag_checksum {
   my($self) =@_;
   my $bagit = $self->{'bag_path'};
-  open(my $SRCFILE, "<",  $bagit."/manifest-md5.txt");
-  binmode($SRCFILE);
+  open(my $SRCFILE, "<:raw",  $bagit."/manifest-md5.txt");
   my $srchex=Digest::MD5->new->addfile($SRCFILE)->hexdigest;
   close($SRCFILE);
   return $srchex;
@@ -178,7 +243,7 @@ sub _build_tagmanifest_entries {
   my @tagmanifests = @{$self->tagmanifest_files};
   my $tagmanifest_entries = {};
   foreach my $tagmanifest_file (@tagmanifests) {
-    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<", $tagmanifest_file));
+    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<:encoding(utf8)", $tagmanifest_file));
     while (my $line = <$TAGMANIFEST>) {
       chomp($line);
       my($digest,$file) = split(/\s+/, $line, 2);
@@ -196,11 +261,11 @@ sub _build_manifest_entries {
   my @manifests = @{$self->manifest_files};
   my $manifest_entries = {};
   foreach my $manifest_file (@manifests) {
-    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST, "<", $manifest_file));
+    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST, "<:encoding(utf8)", $manifest_file));
     while (my $line = <$MANIFEST>) {
         chomp($line);
         my ($digest,$file);
-        ($digest, $file) = $line =~ /^([a-f0-9]+)\s+([a-zA-Z0-9_\.\/\-]+)/;
+        ($digest, $file) = $line =~ /^([a-f0-9]+)\s+(.+)/;
         if(!$file) {
           die ("This is not a valid manifest file");
         } else {
@@ -222,6 +287,8 @@ sub _build_payload_files{
 
   my @payload=();
   File::Find::find( sub{
+    $File::Find::name = decode ('utf8', $File::Find::name);
+    $_ = decode ('utf8', $_);
     if (-f $_) {
         my $rel_path=File::Spec->catdir($self->rel_payload_path,File::Spec->abs2rel($File::Find::name, $payload_dir));
         #print "pushing ".$rel_path." payload_dir: $payload_dir \n";
@@ -261,6 +328,8 @@ sub _build_non_payload_files {
   my @non_payload = ();
 
   File::Find::find( sub{
+    $File::Find::name = decode('utf8', $File::Find::name);
+    $_=decode ('utf8', $_);
     if (-f $_) {
         my $rel_path=File::Spec->catdir($self->rel_metadata_path,File::Spec->abs2rel($File::Find::name, $self->metadata_path));
         #print "pushing ".$rel_path." payload_dir: $payload_dir \n";
@@ -278,6 +347,22 @@ sub _build_non_payload_files {
 
   return wantarray ? @non_payload : \@non_payload;
 
+}
+
+sub load_plugins {
+    my ($self, @plugins) = @_;
+ 
+    #p(@plugins); 
+    my $loaded_plugins = $self->plugins;  
+    @plugins = grep { not exists $loaded_plugins->{$_} } @plugins; 
+
+    return if @plugins == 0;
+    foreach my $plugin (@plugins) {
+        load_class ($plugin) or die ("Can't load $plugin");
+        $plugin->new({bagit => $self});
+    }
+
+    return 1;
 }
 
 
@@ -307,10 +392,11 @@ sub verify_bag {
     my $digestobj = new Digest::MD5;
     foreach my $local_name (@payload) {
         my ($digest);
-        unless ($manifest{$local_name}) {
+        #p %manifest;
+        unless ($manifest{"$local_name"}) {
           die ("file found not in manifest: [$local_name]");
         }
-        open(my $fh, "<", "$bagit/$local_name") or die ("Cannot open $local_name");
+        open(my $fh, "<:raw", "$bagit/$local_name") or die ("Cannot open $local_name");
         $digest = $digestobj->addfile($fh)->hexdigest;
         #print $digest."\n";
         close($fh);
@@ -337,92 +423,35 @@ sub verify_bag {
 }
 
 
+sub init_metadata {
+    my ($class, $bag_path) = @_;
+    unless ( -d $bag_path) { die ( "source bag directory doesn't exist"); }
+    my $self = $class->new(bag_path=>$bag_path);
+    unless ( -d $self->payload_path) {
+        rename ($bag_path, $bag_path.".tmp");
+        mkdir  ($bag_path);
+        rename ($bag_path.".tmp", $self->payload_path);
+    }
+    unless ( -d $self->metadata_path) {
+        #metadata path is not the root path for some reason
+        mkdir ($self->metadata_path);
+    }
+    $self->manifests->{"md5"}->create_bagit();
+    $self->manifests->{"md5"}->create_baginfo();
+    return $self;
+}
+
+
+
 sub make_bag {
   my ($class, $bag_path) = @_;
-  unless ( -d $bag_path) { die ( "source bag directory doesn't exist"); }
-  my $self = $class->new(bag_path=>$bag_path);
-  unless ( -d $self->payload_path) {
-    rename ($bag_path, $bag_path.".tmp");
-    mkdir  ($bag_path);
-    rename ($bag_path.".tmp", $self->payload_path);
-  }
-  unless ( -d $self->metadata_path) {
-    #metadata path is not the root path for some reason
-    mkdir ($self->metadata_path);
-  }
-  $self->_write_bagit();
-  $self->_write_baginfo();
-  $self->_write_manifest_md5();
-  $self->_write_tagmanifest_md5();
+  my $self = $class->init_metadata($bag_path);
+  $self->manifests->{"md5"}->create_manifest();
+  $self->manifests->{"md5"}->create_tagmanifest();
   return $self;
 }
 
-sub _write_bagit {
-    my($self) = @_;
-    open(my $BAGIT, ">", $self->metadata_path."/bagit.txt") or die("Can't open $self->metadata_path/bagit.txt for writing: $!");
-    print($BAGIT "BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8");
-    close($BAGIT);
-    return 1;
-}
-
-sub _write_baginfo {
-    use POSIX;
-    my($self, %param) = @_;
-    open(my $BAGINFO, ">", $self->metadata_path."/bag-info.txt") or die("Can't open $self->metadata_path/bag-info.txt for writing: $!");
-    $param{'Bagging-Date'} = POSIX::strftime("%F", gmtime(time));
-    $param{'Bag-Software-Agent'} = 'Archive::BagIt <http://search.cpan.org/~rjeschmi/Archive-BagIt>';
-    while(my($key, $value) = each(%param)) {
-        print($BAGINFO "$key: $value\n");
-    }
-    close($BAGINFO);
-    return 1;
-}
-
-sub _write_manifest_md5 {
-    use Digest::MD5;
-    my($self) = @_;
-    my $manifest_file = $self->metadata_path."/manifest-md5.txt";
-    # Generate MD5 digests for all of the files under ./data
-    open(my $md5_fh, ">",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
-    foreach my $rel_payload_file (@{$self->payload_files}) {
-        #print "rel_payload_file: ".$rel_payload_file;
-        my $payload_file = File::Spec->catdir($self->bag_path, $rel_payload_file);
-        open(my $DATA, "<", "$payload_file") or die("Cannot read $payload_file: $!");
-        my $digest = Digest::MD5->new->addfile($DATA)->hexdigest;
-        close($DATA);
-        print($md5_fh "$digest  $rel_payload_file\n");
-        #print "lineout: $digest $filename\n";
-    }
-    close($md5_fh);
-}
-
-sub _write_tagmanifest_md5 {
-  my ($self) = @_;
-
-  use Digest::MD5;
-
-  my $tagmanifest_file= $self->metadata_path."/tagmanifest-md5.txt";
-
-  open (my $md5_fh, ">", $tagmanifest_file) or die ("Cannot create tagmanifest-md5.txt: $! \n");
-
-  foreach my $rel_nonpayload_file (@{$self->non_payload_files}) {
-      my $nonpayload_file = File::Spec->catdir($self->bag_path, $rel_nonpayload_file);
-      if ($rel_nonpayload_file=~m/tagmanifest-.*\.txt$/) {
-        # Ignore, we can't take digest from ourselves
-      }
-      elsif ( -f $nonpayload_file && $nonpayload_file=~m/.*\.txt$/) {
-        open(my $DATA, "<", "$nonpayload_file") or die("Cannot read $_: $!");
-        my $digest = Digest::MD5->new->addfile($DATA)->hexdigest;
-        close($DATA);
-        print($md5_fh "$digest  $rel_nonpayload_file\n");
-      }
-      else {
-        die("A file or directory that doesn't match: $rel_nonpayload_file");
-      }
-  }
-
-  close($md5_fh);
-}
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -438,7 +467,7 @@ Archive::BagIt::Base
 
 =head1 VERSION
 
-version 0.052
+version 0.053.3
 
 =head1 NAME
 
@@ -454,10 +483,17 @@ An interface to verify a bag.
 
 You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
 
-=head2 make_bag
-  A constructor that will make and return a bag from a direcory
+=head2 init_metadata
 
-  If a data directory exists, assume it is already a bag (no checking for invalid files in root)
+A constructor that will just create the metadata directory
+
+This won't make a bag, but it will create the conditions to do that eventually
+
+=head2 make_bag
+
+A constructor that will make and return a bag from a directory
+
+If a data directory exists, assume it is already a bag (no checking for invalid files in root)
 
 =head1 AVAILABILITY
 
@@ -467,7 +503,7 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
+The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
 and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -481,7 +517,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

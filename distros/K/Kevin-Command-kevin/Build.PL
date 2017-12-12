@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Kevin-Command-kevin",
-  "dist_version" => "0.4.0",
+  "dist_version" => "0.4.1",
   "license" => "perl",
   "module_name" => "Kevin::Command::kevin",
   "recursive_test_files" => 1,

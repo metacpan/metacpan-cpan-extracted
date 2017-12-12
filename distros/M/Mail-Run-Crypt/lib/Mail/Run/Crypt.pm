@@ -16,7 +16,7 @@ use Mail::GnuPG;
 use MIME::Entity;
 
 # Specify package verson
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Default exit value
 our $DEFAULT_EXIT = 127;    ## no critic (ProhibitMagicNumbers)
@@ -138,7 +138,7 @@ Mail::Run::Crypt - Encrypt and mail output from command runs
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 DESCRIPTION
 

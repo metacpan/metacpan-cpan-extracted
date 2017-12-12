@@ -34,7 +34,7 @@
    "provides" : {
       "Aws::Polly::Select" : {
          "file" : "lib/Aws/Polly/Select.pm",
-         "version" : "20171111"
+         "version" : "20171129"
       },
       "Aws::Polly::Select::Speaker" : {
          "file" : "lib/Aws/Polly/Select.pm"
@@ -46,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171111"
+   "version" : "20171129"
 }

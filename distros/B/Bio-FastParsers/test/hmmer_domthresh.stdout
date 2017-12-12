@@ -1,0 +1,40 @@
+# hmmsearch :: search profile(s) against a sequence database
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query HMM file:                  tmpfile_MipI.hmm
+# target sequence database:        tmpfile_tVIr_target.fasta
+# output directed to file:         tmpfile_Z7Ig.res
+# max ASCII text line length:      unlimited
+# domain reporting threshold:      E-value <= 0.01
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       tmpfile_IV_h_model  [M=524]
+Scores for complete sequences (score includes all domains):
+   --- full sequence ---   --- best 1 domain ---    -#dom-
+    E-value  score  bias    E-value  score  bias    exp  N  Sequence           Description
+    ------- ------ -----    ------- ------ -----   ---- --  --------           -----------
+    4.6e-05    9.6  21.6      0.014    1.4  21.6    3.0  0  Scoe_bact|CAB99155  
+
+
+Domain annotation for each sequence (and alignments):
+>> Scoe_bact|CAB99155  
+   [No individual domains that satisfy reporting thresholds (although complete target did)]
+
+
+
+Internal pipeline statistics summary:
+-------------------------------------
+Query model(s):                              1  (524 nodes)
+Target sequences:                            1  (585 residues searched)
+Passed MSV filter:                         1  (1); expected 0.0 (0.02)
+Passed bias filter:                        1  (1); expected 0.0 (0.02)
+Passed Vit filter:                         1  (1); expected 0.0 (0.001)
+Passed Fwd filter:                         1  (1); expected 0.0 (1e-05)
+Initial search space (Z):                  1  [actual number of targets]
+Domain search space  (domZ):               1  [number of targets reported over threshold]
+# CPU time: 0.02u 0.02s 00:00:00.04 Elapsed: 00:00:00.03
+# Mc/sec: 10.22
+//
+[ok]

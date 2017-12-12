@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Log::Any::Adapter::MojoLog.
 
+0.03 2017-12-06
+  - Fix bug when Mojolicious isn't already loaded by the application (Grinnz)
+
 0.02 2016-04-12
   - Fix license in META files, it should only be Artistic v2
 

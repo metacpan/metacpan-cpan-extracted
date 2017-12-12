@@ -25,8 +25,10 @@ use SQL::Translator;
 my $PRODUCER = \&SQL::Translator::Producer::PostgreSQL::create_field;
 
 {
-  my $table = SQL::Translator::Schema::Table->new( name => 'foo.bar' );
+  my $table = SQL::Translator::Schema::Table->new( name => 'foo.bar',
+                                                   comments => [ "multi\nline",'single line' ] );
   my $field = SQL::Translator::Schema::Field->new( name => 'baz',
+                                                 comments => [ "multi\nline",'single line' ],
                                                  table => $table,
                                                  data_type => 'VARCHAR',
                                                  size => 10,
@@ -39,7 +41,25 @@ my $PRODUCER = \&SQL::Translator::Producer::PostgreSQL::create_field;
   my ($create, $fks) = SQL::Translator::Producer::PostgreSQL::create_table($table, { quote_table_names => q{"} });
   is($table->name, 'foo.bar');
 
-  my $expected = "--\n-- Table: foo.bar\n--\nCREATE TABLE \"foo\".\"bar\" (\n  \"baz\" character varying(10) DEFAULT 'quux' NOT NULL\n)";
+  my $expected = <<EOESQL;
+--
+-- Table: foo.bar
+--
+
+-- Comments:
+-- multi
+-- line
+-- single line
+--
+CREATE TABLE "foo"."bar" (
+  -- multi
+  -- line
+  -- single line
+  "baz" character varying(10) DEFAULT 'quux' NOT NULL
+)
+EOESQL
+
+  $expected =~ s/\n\z//;
   is($create, $expected);
 }
 
@@ -229,6 +249,37 @@ is($add_field, 'ALTER TABLE mytable ADD COLUMN field3 character varying(10)', 'A
 
 my $drop_field = SQL::Translator::Producer::PostgreSQL::drop_field($field2);
 is($drop_field, 'ALTER TABLE mytable DROP COLUMN myfield', 'Drop field works');
+
+my $field_serial = SQL::Translator::Schema::Field->new( name => 'serial_field',
+                                                  table => $table,
+                                                  data_type => 'INT',
+                                                  is_auto_increment => 1,
+                                                  is_nullable => 0 );
+
+my $field_serial_sql = SQL::Translator::Producer::PostgreSQL::create_field($field_serial);
+
+is($field_serial_sql, 'serial_field serial NOT NULL', 'Create serial field works');
+
+my $field_bigserial = SQL::Translator::Schema::Field->new( name => 'bigserial_field',
+                                                  table => $table,
+                                                  data_type => 'BIGINT',
+                                                  is_auto_increment => 1,
+                                                  is_nullable => 0 );
+
+my $field_bigserial_sql = SQL::Translator::Producer::PostgreSQL::create_field($field_bigserial);
+
+is($field_bigserial_sql, 'bigserial_field bigserial NOT NULL', 'Create bigserial field works (from bigint type)');
+
+$field_bigserial = SQL::Translator::Schema::Field->new( name => 'bigserial_field',
+                                                  table => $table,
+                                                  data_type => 'INT',
+                                                  is_auto_increment => 1,
+                                                  is_nullable => 0,
+                                                  size => 12 );
+
+$field_bigserial_sql = SQL::Translator::Producer::PostgreSQL::create_field($field_bigserial);
+
+is($field_bigserial_sql, 'bigserial_field bigserial NOT NULL', 'Create bigserial field works (based on size)');
 
 my $field3 = SQL::Translator::Schema::Field->new( name      => 'time_field',
                                                   table => $table,
@@ -626,6 +677,14 @@ is($view2_sql1, $view2_sql_replace, 'correct "CREATE OR REPLACE VIEW" SQL 2');
         is($def->[0], 'CONSTRAINT constr UNIQUE (bar, lower(foo))', 'constraint created');
         ($def) = SQL::Translator::Producer::PostgreSQL::create_constraint($constr, $quote);
         is($def->[0], 'CONSTRAINT "constr" UNIQUE ("bar", lower(foo))', 'constraint created w/ quotes');
+    }
+
+    {
+        my $index = $table->add_index(name => 'myindex', options => [{using => 'hash'}, {where => "upper(foo) = 'bar' AND bar = 'foo'"}], fields => ['bar', 'lower(foo)']);
+        my ($def) = SQL::Translator::Producer::PostgreSQL::create_index($index);
+        is($def, "CREATE INDEX myindex on foobar USING hash (bar, lower(foo)) WHERE upper(foo) = 'bar' AND bar = 'foo'", 'index using & where created');
+        ($def) = SQL::Translator::Producer::PostgreSQL::create_index($index, $quote);
+        is($def, 'CREATE INDEX "myindex" on "foobar" USING hash ("bar", lower(foo)) WHERE upper(foo) = \'bar\' AND bar = \'foo\'', 'index using & where created w/ quotes');
     }
 }
 

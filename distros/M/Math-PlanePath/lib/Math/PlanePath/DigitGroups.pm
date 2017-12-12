@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -40,7 +40,7 @@ use strict;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -370,7 +370,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

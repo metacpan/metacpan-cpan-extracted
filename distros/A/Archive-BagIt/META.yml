@@ -3,18 +3,18 @@ abstract: 'An interface to make and verify bags according to the BagIt standard'
 author:
   - 'Rob Schmidt <rjeschmi@gmail.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Copy: '0'
   File::Path: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Module::Build: '0.28'
   Test::More: '0'
   lib: '0'
 configure_requires:
-  Module::Build: '0.28'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.142690'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,29 +22,29 @@ meta-spec:
 name: Archive-BagIt
 no_index:
   directory:
-    - corpus
+    - t
     - inc
-    - examples
-recommends:
-  IO::AIO: '0'
 requires:
+  Class::Load: '0'
   Data::Dumper: '0'
   Data::Printer: '0'
   Digest::MD5: '0'
+  Encode: '0'
   File::Find: '0'
   File::Spec: '0'
   IO::AIO: '0'
-  Moo: '0'
   Moose: '0'
+  Moose::Role: '0'
   POSIX: '0'
   String::CRC32: '0'
   Sub::Quote: '0'
   Time::HiRes: '0'
+  namespace::autoclean: '0'
+  open: '0'
   parent: '0'
   perl: '5.014'
   strict: '0'
+  utf8: '0'
   warnings: '0'
-resources:
-  bugtracker: https://github.com/rjeschmi/Archive-BagIt/issues
-  repository: git://github.com/rjeschmi/Archive-BagIt.git
-version: '0.052'
+version: v0.053.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

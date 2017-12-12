@@ -7,7 +7,7 @@ my $have_gmp = check_lib(lib => 'gmp', header => 'gmp.h');
 if ($have_gmp) {
   warn "\n   It looks like you have the GMP C library.\n";
   warn "   Adding Math::Prime::Util::GMP to dep list.\n\n";
-  $require_mpugmp{'Math::Prime::Util::GMP'} = '0.48';
+  $require_mpugmp{'Math::Prime::Util::GMP'} = '0.50';
 } else {
   warn "\n  It looks like you don't have the GMP library.  Sad face.\n";
 }
@@ -87,28 +87,28 @@ WriteMakefile1(
                },
                provides => {
                  'ntheory' => {
-                    version => '0.69', file => 'lib/ntheory.pm',
+                    version => '0.70', file => 'lib/ntheory.pm',
                  },
                  'Math::Prime::Util' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util.pm',
                  },
                  'Math::Prime::Util::MemFree' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/MemFree.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/MemFree.pm',
                  },
                  'Math::Prime::Util::PP' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/PP.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/PP.pm',
                  },
                  'Math::Prime::Util::PrimeArray' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/PrimeArray.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/PrimeArray.pm',
                  },
                  'Math::Prime::Util::PrimeIterator' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
                  },
                  'Math::Prime::Util::Entropy' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/Entropy.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/Entropy.pm',
                  },
                  'Math::Prime::Util::ChaCha' => {
-                    version => '0.69', file => 'lib/Math/Prime/Util/ChaCha.pm',
+                    version => '0.70', file => 'lib/Math/Prime/Util/ChaCha.pm',
                  },
                  # Skip: PPFE, PrimalityProving, RandomPrimes, ZetaBigFloat,
                  #       ECAffinePoint, ECProjectivePoint
@@ -116,9 +116,8 @@ WriteMakefile1(
                prereqs => {
                  runtime => {
                    recommends => {
-                     'Math::Prime::Util::GMP' => 0.48,
+                     'Math::Prime::Util::GMP' => 0.50,
                      'Math::BigInt::GMP'      => 0,
-                     'Math::MPFR'             => 2.03,
                      'Digest::SHA'            => 5.87,
                    },
                  },

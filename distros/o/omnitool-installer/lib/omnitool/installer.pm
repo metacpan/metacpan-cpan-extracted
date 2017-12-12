@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.3";
+our $VERSION = "1.0.5";
 
 # for reading in configs
 use File::Slurp;
@@ -283,6 +283,9 @@ Next Steps:
 	User-Facing: $web_urls[1]
 9. Read some Perl docs: $web_urls[3]
 10. Get Started on Your Apps:  $web_urls[2]
+
+** The username for the Web URL's in steps 8-10 will be 'omnitool_admin' with the
+	password you gave for the ''admin-ui-password' option. **
 
 If you have any questions, please reach out to ericschernoff\@gmail.com .
 };

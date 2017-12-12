@@ -12,25 +12,25 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(:overload binomial);
+use Math::AnyNum qw(:overload binomial factorial);
 
-# This function returns the nth Bernoulli number (Akiyama–Tanigawa algorithm)
+# This function returns the nth Bernoulli number
 # See: https://en.wikipedia.org/wiki/Bernoulli_number
 sub bernoulli_number {
     my ($n) = @_;
 
-    return 0 if $n > 1 && $n % 2;    # Bn = 0 for all odd n > 1
+    return 1/2 if ($n     == 1);
+    return   0 if ($n % 2 == 1);
 
-    my @A;
-    for my $m (0 .. $n) {
-        $A[$m] = 1 / ($m + 1);
+    my @B = (1);
 
-        for (my $j = $m ; $j > 0 ; $j--) {
-            $A[$j - 1] = $j * ($A[$j - 1] - $A[$j]);
+    foreach my $i (1 .. $n) {
+        foreach my $k (0 .. $i - 1) {
+            $B[$i] -= $B[$k] / factorial($i - $k + 1);
         }
     }
 
-    return $A[0];                    # which is Bn
+    $B[-1] * factorial($#B);
 }
 
 # The Faulhaber's formula

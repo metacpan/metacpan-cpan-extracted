@@ -37,6 +37,7 @@ CGI
 CPAN
 Campbell
 Cardillo
+Ceccarelli
 Chamas
 Chase
 Christopher
@@ -61,6 +62,7 @@ Dvornik
 Eldridge
 Etheridge
 FWILES
+Fabian
 Father
 Fesler
 Finch
@@ -68,6 +70,7 @@ Froehlich
 Gavin
 Gerhard
 Gertjan
+Gianni
 Gisle
 Gondwana
 Graaff
@@ -257,6 +260,7 @@ Zajac
 Zakharevich
 Zavarin
 Zefram
+Zeindler
 Zielinski
 Zoest
 adamk
@@ -284,12 +288,14 @@ dpettit
 dsteinbrunner
 erik
 ether
+faz
 file
 freeerider
 ftp
 gerhard
 getprint
 getstore
+gianni
 gisle
 github
 gong

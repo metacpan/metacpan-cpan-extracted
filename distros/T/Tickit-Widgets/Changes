@@ -1,5 +1,10 @@
 Revision history for Tickit-Widgets
 
+0.28    2017-11-30 13:32:58
+        [CHANGES]
+         * Add SingleChildWidget->remove (RT122231)
+         * Update for Tickit 0.63's new focus event API
+
 0.27    2017/03/17 18:50:40
         [BUGFIXES]
          * Ensure ContainerWidget can handle windowless children

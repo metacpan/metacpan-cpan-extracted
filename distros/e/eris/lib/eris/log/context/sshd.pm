@@ -8,7 +8,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub sample_messages {
@@ -75,7 +75,7 @@ eris::log::context::sshd - Parse sshd logs into structured data
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

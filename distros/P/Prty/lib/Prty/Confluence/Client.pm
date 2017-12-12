@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use LWP::UserAgent ();
 use Prty::Option;
@@ -48,11 +48,6 @@ erweitert.
 
     $cli = $class->new(@keyVal);
 
-=head4 Description
-
-Instantiiere einen Client für Confluence mit den Eigenschaften
-@keyval und liefere eine Referenz auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -78,6 +73,11 @@ Gib Laufzeit-Informationen auf STDERR aus.
 =head4 Returns
 
 Client-Objekt (Typ Prty::Confluence::Client)
+
+=head4 Description
+
+Instantiiere einen Client für Confluence mit den Eigenschaften
+@keyval und liefere eine Referenz auf dieses Objekt zurück.
 
 =head4 Example
 
@@ -120,16 +120,6 @@ sub new {
 
     $pag = $cli->createPage($parentId,$title,$markup,@opts);
 
-=head4 Description
-
-Erzeuge eine Confluence-Seite mit Titel $title und Inhalt $markup
-(= Wiki Code) als Unterseite von der Seite mit der Seiten-Id
-$parentId und liefere das Seiten-Objekt der der erzeugten Seite
-zurück.
-
-Die erzeugte Seite ist (notwendigerweise) demselben Space wie die
-übergeordnete Seite zugeordnet.
-
 =head4 Arguments
 
 =over 4
@@ -162,6 +152,16 @@ generiert wurde.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Erzeuge eine Confluence-Seite mit Titel $title und Inhalt $markup
+(= Wiki Code) als Unterseite von der Seite mit der Seiten-Id
+$parentId und liefere das Seiten-Objekt der der erzeugten Seite
+zurück.
+
+Die erzeugte Seite ist (notwendigerweise) demselben Space wie die
+übergeordnete Seite zugeordnet.
 
 =cut
 
@@ -235,10 +235,6 @@ sub createPage {
 
     $pag = $cli->deletePage($pageId);
 
-=head4 Description
-
-Lösche die Confluence-Seite mit der Seiten-Id $pageId.
-
 =head4 Arguments
 
 =over 4
@@ -252,6 +248,10 @@ Seiten-Id
 =head4 Returns
 
 Nichts
+
+=head4 Description
+
+Lösche die Confluence-Seite mit der Seiten-Id $pageId.
 
 =cut
 
@@ -277,11 +277,6 @@ sub deletePage {
 
     $pag = $cli->getPage($pageId);
 
-=head4 Description
-
-Rufe die Confluence-Seite mit der Seiten-Id $pageId ab und liefere
-ein Seiten-Objekt vom Typ Prty::Confluence::Page zurück.
-
 =head4 Arguments
 
 =over 4
@@ -295,6 +290,11 @@ Seiten-Id
 =head4 Returns
 
 Seiten-Objekt (Typ Prty::Confluence::Page)
+
+=head4 Description
+
+Rufe die Confluence-Seite mit der Seiten-Id $pageId ab und liefere
+ein Seiten-Objekt vom Typ Prty::Confluence::Page zurück.
 
 =cut
 
@@ -319,6 +319,39 @@ sub getPage {
 =head4 Synopsis
 
     $cli->updatePage($pageId,$markup,@opts);
+
+=head4 Arguments
+
+=over 4
+
+=item $pageId
+
+Seiten-Id
+
+=item $markup
+
+Seiteninhalt in Confluence Wiki Markup
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -warning => $bool (Default: 0)
+
+Setze eine Warnung an den Anfang der Seite, dass die Seite automatisch
+erzeugt wurde.
+
+=item -title => $title
+
+Setze den Seitentitel.
+
+=back
+
+=head4 Returns
+
+nichts
 
 =head4 Description
 
@@ -355,39 +388,6 @@ muss.
 Der Titel der Seite wird aus dem aktuellen Stand der Seite
 übernommen, sofern er nicht mit der Option -title überschrieben
 wird.
-
-=head4 Arguments
-
-=over 4
-
-=item $pageId
-
-Seiten-Id
-
-=item $markup
-
-Seiteninhalt in Confluence Wiki Markup
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -warning => $bool (Default: 0)
-
-Setze eine Warnung an den Anfang der Seite, dass die Seite automatisch
-erzeugt wurde.
-
-=item -title => $title
-
-Setze den Seitentitel.
-
-=back
-
-=head4 Returns
-
-nichts
 
 =cut
 
@@ -450,11 +450,6 @@ sub updatePage {
 
     $pag = $cli->createAttachment($parentId,$file);
 
-=head4 Description
-
-Füge Datei $file als Attachment zur Confluence-Seite mit der
-Seiten-Id $pageId hinzu.
-
 =head4 Arguments
 
 =over 4
@@ -472,6 +467,11 @@ Pfad zur Attchment-Datei.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Füge Datei $file als Attachment zur Confluence-Seite mit der
+Seiten-Id $pageId hinzu.
 
 =cut
 
@@ -505,13 +505,6 @@ gerufen.
     $res = $cli->send($method,$path);
     $res = $cli->send($method,$path,$contentType,$content);
 
-=head4 Description
-
-Sende einen HTTP-Request vom Typ $method mit dem REST-Pfad $path
-und dem Body $content vom Typ $contentType an den Confluence-Server
-und liefere die resultierende HTTP-Anwort zurück. Im Fehlerfall
-wirft die Methode eine Exception.
-
 =head4 Arguments
 
 =over 4
@@ -542,6 +535,13 @@ Der Inhalt des HTTP-Body, z.B. (auf die Toplevel-Attribute umbrochen)
 =head4 Returns
 
 HTTP-Antwort (Typ HTTP::Response)
+
+=head4 Description
+
+Sende einen HTTP-Request vom Typ $method mit dem REST-Pfad $path
+und dem Body $content vom Typ $contentType an den Confluence-Server
+und liefere die resultierende HTTP-Anwort zurück. Im Fehlerfall
+wirft die Methode eine Exception.
 
 =cut
 
@@ -605,12 +605,6 @@ sub send {
     $url = $cli->url;
     $url = $cli->url($path);
 
-=head4 Description
-
-Erzeuge einen REST-API URL bestehend aus dem beim Konstruktor-Aufruf
-angegebenen Server-URL und dem Pfad $path und liefere diesen zurück.
-Ohne Argument wird der Server-URL geliefert.
-
 =head4 Arguments
 
 =over 4
@@ -625,6 +619,12 @@ z.B. 'wiki/rest/api/content/32788'.
 =head4 Returns
 
 URL (String)
+
+=head4 Description
+
+Erzeuge einen REST-API URL bestehend aus dem beim Konstruktor-Aufruf
+angegebenen Server-URL und dem Pfad $path und liefere diesen zurück.
+Ohne Argument wird der Server-URL geliefert.
 
 =head4 Example
 
@@ -659,7 +659,7 @@ sub url {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

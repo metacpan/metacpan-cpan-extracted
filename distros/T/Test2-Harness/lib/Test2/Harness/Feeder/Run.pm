@@ -2,10 +2,10 @@ package Test2::Harness::Feeder::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use Carp qw/croak/;
-use Time::HiRes qw/time/;
+use Time::HiRes qw/time sleep/;
 use Scalar::Util qw/blessed/;
 use List::Util qw/first/;
 
@@ -25,6 +25,8 @@ use Test2::Harness::Util::HashBase qw{
     -job_ids
     -seen_jobs
     -tail
+
+    -batch
 };
 
 sub init {
@@ -87,27 +89,49 @@ sub poll {
     push @out => map { $self->_harness_event(0, info => [{tag => 'INTERNAL', debug => 1, details => $_}]) } $dir->err_poll;
 
     my @new_jobs;
-    for my $job ($dir->job_poll(1)) {
-        my $job_id = $job->job_id;
-        next if $self->{+JOB_IDS} && !$self->{+JOB_IDS}->{$job_id};
 
-        my $jfeed = Test2::Harness::Feeder::Job->new(
-            job_id => $job_id,
-            run_id => $self->{+RUN}->run_id,
-            complete => $self->{+RUNNER} ? 0 : 1,
-            dir => File::Spec->catdir($self->{+DIR}->root, $job_id),
-            keep_dir => $self->{+KEEP_DIR},
-            event_counter_ref => $self->{+EVENT_COUNTER_REF},
-        );
+    my $stop = 0;
+    while (!$stop) {
+        $stop = 1;
 
-        $self->{+JOB_LOOKUP}->{$job_id} = $jfeed;
-        push @{$self->{+_ACTIVE}} => $jfeed;
+        for my $job ($dir->job_poll(1)) {
+            my $job_id = $job->job_id;
+            if ($self->{+JOB_IDS} && !$self->{+JOB_IDS}->{$job_id}) {
+                $stop = 0;
+                next;
+            }
 
-        push @new_jobs => $self->_harness_event(
-            $job_id,
-            harness_job_launch => {stamp => time},
-            harness_job        => $job,
-        );
+            my $dir = File::Spec->catdir($self->{+DIR}->root, $job_id);
+            my $count = 0;
+            until(-d $dir) {
+                # Wait up to 30 seconds
+                if ($count++ > 1500) {
+                    warn "Directory '$dir' never appeared";
+                    last;
+                }
+                sleep 0.02;
+            }
+
+            next unless -d $dir;
+
+            my $jfeed = Test2::Harness::Feeder::Job->new(
+                job_id => $job_id,
+                run_id => $self->{+RUN}->run_id,
+                complete => $self->{+RUNNER} ? 0 : 1,
+                dir => File::Spec->catdir($self->{+DIR}->root, $job_id),
+                keep_dir => $self->{+KEEP_DIR},
+                event_counter_ref => $self->{+EVENT_COUNTER_REF},
+            );
+
+            $self->{+JOB_LOOKUP}->{$job_id} = $jfeed;
+            push @{$self->{+_ACTIVE}} => $jfeed;
+
+            push @new_jobs => $self->_harness_event(
+                $job_id,
+                harness_job_launch => {stamp => time},
+                harness_job        => $job,
+            );
+        }
     }
 
     my $run_exit = $self->{+RUNNER} ? $self->{+RUNNER}->exited : 1;
@@ -155,18 +179,18 @@ sub poll {
 sub complete {
     my $self = shift;
 
+    # If runner exited with an error we need to be complete
+    my $runner = $self->{+RUNNER};
+    return 1 if $runner && $runner->exit;
+
     if (my $job_ids = $self->{+JOB_IDS}) {
         return 1 unless first { !$self->{+SEEN_JOBS}->{$_} } keys %$job_ids;
         return 0;
     }
 
-    my $runner = $self->{+RUNNER} or return 1;
-    my $exit = $runner->exit;
-
-    # If runner exited with an error we need to be complete
-    return 1 if $exit;
     return 0 if @{$self->{+_ACTIVE}};
     return 1 if $self->{+DIR}->complete();
+    return 1 unless $runner;
     return 1 if $runner->exited;
     return 0;
 }

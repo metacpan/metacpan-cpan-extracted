@@ -3,9 +3,14 @@ abstract: 'Configure endpoints for XMLRPC, JSONRPC and RESTRPC procedures'
 author:
   - 'Abe Timmerman <abeltje@cpan.org>'
 build_requires:
+  Dancer: '1.31'
+  JSON: '2.0'
+  Params::ValidationCompiler: '0.24'
+  RPC::XML: '0.56'
   Test::Fatal: '0.010'
   Test::More: '0.88'
   Test::NoWarnings: '1.00'
+  Types::Standard: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: 6.55_02
 dynamic_config: 1
@@ -29,4 +34,4 @@ requires:
 resources:
   homepage: https://github.com/abeltje/Dancer-Plugin-RPC
   repository: git://github.com/abeltje/Dancer-Plugin-RPC.git
-version: '1.06'
+version: '1.07'

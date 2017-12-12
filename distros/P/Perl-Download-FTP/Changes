@@ -1,5 +1,11 @@
 Revision history for Perl module Perl::Download::FTP
 
+0.03 Mon Dec  4 17:40:44 EST 2017
+    - Touch-ups to documentation.
+
+0.02 Fri Dec  1 18:57:51 EST 2017
+    - Add get_specific_release() method.
+
 0.01 Sat Nov 11 11:26:06 2017
     - original version; created by ExtUtils::ModuleMaker 0.56
 

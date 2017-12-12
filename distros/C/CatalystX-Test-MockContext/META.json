@@ -1,0 +1,71 @@
+{
+   "abstract" : "Conveniently create $c objects for testing",
+   "author" : [
+      "Eden Cardim <edencardim@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CatalystX-Test-MockContext",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Class::Load" : "0",
+            "Plack::Test" : "0",
+            "Sub::Exporter" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moose" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/edenc/CatalystX-Test-MockContext.git",
+         "web" : "https://github.com/edenc/CatalystX-Test-MockContext.git"
+      }
+   },
+   "version" : "0.000003",
+   "x_contributors" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -62,7 +62,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 use Math::PlanePath::Base::NSEW;

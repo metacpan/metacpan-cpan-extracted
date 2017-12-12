@@ -1,6 +1,6 @@
 Changes
-GentooFunctions.pm
-GentooFunctions.pod
+lib/Term/GentooFunctions.pm
+lib/Term/GentooFunctions.pod
 MANIFEST
 Makefile.PL
 README

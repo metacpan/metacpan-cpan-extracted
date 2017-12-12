@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-my $min_ver = 0.17;
+my $min_ver = 0.35;
 eval "use Test::Map::Tube $min_ver tests => 3";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 
@@ -22,3 +22,4 @@ __DATA__
 Route 1|Adenauerplatz|Savignyplatz|Adenauerplatz,Wilmersdorfer Str.,Charlottenburg,Savignyplatz
 Route 2|platz der luftbrücke|möckernbrücke|Platz der Luftbrücke,Mehringdamm,Möckernbrücke
 Route 3|Friedrichstr.|Alexanderplatz|Friedrichstr.,Hackescher Markt,Alexanderplatz
+Route 4|Treptower Park|Warschauer Str.|Treptower Park,Warschauer Str.

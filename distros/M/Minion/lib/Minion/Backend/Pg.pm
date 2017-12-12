@@ -68,9 +68,19 @@ sub list_jobs {
      order by id desc
      limit $5 offset $6', @$options{qw(ids queue state task)}, $limit, $offset
   )->expand->hashes->to_array;
-  my $total = @$jobs ? $jobs->[0]{total} : 0;
-  delete $_->{total} for @$jobs;
-  return {jobs => $jobs, total => $total};
+  return _total('jobs', $jobs);
+}
+
+sub list_locks {
+  my ($self, $offset, $limit, $options) = @_;
+
+  my $locks = $self->pg->db->query(
+    'select name, extract(epoch from expires) as expires,
+       count(*) over() as total from minion_locks
+     where expires > now() and (name = $1 or $1 is null)
+     order by id desc limit $2 offset $3', $options->{name}, $limit, $offset
+  )->hashes->to_array;
+  return _total('locks', $locks);
 }
 
 sub list_workers {
@@ -86,9 +96,7 @@ sub list_workers {
      where (id = any (\$1) or \$1 is null)
      order by id desc limit \$2 offset \$3", $options->{ids}, $limit, $offset
   )->expand->hashes->to_array;
-  my $total = @$workers ? $workers->[0]{total} : 0;
-  delete $_->{total} for @$workers;
-  return {total => $total, workers => $workers};
+  return _total('workers', $workers);
 }
 
 sub lock {
@@ -207,6 +215,8 @@ sub stats {
        count(*) filter (where state = 'finished') as finished_jobs,
        count(*) filter (where state = 'inactive'
          and delayed > now()) as delayed_jobs,
+       (select count(*) from minion_locks where expires > now())
+         as active_locks,
        count(distinct worker) filter (where state = 'active') as active_workers,
        (select case when is_called then last_value else 0 end
          from minion_jobs_id_seq) as enqueued_jobs,
@@ -230,6 +240,13 @@ sub unlock {
 
 sub unregister_worker {
   shift->pg->db->query('delete from minion_workers where id = ?', shift);
+}
+
+sub _total {
+  my ($name, $results) = @_;
+  my $total = @$results ? $results->[0]{total} : 0;
+  delete $_->{total} for @$results;
+  return {total => $total, $name => $results};
 }
 
 sub _try {
@@ -599,6 +616,47 @@ Id of worker that is processing the job.
 
 =back
 
+=head2 list_locks
+
+  my $results = $backend->list_locks($offset, $limit);
+  my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+
+Returns information about locks in batches.
+
+  # Check expiration time
+  my $results = $backend->list_locks(0, 1, {name => 'foo'});
+  my $expires = $results->{locks}[0]{expires};
+
+These options are currently available:
+
+=over 2
+
+=item name
+
+  name => 'foo'
+
+List only locks with this name.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item expires
+
+  expires => 784111777
+
+Epoch time this lock will expire.
+
+=item name
+
+  name => 'foo'
+
+Lock name.
+
+=back
+
 =head2 list_workers
 
   my $results = $backend->list_workers($offset, $limit);
@@ -670,7 +728,8 @@ Hash reference with whatever status information the worker would like to share.
   my $bool = $backend->lock('foo', 3600, {limit => 20});
 
 Try to acquire a named lock that will expire automatically after the given
-amount of time in seconds.
+amount of time in seconds. An expiration time of C<0> can be used to check if a
+named lock already exists without creating one.
 
 These options are currently available:
 
@@ -785,7 +844,7 @@ Queue to put job in.
 
   my $stats = $backend->stats;
 
-Get statistics for jobs and workers.
+Get statistics for the job queue.
 
 These fields are currently available:
 
@@ -796,6 +855,12 @@ These fields are currently available:
   active_jobs => 100
 
 Number of jobs in C<active> state.
+
+=item active_locks
+
+  active_locks => 100
+
+Number of active named locks.
 
 =item active_workers
 

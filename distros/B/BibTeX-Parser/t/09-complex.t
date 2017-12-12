@@ -37,5 +37,6 @@ is_deeply($entry, {_type => 'ARTICLE', _key => 'Ahrenberg88',
     pages =        "66--70",
     year =         "1988",
     keywords =     "conver",
-}'
+}',
+   _pre =>     ''
    }, "parse \@ARTICLE");

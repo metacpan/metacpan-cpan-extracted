@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-use ExtUtils::MakeMaker;
+use Module::Metadata;
 use File::Spec;
 
 # from $version::LAX
@@ -129,7 +129,7 @@ for my $phase ( qw(configure build test runtime develop other) ) {
             my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
 
             if ($prefix) {
-                my $have = MM->parse_version( File::Spec->catfile($prefix, $file) );
+                my $have = Module::Metadata->new_from_file( File::Spec->catfile($prefix, $file) )->version;
                 $have = "undef" unless defined $have;
                 push @reports, [$mod, $want, $have];
 

@@ -11,7 +11,7 @@ use Udev::FFI;
 
 
 my $udev = Udev::FFI->new() or
-    die "Can't create udev context: $@.\n";
+    die "Can't create Udev::FFI object: $@.\n";
 
 my $monitor = $udev->new_monitor() or
     die "Can't create udev monitor: $@.\n";

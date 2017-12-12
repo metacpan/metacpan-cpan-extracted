@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use POSIX ();
 use Time::Local ();
@@ -126,6 +126,10 @@ sub germanToProgramNumber {
     $word = $this->intToWord($n);
     $word = $this->intToWord($n,$alphabet);
 
+=head4 Returns
+
+Zeichenkette
+
 =head4 Description
 
 Wandele positive ganze Zahl $n in ein Wort über dem Alphabet
@@ -152,10 +156,6 @@ verwendet. Die Funktion implementiert folgende Abbildung:
     52 -> 'AZ'
     53 -> 'BA'
     ...
-
-=head4 Returns
-
-Zeichenkette
 
 =cut
 
@@ -390,7 +390,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

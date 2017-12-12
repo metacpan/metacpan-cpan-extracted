@@ -99,17 +99,23 @@ __PACKAGE__->apply_TableSpec;
 __PACKAGE__->TableSpec_set_conf( 
 	title => 'Navtree Node',
 	title_multi => 'Navtree Nodes',
-	#iconCls => 'ra-icon-folder',
-	#multiIconCls => 'ra-icon-folders',
+	iconCls => 'ra-icon-folder',
+	multiIconCls => 'ra-icon-folders',
 	display_column => 'text'
 );
 
 
 __PACKAGE__->TableSpec_set_conf('column_properties_ordered', 
 
-	id => { no_column => \1, no_multifilter => \1, no_quick_search => \1 },
 	pid => { no_column => \1, no_multifilter => \1, no_quick_search => \1 },
 	navtree_node_to_roles => { no_column => \1, no_multifilter => \1, no_quick_search => \1 },
+  
+  id => {
+    header => 'Id',
+    width  => 55,
+    allow_edit => \0,
+    allow_add  => \0
+  },
 
 	text => {
 		header => 'Text',
@@ -120,8 +126,9 @@ __PACKAGE__->TableSpec_set_conf('column_properties_ordered',
 	iconcls => {
 		header => 'Icon Cls',
 		width	=> 150,
-		allow_edit => \0,
-		hidden => \1
+		#allow_edit => \0,
+		hidden => \1,
+    editor => { xtype => 'ra-all-icon-assets-combo', }
 	},
 	
 	expanded => {
@@ -130,6 +137,11 @@ __PACKAGE__->TableSpec_set_conf('column_properties_ordered',
 		allow_edit => \0,
 		hidden => \1
 	},
+  
+  ordering => {
+    header => 'Ordering',
+    width	=> 80,
+  },
 	
 	navtree_nodes => {
 		header => 'Child Nodes',

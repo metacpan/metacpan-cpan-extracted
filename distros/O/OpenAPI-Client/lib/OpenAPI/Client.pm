@@ -8,7 +8,7 @@ use Mojo::Util;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -34,11 +34,19 @@ has pre_processor => sub {
 
 has ua => sub { Mojo::UserAgent->new };
 
+sub call {
+  my ($self, $op) = (shift, shift);
+  my $code = $self->can($op);
+  return $self->$code(@_) if $code;
+  Carp::croak('[OpenAPI::Client] No such operationId');
+}
+
 sub new {
   my ($class, $specification) = (shift, shift);
   my $attrs = @_ == 1 ? shift : {@_};
   my $validator = JSON::Validator::OpenAPI::Mojolicious->new;
 
+  $validator->coerce($attrs->{coerce} // 1);
   $validator->ua->server->app($attrs->{app}) if $attrs->{app};
   $class = $class->_url_to_class($specification);
   _generate_class($class, $validator->load_and_validate_schema($specification, $attrs)) unless $class->isa($BASE);
@@ -66,7 +74,7 @@ use Mojo::Base '$BASE';
 1;
 HERE
 
-  Mojo::Util::monkey_patch($class, validator => sub {$validator});
+  Mojo::Util::monkey_patch($class => validator => sub {$validator});
 
   for my $path (keys %$paths) {
     next if $path =~ $X_RE;
@@ -78,10 +86,8 @@ HERE
       my $method = $op_spec->{operationId} or next;
       my @rules = (@$path_parameters, @{$op_spec->{parameters} || []});
       my $code = _generate_method(lc $http_method, $path, \@rules);
-
-      $method =~ s![^\w]!_!g;
       warn "[$class] Add method $method() for $http_method $path\n" if DEBUG;
-      Mojo::Util::monkey_patch($class, $method => $code);
+      Mojo::Util::monkey_patch($class => $method => $code);
     }
   }
 }
@@ -161,9 +167,8 @@ sub _generate_tx {
     return $self->ua->build_tx($http_method, $url, $self->pre_processor->(\%headers, \%req));
   }
 
-  # Invalid input
   my $tx = Mojo::Transaction::HTTP->new;
-  $tx->req->url($url);
+  $tx->req->url($url || Mojo::URL->new);
   $tx->res->headers->content_type('application/json');
   $tx->res->body(Mojo::JSON::encode_json({errors => \@errors}));
   $tx->res->code(400)->message($tx->res->default_message);
@@ -191,14 +196,14 @@ OpenAPI::Client - A client for talking to an Open API powered server
 
 =head1 DESCRIPTION
 
-L<OpenAPI::Client> is a class for generating classes that can talk to an Open
-API server. This is done by generating a custom class, based on a Open API
-specification, with methods that transform parameters into a HTTP request.
+L<OpenAPI::Client> can generating classes that can talk to an Open API server.
+This is done by generating a custom class, based on a Open API specification,
+with methods that transform parameters into a HTTP request.
 
 The generated class will perform input validation, so invalid data won't be
 sent to the server.
 
-Not that this implementation is currently EXPERIMENTAL, but unlikely to change!
+Note that this implementation is currently EXPERIMENTAL, but unlikely to change!
 Feedback is appreciated.
 
 =head1 SYNOPSIS
@@ -292,11 +297,20 @@ Returns a L<Mojo::UserAgent> object which is used to execute requests.
 
 =head1 METHODS
 
+=head2 call
+
+  $tx = $self->call($operationId => @args);
+  $self = $self->call($operationId => @args, sub { my ($self, $tx) = @_; });
+
+Used to either call an C<$operationId> that has an "invalid name", such as
+"list pets" instead of "listPets" or to call an C<$operationId> that you are
+unsure is supported yet. C<$tx> will have error set to "No such operationId"
+and code "400".
+
 =head2 new
 
-  $client = OpenAPI::Client->new($specification, \%attrs);
-  $client = OpenAPI::Client->new($specification, %attrs);
-  $client = OpenAPI::Client->new($specification, app => Mojolicious->new);
+  $client = OpenAPI::Client->new($specification, \%attributes);
+  $client = OpenAPI::Client->new($specification, %attributes);
 
 Returns an object of a generated class, with methods generated from the Open
 API specification located at C<$specification>. See L<JSON::Validator/schema>
@@ -305,8 +319,20 @@ for valid versions of C<$specification>.
 Note that the class is cached by perl, so loading a new specification from the
 same URL will not generate a new class.
 
+Extra C<%attributes>:
+
+=over 2
+
+=item * app
+
 Specifying an C<app> is useful when running against a local L<Mojolicious>
 instance.
+
+=item * coerce
+
+See L<JSON::Validator/coerce>. Default to 1.
+
+=back
 
 =head2 validator
 

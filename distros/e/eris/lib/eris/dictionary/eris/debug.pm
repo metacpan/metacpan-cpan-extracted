@@ -7,7 +7,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_priority { 100 }
@@ -48,7 +48,7 @@ eris::dictionary::eris::debug - Debugging data in the event
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

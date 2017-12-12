@@ -9,7 +9,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 # Web Attack Detection
@@ -138,7 +138,7 @@ eris::log::context::attacks::url - Inspects URL's for common attack patterns
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

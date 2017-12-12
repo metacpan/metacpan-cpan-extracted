@@ -1,3 +1,15 @@
+v 000.600.100 2017-12-11
+    * marking project as EOL
+v 000.600.000 2016-08-30
+    * peek method can take a count
+v 000.500.000 2016-03-15
+    * new method peek for task queues, lets you see what is at the head or tail of the queue
+    * new 'simple' queue operations, provides push, pop and size methods (queue_size is just for tasks)
+    * queue is now optional for most calls, default_queue can be defined when instancing the queue object
+    * process and process_failures can take callback_params hash to pass optional parameters to the callback, saves using global variables
+    * published items can have expiry times
+    * times as parameters can be parsable strings, eg 'tomorrow', '2016-01-03 12:45', also if time is a number less than the number of seconds in 5 days, then this is added to the current time
+    * Improved POD
 v 000.400.000 2015-12-03
   * Breaking changes - probably not an issue as no one uses this module :)
       * most methods now require arguments to be passed in a hashref

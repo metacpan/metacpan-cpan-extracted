@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use base qw( Circle::Net::IRC::Target );
 
+our $VERSION = '0.173320';
+
 use Carp;
 
 # Don't reprint RPL_USERISAWAY message within 1 hour

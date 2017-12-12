@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::SingleChildWidget;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Tickit::ContainerWidget );
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Carp;
 
@@ -106,6 +106,14 @@ sub add
    my $self = shift;
    croak "Already have a child; cannot add another" if $self->child;
    $self->set_child( $_[0] );
+}
+
+sub remove
+{
+   my $self = shift;
+   my ( $child ) = @_;
+   croak "Cannot remove this child" if !$self->child or $self->child != $child;
+   $self->set_child( undef );
 }
 
 =head1 AUTHOR

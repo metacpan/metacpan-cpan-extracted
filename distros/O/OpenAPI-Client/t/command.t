@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 use Mojo::File 'path';
 use Test::More;
+use File::Temp qw(tempfile);
 use Mojolicious::Command::openapi;
 
 my $cmd = Mojolicious::Command::openapi->new;
@@ -29,7 +30,13 @@ $cmd->run(path('t', 'spec.json'), -I => 'unknown');
 like "@said", qr{Could not find}, 'no information about operation';
 
 @said = ();
-$cmd->run(path('t', 'spec.json'), 'listPets');
+my ($fh, $filename) = tempfile;
+close $fh;
+# this is because under Docker, STDIN is !-t, readable immediately,
+#  gives EOF. This simulates that
+open STDIN, '<', $filename;
+eval { $cmd->run(path('t', 'spec.json'), 'listPets') };
+is $@, '';
 like "@said", qr{Missing property}, 'missing property';
 
 @said = ();

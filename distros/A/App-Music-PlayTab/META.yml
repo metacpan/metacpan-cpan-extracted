@@ -4,10 +4,11 @@ author:
   - 'Johan Vromans (jvromans@squirrel.nl)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.5503'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,8 +18,22 @@ no_index:
   directory:
     - t
     - inc
+    - lib/App/Music/PlayTab
+provides:
+  App::Music::PlayTab:
+    file: lib/App/Music/PlayTab.pm
+    version: '2.904'
+  playtab:
+    file: script/playtab
+    version: '2.904'
 requires:
   App::Packager: '1.42'
   Clone: '0'
-version: '2.903'
+  PDF::API2: '2.03'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/sciurius/playtab/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sciurius/playtab
+version: '2.904'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

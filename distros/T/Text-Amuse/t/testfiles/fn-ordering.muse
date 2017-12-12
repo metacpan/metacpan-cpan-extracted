@@ -1,0 +1,12 @@
+#title Footnote ordering
+
+Author notes that [1].
+
+[1] Author note{1}.
+
+Commentary is {2}.
+
+{1} Commentary about note.
+
+{2} Commentary about text.
+

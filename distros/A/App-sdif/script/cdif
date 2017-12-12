@@ -1,0 +1,1112 @@
+#!/usr/bin/env perl
+
+##
+## cdif: word context diff
+##
+## Copyright (c) 1992- Kazumasa Utashiro
+##
+## Original version on Mar 11 1992
+##
+
+use strict;
+use warnings;
+require 5.014;
+
+use utf8;
+use Carp;
+use Encode;
+use Encode::Guess;
+
+use Pod::Usage;
+use List::Util qw(first sum);
+use Text::ParseWords qw(shellwords);
+use Text::VisualWidth::PP qw(vwidth);
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Sortkeys = 1;
+
+use App::sdif;
+my $version = $App::sdif::VERSION;
+
+sub read_until (&$) {
+    my($sub, $fh) = @_;
+    my @lines;
+    while (<$fh>) {
+	push @lines, $_;
+	return @lines if &$sub;
+    }
+    (@lines, undef);
+}
+
+##
+## options
+##
+my $opt_B;
+my $opt_d;
+my $opt_q;
+my $opt_n;
+my $opt_mecab;
+
+my $opt_env = 1;
+my $opt_stat;
+my $opt_color = 1;
+my $opt_256 = 1;
+my @opt_colormap;
+my $opt_commandcolor = 1;
+my $opt_markcolor = 1;
+my $opt_textcolor = 1;
+my $opt_old = 1;
+my $opt_new = 1;
+my $opt_unknown = 1;
+my $opt_command = 1;
+my $opt_mark = 1;
+
+my $opt_c;
+my $opt_u;
+my $opt_i;
+my $opt_b;
+my $opt_w;
+my $opt_t;
+my $opt_T;
+my $opt_W;
+
+my $rcs;
+my @rcsopt;
+my $diff;
+my @diffopts;
+my @sub_diffopts;
+
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+
+##
+## Special treatment --noenv option.
+##
+if (grep { $_ eq '--noenv' } @ARGV) {
+    $opt_env = 0;
+}
+if ($opt_env and my $env = $ENV{'CDIFOPTS'}) {
+    unshift(@ARGV, shellwords($env));
+}
+
+my @optargs = (
+    "d=s" => \$opt_d,
+    "B|char" => \$opt_B,
+    "diff=s" => \$diff,
+    "color!" => \$opt_color,
+    "256!" => \$opt_256,
+    "commandcolor|cc!" => \$opt_commandcolor,
+    "markcolor|mc!" => \$opt_markcolor,
+    "textcolor|tc!" => \$opt_textcolor,
+    "colormap|cm=s" => \@opt_colormap,
+    "h|help" => sub { pod2usage() },
+    "man" => sub { pod2usage({-verbose => 2}) },
+    "env!" => \$opt_env,
+    "stat" => \$opt_stat,
+    "mecab" => \$opt_mecab,
+    "old!" => \$opt_old,
+    "new!" => \$opt_new,
+    "command!" => \$opt_command,
+    "unknown!" => \$opt_unknown,
+    "mark!" => \$opt_mark,
+    "width|W=i" => \$opt_W,
+
+    "i|ignore-case" => \$opt_i,
+    "b|ignore-space-change" => \$opt_b,
+    "w|ignore-all-space" => \$opt_w,
+    "t|expand-tabs" => \$opt_t,
+    "T|initial-tab" => \$opt_T,
+    "c|context" => sub { push(@diffopts, "-c") },
+    "u|unified" => sub { push(@diffopts, "-u") },
+    "C=i" => sub { push(@diffopts, "-C" . ($_[1] > 0 ? $_[1] : '')) },
+    "U=i" => sub { push(@diffopts, "-U" . ($_[1] > 0 ? $_[1] : '')) },
+
+    "rcs" => \$rcs,
+    "r=s" => sub { push @rcsopt, "-r$_[1]" },
+    "q" => sub { push @rcsopt, "-q" },
+);
+
+use Getopt::EX::Long;
+Getopt::Long::Configure("bundling");
+GetOptions(@optargs) || pod2usage();
+
+my %opt_d;
+if ($opt_d) {
+    map { $opt_d{$_}++ } split //, $opt_d;
+}
+
+$rcs++ if @rcsopt;
+$diff = $rcs ? 'rcsdiff' : 'diff' unless $diff;
+
+push(@diffopts,
+     $opt_i ? "-i" : (),
+     $opt_b ? "-b" : (),
+     $opt_w ? "-w" : (),
+     $opt_t ? "-t" : (),
+     $opt_T ? "-T" : (),
+    );
+
+push(@sub_diffopts,
+     $opt_i ? "-i" : (),
+     $opt_w ? "-w" : (),
+    );
+
+my %colormap = (
+    COMMAND => $opt_256 ? "222SE" : "SE" ,
+    CMARK   => "GS" ,
+    OMARK   => "CS" ,
+    NMARK   => "MS" ,
+    MMARK   => "YS" ,
+    CTEXT   => "G"  ,
+    OTEXT   => "C"  ,
+    NTEXT   => "M"  ,
+    MTEXT   => "Y"  ,
+    OCHANGE => $opt_256 ? "K/445": "BD/W",
+    NCHANGE => $opt_256 ? "K/445": "BD/W",
+    DELETE  => $opt_256 ? "K/544": "RD/W",
+    APPEND  => $opt_256 ? "K/544": "RD/W",
+    );
+
+use Getopt::EX::Colormap;
+my $color_handler = new Getopt::EX::Colormap
+    HASH => \%colormap;
+$color_handler->load_params(@opt_colormap);
+
+$opt_commandcolor or $colormap{COMMAND} = "";
+$opt_markcolor or map { $colormap{$_} = "" } grep /MARK$/, keys %colormap;
+$opt_textcolor or map { $colormap{$_} = "" } grep /TEXT$/, keys %colormap;
+
+warn 'colormap = ', Dumper \%colormap if $opt_d{c};
+
+sub color {
+    $color_handler->color(@_);
+}
+
+my $opt_expand = $colormap{COMMAND} =~ s/E//g;
+my $expand_width;
+if ($opt_expand) {
+    $expand_width = $opt_W || terminal_width();
+}
+
+my $DIFF;
+my $OLD;
+my $NEW;
+
+if ($rcs) {
+    my $rcsfile = shift || usage("No RCS filename\n\n");
+    $DIFF = "$diff @diffopts @rcsopt $rcsfile|";
+} elsif (@ARGV == 2) {
+    ($OLD, $NEW) = splice(@ARGV, 0, 2);
+    $DIFF = "$diff @diffopts $OLD $NEW |";
+} elsif (@ARGV < 2) {
+    $DIFF = shift || '-';
+} else {
+    usage("Arguments error.\n\n") if @ARGV;
+}
+warn "DIFF = \"$DIFF\"\n" if $opt_d{f};
+
+my %func = $opt_color ?
+    (
+     DELETE => sub { color("DELETE",  @_) },
+     APPEND => sub { color("APPEND",  @_) },
+     OLD    => sub { color("OCHANGE", @_) },
+     NEW    => sub { color("NCHANGE", @_) },
+    ) :
+    (
+     DELETE => \&bd,
+     APPEND => \&bd,
+     OLD    => \&ul,
+     NEW    => \&ul,
+    );
+
+my $wchar_re = qr{
+    [\p{East_Asian_Width=Wide}\p{East_Asian_Width=FullWidth}]
+}x;
+
+my $w_pattern;
+if ($opt_B) {
+    $w_pattern = qr/./s;
+} else {
+    $w_pattern = qr{
+	\p{Han} | \p{InHiragana}+ | \p{InKatakana}+ |
+	\p{Hang}+     |
+	\p{Cyrillic}+ |
+	\p{Arabic}+   |
+	\p{Thai}+     |
+	[_\d\p{Latin}]+ |
+	[\ \t\r\f]*\n | \s+ | (.)\g{-1}*
+    }x;
+}
+my @ul = ("", "_\010", "__\010\010");
+my @bs = ("", "\010", "\010\010");
+
+##
+## Temporary files
+##
+use App::cdif::Tmpfile;
+my $T1 = new App::cdif::Tmpfile;
+my $T2 = new App::cdif::Tmpfile;
+binmode $T1->fh, ":encoding(utf8)";
+binmode $T2->fh, ":encoding(utf8)";
+
+##
+## Total statistic info
+##
+my %stat;
+@stat{'a', 'd', 'c', 'anl', 'dnl', 'cnl'} = (0, 0, 0, 0, 0, 0);
+@stat{'anlb', 'dnlb', 'cnlb'} = (0, 0, 0);
+
+open(DIFF, $DIFF) || die "$DIFF: $!\n";
+binmode DIFF, ":encoding(utf8)";
+
+while (<DIFF>) {
+    my($left, $cmd, $right);
+    #
+    # normal diff
+    #
+    if (($left, $cmd, $right) = /^([\d,]+)([adc])([\d,]+)\r?$/) {
+	my $command_line = $_;
+	my($old, $del, $new);
+	eval {
+	    if ($cmd =~ /[cd]/) {
+		$old =  read_diff(*DIFF, scalar(range($left)));
+		$old =~ /^(?!<)/m and die;
+	    }
+	    if ($cmd =~ /[c]/) {
+		$del =  read_diff(*DIFF, 1);
+		$del =~ /^(?!---)/m and die;
+	    }
+	    if ($cmd =~ /[ca]/) {
+		$new =  read_diff(*DIFF, scalar(range($right)));
+		$new =~ /^(?!>)/m and die;
+	    }
+	    1;
+	}
+	or do {
+	    defined and print for ($command_line, $old, $del, $new);
+	    next;
+	};
+
+	print_command($command_line);
+
+	if ($cmd eq 'c') {
+	    compare(\$old, \$new, qr/<[ \t]/, qr/>[ \t]/);
+	}
+
+	if ($opt_color) {
+	    $old =~ s{^(<[ \t])(.*)}{
+		color("OMARK", $1) . color("OTEXT", $2)
+	    }mge if $old;
+	    $new =~ s{^(>[ \t])(.*)}{
+		color("NMARK", $1) . color("NTEXT", $2)
+	    }mge if $new;
+	}
+
+	print $old if $old and $opt_old;
+	print $del if $del;
+	print $new if $new and $opt_new;
+    }
+    #
+    # diff -c
+    #
+    elsif (($left) = /^\*\*\* ([\d,]+) \*\*\*\*\r?$/) {
+	print_command($_);
+	my(@old, @new);
+	my $oline = range($left);
+	@old = read_diffc(*DIFF, $oline);
+	my $new;
+	if (@old and $old[0] =~ /^--- /) {
+	    $new = shift @old;
+	    @old = ("");
+	} else {
+	    $new = <DIFF>;
+	}
+	my $dline = map { /^-/mg } @old;
+	if (($right) = $new =~ /^--- ([\d,]+) ----$/) {
+	    my $nline = range($right);
+	    if (@old == 1 and $old[0] ne "" and $oline - $dline == $nline) {
+		@new = ("");
+	    } else {
+		@new = read_diffc(*DIFF, $nline);
+	    }
+	    my $mark_re = qr/![ \t]/;
+	    for my $i (0 .. $#old) {
+		my $cmark = "! ";
+		if ($i % 2) {
+		    compare(\$old[$i], \$new[$i], $mark_re);
+		}
+		if ($opt_color) {
+		    $old[$i] =~ s{^([\-\!][ \t])(.*)}{
+			color("OMARK", $1) . color("OTEXT", $2)
+		    }mge;
+		    $new[$i] =~ s{^([\+\!][ \t])(.*)}{
+			color("NMARK", $1) . color("NTEXT", $2)
+		    }mge;
+		}
+	    }
+	}
+	print @old if $opt_old;
+	print $new;
+	print @new if $opt_new;
+    }
+    #
+    # diff -u
+    #
+    elsif (/^\@\@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? \@\@/)  {
+	print_command($_);
+	my @buf = read_diffu(*DIFF, $1 // 1, $2 // 1);
+	my $tab = $opt_T ? "\t" : "";
+	my $mark_re = qr/[\-\+]$tab/;
+	while (my($same, $old, $new) = splice(@buf, 0, 3)) {
+	    $same =~ s/^.$tab//mgo if not $opt_mark;
+	    print $same;
+	    if ($old and $new) {
+		compare(\$old, \$new, $mark_re);
+	    }
+	    if ($opt_color) {
+		$old =~ s{^(\-)($tab.*)}{
+		    ($opt_mark ? color("OMARK", $1) : "") . color("OTEXT", $2)
+		}mgoe if $old;
+		$new =~ s{^(\+)($tab.*)}{
+		    ($opt_mark ? color("NMARK", $1) : "") . color("NTEXT", $2)
+		}mgoe if $new;
+	    } else {
+		if (not $opt_mark) {
+		    $old =~ s/^\-$tab//mgo;
+		    $new =~ s/^\+$tab//mgo;
+		}
+	    }
+	    print $old if $old and $opt_old;
+	    print $new if $new and $opt_new;
+	}
+    }
+    #
+    # diff --combined (only support 3 files)
+    #
+    elsif (/^\@\@\@ -\d+(?:,(\d+))? -\d+(?:,(\d+))? \+\d+(?:,(\d+))? \@\@\@/)  {
+
+	print_command($_);
+
+	my @buf = read_diffu3(*DIFF, $1 // 1, $2 // 1, $3 // 1);
+	my @keys = diffu3_keys();
+	my $tab = $opt_T ? "\t" : "";
+	my $mark_re = qr/..$tab/;
+	my %buf;
+
+	while (@buf{@keys} = splice @buf, 0, scalar @keys) {
+
+	    my @r;
+	    $r[0] =     compare(\@buf{q/--/, q/++/}, $mark_re);
+	    $r[1] =     compare(\@buf{q/- /, q/ -/}, $mark_re);
+	    if ($r[1] == 0) {
+		$r[2] = compare(\@buf{q/- /, q/+ /}, $mark_re);
+		$r[3] = compare(\@buf{q/ -/, q/ +/}, $mark_re);
+	    }
+	    if (sum(@r) == 0) {
+		$r[4] = compare(\@buf{q/- /, q/++/}, $mark_re);
+		$r[5] = compare(\@buf{q/ -/, q/++/}, $mark_re) unless $r[4];
+		$r[6] = compare(\@buf{q/--/, q/+ /}, $mark_re);
+		$r[7] = compare(\@buf{q/--/, q/ +/}, $mark_re) unless $r[6];
+	    }
+
+	    if ($opt_color) {
+		map { s/^$mark_re//mg } $buf{q/  /} if not $opt_mark;
+		map {
+		    my($s, $m, $t) = @$_;
+		    $$s =~ s{^(..)($tab.*)}{
+			($opt_mark ? color($m, $1) : '') . color($t, $2)
+		    }mgoe if $$s;
+		}
+		[ \$buf{q/--/}, 'CMARK', 'CTEXT' ],
+		[ \$buf{q/- /}, 'OMARK', 'OTEXT' ],
+		[ \$buf{q/ -/}, 'NMARK', 'NTEXT' ],
+		[ \$buf{q/+ /}, 'MMARK', 'MTEXT' ],
+		[ \$buf{q/ +/}, 'MMARK', 'MTEXT' ],
+		[ \$buf{q/++/}, 'MMARK', 'MTEXT' ];
+	    } else {
+		map { s/^$mark_re//mg } @buf{@keys} if not $opt_mark;
+	    }
+	    print @buf{@keys};
+	}
+    }
+    #
+    # conflict marker
+    #
+    elsif (/^<<<<<<<\s+(.*)/) {
+      CONFLICT:
+	{
+	    my $yours = $1;
+	    my $c1 = $_;
+
+	    my @old = read_until { /^=======$/ } *DIFF;
+	    my $c2 = pop @old // do {
+		print $c1, @old;
+		last;
+	    };
+
+	    my @new = read_until { /^>>>>>>>\s+(.*)/ } *DIFF;
+	    my $theirs = $2;
+	    my $c3 = pop @new // do {
+		print $c1, @old, $c2, @new;
+		last;
+	    };
+
+	    my $i = first { $old[$_] eq "|||||||\n" } 0 .. $#old;
+	    my @org = defined $i ? splice @old, $i : ();
+
+	    my $old = join '', @old;
+	    my $new = join '', @new;
+	    compare(\$old, \$new);
+
+	    print $c1, $old, @org, $c2, $new, $c3;
+	}
+    }
+    else {
+	print if $opt_unknown;
+    }
+}
+close DIFF;
+
+if ($opt_stat) {
+    select STDERR;
+
+    print("TOTAL: ");
+    printf("append=%d delete=%d change=%d\n",
+	   $stat{'a'}, $stat{'d'}, $stat{'c'});
+    print("INGORE WHITESPACE: ");
+    printf("append=%d delete=%d change=%d\n",
+	   $stat{'anl'},
+	   $stat{'dnl'},
+	   $stat{'cnl'});
+    print("INGORE WHITESPACE (bytes): ");
+    printf("append=%d delete=%d change=%d\n",
+	   $stat{'anlb'},
+	   $stat{'dnlb'},
+	   $stat{'cnlb'});
+}
+
+exit $? >> 8;
+
+######################################################################
+
+sub print_command {
+    return unless $opt_command;
+    my $line = shift;
+    if ($opt_color) {
+	if ($opt_expand and length($line) < $expand_width) {
+	    $line =~ s/$/' ' x ($expand_width - vwidth($_))/e;
+	}
+	$line = color($colormap{COMMAND}, $line);
+    }
+    print $line;
+}
+
+sub compare {
+    my($old, $new) = splice @_, 0, 2;
+    return 0 unless $old && $new && $$old && $$new;
+
+    my $omark_re = shift || undef;
+    my $nmark_re = shift || $omark_re;
+
+    my(@omark, @nmark);
+    if ($omark_re) {
+	$$old =~ s/^($omark_re)/push(@omark, $1), ""/mge;
+	$$new =~ s/^($nmark_re)/push(@nmark, $1), ""/mge;
+    }
+
+    ($$old, $$new) = context($$old, $$new);
+
+    $$old =~ s/^/shift @omark/mge if @omark;
+    $$new =~ s/^/shift @nmark/mge if @nmark;
+
+    1;
+}
+
+sub context {
+    my($old, $new) = @_;
+    local $_;
+
+    if ($opt_d{s}) {
+	print STDERR "****************************** Comparing ...\n";
+	print STDERR $old;
+	print STDERR "****************************** and\n";
+	print STDERR $new;
+	print STDERR "****************************** .\n";
+    }
+
+    my %c = (a => 0, d => 0, c => 0);
+    my @owlist = maketmp($T1, $old);
+    my @nwlist = maketmp($T2, $new);
+    my @command = ();
+
+    if ($opt_d{w}) {
+	print STDERR "****************************** Comparing ...\n";
+	print STDERR join ',', @owlist;
+	print STDERR "****************************** and\n";
+	print STDERR join ',', @nwlist;
+	print STDERR "****************************** .\n";
+    }
+
+    my $diff = sprintf "diff @sub_diffopts %s %s", $T1->path, $T2->path;
+    open(CDIF, "$diff |") || die "diff: $!\n";
+    binmode CDIF, ":encoding(utf8)";
+    while (<CDIF>) {
+	warn $_ if $opt_d{d};
+	if (/^[\d,]+([adc])[\d,]+$/) {
+	    push @command, $_;
+	    $c{$1}++;
+	}
+    }
+    close CDIF;
+
+    if ($opt_d{d}) {
+	printf(STDERR "old=%d new=%d command=%d\n",
+	       @owlist+0, @nwlist+0, @command+0);
+	printf(STDERR "append=$c{a} delete=$c{d} change=$c{c}\n");
+    }
+
+    my($obuf, $nbuf) = makebuf(\@owlist, \@nwlist, \@command);
+    die "illegal status of subprocess\n" if ($?>>8) > 1;
+
+    ($obuf, $nbuf);
+}
+
+##
+## Divide given text into word list.  Then write them into temporary
+## file `$file' which include the word list one on each line.  The list
+## itself is returned as a result of subroutine.
+##
+sub maketmp {
+    my $tmpfile = shift;
+    my $text = shift;
+    my @words;
+    my @notspace = (0);
+
+    $tmpfile->reset;
+
+  MECAB:
+
+    goto NORMAL unless $opt_mecab;
+
+    my $pid = open(MECAB, '|-');
+    goto NORMAL if not defined $pid;
+
+    my $eos = "EOS" . "000";
+    $eos++ while $text =~ /$eos/;
+    if ($pid) {
+	binmode MECAB, ":encoding(utf8)";
+	print MECAB $text;
+    } else {
+	open(STDOUT, ">&", $tmpfile->fh) or die;
+	for ("disabling unreach warning") {
+	    exec('mecab',
+		 '--node-format', '%M\\n', '--eos-format', "$eos\\n");
+	}
+	while ($text =~ /($w_pattern)/g) {
+	    my $w = $1;
+	    $w =~ s/^[ \t]*\n/$eos/;
+	    $tmpfile->write($w, "\n");
+	}
+	exit;
+    }
+    close MECAB;
+    $tmpfile->rewind;
+    while (my $s = $tmpfile->fh->getline) {
+	chomp $s;
+	$s =~ s/$eos/\n/;
+	push(@words, $s);
+    }
+    goto DONE;
+
+  NORMAL:
+
+    while ($text =~ /($w_pattern)/g) {
+	local $_ = $1;
+	if ($opt_w) {
+	    push(@notspace, !/\s/);
+	    if (shift(@notspace) && $notspace[0]) {
+		push(@words, '');
+		$tmpfile->write("\n");
+	    }
+	}
+	if (s/^(\s*)\n/\n/ && (length($1) || $opt_b || $opt_w)) {
+	    #     ^ This have to be *.  Don't change to +.
+	    $tmpfile->write(($opt_b || $opt_w) ? "\n" : "$1\n");
+	    push(@words, $1);
+	}
+	push @words, $_;
+	$tmpfile->write($_);
+	$tmpfile->write("\n") unless /\n$/;
+    }
+
+  DONE:
+
+    $tmpfile->flush->rewind;
+
+    if ($opt_d{a} && @words != wc_l($tmpfile)) {
+	die "Error! (\@words != `wc -l $tmpfile`)\n";
+    }
+
+    @words;
+}
+
+##
+##  @owlist: old word list
+##  @nwlist: new word list
+##  @command: how different these lists (`diff' result command lines)
+##
+sub makebuf {
+    my($ol, $nl, $c) = @_;
+    my @owlist = @$ol;
+    my @nwlist = @$nl;
+    my @command = @$c;
+
+    my($o, $n) = (0, 0);	# pointers
+    my(@obuf, @nbuf);
+
+    for (@command) {
+	my($old, $cmd, $new) = /([\d,]+)([adc])([\d,]+)/ or do {
+	    die "Panic! Unexpected diff output";
+	};
+	my($o1, $o2) = range($old);
+	my($n1, $n2) = range($new);
+	map { $_-- } $o1, $o2, $n1, $n2; # make them zero origined
+
+	push(@obuf, @owlist[$o .. $o1 - 1]), $o = $o1 if $o < $o1;
+	push(@nbuf, @nwlist[$n .. $n1 - 1]), $n = $n1 if $n < $n1;
+
+	$stat{$cmd}++;
+
+	if ($cmd eq 'd') {
+	    my $os = join('', @owlist[$o1 .. $o2]);
+	    if ($owlist[$o2] =~ /\S/) {
+		$stat{'dnl'}++;
+		$stat{'dnlb'} += length($os);
+	    }
+	    push(@obuf, $func{DELETE}->($os));
+	    $o = $o2 + 1;
+	}
+	elsif ($cmd eq 'c') {
+	    my $os = join('', @owlist[$o1 .. $o2]);
+	    my $ns = join('', @nwlist[$n1 .. $n2]);
+	    if (($owlist[$o2] =~ /\S/) || ($nwlist[$n2] =~ /\S/)) {
+		$stat{'cnl'}++;
+		$stat{'cnlb'} += length($os);
+		$stat{'cnlb'} += length($ns);
+	    }
+	    push(@obuf, $func{OLD}->($os));
+	    push(@nbuf, $func{NEW}->($ns));
+	    $o = $o2 + 1;
+	    $n = $n2 + 1;
+	}
+	elsif ($cmd eq 'a') {
+	    my $ns = join('', @nwlist[$n1 .. $n2]);
+	    if ($nwlist[$n2] =~ /\S/) {
+		$stat{'anl'}++;
+		$stat{'anlb'} += length($ns);
+	    }
+	    push(@nbuf, $func{APPEND}->($ns));
+	    $n = $n2 + 1;
+	}
+    }
+    push(@obuf, @owlist[$o .. $#owlist]);
+    push(@nbuf, @nwlist[$n .. $#nwlist]);
+
+    (join('', @obuf), join('', @nbuf));
+}
+
+sub read_diff {
+    my($FH, $c) = @_;
+    my @buf = ();
+    while ($c-- > 0) {
+	push @buf, scalar <$FH>;
+    }
+    wantarray ? @buf : join '', @buf;
+}
+
+sub read_diffc {
+    my($FH, $n) = @_;
+    my @buf;
+    local $_;
+    my $i = 0;
+    while ($n-- && ($_ = <$FH>)) {
+	$i++ if ($i % 2) != /^!/;
+	$buf[$i] .= $_;
+	last if /^--- /;
+    }
+    map { $_ // "" } @buf;
+}
+
+my %slot;
+BEGIN {
+    %slot = (" " => 0, "\t" => 0, "-" => 1, "+" => 2);
+}
+sub read_diffu {
+    my $FH = shift;
+    my @l = (0, @_);
+
+    my $i = 0;
+    my @buf;
+    my $slot;
+    while (2 * $l[0] + $l[1] + $l[2] > 0 and $_ = <$FH>) {
+	# `git diff' produces message like this:
+	# "\ No newline at end of file"
+	/^[ \t\-\+]/ or next;
+	$i++ while ($i % 3) != ($slot = $slot{substr($_, 0, 1)});
+	$l[$slot]--;
+	$buf[$i] .= $_;
+    }
+    map { $_ // "" } @buf;
+}
+
+my @keys3;
+my %slot3;
+my %line3;
+BEGIN {
+    @keys3 = ("  ", "--", "- ", "+ ", " -", " +", "++");
+    @slot3{@keys3} = 0 .. @keys3 - 1;
+    %line3 = ("  " => 3,
+	      "--" => 2, "+ " => 2, " +" => 2,
+	      "++" => 1, "- " => 1, " -" => 1);
+}
+sub diffu3_keys { @keys3 }
+sub read_diffu3 {
+    my $FH = shift;
+    my $line = sum @_;
+
+    my $i = 0;
+    my @buf;
+    while (<$FH>) {
+	# `git diff' produces message like this:
+	# "\ No newline at end of file"
+	/^[ \-\+]{2}/ or next;
+	my $mark = substr $_, 0, 2;
+	if (($i % @keys3) != $slot3{$mark}) {
+	    $i += ($slot3{$mark} - $i % @keys3) % @keys3;
+	}
+	$buf[$i] .= $_;
+	last if ($line -= $line3{$mark}) <= 0;
+    }
+    push @buf, "" while @buf % @keys3;
+    map { $_ // "" } @buf;
+}
+
+sub ul {
+    local $_ = join '', @_;
+    s/(.)/$ul[vwidth($1)].$1/ge;
+    $_;
+}
+sub bd {
+    local $_ = join '', @_;
+    s/(\S)/$1.$bs[vwidth($1)].$1/ge;
+    $_;
+}
+
+sub range {
+    local $_ = shift;
+    my($from, $to) = /,/ ? split(/,/) : ($_, $_);
+    wantarray ? ($from, $to) : $to == 0 ? 0 : $to - $from + 1;
+}
+
+##
+## Implement minimum function because Text::Glob is not in standard library
+##
+sub match_glob {
+    local $_ = shift;
+    s/\?/./g;
+    s/\*/.*/g;
+    my $regex = qr/^$_$/;
+    grep { $_ =~ $regex } @_;
+}
+
+sub wc_l {
+    my $file = shift;
+    my $line;
+    $file->rewind;
+    $line++ while $file->fh->getline;
+    $file->rewind;
+    $line;
+}
+
+sub eval {
+    print STDERR &unctrl($_[0]), "\n" x ($_[0] !~ /\n$/) if $_[1] || $opt_d{e};
+    eval shift;
+    die sprintf("eval failed in file %s on line %s\n$@", (caller)[1,2]) if $@;
+}
+
+sub unctrl {
+    local $_ = shift;
+    s/([\000-\010\013-\037])/'^' . pack('c', ord($1)|0100)/ge;
+    $_;
+}
+
+sub terminal_width {
+    my $default = 80;
+    my $cols = `tput cols`;
+    chomp $cols;
+    $cols > 0 ? int($cols) : $default;
+}
+
+######################################################################
+
+=head1 NAME
+
+cdif - word context diff
+
+=head1 SYNOPSIS
+
+cdif [cdif option] file1 file2
+
+cdif [rcs options] [cdif options] file
+
+cdif [cdif options] [diff-data]
+
+Options:
+
+	-c, -Cn		context diff
+	-u, -Un		unified diff
+	-i		ignore case
+	-b		ignore trailing blank
+	-w		ignore whitespace
+	-t		expand tabs
+	-T		initial tabs
+	--rcs		use rcsdiff
+	-r<rev>, -q	rcs options
+
+	-B                  char-by-char comparison
+	-W                  specify terminal width
+	--diff=command      specify diff command
+	--stat              show statistical information
+	--colormap=s        specify color map
+	--[no]color         color or not            (default true)
+	--[no]256           ANSI 256 color mode     (default true)
+	--[no]commandcolor  color for command line  (default true)
+	--[no]markcolor     color for diff mark     (default true)
+	--[no]textcolor     color for normal text   (default true)
+	--[no]old	    print old text          (default true)
+	--[no]new	    print new text          (default true)
+	--[no]command	    print diff command line (default true)
+	--[no]unknown	    print unknown line      (default true)
+
+
+=head1 DESCRIPTION
+
+B<cdif> is a post-processor of the Unix diff command.  It highlights
+deleted, changed and added words based on word context.
+
+You may want to compare character-by-character rather than
+word-by-word.  Option B<-B> option can be used for that purpose.
+
+If only one file is specified, cdif reads that file (stdin if no file)
+as a output from diff command.
+
+Lines those don't look like diff output are simply ignored and
+printed.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<->[B<cCuUibwtT>]
+
+Almost same as B<diff> command.
+
+=item B<--rcs>, B<-r>I<rev>, B<-q>
+
+Use rcsdiff instead of normal diff.  Option B<--rcs> is not required
+when B<-r>I<rev> is supplied.
+
+=item B<-B>, B<--char>
+
+Compare the data character-by-character context.
+
+=item B<-W> I<width>, B<--width>=I<width>
+
+Explicitly specify terminal width.
+
+=item B<--diff>=I<command>
+
+Specify the diff command to use.
+
+=item B<-->[B<no>]B<color>
+
+Use ANSI color escape sequence for output.
+
+=item B<--colormap>=I<colormap>, B<--cm>=I<colormap>
+
+Basic I<colormap> format is :
+
+    FIELD=COLOR
+
+where the FIELD is one from these :
+
+    COMMAND  Command line
+    OMARK    Old mark
+    NMARK    New mark
+    OTEXT    Old text
+    NTEXT    New text
+    OCHANGE  Old change part
+    NCHANGE  New change part
+    APPEND   Appended part
+    DELETE   Deleted part
+
+and additional I<Common> and I<Merged> FIELDs for git-diff combined
+format.
+
+    CMARK    Common mark
+    CTEXT    Common text
+    MMARK    Merged mark
+    MTEXT    Merged text
+
+You can make multiple fields same color joining them by = :
+
+    FIELD1=FIELD2=...=COLOR
+
+Also wildcard can be used for field name :
+
+    *CHANGE=BDw
+
+Multiple fields can be specified by repeating options
+
+    --cm FILED1=COLOR1 --cm FIELD2=COLOR2 ...
+
+or combined with comma (,) :
+
+    --cm FILED1=COLOR1,FIELD2=COLOR2, ...
+
+COLOR is combination of single character representing uppercase
+foreground color :
+
+    R  Red
+    G  Green
+    B  Blue
+    C  Cyan
+    M  Magenta
+    Y  Yellow
+    K  Black
+    W  White
+
+and alternative (usually brighter) colors in lowercase :
+
+    r, g, b, c, m, y, k, w
+
+or RGB values and 24 grey levels if using ANSI 256 or full color
+terminal :
+
+    FORMAT:
+        foreground[/background]
+
+    COLOR:
+        000 .. 555       : 6 x 6 x 6 216 colors
+        000000 .. FFFFFF : 24bit RGB mapped to 216 colors
+        L00 .. L23       : 24 grey levels
+
+    Sample:
+        005     0000FF        : blue foreground
+           /505       /FF00FF : magenta background
+        000/555 000000/FFFFFF : black on white
+        500/050 FF0000/00FF00 : red on green
+
+and other effects :
+
+    S  Stand-out (reverse video)
+    U  Underline
+    D  Double-struck (boldface)
+    F  Flash (blink)
+    E  Expand (only for command line)
+
+When B<E> is specified for command line, the line is expanded to
+window width filling up by space characters.
+
+Defaults are :
+
+    COMMAND => "SE"
+    OMARK   => "CS"
+    NMARK   => "MS"
+    OTEXT   => "C"
+    NTEXT   => "M"
+    OCHANGE => "BD/445"
+    NCHANGE => "BD/445"
+    DELETE  => "RD/544"
+    APPEND  => "RD/544"
+
+    CMARK   => "GS"
+    MMARK   => "YS"
+    CTEXT   => "G"
+    MTEXT   => "Y"
+
+This is equivalent to :
+
+    cdif --cm 'COMMAND=SE,OMARK=CS,NMARK=MS' \
+         --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
+         --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
+
+=item B<-->[B<no>]B<commandcolor>, B<--cc>
+
+=item B<-->[B<no>]B<markcolor>, B<--mc>
+
+=item B<-->[B<no>]B<textcolor>, B<--tc>
+
+Enable/Disable using color for the corresponding field.
+
+=item B<-->[B<no>]B<old>, B<-->[B<no>]B<new>
+
+Print or not old/new text in diff output.
+
+=item B<-->[B<no>]B<command>
+
+Print or not command lines preceding diff output.
+
+=item B<-->[B<no>]B<unknown>
+
+Print or not lines not look like diff output.
+
+=item B<-->[B<no>]B<mark>
+
+Print or not marks at the top of diff output lines.  At this point,
+this option is effective only for unified diff.
+
+Next example produces the output exactly same as I<new> except visual
+effects.
+
+    cdif -U100 --nomark --noold --nocommand --nounknown old new
+
+These options are prepared for watchdiff(1) command.
+
+=item B<--stat>
+
+Print statistical information at the end of output.  It shows number
+of total appended/deleted/changed words in the context of cdif.  It's
+common to have many insertions and deletions of newlines because of
+text filling process.  So normal information is followed by modified
+number which ignores insert/delete newlines.
+
+=item B<--mecab>
+
+Experimental option for using B<mecab> as a tokenizer.  To use this
+option, external command B<mecab> has to be installed.
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Kazumasa Utashiro
+
+=item L<https://github.com/kaz-utashiro/sdif-tools>
+
+=back
+
+=head1 SEE ALSO
+
+L<sdif(1)>, L<watchdiff(1)>
+
+L<Getopt::EX::Colormap>
+
+=head1 BUGS
+
+B<cdif> is naturally not very fast because it uses normal diff command
+as a back-end processor to compare words.
+
+=cut

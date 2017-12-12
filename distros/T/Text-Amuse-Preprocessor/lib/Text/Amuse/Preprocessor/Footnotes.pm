@@ -81,6 +81,10 @@ Print some additional info.
 Do the job, write out C<output> and return C<output>. On failure, set
 an arror and return false.
 
+=head2 rewrite($type, $fh_in, $fh_out)
+
+Internal method to rewrite the footnotes. Type can be primary or secondary.
+
 =head2 error
 
 Accesso to the error. If there is a error, an hashref with the
@@ -177,80 +181,123 @@ sub process {
     # auxiliary files
     my $tmpdir = $self->tmpdir;
     print "Using $tmpdir\n" if $self->debug;
-    my $auxfile  = File::Spec->catfile($tmpdir, 'fixed.muse');
-    # open the auxiliary file
+
+    # if you're wondering, we are doing all this with file streams to
+    # avoid reading the whole document in memory
+
+    my $auxfile  = File::Spec->catfile($tmpdir, 'primary.muse');
+    my $infile = $self->input;
+    open (my $in, '<:encoding(UTF-8)', $infile)
+      or die ("can't open $infile $!");
     open (my $out, '>:encoding(UTF-8)', $auxfile)
       or die ("can't open $auxfile $!");
 
-    my $infile   = $self->input;
-    open (my $in, '<:encoding(UTF-8)', $infile)
-      or die ("can't open $infile $!");
-    
+
+    if ($self->rewrite(primary => $in, $out)) {
+        close $in  or die $!;
+        close $out or die $!;
+
+        my $sec_auxfile  = File::Spec->catfile($tmpdir, 'secondary.muse');
+        open (my $sec_in, '<:encoding(UTF-8)', $auxfile)
+          or die ("can't open $auxfile $!");
+        open (my $sec_out, '>:encoding(UTF-8)', $sec_auxfile)
+          or die ("can't open $sec_auxfile $!");
+
+        if ($self->rewrite(secondary => $sec_in, $sec_out)) {
+            close $sec_in  or die $!;
+            close $sec_out or die $!;
+            if (my $outfile = $self->output) {
+                copy $sec_auxfile, $outfile or die "Cannot copy $sec_auxfile to $outfile $!";
+                return $outfile;
+            }
+            else {
+                # dry run, just state success
+                return 1;
+            }
+        }
+    }
+    return;
+}
+
+sub rewrite {
+    my ($self, $type, $in, $out) = @_;
     # read the file.
     my $fn_counter = 0; 
     my $body_fn_counter = 0;
     my @footnotes_found;
     my @references_found;
+    my ($primary, $secondary, $open, $close);
+    if ($type eq 'primary') {
+        ($open, $close) = ('[', ']');
+        $primary = 1;
+    }
+    elsif ($type eq 'secondary') {
+        ($open, $close) = ('{', '}');
+        $secondary = 1;
+    }
+    else {
+        die "$type can only be 'primary' or 'secondary'";
+    }
+    my $start_re = qr{^ \Q$open\E ( [0-9]+ ) \Q$close\E (?=\s) }x;
+    my $inbody_re = qr{ \Q$open\E ( [0-9]+ ) \Q$close\E }x;
+    my $secondary_re = qr{^ (\{ [0-9]+ \}) (?=\s) }x;
+
+    my $in_footnote = 0;
     while (my $r = <$in>) {
 
         # a footnote
-        if ($r =~ s/^
-                    \[
-                    ([0-9]+)
-                    \]
-                    (?=\s)/_check_and_replace_fn($1,
+        if ($r =~ s/$start_re/_check_and_replace_fn($1,
                                                  \$fn_counter,
-                                                 \@footnotes_found)/xe) {
-            # nothing to do
+                                                 \@footnotes_found, $open, $close, \$in_footnote)/xe) {
+        }
+        elsif ($primary and $r =~ m/$secondary_re/) {
+            # entering a secondary footnote. never matched if type is
+            # secondary. Leave them alone.
+            $in_footnote = length($1) + 1;
+        }
+        elsif ($r =~ m/\A\s*\z/) {
+            # ignore blank lines
+        }
+        # we are in a footnote if there is indentation going on
+        elsif ($in_footnote and $r =~ m/\A(\s{4,})/) {
+            # print "In footnote, shifting indentation on $r\n";
+            $r =~ s/\A(\s{4,})/' ' x $in_footnote/e;
         }
         else {
-            $r =~ s/\[
-                    ([0-9]+)
-                    \]/_check_and_replace_fn($1,
+            # not a continuation, not blank
+            $in_footnote = 0;
+            $r =~ s/$inbody_re/_check_and_replace_fn($1,
                                              \$body_fn_counter,
-                                             \@references_found)/gxe;
+                                             \@references_found, $open, $close, \$in_footnote)/gxe;
         }
         print $out $r;
     }
-
-    close $in  or die $!;
-    close $out or die $!;
-
     if ($body_fn_counter == $fn_counter) {
-        if (my $outfile = $self->output) {
-            copy $auxfile, $outfile or die "Cannot copy $auxfile to $outfile $!";
-            return $outfile;
-        }
-        else {
-            # dry run, just state success
-            return 1;
-        }
+        return 1;
     }
     else {
         $self->_set_error({
                            references => $body_fn_counter,
                            footnotes => $fn_counter,
                            references_found => join(" ",
-                                                    map { "[$_]" }
+                                                    map { $open . $_ . $close }
                                                     @references_found),
                            footnotes_found  => join(" ",
-                                                     map { "[$_]" }
-                                                     @footnotes_found),
+                                                    map { $open . $_ . $close }
+                                                    @footnotes_found),
                           });
         return;
     }
 }
 
 sub _check_and_replace_fn {
-    my ($number, $current, $list) = @_;
+    my ($number, $current, $list, $open, $close, $in_footnote) = @_;
     if ($number < ($$current + 100)) {
         push @$list, $number;
-        return '[' . ++$$current . ']';
+        $number = ++$$current;
     }
-    else {
-        return '[' . $number . ']';
-    }
-
+    $$in_footnote = length($number) + 3;
+    return $open . $number . $close;
 }
 
 1;

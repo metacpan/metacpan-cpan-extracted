@@ -1,0 +1,26 @@
+---
+abstract: 'RPC-Switch client using Mojo(licious).'
+author:
+  - 'Wieger Opmeer <wiegerop@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPC-Switch-Client
+requires:
+  JSON::MaybeXS: '0'
+  JSON::RPC2::TwoWay: '0.03'
+  MojoX::NetstringStream: '0.06'
+  Mojolicious: '7.49'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/a6502/RPC-Switch-Client/issues
+  homepage: https://github.com/a6502/RPC-Switch-Client
+  repository: https://github.com/a6502/RPC-Switch-Client.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

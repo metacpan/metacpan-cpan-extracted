@@ -8,7 +8,7 @@ package Tickit::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 use Carp;
 
@@ -39,9 +39,9 @@ modifiers is set.
 
 =cut
 
-sub mod_is_alt   { shift->mod & Tickit::Term::MOD_ALT }
-sub mod_is_ctrl  { shift->mod & Tickit::Term::MOD_CTRL }
-sub mod_is_shift { shift->mod & Tickit::Term::MOD_SHIFT }
+sub mod_is_alt   { shift->mod & Tickit::MOD_ALT }
+sub mod_is_ctrl  { shift->mod & Tickit::MOD_CTRL }
+sub mod_is_shift { shift->mod & Tickit::MOD_SHIFT }
 
 package
    Tickit::Event::Expose;

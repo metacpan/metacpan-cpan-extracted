@@ -5,9 +5,15 @@ use 5.006002;
 use strict;
 use warnings;
 
-use Geo::Coder::Geocoder::US;
 use LWP::UserAgent;
 use Test::More 0.88;
+
+my $warning;
+local $SIG{__WARN__} = sub {
+    $warning = $_[0];
+};
+
+require Geo::Coder::Geocoder::US;
 
 {
     my $ua = LWP::UserAgent->new();

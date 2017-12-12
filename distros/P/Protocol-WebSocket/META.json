@@ -52,7 +52,7 @@
    "provides" : {
       "Protocol::WebSocket" : {
          "file" : "lib/Protocol/WebSocket.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Protocol::WebSocket::Client" : {
          "file" : "lib/Protocol/WebSocket/Client.pm"
@@ -105,7 +105,7 @@
          "web" : "https://github.com/vti/protocol-websocket"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Anton Petrusevich <anton.petrusevich@lycos.com>",
       "BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>",
@@ -117,6 +117,7 @@
       "Lee Aylward <lee@laylward.com>",
       "Michal Špaček <tupinek@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
+      "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
       "Toshio Ito <debug.ito@gmail.com>",
       "vti <viacheslav.t@gmail.com>",
       "vti <vti@clarive.com>"

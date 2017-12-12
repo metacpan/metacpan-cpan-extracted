@@ -1,0 +1,572 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Measurement::Manual
+#ABSTRACT: API documentation for Lab::Measurement
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Measurement::Manual - API documentation for Lab::Measurement
+
+=head1 VERSION
+
+version 3.613
+
+=head1 OVERVIEW
+
+Currently, the Lab::Measurement API consists of:
+
+=over
+
+=item *
+
+The currently most-used interface consting of the Lab::Instrument virtual
+instruments and the high-level Lab::XPRESS interface, which provides simple
+generation of nested sweeps and logging of output data into a customizable
+folder structure.
+
+=item *
+
+L</Lab::Moose> is a new implementation based on B<Modern Perl> techniques.
+So far, this is focused on providing a new infrastructure for instrument
+drivers, connection backends, ascii datafiles/datafolders with live-plotting.
+High-level functionality (something like
+Lab::XPRESS) will follow soon.
+Until then, the Lab::Moose drivers
+can be used with XPRESS, just like the Lab::Instrument drivers.
+
+=back
+
+=head1 The Lab::Measurement package
+
+=over
+
+=item * L<Lab::Measurement::Installation>
+
+=item * L<Lab::Measurement::Tutorial>
+
+=item * L<Lab::Measurement::Backends>
+
+=item * L<Lab::Measurement::Developer::Testing>
+
+=back
+
+=head2 High-level tool classes
+
+=over
+
+=item * L<Lab::Measurement>
+
+=item * L<Lab::SCPI>
+
+=item * L<Lab::Data::Analysis>
+
+=back
+
+=head2 XPRESS
+
+=head3 Examples
+
+=over
+
+=item * L<examples::XPRESS::Example1_Simple-IV.pl>
+
+=item * L<examples::XPRESS::Example2_Gate-IV-scan.pl>
+
+=item * L<examples::XPRESS::Example3_2samples-2files.pl>
+
+=item * L<examples::XPRESS::Example4_3d-scan.pl>
+
+=back
+
+=head3 General classes
+
+=over
+
+=item * L<Lab::XPRESS::Sweep>
+
+=item * L<Lab::XPRESS::Sweep::Frame>
+
+=back
+
+=head3 Dedicated Sweep Classes
+
+=over
+
+=item * L<Lab::XPRESS::Sweep::Magnet>
+
+=item * L<Lab::XPRESS::Sweep::Voltage>
+
+=item * L<Lab::XPRESS::Sweep::Time>
+
+=item * L<Lab::XPRESS::Sweep::Motor>
+
+=item * L<Lab::XPRESS::Sweep::Repeater>
+
+=item * L<Lab::XPRESS::Sweep::Temperature>
+
+=item * L<Lab::XPRESS::Sweep::PulseLength>
+
+=item * L<Lab::XPRESS::Sweep::LogBlock>
+
+=back
+
+=head2 Instrument control classes
+
+=over
+
+=item * L<Lab::Instrument>
+
+=back
+
+=head3 Multimeters
+
+=over
+
+=item * L<Lab::Instrument::Multimeter>
+
+=item * L<Lab::Instrument::HP34401A>
+
+=item * L<Lab::Instrument::HP34420A>
+
+=item * L<Lab::Instrument::HP3458A>
+
+=item * L<Lab::Instrument::Agilent34410A>
+
+=item * L<Lab::Instrument::Keithley2000>
+
+=back
+
+=head3 Voltage sources
+
+=over
+
+=item * L<Lab::Instrument::Source>
+
+=item * L<Lab::Instrument::DummySource>
+
+=item * L<Lab::Instrument::Yokogawa7651>
+
+=item * L<Lab::Instrument::YokogawaGS200>
+
+=item * L<Lab::Instrument::Keithley2400>
+
+=back
+
+=head3 Lock-in amplifiers
+
+=over
+
+=item * L<Lab::Instrument::SR830>
+
+=item * L<Lab::Instrument::SR830::AuxIn>
+
+=item * L<Lab::Instrument::SR830::AuxOut>
+
+=item * L<Lab::Instrument::SignalRecovery726x>
+
+=back
+
+=head3 RF generators
+
+=over
+
+=item * L<Lab::Instrument::HP33120A>
+
+=item * L<Lab::Instrument::HP83732A>
+
+=item * L<Lab::Instrument::RSSMB100A>
+
+=item * L<Lab::Instrument::MG369xB>
+
+=back
+
+=head3 RF detectors
+
+=over
+
+=item * L<Lab::Instrument::U2000>
+
+=back
+
+=head3 Oscilloscopes
+
+=over
+
+=item * L<Lab::Instrument::TDS2024B>
+
+=item * L<Lab::Instrument::WR640>
+
+=back
+
+=head3 Superconducting magnet power supplies
+
+=over
+
+=item * L<Lab::Instrument::IPS>
+
+=item * L<Lab::Instrument::OI_Mercury::Magnet>
+
+=back
+
+=head3 Temperature control devices
+
+=over
+
+=item * L<Lab::Instrument::TRMC2>
+
+=item * L<Lab::Instrument::OI_ITC503>
+
+=item * L<Lab::Instrument::ITC>
+
+=item * L<Lab::Instrument::TCD>
+
+=item * L<Lab::Instrument::OI_Triton>
+
+=item * L<Lab::Instrument::TemperatureControl::TLK43>
+
+=item * L<Lab::Instrument::Lakeshore33x>
+
+=item * L<Lab::Instrument::Lakeshore340>
+
+=back
+
+=head3 Cryoliquid level meters
+
+=over
+
+=item * L<Lab::Instrument::OI_ILM210>
+
+=item * L<Lab::Instrument::OI_Mercury::Level>
+
+=back
+
+=head3 Stepper motors
+
+=over
+
+=item * L<Lab::Instrument::PD11042>
+
+=back
+
+=head2 Connecting instruments with Buses and Connections
+
+=head3 Base classes
+
+=over
+
+=item * L<Lab::Connection>
+
+=item * L<Lab::Bus>
+
+=item * L<Lab::Bus::DEBUG>
+
+=back
+
+=head3 VISA
+
+=over
+
+=item * L<Lab::Connection::VISA>
+
+=item * L<Lab::Bus::VISA>
+
+=back
+
+=head3 GPIB (IEEE 488.2)
+
+=over
+
+=item * L<Lab::Connection::GPIB>
+
+=item * L<Lab::Connection::LinuxGPIB>
+
+=item * L<Lab::Connection::VISA_GPIB>
+
+=item * L<Lab::Bus::LinuxGPIB>
+
+=back
+
+=head3 RS232 (serial port)
+
+=over
+
+=item * L<Lab::Connection::RS232>
+
+=item * L<Lab::Connection::VISA_RS232>
+
+=item * L<Lab::Bus::RS232>
+
+=back
+
+=head3 USB Test&Measurement (Linux kernel driver)
+
+=over
+
+=item * L<Lab::Connection::USBtmc>
+
+=item * L<Lab::Bus::USBtmc>
+
+=back
+
+=head3 Oxford Instruments ISOBUS
+
+=over
+
+=item * L<Lab::Connection::IsoBus>
+
+=item * L<Lab::Bus::IsoBus>
+
+=back
+
+=head3 MODBUS
+
+=over
+
+=item * L<Lab::Connection::MODBUS_RS232>
+
+=item * L<Lab::Bus::MODBUS_RS232>
+
+=back
+
+=head1 Lab::Moose
+
+=over
+
+=item * L<Lab::Moose::Developer>
+
+=back
+
+=head2 High-level tool classes
+
+=over
+
+=item * L<Lab::Moose>
+
+=item * L<Lab::Moose::DataFolder>
+
+=item * L<Lab::Moose::DataFile>
+
+=item * L<Lab::Moose::DataFile::Gnuplot>
+
+=item * L<Lab::Moose::DataFile::Meta>
+
+=item * L<Lab::Moose::DataFile::Read>
+
+=item * L<Lab::Moose::Plot>
+
+=back
+
+=head2 Instrument control classes
+
+=over
+
+=item * L<Lab::Moose::Instrument>
+
+=item * L<Lab::Moose::Instrument::Cache>
+
+=item * L<Lab::Moose::Instrument::Zhinst>
+
+=back
+
+=head3 Multimeters
+
+=over
+
+=item * L<Lab::Moose::Instrument::HP3458A>
+
+=item * L<Lab::Moose::Instrument::HP34410A>
+
+=back
+
+=head3 Voltage sources
+
+=over
+
+=item * L<Lab::Moose::Instrument::YokogawaGS200>
+
+=item * L<Lab::Moose::Instrument::Yokogawa7651>
+
+=item * L<Lab::Moose::Instrument::DummySource>
+
+=back
+
+=head3 Lock-in amplifiers
+
+=over
+
+=item * L<Lab::Moose::Instrument::SR830>
+
+=item * L<Lab::Moose::Instrument::ZI_MFLI>
+
+=back
+
+=head3 Impedance analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::ZI_MFIA>
+
+=back
+
+=head3 RF generators
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_SMB>
+
+=back
+
+=head3 Spectrum analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_FSV>
+
+=back
+
+=head3 Network analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_ZVA>
+
+=item * L<Lab::Moose::Instrument::RS_ZVM>
+
+=back
+
+=head3 Superconducting magnet power supplies
+
+=over
+
+=item * L<Lab::Moose::Instrument::OI_Mercury::Magnet>
+
+=back
+
+=head2 Moose::Instrument Roles
+
+=over
+
+=item * L<Lab::Moose::Instrument::Common>
+
+=item * L<Lab::Moose::Instrument::LinearStepSweep>
+
+=item * L<Lab::Moose::Instrument::Log>
+
+=item * L<Lab::Moose::Instrument::SCPIBlock>
+
+=item * L<Lab::Moose::Instrument::VNASweep>
+
+=item * L<Lab::Moose::Instrument::SCPI::Format>
+
+=item * L<Lab::Moose::Instrument::SCPI::Initiate>
+
+=item * L<Lab::Moose::Instrument::SCPI::Instrument>
+
+=item * L<Lab::Moose::Instrument::SCPI::Output::State>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Average>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Bandwidth>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Frequency>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Range>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Sweep>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Function>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Level>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Power>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Range>
+
+=back
+
+=head2 Connecting instruments
+
+=over
+
+=item * L<Lab::Moose::Connection>
+
+=item * L<Lab::Moose::Connection::Mock>
+
+=item * L<Lab::Moose::Connection::Debug>
+
+=back
+
+=head3 National Instruments VISA base class
+
+=over
+
+=item * L<Lab::Moose::Connection::VISA>
+
+=back
+
+=head3 GPIB (IEEE 488.2)
+
+=over
+
+=item * L<Lab::Moose::Connection::LinuxGPIB>
+
+=item * L<Lab::Moose::Connection::VISA::GPIB>
+
+alias: C<Lab::Moose::Connection::VISA_GPIB>
+
+=back
+
+=head3 USB Test&Measurement (Linux kernel driver)
+
+=over
+
+=item * L<Lab::Moose::Connection::USB>
+
+=back
+
+=head3 Network socket
+
+=over
+
+=item * L<Lab::Moose::Connection::Socket>
+
+=back
+
+=head3 VXI-11
+
+=over
+
+=item * L<Lab::Moose::Connection::VXI11>
+
+=item * L<Lab::Moose::Connection::VISA::VXI11>
+
+=back
+
+=head3 Zurich Instruments LabONE API
+
+=over
+
+=item * L<Lab::Moose::Connection::Zhinst>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

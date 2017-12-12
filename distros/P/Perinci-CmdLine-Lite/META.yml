@@ -23,6 +23,7 @@ recommends:
   Perinci::Sub::DepChecker: '0'
   Pipe::Find: '0'
   Term::ReadKey: '0'
+  Time::HiRes: '0'
 requires:
   Complete::Bash: '0.27'
   Complete::Fish: '0.03'
@@ -34,6 +35,7 @@ requires:
   Data::Sah: '0.84'
   Data::Sah::Util::Type: '0.45'
   Encode: '0'
+  Fcntl: '0'
   File::Temp: '0'
   File::Which: '0'
   Getopt::Long: '0'
@@ -61,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite
   homepage: https://metacpan.org/release/Perinci-CmdLine-Lite
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Lite.git
-version: '1.80'
+version: '1.810'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

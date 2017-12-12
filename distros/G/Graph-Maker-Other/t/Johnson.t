@@ -52,7 +52,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 10;
   ok ($Graph::Maker::Johnson::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Johnson->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Johnson->VERSION($want_version); 1 }, 1,

@@ -1,11 +1,13 @@
 package Lab::Moose::Instrument::SCPI::Format;
-#ABSTRACT: Format SCPI queries
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.600';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.613';
+#ABSTRACT: Role for SCPI FORMat subsystem.
+
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_getter/;
 use Lab::Moose::Instrument::Cache;
 use MooseX::Params::Validate;
 use Carp;
+
 
 cache format_data => ( getter => 'format_data_query' );
 
@@ -36,6 +38,7 @@ sub format_data {
     return $self->cached_format_data( [ $format, $length ] );
 }
 
+
 cache format_border => ( getter => 'format_border_query' );
 
 sub format_border_query {
@@ -62,18 +65,47 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Instrument::SCPI::Format - Format SCPI queries
+Lab::Moose::Instrument::SCPI::Format - Role for SCPI FORMat subsystem.
 
 =head1 VERSION
 
-version 3.600
+version 3.613
+
+=head1 METHODS
+
+=head2 format_data_query
+
+=head2 format_data
+
+ # set to binary single precision
+ $instr->format_data(format => 'REAL', length => 32);
+
+ # set to binary double precision
+ $instr->format_data(format => 'REAL', length => 64);
+
+ # set to ASCII, 10 significant digits
+ $instr->format_data(format => 'ASC', length => 10);
+
+ my $format = $instr->cached_format_data();
+ print "format: $format->[0], len: $format->[1]\n";
+
+Set/Get data format.
+
+=head2 format_border_query
+
+=head2 format_border
+
+ $instr->format_border(value => 'NORM'); # or 'SWAP'
+
+Set/Get byte order of transferred data. Normally you want 'SWAP'
+(little-endian), which is the native machine format of the measurement PC.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

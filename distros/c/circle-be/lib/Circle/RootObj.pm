@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use base qw( Tangence::Object Circle::WindowItem );
 
+our $VERSION = '0.173320';
+
 use Class::Method::Modifiers;
 
 use Carp;
@@ -62,7 +64,7 @@ sub new
    my $rulestore = $self->{rulestore} = Circle::Rule::Store->new();
    Circle::GlobalRules::register( $rulestore );
 
-   my $file = CIRCLERC;
+   my $file = $args{config} // CIRCLERC;
    if( -r $file ) {
       my $config = YAML::LoadFile( $file );
       $self->load_configuration( $config );
@@ -335,6 +337,7 @@ sub command_eval
 
    my %pad = (
       ROOT    => $self,
+      LOOP    => $self->{loop},
       CONN    => $connection,
       ITEM    => $cinv->invocant,
       SESSION => $session,

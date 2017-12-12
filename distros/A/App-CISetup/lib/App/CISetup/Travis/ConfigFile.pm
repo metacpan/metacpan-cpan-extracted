@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
@@ -343,6 +343,7 @@ my @BlocksOrder = qw(
     solution
     matrix
     env
+    branches
     services
     before_install
     install

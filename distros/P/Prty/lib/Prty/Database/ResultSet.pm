@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Object;
 use Time::HiRes ();
@@ -275,12 +275,6 @@ sub isRaw {
 
     $row = $tab->lookup(@opt,$key=>$val);
 
-=head4 Description
-
-Durchsuche die Tabelle nach dem ersten Datensatz, dessen
-Attribut $key den Wert $val besitzt und liefere diesen zurück.
-Erfüllt kein Datensatz das Kriterium, wird eine Exception ausgelöst.
-
 =head4 Options
 
 =over 4
@@ -291,6 +285,12 @@ Wenn der gesuchte Datensatz nicht existiert, löse keine Exception aus,
 sondern liefere undef.
 
 =back
+
+=head4 Description
+
+Durchsuche die Tabelle nach dem ersten Datensatz, dessen
+Attribut $key den Wert $val besitzt und liefere diesen zurück.
+Erfüllt kein Datensatz das Kriterium, wird eine Exception ausgelöst.
 
 =cut
 
@@ -388,16 +388,6 @@ sub select {
 
     $tab = $class->loadFromFile($file,@opt);
 
-=head4 Description
-
-Lade Datensätze aus Datei $file in eine Datensatz-Tabelle und
-liefere eine Referenz auf dieses Objekt zurück.
-
-B<Dateiformat>
-
-Die erste Zeile enthält die Kolumentitel, alle weiteren Zeilen die
-Datensätze. Die Kolumen werden per | getrennt.
-
 =head4 Options
 
 =over 4
@@ -416,6 +406,16 @@ Die Datensatzklasse entscheidet auch über die Tabellenklasse.
 Setze den initialen Datensatz-Status.
 
 =back
+
+=head4 Description
+
+Lade Datensätze aus Datei $file in eine Datensatz-Tabelle und
+liefere eine Referenz auf dieses Objekt zurück.
+
+B<Dateiformat>
+
+Die erste Zeile enthält die Kolumentitel, alle weiteren Zeilen die
+Datensätze. Die Kolumen werden per | getrennt.
 
 =head4 Example
 
@@ -820,10 +820,6 @@ sub asString {
 
     $str = $tab->asTable(@opt);
 
-=head4 Description
-
-Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
-
 =head4 Options
 
 =over 4
@@ -833,6 +829,10 @@ Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
 Füge $msg zur Statistik-Zeile hinzu.
 
 =back
+
+=head4 Description
+
+Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
 
 =head4 Example
 
@@ -1012,7 +1012,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -25,14 +25,16 @@ div.stats .stats-body {
 .center-md p {
   padding-top: 8px;
 }
+.expand.accordion-toggle {
+  vertical-align: middle;
+}
 .expand.accordion-toggle .expand-icon:after {
   color: grey;
-  content: "\f078";
+  content: "\f107";
   float: right;
-  font-family: FontAwesome;
 }
 .expand.accordion-toggle.collapsed .expand-icon:after {
-  content: "\f054";
+  content: "\f105";
 }
 .expand-icon {
   display: inline-block;
@@ -70,5 +72,12 @@ div.stats .stats-body {
   }
   .center-md ul {
     float: none !important;
+  }
+  .navbar-nav {
+    margin-left: -15px !important;
+  }
+  .navbar-right {
+    float: left !important;
+    margin-left: -15px !important;
   }
 }

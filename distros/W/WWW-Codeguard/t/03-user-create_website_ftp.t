@@ -231,38 +231,54 @@ subtest 'Exercise backup endpoints' => sub {
 };
 
 subtest 'List website rules in the CG account' => sub {
-	my $resp = $user_api->list_website_rules(
-		{
-			website_id => $created_website_id,
-		}
-	);
+    my $num_tests = 2;
+    plan => $num_tests;
 
-	if ( ok ( defined $resp && UNIVERSAL::isa($resp, 'HASH'), 'list_website_rules response was a hash' ) ) {
-		ok ( UNIVERSAL::isa($resp->{exclude_rules}, 'ARRAY'), 'exclude_rules were present' );
-	} else {
-		diag 'API ERROR. Full response:';
-		diag explain $resp;
-		fail 'List website resource rules';
-	}
+    SKIP: {
+        skip 'Requires website_id', $num_tests
+            if ! $created_website_id;
+
+        my $resp = $user_api->list_website_rules(
+            {
+                website_id => $created_website_id,
+            }
+        );
+
+        if ( ok ( defined $resp && UNIVERSAL::isa($resp, 'HASH'), 'list_website_rules response was a hash' ) ) {
+            ok ( UNIVERSAL::isa($resp->{exclude_rules}, 'ARRAY'), 'exclude_rules were present' );
+        } else {
+            diag 'API ERROR. Full response:';
+            diag explain $resp;
+            fail 'List website resource rules';
+        }
+    }
 };
 
 subtest 'Set website exclude rules in the CG account' => sub {
-	my $resp = $user_api->set_website_rules(
-		{
-			website_id => $created_website_id,
-			exclude_rules => [ '*'.substr(getppid, 0, 6).'/*' ],
-		}
-	);
+    my $num_tests = 3;
+    plan => $num_tests;
 
-	if ( ok ( defined $resp && UNIVERSAL::isa($resp, 'HASH'), 'list_website_rules response was a hash' ) ) {
-		if ( ok ( UNIVERSAL::isa($resp->{exclude_rules}, 'ARRAY'), 'exclude_rules were present' ) ) {
-			ok ( scalar ( grep { $_ eq '*'.substr(getppid, 0, 6).'/*' } @{ $resp->{exclude_rules} } ), 'exclude rules were updated properly' )
-		}
-	} else {
-		diag 'API ERROR. Full response:';
-		diag explain $resp;
-		fail 'List website resource rules';
-	}
+    SKIP: {
+        skip 'Requires website_id', $num_tests
+            if ! $created_website_id;
+
+        my $resp = $user_api->set_website_rules(
+            {
+                website_id => $created_website_id,
+                exclude_rules => [ '*'.substr(getppid, 0, 6).'/*' ],
+            }
+        );
+
+        if ( ok ( defined $resp && UNIVERSAL::isa($resp, 'HASH'), 'list_website_rules response was a hash' ) ) {
+            if ( ok ( UNIVERSAL::isa($resp->{exclude_rules}, 'ARRAY'), 'exclude_rules were present' ) ) {
+                ok ( scalar ( grep { $_ eq '*'.substr(getppid, 0, 6).'/*' } @{ $resp->{exclude_rules} } ), 'exclude rules were updated properly' )
+            }
+        } else {
+            diag 'API ERROR. Full response:';
+            diag explain $resp;
+            fail 'List website resource rules';
+        }
+    }
 };
 
 subtest 'Disable created website resource' => sub {

@@ -1,5 +1,5 @@
 {
-   "abstract" : "API interface to pakkelabels.dk",
+   "abstract" : "REST API interface",
    "author" : [
       "Kaare Rasmussen <kaare at cpan dot org>"
    ],
@@ -23,6 +23,7 @@
          "requires" : {
             "Moo" : "0",
             "Role::REST::Client" : "0.22",
+            "Role::REST::Client::Auth::Basic" : "0.05",
             "constant" : "0",
             "perl" : "5.010"
          }
@@ -32,6 +33,7 @@
             "File::Find" : "0",
             "File::Temp" : "0",
             "HTTP::Response" : "0",
+            "JSON" : "0",
             "Test::More" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -46,6 +48,6 @@
          "web" : "http://github.com/kaare/P5kkelabels"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }
 

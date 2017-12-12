@@ -7,7 +7,7 @@ use warnings;
 
 package Dancer2::Plugin::LogReport::Message;
 use vars '$VERSION';
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 
 use parent 'Log::Report::Message';

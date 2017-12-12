@@ -1,0 +1,7 @@
+0.004 - Dec 5th 2017
+  * Silence warnings by actually handling things not passed into us
+  * Use JSON::PP since it's in core and this isn't anything high performance
+
+0.003 - Dec 5th 2017
+  * Now use perl.bot
+  * -c list will now list channels

@@ -49,6 +49,8 @@ my $build = Module::Build->new(
             'Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue',
             'Dave Hayes E<lt>dave@jetcafe.orgE<gt>',
             'Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>',
+            'Ettore Di Giacinto (@mudler)',
+            'Martin Barth (@ufobat)'
         ],
     },
 );

@@ -1,6 +1,6 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2008-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2017 -- leonerd@leonerd.org.uk
 
 package Circle::Net::IRC::Channel;
 
@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use 5.010; # //
 use base qw( Circle::Net::IRC::Target );
+
+our $VERSION = '0.173320';
 
 use Carp;
 
@@ -19,21 +21,6 @@ use Circle::Widget::Label;
 
 use POSIX qw( strftime );
 
-use constant STATE_UNJOINED => 0;
-use constant STATE_JOINING  => 1;
-use constant STATE_JOINED   => 2;
-use constant STATE_PARTING  => 3;
-
-sub new
-{
-   my $class = shift;
-   my $self = $class->SUPER::new( @_ );
-
-   $self->{state} = STATE_UNJOINED;
-
-   return $self;
-}
-
 sub init_prop_occupant_summary
 {
    return { total => 0 };
@@ -44,22 +31,9 @@ sub on_connected
    my $self = shift;
    $self->SUPER::on_connected;
 
-   if( $self->{autojoin} || $self->{rejoin_on_connect} ) {
-      $self->join(
-         on_joined => sub { undef $self->{rejoin_on_connect} }
-         # TODO: something about errors
-      );
+   if( $self->{autojoin} ) {
+      $self->join( on_joined => sub { } );
    }
-}
-
-sub on_disconnected
-{
-   my $self = shift;
-   $self->SUPER::on_disconnected( @_ );
-
-   $self->{rejoin_on_connect} = 1 if $self->{state} == STATE_JOINED;
-
-   $self->{state} = STATE_UNJOINED;
 }
 
 sub join
@@ -70,11 +44,6 @@ sub join
    my $on_joined = $args{on_joined};
    ref $on_joined eq "CODE" or croak "Expected 'on_joined' as CODE ref";
 
-   $self->{state} == STATE_UNJOINED or
-      croak "Cannot join except in UNJOINED state";
-
-   $self->{state} = STATE_JOINING;
-
    my $key = $args{key} // $self->{key};
 
    my $net = $self->{net};
@@ -82,6 +51,16 @@ sub join
 
    $self->{on_joined} = $on_joined;
    $self->{on_join_error} = $args{on_join_error};
+}
+
+sub invite
+{
+   my $self = shift;
+   my ( $nick ) = @_;
+
+   my $irc = $self->{irc};
+   # INVITE user #channel
+   $irc->send_message( "INVITE", undef, $nick, $self->get_prop_name );
 }
 
 sub kick
@@ -116,11 +95,6 @@ sub part
 
    my $on_parted = $args{on_parted};
    ref $on_parted eq "CODE" or croak "Expected 'on_parted' as CODE ref";
-
-   $self->{state} == STATE_JOINED or
-      croak "Cannot part except in JOINED state";
-
-   $self->{state} = STATE_PARTING;
 
    my $irc = $self->{irc};
    $irc->send_message( "PART", undef, $self->get_prop_name, defined $args{message} ? $args{message} : ( "" ) );
@@ -302,12 +276,6 @@ sub on_message_JOIN
    my $userhost = "$hints->{prefix_user}\@$hints->{prefix_host}";
 
    if( $hints->{prefix_is_me} ) {
-      if( $self->{state} != STATE_JOINING ) {
-         print STDERR "Received spurious self JOIN notification when wasn't expecting it\n";
-         return 0;
-      }
-
-      $self->{state} = STATE_JOINED;
       $self->{on_joined}->( $self );
 
       $self->fire_event( "self_joined" );
@@ -349,8 +317,6 @@ sub on_message_KICK
 
    my $irc = $self->{irc};
    if( $irc->is_nick_me( $kicked ) ) {
-      $self->{state} = STATE_UNJOINED;
-
       $self->fire_event( "self_parted" );
       $self->push_displayevent( "irc.kick", { channel => $self->get_prop_name, kicker => $kicker, kicked => $kicked, kickmsg => $kickmsg_formatted } );
       $self->bump_level( 1 );
@@ -443,13 +409,6 @@ sub on_message_PART
    my $userhost = "$hints->{prefix_user}\@$hints->{prefix_host}";
 
    if( $hints->{prefix_is_me} ) {
-      if( $self->{state} != STATE_PARTING ) {
-         print STDERR "Received spurious self PART notification when wasn't expecting it\n";
-         return 0;
-      }
-
-      $self->{state} = STATE_UNJOINED;
-
       $self->fire_event( "self_parted" );
       $self->push_displayevent( "irc.part", { channel => $self->get_prop_name, nick => $nick, userhost => $userhost, partmsg => $partmsg_formatted } );
       $self->bump_level( 1 );
@@ -775,6 +734,18 @@ sub command_devoice
 
    my @users = @$users;
    $self->mode( "-".("v"x@users), @users );
+
+   return;
+}
+
+sub command_invite
+   : Command_description("Invite a new user to the channel")
+   : Command_arg('user')
+{
+   my $self = shift;
+   my ( $nick ) = @_;
+
+   $self->invite( $nick );
 
    return;
 }

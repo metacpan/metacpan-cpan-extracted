@@ -20,7 +20,7 @@ use Test::Most;
 {
     package ProcessImpl;
 
-    use Mic::HashImpl
+    use Mic::Impl
         has => { ID => { reader => 'id' } }
     ;
     
@@ -29,7 +29,7 @@ use Test::Most;
     sub BUILD {
         my ($self) = @_;
 
-        $self->{$ID} = ++$Count;
+        $self->[ID] = ++$Count;
     }
     
     sub DESTROY {

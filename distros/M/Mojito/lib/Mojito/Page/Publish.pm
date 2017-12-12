@@ -1,9 +1,7 @@
 use strictures 1;
 
 package Mojito::Page::Publish;
-{
-  $Mojito::Page::Publish::VERSION = '0.24';
-}
+$Mojito::Page::Publish::VERSION = '0.25';
 use Moo;
 use WWW::Mechanize;
 use Data::Dumper::Concise;

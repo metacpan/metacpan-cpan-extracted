@@ -1,4 +1,4 @@
-# Copyright 2016 Kevin Ryde
+# Copyright 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,7 +24,7 @@ use strict;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;

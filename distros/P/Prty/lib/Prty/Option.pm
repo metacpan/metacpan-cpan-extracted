@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Hash;
 use Scalar::Util ();
@@ -32,6 +32,32 @@ L<Prty::Object>
 
     $opt = $class->extract(@opt,\@args,@keyVal); # Options-Objekt
     $class->extract(@opt,\@args,@keyVal);        # Options-Variablen
+
+=head4 Options
+
+=over 4
+
+=item -dontExtract => $bool (Default: 0)
+
+Entferne die Optionen I<nicht> aus der Argumentliste.
+
+=item -mode => 'strict'|'sloppy' (Default: 'strict')
+
+Im Falle von C<< -mode=>'strict' >> (dem Default), wird eine Exception
+ausgelöst, wenn eine unbekannte Option vorkommt. Im Falle von
+C<< -mode=>'sloppy' >> wird das Argument stillschweigend übergangen.
+
+=item -properties => $bool (Default: 0)
+
+Argumentliste aus Schlüssel/Wert-Paaren, bei denen die Schlüssel
+nicht mit einem Bindestrich (-) beginnen. Eine Unterscheidung
+zwischen Optionen und Argumenten gibt es nicht.
+
+=item -simpleMessage => $bool (Default: 0)
+
+Wirf im Falle eines Fehlers eine einzeilige Fehlermeldung als Exception.
+
+=back
 
 =head4 Description
 
@@ -70,32 +96,6 @@ Abfolge Schlüssel/Wert-Paaren ohne Bindestrich als
 Options-Kennzeichen:
 
     a 1 b 2 c 3
-
-=head4 Options
-
-=over 4
-
-=item -dontExtract => $bool (Default: 0)
-
-Entferne die Optionen I<nicht> aus der Argumentliste.
-
-=item -mode => 'strict'|'sloppy' (Default: 'strict')
-
-Im Falle von C<< -mode=>'strict' >> (dem Default), wird eine Exception
-ausgelöst, wenn eine unbekannte Option vorkommt. Im Falle von
-C<< -mode=>'sloppy' >> wird das Argument stillschweigend übergangen.
-
-=item -properties => $bool (Default: 0)
-
-Argumentliste aus Schlüssel/Wert-Paaren, bei denen die Schlüssel
-nicht mit einem Bindestrich (-) beginnen. Eine Unterscheidung
-zwischen Optionen und Argumenten gibt es nicht.
-
-=item -simpleMessage => $bool (Default: 0)
-
-Wirf im Falle eines Fehlers eine einzeilige Fehlermeldung als Exception.
-
-=back
 
 =head4 Examples
 
@@ -374,6 +374,16 @@ sub extractAll {
 
     $class->extractMulti(@opt,\@arr,$key=>$ref,...);
 
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Übergehe unbekannte Optionen.
+
+=back
+
 =head4 Description
 
 Extrahiere aus Array @arr die Werte zu den angegebenen Schlüsseln
@@ -386,16 +396,6 @@ Im Falle einer Array-Referenz werden mehrere aufeinanderfolgende
 Werte in dem Array gesammelt.
 
 Für das Hinzufügen einer Default-Option, siehe Beispiel.
-
-=head4 Options
-
-=over 4
-
-=item -sloppy => $bool (Default: 0)
-
-Übergehe unbekannte Optionen.
-
-=back
 
 =head4 Example
 
@@ -506,7 +506,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

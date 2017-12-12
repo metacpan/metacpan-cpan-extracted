@@ -21,15 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "File::Path" : "0",
-            "File::Temp" : "0",
-            "Math::BigFloat" : "1.55",
-            "Test::Deep" : "0",
-            "Test::Exception" : "0.31",
-            "Test::More" : "0.4",
-            "Time::HiRes" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -42,6 +34,18 @@
             "DBI" : "1.41",
             "perl" : "5.008001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Math::BigFloat" : "1.55",
+            "Test::CheckDeps" : "0.007",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.4",
+            "Time::HiRes" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,6 +54,6 @@
          "url" : "https://github.com/mariuz/perl-dbd-firebird"
       }
    },
-   "version" : "1.26",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.31",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

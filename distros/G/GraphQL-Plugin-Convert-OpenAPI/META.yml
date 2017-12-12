@@ -4,14 +4,14 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  GraphQL: '0.21'
+  GraphQL: '0.22'
   JSON::Validator: '1.07'
-  OpenAPI::Client: '0.10'
+  OpenAPI::Client: '0.13'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '7.10'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +22,14 @@ no_index:
     - t
     - inc
 requires:
-  GraphQL: '0.21'
+  GraphQL: '0.22'
   JSON::Validator: '1.07'
-  OpenAPI::Client: '0.10'
+  OpenAPI::Client: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI
-version: '0.03'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

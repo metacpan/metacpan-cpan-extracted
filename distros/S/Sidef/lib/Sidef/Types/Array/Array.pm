@@ -79,6 +79,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *unroll_op = \&unroll_operator;
+
     sub map_operator {
         my ($self, $operator, @args) = @_;
 
@@ -92,6 +94,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *map_op = \&map_operator;
+
     sub pam_operator {
         my ($self, $operator, $arg) = @_;
 
@@ -104,6 +108,8 @@ package Sidef::Types::Array::Array {
 
         bless \@array, __PACKAGE__;
     }
+
+    *pam_op = \&pam_operator;
 
     sub reduce_operator {
         my ($self, $operator, $initial) = @_;
@@ -121,6 +127,8 @@ package Sidef::Types::Array::Array {
         }
         $x;
     }
+
+    *reduce_op = \&reduce_operator;
 
     sub cross_operator {
         my ($self, $operator, $arg) = @_;
@@ -148,6 +156,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *cross_op = \&cross_operator;
+
     sub zip_operator {
         my ($self, $operator, $arg) = @_;
 
@@ -174,6 +184,130 @@ package Sidef::Types::Array::Array {
 
         bless \@array, __PACKAGE__;
     }
+
+    *zip_op = \&zip_operator;
+
+    sub scalar_operator {
+        my ($self, $operator, $scalar) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        my %addr;    # support for cyclic references
+
+        sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = bless \@array;
+
+            foreach my $item (@$obj) {
+                if (ref($item) eq __PACKAGE__) {
+                    CORE::push(@array, __SUB__->($item));
+                }
+                else {
+                    if ($operator eq '') {
+                        CORE::push(@array, bless [$item, $scalar]);
+                    }
+                    else {
+                        CORE::push(@array, $item->$operator($scalar));
+                    }
+                }
+            }
+
+            $addr{$refaddr};
+          }
+          ->($self);
+    }
+
+    *scalar_op = \&scalar_operator;
+
+    sub rscalar_operator {
+        my ($self, $operator, $scalar) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        my %addr;    # support for cyclic references
+
+        sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = bless \@array;
+
+            foreach my $item (@$obj) {
+                if (ref($item) eq __PACKAGE__) {
+                    CORE::push(@array, __SUB__->($item));
+                }
+                else {
+                    if ($operator eq '') {
+                        CORE::push(@array, bless [$scalar, $item]);
+                    }
+                    else {
+                        CORE::push(@array, $scalar->$operator($item));
+                    }
+                }
+            }
+
+            $addr{$refaddr};
+          }
+          ->($self);
+    }
+
+    *rscalar_op = \&rscalar_operator;
+
+    sub wise_operator {
+        my ($m1, $operator, $m2) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        my %addr;    # support for cyclic references
+
+        sub {
+            my ($obj1, $obj2) = @_;
+
+            my $refaddr1 = Scalar::Util::refaddr($obj1);
+            my $refaddr2 = Scalar::Util::refaddr($obj2);
+
+            exists($addr{$refaddr1})
+              && return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              && return $addr{$refaddr2};
+
+            my @array;
+
+            $addr{$refaddr2} = $addr{$refaddr1} = bless \@array;
+
+            for my $i (0 .. $#{$obj1}) {
+                if (ref($obj1->[$i]) eq __PACKAGE__) {
+                    CORE::push(@array, __SUB__->($obj1->[$i], $obj2->[$i]));
+                }
+                else {
+                    if ($operator eq '') {
+                        CORE::push(@array, bless [$obj1->[$i], $obj2->[$i]]);
+                    }
+                    else {
+                        CORE::push(@array, $obj1->[$i]->$operator($obj2->[$i]));
+                    }
+                }
+            }
+
+            $addr{$refaddr1};
+          }
+          ->($m1, $m2);
+    }
+
+    *wise_op = \&wise_operator;
 
     sub mul {
         my ($self, $num) = @_;
@@ -494,20 +628,109 @@ package Sidef::Types::Array::Array {
 
     *count_by = \&count;
 
+    sub cmp {
+        my ($self, $array) = @_;
+
+        my %addr;    # support for cyclic references
+
+        my $sub = sub {
+            my ($a1, $a2) = @_;
+
+            my $l1 = $#$a1;
+            my $l2 = $#$a2;
+
+            my $min = $l1 < $l2 ? $l1 : $l2;
+
+            my $refaddr1 = Scalar::Util::refaddr($a1);
+            my $refaddr2 = Scalar::Util::refaddr($a2);
+
+            if ($refaddr1 == $refaddr2) {
+                return Sidef::Types::Number::Number::ZERO;
+            }
+
+            exists($addr{$refaddr1})
+              and return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              and return $addr{$refaddr2};
+
+            my $cmp1 = $refaddr1 <=> $refaddr2;
+            my $cmp2 = $refaddr2 <=> $refaddr1;
+
+            $addr{$refaddr1} = (
+                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                                : $cmp1 < 0      ? Sidef::Types::Number::Number::MONE
+                                :                  Sidef::Types::Number::Number::ONE
+                               );
+
+            $addr{$refaddr2} = (
+                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                                : $cmp2 < 0      ? Sidef::Types::Number::Number::MONE
+                                :                  Sidef::Types::Number::Number::ONE
+                               );
+
+            foreach my $i (0 .. $min) {
+                if (my $cmp = CORE::int($a1->[$i] cmp $a2->[$i])) {
+                    return (
+                            $cmp < 0
+                            ? Sidef::Types::Number::Number::MONE
+                            : Sidef::Types::Number::Number::ONE
+                           );
+                }
+            }
+
+                $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
+              : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
+              :              Sidef::Types::Number::Number::ONE;
+        };
+
+        no strict 'refs';
+        local *Sidef::Types::Array::Array::cmp = $sub;
+        local *{'Sidef::Types::Array::Array::<=>'} = $sub;
+        $sub->($self, $array);
+    }
+
     sub eq {
         my ($self, $array) = @_;
 
-        if ($#$self != $#$array) {
-            return (Sidef::Types::Bool::Bool::FALSE);
-        }
+        my %addr;    # support for cyclic references
 
-        my $i = -1;
-        foreach my $item (@$self) {
-            ($item eq $array->[++$i])
-              or return (Sidef::Types::Bool::Bool::FALSE);
-        }
+        my $sub = sub {
+            my ($a1, $a2) = @_;
 
-        (Sidef::Types::Bool::Bool::TRUE);
+            if ($#$a1 != $#$a2) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            my $refaddr1 = Scalar::Util::refaddr($a1);
+            my $refaddr2 = Scalar::Util::refaddr($a2);
+
+            if ($refaddr1 == $refaddr2) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            exists($addr{$refaddr1})
+              and return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              and return $addr{$refaddr2};
+
+            $addr{$refaddr1} = Sidef::Types::Bool::Bool::FALSE;
+            $addr{$refaddr2} = Sidef::Types::Bool::Bool::FALSE;
+
+            my $i = -1;
+            foreach my $item (@$a1) {
+                ($item eq $a2->[++$i])
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            (Sidef::Types::Bool::Bool::TRUE);
+        };
+
+        no strict 'refs';
+        local *Sidef::Types::Array::Array::eq = $sub;
+        local *{'Sidef::Types::Array::Array::=='} = $sub;
+        $sub->($self, $array);
     }
 
     sub ne {
@@ -1346,8 +1569,8 @@ package Sidef::Types::Array::Array {
     *bshuffle = \&best_shuffle;
 
     sub pair_with {
-        my ($self, @args) = @_;
-        Sidef::Types::Array::MultiArray->new($self, @args);
+        my ($self, $arr) = @_;
+        Sidef::Types::Array::Pair->new($self, $arr);
     }
 
     sub reduce {
@@ -1873,26 +2096,6 @@ package Sidef::Types::Array::Array {
         bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $block->run($_)] } @$self], __PACKAGE__;
     }
 
-    sub cmp {
-        my ($self, $arg) = @_;
-
-        my $l1 = $#$self;
-        my $l2 = $#$arg;
-
-        my $cmp;
-        my $min = $l1 < $l2 ? $l1 : $l2;
-
-        foreach my $i (0 .. $min) {
-            if ($cmp = CORE::int($self->[$i] cmp $arg->[$i])) {
-                return ($cmp < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
-            }
-        }
-
-            $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
-          : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
-          :              Sidef::Types::Number::Number::ONE;
-    }
-
     # Inserts an object between each element
     sub join_insert {
         my ($self, $delim_obj) = @_;
@@ -2023,13 +2226,13 @@ package Sidef::Types::Array::Array {
         $n = Sidef::Types::Number::Number->new($n)->int;
         $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
 
-        my $cmp = Math::GMPz::Rmpz_cmp_ui($n, 0);
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
 
-        if ($cmp < 0) {
+        if ($sgn < 0) {
             Math::GMPz::Rmpz_neg($n, $n);
             @arr = CORE::reverse(@arr);
         }
-        elsif ($cmp == 0) {
+        elsif ($sgn == 0) {
             return bless \@arr, __PACKAGE__;
         }
 
@@ -2049,6 +2252,247 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
+
+    sub det_bareiss {
+        my ($self) = @_;
+
+        my @m = map { [@$_] } @$self;
+
+        my $neg   = 0;
+        my $pivot = Sidef::Types::Number::Number::ONE;
+        my $end   = $#m;
+
+        foreach my $k (0 .. $end) {
+            my @r = ($k + 1 .. $end);
+
+            my $prev_pivot = $pivot;
+            $pivot = $m[$k][$k] // return Sidef::Types::Number::Number::ONE;
+
+            if ($pivot eq Sidef::Types::Number::Number::ZERO) {
+                my $i = List::Util::first(sub { $m[$_][$k] }, @r) // return Sidef::Types::Number::Number::ZERO;
+                @m[$i, $k] = @m[$k, $i];
+                $pivot = $m[$k][$k];
+                $neg ^= 1;
+            }
+
+            foreach my $i (@r) {
+                foreach my $j (@r) {
+                    $m[$i][$j] = $m[$i][$j]->mul($pivot);
+                    $m[$i][$j] = $m[$i][$j]->sub($m[$i][$k]->mul($m[$k][$j]));
+                    $m[$i][$j] = $m[$i][$j]->div($prev_pivot);
+                }
+            }
+        }
+
+        $neg ? $pivot->neg : $pivot;
+    }
+
+    # Code translated from Wikipedia (+ minor tweaks):
+    #   https://en.wikipedia.org/wiki/LU_decomposition#C_code_examples
+
+    sub _LUP_decompose {
+        my ($self) = @_;
+
+        my @A = map { [@$_] } @$self;
+        my $N = $#A;
+        my @P = (0 .. $N + 1);
+
+        foreach my $i (0 .. $N) {
+
+            my $maxA = Sidef::Types::Number::Number::ZERO;
+            my $imax = $i;
+
+            foreach my $k ($i .. $N) {
+                my $absA = ($A[$k][$i] // return ($N, \@A, \@P))->abs;
+
+                if ($absA->gt($maxA)) {
+                    $maxA = $absA;
+                    $imax = $k;
+                }
+            }
+
+            if ($imax != $i) {
+
+                @P[$i, $imax] = @P[$imax, $i];
+                @A[$i, $imax] = @A[$imax, $i];
+
+                ++$P[$N + 1];
+            }
+
+            foreach my $j ($i + 1 .. $N) {
+
+                if ($A[$i][$i]->is_zero) {
+                    return ($N, \@A, \@P);
+                }
+
+                $A[$j][$i] = $A[$j][$i]->div($A[$i][$i]);
+
+                foreach my $k ($i + 1 .. $N) {
+                    $A[$j][$k] = $A[$j][$k]->sub($A[$j][$i]->mul($A[$i][$k]));
+                }
+            }
+        }
+
+        return ($N, \@A, \@P);
+    }
+
+    sub matrix_solve {
+        my ($self, $vector) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my @x = map { $vector->[$P->[$_]] } 0 .. $N;
+
+        foreach my $i (1 .. $N) {
+            foreach my $k (0 .. $i - 1) {
+                $x[$i] = $x[$i]->sub($A->[$i][$k]->mul($x[$k]));
+            }
+        }
+
+        for (my $i = $N ; $i >= 0 ; --$i) {
+            foreach my $k ($i + 1 .. $N) {
+                $x[$i] = $x[$i]->sub($A->[$i][$k]->mul($x[$k]));
+            }
+            $x[$i] = $x[$i]->div($A->[$i][$i]);
+        }
+
+        bless \@x;
+    }
+
+    *msolve = \&matrix_solve;
+
+    sub invert {
+        my ($self) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my @I;
+
+        foreach my $j (0 .. $N) {
+            foreach my $i (0 .. $N) {
+
+                $I[$i][$j] = (
+                              ($P->[$i] == $j)
+                              ? Sidef::Types::Number::Number::ONE
+                              : Sidef::Types::Number::Number::ZERO
+                             );
+
+                foreach my $k (0 .. $i - 1) {
+                    $I[$i][$j] = $I[$i][$j]->sub($A->[$i][$k]->mul($I[$k][$j]));
+                }
+            }
+
+            for (my $i = $N ; $i >= 0 ; --$i) {
+                foreach my $k ($i + 1 .. $N) {
+                    $I[$i][$j] = $I[$i][$j]->sub($A->[$i][$k]->mul($I[$k][$j]));
+                }
+
+                $I[$i][$j] = $I[$i][$j]->div($A->[$i][$i] // return __PACKAGE__->new(__PACKAGE__->new));
+            }
+        }
+
+        bless $_ for @I;
+        bless \@I;
+    }
+
+    *inv     = \&invert;
+    *inverse = \&invert;
+
+    sub determinant {
+        my ($self) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my $det = $A->[0][0] // return Sidef::Types::Number::Number::ONE;
+
+        foreach my $i (1 .. $N) {
+            $det = $det->mul($A->[$i][$i]);
+        }
+
+        if (($P->[$N + 1] - $N) % 2 == 0) {
+            $det = $det->neg;
+        }
+
+        return $det;
+    }
+
+    *det = \&determinant;
+
+    sub matrix_mul {
+        my ($m1, $m2) = @_;
+
+        my @a = map { [@$_] } @$m1;
+        my @b = map { [@$_] } @$m2;
+
+        my @c;
+
+        my $a_rows = $#a;
+        my $b_rows = $#b;
+        my $b_cols = $#{$b[0]};
+
+        foreach my $i (0 .. $a_rows) {
+            foreach my $j (0 .. $b_cols) {
+                foreach my $k (0 .. $b_rows) {
+
+                    my $t = $a[$i][$k]->mul($b[$k][$j]);
+
+                    if (!defined($c[$i][$j])) {
+                        $c[$i][$j] = $t;
+                    }
+                    else {
+                        $c[$i][$j] = $c[$i][$j]->add($t);
+                    }
+                }
+            }
+        }
+
+        bless $_ for @c;
+        bless \@c;
+    }
+
+    *mmul = \&matrix_mul;
+
+    sub scalar_add {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator('+', $scalar);
+    }
+
+    *sadd = \&scalar_add;
+
+    sub scalar_sub {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator('-', $scalar);
+    }
+
+    *ssub = \&scalar_sub;
+
+    sub scalar_mul {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator('*', $scalar);
+    }
+
+    *smul = \&scalar_mul;
+
+    sub scalar_div {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator('/', $scalar);
+    }
+
+    *sdiv = \&scalar_div;
+
+    sub matrix_add {
+        my ($m1, $m2) = @_;
+        $m1->wise_operator('+', $m2);
+    }
+
+    *madd = \&matrix_add;
+
+    sub matrix_sub {
+        my ($m1, $m2) = @_;
+        $m1->wise_operator('-', $m2);
+    }
+
+    *msub = \&matrix_sub;
 
     sub cartesian {
         my ($self, $block) = @_;
@@ -2074,7 +2518,7 @@ package Sidef::Types::Array::Array {
     sub zip {
         my ($self, $block) = @_;
 
-        my @arrays = @{$self};
+        my @arrays = @$self;
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;
@@ -2093,10 +2537,12 @@ package Sidef::Types::Array::Array {
         defined($block) ? $self : bless(\@new_array, __PACKAGE__);
     }
 
+    *transpose = \&zip;
+
     sub zip_by {
         my ($self, $block) = @_;
 
-        my @arrays = @{$self};
+        my @arrays = @$self;
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;

@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use Test::More tests => 15;
-use File::Next (); # For the reslash() function
 
 use lib 't';
 use Util;
@@ -13,12 +12,13 @@ prep_environment();
 
 G_NO_PRINT0: {
     my @expected = qw(
-        t/text/4th-of-july.txt
-        t/text/freedom-of-choice.txt
-        t/text/science-of-myth.txt
+        t/text/amontillado.txt
+        t/text/bill-of-rights.txt
+        t/text/constitution.txt
+        t/text/ozymandias.txt
     );
 
-    my $filename_regex = 'of';
+    my $filename_regex = 'i';
     my @files = qw( t/text/ );
     my @args = ( '-g', $filename_regex );
     my @results = run_ack( @args, @files );
@@ -28,13 +28,14 @@ G_NO_PRINT0: {
 }
 
 G_PRINT0: {
-    my $expected = join( "\0", map { File::Next::reslash($_) } qw(
-        t/text/4th-of-july.txt
-        t/text/freedom-of-choice.txt
-        t/text/science-of-myth.txt
+    my $expected = join( "\0", map { reslash($_) } qw(
+        t/text/amontillado.txt
+        t/text/bill-of-rights.txt
+        t/text/constitution.txt
+        t/text/ozymandias.txt
     ) ) . "\0"; # string of filenames separated and concluded with null byte
 
-    my $filename_regex = 'of';
+    my $filename_regex = 'i';
     my @files = qw( t/text );
     my @args = ( '-g', $filename_regex, '--sort-files', '--print0' );
     my @results = run_ack( @args, @files );

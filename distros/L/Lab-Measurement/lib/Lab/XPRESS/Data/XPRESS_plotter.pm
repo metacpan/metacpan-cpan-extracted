@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
 #ABSTRACT: XPRESS plotting module
-$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.600';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.613';
 use strict;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Time::HiRes qw/usleep/, qw/time/;
@@ -128,7 +128,8 @@ sub init_gnuplot {
     $gp .= "set xtics font 'arial,10'\n";
     $gp .= "set ytics font 'arial,10'\n";
     $gp .= "set ztics font 'arial,10'\n";
-    $gp .= "set cbtics font 'arial,8'\n";
+    $gp .= "set cbtics font 'arial,7'\n";
+    $gp .= "set format cb '%.4e'\n";
     $gp .= "set key font 'arial,8'  at graph 1,1.15\n";
     $gp .= "set title offset -32,0.6\n";
 
@@ -202,7 +203,7 @@ sub init_gnuplot {
     $gp .= "BLOCK_NUM = " . $self->{BLOCK_NUM} . "; ";
     $gp .= "LINE_NUM = " . $self->{LINE_NUM} . "; ";
 
-    $gp .= "show variables;\n";
+    #$gp .= "show variables;\n";
     print $gpipe $gp;
     $gp = "";
 
@@ -274,15 +275,15 @@ sub init_gnuplot {
     }
     elsif ( defined $plot{'y-axis'} ) {
         my $i = $plot{'y-axis'}[0];
-        $gp .= "set ylabel COLUMN_$i\n";
+        if ( $i ne "" ) { $gp .= "set ylabel COLUMN_$i\n"; };
     }
 
     if ( defined $plot{'y2-label'} ) {
         $gp .= "set y2label '$plot{'y2-label'}'\n";
     }
-    elsif ( defined $plot{'y-axis'} ) {
+    elsif ( defined $plot{'y2-axis'} ) {
         my $i = $plot{'y2-axis'}[0];
-        $gp .= "set y2label COLUMN_$i\n";
+        if ( $i ne "" ) { $gp .= "set y2label COLUMN_$i\n"; };
     }
 
     if ( defined $plot{'z-label'} ) {
@@ -361,7 +362,7 @@ sub start_plot {
     my $gp;
     my $gpipe = $self->{gpipe};
 
-    print "start Plot \n";
+    print "Starting plot\n";
 
     # if plot mode == pm3d, then change to other start routine:
     if ( $self->{plot}->{'type'} eq 'pm3d' and $block_num <= 1 ) {
@@ -1383,7 +1384,7 @@ Lab::XPRESS::Data::XPRESS_plotter - XPRESS plotting module
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 COPYRIGHT AND LICENSE
 

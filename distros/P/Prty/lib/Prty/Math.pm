@@ -4,11 +4,13 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
+use 5.010;
 use Prty::Formatter;
 use POSIX ();
 use Math::Trig ();
+use Scalar::Util ();
 
 # -----------------------------------------------------------------------------
 
@@ -241,14 +243,6 @@ sub radToDegree {
 
     ($latitude,$longitude) = $class->geoMidpoint(\@coordinates);
 
-=head4 Description
-
-Berechne den geografischen Mittelpunkt der Geo-Koordination (plus
-optionaler Gewichtung) und liefere diesen zurck.
-
-Beschreibung des Alogrithmus siehe
-L<http://www.geomidpoint.com/example.html>
-
 =head4 Arguments
 
 =over 4
@@ -264,6 +258,14 @@ optial ist. Wenn die Gewichtung fehlt, wird als Wert 1 angenommen.
 =head4 Returns
 
 Breite und Länge des geografischen Mittelpunkts
+
+=head4 Description
+
+Berechne den geografischen Mittelpunkt der Geo-Koordination (plus
+optionaler Gewichtung) und liefere diesen zurck.
+
+Beschreibung des Alogrithmus siehe
+L<http://www.geomidpoint.com/example.html>
 
 =cut
 
@@ -454,9 +456,197 @@ sub latitudeDistance {
 
 # -----------------------------------------------------------------------------
 
+=head2 Welt/Pixel-Koordinaten
+
+=head3 valueToPixelFactor() - Umrechnungsfaktor Wertebereich in Pixelkoordinaten
+
+=head4 Synopsis
+
+    $factor = $class->valueToPixelFactor($length,$min,$max)
+
+=head4 Returns
+
+Faktor
+
+=head4 Description
+
+Liefere den Faktor für die Umrechung von Wertebereich in Pixelkoordinaten.
+Die Werte werden transformiert auf einen Bildschirmabschnitt
+der Länge $length, dessen Randpunkte den Werten $min und $max
+entsprechen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub valueToPixelFactor {
+    my ($class,$size,$min,$max) = @_;
+    return ($size-1)/($max-$min);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 pixelToValueFactor() - Umrechnungsfaktor von Pixel in Wertebereich
+
+=head4 Synopsis
+
+    $factor = $class->pixelToValueFactor($length,$min,$max);
+
+=head4 Returns
+
+Faktor
+
+=head4 Description
+
+Liefere den Faktor für die Umrechung von Pixel in Werte
+entlang eines Bildschirmabschnitts der Länge $length, dessen Randpunkt
+dem Werteberich $min und $max entsprechen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pixelToValueFactor {
+    my ($class,$length,$min,$max) = @_;
+    return 1/Prty::Math->valueToPixelFactor($length,$min,$max);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 valueToPixelX() - Transformiere Wert in X-Pixelkoordinate
+
+=head4 Synopsis
+
+    $x = $class->valueToPixelX($width,$xMin,$xMax,$xVal);
+
+=head4 Alias
+
+valueToPixel()
+
+=head4 Description
+
+Transformiere Wert $xVal in eine Pixelkoordinate auf einer X-Pixelachse
+der Breite $width. Das Minimum des Wertebereichs ist $xMin und das Maximum
+ist $xMax. Die gelieferten Werte liegen im Bereich 0 .. $width-1.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub valueToPixelX {
+    my ($class,$width,$xMin,$xMax,$xVal) = @_;
+    return sprintf '%.0f',($xVal-$xMin)*($width-1)/($xMax-$xMin);
+}
+
+{
+    no warnings 'once';
+    *valueToPixel = \&valueToPixelX;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 valueToPixelY() - Transformiere Wert in Y-Pixelkoordinate
+
+=head4 Synopsis
+
+    $y = $class->valueToPixelY($height,$yMin,$yMax,$yVal);
+
+=head4 Description
+
+Transformiere Wert $yVal in eine Pixelkoordinate auf einer Y-Pixelachse
+der Höhe $height. Das Minimum des Wertebereichs ist $yMin und das Maximum
+ist $yMax. Die gelieferten Werte liegen im Bereich $height-1 .. 0.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub valueToPixelY {
+    my ($class,$height,$yMin,$yMax,$yVal) = @_;
+    return sprintf '%.0f',$height-1-($yVal-$yMin)*($height-1)/($yMax-$yMin);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Interpolation
+
+=head3 interpolate() - Ermittele Wert durch lineare Interpolation
+
+=head4 Synopsis
+
+    $y = $class->interpolate($x0,$y0,$x1,$y1,$x);
+
+=head4 Returns
+
+Float
+
+=head4 Description
+
+Berechne durch lineare Interpolation den Wert y=f(x) zwischen
+den gegebenen Punkten y0=f(x0) und y1=f(x1) und liefere diesen zurück.
+
+Siehe: L<http://de.wikipedia.org/wiki/Interpolation_%28Mathematik%29#Lineare_Interpolation>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub interpolate {
+    my ($class,$x0,$y0,$x1,$y1,$x) = @_;
+    return $y0+($y1-$y0)/($x1-$x0)*($x-$x0);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Zahlen
+
+=head3 isNumber() - Prüfe, ob Skalar eine Zahl darstellt
+
+=head4 Synopsis
+
+    $bool = $class->isNumber($str);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isNumber {
+    return Scalar::Util::looks_like_number($_[1])? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Spike Test
+
+=head3 spikeValue() - Berechne Spike-Wert
+
+=head4 Synopsis
+
+    $val = $class->spikeValue($v1,$v2,$v3,$t1,$t3);
+
+=head4 Description
+
+Berechnung gemäß der Mail von Wilhelm Petersen vom 2017-05-03:
+
+    $v = (abs($v2-($v3+$v1)/2)-abs(($v3-$v1)/2))/($t3/60-$t1/60);
+
+Die Parameter $t1 und $t2 werden in Sekunden angeben, die
+Funktion rechnet jedoch in Minuten, daher die Division durch 60.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub spikeValue {
+    my ($class,$v1,$v2,$v3,$t1,$t3) = @_;
+    return (abs($v2-($v3+$v1)/2)-abs(($v3-$v1)/2))/($t3/60-$t1/60);
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

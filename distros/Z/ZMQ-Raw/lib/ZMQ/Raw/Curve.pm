@@ -1,5 +1,5 @@
 package ZMQ::Raw::Curve;
-$ZMQ::Raw::Curve::VERSION = '0.19';
+$ZMQ::Raw::Curve::VERSION = '0.21';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -10,7 +10,7 @@ ZMQ::Raw::Curve - ZeroMQ CURVE methods
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 DESCRIPTION
 

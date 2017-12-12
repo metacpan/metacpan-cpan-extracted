@@ -1,27 +1,60 @@
 package Lab::Moose::Instrument::RS_ZVA;
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.613';
 #ABSTRACT: Rohde & Schwarz ZVA Vector Network Analyzer
-$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.600';
+
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
-use Lab::Moose::Instrument qw/validated_getter/;
+use Lab::Moose::Instrument
+    qw/validated_getter validated_channel_getter validated_channel_setter /;
+use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
-
 
 extends 'Lab::Moose::Instrument';
 
 with qw(
     Lab::Moose::Instrument::VNASweep
 
-    Lab::Moose::Instrument::SCPI::Calculate::Data
+    Lab::Moose::Instrument::SCPI::Output::State
 );
 
 sub BUILD {
     my $self = shift;
     $self->clear();
     $self->cls();
+}
+
+cache calculate_data_call_catalog => (
+    getter => 'calculate_data_call_catalog',
+    isa    => 'ArrayRef'
+);
+
+sub calculate_data_call_catalog {
+    my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
+
+    my $string
+        = $self->query( command => "CALC${channel}:DATA:CALL:CAT?", %args );
+    $string =~ s/'//g;
+
+    return $self->cached_calculate_data_call_catalog(
+        [ split ',', $string ] );
+}
+
+sub calculate_data_call {
+    my ( $self, $channel, %args ) = validated_channel_getter(
+        \@_,
+        format => { isa => 'Str' }    # {isa => enum([qw/FDATA SDATA MDATA/])}
+    );
+
+    my $format = delete $args{format};
+
+    return $self->binary_query(
+        command => "CALC${channel}:DATA:CALL? $format",
+        %args
+    );
+
 }
 
 sub sparam_catalog {
@@ -73,7 +106,7 @@ Lab::Moose::Instrument::RS_ZVA - Rohde & Schwarz ZVA Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -90,7 +123,7 @@ C<sparam_catalog> methods.
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

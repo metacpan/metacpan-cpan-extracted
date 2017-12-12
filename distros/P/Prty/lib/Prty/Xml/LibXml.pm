@@ -4,7 +4,7 @@ use base qw/XML::LibXML/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Encode ();
 
@@ -35,6 +35,10 @@ um zusätzliche Funktionalität.
 
     $str = $doc->toFormattedString;
 
+=head4 Returns
+
+Formatiertes XML (UTF-8 encoded String)
+
 =head4 Description
 
 Liefere das XML des Dokumentes in formatierter Darstellung. Im
@@ -55,10 +59,6 @@ toString() des Dokuments - im Gegensatz zu anderen Knoten
 - nicht tut)
 
 =back
-
-=head4 Returns
-
-Formatiertes XML (UTF-8 encoded String)
 
 =cut
 
@@ -88,6 +88,10 @@ Formatiertes XML (UTF-8 encoded String)
 
     $nod->removeNode;
 
+=head4 Returns
+
+nichts
+
 =head4 Description
 
 Entferne den Knoten aus dem Dokument.
@@ -95,10 +99,6 @@ Entferne den Knoten aus dem Dokument.
 Dies ist ein Alias für die Methode $nod->unbindNode(), deren Name
 ein wenig inkonsequent ist in Bezug auf $nod->removeChild(),
 $nod->removeChildNodes().
-
-=head4 Returns
-
-nichts
 
 =cut
 
@@ -110,7 +110,7 @@ nichts
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

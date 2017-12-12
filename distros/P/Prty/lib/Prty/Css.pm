@@ -3,7 +3,7 @@ package Prty::Css;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Prty::String;
@@ -83,6 +83,16 @@ sub rule {
 
     $styleTags = Prty::Css->style($h,@specs);
 
+=head4 Arguments
+
+=over 4
+
+=item @specs
+
+Liste von Style-Spezifikationen.
+
+=back
+
 =head4 Description
 
 Übersetze die Style-Spezifikationen @specs in eine Folge von
@@ -111,16 +121,6 @@ hinzugefügt.
 =item \@specs (Arrayreferenz):
 
 Wird zu @specs expandiert.
-
-=back
-
-=head4 Arguments
-
-=over 4
-
-=item @specs
-
-Liste von Style-Spezifikationen.
 
 =back
 
@@ -220,7 +220,7 @@ sub style {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

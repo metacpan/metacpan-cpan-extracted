@@ -1,0 +1,30 @@
+---
+abstract: 'A Moose based SVG Timeline drawing class.'
+author:
+  - 'Vijayvithal <jvs@cpan.org>'
+build_requires:
+  DateTime::Format::Natural: '0'
+  Test::More: '0'
+  diagnostics: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-Timeline-Compact
+requires:
+  DateTime: '0'
+  DateTime::Duration: '0'
+  DateTime::Format::Duration: '0'
+  Moose: '0'
+  POSIX: '0'
+  SVG: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

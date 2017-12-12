@@ -193,7 +193,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Git::Contributors" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Contributors.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       }
    },
    "release_status" : "stable",
@@ -211,10 +211,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.031",
+   "version" : "0.032",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.027005"
+         "version" : "5.027006"
       },
       "plugins" : [
          {
@@ -821,7 +821,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Contributors",
-            "version" : "0.031"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::StaticInstall",
@@ -904,7 +904,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20171020"
+                  "Module::CoreList" : "5.20171120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -954,7 +954,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Git::Remote::Check",
             "name" : "@Author::ETHER/Git::Remote::Check",
-            "version" : "0.2.0"
+            "version" : "0.1.2"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
@@ -1010,7 +1010,7 @@
                }
             },
             "name" : "@Author::ETHER/copy generated files",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1055,7 +1055,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1095,7 +1095,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.031",
+                  "tag" : "v0.032",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },

@@ -16,6 +16,10 @@
             "cats": [ 100 ],
             "meta": { "copyright": "1'st Domain Name Service\\;confidence:50" },
             "html": "<TITLE>[^<>]*регистрация доменов\\;confidence:50"
+        },
+        "header-value-test": {
+            "cats": [ 100 ],
+            "headers": {  "set-cookie": "C" }
         }
 	}
 }

@@ -104,6 +104,52 @@ subtest 'List databases in the CG account' => sub {
 	}
 };
 
+subtest 'List database backups for a website' => sub {
+
+    my $mock = Test::MockModule->new('LWP::UserAgent');
+    $mock->mock(request =>
+        sub {
+            use HTTP::Response;
+            return HTTP::Response->new(200, 'OK', undef, '
+                {
+                    "1234":{
+                        "database_name":"backup_codeguard_1",
+                        "commit_id" : "87f3b9f036c71aebc49abff30f415e763dead8c2",
+                        "backup_time" : "July 1, 2017 = 4:01 am UTC",
+                        "error_message": ""
+                    },
+                    "78910":{
+                        "database_name":"backup_codeguard_1",
+                        "commit_id" : "",
+                        "backup_time" : "",
+                        "error_message": "A restore is already in progress"
+                    }
+                }
+            ');
+        }
+    );
+
+    my $fake_commit_id = '2f902b20d0593051d16acd7b29b5fae28c75fa7d';
+    my $resp = $user_api->list_website_database_backup_commits(
+        {
+            website_id => $created_database_website_id,
+            commit_id  => $fake_commit_id,
+        }
+    );
+
+    if ( ok ( defined $resp && UNIVERSAL::isa($resp, 'HASH'), 'list_databse_backup_commits was a hash' ) ) {
+	    if ( exists $resp->{error_message} && $resp->{error_message} ne "" or not UNIVERSAL::isa($resp, 'HASH') ) {
+            diag 'API ERROR. Full response:';
+            diag explain $resp;
+            fail 'List website database backups';
+        } else {
+            ok ( scalar ( grep { exists $resp->{$_}->{commit_id} } keys %$resp ), 'Codeguard returned a commit_id' );
+            is (ref($resp), 'HASH', 'list_website_database_backup_commits returned a HASH');
+            is ( scalar (keys %$resp), 2, 'list_database_backups returned HASH contains two commits' );
+        }
+    }
+};
+
 subtest 'Show created database' => sub {
 	if ( not ($created_database_id and $created_database_website_id) ) {
 		pass 'Show created database resource skipped';

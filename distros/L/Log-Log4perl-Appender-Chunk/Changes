@@ -1,50 +1,38 @@
 ==================================================
-Changes from 2015-03-04 00:00:00 +0000 to present.
+Changes from 2016-12-07 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2016-03-03 16:21:34 +0000
+version 0.013 at 2017-12-07 12:13:48 +0000
 ------------------------------------------
 
-  Change: fc3f4823d68ae0b4cc865f3790d560e250e77cd8
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-03-03 16:16:21 +0000
+  Change: 60c7311c9eb7965ddd4cfbf213fa87fd52ca9e35
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2017-12-07 12:02:36 +0000
 
-    Protected Chunk appender against destruction in child processes 
+    Merge pull request #1 from stuartskelton/save_chucks_to_disk
 
-------------------------------------------
-version 0.011 at 2016-03-03 15:04:10 +0000
-------------------------------------------
+    Implemented a disk based store. 
 
-  Change: 3a401161330ce44c5b5b75041bb998f97fce4660
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-03-03 15:04:10 +0000
+  Change: 097b206a1f0ec4069132b05dd408f05e56f5bfa6
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2017-12-06 19:54:51 +0000
 
-    Not using sudo in travis 
+    Use File slurp to dump the files to disk 
 
-  Change: ab76bfb37c88a3be572619f528f52141fc700e80
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-03-03 14:58:20 +0000
+  Change: 0443a6bda964d6453c968d87d349abb111acb182
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2017-12-04 10:50:04 +0000
 
-    Added with_forking option 
+    Remove perl versions 5.12 and 5.10 as Dist::zilla 6+ does not support
+    them 
 
-------------------------------------------
-version 0.010 at 2015-10-28 14:03:49 +0000
-------------------------------------------
+  Change: 39d4dc68e0b7a016e41ec31ab38e7728ad89535b
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2017-12-03 20:35:33 +0000
 
-  Change: 8c6bf517e9bd1fab91fa76976830452ff1294043
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2015-10-28 14:03:49 +0000
+    Implemented a disk based store. 
 
-    Added newlines for dist::zilla 
-
-  Change: 54c112951c55f8101dd51d6d4c3bb624872c6877
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2015-10-28 14:01:40 +0000
-
-    Added host and location_constraint options for latest Net::Amazon::S3
-    client support 
-
-================================================
-Plus 8 releases after 2015-03-04 00:00:00 +0000.
-================================================
+=================================================
+Plus 12 releases after 2016-12-07 00:00:00 +0000.
+=================================================

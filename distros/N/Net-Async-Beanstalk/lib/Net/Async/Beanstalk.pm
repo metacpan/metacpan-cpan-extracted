@@ -1,6 +1,6 @@
 package Net::Async::Beanstalk;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -10,13 +10,15 @@ Net::Async::Beanstalk - Non-blocking beanstalk client
 =head1 SYNOPSIS
 
     use IO::Async::Loop;
+    use Net::Async::Beanstalk;
+
     my $loop = IO::Async::Loop->new();
 
-    use Net::Async::Beanstalk;
     my $client = Net::Async::Beanstalk->new();
     $loop->add($client);
-    $client->connect(host => 'localhost', service => '11300',
-                     on_connected => sub { $client->put("anything") });
+
+    $client->connect(host => 'localhost', service => '11300')->get();
+    $client->put("anything")->get();
 
     $loop->run();
 
@@ -24,18 +26,11 @@ Net::Async::Beanstalk - Non-blocking beanstalk client
 
 =over
 
-=item * Some events are invoked with useless data.
-
 =item * Receiving on_disconnect after sending quit might not work.
 
 In fact disconnecting hasn't been tested at all, even ad-hoc.
 
-=item * Protocol errors and the corresponding future exception are out
-of sync.
-
-=item * Net::Async::Beanstalk::Receive is highly repetetive.
-
-=item * This document is too long.
+=item * This document is even longer.
 
 =item * There are no tests
 
@@ -49,10 +44,9 @@ use Moo;
 use strictures 2;
 
 use Carp;
-use IO::Async::Protocol::Stream;
+use IO::Async::Stream;
 use List::Util qw(any);
 use MooX::EventHandler;
-use MooX::HandlesVia;
 use Net::Async::Beanstalk::Constant qw(:state @GENERAL);
 use YAML::Any  qw(Dump Load);
 use namespace::clean;
@@ -63,93 +57,17 @@ Implements the client-side of the beanstalk 1.10 protocol described in
 L<https://raw.githubusercontent.com/kr/beanstalkd/v1.10/doc/protocol.txt>
 using L<IO::Async> to provide an asynchronous non-blocking API.
 
-Responses from the server can be handled with events registered in the
-client object or by waiting on a L<Future> which is returned from the
-function that initiated a command request.
-
 Net::Async::Beanstalk is based on L<Moo> and
-L<IO::Async::Protocol::Stream>. Refer to those modules' documentation
-for basic usage. In particular L<IO::Async::Protocol/connect>.
+L<IO::Async::Stream>. Refer to those modules' documentation for basic
+usage. In particular L<IO::Async::Loop/connect>.
 
-Although this module implements a non-blocking beanstalk client, the
-protocol itself is not asynchronous. Each command sent will receive a
-response before the next command will be processed although in
-practice network buffering makes it appear that commands can be sent
-while waiting for a previous command's response.
+=head1 ATTRIBUTES
 
-Ordinarily this is irrelevant as all the commands except C<reserve>
-and C<reserve-with-timeout> respond quickly enough that any delay will
-be negligible and this module's internal command stack smooths over
-the times where that's not the case. When a C<reserve> or a
-C<reserve-with-timeout> command has been sent any other commands will
-be stacked up waiting to be sent to the server but will not be handled
-until the C<reserve>/C<reserve-with-timeout> command has completed or
-the timeout has expired.
-
-If there is a need to send a command while a C<reserve> or
-C<reserve-with-timeout> is pending then another client object can be
-created to do it. Note that while a job is reserved by a client (and
-it remains connected) that job is invisible to any other clients. It
-cannot, for example, be deleted except over the same connected in
-which it was reserved and if that connection is closed the job will
-return to the ready queue and may be reserved by another client.
+Includes the command stack from L<Net::Async::Beanstalk::Send>.
 
 =cut
 
-my @attributes = qw(
-  default_delay
-  default_priority
-  default_ttr
-  encoder
-  decoder
-);
-
-my @events = qw(
-  on_disconnect
-  on_draining
-  on_job_bury          on_job_bury_not_found
-  on_job_delete        on_job_delete_not_found
-  on_job_insert                                      on_job_insert_fail
-  on_job_kick          on_job_kick_not_found
-  on_job_peek          on_job_peek_not_found
-  on_job_peek_bury     on_job_peek_bury_not_found
-  on_job_peek_delayed  on_job_peek_delayed_not_found
-  on_job_peek_ready    on_job_peek_ready_not_found
-  on_job_release       on_job_release_not_found      on_job_release_fail
-  on_job_reserve
-  on_job_stats         on_job_stats_not_found
-  on_job_touch         on_job_touch_not_found
-  on_list_tubes
-  on_list_tubes_watched
-  on_list_use
-  on_protocol_error
-  on_server_stats
-  on_time_out
-  on_ttr_soon
-  on_tube_ignore                                     on_tube_ignore_fail
-  on_tube_kick
-  on_tube_pause        on_tube_pause_not_found
-  on_tube_stats        on_tube_stats_not_found
-  on_tube_use
-  on_tube_watch
-);
-
-BEGIN { our @ISA; unshift @ISA, 'IO::Async::Protocol::Stream' }
-
-sub FOREIGNBUILDARGS {
-  my $class = shift;
-  my %args = @_;
-  delete @args{@attributes, @events};
-  return %args;
-}
-
-has_event $_ for @events;
-
-with 'Net::Async::Beanstalk::Send';
-
-with 'Net::Async::Beanstalk::Receive';
-
-=head1 ATTRIBUTES
+with 'Net::Async::Beanstalk::Stack';
 
 =over
 
@@ -160,8 +78,8 @@ with 'Net::Async::Beanstalk::Receive';
 =item default_ttr (120)
 
 Default values to associate with a job when it is L</put> on the
-beanstalk server. The defaults are arbitrary but chosen to match the
-default values from L<AnyEvent::Beanstalk>.
+beanstalk server. The defaults here are arbitrary; they have been
+chosen to match the default values from L<AnyEvent::Beanstalk>.
 
 =cut
 
@@ -178,6 +96,9 @@ has default_ttr      => is => lazy => builder => sub { 120 };    # 2 minutes
 A coderef which will be used to deserialise or serialise jobs as they
 are retreived from or sent to a beanstalk server.
 
+This is not related to how the result of C<list> or C<stats> commands
+are deserialised. This is always done using L<YAML/Load>.
+
 =cut
 
 # TODO: has codec => ...; ?
@@ -188,7 +109,7 @@ has encoder          => is => lazy => builder => sub { \&Dump };
 
 =item using
 
-The name of the tube most recently L<use>d.
+The name of the tube which was recently L<use>d.
 
 =cut
 
@@ -197,7 +118,7 @@ has using => is => rwp => init_arg => undef, default => 'default';
 =item _watching
 
 A hashref who's keys are the tubes which are being C<watch>ed. The
-values are irrelevant.
+values are ignored.
 
 Use the accessor C<watching> to get the list of C<watch>ed tubes
 instead of using the attribute directly.
@@ -206,131 +127,210 @@ instead of using the attribute directly.
 
 has _watching => is => rwp => init_arg => undef, default => sub {+{ default => 1 }};
 
-sub watching { [ keys %{ $_[0]->_watching } ] }
+sub watching { keys %{ $_[0]->_watching } }
 
-=item _command_stack
+=back
 
-=for comment Documented out of order because this attribue isn't
-particularly interesting to users of this module.
+=cut
 
-An internal FIFO stack of commands which are waiting to be sent or
-responded to.
+=head1 CLASS
 
-Accessors:
+A Net::Async::Beanstalk object represents a single connection to a
+beanstalkd server. Once a connection has been established (see
+L</CONNECTING>) commands may be submitted by calling the objects
+methods (see L</COMMAND METHODS>).
+
+The command methods all return a L<Future> which will either be
+completed (marked C<done>) with the result if the command was a
+success or failed with the error.
+
+The command methods are named after the L<beanstalk
+API|https://raw.githubusercontent.com/kr/beanstalkd/v1.10/doc/protocol.txt>
+command that they implement, with the hyphens changed to an underscore
+(C<s/-/_/g>). All command methods but L</put> take the same options in
+the same order as the respective API command. L</reserve> also has an
+option added to it so that it can be used to make reservations with or
+without a timeout.
+
+Some events may happen without a command having been sent or in spite
+of a command being actively executed. These invoke the events
+documented below and do I<not> complete or fail the associated
+L<Future>. See the documentation of each error (there aren't many) for
+the details in L</ERRORS>.
+
+Although this class implements a non-blocking beanstalk client, the
+protocol itself is not asynchronous. Each command sent will receive a
+response before the next command will be processed although in
+practice network buffering makes it appear that commands can be sent
+while waiting for a previous command's response.
+
+Ordinarily this is irrelevant as all the commands except C<reserve>
+and C<reserve-with-timeout> respond quickly enough that any delay will
+be negligible and this class' internal L<command
+stack|Net::Async::Beanstalk::Stack> smooths over the times where
+that's not the case.
+
+When any command which blocks the server has been sent, other commands
+will be stacked up waiting to be sent to the server but will not be
+handled (that is, not even put on the wire) until the running command
+command has completed (perhaps with a timeout).
+
+If this is a concern, the beanstalkd server is explicitly written to
+support multiple connections with low overhead, so there is no need to
+perform all operations using the same client object. Just be aware
+that the list of active tubes is not copied (by default) from one
+client to another. Each client starts off using and watching the
+C<default> tube.
+
+When a job has been reserved by a client (which remains connected)
+that job is invisible to any other clients. It cannot, for example, be
+deleted except over the same connected in which it was reserved and if
+that connection is closed the job will return to the ready queue and
+may be reserved by another client.
+
+=head1 CONNECTING
+
+Voodoo.
+
+=head1 ERRORS
+
+=for comment Move this to ::Receive
+
+There are not many error conditions described by the beanstalk
+protocol. L<Net::Async::Beanstalk::Receive> also defines errors in the
+event of bugs revealing mistakes in this code or communication
+failures. Each will cause either the current L<Future> to fail, raise
+an event, or both.
+
+See each error's description but by and large the errors that happen
+because a command failed (which is not the same thing thing as "while
+a command was active") fail the L<Future> while the error conditions
+that arise spontaneously invoke an C<on_error> event (defined in
+L<IO::Async::Notifier>). If the Net::Async::Beanstalk object (or its
+parent) is created without an C<on_error> handler then the default
+C<on_error> handler will be used which calls L<die|perlfunc/die>.
+
+Except where noted each error or failure includes the arguments which
+were sent with the command to the server (not including the command
+itself). If you call a command such as this
+
+    my $give_it_a_rest = $beanstalk->bury(0x6642, 9_001);
+
+then $give_it_a_rest will hold a L<Future> which will eventually fail
+and call its handler with:
+
+    $h->("...buried: 26180 not found", "beanstalk-peek", 0x6632, 9_001);
+
+The exceptional errors are:
+
+
+=for comment = find all three errors.
 
 =over
 
-=item count_commands
+=item C<Protocol error: Bad format>
 
-How many commands are in the stack, including the one which the server
-is currently processing.
+Category: C<beanstalk-internal>
 
-=item current_command
+Arguments: The buffer which was written into the communication stream.
 
-Returns the command the server is currently processing, or has just
-sent a response to, without removing it from the stack.
+This error invokes an C<on_error> event and fails the active L<Future>.
 
-=item is_busy
+The server received a command line that was not well-formed. This
+should never happen and when it does it indicates an error in this
+module. Please report it so that it can be repaired.
 
-A boolean indicating whether the client is busy, ie. has a command
-currently being processed or has commands waiting to be sent. Actually
-implemented by the same method as L</count_commands>.
+=item C<Protocol error: Internal error>
 
-=item _pending_commands
+Category: C<beanstalk-server>
 
-Returns the commands which have not yet completed, including the one
-which the server is currently processing.
+Arguments: Everything.
 
-=item _push_command
+This error invokes C<on_error> only.
 
-Push a new command onto the stack.
+The server suffered from an internal error. This should never happen
+and when it does it indicates an error in the server. Please report it
+to the L<beanstalk maintainer|http://kr.github.com/beanstalkd/> so
+that it can be repaired.
 
-=item _shift_command
+This error does not attempt to fail the current or any pending
+L<Future>s, however the server's probably about to crash so your code
+should deal with that and the pending L<Future>s gracefully.
 
-Remove and return the first command from the stack, which the server
-is either processing or has returned a response to.
+=item C<Protocol error: Out of memory>
+
+Category: C<beanstalk-server>
+
+Arguments: The command name and then the arguments as usual.
+
+This error only fails the active L<Future>.
+
+The server ran out of memory. This happens sometimes but generally it
+should not. Please report it to your system administrator so that he
+can be repaired.
+
+=item C<Protocol error: Unknown command>
+
+Category: C<beanstalk-internal>
+
+Arguments: The command name and then the arguments as usual.
+
+This error invokes an C<on_error> event and fails the active L<Future>.
+
+This module sent a command the server did not understand. This should
+never happen and when it does it indicates an error in the server or a
+protocol mismatch between the server and client.
+
+=item C<Protocol error: Unknown response>
+
+Category: C<beanstalk-server>
+
+Arguments: The buffer which was received from the communication stream
+as an arrayref of each received chunk.
+
+This error invokes C<on_error> only.
+
+The server sent a message this client did not understand. This should
+never happen and when it does it indicates an error in the server or a
+protocol mismatch between the server and client.
+
+This error does not attempt to fail the current or any pending
+L<Future>s, however the server's speaking gibberish so nobody knows
+what's going to happen next. Your code should deal with that and the
+pending L<Future>s gracefully.
 
 =back
 
-=cut
+In order to make the command stack work, each L<Future> is created
+with an C<on_ready> handler which sends the next pending command. In
+the event of an error the pending commands may become invalid. This
+class makes no attempt to deal with that.
 
-has _command_stack => (
-  is          => 'ro',
-  init_arg    => undef,
-  default     => sub { [] },
-  handles_via => 'Array',
-  handles     => {
-    count_commands    => 'count',
-    is_busy           => 'count',
-    _pending_commands => 'all',
-    _push_command     => 'push',
-    _shift_command    => 'shift',
-  },
-);
-
-sub current_command { $_[0]->_command_stack->[0] || croak "No active command" }
-
-=back
-
-=cut
+One other protocol error (C<Expected cr+lf>) can be received only in
+response to a L</put> command (it does not invoke an L<on_error>
+event).
 
 =head1 COMMAND METHODS
 
+=for comment Move this to ::Send
+
 Methods which initiate a command on the server are implemented in
 L<Net::Async::Beanstalk::Send>. The server response is processed by
-the event handlers in L<Net::Async::Beanstalk::Receive>.
+the event handlers in L<Net::Async::Beanstalk::Receive>. Every command
+method returns a L<Future> which will complete with the server's
+response to that command, whether success or failure.
 
-Every method returns a L<Future> which will complete with the server's
-response to that command, whether success or failure. With few
-exceptions, documented below, each method expects exactly the
+With few exceptions, documented below, each method expects exactly the
 arguments that the respective command requires. The commands which
-expect a YAML structure deserialise the response before returning
-it.
+expect to receive a YAML structure as the response (primarily the
+C<list-*> commands) deserialise the response before returning it as a
+(non-reference) list or hash.
 
-As well as completing (or failing) the L<Future> returned when the
-command is sent, each response from the server will attempt to invoke
-an event. It is probably not a good idea to mix code which waits for
-futures with code which handles events.
-
-However all commands can invoke one of the error events if an
-exceptional condition arises and as this is done using
-L<invoke_error|IO::Async::Notifier/invoke_error> which will call die
-if the C<on_error> event is not handled.
-
-All commands can potentially invoke these error events, which will
-raise an exception if an C<on_error> event handler has not been
-installed.
-
-=over
-
-=item on_error (C<Protocol error: Bad format>)
-
-Failed future's exception: C<invalid>
-
-=item on_error (C<Protocol error: Internal error>)
-
-Failed future's exception: C<server-error>
-
-=item on_error (C<Protocol error: Out of memory>)
-
-Failed future's exception: C<server-error>
-
-=item on_error (C<Protocol error: Unknown command>)
-
-Failed future's exception: C<invalid>
-
-=item on_error (C<Protocol error: Unknown response>)
-
-Failed future's exception: C<unknown>
-
-=back
+The methods are named with a C<_> where the API command has a C<->.
 
 See
 L<the protocol documentation|https://raw.githubusercontent.com/kr/beanstalkd/v1.10/doc/protocol.txt>
-for further details on each command.
-
-The methods are named with a C<_> where the respective protocol
-command has a C<->. They are:
+for further details on each command. They are:
 
 =over
 
@@ -340,41 +340,60 @@ Put a job onto the currently C<use>d tube. The job data can be passed
 as the method's first argument or in C<%options>.
 
 The job's C<priority>, C<delay> or C<ttr> can be set by including
-those values in C<%options>. If they are not then the client's default
+those values in C<%options>. If they are not then the object's default
 value is used (see above).
 
-If the job is passed as the method's first argument and it is a
-reference which does not overload the stringify (C<"">) operator then
-it is first serialised using L</encoder>.
+The job may be passed as the method's first or only argument or as
+C<data> in C<%options>. It will be serialised using L</encoder> if
+it's a reference and does not overload the stringify (C<"">) operator.
 
-Alternatively the job may be passed in options as C<raw_data>, which
-is sent to beanstalk as-is, or as C<data> which is first serialised
-using L</encoder>. It should probably be considered a bug that C<$job>
-and C<$options{data}> are handled treated differently.
+The job may instead be passed as C<raw_data> in C<%options> if it has
+already been serialised.
 
-Regardless of whether C</encoder> is used to transform the job data,
-it is first changed to a string of bytes using L<utf8/encode>.
+Regardless of whether C</encoder> is used to serialise the job it is
+changed to a string of bytes using L<utf8::encode|utf8/encode>.
 
 It is an error to pass the job data in more than one form or to
-included unknown options.
+included unknown options and C<put> will L<croak|Carp/croak>.
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_error (C<Protocol error: Expected cr+lf>)
+=item C<Protocol error: Expected cr+lf>
 
-Failed future's exception: C<invalid>
+Category: C<beanstalk-put>
 
-=item on_error (C<Protocol error: Job too big>)
+Arguments: As with C<bad format>, this should but does not include the
+buffer which was sent.
 
-Failed future's exception: C<invalid>
+This error only fails the active L<Future>.
 
-=item on_job_insert ($job_id)
+The client sent badly-formed job data which was not terminated by a
+CR+LF pair. This should never happen and when it does it indicates an
+error in this module. Please report it so that it can be repaired.
 
-=item on_job_insert_fail (?)
+=item C<Invalid job: too big>
 
-=item on_draining (?)
+Category: C<beanstalk-put>
+
+The client sent job data which was rejected by the server for being
+too large. The job has not beed stored in any queue.
+
+=item C<Job was inserted but buried (out of memory): ID $id>
+
+Category: C<beanstalk-put>
+
+The job was successfully received by the server but it was unable to
+allocate memory to put it into the ready queue and so the job has been
+buried.
+
+=item C<Job was not inserted: Server is draining>
+
+Category: C<beanstalk-put>
+
+The server is currently being drained and is not accepting new
+jobs. The job has not been stored in any queue.
 
 =back
 
@@ -393,263 +412,294 @@ the server is transformed into characters but is not deserialised.
 If the C<raw> option is set to a true value then the data is left
 completely untouched.
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_time_out (?)
+=item C<No job was reserved: Deadline soon>
 
-=item on_ttr_soon (?)
+Category: C<beanstalk-reserve>
 
-=item on_job_reserve ($job_id, $data)
+A job which was previously reserved by this client and has not been
+handled is nearing the time when its reservation will expire and the
+server will restore it to the ready queue.
 
 =back
 
 =item reserve_with_timeout ($time, %options)
 
-Implemented by calling L</reserve> with a C<timeout> option.
+Implemented by calling L</reserve> with a C<timeout> option. C<$time>
+may be 0 which will cause the L<Future> to fail immediately with a
+C<Timed out> error if there are no jobs available.
 
-=item bury ($job_id)
-
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_bury ($job_id)
+=item C<No job was reserved: Timed out>
 
-=item on_job_bury_not_found ($job_id)
+Category: C<beanstalk-reserve>
+
+The number of seconds specified in the timeout value to
+C<reserve-with-timeout> has expired without a job becoming ready to
+reserve.
+
+=back
+
+In addition all the failures possible in response to the L</reserve>
+command can be received in response to C<reserve_with_timeout>.
+
+=item bury ($job_id)
+
+Possible failures:
+
+=over
+
+=item C<The job could not be buried: $id not found>
+
+Category: C<beanstalk-job>
+
+The job with ID C<$id> could not be buried because it does not exist
+or has not been previously reserved by this client.
+
+=for comment TODO: Can a job be buried if it is reserved by _no_ client?
 
 =back
 
 =item delete ($job_id)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_delete ($job_id)
+=item C<The job could not be deleted: $id not found>
 
-=item on_job_delete_not_found ($job_id)
+Category: C<beanstalk-job>
+
+The job with ID C<$id> could not be deleted because it does not exist,
+has not been previously reserved by this client or is not in a
+C<ready> or C<buried> state.
 
 =back
 
 =item ignore ($tube_name)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_tube_ignore ($tube, $count)
+=item C<The last tube cannot be ignored: $tube>
 
-=item on_tube_ignore_fail ($tube)
+Category: C<beanstalk-tube>
+
+The client attempted to ignore the only tube remaining in its watch
+list.
+
+=for comment Is it an error to ignore a tube which is not being watched?
 
 =back
 
 =item kick_job ($job_id)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_kick ($job_id)
+=item C<The job could not be kicked: $id not found>
 
-=item on_job_kick_not_found ($job_id)
+Category: C<beanstalk-job>
+
+The job with ID C<$id> could not be kicked because it "is not in a
+kickable state".
+
+=for comment The documentation is vague and includes the possibility
+of "internal errors".
 
 =back
 
 =item kick ($max)
 
-Possible events:
-
-=over
-
-=item on_tube_kick ($tube, $count)
-
-=back
+This command should not fail.
 
 =item list_tubes ()
 
-Possible events:
-
-=over
-
-=item on_list_tubes (@tubes)
-
-=back
+This command should not fail.
 
 =item list_tubes_watched ()
 
-Possible events:
-
-=over
-
-=item on_list_tubes_watched (@tubes)
-
-=back
+This command should not fail.
 
 =item list_tube_used ()
 
-Possible events:
-
-=over
-
-=item on_list_use ($tube)
-
-=back
+This command should not fail.
 
 =item pause_tube ($tube_name, $delay)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_tube_pause ($tube)
+=item C<The tube could not be paused: $tube not found>
 
-=item on_tube_pause_not_found ($tube)
+Category: C<beanstalk-tube>
+
+The tube could not be paused because it doesn't exist.
 
 =back
 
 =item peek ($job_id)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_peek ($job_id, $data)
+=item C<The job could not be peeked at: $id not found>
 
-=item on_job_peek_not_found ($job_id)
+Category: C<beanstalk-peek>
+
+The specified job could not be retrieved because it does not exist.
 
 =back
 
 =item peek_buried ()
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_peek_bury ($job_id, $data)
+=item C<The next buried job could not be peeked at: None found>
 
-=item on_job_peek_bury_not_found ($job_id)
+Category: C<beanstalk-peek>
+
+The next job in a buried state could not be retrieved because one does
+not exist.
 
 =back
 
 =item peek_delayed ()
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_peek_delay ($job_id, $data)
+=item C<The next delayed job could not be peeked at: None found>
 
-=item on_job_peek_delay_not_found ($job_id)
+Category: C<beanstalk-peek>
+
+The next job in a delayed state could not be retrieved because one
+does not exist.
 
 =back
 
 =item peek_ready ()
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_peek_ready ($job_id, $data)
+=item C<The next ready job could not be peeked at: None found>
 
-=item on_job_peek_ready_not_found ($job_id)
+Category: C<beanstalk-peek>
+
+The next job in a ready state could not be retrieved because one does
+not exist.
 
 =back
 
 =item quit ()
 
-Possible events:
-
-=over
-
-=item on_disconnect
-
-=back
+In theory this will raise an C<on_disconnect> in addition to
+completing the L<Future> it returns. In practice I haven't written it
+yet.
 
 =item release ($job_id, $priority, $delay)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_release ($job_id)
+=item C<The job could not be released: $id not found>
 
-=item on_job_release_fail ($job_id)
+Category: C<beanstalk-job>
 
-=item on_job_release_not_found ($job_id)
+The job with ID C<$id> could not be released because it does not exist
+or has not been previously reserved by this client.
+
+=for comment TODO: What if an attempt is made to release a released job?
+
+=item C<The job could not be released (out of memory): ID $id>
+
+Category: C<beanstalk-job>
+
+The job with ID C<$id> could not be released because the server ran
+out of memory.
 
 =back
 
 =item stats ()
 
-Possible events:
-
-=over
-
-=item on_server_stats (%stats)
-
-=back
+This command should not fail.
 
 =item stats_job ($job_id)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_stats (%stats)
+=item C<Statistics were not found for the job: $id not found>
 
-=item on_job_stats_not_found ($job_id)
+Category: C<beanstalk-job>
+
+No statistics are available for the job with ID C<$id> because it does
+not exist.
 
 =back
 
 =item stats_tube ($tube_name)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_tube_stats (%stats)
+=item C<Statistics were not found for the tube: $tube not found>
 
-=item on_tube_stats_not_found ($tube_name)
+Category: C<beanstalk-tube>
+
+No statistics are available for the tube named C<$tube> because it
+does not exist.
 
 =back
 
 =item touch ($job_id)
 
-Possible events:
+Possible failures:
 
 =over
 
-=item on_job_touch ($job_id)
+=item C<The job could not be touched: $id not found>
 
-=item on_job_touch_not_found ($job_id)
+Category: C<beanstalk-job>
+
+The job with ID C<$id> could not be touched because it does not exist
+or has not been previously reserved by this client.
 
 =back
 
 =item use ($tube_name)
 
-Possible events:
-
-=over
-
-=item on_tube_use ($tube_name)
-
-=back
+This command should not fail.
 
 =item watch ($tube_name)
 
-Possible events:
-
-=over
-
-=item on_tube_watch ($tube_name, $count)
-
-=back
+This command should not fail.
 
 =back
 
 =cut
+
+with 'Net::Async::Beanstalk::Receive';
+
+with 'Net::Async::Beanstalk::Send';
 
 =head1 OTHER METHODS
 
@@ -726,55 +776,12 @@ sub _assert_state {
     unless exists $STATE_CAN{$state->[STATE_COMMAND]}{$response};
 }
 
-=item error_command ($exception, $message, @args) => $future
+=item fail_command($message, $exception, @args) => $future
 
-Calls C<invoke_error> on the client object with C<$message> and
-C<@args> then removes the current command from the command stack and
-fails the L<Future> associated with it with C<$exception> and
-C<@args>.
+Remove the current command from the command stack and fail its
+L<Future> with this method's arguments.
 
-The L<Future> returned is the same as that returned when initiating a
-command and can be safely ignored.
-
-This is used by L<Net::Async::Beanstalk::Receive> to indicate serious
-communication or internal errors and should never happen. It is called
-in response to any of these:
-
-=over
-
-=item Invalid response from server
-
-=item BAD_FORMAT
-
-=item EXPECTED_CRLF
-
-=item INTERNAL_ERROR
-
-=item JOB_TOO_BIG
-
-=item OUT_OF_MEMORY
-
-=item UNKNOWN_COMMAND
-
-=back
-
-=cut
-
-sub error_command {
-  my $self = shift;
-  my ($ex, $msg, @args) = @_;
-  $self->invoke_error($msg => @args);
-  $self->_shift_command->[0]->fail($ex, @args);
-}
-
-=item fail_command($event, $exception, @args) => $future
-
-Attempts to invoke the C<$event> event if there is a handler for it
-with C<@args> then removes the current command from the command stack
-and fails the L<Future> associated with it with C<$exception> and
-C<@args>.
-
-The L<Future> returned is the same as that returned when initiating a
+The L<Future> returned is the one which returned when initiating a
 command and can be safely ignored.
 
 This is used by L<Net::Async::Beanstalk::Receive> when the client
@@ -784,32 +791,48 @@ C<reserve> command.
 
 =cut
 
-sub fail_command {
-  my $self = shift;
-  my ($event, $ex, @args) = @_;
-  $self->maybe_invoke_event($event => @args);
-  $self->_shift_command->[0]->fail($ex, @args);
-}
+sub fail_command { $_[0]->_shift_command->[0]->fail(@_[1..$#_]) }
 
 =item finish_command($event, @args) => $future
 
-Attempts to invoke the C<$event> event if there is a handler for it
-with C<@args> then removes the current command from the command stack
-and completes the L<Future> associated with it with C<@args>.
+Remove the current command from the command stack and complete its
+L<Future> with this method's arguments.
 
-The L<Future> returned is the same as that returned when initiating a
+The L<Future> returned is the one which returned when initiating a
 command and can be safely ignored.
 
 This is used by L<Net::Async::Beanstalk::Receive> when the server sent
-a response to a command which indicates success.
+a response to a command which indicates successful completion.
 
 =cut
 
-sub finish_command {
-  my $self = shift;
-  my ($event, @args) = @_;
-  $self->maybe_invoke_event($event => @args);
-  $self->_shift_command->[0]->done(@args);
+sub finish_command { $_[0]->_shift_command->[0]->done(@_[1..$#_]) }
+
+# Messy Moo/IO::Async stuff
+
+# TODO: Don't use IaProtocol. Apparently it's bad.
+BEGIN { our @ISA; unshift @ISA, 'IO::Async::Stream' }
+
+my @events = qw(
+  on_disconnect
+);
+
+# TODO: MooX::EventHandler is looking less and less useful.
+has_event $_ for @events;
+
+my @attributes = qw(
+  default_delay
+  default_priority
+  default_ttr
+  encoder
+  decoder
+);
+
+sub FOREIGNBUILDARGS {
+  my $class = shift;
+  my %args = @_;
+  delete @args{@attributes, @events};
+  return %args;
 }
 
 1;

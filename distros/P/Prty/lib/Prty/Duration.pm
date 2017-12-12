@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Math;
@@ -150,12 +150,6 @@ sub asString {
 
     $str = $dur->asShortString(@opt);
 
-=head4 Description
-
-Liefere die Zeitdauer als Zeichenkette der Form DdHhMmSs (per
-Default, siehe Option -maxUnit), wobei alle Anteile, die 0 sind,
-weggelassen werden, sowohl am Anfang als auch am Ende.
-
 =head4 Options
 
 =over 4
@@ -179,6 +173,12 @@ mit -minUnit als Einheit.
 Anzahl der Sekunden-Nachkommastellen.
 
 =back
+
+=head4 Description
+
+Liefere die Zeitdauer als Zeichenkette der Form DdHhMmSs (per
+Default, siehe Option -maxUnit), wobei alle Anteile, die 0 sind,
+weggelassen werden, sowohl am Anfang als auch am Ende.
 
 =cut
 
@@ -369,11 +369,6 @@ sub stringToSeconds {
 
     $str = $this->secondsToString($sec,@opt);
 
-=head4 Description
-
-Wandele Anzahl Sekunden in eine Zeichenkette zur Bezeichnung einer
-Zeitdauer.
-
 =head4 Arguments
 
 =over 4
@@ -398,6 +393,11 @@ wird auf ganze Sekunden gerundet.
 Liefere String fester Breite ab Einheit $unit.
 
 =back
+
+=head4 Description
+
+Wandele Anzahl Sekunden in eine Zeichenkette zur Bezeichnung einer
+Zeitdauer.
 
 =cut
 
@@ -475,7 +475,7 @@ sub secondsToString {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

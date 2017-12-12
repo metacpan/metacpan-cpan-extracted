@@ -1,0 +1,36 @@
+---
+abstract: 'Scan for modules loaded with Importer::Zim'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Perl::PrereqScanner: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-PrereqScanner-Scanner-Zim
+provides:
+  Perl::PrereqScanner::Scanner::Zim:
+    file: lib/Perl/PrereqScanner/Scanner/Zim.pm
+    version: v0.2.0
+requires:
+  Moose: '0'
+  PPIx::Literal: '0'
+  Perl::PrereqScanner::Scanner: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Perl-PrereqScanner-Scanner-Zim/issues
+  homepage: https://github.com/aferreira/cpan-Perl-PrereqScanner-Scanner-Zim
+  repository: https://github.com/aferreira/cpan-Perl-PrereqScanner-Scanner-Zim.git
+version: 0.2.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

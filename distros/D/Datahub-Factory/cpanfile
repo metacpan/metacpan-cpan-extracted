@@ -38,6 +38,13 @@ requires "DateTime";
 requires 'Term::ANSIColor';
 requires 'Try::Tiny';
 requires 'URI::URL';
+requires 'Config::Onion';
+requires 'HTTP::Headers';
+requires 'HTTP::Request::Common';
+requires 'JSON';
+requires 'Try::Tiny::ByClass';
+requires 'XML::LibXML';
+requires 'DBI';
 
 # https://github.com/libwww-perl/libwww-perl/issues/201
 conflicts "LWP::Authen::Negotiate";

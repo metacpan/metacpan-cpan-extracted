@@ -8,11 +8,10 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 use Fcntl qw(O_RDONLY);
 use integer;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 require Exporter;
-require DynaLoader;
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(Exporter);
 @EXPORT_OK = qw(
 	shake128	shake128_base64		shake128_hex
 	shake256	shake256_base64		shake256_hex
@@ -152,7 +151,15 @@ sub addfile {
 	$self;
 }
 
-Digest::SHA3->bootstrap($VERSION);
+eval {
+	require XSLoader;
+	XSLoader::load('Digest::SHA3', $VERSION);
+	1;
+} or do {
+	require DynaLoader;
+	push @ISA, 'DynaLoader';
+	Digest::SHA3->bootstrap($VERSION);
+};
 
 1;
 __END__

@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.90
+Version 0.92
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.92';
 
 
 =head1 SYNOPSIS
@@ -224,17 +224,11 @@ sub toc_as_html {
     my @out;
     foreach my $item (@toc) {
         next unless $item->{index}; # skip the 0 one, is dummy
-
-        # given that we wrap this into <a>, we have to strip eventual ones
-        my $string = $item->{string};
-        $string =~ s!<a [^>]+?>!!g;
-        $string =~ s!</a>!!g;
-
         my $line = qq{<p class="tableofcontentline toclevel} .
           $item->{level} . qq{"><span class="tocprefix">} .
           "&nbsp;&nbsp;" x  $item->{level} . "</span>" .
             qq{<a href="#toc} . $item->{index} . qq{">} .
-              $string . "</a></p>";
+              $item->{string} . "</a></p>";
         push @out, $line;
     }
     if (@out) {
@@ -316,7 +310,7 @@ sub _latex_obj {
 
 =head3 as_splat_latex
 
-Return a list of strings, each of them is a latex chunk resulting from
+Return a list of strings, each of them is a LaTeX chunk resulting from
 the splitting of the as_latex output.
 
 =cut
@@ -350,7 +344,7 @@ sub as_beamer {
 
 =head3 wants_toc
 
-Return true if a toc is needed because we found some headings inside.
+Return true if a ToC is needed because we found some headings inside.
 
 =head3 wants_preamble
 
@@ -583,21 +577,13 @@ sub hyphenation {
     unless (defined $self->{_doc_hyphenation}) {
         my %header = $self->document->raw_header;
         my $hyphenation = $header{hyphenation} || '';
-        my @patterns = split(/\s+/, $hyphenation);
-        my @validated;
-        foreach my $pattern (@patterns) {
-            if ($pattern =~ m/\A(
-                                  [[:alpha:]]+
-                                  (-[[:alpha:]]+)*
-                              )\z/x) {
-                push @validated, $1;
-            }
-        }
-        my $valid = '';
-        if (@validated) {
-            $valid = join(' ', @validated);
-        }
-        $self->{_doc_hyphenation} = $valid;
+        my @validated = grep {
+            m/\A(
+            [[:alpha:]]+
+            (-[[:alpha:]]+)*
+            )\z/x
+        } split(/\s+/, $hyphenation);
+        $self->{_doc_hyphenation} = @validated ? join(' ', @validated) : '';
     }
     return $self->{_doc_hyphenation};
 }
@@ -636,7 +622,7 @@ Borrowed from the Creole markup.
 
 Embedded lisp code and syntax highlight is not supported.
 
-Exoteric stuff like citing from other resources is not supported.
+Esoteric stuff like citing from other resources is not supported.
 
 The scope of this module is not to replicate all the features of the
 original implementation, but to use the markup for a wiki (as opposed
@@ -659,7 +645,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Text::Amuse
 
-Repository available at Github: L<https://github.com/melmothx/text-amuse>
+Repository available at GitHub: L<https://github.com/melmothx/text-amuse>
 
 =head1 SEE ALSO
 

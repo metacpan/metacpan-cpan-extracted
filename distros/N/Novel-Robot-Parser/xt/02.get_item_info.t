@@ -14,20 +14,59 @@ use utf8;
 
 my @check_site_conf = (
   { site            => 'default',
-    index_url       => 'http://www.tmetb.com/0/271/',
-    chapter_url     => 'http://www.tmetb.com/0/271/18340.html',
-    writer          => '星零',
-    book            => '上古',
-    chapter_title   => '前奏',
-    chapter_content => '仙地',
+    index_url       => 'http://www.ybdu.com/xiaoshuo/13/13448/',
+    chapter_url     => 'http://www.ybdu.com/xiaoshuo/13/13448/3626925.html',
+    book            => '死人经',
+    writer          => '冰临神下',
+    chapter_title   => '杀手',
+    chapter_content => '顶尖',
   },
   { site            => 'default',
-    index_url       => 'http://www.23us.com/html/27/27686/',
-    chapter_url     => 'http://www.23us.com/html/27/27686/17354510.html',
-    book            => '奥术',
-    writer          => '爱潜水的乌贼',
-    chapter_title   => '火刑',
-    chapter_content => '浓烟',
+    index_url       => 'http://www.piaotian.com/html/0/738/',
+    chapter_url     => 'http://www.piaotian.com/html/0/738/360430.html',
+    book            => '宰执天下',
+    writer          => 'cuslaa',
+    chapter_content => '从出租车跳上下来就直奔检票口',
+  },
+  { site            => 'default',
+    index_url       => 'http://www.lwxs520.com/books/21/21457/index.html',
+    chapter_url     => 'http://www.lwxs520.com/books/21/21457/4862903.html',
+    book            => '天醒',
+    writer          => '蝴蝶蓝',
+    chapter_title   => '楔子',
+    chapter_content => '我们要去哪',
+  },
+  { site            => 'default',
+    index_url       => 'http://www.shunong.com/wx/8558/',
+    chapter_url     => 'http://www.shunong.com/wx/8558/267184.html',
+    book            => '青崖白鹿记',
+    writer          => '沈璎璎',
+    chapter_title   => '第1章',
+    chapter_content => '树入天台石路新',
+  },
+  { site            => 'default',
+    index_url       => 'http://www.lkshu.com/book/5/5979/',
+    chapter_url     => 'http://www.lkshu.com/book/5/5979/3256742.html',
+    book            => '拔魔',
+    writer          => '冰临神下',
+    chapter_title   => '少年',
+    chapter_content => '小秋',
+  },
+  { site            => 'default',
+    index_url       => 'http://www.tmetb.net/4/4541/',
+    chapter_url     => 'http://www.tmetb.net/4/4541/956689.html',
+    book            => '死人经',
+    writer          => '冰临神下',
+    chapter_title   => '杀手',
+    chapter_content => '顶尖',
+  },
+  { site            => 'default',
+    index_url       => 'http://www.23us.com/html/24/24469/',
+    chapter_url     => 'http://www.23us.com/html/24/24469/15963965.html',
+    book            => '死人经',
+    writer          => '冰临神下',
+    chapter_title   => '杀手',
+    chapter_content => '顶尖',
   },
   { site            => 'default',
     index_url       => 'http://www.23xs.cc/book/169/index.html',
@@ -69,46 +108,14 @@ my @check_site_conf = (
     chapter_title   => '杀手',
     chapter_content => '顶尖',
   },
-  { site            => 'default',
-    index_url       => 'http://www.biquge.tw/74_74259/',
-    chapter_url     => 'http://www.biquge.tw/74_74259/3817727.html',
-    book            => '月西女传',
-    writer          => '水草二十三',
-    chapter_title   => '楔子',
-    chapter_content => '为妖者',
-  },
-  { site            => 'default',
-    index_url       => 'http://www.lwxs520.com/books/21/21457/index.html',
-    chapter_url     => 'http://www.lwxs520.com/books/21/21457/4862903.html',
-    book            => '天醒',
-    writer          => '蝴蝶蓝',
-    chapter_title   => '楔子',
-    chapter_content => '我们要去哪',
-  },
-  { site            => 'default',
-    index_url       => 'http://www.tadu.com/book/catalogue/394959',
-    chapter_url     => 'http://www.tadu.com/book/394959/26793462/',
-    book            => '凰图',
-    writer          => '寐语者',
-    chapter_title   => '章目-楔子',
-    chapter_content => '南秦',
-  },
-  { site            => 'default',
-    index_url       => 'http://www.shushu8.com/tianxiananxuijieluding/',
-    chapter_url     => 'http://www.shushu8.com/tianxiananxuijieluding/0',
-    book            => '天下男修皆炉鼎',
-    writer          => '青衫烟雨',
-    chapter_title   => '贱人',
-    chapter_content => '看到标题',
-  },
-  { site            => 'default',
-    index_url       => 'http://www.ybdu.com/xiaoshuo/13/13448/',
-    chapter_url     => 'http://www.ybdu.com/xiaoshuo/13/13448/3626925.html',
-    book            => '死人经',
-    writer          => '冰临神下',
-    chapter_title   => '杀手',
-    chapter_content => '顶尖',
-  },
+  #{ site            => 'default',
+    #index_url       => 'http://www.tadu.com/book/catalogue/394959',
+    #chapter_url     => 'http://www.tadu.com/book/394959/26793462/',
+    #book            => '凰图',
+    #writer          => '寐语者',
+    #chapter_title   => '章目-楔子',
+    #chapter_content => '南秦',
+  #},
   { site            => 'default',
     index_url       => 'http://www.zhonghuawuxia.com/book/71',
     chapter_url     => 'http://www.zhonghuawuxia.com/chapter/2647',
@@ -116,14 +123,6 @@ my @check_site_conf = (
     writer          => '古龙',
     chapter_title   => '风雪',
     chapter_content => '怒雪威寒',
-  },
-  { site            => 'default',
-    index_url       => 'http://www.shunong.com/wx/8558/',
-    chapter_url     => 'http://www.shunong.com/wx/8558/267184.html',
-    book            => '青崖白鹿记',
-    writer          => '沈璎璎',
-    chapter_title   => '第1章',
-    chapter_content => '树入天台石路新',
   },
   { site            => 'ddshu',
     index_url       => 'http://www.ddshu.net/html/1920/opf.html',
@@ -159,8 +158,8 @@ my @check_site_conf = (
   },
 );
 
-#check_site($_) for @check_site_conf;
-check_site( $check_site_conf[-1] );
+check_site($_) for @check_site_conf;
+#check_site( $check_site_conf[0] );
 done_testing;
 
 sub check_site {
@@ -173,12 +172,13 @@ sub check_site {
   #print Dumper($index_ref->{book});
   is( $index_ref->{book} =~ /$r->{book}/     ? 1 : 0, 1, "book" );
   is( $index_ref->{writer} =~ /$r->{writer}/ ? 1 : 0, 1, "writer" );
-  if ( ref( $r->{chapter_url} ) eq 'HASH' ) {
-    is( $index_ref->{chapter_list}[0]{url}, $r->{chapter_url}{url}, 'chapter_url' );
-  } else {
-    is( $index_ref->{chapter_list}[0]{url}, $r->{chapter_url}, 'chapter_url' );
-  }
-  is( $index_ref->{chapter_list}[0]{title} =~ /$r->{chapter_title}/ ? 1 : 0, 1, "chapter_title" );
+
+  #if ( ref( $r->{chapter_url} ) eq 'HASH' ) {
+    #is( $index_ref->{chapter_list}[0]{url}, $r->{chapter_url}{url}, 'chapter_url' );
+  #} else {
+    #is( $index_ref->{chapter_list}[0]{url}, $r->{chapter_url}, 'chapter_url' );
+  #}
+  #is( $index_ref->{chapter_list}[0]{title} =~ /$r->{chapter_title}/ ? 1 : 0, 1, "chapter_title" );
 
   #print Dumper(@{$index_ref->{chapter_list}}[ 0 .. 3 ], "\n");
 
@@ -192,7 +192,7 @@ sub check_site {
     sub  => $xs->can( 'parse_novel_item' ),
   );
   is( $chapter_ref->{content} =~ /$r->{chapter_content}/ ? 1 : 0, 1, 'chapter_content' );
-  print join( ",", $index_ref->{book}, $index_ref->{writer}, $index_ref->{chapter_list}[0]{title} ), "\n";
+  print join( ",", $index_ref->{book}, $index_ref->{writer}, $index_ref->{floor_list}[0]{title} ), "\n";
 
   #print $chapter_ref->{content},"\n";
   print "---------\n\n";

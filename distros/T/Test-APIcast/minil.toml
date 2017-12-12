@@ -1,0 +1,7 @@
+name = "Test-APIcast"
+# badges = ["travis"]
+authority="cpan:MCICHRA"
+
+module_maker="ModuleBuildTiny"
+
+license="apache_2_0"

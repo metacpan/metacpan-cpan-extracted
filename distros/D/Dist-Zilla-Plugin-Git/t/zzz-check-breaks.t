@@ -1,12 +1,24 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.018
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 SKIP: {
-    skip 'no conflicts module found to check against', 1;
+    eval { +require Module::Runtime::Conflicts; Module::Runtime::Conflicts->check_conflicts };
+    skip('no Module::Runtime::Conflicts module found', 1) if not $INC{'Module/Runtime/Conflicts.pm'};
+
+    diag $@ if $@;
+    pass 'conflicts checked via Module::Runtime::Conflicts';
+}
+
+SKIP: {
+    eval { +require Moose::Conflicts; Moose::Conflicts->check_conflicts };
+    skip('no Moose::Conflicts module found', 1) if not $INC{'Moose/Conflicts.pm'};
+
+    diag $@ if $@;
+    pass 'conflicts checked via Moose::Conflicts';
 }
 
 # this data duplicates x_breaks in META.json

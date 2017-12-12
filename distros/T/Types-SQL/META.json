@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -14,20 +14,31 @@
    },
    "name" : "Types-SQL",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "PerlX::Maybe::XS" : "0",
+            "Ref::Util::XS" : "0",
             "Type::Tiny::XS" : "0"
          },
          "requires" : {
+            "Exporter" : "0",
             "PerlX::Maybe" : "0",
             "Ref::Util" : "0",
             "Type::Library" : "0",
             "Type::Utils" : "0.44",
             "Types::Standard" : "0",
-            "perl" : "v5.8.8",
-            "strictures" : "0",
-            "version" : "0"
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -42,8 +53,19 @@
          },
          "requires" : {
             "Test::More" : "0.98",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "if" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Types::SQL" : {
+         "file" : "lib/Types/SQL.pm",
+         "version" : "v0.1.2"
+      },
+      "Types::SQL::Util" : {
+         "file" : "lib/Types/SQL/Util.pm",
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -57,6 +79,7 @@
          "web" : "https://github.com/robrwo/Types-SQL"
       }
    },
-   "version" : "v0.0.3"
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

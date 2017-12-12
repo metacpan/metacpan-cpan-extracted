@@ -1,5 +1,16 @@
 Revision history for App-TestOnTap
 
+0.048	2017-12-05
+
+	Beautify error if a suite zip is broken
+	Rewrite (again!) of the hidden pp args and how they work
+
+0.047	2017-11-30
+
+	Don't require 'cmd' value for directly executable binaries
+	Remove the explicit deps on PAR, PAR::Packer and dynamically check for them
+	Fix sample suit for new execmap style
+
 0.046	2017-11-14
 
 	Removed module remained in personal Perl...

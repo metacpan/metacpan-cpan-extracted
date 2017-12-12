@@ -92,35 +92,35 @@
    "provides" : {
       "App::CISetup" : {
          "file" : "lib/App/CISetup.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::AppVeyor::ConfigFile" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigFile.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::AppVeyor::ConfigUpdater" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigUpdater.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::Role::ConfigFile" : {
          "file" : "lib/App/CISetup/Role/ConfigFile.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::Role::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Role/ConfigUpdater.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::Travis::ConfigFile" : {
          "file" : "lib/App/CISetup/Travis/ConfigFile.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::Travis::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Travis/ConfigUpdater.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::CISetup::Types" : {
          "file" : "lib/App/CISetup/Types.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -135,10 +135,10 @@
          "web" : "https://github.com/maxmind/App-CISetup"
       }
    },
-   "version" : "0.10",
+   "version" : 0.11,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.024001"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -174,7 +174,7 @@
                }
             },
             "name" : "@MAXMIND/Git::GatherDir",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -219,7 +219,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::VersionProvider",
             "name" : "@MAXMIND/MAXMIND::VersionProvider",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -551,13 +551,13 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Contributors",
             "name" : "@MAXMIND/MAXMIND::Contributors",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -565,7 +565,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Contributors",
-            "version" : "0.030"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -708,7 +708,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::WeaverConfig",
             "name" : "@MAXMIND/MAXMIND::WeaverConfig",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -753,7 +753,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::License",
             "name" : "@MAXMIND/MAXMIND::License",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -784,24 +784,24 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent",
             "name" : "@MAXMIND/MAXMIND::CheckChangesHasContent",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
@@ -811,7 +811,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@MAXMIND/MAXMIND::TidyAll",
-            "version" : "0.81"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
@@ -838,12 +838,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Check",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -866,7 +866,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -874,7 +874,7 @@
                }
             },
             "name" : "@MAXMIND/Commit generated files",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -883,12 +883,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.10",
+                  "tag" : "v0.11",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -896,7 +896,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Tag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -908,12 +908,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -928,7 +928,7 @@
                }
             },
             "name" : "@MAXMIND/BumpVersionAfterRelease",
-            "version" : "0.015"
+            "version" : "0.016"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -948,7 +948,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -956,7 +956,7 @@
                }
             },
             "name" : "@MAXMIND/Commit version bump",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -968,12 +968,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Push version bump",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1043,6 +1043,6 @@
    "x_contributors" : [
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
@@ -455,6 +455,9 @@ L<http://oeis.org/A146559> (etc)
 =back
 
     realpart=1 (i+1, the default)
+      A290885    -X
+      A290884    Y
+      A290886    norm X^2 + Y^2
       A146559    dX at N=2^k-1 (step to next replication level)
       A077950,A077870
                location of ComplexMinus origin in ComplexPlus
@@ -479,7 +482,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

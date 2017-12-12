@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # version
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';
 
 # commands
 my $ZONEADM  = '/usr/sbin/zoneadm';
@@ -85,7 +85,7 @@ my $SCHEMA = {
     brand       => {
         description => "the zone's brand type",
         default     => 'lipkg',
-        validator   => $elemOf->(qw(ipkg lipkg lx)),
+        validator   => $elemOf->(qw(ipkg lipkg lx sparse)),
     },
     'ip-type'   => {
         description => 'ip-type of zone. can either be "exclusive" or "shared"',
@@ -249,7 +249,7 @@ my $SCHEMA = {
             options => {
                 optional    => 1,
                 description => 'mounting options',
-                validator   => $regexp->(qr/^\[?[\w,]+\]?$/, 'options not valid'),
+                validator   => $regexp->(qr/^\[[\w,]*\]$/, 'options not valid'),
             },
         },
     },
@@ -405,6 +405,7 @@ sub isGZ {
 
 sub listZones {
     my $self = shift;
+    my $opts = shift;
 
     my @cmd = ($ZONEADM, qw(list -cp));
 
@@ -415,7 +416,12 @@ sub listZones {
     my $zoneList = [];
     while (my $zone = <$zones>) {
         chomp $zone;
-        push @$zoneList, { map { $_ => (split /:/, $zone, 7)[$ZMAP{$_}] } keys %ZMAP };
+        my $zoneCfg = { map { $_ => (split /:/, $zone)[$ZMAP{$_}] } keys %ZMAP };
+        # apply brand and SMF filter
+        next if $opts->{brandFilter} && $zoneCfg->{brand} !~ /$opts->{brandFilter}/;
+        next if $opts->{requireSMF}  && !-f $zoneCfg->{zonepath} . '/root/etc/svc/repository.db';
+
+        push @$zoneList, $zoneCfg;
     }
 
     return $zoneList;
@@ -424,8 +430,9 @@ sub listZones {
 sub listZone {
     my $self     = shift;
     my $zoneName = shift;
+    my $opts     = shift;
 
-    my ($zone) = grep { $_->{zonename} eq $zoneName } @{$self->listZones};
+    my ($zone) = grep { $_->{zonename} eq $zoneName } @{$self->listZones($opts)};
 
     return $zone;
 }
@@ -433,8 +440,9 @@ sub listZone {
 sub zoneState {
     my $self     = shift;
     my $zoneName = shift;
+    my $opts     = shift;
 
-    my $zone = $self->listZone($zoneName);
+    my $zone = $self->listZone($zoneName, $opts);
 
     return $zone ? $zone->{state} : undef;
 }
@@ -501,14 +509,9 @@ sub uninstallZone {
 sub zoneExists {
     my $self     = shift;
     my $zoneName = shift;
+    my $opts     = shift;
 
-    my $zoneList = $self->listZones();
-
-    for my $zone (@$zoneList){
-        return 1 if $zone->{zonename} eq $zoneName;
-    }
-
-    return 0;
+    return $self->listZone($zoneName, $opts) ? 1 : 0;
 }
 
 sub getZoneProperties {

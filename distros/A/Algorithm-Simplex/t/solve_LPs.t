@@ -118,7 +118,7 @@ for my $test (keys %{$tests}) {
     $full_test_name = $test . ' - ' . ucfirst $model;
     $tableau_object = Algorithm::Simplex::PDL->new(tableau => $initial_tableau);
     $tableau_object->solve;
-    $optimal_tableau_piddle = pdl $optimal_tableau;
+    $optimal_tableau_piddle = PDL->pdl($optimal_tableau);
     ok(are_equal_piddles($optimal_tableau_piddle, $tableau_object->tableau),
         $full_test_name);
 

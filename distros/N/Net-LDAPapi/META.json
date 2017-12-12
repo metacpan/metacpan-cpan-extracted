@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -19,6 +19,23 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::ASN1" : "0.19"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -27,5 +44,5 @@
          "web" : "https://github.com/quanah/net-ldapapi"
       }
    },
-   "version" : "v3.0.4"
+   "version" : "v3.0.5"
 }

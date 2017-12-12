@@ -340,6 +340,11 @@ centered, on the second page, raggedright, in smaller size.
 Use the default komascript style where chapters and parts have sans
 font.
 
+=item * secondary_footnotes_alpha
+
+By default, secondary footnotes use arabic numbering between parens.
+You can switch to alpha per-page setting this option to 1 (boolean).
+
 =item * headings
 
 Generate the running headings in the document. Beware that this will
@@ -408,6 +413,7 @@ has notoc       => (is => 'rw', isa => Bool, default => sub { 0 });
 has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
 has sansfontsections => (is => 'rw', isa => Bool, default => sub { 0 });
+has secondary_footnotes_alpha => (is => 'rw', isa => Bool, default => sub { 0 });
 
 sub all_headings {
     my @headings = (
@@ -590,6 +596,7 @@ sub config_setters {
                cover coverwidth nocoverpage notoc
                nofinalpage
                impressum sansfontsections
+               secondary_footnotes_alpha
                opening beamertheme beamercolortheme/);
 }
 

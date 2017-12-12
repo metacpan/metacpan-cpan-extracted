@@ -8,14 +8,20 @@ use warnings;
 
 use Tickit;
 
-use Tickit::Widget::Frame;
+use Tickit::Widget::Placegrid;
 
 use List::Util qw( min max );
 
 sub lines { 1 }
 sub cols  { 1 }
 
-sub render_to_rb {}
+sub render_to_rb
+{
+   shift;
+   my ( $rb, $rect ) = @_;
+
+   $rb->eraserect( $rect );
+}
 
 # In a real Widget these would be stored in an attribute of $self
 my @start;
@@ -27,7 +33,7 @@ sub on_mouse
    my ( $args ) = @_;
 
    if( $args->type eq "release" ) {
-      $dragframe->set_window( undef );
+      $dragframe->window->close if $dragframe;
       undef $dragframe;
       return;
    }
@@ -46,13 +52,13 @@ sub on_mouse
 
    return if( $lines == 0 or $cols == 0 );
 
-   $self->window->clear;
+   $self->window->expose;
 
    if( $dragframe ) {
       $dragframe->window->change_geometry( $top, $left, $lines, $cols );
    }
    else {
-      $dragframe = Tickit::Widget::Frame->new;
+      $dragframe = Tickit::Widget::Placegrid->new;
 
       $dragframe->set_window(
          $self->window->make_sub( $top, $left, $lines, $cols )

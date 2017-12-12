@@ -1,0 +1,36 @@
+#!perl
+
+# -*- perl -*-
+
+use LWP::UserAgent;
+use HTTP::Request;
+use URI;
+
+my ($host, @files) = @ARGV;
+
+my $uri = URI->new
+    (sprintf 'http://%s/.well-known/ni/0c17e171-8cb1-4c60-9c58-f218075ae9a9',
+    $host);
+
+my $ua = LWP::UserAgent->new;
+
+my $req = HTTP::Request->new('POST', $uri);
+
+for my $file (@files) {
+    my @stat = stat $file or die $!;
+    -f $file or next;
+    open my $fh, $file or die $!;
+    binmode $fh;
+    my $clone = $req->clone;
+
+    $clone->date($stat[9]);
+    $clone->content_length($stat[7]);
+
+    # sneak this bad boy into the request object
+    my $sub = sub { read($fh, my $buf, 8192) or return; return $buf };
+    $clone->content_ref(\$sub);
+    #$clone->header(Content => );
+
+    my $resp = $ua->request($clone);
+    warn $resp->as_string;
+}

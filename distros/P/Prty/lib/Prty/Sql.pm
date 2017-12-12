@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Hash;
 use Prty::Option;
@@ -1473,6 +1473,21 @@ sub dropSchema {
         @opt,
     );
 
+=head4 Options
+
+=over 4
+
+=item -tableSpace => $tableSpaceName (Default: keiner)
+
+Name des Tablespace, in dem die Tabelle erzeugt wird
+(Oracle und PostgreSQL).
+
+=item -tableType => $tableType (Default: 'InnoDB')
+
+Tabellentyp bei MySQL: 'InnoDb', 'MyISAM'.
+
+=back
+
 =head4 Description
 
 Generiere ein CREATE TABLE Statement und liefere dieses zurück.
@@ -1532,21 +1547,6 @@ Tabellentyp kann mit der Option -tableType abweichend gesetzt werden.
 
 Die Typ-Attribute type und <dbms>Type werden von columnTypeSpec()
 in den DBMS-Typ umgewandelt.
-
-=head4 Options
-
-=over 4
-
-=item -tableSpace => $tableSpaceName (Default: keiner)
-
-Name des Tablespace, in dem die Tabelle erzeugt wird
-(Oracle und PostgreSQL).
-
-=item -tableType => $tableType (Default: 'InnoDB')
-
-Tabellentyp bei MySQL: 'InnoDb', 'MyISAM'.
-
-=back
 
 =cut
 
@@ -2014,23 +2014,6 @@ sub renameColumn {
 
     $stmt = $sql->addPrimaryKeyConstraint($tableName,\@colNames,@opt);
 
-=head4 Description
-
-B<Oracle Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        PRIMARY KEY (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
-
-B<PostgreSQL Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        PRIMARY KEY (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
-
 =head4 Options
 
 =over 4
@@ -2050,6 +2033,23 @@ Name des Tablespace, in dem der Index erzeugt wird
 (Oracle und PostgreSQL).
 
 =back
+
+=head4 Description
+
+B<Oracle Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        PRIMARY KEY (<TABLE_COLUMNS>)
+        USING INDEX TABLESPACE <TABLESPACE_NAME>
+        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+
+B<PostgreSQL Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        PRIMARY KEY (<TABLE_COLUMNS>)
+        USING INDEX TABLESPACE <TABLESPACE_NAME>
 
 =cut
 
@@ -2121,36 +2121,6 @@ sub addPrimaryKeyConstraint {
     $stmt = $sql->addForeignKeyConstraint($tableName,\@tableCols,
         $refTableName,@opt);
 
-=head4 Description
-
-B<Oracle Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME>
-        ON DELETE <ACTION>
-        DEFERRABLE INITIALLY DEFERRED
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
-        DISABLE
-
-B<PostgreSQL Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME>
-        ON DELETE <ACTION>
-        DEFERRABLE INITIALLY DEFERRED
-
-B<MySQL Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME> (REF_TABLE_COLUMNS)
-        ON DELETE <ACTION>
-
 =head4 Options
 
 =over 4
@@ -2183,6 +2153,36 @@ Bei MySQL müssen die referenzierten Kolumnen aufgezählt werden, auch wenn
 ein Primary Key auf der referenzierten Tabelle definiert ist.
 
 =back
+
+=head4 Description
+
+B<Oracle Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        FOREIGN KEY (<TABLE_COLUMNS>)
+        REFERENCES <REF_TABLE_NAME>
+        ON DELETE <ACTION>
+        DEFERRABLE INITIALLY DEFERRED
+        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+        DISABLE
+
+B<PostgreSQL Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        FOREIGN KEY (<TABLE_COLUMNS>)
+        REFERENCES <REF_TABLE_NAME>
+        ON DELETE <ACTION>
+        DEFERRABLE INITIALLY DEFERRED
+
+B<MySQL Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        FOREIGN KEY (<TABLE_COLUMNS>)
+        REFERENCES <REF_TABLE_NAME> (REF_TABLE_COLUMNS)
+        ON DELETE <ACTION>
 
 =cut
 
@@ -2296,6 +2296,21 @@ sub addForeignKeyConstraint {
 
     $stmt = $sql->addNotNullConstraint($tableName,$colName,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -constraintName => $str (Default: <TABLE>_CK)
+
+Name des Constraint (nicht PostgreSQL).
+
+=item -exceptionTable => $tableName (Default: keiner)
+
+Constraint-Verletzende Datensätze werden in Tabelle $tableName
+protokollliert (nur Oracle).
+
+=back
+
 =head4 Description
 
 B<Oracle Syntax>
@@ -2312,21 +2327,6 @@ B<PostgreSQL Syntax>
     ALTER TABLE <TABLE_NAME>
         ALTER COLUMN <COLUMN_NAME>
         SET NOT NULL
-
-=head4 Options
-
-=over 4
-
-=item -constraintName => $str (Default: <TABLE>_CK)
-
-Name des Constraint (nicht PostgreSQL).
-
-=item -exceptionTable => $tableName (Default: keiner)
-
-Constraint-Verletzende Datensätze werden in Tabelle $tableName
-protokollliert (nur Oracle).
-
-=back
 
 =cut
 
@@ -2390,21 +2390,6 @@ sub addNotNullConstraint {
 
     $stmt = $sql->addCheckConstraint($tableName,$clause,@opt);
 
-=head4 Description
-
-B<Oracle Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        CHECK (<CHECK_CLAUSE>)
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
-
-B<PostgreSQL Syntax>
-
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        CHECK (<CHECK_CLAUSE>)
-
 =head4 Options
 
 =over 4
@@ -2419,6 +2404,21 @@ Constraint-Verletzende Datensätze werden in Tabelle $tableName
 protokollliert (nur Oracle).
 
 =back
+
+=head4 Description
+
+B<Oracle Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        CHECK (<CHECK_CLAUSE>)
+        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+
+B<PostgreSQL Syntax>
+
+    ALTER TABLE <TABLE_NAME> ADD
+        CONSTRAINT <CONSTRAINT_NAME>
+        CHECK (<CHECK_CLAUSE>)
 
 =cut
 
@@ -2481,6 +2481,26 @@ sub addCheckConstraint {
 
     $stmt = $sql->addUniqueConstraint($tableName,\@colNames,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -constraintName => $str (Default: <TABLE>_UQ_<COLUMNS>)
+
+Name des Constraint.
+
+=item -exceptionTable => $tableName (Default: keiner)
+
+Constraint-Verletzende Datensätze werden in Tabelle $tableName
+protokollliert (nur Oracle).
+
+=item -tableSpace => $tableSpaceName (Default: keiner)
+
+Name des Tablespace, in dem der Index erzeugt wird
+(Oracle und PostgreSQL).
+
+=back
+
 =head4 Description
 
 Liefere ein SQL-Statement zur Erzeugung eines UNIQUE-Constraint
@@ -2501,26 +2521,6 @@ B<PostgreSQL Syntax>
         CONSTRAINT <CONSTRAINT_NAME>
         UNIQUE (<TABLE_COLUMNS>)
         USING INDEX TABLESPACE <TABLESPACE_NAME>
-
-=head4 Options
-
-=over 4
-
-=item -constraintName => $str (Default: <TABLE>_UQ_<COLUMNS>)
-
-Name des Constraint.
-
-=item -exceptionTable => $tableName (Default: keiner)
-
-Constraint-Verletzende Datensätze werden in Tabelle $tableName
-protokollliert (nur Oracle).
-
-=item -tableSpace => $tableSpaceName (Default: keiner)
-
-Name des Tablespace, in dem der Index erzeugt wird
-(Oracle und PostgreSQL).
-
-=back
 
 =cut
 
@@ -2611,6 +2611,25 @@ sub indexName {
 
     $stmt = $sql->createIndex($tableName,\@colNames,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -indexName => $str (Default: <TABLE>_ix_<COLUMNS>)
+
+Name des Index.
+
+=item -tableSpace => $tableSpaceName (Default: keiner)
+
+Name des Tablespace, in dem der Index erzeugt wird
+(Oracle und PostgreSQL).
+
+=item -unique => $bool (Default: 0)
+
+Statement für Unique Index.
+
+=back
+
 =head4 Description
 
 Generiere ein CREATE INDEX Statement und liefere dieses zurück.
@@ -2636,25 +2655,6 @@ B<MySQL Syntax>
 
     CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
         (<TABLE_COLUMNS>)
-
-=head4 Options
-
-=over 4
-
-=item -indexName => $str (Default: <TABLE>_ix_<COLUMNS>)
-
-Name des Index.
-
-=item -tableSpace => $tableSpaceName (Default: keiner)
-
-Name des Tablespace, in dem der Index erzeugt wird
-(Oracle und PostgreSQL).
-
-=item -unique => $bool (Default: 0)
-
-Statement für Unique Index.
-
-=back
 
 =cut
 
@@ -2761,6 +2761,16 @@ sub dropIndex {
 
     @stmt = $sql->createSequence($name,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -startWith => $n (Default: 1)
+
+Lasse die Sequenz mit Startwert $n beginnen.
+
+=back
+
 =head4 Description
 
 Generiere Statements zur Erzeugung von Sequenz $name und liefere
@@ -2773,16 +2783,6 @@ Unter MySQL und SQLite, die das Konzept der Sequenz nicht haben,
 wird eine Tabelle (CREATE TABLE) mit Autoinkrement-Kolumne zur
 Simulation einer Sequenz erzeugt. Ist die Option -startWith angegeben,
 wird zusätzlich ein INSERT-Statement generiert.
-
-=head4 Options
-
-=over 4
-
-=item -startWith => $n (Default: 1)
-
-Lasse die Sequenz mit Startwert $n beginnen.
-
-=back
 
 =cut
 
@@ -2931,6 +2931,20 @@ sub setSequence {
 
     $stmt = $sql->createFunction($name,$body,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -replace => $bool (Default: 0)
+
+Generiere "OR REPLACE" Klausel.
+
+=item -returns => $type (Default: undef)
+
+Generiere "RETURNS $type" Klausel.
+
+=back
+
 =head4 Description
 
 B<PostgreSQL>
@@ -2946,20 +2960,6 @@ B<PostgreSQL>
 =item *
 
 <name> kann Schema enthalten
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -replace => $bool (Default: 0)
-
-Generiere "OR REPLACE" Klausel.
-
-=item -returns => $type (Default: undef)
-
-Generiere "RETURNS $type" Klausel.
 
 =back
 
@@ -3061,6 +3061,20 @@ sub dropFunction {
     $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
         -execute=>$proc,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -replace => $bool (Default: 0)
+
+Generiere "OR REPLACE" Klausel (Oracle).
+
+=item -execute => $proc (Default: undef)
+
+Generiere "EXECUTE PROCEDURE $proc()" Klausel.
+
+=back
+
 =head4 Description
 
 B<Oracle>
@@ -3116,20 +3130,6 @@ Trigger-Body definieren.
 =item *
 
 Keine Klausel "OR REPLACE" bei Triggern (-replace=>1 wird ignoriert)
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -replace => $bool (Default: 0)
-
-Generiere "OR REPLACE" Klausel (Oracle).
-
-=item -execute => $proc (Default: undef)
-
-Generiere "EXECUTE PROCEDURE $proc()" Klausel.
 
 =back
 
@@ -3498,51 +3498,6 @@ sub rollback {
     $stmt = $sql->select($table,@opt);
     $stmt = $sql->select(@opt);
 
-=head4 Description
-
-Konstruiere ein SELECT-Statement aus den Parametern und liefere
-dieses zurück.
-
-Ist das erste Argument keine Option und enthält es Whitespace,
-wird es als SQL-Statement interpretiert. Enthält es kein Whitespace, wird
-es als Tabellenname interpretiert.
-
-B<Besonderheiten>
-
-=over 2
-
-=item *
-
-Oracle: FROM-Klausel
-
-Bei Oracle ist die FROM-Klausel eine Pflichtangabe, fehlt sie,
-wird "FROM dual" generiert.
-
-=item *
-
-Oracle: LIMIT und OFFSET
-
-Oracle unterstützt weder LIMIT noch OFFSET.
-
-Im Falle von Oracle wird keine LIMIT-Klausel generiert, sondern
-die WHERE-Klausel um "ROWNUM <= $n" erweitert.
-
-Ist im Falle von Oracle OFFSET angegeben, wird eine Exception
-ausgelöst.
-
-=back
-
-B<FROM-Aliase>
-
-Bei PostgreSQL ist ein FROM-Alias zwingend erforderlich, wenn die
-FROM-Klausel ein Ausdruck ist statt ein Tabellenname, z.B.
-
-    ... FROM (<SELECT_STMT>) AS x ...
-
-Bei Oracle ist ein Alias in dem Fall nicht erforderlich, kann aber
-angegeben werden. Ein FROM-Alias wird bei Oracle aber IL<lt>nicht> mit
-"AS" eingeleitet. Das "AS" muss weggelassen werden.
-
 =head4 Options
 
 =over 4
@@ -3632,6 +3587,51 @@ werden diese durch die entsprechenden Komponenten ersetzt
 (noch nicht implementiert).
 
 =back
+
+=head4 Description
+
+Konstruiere ein SELECT-Statement aus den Parametern und liefere
+dieses zurück.
+
+Ist das erste Argument keine Option und enthält es Whitespace,
+wird es als SQL-Statement interpretiert. Enthält es kein Whitespace, wird
+es als Tabellenname interpretiert.
+
+B<Besonderheiten>
+
+=over 2
+
+=item *
+
+Oracle: FROM-Klausel
+
+Bei Oracle ist die FROM-Klausel eine Pflichtangabe, fehlt sie,
+wird "FROM dual" generiert.
+
+=item *
+
+Oracle: LIMIT und OFFSET
+
+Oracle unterstützt weder LIMIT noch OFFSET.
+
+Im Falle von Oracle wird keine LIMIT-Klausel generiert, sondern
+die WHERE-Klausel um "ROWNUM <= $n" erweitert.
+
+Ist im Falle von Oracle OFFSET angegeben, wird eine Exception
+ausgelöst.
+
+=back
+
+B<FROM-Aliase>
+
+Bei PostgreSQL ist ein FROM-Alias zwingend erforderlich, wenn die
+FROM-Klausel ein Ausdruck ist statt ein Tabellenname, z.B.
+
+    ... FROM (<SELECT_STMT>) AS x ...
+
+Bei Oracle ist ein Alias in dem Fall nicht erforderlich, kann aber
+angegeben werden. Ein FROM-Alias wird bei Oracle aber IL<lt>nicht> mit
+"AS" eingeleitet. Das "AS" muss weggelassen werden.
 
 =head4 Example
 
@@ -4548,8 +4548,8 @@ sub opIN {
         if ($str) {
             $str .= ', ';
         }
-        # $str .= $_;
-        $str .= $self->valExpr($_);
+        $str .= $_;
+        # $str .= $self->valExpr($_); Problem: STRING wird zu '''STRING'''
     }
 
     return $str?  "IN ($str)": '';
@@ -5259,7 +5259,7 @@ sub diff {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

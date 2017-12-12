@@ -1,6 +1,6 @@
 package Lab::Measurement::KeyboardHandling;
 #ABSTRACT: Minimal keyboard input handling
-$Lab::Measurement::KeyboardHandling::VERSION = '3.600';
+$Lab::Measurement::KeyboardHandling::VERSION = '3.613';
 use Term::ReadKey;
 
 my $labkey_initialized = 0;
@@ -79,7 +79,7 @@ Lab::Measurement::KeyboardHandling - Minimal keyboard input handling
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 COPYRIGHT AND LICENSE
 

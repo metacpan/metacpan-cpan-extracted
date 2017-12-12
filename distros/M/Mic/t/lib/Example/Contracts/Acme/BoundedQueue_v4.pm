@@ -20,15 +20,15 @@ sub tail {
     my ($self) = @_;
 
     # make postcondition fail
-    \ $self->{$Q}->tail;
+    \ $self->[Q]->tail;
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    $self->{$Q}->push($val);
+    $self->[Q]->push($val);
 
-    if ($self->size > $self->{$MAX_SIZE}) {
+    if ($self->size > $self->[MAX_SIZE]) {
         $self->pop;        
     }
 }

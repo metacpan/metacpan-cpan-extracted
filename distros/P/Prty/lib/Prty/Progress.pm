@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Time::HiRes ();
@@ -329,10 +329,6 @@ sub time {
     $str = $pi->performance;
     $str = $pi->performance($prec);
 
-=head4 Description
-
-Liefere Durchsatz in der Form "X.XX" (Schritte pro Sekunde).
-
 =head4 Arguments
 
 =over 4
@@ -342,6 +338,10 @@ Liefere Durchsatz in der Form "X.XX" (Schritte pro Sekunde).
 Anzahl Nachkommastellen
 
 =back
+
+=head4 Description
+
+Liefere Durchsatz in der Form "X.XX" (Schritte pro Sekunde).
 
 =cut
 
@@ -365,10 +365,6 @@ sub performance {
     $str = $pi->timePerStep;
     $str = $pi->timePerStep($prec);
 
-=head4 Description
-
-Liefere Durchsatz in der Form "HhMmSs.x" (Zeit pro Schritt).
-
 =head4 Arguments
 
 =over 4
@@ -378,6 +374,10 @@ Liefere Durchsatz in der Form "HhMmSs.x" (Zeit pro Schritt).
 Anzahl Nachkommastellen der Sekunde
 
 =back
+
+=head4 Description
+
+Liefere Durchsatz in der Form "HhMmSs.x" (Zeit pro Schritt).
 
 =cut
 
@@ -475,37 +475,6 @@ sub info {
     $str = $pi->msg($fmt,@args);
     $str = $pi->msg($i,$fmt,@args);
 
-=head4 Description
-
-Erzeuge eine Fortschrittsmeldung und liefere diese zurück.
-
-Die Methode ist für die eine einzeilige Ausgabe konzipiert, die
-sich kontnuierlich überschreibt, bis das Ende der Verarbeitung
-erreicht ist. Die letzte Meldung bleibt stehen.
-
-=over 4
-
-=item 1.
-
-Die erste Form (ohne Parameter) liefert die beim letzten
-Aufruf produzierte Meldung - allerdings mit neu berechneten
-Durchschittswerten - noch einmal mit "\n" am Zeilenende.
-
-=item 2.
-
-Die zweite Form erzeugt die Meldung für den aktuellen Schritt
-und beendet sie mit "\r".
-
-=item 3.
-
-Die dritte Form bewirkt dasselbe wie 2), nur dass zuvor das
-Objekt auf Schritt $i gesetzt wird.
-
-=back
-
-Ist bislang kein Schritt ausgeführt worden, liefert die Methode einen
-Leerstring ("").
-
 =head4 Arguments
 
 =over 4
@@ -563,6 +532,37 @@ Ausgabe-Zeichenketten oder Argumente für sprintf-Platzhalter.
 Erzeugte Meldung
 
 =back
+
+=head4 Description
+
+Erzeuge eine Fortschrittsmeldung und liefere diese zurück.
+
+Die Methode ist für die eine einzeilige Ausgabe konzipiert, die
+sich kontnuierlich überschreibt, bis das Ende der Verarbeitung
+erreicht ist. Die letzte Meldung bleibt stehen.
+
+=over 4
+
+=item 1.
+
+Die erste Form (ohne Parameter) liefert die beim letzten
+Aufruf produzierte Meldung - allerdings mit neu berechneten
+Durchschittswerten - noch einmal mit "\n" am Zeilenende.
+
+=item 2.
+
+Die zweite Form erzeugt die Meldung für den aktuellen Schritt
+und beendet sie mit "\r".
+
+=item 3.
+
+Die dritte Form bewirkt dasselbe wie 2), nur dass zuvor das
+Objekt auf Schritt $i gesetzt wird.
+
+=back
+
+Ist bislang kein Schritt ausgeführt worden, liefert die Methode einen
+Leerstring ("").
 
 =cut
 
@@ -727,7 +727,7 @@ sub warn {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

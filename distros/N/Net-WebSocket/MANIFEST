@@ -28,6 +28,7 @@ lib/Net/WebSocket/Frame/continuation.pm
 lib/Net/WebSocket/Frame/ping.pm
 lib/Net/WebSocket/Frame/pong.pm
 lib/Net/WebSocket/Frame/text.pm
+lib/Net/WebSocket/FrameTypeName.pm
 lib/Net/WebSocket/HTTP.pm
 lib/Net/WebSocket/HTTP_R.pm
 lib/Net/WebSocket/Handshake.pm

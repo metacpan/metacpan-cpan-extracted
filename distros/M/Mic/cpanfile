@@ -1,11 +1,8 @@
-requires 'perl', '5.008005';
-
 requires 'Class::Method::Modifiers', '2.12';
 requires 'List::MoreUtils',  '0.33';
 requires 'Module::Runtime', '0.014';
 requires 'Package::Stash', '0.36';
 requires 'Params::Validate', '1.10';
-requires 'Readonly', '2.00';
 requires 'Sub::Name',      '0.09';
 
 on test => sub {

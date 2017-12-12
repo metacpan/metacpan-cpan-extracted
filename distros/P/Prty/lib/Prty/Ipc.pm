@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Shell;
@@ -33,6 +33,17 @@ L<Prty::Object>
     ($out,$err) = Prty::Ipc->filter($cmd,$in,@opt);
     ($out,$err) = Prty::Ipc->filter($cmd,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -ignoreError => $bool (Default: 0)
+
+Ignoriere Exitcode von Kommando $cmd. D.h. es wird keine Exception
+geworfen, wenn das Kommando fehlschlägt.
+
+=back
+
 =head4 Description
 
 Rufe Kommando $cmd als Filter auf. Das Kommando erhält die Daten
@@ -44,17 +55,6 @@ Parameter $in Daten an $cmd gesendet werden und das Kommando
 terminiert, bevor es alle Daten gelesen hat. Insbesondere sollten
 keine Daten an ein Kommando gesendet werden, das nicht von stdin
 liest!
-
-=head4 Options
-
-=over 4
-
-=item -ignoreError => $bool (Default: 0)
-
-Ignoriere Exitcode von Kommando $cmd. D.h. es wird keine Exception
-geworfen, wenn das Kommando fehlschlägt.
-
-=back
 
 =cut
 
@@ -106,7 +106,7 @@ sub filter {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

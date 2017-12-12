@@ -3,6 +3,7 @@ Changes
 Debian_CPANTS.txt
 examples/rs
 lib/CLI/Startup.pm
+lib/CLI/Startup.pm.bak
 Makefile.PL
 MANIFEST
 META.json
@@ -25,7 +26,9 @@ xt/kwalitee.t
 xt/manifest.t
 xt/modules.t
 xt/perl-critic.t
+xt/perl-tidy.t
 xt/perlcriticrc
+xt/perltidyrc
 xt/pod-coverage.t
 xt/pod-spelling.t
 xt/pod.t

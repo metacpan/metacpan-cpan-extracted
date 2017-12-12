@@ -25,7 +25,7 @@ requires "MooseX::Types" => "0";
 requires "MooseX::Types::Combine" => "0";
 requires "MooseX::Types::Common::String" => "0";
 requires "MooseX::Types::Moose" => "0";
-requires "Params::ValidationCompiler" => "0.18";
+requires "Params::ValidationCompiler" => "0.26";
 requires "Scalar::Util" => "0";
 requires "Sub::Exporter" => "0";
 requires "namespace::autoclean" => "0";
@@ -56,6 +56,8 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
@@ -78,5 +80,4 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
 };

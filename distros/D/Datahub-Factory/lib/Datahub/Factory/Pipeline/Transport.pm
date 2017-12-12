@@ -2,7 +2,7 @@ package Datahub::Factory::Pipeline::Transport;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use Moo;
 use namespace::clean;
@@ -13,14 +13,17 @@ sub parse {
     my $self = shift;
     my $options;
 
+    # General
+
     # Set the id_path of the incoming item. Points to the identifier of an object.
 
-    if (!defined($self->config->param('Importer.id_path'))) {
+    if (!defined($self->config->param('General.id_path'))) {
         Datahub::Factory::InvalidPipeline->throw(
-            'message' => sprintf('Missing required property id_path in the [Importer] block.')
+            'message' => sprintf('Missing required property id_path in the [General] block.')
         );
     }
-    $options->{'id_path'} = $self->config->param('Importer.id_path');
+
+    $options->{'id_path'} = $self->config->param('General.id_path');
 
     # Importer
 

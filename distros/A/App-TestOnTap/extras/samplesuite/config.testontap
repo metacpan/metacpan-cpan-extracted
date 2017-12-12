@@ -14,6 +14,8 @@ skip = regexp(^incomplete/) or eq(README.txt)
 #
 order = natural
 
+execmap = perl
+
 [DEPENDENCY All depends on init]
 match = not eq(init.t)
 dependson = eq(init.t)
@@ -26,6 +28,6 @@ dependson = eq(basic_file_handling_setup.t)
 match = regexp(picproc/.*)
 dependson = eq(basic_picture_processing_setup.t)
 
-[EXECMAP]
-match10 = regexp(\.t$)
-cmd10 = perl
+[EXECMAP perl]
+match = regexp(\.t$)
+cmd = perl

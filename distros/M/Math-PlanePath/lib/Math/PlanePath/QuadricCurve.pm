@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -34,6 +34,7 @@ use Math::PlanePath::Base::Digits
   'round_down_pow',
   'round_up_pow',
   'digit_split_lowtohigh';
+*_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -269,6 +270,23 @@ sub n_to_level {
 }
 
 #------------------------------------------------------------------------------
+
+{
+  #                                    0     1  2  3  4  5 6  7
+  my @_UNDOCUMENTED__n_to_turn_LSR = (undef, 1,-1,-1, 0, 1,1,-1);
+  sub _UNDOCUMENTED__n_to_turn_LSR {
+    my ($self, $n) = @_;
+    while ($n) {
+      if (my $digit = _divrem_mutate($n,8)) {  # lowest non-zero digit
+        return $_UNDOCUMENTED__n_to_turn_LSR[$digit];
+      }
+    }
+    return undef;
+  }
+}
+
+
+#------------------------------------------------------------------------------
 1;
 __END__
 
@@ -393,13 +411,13 @@ The sequence of turns made by the curve is straightforward.  In the base 8
 
    low digit   turn (degrees)
    ---------   --------------
-      1            +90
-      2            -90
-      3            -90
+      1            +90  L
+      2            -90  R
+      3            -90  R
       4              0
-      5            +90
-      6            +90
-      7            -90
+      5            +90  L
+      6            +90  L
+      7            -90  R
 
 When the least significant digit is non-zero it determines the turn, to make
 the base N=0 to N=8 shape.  When the low digit is zero it's instead the next
@@ -461,7 +479,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

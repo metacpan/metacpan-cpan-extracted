@@ -218,7 +218,7 @@ my $server = IO::Events::Socket::TCP->new(
 
                                 #Needs to be binary in case of ZMODEM transfer.
                                 $frame_or_msg = SEND_FRAME_CLASS()->new(
-                                    payload_sr => \$self->read(),
+                                    payload => $self->read(),
                                 );
                             }
 

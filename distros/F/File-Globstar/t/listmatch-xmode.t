@@ -6,7 +6,7 @@
 
 use strict;
 
-use Test::More tests => 38;
+use Test::More tests => 43;
 
 use File::Globstar::ListMatch;
 
@@ -150,6 +150,29 @@ $input =<<EOF;
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 ok !$matcher->match('foobar'), 'two escaped slashes';
+
+$input =<<EOF;
+*/**/index.md
+EOF
+$matcher = File::Globstar::ListMatch->new(\$input);
+ok $matcher->match('bg/some/thing/index.md'), 'matching inner globstar';
+ok $matcher->match('bg/index.md'), 'non-matching inner globstar';
+
+$input =<<EOF;
+nested/dir/**
+EOF
+$matcher = File::Globstar::ListMatch->new(\$input);
+ok $matcher->match('nested/dir/deep/inside'), 'trailing globstar inside';
+ok $matcher->match('nested/dir/'), 'trailing globstar, trailing slash';
+SKIP: {
+    # This should match but does not in git.  The documentation
+    # in gitignore(5) is a little vague there, saying that '"/**"
+    # matches everything inside' but does not say wether it matches
+    # the directory itself or not.  Bash globstar does match, and so
+    # do we.
+    skip "git bug", 1 if $ENV{FILE_GLOBSTAR_GIT_CHECK_IGNORE};
+    ok $matcher->match('nested/dir'), 'trailing globstar, empty';
+}
 
 # This file gets required by the git test!
 

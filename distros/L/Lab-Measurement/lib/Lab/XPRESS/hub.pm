@@ -1,11 +1,13 @@
 package Lab::XPRESS::hub;
+$Lab::XPRESS::hub::VERSION = '3.613';
 #ABSTRACT: The XPRESS main hub
-$Lab::XPRESS::hub::VERSION = '3.600';
+
 use Lab::Exception;
 use strict;
 use Exporter 'import';
 use Module::Load qw/load autoload/;
 use Try::Tiny;
+use Carp;
 
 our @EXPORT_OK = qw(DataFile Sweep Frame Instrument Connection);
 
@@ -69,8 +71,36 @@ sub Instrument {
     }
 
     my $module = "Lab::Instrument::" . $instrument;
-    autoload($module);
-    return $module->new(@_);
+    my $found_module;
+
+    try {
+        autoload($module);
+        $found_module = 1;
+    }
+    catch {
+        # Do not try to load a Moose driver, if the problem is just
+        # a syntax error in the non-Moose driver.
+        if ( $_ =~ /Compilation failed in require/ ) {
+            die $_;
+        }
+    };
+
+    if ($found_module) {
+        return $module->new(@_);
+    }
+
+    $module = "Lab::Moose::Instrument::" . $instrument;
+    load($module);
+
+    my $args_ref          = shift;
+    my $connection_type   = delete $args_ref->{connection_type};
+    my $connection_module = "Lab::Moose::Connection::" . $connection_type;
+    load($connection_module);
+    my $connection = $connection_module->new($args_ref);
+    return $module->new(
+        %{$args_ref},
+        connection => $connection
+    );
 }
 
 sub Connection {
@@ -159,7 +189,7 @@ Lab::XPRESS::hub - The XPRESS main hub
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 COPYRIGHT AND LICENSE
 

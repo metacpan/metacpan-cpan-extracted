@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use Mojo::Base -base;
+use Mojo::JSON qw(decode_json encode_json);
+
+# standard modules
+use Data::Dumper;
+use Encode qw(decode_utf8 encode_utf8);
+use Time::HiRes qw(time);
+
+# us
+use RPC::Switch::Client 0.01;
+
+exit main(@ARGV);
+
+sub main {
+	if (scalar @_ != 2) {
+		die "usage: $0 <method> <jsonblob>";
+	}
+
+	my ($method, $inargs) = @_;
+
+	# check for valid json
+	my $inargsp = decode_json($inargs);
+
+	my $client = RPC::Switch::Client->new(
+		#port => 6551,
+		who => 'theCustomer',
+		token => 'wantsThings',
+		json => 1,
+		#debug => 1,
+		#tls => 1,
+		#tls_ca => 'myCA.crt',
+		#tls_cert => 'client.crt',
+		#tls_key => 'client.key',
+	);
+
+	die 'no client?' unless $client;
+
+	my $start = time();
+
+	my ($status, $outargs) = $client->call(
+		method => $method,
+		inargs => $inargs,
+	);
+
+	my $took = time() - $start;
+	
+	if (defined $status) {
+		say "status: $status, outargs: ", decode_utf8($outargs);
+	} else {
+		say "job not created?";
+	}
+	printf("took %0.4f\n", $took);
+
+	$client->close();
+
+	say 'done?';
+	return 0;
+}
+
+1;
+

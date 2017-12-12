@@ -1,0 +1,468 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395028181.11596
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Catalyst::Runtime on cpanmetadb ...
+--> Working on Catalyst::Runtime
+Fetching http://www.cpan.org/authors/id/J/JJ/JJNAPIORK/Catalyst-Runtime-5.90061.tar.gz
+-> OK
+Unpacking Catalyst-Runtime-5.90061.tar.gz
+Entering Catalyst-Runtime-5.90061
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.59 ... Yes (6.88)
+Configuring Catalyst-Runtime-5.90061
+Running Makefile.PL
+*** Module::AutoInstall version 1.08
+*** Checking for Perl dependencies...
+*** Since we're running under cpanminus, I'll just let it take care
+    of the dependency's installation later.
+[Core Features]
+- Test::Fatal                                                ...loaded. (0.013)
+- Test::More                                                 ...loaded. (1.001002 >= 0.88)
+- Data::Dump                                                 ...loaded. (1.22)
+- HTTP::Request::Common                                      ...loaded. (6.04)
+- IO::Scalar                                                 ...loaded. (2.110)
+- HTTP::Status                                               ...loaded. (6.03)
+- JSON::MaybeXS                                              ...loaded. (1.001000)
+- List::MoreUtils                                            ...loaded. (0.33)
+- namespace::autoclean                                       ...loaded. (0.15 >= 0.09)
+- namespace::clean                                           ...loaded. (0.25 >= 0.23)
+- MooseX::Emulate::Class::Accessor::Fast                     ...loaded. (0.00903 >= 0.00903)
+- Class::Load                                                ...loaded. (0.21 >= 0.12)
+- Data::OptList                                              ...loaded. (0.109)
+- Moose                                                      ...loaded. (2.1204 >= 1.03)
+- MooseX::MethodAttributes::Role::AttrContainer::Inheritable ...loaded. (0.29 >= 0.24)
+- MooseX::Role::WithOverloading                              ...loaded. (0.13 >= 0.09)
+- Carp                                                       ...loaded. (1.32)
+- Class::C3::Adopt::NEXT                                     ...loaded. (0.13 >= 0.07)
+- CGI::Simple::Cookie                                        ...loaded. (1.113 >= 1.109)
+- Data::Dump                                                 ...loaded. (1.22)
+- Data::OptList                                              ...loaded. (0.109)
+- HTML::Entities                                             ...loaded. (3.69)
+- HTML::HeadParser                                           ...loaded. (3.71)
+- HTTP::Body                                                 ...loaded. (1.19 >= 1.06)
+- HTTP::Headers                                              ...loaded. (6.05 >= 1.64)
+- HTTP::Request                                              ...loaded. (6.00 >= 5.814)
+- HTTP::Response                                             ...loaded. (6.04 >= 5.813)
+- HTTP::Request::AsCGI                                       ...loaded. (1.2 >= 1.0)
+- Module::Pluggable                                          ...loaded. (5.1 >= 4.7)
+- Path::Class                                                ...loaded. (0.33 >= 0.09)
+- Scalar::Util                                               ...loaded. (1.38)
+- Sub::Exporter                                              ...loaded. (0.987)
+- Text::SimpleTable                                          ...loaded. (2.03 >= 0.03)
+- Time::HiRes                                                ...loaded. (1.9726)
+- Tree::Simple                                               ...loaded. (1.23 >= 1.15)
+- Tree::Simple::Visitor::FindByPath                          ...loaded. (0.12)
+- Try::Tiny                                                  ...loaded. (0.19 >= 0.17)
+- Safe::Isa                                                  ...loaded. (1.000004)
+- Task::Weaken                                               ...loaded. (1.04)
+- Text::Balanced                                             ...loaded. (2.02)
+- MRO::Compat                                                ...loaded. (0.12)
+- MooseX::Getopt                                             ...loaded. (0.61 >= 0.48)
+- String::RewritePrefix                                      ...loaded. (0.007 >= 0.004)
+- Devel::InnerPackage                                        ...loaded. (0.4)
+- Plack                                                      ...loaded. (1.0030 >= 0.9991)
+- Plack::Middleware::ReverseProxy                            ...loaded. (0.15 >= 0.04)
+- Plack::Test::ExternalServer                                ...loaded. (0.01)
+- Class::Data::Inheritable                                   ...loaded. (0.08)
+- Encode                                                     ...loaded. (2.57 >= 2.49)
+- LWP                                                        ...loaded. (6.05 >= 5.837)
+- URI                                                        ...loaded. (1.60 >= 1.36)
+- JSON::MaybeXS                                              ...loaded. (1.001000 >= 1.000000)
+- Stream::Buffered                                           ...loaded. (0.02)
+- Hash::MultiValue                                           ...loaded. (0.15)
+- Plack::Request::Upload                                     ...loaded. (undef)
+- CGI::Struct                                                ...loaded. (1.21)
+- Plack::Middleware::Conditional                             ...loaded. (undef)
+- Plack::Middleware::IIS6ScriptNameFix                       ...loaded. (undef)
+- Plack::Middleware::IIS7KeepAliveFix                        ...loaded. (undef)
+- Plack::Middleware::LighttpdScriptNameFix                   ...loaded. (undef)
+- Plack::Middleware::ContentLength                           ...loaded. (undef)
+- Plack::Middleware::Head                                    ...loaded. (undef)
+- Plack::Middleware::HTTPExceptions                          ...loaded. (undef)
+- Plack::Middleware::FixMissingBodyInRedirect                ...loaded. (0.09 >= 0.09)
+- Plack::Middleware::MethodOverride                          ...loaded. (0.10)
+- Plack::Middleware::RemoveRedundantBody                     ...loaded. (0.03 >= 0.03)
+*** Module::AutoInstall configuration finished.
+Checking if your kit is complete...
+Warning: the following files are missing in your kit:
+	Catalyst-Runtime-5.90061/t/lib/TestAppEncodingSetInConfig/testappencodingsetinconfig.json
+	Catalyst-Runtime-5.90061/t/lib/TestMiddleware/share/static/forced.txt
+	Catalyst-Runtime-5.90061/t/lib/TestMiddleware/share/static/message.txt
+	Catalyst-Runtime-5.90061/t/lib/TestMiddleware/share/static2/message2.txt
+	Catalyst-Runtime-5.90061/t/lib/TestMiddleware/share/static3/message3.txt
+	Catalyst-Runtime-5.90061/t/lib/TestMiddlewareFromConfig/share/static/message.txt
+Please inform the author.
+Generating a Unix-style Makefile
+Writing Makefile for Catalyst::Runtime
+Writing MYMETA.yml and MYMETA.json
+
+ Important:
+
+    This library is for running Catalyst applications.
+
+    For development and use of catalyst.pl and myapp_create.pl, make sure
+    you also install the development tools package Catalyst::Devel.
+
+        perl -MCPANPLUS -e 'install Catalyst::Devel' # or
+        perl -MCPAN -e 'install Catalyst::Devel'     # or
+        cpanm Catalyst::Devel
+
+    To get some commonly used plugins, as well as the TT view and DBIC
+    model, install Task::Catalyst in the same way.
+
+ Have fun!
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have LWP 5.837 ... Yes (6.05)
+Checking if you have Class::Data::Inheritable 0 ... Yes (0.08)
+Checking if you have ExtUtils::MakeMaker 6.59 ... Yes (6.88)
+Checking if you have Class::Load 0.12 ... Yes (0.21)
+Checking if you have namespace::clean 0.23 ... Yes (0.25)
+Checking if you have String::RewritePrefix 0.004 ... Yes (0.007)
+Checking if you have HTTP::Request::Common 0 ... Yes (6.04)
+Checking if you have Text::Balanced 0 ... Yes (2.02)
+Checking if you have Tree::Simple 1.15 ... Yes (1.23)
+Checking if you have Plack::Middleware::ContentLength 0 ... Yes (undef)
+Checking if you have MooseX::Getopt 0.48 ... Yes (0.61)
+Checking if you have Data::OptList 0 ... Yes (0.109)
+Checking if you have Sub::Exporter 0 ... Yes (0.987)
+Checking if you have CGI::Struct 0 ... Yes (1.21)
+Checking if you have HTML::Entities 0 ... Yes (3.69)
+Checking if you have Text::SimpleTable 0.03 ... Yes (2.03)
+Checking if you have Scalar::Util 0 ... Yes (1.38)
+Checking if you have Plack::Middleware::LighttpdScriptNameFix 0 ... Yes (undef)
+Checking if you have Plack::Middleware::ReverseProxy 0.04 ... Yes (0.15)
+Checking if you have Class::C3::Adopt::NEXT 0.07 ... Yes (0.13)
+Checking if you have Stream::Buffered 0 ... Yes (0.02)
+Checking if you have MooseX::Role::WithOverloading 0.09 ... Yes (0.13)
+Checking if you have Path::Class 0.09 ... Yes (0.33)
+Checking if you have Plack::Middleware::MethodOverride 0 ... Yes (0.10)
+Checking if you have CGI::Simple::Cookie 1.109 ... Yes (1.113)
+Checking if you have Time::HiRes 0 ... Yes (1.9726)
+Checking if you have MooseX::Emulate::Class::Accessor::Fast 0.00903 ... Yes (0.00903)
+Checking if you have HTTP::Status 0 ... Yes (6.03)
+Checking if you have Try::Tiny 0.17 ... Yes (0.19)
+Checking if you have HTTP::Headers 1.64 ... Yes (6.05)
+Checking if you have Plack::Middleware::RemoveRedundantBody 0.03 ... Yes (0.03)
+Checking if you have HTTP::Request::AsCGI 1.0 ... Yes (1.2)
+Checking if you have Plack::Middleware::HTTPExceptions 0 ... Yes (undef)
+Checking if you have Plack::Test::ExternalServer 0 ... Yes (0.01)
+Checking if you have Devel::InnerPackage 0 ... Yes (0.4)
+Checking if you have HTTP::Body 1.06 ... Yes (1.19)
+Checking if you have HTTP::Request 5.814 ... Yes (6.00)
+Checking if you have List::MoreUtils 0 ... Yes (0.33)
+Checking if you have IO::Scalar 0 ... Yes (2.110)
+Checking if you have Safe::Isa 0 ... Yes (1.000004)
+Checking if you have Task::Weaken 0 ... Yes (1.04)
+Checking if you have Plack::Request::Upload 0 ... Yes (undef)
+Checking if you have Test::Fatal 0 ... Yes (0.013)
+Checking if you have MRO::Compat 0 ... Yes (0.12)
+Checking if you have Carp 0 ... Yes (1.32)
+Checking if you have URI 1.36 ... Yes (1.60)
+Checking if you have MooseX::MethodAttributes::Role::AttrContainer::Inheritable 0.24 ... Yes (0.29)
+Checking if you have Test::More 0.88 ... Yes (1.001002)
+Checking if you have Plack 0.9991 ... Yes (1.0030)
+Checking if you have Tree::Simple::Visitor::FindByPath 0 ... Yes (0.12)
+Checking if you have Moose 1.03 ... Yes (2.1204)
+Checking if you have JSON::MaybeXS 1.000000 ... Yes (1.001000)
+Checking if you have Plack::Middleware::Head 0 ... Yes (undef)
+Checking if you have Plack::Middleware::IIS6ScriptNameFix 0 ... Yes (undef)
+Checking if you have HTML::HeadParser 0 ... Yes (3.71)
+Checking if you have namespace::autoclean 0.09 ... Yes (0.15)
+Checking if you have Plack::Middleware::Conditional 0 ... Yes (undef)
+Checking if you have Data::Dump 0 ... Yes (1.22)
+Checking if you have Hash::MultiValue 0 ... Yes (0.15)
+Checking if you have Plack::Middleware::FixMissingBodyInRedirect 0.09 ... Yes (0.09)
+Checking if you have Plack::Middleware::IIS7KeepAliveFix 0 ... Yes (undef)
+Checking if you have HTTP::Response 5.813 ... Yes (6.04)
+Checking if you have Encode 2.49 ... Yes (2.57)
+Checking if you have Module::Pluggable 4.7 ... Yes (5.1)
+Building and testing Catalyst-Runtime-5.90061
+cp lib/Catalyst/Component/ApplicationAttribute.pm blib/lib/Catalyst/Component/ApplicationAttribute.pm
+cp lib/Catalyst.pm blib/lib/Catalyst.pm
+cp lib/Catalyst/Request.pm blib/lib/Catalyst/Request.pm
+cp lib/Catalyst/Stats.pm blib/lib/Catalyst/Stats.pm
+cp lib/Catalyst/Exception/Go.pm blib/lib/Catalyst/Exception/Go.pm
+cp lib/Catalyst/DispatchType/Default.pm blib/lib/Catalyst/DispatchType/Default.pm
+cp lib/Catalyst/PSGI.pod blib/lib/Catalyst/PSGI.pod
+cp lib/Catalyst/ActionContainer.pm blib/lib/Catalyst/ActionContainer.pm
+cp lib/Catalyst/Component/ContextClosure.pm blib/lib/Catalyst/Component/ContextClosure.pm
+cp lib/Catalyst/Exception.pm blib/lib/Catalyst/Exception.pm
+cp lib/Catalyst/Exception/Detach.pm blib/lib/Catalyst/Exception/Detach.pm
+cp lib/Catalyst/Base.pm blib/lib/Catalyst/Base.pm
+cp lib/Catalyst/DispatchType/Index.pm blib/lib/Catalyst/DispatchType/Index.pm
+cp lib/Catalyst/Dispatcher.pm blib/lib/Catalyst/Dispatcher.pm
+cp lib/Catalyst/Exception/Basic.pm blib/lib/Catalyst/Exception/Basic.pm
+cp lib/Catalyst/Utils.pm blib/lib/Catalyst/Utils.pm
+cp lib/Catalyst/ScriptRunner.pm blib/lib/Catalyst/ScriptRunner.pm
+cp lib/Catalyst/Upgrading.pod blib/lib/Catalyst/Upgrading.pod
+cp lib/Catalyst/Request/Upload.pm blib/lib/Catalyst/Request/Upload.pm
+cp lib/Catalyst/DispatchType/Path.pm blib/lib/Catalyst/DispatchType/Path.pm
+cp lib/Catalyst/Log.pm blib/lib/Catalyst/Log.pm
+cp lib/Catalyst/Controller.pm blib/lib/Catalyst/Controller.pm
+cp lib/Catalyst/Model.pm blib/lib/Catalyst/Model.pm
+cp lib/Catalyst/Plugin/Unicode/Encoding.pm blib/lib/Catalyst/Plugin/Unicode/Encoding.pm
+cp lib/Catalyst/DispatchType/Chained.pm blib/lib/Catalyst/DispatchType/Chained.pm
+cp lib/Catalyst/DispatchType.pm blib/lib/Catalyst/DispatchType.pm
+cp lib/Catalyst/Script/FastCGI.pm blib/lib/Catalyst/Script/FastCGI.pm
+cp lib/Catalyst/ActionChain.pm blib/lib/Catalyst/ActionChain.pm
+cp lib/Catalyst/Component.pm blib/lib/Catalyst/Component.pm
+cp lib/Catalyst/Response.pm blib/lib/Catalyst/Response.pm
+cp lib/Catalyst/Exception/Interface.pm blib/lib/Catalyst/Exception/Interface.pm
+cp lib/Catalyst/Script/CGI.pm blib/lib/Catalyst/Script/CGI.pm
+cp lib/Catalyst/ActionRole/ConsumesContent.pm blib/lib/Catalyst/ActionRole/ConsumesContent.pm
+cp lib/Catalyst/Delta.pod blib/lib/Catalyst/Delta.pod
+cp lib/Catalyst/Engine/HTTP.pm blib/lib/Catalyst/Engine/HTTP.pm
+cp lib/Catalyst/ClassData.pm blib/lib/Catalyst/ClassData.pm
+cp lib/Catalyst/Script/Server.pm blib/lib/Catalyst/Script/Server.pm
+cp lib/Catalyst/View.pm blib/lib/Catalyst/View.pm
+cp lib/Catalyst/ScriptRole.pm blib/lib/Catalyst/ScriptRole.pm
+cp lib/Catalyst/Test.pm blib/lib/Catalyst/Test.pm
+cp lib/Catalyst/Runtime.pm blib/lib/Catalyst/Runtime.pm
+cp lib/Catalyst/Script/Create.pm blib/lib/Catalyst/Script/Create.pm
+cp lib/Catalyst/Action.pm blib/lib/Catalyst/Action.pm
+cp lib/Catalyst/EngineLoader.pm blib/lib/Catalyst/EngineLoader.pm
+cp lib/Catalyst/Engine.pm blib/lib/Catalyst/Engine.pm
+cp lib/Catalyst/Script/Test.pm blib/lib/Catalyst/Script/Test.pm
+cp lib/Catalyst/ActionRole/HTTPMethods.pm blib/lib/Catalyst/ActionRole/HTTPMethods.pm
+cp script/catalyst.pl blib/script/catalyst.pl
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-Iinc" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/catalyst.pl
+Manifying blib/man1/catalyst.pl.1
+Manifying blib/man3/Catalyst.3
+Manifying blib/man3/Catalyst::Action.3
+Manifying blib/man3/Catalyst::ActionChain.3
+Manifying blib/man3/Catalyst::ActionContainer.3
+Manifying blib/man3/Catalyst::ActionRole::ConsumesContent.3
+Manifying blib/man3/Catalyst::ActionRole::HTTPMethods.3
+Manifying blib/man3/Catalyst::Base.3
+Manifying blib/man3/Catalyst::ClassData.3
+Manifying blib/man3/Catalyst::Component.3
+Manifying blib/man3/Catalyst::Component::ApplicationAttribute.3
+Manifying blib/man3/Catalyst::Component::ContextClosure.3
+Manifying blib/man3/Catalyst::Controller.3
+Manifying blib/man3/Catalyst::Delta.3
+Manifying blib/man3/Catalyst::DispatchType.3
+Manifying blib/man3/Catalyst::DispatchType::Chained.3
+Manifying blib/man3/Catalyst::DispatchType::Default.3
+Manifying blib/man3/Catalyst::DispatchType::Index.3
+Manifying blib/man3/Catalyst::DispatchType::Path.3
+Manifying blib/man3/Catalyst::Dispatcher.3
+Manifying blib/man3/Catalyst::Engine.3
+Manifying blib/man3/Catalyst::Engine::HTTP.3
+Manifying blib/man3/Catalyst::EngineLoader.3
+Manifying blib/man3/Catalyst::Exception.3
+Manifying blib/man3/Catalyst::Exception::Basic.3
+Manifying blib/man3/Catalyst::Exception::Detach.3
+Manifying blib/man3/Catalyst::Exception::Go.3
+Manifying blib/man3/Catalyst::Exception::Interface.3
+Manifying blib/man3/Catalyst::Log.3
+Manifying blib/man3/Catalyst::Model.3
+Manifying blib/man3/Catalyst::PSGI.3
+Manifying blib/man3/Catalyst::Plugin::Unicode::Encoding.3
+Manifying blib/man3/Catalyst::Request.3
+Manifying blib/man3/Catalyst::Request::Upload.3
+Manifying blib/man3/Catalyst::Response.3
+Manifying blib/man3/Catalyst::Runtime.3
+Manifying blib/man3/Catalyst::Script::CGI.3
+Manifying blib/man3/Catalyst::Script::Create.3
+Manifying blib/man3/Catalyst::Script::FastCGI.3
+Manifying blib/man3/Catalyst::Script::Server.3
+Manifying blib/man3/Catalyst::Script::Test.3
+Manifying blib/man3/Catalyst::ScriptRole.3
+Manifying blib/man3/Catalyst::ScriptRunner.3
+Manifying blib/man3/Catalyst::Stats.3
+Manifying blib/man3/Catalyst::Test.3
+Manifying blib/man3/Catalyst::Upgrading.3
+Manifying blib/man3/Catalyst::Utils.3
+Manifying blib/man3/Catalyst::View.3
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t t/aggregate/*.t
+t/01use.t ............................................................. ok
+t/aggregate.t ......................................................... skipped: No test aggregation requested
+t/aggregate/c3_appclass_bug.t ......................................... ok
+t/aggregate/c3_mro.t .................................................. ok
+t/aggregate/caf_backcompat.t .......................................... ok
+t/aggregate/catalyst_test_utf8.t ...................................... ok
+t/aggregate/custom_live_component_controller_action_auto_doublebug.t .. ok
+t/aggregate/custom_live_path_bug.t .................................... ok
+t/aggregate/deprecated_test_import.t .................................. ok
+t/aggregate/deprecated_test_unimported.t .............................. ok
+t/aggregate/error_page_dump.t ......................................... ok
+t/aggregate/live_component_controller_action_action.t ................. ok
+t/aggregate/live_component_controller_action_auto.t ................... ok
+t/aggregate/live_component_controller_action_begin.t .................. ok
+t/aggregate/live_component_controller_action_chained.t ................ ok
+t/aggregate/live_component_controller_action_chained2.t ............... ok
+t/aggregate/live_component_controller_action_default.t ................ ok
+t/aggregate/live_component_controller_action_detach.t ................. ok
+t/aggregate/live_component_controller_action_die_in_end.t ............. ok
+t/aggregate/live_component_controller_action_end.t .................... ok
+t/aggregate/live_component_controller_action_forward.t ................ ok
+t/aggregate/live_component_controller_action_global.t ................. ok
+t/aggregate/live_component_controller_action_go.t ..................... ok
+t/aggregate/live_component_controller_action_index.t .................. ok
+t/aggregate/live_component_controller_action_index_or_default.t ....... ok
+t/aggregate/live_component_controller_action_inheritance.t ............ ok
+t/aggregate/live_component_controller_action_local.t .................. ok
+t/aggregate/live_component_controller_action_multipath.t .............. ok
+t/aggregate/live_component_controller_action_path.t ................... ok
+t/aggregate/live_component_controller_action_path_matchsingle.t ....... ok
+t/aggregate/live_component_controller_action_private.t ................ ok
+t/aggregate/live_component_controller_action_streaming.t .............. ok
+t/aggregate/live_component_controller_action_visit.t .................. ok
+t/aggregate/live_component_controller_actionroles.t ................... ok
+t/aggregate/live_component_controller_anon.t .......................... ok
+t/aggregate/live_component_controller_args.t .......................... ok
+t/aggregate/live_component_controller_attributes.t .................... ok
+t/aggregate/live_component_controller_httpmethods.t ................... ok
+t/aggregate/live_component_controller_moose.t ......................... ok
+t/aggregate/live_component_view_single.t .............................. ok
+t/aggregate/live_engine_request_auth.t ................................ ok
+t/aggregate/live_engine_request_body.t ................................ ok
+t/aggregate/live_engine_request_body_demand.t ......................... ok
+t/aggregate/live_engine_request_cookies.t ............................. ok
+t/aggregate/live_engine_request_env.t ................................. ok
+t/aggregate/live_engine_request_escaped_path.t ........................ ok
+t/aggregate/live_engine_request_headers.t ............................. ok
+t/aggregate/live_engine_request_parameters.t .......................... ok
+t/aggregate/live_engine_request_prepare_parameters.t .................. ok
+t/aggregate/live_engine_request_remote_user.t ......................... ok
+t/aggregate/live_engine_request_uploads.t ............................. ok
+t/aggregate/live_engine_request_uri.t ................................. ok
+t/aggregate/live_engine_response_body.t ............................... ok
+t/aggregate/live_engine_response_cookies.t ............................ ok
+t/aggregate/live_engine_response_emptybody.t .......................... ok
+t/aggregate/live_engine_response_errors.t ............................. ok
+t/aggregate/live_engine_response_headers.t ............................ ok
+t/aggregate/live_engine_response_large.t .............................. ok
+t/aggregate/live_engine_response_print.t .............................. ok
+t/aggregate/live_engine_response_redirect.t ........................... ok
+t/aggregate/live_engine_response_status.t ............................. ok
+t/aggregate/live_engine_setup_basics.t ................................ ok
+t/aggregate/live_engine_setup_plugins.t ............................... ok
+t/aggregate/live_loop.t ............................................... ok
+t/aggregate/live_plugin_loaded.t ...................................... ok
+t/aggregate/live_priorities.t ......................................... ok
+t/aggregate/live_recursion.t .......................................... ok
+t/aggregate/live_view_warnings.t ...................................... ok
+t/aggregate/meta_method_unneeded.t .................................... ok
+t/aggregate/psgi_file.t ............................................... ok
+t/aggregate/unit_controller_actions.t ................................. ok
+t/aggregate/unit_controller_config.t .................................. ok
+t/aggregate/unit_controller_namespace.t ............................... ok
+t/aggregate/unit_core_action.t ........................................ ok
+t/aggregate/unit_core_action_for.t .................................... ok
+t/aggregate/unit_core_appclass_roles_in_plugin_list.t ................. ok
+t/aggregate/unit_core_classdata.t ..................................... ok
+t/aggregate/unit_core_component.t ..................................... ok
+t/aggregate/unit_core_component_generating.t .......................... ok
+t/aggregate/unit_core_component_layers.t .............................. ok
+t/aggregate/unit_core_component_loading.t ............................. ok
+t/aggregate/unit_core_component_mro.t ................................. ok
+t/aggregate/unit_core_controller_actions_config.t ..................... ok
+t/aggregate/unit_core_ctx_attr.t ...................................... ok
+t/aggregate/unit_core_engine-prepare_path.t ........................... ok
+t/aggregate/unit_core_engine_fixenv-iis6.t ............................ ok
+t/aggregate/unit_core_engine_fixenv-lighttpd.t ........................ ok
+t/aggregate/unit_core_log.t ........................................... ok
+t/aggregate/unit_core_merge_config_hashes.t ........................... ok
+t/aggregate/unit_core_mvc.t ........................................... ok
+t/aggregate/unit_core_path_to.t ....................................... ok
+t/aggregate/unit_core_plugin.t ........................................ ok
+t/aggregate/unit_core_script_cgi.t .................................... ok
+t/aggregate/unit_core_script_create.t ................................. ok
+t/aggregate/unit_core_script_fastcgi.t ................................ ok
+t/aggregate/unit_core_script_help.t ................................... ok
+t/aggregate/unit_core_script_run_options.t ............................ ok
+t/aggregate/unit_core_script_server-without_modules.t ................. ok
+t/aggregate/unit_core_script_server.t ................................. ok
+t/aggregate/unit_core_scriptrunner.t .................................. ok
+t/aggregate/unit_core_setup.t ......................................... ok
+t/aggregate/unit_core_setup_log.t ..................................... ok
+t/aggregate/unit_core_setup_stats.t ................................... ok
+t/aggregate/unit_core_uri_for.t ....................................... ok
+t/aggregate/unit_core_uri_for_action.t ................................ ok
+t/aggregate/unit_core_uri_for_multibytechar.t ......................... ok
+t/aggregate/unit_core_uri_with.t ...................................... ok
+t/aggregate/unit_dispatcher_requestargs_restore.t ..................... ok
+t/aggregate/unit_engineloader.t ....................................... ok
+t/aggregate/unit_load_catalyst_test.t ................................. ok
+t/aggregate/unit_metaclass_compat_extend_non_moose_controller.t ....... ok
+t/aggregate/unit_metaclass_compat_non_moose.t ......................... ok
+t/aggregate/unit_metaclass_compat_non_moose_controller.t .............. ok
+t/aggregate/unit_response.t ........................................... ok
+t/aggregate/unit_utils_env_value.t .................................... ok
+t/aggregate/unit_utils_home.t ......................................... ok
+t/aggregate/unit_utils_prefix.t ....................................... ok
+t/aggregate/unit_utils_request.t ...................................... ok
+t/aggregate/utf8_content_length.t ..................................... ok
+t/bad_middleware_error.t .............................................. ok
+t/body_fh.t ........................................................... ok
+t/content_negotiation.t ............................................... ok
+t/custom_exception_class_simple.t ..................................... ok
+[error] No default action defined
+t/data_handler.t ...................................................... ok
+t/dead_load_bad_args.t ................................................ ok
+t/dead_load_multiple_chained_attributes.t ............................. ok
+t/dead_no_unknown_error.t ............................................. ok
+t/dead_recursive_chained_attributes.t ................................. ok
+t/deprecated.t ........................................................ ok
+t/deprecated_appclass_action_warnings.t ............................... ok
+t/encoding_set_in_app.t ............................................... ok
+t/encoding_set_in_config.t ............................................ ok
+t/http_exceptions.t ................................................... ok
+t/http_method.t ....................................................... skipped: Test Cases are Sketch for next release
+t/live_catalyst_test.t ................................................ ok
+t/live_component_controller_context_closure.t ......................... skipped: CatalystX::LeakChecker 0.05 required for this test
+t/live_fork.t ......................................................... ok
+t/live_redirect_body.t ................................................ ok
+t/live_show_internal_actions_warnings.t ............................... ok
+t/live_stats.t ........................................................ ok
+t/more-psgi-compat.t .................................................. ok
+t/optional_http-server-restart.t ...................................... skipped: set TEST_HTTP to enable this test
+t/optional_lighttpd-fastcgi-non-root.t ................................ skipped: set TEST_LIGHTTPD to enable this test
+t/optional_lighttpd-fastcgi.t ......................................... skipped: set TEST_LIGHTTPD to enable this test
+t/optional_memleak.t .................................................. skipped: set TEST_MEMLEAK to enable this test
+t/optional_stress.t ................................................... skipped: set TEST_STRESS to enable this test
+t/optional_threads.t .................................................. skipped: set TEST_THREADS to enable this test
+t/plack-middleware-config.t ........................................... ok
+t/plack-middleware.t .................................................. ok
+t/plugin_new_method_backcompat.t ...................................... ok
+t/psgi-log.t .......................................................... ok
+t/psgi_file_testapp.t ................................................. ok
+t/psgi_file_testapp_engine_plackup_compat.t ........................... skipped: Catalyst::Engine::PSGI required for this test
+t/psgi_file_testapp_engine_psgi_compat.t .............................. ok
+t/psgi_utils.t ........................................................ ok
+t/remove_redundant_body.t ............................................. ok
+t/unicode_plugin_charset_utf8.t ....................................... ok
+t/unicode_plugin_config.t ............................................. skipped: Need Test::WWW::Mechanize::Catalyst for this test
+t/unicode_plugin_live.t ............................................... skipped: Need Test::WWW::Mechanize::Catalyst for this test
+t/unicode_plugin_no_encoding.t ........................................ ok
+t/unicode_plugin_request_decode.t ..................................... ok
+t/unit_core_methodattributes_method_metaclass_on_subclasses.t ......... ok
+t/unit_core_script_test.t ............................................. ok
+t/unit_stats.t ........................................................ ok
+t/unit_utils_load_class.t ............................................. ok
+t/unit_utils_subdir.t ................................................. ok
+All tests successful.
+Files=166, Tests=3352, 175 wallclock secs ( 0.87 usr  0.38 sys + 166.93 cusr  7.05 csys = 175.23 CPU)
+Result: PASS
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Catalyst.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Catalyst/Runtime.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::ActionRole::HTTPMethods.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Delta.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Engine.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Request.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Response.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Runtime.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Upgrading.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Catalyst::Utils.3
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Catalyst-Runtime-5.90061 (upgraded from 5.90060)
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Catalyst-Runtime-5.90061/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Catalyst-Runtime-5.90061/MYMETA.json
+1 distribution installed

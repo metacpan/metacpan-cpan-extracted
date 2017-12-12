@@ -9,7 +9,7 @@ use Test::More tests => 4;
 
 use Mail::Run::Crypt;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 {
     my $mrc;

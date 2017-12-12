@@ -18,7 +18,8 @@ WriteMakefile(
         'MIME::Base64' => 0,
         'File::Spec' => 0,
         'LWP::MediaTypes' => 0,
-        'Email::Date::Format' => 0
+        'Email::Date::Format' => 0,
+        'Authen::SASL' => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Email-Send-SMTP-Gmail-*' },

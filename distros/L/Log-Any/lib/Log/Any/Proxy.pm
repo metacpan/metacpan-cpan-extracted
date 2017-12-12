@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Proxy;
 
 # ABSTRACT: Log::Any generator proxy object
-our $VERSION = '1.702';
+our $VERSION = '1.703';
 
 use Log::Any::Adapter::Util ();
 use overload;
@@ -121,7 +121,7 @@ foreach my $name ( Log::Any::Adapter::Util::logging_methods(), keys(%aliases) )
     };
     *{$namef} = sub {
         my ( $self, @args ) = @_;
-        return unless $self->{adapter}->$is_realname;
+        return if !$self->{adapter}->$is_realname && !defined wantarray;
         my $message =
           $self->{formatter}->( $self->{category}, $numeric, @args );
         return unless defined $message and length $message;
@@ -146,7 +146,7 @@ Log::Any::Proxy - Log::Any generator proxy object
 
 =head1 VERSION
 
-version 1.702
+version 1.703
 
 =head1 SYNOPSIS
 

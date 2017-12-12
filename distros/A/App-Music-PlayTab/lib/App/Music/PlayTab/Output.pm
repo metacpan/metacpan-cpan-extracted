@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Mar 27 16:46:54 2014
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan 19 12:49:51 2015
-# Update Count    : 176
+# Last Modified On: Tue Dec  5 13:14:36 2017
+# Update Count    : 177
 # Status          : Unknown, Use with caution!
 
 package App::Music::PlayTab::Output;
@@ -42,7 +42,7 @@ sub finish {
     return unless $self->{generator};
     $self->{generator}->finish;
     undef $self->{generator};
-    $self->{fh}->close if $self->{fhneedclose};
+    close($self->{fh}) if $self->{fhneedclose};
 }
 
 sub DESTROY {

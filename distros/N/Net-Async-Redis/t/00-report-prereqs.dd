@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'perl' => '5.010001'
+                                    'perl' => '5.014000'
                                   }
                   },
        'configure' => {
@@ -14,7 +14,6 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Synopsis' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -22,11 +21,11 @@ do { my $x = {
                       'requires' => {
                                       'Future' => '0.30',
                                       'IO::Async' => '0',
-                                      'JSON::MaybeXS' => '0',
                                       'List::Util' => '1.29',
-                                      'Mixin::Event::Dispatch' => '2.000',
-                                      'Protocol::Redis' => '0',
+                                      'Log::Any' => '1.050',
+                                      'Ryu::Async' => '0.006',
                                       'curry' => '0',
+                                      'namespace::clean' => '0',
                                       'parent' => '0'
                                     }
                     },
@@ -40,6 +39,8 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
+                                   'Test::Deep' => '0',
+                                   'Test::HexString' => '0',
                                    'Test::More' => '0.98'
                                  }
                  }

@@ -4,8 +4,8 @@
 	##
 	## Copyright (C) 2012-2017 Mark Shelor, All Rights Reserved
 	##
-	## Version: 1.01
-	## Sun Oct 22 16:04:22 MST 2017
+	## Version: 1.02
+	## Fri Dec  8 22:44:46 MST 2017
 
 	## sha3sum SYNOPSIS adapted from GNU Coreutils sha1sum. Add
 	## "-a" option for algorithm selection,
@@ -35,6 +35,7 @@ sha3sum - Print or Check SHA-3 Checksums
    -a, --algorithm   224 (default), 256, 384, 512, 128000, 256000
    -b, --binary      read in binary mode
    -c, --check       read SHA-3 sums from the FILEs and check them
+       --tag         create a BSD-style checksum
    -t, --text        read in text mode (default)
    -U, --UNIVERSAL   read in Universal Newlines mode
                          produces same digest on Windows/Unix/Mac
@@ -97,7 +98,7 @@ I<sha3sum> is implemented using the Perl module L<Digest::SHA3>.
 
 END_OF_POD
 
-my $VERSION = "1.01";
+my $VERSION = "1.02";
 
 sub usage {
 	my($err, $msg) = @_;
@@ -123,7 +124,7 @@ select((select(STDERR), $| = 1)[0]);
 	## Collect options from command line
 
 my ($alg, $binary, $check, $text, $status, $quiet, $warn, $help);
-my ($version, $BITS, $UNIVERSAL);
+my ($version, $BITS, $UNIVERSAL, $tag);
 
 eval { Getopt::Long::Configure ("bundling") };
 GetOptions(
@@ -134,6 +135,7 @@ GetOptions(
 	'h|help' => \$help, 'v|version' => \$version,
 	'U|UNIVERSAL' => \$UNIVERSAL,
 	'0|01' => \$BITS,
+	'tag' => \$tag,
 ) or usage(1, "");
 
 
@@ -150,13 +152,23 @@ usage(1, "sha3sum: --status option used only when verifying checksums\n")
 	if $status && !$check;
 usage(1, "sha3sum: --quiet option used only when verifying checksums\n")
 	if $quiet && !$check;
+usage(1, "sha3sum: --tag does not support --text mode\n")
+	if $tag && $text;
+usage(1, "sha3sum: --tag does not support Universal Newlines mode\n")
+	if $tag && $UNIVERSAL;
+usage(1, "sha3sum: --tag does not support BITS mode\n")
+	if $tag && $BITS;
 
 
 	## Default to SHA3-224 unless overridden by command line option
 
+my %isAlg = map { $_ => 1 } (224, 256, 384, 512, 128000, 256000);
 $alg = 224 unless defined $alg;
-grep { $_ == $alg } (224, 256, 384, 512, 128000, 256000)
-	or usage(1, "sha3sum: Unrecognized algorithm\n");
+usage(1, "sha3sum: Unrecognized algorithm\n") unless $isAlg{$alg};
+
+my %Tag = map { $_ => "SHA3-$_" } (224, 256, 384, 512);
+$Tag{128000} = "SHAKE128";
+$Tag{256000} = "SHAKE256";
 
 
 	## Display version information if requested
@@ -218,7 +230,7 @@ sub verify {
 	my $checkfile = shift;
 	my ($err, $fmt_errs, $read_errs, $match_errs) = (0, 0, 0, 0);
 	my ($num_lines, $num_files) = (0, 0);
-	my ($bslash, $sum, $fname, $rsp, $digest, $isOK);
+	my ($bslash, $fcn, $sum, $fname, $rsp, $digest, $isOK);
 
 	local *FH;
 	$checkfile eq '-' and open(FH, '< -')
@@ -227,13 +239,23 @@ sub verify {
 		or die "sha3sum: $checkfile: $!\n";
 	while (<FH>) {
 		next if /^#/; $num_lines++;
-		($bslash, $sum, $modesym, $fname) =
+		if (/^[ \t]*\\?(SHA3-|SHAKE)/) {
+			$modesym = '*';
+			($bslash, $fcn, $alg, $fname, $sum) =
+		/^[ \t]*(\\?)(SHA3-|SHAKE)(\d+) \((.+)\) = ([\da-fA-F]+)/;
+			if (defined $fcn and $fcn eq 'SHAKE') {
+				$alg *= 1000 if defined $alg;
+			}
+		}
+		else {
+			($bslash, $sum, $modesym, $fname) =
 			/^[ \t]*(\\?)([\da-fA-F]+)[ \t]([ *^U])(.+)/;
-		$alg = defined $sum ? $len2alg{length($sum)} : undef;
-		if (grep { ! defined $_ } ($alg, $sum, $modesym, $fname)) {
-			$alg = 1 unless defined $alg;
+			$alg = defined $sum ? $len2alg{length($sum)} : undef;
+		}
+		if (grep { ! defined $_ } ($alg, $sum, $modesym, $fname) or
+			! $isAlg{$alg}) {
 			warn("sha3sum: $checkfile: $.: improperly formatted" .
-				" SHA3-$alg checksum line\n") if $warn;
+				" SHA3 checksum line\n") if $warn;
 			$fmt_errs++;
 			next;
 		}
@@ -254,7 +276,7 @@ sub verify {
 	}
 	close(FH);
 	unless ($num_files) {
-		$alg = 1 unless defined $alg;
+		$alg = 224 unless defined $alg;
 		warn("sha3sum: $checkfile: no properly formatted " .
 			"SHA3-$alg checksum lines found\n");
 		$err = 1;
@@ -274,16 +296,16 @@ sub verify {
 	## Verify or compute SHA-3 checksums of requested files
 
 my($file, $digest);
-
 my $STATUS = 0;
 for $file (@ARGV) {
 	if ($check) { $STATUS = 1 unless verify($file) }
 	elsif ($digest = sumfile($file)) {
 		if ($file =~ /[\n\\]/) {
 			$file =~ s/\\/\\\\/g; $file =~ s/\n/\\n/g;
-			$digest = "\\$digest";
+			print "\\";
 		}
-		print "$digest $modesym", "$file\n";
+		unless ($tag) { print "$digest $modesym$file\n" }
+		else          { print "$Tag{$alg} ($file) = $digest\n" }
 	}
 	else { $STATUS = 1 }
 }

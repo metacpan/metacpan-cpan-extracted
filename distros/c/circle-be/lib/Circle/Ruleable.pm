@@ -4,10 +4,11 @@
 
 package Circle::Ruleable;
 
-use base qw( Circle::Commandable );
-
 use strict;
 use warnings;
+use base qw( Circle::Commandable );
+
+our $VERSION = '0.173320';
 
 sub init_rulestore
 {

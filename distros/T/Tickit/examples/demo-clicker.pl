@@ -30,11 +30,11 @@ sub render_to_rb
 sub on_mouse
 {
    my $self = shift;
-   my ( $ev, $button, $line, $col ) = @_;
+   my ( $args ) = @_;
 
-   return unless $ev eq "press" and $button == 1;
+   return unless $args->type eq "press" and $args->button == 1;
 
-   push @points, [ $line, $col ];
+   push @points, [ $args->line, $args->col ];
    shift @points while @points > 10;
    $self->redraw;
 }

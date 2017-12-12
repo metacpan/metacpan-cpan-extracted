@@ -18,13 +18,13 @@ static Rectangle
 TransposedImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned height)
 { /* FIXME height/width */
     Rectangle ret = dst_rect;
-    if (width > dst_rect.width-dst_rect.x || height > dst_rect.height-dst_rect.y)
+    if (width > dst_rect.width-dst_rect.y || height > dst_rect.height-dst_rect.x)
         return dst_rect;
 
     if (!ColorEqual(color, BLANK)) {
-        for(unsigned i = 0; i < height; i++) {
-            for(unsigned j = 0; j < width; j++) {
-                Color *pixel = &dst[(j+dst_rect.x)*dst_rect.width + (dst_rect.y+i)];
+        for(unsigned y = 0; y < height; y++) {
+            for(unsigned x = 0; x < width; x++) {
+                Color *pixel = &dst[(x+dst_rect.x)*dst_rect.width + (dst_rect.y+y)];
                 *pixel = color;
             }
         }
@@ -50,9 +50,9 @@ ImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned h
         return dst_rect;
 
     if (!ColorEqual(color, BLANK)) {
-        for(unsigned i = 0; i < height; i++) {
-            for(unsigned j = 0; j < width; j++) {
-                Color *pixel = &dst[(i+dst_rect.y)*dst_rect.width + (dst_rect.x+j)];
+        for(unsigned y = 0; y < height; y++) {
+            for(unsigned x = 0; x < width; x++) {
+                Color *pixel = &dst[(y+dst_rect.y)*dst_rect.width + (dst_rect.x+x)];
                 *pixel = color;
             }
         }
@@ -72,7 +72,7 @@ ImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned h
 
 
 
-MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS        
+MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS
 
 INCLUDE: const-xs.inc
 
@@ -1250,8 +1250,8 @@ LoadImageFromAV(array_ref, color_cb, width, height)
 
             PUSHMARK(SP);
             PUSHs(pixel ? *pixel : &PL_sv_undef);
-            PUSHs(sv_2mortal(newSViv(i)));
             PUSHs(sv_2mortal(newSViv(j)));
+            PUSHs(sv_2mortal(newSViv(i)));
             PUTBACK;
 
             Color color = BLANK;

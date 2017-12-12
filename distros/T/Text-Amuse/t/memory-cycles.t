@@ -12,7 +12,7 @@ if ($@) {
     exit;
 }
 else {
-    plan tests => 12;
+    plan tests => 15;
 }
 
 
@@ -22,6 +22,7 @@ else {
 my $document;
 foreach my $file (qw/packing.muse
                      verb.muse
+                     secondary-fn-recursion.muse
                      footnotes.muse/) {
     $document =
       Text::Amuse->new(file => catfile(t => testfiles => $file),

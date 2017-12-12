@@ -106,13 +106,13 @@ is_deeply([split /(\s+)/, $parsed[4]->string],
           [split /(\s+)/, $exppoetry]);
 is scalar(@parsed), 5, "End of parsed";
 foreach my $fn (1..3) {
-    my $footnote = $poetry->get_footnote($fn);
+    my $footnote = $poetry->get_footnote('[' . $fn . ']');
     chomp $footnote;
     ok ($footnote, "Found footnote $fn: " . $footnote->string) or die "Missing footnote!";
 }
-is ($poetry->get_footnote(1)->string, "The author\n", "Footnote 1 ok");
-is ($poetry->get_footnote(2)->string, "Another author\n", "Footnote 2 ok");
-is ($poetry->get_footnote(3)->string, "This sucks\n", "Footnote 3 ok");
+is ($poetry->get_footnote('[1]')->string, "The author\n", "Footnote 1 ok");
+is ($poetry->get_footnote('[2]')->string, "Another author\n", "Footnote 2 ok");
+is ($poetry->get_footnote('[3]')->string, "This sucks\n", "Footnote 3 ok");
 
 my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
 @parsed = grep { $_->type ne 'null' } $packs->elements;

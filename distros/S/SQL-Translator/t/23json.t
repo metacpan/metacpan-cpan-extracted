@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use Test::More;
-use Test::Differences;
+use Test::Exception;
 use Test::SQL::Translator qw(maybe_plan);
 use SQL::Translator;
 use FindBin '$Bin';
@@ -16,7 +16,7 @@ BEGIN {
 
 my $sqlt_version = $SQL::Translator::VERSION;
 use JSON;
-my $json = to_json(from_json(<<JSON), { canonical => 1, pretty => 1 });
+my $json = from_json(<<JSON);
 {
    "schema" : {
       "procedures" : {},
@@ -104,6 +104,10 @@ my $json = to_json(from_json(<<JSON), { canonical => 1, pretty => 1 });
                   ]
                },
                "person_id" : {
+                  "comments" : [
+                    "field comment 1",
+                    "field comment 2"
+                  ],
                   "data_type" : "INTEGER",
                   "default_value" : null,
                   "is_auto_increment" : 1,
@@ -256,7 +260,8 @@ my $json = to_json(from_json(<<JSON), { canonical => 1, pretty => 1 });
             "name" : "pet_trig",
             "on_table" : "pet",
             "order" : "1",
-            "perform_action_when" : "after"
+            "perform_action_when" : "after",
+            "scope": "row"
          }
       },
       "views" : {
@@ -301,5 +306,5 @@ my $tr = SQL::Translator->new(
 );
 
 my $out;
-ok( $out = $tr->translate, 'Translate SQLite to JSON' );
-eq_or_diff( $out, $json, 'JSON matches expected' );
+lives_ok { $out = from_json($tr->translate) } 'Translate SQLite to JSON';
+is_deeply( $out, $json, 'JSON matches expected' );

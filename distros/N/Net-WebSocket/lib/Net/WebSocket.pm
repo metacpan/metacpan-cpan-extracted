@@ -1,6 +1,6 @@
 package Net::WebSocket;
 
-our $VERSION = '0.053';
+our $VERSION = '0.061';
 
 =encoding utf-8
 
@@ -41,7 +41,7 @@ Net::WebSocket - WebSocket in Perl
     );
 
     $iof_w->write(
-        Net::WebSocket::Frame::text->new( payload_sr => \'Hello, world' )
+        Net::WebSocket::Frame::text->new( payload => 'Hello, world' )
     );
 
     #Determine that $inet can be read from …
@@ -227,9 +227,8 @@ WebSocket feature.
 
 =head1 SEE ALSO
 
-L<Mojolicious> is probably CPAN’s easiest WebSocket implementation to get
-a server up and running. If you’re building a project from scratch, you
-may find this to be a better fit for you than Net::WebSocket.
+L<Mojolicious> has a WebSocket implementation. It’s not as complete as
+Net::WebSocket, but if you’re using Mojolicious, you might try this first.
 
 L<Protocol::WebSocket> is an older module that supports
 pre-standard versions of the WebSocket protocol. It’s similar to this one
@@ -239,7 +238,8 @@ things like automatic ping/pong/close, classes for each message type, etc.
 L<Net::WebSocket::Server> implements only server behaviors and
 gives you more automation than P::WS.
 
-L<Net::WebSocket::EV> uses XS to call a C library.
+L<Net::WebSocket::EV> uses XS to call L<wslay|http://wslay.sourceforge.net>.
+As of this writing it lacks support for handshake logic.
 
 =head1 REPOSITORY
 
@@ -251,7 +251,7 @@ Felipe Gasper (FELIPE)
 
 =head1 COPYRIGHT
 
-Copyright 2017 by L<Gasper Software Consulting, LLC|http://gaspersoftware.com>
+Copyright 2017 by L<Gasper Software Consulting|http://gaspersoftware.com>
 
 =head1 LICENSE
 

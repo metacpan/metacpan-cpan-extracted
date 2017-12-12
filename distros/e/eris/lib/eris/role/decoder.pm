@@ -5,7 +5,7 @@ use Moo::Role;
 use Types::Standard qw( Str Int );
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 requires 'decode_message';
@@ -28,7 +28,7 @@ eris::role::decoder - Role for implementing decoders
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

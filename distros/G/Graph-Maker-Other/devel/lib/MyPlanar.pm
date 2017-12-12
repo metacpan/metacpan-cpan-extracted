@@ -52,6 +52,10 @@ sub points_scale {
   return [ map {[ $_->[0]*$factor, $_->[1]*$factor ]} @$points ];
 }
 
+sub xy_rotate_plus90 {
+  my ($x,$y) = @_;
+  return (-$y,$x);  # rotate +90
+}
 sub points_rotate_plus90 {
   my ($points) = @_;
   return [ map {[xy_rotate_plus90(@$_)]} @$points ];
@@ -62,6 +66,7 @@ sub points_rotate_plus90 {
 sub points_to_gpc {
   my ($points) = @_;
   $points // croak "points_to_gpc() no points given";
+  require Math::Geometry::Planar;
   my $planar = Math::Geometry::Planar->new;
   $planar->points($points);
   return $planar->convert2gpc;

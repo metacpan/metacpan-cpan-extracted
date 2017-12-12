@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ sub generate {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -4,16 +4,16 @@ use Mojo::JSON qw/decode_json/;
 
 use Getopt::Long;
 
-our $VERSION=0.003;
+our $VERSION = '0.004';
 
-# ABSTRACT: Pastes stuff to https://perlbot.pl/
+# ABSTRACT: Pastes stuff to https://perl.bot/
 
 has name => 'anonymous';
 has 'irc_handled' => 1;
 has desc => 'I broke this';
 
 has 'service_usage' => 
-qq{perlbot.pl specific options:
+qq{perl.bot specific options:
 
   --get-channels     Ask the pastebin about what channels it knows, and exit
   --get-languages    Ask the pastebin about what languages it knows, and exit
@@ -34,7 +34,7 @@ sub run {
 
 sub display_channels {
   my $self = shift;
-  my $tx = $self->ua->get( 'https://perlbot.pl/api/v1/channels');
+  my $tx = $self->ua->get( 'https://perl.bot/api/v1/channels');
  
   unless ($tx->res->is_status_class(200)) {
     say "Failed to get channels, try again later.";
@@ -43,7 +43,7 @@ sub display_channels {
 
   my $response = decode_json $tx->res->body;
 
-  my $output="Channels supported by perlbot.pl, all values subject to change.\n-----------------------------------\n";
+  my $output="Channels supported by perl.bot, all values subject to change.\n-----------------------------------\n";
   for my $channel (@{$response->{channels}}) {
       $output .= sprintf "%15s  %20s\n", $channel->{name}, $channel->{description};
   }
@@ -53,7 +53,7 @@ sub display_channels {
 
 sub display_languages {
   my $self = shift;
-  my $tx = $self->ua->get( 'https://perlbot.pl/api/v1/languages');
+  my $tx = $self->ua->get( 'https://perl.bot/api/v1/languages');
  
   unless ($tx->res->is_status_class(200)) {
     say "Failed to get languages, try again later.";
@@ -61,7 +61,7 @@ sub display_languages {
 
   my $response = decode_json $tx->res->body;
 
-  my $output="Languages supported by perlbot.pl\n-----------------------------\n";
+  my $output="Languages supported by perl.bot\n-----------------------------\n";
   for my $lang (@{$response->{languages}}) {
       $output .= sprintf "%15s  %20s\n", $lang->{name}, $lang->{description};
   }
@@ -72,7 +72,7 @@ sub display_languages {
 sub paste {
   my $self = shift;
 
-  my $tx = $self->ua->post( 'https://perlbot.pl/api/v1/paste', form => {
+  my $tx = $self->ua->post( 'https://perl.bot/api/v1/paste', form => {
     paste    => $self->text,
     username => $self->name,
     language => $self->language || '',
@@ -94,7 +94,7 @@ sub paste {
 __END__
 =head1 NAME
 
-Mojolicious::Command::nopaste::Service::perlbot - A Mojo-nopaste service for https://perlbot.pl/
+Mojolicious::Command::nopaste::Service::perlbot - A Mojo-nopaste service for https://perl.bot/
 
 =head1 AUTHOR
 Ryan Voots L<simcop@cpan.org|mailto:SIMCOP@cpan.org>

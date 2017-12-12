@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.013002;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "bin/eris-stdin-listener.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "eris",
   "PREREQ_PM" => {
     "CLI::Helpers" => 0,
@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

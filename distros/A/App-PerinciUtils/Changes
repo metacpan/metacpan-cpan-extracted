@@ -1,3 +1,8 @@
+0.111   2017-12-11 (PERLANCAR)
+
+	- Add utility: peri-fmt-envres.
+
+
 0.110   2017-08-09 (PERLANCAR)
 
 	- Add script: gen-getopt-long-spec-from-meta.

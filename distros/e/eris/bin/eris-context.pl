@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: eris-context.pl
 # ABSTRACT: Utility for testing the logging contextualizer
 ## no critic (RequireEndWithOne)
@@ -93,7 +93,7 @@ eris-context.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 AUTHOR
 

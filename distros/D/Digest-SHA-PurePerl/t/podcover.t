@@ -1,38 +1,27 @@
-my $MODULE;
+use strict;
+use Digest::SHA::PurePerl;
 
-BEGIN {
-	$MODULE = (-d "src") ? "Digest::SHA" : "Digest::SHA::PurePerl";
-	eval "require $MODULE" || die $@;
-	$MODULE->import(qw());
-}
-
-BEGIN {
-	if ($ENV{PERL_CORE}) {
-		chdir 't' if -d 't';
-		@INC = '../lib';
-	}
-}
+my $skip;
 
 BEGIN {
 	eval "use Test::More";
-	if ($@) {
-		print "1..0 # Skipped: Test::More not installed\n";
-		exit;
+	$skip = $@ ? 1 : 0;
+	unless ($skip) {
+		eval "use Test::Pod::Coverage 0.08";
+		$skip = 2 if $@;
 	}
 }
 
-eval "use Test::Pod::Coverage 0.08";
-plan skip_all => "Test::Pod::Coverage 0.08 required for testing POD coverage" if $@;
+if ($skip == 1) {
+	print "1..0 # Skipped: Test::More not installed\n";
+	exit;
+}
+
+if ($skip == 2) {
+	print "1..0 # Skipped: Test::Pod::Coverage 0.08 required\n";
+	exit;
+}
 
 my @privfcns = ();
-
-if ($MODULE eq "Digest::SHA") {
-	@privfcns = qw(
-		newSHA
-		shainit
-		sharewind
-		shawrite
-	);
-}
 
 all_pod_coverage_ok( { also_private => \@privfcns } );

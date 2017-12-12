@@ -3,30 +3,49 @@ use warnings;
 package App::Nopaste::Service::Perlbot;
 # ABSTRACT: Service provider for perlbot.pl - https://perlbot.pl/
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 use parent 'App::Nopaste::Service';
-use JSON qw/decode_json/;
+use JSON::PP qw/decode_json/;
 
 sub run {
     my ($self, %arg) = @_;
     my $ua = LWP::UserAgent->new;
 
-    my $res = $ua->post("https://perlbot.pl/api/v1/paste", {
-        paste => $arg{text},
-        description => $arg{desc},
-        username => $arg{nick},
-        chan => $arg{chan},
-        language => $arg{lang}
-    });
+    if ($arg{chan} eq 'list') {
+      my $res = $ua->get( 'https://perl.bot/api/v1/channels');
+     
+      unless ($res->is_success) {
+        return (0, "Failed to get channels, try again later.\n");
+      }
 
-    if ($res->is_success()) {
-        my $content = $res->decoded_content;
-        my $data = decode_json $content;
+      my $response = decode_json $res->decoded_content;
 
-        return (1, $data->{url});
+      my $output="Channels supported by perl.bot, all values subject to change.\n-----------------------------------\n";
+      for my $channel (@{$response->{channels}}) {
+          $output .= sprintf "%15s  %20s\n", $channel->{name}, $channel->{description};
+      }
+
+       return (1, $output);
+
     } else {
-        return (0, "Paste failed");
+
+      my $res = $ua->post("https://perl.bot/api/v1/paste", {
+          paste => $arg{text},
+          description => $arg{desc} || 'I broke this',
+          username => $arg{nick} || 'Anonymous',
+          $arg{chan} ? (chan => $arg{chan}) : (),
+          language => $arg{lang} || 'text'
+      });
+
+      if ($res->is_success()) {
+          my $content = $res->decoded_content;
+          my $data = decode_json $content;
+
+          return (1, $data->{url});
+      } else {
+          return (0, "Paste failed");
+      }
     }
 }
 
@@ -40,11 +59,11 @@ __END__
 
 =head1 NAME
 
-App::Nopaste::Service::Perlbot - Service provider for perlbot.pl - https://perlbot.pl/
+App::Nopaste::Service::Perlbot - Service provider for perl.bot - https://perl.bot/
 
-=head1 VERSION
+=head1 COMMANDS
 
-version 0.001
+-c list - will list all available channels
 
 =head1 AUTHOR
 

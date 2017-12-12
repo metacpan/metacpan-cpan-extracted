@@ -6,6 +6,6 @@ used to provide access to bignum values produced by other OpenSSL
 modules, such as key parameters from Crypt::OpenSSL::RSA.  This module
 requires that the OpenSSL libraries and header files be installed.
 
-Copyright (c) 2003 Ian Robertson.  Crypt::OpenSSL::RSA is free
+Copyright (c) 2003 Ian Robertson.  Crypt::OpenSSL::Bignum is free
 software; you may redistribute it and/or modify it under the same
 terms as Perl itself.

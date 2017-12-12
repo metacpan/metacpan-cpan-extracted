@@ -1,0 +1,6 @@
+name = "Mojolicious-Plugin-ErrorTracking-Sentry"
+# badges = ["travis"]
+authority="cpan:OSDAKIRA"
+
+module_maker="ModuleBuildTiny"
+

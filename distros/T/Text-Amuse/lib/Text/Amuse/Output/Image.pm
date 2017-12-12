@@ -30,10 +30,10 @@ These arguments are saved in the objects and can be accessed with:
 
 =item wrap
 
-If 'l', the the float will wrap on the left, if 'r' will wrap on the
+If 'l', the float will wrap on the left, if 'r' will wrap on the
 right, if 'f' it's not floating, but it's intended as fullpage (will
 insert a clearpage after the image). This is handy if there is some
-long serie of images without text.
+long series of images without text.
 
 =item fmt
 

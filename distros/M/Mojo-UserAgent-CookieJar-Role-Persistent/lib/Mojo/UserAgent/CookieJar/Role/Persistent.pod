@@ -1,0 +1,96 @@
+=head1 NAME
+
+Mojo::UserAgent::CookieJar::Role::Persistent - Persist cookies to
+Netscape file
+
+=head1 SYNOPSIS
+
+  # Create a UserAgent with persistable cookies and load existing cookies
+  my $cj = Mojo::UserAgent::CookieJar->with_roles('+Persistent')->new;
+  $cj->load;
+  my $ua = Mojo::UserAgent->new(cookie_jar => $cj);
+  
+  # After cookie adding response e.g. logging into a website
+  $cj->save;
+
+=head1 DESCRIPTION
+
+Provides methods for saving and loading of cookies to the Netscape file
+format.
+
+=head1 ATTRIBUTES
+
+Mojo::UserAgent::CookieJar::Role::Persistent implements the following
+attributes.
+
+=head2 file
+
+  my $file = $cookie_jar->file;
+  my $cookie_jar = $cookie_jar->file('cookies.txt');
+
+File to save/load cookies to/from, defaults to 'cookies.txt'.
+
+=head2 expires_in
+
+  my $cb = $cookie_jar->expires_in;
+  my $cookie_jar = $cookie_jar->expires_in(sub { time + (60*10) });
+
+A callback used to determine the expiration time, defaults to current
+time + 10 minutes.
+
+=head2 session
+
+  my $bool = $cookie_jar->session;
+  my $cookie_jar = $cookie_jar->session($bool);
+
+Include session cookies in output, defaults to 1.
+
+=head1 METHODS
+
+Mojo::UserAgent::CookieJar::Role::Persistent implements the following
+methods.
+
+=head2 save
+
+  $cookie_jar->save;
+
+Saves the cookies in the CookieJar to file.
+
+=head2 load
+
+  $cookie_jar->load;
+
+Adds cookies from file into the CookieJar.
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Grinnz
+
+Reviewed a draft implementation.
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item Write a test suite
+
+=back
+
+=head1 AUTHOR
+
+CandyAngel <candyangel@electricjungle.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2017 CandyAngel <candyangel@electricjungle.org>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.  This program
+is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.

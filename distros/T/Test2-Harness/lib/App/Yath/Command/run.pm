@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -58,10 +58,13 @@ sub run {
 
     $run->{search} = \@search;
 
+    my $batch = $$ . '-' . time;
+
     my %jobs;
     my $base_id = 1;
     for my $tf ($self->make_run_from_settings->find_files) {
         my $job_id = $$ . '-' . $base_id++;
+        $jobs{$job_id} = 1;
 
         my $item = $tf->queue_item($job_id);
 
@@ -74,8 +77,9 @@ sub run {
         $item->{use_stream}  = $settings->{use_stream}  if defined $settings->{use_stream}  && !defined $item->{use_stream};
         $item->{use_fork}    = $settings->{use_fork}    if defined $settings->{use_fork}    && !defined $item->{use_fork};
 
+        $item->{batch} = $batch;
+
         $queue->enqueue($item);
-        $jobs{$job_id} = 1;
     }
 
     my $feeder = Test2::Harness::Feeder::Run->new(
@@ -85,6 +89,7 @@ sub run {
         keep_dir => $settings->{keep_dir},
         job_ids  => \%jobs,
         tail     => 10,
+        batch    => $batch,
     );
 
     $self->{+_FEEDER}    = $feeder;
@@ -238,6 +243,22 @@ Use the specified file as standard input to ALL tests
 
 Do not include 'lib'
 
+=item --slack "#CHANNEL"
+
+=item --slack "@USER"
+
+Send results to a slack channel
+
+Send results to a slack user
+
+=item --slack-fail "#CHANNEL"
+
+=item --slack-fail "@USER"
+
+Send failing results to a slack channel
+
+Send failing results to a slack user
+
 =item --tlib
 
 (Default: off) Include 't/lib' in your module path
@@ -299,6 +320,32 @@ Email the owner of broken tests files upon failure. Add `# HARNESS-META-OWNER fo
 Do not fork to start tests
 
 Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.
+
+=item --no-batch-owner-notices
+
+Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
+
+=item --slack-log
+
+=item --no-slack-log
+
+Off by default, log file will be attached if available
+
+Attach the event log to any slack notifications.
+
+=item --slack-notify
+
+=item --no-slack-notify
+
+On by default if --slack-url is specified
+
+Send slack notifications to the slack channels/users listed in test meta-data when tests fail.
+
+=item --slack-url "URL"
+
+Specify an API endpoint for slack webhook integrations
+
+This should be your slack webhook url.
 
 =item --stream
 
@@ -471,6 +518,12 @@ Specify the formatter to use
 (Default: "Test2")
 
 Only useful when the renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+
+=item --qvf
+
+Quiet, but verbose on failure
+
+Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.
 
 =item --show-job-end
 

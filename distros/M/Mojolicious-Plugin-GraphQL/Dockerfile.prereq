@@ -1,0 +1,10 @@
+FROM graphqlperl/graphql:latest
+
+# Copy the current directory contents into the container
+ADD . /opt/m-p-gql-prereq/
+
+# Install any needed packages - -v so can see errors
+RUN cd /opt/m-p-gql-prereq \
+  && perl Makefile.PL \
+  && cpanm -v --installdeps . \
+  && true

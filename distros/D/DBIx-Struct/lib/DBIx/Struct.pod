@@ -528,7 +528,27 @@ Or with parameters:
  
 This literal SQL expressions can be used for insert values also.
 
-=head4 B<JSON> support
+=head4 B<JSON> output support
+
+Every row-object hash C<TO_JSON()> function that can be automatically used
+by C<JSON> C<encode> function. This C<TO_JSON()> has some flexibility what
+to output. 
+
+  my $user = DBC::Users->findOneByUsername("cruks");
+  my $json = JSON->new->convert_blessed;
+  # please pay attention on "id", its value is of number type
+  print $json->encode($user); # {"username":"cruks","id":1}
+  # only one field is required
+  print $json->encode($user->TO_JSON("username")); # {"username":"cruks"}
+  # one field and more data in output
+  print $json->encode($user->TO_JSON("username", 
+       {url => "http://site.com/login"})
+    ); # {"username":"cruks","url":"http://site.com/login"}
+  # just add more data in output
+  print $json->encode($user->TO_JSON({url => "http://site.com/login"})); 
+  # {"url":"http://site.com/login","username":"cruks","id":1}
+
+=head4 B<JSON> type support
 
 Fields with datatype 'json' or 'jsonb' can be transparently used as perl-structures.
 

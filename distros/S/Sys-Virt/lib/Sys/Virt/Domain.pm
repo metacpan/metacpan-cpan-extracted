@@ -1566,6 +1566,10 @@ The bytes per second transferred
 
 The number of memory pages dirtied per second
 
+=item Sys::Virt::Domain::JOB_MEMORY_PAGE_SIZE
+
+The memory page size in bytes
+
 =item Sys::Virt::Domain::JOB_MEMORY_ITERATION
 
 The total number of iterations over guest memory
@@ -1994,6 +1998,11 @@ described by C<$dev> is written beyond the set C<$threshold>
 level. The threshold level is unset once the event fires. The
 event might not be delivered at all if libvirtd was not running
 at the moment when the threshold was reached.
+
+=item $dom->set_lifecycle_action($type, $action, $flags=0)
+
+Changes the actions of lifecycle events for domain represented as
+<on_$type>$action</on_$type> in the domain XML.
 
 =back
 
@@ -4537,6 +4546,57 @@ The name of the blkdev group
 =item Sys::Virt::Domain::TUNABLE_IOTHREADSPIN
 
 The I/O threads pinning
+
+=back
+
+=head2 DOMAIN LIFECYCLE CONSTANTS
+
+The following constants are useful when setting action for
+lifecycle events.
+
+=over 4
+
+=item Sys::Virt::Domain::LIFECYCLE_POWEROFF
+
+The poweroff lifecycle event type
+
+=item Sys::Virt::Domain::LIFECYCLE_REBOOT
+
+The reboot lifecycle event type
+
+=item Sys::Virt::Domain::LIFECYCLE_CRASH
+
+The crash lifecycle event type
+
+=back
+
+=head2 DOMAIN LIFECYCLE ACTION CONSTANTS
+
+=over 4
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_DESTROY
+
+The destroy lifecycle action
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_RESTART
+
+The restart lifecycle action
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_RESTART_RENAME
+
+The restart-rename lifecycle action
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_PRESERVE
+
+The preserve lifecycle action
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_COREDUMP_DESTROY
+
+The coredump-destroy lifecycle action
+
+=item Sys::Virt::Domain::LIFECYCLE_ACTION_COREDUMP_RESTART
+
+The coredump-restart lifecycle action
 
 =back
 

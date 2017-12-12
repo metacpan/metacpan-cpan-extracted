@@ -66,7 +66,7 @@ report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.73.47';
+$VERSION = '0.73.57';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################

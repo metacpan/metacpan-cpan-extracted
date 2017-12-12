@@ -12,6 +12,9 @@ my $build = Module::Build->new(
 Perl::Critic policies which help to avoid both
 explicit and implicit smartmatching
 ABSTRACT
+    configure_requires => {
+        'Module::Build' => 0,
+    },
     test_requires => {
         'Perl::Critic::TestUtils' => 0,
         'Test::More'              => 0,

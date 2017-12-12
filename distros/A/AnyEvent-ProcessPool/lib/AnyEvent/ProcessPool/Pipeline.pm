@@ -1,8 +1,7 @@
 package AnyEvent::ProcessPool::Pipeline;
 # ABSTRACT: A simplified, straightforward way to parallelize tasks
-$AnyEvent::ProcessPool::Pipeline::VERSION = '0.06';
-use strict;
-use warnings;
+$AnyEvent::ProcessPool::Pipeline::VERSION = '0.07';
+use common::sense;
 use AnyEvent::ProcessPool;
 use Try::Catch;
 
@@ -46,7 +45,7 @@ AnyEvent::ProcessPool::Pipeline - A simplified, straightforward way to paralleli
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

@@ -4,14 +4,12 @@ author:
   - 'Jerome Eteve <jerome.eteve@gmail.com>'
 build_requires:
   Data::UUID: '0'
-  File::Slurp: '0'
-  File::Temp: '0'
   Net::Amazon::S3: '0.59'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +19,13 @@ requires:
   Carp: '0'
   Class::Load: '0.20'
   DateTime: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
   Log::Log4perl: '1.42'
   Moose: '2.1005'
   perl: '5.008'
 resources:
   homepage: https://github.com/jeteve/l4p-appender-chunk
   repository: https://github.com/jeteve/l4p-appender-chunk.git
-version: '0.012'
+version: '0.013'

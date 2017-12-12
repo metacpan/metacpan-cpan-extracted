@@ -38,7 +38,8 @@
          "recommends" : {
             "Perinci::Sub::DepChecker" : "0",
             "Pipe::Find" : "0",
-            "Term::ReadKey" : "0"
+            "Term::ReadKey" : "0",
+            "Time::HiRes" : "0"
          },
          "requires" : {
             "Complete::Bash" : "0.27",
@@ -51,6 +52,7 @@
             "Data::Sah" : "0.84",
             "Data::Sah::Util::Type" : "0.45",
             "Encode" : "0",
+            "Fcntl" : "0",
             "File::Temp" : "0",
             "File::Which" : "0",
             "Getopt::Long" : "0",
@@ -102,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.80",
+   "version" : "1.810",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

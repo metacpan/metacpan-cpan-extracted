@@ -4,7 +4,7 @@ use base qw/Prty::ContentProcessor::BaseType/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ our $VERSION = 1.120;
 
 =head1 NAME
 
-Prty::ContentProcessor::Type - Basisklasse für Entitäts-Typen
+Prty::ContentProcessor::Type - Entität
 
 =head1 BASE CLASS
 
@@ -112,19 +112,19 @@ Ferner implementiert die Basisklasse folgende Methoden, die
 
 Liefert den eindeutigen Entitätsbezeichner. Die Basisklassenmethode
 setzt diesen aus dem Typ-Bezeichner und den Werten der
-@keyVal-Liste des Plugin zusammen. Kann überschrieben werden,
+@keyVal-Liste des Plugins zusammen. Kann überschrieben werden,
 wenn der Entitätsbezeichner anders gebildet werden soll.
 
 =item name()
 
 Liefert den Namen der Entität. Die Basisklassenmethode erzeugt
 diesen durch geringfügige Änderungen aus dem Wert des
-Abschnitts-Attributs C<Name:>.  Kann überschrieben werden,
+Abschnitts-Attributs C<Name:>. Kann überschrieben werden,
 wenn der Name anders hergeleitet werden soll.
 
 =back
 
-oder überschrieben werden müssen
+Oder überschrieben werden müssen:
 
 =over 4
 
@@ -155,10 +155,6 @@ C<undef>. Die Methode wird überschrieben.
 
     $ent = $class->create($sec,$cop,$plg,@keyVal);
 
-=head4 Description
-
-Erweitere Abschnitts-Objekt $sec und blesse es zu einer Entität.
-
 =head4 Arguments
 
 =over 4
@@ -184,6 +180,10 @@ Attribute, die der Entität hinzugefügt werden.
 =head4 Returns
 
 Zur Entität geblesstes Abschnitts-Objekt.
+
+=head4 Description
+
+Erweitere Abschnitts-Objekt $sec und blesse es zu einer Entität.
 
 =cut
 
@@ -222,56 +222,7 @@ sub create {
 
 # -----------------------------------------------------------------------------
 
-=head2 Objektmethoden
-
-=head3 entityFile() - Dateiname der Entität
-
-=head4 Synopsis
-
-    $file = $ent->entityFile;
-    $file = $ent->entityFile($dir);
-
-=head4 Description
-
-Liefere den Dateinamen der Entität. Dieser besteht aus der
-Entity-Id und der Entity-Extension. Wenn angegeben, wird diesem
-Dateinamen der Pfad $dir vorangestellt.
-
-=head4 Arguments
-
-=over 4
-
-=item $dir
-
-Verzeichnis, in dem sich die Datei befindet oder in das sie
-geschrieben wird.
-
-=back
-
-=head4 Returns
-
-Dateiname
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub entityFile {
-    my ($self,$dir) = @_;
-
-    my $file = $self->memoize('entityFile',sub {
-        my ($self,$key) = @_;
-        return sprintf '%s.%s',$self->entityId,$self->plugin->extension;
-    });
-
-    if ($dir) {
-        $file = sprintf '%s/%s',$dir,$file;
-    }
-
-    return $file;
-}
-
-# -----------------------------------------------------------------------------
+=head2 Entität
 
 =head3 entityId() - Eindeutiger Entitätsbezeichner
 
@@ -318,14 +269,14 @@ sub entityId {
 
     $entityType = $ent->entityType;
 
+=head4 Returns
+
+Entitäts-Typ (String)
+
 =head4 Description
 
 Liefere den Typ der Entität, wie er bei der bei der Registrierung
 der Entitäts-Klasse angegeben wurde.
-
-=head4 Returns
-
-Entitäts-Typ (String)
 
 =cut
 
@@ -338,106 +289,6 @@ sub entityType {
         my ($self,$key) = @_;
         return $self->plugin->entityType;
     });
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 files() - Liste der Ausgabedateien
-
-=head4 Synopsis
-
-    @files = $ent->files;
-
-=head4 Description
-
-Liefere die Liste der Dateien, die die Entität generiert.
-Diese Basisklassenmethode liefert eine leere Liste. Sie wird
-in Subklassen überschrieben.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub files {
-    my $self = shift;
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 fileSource() - Gesamter Quelltext
-
-=head4 Synopsis
-
-    $source = $ent->fileSource;
-
-=head4 Description
-
-Liefere den gesamten Quelltext der Entität, wie er in der
-Enttitätsdatei steht, einschließlich des Quelltexts der
-Sub-Entitäten.
-
-=head4 Returns
-
-Quelltext (String)
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub fileSource {
-    return shift->get('fileSource');
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 fileSourceRef() - Referenz auf gesamten Quelltext
-
-=head4 Synopsis
-
-    $sourceR = $ent->fileSourceRef;
-
-=head4 Description
-
-Wie $ent->L</fileSource>(), nur dass eine Referenz auf den
-Quelltext geliefert wird.
-
-=head4 Returns
-
-Referenz auf Quelltext
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub fileSourceRef {
-    return shift->getRef('fileSource');
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 appendFileSource() - Ergänze Quelltext
-
-=head4 Synopsis
-
-    $ent->appendFileSource($sec);
-
-=head4 Description
-
-Ergänze Attribut fileSource um den Quelltext des Abschnitts $sec.
-
-=head4 Returns
-
-nichts
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub appendFileSource {
-    my ($self,$sec) = @_;
-    $self->append(fileSource=>$sec->source);
-    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -489,7 +340,137 @@ sub name {
 
 # -----------------------------------------------------------------------------
 
-=head3 pureCode() - Quelltext ohne Kommentare und Inline-Doku
+=head3 entityFile() - Name/Pfad der Entitätsdatei
+
+=head4 Synopsis
+
+    $file = $ent->entityFile;
+    $file = $ent->entityFile($dir);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Verzeichnis, in dem sich die Datei befindet oder in das sie
+geschrieben wird.
+
+=back
+
+=head4 Returns
+
+Dateiname
+
+=head4 Description
+
+Liefere den Dateinamen der Entität. Dieser besteht aus der
+Entity-Id und der Entity-Extension. Wenn angegeben, wird diesem
+Dateinamen der Pfad $dir vorangestellt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub entityFile {
+    my ($self,$dir) = @_;
+
+    my $file = $self->memoize('entityFile',sub {
+        my ($self,$key) = @_;
+        return sprintf '%s.%s',$self->entityId,$self->plugin->extension;
+    });
+
+    if ($dir) {
+        $file = sprintf '%s/%s',$dir,$file;
+    }
+
+    return $file;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Quelltext
+
+=head3 fileSource() - Gesamter Quelltext
+
+=head4 Synopsis
+
+    $source = $ent->fileSource;
+
+=head4 Returns
+
+Quelltext (String)
+
+=head4 Description
+
+Liefere den gesamten Quelltext der Entität, wie er in der
+Enttitätsdatei steht, einschließlich des Quelltexts der
+Sub-Entitäten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub fileSource {
+    return shift->get('fileSource');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 fileSourceRef() - Referenz auf gesamten Quelltext
+
+=head4 Synopsis
+
+    $sourceR = $ent->fileSourceRef;
+
+=head4 Returns
+
+Referenz auf Quelltext
+
+=head4 Description
+
+Wie $ent->L</fileSource>(), nur dass eine Referenz auf den
+Quelltext geliefert wird.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub fileSourceRef {
+    return shift->getRef('fileSource');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 appendFileSource() - Ergänze Quelltext um Abschnitts-Quelltext
+
+=head4 Synopsis
+
+    $ent->appendFileSource($sec);
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Ergänze Attribut fileSource um den Quelltext des Abschnitts $sec.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub appendFileSource {
+    my ($self,$sec) = @_;
+    $self->append(fileSource=>$sec->source);
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Test
+
+=head3 pureCode() - Quelltext ohne Kommentare und Inline-Doku (abstrakt)
 
 =head4 Synopsis
 
@@ -506,7 +487,32 @@ sub pureCode {
 
 # -----------------------------------------------------------------------------
 
-=head2 Intern
+=head2 Dateierzeugung
+
+=head3 files() - Liste der Ausgabedateien (abstrakt)
+
+=head4 Synopsis
+
+    @files = $ent->files;
+
+=head4 Description
+
+Liefere die Liste der Dateien, die die Entität generiert.
+Diese Basisklassenmethode liefert eine leere Liste. Sie wird
+in Subklassen überschrieben.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub files {
+    my $self = shift;
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Interne Methoden
 
 =head3 needsTest() - Liefere/Setze persistenten Test-Status
 
@@ -514,6 +520,20 @@ sub pureCode {
 
     $needsTest = $ent->needsTest;
     $needsTest = $ent->needsTest($state);
+
+=head4 Arguments
+
+=over 4
+
+=item $state
+
+Test-Status, der gesetzt wird.
+
+=back
+
+=head4 Returns
+
+Test-Status der Entität
 
 =head4 Description
 
@@ -548,20 +568,6 @@ Ohne Parameter aufgerufen, liefert die Methode den aktuellen
 Test-Status der Entität. Mit Parameter gerufen, setzt die Methode
 den Test-Status, wobei dieser persistent gespeichert wird.
 
-=head4 Arguments
-
-=over 4
-
-=item $state
-
-Test-Status, der gesetzt wird.
-
-=back
-
-=head4 Returns
-
-Test-Status der Entität
-
 =cut
 
 # -----------------------------------------------------------------------------
@@ -591,6 +597,20 @@ sub needsTest {
     $needsUpdate = $ent->needsUpdate;
     $needsUpdate = $ent->needsUpdate($state);
 
+=head4 Arguments
+
+=over 4
+
+=item $state
+
+Änderungs-Status, der gesetzt wird.
+
+=back
+
+=head4 Returns
+
+Änderungs-Status der Entität
+
 =head4 Description
 
 Liefere/Setze den Änderungs-Status der Entität $ent. Der
@@ -617,20 +637,6 @@ Ohne Parameter aufgerufen, liefert die Methode den aktuellen
 Methode den Änderungs-Status, wobei dieser persistent gespeichert
 wird.
 
-=head4 Arguments
-
-=over 4
-
-=item $state
-
-Änderungs-Status, der gesetzt wird.
-
-=back
-
-=head4 Returns
-
-Änderungs-Status der Entität
-
 =cut
 
 # -----------------------------------------------------------------------------
@@ -655,7 +661,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

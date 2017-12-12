@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 358;
+plan tests => 360;
 
 use lib 't';
 use MyTestHelpers;
@@ -36,7 +36,7 @@ require Math::PlanePath::QuintetCurve;
 # VERSION
 
 {
-  my $want_version = 124;
+  my $want_version = 125;
   ok ($Math::PlanePath::QuintetCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuintetCurve->VERSION,  $want_version,
@@ -71,6 +71,61 @@ require Math::PlanePath::QuintetCurve;
   ok ($path->y_negative, 1, 'y_negative()');
 }
 
+
+#------------------------------------------------------------------------------
+# turn sequence
+
+{
+  sub dxdy_to_dir {
+    my ($dx,$dy) = @_;
+    if ($dy == 0) {
+      if ($dx == 1) { return 0; }
+      if ($dx == -1) { return 2; }
+    }
+    if ($dy == 1) {
+      if ($dx == 0) { return 1; }
+    }
+    if ($dy == -1) {
+      if ($dx == 0) { return 3; }
+    }
+    die "unrecognised $dx,$dy";
+  }
+
+  my $path = Math::PlanePath::QuintetCurve->new;
+  my $n = $path->n_start;
+  my $bad = 0;
+
+  my ($prev_x, $prev_y) = $path->n_to_xy($n++);
+
+  my ($x, $y) = $path->n_to_xy($n++);
+  my $dx = $x - $prev_x;
+  my $dy = $y - $prev_y;
+  my $prev_dir = dxdy_to_dir($dx,$dy);
+
+  while ($n < 1000) {
+    $prev_x = $x;
+    $prev_y = $y;
+
+    ($x,$y) = $path->n_to_xy($n);
+    $dx = $x - $prev_x;
+    $dy = $y - $prev_y;
+    my $dir = dxdy_to_dir($dx,$dy);
+
+    my $want_turn = ($dir - $prev_dir) % 4;
+    if ($want_turn == 3) { $want_turn = -1; }
+    my $got_turn = $path->_UNDOCUMENTED__n_to_turn_LSR($n-1);
+
+    if ($got_turn != $want_turn) {
+      MyTestHelpers::diag ("bad n=$n turn got=$got_turn want=$want_turn");
+      MyTestHelpers::diag ("  dir=$dir prev_dir=$prev_dir");
+      last if $bad++ > 10;
+    }
+
+    $n++;
+    $prev_dir = $dir;
+  }
+  ok ($bad, 0, "turn sequence");
+}
 
 #------------------------------------------------------------------------------
 # level_to_n_range()
@@ -222,21 +277,22 @@ require Math::PlanePath::QuintetCurve;
 # reversible
 
 # bit slow ...
-if (0) {
-  my $good = 1;
+{
+  my $bad = 0;
   foreach my $arms (1 .. 4) {
     my $path = Math::PlanePath::QuintetCurve->new (arms => $arms);
-    for my $n (0 .. 5**5) {
+    for my $n (0 .. 5**4) {
       my ($x,$y) = $path->n_to_xy ($n);
       my $rev_n = $path->xy_to_n ($x,$y);
       if (! defined $rev_n) { $rev_n = 'undef'; }
       if (! defined $rev_n || $rev_n != $n) {
-        $good = 0;
+        last if ++$bad > 10;
         MyTestHelpers::diag ("xy_to_n($x,$y) reverse to expect n=$n, got $rev_n");
       }
     }
   }
-  ok ($good, 1);
+  ok ($bad, 0);
 }
 
+#------------------------------------------------------------------------------
 exit 0;

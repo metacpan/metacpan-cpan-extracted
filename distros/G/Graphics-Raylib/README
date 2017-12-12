@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.007
+    version 0.008
 
 SYNOPSIS
 
@@ -47,9 +47,19 @@ IMPLEMENTATION
     You can import Graphics::Raylib::XS for any functions not yet exposed
     perlishly. Scroll down for an example.
 
+AUTOMATIC IMPORT
+
+    use Graphics::Raylib '+family'; can be used as a shorthand for
+
+        use Graphics::Raylib::Color ':all';
+        use Graphics::Raylib::Shape;
+        use Graphics::Raylib::Text;
+        use Graphics::Raylib::Mouse;
+        use Graphics::Raylib::Keyboard ':all';
+
 METHODS/SUBS AND ARGUMENTS
 
-    window($width, $height, $title)
+    window($width, $height, [$title = $0])
 
       Constructs the Graphics::Raylib window. $title is optional and
       defaults to $0. Resources allocated for the window are freed when the
@@ -86,6 +96,10 @@ EXAMPLES
           my $CELL_SIZE = 3;
       
           use Graphics::Raylib '+family'; # one use to rule them all
+          # Alternatively
+          use Graphics::Raylib::Color ':all';
+          use Graphics::Raylib::Shape;
+          use Graphics::Raylib::Text;
       
           use PDL;
           use PDL::Matrix;
@@ -109,7 +123,7 @@ EXAMPLES
       
           my $bitmap = Graphics::Raylib::Shape->bitmap(
               matrix => unpdl($gen),
-              # color => GOLD; # commented-out, we are doing it fancy
+              # color => GOLD # commented-out, we are doing it fancy
           );
       
           my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
@@ -149,6 +163,8 @@ GIT REPOSITORY
     http://github.com/athreef/Graphics-Raylib
 
 SEE ALSO
+
+    Graphics::Raylib::Shape
 
     Graphics::Raylib::XS Alien::raylib
 

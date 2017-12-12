@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,6 +22,35 @@ use strict;
 use warnings;
 use Math::Libm 'M_PI', 'hypot';
 
+
+{
+  # QuintetCurve turn sequence
+
+  require Math::NumSeq::PlanePathTurn;
+  {
+    # turn
+    # not in OEIS: -1,1,1,0,-1,0,-1,-1,1,1,-1,1,1,0,0,-1,1,1,0,0,0,-1,-1,1,-1,-1,1,1,0,0,0,-1,-1,1,0,0,-1,-1,1,-1,-1,1,1,0,1,0,-1,-1,1,1
+    my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'QuintetCurve',
+                                                turn_type => 'LSR');
+    foreach (1 .. 50) {
+      my ($i,$value) = $seq->next;
+      print "$value,";
+    }
+    print "\n";
+  }
+  {
+    # Left = lowest non-0 is 1,5,6
+    # not in OEIS: 0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,0,1,0,0,1,1,0,1,0,0,0,1,1,
+    my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'QuintetCurve',
+                                                turn_type => 'Left');
+    foreach (1 .. 50) {
+      my ($i,$value) = $seq->next;
+      print "$value,";
+    }
+    print "\n";
+  }
+  exit 0;
+}
 
 {
   require Math::PlanePath::QuintetCurve;

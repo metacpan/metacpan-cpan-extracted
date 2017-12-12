@@ -8,7 +8,7 @@ use vars qw( $VERSION @ISA );
 
 use base qw(DynaLoader);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 bootstrap Crypt::OpenSSL::Bignum $VERSION;
 

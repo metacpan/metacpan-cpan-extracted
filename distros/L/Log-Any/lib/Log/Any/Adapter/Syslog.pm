@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::Syslog;
 
 # ABSTRACT: Send Log::Any logs to syslog
-our $VERSION = '1.702';
+our $VERSION = '1.703';
 
 use Log::Any::Adapter::Util qw{make_method};
 use base qw{Log::Any::Adapter::Base};
@@ -141,7 +141,7 @@ Log::Any::Adapter::Syslog - Send Log::Any logs to syslog
 
 =head1 VERSION
 
-version 1.702
+version 1.703
 
 =head1 SYNOPSIS
 

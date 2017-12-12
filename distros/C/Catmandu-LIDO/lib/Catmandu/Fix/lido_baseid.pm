@@ -8,7 +8,7 @@ use Catmandu::Fix::LIDO::ID qw(emit_base_id);
 
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 #https://librecatproject.wordpress.com/2014/03/26/create-a-fixer-part-2/
 
@@ -19,12 +19,13 @@ has id_value => (fix_arg => 1);
 has type 	 => (fix_opt => 1);
 has source   => (fix_opt => 1);
 has label    => (fix_opt => 1);
+has pref	 => (fix_opt => 1);
 
 sub emit {
 	my ($self, $fixer) = @_;
 	my $perl = '';
 
-	$perl .= emit_base_id($fixer, $fixer->var, $self->path, $self->id_value, $self->source, $self->label, $self->type);
+	$perl .= emit_base_id($fixer, $fixer->var, $self->path, $self->id_value, $self->source, $self->label, $self->type, $self->pref);
 
 	$perl;
 }

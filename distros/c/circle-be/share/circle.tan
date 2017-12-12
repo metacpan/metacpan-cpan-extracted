@@ -121,6 +121,10 @@ class Circle.Widget.Entry {
   prop history = queue of str;
 
   prop completions = objset of obj;
+
+  smashed prop want_typing = bool;
+
+  method typing(bool);
 }
 
 class Circle.Widget.Entry.CompleteGroup {

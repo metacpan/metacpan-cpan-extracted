@@ -1,7 +1,7 @@
 package Business::Tax::ID::PPH21;
 
-our $DATE = '2017-11-09'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-12-04'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use Exporter::Rinci qw(import);
 
 our %SPEC;
 
-my $latest_supported_year = 2016;
+my $latest_supported_year = 2017;
 
 our %arg_tp_status = (
     tp_status => {
@@ -187,7 +187,7 @@ sub get_pph21_op_ptkp {
         };
     };
 
-    if ($year >= 2016 && $year <= 2016) { # UU PMK: 101/PMK.010/2016
+    if ($year >= 2016 && $year <= $latest_supported_year) { # UU PMK: 101/PMK.010/2016
         state $res = [200, "OK", $code_make->( 54_000_000, 4_500_000)];
         return $res;
     } elsif ($year >= 2015 && $year <= 2015) {
@@ -360,7 +360,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.05 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-11-09.
+This document describes version 0.060 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-12-04.
 
 =head1 SYNOPSIS
 

@@ -59,29 +59,38 @@ sub process_components {
   # children for transforming dom.
   foreach my $id(@ordered_keys) {
     next unless $constructed_components{$id};
-    my $processed_component = $constructed_components{$id}->get_processed_dom;
+    my $processed_component = '';
+    if(ref($constructed_components{$id}) eq 'CODE') {    
+      $processed_component = $constructed_components{$id}->();
+    } else {
+      $processed_component = $constructed_components{$id}->get_processed_dom;
+    }
 
 #=head1 comment
 
     # Move all the scripts, styles and links to the head area
     # TODO this probably doesn't work if the stuff is in a component
     # inside a component.
-    $processed_component->find('link:not(head link)')->each(sub {
-        return unless $_->attr('id') || $_->attr('href');
-        $dom->append_link_uniquely($_);
-        $_->remove;
-    }); # href
-    $processed_component->find('style:not(head style)')->each(sub {
-        return unless $_->attr('id');
-        $dom->append_style_uniquely($_);
-        $_->remove;
-    }); #id
-    $processed_component->find('script:not(head script)')->each(sub {
-        my ($e, $num) = @_;
-        return unless $e->attr('id') || $e->attr('src');
-        $dom->append_script_uniquely($e);
-        $_->remove;
-    }); #id or src
+    
+    # $processed_component might be a dom or a collection
+    if(ref($processed_component) && $processed_component->can('find')) {
+      $processed_component->find('link:not(head link)')->each(sub {
+          return unless $_->attr('id') || $_->attr('href');
+          $dom->append_link_uniquely($_);
+          $_->remove;
+      }); # href
+      $processed_component->find('style:not(head style)')->each(sub {
+          return unless $_->attr('id');
+          $dom->append_style_uniquely($_);
+          $_->remove;
+      }); #id
+      $processed_component->find('script:not(head script)')->each(sub {
+          my ($e, $num) = @_;
+          return unless $e->attr('id') || $e->attr('src');
+          $dom->append_script_uniquely($e);
+          $_->remove;
+      }); #id or src
+  }
 
 #=cut
 
@@ -124,12 +133,9 @@ sub process_component {
     }
     return $constructed_component;
   } elsif(ref($component) eq 'CODE') {
-    die "Component not an object";
-    #my $new_dom = $component->($dom->content, %attrs);
-    #warn $new_dom;
-    #$dom->replace($new_dom);
-    #warn $dom;
-    #return;
+    return sub {
+      $component->($self, $dom);
+    };
   }
 }
 

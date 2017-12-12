@@ -392,6 +392,7 @@ share/assets/icons/table_selection_all.png
 share/assets/icons/table_selection_row.png
 share/assets/icons/table_sql_edit.png
 share/assets/icons/tabs_delete.png
+share/assets/icons/text_tree.png
 share/assets/icons/textfield-check.png
 share/assets/icons/textfield-cross.png
 share/assets/icons/textfield-edit.png
@@ -402,6 +403,7 @@ share/assets/icons/tick_tiny_light.png
 share/assets/icons/time.png
 share/assets/icons/tool_close.png
 share/assets/icons/tree-collapse.png
+share/assets/icons/tree-down.png
 share/assets/icons/tree-edit.png
 share/assets/icons/tree-expand.png
 share/assets/icons/user.png

@@ -54,9 +54,7 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Git" : "0",
-            "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0",
-            "Test::Perl::Critic" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -72,7 +70,7 @@
          "web" : "http://github.com/gflohr/File-Globstar.git"
       }
    },
-   "version" : "0.3",
+   "version" : "0.5",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

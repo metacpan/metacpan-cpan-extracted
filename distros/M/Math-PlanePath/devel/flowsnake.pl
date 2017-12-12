@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -27,14 +27,43 @@ use Math::PlanePath;;
 use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh',
   'digit_join_lowtohigh';
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-
 {
+  # islands convex hull
 
+  require Math::PlanePath::GosperIslands;
+  require Math::Geometry::Planar;
+  my $path = Math::PlanePath::GosperIslands->new;
+  my @values;
+  foreach my $k (0 .. 9) {
+    my $n_lo = 3**($k+1) - 2;
+    my $n_hi = 3**($k+2) - 2 - 1;
+    ### $n_lo
+    ### $n_hi
+    my $points = [ map{[$path->n_to_xy($_)]} $n_lo .. $n_hi ];
 
+    my $planar = Math::Geometry::Planar->new;
+    $planar->points($points);
+    if (@$points > 4) {
+      $planar = $planar->convexhull2;
+      $points = $planar->points;
+    }
+    my $area = $planar->area / 6;
+
+    my $whole_area = 7**$k;
+    my $f = $area / $whole_area;
+    my $num_points = scalar(@$points);
+    print "k=$k hull points $num_points area $area cf $whole_area ratio $f\n";
+    push @values,$area;
+
+  }
+  require Math::OEIS::Grep;
+  Math::OEIS::Grep->search(array => \@values, verbose=>1);
+  exit 0;
 }
 
 {
@@ -192,11 +221,11 @@ use Math::PlanePath::Base::Digits
     }
     return path_n_to_tturn6($n);
 
-    if ($n == 1) { return 1; }
-    if ($n == 2) { return 2; }
+    if ($n == 1) { return  1; }
+    if ($n == 2) { return  2; }
     if ($n == 3) { return -1; }
     if ($n == 4) { return -2; }
-    if ($n == 5) { return 0; }
+    if ($n == 5) { return  0; }
     if ($n == 6) { return -1; }
     my @digits = digit_split_lowtohigh($n,7);
     my $high = pop @digits;

@@ -2,13 +2,13 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015 Joelle Maslak
+# Copyright (C) 2015-2017 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 # Basic testing
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 # Instantiate the object
 require_ok('JCM::Boilerplate');
@@ -18,7 +18,7 @@ require_ok('JCM::Boilerplate');
 eval {
     use JCM::Boilerplate;
 
-    my $test=1;
+    my $test = 1;
     given ($test) {
         when (/1/) {
             pass('Boilerplate works!');
@@ -47,6 +47,18 @@ eval {
     pass('Boilerplate role tag works');
 } or fail('Boilerplate role tag works');
 
+$ret = eval {
+    my $x = 'abc';
+    local $SIG{__WARN__} = sub { };
+    eval(
+        "use JCM::Boilerplate 'script'; if (\$x =~ m/\\xabc/) { warn('Should not see this'); }; 1");
+};
+if ($ret) {
+    fail('Invalid regex under strict mode dies');
+} else {
+    pass('Invalid regex under strict mode dies');
+}
+
 
 #
 # Same thing, but for JTM
@@ -60,7 +72,7 @@ require_ok('JTM::Boilerplate');
 eval {
     use JTM::Boilerplate;
 
-    my $test=1;
+    my $test = 1;
     given ($test) {
         when (/1/) {
             pass('Boilerplate works!');
@@ -88,4 +100,16 @@ eval {
     }
     pass('Boilerplate role tag works');
 } or fail('Boilerplate role tag works');
+
+$ret = eval {
+    my $x = 'abc';
+    local $SIG{__WARN__} = sub { };
+    eval(
+        "use JTM::Boilerplate 'script'; if (\$x =~ m/\\xabc/) { warn('Should not see this'); }; 1 ");
+};
+if ($ret) {
+    fail('Invalid regex under strict mode dies');
+} else {
+    pass('Invalid regex under strict mode dies');
+}
 

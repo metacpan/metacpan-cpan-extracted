@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Hash;
 use Prty::Option;
@@ -1223,16 +1223,6 @@ sub asRecord {
 
     $row->copyData($row0,@opt);
 
-=head4 Description
-
-Setze die Datensatz-Attribute in $row auf deren Werte in $row0.
-Attribute, die in $row0 nicht vorkommen, werden nicht gesetzt.
-Die Methode liefert keinen Wert zurück.
-
-Die Methode ist nützlich, wenn ein Datensatz auf der Datenbank
-aktualisiert werden soll und dessen neue Werte auf einem anderen
-Datensatz stehen.
-
 =head4 Options
 
 =over 4
@@ -1249,6 +1239,16 @@ Datensatz $row0 bleibt der Attributwert in $row erhalten.
 Mögliche Erweiterung: Liste von Kolumnennamen.
 
 =back
+
+=head4 Description
+
+Setze die Datensatz-Attribute in $row auf deren Werte in $row0.
+Attribute, die in $row0 nicht vorkommen, werden nicht gesetzt.
+Die Methode liefert keinen Wert zurück.
+
+Die Methode ist nützlich, wenn ein Datensatz auf der Datenbank
+aktualisiert werden soll und dessen neue Werte auf einem anderen
+Datensatz stehen.
 
 =cut
 
@@ -1521,11 +1521,6 @@ sub value {
 
     $sbitRow = $row->toSbit($sbitClass);
 
-=head4 Description
-
-Generiere aus Datensatz I<$row> einen Sbit-Datensatz der Klasse
-I<$sbitClass> und liefere diesen zurück.
-
 =head4 Arguments
 
 =over 4
@@ -1539,6 +1534,11 @@ Datensatz-Klasse der Sbit-Klassenbibliothek
 =head4 Returns
 
 Referenz auf Sbit-Datensatz
+
+=head4 Description
+
+Generiere aus Datensatz I<$row> einen Sbit-Datensatz der Klasse
+I<$sbitClass> und liefere diesen zurück.
 
 =head4 Details
 
@@ -1634,7 +1634,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

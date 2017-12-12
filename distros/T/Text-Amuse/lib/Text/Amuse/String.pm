@@ -9,7 +9,7 @@ Text::Amuse::String - Process one-line muse strings.
 
 =head1 SYNOPSIS
 
-This module provies a minimal class compatible with
+This module provides a minimal class compatible with
 Text::Amuse::Document to process single strings passed via value.
 
 =cut

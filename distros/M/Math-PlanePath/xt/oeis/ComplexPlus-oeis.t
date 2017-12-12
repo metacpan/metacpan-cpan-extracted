@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016 Kevin Ryde
+# Copyright 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 13;
+plan tests => 16;
 use Math::BigInt try => 'GMP';
 
 use lib 't','xt';
@@ -34,6 +34,48 @@ use MyOEIS;
 
 use Math::PlanePath::ComplexPlus;
 my $path = Math::PlanePath::ComplexPlus->new;
+
+
+#------------------------------------------------------------------------------
+# A290885 = -X
+
+MyOEIS::compare_values
+  (anum => 'A290885',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, -$x;
+     }
+     return \@got;
+   });
+
+# A290884 = Y
+MyOEIS::compare_values
+  (anum => 'A290884',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+# A290886 = norm X^2+Y^2
+MyOEIS::compare_values
+  (anum => 'A290886',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x**2 + $y**2;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

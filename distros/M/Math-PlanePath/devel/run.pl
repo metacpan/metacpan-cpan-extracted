@@ -48,7 +48,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::HilbertSpiral';
   $path_class = 'Math::PlanePath::GreekKeySpiral';
   $path_class = 'Math::PlanePath::ComplexMinus';
-  $path_class = 'Math::PlanePath::QuintetReplicate';
   $path_class = 'Math::PlanePath::GosperReplicate';
   $path_class = 'Math::PlanePath::ComplexPlus';
   $path_class = 'Math::PlanePath::CubicBase';
@@ -69,7 +68,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::ComplexRevolving';
   $path_class = 'Math::PlanePath::DragonMidpoint';
   $path_class = 'Math::PlanePath::ParabolicRows';
-  $path_class = 'Math::PlanePath::QuintetCurve';
   $path_class = 'Math::PlanePath::TriangularHypot';
   $path_class = 'Math::PlanePath::SierpinskiArrowheadCentres';
   $path_class = 'Math::PlanePath::DiamondSpiral';
@@ -163,27 +161,31 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::AlternatePaper';
   $path_class = 'Math::PlanePath::HilbertSides';
   $path_class = 'Math::PlanePath::SquaRecurve';
+  $path_class = 'Math::PlanePath::QuintetCurve';
+  $path_class = 'Math::PlanePath::SquareReplicate';
+  $path_class = 'Math::PlanePath::QuintetReplicate';
 
   my $lo = 0;
-  my $hi = 32;
-  
+  my $hi = 5**3;
+
   Module::Load::load($path_class);
   my $path = $path_class->new
     (
-     k=>5,
-     # arms => 8,
+     numbering_type => 'rotate',
+     # k=>5,
+     # arms => 2,
      # align => 'right',
      # parts => 'left',
-     
+
      # direction => 'up',
      # coordinates => 'ST',
      # tree_type => 'UAD',
-     
+
      #  ring_shape => 'polygon',
      # step => 1,
-     
+
      # sign_encoding => 'revbinary',
-     
+
      # n_start => 0,
      # parts => 'wedge',
      # shift => 6,
@@ -194,13 +196,13 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
      # digit_order => 'LtoH',
      # reduced => 1,
      # radix => 4,
-     
+
      # rule => 14,
      # x_start => 5,
      # y_start => 2,
-     
+
      # divisor_type => 'proper',
-     
+
      # wider => 3,
      # reverse => 1,
      # tree_type => 'L',
@@ -235,13 +237,13 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   my $arms_count = $path->arms_count;
   my $path_ref = ref($path);
   print "n_start()=$n_start arms_count()=$arms_count   $path_ref\n";
-  
+
   {
     my $num_roots = $path->tree_num_roots();
     my @n_list = $path->tree_root_n_list();
     print "  $num_roots roots n=",join(',',@n_list),"\n";
   }
-  
+
   {
     require Data::Float;
     my $pos_infinity = Data::Float::pos_infinity();
@@ -263,13 +265,13 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
     $path->rect_to_n_range(0,$neg_infinity,0,0);
     $path->rect_to_n_range(0,$nan,0,0);
   }
-  
+
   for (my $i = $n_start+$lo; $i <= $hi; $i+=1) {
     #for (my $i = $n_start; $i <= $n_start + 800000; $i=POSIX::ceil($i*2.01+1)) {
-    
+
     my ($x, $y) = $path->n_to_xy($i) or next;
     # next unless $x < 0; # abs($x)>abs($y) && $x > 0;
-    
+
     my $dxdy = '';
     my $diffdxdy = '';
     my ($dx, $dy) = $path->n_to_dxdy($i);
@@ -279,7 +281,7 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
     } else {
       $dxdy='[undef]';
     }
-    
+
     my ($next_x, $next_y) = $path->n_to_xy($i+$arms_count);
     if (defined $next_x && defined $next_y) {
       my $want_dx = $next_x - $x;
@@ -288,7 +290,7 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
         $diffdxdy = "dxdy(want $want_dx,$want_dy)";
       }
     }
-    
+
     my $rep = '';
     my $xy = (defined $x ? $x : 'undef').','.(defined $y ? $y : 'undef');
     if (defined $seen{$xy}) {
@@ -297,7 +299,7 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
     } else {
       $seen{$xy} = $i;
     }
-    
+
     my @n_list = $path->xy_to_n_list ($x+.0, $y-.0);
     my $n_rev;
     if (@n_list) {
@@ -361,12 +363,12 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
     my $iwidth = ($i == int($i) ? 0 : 2);
     printf "%.*f %7.3f,%7.3f   %3s  %s  %s%s %s %s\n",
       $iwidth,$i,  $x,$y,
-        $n_rev,
-          "${n_lo}_${n_hi}",
-            $dxdy,
-              $n_children,
-                " $rep",
-                  $flag;
+      $n_rev,
+      "${n_lo}_${n_hi}",
+      $dxdy,
+      $n_children,
+      " $rep",
+      $flag;
 
     # %.2f ($x*$x+$y*$y),
   }

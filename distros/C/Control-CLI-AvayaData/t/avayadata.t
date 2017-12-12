@@ -443,6 +443,7 @@ do {{ # Test loop, we keep testing until user satisfied
 		if ('Stack' eq attribute($cli, 'switch_mode')) {
 			attribute($cli, 'base_unit');
 			attribute($cli, 'unit_number');
+			attribute($cli, 'stack_size');
 		}
 		attribute($cli, 'stp_mode');
 		attribute($cli, 'mgmt_vlan');

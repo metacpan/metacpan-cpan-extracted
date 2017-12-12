@@ -1,25 +1,30 @@
---- 
-abstract: POE http or tcp based JSON-RPC server
-author: Côme BERNIGAUD <come.bernigaud@laposte.net>
-build_requires: 
-  Test::More: 0
+---
+abstract: 'POE tcp or http based JSON-RPC server'
+author:
+  - 'Côme Chilliet <mcmic@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-generated_by: Module::Install version 0.67
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
 license: perl
-meta-spec: 
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-  version: 1.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
 name: POE-Component-Server-JSONRPC
-no_index: 
-  directory: 
+no_index:
+  directory:
     - inc
     - t
-requires: 
+requires:
   Class::Accessor::Fast: 0
   JSON: 0
-  JSON::Client::RPC: 0
   POE: 0
-  POE::Component::Server::TCP: 0
   POE::Component::Server::SimpleHTTP: 0
+  POE::Component::Server::TCP: 0
   POE::Filter::Line: 0
-version: 0.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.06'

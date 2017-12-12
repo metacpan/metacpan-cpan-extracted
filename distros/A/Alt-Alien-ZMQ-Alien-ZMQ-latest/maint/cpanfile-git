@@ -1,0 +1,3 @@
+requires 'Alien::ZMQ::latest',
+	git => 'https://github.com/zmughal/p5-Alien-ZMQ-latest.git',
+	branch => 'master';

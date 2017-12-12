@@ -5,7 +5,7 @@ for running instances.
 With that in mind here is an install approach:
 
 PREREQUISITES: 
-* mongodb
+* elasticsearch OR mongodb
 * git
 
 STEP 1: Copy mojito.conf to mojito_local.conf (in lib/Mojito/conf/ directory)

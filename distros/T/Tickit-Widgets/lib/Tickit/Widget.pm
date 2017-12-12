@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -18,6 +18,7 @@ use Tickit::Pen;
 use Tickit::Style;
 use Tickit::Utils qw( textwidth );
 use Tickit::Window 0.57;  # $win->bind_event
+use Tickit::Event 0.63;  # $info->type("newapi") on Focus
 
 use constant PEN_ATTR_MAP => { map { $_ => 1 } @Tickit::Pen::ALL_ATTRS };
 
@@ -532,7 +533,7 @@ sub window_gained
 
    $event_ids->{focus} = $window->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      $self->_on_win_focus( $win, $info->type, $info->win );
+      $self->_on_win_focus( $win, $info->type( "newapi" ), $info->win );
    } ) if $self->can( "_widget_style_type" );
 
    if( $self->can( "on_key" ) or $self->KEYPRESSES_FROM_STYLE ) {
@@ -570,7 +571,7 @@ sub _on_win_focus
    my $self = shift;
    my ( $win, $focus ) = @_;
 
-   $self->set_style_tag( focus => $focus );
+   $self->set_style_tag( focus => $focus eq "in" );
 }
 
 sub key_focus_next_after

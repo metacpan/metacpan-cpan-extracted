@@ -1,0 +1,147 @@
+NAME
+    Tribology::Lubricant - Data type that represents a Lubricant class.
+
+DESCRIPTION
+    This class, given technical data based on lubricant TDS/PDS documents
+    assists in calculation of various Rheologic characteristics of the
+    lubricant. Such as:
+
+    *   V-T behavior ("m()") using Ubbelohde-Walter equation
+
+    *   Calculate viscosity at a given temperature ( "visc()" ) when any of
+        two calibration points are known
+
+    *   Calculate viscosity index using ASTM D2270's A and B procedures (
+        "vi()" )
+
+    *   Lookup L and H constants of the lubricant using ASTM D2270 Table and
+        using linear interoplation whenever neccessary ( "LH()" )
+
+SYNOPSIS
+        require Tribology::Lubricant;
+
+        # We already have viscosity at 40C and 100C. 
+        my $lub = Tribology::Lubricant->new({
+            label   => "Naphthenic spindle oil",
+            visc40  => 30,
+            visc100 => 100
+        });
+
+        # Viscosity @ 50C:
+        my $visc50 = $lub->visc(50);
+
+        # Viscosity index (VI)
+        my $vi = $lub->vi;
+
+        # Viscosity-temperature constant:
+        my $vtc = $lub->vtc;
+
+        # m-value, aka V-T behavior coefficient
+        my $m = $lub->m;
+
+        # To draw the V-T (hyperbolic) graph of this particular lubricant we can generate data-points, say, from -20 to +100:
+
+        my @data_points;
+        for my $T(-20..100) {
+            push @data_points, [$T, $lub->visc($T)];
+        }
+
+        # Now you may pass @data_points to either GDGrap(Perl) or Highcharts(JS).
+
+  new(\%attr)
+    Constructor. Following attributes (all optional) can be passed:
+
+    label
+        Arbitrary label of the lubricant. Used in graph data or report
+        tables, charts
+
+    visc40, visc100
+        Viscosity @ 40 and 100 degrees Celcius.
+
+    vi  Viscosity index of the lubricant.
+
+    density
+        Specific gravity of the lubricant at a given temperature point. Must
+        be passed a hashref of Temprature-Density values. Density must be in
+        kg/cm3.
+
+    IMPORTANT "visc40" and "visc100" are just convenience attributes, since
+    they are most widely given in product TDSs. If you don't have
+    calibration points at these temperatures IGNORE these attributes.
+    Instead, create empty constructor, set the calibration values you
+    already have using "visc()" method. Such as:
+
+        my $lubricant = Tribology::Lubricant->new({label => "Hypothetical lubricant"});
+        $lubricant->visc(50, 80);
+        $lubricant->visc(100, 5.23);
+
+  label($new_label)
+    Returns and/or sets label of the lubricant
+
+  visc($T, $cst)
+    Given temperature ($T) in celcius returns kinematic viscosity in cst. If
+    such value was not given to the constructor it attempts to calculate
+    this number using Ubbelohde-Walter equation. For this to be possible at
+    least two calibration points must be given to "new()" or two calibration
+    points must be set using two-argument syntax of "visc()".
+
+    If second argument is passed sets the viscosity point and returns the
+    value $cst as is.
+
+    # 1.10 (eni), bo'yi ( 2.27 )
+
+  m()
+    Heart of the Ubbelohde-Walter equation. This is the coeffient that
+    characterises V-T behavior of oils. It's a double-logarithmic V-T graph
+    slope. It requires at least two calibration points be present, or must
+    be calculatable to work. Otherwise it throws error (croaks).
+
+  LH()
+    Returns L and H values for the given lubricant. For this method to work
+    lubricant's viscosity @ 100C must be known or calculatable.
+
+  vi()
+    Returns viscosity index of the lubricant, if such is possible. Remember,
+    for this to be possible calibration points at 40C and 100C must be
+    available or calculatble. If it's impossible, it returns undef and
+    writes a warning to STDERR. When checking for error you must check for
+    "undef" at return.
+
+  vtc()
+    Returns VTC - viscosity-temperature constant used in Ubbelohde-Walter
+    equation to better differentiate V-T behavior when the influence of
+    temperature is low. This constant must be used to accurately (or
+    properly) calculate "m". To calculate this value properly we need to
+    have calibration points at 40C and 100C. If either of these points are
+    missing "vtc()" defaults to 0.8.
+
+  is_mineral
+    Based on the "m" constant or "vi" attempts to guess if current instance
+    represents a mineral oil.
+
+INTERNALS
+  __c2k($T)
+    Given temperature in celcius converts it to Kelvin
+
+  __k2c($T)
+    Given temperature in Kelvin converts it to celcius
+
+  __calibration_points($limit)
+    Returns all known calibration points to the lubricant as array
+    reference. If $limit is given limits the result set to that many points.
+    The points are guaranteed to be in ascending order by temperature. All
+    temperature points are converted to Kelvin, since that's what all
+    internal formulas rely on.
+
+  __vi_lt_100()
+    Uses algorithm described in 5. Procedure A section of ASTM D2270. When
+    you use "vi()" it invokes either method accordingly.
+
+  __vi_gt_100()
+    Uses algorithm described in 6. Procedure B section of ASTM D2270. When
+    you use "vi()" it invokes either method accordingly.
+
+SEE ALSO
+    Lubricants and Lubrication <http://www.amazon.com>, Second Edition by
+    Wiley-VCH
+

@@ -7,13 +7,14 @@ use Getopt::Long;
 use Pod::Usage 1.69;
 use CPAN;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
-our $VERSION = '0.009'; # VERSION
-my ($distro,$help,$version_check);
+
+our $VERSION = '0.010'; # VERSION
+my ( $distro, $help, $version_check );
 
 GetOptions(
-    'help'         => \$help,
-    'distro=s'     => \$distro,
-    'version'      => \$version_check
+    'help'     => \$help,
+    'distro=s' => \$distro,
+    'version'  => \$version_check
 ) or pod2usage(1);
 
 pod2usage( -exitval => 0, -verbose => 2 ) if $help;
@@ -23,19 +24,22 @@ if ($version_check) {
     exit(0);
 }
 
-pod2usage( -exitval => 1, -verbose => 1) unless (is_distro_ok($distro));
+pod2usage( -exitval => 1, -verbose => 1 ) unless ( is_distro_ok($distro) );
 
-my $distribution= '^' . $distro;
-my $filename = "$distro.yml";
+my $distribution = '^' . $distro;
+my $filename     = "$distro.yml";
 $filename =~ s/\//./;
-my %data = ( comment => 'Tests hang smoker',
-             match => { distribution => $distribution },
-             disabled => 1 );
+my %data = (
+    comment  => 'Tests hang smoker',
+    match    => { distribution => $distribution },
+    disabled => 1
+);
 
 CPAN::HandleConfig->load;
 my $prefs_dir = $CPAN::Config->{prefs_dir};
-die "$prefs_dir does not exist or it is not readable\n" unless (-d $prefs_dir);
-DumpFile( File::Spec->catfile( $prefs_dir, $filename), \%data );
+die "$prefs_dir does not exist or it is not readable\n"
+  unless ( -d $prefs_dir );
+DumpFile( File::Spec->catfile( $prefs_dir, $filename ), \%data );
 
 __END__
 

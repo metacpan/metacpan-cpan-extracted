@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2016-11-27 00:00:00 +0000 to present.
+Changes from 2016-12-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2017-11-27 02:11:52 +0000
+version 0.008 at 2017-12-09 16:44:58 +0000
+------------------------------------------
+
+  Change: 7c2fb9c50d95e9ba1cb7a123a316bf70b60c6d88
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-09 17:12:32 +0000
+
+    Make game of life generations overridable via envvar 
+
+  Change: 94ce8ae6cf6f56866ad6c1a131e69ddb81ab4794
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-04 18:44:26 +0000
+
+    Add Graphics::Raylib::Keyboard wrapper 
+
+  Change: 87890bb795defc08945de3799f576bcd24e1b657
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-04 00:20:10 +0000
+
+    Fix incomplete Bitmap drawing when width != height 
+
+------------------------------------------
+version 0.007 at 2017-11-27 02:10:43 +0000
 ------------------------------------------
 
   Change: d9dc6ee85ffe21e4a4ad8432ca7ebfcf610035de

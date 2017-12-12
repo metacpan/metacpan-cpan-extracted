@@ -20,7 +20,7 @@ our @EXPORT = qw(
 	DEVICE_UDP
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -80,9 +80,18 @@ The VXI-11 API is documented in the L<VXI-11 specification|http://www.vxibus.org
 
 =head1 INSTALLATION
 
-On Linux, Sun's RPC library is part of the libc (glibc). Just use your CPAN client:
+With most Unix platforms, Sun's RPC library (sunrpc) is part of the libc and Lab::VXI11
+does not have any dependencies.
+If your system uses GNU C library (glibc) (default libc on Linux), note that
+sunrpc is deprecated as of glibc 2.26. If sunrpc is not contained in the libc, you can
+install libtirpc as an replacement, e.g.
+
+ $ apt-get install libtirpc-dev pkg-config
+
+Lab::VXI11 can then be installed with any CPAN client:
 
  $ cpanm Lab::VXI11
+
 
 On Windows this module is untested (VISA contains a VXI11 driver).
 
@@ -158,11 +167,19 @@ C<$termChar> needs to be a number, e.g. C<ord("\n")>.
 
 =head1 REPORTING BUGS
 
-Please report bugs at L<https://github.com/amba/Lab-VXI11/issues>.
+Please report bugs at L<https://github.com/lab-measurement/Lab-VXI11/issues>.
 
 =head1 CONTACT
 
 Feel free to contact us at the #labmeasurement channel on Freenode IRC.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Blog post on Lab::VXI11 and USB::TMC|http://blogs.perl.org/users/simon_reinhardt/2017/10/labmeasurement-new-lightweight-backends-for-vxi-11-and-usb-tmc.html>
+
+=back
 
 =head1 AUTHOR
 

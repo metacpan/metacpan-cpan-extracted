@@ -25,9 +25,9 @@ use namespace::clean;
 sub _next {
   my $self = shift;
   return unless $self->count_commands >= 1;
-  my @current = @{ $self->current_command };
-  my $buf = join ' ', @current[STATE_COMMAND..$#current];
-  $self->adopt_future($self->write($buf . $NL));
+  my $current = $self->current_command;
+  $current->[STATE_SEND] = join(' ', @$current[STATE_COMMAND..$#$current]) . $NL;
+  $self->adopt_future($self->write($current->[STATE_SEND]));
 }
 
 # TODO: Warn if reserves are pending
@@ -38,19 +38,41 @@ sub _send {
   croak "Invalid command" unless exists $COMMAND{$cmd};
   my $future = $self->loop->new_future;
   $future->on_ready(sub { $self->_next });
-  $self->_push_command([ $future, undef, @_ ]);
+  $self->_push_command([ $future, (undef) x (STATE_COMMAND - 1), @_ ]);
   $self->_next if $self->count_commands == 1;
   defined wantarray ? $future : $future->get;
 }
 
+around decoder => sub {
+  my $orig = shift;
+  my $self = shift;
+  my ($no_decode) = @_;
+  my $decoder = $self->$orig();
+  sub {
+    my $utf8 = ''.$_[0];
+    utf8::decode($utf8);
+    $no_decode ? $utf8 : $decoder->($utf8);
+  };
+};
+
+around encoder => sub {
+  my $orig = shift;
+  my $self = shift;
+  my $encoder = $self->$orig();
+  sub {
+    my $result = '' . ((not ref $_[0] or overload::Method($_[0], '""'))
+                         ? $_[0]
+                         : $encoder->(@_));
+    utf8::encode($result) if utf8::is_utf8($result);
+    $result;
+  };
+};
+
 sub put {
   my $self = shift;
-  my $job;
-  if (@_ % 2) {
-    $job = shift;
-    $job = $self->encoder->($job) if ref $job and not overload::Method($job, '""');
-  }
+  my $job; $job = $self->encoder->(shift) if @_ % 2;
   my %opt = @_;
+
   my @args = (
     delete $opt{priority} || $self->default_priority,
     delete $opt{delay}    || $self->default_delay,
@@ -59,10 +81,7 @@ sub put {
   $job //= delete $opt{raw_data} // $self->encoder->(delete $opt{data});
   croak 'Too much job data' if exists $opt{raw_data} or exists $opt{data};
   croak 'Unknown options to "put": ' . join ', ', sort keys %opt if scalar keys %opt;
-
-  my $data = '' . $job;
-  utf8::encode($data) if utf8::is_utf8($data);
-  $self->_send(put => (map int, @args), length($data) . $NL . $data);
+  $self->_send(put => (map int, @args), length($job) . $NL . $job);
 }
 
 # TODO: raw/decode on other job-fetching commans
@@ -78,13 +97,13 @@ sub reserve {
   my @command = defined $timeout ? ('reserve-with-timeout', $timeout) : ('reserve');
   return $self->_send(@command) if $as_raw;
   $self->_send(@command)->then(sub {
-    utf8::decode($_[1]);
-    Future->done($no_decode ? @_ : ($_[0], $self->decoder->($_[1])));
+    Future->done($_[0], $self->decoder($no_decode)->($_[1]), @_[2..$#_]);
   });
 }
 
 sub reserve_with_timeout { $_[0]->reserve(timeout => $_[1], @_[2..$#_]) }
 
+# TODO: Make void context useful
 for my $command (keys %COMMAND) {
   no strict 'refs';
   my $sub = $command =~ s/-/_/gr;

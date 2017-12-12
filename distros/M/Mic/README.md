@@ -1,6 +1,6 @@
 # NAME
 
-Mic - Messages, Interfaces and Contracts.
+Mic - Simplified OOP with emphasis on modularity and loose coupling.
 
 # SYNOPSIS
 
@@ -117,13 +117,13 @@ This is an early release available for testing and feedback and as such is subje
 
 # DESCRIPTION
 
-Mic is an OOP automation framework with the following features:
+Mic (Messages, Interfaces and Contracts) is a framework for simplifying the coding of OOP modules, with the following features:
 
 - Reduces the tedium and boilerplate code typically involved in creating object oriented modules.
 - Makes it easy to create classes that are [modular](http://en.wikipedia.org/wiki/Modular_programming) and loosely coupled.
 - Enables trivial swapping of implementations (see [Mic::Bind](https://metacpan.org/pod/Mic::Bind)).
 - Encourages self documenting code.
-- Encourages robustness via Eiffel style [contracts](https://metacpan.org/pod/Mic::Contracts).
+- Simplifies code verification via Eiffel style [contracts](https://metacpan.org/pod/Mic::Contracts).
 
 Modularity means there is an obvious separation between what the users of an object need to know (the interface for using the object) and implementation details that users
 don't need to know about.

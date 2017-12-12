@@ -4,7 +4,7 @@ use base qw/Prty::Database::ResultSet/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Hash;
@@ -143,7 +143,20 @@ sub values {
 
 =head4 Synopsis
 
-    %idx|$idxH = $tab->index(@keys);
+    %idx|$idxH = $tab->index(@keys,@opts);
+
+=head4 Options
+
+=over 4
+
+=item -unique => $bool (Default: 1)
+
+Sollte auf 0 gesetzt werden, wenn die @keys nicht eindeutig sind.
+Dann ist der Hashwert nicht die jeweilige Row, sondern eine
+Referenz auf ein Array von Rows (auch wenn nur eine Row enthalten
+ist).
+
+=back
 
 =head4 Description
 
@@ -152,7 +165,7 @@ und mit dem Datensatz als Wert. Im skalaren Kontext liefere eine
 Referenz auf den Hash.
 
 Wird der Index über mehreren Keys gebildet, werden die einzelnen
-Werte mit einem senkrechten Strich ('|') getrennt.
+Werte im Hash mit einem senkrechten Strich ('|') getrennt.
 
 =cut
 
@@ -160,7 +173,17 @@ Werte mit einem senkrechten Strich ('|') getrennt.
 
 sub index {
     my $self = shift;
-    # @_: @keys
+    # @_: @keys,@opts
+
+    # Optionen
+
+    my $unique = 1;
+
+    Prty::Option->extract(\@_,
+        -unique=>\$unique,
+    );
+
+    # Verarbeitung
 
     my %idx;
     for my $row (@{$self->rows}) {
@@ -171,7 +194,14 @@ sub index {
             }
             $indexKey .= $row->$key;
         }
-        $idx{$indexKey} = $row;
+        if ($unique) {
+            # FIXME: Eindeutigkeit prüfen?
+            $idx{$indexKey} = $row;
+        }
+        else {
+            my $arr = $idx{$indexKey} ||= [];
+            push @$arr,$row;
+        }
     }
 
     return wantarray? %idx: Prty::Hash->new(\%idx)->unlockKeys;
@@ -201,6 +231,37 @@ sub min {
     }
 
     return $min;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 maxLength() - Maximale Länge der Kolumnenwerte
+
+=head4 Synopsis
+
+    $len = $tab->maxLength($key);
+    @len = $tab->maxLength(@keys);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub maxLength {
+    my $self = shift;
+    # @_: @keys
+
+    my @len = (0) x @_;
+    for my $row (@{$self->rows}) {
+        for (my $i = 0; $i < @_; $i++) {
+            my $key = $_[$i];
+            my $l = length $row->$key;
+            if ($l > $len[$i]) {
+                $len[$i] = $l;
+            }
+        }
+    }
+
+    return wantarray? @len: $len[0];
 }
 
 # -----------------------------------------------------------------------------
@@ -362,12 +423,6 @@ sub absorbModifications {
     $tab->addAttribute($key);
     $tab->addAttribute($key=>$val);
 
-=head4 Description
-
-Füge Attribut $key mit Wert $val zu allen Datensätzen der
-Ergebnismenge hinzu. Ist $val nicht angegeben, setze den Wert auf
-den Nullwert (Leerstring).
-
 =head4 Arguments
 
 =over 4
@@ -381,6 +436,12 @@ Attributname.
 Attributwert.
 
 =back
+
+=head4 Description
+
+Füge Attribut $key mit Wert $val zu allen Datensätzen der
+Ergebnismenge hinzu. Ist $val nicht angegeben, setze den Wert auf
+den Nullwert (Leerstring).
 
 =cut
 
@@ -409,15 +470,15 @@ sub addAttribute {
 
 fixNumber()
 
+=head4 Returns
+
+nichts
+
 =head4 Description
 
 Normalisiere die Zahldarstellung der genannten Kolumnen. D.h. entferne
 unnötige Nullen und forciere als Dezimaltrennzeichen einen Punkt
 (anstelle eines Komma).
-
-=head4 Returns
-
-nichts
 
 =cut
 
@@ -488,6 +549,21 @@ sub addChildType {
     @rows|$rowT = $tab->selectChilds($db,$primaryKeyColumn,
         $foreignTable,$foreignKeyColumn,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -type => $type (Default: "$foreignTable.$foreignKeyColumn")
+
+Bezeichner für den Satz an Kind-Objekten.
+
+=item I<Select-Optionen>
+
+Select-Optionen, die der Selektion der Kinddatensätze
+hinzugefügt werden.
+
+=back
+
 =head4 Description
 
 Selektiere alle Datensätze der Tabelle $foreignTable, deren
@@ -510,21 +586,6 @@ abgefragt werden. Z.B.
 Mittels der Option C<< -type=>$type >> kann ein anderer Typbezeichner
 anstelle von "$foreignTable,$foreignKeyColumn" für den Satz an
 Kinddatensätzen vereinbart werden.
-
-=head4 Options
-
-=over 4
-
-=item -type => $type (Default: "$foreignTable.$foreignKeyColumn")
-
-Bezeichner für den Satz an Kind-Objekten.
-
-=item I<Select-Optionen>
-
-Select-Optionen, die der Selektion der Kinddatensätze
-hinzugefügt werden.
-
-=back
 
 =cut
 
@@ -594,6 +655,21 @@ sub selectChilds {
     @rows|$rowT = $tab->selectParents($db,$foreignKeyColumn,
         $parentTable,$primaryKeyColumn,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -type => $type (Default: $foreignKeyColumn)
+
+Bezeichner für den Parent-Datensatz beim Child-Datensatz.
+
+=item I<Select-Optionen>
+
+Select-Optionen, die der Selektion der Parent-Datensatzes
+hinzugefügt werden.
+
+=back
+
 =head4 Description
 
 Selektiere alle Datensätze der Tabelle $parentTable, auf die
@@ -610,21 +686,6 @@ abgefragt werden.
 Mittels der Option C<< -type=>$type >> kann ein anderer Typbezeichner
 anstelle von "$foreignKeyColumn" für den Parent-Datensatz
 vereinbart werden.
-
-=head4 Options
-
-=over 4
-
-=item -type => $type (Default: $foreignKeyColumn)
-
-Bezeichner für den Parent-Datensatz beim Child-Datensatz.
-
-=item I<Select-Optionen>
-
-Select-Optionen, die der Selektion der Parent-Datensatzes
-hinzugefügt werden.
-
-=back
 
 =cut
 
@@ -682,19 +743,6 @@ sub selectParents {
 
     @rows|$rowT = $tab->selectParentRows($db,$fkTitle,$pClass,@select);
 
-=head4 Description
-
-Die Methode ermöglicht es, Fremschlüsselverweise einer Selektion
-durch effiziente Nachselektion aufzulösen.
-
-Die Methode selektiert die Elterndatensätze der Tabellen-Klasse
-C<$pClass> zu den Fremdschlüsselwerten der Kolumne C<$fkTitle> und
-den zusätzlichen Selektionsdirektiven C<@select>. Die
-Selektionsdirektiven sind typischerweise C<-select> und C<-orderBy>.
-
-Die Klasse C<$pClass> muss eine Tabellenklasse sein, denn nur diese
-definiert eine Primäschlüsselkolumne.
-
 =head4 Returns
 
 =over 4
@@ -708,6 +756,19 @@ Liste von Datensätzen
 Tabellenobjekt (Prty::Database::ResultSet::Object)
 
 =back
+
+=head4 Description
+
+Die Methode ermöglicht es, Fremschlüsselverweise einer Selektion
+durch effiziente Nachselektion aufzulösen.
+
+Die Methode selektiert die Elterndatensätze der Tabellen-Klasse
+C<$pClass> zu den Fremdschlüsselwerten der Kolumne C<$fkTitle> und
+den zusätzlichen Selektionsdirektiven C<@select>. Die
+Selektionsdirektiven sind typischerweise C<-select> und C<-orderBy>.
+
+Die Klasse C<$pClass> muss eine Tabellenklasse sein, denn nur diese
+definiert eine Primäschlüsselkolumne.
 
 =head4 Example
 
@@ -775,7 +836,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -8,6 +8,7 @@ use Minion::Worker;
 use Mojo::Date;
 use Mojo::Loader 'load_class';
 use Mojo::Server;
+use Mojo::Util 'steady_time';
 use Scalar::Util 'weaken';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
@@ -17,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '8.03';
+our $VERSION = '8.07';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -47,9 +48,10 @@ sub foreground {
 }
 
 sub guard {
-  my ($self, $lock) = (shift, shift);
-  return undef unless $self->lock($lock, @_);
-  return Minion::_Guard->new(minion => $self, lock => $lock);
+  my ($self, $name, $duration, $options) = @_;
+  my $time = steady_time + $duration;
+  return undef unless $self->lock($name, $duration, $options);
+  return Minion::_Guard->new(minion => $self, name => $name, time => $time);
 }
 
 sub job {
@@ -111,7 +113,7 @@ sub _backoff { (shift()**4) + 15 }
 sub _datetime {
   my $hash = shift;
   $hash->{$_} and $hash->{$_} = Mojo::Date->new($hash->{$_})->to_datetime
-    for qw(created delayed finished notified retried started);
+    for qw(created delayed expires finished notified retried started);
   return $hash;
 }
 
@@ -124,7 +126,9 @@ sub _delegate {
 package Minion::_Guard;
 use Mojo::Base -base;
 
-sub DESTROY { $_[0]{minion}->unlock($_[0]{lock}) }
+use Mojo::Util 'steady_time';
+
+sub DESTROY { $_[0]{minion}->unlock($_[0]{name}) if steady_time < $_[0]{time} }
 
 1;
 
@@ -161,13 +165,6 @@ Minion - Job queue
   $worker->status->{jobs} = 12;
   $worker->run;
 
-  # Build custom workers
-  my $worker = $minion->repair->worker;
-  while (int rand 2) {
-    if (my $job = $worker->register->dequeue(5)) { $job->perform }
-  }
-  $worker->unregister;
-
 =head1 DESCRIPTION
 
 =begin html
@@ -189,10 +186,15 @@ protection and multiple backends (such as
 L<PostgreSQL|http://www.postgresql.org>).
 
 Job queues allow you to process time and/or computationally intensive tasks in
-background processes, outside of the request/response lifecycle. Among those
-tasks you'll commonly find image resizing, spam filtering, HTTP downloads,
-building tarballs, warming caches and basically everything else you can imagine
-that's not super fast.
+background processes, outside of the request/response lifecycle of web
+applications. Among those tasks you'll commonly find image resizing, spam
+filtering, HTTP downloads, building tarballs, warming caches and basically
+everything else you can imagine that's not super fast.
+
+=head1 BASICS
+
+You can use L<Minion> as a standalone job queue or integrate it into
+L<Mojolicious> applications with the plugin L<Mojolicious::Plugin::Minion>.
 
   use Mojolicious::Lite;
 
@@ -216,7 +218,7 @@ that's not super fast.
 
 Background worker processes are usually started with the command
 L<Minion::Command::minion::worker>, which becomes automatically available when
-an application loads the plugin L<Mojolicious::Plugin::Minion>.
+an application loads L<Mojolicious::Plugin::Minion>.
 
   $ ./myapp.pl minion worker
 
@@ -406,6 +408,12 @@ Register a task.
 
 Broadcast remote control command to one or more workers.
 
+  # Broadcast "stop" command to all workers to kill job 10025
+  $minion->broadcast('stop', [10025]);
+
+  # Broadcast "jobs" command to pause worker 23
+  $minion->broadcast('jobs', [0], [23]);
+
 =head2 enqueue
 
   my $id = $minion->enqueue('foo');
@@ -548,6 +556,12 @@ failed.
     ...
   });
 
+An expiration time of C<0> can be used to check if a named lock already exists
+without creating one.
+
+  # Check if the lock "foo" already exists
+  say 'Lock exists' unless $minion->lock('foo', 0);
+
 These options are currently available:
 
 =over 2
@@ -608,7 +622,7 @@ Reset job queue.
 
   my $stats = $minion->stats;
 
-Get statistics for jobs and workers.
+Get statistics for the job queue.
 
   # Check idle workers
   my $idle = $minion->stats->{inactive_workers};
@@ -622,6 +636,12 @@ These fields are currently available:
   active_jobs => 100
 
 Number of jobs in C<active> state.
+
+=item active_locks
+
+  active_locks => 100
+
+Number of active named locks.
 
 =item active_workers
 
@@ -695,6 +715,14 @@ Build L<Minion::Worker> object.
   my $worker = $minion->repair->worker->register;
   my $job    = $worker->dequeue(5);
   $job->perform;
+  $worker->unregister;
+
+  # Build a custom worker
+  my $worker = $minion->repair->worker;
+  while (int rand 2) {
+    next unless my $job = $worker->register->dequeue(5);
+    $job->perform;
+  }
   $worker->unregister;
 
 =head1 REFERENCE

@@ -1,0 +1,38 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395040184.15504
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Term::ReadLine::Perl on cpanmetadb ...
+--> Working on Term::ReadLine::Perl
+Fetching http://www.cpan.org/authors/id/I/IL/ILYAZ/modules/Term-ReadLine-Perl-1.0303.tar.gz
+-> OK
+Unpacking Term-ReadLine-Perl-1.0303.tar.gz
+Entering Term-ReadLine-Perl-1.0303
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Configuring Term-ReadLine-Perl-1.0303
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Term::ReadLine
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Building and testing Term-ReadLine-Perl-1.0303
+cp ReadLine/Perl.pm blib/lib/Term/ReadLine/Perl.pm
+cp ReadLine/readline.pm blib/lib/Term/ReadLine/readline.pm
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-Iblib/lib" "-Iblib/arch" test.pl
+Use of uninitialized value $ENV{"PERL_RL_TEST_PROMPT_MINLEN"} in bitwise or (|) at test.pl line 33.
+ at test.pl line 33.
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Term/ReadLine/Perl.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Term/ReadLine/readline.pm
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Term-ReadLine-Perl-1.0303
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Term-ReadLine-Perl-1.0303/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Term-ReadLine-Perl-1.0303/MYMETA.json
+1 distribution installed

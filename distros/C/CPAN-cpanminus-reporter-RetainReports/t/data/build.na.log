@@ -1,0 +1,21 @@
+cpanm (App::cpanminus) 1.7030 on perl 5.021011 built for darwin-2level
+(...)
+Searching Dist::Zilla::Plugin::MungeFile::WithDataSection () on metacpan ...
+--> Working on Dist::Zilla::Plugin::MungeFile::WithDataSection
+Fetching http://www.cpan.org/authors/id/E/ET/ETHER/Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007.tar.gz
+-> OK Unpacking Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007.tar.gz
+Entering Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007
+Checking configure dependencies from META.json
+Checking if you have Module::Build::Tiny 0.034 ... Yes (0.035)
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (6.97_02)
+Checking if you have Module::Build 0.36 ... Yes (0.4205)
+Configuring Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007
+Running Build.PL
+Perl v5.9.5 required--this is only v5.8.9, stopped at Build.PL line 2.
+BEGIN failed--compilation aborted at Build.PL line 2.
+Running Makefile.PL
+Perl v5.9.5 required--this is only v5.8.9, stopped at Makefile.PL line 64.
+BEGIN failed--compilation aborted at Makefile.PL line 64.
+Congratulations, your toolchain understands 'configure_requires'!
+-> N/A
+-> FAIL Configure failed for Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007. See /Users/ether/.cpanm/work/1398728750.58077/build.log for details.

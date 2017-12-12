@@ -25,19 +25,18 @@ WriteMakefile1(
     MIN_PERL_VERSION => 5.010000,
 
     PREREQ_PM    => {
-        'autodie'                  => 0,
-        'parent'                   => 0,
-        'overload' => 0,
+        'parent'    => 0,
         'X::Tiny'   => 0,
         'Module::Load'  => 0,
         'MIME::Base64' => 0,
-        'Digest::SHA' => 0,
+        'Digest::SHA1' => 0,
         'URI::Split' => 0,
         'Call::Context' => 0,
         'HTTP::Headers::Util' => 0,
     },
 
     TEST_REQUIRES => {
+        'autodie'         => 0,
         'Test::More'      => 0,
         'Test::Exception' => 0,
         'Test::Deep' => 0,

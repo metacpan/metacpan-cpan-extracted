@@ -2,7 +2,7 @@ package Text::Xslate::PP::Opcode;
 use Mouse;
 extends qw(Text::Xslate::PP::State);
 
-our $VERSION = '3.4.0';
+use version; our $VERSION = version->declare('v3.5.3');
 
 use Carp ();
 use Scalar::Util ();
@@ -638,6 +638,8 @@ sub proccall {
 no Mouse;
 __PACKAGE__->meta->make_immutable();
 __END__
+
+=for stopwords opcodes
 
 =head1 NAME
 

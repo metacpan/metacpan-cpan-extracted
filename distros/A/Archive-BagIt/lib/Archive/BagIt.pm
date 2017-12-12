@@ -4,12 +4,17 @@ use strict;
 use 5.006;
 use warnings;
 
-our $VERSION = '0.052'; # VERSION
 
+our $VERSION = '0.053.3'; # VERSION
+
+use utf8;
+use open ':std', ':utf8';
 our @checksum_algos = qw(md5 sha1);
 our $DEBUG=0;
+use Encode qw(decode);
 use File::Find;
 use Data::Dumper;
+#use Data::Printer;
 
 sub new {
   my ($class,$bag_path) = @_;
@@ -37,11 +42,11 @@ sub _load_manifests {
 
   my @manifests = $self->manifest_files();
   foreach my $manifest_file (@manifests) {
-    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST,"<", $manifest_file));
+    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST,"<:encoding(utf8)", $manifest_file));
     while (my $line = <$MANIFEST>) {
         chomp($line);
         my ($digest,$file);
-        ($digest, $file) = $line =~ /^([a-f0-9]+)\s+([a-zA-Z0-9_\.\/\-]+)/;
+        ($digest, $file) = $line =~ /^([a-f0-9]+)\s+(.+)$/;
         if(!$file) {
           die ("This is not a valid manifest file");
         } else {
@@ -61,7 +66,7 @@ sub _load_tagmanifests {
 
   my @tagmanifests = $self->tagmanifest_files();
   foreach my $tagmanifest_file (@tagmanifests) {
-    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<", $tagmanifest_file));
+    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<:encoding(utf8)", $tagmanifest_file));
     while (my $line = <$TAGMANIFEST>) {
       chomp($line);
       my($digest,$file) = split(/\s+/, $line, 2);
@@ -121,12 +126,13 @@ sub _manifest_crc32 {
     my $data_dir = "$bagit/data";
 
     # Generate MD5 digests for all of the files under ./data
-    open(my $fh, ">",$manifest_file) or die("Cannot create manifest-crc32.txt: $!\n");
+    open(my $fh, ">:encoding(utf8)",$manifest_file) or die("Cannot create manifest-crc32.txt: $!\n");
     find(
         sub {
-            my $file = $File::Find::name;
+            $_=decode('utf8', $_);
+            my $file = decode('utf8', $File::Find::name);
             if (-f $_) {
-                open(my $DATA, "<", $_) or die("Cannot read $_: $!");
+                open(my $DATA, "<:encoding(utf8)", $_) or die("Cannot read $_: $!");
                 my $digest = sprintf("%010d",crc32($DATA));
                 close($DATA);
                 my $filename = substr($file, length($bagit) + 1);
@@ -144,14 +150,14 @@ sub _manifest_md5 {
     my($self, $bagit) = @_;
     my $manifest_file = "$bagit/manifest-md5.txt";
     my $data_dir = "$bagit/data";
-    print "creating manifest: $data_dir\n";
+    #print "creating manifest: $data_dir\n";
     # Generate MD5 digests for all of the files under ./data
-    open(my $md5_fh, ">",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
+    open(my $md5_fh, ">:encoding(utf8)",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
     find(
         sub {
-            my $file = $File::Find::name;
+            my $file = decode('utf8', $File::Find::name);
             if (-f $_) {
-                open(my $DATA, "<", "$_") or die("Cannot read $_: $!");
+                open(my $DATA, "<:raw", "$_") or die("Cannot read $_: $!");
                 my $digest = Digest::MD5->new->addfile($DATA)->hexdigest;
                 close($DATA);
                 my $filename = substr($file, length($bagit) + 1);
@@ -171,11 +177,12 @@ sub _tagmanifest_md5 {
 
   my $tagmanifest_file= "$bagit/tagmanifest-md5.txt";
 
-  open (my $md5_fh, ">", $tagmanifest_file) or die ("Cannot create tagmanifest-md5.txt: $! \n");
+  open (my $md5_fh, ">:encoding(utf8)", $tagmanifest_file) or die ("Cannot create tagmanifest-md5.txt: $! \n");
 
   find (
     sub {
-      my $file = $File::Find::name;
+      $_ = decode('utf8',$_);
+      my $file = decode('utf8',$File::Find::name);
       if ($_=~m/^data$/) {
         $File::Find::prune=1;
       }
@@ -183,7 +190,7 @@ sub _tagmanifest_md5 {
         # Ignore, we can't take digest from ourselves
       }
       elsif ( -f $_ ) {
-        open(my $DATA, "<", "$_") or die("Cannot read $_: $!");
+        open(my $DATA, "<:raw", "$_") or die("Cannot read $_: $!");
         my $digest = Digest::MD5->new->addfile($DATA)->hexdigest;
         close($DATA);
         my $filename = substr($file, length($bagit) + 1);
@@ -221,7 +228,7 @@ sub verify_bag {
     }
 
     # Compile a list of payload files
-    find(sub{ push(@payload, $File::Find::name)  }, $payload_dir);
+    find(sub{ push(@payload, decode('utf8',$File::Find::name))  }, $payload_dir);
 
     # Evaluate each file against the manifest
     my $digestobj = new Digest::MD5;
@@ -229,11 +236,12 @@ sub verify_bag {
         next if (-d ($file));
         my $local_name = substr($file, length($bagit) + 1);
         my ($digest);
+        #p %manifest;
         unless ($manifest{$local_name}) {
           die ("file found not in manifest: [$local_name]");
         }
         #my $start_time=time();
-        open(my $fh, "<", "$bagit/$local_name") or die ("Cannot open $local_name");
+        open(my $fh, "<:raw", "$bagit/$local_name") or die ("Cannot open $local_name");
         $digest = $digestobj->addfile($fh)->hexdigest;
         close($fh);
         #print "$bagit/$local_name md5 in ".(time()-$start_time)."\n";
@@ -263,8 +271,7 @@ sub verify_bag {
 sub get_checksum {
   my($self) =@_;
   my $bagit = $self->{'bag_path'};
-  open(my $SRCFILE, "<",  $bagit."/manifest-md5.txt");
-  binmode($SRCFILE);
+  open(my $SRCFILE, "<:raw",  $bagit."/manifest-md5.txt");
   my $srchex=Digest::MD5->new->addfile($SRCFILE)->hexdigest;
   close($SRCFILE);
   return $srchex;
@@ -297,7 +304,8 @@ sub _payload_files{
 
   my @payload=();
   File::Find::find( sub{
-    push(@payload,$File::Find::name);
+
+    push(@payload,decode('utf8',$File::Find::name));
     #print "name: ".$File::Find::name."\n";
   }, $payload_dir);
 
@@ -319,6 +327,7 @@ sub _non_payload_files {
 
   my @payload = ();
   File::Find::find( sub {
+    $File::Find::name = decode ('utf8', $File::Find::name);
     if(-f $File::Find::name) {
       my ($relpath) = ($File::Find::name=~m!$self->{"bag_path"}/(.*$)!);
       push(@payload, $relpath);
@@ -378,7 +387,7 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.052
+version 0.053.3
 
 =head1 SYNOPSIS
 
@@ -410,7 +419,7 @@ We use it fairly widely in-house, but it doesn't necessarily implement all of th
 
 Email me with anything you need done urgently.
 
-Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependendies to get
+Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
 better speed by mmap-ing files.
 
 =head1 NAME
@@ -420,42 +429,47 @@ Archive::BagIt - An interface to make and verify bags according to the BagIt sta
 =head1 SUBROUTINES
 
 =head2 new
-   An Object Oriented Interface to a bag. Opens an existing bag.
+
+An Object Oriented Interface to a bag. Opens an existing bag.
+
+  my $bag = Archive::BagIt->new('/path/to/bag');
 
 =head2 make_bag
-   A constructor that will make and return a bag from a directory
 
-   If a data directory exists, assume it is already a bag (no checking for invalid files in root)
+A constructor that will make and return a bag from a directory
+
+If a data directory exists, assume it is already a bag (no checking for invalid files in root)
 
 =head2 verify_bag
 
 An interface to verify a bag.
 
-You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+You might also want to check L<Archive::BagIt::Fast> to see a more direct way of
+accessing files (and thus faster).
 
 =head2 get_checksum
 
-   This is the checksum for the bag, md5 of the manifest-md5.txt
+This is the checksum for the bag, md5 of the manifest-md5.txt
 
 =head2 version
 
-   Returns the bagit version according to the bagit.txt file.
+Returns the bagit version according to the bagit.txt file.
 
 =head2 payload_files
 
-  Returns an array with all of the payload files (those files that are below the data directory)
+Returns an array with all of the payload files (those files that are below the data directory)
 
 =head2 non_payload_files
 
-  Returns an array with files that are in the root of the bag, non-manifest files
+Returns an array with files that are in the root of the bag, non-manifest files
 
 =head2 manifest_files
 
-  return an array with the list of manifest files that exist in the bag
+Return an array with the list of manifest files that exist in the bag
 
 =head2 tagmanifest_files
 
-  return an array with the list of tagmanifest files
+Return an array with the list of tagmanifest files
 
 =head1 AUTHOR
 
@@ -513,7 +527,7 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
+The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
 and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -527,7 +541,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package BibTeX::Parser;
 {
-  $BibTeX::Parser::VERSION = '1.00';
+  $BibTeX::Parser::VERSION = '1.01';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
@@ -73,6 +73,14 @@ sub _parse_next {
                 pos($_) = $position;
             }
 
+            # Remember text before the entry
+            my $pre = substr($_, 0, $start_pos-1);
+	    if ($start_pos == 0) {
+		$pre = '';
+	    }
+            $current_entry->pre($pre);
+
+
             # Remember raw bibtex code
             my $raw = substr($_, $start_pos);
             $raw =~ s/^\s+//;
@@ -141,7 +149,7 @@ sub next {
     return $self->_parse_next;
 }
 
-# slurp everything till the next closing brace. Handels
+# slurp everything till the next closing brace. Handles
 # nested brackets
 sub _slurp_close_bracket {
     my $bracelevel = 0;
@@ -337,7 +345,7 @@ L<BibTeX::Parser::Author>
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 
 =head1 AUTHOR

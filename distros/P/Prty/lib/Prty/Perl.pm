@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Object;
 use Cwd ();
@@ -1324,11 +1324,6 @@ sub setVar {
 
     $ref = $this->getVar($package,$sigil,$name,@opt);
 
-=head4 Description
-
-Liefere eine Referenz auf Package-Variable $name vom Typ $sigil
-('$','@' oder '%'). Existiert die Variable nicht, liefere undef.
-
 =head4 Options
 
 =over 4
@@ -1338,6 +1333,11 @@ Liefere eine Referenz auf Package-Variable $name vom Typ $sigil
 Erzeuge Variable, falls sie nicht existiert.
 
 =back
+
+=head4 Description
+
+Liefere eine Referenz auf Package-Variable $name vom Typ $sigil
+('$','@' oder '%'). Existiert die Variable nicht, liefere undef.
 
 =head4 Caveats
 
@@ -1417,15 +1417,15 @@ sub getVar {
 
     $ref = $this->setSubroutine($package,$name=>$ref);
 
+=head4 Returns
+
+Referenz auf die Subroutine.
+
 =head4 Description
 
 Füge Subroutine $ref zu Package $package unter dem Namen $name hinzu.
 Existiert eine Package-Subroutine mit dem Namen bereits,
 wird diese ersetzt.
-
-=head4 Returns
-
-Referenz auf die Subroutine.
 
 =head4 Examples
 
@@ -1922,7 +1922,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

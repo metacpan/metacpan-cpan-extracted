@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/wfso/Mojolicious-Services/issues
-  homepage: http://mojolicious.org
+  homepage: https://github.com/wfso/Mojolicious-Services/wiki
   license: https://opensource.org/licenses/MIT
   repository: https://github.com/wfso/Mojolicious-Services.git
 version: v1.0.0

@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.67';
+our $VERSION ='0.68';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -25,6 +25,8 @@ my $MCP_DAC_RESOLUTION_10 = 0x020;
 my $MCP_DAC_RESOLUTION_12 = 0x030;
 my $MCP_DAC_DUAL_CHANNEL  = 0x001;
 my $MCP_DAC_CAN_BUFFER    = 0x002;
+
+my $legacyboard = ( HiPi::RaspberryPi::board_type() == 1 ) ? 1 : 0;
 
 my $const = {
     i2c => {
@@ -54,20 +56,19 @@ my $const = {
         I2C_M_NO_RD_ACK	   => 0x0800,
         I2C_M_RECV_LEN	   => 0x0400,
         
-        I2C0_SDA	           => 28,
-        I2C0_SCL	           => 29,
-        I2C1_SDA	           => 2,
-        I2C1_SCL	           => 3,
-        I2C_SDA	               => 2,
-        I2C_SCL	               => 3,
-        ID_SD	               => 0,
-        ID_SC	               => 1,
-        
+        I2C0_SDA	       => ( $legacyboard ) ? 0 : 28,
+        I2C0_SCL	       => ( $legacyboard ) ? 1 : 29,
+        I2C1_SDA	       => 2,
+        I2C1_SCL	       => 3,
+        I2C_SDA	           => ( $legacyboard ) ? 0 : 2,
+        I2C_SCL	           => ( $legacyboard ) ? 1 : 3,
+        ID_SD	           => 0,
+        ID_SC	           => 1,
     },
     
     rpi => {
-        RPI_PIN_3  =>  2,
-        RPI_PIN_5  =>  3,
+        RPI_PIN_3  =>  ( $legacyboard ) ? 0 : 2,
+        RPI_PIN_5  =>  ( $legacyboard ) ? 1 : 3,
         RPI_PIN_7  =>  4,
         RPI_PIN_8  => 14,
         RPI_PIN_10 => 15,

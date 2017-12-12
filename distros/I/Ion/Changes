@@ -1,3 +1,18 @@
+0.05 2017-12-01
+-new feature: << and >> overloaded to add routines to process incoming and
+ outgoing messages (along with assignment operator counterparts)
+-switched to vanilla perl classes rather than Moo to reduce dependencies
+
+0.04 2017-11-29
+-new method Ion::Server->join
+-new function, Service, replaces service handler in Listen
+
+0.03 2017-11-29
+-bugfix: Listen fails to process port, host parameters correctly when no
+ service handler is specified
+-bugfix: port and host parameters ignored due to change in method call syntax
+-bugfix: Connect prototype should specify parameters as optional
+
 0.02 2017-11-28
 -bugfix: croak on connection failure
 -bugfix: warnings emitted during global shutdown

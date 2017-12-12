@@ -5,19 +5,26 @@ use warnings;
 use lib 't/lib';
 use Cwd qw/abs_path/;
 use AnyEvent::Filesys::Notify;
+use Test::More;
 
 use Benchmark qw(:all);
 use File::Find::Rule;
 use Path::Iterator::Rule;
 use Path::Class::Rule;
 
+diag "This isn't a test, it was a benchmark of file search tools";
+
 cmpthese(
-    20,
+    10_000,
     {
         'Path-Iterator-Rule' => sub { path_iterator_rule('t/data'); },
         'File-Find-Rule'     => sub { file_find_rule('t/data'); },
         'Path-Class-Rule'    => sub { path_class_rule('t/data'); },
     } );
+
+ok(1);
+done_testing;
+
 
 sub file_find_rule {
     my (@args) = @_;
@@ -75,5 +82,5 @@ sub path_class_rule {
 }
 
 sub _stat {
-    &AnyEvent::Filesys::Notify->_stat;
+    AnyEvent::Filesys::Notify->_stat(@_);
 }

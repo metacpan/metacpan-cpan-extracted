@@ -92,7 +92,7 @@ PONAPI::Client::Request - request class
 
 =head1 VERSION
 
-version 0.002009
+version 0.002010
 
 =head1 AUTHORS
 

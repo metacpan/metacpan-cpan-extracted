@@ -1,3 +1,9 @@
+0.862   2017-12-09 (PERLANCAR)
+
+	- Update to Rinci 1.1.86 (don't require all example result to be
+	  enveloped).
+
+
 0.861   2017-10-26 (PERLANCAR)
 
 	- Follow specification Rinci 1.1.85 (example's result is always in

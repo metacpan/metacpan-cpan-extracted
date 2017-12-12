@@ -1,0 +1,77 @@
+
+This is a paragraph\footnote{First footnote: [2] will no be a footnote} with a regular and a secondary\footnoteB{Fist secondary} footnote.
+
+
+\clearpage
+
+\part{[First Part]}
+
+
+A new page, then again\footnote{Second footnote [2] with a secondary footnote itself\footnoteB{Third secondary, from the footnote itself.} and another\footnoteB{Last one from the footnote itself.}} and a secondary.\footnoteB{Second secondary, from the body}
+
+\part[{[Part with a primary and a secondary ] [\{\}\textbackslash{}\_\&\^{}\%\#@\$] [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{[Part with a primary\footnote{Regular footnote} and a secondary\footnoteB{From part}] [\{\}\textbackslash{}\_\&\^{}\%\#@\$] [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+\chapter[{[Chapter] with secondary [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{[Chapter] with secondary\footnoteB{From chapter [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}\footnote{Regular} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+\part[{Another [part] [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{Another [part]\footnoteB{From the part [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}\footnote{Regular from the part} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+\section[{[Section] with secondary [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{[Section] with secondary\footnoteB{From section [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}\footnote{Regular footnote from section} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+\subsection[{Subsection with secondary [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{Subsection with secondary\footnoteB{From subsection [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}\footnote{Regular [\{\}\textbackslash{}\_\&\^{}\%\#@\$]} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+\subsubsection[{Sub sub section with secondary [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}]{Sub sub section with secondary\footnoteB{From secondary}\footnote{From subsection \{1\} [\{\}\textbackslash{}\_\&\^{}\%\#@\$] Neutralized} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]}
+
+
+\{10\} Neutralized
+
+
+Neutralized as well \{10\} [\{\}\textbackslash{}\_\&\^{}\%\#@\$].
+
+
+\begin{alltt}
+verbatim block \{10\} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]
+
+\{10\} Nothing happens [\{\}\textbackslash{}\_\&\^{}\%\#@\$]
+\end{alltt}
+
+
+\begin{alltt}
+verbatim block \{11\}
+
+\{11\} Nothing happens
+\end{alltt}
+
+
+
+\begin{verse}
+verbatim block \{12\} [\{\}\textbackslash{}\_\&\^{}\%\#@\$]
+
+\{12\} Parsed [\{\}\textbackslash{}\_\&\^{}\%\#@\$]
+\end{verse}
+
+
+
+\begin{verse}
+verbatim block \{13\}\forcelinebreak
+another\footnoteB{Parsed 1. \endgraf Same indent for secondary. This appears.}
+\end{verse}
+
+
+\{212\}
+
+
+Nothing \{233\} happens here.
+
+\chapter[{Chapter}]{Chapter\footnote{Here we are}\footnoteB{Is it resetting?}}
+
+
+\begin{itemize}
+\item\relax 
+In a list\footnoteB{Fn in a list \endgraf With the same indentation, it continues}\footnote{Fn from list \endgraf Same indent, continues.}
+
+
+
+
+\end{itemize}
+\chapter{Done [56] \{56\}}
+

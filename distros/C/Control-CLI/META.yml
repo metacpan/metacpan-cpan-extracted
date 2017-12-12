@@ -3,28 +3,28 @@ abstract: 'Command Line Interface I/O over either Telnet or SSH (IPv4 & IPv6) or
 author:
   - 'Ludovico Stevens <lstevens@cpan.org>'
 build_requires:
-  IO::Interactive: 0
-  Net::Telnet: 0
+  IO::Interactive: '0'
+  Net::Telnet: '0'
 configure_requires:
-  Module::Build: 0.36
+  Module::Build: '0.36'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Control-CLI
 provides:
   Control::CLI:
     file: lib/Control/CLI.pm
-    version: 2.05
+    version: '2.06'
 requires:
-  Exporter: 0
-  IO::Handle: 0
-  IO::Socket::INET: 0
-  Term::ReadKey: 0
-  Time::HiRes: 0
+  Exporter: '0'
+  IO::Handle: '0'
+  IO::Socket::INET: '0'
+  Term::ReadKey: '0'
+  Time::HiRes: '0'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.05
+version: '2.06'

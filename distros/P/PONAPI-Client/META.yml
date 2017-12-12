@@ -36,5 +36,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/mickeyn/PONAPI/tree/master/Client
-version: '0.002009'
+version: '0.002010'
 x_serialization_backend: 'YAML::Tiny version 1.69'

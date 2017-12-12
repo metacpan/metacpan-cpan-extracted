@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Courriel::Headers;
 use Courriel::Helpers qw( unique_boundary );
@@ -19,7 +19,7 @@ use DateTime::Format::Natural;
 use Email::Address;
 use Encode qw( encode );
 use List::AllUtils qw( uniq );
-use Params::ValidationCompiler 0.18 qw( validation_for );
+use Params::ValidationCompiler 0.26 qw( validation_for );
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -532,7 +532,7 @@ Courriel - High level email parsing and manipulation
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -789,10 +789,13 @@ through the web interface at L<http://rt.cpan.org>.  I will be notified, and
 then you'll automatically be notified of progress on your bug as I make
 changes.
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel>
-(or L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>).
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel> or via email to L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Courriel can be found at L<https://github.com/houseabsolute/Courriel>.
 
 =head1 DONATIONS
 
@@ -837,10 +840,13 @@ Zbigniew Łukasiak <zzbbyy@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

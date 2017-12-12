@@ -13,6 +13,8 @@ lib/App/Music/PlayTab/Output.pm
 lib/App/Music/PlayTab/Output/Dump.pm
 lib/App/Music/PlayTab/Output/PDF.pm
 lib/App/Music/PlayTab/Output/PostScript.pm
+lib/App/Music/PlayTab/Output/PostScript/Preamble.pm
+lib/App/Music/PlayTab/Version.pm
 lib/App/Music/PlayTab/res/fonts/MusicSymbols.ttf
 zzexamples/TOC
 zzexamples/allblues.ptb
@@ -67,7 +69,10 @@ zzexamples/whatadifference.ptb
 zzexamples/whatlove.ptb
 zzexamples/whatsnew.ptb
 zzexamples/yardbirdsuite.ptb
-script/playtab
+script/playtab.pl
+script/pp.PL
+t/001_prereq.t
+t/002_load.t
 t/01note.t
 t/02chord.t
 t/03chord.ptb

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 12;
+plan tests => 15;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -37,14 +37,49 @@ use Math::PlanePath::Diagonals;
 # A079824
 
 #------------------------------------------------------------------------------
+
+# A057554 -- X,Y successively
+MyOEIS::compare_values
+  (anum => 'A057554',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::Diagonals->new;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+       if (@got < $count) {
+         push @got, $y;
+       }
+     }
+     return \@got;
+   });
+
+# A057555 -- X,Y successively, x_start=1,y_start=1
+MyOEIS::compare_values
+  (anum => 'A057555',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::Diagonals->new (x_start=>1, y_start=>1);
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+       if (@got < $count) {
+         push @got, $y;
+       }
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
 # A057046 -- X at N=2^k
 
 require Math::NumSeq::PlanePathN;
 my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 {
-  my $path = Math::PlanePath::Diagonals->new (n_start => 1,
-                                              x_start => 1, y_start => 1);
+  my $path = Math::PlanePath::Diagonals->new (x_start=>1, y_start=>1);
 
   MyOEIS::compare_values
     (anum => 'A057046',
@@ -58,17 +93,18 @@ my $bigclass = Math::NumSeq::PlanePathN::_bigint();
        return \@got;
      });
 
-  MyOEIS::compare_values
-    (anum => 'A057047',
-     func => sub {
-       my ($count) = @_;
-       my @got;
-       for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
-         my ($x,$y) = $path->n_to_xy($n);
-         push @got, $y;
-       }
-       return \@got;
-     });
+# A057047 -- Y at N=2^k
+MyOEIS::compare_values
+  (anum => 'A057047',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $bigclass->new(1); @got < $count; $n *= 2) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
 }
 
 #------------------------------------------------------------------------------

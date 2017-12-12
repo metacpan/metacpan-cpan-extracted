@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Mar 27 16:46:54 2014
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun May 18 21:29:59 2014
-# Update Count    : 235
+# Last Modified On: Tue Dec  5 13:17:54 2017
+# Update Count    : 239
 # Status          : Unknown, Use with caution!
 
 package App::Music::PlayTab::Output::PostScript;
@@ -100,15 +100,15 @@ sub bar {			# API
     ps_move();
     if ( defined($barno) ) {
 	if ( $first ) {
-	    $self->{fh}->print( $barno > 0 ? ("($barno) barn\n") : ("bar\n") );
+	    print { $self->{fh} } ( $barno > 0 ? ("($barno) barn\n") : ("bar\n") );
 	}
 	else {
-	    $self->{fh}->print("bar\n");
+	    print { $self->{fh} } ("bar\n");
 	    $barno++;
 	}
     }
     else {
-	$self->{fh}->print("bar\n");
+	print { $self->{fh} } ("bar\n");
     }
     ps_skip(4);
 }
@@ -125,7 +125,7 @@ sub print_space {
 sub print_rest {
     my $self = shift;
     ps_move();
-    $self->{fh}->print("rest\n");
+    print { $self->{fh} } ("rest\n");
     ps_step();
 }
 
@@ -134,7 +134,7 @@ sub print_same {
     my $save_x = $x;
     $x += ($xs * $xd) / 2;
     ps_move();
-    $self->{fh}->print("same$wh\n");	# TODO: change to "same"
+    print { $self->{fh} } ("same$wh\n");	# TODO: change to "same"
     $x = $save_x;
     ps_skip($xs * $xd);
 }
@@ -142,7 +142,7 @@ sub print_same {
 sub print_ta {
     my $self = shift;
     ps_move();
-    $self->{fh}->print("ta\n");
+    print { $self->{fh} } ("ta\n");
     ps_step();
 }
 
@@ -158,7 +158,7 @@ sub text {			# API
     my $xm = $md;
     $md = $xxmd || 0;
     ps_move();
-    $self->{fh}->print( $font, ' (', $text, ') show', "\n");
+    print { $self->{fh} } ( $font, ' (', $text, ') show', "\n");
     $md = $xm;
 }
 
@@ -197,11 +197,11 @@ sub print_grid {
     my @c = @$grid;
     my $chord = shift(@c);
     my $ps = ref($chord) ? $chord->ps : "($chord) show";
-    $self->{fh}->print('1000 1000 moveto', "\n",
+    print { $self->{fh} } ('1000 1000 moveto', "\n",
 		   $ps, "\n",
 		   'currentpoint pop 1000 sub 2 div', "\n");
     ps_move();
-    $self->{fh}->print(2.5*$std_gridscale, ' exch sub 8 add 0 rmoveto ',
+    print { $self->{fh} } (2.5*$std_gridscale, ' exch sub 8 add 0 rmoveto ',
 		   $ps, "\n");
     ps_move();
 
@@ -213,7 +213,7 @@ sub print_grid {
 	$c = '()';
     }
 
-    $self->{fh}->print('8 ', -5-(4*$std_gridscale), " rmoveto @c $c dots\n");
+    print { $self->{fh} } ('8 ', -5-(4*$std_gridscale), " rmoveto @c $c dots\n");
 }
 
 ################ PostScript routines ################
@@ -227,18 +227,18 @@ my $page_bottom;	# bottom margin of page;
 
 sub ps_page {
     my ( $first, $ttle, $stitles ) = @_;
-    $fh->print('end showpage', "\n") if $ps_pages;
-    $fh->print('%%Page: ', ++$ps_pages. ' ', $ps_pages, "\n",
+    print $fh ('end showpage', "\n") if $ps_pages;
+    print $fh ('%%Page: ', ++$ps_pages. ' ', $ps_pages, "\n",
 		  'tabdict begin', "\n");
     $x = $y = 0;
     $ps_page = $first ? 1 : $ps_page+1;
 
-    $fh->print( "$page_left $page_top m TF ($ttle) show\n" );
+    print $fh ( "$page_left $page_top m TF ($ttle) show\n" );
     $title = $ttle if $first;
 
     if ( $ps_page > 1 ) {
 	my $pp = "Page $ps_page";
-	$fh->print( "$page_right $page_top m SF ($pp) rshow\n" );
+	print $fh ( "$page_right $page_top m SF ($pp) rshow\n" );
     }
     ps_advance();
 
@@ -246,7 +246,7 @@ sub ps_page {
     $md = 0;
     foreach ( @$stitles ) {
 	ps_move();
-	$fh->print( "SF ($_) show\n" );
+	print $fh ( "SF ($_) show\n" );
 	ps_advance();
     }
     $md = $save_md;
@@ -259,7 +259,7 @@ sub ps_move {
 	ps_page( 0, $title, [] );
     }
 
-    $fh->print($page_left+$x+$md, ' ' , $page_top+$y, ' m ');
+    print $fh ($page_left+$x+$md, ' ' , $page_top+$y, ' m ');
 }
 
 sub ps_step { ps_skip($xd) }
@@ -279,7 +279,7 @@ sub ps_skip {
 sub ps_chord {
     my ( $chord ) = @_;
     ps_move();
-    $fh->print($chord->ps, "\n");
+    print $fh ($chord->ps, "\n");
     ps_step();
 }
 
@@ -297,7 +297,7 @@ sub ps_preamble {
 	$data = App::Music::PlayTab::Output::PostScript::Preamble->preamble( $_[0] );
     }
     $data =~ s/\$std_gridscale/$std_gridscale/g;
-    $fh->print($data);
+    print $fh ($data);
 
     # A4 format is 595 pt x 842 pt.
     $page_left   =  50;
@@ -310,7 +310,7 @@ sub ps_preamble {
 }
 
 sub ps_trailer {
-    $fh->print( <<EOD );
+    print $fh ( <<EOD );
 end showpage
 %%Trailer
 %%Pages: $ps_pages

@@ -44,7 +44,7 @@
          "web" : "https://github.com/abbypan/Novel-Robot-Parser"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
 

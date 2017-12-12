@@ -5,7 +5,7 @@ use Git::Wrapper;
 use Path::Tiny qw(path);
 use Test::More 0.88;            # done_testing
 
-use lib 't';
+use lib 't/lib';
 use Util;
 
 # rt#56485 - skip test to avoid failures for old git versions

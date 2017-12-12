@@ -4,7 +4,7 @@
       "Patrick Hochstenbach"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -67,7 +67,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-LIDO"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
@@ -75,6 +75,6 @@
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

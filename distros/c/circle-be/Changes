@@ -1,5 +1,19 @@
 Revision history for Circle
 
+0.173320  2017-11-29 18:55:36
+        [CHANGES]
+         * Better support for formatted strings via String::Tagged::Formatting
+           spec
+         * Better support for other features used by Circle::Net::Matrix
+         * Added `/invite` IRC channel command
+         * Commandline-overridable config file path
+         * Added logfile formatter script
+         * Remove unused-and-buggy channel join state tracking code
+
+        [BUGFIXES]
+         * Fixes for IO::Async 0.64 and Net::Async::Tangence API changes
+           (RT101151)
+
 0.170740  2017/03/16 14:54:14
         [CHANGES]
          * Added `/channels del`

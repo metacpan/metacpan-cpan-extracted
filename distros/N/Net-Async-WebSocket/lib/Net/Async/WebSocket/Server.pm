@@ -11,7 +11,7 @@ use base qw( IO::Async::Listener );
 
 use Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use Net::Async::WebSocket::Protocol;
 
@@ -31,9 +31,9 @@ C<Net::Async::WebSocket::Server> - serve WebSocket clients using C<IO::Async>
        my ( undef, $client ) = @_;
 
        $client->configure(
-          on_frame => sub {
+          on_text_frame => sub {
              my ( $self, $frame ) = @_;
-             $self->send_frame( $frame );
+             $self->send_text_frame( $frame );
           },
        );
     }
@@ -56,12 +56,47 @@ connection on to the continuation callback or method.
 
 =cut
 
+=head1 EVENTS
+
+The following events are invoked, either using subclass methods or CODE
+references in parameters:
+
+=head2 on_client
+
+   $self->on_client( $client )
+   $on_client->( $self, $client )
+
+Invoked when a new client connects and completes its initial handshake.
+
+It will be passed a new instance of a L<Net::Async::WebSocket::Protocol>
+object, wrapping the client connection.
+
+=head2 on_handshake
+
+Invoked when a handshake has been requested.
+
+   $self->on_handshake( $client, $hs, $continue )
+   $on_handshake->( $self, $client, $hs, $continue )
+
+Calling C<$continue> with a true value will complete the handshake, false will
+drop the connection.
+
+This is useful for filtering on origin, for example:
+
+   on_handshake => sub {
+      my ( $self, $client, $hs, $continue ) = @_;
+
+      $continue->( $hs->req->origin eq "http://localhost" );
+   }
+
+=cut
+
 sub new
 {
    my $class = shift;
    return $class->SUPER::new(
-      @_,
       handle_class => "Net::Async::WebSocket::Protocol",
+      @_,
    );
 }
 
@@ -113,30 +148,9 @@ The following named parameters may be passed to C<new> or C<configure>:
 
 =item on_client => CODE
 
-A callback that is invoked whenever a new client connects and completes its
-inital handshake.
-
- $on_client->( $self, $client )
-
-It will be passed a new instance of a L<Net::Async::WebSocket::Protocol>
-object, wrapping the client connection.
-
 =item on_handshake => CODE
 
-A callback that is invoked when a handshake has been requested.
-
- $on_handshake->( $self, $client, $hs, $continuation )
-
-Calling C<$continuation> with a true value will complete the handshake, false
-will drop the connection.
-
-This is useful for filtering on origin, for example:
-
- on_handshake => sub {
-    my ( $self, $client, $hs, $continuation ) = @_;
-
-    $continuation->( $hs->req->origin eq "http://localhost" );
- }
+CODE references for event handlers.
 
 =back
 

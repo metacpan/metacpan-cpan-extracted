@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.1.8';
+$Git::Hooks::VERSION = '2.2.0';
 use 5.010;
 use strict;
 use warnings;
@@ -108,7 +108,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.1.8
+version 2.2.0
 
 =head1 SYNOPSIS
 
@@ -403,6 +403,11 @@ impose a strict structure to the repository's reference hierarchies.
 
 Inserts a C<Change-Id> line in the commit log message to allow
 integration with Gerrit's code review system.
+
+=item * Git::Hooks::Notify
+
+Sends email notifications to interested parties about pushed commits affecting
+specific files in the repository.
 
 =back
 

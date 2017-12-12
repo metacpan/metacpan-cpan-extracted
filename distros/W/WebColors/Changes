@@ -1,3 +1,12 @@
+0.4.7 2017-12-08
+    * adding interesting pantone colors of the years ultraviolet, greenery, masala, chillipepper, tangerine tango
+    * adding lighten and darken functions
+    * minor bug fixes
+0.4.6 2017-08-15
+    * adding prince 'love-symbol-2', lovesymbol2
+    * adding chucknorris for completeness
+0.4.5 2017-08-01
+    * more things have grey/gray variants
 0.4.4 2017-01-20
     * variations on naming open-colors, oc-green7, ocgreen7, oc-green7
 0.4.3 2017-01-17

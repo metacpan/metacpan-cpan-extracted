@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.10.0;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 use Moose 2.0000;
 use Carp;
@@ -222,7 +222,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -1151,7 +1151,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
+=for stopwords Andy Jack Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
 
 =over 4
 
@@ -1194,6 +1194,10 @@ Jonathan Stowe <jns@gellyfish.co.uk>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Larry Leszczynski <larryl@cpan.org>
 
 =item *
 

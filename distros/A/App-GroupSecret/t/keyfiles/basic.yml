@@ -1,0 +1,9 @@
+---
+keys:
+  89b3fb766cf9568ea81adfba1cba7d05:
+    comment: foo
+    filename: foo_rsa.pub
+    secret_passphrase: ~
+    type: rsa
+secret: ~
+version: '1'

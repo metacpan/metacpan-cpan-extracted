@@ -7,6 +7,7 @@ lib/Text/Amuse/Beamer.pm
 lib/Text/Amuse/Document.pm
 lib/Text/Amuse/Element.pm
 lib/Text/Amuse/Functions.pm
+lib/Text/Amuse/InlineElement.pm
 lib/Text/Amuse/Output.pm
 lib/Text/Amuse/Output/Image.pm
 lib/Text/Amuse/String.pm
@@ -30,6 +31,7 @@ t/header-defined.t
 t/headers.t
 t/hyphenation.t
 t/images.t
+t/inline-elements.t
 t/internal-linking.t
 t/languages.t
 t/list-continuations.t
@@ -45,6 +47,7 @@ t/pod-coverage.t
 t/pod.t
 t/regexp.t
 t/splat.t
+t/splat_html.t
 t/splat_latex.t
 t/tables.t
 t/testfiles/10_theses.exp.html
@@ -60,6 +63,9 @@ t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse
+t/testfiles/broken-tags.exp.html
+t/testfiles/broken-tags.exp.ltx
+t/testfiles/broken-tags.muse
 t/testfiles/broken.exp.html
 t/testfiles/broken.exp.ltx
 t/testfiles/broken.muse
@@ -81,9 +87,15 @@ t/testfiles/complete.muse
 t/testfiles/crashed-1.exp.html
 t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
+t/testfiles/desc-lists-2.exp.html
+t/testfiles/desc-lists-2.exp.ltx
+t/testfiles/desc-lists-2.muse
 t/testfiles/desc-lists.exp.html
 t/testfiles/desc-lists.exp.ltx
 t/testfiles/desc-lists.muse
+t/testfiles/empty-tags.exp.html
+t/testfiles/empty-tags.exp.ltx
+t/testfiles/empty-tags.muse
 t/testfiles/enumerations.exp.html
 t/testfiles/enumerations.exp.ltx
 t/testfiles/enumerations.muse
@@ -100,6 +112,9 @@ t/testfiles/false-lists.exp.html
 t/testfiles/false-lists.exp.ltx
 t/testfiles/false-lists.muse
 t/testfiles/float.png
+t/testfiles/fn-ordering.exp.html
+t/testfiles/fn-ordering.exp.ltx
+t/testfiles/fn-ordering.muse
 t/testfiles/footnotes-2.exp.html
 t/testfiles/footnotes-2.exp.ltx
 t/testfiles/footnotes-2.muse
@@ -134,6 +149,8 @@ t/testfiles/image2.muse
 t/testfiles/images.exp.html
 t/testfiles/images.exp.ltx
 t/testfiles/images.muse
+t/testfiles/inline.exp.html
+t/testfiles/inline.exp.ltx
 t/testfiles/inline.muse
 t/testfiles/links-2.exp.html
 t/testfiles/links-2.exp.ltx
@@ -182,6 +199,12 @@ t/testfiles/recursiv.muse
 t/testfiles/right.exp.html
 t/testfiles/right.exp.ltx
 t/testfiles/right.muse
+t/testfiles/secondary-fn-recursion.exp.html
+t/testfiles/secondary-fn-recursion.exp.ltx
+t/testfiles/secondary-fn-recursion.muse
+t/testfiles/secondary-fn.exp.html
+t/testfiles/secondary-fn.exp.ltx
+t/testfiles/secondary-fn.muse
 t/testfiles/special-chars.exp.html
 t/testfiles/special-chars.exp.ltx
 t/testfiles/special-chars.muse

@@ -1,9 +1,7 @@
-use 5.010;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Plack::Middleware::RedirectSSL;
-$Plack::Middleware::RedirectSSL::VERSION = '1.104';
+$Plack::Middleware::RedirectSSL::VERSION = '1.200';
 # ABSTRACT: force all requests to use in-/secure connections
 
 use parent 'Plack::Middleware';
@@ -16,10 +14,9 @@ use Plack::Request ();
 sub DEFAULT_STS_MAXAGE () { 60    * 60    * 24  * 7  * 26 }
 
 sub call {
-	my $self = shift;
-	my $env  = shift;
+	my ( $self, $env ) = ( shift, @_ );
 
-	my $do_ssl = ( $self->ssl // 1 )                      ? 1 : 0;
+	my $do_ssl = $self->ssl ? 1 : 0;
 	my $is_ssl = ( 'https' eq $env->{'psgi.url_scheme'} ) ? 1 : 0;
 
 	if ( $is_ssl xor $do_ssl ) {
@@ -33,8 +30,8 @@ sub call {
 
 	my $res = $self->app->( $env );
 
-	if ( $is_ssl and $self->hsts // 1 ) {
-		my $max_age = 0 + ( $self->hsts // DEFAULT_STS_MAXAGE );
+	if ( $is_ssl and $self->hsts ) {
+		my $max_age = 0 + $self->hsts;
 		$res = Plack::Util::response_cb( $res, sub {
 			my $res = shift;
 			Plack::Util::header_set( $res->[1], 'Strict-Transport-Security', "max-age=$max_age" );
@@ -42,6 +39,12 @@ sub call {
 	}
 
 	return $res;
+}
+
+sub prepare_app {
+	my $self = shift;
+	defined $self->ssl  or $self->ssl ( 1 );
+	defined $self->hsts or $self->hsts( DEFAULT_STS_MAXAGE );
 }
 
 1;
@@ -58,7 +61,7 @@ Plack::Middleware::RedirectSSL - force all requests to use in-/secure connection
 
 =head1 VERSION
 
-version 1.104
+version 1.200
 
 =head1 SYNOPSIS
 

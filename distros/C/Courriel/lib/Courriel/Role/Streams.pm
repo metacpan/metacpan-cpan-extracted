@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Courriel::Types qw( Streamable );
 use Params::ValidationCompiler qw( validation_for );

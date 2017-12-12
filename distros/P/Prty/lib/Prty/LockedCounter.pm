@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::FileHandle;
 
@@ -144,7 +144,7 @@ sub increment {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

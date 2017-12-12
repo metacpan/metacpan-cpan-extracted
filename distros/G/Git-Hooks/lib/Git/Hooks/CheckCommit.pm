@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.1.8';
+$Git::Hooks::CheckCommit::VERSION = '2.2.0';
 use 5.010;
 use utf8;
 use strict;
@@ -389,7 +389,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.1.8
+version 2.2.0
 
 =head1 DESCRIPTION
 

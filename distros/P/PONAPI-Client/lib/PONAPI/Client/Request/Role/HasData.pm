@@ -43,7 +43,7 @@ PONAPI::Client::Request::Role::HasData - request - role - has data
 
 =head1 VERSION
 
-version 0.002009
+version 0.002010
 
 =head1 AUTHORS
 

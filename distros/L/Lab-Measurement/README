@@ -6,7 +6,7 @@ provides an interface to several instrumentation control backends, as e.g. Linux
 National Instruments' NI-VISA library. Dedicated instrument driver classes relieve the
 user from taking care for internal details.
 
-See http://www.labmeasurement.de/ for further information, including installation
+See https://www.labmeasurement.de/ for further information, including installation
 instructions.
 
 COPYRIGHT AND LICENCE

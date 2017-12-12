@@ -7,7 +7,7 @@ package t::CircleTest;
 use strict;
 use warnings;
 
-our $VERSION = '0.170740';
+our $VERSION = '0.173320';
 
 use Exporter qw( import );
 our @EXPORT_OK = qw(
@@ -23,14 +23,9 @@ sub get_session
 {
    my ( $rootobj ) = @_;
 
-   my $session;
-   $rootobj->call_method(
-      method => "get_session",
-      args   => [ [qw( tabs )] ],
-      on_result => sub { $session = $_[0] },
-   );
-
-   wait_for { $session };
+   my ($session) = $rootobj->call_method(
+      get_session => [qw( tabs )]
+   )->get;
 
    return $session;
 }
@@ -39,14 +34,9 @@ sub get_widget_from
 {
    my ( $windowitem ) = @_;
 
-   my $widget;
-   $windowitem->call_method(
-      method => "get_widget",
-      on_result => sub { $widget = $_[0] },
-      on_error  => sub { die "Test failed early - $_[-1]" },
-   );
-
-   wait_for { $widget };
+   my ($widget) = $windowitem->call_method(
+      'get_widget'
+   )->get;
    return $widget;
 }
 
@@ -77,15 +67,9 @@ sub send_command
 {
    my ( $windowitem, $command ) = @_;
 
-   my $done;
    $windowitem->call_method(
-      method => "do_command",
-      args   => [ $command ],
-      on_result => sub { $done = 1 },
-      on_error  => sub { die "Test failed early - $_[-1]" },
-   );
-
-   wait_for { $done };
+      do_command => $command,
+   )->get;
 }
 
 0x55AA;

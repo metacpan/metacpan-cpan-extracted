@@ -28,6 +28,8 @@
 #include <sys/select.h>
 #include <sys/time.h>
 
+#define streq(a,b) (!strcmp(a,b))
+
 /* unit multipliers for working in microseconds */
 #define MSEC      1000
 #define SECOND 1000000
@@ -290,7 +292,7 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
     tt->cols  = cols;
 
     TickitResizeEventInfo info = { .lines = lines, .cols = cols };
-    run_events(tt, TICKIT_EV_RESIZE, &info);
+    run_events(tt, TICKIT_TERM_ON_RESIZE, &info);
   }
 }
 
@@ -525,7 +527,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
     info.mod = key->modifiers;
 
-    run_events_whilefalse(tt, TICKIT_EV_MOUSE, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
@@ -535,7 +537,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
       .mod  = key->modifiers,
     };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE ||
           key->type == TERMKEY_TYPE_FUNCTION ||
@@ -549,18 +551,18 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
       .mod  = key->modifiers,
     };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, &info);
   }
 }
 
 void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *info)
 {
-  run_events_whilefalse(tt, TICKIT_EV_KEY, info);
+  run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, info);
 }
 
 void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info)
 {
-  run_events_whilefalse(tt, TICKIT_EV_MOUSE, info);
+  run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, info);
 }
 
 static void get_keys(TickitTerm *tt, TermKey *tk)
@@ -915,4 +917,34 @@ bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value)
 bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
 {
   return (*tt->driver->vtable->setctl_str)(tt->driver, ctl, value);
+}
+
+const char *tickit_term_ctlname(TickitTermCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_TERMCTL_ALTSCREEN:      return "altscreen";
+    case TICKIT_TERMCTL_CURSORVIS:      return "cursorvis";
+    case TICKIT_TERMCTL_MOUSE:          return "mouse";
+    case TICKIT_TERMCTL_CURSORBLINK:    return "cursorblink";
+    case TICKIT_TERMCTL_CURSORSHAPE:    return "cursorshape";
+    case TICKIT_TERMCTL_ICON_TEXT:      return "icon_text";
+    case TICKIT_TERMCTL_TITLE_TEXT:     return "title_text";
+    case TICKIT_TERMCTL_ICONTITLE_TEXT: return "icontitle_text";
+    case TICKIT_TERMCTL_KEYPAD_APP:     return "keypad_app";
+    case TICKIT_TERMCTL_COLORS:         return "colors";
+
+    case TICKIT_N_TERMCTLS: ;
+  }
+  return NULL;
+}
+
+TickitTermCtl tickit_term_lookup_ctl(const char *name)
+{
+  const char *s;
+
+  for(TickitTermCtl ctl = 1; ctl < TICKIT_N_TERMCTLS; ctl++)
+    if((s = tickit_term_ctlname(ctl)) && streq(name, s))
+      return ctl;
+
+  return -1;
 }

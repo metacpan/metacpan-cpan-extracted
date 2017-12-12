@@ -22,7 +22,7 @@ CatalystX::OAuth2::Request::ProtectedResource - An oauth2 protected resource req
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 AUTHOR
 

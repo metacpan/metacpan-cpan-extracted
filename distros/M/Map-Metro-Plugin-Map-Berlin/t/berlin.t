@@ -52,4 +52,12 @@ if (1) { # U-Bahn example
     }
 }
 
+if (1) { # new since 2017 (Ostkreuz, Suedringkurve)
+    my $routing = $graph->routing_for('Treptower Park', 'Warschauer Str.');
+    my($best_route) = $routing->ordered_routes;
+    my $line_stations = $best_route->line_stations;
+    is join(" ", map { $_->station->name } @$line_stations),
+	'Treptower Park Warschauer Str.';
+}
+
 __END__

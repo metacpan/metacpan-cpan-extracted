@@ -1,3 +1,19 @@
+0.101		2017-12-07	T. R. Wyant
+    Make 'decayed' internal status override anything from external
+    sources. The idea is that the canned table is from Space Track, and
+    therefore authoritative as to whether a satellite is actually
+    on-orbit.
+
+    Iridium 8 decayed.
+
+    Sladen tweaks web page; scraper change needed.
+
+    Further deprecate Iridium status from McCants.  Mike McCants has
+    announced that he is no longer maintaining his Iridium status. The
+    first use of his Iridium status will now generate a warning.  In a
+    further 6 months there will be a warning on every use, and 6 months
+    after that it will become fatal.
+
 0.100		2017-10-12	T. R. Wyant
     Added Iridium status decayed ('[D]', portable status is 3 --
     BODY_STATUS_IS_DECAYED).

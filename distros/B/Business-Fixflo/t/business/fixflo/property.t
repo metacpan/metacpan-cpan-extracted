@@ -32,6 +32,8 @@ can_ok(
         create
 
         Id
+        BlockId
+        BlockName
         ExternalPropertyRef
         PropertyAddressId
         KeyReference

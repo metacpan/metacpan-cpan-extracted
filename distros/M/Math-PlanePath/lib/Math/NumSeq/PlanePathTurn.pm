@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -259,11 +259,17 @@ sub _turn_func_NotStraight {
   ### _turn_func_Left() ...
   return ($next_dy * $dx == $next_dx * $dy ? 0 : 1);
 }
+
+#---------------
+# experimental extras
+
 # sub _turn_func_LR_01 {
 #   my ($dx,$dy, $next_dx,$next_dy) = @_;
 #   ### _turn_func_LR_01() ...
 #   return ($next_dy * $dx >= $next_dx * $dy || 0);
 # }
+
+# 0,1,2,3 as ddir mod 4, incl fractional
 sub _turn_func_Turn4 {
   my ($dx,$dy, $next_dx,$next_dy) = @_;
   ### _turn_func_Turn4(): "$dx,$dy  $next_dx,$next_dy"
@@ -272,6 +278,8 @@ sub _turn_func_Turn4 {
        - Math::NumSeq::PlanePathDelta::_delta_func_Dir360($dx,$dy)) % 360)
      / 90);
 }
+# 0,1,2, -1
+# MAYBE: 0 <= t < 2 and -2 <= t < 0 for symmetry, so reverse=-2
 sub _turn_func_Turn4n {
   my ($dx,$dy, $next_dx,$next_dy) = @_;
   require Math::NumSeq::PlanePathDelta;
@@ -282,6 +290,8 @@ sub _turn_func_Turn4n {
   if ($ret > 2) { $ret -= 4; }
   return $ret;
 }
+
+# 0,1,2,3,4,5 as dtdir mod 6, incl fractional
 sub _turn_func_TTurn6 {
   my ($dx,$dy, $next_dx,$next_dy) = @_;
   require Math::NumSeq::PlanePathDelta;
@@ -290,6 +300,14 @@ sub _turn_func_TTurn6 {
        - Math::NumSeq::PlanePathDelta::_delta_func_TDir360($dx,$dy)) % 360)
      / 60);
 }
+# 0,1,2,3, -2,-1
+# MAYBE: 0 <= t < 3 and -3 <= t < 0 for symmetry, so reverse=-3
+sub _turn_func_TTurn6n {
+  my $t = _turn_func_TTurn6(@_);
+  return ($t <= 3 ? $t : $t-6);
+}
+
+#---------
 
 sub pred {
   my ($self, $value) = @_;
@@ -1028,6 +1046,8 @@ sub characteristic_non_decreasing {
     { 'arms=1' =>
       { LSR => 'A209615',
         # OEIS-Catalogue: A209615 planepath=AlternatePaper turn_type=LSR
+        Right => 'A292077',
+        # OEIS-Catalogue: A292077 planepath=AlternatePaper turn_type=Right
 
         # # Not quite, A106665 has OFFSET=0 cf first here i=1
         # 'Left' => 'A106665', # turn, 1=left,0=right
@@ -1700,7 +1720,7 @@ The C<turn_type> choices are
     "SLR"       0=straight 1=left  2=right
     "SRL"       0=straight 1=right 2=left
 
-In each case the value at i is the turn which occurs at N=i,
+In each case the value at sequence index i is the turn at N=i,
 
             i+1
              ^
@@ -1710,9 +1730,9 @@ In each case the value at i is the turn which occurs at N=i,
                    first turn at i = n_start + 1
 
 For multiple "arms" the turn follows that particular arm so it's i-arms, i,
-i+arms.  i values start C<n_start()+arms_count()> so i-arms is C<n_start()>,
-the first N on the path.  A single arm path beginning N=0 has its first turn
-at i=1.
+i+arms.  i values start C<n_start()+arms_count()> so that i-arms is
+C<n_start()>, the first N on the path.  A single arm path beginning N=0 has
+its first turn at i=1.
 
 For "Straight", "LSR", "SLR" and "SRL", straight means either straight ahead
 or 180-degree reversal, ie. the direction N to N+1 is along the same line as
@@ -1825,7 +1845,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

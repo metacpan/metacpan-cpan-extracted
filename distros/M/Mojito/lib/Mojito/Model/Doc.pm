@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Model::Doc;
-{
-  $Mojito::Model::Doc::VERSION = '0.24';
-}
+$Mojito::Model::Doc::VERSION = '0.25';
 use Mojito::Model::Doc::Mongo;
 use Mojito::Model::Doc::Deep;
 use Mojito::Model::Doc::Elasticsearch;

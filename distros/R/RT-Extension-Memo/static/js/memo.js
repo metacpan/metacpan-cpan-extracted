@@ -16,6 +16,9 @@ function setDisplayMode(doUpdate) {
     if (doUpdate) {
         memoValue = memoTextarea.value;
         memoDiv.innerHTML = memoValue;
+        if (! RT.Config.MemoRichText) {
+            memoDiv.innerHTML = memoValue.replace(/\n/g, '<br />');
+        }
     }
     // Cancel textarea content
     else {
@@ -63,7 +66,7 @@ function setEditMode() {
         }
         // Set the type
         type.val("text/html");
-        memoEditor = CKEDITOR.replace(memoTextarea.name, {width: '100%', height: RT.Config.MessageBoxRichTextHeight});
+        memoEditor = CKEDITOR.replace(memoTextarea.name, {width: '100%', height: RT.Config.MemoRichTextHeight});
         jQuery("#" + memoTextarea.name + "___Frame").addClass("richtext-editor");
     }
 

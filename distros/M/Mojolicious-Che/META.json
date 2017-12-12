@@ -33,12 +33,19 @@
       "runtime" : {
          "requires" : {
             "Mojo::Log::Che" : "0.01",
-            "Mojolicious" : "7",
+            "Mojolicious" : "7.57",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.032",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mche/Mojolicious-Che.git",
+         "web" : "https://github.com/mche/Mojolicious-Che"
+      }
+   },
+   "version" : "0.033",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

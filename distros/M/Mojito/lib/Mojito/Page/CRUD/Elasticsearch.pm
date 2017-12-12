@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Page::CRUD::Elasticsearch;
-{
-  $Mojito::Page::CRUD::Elasticsearch::VERSION = '0.24';
-}
+$Mojito::Page::CRUD::Elasticsearch::VERSION = '0.25';
 use 5.010;
 use Moo;
 
@@ -12,7 +10,7 @@ has base_url => ( is => 'rw', );
 
 =head1 Name
 
-Mojito::Page::CRUD::ES - Elasticsearch CRUD
+Mojito::Page::CRUD::Elasticsearch - Elasticsearch CRUD
 
 =head1 Methods
 
@@ -94,8 +92,8 @@ sub delete {
         index => $self->db_name,
         type  => $self->collection_name,
         id    => $id,
-        refresh => 1,
     );
+    $self->db->indices->refresh( index => $self->db_name );
 }
 
 =head2 get_all

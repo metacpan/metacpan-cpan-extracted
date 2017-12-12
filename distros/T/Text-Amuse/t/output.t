@@ -18,48 +18,11 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 117;
-
-my $document =
-  Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
-                   debug => 0);
-
-ok($document->as_html);
-ok($document->as_latex);
-$document =
-  Text::Amuse->new(file => catfile(t => testfiles => 'inline.muse'),
-                   debug => 0);
-
-my $exphtml = << 'HTML';
-
-<p>
-<em>em</em> <br /> <strong>strong</strong> <br /> <strong><em>emStrong</em></strong> <code>code</code> <em>em</em>
-<strong>strong</strong> <em><strong>EmStrong</em></strong>
-<em>em</em> <strong>strong</strong> <strong><em>emStrong</em></strong> <code>code</code> <em>em</em>
-<strong>strong</strong> <em><strong>EmStrong</em></strong>
-</p>
-
-<p>
-&lt;script&gt;alert(&quot;hacked!&quot;)&lt;/script&gt;&lt;em&gt;&lt;strong&gt;
-</p>
-HTML
-
-my $exptex = << 'TEX';
-
-\emph{em}\forcelinebreak  \textbf{strong}\forcelinebreak  \textbf{\emph{emStrong}} \texttt{code} \emph{em}
-\textbf{strong} \emph{\textbf{EmStrong}}
-\emph{em} \textbf{strong} \textbf{\emph{emStrong}} \texttt{code} \emph{em}
-\textbf{strong} \emph{\textbf{EmStrong}}
-
-
-<script>alert("hacked!")<\Slash{}script><em><strong>
-
-TEX
-is($document->as_html, $exphtml);
-is($document->as_latex, $exptex);
-
+plan tests => 129;
 
 foreach my $testfile (qw/comments
+                         inline
+                         packing
                          special-chars
                          footnotes-packing
                          footnotes
@@ -81,6 +44,7 @@ foreach my $testfile (qw/comments
                          broken
                          broken2
                          broken3
+                         broken-tags
                          list-and-fn
                          complete
                          right
@@ -107,13 +71,18 @@ foreach my $testfile (qw/comments
                          lists-2
                          lists-3
                          desc-lists
+                         desc-lists-2
                          beamer
                          br-in-footnotes
                          hyper
                          hyper-2
                          links-in-h
                          footnotes-multiline
+                         secondary-fn
+                         secondary-fn-recursion
+                         fn-ordering
                          enumerations
+                         empty-tags
                          verb
                         /) {
     test_testfile($testfile);
@@ -121,7 +90,7 @@ foreach my $testfile (qw/comments
 
 sub test_testfile {
     my $base = shift;
-    $document = Text::Amuse->new(file => catfile(t => testfiles => "$base.muse"),
+    my $document = Text::Amuse->new(file => catfile(t => testfiles => "$base.muse"),
                                  debug => 0);
     if ($leave_out_in_tmp) {
         write_to_file(catfile(tmpdir() => "$base.out.html"),
@@ -133,7 +102,7 @@ sub test_testfile {
     {
         my $got_latex = $document->as_latex;
         my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
-        ok ($got_latex eq $latex, "LaTex for $base OK")
+        ok ($got_latex eq $latex, "LaTeX for $base OK")
           or show_diff($got_latex, $latex);
     }
     {

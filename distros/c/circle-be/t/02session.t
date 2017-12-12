@@ -23,11 +23,10 @@ my $session = get_session $rootobj;
 ok( $session->proxy_isa( "Circle.Session.Tabbed" ), '$session proxy isa Circle.Session.Tabbed' );
 
 my $tabs;
-$session->watch_property(
-   property => "tabs",
-   want_initial => 1,
+$session->watch_property_with_initial(
+   "tabs",
    on_updated => sub { $tabs = $_[0] },
-);
+)->get;
 
 wait_for { $tabs };
 

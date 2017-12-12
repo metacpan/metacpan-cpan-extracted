@@ -3,7 +3,7 @@ package Prty::ClassConfig;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
 
@@ -71,12 +71,6 @@ setzen, lesen) diesen Hash.
 
     $h = $class->def(@keyVal);
 
-=head4 Description
-
-Erzeuge einen globalen Hash in Klasse $class und weise diesem die
-Schlüssel/Wert-Paare @keyVal zu. Existiert der Hash bereits,
-wird er nicht neu erzeugt.
-
 =head4 Arguments
 
 =over 4
@@ -90,6 +84,12 @@ Liste der Schlüssel/Wert-Paare
 =head4 Returns
 
 Referenz auf den Hash
+
+=head4 Description
+
+Erzeuge einen globalen Hash in Klasse $class und weise diesem die
+Schlüssel/Wert-Paare @keyVal zu. Existiert der Hash bereits,
+wird er nicht neu erzeugt.
 
 =cut
 
@@ -124,11 +124,6 @@ sub def {
     $val = $class->defGet($key);
     @vals = $class->defGet(@keys);
 
-=head4 Description
-
-Liefere die Werte zu den Schlüsseln @keys. Im Skalarkontext
-liefere den Wert des ersten Schlüssels.
-
 =head4 Arguments
 
 =over 4
@@ -148,6 +143,11 @@ Schlüssel bzw. Liste von Schlüsseln.
 Wert bzw. Liste von Werten.
 
 =back
+
+=head4 Description
+
+Liefere die Werte zu den Schlüsseln @keys. Im Skalarkontext
+liefere den Wert des ersten Schlüssels.
 
 =cut
 
@@ -176,13 +176,6 @@ sub defGet {
 =head4 Synopsis
 
     $val = $class->defMemoize($key,$sub);
-
-=head4 Description
-
-Berechne den Wert per Subroutine $sub, speichere ihn unter dem
-Schlüssel $key und liefere ihn schließlich zurück. Der Wert wird
-nur beim ersten Aufruf berechnet, danach wird der gespeicherte
-Wert unmittelbar geliefert.
 
 =head4 Arguments
 
@@ -214,6 +207,13 @@ Berechneter bzw. gecachter Wert
 
 =back
 
+=head4 Description
+
+Berechne den Wert per Subroutine $sub, speichere ihn unter dem
+Schlüssel $key und liefere ihn schließlich zurück. Der Wert wird
+nur beim ersten Aufruf berechnet, danach wird der gespeicherte
+Wert unmittelbar geliefert.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -235,13 +235,6 @@ sub defMemoize {
 
     $val = $class->defSearch($key);
 
-=head4 Description
-
-Suche "von unten nach oben" in der Vererbungshierarchie, beginnend
-mit Klasse $class, die Information $key. Die erste Klasse, die die
-Information besitzt, liefert den Wert. Existiert die Information
-nicht, wird C<undef> geliefert.
-
 =head4 Arguments
 
 =over 4
@@ -255,6 +248,13 @@ Schlüssel der Information.
 =head4 Returns
 
 Die gesuchte Information oder C<undef>.
+
+=head4 Description
+
+Suche "von unten nach oben" in der Vererbungshierarchie, beginnend
+mit Klasse $class, die Information $key. Die erste Klasse, die die
+Information besitzt, liefert den Wert. Existiert die Information
+nicht, wird C<undef> geliefert.
 
 =cut
 
@@ -282,17 +282,6 @@ sub defSearch {
 
     @arr | $arr = $class->defCumulate($key);
 
-=head4 Description
-
-Durchlaufe die Klassenhierarchie I<von oben nach unten> und sammele
-alle Werte des Attributs $key ein und liefere die Liste der
-Werte zurück.
-
-Diese Methode ist nützlich, wenn z.B. Attributnamen entlang
-einer Vererbungshierarchie definiert werden (je höher die Klasse
-desto allgemeiner das Attribut) und für eine gegebene Klasse
-die Liste der Attributnamen bestimmt werden soll.
-
 =head4 Arguments
 
 =over 4
@@ -306,6 +295,17 @@ Schlüssel der Information.
 =head4 Returns
 
 Liste der Werte. Im Skalarkontext eine Referenz auf die Liste.
+
+=head4 Description
+
+Durchlaufe die Klassenhierarchie I<von oben nach unten> und sammele
+alle Werte des Attributs $key ein und liefere die Liste der
+Werte zurück.
+
+Diese Methode ist nützlich, wenn z.B. Attributnamen entlang
+einer Vererbungshierarchie definiert werden (je höher die Klasse
+desto allgemeiner das Attribut) und für eine gegebene Klasse
+die Liste der Attributnamen bestimmt werden soll.
 
 =head4 Example
 
@@ -361,7 +361,7 @@ sub defCumulate {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

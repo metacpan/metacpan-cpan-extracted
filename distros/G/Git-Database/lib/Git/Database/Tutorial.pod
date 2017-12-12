@@ -4,7 +4,7 @@ Git::Database::Tutorial - Learn how to use Git::Database
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -54,9 +54,13 @@ L<Git::Database::Backend::Git::Repository>.
 
 The currently supported stores are (by order of appearance):
 L<Git::Repository>, L<Git::Sub>, L<Git::PurePerl>, L<Cogit>, L<Git>,
-L<Git::Wrapper>, and L<Git::Raw>.
+L<Git::Wrapper>, and L<Git::Raw::Repository>.
 If you know of other Git wrappers, please let me know or submit patches.
 Thanks!
+
+The following one-liner will list which stores are currently installed:
+
+    perl -MGit::Database -E 'say for Git::Database->available_stores'
 
 =item object
 

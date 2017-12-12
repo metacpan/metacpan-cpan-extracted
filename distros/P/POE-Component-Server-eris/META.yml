@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/reyjrar/POE-Component-Server-eris.git
-version: '2.4'
+version: '2.5'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.024000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -127,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: '0.170880'
+      version: '0.163040'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
@@ -257,7 +257,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
-      version: '3.001'
+      version: '3.000'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -300,10 +300,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          'git --version': 2.0.4
           repo_root: .
       name: '@Git/Check'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -317,12 +317,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          'git --version': 2.0.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -330,16 +330,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.4
+          tag: v2.5
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          'git --version': 2.0.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -348,10 +348,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          'git --version': 2.0.4
           repo_root: .
       name: '@Git/Push'
-      version: '2.042'
+      version: '2.041'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -401,4 +401,4 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.010'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.69'

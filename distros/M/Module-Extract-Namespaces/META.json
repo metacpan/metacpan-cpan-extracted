@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -25,22 +25,38 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "PPI" : 0,
-            "Test::More" : 0
+            "PPI" : "1.126",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/module-extract-namespaces/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/module-extract-namespaces",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/module-extract-namespaces.git",
+         "web" : "https://github.com/briandfoy/module-extract-namespaces"
+      }
+   },
+   "version" : "1.021",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

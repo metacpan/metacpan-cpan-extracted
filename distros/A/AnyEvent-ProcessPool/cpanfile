@@ -11,6 +11,8 @@ requires 'MIME::Base64',            '0';
 requires 'String::Escape',          '0';
 requires 'Try::Catch',              '0';
 requires 'parent',                  '0';
+requires 'common::sense',           '3.74';
+requires 'PadWalker',               '2.3';
 
 on test => sub{
   requires 'Test2::Bundle::Extended', '0';

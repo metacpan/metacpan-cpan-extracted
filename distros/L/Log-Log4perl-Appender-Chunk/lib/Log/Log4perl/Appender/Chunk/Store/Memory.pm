@@ -1,5 +1,5 @@
 package Log::Log4perl::Appender::Chunk::Store::Memory;
-$Log::Log4perl::Appender::Chunk::Store::Memory::VERSION = '0.012';
+$Log::Log4perl::Appender::Chunk::Store::Memory::VERSION = '0.013';
 use Moose;
 extends qw/Log::Log4perl::Appender::Chunk::Store/;
 

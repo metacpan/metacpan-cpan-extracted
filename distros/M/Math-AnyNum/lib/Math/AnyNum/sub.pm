@@ -3,6 +3,12 @@ use warnings;
 
 our ($ROUND, $PREC);
 
+#<<<
+state $has_z_sub = (Math::MPFR::MPFR_VERSION_MAJOR() == 3
+                 && Math::MPFR::MPFR_VERSION_MINOR() >= 1)
+                 || Math::MPFR::MPFR_VERSION_MAJOR() > 3;
+#>>>
+
 sub __sub__ {
     my ($x, $y) = @_;
     goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
@@ -61,8 +67,14 @@ sub __sub__ {
 
   Math_GMPz__Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
-        Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+
+        $has_z_sub
+          ? Math::MPFR::Rmpfr_z_sub($r, $x, $y, $ROUND)
+          : do {
+            Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
+            Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+          };
+
         return $r;
     }
 

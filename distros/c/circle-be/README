@@ -2,6 +2,38 @@ NAME
 
     Circle - server backend for the Circle application host
 
+QUESTIONS
+
+ How do I connect to freenode.net #perl and identify with NickServ
+
+       # in Global tab
+       /networks add -type irc Freenode
+    
+       # in Freenode tab
+       /set nick YourNickHere
+       /servers add irc.freenode.net -ident yournamehere -pass secretpasswordhere
+       /connect
+    
+       # Don't forget to
+       /config save
+
+ How do I get notifications whenever someone uses the word perl in a
+ channel that isn't on magnet or freenode#perl
+
+       /rules add input not(channel("#perl")) matches("perl"): highlight
+
+    Rules are network-specific so just don't do that on Magnet.
+
+ How do I set up a command to ban the hostmask for a given nick in the
+ current channel for 24h
+
+    You'll have to read the hostmask of the user specifically, but then
+
+       /mode +b ident@host.name.here
+       /delay 86400 mode -b ident@host.name.here
+
+    Note the lack of / on the inner mode to delay
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

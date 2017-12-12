@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution P5kkelabels,
-version 0.02:
+version 0.03:
 
-  API interface to pakkelabels.dk
+  REST API interface
 
 This software is copyright (c) 2017 by Kaare Rasmussen.
 

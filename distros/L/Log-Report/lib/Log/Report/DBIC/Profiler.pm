@@ -7,7 +7,7 @@ use warnings;
 
 package Log::Report::DBIC::Profiler;
 use vars '$VERSION';
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 use base 'DBIx::Class::Storage::Statistics';
 

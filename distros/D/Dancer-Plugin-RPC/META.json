@@ -22,9 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Dancer" : "1.31",
+            "JSON" : "2.0",
+            "Params::ValidationCompiler" : "0.24",
+            "RPC::XML" : "0.56",
             "Test::Fatal" : "0.010",
             "Test::More" : "0.88",
-            "Test::NoWarnings" : "1.00"
+            "Test::NoWarnings" : "1.00",
+            "Types::Standard" : "1.00"
          }
       },
       "configure" : {
@@ -52,5 +57,5 @@
          "web" : "https://github.com/abeltje/Dancer-Plugin-RPC"
       }
    },
-   "version" : "1.06"
+   "version" : "1.07"
 }

@@ -2,46 +2,65 @@ README for Perl extension Perl-Download-FTP
 
 Perl::Download::FTP - Identify Perl releases and download the most recent via FTP
 
-This document refers to version 0.01 of Perl-Download-FTP.
-This version was released November 15, 2017.
+This document refers to version 0.03 of Perl-Download-FTP.
+This version was released December 04 2017.
 
 SYNOPSIS
 
-        use Perl::Download::FTP;
+    use Perl::Download::FTP;
 
-        $self = Perl::Download::FTP->new( {
-            host        => 'ftp.cpan.org',
-            dir         => '/pub/CPAN/src/5.0',
-            verbose     => 1,
-        } );
+    $self = Perl::Download::FTP->new( {
+        host        => 'ftp.cpan.org',
+        dir         => '/pub/CPAN/src/5.0',
+        verbose     => 1,
+    } );
 
-        @all_releases = $self->ls();
+    @all_releases = $self->ls();
 
-        $classified_releases = $self->classify_releases();
+    $classified_releases = $self->classify_releases();
 
-        @releases = $self->list_releases( {
-            type            => 'production',
-            compression     => 'gz',
-        } );
+    @releases = $self->list_releases( {
+        type            => 'production',
+        compression     => 'gz',
+    } );
 
-        $latest_release = $self->get_latest_release( {
-            compression     => 'gz',
-            type            => 'dev',
-            dir             => '/path/to/download',
-            verbose         => 1,
-        } );
+    $latest_release = $self->get_latest_release( {
+        compression     => 'gz',
+        type            => 'dev',
+        dir             => '/path/to/download',
+        verbose         => 1,
+    } );
+
+    $specific_release = $self->get_specific_release( {
+        release         => 'perl-5.27.2.tar.xz',
+        path            => '/path/to/download',
+    } );
 
 INSTALLATION
 
 To install this module on your system, place the tarball archive file in a
 temporary directory and call the following:
 
-    gunzip Perl-Download-FTP-0.01.tar.gz
-    tar xf Perl-Download-FTP-0.01.tar
-    cd Perl-Download-FTP-0.01
+    gunzip Perl-Download-FTP-0.03.tar.gz
+    tar xf Perl-Download-FTP-0.03.tar
+    cd Perl-Download-FTP-0.03
     perl Makefile.PL
     make
     make test
     make install
 
 If you are on a windows box you should use 'nmake' rather than 'make'.
+
+TESTING THIS MODULE
+
+This library can only be truly tested by attempting live FTP connections and
+downloads of Perl 5 source code tarballs.  Since testing over the internet
+can be problematic when being conducted in an automatic manner or when the
+user is behind a firewall, the test files under 't/' will only be run live
+when you say:
+
+    export PERL_ALLOW_NETWORK_TESTING=1 && make test
+
+Each test file further attempts to confirm the possibility of making an FTP
+connection by using CPAN library Test::RequiresInternet.
+

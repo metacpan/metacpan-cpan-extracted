@@ -1,5 +1,26 @@
 Revision history for School-Code-Compare
  
+0.006     2017-12-11 16:35:04+01:00 Europe/Zurich
+ - support multiline comments, probably buggy ( /* )
+ - add 'java' as option, added some code_examples
+ - deal with \r (carriage return) at end of file paths (windows)
+ - remove all current files from folder doc (thus whole folder)
+ - add some documentation for windows
+
+0.005     2017-12-04 16:02:32+01:00 Europe/Zurich
+ - auto generated META.json using dzil plugin [MetaJSON] (MANWAR)
+ - explode dzil [@Basic] so that [GatherDir] excludes repo license
+ - fix minor Kwalitee stuff (add use strict and warnings)
+ - fix some minor typos in documentation
+
+0.004     2017-11-30 09:55:14+01:00 Europe/Zurich
+ - replace IO::Prompter with IO::Prompt::Simple (less issues on windows)
+ - fix issue with user-interaction while reading from STDIN
+
+0.003     2017-11-30 09:01:25+01:00 Europe/Zurich
+ - documentation update: function docs for main lib
+ - allow absolute paths for Template. System installation seems requiring this
+
 0.002     2017-11-29 10:24:00+01:00 Europe/Zurich
  - documentation update, mainly for the script in bin directory
 

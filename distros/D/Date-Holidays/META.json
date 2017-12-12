@@ -71,90 +71,94 @@
    "provides" : {
       "Date::Holidays" : {
          "file" : "lib/Date/Holidays.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter" : {
          "file" : "lib/Date/Holidays/Adapter.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::AU" : {
          "file" : "lib/Date/Holidays/Adapter/AU.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::BR" : {
          "file" : "lib/Date/Holidays/Adapter/BR.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::BY" : {
          "file" : "lib/Date/Holidays/Adapter/BY.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::CN" : {
          "file" : "lib/Date/Holidays/Adapter/CN.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::DE" : {
          "file" : "lib/Date/Holidays/Adapter/DE.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::DK" : {
          "file" : "lib/Date/Holidays/Adapter/DK.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::ES" : {
          "file" : "lib/Date/Holidays/Adapter/ES.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::FR" : {
          "file" : "lib/Date/Holidays/Adapter/FR.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::GB" : {
          "file" : "lib/Date/Holidays/Adapter/GB.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::JP" : {
          "file" : "lib/Date/Holidays/Adapter/JP.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::KR" : {
          "file" : "lib/Date/Holidays/Adapter/KR.pm",
-         "version" : "1.06"
+         "version" : "1.07"
+      },
+      "Date::Holidays::Adapter::KZ" : {
+         "file" : "lib/Date/Holidays/Adapter/KZ.pm",
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::LOCAL" : {
          "file" : "lib/Date/Holidays/Adapter/LOCAL.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::NO" : {
          "file" : "lib/Date/Holidays/Adapter/NO.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::PL" : {
          "file" : "lib/Date/Holidays/Adapter/PL.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::PT" : {
          "file" : "lib/Date/Holidays/Adapter/PT.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Date::Holidays::Adapter::RU" : {
          "file" : "lib/Date/Holidays/Adapter/RU.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jonasbn/Date-Holidays/issues"
+         "web" : "https://github.com/jonasbn/perl-date-holidays/issues"
       },
       "homepage" : "https://jonasbn.github.io/perl-date-holidays/",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jonasbn/Date-Holidays.git",
-         "web" : "https://github.com/jonasbn/Date-Holidays"
+         "url" : "https://github.com/jonasbn/perl-date-holidays.git",
+         "web" : "https://github.com/jonasbn/perl-date-holidays"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

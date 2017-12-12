@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION='1.25';
+$VERSION='1.30';
 require Net::SMTP;
+use Authen::SASL;
 use MIME::Base64;
 use Encode;
 use File::Spec;
@@ -20,7 +21,7 @@ sub new{
   my $smtp='smtp.gmail.com'; # Default value
   my $port='default'; # Default value
   my $layer='tls'; # Default value
-  my $auth='LOGIN'; # Default
+  my $auth='AUTO'; # Default
   my $ssl_verify_mode=''; #Default - Warning SSL_VERIFY_NONE
   my $ssl_version='';
   my $timeout=60;
@@ -94,11 +95,22 @@ sub _initsmtp{
   }
   if($auth ne 'none'){
      $self->{sender}->starttls  if($layer eq 'tls');
-     unless($self->{sender}->auth($login,$pass)){
-         my $error_string=$self->{sender}->message();
-         chomp $error_string;
-         $self->{error}=$error_string;
-         print "Authentication (SMTP) failed: $error_string\n" if $debug;
+
+     if($auth eq 'AUTO'){
+        unless($self->{sender}->auth($login,$pass)){
+           my $error_string=$self->{sender}->message();
+           chomp $error_string;
+           $self->{error}=$error_string;
+           print "Authentication -using server methods list- (SMTP) failed: $error_string\n" if $debug;
+        }
+      }
+      else{
+       unless($self->{sender}->auth(Authen::SASL->new(mechanism => $auth, callback => { user => $login, pass => $pass }))){
+           my $error_string=$self->{sender}->message();
+           chomp $error_string;
+           $self->{error}=$error_string;
+           print "Authentication -forcing $auth -(SMTP) failed: $error_string\n" if $debug;
+       }
      }
   }
   return $self;
@@ -492,7 +504,7 @@ It creates the object and opens a session with the SMTP.
 
 =item I<timeout>: defined Timeout for the connection. Default is 60 secs
 
-=item I<auth>: defines the authentication method: ANONYMOUS, CRAM-MD5, DIGEST-MD5, EXTERNAL, GSSAPI, LOGIN (default) and PLAIN. It's currently based on SASL::Perl module
+=item I<auth>: defines the authentication method. Using AUTO (default value) the system uses the list provided by the server. This module supports: ANONYMOUS, CRAM-MD5, DIGEST-MD5, EXTERNAL, GSSAPI, LOGIN and PLAIN (it's currently based on SASL::Perl module).
 
 =item I<debug>: see the log information
 

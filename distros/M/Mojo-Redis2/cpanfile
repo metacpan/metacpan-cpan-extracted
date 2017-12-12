@@ -2,3 +2,4 @@
 requires "Mojolicious"     => "7.50";
 requires "Protocol::Redis" => "1.0";
 test_requires "Test::More" => "0.88";
+test_requires "Sort::Versions" => "1.5";

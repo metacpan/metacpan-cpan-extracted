@@ -1,0 +1,36 @@
+---
+abstract: 'use JSON-encoded data over WebSockets with C<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-WebSocket-JSON
+provides:
+  Net::Async::WebSocket::JSON:
+    file: lib/Net/Async/WebSocket/JSON.pm
+    version: '0.01'
+  Net::Async::WebSocket::JSON::Client:
+    file: lib/Net/Async/WebSocket/JSON/Client.pm
+    version: '0.01'
+  Net::Async::WebSocket::JSON::Protocol:
+    file: lib/Net/Async/WebSocket/JSON/Protocol.pm
+    version: '0.01'
+  Net::Async::WebSocket::JSON::Server:
+    file: lib/Net/Async/WebSocket/JSON/Server.pm
+    version: '0.01'
+requires:
+  JSON::MaybeXS: '0'
+  Net::Async::WebSocket: '0.11'
+  Net::Async::WebSocket::Server: '0.11'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

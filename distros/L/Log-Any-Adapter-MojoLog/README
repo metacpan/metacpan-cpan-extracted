@@ -1,0 +1,100 @@
+NAME
+
+    Log::Any::Adapter::MojoLog - Log::Any integration for Mojo::Log
+
+SYNOPSIS
+
+        use Mojo::Log;
+        use Log::Any::Adapter;
+    
+        Log::Any::Adapter->set('MojoLog', logger => Mojo::Log->new);
+
+    Mojolicious app:
+
+        use Mojo::Base 'Mojolicious';
+    
+        use Log::Any::Adapter;
+    
+        sub startup {
+            my $self = shift;
+    
+            Log::Any::Adapter->set('MojoLog', logger => $self->app->log);
+        }
+
+    Mojolicious::Lite app:
+
+        use Mojolicious::Lite;
+    
+        use Log::Any::Adapter;
+    
+        Log::Any::Adapter->set('MojoLog', logger => app->log);
+
+DESCRIPTION
+
+    This Log::Any adapter uses Mojo::Log for logging. Mojo::Log must be
+    initialized before calling set. The parameter logger must be used to
+    pass in the logging object.
+
+LOG LEVEL TRANSLATION
+
+    Log levels are translated from Log::Any to Mojo::Log as follows:
+
+        trace -> debug
+        notice -> info
+        warning -> warn
+        critical -> fatal
+        alert -> fatal
+        emergency -> fatal
+
+SEE ALSO
+
+      * Log::Any::Adapter::Mojo - The original release of this codebase
+
+      * Log::Any
+
+      * Log::Any::Adapter
+
+      * Mojo::Log
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Log-Any-Adapter-MojoLog
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+    Dan Book (Grinnz)
+
+NOTES
+
+    This module was forked from Log::Any::Adapter::Mojo which bears the
+    copyright
+
+    Copyright (C) 2011 Henry Tang
+
+    and is licensed under the Artistic License version 2.0
+
+    This fork began as fixes for RT#111631
+    <https://rt.cpan.org/Public/Bug/Display.html?id=111631> and RT#101167
+    <https://rt.cpan.org/Public/Bug/Display.html?id=101167>. However the
+    eventual changes that were made prevented any possibility for keeping a
+    consistent log formatter. As such I think it is the responsible action
+    to fork the module to release it. I intend to work with the original
+    author to see how much of these changes can be backported into that
+    codebase without breaking the format.
+
+COPYRIGHT & LICENSE
+
+    Log::Any::Adapter::MojoLog is Copyright (C) 2016 "AUTHOR" and
+    "CONTRIBUTORS".
+
+    Log::Any::Adapter::MojoLog is provided "as is" and without any express
+    or implied warranties, including, without limitation, the implied
+    warranties of merchantibility and fitness for a particular purpose.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

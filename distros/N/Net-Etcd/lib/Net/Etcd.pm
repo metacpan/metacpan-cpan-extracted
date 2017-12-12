@@ -14,6 +14,7 @@ use Net::Etcd::Config;
 use Net::Etcd::Watch;
 use Net::Etcd::Lease;
 use Net::Etcd::Maintenance;
+use Net::Etcd::Member;
 use Net::Etcd::User;
 use Types::Standard qw(Str Int Bool HashRef);
 
@@ -29,7 +30,7 @@ Net::Etcd - etcd v3 REST API.
 
 =cut
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 =head1 SYNOPSIS
 
@@ -91,6 +92,9 @@ our $VERSION = '0.017';
     # member version
     $v = $etcd->version;
 
+    # list members
+    $etcd->member()->list;
+
 =head1 DESCRIPTION
 
 L<Net::Etcd> is object oriented interface to the v3 REST API provided by the etcd L<grpc-gateway|https://github.com/grpc-ecosystem/grpc-gateway>.
@@ -123,35 +127,35 @@ has port => (
 
 =head2 name
 
-Username for authentication
+Username for authentication, defaults to $ENV{ETCD_CLIENT_USERNAME}
 
 =cut
 
 has name => (
     is  => 'ro',
-    isa => Str
+    default => $ENV{ETCD_CLIENT_USERNAME}
 );
 
 =head2 password
 
-Authentication credentials
+Authentication credentials, defaults to $ENV{ETCD_CLIENT_PASSWORD}
 
 =cut
 
 has password => (
     is  => 'ro',
-    isa => Str
+    default => $ENV{ETCD_CLIENT_PASSWORD}
 );
 
 =head2 cacert
 
-Path to cacert
+Path to cacert, defaults to $ENV{ETCD_CERT_FILE}
 
 =cut
 
 has cacert => (
     is  => 'ro',
-    isa => Str,
+    default => $ENV{ETCD_CERT_FILE}
 );
 
 =head2 ssl
@@ -352,6 +356,24 @@ sub maintenance {
     );
 }
 
+=head2 member
+
+See L<Net::Etcd::Member>
+
+    $etcd->member()->list
+
+=cut
+
+sub member {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    return Net::Etcd::Member->new(
+        etcd => $self,
+        cb   => $cb,
+        ( $options ? %$options : () ),
+    );
+}
+
 =head2 user
 
 See L<Net::Etcd::User>
@@ -422,23 +444,12 @@ See L<Net::Etcd::KV::Compare>
 
 =head2 configuration
 
-Initialize configuration checks to see it etcd is installed locally.
+Initialize configuration checks to see if etcd is installed locally.
 
 =cut
 
 sub configuration {
     Net::Etcd::Config->configuration;
-}
-
-sub BUILD {
-    my ( $self, $args ) = @_;
-    if ( not -e $self->configuration->etcd ) {
-        my $msg = "No etcd executable found\n";
-        $msg .= ">> Please install etcd - https://coreos.com/etcd/docs/latest/";
-        die $msg;
-    }
-    # set the intial auth token
-    # $self->auth()->authenticate;
 }
 
 =head1 AUTHOR

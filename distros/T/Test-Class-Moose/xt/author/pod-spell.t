@@ -52,6 +52,8 @@ Jeremy
 Jonathan
 Karen
 Krieg
+Larry
+Leszczynski
 Load
 MetaCPAN
 Method
@@ -112,6 +114,7 @@ invocant
 jns
 kwakwaversal
 la
+larryl
 lib
 madcityzen
 maflick88

@@ -8,6 +8,7 @@ build_requires:
   File::Which: '1.21'
   IO::All: '0.51'
   Path::Class: '0.33'
+  Pod::Markdown: '2.002'
   Test::Exception: '0.32'
   Test::More: '1.001002'
   Test::NoWarnings: '1.04'
@@ -33,6 +34,7 @@ requires:
   CPAN::Perl::Releases: '3.24'
   Capture::Tiny: '0.36'
   Devel::PatchPerl: '1.40'
+  File::Temp: '0.2304'
   Pod::Parser: '1.63'
   Pod::Usage: '1.68'
   local::lib: '2.000014'
@@ -40,4 +42,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/mit-license.php
   repository: git://github.com/gugod/App-perlbrew.git
-version: '0.80'
+version: '0.81'

@@ -2,7 +2,7 @@ package Test2::Tools::Grab;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use Test2::Util::Grabber;
 
@@ -93,7 +93,7 @@ L<Test2::Util::Grabber> - The object constructed and returned by this tool.
 =head1 SOURCE
 
 The source code repository for Test2 can be found at
-F<http://github.com/Test-More/Test-Stream/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

@@ -9,7 +9,7 @@ use Test2::API qw/test2_stack/;
 
 use overload '""' => \&reason, fallback => 1;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 sub init {
     my $self = shift;
@@ -154,7 +154,7 @@ Yes. The most recently created one that is still active will win.
 =head1 SOURCE
 
 The source code repository for Test2-Suite can be found at
-F<http://github.com/Test-More/Test2-Suite/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

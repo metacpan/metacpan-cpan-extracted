@@ -126,3 +126,14 @@ Revision history for Control-CLI
 
 2.05	2017-06-16
 	* Same as version 2.04; bumped up the version to fix a problem with the bundled control-cli.t test script
+
+2.06	2017-12-09
+	* Method poll() did not scale well with many SSH connections due to the partially blocking nature of SSH
+	  authentication which could cumlatively make all objects timeout; algorithm is now optimized to re-credit a
+	  cycle time duration to the underlying object timeouts so as to compensate and allow the deisred scaling.
+	  The changes also improve the frequency of calling the poll_code, which can now be called in between objects
+	  when these take longer than the poll_timer to complete a poll, instead of only at the end of a full cycle
+	* New "atomic_connect" argument for the connect() method for use in non-blocking mode, with SSH, when many
+	  class objects are polled via Control::CLI poll() method, it allows the connect() method to treat socket
+	  setup + SSH authentication as one single poll action to prevent the far end from timing out the connection
+	  if a delay is seen between socket setup and SSH authentication

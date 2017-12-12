@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171126';
+our $VERSION = '20171128';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -167,6 +167,12 @@ sub filePathExt(@)                                                              
   my $f = "$n.$x";
   return $f unless @file;
   filePath(@file, $f)
+ }
+
+BEGIN                                                                           # Some undocumented shorter names for these useful routines
+ {*fpd = *filePathDir;
+  *fpe = *filePathExt;
+  *fpf = *filePath;
  }
 
 sub checkFile($)                                                                # Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
@@ -888,6 +894,11 @@ sub perlPackage($)                                                              
   javaPackage($perl);                                                           # Use same technique as Java
  }
 
+sub printQw(@)                                                                  # Print an array of words in qw() format
+ {my (@words) = @_;                                                             # Array of words
+  'qw('.join(' ', @words).')'
+ }
+
 #1 Cloud Cover                                                                  # Useful for operating across the cloud
 
 sub addCertificate($)                                                           # Add a certificate to the current ssh session.
@@ -1305,7 +1316,7 @@ containingFolder convertImageToJpx convertUnicodeToXml currentDirectory currentD
 dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64
 fileList fileModTime fileOutOfDate
-filePath filePathDir filePathExt fileSize findDirs findFiles
+filePath filePathDir filePathExt fpd fpe fpf fileSize findDirs findFiles
 formatTableBasic fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
@@ -1317,7 +1328,7 @@ loadArrayArrayFromLines loadArrayFromLines
 loadHashArrayFromLines loadHashFromLines
 makePath matchPath max min
 nws
-pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName
+pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
 readBinaryFile readFile removeFilePrefix
 saveToS3 searchDirectoryTreesForMatchingFiles
@@ -2439,7 +2450,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 120;
+use Test::More tests => 121;
 
 #Test::More->builder->output("/dev/null");
 
@@ -2835,3 +2846,5 @@ is_deeply [qw(a b c)],
 
 is_deeply [qw(a b c)],
   [setUnionOfTwoArraysOfWords([qw(a b c )], [qw(a b)])];
+
+ok printQw(qw(a  b  c)) eq "qw(a b c)";

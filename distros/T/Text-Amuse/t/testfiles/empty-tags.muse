@@ -1,0 +1,16 @@
+#title Empty tags
+
+<verbatim>*</verbatim> Hello <em></em> There <em>emph</em> <strong></strong> **strong and stronger**
+<code></code> This is a <code>code</code>.
+Hello <em></em> There <em>emph</em> <strong></strong> **strong and stronger**
+<code></code> This is a <code>code</code>.
+Hello <em></em> There <em>emph</em> <strong></strong> **strong and stronger**
+<code></code> This is a <code>code</code>.
+<verbatim>*</verbatim> <verbatim></verbatim>
+
+<code><</code><code>/code></code>
+
+This =<code>= works.
+
+
+

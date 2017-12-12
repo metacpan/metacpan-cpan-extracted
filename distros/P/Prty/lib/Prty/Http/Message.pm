@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
 use Prty::Http::Cookie;
@@ -119,6 +119,10 @@ my $GetSet = sub {
     $http = $class->new(@keyVal,$file);
     $http = $class->new(@keyVal,\$str);
 
+=head4 Returns
+
+Referenz auf HTTP-Objekt.
+
 =head4 Description
 
 Instantiiere ein HTTP Nachrichten-Objekt mit den Eigenschaften @keyVal.
@@ -168,10 +172,6 @@ Ist eine ungerade Anzahl an Parametern angegeben, wird zunächst
 die (ggf. leere) Liste von Attribut/Wert-Paaren @keyVal zugewiesen.
 Alle weiteren Eigenschaften werden via Handle $fh, Datei $file
 oder String $str gewonnen.
-
-=head4 Returns
-
-Referenz auf HTTP-Objekt.
 
 =cut
 
@@ -227,14 +227,14 @@ sub new {
 
     $http->set(@keyVal);
 
+=head4 Returns
+
+Die Methode liefert keinen Wert zurück.
+
 =head4 Description
 
 Setze die Objekteigenschaften @keyVal. Für die Liste der
 Eigenschaften siehe L</new>().
-
-=head4 Returns
-
-Die Methode liefert keinen Wert zurück.
 
 =head4 Examples
 
@@ -977,7 +977,7 @@ sub asString {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

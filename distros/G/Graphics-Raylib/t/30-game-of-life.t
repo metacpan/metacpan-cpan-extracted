@@ -6,6 +6,7 @@ use warnings;
 my $HZ = 120;
 my $SIZE = 160;
 my $MUTATION_CHANCE = 0.000;
+my $GENERATIONS = $ENV{GAME_OF_LIFE_GENERATIONS} // 50;
 
 ###########
 
@@ -48,7 +49,7 @@ my $bitmap = Graphics::Raylib::Shape->bitmap(
 $g->clear(BLACK);
 
 my $i = 0;
-while (!$g->exiting && $i < 50)
+while (!$g->exiting && $i < $GENERATIONS)
 {
     $bitmap->matrix = unpdl($gen);
     $bitmap->color = $rainbow->();
@@ -75,6 +76,6 @@ while (!$g->exiting && $i < 50)
     $gen = $next;
 }
 
-is $i, 50;
+is $i, $GENERATIONS;
 
 done_testing;

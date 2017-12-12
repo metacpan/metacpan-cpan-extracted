@@ -31,7 +31,7 @@ my $app = builder {
         "PeriAHS::ParseRequest",
         riap_client => Perinci::Access::Schemeless->new(
             load        => 0,
-            allow_paths => [map {s!::!/!g; "/$_"} @modules],
+            allow_paths => [map {my $str = $_; $str =~ s!::!/!g; "/$str"} @modules],
         ),
     );
 

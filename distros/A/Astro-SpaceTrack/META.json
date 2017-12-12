@@ -60,13 +60,12 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack"
       },
       "license" : [
@@ -78,6 +77,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.100",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.101",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

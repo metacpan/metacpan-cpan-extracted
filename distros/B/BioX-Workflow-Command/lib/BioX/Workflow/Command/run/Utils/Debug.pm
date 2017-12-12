@@ -17,7 +17,7 @@ Save object env. This will save all the variables. Useful for debugging, but get
 
 =cut
 
-option 'save_object_env' => (
+has 'save_object_env' => (
     is      => 'rw',
     isa     => 'Bool',
     default => 0,

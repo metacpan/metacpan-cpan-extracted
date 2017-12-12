@@ -36,7 +36,7 @@
             "Scope::Guard" : "0",
             "Sub::Info" : "0.002",
             "Term::Table" : "0.002",
-            "Test2" : "1.302117",
+            "Test2" : "1.302119",
             "Time::HiRes" : "0",
             "overload" : "0",
             "perl" : "5.008001",
@@ -61,7 +61,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000092",
+   "version" : "0.000097",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,5 +1,8 @@
 Revision history for Test::Strict.
 
+0.40  2017-11-29 13:00:00 MANWAR
+      - Merged pull request #22, thanks @cpansprout.
+
 0.39  2016-12-02 12:10:00 MANWAR
       - Merged pull request #21, thanks @arc.
 

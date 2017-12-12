@@ -13,10 +13,6 @@ use OTRS::OPM::Installer::Utils::File;
 use HTTP::Tiny;
 use HTTP::Tiny::FileProtocol;
 
-$OTRS::OPM::Installer::Utils::File::ALLOWED_SCHEME = 'file';
-$OTRS::Repository::ALLOWED_SCHEME = 'file';
-$OTRS::Repository::Source::ALLOWED_SCHEME = 'file';
-
 my $repo = File::Spec->rel2abs(
     File::Spec->catdir( dirname( __FILE__ ), 'repo' ),
 );

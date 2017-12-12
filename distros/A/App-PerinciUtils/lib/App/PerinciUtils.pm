@@ -1,7 +1,7 @@
 package App::PerinciUtils;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2017-12-11'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::PerinciUtils - Some utilities related to Perinci
 
 =head1 VERSION
 
-This document describes version 0.110 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-08-09.
+This document describes version 0.111 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-12-11.
 
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ family.
 =item * L<normalize-rinci-function-metadata>
 
 =item * L<peri-access>
+
+=item * L<peri-fmt-envres>
 
 =item * L<peri-htserve>
 

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Authen::SASL" : "0",
             "Email::Date::Format" : "0",
             "File::Spec" : "0",
             "LWP::MediaTypes" : "0",
@@ -43,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.25",
+   "version" : "1.30",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

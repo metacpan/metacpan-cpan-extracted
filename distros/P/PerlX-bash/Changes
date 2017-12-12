@@ -1,0 +1,19 @@
+Revision history for perlx-bash
+
+0.02      2017-12-12 03:03:15-08:00 America/Los_Angeles
+
+    [Distro Fixes]
+    * Force locale to 'C' when unit testing error messages.
+      github #2 (thx Andreas Koenig (ANDK))
+    * Skip most unit tests when there's no `bash` present.
+      (This should solve CPAN Testers failures on MSWin systems.)
+
+0.01      2017-12-03 05:12:40-08:00 America/Los_Angeles
+
+    * initial version
+    * Basic features implemented:
+      * Spawns proper `bash` (not just calling `system`)
+      * Basic context-dependent return value (bool, int)
+      * Handles basic switches (-e, -x)
+      * Basic capture modes (string, words, lines)
+      * Autoquotes filename objects

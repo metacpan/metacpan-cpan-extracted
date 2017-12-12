@@ -1,5 +1,9 @@
 Revision history for Net-Hadoop-YARN
 
+0.203 2017-12-07 BURAK
+    - Expand automatic history collection
+    - Kerberos support (ciranor).
+
 0.202 2016-11-08 BURAK
     - Patch for the CDH5.8.2 RM redirect bugfix.
 

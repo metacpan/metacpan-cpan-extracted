@@ -1,0 +1,61 @@
+---
+abstract: 'A simple tool for maintaining a shared group secret'
+author:
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GroupSecret
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  App::GroupSecret:
+    file: lib/App/GroupSecret.pm
+    version: '0.302'
+  App::GroupSecret::Crypt:
+    file: lib/App/GroupSecret/Crypt.pm
+    version: '0.302'
+  App::GroupSecret::File:
+    file: lib/App/GroupSecret/File.pm
+    version: '0.302'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Open2: '0'
+  IPC::Open3: '0'
+  MIME::Base64: '0'
+  Pod::Usage: '0'
+  Symbol: '0'
+  YAML::Tiny: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/groupsecret/issues
+  homepage: https://github.com/chazmcgarvey/groupsecret
+  repository: https://github.com/chazmcgarvey/groupsecret.git
+version: '0.302'
+x_authority: cpan:CCM
+x_serialization_backend: 'YAML::Tiny version 1.70'

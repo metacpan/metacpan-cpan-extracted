@@ -24,7 +24,7 @@ eval { $rpc->register('ping', sub { return 'pong' }); };
 ok(!$@, 'register ping worked');
 
 eval { $rpc->register('ping', sub { return 'pong' }); };
-like($@, qr/^procedure ping already registered/ , 'died with procedure already registered');
+like($@, qr/^method ping already registered/ , 'died with procedure already registered');
 
 eval { $rpc->register('greetings', sub { return 'hello there' }, notification => 1); };
 ok(!$@, 'register notification');
@@ -128,7 +128,8 @@ $writebuf->{id} = 'bar';
 is_deeply($writebuf, {jsonrpc => '2.0', method => 'foo', id => 'bar', params => {}}, 'call foo');
 
 @res = $con->handle('{"jsonrpc":"2.0","id":"foo","result":"foo"}');
-is($res[1], 'unknown call', 'unknown call');
+#is($res[1], 'unknown call', 'unknown call');
+is($res[1], undef, 'unknown call');
 
 @res = $con->handle('{"jsonrpc":"2.0","id":"'.$callid.'","result":"foo"}');
 ok(!@res, 'no errors from handle');

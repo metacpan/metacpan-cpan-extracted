@@ -1,0 +1,84 @@
+{
+    "people": {
+        "1": {
+            "id": 1,
+            "name": "Philip J. Fry",
+            "email": "fry@example.com",
+            "age": 32
+        },
+        "2": {
+            "id": 2,
+            "name": "Turanga Leela",
+            "email": "leela@example.com",
+            "age": 34
+        },
+        "3": {
+            "id": 3,
+            "name": "Bender B. Rodriguez",
+            "email": "bender@example.com",
+            "age": 5
+        },
+        "4": {
+            "id": 4,
+            "name": "Dr. John A. Zoidberg",
+            "email": "zoidberg@example.com",
+            "age": 58
+        },
+        "5": {
+            "id": 5,
+            "name": "Hubert J. Farnsworth",
+            "email": "ceo@example.com",
+            "age": 163
+        },
+        "6": {
+            "id": 6,
+            "name": "Hermes Conrad",
+            "email": "coo@example.com",
+            "age": 47
+        },
+        "7": {
+            "id": 7,
+            "name": "Amy Wong",
+            "email": "amy@example.com",
+            "age": 23
+        },
+        "8": {
+            "id": 8,
+            "name": "Scruffy",
+            "email": "janitor@example.com",
+            "age": 63
+        }
+    },
+    "users": {
+        "farnsworth": {
+            "username": "farnsworth",
+            "email": "ceo@example.com",
+            "created": "2017-11-29 07:54:21"
+        },
+        "fry": {
+            "username": "fry",
+            "email": "fry@example.com",
+            "created": "2017-11-29 07:54:21"
+        },
+        "leela": {
+            "username": "leela",
+            "email": "leela@example.com",
+            "created": "2017-11-29 07:54:21"
+        },
+        "bender": {
+            "username": "bender",
+            "email": "bender@example.com",
+            "created": "2017-11-29 07:54:21"
+        },
+        "hermes": {
+            "username": "hermes",
+            "email": "hermes@example.com",
+            "created": "2017-11-29 07:54:21"
+        },
+        "amy": {
+            "username": "amy",
+            "email": "amy@example.com",
+            "created": "2017-11-29 07:54:21"
+        }
+    }
+}

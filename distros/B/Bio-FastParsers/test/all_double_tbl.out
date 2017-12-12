@@ -1,0 +1,21 @@
+#                                                                 --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name          accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#  ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+Ailuropoda_melanoleuca -          Meredith169AA        -                  0 14785.9  16.7         0 13218.3   0.0   2.0   1   1   1   2   2   2   2 -
+Abrocoma_bennettii     -          Meredith169AA        -                  0 12909.9  47.4         0 4943.5  15.5   3.0   3   0   0   3   3   3   3 -
+Aepyprymnus_rufescens  -          Meredith169AA        -                  0 12562.0  71.7         0 11808.5  45.4   2.8   2   1   0   2   2   2   2 -
+Acrobates_pygmaeus     -          Meredith169AA        -                  0 12214.1  81.8         0 5245.2  11.3   4.0   4   0   0   4   4   4   4 -
+Ailuropoda_melanoleuca -          Meredith169AA2       -                  0 14785.9  16.7         0 13218.3   0.0   2.0   1   1   1   2   2   2   2 -
+Abrocoma_bennettii     -          Meredith169AA2       -                  0 12909.9  47.4         0 4943.5  15.5   3.0   3   0   0   3   3   3   3 -
+Aepyprymnus_rufescens  -          Meredith169AA2       -                  0 12562.0  71.7         0 11808.5  45.4   2.8   2   1   0   2   2   2   2 -
+Acrobates_pygmaeus     -          Meredith169AA2       -                  0 12214.1  81.8         0 5245.2  11.3   4.0   4   0   0   4   4   4   4 -
+#
+# Program:         hmmsearch
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      double.hmm
+# Target file:     short.sto
+# Option settings: hmmsearch -o all_double_std.out --tblout all_double_tbl.out --domtblout all_double_domtbl.out --notextw double.hmm short.sto 
+# Current dir:     /home/adf/ulg_janvier2016/hmmer
+# Date:            Mon Jan 11 16:06:58 2016
+# [ok]

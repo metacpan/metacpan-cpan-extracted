@@ -17,6 +17,8 @@ MANIFEST			This list of files
 README
 README.md
 t/00-base.t
+t/000-check-dependencies.t
+t/001-client-version.t
 t/01-connect.t
 t/02-ib_embedded.t
 t/03-dbh-attr.t
@@ -45,6 +47,7 @@ t/80-event-ithreads.t
 t/81-event-fork.t
 t/90-dbinfo.t
 t/91-txinfo.t
+t/92-bigdecimal10_read.t
 t/92-bigdecimal_read.t
 t/93-bigdecimal.t
 t/94-biginteger_read.t

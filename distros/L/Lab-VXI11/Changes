@@ -1,5 +1,9 @@
 Revision history for Perl extension Lab::VXI11::Sunrpc.
 
+0.03 2017-12-05
+    - Handle deprecation of sunrpc in glibc
+    - Makefile.PL: search for libtirpc with pkg-config
+
 0.02 2017-09-07
     - Check for NULL return value of clnt_call, print error messages
     - Set RPC client timeouts

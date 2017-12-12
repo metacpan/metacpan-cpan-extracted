@@ -7,7 +7,7 @@ t/02simple.t
 t/03comp.t
 t/98podsyn.t
 t/99podcov.t
-eg/intspanp.pl
+eg/bioinfo_non_overlapping_coords.pl
 lib/Set/IntSpan/Partition.pm
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

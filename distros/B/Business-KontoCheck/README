@@ -1,11 +1,11 @@
 vim:tw=80:ft=text:ai
 
-Business::KontoCheck version 6.01
+Business::KontoCheck version 6.02
 =================================
 
 This module checks the validity of German and Austrian Bank Account Numbers.
 All currently defined test methods by Deutsche Bundesbank (currently: 00 to
-E0, February 2013) are implemented.
+E4, December 2017) are implemented.
 
 The Österreichische Bundesbank uses a quite different approach. The basic
 tests are more generic; the concrete tests are described by the hash file,

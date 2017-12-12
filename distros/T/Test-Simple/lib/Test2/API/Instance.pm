@@ -2,7 +2,7 @@ package Test2::API::Instance;
 use strict;
 use warnings;
 
-our $VERSION = '1.302118';
+our $VERSION = '1.302120';
 
 
 our @CARP_NOT = qw/Test2::API Test2::API::Instance Test2::IPC::Driver Test2::Formatter/;
@@ -59,6 +59,8 @@ BEGIN {
         *{$finalizer} = $new;
     }
 }
+
+sub has_ipc { !!$_[0]->{+IPC} }
 
 sub import {
     my $class = shift;

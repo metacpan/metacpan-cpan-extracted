@@ -17,6 +17,10 @@ with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 125, December 2017
+    - GosperReplicate, QuintetReplicate new numbering_type "rotate"
+    - SquareReplicate new numbering_type "rotate-4","rotate-8"
+
 Version 124, January 2017
     - new n_to_n_list()
 
@@ -26,7 +30,7 @@ Version 123, April 2016
     - MultipleRings fix BigFloat output on BigRat input
 
 Version 122, January 2016
-    - test fix a sloppy test exposed by recent Math::BigFloat
+    - tests fix sloppy condition exposed by recent Math::BigFloat
 
 Version 121, September 2015
     - new methods xyxy_to_n_list(), xyxy_to_n_list_either(),

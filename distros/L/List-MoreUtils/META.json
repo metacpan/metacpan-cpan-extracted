@@ -77,6 +77,6 @@
          "web" : "https://github.com/perl5-utils/List-MoreUtils"
       }
    },
-   "version" : "0.426",
+   "version" : "0.428",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

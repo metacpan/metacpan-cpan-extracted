@@ -8,6 +8,7 @@ lib/Net/Appliance/Session/Engine.pm
 lib/Net/Appliance/Session/Scripting.pm
 lib/Net/Appliance/Session/Transport.pm
 MANIFEST			This list of files
+META.json
 META.yml
 t/10-use.t
 t/author-10_route_server.t
@@ -19,4 +20,3 @@ t/author-31_local_device_ssh_extra.t
 t/author-32_sdf_shell.t
 t/author-41_ssh_unknown_host.t
 t/author-42_ssh_fail_close.t
-META.json

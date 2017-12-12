@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -18,6 +18,7 @@
 
 # math-image --path=GosperReplicate --lines --scale=10
 # math-image --path=GosperReplicate --all --output=numbers_dash
+# math-image --path=GosperReplicate,numbering_type=rotate --all --output=numbers_dash
 #
 
 package Math::PlanePath::GosperReplicate;
@@ -29,7 +30,7 @@ use Math::Libm 'hypot';
 use Math::PlanePath::SacksSpiral;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -45,6 +46,18 @@ use Math::PlanePath::Base::Digits
 #use Smart::Comments;
 
 
+use constant parameter_info_array =>
+  [ { name            => 'numbering_type',
+      display         => 'Numbering',
+      share_key       => 'numbering_type_rotate',
+      type            => 'enum',
+      default         => 'fixed',
+      choices         => ['fixed','rotate'],
+      choices_display => ['Fixed','Rotate'],
+      description     => 'Fixed or rotating sub-part numbering.',
+    },
+  ];
+
 use constant n_start => 0;
 *xy_is_visited = \&Math::PlanePath::Base::Generic::xy_is_even;
 
@@ -54,6 +67,34 @@ use constant absdx_minimum => 1;
 use constant dir_maximum_dxdy => (3,-1);
 
 #------------------------------------------------------------------------------
+sub new {
+  my $self = shift->SUPER::new (@_);
+  $self->{'numbering_type'} ||= 'fixed';  # default
+  return $self;
+}
+
+sub _digits_rotate_lowtohigh {
+  my ($aref) = @_;
+  my $rot = 0;
+  foreach my $digit (reverse @$aref) {
+    if ($digit) {
+      $rot += $digit-1;
+      $digit = ($rot % 6) + 1;  # mutate $aref
+    }
+  }
+}
+sub _digits_unrotate_lowtohigh {
+  my ($aref) = @_;
+  my $rot = 0;
+  foreach my $digit (reverse @$aref) {
+    if ($digit) {
+      $digit = ($digit-1-$rot) % 6;  # mutate $aref
+      $rot += $digit;
+      $digit++;
+    }
+  }
+}
+
 sub n_to_xy {
   my ($self, $n) = @_;
   ### GosperReplicate n_to_xy(): $n
@@ -91,7 +132,12 @@ sub n_to_xy {
   #        / \
   #       5   6
 
-  foreach my $digit (digit_split_lowtohigh($n,7)) {
+  my @digits = digit_split_lowtohigh($n,7);
+  if ($self->{'numbering_type'} eq 'rotate') {
+    _digits_rotate_lowtohigh(\@digits);
+  }
+
+  foreach my $digit (@digits) {
     ### digit: "$digit  $x,$y  side $sx,$sy"
 
     if ($digit == 1) {
@@ -187,6 +233,9 @@ sub xy_to_n {
                (5*$y - $x) / 14);
   }
 
+  if ($self->{'numbering_type'} eq 'rotate') {
+    _digits_unrotate_lowtohigh(\@n);
+  }
   return digit_join_lowtohigh (\@n, 7, $zero);
 }
 
@@ -248,37 +297,36 @@ Math::PlanePath::GosperReplicate -- self-similar hexagon replications
 This is a self-similar hexagonal tiling of the plane.  At each level the
 shape is the Gosper island.
 
-                         17----16                     4  
-                        /        \                       
-          24----23    18    14----15                  3  
-         /        \     \                                
-       25    21----22    19----20    10---- 9         2  
-         \                          /        \           
-          26----27     3---- 2    11     7---- 8      1  
-                     /        \     \                    
-       31----30     4     0---- 1    12----13     <- Y=0 
-      /        \     \                                   
-    32    28----29     5---- 6    45----44           -1  
-      \                          /        \              
-       33----34    38----37    46    42----43        -2  
-                  /        \     \                       
-                39    35----36    47----48           -3  
-                  \                                      
-                   40----41                          -4  
+                         17----16                     4
+                        /        \
+          24----23    18    14----15                  3
+         /        \     \
+       25    21----22    19----20    10---- 9         2
+         \                          /        \
+          26----27     3---- 2    11     7---- 8      1
+                     /        \     \
+       31----30     4     0---- 1    12----13     <- Y=0
+      /        \     \
+    32    28----29     5---- 6    45----44           -1
+      \                          /        \
+       33----34    38----37    46    42----43        -2
+                  /        \     \
+                39    35----36    47----48           -3
+                  \
+                   40----41                          -4
 
                           ^
     -7 -6 -5 -4 -3 -2 -1 X=0 1  2  3  4  5  6  7
 
-The points are spread out on every second X coordinate to make a a
-triangular lattice in integer coordinates (see L<Math::PlanePath/Triangular
-Lattice>).
+Points are spread out on every second X coordinate to make a triangular
+lattice in integer coordinates (see L<Math::PlanePath/Triangular Lattice>).
 
 The base pattern is the inner N=0 to N=6, then six copies of that shape are
 arranged around as the blocks N=7,14,21,28,35,42.  Then six copies of the
 resulting N=0 to N=48 shape are replicated around, etc.
 
-Each point represents a little hexagon, thus tiling the plane with hexagons.
-The innermost N=0 to N=6 are for instance,
+Each point can be taken as a little hexagon, so that all points tile the
+plane with hexagons.  The innermost N=0 to N=6 are for instance,
 
           *     *
          / \   / \
@@ -301,13 +349,13 @@ The innermost N=0 to N=6 are for instance,
           *     *
 
 The further replications are the same arrangement, but the sides become ever
-wigglier and the centres rotate around.  The rotation can be seen at N=7
+wigglier and the centres rotate around.  The rotation can be seen N=7 at
 X=5,Y=1 which is up from the X axis.
 
 The C<FlowsnakeCentres> path is this same replicating shape, but starting
 from a side instead of the middle and traversing in such as way as to make
 each N adjacent.  The C<Flowsnake> curve itself is this replication too, but
-following edges.
+segments across hexagons.
 
 =head2 Complex Base
 
@@ -321,19 +369,19 @@ The path corresponds to expressing complex integers X+i*Y in a base
 # GP-DEFINE  sqrt3i = quadgen(-12);
 # GP-Test  sqrt3^2  == 3
 # GP-Test  sqrt3i^2 == -3
-
+# GP-DEFINE  b = 5/2 + sqrt3i/2;
 
 =pod
 
-with some scaling to put equilateral triangles on a square
-grid.  So for integer X,Y with X and Y either both odd or both even,
+with coordinates scaled to put equilateral triangles on a square grid.  So
+for integer X,Y on the triangular grid (X,Y either both odd or both even),
 
     X/2 + i*Y*sqrt(3)/2 = a[n]*b^n + ... + a[2]*b^2 + a[1]*b + a[0]
 
-where each digit a[i] is either 0 or a sixth root of unity encoded into N as
-base 7 digits,
+where each digit a[i] is either 0 or a sixth root of unity encoded into
+base-7 digits of N,
 
-     w6 = e^(i*pi/3)            sixth root of unity
+     w6 = e^(i*pi/3)            sixth root of unity, b = 2 + w6
         = 1/2 + i*sqrt(3)/2
 
      N digit     a[i] complex number
@@ -348,7 +396,6 @@ base 7 digits,
 
 =cut
 
-# GP-DEFINE  b = 5/2 + sqrt3i/2;
 # GP-DEFINE  w6 = 1/2 + sqrt3i/2;
 # GP-Test  w6^6 == 1
 
@@ -387,6 +434,80 @@ base 7 digits,
 
 =pod
 
+=head2 Rotate Numbering
+
+Parameter C<numbering_type =E<gt> 'rotate'> applies a rotation in each
+sub-part according to its location around the preceding level.
+
+The effect can be illustrated by writing N in base-7.  Part 10-16 is the
+same as the middle 0-6.  Part 20-26 has a rotation by +60 degrees.  Part
+30-36 has rotation by +120 degrees, and so on.
+
+=cut
+
+# start from this, then mangled by hand
+# math-image --path=GosperReplicate,numbering_type=rotate --all --output=numbers_dash
+
+=pod
+
+                         22----21
+                        /     /           numbering_type => 'rotate'
+          31    36    23    20    26          N shown in base-7
+         /  \     \     \        /
+       32    30    35    24----25    13----12
+         \        /                 /        \
+          33----34     3---- 2    14    10----11
+                     /        \     \
+       46----45     4     0---- 1    15----16
+               \     \
+    41----40    44     5---- 6    64----63
+      \        /                 /        \
+       42----43    55----54    65    60    62
+                  /        \     \     \  /
+                56    50    53    66    61
+                     /     /
+                   51----52
+
+Notice this means in each part the 11, 21, 31, etc, points are directed
+away from the middle in the same way, relative to the sub-part locations.
+
+Working through the expansions gives the following rule for when an N is
+on the boundary of level k,
+
+    write N in k many base-7 digits  (empty string if k=0)
+    if any 0 digit then non-boundary
+    ignore high digit and all 1 digits
+    if any 4 or 5 digit then non-boundary
+    if any 32, 33, 66 pair then non-boundary
+
+A 0 digit is the middle of a block, or 4 or 5 digit the inner side of a
+block, for kE<gt>=1, hence non-boundary.  After that the 6,1,2,3 parts
+variously expand with rotations so that a 66 is enclosed on the clockwise
+side and 32 and 33 on the anti-clockwise side.
+
+=cut
+
+# in decimal
+#                      16----15
+#                     /     /
+#       22    27    17    14    20
+#      /  \     \     \        /
+#    23    21    26    18----19    10---- 9
+#      \        /                 /        \
+#       24----25     3---- 2    11     7---- 8
+#                  /        \     \
+#    34----33     4     0---- 1    12----13
+#            \     \
+# 29----28    32     5---- 6    46----45
+#   \        /                 /        \
+#    30----31    40----39    47    42    44
+#               /        \     \     \  /
+#             41    35    38    48    43
+#                  /     /
+#                36----37
+
+=pod
+
 =head1 FUNCTIONS
 
 See L<Math::PlanePath/FUNCTIONS> for behaviour common to all path classes.
@@ -395,7 +516,12 @@ See L<Math::PlanePath/FUNCTIONS> for behaviour common to all path classes.
 
 =item C<$path = Math::PlanePath::GosperReplicate-E<gt>new ()>
 
-Create and return a new path object.
+=item C<$path = Math::PlanePath::GosperReplicate-E<gt>new (numbering_type =E<gt> $str)>
+
+Create and return a new path object.  The C<numbering_type> parameter can be
+
+    "fixed"        (default)
+    "rotate"
 
 =item C<($x,$y) = $path-E<gt>n_to_xy ($n)>
 
@@ -416,10 +542,12 @@ Return C<(0, 7**$level - 1)>.
 
 =head1 FORMULAS
 
-=head2 Rotations
+=head2 Axis Rotations
 
-The digits positions 1,2,3,4,5,6 go around +60deg each, so the N for
-rotation by +60 is each digit +1, cycling around.
+In the fixed numbering, digit positions 1,2,3,4,5,6 go around +60deg each,
+so the N for rotation of X,Y by +60 degrees is each digit +1.
+
+    N          = 0, 1, 2, 3, 4, 5, 6, 10, 11, 12
 
     rot+60(N)  = 0, 2, 3, 4, 5, 6, 1, 14, 16, 17, ... decimal
                = 0, 2, 3, 4, 5, 6, 1, 20, 22, 23, ... base7
@@ -427,16 +555,18 @@ rotation by +60 is each digit +1, cycling around.
     rot+120(N) = 0, 3, 4, 5, 6, 1, 2, 21, 24, 25, ... decimal
                = 0, 3, 4, 5, 6, 1, 2, 30, 33, 34, ... base7
 
-    rot180(N)  = 0, 4, 5, 6, 1, 2, 3, 28, 32, 33, ... decimal
-               = 0, 4, 5, 6, 1, 2, 3, 40, 44, 45, ... base7
-
-    rot-120(N) = 0, 5, 6, 1, 2, 3, 4, 35, 40, 41, ... decimal
-               = 0, 5, 6, 1, 2, 3, 4, 50, 55, 56, ... base7
-
-    rot-60(N)  = 0, 6, 1, 2, 3, 4, 5, 42, 48, 43, ... decimal
-               = 0, 6, 1, 2, 3, 4, 5, 60, 66, 61, ... base7
+    etc
 
 =cut
+
+    # rot180(N)  = 0, 4, 5, 6, 1, 2, 3, 28, 32, 33, ... decimal
+    #            = 0, 4, 5, 6, 1, 2, 3, 40, 44, 45, ... base7
+    #
+    # rot-120(N) = 0, 5, 6, 1, 2, 3, 4, 35, 40, 41, ... decimal
+    #            = 0, 5, 6, 1, 2, 3, 4, 50, 55, 56, ... base7
+    #
+    # rot-60(N)  = 0, 6, 1, 2, 3, 4, 5, 42, 48, 43, ... decimal
+    #            = 0, 6, 1, 2, 3, 4, 5, 60, 66, 61, ... base7
 
 # GP-DEFINE  digit_plus1(d)  = [0,2,3,4,5,6,1][d+1];
 # GP-DEFINE  digit_plus2(d)  = [0,3,4,5,6,1,2][d+1];
@@ -489,21 +619,41 @@ rotation by +60 is each digit +1, cycling around.
 # GP-Test  vector(500,n,n--; z_point(N_rotate_minus60(n))) == \
 # GP-Test  vector(500,n,n--; conj(w6)*z_point(n))
 
-
 # not in OEIS: 2, 3, 4, 5, 6, 1, 14, 16, 17
 # not in OEIS: 2, 3, 4, 5, 6, 1, 20, 22, 23
-                            
+
 # not in OEIS: 3, 4, 5, 6, 1, 2, 21, 24, 25
 # not in OEIS: 3, 4, 5, 6, 1, 2, 30, 33, 34
-                            
+
 # not in OEIS: 4, 5, 6, 1, 2, 3, 28, 32, 33
 # not in OEIS: 4, 5, 6, 1, 2, 3, 40, 44, 45
-                            
+
 # not in OEIS: 5, 6, 1, 2, 3, 4, 35, 40, 41
 # not in OEIS: 5, 6, 1, 2, 3, 4, 50, 55, 56
-                            
+
 # not in OEIS: 6, 1, 2, 3, 4, 5, 42, 48, 43
 # not in OEIS: 6, 1, 2, 3, 4, 5, 60, 66, 61
+
+=pod
+
+In the rotate numbering, just adding +1 (etc) at the high digit alone is
+rotation.
+
+=cut
+
+# GP-DEFINE  n_rotate_highdigit(n,offset) = {
+# GP-DEFINE    my(v=digits(n));
+# GP-DEFINE    v[1] = ((v[1]-1+offset)%6) + 1;
+# GP-DEFINE    fromdigits(v,7);
+# GP-DEFINE  }
+
+# for(offset=1,6,print(vector(18,n, n_rotate_highdigit(n,offset))))
+# not in OEIS: 2, 3, 4, 5, 6, 1, 2, 3, 4, 14, 15, 16, 17, 18, 19, 20, 21, 22
+# not in OEIS: 3, 4, 5, 6, 1, 2, 3, 4, 5, 21, 22, 23, 24, 25, 26, 27, 28, 29
+# not in OEIS: 4, 5, 6, 1, 2, 3, 4, 5, 6, 28, 29, 30, 31, 32, 33, 34, 35, 36
+# not in OEIS: 5, 6, 1, 2, 3, 4, 5, 6, 1, 35, 36, 37, 38, 39, 40, 41, 42, 43
+# not in OEIS: 6, 1, 2, 3, 4, 5, 6, 1, 2, 42, 43, 44, 45, 46, 47, 48, 49, 50
+# not in OEIS: 1, 2, 3, 4, 5, 6, 1, 2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 
 =pod
 
@@ -676,16 +826,16 @@ Similarly for the location, using conj(w6) for rotation back
 # GP-Test  vector(200,j,j--; z_xmax_by_floor(j)) == \
 # GP-Test  vector(200,j,j--; z_xmax(j))
 #
-# 
+#
 # vector(35,k,k++; z_xmax_exp(k))     \\ floor(angle_F*j+1/2))
 # not in OEIS: 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 11
-# this is not A082964 a(n) = m given by arctan(tan(n)) = n - m*Pi.
+# not A082964 a(n) = m given by arctan(tan(n)) = n - m*Pi.
 # GP-DEFINE  A082964(n) = round((n-atan(tan(n)))/Pi);
 #
 # atan(tan(n)) gives fractional part -pi/2 to +pi/2, so how many revolutions
 # angle n makes around a circle, up to -pi/2, so factor 1/Pi
 # 1/Pi \\ 0.318309886183790671537767 is close to F
-# 
+#
 # GP-DEFINE  A082964_by_floor(n) = floor(1/Pi*n+1/2);
 # GP-Test  vector(10000,n,A082964(n)) == \
 # GP-Test  vector(10000,n,A082964_by_floor(n))
@@ -790,7 +940,7 @@ equal maximums.
 
 # vector(50,k,k++; z_smax_exp(k))   \\ floor(angle_F*j)
 # not in OEIS: 4,4,4,5,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,14,15,15,15,16
-# is not A032615 = floor(n/Pi)
+# not A032615 = floor(n/Pi)
 # 1/Pi   \\ = 0.318309886183790671537767 is close to F
 # GP-DEFINE  A032615(n) = floor(1/Pi*n);
 #
@@ -822,9 +972,9 @@ equal maximums.
 # GP-DEFINE    apply(n->n-1, Vec(select(e->e==z,v,1)));
 # GP-DEFINE  }
 # GP-Test  N_smax_list_by_points(0) == [0]
-# GP-Test  N_smax_list_by_points(1) == [1,2] 
-# GP-Test  N_smax_list_by_points(2) == [8,9] 
-# GP-Test  N_smax_list_by_points(3) == [57,58] 
+# GP-Test  N_smax_list_by_points(1) == [1,2]
+# GP-Test  N_smax_list_by_points(2) == [8,9]
+# GP-Test  N_smax_list_by_points(3) == [57,58]
 # GP-Test  N_smax(3) == 57
 
 # tan(n)
@@ -853,7 +1003,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

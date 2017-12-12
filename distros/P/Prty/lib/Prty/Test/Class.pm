@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Test::Builder ();
 use Prty::Option;
@@ -311,12 +311,6 @@ sub set {
     $dir = $this->fixtureDir(@opt);
     $dir = $this->fixtureDir($subpath,@opt);
 
-=head4 Description
-
-Liefere den Pfad zum Fixture-Verzeichnis der Testklasse. Ist Parameter
-$subpath angegeben, wird diese Zeichenkette, per / getrennt, zum Pfad
-hinzugefügt.
-
 =head4 Options
 
 =over 4
@@ -326,6 +320,12 @@ hinzugefügt.
 Erzeuge Verzeichnis, falls es nicht existiert.
 
 =back
+
+=head4 Description
+
+Liefere den Pfad zum Fixture-Verzeichnis der Testklasse. Ist Parameter
+$subpath angegeben, wird diese Zeichenkette, per / getrennt, zum Pfad
+hinzugefügt.
 
 =cut
 
@@ -877,25 +877,31 @@ sub isnt {
 =head4 Synopsis
 
     $bool = $test->floatIs($got,$expected);
-    $bool = $test->floatIs($got,$expected,$text);
+    $bool = $test->floatIs($got,$expected,$places);
+    $bool = $test->floatIs($got,$expected,$places,$text);
 
 =head4 Description
 
-Vergleiche die Float-Werte $got und $expected, nachdem $got auf
-die Anzahl an Nachkommastellen von $expected gerundet wurde.
+Vergleiche die Float-Werte $got und $expected nachdem beide Werte
+auf $places Nachkommastellen gerundet wurden. Ist $places nicht
+angegeben oder C<undef>, wird die Anzahl der Nachkommastellen
+von $expected genommen.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub floatIs {
-    my ($self,$got,$expected,$text) = @_;
+    my ($self,$got,$expected,$places,$text) = @_;
 
     # Runde auf die Nachkommastellen des erwarteten Werts
 
-    my ($places) = $expected =~ /\.(\d+)/;
+    if (!defined $places) {
+        $places = length($expected =~ /\.(\d+)/);
+    }
     if ($places) {
-        $got = sprintf '%.*f',length($places),$got;
+        $got = sprintf '%.*f',$places,$got;
+        $expected = sprintf '%.*f',$places,$expected;
     }
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -1112,7 +1118,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

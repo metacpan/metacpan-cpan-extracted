@@ -1,0 +1,31 @@
+---
+abstract: 'Retrieve stock quotes using the IEX API'
+author:
+  - 'Jeffrey T. Palmer <jtpalmer@cpan.org>'
+build_requires:
+  Finance::Quote: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Quote-IEX
+requires:
+  DateTime: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jtpalmer/Finance-Quote-IEX/issues
+  homepage: https://github.com/jtpalmer/Finance-Quote-IEX
+  repository: https://github.com/jtpalmer/Finance-Quote-IEX.git
+version: '0.001000'
+x_serialization_backend: 'YAML::Tiny version 1.70'

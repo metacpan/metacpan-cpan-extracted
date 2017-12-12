@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.24 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.25 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.24 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.24
+    Author::Plicease.*   2.25
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -294,6 +294,28 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.24 {
         print STDERR Term::ANSIColor::color('reset') if -t STDERR;
         print STDERR "\n";
       }
+      
+      if(! defined $travis->{env})
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "Travis no env field";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+      elsif(ref($travis->{env}) ne 'HASH')
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "Travis env field is not a hash reference";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+      elsif(grep !/PERL_USE_UNSAFE_INC/, @{ $travis->{env}->{global} })
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "Travis env.global does not have reference to PERL_USE_UNSAFE_INC";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
     }
     
     foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
@@ -317,6 +339,11 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.24 {
         print STDERR "\n";
       }
     }
+
+    $self->_my_add_plugin(
+      [ 'Author::Plicease::NoUnsafeInc' ],
+    );
+
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -336,7 +363,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 SYNOPSIS
 
@@ -458,6 +485,7 @@ This plugin bundle is mostly equivalent to
  travis_status = 0
  
  [Author::Plicease::SpecialPrereqs]
+ [Author::Plicease::NoUnsafeInc]
 
 Some exceptions:
 

@@ -13,7 +13,8 @@ use Test::More;
 use Test::Identity;
 use Test::Refcount;
 
-use Tickit::Term qw( BIND_FIRST );
+use Tickit qw( BIND_FIRST );
+use Tickit::Term;
 
 use Time::HiRes qw( sleep );
 

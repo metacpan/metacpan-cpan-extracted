@@ -8,12 +8,12 @@ package Tickit::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 use Carp;
 
 # Load the XS code
-use Tickit;
+use Tickit qw( MOD_SHIFT MOD_ALT MOD_CTRL BIND_FIRST );
 
 # We export some constants
 use Exporter 'import';
@@ -27,6 +27,8 @@ use constant {
 
 push our @EXPORT_OK, qw(
    TERM_CURSORSHAPE_BLOCK TERM_CURSORSHAPE_UNDER TERM_CURSORSHAPE_LEFT_BAR
+   MOD_SHIFT MOD_ALT MOD_CTRL
+   BIND_FIRST
 );
 
 =head1 NAME
@@ -227,11 +229,6 @@ sub bind_event
    my ( $flags, $code, $data ) = ( ref $_[0] ) ? ( 0, @_ ) : @_;
 
    $self->_bind_event( $ev, $flags, $code, $data );
-}
-
-sub bind_event_with_flags
-{
-   croak "\term->bind_event_with_flags is deprecated; use ->bind_event";
 }
 
 sub bind_event_default

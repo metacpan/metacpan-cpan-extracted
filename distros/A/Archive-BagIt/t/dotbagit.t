@@ -29,6 +29,7 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
 {
   my $bag = $Class->new({bag_path=>$SRC_BAG});
+  note "the bag object: ";note explain ($bag);
   ok($bag,        "Object created");
   isa_ok ($bag,   $Class);
 

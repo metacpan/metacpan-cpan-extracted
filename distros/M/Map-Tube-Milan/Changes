@@ -1,0 +1,13 @@
+0.004     2017-12-11 11:33:14+01:00 Europe/Rome
+    - Add "use" test
+
+0.003     2017-12-10 10:10:05+01:00 Europe/Rome
+    - Bumped Map::Tube version requirement
+    - Fixed meta_yml_has_provides kwalitee test
+    - Fixed build_prereq_matches_use kwalitee test
+
+0.002     2017-12-09 10:24:26+01:00 Europe/Rome
+    - Correct version in main module
+
+0.001     2017-12-08 23:14:30+01:00 Europe/Rome
+    - Initial release

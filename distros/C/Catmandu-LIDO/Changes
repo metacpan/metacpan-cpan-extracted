@@ -1,9 +1,15 @@
 Changelog for Catmandu-LIDO
 
-0.09  2017-02-20 13:04:53 UTC
-   - CPAN release
+0.10  2017-11-30 11:25:27 CET
+
+  - Fixed #7: Stale code causing an 'Use of uninitialized value in split' error.
+
+0.09  2017-11-21 16:18:33 CET
+
+  - Changed: added lido:pref to ID struct.
 
 0.08  2017-01-16 13:44:13 UTC
+
   - updated documentation
 
 0.07  2016-12-07 17:05:07 CET

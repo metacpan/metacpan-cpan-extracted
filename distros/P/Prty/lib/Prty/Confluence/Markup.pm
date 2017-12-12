@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Unindent;
 
@@ -239,14 +239,6 @@ sub paragraph {
 
     $markup = $gen->code($type,$code,@opts);
 
-=head4 Description
-
-Confluence Doku: L<Code Block Macro|https://confluence.atlassian.com/doc/code-block-macro-139390.html>
-
-Erzeuge ein Code-Macro für Code $code mit Syntax-Typ $type und
-liefere den resultierenden Wiki-Code zurück. Die Liste der verfügbaren
-Syntax-Typen findet sich in o.g. Confluence-Doku.
-
 =head4 Options
 
 =over 4
@@ -275,6 +267,14 @@ Werte siehe o.g. Confluence-Doku.
 Füge einen Titel zum Code-Block hinzu.
 
 =back
+
+=head4 Description
+
+Confluence Doku: L<Code Block Macro|https://confluence.atlassian.com/doc/code-block-macro-139390.html>
+
+Erzeuge ein Code-Macro für Code $code mit Syntax-Typ $type und
+liefere den resultierenden Wiki-Code zurück. Die Liste der verfügbaren
+Syntax-Typen findet sich in o.g. Confluence-Doku.
 
 =head4 Examples
 
@@ -349,6 +349,16 @@ sub code {
 
     $markup = $gen->noFormat($text,@opts);
 
+=head4 Options
+
+=over 4
+
+=item -noPanel => $bool (Confluence-Default: 0)
+
+Kein Panel um den Inhalt herum.
+
+=back
+
 =head4 Description
 
 Confluence Doku: L<Noformat Macro|https://confluence.atlassian.com/doc/noformat-macro-139545.html>
@@ -360,16 +370,6 @@ innerhalb eines Paragraphen zu verhindern, da der Text als
 eigenständiger Block (mit oder ohne Umrandung) dargestellt wird.
 Es entspricht einem Code-Block-Makro ohne Syntax-Highlighting,
 bei dem zusätzlich die Umrandung unterdrückt werden kann.
-
-=head4 Options
-
-=over 4
-
-=item -noPanel => $bool (Confluence-Default: 0)
-
-Kein Panel um den Inhalt herum.
-
-=back
 
 =head4 Examples
 
@@ -430,13 +430,6 @@ sub noFormat {
 
     $markup = $gen->panel($body,@opts);
 
-=head4 Description
-
-Confluence-Doku: L<Panel Macro|https://confluence.atlassian.com/doc/panel-macro-51872380.html>
-
-Erzeuge ein Panel-Macro mit Inhalt $body und liefere den
-resultierenden Wiki-Code zurück.
-
 =head4 Options
 
 =over 4
@@ -471,6 +464,13 @@ Farbe Titel-Hintergrund. Wert: wie HTML.
 Farbe des Titel-Textes. Wert: wie HTML.
 
 =back
+
+=head4 Description
+
+Confluence-Doku: L<Panel Macro|https://confluence.atlassian.com/doc/panel-macro-51872380.html>
+
+Erzeuge ein Panel-Macro mit Inhalt $body und liefere den
+resultierenden Wiki-Code zurück.
 
 =cut
 
@@ -529,13 +529,6 @@ sub panel {
 =head4 Synopsis
 
     $markup = $gen->tableOfContents(@opts);
-
-=head4 Description
-
-Confluence-Doku: L<Table of Contents Macro|https://confluence.atlassian.com/doc/table-of-contents-macro-182682099.html>
-
-Erzeuge ein Inhaltsverzeichnis-Macro und liefere den
-resultierenden Wiki-Code zurück.
 
 =head4 Options
 
@@ -596,6 +589,13 @@ Inhaltsverzeichnis wird in <div class="$class">...</div> eingefasst.
 Verwende absolute URLs.
 
 =back
+
+=head4 Description
+
+Confluence-Doku: L<Table of Contents Macro|https://confluence.atlassian.com/doc/table-of-contents-macro-182682099.html>
+
+Erzeuge ein Inhaltsverzeichnis-Macro und liefere den
+resultierenden Wiki-Code zurück.
 
 =cut
 
@@ -948,7 +948,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

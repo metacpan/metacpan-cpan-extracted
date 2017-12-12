@@ -30,6 +30,8 @@ $user2 = app->model('users')->get(a => 1);
 isa_ok $user2->app, 'Mojolicious::Lite';
 
 isnt refaddr $user1, refaddr $user2, 'Different objects';
+
 is refaddr app->model('users'), refaddr app->model('users'), 'Same objects';
+isnt refaddr app->entity('users'), refaddr app->entity('users'), 'Different entities';
 
 done_testing;

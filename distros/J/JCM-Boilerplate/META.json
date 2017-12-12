@@ -3,7 +3,7 @@
    "author" : [
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -116,6 +116,7 @@
             "forks" : "0.36",
             "namespace::autoclean" : "0.28",
             "perl" : "v5.22.0",
+            "re" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -129,11 +130,11 @@
    "provides" : {
       "JCM::Boilerplate" : {
          "file" : "lib/JCM/Boilerplate.pm",
-         "version" : "1.017"
+         "version" : "1.019"
       },
       "JTM::Boilerplate" : {
          "file" : "lib/JTM/Boilerplate.pm",
-         "version" : "1.017"
+         "version" : "1.019"
       }
    },
    "release_status" : "stable",
@@ -147,7 +148,7 @@
          "web" : "https://github.com/jmaslak/dotfiles"
       }
    },
-   "version" : "1.017",
+   "version" : "1.019",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

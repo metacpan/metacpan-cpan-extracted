@@ -5,15 +5,15 @@ use strict;
 use warnings;
 use utf8;
 
+# Target reasonably old Perl
+use 5.006;
+
 # Include required modules
 use Carp;
 use English '-no_match_vars';
 
-# Target reasonably old Perl
-use 5.006;
-
 # Declare package version
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 # Patterns to match elements of the LRC file; these are somewhat tolerant
 our %RE = (
@@ -272,7 +272,7 @@ Music::Lyrics::LRC - Manipulate LRC karaoke timed lyrics files
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 DESCRIPTION
 
@@ -431,11 +431,11 @@ Perl 5.6 or newer
 
 =item *
 
-C<Carp>
+L<Carp|Carp>
 
 =item *
 
-C<English>
+L<English|English>
 
 =back
 
@@ -453,8 +453,6 @@ different LRC files from the wild.
 Fractional seconds of any length can be parsed, and preserved in the
 millisecond count return by C<lyrics()>, but any resolution beyond 2 decimal
 places is lost on C<save()>.
-
-The test suite is skeletal, and needs a lot of fleshing out.
 
 =head1 AUTHOR
 

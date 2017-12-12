@@ -23,10 +23,13 @@ t/10-funnyname.t
 t/11-split_braced.t
 t/12-von_token.t
 t/13_output.t
+t/14-extratext.t
+t/15-capitalization.t
 t/bibs/01.bib
 t/bibs/06.bib
 t/bibs/09-complex.bib
 t/bibs/10-funnyname.bib
+t/bibs/14-extratext.bib
 t/bibs/braces.bib
 t/bibs/endnote.txt
 t/bibs/engineering_village.txt

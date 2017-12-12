@@ -1,0 +1,48 @@
+# hmmsearch :: search profile(s) against a sequence database
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query HMM file:                  GNTPAN12210_noloxo.hmm
+# target sequence database:        loxo.fasta
+# output directed to file:         loxo_std.out
+# max ASCII text line length:      unlimited
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       GNTPAN12210_noloxo  [M=779]
+Scores for complete sequences (score includes all domains):
+   --- full sequence ---   --- best 1 domain ---    -#dom-
+    E-value  score  bias    E-value  score  bias    exp  N  Sequence Description
+    ------- ------ -----    ------- ------ -----   ---- --  -------- -----------
+          0 1563.7   0.0          0 1563.4   0.0    1.0  1  L         oxodonta_africana@ENSLAFP00000006713_that is really long with strange stuff
+
+
+Domain annotation for each sequence (and alignments):
+>> L  oxodonta_africana@ENSLAFP00000006713_that is really long with strange stuff
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 ! 1563.4   0.0         0         0       5     779 .]      20     802 .]      12     802 .] 0.98
+
+  Alignments for each domain:
+  == domain 1  score: 1563.4 bits;  conditional E-value: 0
+  GNTPAN12210_noloxo   5 pgsgaagsg.....aggdparpglsqqqrasqrkaqvralprakkleklgvfsackanesckcngwknpnpptaprmdlqqpaaslsepcrscshaladhvshlenvseeeinrllgmvvdvenlfmsvhkeedtdtkqvyfylfkllrkcilqmgkpvvegslgsppfekpnieqgvlnfvqykfshlppkerqtmvelskmfllclnywkletpsqfrqrsqnddvagykvnytrwlcychvpqscdslpryettqvfgrsllrsiftvtrrqllekfrvekdklvpekrtlilthfpkflsmleeeiygenspiweqdftmpasegtqlgirpavvstvsvpsspsfseqlnggssspaskdssglepnpgekrklpesltledakrprvmgdipmelvnevmltitdpaamlgpetsllsanaardetarleerrgiiefhvignslnqkpnkkilmwlvglqnvfshqlprmpkeyitrlvfdpkhktlalikdgrviggicfrmfptqgfteivfcavtsneqvkgygthlmnhlkeyhikhnilnfltyadeyaigyfkkqgfskdikvpksrylgyikdyegatlmecelnpripytelshiikkqkeiikklierkqaqirkvypglscfkegvrqipiesipgiretgwkpsgkekgkelkdpdqlystlknllaqikshpsawpfmepvkkseapdyyevirfpi...dlktmterlknryyvtkklfmadlqrvitncreynppeseyckcanilekffyfklkeaglidk 779
+                         +g+g++g+g     +ggdparpglsqqqrasqrkaqvr+lprakkleklgvfsackane+ckcngwknp+pptaprmdlqqpaa+lse crsc+h+ladhvshlenvse+einrllgmvvdvenlfmsvhkeedtdtkqvyfylfkllrkcilqm++pvvegslgsppfekpnieqgvlnfvqykfshl+p+erqtm+elskmfllclnywkletp+qfrqrsq +dva+ykvnytrwlcychvpqscdslpryett+vfgrsllrsiftvtrrqllekfrvekdklvpekrtlilthfpkflsmleeeiyg nspiwe++ftmp+segtql++rpa+vs+++vps+p fs+ ++ggs+s+ s+ds+g+ep+pgekrklpe+ltledakr+rvmgdipmelvnevmltitdpaamlgpetsllsanaardetarleerrgiiefhvignsl++k+n+++l+wlvglqnvfshqlprmpkeyi+rlvfdpkhktlalikdgrviggicfrmfptqgfteivfcavtsneqvkgygthlmnhlkeyhikhnil+fltyadeyaigyfkkqgfskdikvpksrylgyikdyegatlmecelnpripytelshiikkqkeiikklierkqaqirkvypglscfkegvrqip+es+pgiretgwkp+gkekgkelkdpdqly+tlknllaqikshpsawpfmepvkkseapdyyevirfpi   dlktmterl++ryyvt+klf+adlqrvi+ncreynpp+seyc+ca++lekffyfklke+glidk
+                   L  20 TGTGGPGVGsggtgSGGDPARPGLSQQQRASQRKAQVRGLPRAKKLEKLGVFSACKANETCKCNGWKNPKPPTAPRMDLQQPAANLSELCRSCEHPLADHVSHLENVSEDEINRLLGMVVDVENLFMSVHKEEDTDTKQVYFYLFKLLRKCILQMTRPVVEGSLGSPPFEKPNIEQGVLNFVQYKFSHLAPRERQTMFELSKMFLLCLNYWKLETPAQFRQRSQAEDVATYKVNYTRWLCYCHVPQSCDSLPRYETTHVFGRSLLRSIFTVTRRQLLEKFRVEKDKLVPEKRTLILTHFPKFLSMLEEEIYGANSPIWESGFTMPPSEGTQLVPRPATVSAAVVPSTPIFSPTMGGGSNSSLSLDSGGAEPMPGEKRKLPENLTLEDAKRLRVMGDIPMELVNEVMLTITDPAAMLGPETSLLSANAARDETARLEERRGIIEFHVIGNSLTPKANRRVLLWLVGLQNVFSHQLPRMPKEYIARLVFDPKHKTLALIKDGRVIGGICFRMFPTQGFTEIVFCAVTSNEQVKGYGTHLMNHLKEYHIKHNILYFLTYADEYAIGYFKKQGFSKDIKVPKSRYLGYIKDYEGATLMECELNPRIPYTELSHIIKKQKEIIKKLIERKQAQIRKVYPGLSCFKEGVRQIPVESVPGIRETGWKPLGKEKGKELKDPDQLYTTLKNLLAQIKSHPSAWPFMEPVKKSEAPDYYEVIRFPIgrpDLKTMTERLRSRYYVTRKLFVADLQRVIANCREYNPPDSEYCRCASALEKFFYFKLKEGGLIDK 802
+                         45555554455665789**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************87779*************************************************************98 PP
+
+
+
+Internal pipeline statistics summary:
+-------------------------------------
+Query model(s):                              1  (779 nodes)
+Target sequences:                            1  (802 residues searched)
+Passed MSV filter:                         1  (1); expected 0.0 (0.02)
+Passed bias filter:                        1  (1); expected 0.0 (0.02)
+Passed Vit filter:                         1  (1); expected 0.0 (0.001)
+Passed Fwd filter:                         1  (1); expected 0.0 (1e-05)
+Initial search space (Z):                  1  [actual number of targets]
+Domain search space  (domZ):               1  [number of targets reported over threshold]
+# CPU time: 0.03u 0.00s 00:00:00.03 Elapsed: 00:00:00.04
+# Mc/sec: 15.62
+//
+[ok]

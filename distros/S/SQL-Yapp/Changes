@@ -1,5 +1,13 @@
 Revision history for SQL-Yapp
 
+2.002   2017-12-03
+        - implement column subqueries, i.e. 'SELECT * FROM (SELECT ...) AS ...'
+          Thanks to Yoran Heling for pointing me to this and for beta testing.
+        - Allow COUNT(ALL a), COUNT(DISTINCT a), etc.; some syntax is now
+          relaxed and does not catch all syntax errors, i.e., this will delay
+          some syntax errors till the SQL DB reads the expression
+        - Fix documentation.
+
 2.001   2016-04-24
         - Fix Oracle 'AS' generation bug (CPAN #100454)
 

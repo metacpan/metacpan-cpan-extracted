@@ -2,9 +2,9 @@ NAME
     Perinci::Access::HTTP::Server - PSGI application to implement Riap::HTTP
 
 VERSION
-    This document describes version 0.61 of Perinci::Access::HTTP::Server
+    This document describes version 0.620 of Perinci::Access::HTTP::Server
     (from Perl distribution Perinci-Access-HTTP-Server), released on
-    2017-07-10.
+    2017-12-09.
 
 SYNOPSIS
 DESCRIPTION
@@ -165,7 +165,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
+    <https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

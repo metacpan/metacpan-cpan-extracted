@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.019     2017-12-03 18:40:19+01:00 Europe/Amsterdam
+          - Rerelease without NYTProf files
+
 0.018     2017-11-29 12:39:58+01:00 Europe/Amsterdam
           - Make test pass when warnings are enabled
           - Make experimental installable on 5.8

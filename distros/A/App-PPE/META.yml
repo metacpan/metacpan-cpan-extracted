@@ -1,0 +1,38 @@
+---
+abstract: 'Prettify Perl Error messages'
+author:
+  - 'Kenta, Kobayashi <kentafly88@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PPE
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::PPE:
+    file: lib/App/PPE.pm
+    version: '0.04'
+requires:
+  Parse::ErrorString::Perl: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kfly8/App-PPE/issues
+  homepage: https://github.com/kfly8/App-PPE
+  repository: git://github.com/kfly8/App-PPE.git
+version: '0.04'

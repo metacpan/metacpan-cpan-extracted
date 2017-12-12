@@ -18,8 +18,8 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Module::Build'  => '0.422',
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-BitBucket-cli-*' ],
     create_license     => 1,

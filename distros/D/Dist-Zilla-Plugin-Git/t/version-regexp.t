@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More 0.88 tests => 6;
 
-use lib 't';
+use lib 't/lib';
 use Util qw(:DEFAULT zilla_version);
 
 init_test(corpus => 'version-regexp');

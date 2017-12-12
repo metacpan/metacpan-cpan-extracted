@@ -2,7 +2,7 @@ package Datahub::Factory::Pipeline;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use Moose::Role;
 use Config::Simple;

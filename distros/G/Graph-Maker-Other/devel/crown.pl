@@ -32,6 +32,27 @@ use Graph::Maker::Crown;
 use Smart::Comments;
 
 {
+  # crown HOG
+  # 0   empty      https://hog.grinvin.org/ViewGraphInfo.action?id=6901
+  # 1   2 isolated https://hog.grinvin.org/ViewGraphInfo.action?id=19653
+  # 2   2 x path-2 https://hog.grinvin.org/ViewGraphInfo.action?id=538
+  # 3   6-cycle    https://hog.grinvin.org/ViewGraphInfo.action?id=670
+  # 4   cube       https://hog.grinvin.org/ViewGraphInfo.action?id=1022
+
+  my @graphs;
+  foreach my $n (0 .. 12) {
+    my $graph = Graph::Maker->new('crown', N=>$n, undirected=>1);
+    if (0 && $n == 4) {
+      MyGraphs::Graph_print_tikz($graph);
+      MyGraphs::Graph_view($graph);
+    }
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
   require Graph;
   my $graph = Graph->new(undirected => 1);
   $graph->add_edges([1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8],
@@ -86,25 +107,3 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  # HOG crowns
-
-  # 2   path-4
-  # 3   fork
-  # 4   cross
-  # 3   H graph
-  # 4
-  # 4   Ethane
-
-  my @graphs;
-  foreach my $n (1 .. 20) {
-    my $graph = Graph::Maker->new('crown', N=>$n, undirected=>1);
-    if ($n == 4) {
-      MyGraphs::Graph_print_tikz($graph);
-      MyGraphs::Graph_view($graph);
-    }
-    push @graphs, $graph;
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}

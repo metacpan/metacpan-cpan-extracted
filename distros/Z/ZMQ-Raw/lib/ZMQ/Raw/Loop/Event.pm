@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Event;
-$ZMQ::Raw::Loop::Event::VERSION = '0.19';
+$ZMQ::Raw::Loop::Event::VERSION = '0.21';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ ZMQ::Raw::Loop::Event - Event class
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 DESCRIPTION
 

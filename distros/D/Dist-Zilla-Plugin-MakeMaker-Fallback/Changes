@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.026     2017-12-11 03:01:32Z
+          - warning messages shown to the user are text-wrapped to 78 chars
+          - fix printing the Makefile.PL warning during 'dzil run' (and other
+            -BuildRunner operations), by eliminating a double build where it
+            is not needed
+
 0.025     2017-10-08 20:33:24Z
           - disable printing the Makefile.PL warning during 'dzil test
             --release' and 'dzil release' operations, which run Makefile.PL as

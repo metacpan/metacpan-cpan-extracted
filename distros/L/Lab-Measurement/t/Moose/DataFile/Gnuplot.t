@@ -12,6 +12,14 @@ use Test::Fatal;
 use File::Spec::Functions qw/catfile/;
 use Lab::Moose;
 use PDL::Core qw/pdl/;
+use Module::Load 'autoload';
+
+eval {
+    autoload 'PDL::Graphics::Gnuplot';
+    1;
+} or do {
+    plan skip_all => "test requires PDL::Graphics::Gnuplot";
+};
 
 my $dir = tempdir( CLEANUP => 1 );
 my $folder = datafolder( path => catfile( $dir, 'gnuplot' ) );
@@ -23,7 +31,7 @@ my $file = datafile(
 );
 my $path = $file->path();
 $file->log( A => 0.7, B => 2, C => 3 );
-$file->log_newline();
+$file->new_block();
 $file->log_comment( comment => 'YOLO' );
 $file->log( A => 2, B => 3, C => 4 );
 

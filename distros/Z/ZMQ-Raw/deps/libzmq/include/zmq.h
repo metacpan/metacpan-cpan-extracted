@@ -573,7 +573,7 @@ ZMQ_EXPORT void zmq_threadclose (void* thread);
 
 /*  DRAFT 0MQ socket events and monitoring                                    */
 /*  Unspecified system errors during handshake. Event value is an errno.      */
-#define ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL   0x0800 
+#define ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL   0x0800
 /*  Handshake complete successfully with successful authentication (if        *
  *  enabled). Event value is unused.                                          */
 #define ZMQ_EVENT_HANDSHAKE_SUCCEEDED          0x1000
@@ -610,9 +610,9 @@ ZMQ_EXPORT void zmq_threadclose (void* thread);
 
 /*  DRAFT Context options                                                     */
 #define ZMQ_MSG_T_SIZE 6
-#define ZMQ_THREAD_AFFINITY 7
-#define ZMQ_THREAD_AFFINITY_DFLT -1
-#define ZMQ_THREAD_NAME_PREFIX 8
+#define ZMQ_THREAD_AFFINITY_CPU_ADD 7
+#define ZMQ_THREAD_AFFINITY_CPU_REMOVE 8
+#define ZMQ_THREAD_NAME_PREFIX 9
 
 /*  DRAFT Socket methods.                                                     */
 ZMQ_EXPORT int zmq_join (void *s, const char *group);

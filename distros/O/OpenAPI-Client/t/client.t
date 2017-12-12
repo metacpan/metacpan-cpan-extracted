@@ -10,15 +10,21 @@ my $i = 0;
 get '/pets/:type' => sub {
   $i++;
   my $c = shift->openapi->valid_input or return;
-  return $c->render(openapi => [{type => $c->param('type')}]);
+  $c->render(openapi => [{type => $c->param('type')}]);
   },
   'listPets';
+
+get '/pets' => sub {
+  my $c = shift->openapi->valid_input or return;
+  $c->render(openapi => [$c->req->params->to_hash]);
+  },
+  'list pets';
 
 post '/pets' => sub {
   my $c = shift->openapi->valid_input or return;
   my $res = $c->req->body_params->to_hash;
   $res->{dummy} = true if $c->req->headers->header('x-dummy');
-  return $c->render(openapi => $res);
+  $c->render(openapi => $res);
   },
   'addPet';
 
@@ -44,8 +50,8 @@ is $tx->res->code, 200, 'sync listPets';
 is $tx->req->url->query->param('p'), 12, 'sync listPets p=12';
 is $i, 1, 'one request';
 
-$tx = $client->addPet({type => 'dog', name => 'Pluto', 'x-dummy' => true});
-is_deeply $tx->res->json, {dummy => true, type => 'dog', name => 'Pluto'}, 'sync addPet';
+$tx = $client->addPet({age => '5', type => 'dog', name => 'Pluto', 'x-dummy' => true});
+is $tx->res->code, 200, 'coercion for "age":"5" works';
 
 note 'Async testing';
 $i = 0;
@@ -55,6 +61,13 @@ is $obj, $client, 'got client in callback';
 is $tx->res->code, 400, 'invalid listPets';
 is $tx->error->{message}, 'Invalid input', 'sync invalid message';
 is $i, 0, 'invalid on client side';
+
+note 'call()';
+$tx = $client->call('list pets', {page => 2});
+is_deeply $tx->res->json, [{page => 2}], 'call(list pets)';
+
+eval { $tx = $client->call('nope') };
+like $@, qr{No such operationId.*client\.t}, 'call(nope)';
 
 done_testing;
 
@@ -73,11 +86,24 @@ __DATA__
       "parameters": [
         { "$ref": "#/parameters/name" }
       ],
+      "get": {
+        "operationId": "list pets",
+        "parameters": [
+          { "in": "query", "name": "page", "type": "integer" }
+        ],
+        "responses": {
+          "200": {
+            "description": "pets",
+            "schema": { "type": "array" }
+          }
+        }
+      },
       "post": {
         "x-whatever": [],
         "operationId": "addPet",
         "parameters": [
           { "in": "header", "name": "x-dummy", "type": "boolean" },
+          { "in": "formData", "name": "age", "type": "integer" },
           { "in": "formData", "name": "type", "type": "string" }
         ],
         "responses": {

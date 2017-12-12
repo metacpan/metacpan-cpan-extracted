@@ -3,7 +3,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More 0.96;
+use Test::More 0.98;
 
 use Calendar::Indonesia::Holiday qw(
                                        list_id_holidays
@@ -52,6 +52,7 @@ test_year_has_num_of_holidays(2014, 17, 4);
 test_year_has_num_of_holidays(2015, 16, 4);
 test_year_has_num_of_holidays(2016, 15, 4);
 test_year_has_num_of_holidays(2017, 16, 5);
+test_year_has_num_of_holidays(2018, 16, 5);
 
 DONE_TESTING:
 done_testing;

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/Poloniex-API.t
+t/Critic.t
+t/Pod.t
+t/Tidy.t
+lib/Poloniex/API.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

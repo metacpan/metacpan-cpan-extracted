@@ -1,0 +1,40 @@
+POSIX-Run-Capture version 0.01
+==============================
+
+POSIX::Run::Capture runs an external command and captures its output. Both
+standard error and output are captured. Upon exit, their contents can be
+accessed line by line or in one chunk. Callback routines can be supplied
+that will be called for each complete line of output read, providing a way
+for synchronous processing. Standard input can be supplied as either a
+filehandle or a text.
+
+This module is for those who value performance and effectiveness over
+portability. As its name suggests, it can be used only on POSIX systems.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Sergey Poznyakoff
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+It is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this library. If not, see <http://www.gnu.org/licenses/>.    
+
+

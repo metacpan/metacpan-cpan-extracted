@@ -1,0 +1,64 @@
+# PODNAME: Authen::Krb5::Keytab
+# ABSTRACT: A Kerberos 5 keytab
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Authen::Krb5::Keytab - A Kerberos 5 keytab
+
+=head1 VERSION
+
+version 1.905
+
+=head1 METHODS
+
+=head2 C<add_entry(entry)>
+
+Adds I<entry> to the keytab.
+
+=head2 C<remove_entry(entry)>
+
+Removes I<entry> from the keytab.
+
+=head2 C<get_name()>
+
+Returns the name of the keytab.
+
+=head2 C<get_entry(principal[, kvno, enctype])>
+
+Returns an Authen::Krb5::KeytabEntry object representing an entry in
+the keytab matching I<principal> and optionally I<kvno> and
+I<enctype>.
+
+=head2 C<start_seq_get()>
+
+Returns a cursor that can be passed to <I<next_entry()> to read in turn
+every key in the keytab.
+
+=head2 C<next_entry(cursor)>
+
+Returns the next entry in the keytab as an Authen::Krb5::KeytabEntry
+object.
+
+=head2 C<end_seq_get(cursor)>
+
+Perform cleanup opreations after I<next_entry()> and invalidates
+I<cursor>.
+
+=head1 AUTHOR
+
+Jeff Horwitz <jeff@smashing.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Jeff Horwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -19,14 +19,15 @@ if ( -d "t" ) {
 
 { package PlayTab;
   use App::Music::PlayTab;
-  run( "--test",
-       "--output", "${prefix}test.$ext",
+  run( "-test",
+       "-output", "${prefix}${base}test.ps",
+       "-preamble", "${prefix}dummy.pre",
        "${prefix}${base}.ptb",
      );
 }
 
-my $ok = !differ ("${prefix}test.$ext", "${prefix}${base}.$ext");
-unlink ("${prefix}test.$ext") if $ok;
+my $ok = !differ ("${prefix}${base}test.ps", "${prefix}${base}.ps");
+unlink ("${prefix}test.ps") if $ok;
 print $ok ? "" : "not ", "ok 6\n";
 
 # Compare two text files, ignoring line endings.

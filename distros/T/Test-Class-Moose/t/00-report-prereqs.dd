@@ -35,8 +35,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                      'Parallel::ForkManager' => 'v0.7.6'
-                                    },
+                                        'Parallel::ForkManager' => 'v0.7.6'
+                                      },
                       'requires' => {
                                       'Benchmark' => '0',
                                       'Carp' => '0',
@@ -75,9 +75,9 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                   'CPAN::Meta' => '2.120900',
-                                   'Test::Output' => '0.0005'
-                                 },
+                                     'CPAN::Meta' => '2.120900',
+                                     'Test::Output' => '0.0005'
+                                   },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',

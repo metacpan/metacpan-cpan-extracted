@@ -5,10 +5,10 @@ use warnings;
 use strict;
 use lib 'lib', '../lib';
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use Log::Report;   # no domains, no translator
-use Scalar::Util qw/refaddr/;
+use Scalar::Util qw/refaddr blessed/;
 
 ### examples from Log::Report::Message and more
 
@@ -37,3 +37,7 @@ my $w = __"World!";
 my $e =  "$h $w\n";
 isa_ok($e, 'Log::Report::Message');
 is("$e", "Hello World!\n");
+
+### issue #123835
+
+ok ! blessed(($h.$w)->toString), 'append/prepend must be stringified as well';

@@ -5,16 +5,12 @@ use Pcore;
 if ( $ENV->is_par ) {
     $INC{'Inline.pm'} = $INC{'Pcore/Core/Inline.pm'};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
-    state $init = !!require DynaLoader;
+    state $init = !!require XSLoader;
 
     *Inline::import = sub {
         my $caller = caller;
 
-        no strict qw[refs];
-
-        push *{"$caller\::ISA"}->@*, 'DynaLoader';
-
-        DynaLoader::bootstrap($caller);
+        XSLoader::load $caller;
 
         return;
     };
@@ -39,7 +35,7 @@ else {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 47                   | Documentation::RequirePodLinksIncludeText - Link L<Inline> on line 63 does not specify text                    |
+## |    2 | 43                   | Documentation::RequirePodLinksIncludeText - Link L<Inline> on line 59 does not specify text                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

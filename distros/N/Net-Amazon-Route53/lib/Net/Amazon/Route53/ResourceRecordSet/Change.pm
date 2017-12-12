@@ -2,8 +2,9 @@ use strict;
 use warnings;
 
 package Net::Amazon::Route53::ResourceRecordSet::Change;
-$Net::Amazon::Route53::ResourceRecordSet::Change::VERSION = '0.160530';
-use Any::Moose;
+$Net::Amazon::Route53::ResourceRecordSet::Change::VERSION = '0.173450';
+use Moo;
+use Types::Standard 'ArrayRef';
 extends "Net::Amazon::Route53::ResourceRecordSet";
 use HTML::Entities;
 
@@ -29,8 +30,7 @@ The values associated with this resource record.
 
 =cut
 
-has 'original_values' =>
-    (is => 'rw', isa => 'ArrayRef', required => 1, default => sub {[]});
+has 'original_values' => ( is => 'rw', isa => ArrayRef, required => 1, default => sub { [] } );
 
 =head2 METHODS
 
@@ -88,42 +88,31 @@ sub change {
    </ChangeBatch>
 </ChangeResourceRecordSetsRequest>
 ENDXML
-    my $request_xml = sprintf(
-        $request_xml_str,
-        (map {$_} ($self->type, $self->name, $self->type, $self->ttl,)),
-        join("\n",
-            map {"<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>"}
-                @{ $self->original_values }),
-        (map {$_} ($self->name, $self->type, $self->ttl,)),
-        join("\n",
-            map {"<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>"}
-                @{ $self->values }));
+    my $request_xml = sprintf( $request_xml_str,
+        (map { $_ } ( $self->type, $self->name, $self->type, $self->ttl, ) ),
+        join( "\n", map { "<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>" } @{ $self->original_values } ),
+        (map { $_ } ( $self->name, $self->type, $self->ttl, ) ),
+        join( "\n", map { "<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>" } @{ $self->values } ) );
 
     my $resp = $self->route53->request(
         'post',
-        'https://route53.amazonaws.com/2010-10-01/'
-            . $self->hostedzone->id
-            . '/rrset',
+        'https://route53.amazonaws.com/2010-10-01/' . $self->hostedzone->id . '/rrset',
         Content => $request_xml
     );
     my $change = Net::Amazon::Route53::Change->new(
         route53 => $self->route53,
-        (
-            map {lc($_) => decode_entities($resp->{ChangeInfo}{$_})}
-                qw/Id Status SubmittedAt/
-        ),
+        ( map { lc($_) => decode_entities($resp->{ChangeInfo}{$_}) } qw/Id Status SubmittedAt/ ),
     );
     $change->refresh();
     return $change if !$wait;
-
-    while (lc($change->status) ne 'insync') {
+    while ( lc( $change->status ) ne 'insync' ) {
         sleep 2;
         $change->refresh();
     }
     return $change;
 }
 
-no Any::Moose;
+no Moo;
 
 =head1 AUTHOR
 

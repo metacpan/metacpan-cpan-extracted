@@ -68,6 +68,7 @@ my $removed_count = remove_tree($t, { error  => \my $err_list, })
 ($tdir) = make_path($t, +{ mode => 0711 })
     or croak "Unable to make_path for testing";
 
+note("Downloading tarball via FTP; this may take a while");
 $stdout = capture_stdout {
     $tb = $self->get_latest_release( {
         compression => $compression,

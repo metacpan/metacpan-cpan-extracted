@@ -8,13 +8,14 @@ use Getopt::Long;
 use Pod::Usage 1.69;
 use CPAN::Mini 1.111016;
 use File::Spec;
-our $VERSION = '0.009'; # VERSION
 
-my ($help, $version_check);
+our $VERSION = '0.010'; # VERSION
+
+my ( $help, $version_check );
 
 GetOptions(
-    'help'         => \$help,
-    'version'      => \$version_check
+    'help'    => \$help,
+    'version' => \$version_check
 ) or pod2usage(1);
 pod2usage( -exitval => 0, -verbose => 2 ) if $help;
 
@@ -28,38 +29,46 @@ CPAN::HandleConfig->load;
 CPAN::Shell::setup_output;
 CPAN::Index->force_reload;
 print "Starting cleanup...\n";
-my $dbfile = '/home/vagrant/.cpan/cpandb.sql';
-my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","");
-my $query_distros = $dbh->prepare(q{select A.dist_file from dists A join auths B on A.auth_id = B.auth_id where B.cpanid = ?});
+my $self          = scalar( getpwuid($<) );
+my $dbfile        = "/home/$self/.cpan/cpandb.sql";
+my $dbh           = DBI->connect( "dbi:SQLite:dbname=$dbfile", "", "" );
+my $query_distros = $dbh->prepare(
+q{select A.dist_file from dists A join auths B on A.auth_id = B.auth_id where B.cpanid = ?}
+);
 my $query_authors = $dbh->prepare(q{select cpanid from auths});
 $query_authors->execute();
 my $removed = 0;
 
 my $minicpan_root = get_root();
 
-while (my $row = $query_authors->fetchrow_arrayref()) {
-    my $distros = get_distro_files($dbh, $query_distros, $row->[0]);
-    my $path = File::Spec->catdir( $minicpan_root, 'authors', 'id', substr($row->[0],0,1), substr($row->[0],0,2), $row->[0] );
+while ( my $row = $query_authors->fetchrow_arrayref() ) {
+    my $distros = get_distro_files( $dbh, $query_distros, $row->[0] );
+    my $path = File::Spec->catdir(
+        $minicpan_root, 'authors', 'id',
+        substr( $row->[0], 0, 1 ),
+        substr( $row->[0], 0, 2 ),
+        $row->[0]
+    );
     next unless ( -d $path );
-    opendir(DIR,$path) or die "Cannot read $path: $!";
+    opendir( DIR, $path ) or die "Cannot read $path: $!";
     my @files = readdir(DIR);
     close(DIR);
     shift(@files);
     shift(@files);
 
-    foreach my $distro_file(@files) {
+    foreach my $distro_file (@files) {
         next if $distro_file eq 'CHECKSUMS';
         my $to_remove = File::Spec->catfile( $path, $distro_file );
-        next unless (-f $to_remove);
-        
-        unless ($distros->has($distro_file)) {
+        next unless ( -f $to_remove );
+
+        unless ( $distros->has($distro_file) ) {
             my $to_remove = File::Spec->catfile( $path, $distro_file );
             print "$to_remove can be removed\n";
-            unlink( $to_remove ) or warn "could not remove $to_remove: $!";
+            unlink($to_remove) or warn "could not remove $to_remove: $!";
             $removed++;
         }
     }
-    
+
 }
 
 $dbh->disconnect();
@@ -69,17 +78,17 @@ sub get_root {
     my %config = CPAN::Mini->read_config();
     return $config{local};
 }
-    
+
 sub get_distro_files {
-    my ($dbh, $sth, $author) = @_;
-    $sth->bind_param(1, $author);
+    my ( $dbh, $sth, $author ) = @_;
+    $sth->bind_param( 1, $author );
     $sth->execute();
     my @distros;
 
     while ( my $row = $sth->fetchrow_arrayref() ) {
-        push(@distros, $row->[0]);
+        push( @distros, $row->[0] );
     }
-    
+
     return Set::Tiny->new(@distros);
 }
 

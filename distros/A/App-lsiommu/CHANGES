@@ -1,0 +1,32 @@
+==================================================
+Changes from 2016-12-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2017-12-07 23:42:17 +0000
+------------------------------------------
+
+  Change: cb9670cd302c9091e12904f1b504e9631ee004ce
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-08 00:42:03 +0000
+
+    Make shebang rewritable by EU::MM
+
+    Also moves documentation to the script for better metacpan
+    integration.
+
+    Thanks @Grinnz! 
+
+------------------------------------------
+version 0.001 at 2017-12-07 21:28:14 +0000
+------------------------------------------
+
+  Change: 3da808189f0e8148efcb517b82c87c5ed8feb3cb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-07 22:28:14 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

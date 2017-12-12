@@ -1,5 +1,12 @@
 Revision history for Changes
 
+0.64    2017-11-30 01:42:26
+        [CHANGES]
+         * Perform Tickit 0.64 deprecations:
+            + Remove now-dead methods in Term and Window
+         * Bundled libtickit is now 0.2-beta1
+         * Fix up example demo scripts for current APIs
+
 0.63    2017/06/13 14:38:01
         [CHANGES]
          * Perform Tickit 0.63 deprecations:

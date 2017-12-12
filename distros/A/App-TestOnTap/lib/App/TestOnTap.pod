@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.046
+Version 0.048
 
 =head1 SYNOPSIS
 
@@ -295,6 +295,10 @@ The sections together detail how to decide which files are tests and how they sh
 The section should contain pairs of key/values named C<match> and C<cmd>, where the C<match> part defines a
 a L<Grep::Query> expression to match to test names, and the C<cmd> part defines the command line to use for matching tests.
 
+NOTE: the C<cmd> value may be empty for tests compiled to native directly executable files, i.e. 'binaries'. On Windows
+typically '.exe.' files, on Unix/Linux, generally without extension. A recommended strategy is to rename such tests
+to use the extension '.tbin' and match on that - see the default exec mappings below.
+
 The C<cmd> value may be in multi-line/part format, which is required if the command contains
 whitespace in the individual parts. A plain string will be split on space in order to separate the command into
 parts.
@@ -319,7 +323,7 @@ will be run by 'java -jar <file>'. Any other files will be ignored.
 If no "execmap" list is present, an internal one with corresponding sections will be used, equivalent to
 this (for this release, may change):
 
-  execmap = perl python java groovy shell autoit3 batch
+  execmap = perl python java groovy shell autoit3 batch binary
   
   [EXECMAP perl]
   # well, a no-brainer...:-)
@@ -364,6 +368,13 @@ this (for this release, may change):
   #
   match = regexp[\.(bat|cmd)$]
   cmd = cmd.exe /c
+
+  [EXECMAP binary]
+  # for directly executable binaries, no actual 'cmd' is needed
+  # On Windows: rename 'xyz.exe' => 'xyz.tbin'
+  # On Unix: rename 'xyz' => 'xyz.tbin'
+  #
+  match = regexp[\.tbin$]
 
 While useful in the early stages for quickly getting started, good form is to ensure the execmap is explicitly 
 defined in the configuration, avoiding surprises if other extensions are added to the default, and also to use

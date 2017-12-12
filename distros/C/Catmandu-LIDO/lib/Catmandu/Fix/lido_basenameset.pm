@@ -8,7 +8,7 @@ use Catmandu::Fix::LIDO::Nameset qw(emit_nameset);
 
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 with 'Catmandu::Fix::Base';

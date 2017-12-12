@@ -1,6 +1,6 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2008-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2017 -- leonerd@leonerd.org.uk
 
 package Circle::Net::IRC;
 
@@ -11,6 +11,8 @@ use base qw( Circle::Net Circle::Ruleable );
 __PACKAGE__->APPLY_Ruleable;
 
 use base qw( Circle::Rule::Store ); # for the attributes
+
+our $VERSION = '0.173320';
 
 use constant NETTYPE => 'irc';
 
@@ -93,7 +95,6 @@ sub new
    $rulestore->register_cond( channel   => $self );
    $rulestore->register_cond( isaction  => $self );
 
-   $rulestore->register_action( highlight => $self );
    $rulestore->register_action( display   => $self );
    $rulestore->register_action( chaction  => $self );
 
@@ -649,37 +650,6 @@ sub eval_cond_isaction
    my ( $event, $results, $name ) = @_;
 
    return $event->{is_action};
-}
-
-sub parse_action_highlight
-   : Rule_description("Highlight matched regions and set activity level to 3")
-   : Rule_format('')
-{
-   my $self = shift;
-   return;
-}
-
-sub deparse_action_highlight
-{
-   my $self = shift;
-   return;
-}
-
-sub eval_action_highlight
-{
-   my $self = shift;
-   my ( $event, $results ) = @_;
-
-   my $str = $event->{text};
-
-   foreach my $matchgroup ( @{ $results->get_result( "matchgroups" ) } ) {
-      my ( $start, $len ) = @{$matchgroup->[0]}[0,1];
-
-      $str->apply_tag( $start, $len, b => 1 );
-      $str->apply_tag( $start, $len, fg => "highlight" );
-   }
-
-   $event->{level} = 3;
 }
 
 sub parse_action_display
@@ -1307,10 +1277,6 @@ use Circle::Collection
    storage => 'methods',
    attrs => [
       name     => { desc => "name" },
-      joined   => { desc      => "currently JOINed?",
-                    transient => 1,
-                    show      => sub { $_ ? "yes" : "no" },
-                  },
       autojoin => { desc => "JOIN automatically when connected",
                     show => sub { $_ ? "yes" : "no" },
                   },
@@ -1333,7 +1299,6 @@ sub channels_get
 
    return {
       name     => $chan->get_prop_name,
-      joined   => $chan->{state} == Circle::Net::IRC::Channel::STATE_JOINED,
       ( map { $_ => $chan->{$_} } qw( autojoin key ) ),
    };
 }
@@ -1370,8 +1335,6 @@ sub channels_del
    my ( $name, $def ) = @_;
 
    my $chanobj = $self->get_channel_if_exists( $name ) or return undef;
-
-   die "channel is joined" if $chanobj->{state} == Circle::Net::IRC::Channel::STATE_JOINED;
 
    $chanobj->destroy;
 }

@@ -3,7 +3,7 @@ package Prty::Object;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -113,12 +113,6 @@ sub rebless {
     $this->throw(@opt,@keyVal);
     $this->throw($msg,@opt,@keyVal);
 
-=head4 Description
-
-Wirf eine Exception mit dem Fehlertext $msg und den hinzugefügten
-Schlüssel/Wert-Paaren @keyVal. Die Methode kehrt nur zurück, wenn
-Option -warning gesetzt ist.
-
 =head4 Options
 
 =over 4
@@ -137,6 +131,12 @@ Ergänze den Exception-Text um einen Stacktrace.
 Wirf keine Exception, sondern gib lediglich eine Warnung aus.
 
 =back
+
+=head4 Description
+
+Wirf eine Exception mit dem Fehlertext $msg und den hinzugefügten
+Schlüssel/Wert-Paaren @keyVal. Die Methode kehrt nur zurück, wenn
+Option -warning gesetzt ist.
 
 =cut
 
@@ -413,7 +413,7 @@ sub this {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

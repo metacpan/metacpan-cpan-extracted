@@ -3,7 +3,9 @@
     return raw MPU::GMP results will return strings, which isn't right.
   * Valgrind, coverage
   * use:  -O2 -g -Wall -Wextra -Wdeclaration-after-statement -fsigned-char
-  * Test on 32-bit Perl.  Test on Win32.
+  * Test on 32-bit Perl, Cygwin, Win32.
+  * Test on gcc70 (NetBSD), gcc119 (AIX/Power8), gcc22 (MIPS64), gcc115 (aarch)
+  * prove -b -I../Math-Prime-Util-GMP/blib/lib -I../Math-Prime-Util-GMP/blib/arch
 
 - For new functions:
   XS, .h, .c, PP, PPFE, export, t exports, lib/ntheory.pm, doc, test
@@ -100,8 +102,6 @@
 
 - sum primes better than current method.  Especially using less memory.
 
-- bernreal and bernfrac using MPFR
-
 - divsum and divsummult as block functions.
   The latter does sum = vecprod(1 + f(p_i) + f(p_i^2) + ... f(p_i^e) for all p.
 
@@ -135,8 +135,13 @@
 
 - sieve_range does trial division
 
-- csrand and srand should be calling a util function to seed GMP csprng
+- srand with no args should be calling GMP's srand with the selected seed
+  value.  This is all a hacky artifact of having the two codebases.
 
-- prime_count_approx should give a proper integer result when given a
-  bigint input.  Currently it calls RiemannR which since bignum isn't on,
-  calls the XS RiemannR.  That starts truncating excessively past 10^23 ish.
+- Look at using Ramanujan series for PP Li.
+
+- _reftyped as XS call
+
+- update prime count lower/upper from https://arxiv.org/pdf/1703.08032.pdf
+
+- Consider Lim-Lee random prime generation, optionally with proof.

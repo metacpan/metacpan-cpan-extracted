@@ -1,6 +1,15 @@
 
 === version history for XML::LibXML::Simple
 
+version 0.99: Mon 11 Dec 12:53:14 CET 2017
+
+	Changes:
+	- support SuppressEmpty.
+
+	Improvements:
+	- typo
+	  rt.cpan.org#123618 [Gregor Herrmann, Debian]
+
 version 0.98: Wed  8 Nov 10:38:35 CET 2017
 
 	Improvements:

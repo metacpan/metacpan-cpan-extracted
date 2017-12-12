@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More;
 use Set::IntSpan;
 use Set::IntSpan::Partition;
@@ -27,7 +30,7 @@ for my $round (1 .. 100) {
   my @new = uniq map @$_, values %h;
   my $old_str = join '!', sort map { "$_" } @old;
   my $new_str = join '!', sort map { "$_" } @new;
-  ok($old_str eq $new_str, '...');
+  is($old_str, $new_str, '...');
   $ran++;
 }
 

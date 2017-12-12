@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -1491,6 +1491,7 @@ L<http://oeis.org/A106665> (etc)
                 being Golay/Rudin/Shapiro cumulative
     A020990   Y coordinate unduplicated, X-Y diff starting from N=1
                 being Golay/Rudin/Shapiro * (-1)^n cumulative
+    A068915   Y when N even, X when N odd
 
 Since the X and Y coordinates each change alternately, each coordinate
 appears twice, for instance X=0,1,1,2,2,3,3,2,2,etc.  A020986 and A020990
@@ -1498,6 +1499,7 @@ are "undoubled" X and Y in the sense of just one copy of each of those
 paired values.
 
     A209615   turn 1=left,-1=right
+    A292077   turn 0=left,1=right
     A106665   next turn 1=left,0=right, a(0) is turn at N=1
     A020985   dX and dY alternately, dSum change in X+Y
                 being Golay/Rudin/Shapiro sequence +1,-1                
@@ -1546,6 +1548,13 @@ first turn, whereas for the path here that's N=1.
     A134057   area to N=4^k
     A060867   area to N=2*4^k
     A122746   area increment N=2^k to N=2^(k+1)
+                = num segments West  N=0 to 2^k-1
+
+    A005418   num segments East  N=0 to 2^k-1
+    A051437   num segments North N=0 to 2^k-1
+    A007179   num segments South N=0 to 2^k-1
+    A097038   num runs of 8 consecutive segments within N=0 to 2^k-1
+                each segment enclosing a new unit square
 
     A000225   convex hull area*2, being 2^k-1
 
@@ -1554,13 +1563,6 @@ first turn, whereas for the path here that's N=1.
                (boundary is half verticals half horizontals)
     A131128   boundary to N=4^k
     A028399   boundary to N=2*4^k
-
-    A005418   num segments East  N=0 to 2^k-1
-    A051437   num segments North N=0 to 2^k-1
-    A122746   num segments West  N=0 to 2^k-1
-    A007179   num segments South N=0 to 2^k-1
-    A097038   num runs of 8 consecutive segments within N=0 to 2^k-1
-                each segment enclosing a new unit square
 
     A052955   single-visited points to N=2^k
     A052940   single-visited points to N=4^k, being 3*2^n-1

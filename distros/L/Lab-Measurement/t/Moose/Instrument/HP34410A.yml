@@ -1,0 +1,254 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: SENS:FUNC 'CURR'
+id: 2
+method: Write
+---
+command: SENS:FUNC?
+id: 3
+method: Query
+retval: "\"CURR\"\n"
+---
+command: SENS:FUNC 'VOLT'
+id: 4
+method: Write
+---
+command: SENS:FUNC?
+id: 5
+method: Query
+retval: "\"VOLT\"\n"
+---
+command: SENS:FUNC 'VOLT'
+id: 6
+method: Write
+---
+command: SENS:VOLT:RANG 0.1
+id: 7
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 8
+method: Query
+retval: '+1.00000000E-01
+
+'
+---
+command: SENS:VOLT:RANG 1
+id: 9
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 10
+method: Query
+retval: '+1.00000000E+00
+
+'
+---
+command: SENS:VOLT:RANG 10
+id: 11
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 12
+method: Query
+retval: '+1.00000000E+01
+
+'
+---
+command: SENS:VOLT:RANG 100
+id: 13
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 14
+method: Query
+retval: '+1.00000000E+02
+
+'
+---
+command: SENS:VOLT:RANG 1000
+id: 15
+method: Write
+---
+command: SENS:VOLT:RANG?
+id: 16
+method: Query
+retval: '+1.00000000E+03
+
+'
+---
+command: SENS:FUNC 'CURR'
+id: 17
+method: Write
+---
+command: SENS:CURR:RANG 0.0001
+id: 18
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 19
+method: Query
+retval: '+1.00000000E-04
+
+'
+---
+command: SENS:CURR:RANG 0.001
+id: 20
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 21
+method: Query
+retval: '+1.00000000E-03
+
+'
+---
+command: SENS:CURR:RANG 0.01
+id: 22
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 23
+method: Query
+retval: '+1.00000000E-02
+
+'
+---
+command: SENS:CURR:RANG 0.1
+id: 24
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 25
+method: Query
+retval: '+1.00000000E-01
+
+'
+---
+command: SENS:CURR:RANG 1
+id: 26
+method: Write
+---
+command: SENS:CURR:RANG?
+id: 27
+method: Query
+retval: '+1.00000000E+00
+
+'
+---
+command: SENS:CURR:NPLC 0.006
+id: 28
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 29
+method: Query
+retval: '+6.00000000E-03
+
+'
+---
+command: SENS:CURR:NPLC 0.02
+id: 30
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 31
+method: Query
+retval: '+2.00000000E-02
+
+'
+---
+command: SENS:CURR:NPLC 0.06
+id: 32
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 33
+method: Query
+retval: '+6.00000000E-02
+
+'
+---
+command: SENS:CURR:NPLC 0.2
+id: 34
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 35
+method: Query
+retval: '+2.00000000E-01
+
+'
+---
+command: SENS:CURR:NPLC 1
+id: 36
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 37
+method: Query
+retval: '+1.00000000E+00
+
+'
+---
+command: SENS:CURR:NPLC 2
+id: 38
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 39
+method: Query
+retval: '+2.00000000E+00
+
+'
+---
+command: SENS:CURR:NPLC 10
+id: 40
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 41
+method: Query
+retval: '+1.00000000E+01
+
+'
+---
+command: SENS:CURR:NPLC 100
+id: 42
+method: Write
+---
+command: SENS:CURR:NPLC?
+id: 43
+method: Query
+retval: '+1.00000000E+02
+
+'
+---
+command: SENS:FUNC 'VOLT'
+id: 44
+method: Write
+---
+command: SENS:VOLT:RANG 0.1
+id: 45
+method: Write
+---
+command: SENS:VOLT:NPLC 10
+id: 46
+method: Write
+---
+command: :read?
+id: 47
+method: Query
+retval: '-1.46230558E-04
+
+'
+---
+command: '*RST'
+id: 48
+method: Write

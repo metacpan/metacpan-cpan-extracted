@@ -8,7 +8,7 @@ use Test::More tests => 9;
 
 use Music::Lyrics::LRC;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 my $lrc = Music::Lyrics::LRC->new();
 ok( defined $lrc, 'constructed' );

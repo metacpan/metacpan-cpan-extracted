@@ -1,0 +1,34 @@
+---
+abstract: "Perl::Critic policies which help to avoid both\nexplicit and implicit smartmatching\n"
+author:
+  - unknown
+build_requires:
+  Perl::Critic::TestUtils: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-ProhibitSmartmatch
+provides:
+  Perl::Critic::Policy::ControlStructures::ProhibitSwitchStatements:
+    file: lib/Perl/Critic/Policy/ControlStructures/ProhibitSwitchStatements.pm
+    version: '0.2'
+  Perl::Critic::Policy::Operators::ProhibitSmartmatch:
+    file: lib/Perl/Critic/Policy/Operators/ProhibitSmartmatch.pm
+    version: '0.2'
+  Perl::Critic::Policy::ProhibitSmartmatch:
+    file: lib/Perl/Critic/Policy/ProhibitSmartmatch.pm
+    version: '0.4'
+requires:
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

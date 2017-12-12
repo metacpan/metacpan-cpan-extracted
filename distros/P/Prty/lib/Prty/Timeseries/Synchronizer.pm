@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Array;
@@ -94,15 +94,6 @@ legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
 
     $tsy = $class->new($interval,@param,@opt);
 
-=head4 Description
-
-Instantiiere Synchronizer-Objekt für die Parameter @param mit einem
-Zeitraster von $interval Sekunden und liefere eine Referenz auf
-dieses Objekt zurück.
-
-Die Liste @param vereinbart die Parameternamen, die auch bei add()
-und rows() angegeben werden.
-
 =head4 Options
 
 =over 4
@@ -133,6 +124,15 @@ Betrachte nur Daten, die innerhalb von $s Sekunden um einen Rasterpunkt
 liegen. Ignoriere Daten, die außerhalb liegen.
 
 =back
+
+=head4 Description
+
+Instantiiere Synchronizer-Objekt für die Parameter @param mit einem
+Zeitraster von $interval Sekunden und liefere eine Referenz auf
+dieses Objekt zurück.
+
+Die Liste @param vereinbart die Parameternamen, die auch bei add()
+und rows() angegeben werden.
 
 =cut
 
@@ -359,6 +359,20 @@ sub parameters {
         @opt,
     );
 
+=head4 Options
+
+=over 4
+
+=item -noValue => $str (Default: '')
+
+Zeichenkette für "Wert nicht vorhanden".
+
+=item -timeFormat => $fmt (Default: 'yyyymmddhhmmss')
+
+Format der Zeitkolumne.
+
+=back
+
 =head4 Description
 
 Die erste Kolumne enthält die Zeit. Wenn bei Konstruktor die
@@ -404,20 +418,6 @@ gelegenen Wert.
 
 Generiere Kolumne mit dem Abstand in Sekunden, den der zeitlich
 am dichtesten am Rasterpunkt gelegenen Wert hat.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -noValue => $str (Default: '')
-
-Zeichenkette für "Wert nicht vorhanden".
-
-=item -timeFormat => $fmt (Default: 'yyyymmddhhmmss')
-
-Format der Zeitkolumne.
 
 =back
 
@@ -610,7 +610,7 @@ sub rows {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

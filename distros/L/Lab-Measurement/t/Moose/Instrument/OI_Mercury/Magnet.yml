@@ -1,0 +1,129 @@
+---
+command: READ:SYS:CAT
+id: 0
+method: Query
+retval: |
+  STAT:SYS:CAT:DEV:GRPX:PSU:DEV:MB1.T1:TEMP:DEV:GRPY:PSU:DEV:GRPZ:PSU:DEV:PSU.M1:PSU:DEV:PSU.M2:PSU:DEV:DB5.L1:LVL
+---
+command: READ:DEV:MB1.T1:TEMP:SIG:TEMP
+id: 1
+method: Query
+retval: |
+  STAT:DEV:MB1.T1:TEMP:SIG:TEMP:813.1000K
+---
+command: READ:DEV:DB5.L1:LVL:SIG:HEL
+id: 2
+method: Query
+retval: |
+  STAT:DEV:DB5.L1:LVL:SIG:HEL:LEV:79.3470%:RES:22.6708O
+---
+command: READ:DEV:DB5.L1:LVL:SIG:HEL
+id: 3
+method: Query
+retval: |
+  STAT:DEV:DB5.L1:LVL:SIG:HEL:LEV:79.3470%:RES:22.6708O
+---
+command: READ:DEV:DB5.L1:LVL:SIG:NIT
+id: 4
+method: Query
+retval: |
+  STAT:DEV:DB5.L1:LVL:SIG:NIT:COUN:10062.0000n:FREQ:497378:LEV:55.3077%
+---
+command: READ:DEV:DB5.L1:LVL:SIG:NIT
+id: 5
+method: Query
+retval: |
+  STAT:DEV:DB5.L1:LVL:SIG:NIT:COUN:10062.0000n:FREQ:497378:LEV:55.3077%
+---
+command: READ:DEV:DB5.L1:LVL:SIG:NIT
+id: 6
+method: Query
+retval: |
+  STAT:DEV:DB5.L1:LVL:SIG:NIT:COUN:10062.0000n:FREQ:497378:LEV:55.3077%
+---
+command: READ:DEV:GRPZ:PSU:SIG:CURR
+id: 7
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:CURR:-0.0001A
+---
+command: READ:DEV:GRPZ:PSU:SIG:FLD
+id: 8
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:FLD:-0.0000T
+---
+command: SET:DEV:GRPZ:PSU:SIG:SWHT:ON
+id: 9
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:SIG:SWHT:ON:VALID
+---
+command: READ:DEV:GRPZ:PSU:SIG:SWHT
+id: 10
+method: Query
+retval: "STAT:DEV:GRPZ:PSU:SIG:SWHT:ON\n"
+---
+command: SET:DEV:GRPZ:PSU:SIG:RCST:0.001
+id: 11
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:SIG:RCST:0.001:VALID
+---
+command: READ:DEV:GRPZ:PSU:SIG:RCST
+id: 12
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:RCST:0.0010A/m
+---
+command: SET:DEV:GRPZ:PSU:SIG:RFST:0.0015
+id: 13
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:SIG:RFST:0.0015:VALID
+---
+command: READ:DEV:GRPZ:PSU:SIG:RFST
+id: 14
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:RFST:0.0015T/m
+---
+command: SET:DEV:GRPZ:PSU:ACTN:HOLD
+id: 15
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:ACTN:HOLD:VALID
+---
+command: READ:DEV:GRPZ:PSU:ACTN
+id: 16
+method: Query
+retval: "STAT:DEV:GRPZ:PSU:ACTN:HOLD\n"
+---
+command: SET:DEV:GRPZ:PSU:SIG:CSET:0.0012
+id: 17
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:SIG:CSET:0.0012:VALID
+---
+command: READ:DEV:GRPZ:PSU:SIG:CSET
+id: 18
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:CSET:0.0012A
+---
+command: SET:DEV:GRPZ:PSU:SIG:FSET:0.0023
+id: 19
+method: Query
+retval: |
+  STAT:SET:DEV:GRPZ:PSU:SIG:FSET:0.0023:VALID
+---
+command: READ:DEV:GRPZ:PSU:SIG:FSET
+id: 20
+method: Query
+retval: |
+  STAT:DEV:GRPZ:PSU:SIG:FSET:0.0023T
+---
+command: READ:DEV:GRPZ:PSU:ATOB
+id: 21
+method: Query
+retval: "STAT:DEV:GRPZ:PSU:ATOB:18.705\n"

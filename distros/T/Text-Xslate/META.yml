@@ -3,43 +3,131 @@ abstract: 'Scalable template engine for Perl5'
 author:
   - 'Fuji, Goro (gfx) <gfuji@cpan.org>.'
 build_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  File::Copy::Recursive: 0
+  File::Copy::Recursive: '0'
   File::Path: '2.07'
-  Test::More: 0.88
-  Test::Requires: 0
+  Test::More: '0.98'
+  Test::Requires: '0'
 configure_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  ExtUtils::ParseXS: 3.18
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+  Devel::PPPort: '3.33'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0'
+  version: '0.9913'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Text::Xslate
+  version: '1.4'
 name: Text-Xslate
 no_index:
   directory:
-    - example
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Xslate:
+    file: lib/Text/Xslate.pm
+    version: v3.5.3
+  Text::Xslate::Bridge:
+    file: lib/Text/Xslate/Bridge.pm
+  Text::Xslate::Bridge::Star:
+    file: lib/Text/Xslate/Bridge/Star.pm
+  Text::Xslate::Compiler:
+    file: lib/Text/Xslate/Compiler.pm
+  Text::Xslate::Engine:
+    file: lib/Text/Xslate.pm
+    version: v3.5.3
+  Text::Xslate::HashWithDefault:
+    file: lib/Text/Xslate/HashWithDefault.pm
+  Text::Xslate::PP:
+    file: lib/Text/Xslate/PP.pm
+    version: v3.5.3
+  Text::Xslate::PP::Method:
+    file: lib/Text/Xslate/PP/Method.pm
+  Text::Xslate::PP::Opcode:
+    file: lib/Text/Xslate/PP/Opcode.pm
+    version: v3.5.3
+  Text::Xslate::PP::State:
+    file: lib/Text/Xslate/PP/State.pm
+  Text::Xslate::PP::Type::Macro:
+    file: lib/Text/Xslate/PP/Type/Macro.pm
+  Text::Xslate::PP::Type::Pair:
+    file: lib/Text/Xslate/PP/Type/Pair.pm
+  Text::Xslate::PP::Type::Raw:
+    file: lib/Text/Xslate/PP/Type/Raw.pm
+  Text::Xslate::Parser:
+    file: lib/Text/Xslate/Parser.pm
+  Text::Xslate::Runner:
+    file: lib/Text/Xslate/Runner.pm
+  Text::Xslate::Symbol:
+    file: lib/Text/Xslate/Symbol.pm
+  Text::Xslate::Syntax::Kolon:
+    file: lib/Text/Xslate/Syntax/Kolon.pm
+  Text::Xslate::Syntax::Metakolon:
+    file: lib/Text/Xslate/Syntax/Metakolon.pm
+  Text::Xslate::Syntax::TTerse:
+    file: lib/Text/Xslate/Syntax/TTerse.pm
+  Text::Xslate::Type::Raw:
+    file: lib/Text/Xslate/Type/Raw.pm
+  Text::Xslate::Util:
+    file: lib/Text/Xslate/Util.pm
 requires:
   Data::MessagePack: '0.38'
-  Mouse: v2.4.5
+  Encode: '2.26'
+  Mouse: v2.5.0
   Scalar::Util: '1.14'
-  XSLoader: 0.02
+  Storable: '2.15'
   parent: '0.221'
-  perl: 5.8.1
+  perl: '5.008001'
 resources:
-  MailingList: http://groups.google.com/group/xslate
-  ProjectHome: https://github.com/xslate
   bugtracker: https://github.com/xslate/p5-Text-Xslate/issues
-  homepage: http://xslate.org/
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/xslate/p5-Text-Xslate
-version: 3.4.0
+  homepage: https://github.com/xslate/p5-Text-Xslate
+  repository: git://github.com/xslate/p5-Text-Xslate.git
+version: v3.5.3
+x_contributors:
+  - 'André Walker <andre@andrewalker.net>'
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'Anirvan Chatterjee <x.github@chatterjee.net>'
+  - 'Brian Fraser <fraserbn@gmail.com>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Fuji, Goro (gfx) <goro-fuji@cookpad.com>'
+  - 'Fuji, Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Hao Wu <hwu@intellisurvey.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Justin Cook <jscook@users.noreply.github.com>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Kevin M. Goess <kgoess@craigslist.org>'
+  - 'Konstantin S. Uvarin <khedin@gmail.com>'
+  - 'Mariano Wahlmann <dichoso@gmail.com>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'Michael Kröll <michael.kroell@geizhals.at>'
+  - 'Mike Raynham <mike.raynham@spareroom.co.uk>'
+  - 'Mons Anderson <mons@cpan.org>'
+  - 'Nick Morrott <knowledgejunkie@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Shigeki Morimoto <github@morimo.to>'
+  - 'Shigeki Morimoto <shigeki.morimoto@mixi.co.jp>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Shoichi Kaji <skaji@outlook.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Ueda Satoshi <gunyoki@gmail.com>'
+  - 'Ueda Satoshi <ueda.satoshi@dena.jp>'
+  - 'Yoshiki Kurihara <kurihara@cpan.org>'
+  - 'c9s <cornelius.howl@gmail.com>'
+  - 'hiratara <hiratara@cpan.org>'
+  - 'hitode909 <hitode909@gmail.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'punytan <punytan@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

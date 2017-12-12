@@ -1,0 +1,81 @@
+{
+   "abstract" : "error traking plugin for Mojolicious with Sentry",
+   "author" : [
+      "Akira Osada <osd.akira@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ErrorTracking-Sentry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Software::License" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "1.22",
+            "Mojolicious" : "== 4.86",
+            "Sentry::Raven" : "== 1.10",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0.10",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::ErrorTracking::Sentry" : {
+         "file" : "lib/Mojolicious/Plugin/ErrorTracking/Sentry.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry/issues"
+      },
+      "homepage" : "https://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry",
+      "repository" : {
+         "url" : "git://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry.git",
+         "web" : "https://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry"
+      }
+   },
+   "version" : "1.0.0",
+   "x_authority" : "cpan:OSDAKIRA"
+}

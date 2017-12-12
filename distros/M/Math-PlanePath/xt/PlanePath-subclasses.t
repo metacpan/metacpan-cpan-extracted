@@ -51,6 +51,21 @@ my @modules = (
 
                # module list begin
 
+               'SquareReplicate',
+
+               'GosperReplicate',
+               'GosperSide',
+
+               'QuintetReplicate',
+               'QuintetCurve',
+               'QuintetCurve,arms=2',
+               'QuintetCurve,arms=3',
+               'QuintetCurve,arms=4',
+               'QuintetCentres',
+               'QuintetCentres,arms=2',
+               'QuintetCentres,arms=3',
+               'QuintetCentres,arms=4',
+
                'GrayCode',
                'GrayCode,radix=3',
                'GrayCode,radix=4',
@@ -295,16 +310,6 @@ my @modules = (
                # '*OneOfEight,parts=side',
                '*OneOfEight,parts=3mid',
 
-               'QuintetCentres',
-               'QuintetCentres,arms=2',
-               'QuintetCentres,arms=3',
-               'QuintetCentres,arms=4',
-               'QuintetReplicate',
-               'QuintetCurve',
-               'QuintetCurve,arms=2',
-               'QuintetCurve,arms=3',
-               'QuintetCurve,arms=4',
-
                'PythagoreanTree',
                'PythagoreanTree,coordinates=AC',
                'PythagoreanTree,coordinates=BC',
@@ -428,11 +433,6 @@ my @modules = (
                'ComplexMinus,realpart=3',
                'ComplexMinus,realpart=4',
                'ComplexMinus,realpart=5',
-
-               'GosperReplicate',
-               'GosperSide',
-
-               'SquareReplicate',
 
                'DekkingCurve',
                'DekkingCurve,arms=2',
@@ -879,7 +879,7 @@ BEGIN {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 124;
+my $want_version = 125;
 
 ok ($Math::PlanePath::VERSION, $want_version, 'VERSION variable');
 ok (Math::PlanePath->VERSION,  $want_version, 'VERSION class method');
@@ -1948,7 +1948,7 @@ sub pythagorean_diag {
         if (defined(my $n = $path->$method)) {
           my $got_LSR = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
           $got_LSR == $want_LSR
-            or &$report ("$method()=$n got LSR=$got_LSR want $want_LSR");
+            or &$report ("$method()=$n at that N got LSR=$got_LSR want $want_LSR");
           if (defined $seen_at_n) {
             $n == $seen_at_n
               or &$report ("$method()=$n but saw first at N=$seen_at_n");

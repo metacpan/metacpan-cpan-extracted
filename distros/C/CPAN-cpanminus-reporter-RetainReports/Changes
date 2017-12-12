@@ -1,0 +1,18 @@
+Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
+
+0.04 Tue Dec  5 09:44:15 EST 2017
+    - Require recent version of App-cpanminus-reporter.  Older versions handle
+      UNKNOWN/NA reports differently; CPANtesters using those older versions
+      were generating FAILs in unit tests
+
+0.03 Mon Dec  4 15:42:33 EST 2017
+    - First CPAN release
+
+0.02 Fri Dec 01 2017
+    - [Not released to CPAN ]
+
+0.01 Tue Nov 28 08:05:47 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+    - [Not released to CPAN ]
+
+

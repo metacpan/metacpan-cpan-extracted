@@ -186,13 +186,14 @@ int32_t SPVM_CONSTANT_POOL_push_sub(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL*
   SPVM_CONSTANT_POOL_SUB constant_pool_sub;
   memset(&constant_pool_sub, 0, sizeof(SPVM_CONSTANT_POOL_SUB));
   constant_pool_sub.native_address = sub->native_address;
-  constant_pool_sub.bytecode_base = sub->bytecode_base;
+  constant_pool_sub.opcode_base = sub->opcode_base;
   constant_pool_sub.mys_length = sub->op_mys->length;
-  constant_pool_sub.operand_stack_max = sub->operand_stack_max;
+  constant_pool_sub.call_sub_arg_stack_max = sub->call_sub_arg_stack_max;
   constant_pool_sub.args_length = sub->op_args->length;
   constant_pool_sub.is_native = sub->is_native;
   constant_pool_sub.is_destructor = sub->is_destructor;
   constant_pool_sub.is_jit = sub->is_jit;
+  constant_pool_sub.eval_stack_max_length = sub->eval_stack_max_length;
   
   if (sub->op_return_type->uv.type->code == SPVM_TYPE_C_CODE_VOID) {
     constant_pool_sub.is_void = 1;

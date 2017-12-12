@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.42';
+our $VERSION = '0.46';
 
 use AnyEvent::RipeRedis::Error;
 
@@ -646,7 +646,9 @@ sub _auth {
       on_reply => sub {
         my $err = $_[1];
 
-        if ( defined $err ) {
+        if ( defined $err
+          && $err->message ne 'ERR Client sent AUTH, but no password is set' )
+        {
           $self->{_auth_state} = S_NEED_DO;
           $self->_abort($err);
 
@@ -746,6 +748,13 @@ sub _process_error {
       q{Don't know how process error message. Processing queue is empty.},
       E_UNEXPECTED_DATA
     );
+    $self->_disconnect($err);
+
+    return;
+  }
+
+  if ( $err_code == E_NO_AUTH ) {
+    my $err = _new_error( $reply, $err_code );
     $self->_disconnect($err);
 
     return;

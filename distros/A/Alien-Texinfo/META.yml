@@ -1,0 +1,66 @@
+---
+abstract: 'Find Or Download/Build/Install libtexinfo In Texinfo'
+author:
+  - 'Will Braswell <wbraswell@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Alien::gmake: '0.11'
+  Archive::Tar: '0'
+  Config: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.32'
+  Alien::Build::MM: '0.25'
+  IO::Socket::SSL: '2.043'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - alien
+  - texinfo
+  - makeinfo
+  - documentation
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Texinfo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  Test2::Suite: '0.000072'
+resources:
+  IRC: irc://irc.perl.org/#native
+  Mailinglist: http://lists.gnu.org/mailman/listinfo/help-texinfo
+  Wiki: https://en.wikipedia.org/wiki/Texinfo
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-Texinfo
+  homepage: https://www.gnu.org/software/texinfo/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/wbraswell/alien-texinfo.git
+version: '0.001000'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.28'
+  requires:
+    share:
+      Alien::gmake: '0.11'
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

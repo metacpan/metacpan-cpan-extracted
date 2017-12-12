@@ -8,7 +8,7 @@
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
 package File::Globstar;
-$File::Globstar::VERSION = '0.3';
+$File::Globstar::VERSION = '0.5';
 use strict;
 
 use Locale::TextDomain qw(File-Globstar);
@@ -285,7 +285,7 @@ sub translatestar {
                     } elsif ('**' eq $2) {
                         $translated .= '.*';
                     } elsif ('/**' eq $2) {
-                        $translated .= '/.*';
+                        $translated .= '(?:/.*)?';
                     } elsif ('.' eq $2) {
                         $translated .= '\\.';
                     } elsif ('*' eq $2) {

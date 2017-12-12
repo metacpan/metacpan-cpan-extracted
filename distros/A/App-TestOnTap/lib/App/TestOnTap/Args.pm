@@ -67,12 +67,8 @@ sub __parseArgv
 			#
 			_help => 0,
 			_pp => 0,
-			_pp_path => undef,
-			_info => 0,
-			_info_ppcmd => 0,
-			_info_ppname => 0,
-			_info_config => 0,
-			_info_modules => 0,
+			_pp_script => undef,
+			_pp_info => 0,
 			_ignore_dependencies => 0,
 		);
 		
@@ -99,12 +95,8 @@ sub __parseArgv
 			#
 			'_help',
 			'_pp',
-			'_pp_path=s',
-			'_info',
-			'_info_ppcmd',
-			'_info_ppname',
-			'_info_config',
-			'_info_modules',
+			'_pp_script=s',
+			'_pp_info',
 			'_ignore_dependencies',
 		);
 
@@ -139,12 +131,12 @@ sub __parseArgv
 
 	pod2usage(-input => $_argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{_help};
 
-	# for the special selection of using --_pp* or '--_info*', turn over to packinfo
+	# for the special selection of using --_pp* turn over to packinfo
 	#
 	my %packHelperOpts;
 	foreach my $opt (keys(%rawOpts))
 	{
-		$packHelperOpts{$opt} = $rawOpts{$opt} if ($opt =~ /^_(pp|info)/ && $rawOpts{$opt});
+		$packHelperOpts{$opt} = $rawOpts{$opt} if ($opt =~ /^_pp(_.+)?/ && $rawOpts{$opt});
 	}
 	if (keys(%packHelperOpts))
 	{
@@ -433,7 +425,10 @@ sub __findSuiteRoot
 		}
 		
 		print "Attempting to unpack '$zipfile'...\n" if $self->{v};
+		my $zipErr;
+		Archive::Zip::setErrorHandler(sub { $zipErr = $_[0]; chomp($zipErr) });
 		my $zip = Archive::Zip->new($zipfile);
+		die("Error when unpacking '$zipfile': $zipErr\n") if $zipErr;
 		my @memberNames = $zip->memberNames();
 		die("The zip archive '$suiteroot' is empty\n") unless @memberNames;
 		my @rootEntries = grep(m#^[^/]+/?$#, @memberNames);

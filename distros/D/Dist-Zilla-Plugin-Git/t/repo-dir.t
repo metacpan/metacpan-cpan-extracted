@@ -7,7 +7,7 @@ use Path::Tiny 0.012 qw(path); # cwd
 use File::Copy 'move';
 use Test::More   tests => 1;
 
-use lib 't';
+use lib 't/lib';
 use Util qw(chdir_original_cwd clean_environment init_repo);
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

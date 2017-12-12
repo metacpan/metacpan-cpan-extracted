@@ -53,20 +53,24 @@ sub process {
     my ($in_frame, $in_text, @current, $current_title);
     # print Dumper($latex);
     foreach my $piece (@$latex) {
+        $piece =~ s/\\footnoteB?\{/\\footnote[frame]{/g;
         if ($piece =~ /\A\s*\\(
                            part|
                            chapter|
                            section|
                            subsection|
                            subsubsection)
-                       ({(.+)}\s*\z)/x) {
-            $in_frame = $3;
+                       (\[\{(.+)\}\])?
+                       ({(.+)}\s*\z)
+                      /x) {
+            my $type = $1;
+            $in_frame = $3 || $5;
             if (@current) {
                 push @out, { title => $current_title || '',
                              body => [@current] };
                 @current = ();
             }
-            push @out, $piece;
+            push @out, "\\" . $type . '{' . $in_frame . '}' . "\n\n";
             $current_title = $in_frame;
         }
         elsif (defined $in_frame) {

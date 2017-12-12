@@ -1,0 +1,43 @@
+# PODNAME: Authen::Krb5::Keyblock
+# ABSTRACT: Object representation of the krb5_keyblock structure.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Authen::Krb5::Keyblock - Object representation of the krb5_keyblock structure.
+
+=head1 VERSION
+
+version 1.905
+
+=head1 METHODS
+
+=head2 C<enctype()>
+
+The integral enctype of the key.
+
+=head2 C<length()>
+
+Length of the key.
+
+=head2 C<contents()>
+
+Contents of the key itself, as a string.
+
+=head1 AUTHOR
+
+Jeff Horwitz <jeff@smashing.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Jeff Horwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

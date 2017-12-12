@@ -130,6 +130,14 @@ Parameters to be passed to the class constructor of the model.
 Load, create and cache a model object with given name. Default class for
 model `camelize($moniker)::Model`. Return `undef` if model not found.
 
+## entity
+
+    my $disposable_model = $c->entity($name);
+
+Create a new model object with given name. Default class for
+model `camelize($moniker)::Model`. Return `undef` if model not found.
+Use `entity` instead of `model` when you need stateful objects.
+
 # METHODS
 
 [Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious::Plugin::Model) inherits all methods from

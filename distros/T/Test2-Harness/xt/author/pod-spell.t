@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test2::Require::AuthorTesting;
+use Test2::Require::Module 'Test::Spelling';
 use Test::Spelling;
 
 my @stopwords;
@@ -125,6 +126,7 @@ preload
 loadim
 preloading
 shm
+qvf
 
 
 ## other jargon, slang
@@ -142,6 +144,8 @@ SIGHUP
 SIGTERM
 SIGUSR1
 SIGUSR2
+webhook
+integrations
 
 ## Spelled correctly according to google:
 recognise

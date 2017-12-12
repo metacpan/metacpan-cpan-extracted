@@ -1,5 +1,14 @@
 Revision history for App-bitbucket-cli
 
+0.002   2017-12-11
+        Updating for release of version 0.002
+        Adding TravisCI config (Ivan Wills)
+        Default edit tests (Ivan Wills)
+        Adding better documentation (Ivan Wills)
+        Adding descriptions of methods (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added missing state param (Ivan Wills)
+
 0.001   2017-06-05
         Fixing POD (Ivan Wills)
         Fixing dependencies (Ivan Wills)

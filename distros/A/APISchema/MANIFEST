@@ -26,6 +26,7 @@ lib/Plack/Middleware/APISchema/ResponseValidator.pm
 minil.toml
 script/generate_markdown_document.pl
 t/APISchema-DSL.t
+t/APISchema-Generator-Markdown-Formatter.t
 t/APISchema-Generator-Markdown.t
 t/APISchema-Generator-Router-Simple.t
 t/APISchema-JSON.t

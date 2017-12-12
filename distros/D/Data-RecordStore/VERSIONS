@@ -1,3 +1,18 @@
+3.13 - fix broken transactions.
+    
+3.11 - remove backticks from tests. include version info
+    
+3.10 - automatically uuencode data coming into the store that has \0 in the middle
+    
+3.00 - Big update
+	introduces transactions
+	fixed record stores are not called Silos
+	silos now have a max file size and span multiple files
+	updates to tests
+
+2.02 - updated version. removed old build dependencies.
+      appogies, but changing open to open_store to not use
+      a reserved word.
 1.04 - added version, changelog, readme to manifest
 1.03 - added version, changelog, readme
 1.02 - updated the min perl version needed

@@ -15,7 +15,7 @@ WriteMakefile(
     prereqs        => {runtime => {requires => {perl => '5.010001'}}},
     resources      => {
       bugtracker => {web => 'https://github.com/wfso/Mojolicious-Services/issues'},
-      homepage   => 'http://mojolicious.org',
+      homepage   => 'https://github.com/wfso/Mojolicious-Services/wiki',
       license    => ['https://opensource.org/licenses/MIT'],
       repository => {
         type => 'git',

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.98 2017-12-10
+
+ - Support for secondary footnotes (and option for styling)
+
 0.97 2017-10-26
 
  - At the CLI, do not validate the font names (just warn)

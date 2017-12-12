@@ -1,5 +1,5 @@
 package Net::Hadoop::YARN::NodeManager;
-$Net::Hadoop::YARN::NodeManager::VERSION = '0.202';
+$Net::Hadoop::YARN::NodeManager::VERSION = '0.203';
 use strict;
 use warnings;
 use 5.10.0;
@@ -71,7 +71,7 @@ Net::Hadoop::YARN::NodeManager
 
 =head1 VERSION
 
-version 0.202
+version 0.203
 
 =head1 METHODS
 

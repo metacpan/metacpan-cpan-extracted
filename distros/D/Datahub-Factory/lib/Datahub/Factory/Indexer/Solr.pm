@@ -2,7 +2,7 @@ package Datahub::Factory::Indexer::Solr;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use Moo;
 use Catmandu;
@@ -55,10 +55,11 @@ sub index {
     if ($response->is_success) {
         return decode_json($response->decoded_content);
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
             code             => $response->code,
-            message          => $response->headers->header('message'),
-            url              => $response->request->uri,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
             method           => $response->request->method,
             request_headers  => [],
             request_body     => $response->request->decoded_content,
@@ -98,10 +99,11 @@ sub commit {
 
         return $result;
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
             code             => $response->code,
-            message          => $response->headers->header('message'),
-            url              => $response->request->uri,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
             method           => $response->request->method,
             request_headers  => [],
             request_body     => $response->request->decoded_content,
@@ -128,7 +130,8 @@ Datahub::Factory::Indexer::Solr - Index data in Solr via a data import handler.
 
     my $indexer = Datahub::Factory->indexer('Solr')->new('request_handler' => 'http://path');
 
-    $indexer->import();
+    $indexer->index();
+    $indexer->commit();
 
 =head1 DESCRIPTION
 

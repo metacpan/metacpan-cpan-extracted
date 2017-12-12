@@ -1,0 +1,48 @@
+NAME
+    Bencher::Scenarios::MathBigFloat - A collection of scenarios to
+    benchmark Math::BigFloat
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenarios::MathBigFloat (from Perl distribution
+    Bencher-Scenarios-MathBigFloat), released on 2017-12-09.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::MathBigFloat::Add
+
+    *   Bencher::Scenario::MathBigFloat::Subtract
+
+    *   Bencher::Scenario::MathBigFloat::Divide
+
+    *   Bencher::Scenario::MathBigFloat::Multiply
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-MathBigFloat>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-MathBigFloat>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Mat
+    hBigFloat>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Bencher
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

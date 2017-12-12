@@ -66,7 +66,7 @@ See [@dirnaichnerprl2016], [@nphysgranger2012], [@gaassprl2011] as examples for
 publications based on `Lab::Measurement`. `Lab::Measurement` is free software 
 published under the same license as Perl 5 itself; its releases are uploaded on 
 CPAN. More information can be found on the project homepage, 
-http://www.labmeasurement.de/
+https://www.labmeasurement.de/
 
 # Acknowledgements
 

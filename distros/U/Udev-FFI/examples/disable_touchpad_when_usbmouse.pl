@@ -28,7 +28,7 @@ my %inserted_mouses;
 
 
 my $udev = Udev::FFI->new() or
-    die "Can't create udev context: $@.\n";
+    die "Can't create Udev::FFI object: $@.\n";
 
 
 # monitor for new devices

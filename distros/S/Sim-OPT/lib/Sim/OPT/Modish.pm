@@ -23,7 +23,7 @@ our @EXPORT = qw( modish );
 
 BEGIN { $Devel::DumpTrace::TRACE = 0 }
 
-$VERSION = '0.79.105';
+$VERSION = '0.79.111';
 $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (shading and insolation) files of the ESP-r building performance simulation suite in order to make it take into account the reflections from obstructions.';
 
 # Modish is a program for altering the shading values calculated by the ESP-r simulation platform to take into account the reflections from obstructions.
@@ -2644,8 +2644,17 @@ sub modifyshda
                       {
                         $calcamount = ( 1 - $el ); # THIS IS THE RATIO OF NON-SHADED IRRADIATION AS CALCULATED BY THE ESP-r's ISH MODULE
                         $improvedguess = ( $calcamount * $irrvariation ); # THIS IS THE RATIO ABOVE CORRECTED BY MULTIPLYING IT BY THE IRRADIANCE RATIO TO TAKE REFLECTIONS INTO ACCOUNT.
+                        
+                        my $num;
+                        foreach my $el ( @calcprocedures )
+                        {
+                        	if ( $el eq ( $el + 0 ) )
+                        	{
+                        		$num = $el;
+                        	}
+                        } say REPORT "HERENUM : " . dump( $num ) ;
 
-                        unless ( ( "halved" ~~ @calcprocedures ) or ( "halved250" ~~ @calcprocedures ) or ( "halved125" ~~ @calcprocedures ) or ( "halved375" ~~ @calcprocedures ) )
+                        unless ( ( "halved" ~~ @calcprocedures ) or ( "halved250" ~~ @calcprocedures ) or ( "halved125" ~~ @calcprocedures ) or ( "halved375" ~~ @calcprocedures ) or ( "modded" ~~ @calcprocedures ) )
                         {
                           $newshadingvalue = ( 1 - $improvedguess ); # AS THE NAME SAYS, THIS IS THE NEW SHADING VALUE.
                         }
@@ -2672,6 +2681,11 @@ sub modifyshda
                         elsif ( "halved0675" ~~ @calcprocedures )
                         {
                           my $halfdiff = ( ( $el - ( 1 - $improvedguess ) )  / 16 );
+                          $newshadingvalue = ( $el - $halfdiff );
+                        }
+                        elsif ( "modded" ~~ @calcprocedures )
+                        {
+                          my $halfdiff = ( ( $el - ( 1 - $improvedguess ) )  / $num );
                           $newshadingvalue = ( $el - $halfdiff );
                         }
                       }
@@ -3475,12 +3489,21 @@ sub prunepoints
 
 
 sub modish
-{ # MAIN PROGRAM
-  my $launchfile = shift;
-  print "LAUNCHFILE: $launchfile\n";
-  my @received = @_;
-  my @restpars;
-  my @settings;
+{ # MAIN PROGRAM4 
+  my @things = @_; say "THINGS: @things";
+  my $modishdefpath;
+  if ( $things[0] =~ /modish_defaults/ )
+  {
+    $modishdefpath = shift( @things );
+  }
+  else
+  {
+    shift( @things );
+  }
+
+  my $launchfile = shift( @things );
+  my ( @restpars, @settings, @received );  
+  my @received = @things;
 
   if ( not ( @ARGV) )
   {
@@ -3510,6 +3533,7 @@ sub modish
       }
     }
   }
+  
 
   if ( scalar( @restpars ) == 0 ) { say "NO ZONE HAVE BEEN SPECIFIED. EXITING." and die; }
 
@@ -3518,9 +3542,10 @@ sub modish
 
   say "Setting things up...\n";
   
-  my $path = definepath( $launchfile ); say  "1 NOW \$path " . dump( $path );
+  my $path = definepath( $launchfile ); 
  
-  my $radpath = $path . "/rad"; say  "1 NOW \$radpath " . dump( $radpath );
+  my $radpath = $path . "/rad"; 
+
 
   ##################################################
 
@@ -3529,7 +3554,17 @@ sub modish
 
   if ( scalar( @{ $settings } ) == 0 )
   {
-    if ( -e "./modish_defaults.pl" )
+    if ( -e "$modishdefpath" )
+    {
+    	require "$modishdefpath";
+    	@resolutions = @{ $defaults[0] };
+	    $dirvectorsnum = $defaults[1];
+	    $bounceambnum = $defaults[2];
+	    $bouncemaxnum = $defaults[3];
+	    $distgrid = $defaults[4];
+	    $threshold = $defaults[5];
+    }
+    elsif ( -e "./modish_defaults.pl" )
     {
       require "./modish_defaults.pl";
       @resolutions = @{ $defaults[0] };
@@ -3563,7 +3598,11 @@ sub modish
   if ( not ( @calcprocedures ) ) { @calcprocedures = ( "simplified" ); };
   if ( not ( keys %specularratios ) ) { %specularratios = ( undefined__ => "undefined__" ) }
 
-
+  say REPORT "PATH: $path ";
+  say REPORT "SETTINGS: " . dump( @settings ) ;
+  say REPORT "LAUNCHFILE: $launchfile";
+  say REPORT "MODISHDEFPATH: $modishdefpath";
+  say REPORT "1 NOW \$radpath " . dump( $radpath );
   say REPORT "5q \@resolutions\ " . dump( @resolutions );
   say REPORT "\$dirvectorsnum\ " . dump( $dirvectorsnum );
   say REPORT "\$computype\ " . dump( $computype );
@@ -3818,11 +3857,11 @@ sub modish
       $currentmonth =~ s/`//g;
     }
 
-    if ( $lin =~ /^24 hour external surface shading/ )
+    if ( ( $lin =~ /24 hour external surface shading/ ) or ( $lin =~ /\* month:/ ) or ( $lin =~ /\* end/ ) or ( $lin =~ /\* end/ ) or ( $lin =~ /Shading and insolation data in db/ ) )
     {
       $signal = "on";
     }
-    elsif ( ( $lin =~ /^24 hour internal surface insolation/ ) or ( $lin =~ /\* month:/ ) )
+    elsif ( $lin =~ /24 hour internal surface insolation/ )
     {
       $signal = "off";
     }
@@ -3880,19 +3919,24 @@ sub modish
 
     if ( "noins" ~~ @calcprocedures )
     {
-      if ( $lin =~ /^24 hour internal surface insolation/ )
+      if ( ( $lin =~ /24 hour external surface shading/ ) or 
+        ( $lin =~ /\* month:/ ) or ( $lin =~ /\* end/ ) or 
+        ( $lin =~ /Shading and insolation data in db/ ) )
+      {
+        $signalins = "off"; 
+        say REPORT "signalins off";
+      }
+      elsif ( $lin =~ /24 hour internal surface insolation/ )
       {
         $signalins = "on";
-      }
-      elsif ( ( $lin =~ /^24 hour external surface shading/ ) or ( $lin =~ /\* month:/ ) or ( $lin =~ /\* end/ ) )
-      {
-        $signalins = "off";
+        say REPORT "signalins on";
       }
     }
 
     unless ( $signalins eq "on" )
     {
       print SHDAMOD $lin;
+      say REPORT "I AM GOING TO PRINT THIS IN $shdafilemod: " . "$lin, because \$signalins is $signalins." ;
     }
 
   }

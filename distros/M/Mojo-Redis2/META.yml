@@ -3,10 +3,12 @@ abstract: 'Pure-Perl non-blocking I/O Redis driver'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  Sort::Versions: '1.5'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -24,5 +26,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis2/issues
   homepage: https://github.com/jhthorsen/mojo-redis2
   repository: https://github.com/jhthorsen/mojo-redis2.git
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

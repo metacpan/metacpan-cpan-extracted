@@ -1,0 +1,99 @@
+#!/usr/bin/perl -w
+
+# Sreview, a web-based video review and transcoding system
+# Copyright (c) 2016-2017, Wouter Verhelst <w@uter.be>
+#
+# Sreview is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public
+# License along with this program.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+=head1 NAME
+
+sreview-detect - detect new files for SReview
+
+=head1 SYNOPSIS
+
+sreview-detect
+
+=head1 DESCRIPTION
+
+sreview-detect is used to detect new files in the SReview input
+directory, and add them to the database. Additionally, sreview-detect
+will update the length (but not the other metadata) of files that
+already exist in the database. This makes it safe to run on input files
+that are still being written to.
+
+It is designed to be run from cron (or a similar scheduling system) on a
+regular basis. Care should be taken to not overload the server on which
+it runs; while at the same time it should run regularly enough so that
+review is not waiting for too long.
+
+=head1 OPTIONS
+
+None exist currently. Configuration should be done through the main
+configuration file; see L<sreview-config>.
+
+=cut
+
+use strict;
+use warnings;
+
+use DBI;
+use SReview::Config::Common;
+use SReview::Video;
+
+use Net::Domain qw(hostname);
+
+my $config = SReview::Config::Common::setup;
+
+my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
+
+$dbh->begin_work;
+
+my $exists = $dbh->prepare("SELECT count(*) FROM raw_files WHERE filename = ?");
+my $add = $dbh->prepare("INSERT INTO raw_files(filename, room, starttime, endtime) VALUES (?, (SELECT id FROM rooms WHERE altname = ? OR name = ?), ?::timestamptz, ?::timestamptz + ?::interval)");
+my $update = $dbh->prepare("UPDATE raw_files SET endtime = starttime + ?::interval WHERE filename = ?");
+
+my @files = glob($config->get('inputglob'));
+
+my $host = hostname();
+
+foreach my $file(@files) {
+	next unless (-f $file);
+	my $parse_re = $config->get('parse_re');
+	next unless $file =~ /$parse_re/;
+	my $room = $+{room};
+	my $start_hour = $+{hour} . ":" . $+{minute} . ":" . $+{second};
+	my $start_day = $+{year} . "-" . $+{month} . "-" . $+{day};
+	next unless defined($room);
+	my $url_build = $config->get('url_re');
+	my $url = $file;
+	if(defined($url_build)) {
+		$url =~ s/$parse_re/$url_build/g;
+	}
+	$exists->execute($url);
+	my $row = $exists->fetchrow_hashref;
+	my $length = SReview::Video->new(url => $url)->duration;
+	if($row->{count} eq '0') {
+		$add->execute($url, $room, $room, "$start_day $start_hour", "$start_day $start_hour", $length);
+	} else {
+		$update->execute("$length", $url);
+	}
+}
+
+my $full = $dbh->prepare("UPDATE talks SET progress = 'done' WHERE state = 'waiting_for_files' AND progress < 'done' AND id IN (select talkid FROM raw_talks WHERE talks_length <= (raw_total + '5 seconds'::interval))");
+$full->execute();
+my $partial = $dbh->prepare("UPDATE talks SET progress = 'running' WHERE state = 'waiting_for_files' AND progress < 'running' AND id IN (select distinct talkid FROM raw_talks)");
+$partial->execute();
+
+$dbh->commit;

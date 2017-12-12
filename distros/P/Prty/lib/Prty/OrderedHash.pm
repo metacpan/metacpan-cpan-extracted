@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Hash;
 
@@ -98,13 +98,13 @@ sub get {
 
     $oh->set(@keyVal);
 
-=head4 Description
-
-Setze die angegebenen Schlüssel/Wert-Paare.
-
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Setze die angegebenen Schlüssel/Wert-Paare.
 
 =cut
 
@@ -408,7 +408,7 @@ sub exists {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

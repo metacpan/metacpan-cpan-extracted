@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::OutputPager;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000037-000004"; }
+sub IDENTIFICATION { return "000001-000037-000005"; }
 
 sub preference { return -50; }
 
@@ -18,6 +18,9 @@ sub handle_action {
 
 	if ($action{action} eq 'OUTPUT' and $action{output_pager} and $obj->{-interface}->can_pager()) {
 		open F,"|less";
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode F, ':utf8';
+        }
 		print F $action{output};
 		close F;
 		$action{action} = 'NONE';

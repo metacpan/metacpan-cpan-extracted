@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+
+use Mojo::Base -base;
+
+# see the comments in JobCenter::Client::Mojo
+# we need to do this before use-ing Mojo::IOLoop
+BEGIN {
+	#$ENV{MOJO_IOLOOP_DEBUG} = 1;
+        $ENV{'MOJO_REACTOR'} = 'Mojo::Reactor::Poll';
+}
+use Mojo::IOLoop; # for the timers in do_*
+use Mojo::JSON qw(decode_json encode_json);
+
+# standard modules
+use Data::Dumper;
+use Time::HiRes qw(sleep);
+
+# us
+use RPC::Switch::Client;
+
+my @actions = (
+	# [ actionname, callback, mode, filter ]
+	['add', \&do_add, 'async'],
+	#['square', \&do_square2, 'subproc'],
+	#['square', \&do_square, 'async', {foo => 'bar'}],
+	['square', \&do_square, 'async'],
+	['div', \&do_div],
+);
+
+exit main(@ARGV);
+
+sub main {
+	my $stop = 0;
+	$SIG{TERM} = $SIG{INT} = sub {
+		my $signame = shift;
+		say STDERR "caught sig$signame!";
+		Mojo::IOLoop->stop;
+		$stop = 1;
+	};
+
+	my $client = RPC::Switch::Client->new(
+		#port => 6850,
+		#method => 'clientcert',
+		who => 'derArbeitnehmer',
+		token => 'machtDinge',
+		debug => 1,
+		json => 0,
+		#tls => 1,
+		#tls_ca => 'myCA.crt',
+		#tls_cert => 'myworker.crt',
+		#tls_key => 'myworker.key',
+	);
+
+	die 'no client?' unless $client;
+
+	for (@actions) {
+		my ($method, $cb, $mode, $filter) = @$_;
+		my $err = $client->announce(
+			method => "bar.$method",
+			cb => $cb,
+			mode => $mode,
+			filter => $filter,
+		);
+		die "could not announce $method: $err" if $err;
+	}
+
+	$client->work();
+
+	return 0;
+}
+
+# example of a async worker
+sub do_add {
+	my ($req_id, $vars, $cb) = @_;
+	my $out = {};
+	$out->{counter} = $vars->{counter} + ($vars->{step} // 1);
+	my $tmr = Mojo::IOLoop->next_tick(sub { $cb->($out) } );
+	return;
+}
+
+# example of a subproc worker
+sub do_square2 {
+	my ($req_id, $vars, $cb) = @_;
+	sleep 1.55;
+	return {'square' => ($vars->{root}**2)};
+}
+
+sub do_square {
+	my ($req_id, $vars, $cb) = @_;
+	Mojo::IOLoop->timer(.002 => sub {
+		$cb->({'square' => ($vars->{root}**2)});
+	});
+}
+
+# example of a 'normal' worker
+sub do_div {
+	my ($req_id, $vars, $cb) = @_;
+	my $out = {};
+	$out->{quotient} = $vars->{dividend} / $vars->{divisor};
+	return $out;
+}

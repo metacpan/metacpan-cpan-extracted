@@ -23,9 +23,11 @@ is_deeply(\@c, [2, 4, 6], "pw7");
 
 # sub returns more than two items
 @a = (1, 1, 2, 3, 5);
-@b = (2, 3, 5, 7, 11);
+@b = (2, 3, 5, 7, 11, 13);
 @c = pairwise { ($a) x $b } @a, @b;
-is_deeply(\@c, [(1) x 2, (1) x 3, (2) x 5, (3) x 7, (5) x 11], "pw8");
+is_deeply(\@c, [(1) x 2, (1) x 3, (2) x 5, (3) x 7, (5) x 11, (undef) x 13], "pw8");
+is_deeply(\@a, [1, 1, 2, 3, 5], "pw9");
+is_deeply(\@b, [2, 3, 5, 7, 11, 13], "pwX");
 
 (@a, @b) = ();
 push @a, int rand(1000) for 0 .. rand(1000);

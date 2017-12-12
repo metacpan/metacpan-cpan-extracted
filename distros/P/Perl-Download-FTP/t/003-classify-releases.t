@@ -273,7 +273,7 @@ $allcount = scalar(@allarchives);
 ok($allcount, "ls(): returned >0 elements: $allcount");
 like(
     $stdout,
-    qr/Identified \d+ perl releases at ftp:\/\/\Q${default_host}${default_dir}\E/,
+    qr|Identified \d+ perl releases at ftp://${default_host}${default_dir}|,
     "ls(): Got expected verbose output"
 );
 

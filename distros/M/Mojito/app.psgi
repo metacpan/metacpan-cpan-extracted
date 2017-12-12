@@ -179,7 +179,7 @@ sub dispatch_request {
             collection_id => $collection_id,
             page_id       => $page_id
         };
-        my $output = $mojito->view_page_collected($params);
+        my $output = Encode::encode_utf8($mojito->view_page_collected($params));
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
       },
 
@@ -190,7 +190,7 @@ sub dispatch_request {
             collection_id => $collection_id,
             page_id       => $page_id
         };
-        my $output = $mojito->view_page_collected($params);
+        my $output = Encode::encode_utf8($mojito->view_page_collected($params));
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
       },
 

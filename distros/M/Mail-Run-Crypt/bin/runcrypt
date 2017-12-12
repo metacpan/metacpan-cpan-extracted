@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 package main;
 
 # Force me to write this properly
@@ -16,7 +16,7 @@ use Getopt::Long::Descriptive;
 use Mail::Run::Crypt;
 
 # Specify package version
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Name ourselves
 our $SELF = 'runcrypt';

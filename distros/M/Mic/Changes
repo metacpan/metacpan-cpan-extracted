@@ -1,5 +1,12 @@
 Revision history for Minions
 
+0.001003 2017-12-11T14:16:34Z
+        - Readonly is not used anymore.
+
+0.001002 2017-12-10T20:50:18Z
+        - Hash based objects are no longer supported
+        - Scalar attr vars are gone
+
 0.000006 2017-11-12T21:15:36Z
         - Add "impl" and "via" as aliases for "implementation"
         - hash based objects are deprecated

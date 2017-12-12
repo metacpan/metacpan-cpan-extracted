@@ -39,6 +39,7 @@ is_deeply(
   number = {1},
   pages = {1},
 }',
+  _pre => ''
   },
   "parse \@ARTICLE"
 );

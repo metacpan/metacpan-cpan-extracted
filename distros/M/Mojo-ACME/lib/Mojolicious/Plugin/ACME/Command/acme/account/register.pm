@@ -12,8 +12,11 @@ has usage => sub {
 sub run {
   my ($c, @args) = @_;
   my $acme = $c->build_acme(\@args);
-  say $acme->register || die "Account not registered\n";
+  my $response = eval { $acme->register };
+  print $@ if $@;
+  die "Account not registered\n" unless $response;
 
+  say $response;
   my $key = $acme->account_key;
   if ($key->generated) {
     my $key_path = $key->path;

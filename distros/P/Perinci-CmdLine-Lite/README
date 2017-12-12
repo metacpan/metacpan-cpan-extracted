@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.80 of Perinci::CmdLine::Lite (from
-    Perl distribution Perinci-CmdLine-Lite), released on 2017-11-01.
+    This document describes version 1.810 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2017-12-11.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -167,7 +167,7 @@ ENVIRONMENT
   LOG_LEVEL
     Set log level.
 
-  PROGRESS => BOOL
+  PROGRESS => bool
     Explicitly turn the progress bar on/off.
 
   FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)

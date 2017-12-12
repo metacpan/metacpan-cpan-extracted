@@ -1,0 +1,51 @@
+---
+abstract: 'sdif and family tools, cdif and watchdiff'
+author:
+  - 'Kaz Utashiro <kaz@utashiro.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-sdif
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::cdif::Command:
+    file: lib/App/cdif/Command.pm
+  App::cdif::Tmpfile:
+    file: lib/App/cdif/Tmpfile.pm
+  App::sdif:
+    file: lib/App/sdif.pm
+    version: v3.2.2
+  App::sdif::LabelStack:
+    file: lib/App/sdif/LabelStack.pm
+  App::sdif::colors:
+    file: lib/App/sdif/colors.pm
+  App::sdif::osx_autocolor:
+    file: lib/App/sdif/osx_autocolor.pm
+requires:
+  Getopt::EX: v1.2.1
+  List::Util: '1.33'
+  Text::VisualWidth::PP: '0.05'
+  Unicode::EastAsianWidth::Detect: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
+  homepage: https://github.com/kaz-utashiro/sdif-tools
+  repository: git://github.com/kaz-utashiro/sdif-tools.git
+version: 3.2.2
+x_authority: cpan:UTASHIRO

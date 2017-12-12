@@ -4,7 +4,7 @@
       "Daniel Berrange <dan@berrange.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v3.8.0",
+   "version" : "v3.9.1",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

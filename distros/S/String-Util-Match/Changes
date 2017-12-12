@@ -1,0 +1,11 @@
+0.002   2017-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Remove extraneous code in Synopsis.
+
+
+0.001   2017-12-09 (PERLANCAR)
+
+        - First release, repackaging of some functions from
+          SHARYANTO::Array::Util.

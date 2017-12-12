@@ -1,5 +1,5 @@
 package Catalyst::TraitFor::Request::REST;
-$Catalyst::TraitFor::Request::REST::VERSION = '1.20';
+$Catalyst::TraitFor::Request::REST::VERSION = '1.21';
 use Moose::Role;
 use HTTP::Headers::Util qw(split_header_words);
 use namespace::autoclean;
@@ -11,6 +11,7 @@ has accepted_content_types => (
     isa      => 'ArrayRef',
     lazy     => 1,
     builder  => '_build_accepted_content_types',
+    clearer  => 'clear_accepted_cache',
     init_arg => undef,
 );
 
@@ -22,24 +23,107 @@ has preferred_content_type => (
     init_arg => undef,
 );
 
+#
+# By default the module looks at both Content-Type and
+# Accept and uses the selected content type for both
+# deserializing received data and serializing the response.
+# However according to RFC 7231, Content-Type should be
+# used to specify the payload type of the data sent by
+# the requester and Accept should be used to negotiate
+# the content type the requester would like back from
+# the server. Compliance mode adds support so the method
+# described in the RFC is more closely model.
+#
+# Using a bitmask to represent the the two content type
+# header schemes.
+# 0x1 for Accept
+# 0x2 for Content-Type
+
+has 'compliance_mode' => (
+    is       => 'ro',
+    isa      => 'Int',
+    lazy     => 1,
+    writer   => '_set_compliance_mode',
+    default  => 0x3,
+);
+
+# Set request object to only use the Accept header when building
+# accepted_content_types
+sub set_accept_only {
+    my $self = shift;
+
+    # Clear the accepted_content_types cache if we've changed
+    # allowed headers
+    $self->clear_accepted_cache();
+    $self->_set_compliance_mode(0x1);
+}
+
+# Set request object to only use the Content-Type header when building
+# accepted_content_types
+sub set_content_type_only {
+    my $self = shift;
+
+    $self->clear_accepted_cache();
+    $self->_set_compliance_mode(0x2);
+}
+
+# Clear serialize/deserialize compliance mode, allow all headers
+# in both situations
+sub clear_compliance_mode {
+    my $self = shift;
+
+    $self->clear_accepted_cache();
+    $self->_set_compliance_mode(0x3);
+}
+
+# Return true if bit set to examine Accept header
+sub accept_allowed {
+    my $self = shift;
+
+    return $self->compliance_mode & 0x1;
+}
+
+# Return true if bit set to examine Content-Type header
+sub content_type_allowed {
+    my $self = shift;
+
+    return $self->compliance_mode & 0x2;
+}
+
+# Private writer to set if we're looking at Accept or Content-Type headers
+sub _set_compliance_mode {
+    my $self = shift;
+    my $mode_bits = shift;
+
+    $self->compliance_mode($mode_bits);
+}
+
 sub _build_accepted_content_types {
     my $self = shift;
 
     my %types;
 
     # First, we use the content type in the HTTP Request.  It wins all.
+    # But only examine it if we're not in compliance mode or if we're
+    # in deserializing mode
     $types{ $self->content_type } = 3
-        if $self->content_type;
+        if $self->content_type && $self->content_type_allowed();
 
-    if ($self->method eq "GET" && $self->param('content-type')) {
+    # Seems backwards, but users are used to adding &content-type= to the uri to
+    # define what content type they want to recieve back, in the equivalent Accept
+    # header. Let the users do what they're used to, it's outside the RFC
+    # specifications anyhow.
+    if ($self->method eq "GET" && $self->param('content-type') && $self->accept_allowed()) {
         $types{ $self->param('content-type') } = 2;
     }
 
     # Third, we parse the Accept header, and see if the client
     # takes a format we understand.
+    # But only examine it if we're not in compliance mode or if we're
+    # in serializing mode
     #
     # This is taken from chansen's Apache2::UploadProgress.
-    if ( $self->header('Accept') ) {
+    if ( $self->header('Accept') && $self->accept_allowed() ) {
         $self->accept_only(1) unless keys %types;
 
         my $accept_header = $self->header('Accept');
@@ -96,7 +180,7 @@ Catalyst::TraitFor::Request::REST - A role to apply to Catalyst::Request giving 
 This is a L<Moose::Role> applied to L<Catalyst::Request> that adds a few
 methods to the request object to facilitate writing REST-y code.
 Currently, these methods are all related to the content types accepted by
-the client.
+the client and the content type sent in the request.
 
 =head1 METHODS
 

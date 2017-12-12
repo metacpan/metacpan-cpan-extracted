@@ -10,7 +10,7 @@ GraphQL - Perl implementation of GraphQL
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 =begin markdown
 
@@ -32,10 +32,7 @@ our $VERSION = '0.21';
   use GraphQL::Execution qw(execute);
 
   my $schema = GraphQL::Schema->from_doc(<<'EOF');
-  schema {
-    query: QueryRoot
-  }
-  type QueryRoot {
+  type Query {
     helloWorld: String
   }
   EOF
@@ -116,6 +113,10 @@ to update/create/delete data. This requires some thought for return types,
 to ensure you can get all the information you need to proceed to avoid
 extra round-trips.
 
+The easiest way to achieve these things is to make a
+L<GraphQL::Plugin::Convert> subclass, to encapsulate the specifics of
+your system. See the documentation for further information.
+
 Finally, you should consider whether you need "subscriptions". These
 are designed to hook into WebSockets. Apollo has a L<JavaScript
 module|https://github.com/apollographql/graphql-subscriptions> for this.
@@ -135,6 +136,14 @@ None yet.
 
 L<SQL::Translator::Producer::GraphQL> - produce GraphQL schemas from a L<DBIx::Class::Schema> (or in fact any SQL database)
 
+L<GraphQL::Plugin::Convert::DBIC> - produce working GraphQL schema from
+a L<DBIx::Class::Schema>
+
+L<GraphQL::Plugin::Convert::OpenAPI> - produce working GraphQL schema
+from an OpenAPI specification
+
+L<Sample Mojolicious OpenAPI to GraphQL applet|https://github.com/graphql-perl/sample-mojolicious-openapi>
+
 L<Sample Dancer 2 applet|https://github.com/graphql-perl/sample-dancer2>
 
 L<Sample Mojolicious applet|https://github.com/graphql-perl/sample-mojolicious>
@@ -147,6 +156,8 @@ L<http://facebook.github.io/graphql/> - GraphQL specification
 
 L<http://graphql.org/graphql-js/> - Tutorial on the JavaScript version,
 highly recommended.
+L<Translation to
+graphql-perl|http://blogs.perl.org/users/ed_j/2017/10/graphql-perl---graphql-js-tutorial-translation-to-graphql-perl-and-mojoliciousplugingraphql.html>.
 
 =head1 AUTHOR
 

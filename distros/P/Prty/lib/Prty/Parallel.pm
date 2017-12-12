@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::System;
@@ -129,19 +129,6 @@ sub runArray {
 
     $class->runFetch($fetchSub,$execSub,@opt);
 
-=head4 Description
-
-Verarbeite die Elemente, die von Subroutine $fetchSub geliefert
-werden, mit der Subroutine $execSub mit parallel laufenden
-Prozessen. Per Default wird für die Anzahl der parallelen Prozesse
-die Anzahl der CPUs des ausführenden Rechners gewählt. Mit
-der Option -maxProcesses kann eine abweichende Anzahl gewählt
-werden.
-
-Tip: Die Anzahl der vorhandenen CPUs liefert die Methode
-
-    $n = Prty::System->numberOfCpus;
-
 =head4 Arguments
 
 =over 4
@@ -180,6 +167,19 @@ Zeige Fortschrittsanzeige an.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Verarbeite die Elemente, die von Subroutine $fetchSub geliefert
+werden, mit der Subroutine $execSub mit parallel laufenden
+Prozessen. Per Default wird für die Anzahl der parallelen Prozesse
+die Anzahl der CPUs des ausführenden Rechners gewählt. Mit
+der Option -maxProcesses kann eine abweichende Anzahl gewählt
+werden.
+
+Tip: Die Anzahl der vorhandenen CPUs liefert die Methode
+
+    $n = Prty::System->numberOfCpus;
 
 =cut
 
@@ -256,7 +256,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

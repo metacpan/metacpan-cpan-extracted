@@ -9,9 +9,5 @@ Makefile.PL
 README
 dist.ini
 lib/experimental.pm
-nytprof.out
-nytprof.out.9891
-nytprof.out.9893
-nytprof.out.9894
 t/basic.t
 xt/author/pod-syntax.t

@@ -1,5 +1,11 @@
 Revision history for Perl extension SVG.
 
+2.80  2017.11.30 MANWAR
+      - Added one more test author only as suggested by @DAVE. (RT #123705)
+
+2.79  2017.11.30 MANWAR
+      - Addressed RT #123705, making test t/96-perl-critic.t and t/99_test_pod_coverage.t author only.
+
 2.78  2017.07.07 MANWAR
       - Merged PR #10 (fix entity escaping), thanks @haarg. This also resolved RT #121612.
 

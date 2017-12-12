@@ -4,7 +4,7 @@ package eris::role::plugin;
 use Moo::Role;
 use Types::Standard qw(Bool Int Str);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 
@@ -61,7 +61,7 @@ eris::role::plugin - Common interface for implementing an eris plugin
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

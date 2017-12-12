@@ -1,3 +1,7 @@
+0.25      2017-12-10 16:15:38-07:00 America/Denver
+         - Change from Elasticsearch to Search::Elasticsearch
+         - script to convert from mongo to elasticsearch backend
+
 0.24      2013-11-16 09:23:45 MST7MDT
          - Add Elasticsearch backend
 

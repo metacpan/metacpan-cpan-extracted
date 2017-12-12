@@ -1,6 +1,13 @@
 # -*- cperl -*-
 use Test;
 
+BEGIN {
+    if ($ENV{AUTOMATED_TESTING}) {
+        print "1..0 # Skipped. Deprecated, use XML::XSH2 instead.\n";
+        exit
+    }
+}
+
 use IO::File;
 
 BEGIN {

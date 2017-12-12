@@ -53,10 +53,24 @@ WriteMakefile(
 );
 
 sub MY::postamble {
+  my $container = 'graphqlperl/mojoliciousplugin';
+  my $prereq = "$container-prereq";
   <<EOF;
 pure_all :: README.md
 
 README.md : lib/Mojolicious/Plugin/GraphQL.pm
 \tpod2markdown \$< >\$\@
+
+containerprereq :
+\tdocker build -f Dockerfile.prereq -t $prereq .
+
+containerprereqpush :
+\tdocker push $prereq
+
+container :
+\tdocker build -t $container .
+
+containerpush :
+\tdocker push $container
 EOF
 }

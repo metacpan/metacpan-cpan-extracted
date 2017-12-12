@@ -25,7 +25,7 @@ Sphinx::Search - Sphinx search engine API Perl client
 
 Please note that you *MUST* install a version which is compatible with your version of Sphinx.
 
-Use version 0.30 for Sphinx-2.2.8-release or later (or use DBI instead)
+Use version 0.31 for Sphinx-2.2.8-release or later (or use DBI instead)
 
 Use version 0.28 for Sphinx-2.0.8-release or later
 
@@ -61,7 +61,7 @@ Use version 0.02 for Sphinx 0.9.8-cvs-20070818
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -415,7 +415,7 @@ sub _Error {
     my ($self, $msg) = @_;
 
     $self->{_error} = $msg;
-    $self->{_log}->error($msg) if $self->{_log};
+    $self->{_log}->error($msg) if $self->{_log} && defined $msg;
     return;
 }
 
@@ -442,7 +442,7 @@ sub _Warning {
     my ($self, $msg) = @_;
 
     $self->{_warning} = $msg;
-    $self->{_log}->warn($msg) if $self->{_log};
+    $self->{_log}->warn($msg) if $self->{_log} && defined $msg;
     return;
 }
 

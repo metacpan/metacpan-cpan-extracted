@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Repository;
-$Git::Database::Backend::Git::Repository::VERSION = '0.009';
+$Git::Database::Backend::Git::Repository::VERSION = '0.010';
 use IO::Select;
 use Sub::Quote;
 
@@ -211,7 +211,7 @@ Git::Database::Backend::Git::Repository - A Git::Database backend based on Git::
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,7 @@ version 0.009
 
 =head1 DESCRIPTION
 
-This backend reads and write data from a Git repository using the
+This backend reads and writes data from a Git repository using the
 L<Git::Repository> Git wrapper.
 
 =head2 Git Database Roles

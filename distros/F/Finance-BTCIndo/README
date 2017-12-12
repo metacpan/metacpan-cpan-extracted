@@ -2,8 +2,8 @@ NAME
     Finance::BTCIndo - Trade with bitcoin.co.id (VIP) using Perl
 
 VERSION
-    This document describes version 0.006 of Finance::BTCIndo (from Perl
-    distribution Finance-BTCIndo), released on 2017-11-24.
+    This document describes version 0.007 of Finance::BTCIndo (from Perl
+    distribution Finance-BTCIndo), released on 2017-12-09.
 
 SYNOPSIS
      use Finance::BTCIndo;

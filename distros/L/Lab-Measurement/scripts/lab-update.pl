@@ -57,7 +57,7 @@ sub install_from_repository {
 	
 	backup_Lab();
 	
-	my $url = 'http://www.labmeasurement.de/gitweb/?p=labmeasurement;a=snapshot;h=refs/heads/master;sf=tgz';
+	my $url = 'https://www.labmeasurement.de/gitweb/?p=labmeasurement;a=snapshot;h=refs/heads/master;sf=tgz';
 
 	my $filename = download($url, 'TEMP');
 	install_archive($filename);

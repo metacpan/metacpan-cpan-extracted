@@ -1,14 +1,11 @@
 use strictures 1;
 package Mojito::Collection::CRUD::Elasticsearch;
-{
-  $Mojito::Collection::CRUD::Elasticsearch::VERSION = '0.24';
-}
+$Mojito::Collection::CRUD::Elasticsearch::VERSION = '0.25';
 use MongoDB::OID;
 use 5.010;
 use Moo;
 use List::Util qw/first/;
 use Syntax::Keyword::Junction qw/ any /;
-use Elasticsearch::Scroll; 
 use Data::Dumper::Concise;
 
 with('Mojito::Role::DB::Elasticsearch');
@@ -151,9 +148,7 @@ sub update_collection_membership {
         $collection_ids = [$collection_ids];
     }
 
-    my $scroll = Elasticsearch::Scroll->new(
-        es => $self->db,
-        search_type => 'scan',
+    my $scroll = $self->db->scroll_helper(
         index => $self->db_name,
         type  => $self->collection_name,
         body => {query => {term => {collected_page_ids => $params->{mongo_id}}}},

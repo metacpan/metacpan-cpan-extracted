@@ -15,6 +15,8 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
+        'English'    => '0',
+        'File::Temp' => '0',
         'Test::More' => '0',
     },
     PREREQ_PM => {
@@ -25,7 +27,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Music::Lyrics::LRC' => {
-                version => '0.09',
+                version => '0.11',
                 file => 'lib/Music/Lyrics/LRC.pm',
             },
         },

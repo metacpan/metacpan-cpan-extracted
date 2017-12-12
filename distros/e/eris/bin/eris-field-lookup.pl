@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: eris-field-lookup.pl
 # ABSTRACT: Utility for testing the logging contextualizer
 ## no critic (RequireEndWithOne)
@@ -32,7 +32,7 @@ my ($opt,$usage) = describe_options(
 # Main
 my $cfg = $opt->config ? YAML::LoadFile($opt->config) : {};
 my %args = exists $cfg->{dictionary} && ref $cfg->{dictionary} eq 'HASH' ? %{ $cfg->{dictionary} } : ();
-my $dict = eris::dictionary->instance(%args);
+my $dict = eris::dictionary->new(%args);
 
 if( $opt->list ) {
     my $fields = $dict->fields;
@@ -62,7 +62,7 @@ eris-field-lookup.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 AUTHOR
 

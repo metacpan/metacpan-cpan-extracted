@@ -1,6 +1,6 @@
 # Web site version watch, for devscripts uscan program.
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,5 +23,5 @@
 # test with: uscan --report --verbose --watchfile=debian/watch
 
 version=3
-http://user42.tuxfamily.org/graph-maker-other/index.html \
+https://user42.tuxfamily.org/graph-maker-other/index.html \
 	.*/Graph-Maker-Other-([0-9]+)\.tar\.gz

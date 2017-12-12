@@ -1,5 +1,5 @@
 ---
-abstract: 'Calculate the difference between two strings'
+abstract: "'naive' metrics for code similarity"
 author:
   - 'Boris Däppen <bdaeppen.perl@gmail.com>'
 build_requires:
@@ -17,7 +17,7 @@ requires:
   DateTime: '0'
   File::Slurp: '0'
   Getopt::Args: '0'
-  IO::Prompter: '0'
+  IO::Prompt::Simple: '0'
   Template: '0'
   Text::Levenshtein::XS: '0'
   feature: '0'
@@ -28,5 +28,5 @@ requires:
 resources:
   homepage: https://github.com/borisdaeppen/School-Code-Compare
   repository: git://github.com/borisdaeppen/School-Code-Compare.git
-version: '0.002'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Guido Flohr <guido.flohr\@cantanea.com>"
   ],
   "dist_name" => "File-Globstar",
-  "dist_version" => "0.3",
+  "dist_version" => "0.5",
   "license" => "artistic_2",
   "module_name" => "File::Globstar",
   "recursive_test_files" => 1,
@@ -40,9 +40,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Git" => 0,
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::More" => 0,
-    "Test::Perl::Critic" => 0
+    "Test::More" => 0
   }
 );
 
@@ -53,9 +51,7 @@ my %fallback_build_requires = (
   "File::Temp" => 0,
   "Git" => 0,
   "Module::Build" => "0.28",
-  "Pod::Coverage::TrustPod" => 0,
-  "Test::More" => 0,
-  "Test::Perl::Critic" => 0
+  "Test::More" => 0
 );
 
 

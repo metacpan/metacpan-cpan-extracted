@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -41,13 +41,12 @@
    "provides" : {
       "Geo::Coder::Geocoder::US" : {
          "file" : "lib/Geo/Coder/Geocoder/US.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Geocoder-US"
       },
       "license" : [
@@ -59,7 +58,7 @@
          "web" : "https://github.com/trwyant/perl-Geo-Coder-Geocoder-US"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

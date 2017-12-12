@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ require Math::PlanePath::QuadricCurve;
 # VERSION
 
 {
-  my $want_version = 124;
+  my $want_version = 125;
   ok ($Math::PlanePath::QuadricCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuadricCurve->VERSION,  $want_version,
@@ -131,22 +131,6 @@ require Math::PlanePath::QuadricCurve;
 # turn sequence
 
 {
-  sub n_to_turn {
-    my ($n) = @_;
-    for (;;) {
-      if ($n == 0) { die "oops n=0"; }
-      my $mod = $n % 8;
-      if ($mod == 1) { return 1; }
-      if ($mod == 2) { return -1; }
-      if ($mod == 3) { return -1; }
-      if ($mod == 4) { return 0; }
-      if ($mod == 5) { return 1; }
-      if ($mod == 6) { return 1; }
-      if ($mod == 7) { return -1; }
-      $n = int($n/8);
-    }
-  }
-
   sub dxdy_to_dir {
     my ($dx,$dy) = @_;
     if ($dy == 0) {
@@ -182,8 +166,9 @@ require Math::PlanePath::QuadricCurve;
     $dy = $y - $prev_y;
     my $dir = dxdy_to_dir($dx,$dy);
 
-    my $got_turn = ($dir - $prev_dir) % 4;
-    my $want_turn = n_to_turn($n-1) % 4;
+    my $want_turn = ($dir - $prev_dir) % 4;
+    if ($want_turn == 3) { $want_turn = -1; }
+    my $got_turn = $path->_UNDOCUMENTED__n_to_turn_LSR($n-1);
 
     if ($got_turn != $want_turn) {
       MyTestHelpers::diag ("n=$n turn got=$got_turn want=$want_turn");
@@ -197,4 +182,5 @@ require Math::PlanePath::QuadricCurve;
   ok ($bad, 0, "turn sequence");
 }
 
+#------------------------------------------------------------------------------
 exit 0;

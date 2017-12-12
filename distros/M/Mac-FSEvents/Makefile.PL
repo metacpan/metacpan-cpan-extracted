@@ -1,6 +1,7 @@
 use 5.008008;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant qw(WriteConstants);
+use lib '.';
 use MacVersion;
 
 use Config;

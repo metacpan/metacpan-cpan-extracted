@@ -10,7 +10,7 @@ use Carp ();
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG} || 0;
 use constant DEFAULT_PORT => 6379;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 my $PROTOCOL_CLASS = do {
   my $class = $ENV{MOJO_REDIS_PROTOCOL}
@@ -85,17 +85,18 @@ sub unsubscribe {
 sub DESTROY { $_[0]->{destroy} = 1; $_[0]->_cleanup; }
 
 sub _basic_operations {
-  'append', 'bitcount', 'bitop', 'bitpos', 'decr', 'decrby', 'del', 'echo', 'exists', 'expire', 'expireat', 'get',
-    'getbit', 'getrange', 'getset', 'geoadd', 'geodist', 'geohash', 'geopos', 'georadius', 'georadiusbymember', 'hdel',
-    'hexists', 'hget', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hset', 'hsetnx',
-    'hstrlen', 'hvals', 'incr', 'incrby', 'incrbyfloat', 'keys', 'lindex', 'linsert', 'llen', 'lpop', 'lpush',
-    'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'mget', 'move', 'mset', 'msetnx', 'persist', 'pexpire', 'pexpireat',
-    'pfadd', 'pfcount', 'pfmerge', 'ping', 'psetex', 'pttl', 'publish', 'randomkey', 'rename', 'renamenx', 'rpop',
-    'rpoplpush', 'rpush', 'rpushx', 'sadd', 'scard', 'sdiff', 'sdiffstore', 'set', 'setbit', 'setex', 'setnx',
-    'setrange', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'sort', 'spop', 'srandmember', 'srem',
-    'strlen', 'sunion', 'sunionstore', 'ttl', 'type', 'zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zlexcount',
-    'zrange', 'zrangebylex', 'zrangebyscore', 'zrank', 'zrem', 'zremrangebylex', 'zremrangebyrank', 'zremrangebyscore',
-    'zrevrange', 'zrevrangebylex', 'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore';
+  'append', 'bitcount', 'bitop', 'bitpos', 'decr', 'decrby', 'del', 'echo', 'eval', 'evalsha', 'exists', 'expire',
+    'expireat', 'get', 'getbit', 'getrange', 'getset', 'geoadd', 'geodist', 'geohash', 'geopos', 'georadius',
+    'georadiusbymember', 'hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget',
+    'hmset', 'hset', 'hsetnx', 'hstrlen', 'hvals', 'incr', 'incrby', 'incrbyfloat', 'keys', 'lindex', 'linsert',
+    'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'mget', 'move', 'mset', 'msetnx', 'persist',
+    'pexpire', 'pexpireat', 'pfadd', 'pfcount', 'pfmerge', 'ping', 'psetex', 'pttl', 'publish', 'randomkey', 'rename',
+    'renamenx', 'rpop', 'rpoplpush', 'rpush', 'rpushx', 'sadd', 'scard', 'sdiff', 'sdiffstore', 'set', 'setbit',
+    'setex', 'setnx', 'setrange', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'sort', 'spop',
+    'srandmember', 'srem', 'strlen', 'sunion', 'sunionstore', 'ttl', 'type', 'zadd', 'zcard', 'zcount', 'zincrby',
+    'zinterstore', 'zlexcount', 'zrange', 'zrangebylex', 'zrangebyscore', 'zrank', 'zrem', 'zremrangebylex',
+    'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebylex', 'zrevrangebyscore', 'zrevrank', 'zscore',
+    'zunionstore';
 }
 
 sub _blocking_group {'blocking'}
@@ -339,7 +340,7 @@ Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 =head1 VERSION
 
-0.29
+0.30
 
 =head1 DESCRIPTION
 
@@ -567,6 +568,10 @@ lset, ltrim, rpop, rpoplpush, rpush, rpushx
 
 publish
 
+=head3 Scripting
+
+eval, evalsha
+
 =head3 Sets
 
 sadd, scard, sdiff, sdiffstore, sinter, sinterstore,
@@ -715,6 +720,6 @@ Ben Tyler - C<benjamin.tyler@gmail.com>
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
-Mike Magowan
+Mike Magowan - C<mike@magowan.co.uk>
 
 =cut

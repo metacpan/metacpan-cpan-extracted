@@ -1,0 +1,52 @@
+Revision history for Perl Shell.
+
+1.01  Thu Dec  7 14:05:00 2017
+    - Fixed failing tests for missing L::P and M::R.
+
+1.00  Wed Dec  6 14:05:00 2017
+    - CPAN release.
+
+0.10  Fri Nov 17 14:05:00 2017
+    - Changed name.
+
+0.09  Fri Nov 17 14:05:00 2017
+    - Placeholder - skipped version 0.09
+
+0.08  Wed Oct 11 14:05:00 2017
+    - Moved in commands() and modules().
+    - Added dumper() for Data::Dumper.
+
+0.07  Wed Sep 13 14:05:00 2017
+    - Cleanup $PerlApp_Shell object.
+    - Remove @argv in favor of built-in @ARGV.
+    - Remove AutoLoader from PerlApp::Shell::ShellCommands.
+    - More options for bin/plsh.pl to configure new() object.
+    - Remove broken slurping of command pipelining (and -w).
+    - Makefile.PL updates for checks / dependencies.
+    - More POD.
+
+0.06  Wed Aug 16 14:05:00 2017
+    - LexEnv becomes LexPersist.
+    - Added PerlApp::Shell::ModRefresh to use if Module::Refresh
+      is installed.
+
+0.05  Fri Feb 12 14:05:00 2016
+    - Added PerlApp::Shell::LexEnv for lexical persistence ("my") 
+      variables.
+    - Updated PerlApp::Shell to account for -lexical option if 
+      Lexical::Persistence not installed.
+
+0.04  Wed Jan 27 14:05:00 2016
+    - Added delete(), exists() accessors to PerlApp::Config.
+
+0.03  Tue Dec 11 14:05:00 2015
+    - Minor updates.
+
+0.02  Tue Aug 11 14:05:00 2015
+    - Added -argv and -execute paramters.
+    - Updated bin/plsh.pl to include their options.
+
+0.01  Mon Feb 16 13:05:31 2015
+    - original version; created by h2xs 1.23 with options
+        -b 5.10.1 -v 0.01 -XAn Shell
+

@@ -14,11 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 f8c58e347d0b21584b2971e8e20a6aa465e7dbed ChangeLog
+SHA1 22022a40e7922389ccab46d36d91ea32311ed621 ChangeLog
 SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
-SHA1 eabdadc5b565952e6168f5a650fb32bc25e0c716 MANIFEST
-SHA1 27ac95844b1143bbd991f85b288ad6d0bedc0e6a META.yml
-SHA1 783a9ddc268cd56e397da094a51109a7985e66fa Makefile.PL
+SHA1 ff9f8ed766442cb6e9e46ee86332536302845eb8 MANIFEST
+SHA1 fe063821f386baa25ae646f112096740bc743069 META.yml
+SHA1 e9f2ed6f9cc7d8a936450d1ee532360cbf89561a Makefile.PL
 SHA1 d78ed6f21f203e2054419369d111efa325a97d1b README
 SHA1 ecb089134bba590f02aa974be5a6e86d72cdb0dc UNINSTALL_CYGWIN
 SHA1 0da04817f80ed6c542780dffe674926c1bf7b3de api/Docker_is.py
@@ -70,6 +70,8 @@ SHA1 d1f4adcd9b6548c8cc85cb999dc97badcc846efd dependencies/FIGlet_fonts/deep_str
 SHA1 544b03473f8248885ce8086edae96d5e90803fa4 dependencies/FIGlet_fonts/doom.flf
 SHA1 c68b4d0b1389ff4dcc2f747e433f3277de21ac21 dependencies/FIGlet_fonts/doubleshorts.flf
 SHA1 832b01aae57295f51ff9fe45d038b6683e3275b5 dependencies/FIGlet_fonts/drpepper.flf
+SHA1 4eba6a875d7b3167ddbdf2fc3651d485ba3a084e dependencies/gw/angelwing75.png
+SHA1 8a81084fbff6521a50af25a3e4ff36676e6f8c86 dependencies/gw/gw_background.jpg
 SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
 SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
 SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
@@ -111,7 +113,7 @@ SHA1 acb1a0daeae8b6c0cfd3ce4ee899204052d40855 installer/runputty.ahk
 SHA1 2887d192d7c656080bab522cf64354975b77a915 installer/runputty.exe
 SHA1 784955e0e44b132341668db4efa407569dd71189 installer/standup.gif
 SHA1 6c3adc63eb0e790491af15178fabb88f9508bf50 lbbroker_zmqv4.pl
-SHA1 5e5cc3b95b9da837bff13427ca8381246d07707f lib/Net/FullAuto.pm
+SHA1 78eee6ac80d5716fe2073ce3f7b8f3ceb2c684ae lib/Net/FullAuto.pm
 SHA1 a73fa03896208dc550b292954f51722d7b139c24 lib/Net/FullAuto/Cloud/fa_amazon.pm
 SHA1 71928e8ed46e6c63d2effda32c2ceba413ab3976 lib/Net/FullAuto/Cloud/fa_azure.pm
 SHA1 2d1d4af82b485a801bd146f5c079418f4bd56dd2 lib/Net/FullAuto/Cloud/fa_google.pm
@@ -137,16 +139,16 @@ SHA1 a4d5e6f009042ecde8701230f3b31d1a66236279 lib/Net/FullAuto/ISets/Amazon/Kali
 SHA1 ddb48cea930f376830b4b3c5a80f29826e231bad lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
 SHA1 4708044b661f8aa812d1d9dc2d61496509ba72d8 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
 SHA1 9e2dd950d026a00e5242695306b7a82ed6fb7f9e lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
-SHA1 8ded14b5f13e3f1f6373ff5474939b818f025b40 lib/Net/FullAuto/ISets/Local/WordPress_is.pm
+SHA1 b8bf60875fce97e0c04d38a9bb5489481d289ecb lib/Net/FullAuto/ISets/Local/WordPress_is.pm
 SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
 SHA1 6fac6b17647d05b71441ac3783ceec38b9b71fa6 t/test.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaGlEJAAoJEBa/9Pad787EVhgH/0XQapf3Un2Cd2TGv7pK4gNw
-VRG/NTM8Fmdk1KhayAmb7oj2sUbbpD4sLm0UDqXliw9cYTIfpmF2ZwvOs/DLUFlB
-opHdJmf0QyJtVs361CAXDNCncfGo3PrsJTfvz2EqjnS8uLRJJuRYomD6X2rm3dQ+
-bl7YFhX2HqmGMgZw8DHZPOokl2hgmUWk9JwrXrNSfoOX/WJg+Gy05/kbON0OoSfI
-pTRwHYtdII53J8kWZBa70MhHKmM3n/1yIuQXKrQ0+AIBKvaY0Wf89LB1Zl7ye6lg
-qoD212yHZluvKKFEvbCvalFk16vD5wpS4Cu8m27NE4ZhOncfhMvKVLy1ikKwIu0=
-=vin2
+iQEcBAEBAgAGBQJaLTtyAAoJEBa/9Pad787Ev+4H/jY537r41sMc2sdiahoU+kvB
+t1oxgZRmnxHSWw0JEWO5IQ18qu62wiwuG58sm853vbtgNR6jqlexm+NXHgNNKKhy
+q8RxA23H87iRj9Rrd7MezS7RzcavOagH/9ItEUyRzefgmB3UV8yO0XXMEUt/UqZc
+wHaglHSwkkHejfp7T8QZeJmR0PYq8D2+pMbxeieW9EursVELnu16jJDEY01uogM/
+vzeLZ6ltneuBItuAb2E0wXdLVPpE6uE8tqkum8Ytp0UtJ1Agzvnoe887NoJCxmQT
+FCLSbigTRyG9DbptjY2WYj5i54aJiylI/g3ebqWni2O5GifrC8uf+L34OW4dhNU=
+=b/yQ
 -----END PGP SIGNATURE-----

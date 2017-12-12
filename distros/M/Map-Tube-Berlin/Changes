@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+0.16  2017-12-09
+	- data changes:
+	  - "Fahrplanwechsel": various changes, e.g. new "Ostkreuzkurve"
+	- minimum prereq Map::Tube version is now v3.40
+
 0.15  2017-10-31
 	- data changes:
 	  - new stations names Kienberg and Freie Universitaet

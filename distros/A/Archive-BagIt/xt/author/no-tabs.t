@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.09
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
 
 use Test::More 0.88;
 use Test::NoTabs;
@@ -11,6 +11,11 @@ my @files = (
     'lib/Archive/BagIt/Base.pm',
     'lib/Archive/BagIt/DotBagIt.pm',
     'lib/Archive/BagIt/Fast.pm',
+    'lib/Archive/BagIt/Plugin/Algorithm/MD5.pm',
+    'lib/Archive/BagIt/Plugin/Manifest/MD5.pm',
+    'lib/Archive/BagIt/Role/Algorithm.pm',
+    'lib/Archive/BagIt/Role/Manifest.pm',
+    'lib/Archive/BagIt/Role/Plugin.pm',
     't/00-compile.t',
     't/00-load.t',
     't/base.t',

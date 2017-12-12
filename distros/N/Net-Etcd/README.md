@@ -64,6 +64,9 @@ Net::Etcd - etcd v3 REST API.
     # member version
     $v = $etcd->version;
 
+    # list members
+    $etcd->member()->list;
+
 # DESCRIPTION
 
 [Net::Etcd](https://metacpan.org/pod/Net::Etcd) is object oriented interface to the v3 REST API provided by the etcd [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
@@ -80,11 +83,15 @@ Default 2379.
 
 ## name
 
-Username for authentication
+Username for authentication, defaults to $ENV{ETCD\_CLIENT\_USERNAME}
 
 ## password
 
-Authentication credentials
+Authentication credentials, defaults to $ENV{ETCD\_CLIENT\_PASSWORD}
+
+## cacert
+
+Path to cacert, defaults to $ENV{ETCD\_CERT\_FILE}
 
 ## ssl
 
@@ -155,6 +162,12 @@ See [Net::Etcd::Maintenance](https://metacpan.org/pod/Net::Etcd::Maintenance)
 
     $etcd->maintenance()->snapshot
 
+## member
+
+See [Net::Etcd::Member](https://metacpan.org/pod/Net::Etcd::Member)
+
+    $etcd->member()->list
+
 ## user
 
 See [Net::Etcd::User](https://metacpan.org/pod/Net::Etcd::User)
@@ -201,7 +214,7 @@ See [Net::Etcd::KV::Compare](https://metacpan.org/pod/Net::Etcd::KV::Compare)
 
 ## configuration
 
-Initialize configuration checks to see it etcd is installed locally.
+Initialize configuration checks to see if etcd is installed locally.
 
 # AUTHOR
 

@@ -1,0 +1,174 @@
+=head1 NAME
+
+Doit::File - commands for file creation
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('file');
+
+    $doit->file_atomic_write('/path/to/file', sub {
+        my $fh = shift;
+        print $fh "Hello, world!\n";
+    };
+
+    $doit->file_atomic_write('/path/to/file', sub {
+        my($fh, $filename) = @_;
+	$doit->system("a_system_cmd > $filename");
+    }, tmpsuffix => '.my.tmp';
+
+=head1 DESCRIPTION
+
+B<Doit::File> is a L<Doit> component providing methods for file
+creation. It has to be added to a script using L<Doit's add_component|Doit/add_component>:
+
+    $doit->add_component('file');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 file_atomic_write
+
+    $doit->file_atomic_write($filename, $code, optkey => optval ...)
+
+Create a file I<$filename> using a code reference I<$code> in an
+atomic way. This command creates a temporary file first which is used
+for the writes. If no errors happen during the code execution (i.e. no
+perl-level exceptions when running the code reference, and no system
+errors like "no space left on device"), then the temporary file is
+renamed atomically to the final destination.
+
+The code reference takes two parameters: a filehandle and the filename
+of a temporary file.
+
+Options are specified as named parameters. Possible options are:
+
+=over
+
+=item C<< tmpdir => I<directory> >>
+
+Change the directory where the temporary file is created. Default is
+the same directory as the final destination. The directory must
+already exist. Change this if a system cannot tolerate the existence
+of stray temporay files, and setting the C<tmpsuffix> option (see
+below) does not help. Example:
+
+    $doit->file_atomic_write('/path/to/filename', \&writer, tmpdir => '/tmp');
+
+B<NOTE:> if the temporary file is created in another file system than
+the final destination file, then the final rename is C<not> atomic
+(i.e. C<File::Copy::move> is used instead of C<rename>). For example,
+on many systems F</tmp> is located on a separate file system (root fs
+or a special tmpfs) than the rest of the system.
+
+=item C<< tmpsuffix => I<suffix> >>
+
+Change the suffix used for the temporary file. Default is C<.tmp>.
+Change the suffix if a system may tolerate the existence of stray
+temporary files if special suffixes are used. For example, in a
+directory controlled by Debian's L<run-parts(8)> programm it can help
+to use C<.dpkg-tmp> as the tempory file suffix.
+
+=item C<< mode => I<mode> >>
+
+Set permissions of the final destination file, using the
+L<perlfunc/chmod> syntax.
+
+If not used, then the permissions would be as creating a normal
+non-executable file, which usually takes L<perlfunc/umask> into
+account.
+
+=back
+
+B<NOTES>
+
+The temporary file creation is done using L<File::Temp>. The temporary
+files are removed as early as possible, even in the case of
+exceptions. Only left-overs may happen if the script is killed from
+outside (e.g. SIGINT, SIGKILL...).
+
+Some of L<File::Temp>'s standard behaviors are changed here: mode is
+different (see above), and C<EXLOCK> is not set.
+
+If the C<tmpdir> option is used, then the group of the created
+temporary file may differ as it was created in the final destination
+directory (e.g. in presence of setgid bits, or on BSD systems if the
+directory belongs to another group). Some precautions are made to fix
+this, at least for some common operating systems, but this is far from
+perfect.
+
+While running this function two versions of the file will exist
+simultaneously on the disk: the old version (if it's an overwrite) and
+the new version. This may be problematic if the files are large and
+the diskspace limited.
+
+The C<tmpdir> option may be set to F</dev/full>; in this case the
+temporary file will be set to F</dev/full>. This is only useful in
+test scripts for testing the C<ENOSPC> (see L<errno(3)> or
+L<errno(2)>) case.
+
+Special handling is implemented for older perls (5.8.x), as a failing
+L<close|perlfunc/close> is not correctly detected here.
+
+=head2 TODO
+
+=over
+
+=item Catch signals for temporary file cleanup?
+
+It would be nice if signals like SIGINT would be caught and created
+temporary files removed. But this would require some framework support
+from <Doit>.
+
+=item Automatic cleanup of leftover temporary files?
+
+It would be nice to have an option to detect and remove temporary
+files from earlier runs. The rule could be time-based (.tmp files
+older than I<n> days), and maybe a check if the files are actively
+used (e.g. with L<lsof(8)>) could be done.
+
+=item C<tmpdir> option with relative directories?
+
+L<rsync(1)> creates temporary directories named C<.~tmp~> as
+subdirectories of the final destination paths. This is useful as
+atomic L<rename(2)> may always be used in this case. Specification
+could look like this:
+
+    tmpdir => "./.~tmp~"
+
+In this case B<file_atomic_write> should take care of temporary
+directory creation and removal (but what if there are multiple
+simultaneous writers?).
+
+=item Use invisible temporary files
+
+On recent Linux kernels it's possible to L<open(2)> a file with the
+C<O_TMPFILE> flag, which would create an invisible file, and make it
+"visible" using L<linkat(2)> (see
+L<https://stackoverflow.com/questions/4171713/relinking-an-anonymous-unlinked-but-open-file>).
+It would be nice if B<file_atomic_write> would offer such a solution.
+
+=item file_atomic_directory?
+
+How would an implementation for atomic directory writes could look
+like?
+
+=back
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<File::Temp>.
+
+=cut

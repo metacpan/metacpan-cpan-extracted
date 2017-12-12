@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -235,7 +235,7 @@ MyOEIS::compare_values
    });
 MyOEIS::compare_values
   (name => 'count 1-bits at even bit positions',
-   anum => q{A139351},
+   anum => qq{A139351},
    func => sub {
      my ($count) = @_;
      my @got;

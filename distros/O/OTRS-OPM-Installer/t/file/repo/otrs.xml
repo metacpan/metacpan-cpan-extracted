@@ -62,4 +62,18 @@
     </Filelist>
   <File>TicketOverviewHooked-5.0.6.opm</File>
 </Package>
+<Package>
+    <Name>InvalidOPM</Name>
+    <Version>6.0.6</Version>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>http://www.perl-services.de</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="de">Ein Dynamisches Feld 'Datum' mit aktivierter Checkbox</Description>
+    <Description Lang="en">A date dynamic field with checked checkbox</Description>
+    <Framework>6.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/DynamicFieldCheckedDate.json" Permission="644" ></FileDoc>
+    </Filelist>
+  <File>InvalidOPM-6.0.6.opm</File>
+</Package>
 </otrs_package_list>

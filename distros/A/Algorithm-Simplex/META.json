@@ -4,7 +4,7 @@
       "mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,8 @@
             "MooX::Types::MooseLike" : "0.16",
             "PDL" : "0",
             "PDL::Lite" : "0",
-            "namespace::clean" : "0"
+            "namespace::clean" : "0",
+            "perl" : "5.006"
          }
       }
    },
@@ -48,8 +49,10 @@
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-Simplex"
       },
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/mateu/Algorithm-Simplex.git"
       }
    },
-   "version" : "0.43"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

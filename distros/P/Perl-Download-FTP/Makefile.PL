@@ -8,6 +8,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Perl/Download/FTP.pm', # finds \$VERSION
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Identify Perl releases and download the most recent via FTP',
+    MIN_PERL_VERSION => '5.10.1',
     PREREQ_PM    => {
                      'Net::FTP'     => 0,
                      'Carp'         => 0,

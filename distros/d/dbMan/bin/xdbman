@@ -4,6 +4,7 @@ eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
 use strict;
 use lib '.';
 use FindBin;
+use locale;
 
 BEGIN {
 	unshift @INC,"$FindBin::Bin/../lib";

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl::Critic policies which help to avoid both\nexplicit and implicit smartmatching\n",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-ProhibitSmartmatch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic::TestUtils" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::ControlStructures::ProhibitSwitchStatements" : {
+         "file" : "lib/Perl/Critic/Policy/ControlStructures/ProhibitSwitchStatements.pm",
+         "version" : "0.2"
+      },
+      "Perl::Critic::Policy::Operators::ProhibitSmartmatch" : {
+         "file" : "lib/Perl/Critic/Policy/Operators/ProhibitSmartmatch.pm",
+         "version" : "0.2"
+      },
+      "Perl::Critic::Policy::ProhibitSmartmatch" : {
+         "file" : "lib/Perl/Critic/Policy/ProhibitSmartmatch.pm",
+         "version" : "0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

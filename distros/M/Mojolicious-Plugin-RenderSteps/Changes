@@ -1,3 +1,6 @@
+0.06 10-12-2017
+  - Fix tests on recent versions of Mojolicious (now requires its 6.10 version)
+
 0.05 10-06-2014
   - Fix render_exception and add test for error content
   - Add bug tracker metadata (jht)

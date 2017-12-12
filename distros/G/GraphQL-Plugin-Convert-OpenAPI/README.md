@@ -13,9 +13,8 @@ GraphQL::Plugin::Convert::OpenAPI - convert OpenAPI schema to GraphQL schema
 # SYNOPSIS
 
     use GraphQL::Plugin::Convert::OpenAPI;
-    use Schema;
     my $converted = GraphQL::Plugin::Convert::OpenAPI->to_graphql(
-      sub { Schema->connect }
+      'file-containing-spec.json',
     );
     print $converted->{schema}->to_doc;
 
@@ -44,11 +43,13 @@ containing a JSON specification, of an OpenAPI v2. Optionally, a
 
 # PACKAGE FUNCTIONS
 
-## field\_resolver
+## make\_field\_resolver
 
-This is available as `\&GraphQL::Plugin::Convert::OpenAPI::field_resolver`
+This is available as `\&GraphQL::Plugin::Convert::OpenAPI::make_field_resolver`
 in case it is wanted for use outside of the "bundle" of the `to_graphql`
-method.
+method. It takes one argument, a hash-ref mapping from a GraphQL operation
+field-name to an `operationId`, and returns a closure that can be used
+as a field resolver.
 
 # DEBUGGING
 

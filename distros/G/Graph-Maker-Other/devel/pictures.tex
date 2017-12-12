@@ -17,7 +17,6 @@
 \renewcommand\figureautorefname{figure}   % lower case
 \renewcommand\theoremautorefname{theorem} % lower case
 \providecommand*{\lemmaautorefname}{lemma}
-\providecommand*{\corollaryautorefname}{corollary}
 \usepackage[all]{hypcap} % figure links to top of figure
 
 \usepackage{mathtools}  % for \mathclap and showonlyrefs
@@ -26,7 +25,6 @@
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
-\newtheorem{corollary}{Corollary}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}  % for arrow To[length etc
@@ -193,6 +191,10 @@ number of runs binary beanstalk A255327=size of subtree, A255056=trunk
 %------------------------------------------------------------------------------
 \section{Regular But Median Size Less than N}
 
+polyhedral of vertices
+A000944 0, 0, 0, 1, 2, 7, 34, 257, 2606, ...
+n =     1  2  3  4  5  6   7    8     9
+
 n=8 regular 1 but median size 4 is not all vertices
 \begin{center}
 \begin{tikzpicture}
@@ -201,14 +203,110 @@ n=8 regular 1 but median size 4 is not all vertices
      font=\small,
     ]
 
-  \node (0) at (1.5,.5) [my box] {0};
+  \node (0) at (1.5, .4) [my box] {0};
   \node (1) at (2, -1) [my box] {1};
   \node (2) at (.5,0) [my box] {2};
   \node (3) at (2,1) [my box] {3};
   \node (4) at (1,-1) [my box] {4};
-  \node (5) at (1.5,-.5) [my box] {5};
+  \node (5) at (1.5, -.4) [my box] {5};
   \node (6) at (2.5,0) [my box] {6};
   \node (7) at (1,1) [my box] {7};
+
+  \draw [] (0) to (7);
+  \draw [] (4) to (5);
+  \draw [] (0) to (5);
+  \draw [] (1) to (5);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+  \draw [] (2) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (6);
+  \draw [] (3) to (7);
+  \draw [] (3) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (0,0) [my box] {0};
+  \node (1) at (-1,1) [my box] {1};
+  \node (2) at (-2, 2) [my box] {2};
+  \node (3) at (1, 1) [my box] {3};
+  \node (4) at (-2, 1) [my box] {4};
+  \node (5) at (-1, 0) [my box] {5};
+  \node (6) at (1, 2) [my box] {6};
+  \node (7) at (0,1) [my box] {7};
+
+  \draw [] (0) to (7);
+  \draw [] (4) to (5);
+  \draw [] (0) to (5);
+  \draw [] (1) to (5);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+  \draw [] (2) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (6);
+  \draw [] (3) to (7);
+  \draw [] (3) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (0/8*360:1) [my box] {0};
+  \node (1) at (3/8*360:1) [my box] {1};
+  \node (2) at (6/8*360:1) [my box] {2};
+  \node (3) at (1/8*360:1) [my box] {3};
+  \node (4) at (5/8*360:1) [my box] {4};
+  \node (5) at (4/8*360:1) [my box] {5};
+  \node (6) at (2/8*360:1) [my box] {6};
+  \node (7) at (7/8*360:1) [my box] {7};
+
+  \draw [] (0) to (7);
+  \draw [] (4) to (5);
+  \draw [] (0) to (5);
+  \draw [] (1) to (5);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+  \draw [] (2) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (6);
+  \draw [] (3) to (7);
+  \draw [] (3) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (6/8*360:1) [my box] {0};
+  \node (1) at (3/8*360:1) [my box] {1};
+  \node (2) at (1/8*360:1) [my box] {2};
+  \node (3) at (7/8*360:1) [my box] {3};
+  \node (4) at (4/8*360:1) [my box] {4};
+  \node (5) at (5/8*360:1) [my box] {5};
+  \node (6) at (2/8*360:1) [my box] {6};
+  \node (7) at (0/8*360:1) [my box] {7};
 
   \draw [] (0) to (7);
   \draw [] (4) to (5);
@@ -305,6 +403,7 @@ n=9 not regular but median size = 9
 %------------------------------------------------------------------------------
 \section{n=8 Pseudosimilar which are Line Graph}
 
+edges=9, is smallest of all n=8 pseudosimilars
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,
@@ -338,19 +437,23 @@ n=9 not regular but median size = 9
 
 XXXXXXXXXXXXX
 
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=30339}
+
+edges=10, vertices 1,5 pseudosimilar
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,
      my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my circle box/.style={draw,circle,minimum size=2em,inner sep=.1em,outer sep=.3em},
      font=\small,
     ]
 
   \node (0) at (1,1) [my box] {0};
-  \node (1) at (-1,1) [my box] {1};
+  \node (1) at (-1,1) [my circle box] {1};
   \node (2) at (-.5,2) [my box] {2};
   \node (3) at (2,1) [my box] {3};
   \node (4) at (-2,1) [my box] {4};
-  \node (5) at (1,2) [my box] {5};
+  \node (5) at (1,2) [my circle box] {5};
   \node (6) at (-2,2) [my box] {6};
   \node (7) at (0,1) [my box] {7};
 
@@ -372,21 +475,26 @@ XXXXXXXXXXXXX
 
 XXXXXXXXXXXXX
 
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=30337}
 
+edges=12, vertices 5,6 pseudosimilar
+
+degree 3s 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.2,
+    [scale=1.25,
      my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my circle box/.style={draw,circle,minimum size=2em,inner sep=.1em,outer sep=.3em},
      font=\small,
     ]
 
-  \node (0) at (0,1) [my box] {0};
-  \node (1) at (3,1) [my box] {1};
-  \node (2) at (1,0) [my box] {2};
-  \node (3) at (-1,2) [my box] {3};
+  \node (0) at (1,1) [my box] {0};
+  \node (1) at (3,2) [my box] {1};
+  \node (2) at (2,0) [my box] {2};
+  \node (3) at (0,0) [my box] {3};
   \node (4) at (2,2) [my box] {4};
-  \node (5) at (2,0) [my box] {5};
-  \node (6) at (-1,0) [my box] {6};
+  \node (5) at (3,1) [my circle box] {5};
+  \node (6) at (1,0) [my circle box] {6};
   \node (7) at (2,1) [my box] {7};
 
   % 12 edges
@@ -408,15 +516,66 @@ XXXXXXXXXXXXX
 \end{tikzpicture}
 \end{center}
 
-XXXXXXXXXXXXX
-
 \medskip
 
-5,4 pseudosimilar
+XXXXXXXXXXXXX
+
+\url{https://hog.grinvin.org/ViewGraphInfo.action?id=30335}
+
+edges=17
+
+drawn to show contains second biggest as subgraph
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,yscale=1.3,xscale=1.5,
      my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my circle box/.style={draw,circle,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (3,2) [my box] {0};
+  \node (1) at (0,0) [my box] {1};
+  \node (3) at (1,1) [my box] {3};
+
+  \node (2) at (2,0) [my box] {2};
+
+  \node (4) at (3,1) [my circle box] {4};
+  \node (5) at (1,0) [my circle box] {5};
+  \node (6) at (2,2) [my box] {6};
+
+  \node (7) at (2,1) [my box] {7};
+
+  % 17 edges
+  \draw [] (0) to (3);
+  \draw [] (2) to (4);
+  \draw [] (3) to (6);
+  \draw [] (0) to (4);
+  \draw [bend right=25] (2) to (6);
+
+  \draw [] (6) to (7);
+  \draw [] (1) to (3);
+  \draw [] (3) to (5);
+  \draw [] (2) to (5);
+  \draw [] (0) to (6);
+
+  \draw [] (4) to (6);
+  \draw [] (1) to (7);
+  \draw [] (3) to (7);
+  \draw [] (1) to (5);
+  \draw [] (5) to (7);
+
+  \draw [] (4) to (7);
+  \draw [] (2) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+vertices 4,5 pseudosimilar
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,yscale=1.3,xscale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my circle box/.style={draw,circle,minimum size=2em,inner sep=.1em,outer sep=.3em},
      font=\small,
     ]
 
@@ -424,8 +583,8 @@ XXXXXXXXXXXXX
   \node (1) at (300:1) [my box] {1};
   \node (2) at (60:1) [my box] {2};
   \node (3) at (240:1) [my box] {3};
-  \node (4) at (120:1) [my box] {4};
-  \node (5) at (1,0) [my box] {5};
+  \node (4) at (120:1) [my circle box] {4};
+  \node (5) at (1,0) [my circle box] {5};
   \node (6) at (-1,0) [my box] {6};
   \node (7) at (0, 0) [my box] {7};
 
@@ -476,6 +635,234 @@ its root graph
   \draw [] (0) to (4);
   \draw [] (4) to (2);
   \draw [] (0) to (3);
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%------------------------------------------------------------------------------
+\section{Pseudosimilar n=8 Subgraph Relations}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,yscale=.8,
+     my box/.style={draw,inner sep=.1em,outer sep=0em,font=\scriptsize},
+     font=\small,
+     rotate=90,
+    ]
+  \node (291-19) at (303,19) [my box] {291,19};
+
+  \node (294-18) at (294,19) [my box] {294,18};
+  \node (297-18) at (298,19) [my box] {297,18};
+  \node (291-18) at (303,18) [my box] {291,18};
+
+  \node (294-17) at (292,17) [my box] {294,17};
+  \node (297-17) at (295,17) [my box] {297,17};
+  \node (291-17) at (298,18) [my box] {291,17};
+
+  \node (291-16) at (290,16) [my box] {291,16};
+  \node (294-16) at (294,16) [my box] {294,16};
+  \node (297-16) at (297,16) [my box] {297,16};
+  \node (300-16) at (300,16) [my box] {300,16};
+  \node (306-16) at (307,19) [my box] {306,16};
+  \node (303-16) at (302,17) [my box] {303,16};
+
+  \node (291-15) at (291,15) [my box] {291,15};
+  \node (294-15) at (294,15) [my box] {294,15};
+  \node (297-15) at (297,15) [my box] {297,15};
+  \node (300-15) at (300,15) [my box] {300,15};
+  \node (303-15) at (302,16) [my box] {303,15};
+  \node (306-15) at (305,15) [my box] {306,15};
+  \node (309-15) at (309,15) [my box] {309,15};
+
+
+
+
+  \node (291-9) at (296,9) [my box] {291,9};
+
+  \node (291-10) at (291, 9) [my box] {291,10};
+  \node (294-10) at (294, 9) [my box] {294,10};
+  \node (297-10) at (298, 9) [my box] {297,10};
+
+  \node (291-11) at (291,11) [my box] {291,11};
+  \node (294-11) at (294,11) [my box] {294,11};
+  \node (297-11) at (301,10) [my box] {297,11};
+
+  \node (291-12) at (290,12) [my box] {291,12};
+  \node (294-12) at (294,12) [my box] {294,12};
+  \node (297-12) at (297,12) [my box] {297,12};
+  \node (300-12) at (300,12) [my box] {300,12};
+  \node (303-12) at (303,12) [my box] {303,12};
+  \node (306-12) at (306,12) [my box] {306,12};
+
+  \node (291-13) at (290,13) [my box] {291,13};
+  \node (294-13) at (294,13) [my box] {294,13};
+  \node (297-13) at (297,13) [my box] {297,13};
+  \node (300-13) at (300,13) [my box] {300,13};
+  \node (303-13) at (303,13) [my box] {303,13};
+  \node (306-13) at (306,13) [my box] {306,13};
+  \node (309-13) at (309,13) [my box] {309,13};
+
+  \node (291-14) at (291,14) [my box] {291,14};
+  \node (294-14) at (294,14) [my box] {294,14};
+  \node (297-14) at (297,14) [my box] {297,14};
+  \node (300-14) at (300,14) [my box] {300,14};
+
+
+  \draw [<-] (291-10) to (291-11);
+  \draw [<-] (294-14) to (303-16);
+  \draw [<-] (294-11) to (291-12);
+  \draw [<-] (294-10) to (300-14);
+  \draw [<-] (291-9) to (297-12);
+  \draw [<-] (297-12) to (291-15);
+  \draw [<-] (291-14) to (291-17);
+  \draw [<-] (297-12) to (294-16);
+  \draw [<-] (291-15) to (297-17);
+  \draw [<-] (303-15) to (291-18);
+  \draw [<-] (300-13) to (306-15);
+  \draw [<-] (309-13) to (294-16);
+  \draw [<-] (294-12) to (294-14);
+  \draw [<-] (300-14) to (291-17);
+  \draw [<-] (297-13) to (294-17);
+  \draw [<-] (294-13) to (294-15);
+  \draw [<-] (297-14) to (309-15);
+  \draw [<-] (294-16) to (291-17);
+  \draw [<-] (300-15) to (291-18);
+  \draw [<-] (291-9) to (294-10);
+  \draw [<-] (291-13) to (303-15);
+  \draw [<-] (303-12) to (297-14);
+  \draw [<-] (303-12) to (306-13);
+  \draw [<-] (294-11) to (291-14);
+  \draw [<-] (300-12) to (297-13);
+  \draw [<-] (297-10) to (297-12);
+  \draw [<-] (297-16) to (291-19);
+  \draw [<-] (294-14) to (297-17);
+  \draw [<-] (303-13) to (294-17);
+  \draw [<-] (291-12) to (300-16);
+  \draw [<-] (306-15) to (306-16);
+  \draw [<-] (291-11) to (297-14);
+  \draw [<-] (294-12) to (300-15);
+  \draw [<-] (291-11) to (297-13);
+  \draw [<-] (294-16) to (294-17);
+  \draw [<-] (291-9) to (300-12);
+  \draw [<-] (291-14) to (294-17);
+  \draw [<-] (291-14) to (303-16);
+  \draw [<-] (294-14) to (294-17);
+  \draw [<-] (297-11) to (291-12);
+  \draw [<-] (297-10) to (294-11);
+  \draw [<-] (309-15) to (297-16);
+  \draw [<-] (300-14) to (306-16);
+  \draw [<-] (291-18) to (291-19);
+  \draw [<-] (291-11) to (291-14);
+  \draw [<-] (300-15) to (294-18);
+  \draw [<-] (291-15) to (291-16);
+  \draw [<-] (294-11) to (297-14);
+  \draw [<-] (303-16) to (291-19);
+  \draw [<-] (306-12) to (300-13);
+  \draw [<-] (297-15) to (294-18);
+  \draw [<-] (291-12) to (294-17);
+  \draw [<-] (294-10) to (297-14);
+  \draw [<-] (297-14) to (291-18);
+  \draw [<-] (291-16) to (291-18);
+  \draw [<-] (297-10) to (291-13);
+  \draw [<-] (297-12) to (303-13);
+  \draw [<-] (300-13) to (300-14);
+  \draw [<-] (291-12) to (297-15);
+  \draw [<-] (297-10) to (297-11);
+  \draw [<-] (297-13) to (303-16);
+  \draw [<-] (294-15) to (297-18);
+  \draw [<-] (291-10) to (294-12);
+  \draw [<-] (300-16) to (291-19);
+  \draw [<-] (291-11) to (303-15);
+  \draw [<-] (294-12) to (291-13);
+  \draw [<-] (297-13) to (297-17);
+  \draw [<-] (303-12) to (306-15);
+  \draw [<-] (300-12) to (294-14);
+  \draw [<-] (297-12) to (306-15);
+  \draw [<-] (306-13) to (300-16);
+  \draw [<-] (291-12) to (294-15);
+  \draw [<-] (294-10) to (297-13);
+  \draw [<-] (303-15) to (297-17);
+  \draw [<-] (294-10) to (303-13);
+  \draw [<-] (303-12) to (291-16);
+  \draw [<-] (297-13) to (306-15);
+  \draw [<-] (297-15) to (291-17);
+  \draw [<-] (297-11) to (309-15);
+  \draw [<-] (306-12) to (309-13);
+  \draw [<-] (294-14) to (294-15);
+  \draw [<-] (294-14) to (291-17);
+  \draw [<-] (306-13) to (306-16);
+  \draw [<-] (309-13) to (300-14);
+  \draw [<-] (294-17) to (297-18);
+  \draw [<-] (291-12) to (303-16);
+  \draw [<-] (291-16) to (294-18);
+  \draw [<-] (303-13) to (291-16);
+  \draw [<-] (303-13) to (303-15);
+  \draw [<-] (297-11) to (303-15);
+  \draw [<-] (303-15) to (303-16);
+  \draw [<-] (294-11) to (294-14);
+  \draw [<-] (291-13) to (291-14);
+  \draw [<-] (294-13) to (297-17);
+  \draw [<-] (294-13) to (294-17);
+  \draw [<-] (297-17) to (294-18);
+  \draw [<-] (297-11) to (291-15);
+  \draw [<-] (297-13) to (300-15);
+  \draw [<-] (306-13) to (303-15);
+  \draw [<-] (297-14) to (303-16);
+  \draw [<-] (300-12) to (291-14);
+  \draw [<-] (291-10) to (309-13);
+  \draw [<-] (309-15) to (294-17);
+  \draw [<-] (291-12) to (300-14);
+  \draw [<-] (297-16) to (297-18);
+  \draw [<-] (294-15) to (291-16);
+  \draw [<-] (294-10) to (294-12);
+  \draw [<-] (300-16) to (297-18);
+  \draw [<-] (297-11) to (294-16);
+  \draw [<-] (297-13) to (294-15);
+  \draw [<-] (291-14) to (297-17);
+  \draw [<-] (303-16) to (294-18);
+  \draw [<-] (303-13) to (300-16);
+  \draw [<-] (303-16) to (297-18);
+  \draw [<-] (300-12) to (303-15);
+  \draw [<-] (297-11) to (300-13);
+  \draw [<-] (291-11) to (294-14);
+  \draw [<-] (306-13) to (309-15);
+  \draw [<-] (297-14) to (294-16);
+  \draw [<-] (294-11) to (297-13);
+  \draw [<-] (294-12) to (294-13);
+  \draw [<-] (297-14) to (297-17);
+  \draw [<-] (291-10) to (300-12);
+  \draw [<-] (294-13) to (300-16);
+  \draw [<-] (300-14) to (291-18);
+  \draw [<-] (300-12) to (300-14);
+  \draw [<-] (291-14) to (291-16);
+  \draw [<-] (291-9) to (306-12);
+  \draw [<-] (291-11) to (300-14);
+  \draw [<-] (300-15) to (300-16);
+  \draw [<-] (297-12) to (300-15);
+  \draw [<-] (300-14) to (297-17);
+  \draw [<-] (294-12) to (306-16);
+  \draw [<-] (291-10) to (303-13);
+  \draw [<-] (303-13) to (306-16);
+  \draw [<-] (291-11) to (294-13);
+  \draw [<-] (303-15) to (291-17);
+  \draw [<-] (297-11) to (294-14);
+  \draw [<-] (297-10) to (306-12);
+  \draw [<-] (291-13) to (291-15);
+  \draw [<-] (297-11) to (300-15);
+  \draw [<-] (291-13) to (294-16);
+  \draw [<-] (303-12) to (300-15);
+  \draw [<-] (300-13) to (294-17);
+  \draw [<-] (297-15) to (297-16);
+  \draw [<-] (291-17) to (297-18);
+  \draw [<-] (291-11) to (291-15);
+  \draw [<-] (297-11) to (291-14);
+  \draw [<-] (297-14) to (297-15);
+  \draw [<-] (294-11) to (309-13);
+  \draw [<-] (297-10) to (300-12);
+  \draw [<-] (300-12) to (294-16);
+
 \end{tikzpicture}
 \end{center}
 

@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -52,7 +52,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/petdance/ack2"
+         "web" : "https://github.com/beyondgrep/ack2"
       },
       "homepage" : "https://beyondgrep.com/",
       "license" : [
@@ -60,10 +60,10 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/petdance/ack2.git"
+         "url" : "git://github.com/beyondgrep/ack2.git"
       },
       "x_MailingList" : "https://groups.google.com/group/ack-users"
    },
-   "version" : "2.18",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.20",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

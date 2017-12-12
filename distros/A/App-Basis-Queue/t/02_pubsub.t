@@ -17,7 +17,6 @@ subsequent ones
 
 =cut
 
-use 5.18.2 ;
 use strict ;
 use warnings ;
 use feature 'state' ;
@@ -164,7 +163,7 @@ if ( $ENV{AUTHOR_TESTING} ) {
         $queue = App::Basis::Queue->new(
             dbh    => $dbh,
             prefix => $test_q,
-            debug  => 0
+            debug  => $ENV{DEBUG}
         ) ;
         # isa_ok( $queue, 'App::Basis::Queue' ) ;
 

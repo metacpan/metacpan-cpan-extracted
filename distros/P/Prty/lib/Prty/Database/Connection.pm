@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Sql;
 use Prty::Object;
@@ -54,18 +54,6 @@ Relationalen Datenbank.
 
 connect()
 
-=head4 Description
-
-Instantiiere eine Datenbankverbindung und liefere eine Referenz auf
-dieses Objekt zurück.
-
-Ist $udl nicht angegeben, wird der Wert der Environment-Variable
-$UDL verwendet.
-
-Wird die Methode als Objektmethode einer bestehenden Datenbankverbindung
-gerufen, wird eine weitere Verbindung zur selben Datenbank aufgebaut.
-Dies ist nützlich, wenn eine parallele Transaktion benötigt wird.
-
 =head4 Options
 
 =over 4
@@ -91,6 +79,18 @@ Name der Sql-Klasse zur Statementgenerierung.
 Definiere das clientseitige Character Encoding als UTF-8.
 
 =back
+
+=head4 Description
+
+Instantiiere eine Datenbankverbindung und liefere eine Referenz auf
+dieses Objekt zurück.
+
+Ist $udl nicht angegeben, wird der Wert der Environment-Variable
+$UDL verwendet.
+
+Wird die Methode als Objektmethode einer bestehenden Datenbankverbindung
+gerufen, wird eine weitere Verbindung zur selben Datenbank aufgebaut.
+Dies ist nützlich, wenn eine parallele Transaktion benötigt wird.
 
 =cut
 
@@ -1113,12 +1113,6 @@ sub lockTable {
 
     $cur = $db->sql($stmt,@opt);
 
-=head4 Description
-
-Führe SQL-Statement $stmt über Datenbankverbindung $db aus,
-instantiiere ein Resultat-Objekt (Cursor), und liefere eine Referenz
-auf dieses Objekt zurück.
-
 =head4 Options
 
 =over 4
@@ -1201,6 +1195,12 @@ ansonsten Prty::Database::ResultSet::Object.
 =head4 Returns
 
 Referenz auf Cursor-Objekt (Prty::Database::Cursor)
+
+=head4 Description
+
+Führe SQL-Statement $stmt über Datenbankverbindung $db aus,
+instantiiere ein Resultat-Objekt (Cursor), und liefere eine Referenz
+auf dieses Objekt zurück.
 
 =head4 Details
 
@@ -2030,15 +2030,6 @@ sub loadRow {
 
     $row = $db->nullRow(@select,@opt);
 
-=head4 Description
-
-Liefere Null-Datensatz zu Select-Statement @select und der
-spezifizierten Klasse.
-
-Anmerkung: Die Row-Instantiierung wird gecacht. Je Statement und
-Klasse wird beim ersten Aufruf eine Row instantiiert. Bei allen
-weiteren Aufrufen wird diese Row kopiert.
-
 =head4 Options
 
 =over 4
@@ -2053,6 +2044,15 @@ Default Datensatz-Klasse. Im Falle von -raw=>1 ist
 'Prty::Database::Row::Array' der Default.
 
 =back
+
+=head4 Description
+
+Liefere Null-Datensatz zu Select-Statement @select und der
+spezifizierten Klasse.
+
+Anmerkung: Die Row-Instantiierung wird gecacht. Je Statement und
+Klasse wird beim ersten Aufruf eine Row instantiiert. Bei allen
+weiteren Aufrufen wird diese Row kopiert.
 
 =head4 Example
 
@@ -2109,6 +2109,16 @@ sub nullRow {
     @keyVal|%hash|$arr = $db->values(@select);
     $hash = $db->values(@select,-hash=>1);
 
+=head4 Options
+
+=over 4
+
+=item -hash => $bool (Default: 0)
+
+Liefere Hashreferenz.
+
+=back
+
 =head4 Description
 
 Selektiere Kolumnenwerte und liefere sie als Liste oder Hash
@@ -2145,16 +2155,6 @@ eine C<ORDER BY> Klausel hinzugefügt.
 Im Skalarkontext wird ein Objekt der Klasse C<< Prty::Array >> oder
 der Klasse C<< Prty::Hash >> geliefert. Letzteres, wenn Option
 C<< -hash=>1 >> angegeben ist.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -hash => $bool (Default: 0)
-
-Liefere Hashreferenz.
 
 =back
 
@@ -2265,6 +2265,21 @@ sub values {
 
     $val = $db->value(@select,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn die Ergebnismenge leer ist, sondern C<undef>.
+
+=item -default => $val (Default: undef)
+
+Wenn auf einen Wert ungleich undef gesetzt, wirf keine Exception,
+wenn die Ergebnismenge leer ist, sondern $val.
+
+=back
+
 =head4 Description
 
 Lies den ersten Datensatz der Ergebnismenge und liefere den Wert der
@@ -2290,21 +2305,6 @@ Ist die Ergebnismenge leer, wird eine Exception ausgelöst.
 
 Es ist kein Fehler, wenn mehr als ein Datensatz getroffen wird.
 Es wird allerdings nur der erste Datensatz geliefert.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -sloppy => $bool (Default: 0)
-
-Wirf keine Exception, wenn die Ergebnismenge leer ist, sondern C<undef>.
-
-=item -default => $val (Default: undef)
-
-Wenn auf einen Wert ungleich undef gesetzt, wirf keine Exception,
-wenn die Ergebnismenge leer ist, sondern $val.
 
 =back
 
@@ -2346,11 +2346,6 @@ sub value {
     $cur = $db->insert($table,@opt,@keyVal);
     $cur = $db->insert($table,@opt,\@keys,\@values);
 
-=head4 Description
-
-Füge Datensatz zu Tabelle $table hinzu und liefere das Resultat
-der Ausführung zurück.
-
 =head4 Options
 
 =over 4
@@ -2360,6 +2355,11 @@ der Ausführung zurück.
 Ignoriere Doubletten-Fehler.
 
 =back
+
+=head4 Description
+
+Füge Datensatz zu Tabelle $table hinzu und liefere das Resultat
+der Ausführung zurück.
 
 =cut
 
@@ -2577,10 +2577,6 @@ sub delete {
         @opt,
     );
 
-=head4 Description
-
-Erzeuge Tabelle $table auf der Datenbank.
-
 =head4 Options
 
 =over 4
@@ -2594,6 +2590,10 @@ Erzeuge Tabelle neu, falls sie bereits existiert.
 Erzeuge Tabelle nicht, falls sie bereits existiert.
 
 =back
+
+=head4 Description
+
+Erzeuge Tabelle $table auf der Datenbank.
 
 =cut
 
@@ -3112,10 +3112,6 @@ sub indexExists {
 
     $cur = $db->createIndex($table,\@colNames,@opt);
 
-=head4 Description
-
-Erzeuge Index für Tabelle $table und Kolumnen @colNames auf der Datenbank.
-
 =head4 Options
 
 =over 4
@@ -3138,6 +3134,10 @@ Name des Tablespace, in dem der Index erzeugt wird
 Statement für Unique Index.
 
 =back
+
+=head4 Description
+
+Erzeuge Index für Tabelle $table und Kolumnen @colNames auf der Datenbank.
 
 =cut
 
@@ -3190,14 +3190,14 @@ sub createIndex {
 
     $cur = $db->createUniqueIndex($table,\@colNames,@opt);
 
+=head4 Options
+
+Siehe $db->createIndex()
+
 =head4 Description
 
 Erzeuge Unique Index für Tabelle $table und Kolumnen @colNames
 auf der Datenbank.
-
-=head4 Options
-
-Siehe $db->createIndex()
 
 =cut
 
@@ -3245,18 +3245,6 @@ sub dropIndex {
 
     $db->createSequence($name,@opt);
 
-=head4 Description
-
-Erzeuge Sequenz $name auf Datenbank $db. Die Methode liefert
-keinen Wert zurück.
-
-Unter Oracle und PostgreSQL, die das Konzept der Sequenz haben,
-wird eine normale Sequenz auf der Datenbank erzeugt.
-
-Unter MySQL und SQLite, die das Konzept der Sequenz nicht haben,
-wird eine Tabelle mit Autoinkrement-Kolumne zur Simulation einer
-Sequenz erzeugt.
-
 =head4 Options
 
 =over 4
@@ -3270,6 +3258,18 @@ Droppe Sequenz, falls sie bereits existiert.
 Die Sequenz beginnt mit Startwert $n.
 
 =back
+
+=head4 Description
+
+Erzeuge Sequenz $name auf Datenbank $db. Die Methode liefert
+keinen Wert zurück.
+
+Unter Oracle und PostgreSQL, die das Konzept der Sequenz haben,
+wird eine normale Sequenz auf der Datenbank erzeugt.
+
+Unter MySQL und SQLite, die das Konzept der Sequenz nicht haben,
+wird eine Tabelle mit Autoinkrement-Kolumne zur Simulation einer
+Sequenz erzeugt.
 
 =cut
 
@@ -3579,6 +3579,20 @@ sub viewExists {
         @opt
     );
 
+=head4 Options
+
+=over 4
+
+=item -replace => $bool (Default: 0)
+
+Ersetze den Trigger, falls ein solcher existiert.
+
+=back
+
+=head4 Returns
+
+Cursor
+
 =head4 Description
 
 Erzeuge einen Trigger mit Name $name für Tabelle $table und Zeitpunkt
@@ -3602,20 +3616,6 @@ verschiedene RDBMSe definiert werden:
 
 Die Methode wählt dann die zur Datenbank $db passende
 Rumpf-Definition aus.
-
-=head4 Options
-
-=over 4
-
-=item -replace => $bool (Default: 0)
-
-Ersetze den Trigger, falls ein solcher existiert.
-
-=back
-
-=head4 Returns
-
-Cursor
 
 =head4 Example
 
@@ -4175,7 +4175,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

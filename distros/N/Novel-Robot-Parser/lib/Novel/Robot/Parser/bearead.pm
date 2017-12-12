@@ -22,7 +22,7 @@ sub parse_novel {
   my %res;
   $res{book}         = $r->{name};
   $res{writer}       = $r->{author}{nickname};
-  $res{chapter_list} = [
+  $res{floor_list} = [
     map { { url       => 'https://www.bearead.com/api/book/chapter/content',
         post_data => "bid=$_->{bid}&cid=$_->{cid}",
         title     => $_->{name},

@@ -1,5 +1,10 @@
 Revision history for P5kkelabels
 
+0.03    2017-12-01 03:30:31 Europe/Copenhagen
+ - Upgrade to V3. NB! This will very likely break any code relying on the old
+   behaviour
+ - Add more tests
+
 0.02    2017-08-21 07:06:06 Europe/Copenhagen
 
 0.01    2017-08-20 10:02:56 Europe/Copenhagen

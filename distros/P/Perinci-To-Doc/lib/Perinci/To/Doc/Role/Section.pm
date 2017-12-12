@@ -1,7 +1,7 @@
 package Perinci::To::Doc::Role::Section;
 
-our $DATE = '2017-10-26'; # DATE
-our $VERSION = '0.861'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.862'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -111,7 +111,7 @@ Perinci::To::Doc::Role::Section - Role for class that generates documentation wi
 
 =head1 VERSION
 
-This document describes version 0.861 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2017-10-26.
+This document describes version 0.862 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2017-12-09.
 
 =head1 DESCRIPTION
 
@@ -176,7 +176,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

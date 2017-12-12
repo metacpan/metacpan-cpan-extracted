@@ -2,7 +2,7 @@ package Datahub::Factory::CLI;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use Datahub::Factory;
 use Log::Any::Adapter;

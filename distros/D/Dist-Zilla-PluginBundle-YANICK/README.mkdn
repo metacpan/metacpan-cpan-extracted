@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 # VERSION
 
-version 0.27.0
+version 0.28.0
 
 # DESCRIPTION
 
@@ -49,6 +49,12 @@ time_zone = America/Montreal
 [ManifestSkip]
 
 [Git::GatherDir]
+exclude_filename = cpanfile
+
+[CopyFilesFromBuild]
+copy = cpanfile
+
+
 [ExecDir]
 
 [PkgVersion]
@@ -99,7 +105,12 @@ install_command = cpanm .
 [DOAP]
 process_changes = 1
 
+[TravisCI]
+verbose = 0
+
 [CPANFile]
+
+[CopyrightYearFromGit]
 ```
 
 ## ARGUMENTS
@@ -162,13 +173,25 @@ The name of the upstream repo.
 
 Defaults to `github`.
 
+### travis\_perl\_versions
+
+```
+travis_perl_versions = 14,16,18,20,22,24,26
+```
+
+Comma-separated list of perl versions (without the leading '5') that
+travis should test. Ranges can be given (`14..16`), for which the
+odd numbers will be skipped. So `14..26` will result in `14,16,18,...`.
+
+Defaults to `14..26`.
+
 # AUTHOR
 
 Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Yanick Champoux.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

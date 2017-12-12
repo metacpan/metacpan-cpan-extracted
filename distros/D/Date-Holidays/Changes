@@ -1,5 +1,11 @@
 Changes file for Date-Holidays
 
+1.07 2017-12-10 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::KZ (Kazakhstan) via patch from Vladimir Varlamov
+
+
 1.06 2017-05-31 Maintenance release, update not required
 
 - Added use of Test::Fatal
@@ -30,7 +36,7 @@ Changes file for Date-Holidays
 1.04 2017-05-30 Feature release, update not required
 
 - Added adapter for:
-    Date::Holidays::BY via patch from Vladimir Varlamov
+    Date::Holidays::BY (Belarus) via patch from Vladimir Varlamov
 
 
 1.03 2015-08-10 bug fix release, update not required

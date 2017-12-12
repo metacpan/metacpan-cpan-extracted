@@ -1,11 +1,13 @@
 Changes
 lib/Prty.pm
+lib/Prty/AnsiColor.pm
 lib/Prty/ApplicationPaths.pm
 lib/Prty/Array.pm
 lib/Prty/ClassConfig.pm
 lib/Prty/ClassLoader.pm
 lib/Prty/Color.pm
 lib/Prty/ColumnFormat.pm
+lib/Prty/CommandLine.pm
 lib/Prty/Config.pm
 lib/Prty/Confluence/Client.pm
 lib/Prty/Confluence/Markup.pm
@@ -38,6 +40,10 @@ lib/Prty/Duration.pm
 lib/Prty/Epoch.pm
 lib/Prty/ExampleCode.pm
 lib/Prty/FFmpeg.pm
+lib/Prty/Fibu/Bankbuchung.pm
+lib/Prty/Fibu/BankbuchungListe.pm
+lib/Prty/Fibu/Buchung.pm
+lib/Prty/Fibu/BuchungListe.pm
 lib/Prty/File/Audio.pm
 lib/Prty/File/Image.pm
 lib/Prty/File/Video.pm
@@ -147,6 +153,7 @@ lib/Prty/TimeLapse/Filename.pm
 lib/Prty/TimeLapse/RangeDef.pm
 lib/Prty/TimeLapse/Sequence.pm
 lib/Prty/Timeseries/Synchronizer.pm
+lib/Prty/TreeFormatter.pm
 lib/Prty/Udl.pm
 lib/Prty/Unindent.pm
 lib/Prty/Url.pm
@@ -156,12 +163,14 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
+t/bin/Prty/AnsiColor.t
 t/bin/Prty/ApplicationPaths.t
 t/bin/Prty/Array.t
 t/bin/Prty/ClassConfig.t
 t/bin/Prty/ClassLoader.t
 t/bin/Prty/Color.t
 t/bin/Prty/ColumnFormat.t
+t/bin/Prty/CommandLine.t
 t/bin/Prty/Config.t
 t/bin/Prty/Confluence/Client.t
 t/bin/Prty/Confluence/Markup.t
@@ -194,6 +203,10 @@ t/bin/Prty/Duration.t
 t/bin/Prty/Epoch.t
 t/bin/Prty/ExampleCode.t
 t/bin/Prty/FFmpeg.t
+t/bin/Prty/Fibu/Bankbuchung.t
+t/bin/Prty/Fibu/BankbuchungListe.t
+t/bin/Prty/Fibu/Buchung.t
+t/bin/Prty/Fibu/BuchungListe.t
 t/bin/Prty/File/Audio.t
 t/bin/Prty/File/Image.t
 t/bin/Prty/File/Video.t
@@ -303,6 +316,7 @@ t/bin/Prty/TimeLapse/Filename.t
 t/bin/Prty/TimeLapse/RangeDef.t
 t/bin/Prty/TimeLapse/Sequence.t
 t/bin/Prty/Timeseries/Synchronizer.t
+t/bin/Prty/TreeFormatter.t
 t/bin/Prty/Udl.t
 t/bin/Prty/Unindent.t
 t/bin/Prty/Url.t
@@ -311,6 +325,7 @@ t/bin/Prty/XTerm.t
 t/data/class/MyClass1.pm
 t/data/class/MyClass2.pm
 t/data/class/P1.pm
+t/data/csv/spike-test.csv
 t/data/db/person.tab
 t/data/db/test-databases.conf
 t/data/etc/test1.conf

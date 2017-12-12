@@ -25,4 +25,4 @@ requires:
   String::Print: 0.91
   Sys::Syslog: 0.27
   Test::More: 0.86
-version: 1.23
+version: 1.25

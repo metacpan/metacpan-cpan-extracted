@@ -5,13 +5,31 @@ use warnings;
 
 use Test::More 0.40;
 
-require_ok('Geo::Coder::Geocoder::US');
+{
+    my $warning;
 
-can_ok( 'Geo::Coder::Geocoder::US', qw{ new debug geocode response ua } );
+    local $SIG{__WARN__} = sub {
+	$warning = $_[0];
+    };
 
-my $ms = Geo::Coder::Geocoder::US->new();
+    require_ok('Geo::Coder::Geocoder::US');
 
-isa_ok($ms, 'Geo::Coder::Geocoder::US');
+    my $re = qr/ \A \Q@{[
+	Geo::Coder::Geocoder::US->RETRACTION_MESSAGE() ]}\E /smx;
+
+    like $warning, $re, 'Got correct retraction message on load';
+
+    can_ok( 'Geo::Coder::Geocoder::US', qw{ new debug geocode response ua } );
+
+    $warning = undef;
+
+    my $ms = Geo::Coder::Geocoder::US->new();
+
+    isa_ok($ms, 'Geo::Coder::Geocoder::US');
+
+    like $warning, $re, 'Got correct retraction message on instantiation';
+
+}
 
 done_testing;
 

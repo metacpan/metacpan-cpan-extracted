@@ -23,8 +23,10 @@ t/31-notify-fallback.t
 t/32-specify-backend.t
 t/33-specify-kqueue.t
 t/34-parse_events.t
+t/35-skip_subdirs.t
 t/40-bugs.t
 t/41-bug-modified-in-cb.t
+t/42-inotify-race.t
 t/lib/TestSupport.pm
 TODO
 xt/bench.t
@@ -40,4 +42,3 @@ xt/minimumversion.t
 xt/perlcriticrc
 xt/pod-coverage.t
 xt/pod.t
-xt/profile.t

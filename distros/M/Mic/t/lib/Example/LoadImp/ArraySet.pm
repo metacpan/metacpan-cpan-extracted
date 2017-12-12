@@ -7,14 +7,14 @@ use Mic::Implementation
 
 sub has {
     my ($self, $e) = @_;
-    scalar grep { $_ == $e } @{ $self->{$SET} };
+    scalar grep { $_ == $e } @{ $self->[SET] };
 }
 
 sub add {
     my ($self, $e) = @_;
 
     if ( ! $self->has($e) ) {
-        push @{ $self->{$SET} }, $e;
+        push @{ $self->[SET] }, $e;
     }
 }
 

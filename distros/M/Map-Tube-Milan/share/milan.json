@@ -1,0 +1,146 @@
+{
+    "name": "Milan",
+    "lines": {
+        "line": [
+            { "id": "M1", "name": "M1", "color": "red" },
+            { "id": "M2", "name": "M2", "color": "green" },
+            { "id": "M3", "name": "M3", "color": "yellow" },
+            { "id": "M5", "name": "M5", "color": "purple" }
+        ]
+    },
+    "stations": {
+        "station": [
+            { "id": "RHOFIERAMILANO", "name": "Rho Fieramilano", "line": "M1", "link": "PERO" },
+            { "id": "PERO", "name": "Pero", "line": "M1", "link": "RHOFIERAMILANO,MOLINODORINO" },
+            { "id": "MOLINODORINO", "name": "Molino Dorino", "line": "M1", "link": "PERO,SLEONARDO" },
+            { "id": "SLEONARDO", "name": "S. Leonardo", "line": "M1", "link": "MOLINODORINO,BONOLA" },
+            { "id": "BONOLA", "name": "Bonola", "line": "M1", "link": "SLEONARDO,URUGUAY" },
+            { "id": "URUGUAY", "name": "Uruguay", "line": "M1", "link": "BONOLA,LAMPUGNANO" },
+            { "id": "LAMPUGNANO", "name": "Lampugnano", "line": "M1", "link": "URUGUAY,QT8" },
+            { "id": "QT8", "name": "QT8", "line": "M1", "link": "LAMPUGNANO,LOTTO" },
+            { "id": "LOTTO", "name": "Lotto", "line": "M1,M5", "link": "QT8,SEGESTA,AMENDOLA,PORTELLO" },
+            { "id": "AMENDOLA", "name": "Amendola", "line": "M1", "link": "LOTTO,BUONARROTI" },
+            { "id": "BUONARROTI", "name": "Buonarroti", "line": "M1", "link": "AMENDOLA,PAGANO" },
+
+            { "id": "PAGANO", "name": "Pagano", "line": "M1", "link": "BUONARROTI,WAGNER,CONCILIAZIONE" },
+
+            { "id": "WAGNER", "name": "Wagner", "line": "M1", "link": "PAGANO,DEANGELI" },
+            { "id": "DEANGELI", "name": "De Angeli", "line": "M1", "link": "WAGNER,GAMBARA" },
+            { "id": "GAMBARA", "name": "Gambara", "line": "M1", "link": "DEANGELI,BANDENERE" },
+            { "id": "BANDENERE", "name": "Bande Nere", "line": "M1", "link": "GAMBARA,PRIMATICCIO" },
+            { "id": "PRIMATICCIO", "name": "Primaticcio", "line": "M1", "link": "BANDENERE,INGANNI" },
+            { "id": "INGANNI", "name": "Inganni", "line": "M1", "link": "PRIMATICCIO,BISCEGLIE" },
+            { "id": "BISCEGLIE", "name": "Bisceglie", "line": "M1", "link": "INGANNI" },
+
+            { "id": "CONCILIAZIONE", "name": "Conciliazione", "line": "M1", "link": "PAGANO,CADORNAFN" },
+
+            { "id": "CADORNAFN", "name": "Cadorna F.N.", "line": "M1,M2", "link": "CONCILIAZIONE,LANZA,SAMBROGIO,CAIROLI" },
+
+            { "id": "CAIROLI", "name": "Cairoli", "line": "M1", "link": "CADORNAFN,CORDUSIO" },
+            { "id": "CORDUSIO", "name": "Cordusio", "line": "M1", "link": "CAIROLI,DUOMO" },
+
+            { "id": "DUOMO", "name": "Duomo", "line": "M1,M3", "link": "CORDUSIO,MONTENAPOLEONE,MISSORI,SANBABILA" },
+
+            { "id": "SANBABILA", "name": "San Babila", "line": "M1", "link": "DUOMO,PALESTRO" },
+            { "id": "PALESTRO", "name": "Palestro", "line": "M1", "link": "SANBABILA,PTAVENEZIA" },
+            { "id": "PTAVENEZIA", "name": "Porta Venezia", "line": "M1", "link": "PALESTRO,LIMA" },
+            { "id": "LIMA", "name": "Lima", "line": "M1", "link": "PTAVENEZIA,LORETO" },
+
+            { "id": "LORETO", "name": "Loreto", "line": "M1,M2", "link": "LIMA,CAIAZZO,PIOLA,PASTEUR" },
+
+            { "id": "PASTEUR", "name": "Pasteur", "line": "M1", "link": "LORETO,ROVERETO" },
+            { "id": "ROVERETO", "name": "Rovereto", "line": "M1", "link": "PASTEUR,TURRO" },
+            { "id": "TURRO", "name": "Turro", "line": "M1", "link": "ROVERETO,GORLA" },
+            { "id": "GORLA", "name": "Gorla", "line": "M1", "link": "TURRO,PRECOTTO" },
+            { "id": "PRECOTTO", "name": "Precotto", "line": "M1", "link": "GORLA,VILLASGIOVANNI" },
+            { "id": "VILLASGIOVANNI", "name": "Villa S. Giovanni", "line": "M1", "link": "PRECOTTO,SESTOMARELLI" },
+            { "id": "SESTOMARELLI", "name": "Sesto Marelli", "line": "M1", "link": "VILLASGIOVANNI,SESTORONDO" },
+            { "id": "SESTORONDO", "name": "Sesto Rondò", "line": "M1", "link": "SESTOMARELLI,SESTO1MFS" },
+            { "id": "SESTO1MFS", "name": "Sesto 1º Maggio F.S.", "line": "M1", "link": "SESTORONDO" },
+
+
+            { "id": "ASSAGOFORUM", "name": "Assago Milanofiori Forum", "line": "M2", "link": "ASSAGONORD" },
+            { "id": "ASSAGONORD", "name": "Assago Milanofiori Nord", "line": "M2", "link": "ASSAGOFORUM,FAMAGOSTA" },
+            { "id": "ABBIATEGRASSO", "name": "Piazza Abbiategrasso", "line": "M2", "link": "FAMAGOSTA" },
+            { "id": "FAMAGOSTA", "name": "Famagosta", "line": "M2", "link": "ASSAGONORD,ABBIATEGRASSO,ROMOLO" },
+            { "id": "ROMOLO", "name": "Romolo", "line": "M2", "link": "FAMAGOSTA,PTAGENOVAFS" },
+            { "id": "PTAGENOVAFS", "name": "Porta Genova F.S.", "line": "M2", "link": "ROMOLO,SAGOSTINO" },
+            { "id": "SAGOSTINO", "name": "S. Agostino", "line": "M2", "link": "PTAGENOVAFS,SAMBROGIO" },
+            { "id": "SAMBROGIO", "name": "S. Ambrogio", "line": "M2", "link": "SAGOSTINO,CADORNAFN" },
+            { "id": "LANZA", "name": "Lanza", "line": "M2", "link": "CADORNAFN,MOSCOVA" },
+            { "id": "MOSCOVA", "name": "Moscova", "line": "M2", "link": "LANZA,GARIBALDIFS" },
+
+            { "id": "GARIBALDIFS", "name": "Garibaldi F.S.", "line": "M2,M5", "link": "MOSCOVA,MONUMENTALE,ISOLA,GIOIA" },
+
+            { "id": "GIOIA", "name": "Gioia", "line": "M2", "link": "GARIBALDIFS,CENTRALEFS" },
+
+            { "id": "CENTRALEFS", "name": "Centrale F.S.", "line": "M2,M3", "link": "GIOIA,SONDRIO,REPUBBLICA,CAIAZZO" },
+
+            { "id": "CAIAZZO", "name": "Caiazzo", "line": "M2", "link": "CENTRALEFS,LORETO" },
+            { "id": "PIOLA", "name": "Piola", "line": "M2", "link": "LORETO,LAMBRATEFS" },
+            { "id": "LAMBRATEFS", "name": "Lambrate F.S.", "line": "M2", "link": "PIOLA,UDINE" },
+            { "id": "UDINE", "name": "Udine", "line": "M2", "link": "LAMBRATEFS,CIMIANO" },
+            { "id": "CIMIANO", "name": "Cimiano", "line": "M2", "link": "UDINE,CRESCENZAGO" },
+            { "id": "CRESCENZAGO", "name": "Crescenzago", "line": "M2", "link": "CIMIANO,CASCINAGOBBA" },
+            { "id": "CASCINAGOBBA", "name": "Cascina Gobba", "line": "M2", "link": "CRESCENZAGO,COLOGNOSUD,VIMODRONE" },
+            { "id": "COLOGNOSUD", "name": "Cologno Sud", "line": "M2", "link": "CASCINAGOBBA,COLOGNOCENTRO" },
+            { "id": "COLOGNOCENTRO", "name": "Cologno Centro", "line": "M2", "link": "COLOGNOSUD,COLOGNONORD" },
+            { "id": "COLOGNONORD", "name": "Cologno Nord", "line": "M2", "link": "COLOGNOCENTRO" },
+            { "id": "VIMODRONE", "name": "Vimodrone", "line": "M2", "link": "CASCINAGOBBA,CASCINABURRONA" },
+            { "id": "CASCINABURRONA", "name": "Cascina Burrona", "line": "M2", "link": "VIMODRONE,CERNUSCOSN" },
+            { "id": "CERNUSCOSN", "name": "Cernusco S.N.", "line": "M2", "link": "CASCINABURRONA,VILLAFIORITA" },
+            { "id": "VILLAFIORITA", "name": "Villa Fiorita", "line": "M2", "link": "CERNUSCOSN,CASSINADEPECCHI" },
+            { "id": "CASSINADEPECCHI", "name": "Cassina de' Pecchi", "line": "M2", "link": "VILLAFIORITA,BUSSERO" },
+            { "id": "BUSSERO", "name": "Bussero", "line": "M2", "link": "CASSINADEPECCHI,VILLAPOMPEA" },
+            { "id": "VILLAPOMPEA", "name": "Villa Pompea", "line": "M2", "link": "BUSSERO,GORGONZOLA" },
+            { "id": "GORGONZOLA", "name": "Gorgonzola", "line": "M2", "link": "VILLAPOMPEA,CASCINAANTONIETTA" },
+            { "id": "CASCINAANTONIETTA", "name": "Cascina Antonietta", "line": "M2", "link": "GORGONZOLA,GESSATE" },
+            { "id": "GESSATE", "name": "Gessate", "line": "M2", "link": "CASCINAANTONIETTA" },
+
+            { "id": "COMASINA", "name": "Comasina", "line": "M3", "link": "AFFORIFN" },
+            { "id": "AFFORIFN", "name": "Affori F.N.", "line": "M3", "link": "COMASINA,AFFORICENTRO" },
+            { "id": "AFFORICENTRO", "name": "Affori Centro", "line": "M3", "link": "AFFORIFN,DERGANO" },
+            { "id": "DERGANO", "name": "Dergano", "line": "M3", "link": "AFFORICENTRO,MACIACHINI" },
+            { "id": "MACIACHINI", "name": "Maciachini", "line": "M3", "link": "DERGANO,ZARA" },
+
+            { "id": "ZARA", "name": "Zara", "line": "M3,M5", "link": "MACIACHINI,MARCHE,ISOLA,SONDRIO" },
+
+            { "id": "SONDRIO", "name": "Sondrio", "line": "M3", "link": "ZARA,CENTRALEFS" },
+
+            { "id": "REPUBBLICA", "name": "Repubblica", "line": "M3", "link": "CENTRALEFS,TURATI" },
+            { "id": "TURATI", "name": "Turati", "line": "M3", "link": "REPUBBLICA,MONTENAPOLEONE" },
+            { "id": "MONTENAPOLEONE", "name": "Montenapoleone", "line": "M3", "link": "TURATI,DUOMO" },
+
+            { "id": "MISSORI", "name": "Missori", "line": "M3", "link": "DUOMO,CROCETTA" },
+            { "id": "CROCETTA", "name": "Crocetta", "line": "M3", "link": "MISSORI,PTAROMANA" },
+            { "id": "PTAROMANA", "name": "Porta Romana", "line": "M3", "link": "CROCETTA,LODITIBB" },
+            { "id": "LODITIBB", "name": "Lodi TIBB", "line": "M3", "link": "PTAROMANA,BRENTA" },
+            { "id": "BRENTA", "name": "Brenta", "line": "M3", "link": "LODITIBB,CORVETTO" },
+            { "id": "CORVETTO", "name": "Corvetto", "line": "M3", "link": "BRENTA,PORTODIMARE" },
+            { "id": "PORTODIMARE", "name": "Porto di Mare", "line": "M3", "link": "CORVETTO,ROGOREDOFS" },
+            { "id": "ROGOREDOFS", "name": "Rogoredo F.S.", "line": "M3", "link": "PORTODIMARE,SDONATO" },
+            { "id": "SDONATO", "name": "S. Donato", "line": "M3", "link": "ROGOREDOFS" },
+
+            { "id": "SANSIROSTADIO", "name": "San Siro Stadio", "line": "M5", "link": "SANSIROIPPODROMO" },
+            { "id": "SANSIROIPPODROMO", "name": "San Siro Ippodromo", "line": "M5", "link": "SANSIROSTADIO,SEGESTA" },
+            { "id": "SEGESTA", "name": "Segesta", "line": "M5", "link": "SANSIROIPPODROMO,LOTTO" },
+
+            { "id": "PORTELLO", "name": "Portello", "line": "M5", "link": "LOTTO,TRETORRI" },
+            { "id": "TRETORRI", "name": "Tre Torri", "line": "M5", "link": "PORTELLO,DOMODOSSOLAFN" },
+            { "id": "DOMODOSSOLAFN", "name": "Domodossola F.N.", "line": "M5", "link": "TRETORRI,GERUSALEMME" },
+            { "id": "GERUSALEMME", "name": "Gerusalemme", "line": "M5", "link": "DOMODOSSOLAFN,CENISIO" },
+            { "id": "CENISIO", "name": "Cenisio", "line": "M5", "link": "GERUSALEMME,MONUMENTALE" },
+            { "id": "MONUMENTALE", "name": "Monumentale", "line": "M5", "link": "CENISIO,GARIBALDIFS" },
+
+            { "id": "ISOLA", "name": "Isola", "line": "M5", "link": "GARIBALDIFS,ZARA" },
+
+            { "id": "MARCHE", "name": "Marche", "line": "M5", "link": "ZARA,ISTRIA" },
+            { "id": "ISTRIA", "name": "Istria", "line": "M5", "link": "MARCHE,CAGRANDA" },
+            { "id": "CAGRANDA", "name": "Ca' Granda", "line": "M5", "link": "ISTRIA,BICOCCA" },
+            { "id": "BICOCCA", "name": "Bicocca", "line": "M5", "link": "CAGRANDA,PONALE" },
+            { "id": "PONALE", "name": "Ponale", "line": "M5", "link": "BICOCCA,BIGNAMIPARCONORD" },
+            { "id": "BIGNAMIPARCONORD", "name": "Bignami Parco Nord", "line": "M5", "link": "PONALE" }
+
+        ]
+    }
+}

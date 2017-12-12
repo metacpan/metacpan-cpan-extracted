@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::EIZ;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.94';
+our $VERSION = '0.96';
 
 use Catmandu::Importer::OAI;
 use Moo;
@@ -22,16 +22,6 @@ has from                   => (is => 'ro');
 has until                  => (is => 'ro');
 has username               => (is => 'ro');
 has password               => (is => 'ro');
-has pids_path              => (is => 'ro', required => 1);
-has aat_path               => (is => 'ro', required => 1);
-has creators_path          => (is => 'ro', required => 1);
-# has pid_module             => (is => 'ro', default => 'rcf');
-# has pid_username           => (is => 'ro');
-# has pid_password           => (is => 'ro');
-# has pid_lwp_realm          => (is => 'ro');
-# has pid_lwp_base_url       => (is => 'ro');
-# has pid_rcf_container_name => (is => 'ro');
-
 
 sub _build_importer {
     my $self = shift;
@@ -51,95 +41,12 @@ sub _build_importer {
     my $importer = Catmandu::Importer::OAI->new(
        $options
     );
-    $self->prepare();
+
     return $importer;
 }
 
-sub prepare {
-    my $self = shift;
-    $self->logger->info('Creating "pids" temporary table.');
-    $self->__pids();
-    $self->logger->info('Creating "creators" temporary table.');
-    $self->__creators();
-    $self->logger->info('Creating "aat" temporary table.');
-    $self->__aat();
-}
-
-sub __pids {
-    my $self = shift;
-    $self->temporary_table($self->pids_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/PIDS_MSK_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'PIDS_MSK_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path);
-}
-
-sub __creators {
-    my $self = shift;
-    $self->temporary_table($self->creators_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/CREATORS_MSK_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'CREATORS_MSK_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path);
-}
-
-sub __aat {
-    my $self = shift;
-    $self->temporary_table($self->aat_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/AAT_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'AAT_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path, 'record - object_name');
-}
-
-sub temporary_table {
-    my ($self, $csv_location, $id_column) = @_;
-    my $store_table = fileparse($csv_location, '.csv');
-
-    unless (-e $csv_location) {
-        Catmandu::BadArg->throw(
-            message => sprintf('The CSV file %s is missing.', $store_table)
-        );
-    }
-
-    my $importer = Catmandu->importer(
-        'CSV',
-        file => $csv_location
-    );
-    my $store = Catmandu->store(
-        'DBI',
-        data_source => sprintf('dbi:SQLite:/tmp/import.%s.sqlite', $store_table),
-    );
-    $importer->each(sub {
-            my $item = shift;
-            if (defined ($id_column)) {
-                $item->{'_id'} = $item->{$id_column};
-            }
-            my $bag = $store->bag();
-            # first $bag->get($item->{'_id'})
-            $bag->add($item);
-        });
-}
-
 1;
+
 __END__
 
 =encoding utf-8
@@ -158,10 +65,6 @@ L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
         url                    => 'https://endpoint.eiz.be/oai',
         metadataPrefix         => 'oai_lido',
         set                    => '2011',
-        pid_module             => 'rcf',
-        pid_username           => 'datahub',
-        pid_password           => 'datahub',
-        pid_rcf_container_name => 'datahub',
     );
 
     $oai->importer->each(sub {
@@ -179,11 +82,6 @@ I<until>).
 
 It automatically deals with I<resumptionTokens>, so client code does not have to
 implement paging.
-
-To support PIDs, it uses Rackspace Cloud Files to fetch PID CSV's and convert
-them to temporary sqlite tables.
-
-Provide C<pid_username>, C<pid_password> and C<pid_rcf_container_name>.
 
 =head1 PARAMETERS
 
@@ -243,40 +141,6 @@ Optionally, a I<must_be_younger_than> date.
 =item C<username>
 
 =item C<password>
-
-=back
-
-=head2 PID options
-
-=over
-
-=item C<pid_module>
-
-Choose the PID module you want to use. Set to I<rcf> to use Rackspace Cloud Files, or to
-I<lwp> to use a public web site.
-
-=item C<pid_username>
-
-Provide your Rackspace Cloud Files username. If you selected I<lwp>, provide an optional
-username (for HTTP Basic Authentication).
-
-=item C<pid_password>
-
-Provide your Rackspace Cloud Files api key. For I<lwp>, an optional password.
-
-=item C<pid_rcf_container_name>
-
-Provide the container name that holds the PID CSV's for I<rcf>.
-
-=item C<pid_lwp_realm>
-
-For I<lwp>, provide (optionally) the HTTP Basic Authentication Realm.
-
-=item C<pid_lwp_base_url>
-
-For I<lwp>, provide the URL where the CSV's are stored. This URL is used in addition
-to the name of the CSV file to create the URL where the file can be fetched from (i.e
-C<my $url = $pid_lwp_base_url + $csv_file_name>).
 
 =back
 

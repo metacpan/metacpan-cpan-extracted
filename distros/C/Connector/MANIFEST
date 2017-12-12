@@ -32,6 +32,7 @@ lib/Connector/Proxy/Config/Std.pm
 lib/Connector/Proxy/Config/Versioned.pm
 lib/Connector/Proxy/DBI.pm
 lib/Connector/Proxy/HTTP.pm
+lib/Connector/Proxy/Net/FTP.pm
 lib/Connector/Proxy/Net/LDAP.pm
 lib/Connector/Proxy/Net/LDAP/DN.pm
 lib/Connector/Proxy/Net/LDAP/Simple.pm
@@ -63,6 +64,7 @@ t/01-multi-yaml.t
 t/01-multi.t
 t/01-proxy-config-std.t
 t/01-proxy-config-versioned.t
+t/01-proxy-ftp.t
 t/01-proxy-http.t
 t/01-proxy-net-ldap.t
 t/01-proxy-net-ldap.t.disabled
@@ -116,3 +118,4 @@ t/config/test/list/test/0
 t/config/test/list/test/1
 t/config/test/list/test/2
 t/config/test/list/test/3
+test.pl

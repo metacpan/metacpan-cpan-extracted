@@ -612,7 +612,11 @@ sub to_toml ( $data, @ ) {
 sub from_toml ( $data, @ ) {
     state $init = !!require TOML;
 
-    return TOML::from_toml( $data->$* );
+    my ( $hash, $err ) = TOML::from_toml( $data->$* );
+
+    die $err if $err;
+
+    return $hash;
 }
 
 # BASE64
@@ -823,9 +827,9 @@ sub to_xor ( $buf, $mask ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
 ## |      | 380, 433             | * Postfix control "for" used                                                                                   |
-## |      | 802                  | * Postfix control "while" used                                                                                 |
+## |      | 806                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 666                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 670                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

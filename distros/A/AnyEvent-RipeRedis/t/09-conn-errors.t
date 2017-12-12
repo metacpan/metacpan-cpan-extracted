@@ -25,6 +25,7 @@ sub t_cant_connect {
   my $t_cmd_err;
 
   AE::now_update();
+
   ev_loop(
     sub {
       my $cv = shift;
@@ -73,6 +74,7 @@ sub t_no_connection {
   my $t_cmd_err_1;
 
   AE::now_update();
+
   ev_loop(
     sub {
       my $cv = shift;
@@ -152,6 +154,7 @@ sub t_reconnection {
     my $redis;
 
     AE::now_update();
+
     ev_loop(
       sub {
         my $cv = shift;
@@ -252,15 +255,18 @@ sub t_read_timeout {
     my $t_cli_err;
     my $t_cmd_err;
 
+    AE::now_update();
+
     ev_loop(
       sub {
         my $cv = shift;
 
         $redis = AnyEvent::RipeRedis->new(
-          host         => $server_info->{host},
-          port         => $server_info->{port},
-          reconnect    => 0,
-          read_timeout => 1,
+          host               => $server_info->{host},
+          port               => $server_info->{port},
+          reconnect          => 0,
+          connection_timeout => 6,
+          read_timeout       => 1,
 
           on_error => sub {
             $t_cli_err = shift;

@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -32,12 +32,6 @@ L<Prty::Object>
 =head4 Synopsis
 
     $val = $class->askUser($text,@opt);
-
-=head4 Description
-
-Fordere den Benutzer mit Prompt $text zur Eingabe eines
-Werts auf. Der vom Benutzer eingegebene Wert wird zurückgeliefert.
-Whitespace am Anfang und am Ende des Werts werden entfernt.
 
 =head4 Options
 
@@ -97,6 +91,12 @@ Liste der zulässigen Antworten. Ist die Antwort nicht in der Liste
 enthalten, wird die Frage erneut gestellt.
 
 =back
+
+=head4 Description
+
+Fordere den Benutzer mit Prompt $text zur Eingabe eines
+Werts auf. Der vom Benutzer eingegebene Wert wird zurückgeliefert.
+Whitespace am Anfang und am Ende des Werts werden entfernt.
 
 =head4 Example
 
@@ -289,7 +289,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

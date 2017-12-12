@@ -1,9 +1,6 @@
 # Avoid version control files.
-\bRCS\b
-\bCVS\b
-,v$
-\B\.svn\b
-.gitignore$
+\.gitignore$
+\.git$
 
 # Avoid Makemaker generated and utility files.
 \bMakefile$
@@ -11,7 +8,7 @@
 \bMakeMaker-\d
 \bpm_to_blib$
 \bblibdirs$
-^MYMETA.yml$
+^MYMETA\.yml$
 ^MYMETA\.json$
 
 # Avoid Module::Build generated and utility files.
@@ -19,6 +16,9 @@
 \bBuild.bat$
 \b_build
 .tar.gz$
+
+# Avoid tars and their unpacked directory trees
+^Lab-Measurement
 
 # Avoid temp and backup files.
 ~$
@@ -37,12 +37,7 @@ nytprof
 # coding documentation not for distribution
 \bdoc\b
 
-# author utility script
-
-^authorstats$
-
 # drivers and modules that are not ready yet for release
-
 
 # dont distribute the old examples
 ^examples/Old

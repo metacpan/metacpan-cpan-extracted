@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::V0;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 BEGIN {
     push @Test2::Bundle::Extended::ISA => 'Test2::V0';
@@ -442,7 +442,7 @@ See L<Test2::Tools::Warnings>.
 =head1 SOURCE
 
 The source code repository for Test2-Suite can be found at
-F<http://github.com/Test-More/Test2-Suite/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

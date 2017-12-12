@@ -22,7 +22,7 @@
 #include "spvm_call_field.h"
 #include "spvm_call_sub.h"
 #include "spvm_type.h"
-#include "spvm_bytecode_builder.h"
+#include "spvm_opcode_builder.h"
 #include "spvm_op_checker.h"
 #include "spvm_switch_info.h"
 #include "spvm_descriptor.h"
@@ -32,6 +32,7 @@
 #include "spvm_constant_pool.h"
 #include "spvm_constant_pool_type.h"
 #include "spvm_constant_pool_package.h"
+#include "spvm_constant_pool_sub.h"
 #include "spvm_our.h"
 #include "spvm_package_var.h"
 #include "spvm_jitcode_builder.h"
@@ -916,11 +917,7 @@ SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_term_condi
   return op_condition;
 }
 
-SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_statement_init, SPVM_OP* op_term_condition, SPVM_OP* op_term_next_value, SPVM_OP* op_block) {
-  
-  // Outer block for initialize loop variable
-  SPVM_OP* op_block_outer = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, op_for->file, op_for->line);
-  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_statement_init);
+SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_statement_init, SPVM_OP* op_term_condition, SPVM_OP* op_term_next_step, SPVM_OP* op_block) {
   
   // Loop
   SPVM_OP* op_loop = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LOOP, op_for->file, op_for->line);
@@ -931,25 +928,32 @@ SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, S
   
   // Set block flag
   op_block->flag |= SPVM_OP_C_FLAG_BLOCK_LOOP;
+
+  // Outer block for initialize loop variable
+  SPVM_OP* op_block_outer = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, op_for->file, op_for->line);
   
-  // Push next value to the last of statements in block
-  SPVM_OP* op_statements = op_block->first;
-  if (op_term_next_value->code != SPVM_OP_C_CODE_NULL) {
-    SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_term_next_value);
-  }
+  // Block for next step
+  SPVM_OP* op_block_next_step = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, op_for->file, op_for->line);
+  op_block_next_step->flag |= SPVM_OP_C_FLAG_BLOCK_LOOP_NEXT_STEP;
+  SPVM_OP_insert_child(compiler, op_block_next_step, op_block_next_step->last, op_term_next_step);
   
-  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_condition);
-  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_statement_init);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_condition);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_block_next_step);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_block);
   
-  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_loop);
+  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block_outer);
   
-  return op_block_outer;
+  return op_loop;
 }
 
 SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_while, SPVM_OP* op_term_condition, SPVM_OP* op_block) {
   
   // Loop
   SPVM_OP* op_loop = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LOOP, op_while->file, op_while->line);
+  
+  // Init statement. This is null.
+  SPVM_OP* op_statement_init = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, op_while->file, op_while->line);
   
   // Condition
   SPVM_OP* op_condition = SPVM_OP_build_condition(compiler, op_term_condition, 1);
@@ -958,15 +962,24 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   // Set block flag
   op_block->flag |= SPVM_OP_C_FLAG_BLOCK_LOOP;
   
-  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_condition);
-  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block);
-  
-  // while is wraped with block to allow the following syntax
-  // while (my $var = 3) { ... }
+  // Next value. This is null.
+  SPVM_OP* op_term_next_step = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, op_while->file, op_while->line);
+
   SPVM_OP* op_block_outer = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, op_while->file, op_while->line);
-  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_loop);
+
+  // Block for next step
+  SPVM_OP* op_block_next_step = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, op_while->file, op_while->line);
+  op_block_next_step->flag |= SPVM_OP_C_FLAG_BLOCK_LOOP_NEXT_STEP;
+  SPVM_OP_insert_child(compiler, op_block_next_step, op_block_next_step->last, op_term_next_step);
+
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_statement_init);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_condition);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_block_next_step);
+  SPVM_OP_insert_child(compiler, op_block_outer, op_block_outer->last, op_block);
   
-  return op_block_outer;
+  SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block_outer);
+  
+  return op_loop;
 }
 
 SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_term_condition, SPVM_OP* op_block_true, SPVM_OP* op_block_false) {
@@ -1482,6 +1495,8 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
       SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_subs, sub_index);
       SPVM_SUB* sub = op_sub->uv.sub;
       sub->id = SPVM_CONSTANT_POOL_push_sub(compiler, compiler->constant_pool, sub);
+      SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&compiler->constant_pool->values[sub->id];
+      constant_pool_sub->native_address = sub->native_address;
     }
   }
 
@@ -1532,9 +1547,6 @@ SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages) {
     return NULL;
   }
   
-  // Build constant pool
-  SPVM_OP_build_constant_pool(compiler);
-  
   if (compiler->fatal_error) {
     return NULL;
   }
@@ -1543,12 +1555,6 @@ SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages) {
   if (compiler->error_count > 0) {
     return NULL;
   }
-  
-  // Build bytecode
-  SPVM_BYTECODE_BUILDER_build_bytecode_array(compiler);
-  
-  // Build JIT code(This is C source code which is passed to gcc)
-  SPVM_JITCODE_BUILDER_build_jitcode(compiler);
   
   return op_grammar;
 }

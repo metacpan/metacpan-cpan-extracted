@@ -112,7 +112,7 @@ sub postscript_view_file {
   my ($filename, %options) = @_;
   require IPC::Run;
   my @command = ('gv',
-                 '--scale=.4',
+                 '--scale=.7',
                  $filename);
   if ($options{'synchronous'}) {
     IPC::Run::run(\@command);
@@ -1072,7 +1072,6 @@ HERE
 
     if ($num_vertices == 0) {
       print $h "empty\n";
-      next;
     }
     print $h <<"HERE";
   <FORM name="DoSearchGraphFromFile" id="DoSearchGraphFromFile"

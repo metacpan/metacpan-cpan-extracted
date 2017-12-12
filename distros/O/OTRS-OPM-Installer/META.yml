@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ requires:
   Module::Path: '0'
   Moo: '0'
   OTRS::OPM::Parser: '0'
-  OTRS::Repository: '0'
+  OTRS::Repository: '0.08'
   Regexp::Common: '0'
   Test::More: '0'
   Type::Tiny: '0'
@@ -35,5 +35,5 @@ resources:
   bugtracker: http://github.com/reneeb/OTRS-OPM-Installer/issues
   homepage: http://github.com/reneeb/OTRS-OPM-Installer
   repository: http://github.com/reneeb/OTRS-OPM-Installer.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -18,9 +18,19 @@ use constant +{
     SHORT_DESCRIPTION_LENGTH => 100,
 };
 
+sub type ($); # type has recursive call
+
 sub type ($) {
     my $def = shift;
     my $bar = '&#124;';
+
+    if (ref $def) {
+        for my $type (qw(oneOf anyOf allOf)) {
+            if (my $union = $def->{$type}) {
+                return join($bar, map { type($_) } @$union);
+            }
+        }
+    }
 
     my $ref = ref $def ? $def->{'$ref'} : $def;
     if ($ref) {

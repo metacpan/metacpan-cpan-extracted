@@ -1,32 +1,26 @@
 package Mojo::Base::Che;
-
+# ABSTRACT: current copied from Mojo::Base 7.57 + comment the line 33 + sub _lib_flags
 use strict;
 use warnings;
 use utf8;
 use feature ();
-#~ binmode(STDOUT, ":utf8");
-#~ binmode(STDERR, ":utf8");
 
 # No imports because we get subclassed, a lot!
-use Carp ();
+use Carp         ();
+use Scalar::Util ();
+
+# Defer to runtime so Mojo::Util can use "-strict"
+require Mojo::Util;
 
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
+# Role support requires Role::Tiny 2.000001+
+use constant ROLES =>
+  !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
-
-# Declared here to avoid circular require problems in Mojo::Util
-sub _monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
-}
 
 sub attr {
   my ($self, $attrs, $value) = @_;
@@ -36,115 +30,118 @@ sub attr {
     if ref $value && ref $value ne 'CODE';
 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
+    # patch1
     #~ Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Very performance-sensitive code with lots of micro-optimizations
     if (ref $value) {
-      _monkey_patch $class, $attr, sub {
+      my $sub = sub {
         return
           exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     elsif (defined $value) {
-      _monkey_patch $class, $attr, sub {
+      my $sub = sub {
         return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     else {
-      _monkey_patch $class, $attr,
-        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
+      Mojo::Util::monkey_patch($class, $attr,
+        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
     }
   }
 }
 
 sub import {
-  my $class = shift;
-  #~ return unless my $flag = shift;
-  
-  my ($flag, $findbin,);
-  my @flags = ();
-  my @libs = ();
-
-  # parse flags
-  while ((my $it = shift) || @_) {
-    unshift @_, @$it
-      and next
-      if ref $it eq 'ARRAY';
-    
-    next 
-      unless defined($it) && $it =~ m'/|\w';# /  root lib? lets
-    
-    # controll flag
-    if ($it =~ s'^(-\w+)'') {
-      
-      $flag = $1;
-      push @flags, $flag
-        and next
-        unless $flag eq '-lib';
-      
-      unshift @_, split m'[:;]+', $it # -lib:foo;bar
-        if $it;
-      
-      next;
-      
-    } else { # non controll
-      
-      push @flags, $it
-        and next
-        unless $flag && $flag eq '-lib';# non lib items
-      
-    }
-    
-    # abs lib
-    push @libs, $it
-      and next
-      if $it =~ m'^/';
-    
-    # relative lib
-    $findbin ||= do {
-      require FindBin;
-      $FindBin::Bin;
-    };
-    push @libs, $findbin.'/'.$it;
-  }
-  
-  if ( @libs && (my @ok_libs = grep{ my $lib = $_; not scalar grep($lib eq $_, @INC) } @libs) ) {
-    require lib;
-    lib->import(@ok_libs);
-  }
-  
-  $flag = shift @flags
-    or return;
+  my ($class, $caller) = (shift, caller);
+  return unless my @flags = _lib_flags(@_);
 
   # Base
-  if ($flag eq '-base') { $flag = $class }
+  if ($flags[0] eq '-base') { $flags[0] = $class }
 
   # Strict
-  elsif ($flag eq '-strict') { $flag = undef }
+  elsif ($flags[0] eq '-strict') { $flags[0] = undef }
 
-  # Module
-  elsif ((my $file = $flag) && !$flag->can('new')) {
-    $file =~ s!::|'!/!g;
-    require "$file.pm";
+  # Role
+  elsif ($flags[0] eq '-role') {
+    Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+    eval "package $caller; use Role::Tiny; 1" or die $@;
   }
 
-  # ISA
-  if ($flag) {
-    my $caller = caller;
+  # Module
+  elsif ($flags[0] && !$flags[0]->can('new')) {
+    require(Mojo::Util::class_to_path($flags[0]));
+  }
+
+  # "has" and possibly ISA
+  if ($flags[0]) {
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flag;
-    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
+    push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
+    Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
   }
 
   # Mojo modules are strict!
   $_->import for qw(strict warnings utf8);
   feature->import(':5.10');
+
+  # Signatures (Perl 5.20+)
+  if (($flags[1] || '') eq '-signatures') {
+    Carp::croak 'Subroutine signatures require Perl 5.20+' if $] < 5.020;
+    require experimental;
+    experimental->import('signatures');
+  }
+}
+
+sub _lib_flags {# patch2
+  my ($flag, $findbin, @flags, @libs) = ();
+
+  while ((my $it = shift) || @_) {# parse flags
+    unshift @_, @$it
+      and next
+      if ref $it eq 'ARRAY';
+     
+    next
+      unless defined($it) && $it =~ m'/|\w';# /  root lib? lets
+
+    if ($it =~ s'^(-\w+)'') {# controll flag
+      $flag = $1;
+      push @flags, $flag
+        and next
+        unless $flag eq '-lib';
+
+      unshift @_, split m'[:;]+', $it # -lib:foo;bar
+        if $it;
+
+      next;
+    } elsif (!$flag || $flag ne '-lib') { # non controll
+      push @flags, $it;
+      next;
+        #~ unless $flag && $flag eq '-lib';# non lib items
+    }
+    
+    push @libs, $it # abs lib
+      and next
+      if $it =~ m'^/';
+    
+    $findbin ||= require FindBin && $FindBin::Bin;# relative lib
+    push @libs, $findbin.'/'.$it;
+  }
+  
+  my @ok_libs = grep { my $lib = $_; not scalar grep($lib eq $_, @INC) } @libs
+    if @libs;
+  require lib
+    and lib->import(@ok_libs)
+    if @ok_libs;
+  
+  return @flags;
 }
 
 sub new {
@@ -156,6 +153,18 @@ sub tap {
   my ($self, $cb) = (shift, shift);
   $_->$cb(@_) for $self;
   return $self;
+}
+
+sub with_roles {
+  Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+  my ($self, @roles) = @_;
+
+  return Role::Tiny->create_class_with_roles($self,
+    map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)
+    unless my $class = Scalar::Util::blessed $self;
+
+  return Role::Tiny->apply_roles_to_object($self,
+    map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles);
 }
 
 1;
@@ -172,9 +181,9 @@ sub tap {
 
 =head1 NAME
 
-Mojo::Base::Che - use Mojo::Base::Che 'SomeBaseClass',-lib, qw(rel/path/lib /abs/path/lib);
+Mojo::Base::Che - current copied from L<Mojo::Base> 7.57 where commented the line 33 + sub _lib_flags
 
-=head1 DESCR
+=head1 DESCRIPTION
 
 Чистая копия L<Mojo::Base> и небольшие патчи.
 
@@ -182,11 +191,11 @@ Mojo::Base::Che - use Mojo::Base::Che 'SomeBaseClass',-lib, qw(rel/path/lib /abs
 
 1. Добавление путей в @INC;
 
-2. Разрешены хазы не латиницей;
+2. Разрешены хазы/атрибуты не только латиницей;
 
 =head1 SYNOPSIS
 
-This module provide a fourth extended form for add extra lib directories to perl's search path. See <lib>
+This module provide a extended form for add extra lib directories to perl's search path. See L<lib>
 
   use Mojo::Base::Che -lib, qw(rel/path/lib /abs/path/lib);
   use Mojo::Base::Che -lib, ['lib1', 'lib2'];
@@ -195,12 +204,13 @@ This module provide a fourth extended form for add extra lib directories to perl
   use Mojo::Base::Che qw(-base -lib lib1 lib2);
   use Mojo::Base::Che 'SomeBaseClass', qw(-lib lib1 lib2);
   
+  # non latinic names allow
   has qw(хаз);
 
 For relative lib path will use L<FindBin> module and C<$FindBin::Bin> is prepends to that lib.
 Libs always applied first even its last on flags list.
 
-All three L<Mojo::Base> forms works also.
+Other L<Mojo::Base> forms works also.
 
 =head1 SEE ALSO
 

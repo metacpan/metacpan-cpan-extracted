@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 8;
+$VERSION = 10;
 @ISA = ('Graph::Maker');
 
 
@@ -43,6 +43,8 @@ sub init {
 
   my $directed = $graph->is_directed;
   foreach my $u (1 .. $N) {
+    $graph->add_vertex ($u);
+    $graph->add_vertex ($u+$N);
     foreach my $v (1 .. $N) {
       if ($u != $v) {
         $graph->add_edge($u, $v+$N);
@@ -107,19 +109,15 @@ House of Graphs entries for the graphs here include
 
 =over
 
-=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+=item N=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6901>  (empty)
 
-=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+=item N=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19653>  (2 isolated)
 
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+=item N=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=538>  (two path-2)
 
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=260>  (path-8)
+=item N=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=670>  (6-cycle)
 
-=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27042>
-
-=item level=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27044>
-
-=item level=6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27046>
+=item N=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>  (cube)
 
 =back
 

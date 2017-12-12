@@ -4,7 +4,7 @@ use base qw/Prty::File::Image/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::TimeLapse::Filename;
 
@@ -61,11 +61,6 @@ Hierbei ist NNNNNN die Bild-Nummer.
 
     $img = $class->new($file);
 
-=head4 Description
-
-Instantiiere Datei $file als Bilddatei-Objekt und liefere eine
-Referenz auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -79,6 +74,11 @@ Pfad der Bilddatei.
 =head4 Returns
 
 Referenz auf das Bilddatei-Objekt.
+
+=head4 Description
+
+Instantiiere Datei $file als Bilddatei-Objekt und liefere eine
+Referenz auf dieses Objekt zurück.
 
 =cut
 
@@ -111,13 +111,13 @@ L</"BASE CLASS">).
 
     $n = $img->number;
 
-=head4 Description
-
-Liefere die Nummer des Bildes als Zahl. Z.B. 47.
-
 =head4 Returns
 
 Integer >= 1
+
+=head4 Description
+
+Liefere die Nummer des Bildes als Zahl. Z.B. 47.
 
 =cut
 
@@ -135,13 +135,13 @@ sub number {
 
     $width = $img->width;
 
-=head4 Description
-
-Liefere die Breite des Bildes.
-
 =head4 Returns
 
 Integer >= 1
+
+=head4 Description
+
+Liefere die Breite des Bildes.
 
 =cut
 
@@ -160,13 +160,13 @@ sub width {
 
     $height = $img->height;
 
-=head4 Description
-
-Liefere die Höhe des Bildes.
-
 =head4 Returns
 
 Integer >= 1
+
+=head4 Description
+
+Liefere die Höhe des Bildes.
 
 =cut
 
@@ -185,13 +185,13 @@ sub height {
 
     $text = $img->text;
 
-=head4 Description
-
-Liefere den Text des Dateinamens.
-
 =head4 Returns
 
 String
+
+=head4 Description
+
+Liefere den Text des Dateinamens.
 
 =cut
 
@@ -205,7 +205,7 @@ sub text {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

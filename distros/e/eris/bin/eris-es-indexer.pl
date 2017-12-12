@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: eris-es-indexer.pl
 # ABSTRACT: Sample implementation using the eris toolkit to index data to elasticsearch
 ## no critic (RequireEndWithOne)
@@ -64,7 +64,7 @@ my $eris = eris::log::contextualizer->new(
     config => $config,
 );
 my $schemas = eris::schemas->new(
-    exists $config->{schemas} ? ( config => $config->{schemas} ) : (),
+    exists $config->{schemas} ? ( %{ $config->{schemas} } ) : (),
 );
 
 # POE Sessions
@@ -229,7 +229,7 @@ sub es_mapping {
                                     country     => { type => 'string', index => 'not_analyzed' },
                                     continent   => { type => 'string', index => 'not_analyzed' },
                                     postal_code => { type => 'string', index => 'not_analyzed' },
-                                    location    => { type => 'geopoint', lat_lon => 'true' },
+                                    location    => { type => 'geo_point' },
                                 }
                             },
                         }},
@@ -309,7 +309,7 @@ sub es_mapping {
                                     country     => { type => 'keyword' },
                                     continent   => { type => 'keyword' },
                                     postal_code => { type => 'keyword' },
-                                    location    => { type => 'geopoint', lat_lon => 'true' },
+                                    location    => { type => 'geo_point' },
                                 }
                             },
                         }},
@@ -450,7 +450,7 @@ eris-es-indexer.pl - Sample implementation using the eris toolkit to index data 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 AUTHOR
 

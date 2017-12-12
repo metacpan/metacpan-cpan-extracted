@@ -30,49 +30,6 @@ static SV *newSVivpv(int iv, const char *pv)
   return sv;
 }
 
-static SV *tickit_ev2sv(TickitEventType ev)
-{
-  const char *name = NULL;
-  switch(ev) {
-    case TICKIT_EV_CHANGE:     name = "change";     break;
-    case TICKIT_EV_EXPOSE:     name = "expose";     break;
-    case TICKIT_EV_FOCUS:      name = "focus";      break;
-    case TICKIT_EV_GEOMCHANGE: name = "geomchange"; break;
-    case TICKIT_EV_KEY:        name = "key";        break;
-    case TICKIT_EV_MOUSE:      name = "mouse";      break;
-    case TICKIT_EV_RESIZE:     name = "resize";     break;
-  }
-  return newSVivpv(ev, name);
-}
-
-static TickitEventType tickit_name2ev(const char *name)
-{
-  switch(name[0]) {
-    case 'c':
-      return streq(name+1, "hange") ? TICKIT_EV_CHANGE
-                                    : -1;
-    case 'e':
-      return streq(name+1, "xpose") ? TICKIT_EV_EXPOSE
-                                    : -1;
-    case 'f':
-      return streq(name+1, "ocus") ? TICKIT_EV_FOCUS
-                                   : -1;
-    case 'g':
-      return streq(name+1, "eomchange") ? TICKIT_EV_GEOMCHANGE
-                                        : -1;
-    case 'k':
-      return streq(name+1, "ey") ? TICKIT_EV_KEY
-                                 : -1;
-    case 'm':
-      return streq(name+1, "ouse") ? TICKIT_EV_MOUSE
-                                   : -1;
-    case 'r':
-      return streq(name+1, "esize") ? TICKIT_EV_RESIZE
-                                    : -1;
-  }
-  return -1;
-}
-
 static SV *tickit_focusevtype2sv(TickitFocusEventType type)
 {
   const char *name = NULL;
@@ -185,6 +142,7 @@ static int tickit_name2mousewheel(const char *name)
 
 struct GenericEventData
 {
+  int ev;
   SV *self;
   CV *code;
   SV *data;
@@ -353,48 +311,47 @@ static TickitTermCtl term_name2ctl(const char *name)
   return -1;
 }
 
-static int term_userevent_fn(TickitTerm *tt, TickitEventType ev, void *_info, void *user)
+static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info, void *user)
 {
   struct GenericEventData *data = user;
 
   int ret = 0;
 
-  if(ev & ~(TICKIT_EV_UNBIND|TICKIT_EV_DESTROY)) {
+  if(flags & TICKIT_EV_FIRE) {
     SV *info_sv = newSV(0);
+    char *evname;
 
-    switch(ev) {
-      case TICKIT_EV_KEY: {
+    switch((TickitTermEvent)data->ev) {
+      case TICKIT_TERM_ON_KEY: {
         TickitKeyEventInfo *info = _info, *self;
         Newx(self, 1, TickitKeyEventInfo);
         *self = *info;
         self->str = savepv(info->str);
 
+        evname = "key";
         sv_setref_pv(info_sv, "Tickit::Event::Key", self);
         break;
       }
 
-      case TICKIT_EV_MOUSE: {
+      case TICKIT_TERM_ON_MOUSE: {
         TickitMouseEventInfo *info = _info, *self;
         Newx(self, 1, TickitMouseEventInfo);
         *self = *info;
 
+        evname = "mouse";
         sv_setref_pv(info_sv, "Tickit::Event::Mouse", self);
         break;
       }
 
-      case TICKIT_EV_RESIZE: {
+      case TICKIT_TERM_ON_RESIZE: {
         TickitResizeEventInfo *info = _info, *self;
         Newx(self, 1, TickitResizeEventInfo);
         *self = *info;
 
+        evname = "resize";
         sv_setref_pv(info_sv, "Tickit::Event::Resize", self);
         break;
       }
-
-      // These don't happen to terminal
-      case TICKIT_EV_CHANGE:
-        SvREFCNT_dec(info_sv);
-        return 0;
     }
 
     dSP;
@@ -404,7 +361,7 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventType ev, void *_info, vo
     PUSHMARK(SP);
     EXTEND(SP, 4);
     mPUSHs(newSVsv(data->self));
-    mPUSHs(tickit_ev2sv(ev));
+    mPUSHs(newSVivpv(data->ev, evname));
     mPUSHs(info_sv);
     mPUSHs(newSVsv(data->data));
     PUTBACK;
@@ -420,7 +377,7 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventType ev, void *_info, vo
     LEAVE;
   }
 
-  if(ev & TICKIT_EV_UNBIND) {
+  if(flags & TICKIT_EV_UNBIND) {
     SvREFCNT_dec(data->self);
     SvREFCNT_dec(data->code);
     SvREFCNT_dec(data->data);
@@ -503,7 +460,7 @@ typedef struct Tickit__Window {
  */
 static HV *sv_for_window;
 
-static int window_destroyed(TickitWindow *win, TickitEventType ev, void *info, void *user)
+static int window_destroyed(TickitWindow *win, TickitEventFlags flags, void *info, void *user)
 {
   SV *key = newSViv(PTR2UV(win));
   hv_delete_ent(sv_for_window, key, G_DISCARD, 0);
@@ -529,7 +486,7 @@ static SV *newSVwin_noinc(TickitWindow *win)
   self->win = win;
   self->tickit = NULL;
 
-  tickit_window_bind_event(win, TICKIT_EV_DESTROY, 0, &window_destroyed, NULL);
+  tickit_window_bind_event(win, TICKIT_WINDOW_ON_DESTROY, 0, &window_destroyed, NULL);
 
   SV *ret = newSVsv(HeVAL(he));
   sv_rvweaken(HeVAL(he));
@@ -542,60 +499,65 @@ static SV *newSVwin(TickitWindow *win)
   return newSVwin_noinc(tickit_window_ref(win));
 }
 
-static int window_userevent_fn(TickitWindow *win, TickitEventType ev, void *_info, void *user)
+static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *_info, void *user)
 {
   struct GenericEventData *data = user;
 
   int ret = 0;
 
-  if(ev & ~(TICKIT_EV_UNBIND|TICKIT_EV_DESTROY)) {
+  if(flags & TICKIT_EV_FIRE) {
     SV *info_sv = newSV(0);
+    char *evname;
 
-    switch(ev) {
-      case TICKIT_EV_EXPOSE: {
+    switch((TickitWindowEvent)data->ev) {
+      case TICKIT_WINDOW_ON_EXPOSE: {
         TickitExposeEventInfo *info = _info, *self;
         Newx(self, 1, TickitExposeEventInfo);
         *self = *info;
         self->rb = tickit_renderbuffer_ref(info->rb);
 
+        evname = "expose";
         sv_setref_pv(info_sv, "Tickit::Event::Expose", self);
         break;
       }
 
-      case TICKIT_EV_FOCUS: {
+      case TICKIT_WINDOW_ON_GEOMCHANGE: {
+        /* TODO: shouldn't we unpack some arguments? */
+        evname = "geomchange";
+        break;
+      }
+
+      case TICKIT_WINDOW_ON_FOCUS: {
         TickitFocusEventInfo *info = _info, *self;
         Newx(self, 1, TickitFocusEventInfo);
         *self = *info;
         self->win = tickit_window_ref(info->win);
 
+        evname = "focus";
         sv_setref_pv(info_sv, "Tickit::Event::Focus", self);
         break;
       }
 
-      case TICKIT_EV_KEY: {
+      case TICKIT_WINDOW_ON_KEY: {
         TickitKeyEventInfo *info = _info, *self;
         Newx(self, 1, TickitKeyEventInfo);
         *self = *info;
         self->str = savepv(info->str);
 
+        evname = "key";
         sv_setref_pv(info_sv, "Tickit::Event::Key", self);
         break;
       }
 
-      case TICKIT_EV_MOUSE: {
+      case TICKIT_WINDOW_ON_MOUSE: {
         TickitMouseEventInfo *info = _info, *self;
         Newx(self, 1, TickitMouseEventInfo);
         *self = *info;
 
+        evname = "mouse";
         sv_setref_pv(info_sv, "Tickit::Event::Mouse", self);
         break;
       }
-
-      // These don't happen to terminal
-      case TICKIT_EV_CHANGE:
-      case TICKIT_EV_RESIZE:
-        SvREFCNT_dec(info_sv);
-        return 0;
     }
 
     dSP;
@@ -605,7 +567,7 @@ static int window_userevent_fn(TickitWindow *win, TickitEventType ev, void *_inf
     PUSHMARK(SP);
     EXTEND(SP, 4);
     mPUSHs(newSVsv(data->self));
-    mPUSHs(tickit_ev2sv(ev));
+    mPUSHs(newSVivpv(data->ev, evname));
     mPUSHs(info_sv);
     mPUSHs(newSVsv(data->data));
     PUTBACK;
@@ -622,7 +584,7 @@ static int window_userevent_fn(TickitWindow *win, TickitEventType ev, void *_inf
     LEAVE;
   }
 
-  if(ev & TICKIT_EV_UNBIND) {
+  if(flags & TICKIT_EV_UNBIND) {
     SvREFCNT_dec(data->self);
     SvREFCNT_dec(data->code);
     SvREFCNT_dec(data->data);
@@ -642,6 +604,15 @@ static void setup_constants(void)
 #define DO_CONSTANT(c) \
   newCONSTSUB(stash, #c+7, newSViv(c)); \
   av_push(export, newSVpv(#c+7, 0));
+
+  stash = gv_stashpvn("Tickit", 6, TRUE);
+  export = get_av("Tickit::EXPORT_OK", TRUE);
+
+  DO_CONSTANT(TICKIT_MOD_SHIFT)
+  DO_CONSTANT(TICKIT_MOD_ALT)
+  DO_CONSTANT(TICKIT_MOD_CTRL)
+
+  DO_CONSTANT(TICKIT_BIND_FIRST)
 
   stash = gv_stashpvn("Tickit::Term", 12, TRUE);
   export = get_av("Tickit::Term::EXPORT_OK", TRUE);
@@ -665,12 +636,6 @@ static void setup_constants(void)
   DO_CONSTANT(TICKIT_TERM_MOUSEMODE_CLICK)
   DO_CONSTANT(TICKIT_TERM_MOUSEMODE_DRAG)
   DO_CONSTANT(TICKIT_TERM_MOUSEMODE_MOVE)
-
-  DO_CONSTANT(TICKIT_MOD_SHIFT)
-  DO_CONSTANT(TICKIT_MOD_ALT)
-  DO_CONSTANT(TICKIT_MOD_CTRL)
-
-  DO_CONSTANT(TICKIT_BIND_FIRST)
 
   stash = gv_stashpvn("Tickit::Window", 14, TRUE);
   export = get_av("Tickit::Window::EXPORT_OK", TRUE);
@@ -1947,21 +1912,35 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
   CV           *code
   SV           *data
   INIT:
-    TickitEventType ev_e;
+    TickitTermEvent _ev = -1;
     struct GenericEventData *user;
   CODE:
-    ev_e = tickit_name2ev(ev);
-    if(ev_e == -1)
+    switch(ev[0]) {
+      case 'k':
+        if(strEQ(ev, "key"))
+          _ev = TICKIT_TERM_ON_KEY;
+        break;
+      case 'm':
+        if(strEQ(ev, "mouse"))
+          _ev = TICKIT_TERM_ON_MOUSE;
+        break;
+      case 'r':
+        if(strEQ(ev, "resize"))
+          _ev = TICKIT_TERM_ON_RESIZE;
+        break;
+    }
+    if(_ev == -1)
       croak("Unrecognised event name '%s'", ev);
 
     Newx(user, 1, struct GenericEventData);
+    user->ev = _ev;
     user->self = newSVsv(ST(0));
     user->code = (CV*)SvREFCNT_inc(code);
     user->data = newSVsv(data);
 
     sv_rvweaken(user->self);
 
-    RETVAL = tickit_term_bind_event(self, ev_e|TICKIT_EV_UNBIND, flags, term_userevent_fn, user);
+    RETVAL = tickit_term_bind_event(self, _ev, flags|TICKIT_EV_UNBIND, term_userevent_fn, user);
   OUTPUT:
     RETVAL
 
@@ -2392,7 +2371,7 @@ string_count(str,pos,limit=NULL)
     }
 
     s = SvPVutf8(str, len);
-    RETVAL = tickit_string_ncount(s, len, pos, limit);
+    RETVAL = tickit_utf8_ncount(s, len, pos, limit);
     if(RETVAL == -1)
       XSRETURN_UNDEF;
   OUTPUT:
@@ -2413,7 +2392,7 @@ string_countmore(str,pos,limit=NULL)
     }
 
     s = SvPVutf8(str, len);
-    RETVAL = tickit_string_ncountmore(s, len, pos, limit);
+    RETVAL = tickit_utf8_ncountmore(s, len, pos, limit);
     if(RETVAL == -1)
       XSRETURN_UNDEF;
   OUTPUT:
@@ -2435,7 +2414,7 @@ int textwidth(str)
     }
 
     s = SvPVutf8(str, len);
-    if(tickit_string_ncount(s, len, &pos, &limit) == -1)
+    if(tickit_utf8_ncount(s, len, &pos, &limit) == -1)
       XSRETURN_UNDEF;
 
     RETVAL = pos.columns;
@@ -2471,7 +2450,7 @@ void chars2cols(str,...)
         croak("chars2cols requires a monotonically-increasing list of character numbers; %d is not greater than %d\n",
           limit.codepoints, pos.codepoints);
 
-      bytes = tickit_string_ncountmore(s, len, &pos, &limit);
+      bytes = tickit_utf8_ncountmore(s, len, &pos, &limit);
       if(bytes == -1)
         XSRETURN_UNDEF;
 
@@ -2511,7 +2490,7 @@ void cols2chars(str,...)
         croak("cols2chars requires a monotonically-increasing list of column numbers; %d is not greater than %d\n",
           limit.columns, pos.columns);
 
-      bytes = tickit_string_ncountmore(s, len, &pos, &limit);
+      bytes = tickit_utf8_ncountmore(s, len, &pos, &limit);
       if(bytes == -1)
         XSRETURN_UNDEF;
 
@@ -2693,21 +2672,43 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
   CV             *code
   SV             *data
   INIT:
-    TickitEventType ev_e;
+    TickitWindowEvent _ev = -1;
     struct GenericEventData *user;
   CODE:
-    ev_e = tickit_name2ev(ev);
-    if(ev_e == -1)
+    switch(ev[0]) {
+      case 'e':
+        if(strEQ(ev, "expose"))
+          _ev = TICKIT_WINDOW_ON_EXPOSE;
+        break;
+      case 'f':
+        if(strEQ(ev, "focus"))
+          _ev = TICKIT_WINDOW_ON_FOCUS;
+        break;
+      case 'g':
+        if(strEQ(ev, "geomchange"))
+          _ev = TICKIT_WINDOW_ON_GEOMCHANGE;
+        break;
+      case 'k':
+        if(strEQ(ev, "key"))
+          _ev = TICKIT_WINDOW_ON_KEY;
+        break;
+      case 'm':
+        if(strEQ(ev, "mouse"))
+          _ev = TICKIT_WINDOW_ON_MOUSE;
+        break;
+    }
+    if(_ev == -1)
       croak("Unrecognised event name '%s'", ev);
 
     Newx(user, 1, struct GenericEventData);
+    user->ev = _ev;
     user->self = newSVsv(ST(0));
     user->code = (CV*)SvREFCNT_inc(code);
     user->data = newSVsv(data);
 
     sv_rvweaken(user->self);
 
-    RETVAL = tickit_window_bind_event(self->win, ev_e|TICKIT_EV_UNBIND, flags, window_userevent_fn, user);
+    RETVAL = tickit_window_bind_event(self->win, _ev, flags|TICKIT_BIND_UNBIND, window_userevent_fn, user);
   OUTPUT:
     RETVAL
 

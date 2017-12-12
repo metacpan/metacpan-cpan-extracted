@@ -34,7 +34,7 @@ $zvm->sense_sweep_points( value => 3 );
 for my $i ( 1 .. 3 ) {
     my $data = $zvm->sparam_sweep( timeout => 10 );
 
-    is_deeply( [ $data->dims() ], [ 3, 3 ], "data PDL is 3x3 array" );
+    is_deeply( [ $data->dims() ], [ 3, 5 ], "data PDL has dims  3 x 5" );
 
     my $freqs = $data->slice(":, 0");
 

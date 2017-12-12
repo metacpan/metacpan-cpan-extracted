@@ -2,7 +2,7 @@ package Test2::AsyncSubtest::Event::Attach;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use base 'Test2::Event';
 use Test2::Util::HashBase qw/id/;
@@ -60,7 +60,7 @@ Used internally by L<Test2::AsyncSubtest>. No user serviceable parts inside.
 =head1 SOURCE
 
 The source code repository for Test2-AsyncSubtest can be found at
-F<http://github.com/Test-More/Test2-AsyncSubtest/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

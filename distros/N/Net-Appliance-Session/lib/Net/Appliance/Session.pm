@@ -1,9 +1,9 @@
 package Net::Appliance::Session;
-{ $Net::Appliance::Session::VERSION = '4.300000' }
+{ $Net::Appliance::Session::VERSION = '4.300001' }
 
 use Moo;
 use Sub::Quote;
-use MooX::Types::MooseLike::Base qw(Bool Int Str HashRef InstanceOf);
+use MooX::Types::MooseLike::Base qw(Any Bool Int Str HashRef InstanceOf);
 use Net::CLI::Interact;
 
 with 'Net::Appliance::Session::Transport';
@@ -89,7 +89,6 @@ foreach my $slot (qw/
 foreach my $slot (qw/
     host
     app
-    add_library
 /) {
     has $slot => (
         is => 'ro',
@@ -98,6 +97,13 @@ foreach my $slot (qw/
         predicate => 1,
     );
 }
+
+has 'add_library' => (
+    is => 'ro',
+    isa => Any,
+    required => 0,
+    predicate => 1,
+);
 
 has 'timeout' => (
     is => 'ro',
@@ -275,7 +281,7 @@ respective manual pages for each transport backend for further details
 L<Telnet|Net::CLI::Interact::Transport::Telnet>,
 L<Serial|Net::CLI::Interact::Transport::Serial>).
 
-=item C<< add_library => $directory >>
+=item C<< add_library => $directory | \@directories >>
 
 If you've added to the built-in phrasebook with your own macros, then use
 this option to load your new phrasebook file(s). The path here should be the

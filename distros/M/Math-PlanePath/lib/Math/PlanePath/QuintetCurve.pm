@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 
 # inherit: new(), rect_to_n_range(), arms_count(), n_start(),
 #          parameter_info_array(), xy_is_visited()
@@ -52,7 +52,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 {
@@ -271,6 +271,52 @@ sub n_to_level {
 
 
 #------------------------------------------------------------------------------
+
+# R,L,L,S
+#
+# forward       reverse
+# 0 forward     0 forward
+# 1 reverse     1 reverse
+# 2 forward     2 reverse
+# 3 forward     3 forward
+# 4 reverse     4 reverse
+{
+  #                                   1   2  3  4
+  my @_UNDOCUMENTED__n_to_turn_LSR = (-1, 1, 1, 0,  # forward no low zeros
+                                      -1, 1, 0, 0,  # forward low zeros
+                                       0,-1,-1, 1,  # reverse
+                                       0, 0,-1, 1);
+  sub _UNDOCUMENTED__n_to_turn_LSR {
+    my ($self, $n) = @_;
+    ### _UNDOCUMENTED__n_to_turn_LSR(): $n
+
+    $n += $self->{'arms'}-1;  # division rounding up
+    _divrem_mutate ($n, $self->{'arms'});
+    if ($n < 1) { return undef; }
+
+    my $any_low_zeros;
+    my $low;
+    while ($n) {
+      last if ($low = _divrem_mutate($n,5));
+      $any_low_zeros = 1;
+    }
+    ### $low
+    ### $any_low_zeros
+
+    my $non_two = 0;
+    while (($non_two = _divrem_mutate($n,5)) == 2) {}
+    ### $non_two
+
+    $low = $low - 1
+      + ($any_low_zeros ? 4 : 0)                   # low zeros
+      + ($non_two == 1 || $non_two == 4 ? 8 : 0);  # reverse
+    ### lookup: $low
+    return $_UNDOCUMENTED__n_to_turn_LSR[$low];
+  }
+}
+
+
+#------------------------------------------------------------------------------
 1;
 __END__
 
@@ -288,7 +334,8 @@ Math::PlanePath::QuintetCurve -- self-similar "plus" shaped curve
 
 =head1 DESCRIPTION
 
-This path is traces out a spiralling self-similar "+" shape,
+This path is Mandelbrot's "quartet" trace of spiralling self-similar "+"
+shape,
 
             125--...                 93--92                      11
               |                       |   |
@@ -321,8 +368,17 @@ This path is traces out a spiralling self-similar "+" shape,
       ^
      X=0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 ...
 
+As per
 
-The base figure is the initial N=0 to N=4.
+    Benoit B. Mandelbrot, "The Fractal Geometry of Nature", W. H. Freeman
+    and Co., 1983, ISBN 0-7167-1186-9, section 7, "Harnessing the Peano
+    Monster Curves", pages 72-73.
+
+Mandelbrot calls this a "quartet", taken as 4 parts around a further middle
+part (like 4 players around a table).  The module name "quintet" here is a
+mistake, though it does suggest the base-5 nature of the curve.
+
+The base figure is the initial N=0 to N=5.
 
               5
               |
@@ -349,10 +405,10 @@ It corresponds to a traversal of the following "+" shape,
          . .. .
 
 The "v" and ">" notches are the side the figure is directed at the higher
-replications.  The 0, 2 and 3 parts are the right hand side of the line and
-are a plain repetition of the base figure.  The 1 and 4 parts are to the
-left and are a reversal.  The first such reversal is seen above as N=5 to
-N=10.
+replications.  The 0, 2 and 3 sub-curves are the right hand side of the line
+and are a plain repetition of the base figure.  The 1 and 4 parts are to the
+left and are a reversal.  The first such reversal is seen in the sample
+above as N=5 to N=10.
         .....
         .   .
 
@@ -364,18 +420,23 @@ N=10.
         |   .
        10 ...
 
+Mandelbrot gives the expansion without designating start and end.  The start
+is chosen here so the expansion has sub-curve 0 forward (not reverse).  This
+ensures the next expansion has the curve the same up to the preceding level,
+and extending from there.
+
 In the base figure it can be seen the N=5 endpoint is rotated up around from
 the N=0 to N=1 direction.  This makes successive higher levels slowly spiral
 around.
 
+    base b = 2 + i
     N = 5^level
-    angle = level * atan(1/2)
+    angle = level * arg(b) = level*atan(1/2)
           = level * 26.56 degrees
-    radius = sqrt(5) ^ level
 
 In the sample shown above N=125 is level=3 and has spiralled around to angle
-3*26.56=79.7 degrees.  The next level goes into the second quadrant with X
-negative.  A full circle around the plane is around level 14.
+3*26.56=79.7 degrees.  The next level goes to X negative in the second
+quadrant.  A full circle around the plane is approximately level 14.
 
 =head2 Arms
 
@@ -411,24 +472,24 @@ are rotated copies of it.
         ...                     67--71
 
 The curve is essentially an ever expanding "+" shape with one corner at the
-origin.  Four such shapes can be packed as follows,
+origin.  Four such shapes pack as follows,
 
                 +---+
                 |   |
-        +---+---    +---+
-        |   |     A     |
-    +---+   +---+   +---+
-    |     B     |   |   |
+        +---@---    +---+
+        |   |     B     |
+    +---+   +---+   +---@
+    |     C     |   |   |
     +---+   +---O---+   +---+
-        |   |   |     D     |
-        +---+   +---+   +---+
-        |     C     |   |
-        +---+   +---+---+ 
+        |   |   |     A     |
+        @---+   +---+   +---+
+        |     D     |   |
+        +---+   +---@---+ 
             |   |
             +---+
 
 At higher replication levels the sides are wiggly and spiralling and the
-centres of each rotated around, but they sides are symmetric and mesh
+centres of each rotate around, but their sides are symmetric and mesh
 together perfectly to fill the plane.
 
 =head1 FUNCTIONS
@@ -518,7 +579,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

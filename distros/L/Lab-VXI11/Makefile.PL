@@ -1,4 +1,18 @@
 use ExtUtils::MakeMaker;
+use warnings;
+use strict;
+
+my $libs = '';
+my $inc;
+
+# Use libtirpc if it exits. Otherwise use libc
+`pkg-config --exists libtirpc`;
+if (not $?) {
+    # have libtircp
+    $inc = `pkg-config --cflags-only-I libtirpc`;
+    $libs = `pkg-config --libs libtirpc`;
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -10,9 +24,9 @@ WriteMakefile(
     #LICENSE           => 'perl',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
-    LIBS              => [''], # e.g., '-lm'
+    LIBS              => [$libs], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    INC               => '-I.', # e.g., '-I. -I/usr/include/other'
+    INC               => '-I. ' . $inc, # e.g., '-I. -I/usr/include/other'
     CCFLAGS           => '-Wall',
 	# Un-comment this if you add C files to link with later:
     OBJECT            => '$(O_FILES)', # link all the C files too

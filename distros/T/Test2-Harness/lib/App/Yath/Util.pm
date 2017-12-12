@@ -2,11 +2,12 @@ package App::Yath::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use File::Spec;
 
 use Cwd qw/realpath/;
+use Carp qw/croak/;
 
 use Importer Importer => 'import';
 
@@ -57,11 +58,15 @@ sub find_pfile {
 }
 
 sub read_config {
-    my ($cmd, $rcfile) = @_;
+    my ($cmd, %params) = @_;
 
-    $rcfile ||= find_in_updir('.yath.rc') or return;
+    my $rcfile = $params{file} or croak "'file' is a required argument";
 
-    open(my $fh, '<', $rcfile) or die "Could not open '$rcfile': $!";
+    if ($params{search}) {
+        $rcfile = find_in_updir($rcfile) or return;
+    }
+
+    open(my $fh, '<', $rcfile) or croak "Could not open '$rcfile': $!";
 
     my @out;
 

@@ -1,31 +1,32 @@
-my $MODULE;
+use strict;
+use Digest::SHA3;
 
-BEGIN {
-	$MODULE = "Digest::SHA3";
-	eval "require $MODULE" || die $@;
-	$MODULE->import(qw());
-}
+my $skip;
 
 BEGIN {
 	eval "use Test::More";
-	if ($@) {
-		print "1..0 # Skipped: Test::More not installed\n";
-		exit;
+	$skip = $@ ? 1 : 0;
+	unless ($skip) {
+		eval "use Test::Pod::Coverage 0.08";
+		$skip = 2 if $@;
 	}
 }
 
-eval "use Test::Pod::Coverage 0.08";
-plan skip_all => "Test::Pod::Coverage 0.08 required for testing POD coverage" if $@;
-
-my @privfcns = ();
-
-if ($MODULE eq "Digest::SHA3") {
-	@privfcns = qw(
-		newSHA3
-		shainit
-		sharewind
-		shawrite
-	);
+if ($skip == 1) {
+	print "1..0 # Skipped: Test::More not installed\n";
+	exit;
 }
+
+if ($skip == 2) {
+	print "1..0 # Skipped: Test::Pod::Coverage 0.08 required\n";
+	exit;
+}
+
+my @privfcns = qw(
+	newSHA3
+	shainit
+	sharewind
+	shawrite
+);
 
 all_pod_coverage_ok( { also_private => \@privfcns } );

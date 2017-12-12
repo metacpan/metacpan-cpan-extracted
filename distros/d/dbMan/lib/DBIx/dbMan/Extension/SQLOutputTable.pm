@@ -3,6 +3,7 @@ package DBIx::dbMan::Extension::SQLOutputTable;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
+use utf8;
 
 our $VERSION = '0.04';
 

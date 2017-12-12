@@ -4,7 +4,7 @@
       "Tomas Doran <bobtfish@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,6 +62,7 @@
       },
       "x_authority" : "cpan:BOBTFISH"
    },
-   "version" : "1.20"
+   "version" : "1.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

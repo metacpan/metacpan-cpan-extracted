@@ -1,0 +1,125 @@
+Doit - an experimental scripting framework
+==========================================
+
+Doit is a framework for writing imperative scripts which feel in the
+execution like declarative ones.
+
+The commands implemented in this framework follow these priciples:
+
+* A failing command throws an exception and thus stops the script
+  (unless caught). This is like a Perl script using "use autodie", but
+  in Doit it is implemented consistently for all framework commands.
+  "use autodie" knows only about Perl builtins, not about module
+  functions
+
+* Before executing a command a check is done whether the command has
+  to run at all. This makes it possible to write "converging" scripts:
+  a first run would do the changes, subsequent runs would not do at
+  all.
+
+* Command execution is logged --- so one actually see what changes are
+  done to a system. A command which doesn't have to run won't output
+  anything. So "convergent" scripts are typically silent after the
+  first run.
+
+There's a dry-run mode built-in, which would just show what commands
+would run, similar like make's -n switch or puppet's --noop --test
+options.
+
+Status
+------
+
+This module is experimental, but already used in productive scripts.
+Backward-incompatible changes to the module are possible, but will be
+kept to a low number.
+
+Examples
+--------
+
+Here's an example using a command from the git component. It just
+either clones the given git repository to the given directory, or does
+a fetch if the repository is already cloned:
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component("git");
+    $doit->git_repo_update(
+        repository => "git://github.com/eserte/Doit",
+        directory  => "$ENV{HOME}/src/Doit",
+    );
+
+An excerpt from a real-world system setup script (for setup of
+FreeBSD and Linux based smokers for CPAN Testers):
+
+    use Doit;
+    my $doit = Doit->init;
+    $d->add_component('user');
+
+    my $root = $doit->do_sudo; # for running commands/scripts as root
+    $root->write_binary('/etc/sudoers.d/20_cpansand', <<'EOF'); # for auto-installing system depencies with CPAN::Plugin::Sysdeps
+    cpansand ALL=(ALL) NOPASSWD: /usr/bin/apt-get install *
+    cpansand ALL=(ALL) NOPASSWD: /usr/bin/apt-get -y install *
+    EOF
+    $root->chmod(0440, '/etc/sudoers.d/20_cpansand');
+    chomp(my $zsh = `which zsh`);
+    $root->user_account(
+        username => 'cpansand',
+        uid      => 1234,
+        shell    => $zsh,
+        ssh_keys => ['ssh-rsa ... '],
+    );
+
+    my $cpansand = $d->do_sudo(sudo_opts => [qw(-u cpansand)]); # for running commands as cpansand user
+    $cpansand->make_path("/home/cpansand/.cpan/build");
+    $cpansand->mkdir("/home/cpansand/.cpanreporter");
+    $cpansand->write_binary("/home/cpansand/.cpanreporter/config.ini", <<'EOF');
+    edit_report=default:no
+    email_from=somebody@example.com
+    send_report=default:yes fail:ask/yes
+    transport = Metabase uri http://metabase.cpantesters.org/beta/ id_file /home/cpansand/.cpanreporter/somebody_metabase_id.json
+    EOF
+    ...
+
+Installation
+------------
+
+The distribution is installed like a normal CPAN distribution. You
+don't have to download it but use CPAN.pm or cpanm:
+
+    cpan Doit
+
+or
+
+    cpanm Doit
+
+An extracted tarball or git clone may be installed like this:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+(on Windows use just "Build" instead of "./Build")
+
+The Build script itself is a Doit script and not implementing all
+features of a Module::Build-based script, but it provides some
+interesting actions like
+
+    test_installed
+    test_in_docker
+    debian_package
+    debian_package_with_docker
+
+You don't have to install the distribution at all --- just leave the
+extracted or cloned directory where it is and specify in your script
+
+    use lib "/path/to/Doit/lib";
+    use Doit;
+
+Or if the extracted is relative to a script, say, in an "inc"
+subdirectory:
+
+    use FindBin;
+    use lib "$FindBin::RealBin/inc/Doit/lib";
+    use Doit;
+

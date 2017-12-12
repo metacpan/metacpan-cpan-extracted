@@ -1,0 +1,29 @@
+# Personal preferences:
+--stack-opening-tokens          # Stack opening tokens ( { [
+--stack-closing-tokens          # Stack closing tags   ] } )
+--opening-hash-brace-right      # Put opening hash brace on right of same line
+--vertical-tightness-closing=0  # Medium "vertical tightness of closing tokens"
+--opening-token-right           # Opening tokens to right of commas without line break
+--vertical-tightness=0          # Always add a line break after an opening token (except when stacking)
+--no-opening-anonymous-sub-brace-on-new-line
+
+# PBP options:
+
+--maximum-line-length=78        # Max line width is 78 cols
+--indent-columns=4              # Indent level is 4 cols
+--continuation-indentation=4    # Continuation indent is 4 cols
+--standard-error-output         # Errors to STDERR
+--add-semicolons                # Add semicolons to last statement in block
+--closing-token-indentation=0   # No extra indentation for closing brackets
+--paren-tightness=1             # Medium parenthesis tightness
+--brace-tightness=1             # Medium brace tightness
+--square-bracket-tightness=1    # Medium square bracket tightness
+--block-brace-tightness=1       # Medium block brace tightness
+--nospace-for-semicolon         # No space before semicolons
+--nooutdent-long-quotes         # Don't outdent long quoted strings
+--opening-brace-on-new-line     # Put opening brace on line below keyword
+--opening-sub-brace-on-new-line # Put sub opening brace on line below sub declaration
+
+# Break before all operators:
+--want-break-before="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= && += -= /= |= >>= ||= .= %= ^= x="
+

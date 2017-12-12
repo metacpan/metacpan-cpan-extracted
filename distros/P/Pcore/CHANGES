@@ -1,3 +1,9 @@
+v0.56.4 2017-12-03T15:05:04Z
+ - toml die on parsing error
+ - DynaLoader replaced with XSLoader
+ - HTTP $res->tree method added (HTML::TreeBuilder::LibXML)
+ - IMAP removed from Pcore utils
+
 v0.56.3 2017-11-27T16:26:33Z
  - dist pause cleanup cli added
  - typo

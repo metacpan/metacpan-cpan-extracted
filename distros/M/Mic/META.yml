@@ -1,5 +1,5 @@
 ---
-abstract: 'Messages, Interfaces and Contracts.'
+abstract: 'Simplified OOP with emphasis on modularity and loose coupling.'
 author:
   - 'Arun Prasaad <arunbear@cpan.org>'
 build_requires:
@@ -28,7 +28,7 @@ no_index:
 provides:
   Mic:
     file: lib/Mic.pm
-    version: '0.000006'
+    version: '0.001003'
   Mic::ArrayImpl:
     file: lib/Mic/ArrayImpl.pm
   Mic::Assembler:
@@ -39,8 +39,6 @@ provides:
     file: lib/Mic/Class.pm
   Mic::Contracts:
     file: lib/Mic/Contracts.pm
-  Mic::HashImpl:
-    file: lib/Mic/HashImpl.pm
   Mic::Impl:
     file: lib/Mic/Impl.pm
   Mic::Implementation:
@@ -53,14 +51,13 @@ requires:
   Module::Runtime: '0.014'
   Package::Stash: '0.36'
   Params::Validate: '1.10'
-  Readonly: '2.00'
   Sub::Name: '0.09'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/arunbear/Mic/issues
   homepage: https://github.com/arunbear/Mic
   repository: git://github.com/arunbear/Mic.git
-version: '0.000006'
+version: '0.001003'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'arunbear <arunbear@gmail.com>'

@@ -15,7 +15,7 @@ if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT}) {
     $config->{host}   = $ENV{ETCD_TEST_HOST};
     $config->{port}   = $ENV{ETCD_TEST_PORT};
     $config->{cacert} = $ENV{ETCD_TEST_CAPATH} if $ENV{ETCD_TEST_CAPATH};
-    plan tests => 14;
+    plan tests => 16;
 }
 
 else {
@@ -67,6 +67,14 @@ lives_ok( sub {  $lease = $etcd->lease( { ID => $lease_id, keys => 1 } )->ttl },
     "lease_ttl" );
 
 cmp_ok( $lease->is_success, '==', 1, "return lease_ttl success" );
+
+#print STDERR Dumper($lease);
+
+# lease leases
+lives_ok( sub {  $lease = $etcd->lease()->leases },
+    "lease_leases" );
+
+cmp_ok( $lease->is_success, '==', 1, "return lease_leases success" );
 
 #print STDERR Dumper($lease);
 

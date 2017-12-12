@@ -29,13 +29,16 @@ package Sidef::Parser {
             hyper_ops => {
 
                 # type => [takes args, method name]
-                map    => [1, 'map_operator'],
-                pam    => [1, 'pam_operator'],
-                zip    => [1, 'zip_operator'],
-                cross  => [1, 'cross_operator'],
-                unroll => [1, 'unroll_operator'],
-                reduce => [0, 'reduce_operator'],
-                lmap   => [0, 'map_operator'],
+                map     => [1, 'map_operator'],
+                pam     => [1, 'pam_operator'],
+                zip     => [1, 'zip_operator'],
+                wise    => [1, 'wise_operator'],
+                scalar  => [1, 'scalar_operator'],
+                rscalar => [1, 'rscalar_operator'],
+                cross   => [1, 'cross_operator'],
+                unroll  => [1, 'unroll_operator'],
+                reduce  => [0, 'reduce_operator'],
+                lmap    => [0, 'map_operator'],
             },
 
             static_obj_re => qr{\G
@@ -60,7 +63,6 @@ package Sidef::Parser {
                      | Dir\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Dir') })
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
-                     | MultiArr(?:ay)?+\b             (?{ state $x = bless({}, 'Sidef::DataTypes::Array::MultiArray') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
@@ -189,7 +191,6 @@ package Sidef::Parser {
                   Arr Array
                   Pair
                   Enumerator
-                  MultiArray MultiArr
                   Hash
                   Str String
                   Num Number
@@ -284,7 +285,7 @@ package Sidef::Parser {
             operators_re    => do {
                 local $" = q{|};
 
-                # The order matters: longer first
+                # Longest prefix first
                 my @operators = map { quotemeta } qw(
 
                   ||= ||
@@ -329,8 +330,11 @@ package Sidef::Parser {
                       »(?<unroll>[^\W\d]\w*+|(?&ops))«                # unroll operator (e.g.: »add« or »+«)
                     | >>(?<unroll>[^\W\d]\w*+|(?&ops))<<              # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator (e.g.: ~X or ~X+)
-                    | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator (e.g.: ~Z or ~Z+)
+                    | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator          (e.g.: ~X or ~X+)
+                    | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator            (e.g.: ~Z or ~Z+)
+                    | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator           (e.g.: ~W or ~W+)
+                    | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator         (e.g.: ~S or ~S+)
+                    | ~RS(?<rscalar>[^\W\d]\w*+|(?&ops)|)             # reverse scalar operator (e.g.: ~RS or ~RS/)
 
                     | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
                     | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)
@@ -2938,7 +2942,9 @@ package Sidef::Parser {
                 }
 
                 # Parse array and hash fetchers ([...] and {...})
-                $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
+                if (/\G\.\h*(?=[\[\{])/gc or 1) {
+                    $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
+                }
 
                 # Tight bound operator
                 if (

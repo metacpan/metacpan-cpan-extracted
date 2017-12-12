@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.024-2-ga63500b
+package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.025-4-gacff9a1
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Generate a Makefile.PL containing a warning for legacy users
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::MakeMaker::Awesome' => { -version => '0.26' };
@@ -121,6 +121,11 @@ around _build_MakeFile_PL_template => sub
     return substr($string, 0, pos($string)) . $self->__preamble . substr($string, pos($string));
 };
 
+sub build {
+    my $self = shift;
+    $self->log_debug('doing nothing during build...');
+}
+
 sub test
 {
     my $self = shift;
@@ -171,9 +176,9 @@ __PACKAGE__->meta->make_immutable;
 #pod
 #pod *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 #pod
-#pod If you're seeing this warning, your toolchain is really, really old* and you'll
-#pod almost certainly have problems installing CPAN modules from this century. But
-#pod never fear, dear user, for we have the technology to fix this!
+#pod If you're seeing this warning, your toolchain is really, really old* and
+#pod you'll almost certainly have problems installing CPAN modules from this
+#pod century. But never fear, dear user, for we have the technology to fix this!
 #pod
 #pod If you're using CPAN.pm to install things, then you can upgrade it using:
 #pod
@@ -186,7 +191,8 @@ __PACKAGE__->meta->make_immutable;
 #pod If you're using cpanminus, you shouldn't be seeing this message in the first
 #pod place, so please file an issue on github.
 #pod
-#pod If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+#pod If you're using a packaging tool through a unix distribution, this issue
+#pod should be reported to the package manager.
 #pod
 #pod If you're installing manually, please retrain your fingers to run Build.PL
 #pod when present instead of Makefile.PL.
@@ -253,7 +259,7 @@ Dist::Zilla::Plugin::MakeMaker::Fallback - Generate a Makefile.PL containing a w
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -277,9 +283,9 @@ your distribution, with an added preamble that is printed when it is run:
 
     *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 
-    If you're seeing this warning, your toolchain is really, really old* and you'll
-    almost certainly have problems installing CPAN modules from this century. But
-    never fear, dear user, for we have the technology to fix this!
+    If you're seeing this warning, your toolchain is really, really old* and
+    you'll almost certainly have problems installing CPAN modules from this
+    century. But never fear, dear user, for we have the technology to fix this!
 
     If you're using CPAN.pm to install things, then you can upgrade it using:
 
@@ -292,7 +298,8 @@ your distribution, with an added preamble that is printed when it is run:
     If you're using cpanminus, you shouldn't be seeing this message in the first
     place, so please file an issue on github.
 
-    If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+    If you're using a packaging tool through a unix distribution, this issue
+    should be reported to the package manager.
 
     If you're installing manually, please retrain your fingers to run Build.PL
     when present instead of Makefile.PL.
@@ -384,9 +391,9 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 
-If you're seeing this warning, your toolchain is really, really old* and you'll
-almost certainly have problems installing CPAN modules from this century. But
-never fear, dear user, for we have the technology to fix this!
+If you're seeing this warning, your toolchain is really, really old* and
+you'll almost certainly have problems installing CPAN modules from this
+century. But never fear, dear user, for we have the technology to fix this!
 
 If you're using CPAN.pm to install things, then you can upgrade it using:
 
@@ -399,7 +406,8 @@ If you're using CPANPLUS to install things, then you can upgrade it using:
 If you're using cpanminus, you shouldn't be seeing this message in the first
 place, so please file an issue on github.
 
-If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+If you're using a packaging tool through a unix distribution, this issue
+should be reported to the package manager.
 
 If you're installing manually, please retrain your fingers to run Build.PL
 when present instead of Makefile.PL.

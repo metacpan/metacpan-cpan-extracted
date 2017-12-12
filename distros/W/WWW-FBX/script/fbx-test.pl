@@ -15,13 +15,17 @@ my $conn = {
     app_name => "APP NAME",
     app_version => "1.0",
     device_name => "debian",
+    track_id => $ENV{track_id},
+    app_token => $ENV{app_token},
 };
 my $json;
 my $res;
+my ($quiet,$debug);
 
 sub die_helper {
-  print "Usage : $0 [COMMAND] [PARAMETERS]\n";
+  print "Usage : $0 [OPTIONS] [COMMAND] [PARAMETERS]\n";
   print "Control FreeboxOs v6 through its API v3\n\n";
+  print "OPTIONS can be --debug, --quiet and --help\n\n";
   print "Without COMMAND, the script will list the permission granted and display your internet connection state as an example.\n\n";
   print "List of COMMAND and PARAMETERS are:\n";
   for my $role ( @{ $fbx->meta->roles } ) {
@@ -39,42 +43,48 @@ eval {
   if (-f $store) {
     my $token = retrieve $store;
     %$conn = ( %$conn, %$token );
-    print "Retrieved track_id and app_token from $store\n";
+    warn "Retrieved track_id and app_token from $store\n";
   } else {
-    print "No stored token found\n";
+    warn "No stored token found\n";
   }
-  $fbx = WWW::FBX->new( $conn );
-  unless ( -f $store ) {
-    print "Storing token in $store in current directory for further usage [ track_id = ", $fbx->track_id, " app_token = ", $fbx->app_token, " ]\n";
-    print "You can add the remaining permissions by connecting on the web interface\n";
-    store { track_id => $fbx->track_id, app_token => $fbx->app_token }, $store;
-  }
-
   GetOptions(
-    'debug' => sub { $fbx->debug(1) },
+    'debug' => sub { $conn->{debug} = 1 },
+    'quiet' => sub { $quiet = 1 },
     'help' => \&die_helper,
   ) or die_helper;
 
+  $fbx = WWW::FBX->new( $conn );
+  unless ( -f $store ) {
+    warn "Storing token in $store in current directory for further usage [ track_id = ", $fbx->track_id, " app_token = ", $fbx->app_token, " ]\n";
+    warn "You can add the remaining permissions by connecting on the web interface\n";
+    store { track_id => $fbx->track_id, app_token => $fbx->app_token }, $store;
+  }
+
   if (! defined (my $cmd = shift @ARGV) ) {
-    #Just run a simple test
-    print "App permissions are:\n"; 
-    while ( my( $key, $value ) = each %{ $fbx->uar->{result}{permissions} } ) { 
-      print "\t $key\n" if $value; 
+    #Just run a simple connection test
+    print "App permissions are:\n";
+    while ( my( $key, $value ) = each %{ $fbx->uar->{result}{permissions} } ) {
+      print "\t $key\n" if $value;
     }
     $res = $fbx->connection;
     printf "Your %s internet connection is %s\n", $res->{media}, $res->{state};
-  } elsif (eval { $json = from_json( $ARGV[0]) } ) {
-    #Execute with JSON
-    my $res = $fbx->$cmd($json);
   } else {
-    #Execute non JSON
-    my $res = $fbx->$cmd(@ARGV);
+    #Execute given command (JSON or not)
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Deepcopy = 1;
+    if (eval { $json = from_json( $ARGV[0]) } ) {
+      $res = $fbx->$cmd($json);
+    } else {
+      $res = $fbx->$cmd(@ARGV);
+    }
+    print Dumper $res unless $quiet;
   }
 };
 
 if ( my $err = $@ ) {
     die $@ unless blessed $err && $err->isa('WWW::FBX::Error');
- 
+
     warn "HTTP Response Code: ", $err->code, "\n",
          "HTTP Message......: ", $err->message, "\n",
          "API Error.........: ", $err->error, "\n",

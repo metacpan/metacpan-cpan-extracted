@@ -1,3 +1,9 @@
+0.08 20171129
+    ! 3xx status codes are not treated as errors anymore
+    . Common code was moved into a Role
+	+ Support for HTTP::Tiny::Paranoid
+	+ Support for IO::Async / Net::Async::HTTP
+
 0.07 20170703
     . Only test changes, no need to upgrade
 	. Split up the backend test into separate files to avoid trying to reload

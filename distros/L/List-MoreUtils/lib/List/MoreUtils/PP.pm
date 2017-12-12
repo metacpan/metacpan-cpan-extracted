@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.426';
+our $VERSION = '0.428';
 
 =pod
 
@@ -411,7 +411,7 @@ sub pairwise (&\@\@)
     local (*$caller_a, *$caller_b);
     map {
         # Assign to $a, $b as refs to caller's array elements
-        (*$caller_a, *$caller_b) = \($A[$_], $B[$_]);
+        (*$caller_a, *$caller_b) = \($#A < $_ ? undef : $A[$_], $#B < $_ ? undef : $B[$_]);
 
         # Perform the transformation
         $op->();

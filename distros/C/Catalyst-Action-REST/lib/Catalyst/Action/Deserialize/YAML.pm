@@ -1,5 +1,5 @@
 package Catalyst::Action::Deserialize::YAML;
-$Catalyst::Action::Deserialize::YAML::VERSION = '1.20';
+$Catalyst::Action::Deserialize::YAML::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 use Scalar::Util qw(openhandle);

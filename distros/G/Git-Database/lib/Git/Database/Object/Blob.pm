@@ -1,5 +1,5 @@
 package Git::Database::Object::Blob;
-$Git::Database::Object::Blob::VERSION = '0.009';
+$Git::Database::Object::Blob::VERSION = '0.010';
 use Moo;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ Git::Database::Object::Blob - A blob object in the Git object database
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

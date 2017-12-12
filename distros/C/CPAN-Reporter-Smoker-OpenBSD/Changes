@@ -1,10 +1,123 @@
 ==================================================
-Changes from 2016-11-20 00:00:00 +0000 to present.
+Changes from 2016-12-12 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.009 at 2017-11-20 12:53:03 +0000
+version 0.010 at 2017-12-12 10:41:09 +0000
 ------------------------------------------
+
+  Change: f539fc6024ce4ae81f0859bea8f60ebe3d2c005b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-11 23:47:15 +0000
+
+    Bug fixes
+
+    Fixed adding users to the Mysql DB. Fixed using perl-blead (there is
+    a bug in perlbrew). Added /home file system extension to speed up
+    writting. Added missing Perl module dependency for completely testing
+    DBD::mysql. 
+
+  Change: f348d02ebc617129ebf0a497a42b23ca3a13950c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-09 11:58:57 +0000
+
+    Replaced commands with their full path location 
+
+  Change: 18998e82cec28ee719a86f5d78758dca84059696
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-09 01:42:24 +0000
+
+    Testing provisioning and MariaDB config
+
+    Added tests to verify if the box provisioning was done correctly.
+    Adding configuration for DBD::mysql testing during regular user
+    provisioning. Fixed small bug on config_user.sh. 
+
+  Change: 593963ae3799a38ff5179903355b0ebed2246a5e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-12-08 14:54:14 +0000
+
+    Updated README.me
+
+    Included latest inclusions. 
+
+  Change: bbe1cc576a13c12a18cfd8b8e30904492a574707
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-04 17:17:36 +0000
+
+    Added new preference file 
+
+  Change: d3df262ae8338d65753f3b54b2ff127810216e45
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-30 20:00:23 +0000
+
+    Added more preference files 
+
+  Change: faad83e220a57a575ed20189ff6f670f9d01e1bd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-28 19:29:33 +0000
+
+    Merge branch 'master' of
+    https://github.com/glasswalk3r/cpan-openbsd-smoker 
+
+  Change: e14770bd850b46eb8f0a7494f3ccd82c16259600
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-28 19:29:19 +0000
+
+    Added more preferences files to disable distributions smoking 
+
+  Change: 25ef734b30376bb217dce9807f3b6f3bbf9fffca
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-27 09:07:10 +0000
+
+    Enhancements and bug fixes
+
+    Added configurable prefs_dir, since using it through /minicpan was
+    causing problems (minicpan erases all files when executed). Added
+    more comments in the Vagrantfile Now support to "perl-stable" and
+    "perl-blead" keywords are correctly supported. 
+
+  Change: 5ad49ada795c8faa8f425903aa8633b056132ceb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-26 10:59:28 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/cpan-openbsd-smoker 
+
+  Change: 5c768000e2d953a27820f9f728461041d86c8676
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-23 17:20:23 +0000
+
+    Added alias for minicpan
+
+    Added alias creation for minicpan to always be invoked with
+    CPAN::Mini::LatestDistVersion. Added more distributions to be blocked
+    from smoker. 
+
+  Change: ca0d686e5f3b431d5182c766648c0ec30c4c7f75
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-20 18:47:31 +0000
+
+    Updated documentation of Vagrantfile 
+
+  Change: 0cbded901c571c60192a4c2088b3ead71c2950a1
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-20 18:37:49 +0000
+
+    Merge branch 'improvements' 
+
+  Change: 6c89827c743b9eec6935dda3eb8022d6af81e1f7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-20 18:29:42 +0000
+
+    Bug fixes and optional CPAN local mirror
+
+    Fixed bug regarding the tests submissions information (name and
+    e-mail) being lost due Bash was parsing arguments. The CPAN local
+    mirror is now optional with use_local_mirror variable in the
+    Vagrantfile. vagrant_user.sh script was not using parameters to
+    configure the local CPAN mirror, that was fixed too. vagrant_user.sh
+    script also now install Perl module requirements during the
+    provisioning (if missed during VM creation). 
 
   Change: 6d4f46cf469ddedf71064209df681ecfa84d814e
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -20,6 +133,12 @@ version 0.009 at 2017-11-20 12:53:03 +0000
   Date : 2017-11-20 10:42:30 +0000
 
     Added TODO file 
+
+  Change: 736c09970fe2cfba1cca3b1223e2e9f227020aa1
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-16 17:19:32 +0000
+
+    Fixed bug regarding build_dir cleanup 
 
   Change: 5a2b8b126853dc62dcbc46bde483ffe2a4bb4028
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -43,6 +162,18 @@ version 0.009 at 2017-11-20 12:53:03 +0000
   Date : 2017-11-14 14:18:55 +0000
 
     Added new distribution which are blocked to be tested on smoker 
+
+  Change: 36373259f0a260a21e6737c3dfd4cba32027a605
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-14 08:25:25 +0000
+
+    Bug fixes
+
+    Fixed bug of not getting the full name from Vagrantfile of the test
+    results submitter. Fixed typo with with build_dir parameter, which
+    had an extra slash at the beginning of the string. Added commands to
+    make sure the test users can add preference files to /minicpan/prefs
+    as well. 
 
   Change: 1f0348e3abf5c39c3caba7217188b4dd73eb6e6b
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -68,6 +199,44 @@ version 0.009 at 2017-11-20 12:53:03 +0000
   Date : 2017-11-11 10:41:01 +0000
 
     Fixed bug when creating Set::Tiny instance 
+
+  Change: 3edd65ea05112b2852198bbb67bc249603c4106a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-11 10:39:18 +0000
+
+    Bug fix for CPAN::Reporter configuration file
+
+    The shell script is not passing (or receiving) the complete value to
+    setup the "From" information sent in all reports. 
+
+  Change: 4bf3d75698612194ae1479e5447144bcda3c3f2f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-11 10:37:15 +0000
+
+    Fixed bug when creating Set::Tiny instance 
+
+  Change: 6fd91d0ce92c355a6a5a563bb9a9e293042f9647
+  Author: Alceu Rodrigues de Freitas Junior <freitas@axiros.com>
+  Date : 2017-11-09 19:33:13 +0000
+
+    Bug fixes due new version of OpenBSD
+
+    The base VM received modifications and bugs were because of that. 
+
+  Change: c6c7fc4a4511b1284029a8c8b6db16e585476d46
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-08 09:34:10 +0000
+
+    Adding improvements from previous versions
+
+    Vagrantfile can be used with different versions of OpenBSD. Updated
+    to use more recent versions of perl. Enabling the Vagrantfile to
+    autoconfigure files locations so all required files can be included
+    in the Vagrant box. Updated documentation. Users running the smoker
+    will now share the set of preference files. Users now will be part of
+    the testers group, so file system permissions can reflect that. Will
+    not inject CPAN::OpenBSD::Smoker distribution anymore in the local
+    CPAN mirror since the distribution is already available at CPAN. 
 
   Change: 8cbdc00b6be8dd1281086f910a66bf8d00f735e8
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

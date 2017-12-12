@@ -11,13 +11,12 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0.88'
   Test::Requires::Git: '1.005'
-  blib: '1.01'
   lib: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 keywords:
   - git
   - database
@@ -32,6 +31,7 @@ requires:
   DateTime: '0'
   Digest::SHA: '0'
   Encode: '0'
+  File::Spec: '0'
   File::pushd: '0'
   Git::Raw: '0'
   Git::Sub: '0'
@@ -51,7 +51,8 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Database
   repository: http://github.com/book/Git-Database.git
-version: '0.009'
+version: '0.010'
 x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

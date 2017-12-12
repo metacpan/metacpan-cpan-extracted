@@ -16,14 +16,14 @@ my $prereq_pm = {
         'Moo'              => 0,
         'namespace::clean' => 0,
         'File::Share'      => 0,
-        'Map::Tube'        => '3.32',
+        'Map::Tube'        => '3.40',
     }
 };
 
 eval { ExtUtils::MakeMaker->VERSION(6.64) } ?
- ($build_requires->{TEST_REQUIRES} = { 'Test::Map::Tube' => '0.17' })
+ ($build_requires->{TEST_REQUIRES} = { 'Test::Map::Tube' => '0.35' })
  :
- ($prereq_pm->{PREREQ_PM}->{'Test::Map::Tube'} = '0.17');
+ ($prereq_pm->{PREREQ_PM}->{'Test::Map::Tube'} = '0.35');
 
 WriteMakefile(
     NAME               => 'Map::Tube::Berlin',

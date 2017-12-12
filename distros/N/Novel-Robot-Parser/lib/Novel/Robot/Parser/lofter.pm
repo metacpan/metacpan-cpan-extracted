@@ -55,18 +55,14 @@ sub gen_next_url {
 
 sub extract_item {
   my ( $self, $r ) = @_;
-
   my $c = $self->{browser}->request_url( $r->{url} );
-  my $s = scraper {
-    process '//div[starts-with(@class,"m-post")]',
-      'content' => 'HTML';
-    process '//div[@class="txtcont"]',  'cont1' => 'HTML';
-    process '//div[@class="content"]',  'cont2' => 'HTML';
-    process '//div[@class="postdesc"]', 'cont3' => 'HTML';
-    process '//div[@class="article"]',  'cont4' => 'HTML';
-  };
-  my $res = $s->scrape( \$c );
-  $r->{content} = $res->{content} || $res->{cont1} || $res->{cont2} || $res->{cont3} || $res->{cont4};
+  $r->{content} = $self->scrape_element_try(\$c, [
+          { path =>  '//div[starts-with(@class,"m-post")]', 'extract' => 'HTML' },
+          { path =>  '//div[@class="txtcont"]',  'extract' => 'HTML' },
+          { path =>  '//div[@class="content"]',  'extract' => 'HTML' },
+          { path =>  '//div[@class="postdesc"]', 'extract' => 'HTML' },
+          { path =>  '//div[@class="article"]',  'extract' => 'HTML' },
+      ]);
   return $r;
 }
 
@@ -92,6 +88,7 @@ sub get_tiezi_ref {
 
     $info->{url}        = $url;
     $info->{floor_list} = $floor_list;
+    $self->update_floor_list($info);
     #print "last_chapter_id : $info->{floor_list}[-1]{id}\n";
     return $info;
 } ## end sub get_tiezi_ref

@@ -37,6 +37,143 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 * Tutorial: https://github.com/trizen/sidef/wiki
 * RosettaCode: http://rosettacode.org/wiki/Sidef
 
+## EXAMPLES
+
+### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus):
+```ruby
+var y = ->(f) {->(g) {g(g)}(->(g) { f(->(*args) {g(g)(args...)})})}
+
+var fac = ->(f) { ->(n) { n < 2 ? 1 : (n * f(n-1)) } }
+say 10.of { |i| y(fac)(i) }     #=> [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880]
+
+var fib = ->(f) { ->(n) { n < 2 ? n : (f(n-2) + f(n-1)) } }
+say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+### Approximation of the [gamma function](https://en.wikipedia.org/wiki/Gamma_function):
+```ruby
+define ℯ = Num.e
+define τ = Num.tau
+ 
+func Γ(t, r=50) {
+    t < r ? (__FUNC__(t + 1) / t)
+           : (sqrt(τ*t) * pow(t/ℯ + 1/(12*ℯ*t), t) / t)
+}
+ 
+for i in (1..10) {
+    say ("%.14f" % Γ(i/3))
+}
+```
+
+### ASCII generation of the [Sierpinksi triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+```ruby
+func sierpinski_triangle(n) {
+    var triangle = ['*']
+    { |i|
+        var sp = (' ' * 2**i)
+        triangle = (triangle.map {|x| sp + x + sp} +
+                    triangle.map {|x| x + ' ' + x})
+    } * n
+    triangle.join("\n")
+}
+
+say sierpinski_triangle(4)
+```
+Output:
+```text
+               *               
+              * *              
+             *   *             
+            * * * *            
+           *       *           
+          * *     * *          
+         *   *   *   *         
+        * * * * * * * *        
+       *               *       
+      * *             * *      
+     *   *           *   *     
+    * * * *         * * * *    
+   *       *       *       *   
+  * *     * *     * *     * *  
+ *   *   *   *   *   *   *   * 
+* * * * * * * * * * * * * * * *
+```
+
+### ASCII generation of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
+```ruby
+func mandelbrot(z, r=20) {
+    var c = z
+    r.times {
+        z = (z*z + c)
+        return true if (z.abs > 2)
+    }
+    return false
+}
+
+for y in (1 `downto` -1 `by` 0.05) {
+    for x in (-2 `upto` 0.5 `by` 0.0315) {
+        print(mandelbrot(Complex(x, y)) ? ' ' : '#')
+    }
+    print "\n"
+}
+```
+Output:
+```text
+                                                                                
+                                                            #                   
+                                                        #  ###  #               
+                                                        ########                
+                                                       #########                
+                                                         ######                 
+                                             ##    ## ############  #           
+                                              ### ###################      #    
+                                              #############################     
+                                              ############################      
+                                          ################################      
+                                           ################################     
+                                         #################################### # 
+                          #     #        ###################################    
+                          ###########    ###################################    
+                           ###########   #####################################  
+                         ############## ####################################    
+                        ####################################################    
+                     ######################################################     
+#########################################################################       
+                     ######################################################     
+                        ####################################################    
+                         ############## ####################################    
+                           ###########   #####################################  
+                          ###########    ###################################    
+                          #     #        ###################################    
+                                         #################################### # 
+                                           ################################     
+                                          ################################      
+                                              ############################      
+                                              #############################     
+                                              ### ###################      #    
+                                             ##    ## ############  #           
+                                                         ######                 
+                                                       #########                
+                                                        ########                
+                                                        #  ###  #               
+                                                            #                   
+                                                                                
+```
+
+### More examples
+   * For more examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+
+### INTERACTIVE MODE
+
+![sidef](https://user-images.githubusercontent.com/614513/32420413-973f20a2-c292-11e7-9c60-d58d84666232.png)
+
+### AVAILABILITY
+
+* **CPAN**: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
+* **PKGS.org**: [https://pkgs.org/download/Sidef](https://pkgs.org/download/Sidef)
+* **Arch Linux**: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
+* **Slackware**: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
+
 ### LICENSE AND COPYRIGHT
 
 * Copyright (C) 2013-2017 Daniel Șuteu, Ioana Fălcușan

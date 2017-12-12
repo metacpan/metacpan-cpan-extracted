@@ -1,15 +1,19 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2008-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2017 -- leonerd@leonerd.org.uk
 
 package Circle::GlobalRules;
 
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Text::Balanced qw( extract_delimited extract_quotelike );
 
 use base qw( Circle::Rule::Store ); # for the attributes
+
+use Circle::TaggedString;
 
 sub unquote_qr
 {
@@ -42,6 +46,7 @@ sub register
    $rulestore->register_action( format => __PACKAGE__ );
    $rulestore->register_action( unformat => __PACKAGE__ );
    $rulestore->register_action( level => __PACKAGE__ );
+   $rulestore->register_action( highlight => __PACKAGE__ );
 }
 
 ###### CONDITIONS
@@ -86,7 +91,8 @@ sub eval_cond_matches
    shift; # class
    my ( $event, $results, $re ) = @_;
 
-   my $text = $event->{text}->str;
+   defined( my $text = $event->{text} ) or return 0;
+   $text = "$text";  # stringify a String::Tagged
 
    pos( $text ) = 0;
 
@@ -193,6 +199,7 @@ sub eval_action_rewrite
       }
    }
 
+   ref $event->{text} or $event->{text} = Circle::TaggedString->new( $event->{text} );
    my $text = $event->{text}->substr( $location[0], $location[1] );
 
    if( $kind eq "literal" ) {
@@ -273,6 +280,7 @@ sub eval_action_format
    my ( $event, $results, $groupnum, $formathash ) = @_;
 
    my $str = $event->{text};
+   ref $str or $str = Circle::TaggedString->new( $str );
 
    if( $groupnum == -1 ) {
       $str->apply_tag( 0, -1, $_, $formathash->{$_} ) for keys %$formathash;
@@ -356,6 +364,7 @@ sub eval_action_unformat
    $taglist = \@alltags unless @$taglist;
 
    my $str = $event->{text};
+   ref $str or $str = Circle::TaggedString->new( $str );
 
    if( $groupnum == -1 ) {
       $str->unapply_tag( 0, -1, $_ ) for @$taglist;
@@ -401,6 +410,40 @@ sub eval_action_level
    my ( $event, $results, $level ) = @_;
 
    $event->{level} = $level;
+}
+
+## HIGHLIGHT
+
+sub parse_action_highlight
+   : Rule_description("Highlight matched regions and set activity level to 3")
+   : Rule_format('')
+{
+   my $self = shift;
+   return;
+}
+
+sub deparse_action_highlight
+{
+   my $self = shift;
+   return;
+}
+
+sub eval_action_highlight
+{
+   my $self = shift;
+   my ( $event, $results ) = @_;
+
+   my $str = $event->{text};
+   ref $str or $str = Circle::TaggedString->new( $str );
+
+   foreach my $matchgroup ( @{ $results->get_result( "matchgroups" ) } ) {
+      my ( $start, $len ) = @{$matchgroup->[0]}[0,1];
+
+      $str->apply_tag( $start, $len, b => 1 );
+      $str->apply_tag( $start, $len, fg => "highlight" );
+   }
+
+   $event->{level} = 3;
 }
 
 0x55AA;

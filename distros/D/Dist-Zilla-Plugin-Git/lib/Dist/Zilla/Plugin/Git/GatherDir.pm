@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -31,8 +31,7 @@ extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_
 #pod This is a trivial variant of the L<GatherDir|Dist::Zilla::Plugin::GatherDir>
 #pod plugin.  It looks in the directory named in the L</root> attribute and adds all
 #pod the Git tracked files it finds there (as determined by C<git ls-files>).  If the
-#pod root begins with a tilde, the tilde is replaced with the current user's home
-#pod directory according to L<File::HomeDir>.
+#pod root begins with a tilde, the directory name is passed through C<glob()> first.
 #pod
 #pod Most users just need:
 #pod
@@ -140,6 +139,7 @@ around dump_config => sub
 
     $config->{+__PACKAGE__} = {
         include_untracked => $self->include_untracked ? 1 : 0,
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -151,15 +151,15 @@ override gather_files => sub {
   require Git::Wrapper;
   require Path::Tiny;
 
-  my $root = "" . $self->root;
+  my $root = '' . $self->root;
+
   # Convert ~ to home directory:
   if ($root =~ /^~/) {
-    require File::HomeDir;
-    File::HomeDir->VERSION(0.81);
+    ($root) = glob($root);
+    warn 'old perl on Win32 detected: ~ in root not translated'
+      if $root =~ /^~/ and $^O eq 'Win32' && "$]" < '5.016';
+  }
 
-    $root =~ s/^~(\w+)/ File::HomeDir->users_home("$1") /e;
-    $root =~ s/^~/      File::HomeDir->my_home /e;
-  } # end if $root begins with ~
   $root = Path::Tiny::path($root)->absolute($self->zilla->root->absolute);
 
   # Prepare to gather files
@@ -229,7 +229,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 SYNOPSIS
 
@@ -248,8 +248,7 @@ In your F<dist.ini>:
 This is a trivial variant of the L<GatherDir|Dist::Zilla::Plugin::GatherDir>
 plugin.  It looks in the directory named in the L</root> attribute and adds all
 the Git tracked files it finds there (as determined by C<git ls-files>).  If the
-root begins with a tilde, the tilde is replaced with the current user's home
-directory according to L<File::HomeDir>.
+root begins with a tilde, the directory name is passed through C<glob()> first.
 
 Most users just need:
 

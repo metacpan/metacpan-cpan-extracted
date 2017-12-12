@@ -126,3 +126,10 @@ Revision history for Control-CLI-AvayaData
 	* Added new attributes 'is_voss', 'is_apls', 'apls_box_type' and 'brand_name'
 	* On BaystackERS family types, login() method now detects failed authentication if password is asked twice
 	* WLAN9100 attribute "model" is now formatted correctly, like WAP-9132
+
+2.04	2017-12-09
+	* Telnet login with username/password was detecting the same password prompt twice and failing to connect
+	* Attribute 'model' wan not correctly formatted for PassportERS VSP platforms; e.g. VSP-8284XSQ instead of
+	  VSP-8284-XSQ
+	* Updated to support new Control::CLI's 'atomic_connect' argument in connect()
+	* Update to error message patterns

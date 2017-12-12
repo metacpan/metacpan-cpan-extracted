@@ -1,5 +1,5 @@
 package GitLab::API::v3::RESTClient;
-$GitLab::API::v3::RESTClient::VERSION = '1.00';
+$GitLab::API::v3::RESTClient::VERSION = '1.02';
 =head1 NAME
 
 GitLab::API::v3::RESTClient - GitLab API v3 REST client.
@@ -21,10 +21,20 @@ rather than the response object itself.
 
 use Carp qw( confess );
 use Data::Dumper qw();
+use Role::REST::Client::Response;
 
 use Moo;
+use Try::Tiny;
 use strictures 1;
 use namespace::clean;
+use Log::Any qw( $log );
+use Types::Standard qw( Int );
+
+has retries => (
+  is => 'ro',
+  isa => Int,
+  default => 0,
+);
 
 with 'Role::REST::Client';
 
@@ -34,7 +44,19 @@ foreach my $method (qw( post get head put delete options )) {
         my $self = shift;
         my $path = shift;
 
-        my $res = $self->$orig( "/$path", @_ );
+        my $res;
+        my $retry = $self->retries;
+        do {
+          $log->infof( 'Making %s request against %s', uc($method), $path );
+          $res = $self->$orig( "/$path", @_ );
+
+          if ($res->code =~ /^5/) {
+            $log->warn('Request failed. Retrying...') if $retry;
+          }
+          else {
+            $retry = 0;
+          }
+        } while --$retry >= 0;
 
         return undef if $res->code() eq '404' and $method eq 'get';
 

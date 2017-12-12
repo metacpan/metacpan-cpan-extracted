@@ -22,23 +22,17 @@ my $session = get_session $rootobj;
 
 send_command $rootobj, "networks add -type raw Test";
 
-my $rawnet;
-$session->get_property(
-   property => "tabs",
-   on_value => sub {
-      $rawnet = $_[0]->[1],
-      defined $rawnet or die "Expected a tab [1] didn't get one";
-   },
-);
-wait_for { defined $rawnet };
-
+my ($rawnet) = $session->get_property(
+   "tabs",
+)->get->[1];
+defined $rawnet or die "Expected a tab [1] didn't get one";
 ok( $rawnet->proxy_isa( "Circle.Net.Raw" ), '$rawnet proxy isa Circle.Net.Raw' );
 
 my $connected_args;
 $rawnet->subscribe_event(
-   event => "connected",
+   "connected",
    on_fire => sub { $connected_args = [ @_ ] },
-);
+)->get;
 
 my $widgets = get_widgetset_from $rawnet;
 
@@ -87,28 +81,22 @@ $serverstream->configure(
 $loop->add( $serverstream );
 
 $widgets->{"Circle.Widget.Entry"}->call_method(
-   method => "enter",
-   args   => [ "Hello, server!" ],
-   on_result => sub { },
-);
+   enter => "Hello, server!"
+)->get;
 
 wait_for { @lines_from_client };
 
 is( shift @lines_from_client, "Hello, server!", 'client can send to server' );
 
-my $watching;
 my @displayevents;
 $widgets->{"Circle.Widget.Scroller"}->watch_property(
-   property => "displayevents",
+   "displayevents",
    on_set => sub {},
    on_push => sub {
       push @displayevents, @_;
    },
    on_shift => sub {},
-   on_watched => sub { $watching++ },
-);
-
-wait_for { $watching };
+)->get;
 
 my $time_before = time;
 

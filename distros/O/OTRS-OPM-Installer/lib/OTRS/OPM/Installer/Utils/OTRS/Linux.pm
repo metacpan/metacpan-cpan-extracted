@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS::Linux;
-$OTRS::OPM::Installer::Utils::OTRS::Linux::VERSION = '0.02';
+$OTRS::OPM::Installer::Utils::OTRS::Linux::VERSION = '0.03';
 # ABSTRACT: helper functions for OTRS installations on Linux
 
 use strict;
@@ -41,7 +41,7 @@ OTRS::OPM::Installer::Utils::OTRS::Linux - helper functions for OTRS installatio
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

@@ -1,0 +1,14 @@
+
+Release history for Dist-Zilla-PluginBundle-Author-FERREIRA 
+
+0.3.0     2017-12-01 17:36:35-08:00 America/Los_Angeles
+
+      - Declare dependency on custom scanners
+
+v0.2     2017-11-30 18:57:05-08:00 America/Los_Angeles
+
+      - Add "Zim" to AutoPrereq extra_scanners
+
+v0.1     2017-11-30 16:48:05-08:00 America/Los_Angeles
+
+      - Initial version

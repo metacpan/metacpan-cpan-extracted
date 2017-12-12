@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Model::Doc::Elasticsearch;
-{
-  $Mojito::Model::Doc::Elasticsearch::VERSION = '0.24';
-}
+$Mojito::Model::Doc::Elasticsearch::VERSION = '0.25';
 use Moo;
 use Data::Dumper::Concise;
 

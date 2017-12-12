@@ -209,7 +209,7 @@ Mojo::IOLoop->one_tick until $tx->req->is_finished;
 $body = <<EOF;
 plugin Config => {
   default => {
-    elzar => {
+    hypnotoad => {
       accepts => 2,
       inactivity_timeout => 3,
       listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],

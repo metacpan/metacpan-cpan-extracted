@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use IO::String;
 use BibTeX::Parser;
@@ -30,8 +30,42 @@ use BibTeX::Parser;
        pages => "498--516", _parse_ok => 1,
        _fieldnums =>   {'author' => 0, 'title' => 1,
                         'journal' => 2, 'volume' => 3,
-                        'year' => 4, 'pages' => 5},
+			    'year' => 4, 'pages' => 5},
+       _pre => '',		       
        _raw => $string}, "parse \@ARTICLE");
+
+}
+{
+    my $string1 = q|@article{lin1973,
+       author = "Shen Lin and Brian W. Kernighan",
+       title = "An Effective Heuristic Algorithm for the Travelling-Salesman Problem",
+       journal = "Operations Research",
+       volume = 21,
+       year = 1973,
+       pages = "498--516"
+    }|;
+    my $string = "some
+text
+$string1";
+    my $fh = IO::String->new($string);
+
+    my $parser = BibTeX::Parser->new( $fh );
+
+#my @result = BibTeX::Parser->_parse($fh);
+
+    my $entry = $parser->next;
+
+    is_deeply($entry, {_type => 'ARTICLE', _key => 'lin1973', author => "Shen Lin and Brian W. Kernighan",
+       title => "An Effective Heuristic Algorithm for the Travelling-Salesman Problem",
+       journal => "Operations Research",
+       volume => 21,
+       year => 1973,
+       pages => "498--516", _parse_ok => 1,
+       _fieldnums =>   {'author' => 0, 'title' => 1,
+                        'journal' => 2, 'volume' => 3,
+			    'year' => 4, 'pages' => 5},
+       _pre => "some\ntext",		       
+       _raw => $string1}, "parse \@ARTICLE");
 
 }
 {
@@ -63,5 +97,6 @@ use BibTeX::Parser;
         editor => "Reinhard Keil-Slavik and Johannes Magenheim",
         year => 2001,
         _parse_ok => 1,
+        _pre => '',
         _raw => $string}, "parse \@ARTICLE");
 }

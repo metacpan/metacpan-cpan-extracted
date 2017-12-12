@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -128,10 +128,6 @@ sub new {
     $html = $e->html($h,$body);
     $html = $class->html($h,$body,@keyVal);
 
-=head4 Description
-
-Generiere den HTML-Code der Tablle und liefere diesen zurück.
-
 =head4 Arguments
 
 =over 4
@@ -150,6 +146,10 @@ Attribut-Wert-Paare des Konstruktoraufrufs, wenn die
 Methode das Objekt instantiieren soll.
 
 =back
+
+=head4 Description
+
+Generiere den HTML-Code der Tablle und liefere diesen zurück.
 
 =cut
 
@@ -196,7 +196,7 @@ sub html {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -11,11 +11,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 =cut
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 =head1 SYNOPSIS
 
@@ -167,6 +167,8 @@ sub parse_source {
         require Pg::Explain::FromText;
         $self->{ 'top_node' } = Pg::Explain::FromText->new()->parse_source( $source );
     }
+
+    $self->{ 'top_node' }->check_for_parallelism();
 
     return;
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,9 +20,6 @@
 use 5.010;
 use strict;
 use Math::PlanePath::R5DragonMidpoint;
-
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 
 my $path = Math::PlanePath::R5DragonMidpoint->new (arms => 1);

@@ -1,9 +1,41 @@
 Revision history for Perl extension DBD::Firebird.
+1.31 [2017-12-05]
+ * Re-release with all tests (some were missing in MANIFEST in 1.30)
+1.30 [2017-12-05]
+ * remove artificial hard-coded limit of 1_000_000 bytes when fetching BLOB
+   data
+1.29 [2017-12-02]
+ * add /usr/local to the list of possible firebird homes [RT#123723]
+ * blob_type needs to be signed to be assigned/compared to -1
+ * bpb parameter to isc_open_blob2 is a pointer
+ * drop unused column character set definition
+1.28 [2017-12-01]
+ * Update MANIFEST to include newly added tests
+ * add missing items in 1.27 changes
+ * correctly check for Test::CheckDeps presense
+1.27 [2017-12-01]
+ * finish: do not check uninitialised status vector
+   If statement type is isc_info_sql_stmt_exec_procedure,
+   isc_dsql_free_statement is not called and there is no point checking the
+   status vector for errors. An error there may be from a previous call,
+   or just plain garbage
+   Fixes https://bugs.debian.org/883183 -- test failure on i386, and
+   http://www.cpantesters.org/cpan/report/e9ebeff4-d095-11e7-bc5d-91f60384196d, and
+   RT#110979
+ * add 000-check-dependencies.t
+ * Makefile.PL: move test dependencies in TEST_REQUIRES
+ * fix typo in 1.26 Changes
+ * POD: wrap some overly long lines
+ * add support for a 'timeout=$secs' parameter [RT#119764]
+ * bump years of copyright
+ * put fb_api_ver in XS and make it available to both embedded and regular
+   driver
+ * more constants for client version (major/minor/full version string)
 1.26 [2017-11-12]
  * TestFirebirdEmbedded: use a temporary directory for firebird locks and
    database storage (RT#123623)
  * fix typo in FirebirdEmbedded
- * detect Firebird API version even when patch are supplied via environment
+ * detect Firebird API version even when paths are supplied via environment
 1.25 [2017-10-01]
  * Add tests for values between 0 and ±1 to bigdecimal[_read].t
  * dbd_st_fetch: fix conversion of numerics between -1 and 0

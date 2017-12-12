@@ -1,0 +1,23 @@
+---
+abstract: 'Returns your ip address using L<http://checkip.amazonaws.com/>'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Amazon-checkip
+requires:
+  HTTP::Tiny: '0'
+resources:
+  bugtracker: https://github.com/pplu/www-amazon-checkip-perl/issues
+  repository: https://github.com/pplu/www-amazon-checkip-perl.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

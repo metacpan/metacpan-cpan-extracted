@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
 # PODNAME: ooi
+# ABSTRACT: Commandline tool to install OTRS addons
+
+use v5.10;
 
 use strict;
 use warnings;
@@ -9,17 +12,32 @@ use OTRS::OPM::Installer;
 use Getopt::Long;
 
 GetOptions(
-    'p=s'  => \my $package,
-    'h'    => \my $help,
-    'r=s'  => \my @repositories,
-    'v=s'  => \my $version,
-    'vv'   => \my $verbose,
-    'sudo' => \my $sudo,
+    'h'       => \my $help,
+    'r=s'     => \my @repositories,
+    'v=s'     => \my $version,
+    'vv'      => \my $verbose,
+    'version' => \my $print_version,
+    'list'    => \my $list_available,
+    'sudo'    => \my $sudo,
 );
 
-$package ||= $ARGV[0];
+unshift @ARGV, $package if $package;
 
-if( $help || !$package ) {
+if ( $print_version ) {
+    print OTRS::OPM::Installer->VERSION();
+    exit;
+}
+
+if ( $list_available ) {
+    my $installer = OTRS::OPM::Installer->new;
+    for my $addon ( $installer->list_available ) {
+        say sprintf "%s (%s) from\n    %s\n",
+            $addon->{name}, $addon->{version}, $addon->{url};
+    }
+    exit;
+}
+
+if( $help || !@ARGV ) {
     print_usage();
     exit;
 }
@@ -33,15 +51,20 @@ $class_opts{verbose} = 1             if $verbose;
 $class_opts{sudo}    = 1             if $sudo;
 
 my $installer = OTRS::OPM::Installer->new( %class_opts );
-$installer->install(
-    package => $package,
-    %opts,
-);
+
+for my $package_info ( @ARGV ) {
+    my ($package, $version) = split /=/, $package_info;
+    $opts{version}          = $version if $version;
+
+    $installer->install(
+        package => $package,
+        %opts,
+    );
+}
 
 sub print_usage {
-    print qq~$0 -p <package> [-h] [-r <repository>] [-v <version>] [vv]
+    print qq~$0 [-h] [-r <repository>] [-v <version>] [vv] <package> [<package>...]
     
-    package:    path or url to opm file
     version:    exact version of otrs package to be installed
     repository: repository for OTRSM packages
     help:       show this screen
@@ -57,11 +80,11 @@ __END__
 
 =head1 NAME
 
-ooi
+ooi - Commandline tool to install OTRS addons
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

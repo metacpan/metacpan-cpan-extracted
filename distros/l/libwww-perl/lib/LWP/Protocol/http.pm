@@ -1,6 +1,8 @@
 package LWP::Protocol::http;
-$LWP::Protocol::http::VERSION = '6.29';
+
 use strict;
+
+our $VERSION = '6.31';
 
 require HTTP::Response;
 require HTTP::Status;
@@ -234,7 +236,7 @@ sub request
     $request_headers->scan(sub {
 			       my($k, $v) = @_;
 			       $k =~ s/^://;
-			       $v =~ s/\n/ /g;
+			       $v =~ tr/\n/ /;
 			       push(@h, $k, $v);
 			   });
 
@@ -516,6 +518,6 @@ sub increment_response_count {
 package # hide from PAUSE
     LWP::Protocol::http::Socket;
 
-use base qw(LWP::Protocol::http::SocketMethods Net::HTTP);
+use parent -norequire, qw(LWP::Protocol::http::SocketMethods Net::HTTP);
 
 1;

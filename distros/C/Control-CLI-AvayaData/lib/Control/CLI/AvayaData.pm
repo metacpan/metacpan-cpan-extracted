@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -27,7 +27,7 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	menu		=>	'Use arrow keys to highlight option, press <Return> or <Enter> to select option',
 	submenu		=>	'Press Ctrl-R to return to previous menu.  Press Ctrl-C to return to Main Menu',
 	username	=>	'Enter Username: ',
-	password	=>	"Enter Password: \e",
+	password	=>	"Enter Password: \e[?", # Should match only on the initial password prompt and not subsequent ones where * are printed
 	lastlogin	=>	'Failed retries since last login:',
 	localfail	=>	'Incorrect',
 	radiusfail	=>	'Access Denied from RADIUS',
@@ -161,6 +161,8 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|% View already exists, you must first delete it\.'	# snmp-server view root 1
 					. '|% User \w+ does not exist'		# no snmp-server user admindes
 					. '|% User \'.+?\' already exists'	# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
+					. '|% Password length must be in range:' # username add rwa role-name RW password // rwa // rwa (with password security)
+					. '|% Bad format, use forms:'		# vlan members add 71 1/6-1/7 (1/6-7 is correct)
 				. ')',
 	$Prm{pers}		=>	'^('
 					. '\x07?\s+\^\n.+'
@@ -182,6 +184,9 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|can\'t \w+ ".+?" 0x\d+'					# delete /flash/.ssh -y : can't remove "/flash/.ssh" 0x300042
 					. '|".+?" is ambiguous in path /'				# AccDist3:5#% do
 					. '|Password change aborted\.'	# Creating snmpv3 usm user with enh-secure-mode and password does not meet complexity requirements
+					. '|Invalid password. Authentication failed'			# username teamnoc level ro // invalid-old-pwd // ...
+					. '|Passwords do not match. Password change aborted'		# username teamnoc level ro // valid-old-pwd // newpwd // diffpwd
+					. '|Error: Prefix List ".+?" not found'				# no ip prefix-list "<non-existent>"
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -321,7 +326,8 @@ sub connect { # All the steps necessary to connect to a CLI session on an Avaya 
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'timeout', 'read_attempts', 'wake_console',
-				 'return_reference', 'blocking', 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud');
+				 'return_reference', 'blocking', 'data_with_error', 'terminal_type', 'window_size',
+				 'callback', 'forcebaud', 'atomic_connect');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -356,6 +362,7 @@ sub connect { # All the steps necessary to connect to a CLI session on an Avaya 
 		window_size		=>	$args{window_size},
 		callback		=>	$args{callback},
 		forcebaud		=>	$args{forcebaud},
+		atomic_connect		=>	$args{atomic_connect},
 		login_timeout		=>	defined $args{timeout} ? $args{timeout} : $self->{timeout},
 		read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 		data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
@@ -1123,7 +1130,8 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'login_timeout', 'read_attempts', 'wake_console',
-				 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud');
+				 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud',
+				 'atomic_connect');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{host}, $args{port}, $args{username}, $args{password}, $args{publickey}, $args{privatekey},
@@ -1151,6 +1159,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			window_size		=>	$args{window_size},
 			callback		=>	$args{callback},
 			forcebaud		=>	$args{forcebaud},
+			atomic_connect		=>	$args{atomic_connect},
 			login_timeout		=>	defined $args{login_timeout} ? $args{login_timeout} : $self->{timeout},
 			read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 			data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
@@ -1185,6 +1194,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			Terminal_type		=> $connect->{terminal_type},
 			Window_size		=> $connect->{window_size},
 			Callback		=> $connect->{callback},
+			Atomic_connect		=> $connect->{atomic_connect},
 		);
 		return $self->poll_return($ok) unless $ok; # Come out if error (if errmode='return'), or if nothing to read in non-blocking mode
 		# Unless console already set, set it now; will determine whether or not wake_console is sent upon login
@@ -3465,6 +3475,9 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 		$model =~ s/Virtual Services Platform /VSP-/;
 		$model =~ s/(-\d{3,})([A-Z])/$1-$2/;
 	}
+	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{pers}) {
+		$model =~ s/(-\d{3,})([A-Z])/$1-$2/;
+	}
 	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{sr}) {
 		# Try and reformat the model number into something like SR-4134
 		$model =~ s/SR(\d+)/SR-$1/;		# From show chassis
@@ -3955,6 +3968,7 @@ Methods which can be run on a previously created Control::CLI::AvayaData instanc
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
+  	[Atomic_connect		=> $flag,]
   );
 
   ($ok, $output || $outputRef) = $obj->connect(
@@ -3983,6 +3997,7 @@ Methods which can be run on a previously created Control::CLI::AvayaData instanc
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
+  	[Atomic_connect		=> $flag,]
   );
 
 Polling method (only applicable in non-blocking mode):
@@ -4030,6 +4045,7 @@ For Telnet, these arguments are used:
   	[Errmode		=> $errmode,]
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
+  	[Atomic_connect		=> $flag,]
   );
 
 If not specified, the default port number for Telnet is 23. The wake_console argument is only relevant when connecting to a Telnet port other than 23 (i.e. to a Terminal Server device) or if console() has been manually set; see console(). In which case, the login() method, which is called by connect(), will automatically send the wake_console string sequence to the attached device to alert it of the connection. The default sequence will work across all Avaya Networking products but can be overridden by using the wake_console argument. See wake_console().
@@ -4059,6 +4075,7 @@ For SSH, these arguments are used:
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
+  	[Atomic_connect		=> $flag,]
   );
 
 If not specified, the default port number for SSH is 22. The wake_console argument is only relevant when connecting to a SSH port other than 22 (i.e. to a Terminal Server device) or if console() has been manually set; see console(). In which case, the login() method, which is called by connect(), will automatically send the wake_console string sequence to the attached device to alert it of the connection. The default sequence will work across all Avaya Networking products but can be overridden by using the wake_console argument. See wake_console().
@@ -5066,9 +5083,9 @@ Once set, the object CLI prompt match pattern is only used by the cmd() and cmd_
 
   $prev = $obj->more_prompt($string [, $delayPrompt]);
 
-This method sets the CLI --More-- prompt match patterns for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned (the $delayPrompt can be set as a subset of $string if $string accepts multiple patterns some of which are subsets of others)
+This method sets the CLI --More-- prompt match patterns for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned (the $delayPrompt can be set as a subset of $string if $string accepts multiple patterns some of which are subsets of others).
 If no prompt has yet been set (connection not yet established) undef is returned.
-The object CLI --More-- prompt pattern is automatically set by the connect() and login() methods based upon the device type detected during login. Normally this should not need not be changed manually.
+The object's CLI --More-- prompt pattern is automatically set by the connect() and login() methods based upon the device type detected during login. Normally there should be no need to set this manually.
 Once set, the object CLI --More-- prompt match patterns is only used by the cmd() and cmd_prompted() methods.
 
 
@@ -5389,6 +5406,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
 =item B<ssh_authentication> - return ssh authentication type performed
 
 =item B<connection_type> - return connection type for object
+
+=item B<host> - return the host for the connection
 
 =item B<port> - return the TCP port / COM port for the connection
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::USB;
-$Lab::Moose::Connection::USB::VERSION = '3.600';
+$Lab::Moose::Connection::USB::VERSION = '3.613';
 #ABSTRACT: Connection backend to USB Test & Measurement (USBTMC) bus
 
 use 5.010;
@@ -21,13 +21,13 @@ has usbtmc => (
 
 has vid => (
     is       => 'ro',
-    isa      => 'Num',
+    isa      => 'Str',
     required => 1,
 );
 
 has pid => (
     is       => 'ro',
-    isa      => 'Num',
+    isa      => 'Str',
     required => 1,
 );
 
@@ -52,9 +52,18 @@ sub BUILD {
     my $self   = shift;
     my $serial = $self->serial();
 
+    my $vid = $self->vid();
+    my $pid = $self->pid();
+    if ( $vid =~ /^0x/i ) {
+        $vid = hex($vid);
+    }
+    if ( $pid =~ /^0x/i ) {
+        $pid = hex($pid);
+    }
+
     my $usbtmc = USB::TMC->new(
-        vid => $self->vid(),
-        pid => $self->pid(),
+        vid => $vid,
+        pid => $pid,
         defined($serial) ? ( serial => $serial ) : (),
         debug_mode => $self->debug_mode(),
     );
@@ -115,7 +124,7 @@ Lab::Moose::Connection::USB - Connection backend to USB Test & Measurement (USBT
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 

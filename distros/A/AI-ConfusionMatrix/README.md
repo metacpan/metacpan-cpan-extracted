@@ -22,13 +22,14 @@ This module prints a [confusion matrix](https://en.wikipedia.org/wiki/Confusion_
 
 ### Function
 
-#### `makeConfusionMatrix($hash_ref, $file)`
+#### `makeConfusionMatrix($hash_ref, $file [, $delimiter ])`
 
-This function makes a confusion matrix from `$hash_ref` and writes it to `$file`. `$file` can be a filename or a file handle opened with the `w+` mode.
+This function makes a confusion matrix from `$hash_ref` and writes it to `$file`. `$file` can be a filename or a file handle opened with the `w+` mode. If `$delimiter` is present, it is used as a custom separator for the fields in the confusion matrix.
 
 Examples:
 
     makeConfusionMatrix(\%matrix, 'output.csv');
+    makeConfusionMatrix(\%matrix, 'output.csv', ';');
     makeConfusionMatrix(\%matrix, *$fh);
 
 The hash reference must look like this :
@@ -51,30 +52,24 @@ The hash reference must look like this :
 
 The output will be in CSV. Here is an example:
 
-    ,1997,1998,2001,2003,2005,2008,2012,2015,TOTAL,TP,FP,FN,ACC
-    1997,2,,,,,,,,2,2,0,0,100.00%
-    1998,,1,,,,,,,1,1,0,0,100.00%
-    2001,,,1,,,,,,1,1,0,0,100.00%
-    2003,,,,5,,,1,1,7,5,0,2,71.43%
-    2005,,,,,7,,,2,9,7,0,2,77.78%
-    2008,,,,,,3,,,3,3,0,0,100.00%
-    2012,,,,,,,5,,5,5,1,0,100.00%
-    2015,,,,,,,,8,8,8,3,0,100.00%
-    TOTAL,2,1,1,5,7,3,6,11,36,32,4,4,88.89%
+    ,1974,1978,2002,2003,2005,TOTAL,TP,FP,FN,SENS,ACC
+    1974,3,1,,,2,6,3,4,3,42.86%,50.00%
+    1978,1,5,,,,6,5,4,1,55.56%,83.33%
+    2002,2,2,8,,,12,8,1,4,88.89%,66.67%
+    2003,1,,,7,2,10,7,0,3,100.00%,70.00%
+    2005,,1,1,,6,8,6,4,2,60.00%,75.00%
+    TOTAL,7,9,9,7,10,42,29,13,13,69.05%,69.05%
 
 Prettified:
 
-    |       | 1997 | 1998 | 2001 | 2003 | 2005 | 2008 | 2012 | 2015 | TOTAL | TP | FP | FN | ACC     |
-    |-------|------|------|------|------|------|------|------|------|-------|----|----|----|---------|
-    | 1997  | 2    |      |      |      |      |      |      |      | 2     | 2  | 0  | 0  | 100.00% |
-    | 1998  |      | 1    |      |      |      |      |      |      | 1     | 1  | 0  | 0  | 100.00% |
-    | 2001  |      |      | 1    |      |      |      |      |      | 1     | 1  | 0  | 0  | 100.00% |
-    | 2003  |      |      |      | 5    |      |      | 1    | 1    | 7     | 5  | 0  | 2  | 71.43%  |
-    | 2005  |      |      |      |      | 7    |      |      | 2    | 9     | 7  | 0  | 2  | 77.78%  |
-    | 2008  |      |      |      |      |      | 3    |      |      | 3     | 3  | 0  | 0  | 100.00% |
-    | 2012  |      |      |      |      |      |      | 5    |      | 5     | 5  | 1  | 0  | 100.00% |
-    | 2015  |      |      |      |      |      |      |      | 8    | 8     | 8  | 3  | 0  | 100.00% |
-    | TOTAL | 2    | 1    | 1    | 5    | 7    | 3    | 6    | 11   | 36    | 32 | 4  | 4  | 88.89%  |
+    |       | 1974 | 1978 | 2002 | 2003 | 2005 | TOTAL | TP | FP | FN | SENS    | ACC    |
+    |-------|------|------|------|------|------|-------|----|----|----|---------|--------|
+    | 1974  | 3    | 1    |      |      | 2    | 6     | 3  | 4  | 3  | 42.86%  | 50.00% |
+    | 1978  | 1    | 5    |      |      |      | 6     | 5  | 4  | 1  | 55.56%  | 83.33% |
+    | 2002  | 2    | 2    | 8    |      |      | 12    | 8  | 1  | 4  | 88.89%  | 66.67% |
+    | 2003  | 1    |      |      | 7    | 2    | 10    | 7  | 0  | 3  | 100.00% | 70.00% |
+    | 2005  |      | 1    | 1    |      | 6    | 8     | 6  | 4  | 2  | 60.00%  | 75.00% |
+    | TOTAL | 7    | 9    | 9    | 7    | 10   | 42    | 29 | 13 | 13 | 69.05%  | 69.05% |
 
 - TP:
 
@@ -88,13 +83,17 @@ Prettified:
 
     False Negative
 
+- SENS
+
+    Sensitivity. Number of true positives divided by the number of positives.
+
 - ACC:
 
     Accuracy
 
 # AUTHOR
 
-Vincent Lequertier <sky@riseup.net>
+Vincent Lequertier <vi.le@autistici.org>
 
 # LICENSE
 

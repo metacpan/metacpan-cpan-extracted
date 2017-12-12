@@ -1,3 +1,10 @@
+0.07 2017-12-01
+- Use common::sense
+- Use DumpLex and PadWalker to include as much closing state as possible in
+  serialized task code
+- Fix typo in AnyEvent::ProcessPool::Util::cpu_count and add android to linux
+  case
+
 0.06 2017-11-13
 - Added support for alternately passing a "task class" + args rather than a
   code ref

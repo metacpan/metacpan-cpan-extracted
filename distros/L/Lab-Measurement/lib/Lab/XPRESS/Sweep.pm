@@ -1,6 +1,7 @@
 package Lab::XPRESS::Sweep;
+$Lab::XPRESS::Sweep::VERSION = '3.613';
 #ABSTRACT: Base sweep class
-$Lab::XPRESS::Sweep::VERSION = '3.600';
+
 use Role::Tiny::With;
 
 use Time::HiRes qw/usleep/, qw/time/;
@@ -483,17 +484,14 @@ sub start {
     }
 
     if ( not defined @{ $self->{slaves} }[0] ) {
-
         if ( $self->{DataFile_counter} <= 0 ) {
             print new Lab::Exception::Warning( error => "Attention: "
                     . ref($self)
                     . " has no DataFile ! \n" );
         }
-
         if ( defined @{ $self->{filename_extensions} }[0] ) {
             foreach my $DataFile ( @{ $self->{DataFiles} } ) {
                 my $filenamebase = $DataFile->{filenamebase};
-
                 my $new_filenamebase
                     = $self->add_filename_extensions($filenamebase);
                 if ( $new_filenamebase ne $DataFile->{file} ) {
@@ -1330,6 +1328,12 @@ sub deep_copy {
     }
 }
 
+# Need to provide this or AUTOLOAD cannot find it and will die on object destruction.
+sub DESTROY {
+
+    # do nothing
+}
+
 sub AUTOLOAD {
 
     my $self  = shift;
@@ -1430,7 +1434,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -1563,8 +1567,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Christian Butschkow
             2015       Christian Butschkow
-            2016       Andreas K. Huettel, Simon Reinhardt
-            2017       Andreas K. Huettel
+            2016-2017  Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

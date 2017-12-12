@@ -13,3 +13,4 @@ example/local
 example/.*\.log
 pm_to_blib
 tags
+\.travis\.yml

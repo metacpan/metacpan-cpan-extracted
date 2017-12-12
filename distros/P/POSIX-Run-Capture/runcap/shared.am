@@ -1,0 +1,6 @@
+# Automake settings to build runcap as a shared convenience library.
+# See Make.am for details.
+include Make.am
+noinst_LTLIBRARIES=libruncap.la
+libruncap_la_SOURCES = $(RUNCAP_SRC)
+noinst_HEADERS=runcap.h

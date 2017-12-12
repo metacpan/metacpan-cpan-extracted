@@ -1,0 +1,61 @@
+{
+   "abstract" : "use JSON-encoded data over WebSockets with C<IO::Async>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-WebSocket-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Net::Async::WebSocket" : "0.11",
+            "Net::Async::WebSocket::Server" : "0.11"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::WebSocket::JSON" : {
+         "file" : "lib/Net/Async/WebSocket/JSON.pm",
+         "version" : "0.01"
+      },
+      "Net::Async::WebSocket::JSON::Client" : {
+         "file" : "lib/Net/Async/WebSocket/JSON/Client.pm",
+         "version" : "0.01"
+      },
+      "Net::Async::WebSocket::JSON::Protocol" : {
+         "file" : "lib/Net/Async/WebSocket/JSON/Protocol.pm",
+         "version" : "0.01"
+      },
+      "Net::Async::WebSocket::JSON::Server" : {
+         "file" : "lib/Net/Async/WebSocket/JSON/Server.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

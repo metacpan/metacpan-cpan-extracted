@@ -284,6 +284,12 @@ sub test()
             (0 ? sql { 1 } : ()),
             (0 ? sql { 1 } : ()),
         };
+
+        SELECT * FROM (SELECT * FROM a) AS aa CROSS JOIN (SELECT * FROM b) AS bb;
+
+        SELECT COUNT(a,b) FROM c;
+
+        SELECT COUNT(DISTINCT a) FROM c;
     };
     my @a2= sql{
         @a[1..2]

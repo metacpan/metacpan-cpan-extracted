@@ -9,13 +9,14 @@ use Text::Amuse::Compile;
 use PDF::API2;
 use Data::Dumper;
 my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-
+binmode $builder->output,         ":encoding(UTF-8)";
+binmode $builder->failure_output, ":encoding(UTF-8)";
+binmode $builder->todo_output,    ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)";
+binmode STDOUT, ":encoding(UTF-8)";
 
 if ($ENV{TEST_WITH_LATEX}) {
-    plan tests => 108;
+    plan tests => 112;
 }
 else {
     plan skip_all => "No TEST_WITH_LATEX set, skipping";
@@ -35,6 +36,7 @@ if (-f $output) {
 ok (! -f $output);
 my $c = Text::Amuse::Compile->new(tex => 1, pdf => 1);
 $c->compile($file);
+ok(!$c->has_errors, "No errors") or die Dumper($c->errors);
 ok (-f $output);
 like first_line($log), qr{This is XeTeX};
 check_metadata($output);
@@ -42,8 +44,8 @@ check_metadata($output);
 unlink $output or die "Cannot unlink $output $!";
 
 $c = Text::Amuse::Compile->new(tex => 1, pdf => 1, luatex => 1);
-
 $c->compile($file);
+ok(!$c->has_errors, "No errors") or die Dumper($c->errors);
 ok (-f $output);
 check_metadata($output);
 
@@ -72,10 +74,10 @@ foreach my $luatex (0..1) {
     foreach my $file (@exp) {
         ok (-f $file, "$file created");
         check_metadata($file, {
-                               Title => "Title is Bla bla bla",
+                               Title => "Title is Bla *bla* bla",
                                Subject => "My [subtitle]",
                                Author => 'My á Д {author}',
-                               Keywords => '\-my \ cat; [another] {cat}',
+                               Keywords => '\-=my= \ **cat**; [another] {cat}',
                               });
     }
 }

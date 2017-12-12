@@ -1,0 +1,240 @@
+cpanm (App::cpanminus) 1.7004 on perl 5.020000 built for darwin-thread-multi-2level
+Work directory is /Users/ambs/.cpanm/work/1403193182.34728
+You have make /usr/bin/make
+You have LWP 6.06
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Lingua::NATools on cpanmetadb ...
+--> Working on Lingua::NATools
+Fetching http://www.cpan.org/authors/id/A/AM/AMBS/Lingua/Lingua-NATools-v0.7.8.tar.gz
+-> OK
+Unpacking Lingua-NATools-v0.7.8.tar.gz
+Entering Lingua-NATools-v0.7.8
+Checking configure dependencies from META.json
+Checking if you have Config::AutoConf 0.19 ... Yes (0.305)
+Checking if you have Module::Build 0.3603 ... Yes (0.4205)
+Checking if you have Parse::Yapp::Driver 1.05 ... Yes (1.05)
+Checking if you have ExtUtils::CBuilder 0.27 ... Yes (0.280216)
+Checking if you have Capture::Tiny 0.15 ... Yes (0.24)
+Checking if you have ExtUtils::PkgConfig 1.12 ... Yes (1.15)
+Checking if you have ExtUtils::LibBuilder 0.01 ... Yes (0.04)
+Checking if you have Module::Build 0.36 ... Yes (0.4205)
+Configuring Lingua-NATools-v0.7.8
+Running Build.PL
+Checking NATools version... 0.7.8
+Checking for stdlib.h... yes
+Checking for stdarg.h... yes
+Checking for string.h... yes
+Checking for float.h... yes
+Checking for assert.h... yes
+Checking for ctype.h... yes
+Checking for errno.h... yes
+Checking for limits.h... yes
+Checking for locale.h... yes
+Checking for math.h... yes
+Checking for setjmp.h... yes
+Checking for signal.h... yes
+Checking for stddef.h... yes
+Checking for stdio.h... yes
+Checking for time.h... yes
+Checking for library containing log2... none required
+Checking for library containing pow... none required
+Checking for library containing log10... none required
+Checking for library containing log... none required
+Checking for library containing exp... none required
+Checking for library containing sqrt... none required
+Checking for gzopen in -lz... yes
+Checking for gzread in -lz... yes
+Checking for gzwrite in -lz... yes
+Checking for gzclose in -lz... yes
+Checking for glib-2.0 >= 2.8... yes
+Checking for sqlite3 >= 3.5.0... yes
+Checking for sqlite3 binary... yes
+Checking for Berkeley DB header >= 4.3.0... yes
+Checking for Berkeley DB library >= 4.3.0... yes
+Created MYMETA.yml and MYMETA.json
+Creating new 'Build' script for 'Lingua-NATools' version 'v0.7.8'
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::Pod::Coverage 1.06 ... Yes (1.08)
+Checking if you have Test::More 0 ... Yes (1.001003)
+Checking if you have Term::ReadLine 1.01 ... Yes (1.14)
+Checking if you have MLDBM 2.00 ... Yes (2.05)
+Checking if you have Module::Build 0.3603 ... Yes (0.4205)
+Checking if you have DBD::SQLite 1.30 ... Yes (1.42)
+Checking if you have Fcntl 1.03 ... Yes (1.11)
+Checking if you have URI::Escape 3.26 ... Yes (3.31)
+Checking if you have IO::Socket 1.28 ... Yes (1.37)
+Checking if you have XML::DT 0.44 ... Yes (0.63)
+Checking if you have Test::Harness 2.26 ... Yes (3.32)
+Checking if you have File::Copy 2.06 ... Yes (2.29)
+Checking if you have ExtUtils::CBuilder 0.27 ... Yes (0.280216)
+Checking if you have Parse::Yapp::Driver 1.05 ... Yes (1.05)
+Checking if you have Config::AutoConf 0.19 ... Yes (0.305)
+Checking if you have XML::TMX 0.21 ... Yes (0.25)
+Checking if you have ExtUtils::MakeMaker 6.31 ... Yes (6.98)
+Checking if you have File::Spec 0.86 ... Yes (3.47)
+Checking if you have Lingua::Identify 0.17 ... Yes (0.56)
+Checking if you have POSIX 0 ... Yes (1.38_03)
+Checking if you have Text::NSP 1.09 ... Yes (1.27)
+Checking if you have CGI 0 ... Yes (4.02)
+Checking if you have Test::Pod 1.20 ... Yes (1.48)
+Checking if you have DBI 0 ... Yes (1.631)
+Checking if you have Capture::Tiny 0 ... Yes (0.24)
+Checking if you have Compress::Zlib 1.16 ... Yes (2.064)
+Checking if you have Lingua::PT::PLNbase 0.17 ... Yes (0.26)
+Checking if you have File::Path 1.06 ... Yes (2.09)
+Checking if you have List::MoreUtils 0 ... Yes (0.33)
+Checking if you have IPC::Open2 1.01 ... Yes (1.04)
+Checking if you have ExtUtils::LibBuilder 0.01 ... Yes (0.04)
+Checking if you have ExtUtils::Manifest 0 ... Yes (1.63)
+Checking if you have Time::HiRes 1.2 ... Yes (1.9726)
+Checking if you have DB_File 1.804 ... Yes (1.831)
+Checking if you have Memoize 0 ... Yes (1.03)
+Checking if you have Storable 2.04 ... Yes (2.49)
+Checking if you have Lingua::PTD 1.00 ... Yes (1.12)
+Checking if you have Pod::Man 0 ... Yes (2.28)
+Building and testing Lingua-NATools-v0.7.8
+Building Lingua-NATools
+  [pod2man] pods/nat-css.pod
+  [pod2man] pods/nat-initmat.pod
+  [pod2man] pods/nat-ipfp.pod
+  [pod2man] pods/nat-mat2dic.pod
+  [pod2man] pods/nat-postbin.pod
+  [pod2man] pods/nat-pre.pod
+  [pod2man] pods/nat-samplea.pod
+  [pod2man] pods/nat-sampleb.pod
+  [pod2man] pods/nat-sentalign.pod
+  [cc] src/initmat.c
+  [cc] src/grep.c
+  [cc] src/ngrams_bdb.c
+  [cc] src/standard.c
+  [cc] src/search_sentence.c
+  [cc] src/words2id.c
+  [cc] src/parseini.c
+  [cc] src/natdict.c
+  [cc] src/pre.c
+  [cc] src/mat2dic.c
+  [cc] src/server.c
+  [cc] src/invindex.c
+  [cc] src/unicode.c
+  [cc] src/mkdict.c
+  [cc] src/bucket.c
+  [cc] src/natlexicon.c
+  [cc] src/words.c
+  [cc] src/corpus.c
+  [cc] src/sampleb.c
+  [cc] src/srvshared.c
+  [cc] src/ngramidx.c
+  [cc] src/dictionary.c
+  [cc] src/postbin.c
+  [cc] src/tempdict.c
+  [cc] src/ntdump.c
+  [cc] src/sent_align.c
+  [cc] src/partials.c
+  [cc] src/adddic.c
+  [cc] src/samplea.c
+  [cc] src/ipfp.c
+  [cc] src/matrix.c
+  [cc] src/corpusinfo.c
+  [cc] src/invindexjoin.c
+  [ld] building libnatools.dylib
+  [ld] nat-grep
+  [ld] nat-sampleb
+  [ld] nat-ipfp
+  [ld] nat-ngrams
+  [ld] nat-css
+  [ld] nat-pre
+  [ld] nat-postbin
+  [ld] nat-mkntd
+  [ld] nat-initmat
+  [ld] nat-server
+  [ld] nat-mat2dic
+  [ld] nat-mergeidx
+  [ld] nat-ntd-add
+  [ld] nat-sentalign
+  [ld] nat-samplea
+  [ld] nat-ntd-dump
+  [ld] nat-words2id
+  [XS] natools.xs
+  [CC] natools.c
+  [LD] NATools.bundle
+t/bin/corpus.t ............... ok
+t/bin/nat-pre.t .............. ok
+Warning: some of these tests can take about 1 minute on slow machines
+t/bin/nat-these.t ............ ok
+t/bin/words.t ................ ok
+t/pm/00_basic.t .............. ok
+t/pm/01_config.t ............. ok
+# Let the server start...
+t/pm/03.1_create_from_tmx.t .. ok
+t/pm/10_pcorpus.t ............ ok
+t/pm/11_corpus.t ............. ok
+t/pm/14_scripts.t ............ ok
+t/pm/15_cgis.t ............... ok
+t/pm/16_pods.t ............... skipped: export AUTHOR_TEST for author tests
+t/pm/17_pod_coverage.t ....... skipped: export AUTHOR_TEST for author tests
+Parsing rules file: [t/pm/20_patterns.in]
+t/pm/20_patterns.t ........... ok
+All tests successful.
+Files=14, Tests=8840, 21 wallclock secs ( 0.76 usr  0.13 sys + 14.78 cusr  1.56 csys = 17.23 CPU)
+Result: PASS
+Building Lingua-NATools
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/auto/Lingua/NATools/NATools.bundle
+Installing /opt/perl/man/man1/nat-addDict.1
+Installing /opt/perl/man/man1/nat-codify.1
+Installing /opt/perl/man/man1/nat-compareDicts.1
+Installing /opt/perl/man/man1/nat-create.1
+Installing /opt/perl/man/man1/nat-css.1
+Installing /opt/perl/man/man1/nat-dict.1
+Installing /opt/perl/man/man1/nat-dumpDicts.1
+Installing /opt/perl/man/man1/nat-examplesExtractor.1
+Installing /opt/perl/man/man1/nat-initmat.1
+Installing /opt/perl/man/man1/nat-ipfp.1
+Installing /opt/perl/man/man1/nat-lex2perl.1
+Installing /opt/perl/man/man1/nat-makeCWB.1
+Installing /opt/perl/man/man1/nat-mat2dic.1
+Installing /opt/perl/man/man1/nat-mkMakefile.1
+Installing /opt/perl/man/man1/nat-mkRealDict.1
+Installing /opt/perl/man/man1/nat-ngramsIdx.1
+Installing /opt/perl/man/man1/nat-pair2tmx.1
+Installing /opt/perl/man/man1/nat-postbin.1
+Installing /opt/perl/man/man1/nat-pre.1
+Installing /opt/perl/man/man1/nat-rank.1
+Installing /opt/perl/man/man1/nat-samplea.1
+Installing /opt/perl/man/man1/nat-sampleb.1
+Installing /opt/perl/man/man1/nat-sentalign.1
+Installing /opt/perl/man/man1/nat-sentence-align.1
+Installing /opt/perl/man/man1/nat-shell.1
+Installing /opt/perl/man/man1/nat-StarDict.1
+Installing /opt/perl/man/man1/nat-substDict.1
+Installing /opt/perl/man/man1/nat-tmx2pair.1
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/Lingua/NATools.pm
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/Lingua/NATools/Config.pm
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/Lingua/NATools/ConfigData.pm
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/Lingua/NATools/Corpus.pm
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/Lingua/NATools/PatternRules.pm
+Installing /opt/perl/man/man3/Lingua::NATools.3
+Installing /opt/perl/man/man3/Lingua::NATools::CGI.3
+Installing /opt/perl/man/man3/Lingua::NATools::Client.3
+Installing /opt/perl/man/man3/Lingua::NATools::Config.3
+Installing /opt/perl/man/man3/Lingua::NATools::ConfigData.3
+Installing /opt/perl/man/man3/Lingua::NATools::Corpus.3
+Installing /opt/perl/man/man3/Lingua::NATools::Dict.3
+Installing /opt/perl/man/man3/Lingua::NATools::Lexicon.3
+Installing /opt/perl/man/man3/Lingua::NATools::Matrix.3
+Installing /opt/perl/man/man3/Lingua::NATools::NATDict.3
+Installing /opt/perl/man/man3/Lingua::NATools::PCorpus.3
+Installing /opt/perl/bin/nat-create
+Installing /opt/perl/bin/nat-css
+Installing /opt/perl/bin/nat-initmat
+Installing /opt/perl/bin/nat-ipfp
+Installing /opt/perl/bin/nat-ngrams
+Installing /opt/perl/bin/nat-pre
+Installing /opt/perl/lib/libnatools.dylib
+-> OK
+Successfully installed Lingua-NATools-v0.7.8 (upgraded from 0.7.6)
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/.meta/Lingua-NATools-v0.7.8/install.json
+Installing /opt/perl/lib/site_perl/5.20.0/darwin-thread-multi-2level/.meta/Lingua-NATools-v0.7.8/MYMETA.json
+1 distribution installed

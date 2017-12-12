@@ -22,7 +22,7 @@ requires:
   Scope::Guard: '0'
   Sub::Info: '0.002'
   Term::Table: '0.002'
-  Test2: '1.302117'
+  Test2: '1.302119'
   Time::HiRes: '0'
   overload: '0'
   perl: '5.008001'
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Suite/issues
   repository: http://github.com/Test-More/Test2-Suite/
-version: '0.000092'
+version: '0.000097'
 x_serialization_backend: 'YAML::Tiny version 1.70'

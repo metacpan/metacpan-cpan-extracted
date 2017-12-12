@@ -1,0 +1,38 @@
+---
+abstract: 'classes for parsing bioinformatics program output'
+author:
+  - 'Denis BAURAIN <denis.baurain@uliege.be>'
+build_requires:
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-FastParsers
+requires:
+  Carp: '0'
+  Const::Fast: '0'
+  Exporter::Easy: '0'
+  List::AllUtils: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Class: '0'
+  Smart::Comments: '0'
+  Test::Most: '0'
+  XML::Bare: '0.53'
+  aliased: '0'
+  autodie: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.173450'
+x_serialization_backend: 'YAML::Tiny version 1.69'

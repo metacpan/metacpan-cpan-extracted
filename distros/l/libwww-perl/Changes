@@ -1,5 +1,15 @@
 Change history for libwww-perl
 
+6.31      2017-12-11 01:55:53Z
+    - fix version numbering (RT#123841)
+
+6.30      2017-12-07
+    - Use tr/// instead of s/// where appropriate (Ville Skyttä) (GH #265)
+    - Use parent -norequire instead of base to not look for external
+      dependencies (Fabian Zeindler) (GH #259)
+    - Fix run_handlers to allow assigning to the request / response (Gianni
+      Ceccarelli) (GH #274)
+
 6.29      2017-11-06
     - Fix some version numbers
 

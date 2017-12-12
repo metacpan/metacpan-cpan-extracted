@@ -1,0 +1,92 @@
+
+=head1 NAME
+
+File::HomeDir::Tiny - Find your home directory
+
+=head1 VERSION
+
+0.01
+
+=head1 SYNOPSIS
+
+  use File::HomeDir::Tiny;
+  $home = home;
+
+=head1 DESCRIPTION
+
+This module is useful for the 90% of the time that you only need 10% of
+L<File::HomeDir>'s functionality.  It depends on no other modules and
+consists of just fourteen lines of code.
+
+=head1 EXPORT
+
+C<home> is exported by default.  If you do not want to import it, use
+parentheses:
+
+  use File::HomeDir::Tiny ();
+  $home = File::HomeDir::Tiny::home;
+
+But why would you want to type all that?
+
+=head1 WHEN TO USE IT AND WHEN NOT TO USE IT
+
+If you need more functionality than just the current user's home folder,
+then try L<File::HomeDir>.
+
+If your code is only going to run on Unix, you do not need to bother with
+any module.  Just use the alien spaceship operator:
+
+  ($home) = <~> ;
+
+If your code is only going to run on 5.16 and later, again, you can use the
+alien spaceship:
+
+  { use v5.16 }
+  ($home) = <~> ;  # Didn't I just mention this?
+
+If your code may need to run on Windows on perl 5.14 or earlier, where the
+alien spaceship does not work, then use this module:
+
+  use File'HomeDir'Tiny;  # ' so it looks *old*
+  $home = home;
+
+Notice also that I put parentheses around $home in the spaceship examples.
+This is because the alien spaceship is an iterator.  In scalar context it
+will alternate between returning the home directory and returning the
+undefined value.  (It is alien, after all.)  You can ovoid this by
+evaluating it in list context; either of these will work:
+
+  ($home) = <~>;
+  $hoem = (<~>)[0];
+
+So, if you want to avoid this pitfall, or if you just prefer C<home> to
+C<a bunch of punctuation marks>, use this module:
+
+  use File::HomeDir::Tiny; # :: so it looks *new*!
+  $home = home;
+
+=head1 PREREQUISITES
+
+None except perl.  I believe this module will work all the back to Perl
+5.004, but have not been able to verify.  The earliest I tested with was
+5.8.7.
+
+I have no idea whether this works on VMS.
+
+=head1 AUTHOR & COPYRIGHT
+
+Copyright (C) 2017 Father Chrysostomos <sprout [at] cpan
+[dot] org>
+
+This program is free software; you may redistribute it, modify it, or both
+under the same terms as perl.
+
+=head1 ACKNOWLEDGEMENTS
+
+The Windows logic for perl 5.14 and earlier was based on this L<File::Glob>
+commit by Douglas Christopher Wilson:
+L<https://perl5.git.perl.org/perl.git/commitdiff/528bd3ce854>
+
+=head1 SEE ALSO
+
+L<File::HomeDir>

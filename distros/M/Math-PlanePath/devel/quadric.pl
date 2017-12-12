@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,6 +22,37 @@ use strict;
 use warnings;
 
 {
+  # QuadricCurve turn sequence
+
+  require Math::NumSeq::PlanePathTurn;
+  {
+    # turn
+    # not in OEIS: 1,-1,-1,0,1,1,-1,1,1,-1,-1,0,1,1,-1,-1,1,-1,-1,0,1,1,-1,-1,1,-1,-1,0,1,1,-1,0,1,-1,-1,0,1,1,-1,1,1,-1,-1,0,1,1,-1,1,1,-1,
+    # not A168181 = abs values non-multiples of 8 are L or R
+    # nor other abs matches
+    my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'QuadricCurve',
+                                                turn_type => 'LSR');
+    foreach (1 .. 50) {
+      my ($i,$value) = $seq->next;
+      print "$value,";
+    }
+    print "\n";
+  }
+  {
+    # Left = lowest non-0 is 1,5,6
+    # not in OEIS: 1,0,0,0,1,1,0,1,1,0,0,0,1,1,0,0,1,0,0,0,1,1,0,0,1,0,0,0,1,1,0,0,1,0,0,0,1,1,0,1,1,0,0,0,1,1,0,1,1,0
+    my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'QuadricCurve',
+                                                turn_type => 'Left');
+    foreach (1 .. 50) {
+      my ($i,$value) = $seq->next;
+      print "$value,";
+    }
+    print "\n";
+  }
+  exit 0;
+}
+
+{
   # QuadricIslands X negative axis N increasing
   require Math::PlanePath::QuadricIslands;
   my $path = Math::PlanePath::QuadricIslands->new;
@@ -33,8 +64,8 @@ use warnings;
     }
     $prev_n = $n;
   }
+  exit 0;
 }
-
 
 {
   # min/max for level

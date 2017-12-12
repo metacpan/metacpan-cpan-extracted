@@ -1,0 +1,20 @@
+Revision history for Perl extension App-PPE
+
+0.04 2017-12-02T13:12:17Z
+
+    - upload cpan
+
+0.03 2017-12-02T13:00:54Z
+
+    - update doc
+    - support when unknown error type
+
+0.02 2017-12-02T12:01:36Z
+
+    - update README
+
+
+0.01 2017-12-02T11:54:16Z
+
+    - original version
+

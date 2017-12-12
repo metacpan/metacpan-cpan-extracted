@@ -100,7 +100,7 @@ SERVERLOOP: {
                   'Max-Age' => 0,
                   'Connection' => 'close',
                   'Content-Length' => length($rbody),
-				  'Content-Disposition' => 'attachment; name="$1"',
+				  'Content-Disposition' => qq{attachment; filename=$1;},
             ], $rbody);
 
         } elsif ($location =~ m!^/error/notfound/(.*)$! or $location =~ m!^/favicon.ico!) {

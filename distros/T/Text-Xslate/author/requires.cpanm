@@ -1,0 +1,37 @@
+# for configure
+Module::Install
+Module::Install::XSUtil
+Module::Install::AuthorTests
+Module::Install::TestTarget
+Module::Install::Repository
+
+# for testing
+Test::Vars
+Test::Synopsis
+Test::Spellunker
+Test::LeakTrace
+Plack
+IPC::Run
+
+# for benchmarks
+Text::MicroTemplate::Extended
+Text::ClearSilver
+HTML::Template
+HTML::Template::Pro
+Template
+
+# for examples
+Data::Section::Simple
+HTML::FillInForm
+HTML::FillInForm::Lite
+HTML::Shakan
+URI::Find
+Mojolicious
+MojoX::Renderer::Xslate
+JavaScript::Value::Escape
+Locale::Maketext::Lexicon
+Data::Localize
+File::Which
+Amon2::Lite
+Catalyst::View::Xslate
+

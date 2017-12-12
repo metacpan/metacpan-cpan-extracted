@@ -1,5 +1,5 @@
 package Mojolicious::Che;
-use Mojo::Base::Che 'Mojolicious';
+use Mojo::Base  'Mojolicious';#::Che
 use Mojo::Log::Che;
 use Mojo::Loader qw(load_class);
 
@@ -221,7 +221,7 @@ sub спейсы {
   push @{$app->routes->namespaces}, @$ns;
 }
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 =pod
 
@@ -235,7 +235,7 @@ our $VERSION = '0.032';
 
 =head1 VERSION
 
-0.032
+0.033
 
 =head1 NAME
 

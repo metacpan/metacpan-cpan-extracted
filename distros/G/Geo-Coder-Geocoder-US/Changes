@@ -1,3 +1,8 @@
+0.009		2017-12-08	T. R. Wyant
+    THIS MODULE IS IN THE PROCESS OF BEING RETRACTED.
+
+    Warn with stack dump on load or call to new().
+
 0.008		2017-06-01	T. R. Wyant
     THIS MODULE IS IN THE PROCESS OF BEING RETRACTED.
 
@@ -10,7 +15,6 @@
 
     Add xt/author/minimum_perl.t
 
-0.006_01	2016-06-29	T. R. Wyant
   Add deprecation notice to documentation and metadata. No functional
     changes.
 
@@ -26,9 +30,6 @@
   Add GitHub repository to metadata.
 
 0.005		2014-12-12	T. R. Wyant
-  No changes since 0.004_01.
-
-0.004_01	2014-12-03	T. R. Wyant
   Tweak author tests.
 
 0.004		2013-07-28	T. R. Wyant
@@ -46,7 +47,4 @@
   Correct address in LICENSES/Copying (GNU GPL 1.0).
 
 0.001		2011-11-19	T. R. Wyant
-  Initial production release to CPAN. No changes since 0.000_01.
-
-0.000_01	2011-11-05	T. R. Wyant
-  Initial release to CPAN.
+  Initial production release to CPAN.

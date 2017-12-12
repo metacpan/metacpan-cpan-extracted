@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: eris-eris-client.pl
 # ABSTRACT: Simple wrapper to spawn workers for handling syslog stream
 ## no critic (RequireEndWithOne)
@@ -219,7 +219,7 @@ eris-eris-client.pl - Simple wrapper to spawn workers for handling syslog stream
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 AUTHOR
 

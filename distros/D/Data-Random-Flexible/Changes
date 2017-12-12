@@ -1,0 +1,35 @@
+Revision history for Data-Random-Flexible
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+1.00    First release
+        Attempt to use Math::Random::Secure if its availible
+
+1.01    Second release
+        Fixed a typo in the pod, updated some minor formatting
+
+1.02    Third release
+        Fixed the auto loading of Math::Random::Secure (hopefully)
+
+1.03    Four Release
+        Added detection for:
+
+        'Math::Random::Secure' 
+        'Math::Random::MTwist' 
+        'Math::Random::Xorshift'
+        'Math::Random::MT'     
+        'Math::Random::ISAAC' 
+        'Math::Random::ISAAC::XS' (Inferred autoloaded)
+        'Crypt::PRNG' 
+
+        You can select which to use via the ->engine() call
+
+1.04    Fifth release
+        Added the new modules to the make file (minor fix)
+
+1.05    Sixth release
+        More random documentation updates for typos and what not 
+
+1.06    Seventh release
+        Last correction I promise..

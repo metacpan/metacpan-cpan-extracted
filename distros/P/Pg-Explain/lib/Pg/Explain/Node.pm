@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 =cut
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 =head1 SYNOPSIS
 
@@ -75,6 +75,12 @@ This cost is measured in units of "single-page seq scan".
 Returns estimated full cost of given node. 
 
 This cost is measured in units of "single-page seq scan".
+
+=head2 force_loops
+
+Stores/returns number of "forced loops". In case of parallel plans, despite having loops=<some_number> in some "parallel node", we should use loops=X from nearest parent Gather node.
+
+This is for calculation of total_inclusive_time and total_exclusive_time only.
 
 =head2 type
 
@@ -159,6 +165,7 @@ sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' } 
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
+sub force_loops            { my $self = shift; $self->{ 'force_loops' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'force_loops' }; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
 sub scan_on                { my $self = shift; $self->{ 'scan_on' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'scan_on' }; }
@@ -205,7 +212,7 @@ sub new {
     croak( 'estimated_total_cost has to be passed to constructor of explain node' )   unless defined $self->estimated_total_cost;
     croak( 'type has to be passed to constructor of explain node' )                   unless defined $self->type;
 
-    if ( $self->type =~ m{ \A ( Seq \s Scan | Bitmap \s+ Heap \s+ Scan | Foreign \s+ Scan | Update | Insert | Delete ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
+    if ( $self->type =~ m{ \A ( (?: Parallel \s+ )? (?: Seq \s Scan | Bitmap \s+ Heap \s+ Scan | Foreign \s+ Scan | Update | Insert | Delete ) ) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
         $self->type( $1 );
         $self->scan_on( { 'table_name' => $2, } );
         $self->scan_on->{ 'table_alias' } = $3 if defined $3;
@@ -449,6 +456,34 @@ sub get_struct {
     return $reply;
 }
 
+=head2 check_for_parallelism
+
+Handles parallelism by setting "override_loops" if plan is analyzed and there are gather nodes.
+
+=cut
+
+sub check_for_parallelism {
+    my $self        = shift;
+    my $force_loops = shift;
+    if ( 'Gather' eq $self->type ) {
+        $force_loops = $self->actual_loops;
+    }
+    else {
+        $self->{ 'force_loops' } = $force_loops;
+    }
+
+    for my $key ( qw( sub_nodes initplans subplans ) ) {
+        next unless $self->{ $key };
+        $_->check_for_parallelism( $force_loops ) for @{ $self->{ $key } };
+    }
+
+    if ( $self->{ 'ctes' } ) {
+        $_->check_for_parallelism( $force_loops ) for values %{ $self->{ 'ctes' } };
+    }
+
+    return;
+}
+
 =head2 total_inclusive_time
 
 Method for getting total node time, summarized with times of all subnodes, subplans and initplans - which is basically ->actual_loops * ->actual_time_last.
@@ -457,9 +492,14 @@ Method for getting total node time, summarized with times of all subnodes, subpl
 
 sub total_inclusive_time {
     my $self = shift;
-    return unless $self->actual_loops;
     return unless defined $self->actual_time_last;
-    return $self->actual_loops * $self->actual_time_last;
+    if ( defined $self->{ 'force_loops' } ) {
+        return $self->actual_time_last * $self->{ 'force_loops' };
+    }
+    elsif ( $self->actual_loops ) {
+        return $self->actual_loops * $self->actual_time_last;
+    }
+    return;
 }
 
 =head2 total_exclusive_time

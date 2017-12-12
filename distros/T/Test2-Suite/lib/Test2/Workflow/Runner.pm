@@ -2,7 +2,7 @@ package Test2::Workflow::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use Test2::API();
 use Test2::Todo();
@@ -40,8 +40,11 @@ sub init {
     $self->{+PID} = $$;
     $self->{+TID} = get_tid();
 
-    $self->{+NO_FORK}    ||= $ENV{T2_WORKFLOW_NO_FORK}    || !CAN_REALLY_FORK();
-    $self->{+NO_THREADS} ||= $ENV{T2_WORKFLOW_NO_THREADS} || !Test2::AsyncSubtest->CAN_REALLY_THREAD();
+    $self->{+NO_FORK} ||= $ENV{T2_WORKFLOW_NO_FORK} || !CAN_REALLY_FORK();
+
+    my $can_thread = Test2::AsyncSubtest->CAN_REALLY_THREAD();
+    my $should_thread = ($ENV{T2_WORKFLOW_USE_THREADS} || $ENV{T2_DO_THREAD_TESTS}) && !$ENV{T2_WORKFLOW_NO_THREADS};
+    $self->{+NO_THREADS} ||= !($can_thread && $should_thread);
 
     $self->{+RAND} = 1 unless defined $self->{+RAND};
 
@@ -442,7 +445,7 @@ Test2::Workflow::Runner - Runs the workflows.
 =head1 SOURCE
 
 The source code repository for Test2-Workflow can be found at
-F<http://github.com/Test-More/Test2-Workflow/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

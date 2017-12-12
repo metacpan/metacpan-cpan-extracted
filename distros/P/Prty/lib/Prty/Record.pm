@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::String;
 use Prty::Path;
@@ -154,11 +154,6 @@ sub fromFile {
     $str = $class->toString(@keyVal,@opt);
     $str = $class->toString(\@keyVal,@opt);
 
-=head4 Description
-
-Generiere für die Schlüssel/Wert-Paare @keyVal eine Text-Record
-Repräsentation und liefere diese zurück.
-
 =head4 Options
 
 =over 4
@@ -180,6 +175,11 @@ Anzahl Leerzeilen zwischen den Einträgen.
 Entferne Leerzeilen am Anfang und Whitespace am Ende des Werts.
 
 =back
+
+=head4 Description
+
+Generiere für die Schlüssel/Wert-Paare @keyVal eine Text-Record
+Repräsentation und liefere diese zurück.
 
 =cut
 
@@ -242,14 +242,14 @@ sub toString {
     $class->toFile($file,@keyVal,@opt);
     $class->toFile($file,\@keyVal,@opt);
 
+=head4 Options
+
+Siehe L</toString>
+
 =head4 Description
 
 Wie L</toString>, nur dass der Record auf eine Datei geschrieben wird.
 Die Methode liefert keinen Wert zurück.
-
-=head4 Options
-
-Siehe L</toString>
 
 =cut
 
@@ -268,7 +268,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

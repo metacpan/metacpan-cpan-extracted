@@ -1,0 +1,23 @@
+Revision history for Perl application 'sdif-tools'.
+
+3.2.2 2017-12-11T03:59:41Z
+
+    watchdiff:
+    - Update examples.
+    - Use termcap{cd} when termcap{ed} is not available.
+    - Set require_order for option handling.
+
+    sdif:
+    - Add test for --colortable option.
+    - Make --colortable option to work. Fixes #1.
+
+3.2.1 2017-12-08T08:55:02Z
+
+    - Implement sdif --ambiguous option.
+    - Require perl 5.014
+    - make sdif --cdif option as toggle one.
+
+3.1.1 2017-12-04T06:43:12Z
+
+    - first CPAN release
+

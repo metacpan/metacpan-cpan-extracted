@@ -96,7 +96,7 @@ file.  In that file, you should find a category with the $name.
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  'ALL'
   charset        Log::Report::Dispatcher  <undef>
-  config                                  <required>
+  config                                  <undef>
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
   locale         Log::Report::Dispatcher  <system locale>
   mode           Log::Report::Dispatcher  'NORMAL'
@@ -112,6 +112,10 @@ file.  In that file, you should find a category with the $name.
 
 When a SCALAR reference is passed in, that must refer to a string which
 contains the configuration text.  Otherwise, specify an existing FILENAME.
+
+By default, it is expected that Log::Log4perl has been initialized
+externally.  That module uses global variables to communicate, which
+should be present before any logging is attempted.
 
 =item format_reason => 'UPPERCASE'|'LOWERCASE'|'UCFIRST'|'IGNORE'|CODE
 
@@ -226,8 +230,8 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
  
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.23,
-built on November 02, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.25,
+built on December 08, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

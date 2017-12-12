@@ -50,6 +50,7 @@ while (@ARGV) {
     my $graph = Graph->new (directed=>1);
     $graph->set_graph_attribute (name => $name);
     $graph->set_graph_attribute (flow => 'north');
+    @ARGV = map {split /, /} @ARGV;
     foreach my $v0 (0 .. $#ARGV) {
       my $v1 = $v0 + 1;
       $graph->add_vertex($v1);

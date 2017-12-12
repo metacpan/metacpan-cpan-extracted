@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito;
-{
-  $Mojito::VERSION = '0.24';
-}
+$Mojito::VERSION = '0.25';
 use Moo;
 use Path::Class;
 use File::Spec;

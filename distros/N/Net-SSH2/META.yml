@@ -22,7 +22,7 @@ no_index:
 provides:
   Net::SSH2:
     file: lib/Net/SSH2.pm
-    version: '0.66'
+    version: '0.67'
   Net::SSH2::Channel:
     file: lib/Net/SSH2/Channel.pm
   Net::SSH2::Dir:
@@ -42,4 +42,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/rkitover/net-ssh2.git
-version: '0.66'
+version: '0.67'

@@ -6,7 +6,8 @@ package Circle::Widget::Label;
 
 use strict;
 use warnings;
-
 use base qw( Circle::Widget );
+
+our $VERSION = '0.173320';
 
 0x55AA;

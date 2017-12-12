@@ -3,7 +3,7 @@ package Prty::Stacktrace;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -98,14 +98,6 @@ $i erreicht werden.
     $st = $class->new;
     $st = $class->new($i);
 
-=head4 Description
-
-Instantiiere ein Stacktrace-Objekt und liefere eine Referenz auf diese
-Objekt zurück. Das Stacktrace-Objekt repräsentiert die Aufruf-Hierarchie
-des laufenden Perl-Programms zum Zeitpunkt der Instantiierung. Letztes
-Element in der Hierarchie ist der Konstruktor-Aufruf. Soll der
-Stacktrace vorher enden,
-
 =head4 Arguments
 
 =over 4
@@ -117,6 +109,14 @@ berücksichtigt werden. Ist $i == 0 (was der Default ist), werden
 alle Frames berücksichtigt.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Stacktrace-Objekt und liefere eine Referenz auf diese
+Objekt zurück. Das Stacktrace-Objekt repräsentiert die Aufruf-Hierarchie
+des laufenden Perl-Programms zum Zeitpunkt der Instantiierung. Letztes
+Element in der Hierarchie ist der Konstruktor-Aufruf. Soll der
+Stacktrace vorher enden,
 
 =cut
 
@@ -145,11 +145,6 @@ sub new {
     $str = $st->asString;
     $str = $class->asString($i);
 
-=head4 Description
-
-Visualisiere das Stacktrace-Objekt in Form einer Zeichenkette und liefere
-diese zurück. Aufbau der Zeichenkette siehe Abschnitt DESCRIPTION.
-
 =head4 Arguments
 
 =over 4
@@ -159,6 +154,11 @@ diese zurück. Aufbau der Zeichenkette siehe Abschnitt DESCRIPTION.
 Siehe L</new>().
 
 =back
+
+=head4 Description
+
+Visualisiere das Stacktrace-Objekt in Form einer Zeichenkette und liefere
+diese zurück. Aufbau der Zeichenkette siehe Abschnitt DESCRIPTION.
 
 =cut
 
@@ -189,7 +189,7 @@ sub asString {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

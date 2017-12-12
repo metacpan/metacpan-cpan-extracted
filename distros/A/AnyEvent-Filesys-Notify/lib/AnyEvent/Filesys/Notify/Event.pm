@@ -6,7 +6,7 @@ use Moo;
 use MooX::late;
 use namespace::autoclean;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 has path => ( is => 'ro', isa => 'Str', required => 1 );
 has type => ( is => 'ro', isa => 'Str', required => 1 );
@@ -34,7 +34,7 @@ AnyEvent::Filesys::Notify::Event - Object to report changes in the monitored fil
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -102,97 +102,35 @@ True if C<$event-E<gt>type eq 'deleted'>.
 
 L<AnyEvent::Filesys::Notify>
 
-=head1 CONTRIBUTOR
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<dt>
-
-=over 4
-
-=item *
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=item *
-
-Dave Hayes E<lt>dave@jetcafe.orgE<dt> 
-
-=back
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<dt>
-
-=over 4
-
-=item *
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=item *
-
-Dave Hayes E<lt>dave@jetcafe.orgE<dt> 
-
-=back
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<gt> Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=over 4
-
-=item *
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=item *
-
-Dave Hayes E<lt>dave@jetcafe.orgE<gt>
-
-=item *
-
-Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=back
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<gt> Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=over 4
-
-=item *
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=item *
-
-Dave Hayes E<lt>dave@jetcafe.orgE<gt>
-
-=item *
-
-Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=back
-
-=head1 CONTRIBUTORS
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<gt> Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=over 4
-
-=item *
-
-Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
-
-=item *
-
-Dave Hayes E<lt>dave@jetcafe.orgE<gt>
-
-=item *
-
-Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
-
-=back
-
 =head1 AUTHOR
 
 Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue
+
+=item *
+
+Dave Hayes E<lt>dave@jetcafe.orgE<gt>
+
+=item *
+
+Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
+
+=item *
+
+Ettore Di Giacinto (@mudler)
+
+=item *
+
+Martin Barth (@ufobat)
+
+=back
 
 =head1 SOURCE
 
@@ -208,7 +146,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2017 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

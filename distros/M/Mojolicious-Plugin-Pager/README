@@ -9,19 +9,19 @@ SYNOPSIS
 
       get "/" => sub {
         my $c = shift;
-        $c->stash(total_entries => 1431, entries_per_page => 20);
+        $c->stash(total_items => 1431, items_per_page => 20);
       };
 
   Example template
       <ul class="pager">
-        % for my $page (pages_for $total_entries / $entries_per_page) {
+        % for my $page (pages_for $total_items / $items_per_page) {
           <li><%= pager_link $page %></li>
         % }
       </ul>
 
   Custom template
       <ul class="pager">
-        % for my $page (pages_for $total_entries / $entries_per_page) {
+        % for my $page (pages_for $total_items / $items_per_page) {
           % my $url = url_with; $url->query->param(x => $page->{n});
           <li><%= link_to "hey!", $url %></li>
         % }
@@ -59,6 +59,8 @@ HELPERS
 
   pages_for
       @pages = $self->pages_for($total_pages);
+      @pages = $self->pages_for(\%args)
+      @pages = $self->pages_for;
 
     Returns a list of %page hash-refs, that can be passed on to
     "pager_link".
@@ -74,9 +76,31 @@ HELPERS
         prev    => 1,    # if this is first, that brings you to the previous page
       }
 
+    %args can contain:
+
+    * current
+
+      Default to the "page" query param or "1".
+
+    * items_per_page
+
+      Only useful unless "total" is specified. Default to 20.
+
+    * size
+
+      The max number of pages to show in the pagination. Default to 8 +
+      "Previous" and "Next" links.
+
+    * total
+
+      The total number of pages. Default to "1" or...
+
+        $total = $args->{total_items} / $args->{items_per_page}
+        $total = $c->stash('total_items') / $c->stash('items_per_page')
+
 METHODS
   register
-      $app->plugin("pager" => \%config);
+      $app->plugin(pager => \%config);
 
     Used to register this plugin and the "HELPERS" above. %config can be:
 
@@ -102,12 +126,6 @@ METHODS
         each request under the name "page_param_name".
 
         Default: "page"
-
-    *   window_size
-
-        Used to decide how many pages to show after/before the current page.
-
-        Default: 3
 
 AUTHOR
     Jan Henning Thorsen

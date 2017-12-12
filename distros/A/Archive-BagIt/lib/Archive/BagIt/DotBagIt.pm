@@ -4,23 +4,36 @@ use warnings;
 
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053.3'; # VERSION
 
 use Sub::Quote;
-use Moo;
+use Moose;
 
 extends "Archive::BagIt::Base";
 
 
 has 'metadata_path' => (
-    is=> 'rw',
-    default => sub { my ($self) = @_; return $self->bag_path."/.bagit"; },
+    is=> 'ro',
+    lazy => 1,
+    builder => '_build_metadata_path',
 );
 
+sub _build_metadata_path {
+    my ($self) = @_;
+    return $self->bag_path."/.bagit";
+}
+
 has 'payload_path' => (
-    is => 'rw',
-    default => sub { my ($self) = @_; return $self->bag_path; },
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_path',
 );
+    
+sub _build_payload_path {
+    my ($self) = @_; 
+    return $self->bag_path; 
+
+}
 
 1;
 
@@ -36,7 +49,7 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.052
+version 0.053.3
 
 =head1 NAME
 
@@ -50,7 +63,7 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
+The development version is on github at L<https://github.com/rjeschmi/Archive-BagIt>
 and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -64,7 +77,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

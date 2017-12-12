@@ -29,7 +29,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 8;
+$VERSION = 10;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines

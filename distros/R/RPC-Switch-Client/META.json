@@ -1,0 +1,47 @@
+{
+   "abstract" : "RPC-Switch client using Mojo(licious).",
+   "author" : [
+      "Wieger Opmeer <wiegerop@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "RPC-Switch-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "JSON::RPC2::TwoWay" : "0.03",
+            "MojoX::NetstringStream" : "0.06",
+            "Mojolicious" : "7.49",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/a6502/RPC-Switch-Client/issues"
+      },
+      "homepage" : "https://github.com/a6502/RPC-Switch-Client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/a6502/RPC-Switch-Client.git",
+         "web" : "https://github.com/a6502/RPC-Switch-Client"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

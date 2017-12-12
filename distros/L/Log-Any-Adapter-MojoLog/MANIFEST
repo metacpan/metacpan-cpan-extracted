@@ -4,6 +4,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+README
 cpanfile
 lib/Log/Any/Adapter/MojoLog.pm
 t/basic.t

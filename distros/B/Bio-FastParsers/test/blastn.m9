@@ -1,0 +1,18 @@
+# blastn
+# Iteration: 0
+# Query: gi|11467088|ref|NC_001638.1| Chlamydomonas reinhardtii mitochondrion, complete genome
+# RID: SPFJHAJ9111
+# Database: n/a
+# Fields: query id, subject ids, % identity, alignment length, mismatches, gap opens, q. start, q. end, s. start, s. end, evalue, bit score
+# 7 hits found
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	15758	0	0	1	15758	1	15758	0.0	2.910e+04
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	532	0	0	15227	15758	532	1	0.0	 983
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	532	0	0	1	532	15758	15227	0.0	 983
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	86	0	0	14999	15084	1	86	2e-40	 159
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	86	0	0	86	1	14999	15084	2e-40	 159
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	86	0	0	15673	15758	15084	14999	2e-40	 159
+gi|11467088|ref|NC_001638.1|	gi|11467088|ref|NC_001638.1|	100.00	86	0	0	14999	15084	15758	15673	2e-40	 159
+
+
+
+

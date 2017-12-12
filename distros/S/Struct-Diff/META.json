@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Clone" : "0",
             "Data::Dumper" : "0",
             "Test::More" : "0"
          }
@@ -50,5 +51,5 @@
          "url" : "https://github.com/mr-mixas/Struct-Diff.pm"
       }
    },
-   "version" : "0.92"
+   "version" : "0.93"
 }

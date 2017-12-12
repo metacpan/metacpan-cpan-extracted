@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
 
 package Net::Async::WebSocket::Client;
 
 use strict;
 use warnings;
 use base qw( Net::Async::WebSocket::Protocol );
+use 5.010;  # //
 
 IO::Async::Notifier->VERSION( '0.63' ); # ->adopt_future
 
@@ -17,12 +18,30 @@ use Scalar::Util qw( blessed );
 
 use URI;
 
-# In case URI doesn't know that ws:// and wss:// URIs use host/port
-require URI::_server;
-@URI::ws::ISA = ("URI::_server");
-@URI::wss::ISA = ("URI::_server");
+BEGIN {
+   eval {
+      require URI::wss;
+   } or do {
+      # In case URI doesn't know that ws:// and wss:// URIs use host/port
+      require URI::_server;
 
-our $VERSION = '0.10';
+      @URI::ws::ISA = qw( URI::_server );
+      *URI::ws::default_port = sub { 80 };
+
+      @URI::wss::ISA = qw( URI::_server );
+      *URI::wss::default_port = sub { 443 };
+      *URI::wss::secure = sub { 1 };
+   };
+
+   # We also need to support ->resource_name, which the CPAN module does not
+   # understand as of 2017-01-01
+   no warnings 'once';
+   *URI::wss::resource_name = sub {
+      shift->path_query
+   } unless URI::wss->can( "resource_name" );
+}
+
+our $VERSION = '0.12';
 
 use Protocol::WebSocket::Handshake::Client;
 
@@ -37,7 +56,7 @@ C<IO::Async>
  use Net::Async::WebSocket::Client;
 
  my $client = Net::Async::WebSocket::Client->new(
-    on_frame => sub {
+    on_text_frame => sub {
        my ( $self, $frame ) = @_;
        print $frame;
     },
@@ -49,7 +68,7 @@ C<IO::Async>
  $client->connect(
     url => "ws://$HOST:$PORT/",
  )->then( sub {
-    $client->send_frame( "Hello, world!\n" );
+    $client->send_text_frame( "Hello, world!\n" );
  })->get;
 
  $loop->run;
@@ -60,6 +79,15 @@ This subclass of L<Net::Async::WebSocket::Protocol> connects to a WebSocket
 server to establish a WebSocket connection for passing frames.
 
 =cut
+
+sub new
+{
+   my $class = shift;
+   return $class->SUPER::new(
+      masked => 1,
+      @_,
+   );
+}
 
 =head1 METHODS
 
@@ -142,8 +170,14 @@ sub connect
    if( my $url = $params{url} ) {
       $url = URI->new( $url ) unless blessed $url and $url->isa( "URI" );
 
-      $params{host} //= $url->host;
+      $params{host}    //= $url->host;
       $params{service} //= $url->port;
+
+      if( $url->secure ) {
+         require IO::Async::SSL;
+         push @{ $params{extensions} }, qw( SSL );
+         $params{SSL_hostname} //= $url->host;
+      }
    }
 
    my $on_connected = delete $params{on_connected};

@@ -1,0 +1,86 @@
+{
+   "abstract" : "Testing framework for L<APIcast|https://github.com/3scale/apicast>.",
+   "author" : [
+      "Michal Cichra <mcichra@redhat.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-APIcast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2",
+            "Test::Nginx" : "0.26",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::APIcast" : {
+         "file" : "lib/Test/APIcast.pm",
+         "version" : "0.03"
+      },
+      "Test::APIcast::Blackbox" : {
+         "file" : "lib/Test/APIcast/Blackbox.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/3scale/Test-APIcast/issues"
+      },
+      "homepage" : "https://github.com/3scale/Test-APIcast",
+      "repository" : {
+         "url" : "git://github.com/3scale/Test-APIcast.git",
+         "web" : "https://github.com/3scale/Test-APIcast"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:MCICHRA",
+   "x_contributors" : [
+      "Michal Cichra <michal@cichra.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97000"
+}

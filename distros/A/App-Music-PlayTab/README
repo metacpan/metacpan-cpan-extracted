@@ -1,8 +1,5 @@
-'playtab' is a perl program that generates PostScript to print the
-chords of songs. 
-
-Important: This is a 'snapshot' release. I've been using it for
-several years now with much pleasure but your mileage may vary.
+'playtab' is a perl program that generates PDF documents to print the
+chords of songs. The output resembles (is influenced by) jazz grilles.
 
 The input for playtab is plain ASCII. It contains the chords, the
 division in bars, with optional annotations.
@@ -70,10 +67,3 @@ If you are a LilyPond adept, it can accept chord specifications the
 LilyPond way as well.
 
 Have fun, and let me know your ideas!
-
-----------------------------------------------------------------------------
-Johan Vromans                                           jvromans@squirrel.nl
-Squirrel Consultancy                                  Exloo, the Netherlands
-http://www.squirrel.nl                              http://johan.vromans.org
-PGP Key 1024D/1298C2B4                  http://johan.vromans.org/pgpkey.html
------------------------ "Arms are made for hugging" ------------------------

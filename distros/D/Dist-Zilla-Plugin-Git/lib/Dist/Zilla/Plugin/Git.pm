@@ -10,13 +10,11 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.041-5-g07880cd
+package Dist::Zilla::Plugin::Git; # git description: v2.042-12-g6cc6fe0
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
-use Dist::Zilla 2.100880;    # Need mvp_multivalue_args in Plugin role
-use namespace::autoclean;
 1;
 
 __END__
@@ -31,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 DESCRIPTION
 

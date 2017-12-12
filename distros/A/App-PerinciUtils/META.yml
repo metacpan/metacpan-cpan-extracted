@@ -27,6 +27,7 @@ requires:
   File::Slurper: '0'
   File::Write::Rotate: '0.29'
   Gepok: '0'
+  Getopt::Long: '0'
   Getopt::Long::Complete: '0'
   JSON::MaybeXS: '0'
   Log::ger: '0.023'
@@ -36,6 +37,7 @@ requires:
   Perinci::Access::Base::Patch::PeriAHS: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::Gen::ForModule: '0'
+  Perinci::Result::Format::Lite: '0.26'
   Perinci::Sub::GetArgs::Argv: '0.83'
   Perinci::Sub::Normalize: '0.19'
   Perinci::Sub::Wrapper: '0.83'
@@ -53,7 +55,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils
   homepage: https://metacpan.org/release/App-PerinciUtils
   repository: git://github.com/perlancar/perl-App-PerinciUtils.git
-version: '0.110'
+version: '0.111'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

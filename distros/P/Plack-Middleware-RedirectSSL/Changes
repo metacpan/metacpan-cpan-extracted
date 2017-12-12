@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-RedirectSSL
 
+1.200 Sat 09 Dec 2017
+	- Minimum perl requirement reduction to 5.6
+	- Minimum Test::More requirement dropped
+
 1.104 Mon 16 Mar 2015
 	- No functional changes
 	- Correct documentation of default HSTS maxage

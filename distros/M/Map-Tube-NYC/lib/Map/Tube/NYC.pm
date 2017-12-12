@@ -1,6 +1,6 @@
 package Map::Tube::NYC;
 
-$Map::Tube::NYC::VERSION   = '0.46';
+$Map::Tube::NYC::VERSION   = '0.47';
 $Map::Tube::NYC::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::NYC - Interface to the NYC Subway Map.
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use File::Share ':all';
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has xml => (is => 'ro', default => sub { return dist_file('Map-Tube-NYC', 'nyc-map.xml') });
 

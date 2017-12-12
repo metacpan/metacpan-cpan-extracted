@@ -1,5 +1,8 @@
 Revision history for Perl extension Set::IntSpan::Partition.
 
+0.03 December 2017
+  - Replace Heap::Simple with Heap::MinMax
+
 0.02 November 2013
   - Improved version that keeps track of splits and uses a heap
     for O(n log n)-ish rather than O(n^2)-ish performance.

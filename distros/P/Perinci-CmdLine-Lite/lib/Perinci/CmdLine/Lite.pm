@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-11-01'; # DATE
-our $VERSION = '1.80'; # VERSION
+our $DATE = '2017-12-11'; # DATE
+our $VERSION = '1.810'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -499,7 +499,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.80 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-11-01.
+This document describes version 1.810 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-12-11.
 
 =head1 SYNOPSIS
 
@@ -680,7 +680,7 @@ Set log level to 'trace'.
 
 Set log level.
 
-=head2 PROGRESS => BOOL
+=head2 PROGRESS => bool
 
 Explicitly turn the progress bar on/off.
 

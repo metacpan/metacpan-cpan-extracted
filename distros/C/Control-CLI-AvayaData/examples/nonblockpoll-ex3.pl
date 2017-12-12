@@ -80,7 +80,7 @@ MAIN:{
 			Output_log		=> $debug ? $switch.'.out' : undef,
 			Dump_log		=> $debug ? $switch.'.dump' : undef,
 			Blocking		=> 0,
-	       		Debug			=> $debug,
+			Debug			=> $debug,
 		);
 		print " - $switch\n";
 	}

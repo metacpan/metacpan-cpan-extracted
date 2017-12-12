@@ -1,5 +1,5 @@
 package Catalyst::Action::Deserialize::View;
-$Catalyst::Action::Deserialize::View::VERSION = '1.20';
+$Catalyst::Action::Deserialize::View::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Exporter 'import';
 our @EXPORT_OK = qw(is_distro_ok);
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub is_distro_ok {
     my $distro = shift;

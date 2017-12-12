@@ -1,5 +1,14 @@
 Revision history for Git-Database
 
+0.010 2017-12-08 BOOK
+    - Improved the Git::Database constructor to also accept the `backend`,
+      `work_tree` and `git_dir` paramaters, and to autoselect the best
+      available git wrapper when none is explicitely provided
+    - The Cogit, Git::PurePerl, Git::Sub and Git::Wrapper backends coerce
+      the repository path to an absolute path
+    - Improved tests for the Git::Sub backend
+    - Minor documentation patches
+
 0.009 2017-03-29 BOOK
     - Ensure the test suite skips backends that do not match the minimum
       version requirements (RT #120760, reported by SREZIC)

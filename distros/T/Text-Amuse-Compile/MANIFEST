@@ -84,6 +84,7 @@ t/recursive.t
 t/resources/t-a-test.jpeg
 t/resources/t-a-test.jpg
 t/resources/test.png
+t/secondary-footnotes.t
 t/strike.t
 t/templates.t
 t/testfile/attachment.png

@@ -28,12 +28,12 @@ use List::Util;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION','@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
 use Math::PlanePath 124;  # v.124 for n_to_n_list()
-*_divrem = \&Math::PlanePath::_divrem;
+*_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
 
 use Math::PlanePath::Base::Generic
   'is_infinite';
@@ -88,15 +88,16 @@ use constant::defer parameter_info_array =>
                    # 'ExperimentalHammingDist',
                    # 'ExperimentalNumOverlap',
                    #
-                   'ExperimentalNeighbours3',
-                   'ExperimentalNeighbours4',
-                   'ExperimentalNeighbours4d',
-                   'ExperimentalNeighbours6',
-                   'ExperimentalNeighbours8',
+                   # 'ExperimentalNeighbours3',    # NumNeighbours
+                   # 'ExperimentalNeighbours4',
+                   # 'ExperimentalNeighbours4d',
+                   # 'ExperimentalNeighbours6',
+                   # 'ExperimentalNeighbours8',
                    #
-                   'ExperimentalVisitNum',
-                   'ExperimentalVisitCount',
-                   'ExperimentalRevisit',
+                   # 'ExperimentalVisitNum',
+                   # 'ExperimentalVisitCount',
+                   # 'ExperimentalRevisit',
+                   'ExperimentalPairsXY','ExperimentalPairsYX',
                   ];
     return [
             _parameter_info_planepath(),
@@ -747,6 +748,41 @@ sub path_tree_n_num_siblings {
 
 #------------------------------------------------------------------------------
 # UNTESTED/EXPERIMENTAL
+
+# n_start = i_start is X(n)
+# n_start + 1       is Y(n) etc
+#
+# floor((n - nstart)/2) + nstart
+# = floor((n - nstart)/2 + nstart)
+# = floor((n + nstart)/2)
+# xy = n - nstart mod 2
+#    = n - nstart + 2*nstart mod 2
+#    = n + nstart mod 2
+#
+# GP-Test  my(nstart=0,n=0); floor((n+nstart)/2)==0 && (n+nstart)%2==0
+# GP-Test  my(nstart=0,n=1); floor((n+nstart)/2)==0 && (n+nstart)%2==1
+#
+# GP-Test  my(nstart=3,n=3); floor((n+nstart)/2)==3 && (n+nstart)%2==0
+# GP-Test  my(nstart=3,n=4); floor((n+nstart)/2)==3 && (n+nstart)%2==1
+# GP-Test  my(nstart=3,n=5); floor((n+nstart)/2)==4 && (n+nstart)%2==0
+# GP-Test  my(nstart=3,n=6); floor((n+nstart)/2)==4 && (n+nstart)%2==1
+#
+sub _coordinate_func_ExperimentalPairsXY {
+  my ($self, $n) = @_;
+  my $path = $self->{'planepath_object'};
+  $n += $path->n_start;
+  my $xy = _divrem_mutate($n,2);
+  my ($x, $y) = $path->n_to_xy($n) or return undef;
+  return ($xy ? $y : $x);
+}
+sub _coordinate_func_ExperimentalPairsYX {
+  my ($self, $n) = @_;
+  my $path = $self->{'planepath_object'};
+  $n += $path->n_start;
+  my $xy = _divrem_mutate($n,2);
+  my ($x, $y) = $path->n_to_xy($n) or return undef;
+  return ($xy ? $x : $y);
+}
 
 sub _coordinate_func_ExperimentalAbsX {
   my ($self, $n) = @_;
@@ -3354,7 +3390,19 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_n_list_max => 4;
 }
 # { package Math::PlanePath::ComplexPlus;
-#   Sum X+Y < 0 at N=16
+  # Sum X+Y < 0 at N=16
+  # use constant _NumSeq_Coord_oeis_anum =>
+  #  { 'realpart=1,arms=1' =>
+  #    {
+  #     # not quite, OFFSET=1 but start N=0 here
+  #     # Y        => 'A290884',
+  #     # RSquared => 'A290886',
+  #     # OEIS-Catalogue: A290884 planepath=ComplexPlus coordinate_type=Y
+  #     # OEIS-Catalogue: A290886 planepath=ComplexPlus coordinate_type=RSquared
+  #     # also -X, also OFFSET=1
+  #     # NegX => 'A290885',
+  #    },
+  #  };
 # }
 { package Math::PlanePath::ComplexMinus;
   use constant _NumSeq_Coord_filling_type => 'plane';
@@ -3557,12 +3605,63 @@ sub characteristic_smaller {
 
   use constant _NumSeq_Coord_oeis_anum =>
     {
+     'direction=down,n_start=1,x_start=0,y_start=0' =>
+     { ExperimentalPairsXY => 'A057554',  # starting OFFSET=1 so the default n_start=1 here
+       # OEIS-Catalogue: A057554 planepath=Diagonals coordinate_type=ExperimentalPairsXY
+     },
+     'direction=up,n_start=1,x_start=0,y_start=0' =>
+     { ExperimentalPairsYX => 'A057554',  # starting OFFSET=1 so the default n_start=1 here
+       # OEIS-Other:     A057554 planepath=Diagonals,direction=up coordinate_type=ExperimentalPairsYX
+     },
+
      'direction=down,n_start=1,x_start=1,y_start=0' =>
      { ExperimentalNumerator   => 'A164306',  # T(n,k) = k/GCD(n,k) n,k>=1 offset=1
        ExperimentalDenominator => 'A167192',  # T(n,k) = (n-k)/GCD(n,k) n,k>=1 offset=1
        # OEIS-Catalogue: A164306 planepath=Diagonals,x_start=1,y_start=0 coordinate_type=ExperimentalNumerator
        # OEIS-Catalogue: A167192 planepath=Diagonals,x_start=1,y_start=0 coordinate_type=ExperimentalDenominator
      },
+
+     'direction=down,n_start=1,x_start=1,y_start=1' =>
+     { Product => 'A003991', # X*Y starting (1,1) n=1
+       GCD     => 'A003989', # GCD by diagonals starting (1,1) n=1
+       Min     => 'A003983', # X,Y>=1
+       MinAbs  => 'A003983', #   MinAbs=Min
+       Max     => 'A051125', # X,Y>=1
+       MaxAbs  => 'A051125', #   MaxAbs=Max
+       IntXY   => 'A004199', # X>=0,Y>=0, X/Y round towards zero
+       ExperimentalPairsXY => 'A057555',  # starting OFFSET=1 so n_start=1 here
+       # OEIS-Catalogue: A003991 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Product
+       # OEIS-Catalogue: A003989 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=GCD
+       # OEIS-Catalogue: A003983 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Min
+       # OEIS-Other:     A003983 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=MinAbs
+       # OEIS-Catalogue: A051125 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Max
+       # OEIS-Other:     A051125 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=MaxAbs
+       # OEIS-Catalogue: A004199 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=IntXY
+       # OEIS-Catalogue: A057555 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=ExperimentalPairsXY
+
+       # cf A003990 LCM starting (1,1) n=1
+       #    A003992 X^Y power starting (1,1) n=1
+     },
+
+     'direction=up,n_start=1,x_start=1,y_start=1' =>
+     { Product => 'A003991', # X*Y starting (1,1) n=1
+       GCD     => 'A003989', # GCD by diagonals starting (1,1) n=1
+       IntXY   => 'A003988', # Int(X/Y) starting (1,1) n=1
+       ExperimentalPairsYX => 'A057555',  # starting OFFSET=1 so n_start=1 here
+       # OEIS-Other:     A003991 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=Product
+       # OEIS-Other:     A003989 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=GCD
+       # OEIS-Catalogue: A003988 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=IntXY
+       # OEIS-Other:     A057555 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=ExperimentalPairsYX
+
+       # num,den of reduction of A004736/A002260 which is run1toK/runKto1.
+       ExperimentalNumerator   => 'A112543', # 1,2,1,3,1,1,4,3,2,1,5,2,1,1,1,6,
+       ExperimentalDenominator => 'A112544', # 1,1,2,1,1,3,1,2,3,4,1,1,1,2,5,1,
+       # OEIS-Catalogue: A112543 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=ExperimentalNumerator
+       # OEIS-Catalogue: A112544 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=ExperimentalDenominator
+     },
+
+     #------------------
+     # n_start=0 instead
 
      'direction=down,n_start=0,x_start=0,y_start=0' =>
      { X           => 'A002262',  # runs 0toN   0, 0,1, 0,1,2, etc
@@ -3629,40 +3728,6 @@ sub characteristic_smaller {
        # OEIS-Other: A101080 planepath=Diagonals,direction=up,n_start=0 coordinate_type=ExperimentalHammingDist
      },
 
-     'direction=down,n_start=1,x_start=1,y_start=1' =>
-     { Product => 'A003991', # X*Y starting (1,1) n=1
-       GCD     => 'A003989', # GCD by diagonals starting (1,1) n=1
-       Min     => 'A003983', # X,Y>=1
-       MinAbs  => 'A003983', #   MinAbs=Min
-       Max     => 'A051125', # X,Y>=1
-       MaxAbs  => 'A051125', #   MaxAbs=Max
-       IntXY   => 'A004199', # X>=0,Y>=0, X/Y round towards zero
-       # OEIS-Catalogue: A003991 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Product
-       # OEIS-Catalogue: A003989 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=GCD
-       # OEIS-Catalogue: A003983 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Min
-       # OEIS-Other:     A003983 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=MinAbs
-       # OEIS-Catalogue: A051125 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=Max
-       # OEIS-Other:     A051125 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=MaxAbs
-       # OEIS-Catalogue: A004199 planepath=Diagonals,x_start=1,y_start=1 coordinate_type=IntXY
-
-       # cf A003990 LCM starting (1,1) n=1
-       #    A003992 X^Y power starting (1,1) n=1
-     },
-
-     'direction=up,n_start=1,x_start=1,y_start=1' =>
-     { Product => 'A003991', # X*Y starting (1,1) n=1
-       GCD     => 'A003989', # GCD by diagonals starting (1,1) n=1
-       IntXY   => 'A003988', # Int(X/Y) starting (1,1) n=1
-       # OEIS-Other:     A003991 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=Product
-       # OEIS-Other:     A003989 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=GCD
-       # OEIS-Catalogue: A003988 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=IntXY
-
-       # num,den of reduction of A004736/A002260 which is run1toK/runKto1.
-       ExperimentalNumerator   => 'A112543', # 1,2,1,3,1,1,4,3,2,1,5,2,1,1,1,6,
-       ExperimentalDenominator => 'A112544', # 1,1,2,1,1,3,1,2,3,4,1,1,1,2,5,1,
-       # OEIS-Catalogue: A112543 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=ExperimentalNumerator
-       # OEIS-Catalogue: A112544 planepath=Diagonals,direction=up,x_start=1,y_start=1 coordinate_type=ExperimentalDenominator
-     },
     };
 }
 { package Math::PlanePath::DiagonalsAlternating;
@@ -4194,6 +4259,7 @@ sub characteristic_smaller {
         Max    => 'A004396', # Max=Y
         BitOr  => 'A004396', # BitOr=Y
         SumAbs => 'A004773', # 0,1,2 mod 4
+        ExperimentalPairsXY => 'A002264',  # triples 0,0,0, 1,1,1, etc
 
         # OEIS-Catalogue: A004523 planepath=CellularRule,rule=20,n_start=0 coordinate_type=X
         # OEIS-Other:     A004523 planepath=CellularRule,rule=20,n_start=0 coordinate_type=Min
@@ -4203,6 +4269,7 @@ sub characteristic_smaller {
         # OEIS-Other:     A004396 planepath=CellularRule,rule=180,n_start=0 coordinate_type=BitOr
         # OEIS-Catalogue: A004773 planepath=CellularRule,rule=20,n_start=0 coordinate_type=SumAbs
         # OEIS-Other:     A004773 planepath=CellularRule,rule=180,n_start=0 coordinate_type=SumAbs
+        # OEIS-Other:     A002264 planepath=CellularRule,rule=20,n_start=0 coordinate_type=ExperimentalPairsXY
       },
     };
 }
@@ -4420,15 +4487,16 @@ sub characteristic_smaller {
       },
 
       'align=right,n_start=0' =>
-      { X      => 'A001477',  # integers Y=0,1,2,etc
-        Min    => 'A001477',  # Min=X
-        Y      => 'A001477',  # integers Y=0,1,2,etc
-        Max    => 'A001477',  # Max=Y
-        Sum    => 'A005843',  # even 0,2,4,etc
-        DiffYX => 'A000004',  # all zeros
-        DiffXY => 'A000004',  # all zeros
+      { X         => 'A001477',  # integers Y=0,1,2,etc
+        Min       => 'A001477',  # Min=X
+        Y         => 'A001477',  # integers Y=0,1,2,etc
+        Max       => 'A001477',  # Max=Y
+        Sum       => 'A005843',  # even 0,2,4,etc
+        DiffYX    => 'A000004',  # all zeros
+        DiffXY    => 'A000004',  # all zeros
         RSquared  => 'A001105',  # 2*n^2
         TRSquared => 'A016742',  # 4*n^2
+        ExperimentalPairsXY => 'A004526', # 0,0,1,1,2,2,etc cf Math::NumSeq::Runs
         # OEIS-Other: A001477 planepath=CellularRule,rule=16,n_start=0 coordinate_type=X
         # OEIS-Other: A001477 planepath=CellularRule,rule=16,n_start=0 coordinate_type=Min
         # OEIS-Other: A001477 planepath=CellularRule,rule=16,n_start=0 coordinate_type=Y
@@ -4438,6 +4506,7 @@ sub characteristic_smaller {
         # OEIS-Other: A000004 planepath=CellularRule,rule=16,n_start=0 coordinate_type=DiffXY
         # OEIS-Other: A001105 planepath=CellularRule,rule=16,n_start=0 coordinate_type=RSquared
         # OEIS-Other: A016742 planepath=CellularRule,rule=16,n_start=0 coordinate_type=TRSquared
+        # OEIS-Other: A004526 planepath=CellularRule,rule=16,n_start=0 coordinate_type=ExperimentalPairsXY
       },
 
       # same as PyramidRows step=0
@@ -5068,9 +5137,9 @@ sort of geometric interpretation or are related to fractions X/Y.
     "DiffYX"       Y-X difference (negative of DiffXY)
     "AbsDiff"      abs(X-Y) difference
     "Radius"       sqrt(X^2+Y^2) radial distance
-    "RSquared"     X^2+Y^2 radius squared
+    "RSquared"     X^2+Y^2 radius squared (norm)
     "TRadius"      sqrt(X^2+3*Y^2) triangular radius
-    "TRSquared"    X^2+3*Y^2 triangular radius squared
+    "TRSquared"    X^2+3*Y^2 triangular radius squared (norm)
     "IntXY"        int(X/Y) division rounded towards zero
     "FracXY"       frac(X/Y) division rounded towards zero
     "BitAnd"       X bitand Y

@@ -4,7 +4,7 @@ AnyEvent::Filesys::Notify - An AnyEvent compatible module to monitor files/direc
 
 # VERSION
 
-version 1.21
+version 1.23
 
 # STATUS
 
@@ -117,6 +117,13 @@ Arguments for new are:
     generate an additional 'modified' event when a file changes (once when opened
     for write, and once when modified).
 
+- skip\_subdirs
+
+        skip_subdirs => 1,
+
+    Skips subdirectories and anything in them while building a list of files/dirs
+    to watch. Optional.
+
 # WATCHER IMPLEMENTATIONS
 
 ## INotify2 (Linux)
@@ -180,15 +187,17 @@ Modules used to implement this module [AnyEvent](https://metacpan.org/pod/AnyEve
 
 Alternatives to this module [Filesys::Notify::Simple](https://metacpan.org/pod/Filesys::Notify::Simple), [File::ChangeNotify](https://metacpan.org/pod/File::ChangeNotify).
 
+# AUTHOR
+
+Mark Grimes, <mgrimes@cpan.org>
+
 # CONTRIBUTORS
 
 - Gasol Wu <gasol.wu@gmail.com> who contributed the BSD support for IO::KQueue
 - Dave Hayes <dave@jetcafe.org>
 - Carsten Wolff <carsten@wolffcarsten.de>
-
-# AUTHOR
-
-Mark Grimes, <mgrimes@cpan.org>
+- Ettore Di Giacinto (@mudler)
+- Martin Barth (@ufobat)
 
 # SOURCE
 
@@ -204,7 +213,7 @@ feature.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes, <mgrimes@cpan.org>.
+This software is copyright (c) 2017 by Mark Grimes, <mgrimes@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

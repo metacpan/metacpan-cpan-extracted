@@ -2,7 +2,7 @@ package Mojo::ACME;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 use Mojo::Collection 'c';
@@ -171,7 +171,12 @@ sub register {
     resource => 'new-reg',
     agreement => $self->ca->agreement,
   });
-  my $code = $self->ua->post($url, $req)->res->code;
+  my $res = $self->ua->post($url, $req)->result;
+  my $code = $res->code;
+  if ($code == 400) {
+    my $detail = $res->json('/detail');
+    die "$detail\n" || 'An error occurred';
+  }
   return
     $code == 201 ? 'Account Created' :
     $code == 409 ? 'Account Exists' :

@@ -44,5 +44,4 @@ my $mojito_auth = Mojito::Auth->new(
 
 my $id = $mojito_auth->add_user;
 
-say "\nAdded user: ", $mojito_auth->username, " with id: $id\n";
-
+print "\nAdded user: $username with id: $id\n\n";

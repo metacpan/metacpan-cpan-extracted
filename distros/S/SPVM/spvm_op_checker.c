@@ -223,6 +223,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       SPVM_OP* op_package = sub->op_package;
       SPVM_PACKAGE* package = op_package->uv.package;
       
+      int32_t eval_stack_length = 0;
+      
       // Destructor must receive own package object
       if (sub->is_destructor) {
         // DESTROY argument must be 0
@@ -276,7 +278,13 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 SPVM_DYNAMIC_ARRAY_push(sub_check_info->loop_block_my_base_stack, block_my_base_ptr);
               }
               else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
-                SPVM_DYNAMIC_ARRAY_push(sub_check_info->try_block_my_base_stack, block_my_base_ptr);
+                SPVM_DYNAMIC_ARRAY_push(sub_check_info->eval_block_my_base_stack, block_my_base_ptr);
+                
+                // Eval block max length
+                eval_stack_length++;
+                if (eval_stack_length > sub->eval_stack_max_length) {
+                  sub->eval_stack_max_length = eval_stack_length;
+                }
               }
               
               break;
@@ -1308,16 +1316,16 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 }
                 case SPVM_OP_C_CODE_LOOP: {
                   // Exchange condition and loop block to move condition to end of block
-                  SPVM_OP* op_condition = op_cur->first;
-                  SPVM_OP* op_block_loop = op_cur->last;
-                  op_cur->first = op_block_loop;
-                  op_cur->last = op_condition;
-                  op_block_loop->moresib = 1;
-                  op_block_loop->sibparent = op_condition;
-                  op_condition->moresib = 0;
-                  op_condition->sibparent = op_cur;
+                  SPVM_OP* op_block_outer = op_cur->first;
                   
+                  SPVM_OP* op_condition = op_block_outer->first->sibparent;
+                  SPVM_OP* op_block_loop = op_block_outer->last;
                   
+                  SPVM_OP* op_stab_condition = SPVM_OP_cut_op(compiler, op_condition);
+                  SPVM_OP* op_stab_block_loop = SPVM_OP_cut_op(compiler, op_block_loop);
+                  
+                  SPVM_OP_replace_op(compiler, op_stab_condition, op_block_loop);
+                  SPVM_OP_replace_op(compiler, op_stab_block_loop, op_condition);
                   
                   break;
                 }
@@ -1344,8 +1352,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   // Pop try block my variable base
                   else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
-                    assert(sub_check_info->try_block_my_base_stack->length > 0);
-                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->try_block_my_base_stack);
+                    assert(sub_check_info->eval_block_my_base_stack->length > 0);
+                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->eval_block_my_base_stack);
+                    eval_stack_length--;
                   }
                   
                   break;
@@ -1496,6 +1505,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     break;
                   }
                   
+                  // Update operand stack max
+                  if (sub->call_sub_arg_stack_max > call_sub_args_count) {
+                    sub->call_sub_arg_stack_max = call_sub_args_count;
+                  }
+                  
                   break;
                 }
                 case SPVM_OP_C_CODE_PACKAGE_VAR: {
@@ -1623,9 +1637,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         }
         // Set my var information
         sub->op_mys = sub_check_info->op_mys;
-        
-        // Operand stack max
-        sub->operand_stack_max = sub_check_info->op_count * 2;
       }
 
       if (!sub->is_native) {

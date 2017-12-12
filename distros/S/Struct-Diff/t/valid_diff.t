@@ -1,25 +1,17 @@
 #!perl -T
 
 use strict;
-use warnings;
-use Storable qw(freeze);
+use warnings FATAL => 'all';
+
 use Struct::Diff qw(valid_diff);
-use Test::More tests => 14;
+use Test::More tests => 13;
 
 use lib "t";
 use _common qw(scmp);
 
-local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
-
 my (@got, @exp);
 
 ### scalar context
-is(
-    valid_diff({}),
-    1,
-    "Empty HASH is a valid diff"
-);
-
 is(
     valid_diff(sub { 0 }),
     undef,

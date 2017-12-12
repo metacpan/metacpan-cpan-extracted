@@ -1,11 +1,12 @@
 package Finance::BTCIndo;
 
-our $DATE = '2017-11-24'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Digest::SHA qw(hmac_sha512_hex);
 use Time::HiRes qw(time);
@@ -41,12 +42,17 @@ sub new {
 sub _get_json {
     my ($self, $url) = @_;
 
+    log_trace("JSON API request: %s", $url);
+
     my $res = $self->{_http}->get($url);
     die "Can't retrieve $url: $res->{status} - $res->{reason}"
         unless $res->{success};
     my $decoded;
     eval { $decoded = $self->{_json}->decode($res->{content}) };
     die "Can't decode response from $url: $@" if $@;
+
+    log_trace("JSON API response: %s", $decoded);
+
     $decoded;
 }
 
@@ -63,6 +69,8 @@ sub tapi {
         # ms after 2015-01-01
         nonce => int(1000 * (time() - 1_420_045_200)),
     };
+
+    log_trace("TAPI request: %s", $form);
 
     my $encoded_form = join(
         "&",
@@ -90,25 +98,31 @@ sub tapi {
     my $decoded;
     eval { $decoded = $self->{_json}->decode($res->{content}) };
     die "Can't decode response from $url: $@" if $@;
+
+    log_trace("TAPI response: %s", $decoded);
+
     die "API response not a hash: $decoded" unless ref $decoded eq 'HASH';
     die "API response is not success: $decoded->{error}" unless $decoded->{success};
     $decoded;
 }
 
+sub _check_pair {
+    my $pair = shift;
+    $pair =~ /\A(\w{3,5})_(\w{3,5})\z/
+        or die "Invalid pair: must be in the form of 'abc_xyz'";
+}
+
 sub get_ticker {
     my ($self, %args) = @_;
     $args{pair} //= "btc_idr";
-    $args{pair} =~ /\A\w{3}_\w{3}\z/
-        or die "Invalid pair: must be in the form of 'abc_xyz'";
-
+    _check_pair($args{pair});
     $self->_get_json("$url_prefix/api/$args{pair}/ticker");
 }
 
 sub get_trades {
     my ($self, %args) = @_;
     $args{pair} //= "btc_idr";
-    $args{pair} =~ /\A\w{3}_\w{3}\z/
-        or die "Invalid pair: must be in the form of 'abc_xyz'";
+    _check_pair($args{pair});
 
     $self->_get_json("$url_prefix/api/$args{pair}/trades");
 }
@@ -116,8 +130,7 @@ sub get_trades {
 sub get_depth {
     my ($self, %args) = @_;
     $args{pair} //= "btc_idr";
-    $args{pair} =~ /\A\w{3}_\w{3}\z/
-        or die "Invalid pair: must be in the form of 'abc_xyz'";
+    _check_pair($args{pair});
 
     $self->_get_json("$url_prefix/api/$args{pair}/depth");
 }
@@ -125,8 +138,7 @@ sub get_depth {
 sub get_price_history {
     my ($self, %args) = @_;
     $args{pair} //= "btc_idr";
-    $args{pair} =~ /\A\w{3}_\w{3}\z/
-        or die "Invalid pair: must be in the form of 'abc_xyz'";
+    _check_pair($args{pair});
     $args{period} //= 'day';
     $args{period} =~ /\A(day|all)\z/
         or die "Invalid period: must be day|all";
@@ -218,7 +230,7 @@ Finance::BTCIndo - Trade with bitcoin.co.id (VIP) using Perl
 
 =head1 VERSION
 
-This document describes version 0.006 of Finance::BTCIndo (from Perl distribution Finance-BTCIndo), released on 2017-11-24.
+This document describes version 0.007 of Finance::BTCIndo (from Perl distribution Finance-BTCIndo), released on 2017-12-09.
 
 =head1 SYNOPSIS
 

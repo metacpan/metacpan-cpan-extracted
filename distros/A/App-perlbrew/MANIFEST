@@ -1,7 +1,6 @@
 bin/perlbrew
 Changes
 doc/MIT-LICENSE
-doc/notes.org
 doc/PERL-LICENSE
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -44,6 +43,7 @@ t/14.perl_version_parsing.t
 t/15.no-reuse-build-dir.t
 t/16.release-detail.t
 t/17.release-detail-cperl-local.t
+t/17.release-detail-cperl-remote.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
 t/command-alias.t

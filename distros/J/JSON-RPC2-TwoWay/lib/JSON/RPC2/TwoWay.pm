@@ -3,7 +3,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 # standard perl
 use Carp;
@@ -49,22 +49,33 @@ sub register {
 		by_name => 1,
 		non_blocking => 0,
 		notification => 0,
+		raw => 0,
 		state => undef,
 	);
 	croak 'no self?' unless $self;
+	croak 'no name?' unless $name;
 	croak 'no callback?' unless ref $cb eq 'CODE';
 	%opts = (%defaults, %opts);
 	croak 'a non_blocking notification is not sensible'
 		if $opts{non_blocking} and $opts{notification};
-	croak "procedure $name already registered" if $self->{methods}->{$name};
+	croak "method $name already registered" if $self->{methods}->{$name};
 	$self->{methods}->{$name} = { 
 		name => $name,
 		cb => $cb,
 		by_name => $opts{by_name},
 		non_blocking => $opts{non_blocking},
 		notification => $opts{notification},
+		raw => $opts{raw},
 		state => $opts{state},
 	};
+}
+
+sub unregister {
+	my ($self, $name) = @_;
+	croak 'no self?' unless $self;
+	croak 'no name?' unless $name;
+	my $method = delete $self->{methods}->{$name};
+	croak "method $name already registered" unless $method;
 }
 
 
@@ -86,6 +97,20 @@ sub _handle_request {
 	return $self->_error($c, $id, ERR_BADSTATE, 'This method requires connection state ' . ($m->{state} // 'undef'))
 		if $m->{state} and not ($c->state and $m->{state} eq $c->state);
 
+	if ($m->{raw}) {
+		my $cb;
+		$cb = sub { $c->write(encode_json($_[0])) if $id } if $m->{non_blocking};
+
+		local $@;
+		#my @ret = eval { $m->{cb}->($c, $jsonr, $r, $cb)};
+		my @ret = eval { $m->{cb}->($c, $r, $cb)};
+		return $self->_error($c, $id, ERR_ERR, "Method threw error: $@") if $@;
+		#say STDERR 'method returned: ', Dumper(\@ret);
+
+		$c->write(encode_json($ret[0])) if !$cb and $id;
+		return
+	}
+
 	my $cb;
 	$cb = sub { $self->_result($c, $id, \@_) if $id; } if $m->{non_blocking};
 
@@ -102,7 +127,7 @@ sub _error {
 	my ($self, $c, $id, $code, $message, $data) = @_;
 	my $err = "error: $code " . $message // '';
 	say STDERR $err if $self->{debug};
-	$c->_write(encode_json({
+	$c->write(encode_json({
 		jsonrpc     => '2.0',
 		id          => $id,
 		error       => {
@@ -118,13 +143,18 @@ sub _result {
 	my ($self, $c, $id, $result) = @_;
 	$result = $$result[0] if scalar(@$result) == 1;
 	#say STDERR Dumper($result) if $self->{debug};
-	$c->_write(encode_json({
+	$c->write(encode_json({
 		jsonrpc     => '2.0',
 		id          => $id,
 		result      => $result,
 	}));
 	return;
 }
+
+#sub DESTROY {
+#       my $self = shift;
+#       say 'destroying ', $self;
+#}
 
 1;
 
@@ -205,6 +235,12 @@ When defined must be a string value defining the state the connection (see
 L<newconnection>) must be in for this call to be accepted.
 
 =back
+
+=head2 unregister
+
+$rpc->unregister('my_method')
+
+Unregister a method.
 
 =head1 REGISTERED CALLBACK CALLING CONVENTION
 

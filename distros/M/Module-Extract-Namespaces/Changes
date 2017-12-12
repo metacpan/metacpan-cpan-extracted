@@ -1,40 +1,45 @@
-# Changes for Module::Extract::Namespaces
+Revision history for Perl module Module::Extract::Namespaces
 
-1.02 - Fri Jan  3 13:48:50 2014
+1.021 2017-11-30T04:41:09Z
+	* Removed the shim code for PPI's older than 1.125. Now you 
+	have to have an updated PPI that understand the v5.12 package 
+	syntax.
+
+1.02 - 2014-01-03
 	* Get rid of MYMETA
 
-1.01 - Tue May  7 19:19:26 2013
+1.01 - 2013-05-07
 	* Implement from_module so you can specify a namespace
 	instead of a filename
 
-0.14_02 - Sat Apr 30 11:44:49 2011
-	* I forgot to add the lexer hint for ::Package for the 
+0.14_02 - 2011-04-30
+	* I forgot to add the lexer hint for ::Package for the
 	monkey patch. That patch is only there until PPI updates
 	for the patch.
 
-0.14_01 - Fri Apr 29 08:01:08 2011
+0.14_01 - 2011-04-29
 	* Handle the Perl 5.12 package NAME VERSION BLOCK syntax,
 	even if you aren't using Perl 5.12. It's just PPI, so it's
 	not actually running code.
 
-0.14 - Wed Oct 29 12:59:58 2008
+0.14 - 2008-10-29
 	* Adding an error() method so you can check what went wrong.
 	That means no more carping and stomping all over your terminal
 	or log file unless you want that.
 
-0.13 - Tue Sep 16 21:40:36 2008
+0.13 - 2008-09-16
 	* Adding bits to META.yml with MakeMaker's new META_MERGE feature
 	* Moved everything to github, so the new source URL is, well, new
 
-0.12 - Sat Aug  9 08:59:42 2008
+0.12 - 2008-08-09
 	* This is still an early version of the module
 	* This version takes more care to catch PPI problems
 
-0.11_01 - Fri Aug  8 06:06:48 2008
+0.11_01 - 2008-08-08
 	* Handle the PDOMs a bit more carefully in case things
 	go terribly wrong
 
-0.10_01 - Thu Apr  3 11:48:51 2008
+0.10_01 - 2008-04-03
 	* This is the initial release while I'm at the Oslo QA Hackathon
 	* Extract the package declarations in a file to see which namespaces
 	are in it

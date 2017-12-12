@@ -4,11 +4,11 @@ use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
-sub IDENTIFICATION { return "000001-000047-000007"; }
+sub IDENTIFICATION { return "000001-000047-000008"; }
 
 sub preference { return 0; }
 
@@ -100,6 +100,9 @@ sub handle_action {
 				my $t = $action{type};  $t =~ s/ /_/g;
 				my $filename = "/tmp/dbman.edit_object.$t.$action{name}.$$.plsql";
 				if (open F,">$filename") {
+                    if ( $obj->{ -interface }->is_utf8 ) {
+                        binmode F, ':utf8';
+                    }
 					print F $text;
 					close F;
 					$text = '';
@@ -108,6 +111,9 @@ sub handle_action {
 					system "$editor $filename";
 					$obj->{-interface}->come_back();
 					if (-M $filename ne $modi and open F,$filename) {
+                        if ( $obj->{ -interface }->is_utf8 ) {
+                            binmode F, ':utf8';
+                        }
 						$text = join '',<F>;
 						close F;
 					}

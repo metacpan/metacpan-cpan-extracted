@@ -1,0 +1,41 @@
+# Main Makefile.am source for runcap
+# Copyright (C) 2017 Sergey Poznyakoff
+#
+# Runcap is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at your
+# option) any later version.
+#
+# Runcap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Runcap. If not, see <http://www.gnu.org/licenses/>.
+
+# The runcap library can be built in three distinct flavours:
+#   1. as a standalone library
+#   2. as a shared convenience library
+#   3. as a static convenience library
+# Due to various Automake/libtools subtleties, the three builds cannot be
+# defined in a single Makefile.am. Therefore, three distinct Automake sources
+# are provided for each of the above types. Each of them contains the rules
+# and variables for its particular build flavour, and obtains common rules and
+# and variables by including Make.am. The actual build flavour is determined by
+# the second argument to the RUNCAP_SETUP macro invocation (see runcap.m4).
+# The files and the corresponding 2nd argument for each build type are:
+#   1. install.am   install
+#   2. shared.am    shared
+#   3. static.am    static
+
+RUNCAP_SRC = \
+ getc.c\
+ getl.c\
+ runcap.c\
+ seek.c\
+ tell.c
+EXTRA_DIST = Make.am install.am shared.am static.am
+check:
+	$(MAKE) -C t check
+SUBDIRS = . t

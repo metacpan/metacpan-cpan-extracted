@@ -22,8 +22,8 @@
     applications, independently of the web framework.
     * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
       SNI, IDNA, HTTP/SOCKS5 proxy, UNIX domain socket, Comet (long polling),
-      keep-alive, connection pooling, timeout, cookie, multipart, and gzip
-      compression support.
+      Promises/A+, keep-alive, connection pooling, timeout, cookie, multipart,
+      and gzip compression support.
     * Built-in non-blocking I/O web server, supporting multiple event loops as
       well as optional pre-forking and hot deployment, perfect for building
       highly scalable web services.
@@ -33,6 +33,10 @@
     can be used too, but may require additional CPAN modules to be installed)
   * Fresh code based upon years of experience developing
     [Catalyst](http://www.catalystframework.org), free and open source.
+  * Hundreds of 3rd party
+    [extensions](https://metacpan.org/requires/distribution/Mojolicious) and
+    high quality spin-off projects like the
+    [Minion](https://metacpan.org/pod/Minion) job queue.
 
 ## Installation
 
@@ -66,14 +70,17 @@ app->start;
 ## Duct tape for the HTML5 web
 
   Use all the latest Perl and HTML features in beautiful single file
-  prototypes like this one, and grow them easily into well-structured
-  applications.
+  prototypes like this one, and
+  [grow](http://mojolicious.org/perldoc/Mojolicious/Guides/Growing#Differences)
+  them easily into well-structured **Model-View-Controller** web applications.
 
 ```perl
 use Mojolicious::Lite -signatures;
 
 # Render template "index.html.ep" from the DATA section
-get '/' => {template => 'index'};
+get '/' => sub ($c) {
+  $c->render(template => 'index');
+};
 
 # WebSocket service used by the template to extract the title from a website
 websocket '/title' => sub ($c) {

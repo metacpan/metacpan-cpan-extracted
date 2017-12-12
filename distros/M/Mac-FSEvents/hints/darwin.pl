@@ -11,6 +11,7 @@ if ( $Config{myarchname} =~ /i386/ ) {
         my @directories = (
             "/Developer/SDKs/MacOSX$os_version.sdk",
             "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$os_version.sdk",
+            "/Library/Developer/CommandLineTools/SDKs/MacOSX$os_version.sdk",
         );
 
         my $sysroot;

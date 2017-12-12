@@ -99,7 +99,7 @@ use constant get_opcode => 8;
 sub new {
     my ($class, %opts) = @_;
 
-    if (!$opts{'payload_sr'}) {
+    if (!$opts{'payload_sr'} && !defined $opts{'payload'}) {
         my $payload;
 
         if ($opts{'code'}) {
@@ -132,10 +132,10 @@ sub new {
             $payload = q<>;
         }
 
-        $opts{'payload_sr'} = \$payload;
+        $opts{'payload'} = $payload;
     }
 
-    return $class->SUPER::new( %opts, type => 'close' );
+    return $class->SUPER::new( %opts );
 }
 
 sub get_code_and_reason {

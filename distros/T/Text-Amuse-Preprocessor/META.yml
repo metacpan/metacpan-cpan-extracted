@@ -24,4 +24,4 @@ requires:
   Text::Amuse: '0.76'
 resources:
   repository: https://github.com/melmothx/text-amuse-preprocessor
-version: '0.41'
+version: '0.50'

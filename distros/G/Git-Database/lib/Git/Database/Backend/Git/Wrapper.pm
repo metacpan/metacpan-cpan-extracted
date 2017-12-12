@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Wrapper;
-$Git::Database::Backend::Git::Wrapper::VERSION = '0.009';
+$Git::Database::Backend::Git::Wrapper::VERSION = '0.010';
 use Cwd qw( cwd );
 use Git::Wrapper;
 use Git::Version::Compare qw( ge_git );
@@ -141,7 +141,7 @@ Git::Database::Backend::Git::Wrapper - A Git::Database backend based on Git::Wra
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ version 0.009
 
 =head1 DESCRIPTION
 
-This backend reads and write data from a Git repository using the
+This backend reads and writes data from a Git repository using the
 L<Git::Wrapper> module.
 
 =head2 Git Database Roles

@@ -39,7 +39,7 @@ require Graph::Maker::Dragon;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 10;
   ok ($Graph::Maker::Dragon::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Dragon->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Dragon->VERSION($want_version); 1 }, 1,

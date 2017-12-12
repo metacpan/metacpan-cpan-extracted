@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 
 use Test::More tests => 1;
 
@@ -15,7 +17,7 @@ my @input = (
 
 my @output = intspan_partition @input;
 my @sorted = sort { $a cmp $b } map "$_", @output;
-my $expect = 
+my $expect =
 [
  '1-4,40',
  '11-19,21-30',

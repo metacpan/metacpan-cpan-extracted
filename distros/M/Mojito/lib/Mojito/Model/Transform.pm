@@ -1,16 +1,23 @@
 use strictures 1;
 package Mojito::Model::Transform;
-{
-  $Mojito::Model::Transform::VERSION = '0.24';
-}
+$Mojito::Model::Transform::VERSION = '0.25';
 use Moo;
 use MooX::Types::MooseLike::Base qw/Object ArrayRef/;
 use Mojito::Page::CRUD::Mongo;
 use Mojito::Model::Config;
 use DBM::Deep;
 use Data::Dumper::Concise;
+use Search::Elasticsearch
 
-# Move records from Mongodb to DBM::Deep
+# Move records from Mongodb to Elasticsearch or DBM::Deep
+has transfer_type => (
+  is => 'lazy',
+  builder => sub { 'elasticsearch' },
+);
+has db_host => (
+  is => 'lazy',
+  builder => sub { 'localhost:9200' },
+);
 has db_file => (
     is => 'rw',
     lazy => 1,
@@ -23,10 +30,22 @@ has editer => (
     default => sub { Mojito::Page::CRUD::Mongo->new },
 );
 has frigo => (
-    is => 'ro',
+    is => 'lazy',
     isa => Object,
-    lazy => 1,
-    default => sub { DBM::Deep->new($_[0]->db_file) },
+    builder => sub {
+      my $self = shift;
+      my $frigo;
+      my $transfer_type = $self->transfer_type;
+      if ($transfer_type eq 'deep') {
+        $frigo = DBM::Deep->new($_[0]->db_file);
+      }
+      elsif ($transfer_type eq 'elasticsearch') {
+        $frigo = Search::Elasticsearch->new(
+          nodes => [$self->db_host],
+        );
+      }
+      return $frigo;
+    },
 );
 has collections => (
     is => 'ro',
@@ -49,19 +68,30 @@ sub transfer_record {
     # Remove the MongoDB::OID object, and replace it with just the oid string for the id key's value
     delete $doc->{_id};
     $doc->{id} = $doc_id;
-    $self->set_deep_record($collection, $doc_id, $doc);
+    $self->set_record($collection, $doc_id, $doc);
 }
 sub get_mongo_record {
     my ($self, $collection, $id) = @_;
     $self->set_collection_name($collection);
     my $doc = $self->editer->read($id); 
 }
-sub set_deep_record { 
+sub set_record {
    my ($self, $collection, $id, $record) = @_;
-    print "SETTING DEEP Doc entitled: ", $record->{title}, "\n" if $record->{title};
-    print "SETTING DEEP Collection named: ", $record->{collection_name}, "\n" if $record->{collection_name};
-    print "SETTING DEEP User named: ", $record->{username}, "\n" if $record->{username};
-    $self->frigo->{$collection}->{$id} = $record;
+    print "SETTING Doc entitled: ", $record->{title}, "\n" if $record->{title};
+    print "SETTING Collection named: ", $record->{collection_name}, "\n" if $record->{collection_name};
+    print "SETTING User named: ", $record->{username}, "\n" if $record->{username};
+    my $transfer_type = $self->transfer_type;
+    if ($transfer_type eq 'deep') {
+      $self->frigo->{$collection}->{$id} = $record;
+    }
+    elsif ($transfer_type eq 'elasticsearch') {
+      $self->frigo->index(
+        id => $id,
+        type => $collection,
+        index => Mojito::Model::Config->new->config->{es_index} || 'mojito',
+        body => $record,
+      );
+    }
 }
 
 sub list_mongo_ids {

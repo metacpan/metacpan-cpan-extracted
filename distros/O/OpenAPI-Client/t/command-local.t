@@ -28,6 +28,13 @@ $cmd->run('/v1', 'addPet', -p => "key=abc", -c => '{"type":"dog"}');
 like "@said", qr{"key":"abc"},  'addPet with key';
 like "@said", qr{"type":"dog"}, 'addPet with type';
 
+@said = ();
+my $characters = qq(\x{88c5}\x{903c}\x{4e2d});
+my $encoded = Mojo::Util::encode("UTF-8", $characters);
+$cmd->run('/v1', 'addPet', -p => "key=abc", -c => qq[{"type":"$encoded"}]);
+like "@said", qr{"key":"abc"},          'addPet with key';
+like "@said", qr{"type":"$characters"}, 'addPet with unicode';
+
 done_testing;
 
 __DATA__

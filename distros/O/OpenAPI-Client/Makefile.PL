@@ -19,9 +19,9 @@ WriteMakefile(
 }
 ,
   PREREQ_PM => {
-  'JSON::Validator' => '1.06',
-  'Mojolicious' => '7.00',
-  'Mojolicious::Plugin::OpenAPI' => '1.10'
+  'JSON::Validator' => '1.07',
+  'Mojolicious' => '7.40',
+  'Mojolicious::Plugin::OpenAPI' => '1.22'
 }
 ,
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},

@@ -1,0 +1,139 @@
+package Bio::FastParsers::Blast::Xml;
+# ABSTRACT: front-end class for XML BLAST parser
+$Bio::FastParsers::Blast::Xml::VERSION = '0.173450';
+use Moose;
+use namespace::autoclean;
+
+use Carp;
+use XML::Bare;
+
+extends 'Bio::FastParsers::Base';
+
+use aliased 'Bio::FastParsers::Blast::Xml::BlastOutput';
+
+# TODO: check behavior with single iterations, hits or hsps
+
+# public attributes (some inherited)
+
+
+
+has 'blast_output' => (
+    is       => 'ro',
+    isa      => 'Maybe[Bio::FastParsers::Blast::Xml::BlastOutput]',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_blast_output',
+);  
+
+## no critic (ProhibitUnusedPrivateSubroutines)
+
+sub _build_blast_output {
+    my $self = shift;
+
+    my $file = $self->file;
+    my $xb = XML::Bare->new( file => $file )
+        or croak "Can't open '$file' for reading: $!";
+
+    my $bo = $xb->parse->{'BlastOutput'};
+    unless ($bo) {
+        carp "Warning: '$file' unexpectedly empty; returning no BlastOutput!";
+        return;
+    }
+    
+    return BlastOutput->new( _root => $bo );
+}
+
+## use critic
+
+
+__PACKAGE__->meta->make_immutable;
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Bio::FastParsers::Blast::Xml - front-end class for XML BLAST parser
+
+=head1 VERSION
+
+version 0.173450
+
+=head1 SYNOPSIS
+
+    use aliased 'Bio::FastParsers::Blast::Xml';
+
+    # open and parse BLAST report in XML format
+    my $infile = 'test/blastp.xml';
+    my $report = Xml->new( file => $infile );
+
+    # get main container
+    my $bo = $report->blast_output;
+
+    # examine report content
+    say $bo->program;               # blastp
+    say $bo->version;               # BLASTP 2.2.25+
+    say $bo->db;                    # mcl-db-22species
+
+    # get evalue threshold...
+    say $bo->parameters->expect;    # 10
+
+    # ...or equivalently
+    my $param = $bo->parameters;
+    say $param->expect;             # 10
+    say $param->matrix;             # BLOSUM62
+
+    # get the number of iterations (= queries)
+    say $bo->count_iterations;      # 3
+
+    # loop through iterations (or queries), hits and hsps
+    # this is extremely fast because no data is moved around
+    for my $iter ($bo->all_iterations) {
+        say $iter->count_hits;      # always available!
+        for my $hit ($iter->all_hits) {
+            for my $hsp ($hit->all_hsps) {
+                # ...
+            }
+        }
+    }
+
+    # ...or nearly equivalently (still ultra-fast)
+    # here the container is altered by each iterator call
+    while (my $iter = $bo->next_iteration) {
+        say $iter->count_hits;      # here too!
+        while (my $hit = $iter->next_hit) {
+            while (my $hsp = $hit->next_hsp) {
+                # ...
+            }
+        }
+        say $iter->count_hits;      # 0 (exhausted)
+    }
+
+=head1 DESCRIPTION
+
+    # TODO
+
+=head1 ATTRIBUTES
+
+=head2 file
+
+Path to BLAST report file in XML format to be parsed
+
+=head2 blast_output
+
+L<Bio::FastParsers::Blast::Xml::BlastOutput> composed object
+
+=head1 AUTHOR
+
+Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by University of Liege / Unit of Eukaryotic Phylogenomics / Denis BAURAIN.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,44 @@
+#!perl
+
+# -*- perl -*-
+
+use strict;
+use warnings FATAL => 'all';
+use Store::Digest::Driver::FileSystem;
+use Path::Class;
+use Carp;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+
+sub do_file {
+    my ($driver, $file) = @_;
+    my $stat = $file->stat or return;
+    my $fh = $file->openr;
+    my $obj = $driver->add(content => $fh, mtime => $stat->mtime);
+    print STDERR $obj->as_string;
+}
+
+my %p = (
+    dir => '/tmp/store-digest',
+);
+
+Getopt::Long::GetOptions(
+    'd|dir=s' => \$p{dir},
+);
+
+my $driver = Store::Digest::Driver::FileSystem->new(dir => $p{dir});
+
+for my $path (@ARGV) {
+    Carp::croak("Nonexistent path") unless -e $path;
+    if (-d $path) {
+        $path = Path::Class::Dir->new($path);
+        $path->recurse
+            (callback => sub { do_file($driver, $_[0]) unless -d $_[0] });
+    }
+    else {
+        do_file($driver, Path::Class::File->new($path));
+    }
+}
+
+print STDERR $driver->stats->as_string;
+

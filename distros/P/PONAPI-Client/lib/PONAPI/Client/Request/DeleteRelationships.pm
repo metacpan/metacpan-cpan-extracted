@@ -26,7 +26,7 @@ PONAPI::Client::Request::DeleteRelationships - request - delete relationships
 
 =head1 VERSION
 
-version 0.002009
+version 0.002010
 
 =head1 AUTHORS
 

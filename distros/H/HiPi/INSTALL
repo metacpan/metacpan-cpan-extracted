@@ -5,11 +5,18 @@ existing Perl on your Raspberry Pi.
 This release of HiPi is tested against the
 current Raspbian release.
 
-For a simple installation on latest Raspbian download
-the deb package from http://hipi.znix.com/install.html
+1) For a simple installation on latest Raspbian download
+   the deb package from http://hipi.znix.com/install.html
 
-cpan -i HiPi
+2) cpan -i HiPi
 
-or download the source from cpan or
-http://hipi.znix.com/install.html
+3) download the source from cpan or
+   http://hipi.znix.com/install.html
+   
+   build with
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
 

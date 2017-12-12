@@ -1,8 +1,8 @@
 package Mic::Impl;
 
-require Mic::ArrayImpl;
+require Mic::Implementation;
 
-our @ISA = qw( Mic::ArrayImpl );
+our @ISA = qw( Mic::Implementation );
 
 1;
 

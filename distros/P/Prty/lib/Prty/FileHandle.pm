@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Scalar::Util ();
@@ -75,11 +75,6 @@ Siehe auch Prty::LockedCounter.
 
 open()
 
-=head4 Description
-
-Instantiiere Dateihandle-Objekt und liefere eine Referenz auf dieses
-Objekt zurück.
-
 =head4 Options
 
 =over 4
@@ -97,6 +92,11 @@ der Lock nicht erworben werden kann. Andernfalls bleibt die
 Dateihandle geöffnet.
 
 =back
+
+=head4 Description
+
+Instantiiere Dateihandle-Objekt und liefere eine Referenz auf dieses
+Objekt zurück.
 
 =head4 Examples
 
@@ -425,16 +425,16 @@ sub getc {
 
     $data = $fh->slurp;
 
+=head4 Returns
+
+String
+
 =head4 Description
 
 Lies den Rest von Dateihandle $fh liefere diesen zurück.
 
 Die Methode ist nützlich, wenn der gesamte Inhalt einer Datei ab einer
 bestimmten Position gelesen werden soll.
-
-=head4 Returns
-
-String
 
 =head4 Example
 
@@ -677,6 +677,10 @@ sub unlock {
 
     $fh = $fh->setEncoding($encoding);
 
+=head4 Returns
+
+FileHandle-Objekt (für Method-Chaining)
+
 =head4 Description
 
 Definiere für Filehandle $fh das Encoding $encoding. D.h. alle Daten
@@ -684,10 +688,6 @@ werden automatisch gemäß diesem Encoding beim Schreiben encodiert
 bzw. beim Lesen dekodiert.
 
 Die Methode liefert keinen Wert zurück.
-
-=head4 Returns
-
-FileHandle-Objekt (für Method-Chaining)
 
 =cut
 
@@ -758,14 +758,14 @@ sub binmode {
 
     $class->captureStderr(\$str);
 
+=head4 Returns
+
+Die Methode liefert keinen Wert zurrück
+
 =head4 Description
 
 Fange alle Ausgaben auf STDERR ab und lenke sie auf Skalarvariable
 $str um.
-
-=head4 Returns
-
-Die Methode liefert keinen Wert zurrück
 
 =cut
 
@@ -789,7 +789,7 @@ sub captureStderr {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

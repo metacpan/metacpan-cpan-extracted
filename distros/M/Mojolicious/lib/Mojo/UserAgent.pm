@@ -74,8 +74,10 @@ sub start_p {
     $tx => sub {
       my ($self, $tx) = @_;
       my $err = $tx->error;
-      $promise->resolve($tx) if !$err || $err->{code};
-      $promise->reject($err->{message});
+      return $promise->reject($err->{message}) if $err && !$err->{code};
+      return $promise->reject('WebSocket handshake failed')
+        if $tx->req->is_handshake && !$tx->is_websocket;
+      $promise->resolve($tx);
     }
   );
 
@@ -85,6 +87,11 @@ sub start_p {
 sub websocket {
   my ($self, $cb) = (shift, pop);
   $self->start($self->build_websocket_tx(@_), $cb);
+}
+
+sub websocket_p {
+  my $self = shift;
+  return $self->start_p($self->build_websocket_tx(@_));
 }
 
 sub _cleanup {
@@ -450,8 +457,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
 agent, with IPv6, TLS, SNI, IDNA, HTTP/SOCKS5 proxy, UNIX domain socket, Comet
-(long polling), keep-alive, connection pooling, timeout, cookie, multipart, gzip
-compression and multiple event loop support.
+(long polling), Promises/A+, keep-alive, connection pooling, timeout, cookie,
+multipart, gzip compression and multiple event loop support.
 
 All connections will be reset automatically if a new process has been forked,
 this allows multiple processes to share the same L<Mojo::UserAgent> object
@@ -1053,6 +1060,29 @@ but also increases memory usage by up to 300KiB per connection.
   $ua->websocket('ws://example.com/foo' => {
     'Sec-WebSocket-Extensions' => 'permessage-deflate'
   } => sub {...});
+
+=head2 websocket_p
+
+  my $promise = $ua->websocket_p('ws://example.com');
+
+Same as L</"websocket">, but returns a L<Mojo::Promise> object instead of
+accepting a callback.
+
+  $ua->websocket_p('wss://example.com/echo')->then(sub {
+    my $tx = shift;
+    my $promise = Mojo::Promise->new;
+    $tx->on(finish => sub { $promise->resolve });
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+    $tx->send('Hi!');
+    return $promise;
+  })->catch(sub {
+    my $err = shift;
+    warn "WebSocket error: $err";
+  })->wait;
 
 =head1 DEBUGGING
 

@@ -1,0 +1,92 @@
+=head1 NAME
+
+Doit::Deb - commands for dealing with the Debian package system
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('deb');
+
+    $doit->deb_install_packages(qw(zsh wget aptitude));
+
+    my @missing_packages = $doit->deb_missing_packages(qw(zsh wget aptitude));
+
+    $doit->deb_install_key(
+        url => 'http://deb.example.org/key/deb.example.org.key',
+        key => '0123456789ABCDEF0123456789ABCDEF01234567',
+    );
+
+=head1 DESCRIPTION
+
+B<Doit::Deb> is a L<Doit> component providing commands for dealing
+with debian packages. It has to be added to a script using L<Doit's
+add_component|Doit/add_component>:
+
+    $doit->add_component('deb');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 deb_install_packages
+
+    $doit->deb_install_packages(@packages);
+
+Make sure that the listed debian packages are installed (currently
+using L<apt-get(8)>). Return a list of the packages which were
+actually installed during the execution of this command (or the number
+of packages in scalar context).
+
+=head3 deb_missing_packages
+
+    my @missing_packages = $doit->deb_missing_packages(@packages);
+
+Return the packages out of I<@packages> which are not yet installed.
+This is an "informational" command and runs even in dry-run mode.
+
+=head3 deb_install_key
+
+    $doit->deb_install_key(
+        url => $url,
+    );
+    $doit->deb_install_key(
+        keyserver => $keyserver,
+        key       => $key,
+    );
+
+Make sure that the given key is installed in the apt keyring. The key
+can be expressed either using an I<$url> (in which case L<curl(1)> is
+used to download the key), or using a I<$keyserver> and I<$key>
+speciication (in which case L<apt-key(8)> is used to download and
+install the key).
+
+Return 1 if the key was actually installed, otherwise 0.
+
+=head2 NOTES
+
+=head3 Add to sources.list
+
+To add a Debian repository to F</etc/apt/sources.list.d> the following
+approach may be used:
+
+    chomp(my $distro = $doit->info_qx({quiet=>1},qw(lsb_release -cs)));
+    if ($doit->write_binary("/etc/apt/sources.list.d", "deb http://debs.example.org $distro main\n")) {
+        $doit->system(qw(apt-get update));
+    }
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<apt-get(8)>, L<dpkg-query(1)>, L<apt-key(8)>.
+
+=cut

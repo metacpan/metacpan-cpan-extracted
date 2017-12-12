@@ -52,8 +52,14 @@ sub no_git_tempdir
     package My::Git::Wrapper;
     use parent 'Git::Wrapper';
 
+    our $has_gpgsign;
+
     sub commit {
-        return shift->RUN(commit => @_, { 'no-verify' => 1, '-c' => 'commit.gpgsign=false' });
+        my $git = shift;
+        return $git->RUN(commit => @_, {
+            'no-verify' => 1,
+            $has_gpgsign ? ( '-c' => 'commit.gpgsign=false' ) : (),
+        });
     }
 }
 
@@ -76,6 +82,8 @@ sub git_wrapper
 
     plan skip_all => 'Need mysysgit v1.7.10 for proper unicode support on windows (https://github.com/msysgit/msysgit/wiki/Git-for-Windows-Unicode-Support)'
         if $^O eq 'MSWin32' and versioncmp($version, '1.7.10') < 0;
+
+    $My::Git::Wrapper::has_gpgsign = versioncmp($version, '2.0.0') >= 0;
 
     $git->init;
     $err = $git->ERR;

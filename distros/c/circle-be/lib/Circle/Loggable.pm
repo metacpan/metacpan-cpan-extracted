@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use base qw( Circle::Commandable Circle::Configurable );
 
+our $VERSION = '0.173320';
+
 use File::Basename qw( dirname );
 use File::Path qw( make_path );
 use POSIX qw( strftime mktime );

@@ -42,7 +42,7 @@ Catalyst::ActionRole::OAuth2::AuthToken::ViaRefreshToken - Authorization token r
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 SYNOPSIS
 

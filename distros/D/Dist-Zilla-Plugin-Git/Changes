@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.043     2017-12-10 00:49:29Z
+ - replace uses of File::HomeDir with a simple glob()
+
 2.042     2017-05-12 16:29:18Z
  - remove spaces from config data dumped to META, which parses badly on older
    YAML decoders in the toolchain

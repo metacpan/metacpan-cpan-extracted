@@ -22,7 +22,7 @@ Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 4.0.0
+Standards-Version: 4.1.1
 Homepage: http://user42.tuxfamily.org/graph-maker-other/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 
@@ -32,5 +32,5 @@ Depends: libgraph-perl, libgraph-maker-perl, perl (>= 5.004), ${perl:Depends}, $
 Description: Create Graph.pm graphs of various kinds
  Graph types include: Beineke, BinaryBeanstalk, BinomialTree, BiStar,
  FibonacciTree, GosperIsland, Hanoi, HexGrid, Johnson, Keller, Kneser,
- KnightGrid, NoughtsAndCrosses, Petersen (and generalized), RookGrid,
- TwinAlternateAreaTree, TwindragonAreaTree.
+ KnightGrid, NoughtsAndCrosses, Petersen (and generalized),
+ QuartetTree, RookGrid, TwinAlternateAreaTree, TwindragonAreaTree.

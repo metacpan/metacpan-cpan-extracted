@@ -14,9 +14,10 @@ use Memoize qw(memoize);
 use experimental qw(signatures);
 use Math::AnyNum qw(:overload pi);
 
-sub bernoulli_number($n) {
+sub bernoulli_number($n) {  # Akiyama–Tanigawa algorithm
 
-    return 0 if $n > 1 && $n % 2;    # Bn = 0 for all odd n > 1
+    return 1/2 if ($n     == 1);
+    return   0 if ($n % 2 == 1);
 
     my @A;
     for my $m (0 .. $n) {

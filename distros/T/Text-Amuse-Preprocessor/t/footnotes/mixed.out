@@ -1,0 +1,18 @@
+#title Hello
+
+first [1] Footnote
+
+[1] Here is a multi
+
+    Line footnote [10]
+
+    [11] This is left alone {1}
+
+{1} Secondary
+
+    Multiline {3} footnote, is left alone [1]
+
+
+    Continuing as well [3] {3}
+
+

@@ -23,13 +23,12 @@ use warnings;
 use POE::Component::Server::JSONRPC; # for old Perl 5.005
 use base qw(POE::Component::Server::JSONRPC);
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use POE qw/
     Component::Server::SimpleHTTP
     Filter::Line
     /;
-use JSON::Any;
 
 use Data::Dumper;
 

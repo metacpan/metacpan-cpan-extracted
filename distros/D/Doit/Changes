@@ -1,0 +1,72 @@
+Revision history for Doit.
+
+0.024    2017-12-08
+	- constant IS_WIN
+	- test changes: use bigger epoch times
+
+0.023_50 2017-12-07
+	- test fixes
+	  - atime does not work on some netbsd systems (GH #1)
+	  - rmdir on current directory forbidden on some systems
+	  - different errno on failed rmdir calls
+	  - groupadd is more portable than addgroup
+
+0.023	 2017-12-06
+	- Doit::User: fix: call endgrent
+	- Doit::Git: new option refresh
+	- workaround for list pipe open on Win32 and older perls
+	- debian_package_with_docker: propagate some env vars
+
+0.022_50 2017-12-05
+	- Doit::Locale: implementation for RedHat/CentOS
+	- write_binary: better message on missing diff
+	- META.*: specify missing requirements
+	- Doit package with $VERSION is now on top of file
+	- test fixes
+	  - don't run sudo by default
+	    (DOIT_TEST_WITH_SUDO=1 has now to be set)
+	  - fix timing problem in write_binary.t
+	  - better diagnostics on too old Term::ANSIColor
+	  - fix log.t test with older Carp,pm
+	  - skip ssh tests completely on Windows
+	  - fix possible Win32 short pathname problems
+	- more tests
+	  - scope cleanups and exceptions
+	- test more in docker with XXX_MORE_TESTING
+
+0.022	 2017-12-04
+	- new Build action "look"
+	- really add repository to META
+
+0.021_53 2017-12-03
+	- Doit::Lwp: support for HTTP::Tiny ua
+	- Doit::Deb: automatically use sudo if needed
+	- documentation for Doit::Deb and Doit::Lwp
+	- installation fix: don't ignore Pod files
+	- build improvements
+	  - new action test_pod
+	- more tests
+
+0.021_52 2017-12-02
+	- remove Doit::Log::note (BACKWARD INCOMPATIBILITY)
+	- documentation for Doit::Log
+	- build improvements
+	  - new action dist_install_with_cpanm
+	  - debian_package may deal with devel versions
+	  - add repository to META
+	  - skip .gitignore when building dist
+	  - dist_install_and_test works on Windows
+	  - test_in_docker works for centos
+	- test fixes on netbsd (hostname without -f)
+	- ci testing improvements
+	  - run dist_install_and_test on appveyor
+
+0.021_51 2017-12-01
+	- test fixes for git 1.7.x and perl 5.8.x
+
+0.021_50 2017-12-01
+	- first devel release
+ 
+0.02	 2017-11-23
+	- still awaiting first release
+

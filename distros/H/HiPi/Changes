@@ -1,3 +1,7 @@
+Version 0.68  - 29 November 2017
+                Added HiPi::Interface::PCF8574
+                Added HiPi::Interface::LCDBackpackPCF9574
+                
 Version 0.67  - 08 October 2017
                 Debug print statements left in OpenThings messages.
 

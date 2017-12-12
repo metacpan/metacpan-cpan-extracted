@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Auth;
-{
-  $Mojito::Auth::VERSION = '0.24';
-}
+$Mojito::Auth::VERSION = '0.25';
 use Mojito::Auth::Mongo;
 use Mojito::Auth::Deep;
 use Mojito::Auth::Elasticsearch;

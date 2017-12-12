@@ -32,7 +32,13 @@ use Smart::Comments;
 
 
 {
-  # pictures
+  # pictures and hog
+
+  # level=0  https://hog.grinvin.org/ViewGraphInfo.action?id=19655
+  # level=1  https://hog.grinvin.org/ViewGraphInfo.action?id=496
+  # level=2  https://hog.grinvin.org/ViewGraphInfo.action?id=30345
+  # level=3  https://hog.grinvin.org/ViewGraphInfo.action?id=30347
+
   my @graphs;
   foreach my $level (0 .. 3) {
     my $graph = Graph::Maker->new('quartet_tree',

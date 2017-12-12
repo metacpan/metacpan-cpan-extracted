@@ -45,21 +45,23 @@ sending full messages rather than frames.
 
 =head1 EXTENSION SUPPORT
 
-To stream custom frame types (or overridden classes), you can subclass
-this module and define C<frame_class_*> constants, where C<*> is the
-frame type, e.g., C<text>, C<binary>.
+To stream custom frame types (or overridden classes), you can pass in
+a full package name to C<new()> rather than merely C<text> or C<binary>.
 
 =cut
 
 use strict;
 use warnings;
 
+use Module::Load ();
+
 use Net::WebSocket::Frame::continuation ();
 use Net::WebSocket::X ();
 
 use constant {
 
-    #These can be overridden in subclasses.
+    #The old way of doing this. No longer documented,
+    #but still supported.
     frame_class_text => 'Net::WebSocket::Frame::text',
     frame_class_binary => 'Net::WebSocket::Frame::binary',
 
@@ -80,7 +82,7 @@ sub create_chunk {
     my $frame = $self->{'class'}->new(
         fin => 0,
         $self->FRAME_MASK_ARGS(),
-        payload_sr => \$_[0],
+        payload => \$_[0],
     );
 
     #The first $frame we create needs to be typed (e.g., text or binary),
@@ -96,9 +98,9 @@ sub create_final {
     my $self = shift;
 
     my $frame = $self->{'class'}->new(
-        $self->FRAME_MASK_ARGS(),
         fin => 1,
-        payload_sr => \$_[0],
+        $self->FRAME_MASK_ARGS(),
+        payload => \$_[0],
     );
 
     $self->{'finished'} = 1;
@@ -109,12 +111,18 @@ sub create_final {
 sub _load_frame_class {
     my ($class, $type) = @_;
 
+    #The old, legacy way of doing this. No longer documented,
+    #but it shipped in production so we’ll keep supporting it.
     my $frame_class = $class->can("frame_class_$type");
-    if (!$frame_class) {
-        die "Unknown frame type: “$type”!";
+
+    if ($frame_class) {
+        $frame_class = $frame_class->();
+    }
+    else {
+        Module::Load::load('Net::WebSocket::FrameTypeName');
+        $frame_class = Net::WebSocket::FrameTypeName::get_module($type);
     }
 
-    $frame_class = $frame_class->();
     if (!$frame_class->can('new')) {
         Module::Load::load($frame_class);
     }

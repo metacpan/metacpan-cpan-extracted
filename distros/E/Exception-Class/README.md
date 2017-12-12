@@ -4,7 +4,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 # VERSION
 
-version 1.43
+version 1.44
 
 # SYNOPSIS
 

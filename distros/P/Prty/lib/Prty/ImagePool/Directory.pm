@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::TimeLapse::Directory;
 use Prty::Option;
@@ -66,12 +66,6 @@ sub new {
 
     $seq = $dir->sequence($name,@opt);
 
-=head4 Description
-
-Liefere das Sequenz-Objekt mit Name $name. Das Objekt wird
-gecached. Existiert das Verzeichnis nicht, wird eine Exception
-geworfen, es sei denn, die Option -sloppy ist gesetzt.
-
 =head4 Arguments
 
 =over 4
@@ -92,6 +86,12 @@ Liefere undef, wenn die Sequenz-Datei nicht existiert oder
 keinen Range definiert.
 
 =back
+
+=head4 Description
+
+Liefere das Sequenz-Objekt mit Name $name. Das Objekt wird
+gecached. Existiert das Verzeichnis nicht, wird eine Exception
+geworfen, es sei denn, die Option -sloppy ist gesetzt.
 
 =cut
 
@@ -202,7 +202,7 @@ sub image {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

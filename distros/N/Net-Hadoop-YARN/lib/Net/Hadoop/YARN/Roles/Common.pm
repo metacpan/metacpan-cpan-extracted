@@ -1,5 +1,5 @@
 package Net::Hadoop::YARN::Roles::Common;
-$Net::Hadoop::YARN::Roles::Common::VERSION = '0.202';
+$Net::Hadoop::YARN::Roles::Common::VERSION = '0.203';
 use strict;
 use warnings;
 use 5.10.0;
@@ -9,10 +9,13 @@ use Moo::Role;
 use Data::Dumper;
 use HTTP::Request;
 use JSON::XS;
+use HTML::PullParser;
 use LWP::UserAgent;
 use Regexp::Common qw( net );
 use Scalar::Util   qw( blessed );
 use Socket;
+use Carp;
+use Text::Trim qw( trim );
 use URI;
 use XML::LibXML::Simple;
 
@@ -152,14 +155,17 @@ sub _request {
     my @servers  = $server ? ( $server ) : @{ $self->servers };
     my $maxtries = @servers;
 
-    my ($eval_error, $ret, $n);
+    my ($eval_error, $ret);
+    my $n = 0;
 
     # get a copy, don't mess with the global setting
     #
     my @banned_servers;
     my $selected_server;
 
-    TRY: for ( 1 .. $maxtries ) {
+    my $e_non_html = "Response doesn't look like XML: ";
+
+    TRY: while ( $n < $maxtries ) {
         my $redo;
 
         $n++;
@@ -194,6 +200,13 @@ sub _request {
 
             if ( $response->code == 500 ) {
                 die "Bad request: $uri";
+            } elsif ( $response->code == 401 ) {
+                my $extramsg = ( $response->headers->{'www-authenticate'} || '' ) eq 'Negotiate'
+                    ? eval { require LWP::Authen::Negotiate; 1; }
+                        ? q{ (Did you forget to run kinit?) }
+                        : q{ (LWP::Authen::Negotiate doesn't seem available) }
+                    : '';
+                croak "SecurityError$extramsg";
             }
 
             # found out the json support is buggy at least in the scheduler
@@ -213,7 +226,7 @@ sub _request {
                         $redo++;
                         die "Hit the standby with $selected_server";
                     }
-                    die "Response doesn't look like XML: $content";
+                    die $e_non_html . $content;
                 }
 
                 $res = XMLin(
@@ -233,8 +246,29 @@ sub _request {
                 ) || die "Failed to parse XML!";
                 1;
             } or do {
-                # $self->_json->decode($content)
+                my $is_html = $response->content_type eq 'text/html';
                 my $decode_error = $@ || 'Zombie error';
+
+                if ( $is_html ) {
+                    (my $str_to_parse = $decode_error) =~ s{ \Q$e_non_html\E }{}xms;
+                    my $parser = HTML::PullParser->new(
+                                    doc  => \$str_to_parse,
+                                    text => 'dtext',
+                                ) || Carp::confess "Can't parse HTML received from the API: $!";
+                    my %link;
+                    my @txt_error;
+                    while ( my $token = $parser->get_token ) {
+                        my $txt = trim $token->[0] or next;
+                        push @txt_error, $txt;
+                    }
+                    $decode_error = 'Decoded error: ' . join q{ }, @txt_error;
+                };
+
+                my $will_fail_again = $decode_error =~ m{
+                    \Qcould not be found, please try the history server\E
+                }xms;
+
+                $n = $maxtries if $will_fail_again;
 
                 # when redirected to the history server, a bug present in hadoop 2.5.1
                 # sends to an HTML page, ignoring the Accept-Type header
@@ -303,7 +337,7 @@ Net::Hadoop::YARN::Roles::Common
 
 =head1 VERSION
 
-version 0.202
+version 0.203
 
 =head1 AUTHOR
 

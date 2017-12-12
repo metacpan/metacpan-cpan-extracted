@@ -1,5 +1,5 @@
 package ZMQ::Raw;
-$ZMQ::Raw::VERSION = '0.19';
+$ZMQ::Raw::VERSION = '0.21';
 use strict;
 use warnings;
 use Carp;
@@ -54,7 +54,7 @@ ZMQ::Raw - Perl bindings to the ZeroMQ library
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,14 @@ Check if C<$feature> is available.
 =head2 ZMQ_EVENT_MONITOR_STOPPED
 
 =head2 ZMQ_EVENT_ALL
+
+=head2 ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL
+
+=head2 ZMQ_EVENT_HANDSHAKE_SUCCEEDED
+
+=head2 ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL
+
+=head2 ZMQ_EVENT_HANDSHAKE_FAILED_AUTH
 
 =head2 FEATURE_IPC
 

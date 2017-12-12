@@ -11,6 +11,7 @@ sub enqueue      { croak 'Method "enqueue" not implemented by subclass' }
 sub fail_job     { croak 'Method "fail_job" not implemented by subclass' }
 sub finish_job   { croak 'Method "finish_job" not implemented by subclass' }
 sub list_jobs    { croak 'Method "list_jobs" not implemented by subclass' }
+sub list_locks   { croak 'Method "list_locks" not implemented by subclass' }
 sub list_workers { croak 'Method "list_workers" not implemented by subclass' }
 sub lock         { croak 'Method "lock" not implemented by subclass' }
 sub note         { croak 'Method "note" not implemented by subclass' }
@@ -50,6 +51,7 @@ Minion::Backend - Backend base class
   sub fail_job          {...}
   sub finish_job        {...}
   sub list_jobs         {...}
+  sub list_locks        {...}
   sub list_workers      {...}
   sub lock              {...}
   sub note              {...}
@@ -90,7 +92,8 @@ following new ones.
   my $bool = $backend->broadcast('some_command', [@args]);
   my $bool = $backend->broadcast('some_command', [@args], [$id1, $id2, $id3]);
 
-Broadcast remote control command to one or more workers.
+Broadcast remote control command to one or more workers. Meant to be overloaded
+in a subclass.
 
 =head2 dequeue
 
@@ -376,6 +379,48 @@ Id of worker that is processing the job.
 
 =back
 
+=head2 list_locks
+
+  my $results = $backend->list_locks($offset, $limit);
+  my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+
+Returns information about locks in batches. Meant to be overloaded in a
+subclass.
+
+  # Check expiration time
+  my $results = $backend->list_locks(0, 1, {name => 'foo'});
+  my $expires = $results->{locks}[0]{expires};
+
+These options are currently available:
+
+=over 2
+
+=item name
+
+  name => 'foo'
+
+List only locks with this name.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item expires
+
+  expires => 784111777
+
+Epoch time this lock will expire.
+
+=item name
+
+  name => 'foo'
+
+Lock name.
+
+=back
+
 =head2 list_workers
 
   my $results = $backend->list_workers($offset, $limit);
@@ -448,7 +493,9 @@ Hash reference with whatever status information the worker would like to share.
   my $bool = $backend->lock('foo', 3600, {limit => 20});
 
 Try to acquire a named lock that will expire automatically after the given
-amount of time in seconds.
+amount of time in seconds. An expiration time of C<0> can be used to check if a
+named lock already exists without creating one. Meant to be overloaded in a
+subclass.
 
 These options are currently available:
 
@@ -467,13 +514,14 @@ defaults to C<1>.
 
   $backend->note($job_id, foo => 'bar');
 
-Change a metadata field for a job.
+Change a metadata field for a job. Meant to be overloaded in a subclass.
 
 =head2 receive
 
   my $commands = $backend->receive($worker_id);
 
-Receive remote control commands for worker.
+Receive remote control commands for worker. Meant to be overloaded in a
+subclass.
 
 =head2 register_worker
 
@@ -559,7 +607,7 @@ Queue to put job in.
 
   my $stats = $backend->stats;
 
-Get statistics for jobs and workers. Meant to be overloaded in a subclass.
+Get statistics for the job queue. Meant to be overloaded in a subclass.
 
 These fields are currently available:
 
@@ -570,6 +618,12 @@ These fields are currently available:
   active_jobs => 100
 
 Number of jobs in C<active> state.
+
+=item active_locks
+
+  active_locks => 100
+
+Number of active named locks.
 
 =item active_workers
 
@@ -621,7 +675,7 @@ Uptime in seconds.
 
   my $bool = $backend->unlock('foo');
 
-Release a named lock.
+Release a named lock. Meant to be overloaded in a subclass.
 
 =head2 unregister_worker
 

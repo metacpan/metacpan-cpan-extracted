@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Shell;
 
@@ -31,11 +31,6 @@ L<Prty::Hash>
     $xtl = $class->new;
     $xtl = $class->new($program);
 
-=head4 Description
-
-Instantiiere ein XTerminal-Fenster-Objekt und liefere eine
-Referenz auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -46,6 +41,11 @@ Art des X-Terminals. Mögliche Werte: 'xterm' (Default),
 'gnome-terminal'.
 
 =back
+
+=head4 Description
+
+Instantiiere ein XTerminal-Fenster-Objekt und liefere eine
+Referenz auf dieses Objekt zurück.
 
 =cut
 
@@ -142,7 +142,7 @@ sub launch {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

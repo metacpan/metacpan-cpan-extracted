@@ -1,0 +1,765 @@
+=head1 NAME
+
+Doit - a scripting framework
+
+=head1 SYNOPSIS
+
+    use Doit; # automatically does use strict + warnings
+    my $doit = Doit->init;
+    $doit->...;
+
+Some boilerplate is needed if parts of the Doit script should be used
+on a remote machine or as another user E<0x2014> basically the script
+should be written like a "modulino":
+
+    use Doit;
+    sub function_which_may_run_on_remote {
+        my($doit, @args) = @_;
+        ...
+        return ...;
+    }
+    return 1 if caller;
+    my $doit = Doit->init;
+    {
+        my $ssh = $doit->do_ssh_connect('user@host'); # will sync all necessary bits to remote automatically
+        my $result = $ssh->call_with_runner('function_which_may_run_on_remote', $arg, ...);
+    }
+    {
+        my $sudo = $doit->do_sudo;
+        my result = $sudo->call_with_runner('function_which_may_run_on_remote', $arg, ...);
+    }
+
+Call a Doit-using script in dry-run mode:
+
+    doit-script.pl --dry-run [other parameters]
+
+Call a Doit-using script in real mode:
+
+    doit-script.pl [other parameters]
+
+=head1 DESCRIPTION
+
+B<Doit> is a scripting framework. Some core principles implemented
+here are:
+
+=over
+
+=item * Failing commands throw exceptions E<0x2014> similar to
+L<autodie> or L<Fatal> (but implemented consistently) or L<Bourne
+shell|sh(1)>'s C<set -e>, or L<make(1)>'s default mode without C<-k>
+
+=item * Commands are checked first whether execution is required
+E<0x2014> making it possible to write "converging" scripts
+
+=item * Command execution is logged E<0x2014> like with Bourne shell's
+C<set -x> or make's default mode
+
+=item * There's a dry-run mode which just shows what would happen
+E<0x2014> like make's C<-n> switch
+
+=back
+
+Doit scripts are normal Perl scripts which happen to run Doit commands
+E<0x2014> no limiting DSL involved, but the full expressiveness of
+Perl is available.
+
+To achieve the principles it's required to wrap existing functions. A
+number of Perl builtins and module functions which do side-effects on
+a system (mostly changes on the file system) are available as Doit
+commands. Additionally there's a L<component system|/COMPONENTS> for
+supporting typical tasks like managing system packages, adding users,
+dealing with source repositories.
+
+Additionally it's possible to run Doit functionality on L<remote
+servers|/REMOTE AND USER-SWITCHING FUNCTIONS> (through L<ssh(1)>) or
+as L<different users|/REMOTE AND USER-SWITCHING FUNCTIONS> (using
+L<sudo(8)>).
+
+It is possible to create Doit scripts for running in bootstrapping
+situations. This means that prerequisites for Doit should be minimal.
+No mandatory CPAN modules are required, just standard Perl modules.
+Only for remote connections L<Net::OpenSSH> is needed on the local
+side. For convenient system command execution L<IPC::Run> may be used.
+Scripts run with Perl 5.8.x (maybe even 5.6.x is possible).
+
+=head2 CONSTRUCTOR
+
+    my $doit = Doit->init;
+
+Generates an object (technically it's a C<Doit::Runner> object) which
+is used for calling Doit commands. The constructor looks for a
+command-line option C<--dry-run> (or the short C<-n> alias) and
+configures the runner for dry-run mode (just print what would be
+executed), otherwise for real mode (actually execute everything).
+Other command-line options are still available and may be used in the
+script, e.g. by using L<Getopt::Long> or looking into C<@ARGV>:
+
+    use Doit;
+    use Getopt::Long;
+    my $doit = Doit->init; # already handles --dry-run and -n
+    GetOptions(...)
+        or die "usage: ...";
+    my @files = @ARGV
+        or die "usage: ...";
+
+=head2 CORE COMMANDS
+
+All core commands throw exceptions on errors. If not stated otherwise,
+then the return value is the number of changes, typically the number
+of files affected --- in dry-run mode it's the number of changes which
+would be done, and in real mode it's the number of changes performed.
+
+=head3 chmod
+
+    $doit->chmod($mode, $file ...);
+
+Make sure that the permission of the listed files is set to I<$mode>
+(which is typically expressed as an octal number). Fails if not all
+files could be changed. See L<perlfunc/chmod> for more details.
+
+=head3 chown
+
+    $doit->chown($user, $group, $file ...);
+
+Make sure that the owner (and group) of the listed files is set to the
+given values. The user and group may be specified as uid/gid or as
+username/groupname. A value of -1 or C<undef> for I<$user> and
+I<$group> is interpreted to leave that value unchanged. This command
+is not useful on Windows systems. See L<perlfunc/chown> for more
+details.
+
+=head3 create_file_if_nonexisting
+
+    $doit->create_file_if_nonexisting($file ...);
+
+Make sure that the listed files exist. Contrary to L<the Doit touch
+command|/touch> and the system command L<touch(1)> this does nothing
+if the file already exists.
+
+=head3 copy
+
+    $doit->copy($from, $to);
+    $doit->copy({quiet => $bool}, $from, $to);
+
+Make sure that the file I<$from> is copied to I<$to> unless there's
+already a file with same contents. Copying is done with
+L<File::Copy::copy|File::Copy/copy>. File attributes are not copied
+E<0x2014> this can be done using
+L<Doit::Util::copy_stat|Doit::Util/copy_stat>.
+
+The logging includes a diff between both files, if the L<diff(1)>
+utility is available. This can be turned off by specifying the C<<
+quiet=>1 >> option.
+
+=head3 ln_nsf
+
+    $doit->ln_nsf($oldfile, $newfile);
+
+Make sure that I<$newfile> is a symlink pointing to I<$oldfile>,
+possibly replacing an existing symlink. Implemented by running the
+system's C<ln -nsf>. See L<ln(1)> for more details and L</symlink> for
+an alternative.
+
+=head3 make_path
+
+    $doit->make_path($directory ...);
+    $doit->make_path($directory ..., { key => val ... });
+
+Make sure that the listed directories exist, together with any missing
+intermediate directories. Additional options may be specified as
+key-value pairs in a hashref, and will be passed to
+L<File::Path::make_path|File::Path/make_path>.
+
+Note that it's possible to set the directory permissions with the
+C<mode> option, but the C<make_path> command does not check if an
+already existing directory has these permission bits set.
+
+See also L</mkdir>.
+
+=head3 mkdir
+
+    $doit->mkdir($directory);
+    $doit->mkdir($directory, $mode);
+
+Make sure that the given I<$directory> exist. The I<$mode> will be
+used only if creating a new directory and not effective if the
+directory already exists. See L<perlfunc/mkdir> for more details. See
+L</make_path> for a command which will also create mising intermediate
+directories.
+
+=head3 move
+
+    $doit->move($from, $to);
+
+Move file I<$from> to I<$to>. This command probably cannot be used in
+converging scripts without an accompanying condition. See
+L<File::Copy::move|File::Copy/move> for details. For an alternative
+command see L</rename>.
+
+Always returns C<1> (unless there's an exception).
+
+=head3 remove_tree
+
+    $doit->remove_tree($directory ...);
+    $doit->remove_tree($directory ..., { key => $val ... });
+
+Make sure that the listed directories don't exist anymore, together
+with containing files and sub-directories. See
+L<File::Path::remove_tree|File::Path/remove_tree> for details.
+
+=head3 rename
+
+    $doit->rename($from, $to);
+
+Rename I<$from> to I<$to>. This command probably cannot be used in
+converging scripts without an accompanying condition. See
+L<perlfunc/rename> for details. See L</move> for a command which can
+move a file between different filesystems.
+
+Always returns C<1> (unless there's an exception).
+
+=head3 rmdir
+
+    $doit->rmdir($directory);
+
+Make sure that the given I<$directory> is removed. Fails if this
+directory is not empty. See L<perlfunc/rmdir> for details.
+
+=head3 setenv
+
+    $doit->setenv($key, $val);
+
+Make sure that I<%ENV> contains a key I<$key> set to I<$value>.
+
+=head3 symlink
+
+    $doit->symlink($oldfile, $newfile);
+
+Make sure that I<$newfile> is a symlink pointing to I<$oldfile>.
+Contrary to L</ln_nsf> it does not change an existing symlink. See
+L<perlfunc/symlink> for more details.
+
+=head3 touch
+
+    $doit->touch($file ...);
+
+"Touches" the given files. Loosely modelled after the system command
+L<touch(1)>. Non-existent files are created as empty files, and for
+existent files the access and modification are updated. This command
+does not converge; for a converging command see
+L</create_file_if_nonexisting>.
+
+Always returns the number of given files (unless there's an exception).
+
+=head3 unlink
+
+    $doit->unlink($file ...);
+
+Make sure that the given files are deleted. See L<perlfunc/unlink>.
+
+=head3 unsetenv
+
+    $doit->unsetenv($key);
+
+Make sure that I<%ENV> does not contain the key I<$key> anymore.
+
+=head3 utime
+
+    $doit->utime($atime, $mtime, $file ...);
+
+Make sure that access time and modification time of the listed files
+is set to the given values. Undefined time values are replaced by
+current time. Fails if not all files could be changed. See
+L<perlfunc/utime> for details.
+
+=head2 FILE CREATION AND MODIFICATION
+
+=head3 change_file
+
+    $doit->change_file({debug => $bool, check => $code}, $file, { change ... } ...);
+
+Modify an existing I<$file> using the set of change specifications.
+Return the number of changes made. Depending on the changes the
+command call can be converging or not. The following change
+specifications exist:
+
+=over
+
+=item C<< { add_if_missing => $line } >>
+
+Add the specified I<$line> to the end of file if it is missing.
+
+=item C<< { add_if_missing => $line, add_after => $rx } >>
+
+Add the specified I<$line> after a the last line mathing I<$rx>. If no
+line matches, then an exception will be thrown.
+
+=item C<< { add_if_missing => $line, add_after_first => $rx } >>
+
+Add the specified I<$line> after a the first line mathing I<$rx>. If
+no line matches, then an exception will be thrown.
+
+=item C<< { add_if_missing => $line, add_before => $rx } >>
+
+Add the specified I<$line> before a the first line mathing I<$rx>. If
+no line matches, then an exception will be thrown.
+
+=item C<< { add_if_missing => $line, add_before_last => $rx } >>
+
+Add the specified I<$line> before a the last line mathing I<$rx>. If
+no line matches, then an exception will be thrown.
+
+=item C<< { match => $rx_or_string, replace => $line } >>
+
+Substitute all lines matching I<$rx_or_string> with I<$line>.
+I<$rx_or_string> may be a regexp, or a string. In the latter case the
+complete line has to match.
+
+=item C<< { match => $rx_or_string, delete => $bool } >>
+
+All lines matching I<$rx_or_string> will be deleted if C<delete> is
+set to a true value.
+
+=item C<< { match => $rx, action => $code } >>
+
+For all lines matching I<$rx_or_string> call the specified I<$code>
+reference. In the code reference I<$_[0]> can be used to manipulate
+the line.
+
+=item C<< { unless_match ... } >>
+
+TBD
+
+=back
+
+The following options may be set:
+
+=over
+
+=item C<< debug => I<$bool> >>
+
+Turn on debugging if set to a true value.
+
+=item C<< check => I<$code> >>
+
+Do a final check on the non-committed file. The I<$code> reference
+will take the filename as parameter. Just throw an exception if the
+changes should not be committed.
+
+=back
+
+Implementation details: a temporary copy is created first, which is
+then changed using L<Tie::File>. If everything went right and changes
+had to be done, then the changed file is renamed to the final
+destination.
+
+Using C<Tie::File> has some consequences: it does not know anything
+about encodings, and it uses C<$/> to determine line endings, which by
+default is set to do the right thing for text files. In future these
+details may be streamlined or even changed.
+
+=head3 write_binary
+
+    $doit->write_binary($filename, $content);
+    $doit->write_binary({quiet=>$level, atomic=>$bool}, $filename, $content);
+
+Make sure that the file I<$filename> has the content I<$content>. The
+given content should be unencoded (raw, binary, octets). If you need a
+specific encoding, then it has to be encoded before:
+
+    $doit->write_binary($filename, Encode::encode_utf8($character_content));
+
+If C<quiet> is set to C<1>, then no diffs are shown, otherwise a diff
+is shown if the file contents changed (and the L<diff(1)> utility is
+available), or the complete contents are shown for a new file. If
+C<quiet> is set to C<2>, then no logging at all is done.
+
+By default, the file is written atomically by writing to a temporary
+file first, and then renamed. This can be changed by setting C<<
+atomic=>0 >>.
+
+The command is modelled after
+L<File::Slurper::write_binary|File::Slurper/binary>, but implemented
+without any dependencies.
+
+Note: currently there's no C<write_text>, but maybe will be added in
+future.
+
+=head2 SYSTEM EXECUTION COMMANDS
+
+A number of commands exist for executing system commands. All of these
+(except for C<cond_run>) are non-converging and probably should be run
+conditionally.
+
+All of the commands may be used with list syntax to avoid usage of a
+shell. This is also especially true on Windows, where perl's C<system>
+has problematic edge cases.
+
+A quick overview:
+
+=over
+
+=item L</run> - most comprehensive, but requires the non-core module L<IPC::Run>
+
+=item L</qx> - may capture stdout
+
+=item L</open2> - may capture stdout and provide stdin
+
+=item L</open3> - may capture stdout and stderr and provide stdin
+
+=item L</system> - just run the command, cannot capture anything
+
+=item L<"info_*"|/info_qx> - variants which also run in dry-run mode,
+see L<SYSTEM EXECUTION INFORMATIONAL COMMANDS>
+
+=item L<"cond_*"|/cond_run> - variants which are run conditionally
+
+=back
+
+=head3 cond_run
+
+    $doit->cond_run(if      => sub { ... }, cmd => ["command", "arg" ...]);
+    $doit->cond_run(unless  => sub { ... }, cmd => ["command", "arg" ...]);
+    $doit->cond_run(creates => $file,       cmd => ["command", "arg" ...]);
+
+Conditionally run the command specified in C<cmd> (an array reference
+with command and arguments). Conditions are expressed as code
+references which should return a true or false value (options C<if>
+for a positive condition and C<unless> for a negative condition), or
+with the option C<creates> for checking the existence of the given
+I<$file> which is expected to be created by the given command.
+Conditions may be combined.
+
+The C<cmd> option may also specify a L<IPC::Run>-compatible list, for
+example:
+
+    $doit->cond_run(creates => $file, cmd => [["command", "arg" ...], ">", $file]);
+
+Return C<1> if the condition was true and the I<cmd> executed,
+otherwise C<0>.
+
+=head3 open2
+
+    my $stdout = $doit->open2("command", "arg" ...);
+    my $stdout = $doit->open2({quiet => $bool, info => $bool, instr => $input}, "command", "arg" ...);
+
+Execute a command and return the produced stdout. If C<quiet> is set
+to a true value, then no logging is done. If C<info> is set to a true
+value, then command execution happens even in dry-run mode. If
+C<instr> is specified, then it's send to the stdin of the command.
+Implementation is done with L<IPC::Open2>.
+
+=head3 open3
+
+    my $stdout = $doit->open3("command", "arg" ...);
+    my $stdout = $doit->open3({quiet     => $bool,
+                               info      => $bool,
+                               instr     => $input,
+                               errref    => \$stderr,
+                               statusref => \%status, 
+                              }, "command", "arg" ...);
+
+Execute a command and return the produced stdout. If C<quiet> is set
+to a true value, then no logging is done. If C<info> is set to a true
+value, then command execution happens even in dry-run mode. If
+C<instr> is specified, then it's send to the stdin of the command. If
+C<errref> is set to a scalar reference, then this is filled with the
+stderr of the command; otherwise stderr won't show up. If C<statusref>
+is set to a hash reference, then it is filled with the exit
+information of the command: C<msg>, C<errno>, C<exitcode>,
+C<signalnum>, C<coredump> (except for C<msg> fields may be missing).
+
+Implementation is done with L<IPC::Open3>.
+
+=head3 qx
+
+    my $stdout = $doit->qx("command", "arg" ...);
+    my $stdout = $doit->qx({quiet => $bool, info => $bool, statusref => \%status}, "command", "arg" ...);
+
+Execute a command and return the produced stdout. If C<quiet> is set
+to a true value, then no logging is done. If C<info> is set to a true
+value, then command execution happens even in dry-run mode. statusref
+may be set to a hash reference for getting exit information, see
+L</open3> for more information on it.
+
+Implementation is done with L<Safe Pipe Opens|perlipc/Safe Pipe
+Opens>.
+
+=head3 run
+
+    $doit->run(...);
+
+Execute a command using L<IPC::Run>. The command specification may
+contain pipes, redirects and everything C<IPC::Run> supports. Example:
+
+    $doit->run([qw(grep pattern file)], '|', ['sort'], '|', [qw(uniq -c)], '>', 'outfile');
+
+Always returns C<1> (unless there's an exception).
+
+=head3 system
+
+    $doit->system("command", "arg" ...);
+    $doit->system({show_cwd => $bool}, "command", "arg" ...);
+
+Execute a command. If C<show_cwd> is set to a true value, then logging
+shows also the current working directory. See L<"system" in
+perlfunc|perlfunc/system LIST> for more details.
+
+Always returns C<1> (unless there's an exception).
+
+=head2 SYSTEM EXECUTION INFORMATIONAL COMMANDS
+
+Commands starting with C<info_> also run in dry-run mode. It is
+expected that the user only runs system commands which are not doing
+any changes to the system, but just return some kind of "information".
+
+B<Note>: currently the C<info_*> commands fail on non-zero exit code.
+This behavior is probably not very useful (just think of running a non-matching
+grep) and may change in future. Currently these invocations have to be
+wrapped in an C<< eval { ... } >> if non-zero exit may happen.
+
+=head3 info_open2
+
+    my $stdout = $doit->info_open2("command", "arg" ...);
+    my $stdout = $doit->info_open2({quiet => $bool, instr => $input}, "command", "arg" ...);
+
+Like L</open2>, but with the option C<< info=>1 >> set.
+
+=head3 info_open3
+
+    my $stdout = $doit->info_open3("command", "arg" ...);
+    my $stdout = $doit->info_open3({...}, "command", "arg" ...);
+
+Like L</open3>, but with the option C<< info=>1 >> set.
+
+=head3 info_qx
+
+    my $stdout = $doit->info_qx("command", "arg" ...);
+    my $stdout = $doit->info_qx({quiet => $bool, statusref => \%status}, "command", "arg" ...);
+
+Like L</qx>, but with the option C<< info=>1 >> set.
+
+=head2 REMOTE AND USER-SWITCHING FUNCTIONS
+
+It's possible to run Perl code or Doit functionality on remote
+servers, or as different users. Two commands exist to create a Doit
+runner-like object: L</do_ssh_connect> for running code over a ssh
+connection, and L</do_sudo> for running code as a different user using
+C<sudo>.
+
+This Doit runner-like object may execute all Doit commands.
+Additionally it's possible to call functions defined in the Doit
+script itself using L</call_with_runner> and L</call>. The latter two
+may be preferable in some cases preferable, as every call involves
+some serialization and communication overhead, also the current
+serialization method (L<Storable>) limits the possible parameter and
+result types (i.e. regexps cannot be transferred, which is needed for
+some Doit commands like L</change_file>).
+
+For remote and sudo operation the active Doit script together with
+F<Doit.pm> and required L<components|/COMPONENTS> are sent to the
+destination system. The Doit script is loaded using
+L<require|perlfunc/require EXPR> there E<0x2014> which is the reason
+why the script has to be written like a modulino: the "main" part of
+the script must not re-run again.
+
+Remote and sudo operation work best if things are setup to be
+password-less. Using a ssh agent helps here, and if you may, define
+C<NOPASSWD> in the F</etc/sudoers> rules. It's still possible to run
+scripts which require manual password input, but some setups like
+combining ssh and sudo may be tricky.
+
+dry-run mode, if defined, is passed to the other system or user.
+
+=head3 do_ssh_connect
+
+    my $ssh = $doit->do_ssh_connect('user@host', options ...);
+
+Create a Doit runner-like object which runs commands over a ssh
+connection to I<user@host>. The connection and communication is
+created and done using L<Net::OpenSSH>. The following options are
+available:
+
+=over
+
+=item C<< debug => I<$bool> >>
+
+Turn communication-level debugging on.
+
+=item C<< as => I<$username> >>
+
+Run as a different user on remote side. Switching user is done with
+C<sudo>. If the switch is not password-less, then probably something
+like C<tty> should be passed in the options.
+
+=item C<< forward_agent => I<$bool> >>
+
+Enable ssh agent forwardning if set to true.
+
+=item C<< tty => I<$bool> >>
+
+Allocate a pseudo terminal. May be useful if the script requires
+interactive input (e.g. password input).
+
+=item C<< port => I<$port> >>
+
+Use a different ssh port.
+
+=item C<< master_opts => [ ... ] >>
+
+Additional options to pass. See L<Net::OpenSSH/master_opts>.
+
+=item C<< put_to_remote => I<$method> >>
+
+Method to copy files to the remote side. Possible options are
+C<rsync_put> (default) and C<scp_put>.
+
+=item C<< perl => I<$path> >>
+
+Use a different perl for running the commands. Defaults to C<$^X>.
+
+=back
+
+=head3 do_sudo
+
+    my $sudo = $doit->do_sudo(options);
+
+Create a Doit runner-like object which runs in a different user
+context. By default it runs as C<root>. The following options are
+available:
+
+=over
+
+=item C<< sudo_opts => [ ... ] >>
+
+An array reference of options passed to the C<sudo> command. For
+example, to run as another user than C<root>, try:
+
+    ..., sudo_opts => ['-u', $username], ...
+
+=item C<< debug => I<$bool> >>
+
+Turn communication-level debugging on.
+
+=item C<< perl => I<$path> >>
+
+Use a different perl for running the commands. Defaults to C<$^X>.
+
+=back
+
+=head3 call_with_runner
+
+    my $result = $ssh->call_with_runner('function', 'arg' ...);
+    my $result = $sudo->call_with_runner('function', 'arg' ...);
+
+Call a function in a remote or switched user context. The function
+will get the Doit runner object as the first argument. Other arguments
+are serialized and sent to the function. The function's result is also
+serialized and sent back. Context is preserved.
+
+Example:
+
+    sub print_hostname {
+        my($doit) = @_;
+        $doit->system('hostname'); # will print the remote hostname
+    }
+    ...
+    return 1 if caller;
+    ...
+    my $ssh = $doit->do_ssh_connect('user@host');
+    $ssh->call_with_runner('print_hostname');
+
+=head3 call
+
+    my $result = $ssh->call('function', 'arg' ...);
+    my $result = $sudo->call('function', 'arg' ...);
+
+Like L</call_with_runner>, but don't pass a Doit runner object.
+
+=head2 COMPONENTS
+
+Doit components are Perl modules which may define additional commands
+mixed into the Doit runner object. A component is added by calling the
+L</add_component> method:
+
+    $doit->add_component('git');
+
+The component name is written lowercase without the C<Doit::> prefix
+of the implementing module, that is, for C<Doit::Git> one uses the
+name C<git>.
+
+The component commands are typically prefixed with the component name.
+For example, the C<fbsdpkg> component defined the
+C<fbsdpkg_install_packages> and C<fbsdpkg_missing_packages> commands.
+
+Components added with C<add_component> are also synced to remote
+systems for subsequent connections.
+
+The following components are available:
+
+=over
+
+=item System Packages
+
+=over
+
+=item * L<Doit::Brew> - handle homebrew packages for Mac OS X
+
+=item * L<Doit::Deb> - handle Debian packages
+
+=item * L<Doit::Fbsdpkg> - handle FreeBSD packages
+
+=item * L<Doit::Gem> - handle Ruby gem packages
+
+=item * L<Doit::Rpm> - handle RPM packages
+
+=back
+
+=item Security
+
+=over
+
+=item * L<Doit::Macsecurity> - handle certificate management on Mac OS X
+
+=item * L<Doit::Ssl> - handle certificate management for OpenSSL systems
+
+=back
+
+=item Other
+
+=over
+
+=item * L<Doit::File> - additional file commands
+
+=item * L<Doit::Git> - handle git repositories
+
+=item * L<Doit::Locale> - handle locale installation
+
+=item * L<Doit::Lwp> - WWW access
+
+=item * L<Doit::User> - user management
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<perlfunc> - most core commands are modelled after perl builtin functions
+
+L<Doit::Log>, L<Doit::Exception>, L<Doit::ScopeCleanups>,
+L<Doit::Util>, L<Doit::Win32Util> - packages embeded in F<Doit.pm>
+
+L<make(1)>, L<slaymake(1)>, L<Slay::Makefile>, L<Commands::Guarded>
+
+=cut

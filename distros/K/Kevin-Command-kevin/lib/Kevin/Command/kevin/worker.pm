@@ -1,5 +1,5 @@
 package Kevin::Command::kevin::worker;
-$Kevin::Command::kevin::worker::VERSION = '0.4.0';
+$Kevin::Command::kevin::worker::VERSION = '0.4.1';
 # ABSTRACT: Alternative Minion worker command
 use Mojo::Base 'Mojolicious::Command';
 
@@ -282,7 +282,7 @@ Kevin::Command::kevin::worker - Alternative Minion worker command
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

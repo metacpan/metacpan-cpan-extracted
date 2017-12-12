@@ -59,7 +59,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.63.39'; # our $VERSION = '';
+$VERSION = '0.65'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
@@ -2986,6 +2986,8 @@ sub recalculateish
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3]; 
 	my $recalculateish = $recalculateish_ref->[ $countop ]; 
+	my @things = @$recalculateish;
+	my $whatto = shift( @things );
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -3002,7 +3004,9 @@ sub recalculateish
 	
 	say $tee "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	
-	my $printthis =
+	if ( $whatto eq "y" )
+	{
+	  my $printthis =
 "prj $launchline<<YYY
 m
 c
@@ -3018,9 +3022,43 @@ a
 -
 YYY
 ";
-	unless ($exeonfiles eq "n") 
-	{ 
+	  unless ($exeonfiles eq "n") 
+	  { 
 		print `$printthis`;
+	  }
+	}
+	elsif ( $whatto eq "noins" )
+	{
+	  foreach my $el ( @things )
+	  {
+		my $printthis =
+"prj $launchline<<YYY
+m
+c
+f
+$el
+
+y
+f
+b
+g
+b
+
+
+-
+y
+-
+-
+-
+-
+-
+YYY
+";
+	    unless ($exeonfiles eq "n") 
+	    { 
+		  print `$printthis`;
+	    }
+	  }
 	}
 
 	print $tee "
@@ -4927,7 +4965,7 @@ sub use_modish
 	#use strict;
 	#use warnings;
 	
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $dowhat_ref ) = @_;
 				
 				
 				my @applytype = @$applytype_ref; 
@@ -4936,6 +4974,8 @@ sub use_modish
 				say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 				my @menus = @$menus_ref;
+				my %dowhat = %$dowhat_ref;
+
 				my %numvertmenu = %{ $menus[0] };
 				my %vertnummenu = %{ $menus[1] };
 				
@@ -4946,6 +4986,14 @@ sub use_modish
 					foreach $cycle_ref ( @use_modish )
 					{
 						my @cycle = @$cycle_ref; #say $tee "\@cycle " . dump( @cycle );
+						
+						my $shortmodishdefpath;
+						if ( ref $cycle[0] )
+						{
+                          $shortmodishdefpath_ref = shift( @cycle ) ;
+						}
+						my $modishdefpath = "$to" . "$shortmodishdefpath_ref->[0]" ;
+
 			my $zonenumber = $cycle[0]; #say $tee "\$zonenumber " . dump( $zonenumber );
 			my $shdname = $to . $cycle[1]; #say $tee "\$shdname " . dump( $shdname );
 			my $shdaname = $shdname . "a"; #say $tee "\$shdaname " . dump( $shdaname );
@@ -4964,8 +5012,8 @@ sub use_modish
 			{
 				print $tee "rm -f $to/rad/*\n";
 				`rm -f $to/rad/*`;
-				print $tee "perl ./Modish.pm $to/cfg/$fileconfig $zonenumber  @surfaces \r\n";
-				`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber  @surfaces `;
+				print $tee "perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces \r\n";
+				`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
 				#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
 				#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
 				

@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Auth::Elasticsearch;
-{
-  $Mojito::Auth::Elasticsearch::VERSION = '0.24';
-}
+$Mojito::Auth::Elasticsearch::VERSION = '0.25';
 use Moo;
 use Mojito::Page::CRUD::Elasticsearch;
 use List::Util qw/first/;
@@ -11,7 +9,7 @@ with('Mojito::Role::DB::Elasticsearch');
 
 =head1 Name
 
-Mojito::Auth::ES - authentication delegatee class for Elasticsearch
+Mojito::Auth::Elasticsearch - authentication delegatee class for Elasticsearch
 
 =cut
 

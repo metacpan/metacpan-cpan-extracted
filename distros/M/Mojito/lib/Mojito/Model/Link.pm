@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Model::Link;
-{
-  $Mojito::Model::Link::VERSION = '0.24';
-}
+$Mojito::Model::Link::VERSION = '0.25';
 use Moo;
 use Mojito::Model::Doc;
 use Mojito::Collection::Present;

@@ -3,6 +3,10 @@ Revision history for Perl module Mail::Run::Crypt
 This project began life as a monolithic Perl script. It does much the
 same thing now but it's refactored out into an application and a module.
 
+0.10 2017-12-04
+
+ - Switch to translatable shebang for binscript
+
 0.09 2017-10-27
 
  - Use warn/die as appropriate, rather than carp/croak.

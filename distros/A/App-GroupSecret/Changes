@@ -1,0 +1,17 @@
+Revision history for groupsecret.
+
+0.302     2017-12-02 11:28:57-07:00 MST7MDT
+
+  * Documentation fixes.
+  * Documented the ansible-vault use case.
+
+0.301     2017-11-30 20:46:23-07:00 MST7MDT
+
+  * Add support for ssh-keygen versions that don't have the -E fag.
+  * Explicitly use sha256 digest for aes-256-cbc passphrase.
+
+0.300     2017-11-29 23:54:31-07:00 MST7MDT
+
+  * First release.
+  * Command-line interface is stable.
+

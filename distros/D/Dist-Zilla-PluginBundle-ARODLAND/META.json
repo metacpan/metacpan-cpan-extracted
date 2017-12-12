@@ -56,8 +56,8 @@
          "web" : "http://github.com/arodland/Dist-Zilla-PluginBundle-ARODLAND"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_authority" : "cpan:ARODLAND",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

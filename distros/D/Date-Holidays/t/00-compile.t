@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 18;
+plan tests => 19;
 
 my @module_files = (
     'Date/Holidays.pm',
@@ -22,6 +22,7 @@ my @module_files = (
     'Date/Holidays/Adapter/GB.pm',
     'Date/Holidays/Adapter/JP.pm',
     'Date/Holidays/Adapter/KR.pm',
+    'Date/Holidays/Adapter/KZ.pm',
     'Date/Holidays/Adapter/LOCAL.pm',
     'Date/Holidays/Adapter/NO.pm',
     'Date/Holidays/Adapter/PL.pm',

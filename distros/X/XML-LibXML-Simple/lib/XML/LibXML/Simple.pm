@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package XML::LibXML::Simple;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '0.99';
 
 use base 'Exporter';
 
@@ -26,7 +26,7 @@ use Data::Dumper;  #to be removed
 my %known_opts = map +($_ => 1),
   qw(keyattr keeproot forcecontent contentkey noattr searchpath
      forcearray grouptags nsexpand normalisespace normalizespace
-     valueattr nsstrip parser parseropts hooknodes);
+     valueattr nsstrip parser parseropts hooknodes suppressempty);
 
 my @default_attributes  = qw(name key id);
 my $default_content_key = 'content';
@@ -314,7 +314,9 @@ sub collapse($$)
         if($hooks && (my $hook = $hooks->{$child->unique_key}))
              { $v = $hook->($child) }
         else { $v = $self->collapse($child, $opts) }
-        defined $v or next CHILD;
+
+		next CHILD
+        	if ! defined $v && $opts->{suppressempty};
 
         my $name
           = $opts->{nsexpand} ? _expand_name($child)
@@ -375,6 +377,12 @@ sub collapse($$)
         if keys %data == 1
         && exists $data{anon}
         && ref $data{anon} eq 'ARRAY';
+
+    # Suppress empty elements?
+    if(! keys %data && exists $opts->{suppressempty}) {
+		my $sup = $opts->{suppressempty};
+        return +(defined $sup && $sup eq '') ? '' : undef;
+    }
 
     # Roll up named elements with named nested 'value' attributes
     if(my $va = $opts->{valueattrlist})

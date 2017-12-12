@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "AnyEvent" => "7.14",
     "Carp" => 0,
     "Coro" => "6.514",
-    "Moo" => 0,
+    "List::Util" => 0,
     "Scalar::Util" => 0,
     "common::sense" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "Coro" => "6.514",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Moo" => 0,
+  "List::Util" => 0,
   "Scalar::Util" => 0,
   "Test2::Bundle::Extended" => 0,
   "Test::More" => 0,

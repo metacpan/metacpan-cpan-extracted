@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.24 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.25 {
   
   use 5.014;
   use Moose;
@@ -268,6 +268,10 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.24 {
                             q{},
                             q{script:},
                             q{  - dzil test -v},
+                            q{},
+                            q{env:},
+                            q{  global:},
+                            q{    - PERL_USE_UNSAFE_INC=0},
       ),
     });
   
@@ -549,7 +553,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 DESCRIPTION
 

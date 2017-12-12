@@ -1,3 +1,6 @@
+Version 0.03: 2017-12-09
+  * Fix line wrapping for "Subcommands available" list
+
 Version 0.02: 2017-09-30
   * Add missing prereq: Path::Tiny
 

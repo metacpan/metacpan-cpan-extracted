@@ -44,7 +44,7 @@ Catalyst::ActionRole::OAuth2::AuthToken::ViaAuthGrant - Authorization token prov
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 SYNOPSIS
 

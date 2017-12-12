@@ -1,0 +1,10 @@
+Revision history for Perl extension Slob.
+
+0.001 2017-12-09T20:39+02:00
+ - First stable release
+ - Add lzma2 compression support
+ - Add a convenience method seek_and_read_ref_and_data
+ - Write documentation
+
+0.000_001 2017-11-30T21:45+00:00
+ - Initial release

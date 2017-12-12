@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -18,6 +18,7 @@
 
 # math-image --path=QuintetReplicate --lines --scale=10
 # math-image --path=QuintetReplicate --output=numbers --all
+# math-image --path=QuintetReplicate,numbering_type=rotate --output=numbers --all
 # math-image --path=QuintetReplicate --expression='5**i'
 
 package Math::PlanePath::QuintetReplicate;
@@ -25,7 +26,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -38,13 +39,32 @@ use Math::PlanePath::Base::Digits
   'digit_join_lowtohigh';
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
+
+use constant parameter_info_array =>
+  [ { name            => 'numbering_type',
+      display         => 'Numbering',
+      share_key       => 'numbering_type_rotate',
+      type            => 'enum',
+      default         => 'fixed',
+      choices         => ['fixed','rotate'],
+      choices_display => ['Fixed','Rotate'],
+      description     => 'Fixed or rotating sub-part numbering.',
+    },
+  ];
 
 use constant n_start => 0;
 use constant xy_is_visited => 1;
 use constant x_negative_at_n => 3;
 use constant y_negative_at_n => 4;
+
+#------------------------------------------------------------------------------
+sub new {
+  my $self = shift->SUPER::new (@_);
+  $self->{'numbering_type'} ||= 'fixed';  # default
+  return $self;
+}
 
 #     10        7
 #         2  8  5  6
@@ -57,6 +77,28 @@ use constant y_negative_at_n => 4;
 # my @digit_to_yby = (0,0,1,0,-1);
 #     $x += $bx * $digit_to_xbx[$digit] + $by * $digit_to_xby[$digit];
 #     $y += $bx * $digit_to_ybx[$digit] + $by * $digit_to_yby[$digit];
+
+sub _digits_rotate_lowtohigh {
+  my ($aref) = @_;
+  my $rot = 0;
+  foreach my $digit (reverse @$aref) {  # high to low
+    if ($digit) {
+      $rot += $digit-1;
+      $digit = ($rot % 4) + 1;  # mutate $aref
+    }
+  }
+}
+sub _digits_unrotate_lowtohigh {
+  my ($aref) = @_;
+  my $rot = 0;
+  foreach my $digit (reverse @$aref) {   # high to low
+    if ($digit) {
+      $digit = ($digit-1-$rot) % 4;  # mutate $aref
+      $rot += $digit;
+      $digit++;
+    }
+  }
+}
 
 sub n_to_xy {
   my ($self, $n) = @_;
@@ -86,7 +128,11 @@ sub n_to_xy {
   my $x = my $y = my $by = ($n * 0); # inherit bignum 0
   my $bx = $x+1; # inherit bignum 1
 
-  foreach my $digit (digit_split_lowtohigh($n,5)) {
+  my @digits = digit_split_lowtohigh($n,5);
+  if ($self->{'numbering_type'} eq 'rotate') {
+    _digits_rotate_lowtohigh(\@digits);
+  }
+  foreach my $digit (@digits) {
     ### $digit
     ### $bx
     ### $by
@@ -161,6 +207,9 @@ sub xy_to_n {
     ($x,$y) = ((2*$x + $y) / 5,
                (2*$y - $x) / 5);
   }
+  if ($self->{'numbering_type'} eq 'rotate') {
+    _digits_unrotate_lowtohigh(\@n);
+  }
   return digit_join_lowtohigh (\@n, 5, $zero);
 }
 
@@ -224,6 +273,47 @@ sub n_to_level {
 
 
 #------------------------------------------------------------------------------
+
+# Return true if $n is on the boundary of $level.
+#
+sub _UNDOCUMENTED__n_is_boundary_level {
+  my ($self, $n, $level) = @_;
+
+  ### _UNDOCUMENTED__n_is_boundary_level(): "n=$n"
+
+  my @digits = digit_split_lowtohigh($n,5);
+  ### @digits
+  if ($self->{'numbering_type'} eq 'fixed') {
+    _digits_unrotate_lowtohigh(\@digits);
+    ### @digits
+  }
+
+  # no high 0 digit (and nothing too big)
+  if (@digits != $level) {
+    return 0;
+  }
+
+  # no 0 digit anywhere else
+  if (grep {$_==0} @digits) {
+    return 0;
+  }
+
+  # skip high digit and all 1 digits
+  pop @digits;
+  @digits = grep {$_ != 1} @digits;
+
+  for (my $i = 0; $i < $#digits; $i++) {  # low to high
+    if (($digits[$i+1] == 3 && $digits[$i] <= 3)        # 33, 32
+        || ($digits[$i+1] == 4 && $digits[$i] == 4)) {  # 44
+      ### no, pair at: $i
+      return 0;
+    }
+  }
+  return 1;
+}
+
+
+#------------------------------------------------------------------------------
 1;
 __END__
 
@@ -270,7 +360,7 @@ The base pattern is a "+" shape
     | 3 | 0 | 1 |
     +---+---+---+
         | 4 |
-        +---+
+        +---+      
 
 which is then replicated
 
@@ -291,8 +381,16 @@ which is then replicated
                +--+
 
 The effect is to tile the whole plane.  Notice the centres 0,5,10,15,20 are
-the same "+" shape but rotated around by an angle atan(1/2)=26.565 degrees,
-as noted below.
+the same "+" shape but positioned around at angle atan(1/2)=26.565 degrees.
+The relative positioning in each of those parts is the same, so at 5 the
+successive 6,7,8,9 are E,N,W,S like the base shape.
+
+=cut
+
+# not in OEIS: 26.565051177077989351
+# not A242723 which starts 116.565
+
+=pod
 
 =head2 Complex Base
 
@@ -324,9 +422,9 @@ where each digit position factor a[i] corresponds to N digits
 
 =pod
 
-The base b is at an angle atan(1/2) = 26.56 degrees as seen at N=5 above.
-Successive powers b^2, b^3, b^4 etc at N=5^level rotate around by that much
-each time.
+The base b is at an angle arg(b) = atan(1/2) = 26.56 degrees as seen at N=5
+above.  Successive powers b^2, b^3, b^4 etc at N=5^level rotate around by
+that much each time.
 
     Npow = 5^level  at b^level
     angle(Npow) = level*26.56 degrees
@@ -354,6 +452,70 @@ each time.
 # A073000  atan(1/2) radians = 0.463...
 
 =pod
+
+The path can be reckoned bottom-up as a new low digit of N expanding each
+unit square to the base "+" shape.
+
+                             +---C      
+    D-------C                | 2 |      
+    |       |            D---+---+---+  
+    |       |     =>     | 3 | 0 | 1 |  
+    |       |            +---+---+---B  
+    A-------B                | 4 |      
+                             A---+      
+
+Side A-B becomes a 3-segment S.  Such an expansion is the same as the
+TerdragonCurve or GosperSide, but here turns of 90 degrees.  Like GosperSide
+there is no touching or overlap of the sides expansions, so boundary length
+4*3^level.
+
+=head2 Rotate Numbering
+
+Parameter C<numbering_type =E<gt> 'rotate'> applies a rotation to the
+numbering in each sub-part according to its location around the preceding
+level.
+
+The effect can be illustrated by writing N in base-5.  Part 10-14 is the
+same as the middle 0-4.  Part 20-24 has a rotation by +90 degrees.  Part
+30-34 has rotation by +180 degrees, and part 40-44 by +270 degrees.
+
+            21
+          /  |                   
+        22  20  24      12           numbering_type => 'rotate' 
+          \    /      /    \             N shown in base-5
+            23   2  13  10--11
+               /   \   \
+        34   3   0-- 1  14
+           \   \  
+    31--30  33   4  41
+      \    /       /   \
+        32      43  40  42
+                     | /
+                    41
+
+=cut
+
+# cf
+# math-image --path=QuintetReplicate,numbering_type=rotate --output=numbers --all
+
+=pod
+
+Notice this means in each part the 11, 21, 31, etc, points are directed
+away from the middle in the same way, relative to the sub-part locations.
+
+Working through the expansions gives the following rule for when an N is
+on the boundary of level k,
+
+    write N in base-5 digits  (empty string if k=0)
+    if length < k then non-boundary
+    ignore high digit and all 1 digits
+    if any pair 32, 33, 44 then non-boundary
+
+A 0 digit is the middle of a block, so always non-boundary.  After that the
+4,1,2,3 parts variously expand with rotations so that a 44 is enclosed on
+the clockwise side and 32 and 33 on the anti-clockwise side.
+
+=cut
 
 =head1 FUNCTIONS
 
@@ -384,7 +546,7 @@ Return C<(0, 5**$level - 1)>.
 
 =head1 FORMULAS
 
-=head2 Rotations
+=head2 Axis Rotations
 
 The digits positions 1,2,3,4 go around +90deg each, so the N for rotation by
 +90 is each digit +1, cycling around.
@@ -561,7 +723,7 @@ mod giving 0 to 3),
 The +1/2 is since initial direction b^0=1 is angle 0 which is half way
 between -45 and +45 deg.
 
-Similarly the location, using -i for rotation back
+Similarly the X,Y location, using -i for rotation back
 
     z_xmax_exp(j) = floor(F*j+1/2)
                   = 0,0,1,1,1,1,2,2,2,3,3,3,4,4,4,4,5,5, ...
@@ -678,7 +840,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

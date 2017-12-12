@@ -85,22 +85,19 @@ all one element for each error message.
 In addition to the methods listed in this module, you can call these Redis
 methods on C<$self>:
 
-append, echo, decr, decrby,
-del, exists, expire, expireat, get, getbit,
-getrange, getset, hdel, hexists, hget, hgetall,
-hincrby, hkeys, hlen, hmget, hmset, hset,
-hsetnx, hvals, incr, incrby, keys, lindex,
-linsert, llen, lpop, lpush, lpushx, lrange,
-lrem, lset, ltrim, mget, move, mset,
-msetnx, persist, ping, publish, randomkey, rename,
-renamenx, rpop, rpoplpush, rpush, rpushx, sadd,
-scard, sdiff, sdiffstore, set, setbit, setex,
-setnx, setrange, sinter, sinterstore, sismember, smembers,
-smove, sort, spop, srandmember, srem, strlen,
-sunion, sunionstore, ttl, type, zadd, zcard,
-zcount, zincrby, zinterstore, zrange, zrangebyscore, zrank,
-zrem, zremrangebyrank, zremrangebyscore, zrevrange, zrevrangebyscore, zrevrank,
-zscore and zunionstore.
+append, bitcount, bitop, bitpos, decr, decrby, del, echo, eval, evalsha, exists,
+expire, expireat, geoadd, geodist, geohash, geopos, georadius, georadiusbymember,
+get, getbit, getrange, getset, hdel, hexists, hget, hgetall, hincrby, hincrbyfloat,
+hkeys, hlen, hmget, hmset, hset, hsetnx, hstrlen, hvals, incr, incrby, incrbyfloat,
+keys, lindex, linsert, llen, lpop, lpush, lpushx, lrange, lrem, lset, ltrim, mget,
+move, mset, msetnx, persist, pexpire, pexpireat, pfadd, pfcount, pfmerge, ping,
+psetex, pttl, publish, randomkey, rename, renamenx, rpop, rpoplpush, rpush, rpushx,
+sadd, scard, sdiff, sdiffstore, set, setbit, setex, setnx, setrange, sinter,
+sinterstore, sismember, smembers, smove, sort, spop, srandmember, srem, strlen,
+sunion, sunionstore, ttl, type, zadd, zcard, zcount, zincrby, zinterstore, zlexcount,
+zrange, zrangebylex, zrangebyscore, zrem, zremrangebylex, zremrangebyrank,
+zremrangebyscore, zrank, zrevrange, zrevrangebylex, zrevrangebyscore, zrevrank,
+zscore, zunionstore
 
 =head2 execute
 

@@ -74,9 +74,9 @@ MAIN:{
 			Output_log		=> $debug ? $switch.'.out' : undef,
 			Dump_log		=> $debug ? $switch.'.dump' : undef,
 			Blocking		=> 0,
-	       		Debug			=> $debug,
-	       		Errmode			=> 'return',	# Always return on error
-	       		Errmsg_format		=> 'terse',
+			Debug			=> $debug,
+			Errmode			=> 'return',	# Always return on error
+			Errmsg_format		=> 'terse',
 		);
 		print " - $switch\n";
 	}

@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::JSON::XS;
-$Catalyst::Action::Serialize::JSON::XS::VERSION = '1.20';
+$Catalyst::Action::Serialize::JSON::XS::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 BEGIN {

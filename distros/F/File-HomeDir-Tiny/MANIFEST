@@ -1,0 +1,10 @@
+Changes
+lib/File/HomeDir/Tiny.pm
+lib/File/HomeDir/Tiny.pod
+Makefile.PL
+MANIFEST
+README
+t/home.t
+t/win32.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

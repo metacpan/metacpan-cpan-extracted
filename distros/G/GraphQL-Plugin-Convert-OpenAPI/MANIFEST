@@ -5,9 +5,14 @@ MANIFEST			This list of files
 README.md
 t/00-compile.t
 t/00-report-prereqs.t
+t/01-corpus.json
+t/01-execute.t
 t/01-schema.t
-t/02-execute.t
-t/cpantesters-v3.json
+t/03-corpus.json
+t/03-schema.t
+t/04-corpus.json
+t/04-execute.t
+t/04-schema.t
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

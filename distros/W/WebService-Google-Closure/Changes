@@ -1,5 +1,11 @@
 Revision history for WebService-Google-Closure
 
+0.13    1 Dec 2017
+        - Require env var set to run integration test
+
+0.12    30 Nov 2017
+        - Use HTTPS to access the closure compiler
+        
 0.11    27 Dec 2015
         - Fix bad code test, following change by Google [RT#110454]
           Thanks to SREZIC for reporting

@@ -4,7 +4,7 @@
       "Marco Fontani"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Any::Moose" : "0",
             "Digest::HMAC_SHA1" : "0",
             "FindBin" : "0",
             "Getopt::Long" : "0",
@@ -36,18 +35,46 @@
             "HTTP::Request" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
+            "Moo" : "0",
             "Pod::Usage" : "0",
+            "Types::Standard" : "0",
             "XML::Bare" : "0",
             "lib" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
+      }
+   },
+   "provides" : {
+      "Net::Amazon::Route53" : {
+         "file" : "lib/Net/Amazon/Route53.pm",
+         "version" : "0.173450"
+      },
+      "Net::Amazon::Route53::Change" : {
+         "file" : "lib/Net/Amazon/Route53/Change.pm",
+         "version" : "0.173450"
+      },
+      "Net::Amazon::Route53::HostedZone" : {
+         "file" : "lib/Net/Amazon/Route53/HostedZone.pm",
+         "version" : "0.173450"
+      },
+      "Net::Amazon::Route53::ResourceRecordSet" : {
+         "file" : "lib/Net/Amazon/Route53/ResourceRecordSet.pm",
+         "version" : "0.173450"
+      },
+      "Net::Amazon::Route53::ResourceRecordSet::Change" : {
+         "file" : "lib/Net/Amazon/Route53/ResourceRecordSet/Change.pm",
+         "version" : "0.173450"
       }
    },
    "release_status" : "stable",
@@ -61,6 +88,7 @@
          "web" : "https://github.com/mfontani/Net-Amazon-Route53"
       }
    },
-   "version" : "0.160530"
+   "version" : "0.173450",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

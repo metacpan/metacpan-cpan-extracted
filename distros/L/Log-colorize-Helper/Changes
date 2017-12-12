@@ -1,0 +1,8 @@
+Revision history for Log-Colorize-Helper
+
+0.1.0	 2017-12-04/19:00
+		 -Now uses tail with -F.
+
+0.0.0	 2017-08-15/06:30
+		 -Initial release.
+

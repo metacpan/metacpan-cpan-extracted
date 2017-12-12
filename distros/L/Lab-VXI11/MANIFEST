@@ -1,6 +1,5 @@
 Changes
 lib/Lab/VXI11.pm
-main
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

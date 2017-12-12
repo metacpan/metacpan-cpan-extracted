@@ -4,27 +4,22 @@
 
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More;
 use Errno qw(ENOENT);
 
 use WebService::Google::Closure;
 
-# Make sure we can get to the service before we proceed
-SKIP: {
-    eval {
-        WebService::Google::Closure->new(
-            js_code => 'alert("foo")',
-        )->compile;
-    };
-    skip "Skipping integration tests - $@", 1 if $@;
-    ok(1,"Can connect to the Google API");
-
-    test_with_code();
-    test_with_code_fail();
-
-    test_with_file();
-    test_with_file_fail();
+if( defined $ENV{ INTEGRATION_TEST } ) {
+    plan tests => 19;
+} else {
+    plan skip_all => 'To run integration test, set env var INTEGRATION_TEST=1';
 }
+
+test_with_code();
+test_with_code_fail();
+
+test_with_file();
+test_with_file_fail();
 
 sub test_with_code {
 

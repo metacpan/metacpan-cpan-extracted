@@ -164,7 +164,6 @@ lib/Pcore/Util/Hash/Multivalue.pm
 lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm
-lib/Pcore/Util/Mail.pm
 lib/Pcore/Util/PM.pm
 lib/Pcore/Util/PM/Proc.pm
 lib/Pcore/Util/Path.pm

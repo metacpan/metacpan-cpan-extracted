@@ -3,7 +3,7 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -35,6 +35,12 @@
             "Mojolicious" : "7.50",
             "Protocol::Redis" : "1.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Sort::Versions" : "1.5",
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -44,9 +50,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/mojo-redis2",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/mojo-redis2.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-redis2.git",
+         "web" : "https://github.com/jhthorsen/mojo-redis2"
       }
    },
-   "version" : "0.29",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

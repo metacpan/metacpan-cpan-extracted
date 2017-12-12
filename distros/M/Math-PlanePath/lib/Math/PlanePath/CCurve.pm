@@ -22,7 +22,7 @@ use strict;
 use List::Util 'min','max','sum';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',

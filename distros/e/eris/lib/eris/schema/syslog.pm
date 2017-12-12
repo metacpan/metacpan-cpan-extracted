@@ -9,7 +9,7 @@ with qw(
     eris::role::schema
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_priority { 100 }
@@ -33,12 +33,26 @@ eris::schema::syslog - Schema for the syslog data
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
 Simple syslog schema.  Matches all logs and will index them into
 the B<index_name> specified or C<syslog-%Y.%m.%d> if not provided.
+
+If you'd like to enable the debugging dictionary on this schema, add the
+following to your C<config.yaml>.
+
+    ---
+    schemas:
+      config:
+        syslog:
+          dictionaries:
+            config:
+              eris::debug: { enabled: 1 }
+
+This will index the fields contained in the L<eris::dictionary::eris::debug>
+dictionary.
 
 =head1 PROPERTIES
 

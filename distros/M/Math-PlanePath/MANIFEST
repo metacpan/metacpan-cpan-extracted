@@ -340,6 +340,7 @@ t/Flowsnake.t
 t/FlowsnakeCentres.t
 t/GcdRationals.t
 t/GosperIslands.t
+t/GosperReplicate.t
 t/GosperSide.t
 t/GrayCode.t
 t/GreekKeySpiral.t
@@ -380,6 +381,7 @@ t/QuadricCurve.t
 t/QuadricIslands.t
 t/QuintetCentres.t
 t/QuintetCurve.t
+t/QuintetReplicate.t
 t/RationalsTree.t
 t/Rows-load.t
 t/Rows.t
@@ -389,6 +391,7 @@ t/SierpinskiArrowheadCentres.t
 t/SierpinskiCurve.t
 t/SierpinskiCurveStair.t
 t/SierpinskiTriangle.t
+t/SquareReplicate.t
 t/SquareSpiral.t
 t/Staircase.t
 t/StaircaseAlternating.t

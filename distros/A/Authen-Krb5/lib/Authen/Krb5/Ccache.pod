@@ -1,0 +1,69 @@
+# PODNAME: Authen::Krb5::Ccache
+# ABSTRACT: Kerberos 5 credentials cache object.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Authen::Krb5::Ccache - Kerberos 5 credentials cache object.
+
+=head1 VERSION
+
+version 1.905
+
+=head1 METHODS
+
+=head2 C<initialize(p)>
+
+Creates/refreshes a credentials cache for the primary principal 'p'.  If the
+cache already exists, its contents are destroyed.
+
+=head2 C<store_cred(creds)>
+
+Stores the given credentials, which should be an Authen::Krb5::Creds object
+as returned from get_init_creds_password() or get_init_creds_keytab(), in
+the cache.
+
+=head2 C<get_name>
+
+Returns the name of the credentials cache.
+
+=head2 C<get_principal>
+
+Returns the primary principal of the credentials cache.
+
+=head2 C<destroy>
+
+Destroys the credentials cache and releases all resources it used.
+
+=head2 C<start_seq_get()>
+
+Returns a cursor that can be passed to I<next_cred()> to read in turn
+every credential in the cache.
+
+=head2 C<next_cred(cursor)>
+
+Returns the next credential in the cache as an Authen::Krb5::Creds
+object.
+
+=head2 C<end_seq_get(cursor)>
+
+Perform cleanup opreations after I<next_cred()> and invalidates
+I<cursor>.
+
+=head1 AUTHOR
+
+Jeff Horwitz <jeff@smashing.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Jeff Horwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

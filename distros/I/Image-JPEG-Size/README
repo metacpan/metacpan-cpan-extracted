@@ -1,0 +1,80 @@
+NAME
+    Image::JPEG::Size - find the size of JPEG images
+
+SYNOPSIS
+        use Image::JPEG::Size;
+
+        my $jpeg_sizer = Image::JPEG::Size->new;
+        my ($width, $height) = $jpeg_sizer->file_dimensions($filename);
+
+DESCRIPTION
+    This module uses libjpeg to rapidly determine the size of one or more
+    JPEG images.
+
+CONSTRUCTOR
+    First create an instance of the class:
+
+        my $jpeg_sizer = Image::JPEG::Size->new;
+
+    The constructor initialises internal libjpeg structures; if that fails,
+    an exception is thrown.
+
+    The constructor takes attributes as either a hash reference or a
+    listified hash. Unknown attributes are ignored. The following attributes
+    are understood:
+
+    "error"
+        Specifies the action to take on encountering a non-recoverable error
+        in an image; see "ERROR HANDLING". Defaults to "fatal".
+
+    "warning"
+        Specifies the action to take on encountering a recoverable error in
+        an image; see "ERROR HANDLING". Defaults to "warn".
+
+METHODS
+  "file_dimensions"
+    You can repeatedly call "file_dimensions" in list context to find the
+    width and height of your JPEG images:
+
+        my ($width, $height) = $jpeg_sizer->file_dimensions($filename);
+
+    For now, the JPEG images must be supplied as a filename.
+
+  "file_dimensions_hash"
+    In some cases, you may prefer to get the image dimensions as a hash. The
+    "file_dimensions_hash" takes a single filename argument, and returns a
+    listified hash with keys "width" and "height".
+
+ERROR HANDLING
+    By default, recoverable errors in the image are reported using Perl's
+    warning mechanism, and non-recoverable errors cause an exception to be
+    thrown. However, this behaviour can be changed when creating an
+    Image::JPEG::Size instance. The options are:
+
+    "fatal"
+        Throw an exception with information about the error, and stop
+        processing this image immediately.
+
+    "warn"
+        Emit a Perl warning with information about the error. If the error
+        is non-recoverable, image processing stops immediately, and its
+        dimensions are reported as 0×0 pixels.
+
+    "quiet"
+        Suppress the error entirely. If the error is non-recoverable, image
+        processing stops immediately, and its dimensions are reported as 0×0
+        pixels.
+
+AUTHOR
+    Aaron Crane, <arc@cpan.org>
+
+    The initial development of this module was sponsored by Science Photo
+    Library <https://www.sciencephoto.com/>.
+
+COPYRIGHT
+    Copyright 2017 Aaron Crane.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

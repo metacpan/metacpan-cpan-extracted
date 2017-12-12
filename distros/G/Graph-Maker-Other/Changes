@@ -17,6 +17,12 @@ along with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 10, December 2017
+    - fix QuartetTree perl-5.10-ism
+
+Version 9, December 2017
+    - new QuartetTree
+
 Version 8, October 2017
     - new RookGrid
 

@@ -1,5 +1,5 @@
 package Log::Log4perl::Appender::Chunk;
-$Log::Log4perl::Appender::Chunk::VERSION = '0.012';
+$Log::Log4perl::Appender::Chunk::VERSION = '0.013';
 use Moose;
 
 use Carp;

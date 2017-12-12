@@ -96,16 +96,16 @@
             "Filter::Crypto" : "0",
             "Guard" : "0",
             "HTML::Entities" : "0",
+            "HTML::TreeBuilder::LibXML" : "v0.26.0",
             "HTTP::Date" : "0",
-            "HTTP::Message" : "0",
-            "HTTP::Parser::XS" : "0",
+            "HTTP::Message" : "v6.13.0",
+            "HTTP::Parser::XS" : "v0.17.0",
             "Import::Into" : "0",
             "Inline" : "0",
             "Inline::C" : "0",
             "List::AllUtils" : "0",
             "List::Util::XS" : "0",
             "MIME::Base64" : "0",
-            "Mail::IMAPClient" : "0",
             "Module::CPANfile" : "0",
             "Moo" : "0",
             "MooX::TypeTiny" : "0",
@@ -159,6 +159,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.56.3",
+   "version" : "v0.56.4",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

@@ -4,7 +4,7 @@ package Test::Class::Moose::Report;
 
 use 5.10.0;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 use Carp;
 use Moose;
@@ -33,7 +33,7 @@ has test_classes => (
 
 sub num_test_instances {
     my $self = shift;
-    return sum map { $_->num_test_instances } $self->all_test_classes;
+    return sum0 map { $_->num_test_instances } $self->all_test_classes;
 }
 
 sub num_test_methods {
@@ -144,7 +144,7 @@ Test::Class::Moose::Report - Test information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

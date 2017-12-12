@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Ipc;
@@ -32,11 +32,6 @@ L<Prty::Hash>
 
     $vid = $class->new($file,@opt);
 
-=head4 Description
-
-Instantiiere ein Video-Datei-Objekt und liefere eine Referenz auf
-dieses Objekt zurück.
-
 =head4 Options
 
 =over 4
@@ -46,6 +41,11 @@ dieses Objekt zurück.
 Gib das ffprobe-Kommando auf STDOUT aus.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Video-Datei-Objekt und liefere eine Referenz auf
+dieses Objekt zurück.
 
 =cut
 
@@ -360,7 +360,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

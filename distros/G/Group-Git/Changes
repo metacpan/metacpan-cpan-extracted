@@ -1,5 +1,12 @@
 Revision history for Group-Git
 
+0.6.6   2017-12-04
+        Updating for release of version 0.6.6
+        Adding support for github one-time-passwords (Ivan Wills)
+        Better idea add new line to end of state and leave default alone (Ivan Wills)
+        Adding final new line to output (Ivan Wills)
+        Fixed unrenamed method from file copy (Ivan Wills)
+
 0.6.5   2017-10-16
         Updating for release of version 0.6.5
         Updating Test::Warnings for Windows frendly version (Ivan Wills)

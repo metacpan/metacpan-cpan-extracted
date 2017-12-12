@@ -7,7 +7,7 @@ use parent 'Perl::Critic::Policy';
 use Perl::Critic::Utils qw{ :severities };
 use Readonly;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 Readonly::Scalar my $DESC => q{Switch statement keywords used};
 Readonly::Scalar my $EXPL => q{Avoid using switch statement keywords};
@@ -25,6 +25,7 @@ sub default_themes {
 }
 
 sub applies_to {
+
     # PPI::Statement and PPI::Structure works for (given|when|default),
     # yet do not for CORE::(given|when|default)
     return 'PPI::Token';
@@ -33,8 +34,17 @@ sub applies_to {
 sub violates {
     my ( $self, $elem, undef ) = @_;
 
-    return if $elem !~ m{^(CORE::)?(given|when|default)$};
-    return $self->violation( $DESC, $EXPL, $elem );
+    return $self->violation( $DESC, $EXPL, $elem )
+        if ( $elem->parent->class eq 'PPI::Statement::Given'
+        || $elem->parent->class eq 'PPI::Statement::When' )
+        && $elem->class eq 'PPI::Token::Word';
+
+    return $self->violation( $DESC, $EXPL, $elem )
+        if $elem->parent->class eq 'PPI::Statement'
+        && $elem->content =~ m{CORE::(?:given|when|default)}
+        && $elem->class eq 'PPI::Token::Word';
+
+    return;
 }
 
 1;

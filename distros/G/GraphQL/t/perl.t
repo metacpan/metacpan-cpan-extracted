@@ -93,4 +93,43 @@ subtest 'test convert plugin' => sub {
   );
 };
 
+subtest 'multi-line description' => sub {
+  my $doc = <<'EOF';
+type Query {
+  # first line
+  #
+  # second bit
+  hello: String
+}
+EOF
+  my $got = eval { GraphQL::Schema->from_doc($doc)->to_doc };
+  SKIP: {
+    if ($@) {
+      is ref($@) ? $@->message : $@, '';
+      skip 1;
+    }
+    is $got, $doc;
+  }
+};
+
+subtest 'list of enum as arg' => sub {
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+enum E {
+  available
+  pending
+}
+
+type Query {
+  hello(arg: [E]): String
+}
+EOF
+  run_test([
+    $schema, '{hello(arg: [available])}', {
+      hello => sub { 'Hello, '.shift->{arg}[0] }
+    }
+  ],
+    { data => { hello => 'Hello, available' } },
+  );
+};
+
 done_testing;

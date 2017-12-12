@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-11-24'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,6 +12,14 @@ use Perinci::CmdLine::Any;
 
 our %SPEC;
 
+my %Canonical_Currencies = (
+    # the JSON API/TAPI still uses STR instead of XLM for Stellar Lumens
+    str => 'xlm',
+);
+my %Rev_Canonical_Currencies = (
+    xlm => 'str',
+);
+
 my @Market_Pairs = (
     'btc_idr',
     'bch_idr',
@@ -19,6 +27,7 @@ my @Market_Pairs = (
     'eth_idr',
     'etc_idr',
     'ltc_idr',
+    'nxt_idr',
     'waves_idr',
     'xlm_idr',
     'xrp_idr',
@@ -174,6 +183,16 @@ sub _init {
         (key    => $args->{key}   ) x !!(defined $args->{key}),
         (secret => $args->{secret}) x !!(defined $args->{secret}),
     );
+}
+
+sub _convert_pair {
+    my $pair = shift;
+    my ($cur1, $cur2) = $pair =~ /\A(\w{3,5})_(\w{3,5})\z/
+        or return $pair;
+    for ($cur1, $cur2) {
+        $_ = $Rev_Canonical_Currencies{$_} // $_;
+    }
+    "${cur1}_$cur2";
 }
 
 $SPEC{':package'} = {
@@ -339,12 +358,13 @@ sub balance {
     my @recs;
     my @idr_markets;
     my @btc_markets;
-    for my $currency (sort keys %{$res->{return}{balance}}) {
+    for my $currency0 (sort keys %{$res->{return}{balance}}) {
+        my $currency = $Canonical_Currencies{$currency0} // $currency0;
         my $rec = {};
         $rec->{currency} = $currency;
-        $rec->{bal_avail} = $res->{return}{balance}{$currency} // 0;
-        $rec->{bal_held}  = $res->{return}{balance_hold}{$currency} // 0;
-        $rec->{bal_total} = ($res->{return}{balance}{$currency} // 0) + ($res->{return}{balance_hold}{$currency} // 0);
+        $rec->{bal_avail} = $res->{return}{balance}{$currency0} // 0;
+        $rec->{bal_held}  = $res->{return}{balance_hold}{$currency0} // 0;
+        $rec->{bal_total} = ($res->{return}{balance}{$currency0} // 0) + ($res->{return}{balance_hold}{$currency0} // 0);
         if ($currency eq 'idr') {
             # do nothing
         } elsif (grep {$currency eq $_} @Idr_Market_Currencies) {
@@ -365,16 +385,19 @@ sub balance {
         push @recs, $rec;
     }
 
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
     my %resmeta;
     if ($args{with_idr_estimates}) {
         my %idr_prices;
         for my $currency (@idr_markets) {
-            my $res = $btcindo->get_ticker(pair => "${currency}_idr");
+            my $res = $btcindo->get_ticker(pair => _convert_pair("${currency}_idr"));
             $idr_prices{$currency} = ($res->{ticker}{buy} + $res->{ticker}{sell})/2;
         }
         my %btc_prices;
         for my $currency (@btc_markets) {
-            my $res = $btcindo->get_ticker(pair => "${currency}_btc");
+            my $res = $btcindo->get_ticker(pair => _convert_pair("${currency}_btc"));
             $btc_prices{$currency} = ($res->{ticker}{buy} + $res->{ticker}{sell})/2;
         }
 
@@ -404,15 +427,30 @@ sub balance {
             $tot_held_est_idr  += $rec->{held_est_idr};
             $tot_total_est_idr += $rec->{total_est_idr};
         }
+
+        # calculate percentages
+        for my $rec (@recs) {
+            if ($tot_total_est_idr > 0) {
+                $rec->{pct_est_idr} = $rec->{total_est_idr} / $tot_total_est_idr;
+            } else {
+                $rec->{pct_est_idr} = 0;
+            }
+        }
+
         push @recs, {
             currency => 'est_idr',
             avail_est_idr => $tot_avail_est_idr,
             held_est_idr  => $tot_held_est_idr,
             total_est_idr => $tot_total_est_idr,
+            pct_est_idr   => 1,
         };
-        $resmeta{'table.fields'} = [qw/currency bal_avail price_btc price_idr avail_est_idr bal_held held_est_idr bal_total total_est_idr/];
+        $resmeta{'table.fields'}        = [qw/currency bal_avail price_btc price_idr avail_est_idr bal_held held_est_idr bal_total total_est_idr pct_est_idr/];
+        $resmeta{'table.field_aligns'}  = [qw/left     right     right     right     right         right    right        right     right         right/];
+        $resmeta{'table.field_formats'} = [undef,      undef,    $fnum8,   $fnum0,   $fnum0,       $fnum8,  $fnum0,      $fnum8,   $fnum0,       'percent'];
     } else {
-        $resmeta{'table.fields'} = [qw/currency bal_avail bal_held bal_total/];
+        $resmeta{'table.fields'}        = [qw/currency bal_avail bal_held bal_total/];
+        $resmeta{'table.field_aligns'}  = [qw/left     right     right    right/];
+        $resmeta{'table.field_formats'} = [undef,      $fnum8,   $fnum8,  $fnum8,];
     }
 
     [200, "OK", \@recs, \%resmeta];
@@ -431,9 +469,10 @@ sub hold_details {
     _init(\%args);
 
     my $currency = $args{currency};
+    my $currency0 = $Rev_Canonical_Currencies{$currency} // $currency;
     my $res = $btcindo->get_info;
-    my $bal      = $res->{return}{balance}{$currency}      // 0;
-    my $bal_held = $res->{return}{balance_hold}{$currency} // 0;
+    my $bal      = $res->{return}{balance}{$currency0}      // 0;
+    my $bal_held = $res->{return}{balance_hold}{$currency0} // 0;
 
     my @rows;
     if ($bal_held > 0) {
@@ -453,7 +492,7 @@ sub hold_details {
             my $orders;
             eval {
                 $orders = $btcindo->get_open_orders(
-                    pair => $pair,
+                    pair => _convert_pair($pair),
                 )->{return}{orders};
             };
             if ($@) {
@@ -468,6 +507,7 @@ sub hold_details {
                         pair              => $pair,
                         submit_time       => $order->{submit_time},
                         type              => $order->{type},
+                        price             => $order->{price},
                         amount            => $order->{"remain_$currency"},
                     };
                 } else {
@@ -477,6 +517,7 @@ sub hold_details {
                         pair              => $pair,
                         submit_time       => $order->{submit_time},
                         type              => $order->{type},
+                        price             => $order->{price},
                         amount            => $order->{"remain_$currency"},
                     };
                 }
@@ -491,10 +532,12 @@ sub hold_details {
     my $fnum0 = [number => {precision=>0}];
     my $fnum8 = [number => {precision=>8}];
 
+    my $fnum  = $currency eq 'idr' ? $fnum0 : $fnum8;
+
     my %resmeta;
-    $resmeta{'table.fields'}        = [qw/order_id pair submit_time type amount/];
-    $resmeta{'table.field_formats'} = [undef, undef, 'iso8601_datetime', undef, $currency eq 'idr' ? $fnum0 : $fnum8];
-    $resmeta{'table.field_aligns'}  = [qw/right    left left        left right/];
+    $resmeta{'table.fields'}        = [qw/order_id pair submit_time type price amount/];
+    $resmeta{'table.field_formats'} = [undef, undef, 'iso8601_datetime', undef, $fnum, $fnum];
+    $resmeta{'table.field_aligns'}  = [qw/right    left left        left right right/];
 
     [200, "OK", \@rows, \%resmeta];
 }
@@ -596,7 +639,7 @@ sub profit {
     #}
     # XXX if actual balance is larger?
 
-    my $res2 = $btcindo->get_ticker(pair => $args{pair});
+    my $res2 = $btcindo->get_ticker(pair => _convert_pair($args{pair}));
     my $cur_price = ($res2->{ticker}{buy} + $res2->{ticker}{sell}) / 2;
 
     [200, "OK", {
@@ -671,7 +714,7 @@ sub trade_history {
     _init(\%args);
 
     my $res = $btcindo->get_trade_history(
-        pair => $args{pair},
+        pair => _convert_pair($args{pair}),
         (since => $args{time_from}) x !!(defined $args{time_from}),
         (end   => $args{time_to}  ) x !!(defined $args{time_to}  ),
         (from_id => $args{trade_id_from}) x !!(defined $args{trade_id_from}),
@@ -718,7 +761,7 @@ sub open_orders {
         my $orders;
         eval {
             $orders = $btcindo->get_open_orders(
-                pair => $pair,
+                pair => _convert_pair($pair),
             )->{return}{orders};
         };
 
@@ -775,7 +818,7 @@ sub create_order {
     _init(\%args);
 
     my $res = $btcindo->create_order(
-        pair => $args{pair},
+        pair => _convert_pair($args{pair}),
         type => $args{type},
         price => $args{price},
         (idr => $args{idr}) x !!(defined $args{idr}),
@@ -812,7 +855,7 @@ sub cancel_order {
     } else {
         $btcindo->cancel_order(
             type => $args{type},
-            pair => $args{pair},
+            pair => _convert_pair($args{pair}),
             order_id => $args{order_id},
         );
         [200, "OK"];
@@ -854,7 +897,7 @@ sub cancel_orders {
         my $orders;
         eval {
             $orders = $btcindo->get_open_orders(
-                pair => $pair,
+                pair => _convert_pair($pair),
             )->{return}{orders};
         };
         if ($@) {
@@ -876,7 +919,7 @@ sub cancel_orders {
                 eval {
                     $btcindo->cancel_order(
                         type => $order->{type},
-                        pair => $pair,
+                        pair => _convert_pair($pair),
                         order_id => $order->{order_id},
                     );
                 };
@@ -951,7 +994,7 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.011 of btcindo (from Perl distribution App-btcindo), released on 2017-11-24.
+This document describes version 0.014 of btcindo (from Perl distribution App-btcindo), released on 2017-12-09.
 
 =head1 SYNOPSIS
 
@@ -1224,7 +1267,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1262,7 +1305,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1302,7 +1345,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -1380,7 +1423,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1424,7 +1467,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =back
 
@@ -1454,7 +1497,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -1490,7 +1533,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 

@@ -25,9 +25,14 @@ eod
     }
 }
 
-all_pod_coverage_ok ({
-	also_private => [ qr{^[[:upper:]\d_]+$}, ],
-	coverage_class => 'Pod::Coverage::CountParents'
-    });
+{
+
+    local $SIG{__WARN__} = sub {};
+
+    all_pod_coverage_ok ({
+	    also_private => [ qr{^[[:upper:]\d_]+$}, ],
+	    coverage_class => 'Pod::Coverage::CountParents'
+	});
+}
 
 1;

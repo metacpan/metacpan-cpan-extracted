@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Role::DB;
-{
-  $Mojito::Role::DB::VERSION = '0.24';
-}
+$Mojito::Role::DB::VERSION = '0.25';
 use Moo::Role;
 use Mojito::Model::Config;
 

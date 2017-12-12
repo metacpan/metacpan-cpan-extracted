@@ -145,7 +145,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -171,8 +171,8 @@ use constant parameter_info_array =>
       display         => 'Tree Type',
       type            => 'enum',
       default         => 'SB',
-      choices         => ['SB','CW','AYT','HCS','Bird','Drib','L',],
-      choices_display => ['SB','CW','AYT','HCS','Bird','Drib','L',],
+      choices         => ['SB','CW','AYT','HCS','Bird','Drib','L'],
+      choices_display => ['SB','CW','AYT','HCS','Bird','Drib','L'],
     },
   ];
 
@@ -895,7 +895,7 @@ Shen Yu-Ting, "A Natural Enumeration of Non-Negative Rational Numbers
 pages 25-29.  L<http://www.jstor.org/stable/2320374>
 
 D. N. Andreev, "On a Wonderful Numbering of Positive Rational Numbers",
-Matematicheskoe Prosveshchenie, Ser. 3, 1, 1997, pages 126-134
+Matematicheskoe Prosveshchenie, Series 3, volume 1, 1997, pages 126-134
 L<http://mi.mathnet.ru/mp12>
 
 =back
@@ -1015,6 +1015,13 @@ L<http://www.cut-the-knot.org/do_you_know/countRatsCF.shtml>
 L<http://www.dm.unito.it/~cerruti/doc-html/tremattine/tre_mattine.pdf>
 
 =back
+
+=cut
+
+# also at, but an awful site,
+# http://www.academia.edu/5233434/Numeri
+
+=pod
 
 This arises also in a radix=1 variation of Jeffrey Shallit's digit-based
 continued fraction encoding.  See L<Math::PlanePath::CfracDigits/Radix 1>.
@@ -1599,14 +1606,18 @@ L<http://oeis.org/A007305> (etc)
 
     A059893  permutation SB<->CW, AYT<->HCS, Bird<->Drib
                reverse bits below highest
-    A153153  permutation CW->AYT, reverse and un-Gray
-    A153154  permutation AYT->CW, reverse and Gray code
-    A154437  permutation AYT->Drib, Lamplighter low to high
-    A154438  permutation Drib->AYT, un-Lamplighter low to high
+    A258746  permutation SB<->Bird,
+               flip every second bit, from 3rd highest downward
     A003188  permutation SB->HCS, Gray code shift+xor
     A006068  permutation HCS->SB, Gray code inverse
     A154435  permutation HCS->Bird, Lamplighter bit flips
     A154436  permutation Bird->HCS, Lamplighter variant
+
+    A258996  permutation CW<->Drib, phase shift code high to low
+    A153153  permutation CW->AYT, reverse and un-Gray
+    A153154  permutation AYT->CW, reverse and Gray code
+    A154437  permutation AYT->Drib, Lamplighter low to high
+    A154438  permutation Drib->AYT, un-Lamplighter low to high
 
     A054429  permutation SB,CW,Bird,Drib N at transpose Y/X,
                (mirror binary tree, runs 0b11..11 down to 0b10..00)
@@ -1628,6 +1639,12 @@ The sequences marked "extra ..." have one or two extra initial values over
 what the RationalsTree here gives, but are the same after that.  And the
 Stern first differences "less ..." means it has one less term than what the
 code here gives.
+
+=cut
+
+# 6 trees, 6*5/2=15 pairs for permutations
+
+=pod
 
 =head1 SEE ALSO
 

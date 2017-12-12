@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Template;
 use Prty::String;
@@ -834,50 +834,6 @@ sub new {
     $html = $h->tag($elem,@keyVal,$content); # [2]
     $html = $h->tag($elem,@keyVal,'-',@content); # [3]
 
-=head4 Description
-
-Generiere HTML-Tag $tag gemäß den Optionen und Attributen @keyVal
-und dem Inhalt $content und liefere das Resultat zurück [2].
-Der Inhalt kann auch fehlen [1] oder sich über mehrere Argumente
-erstrecken [3].
-
-B<Boolsche Attribute>
-
-Boolsche Attribute werden in HTML ohne Wert und in XHTML mit sich
-selbst als Wert generiert.
-
-HTML
-
-    <TAG ... ATTRIBUTE ...>
-
-XHTML
-
-    <TAG ... ATTRIBUTE="ATTRIBUTE" ...>
-
-Boolsche Attribute sind:
-
-    checked
-    declare
-    defer
-    disabled
-    ismap
-    multiple
-    nohref
-    noresize
-    readonly
-    selected
-
-B<Default-Attribute>
-
-Für einige Elemente sind Default-Attribute vereinbart, die nicht
-explizit gesetzt werden müssen.
-
-    Element Attribute
-    
-    form    method=>'post', enctype=>'multipart/form-data'
-    script  type=>'text/javascript'
-    style   type=>'text/css'
-
 =head4 Options
 
 =over 4
@@ -1123,6 +1079,50 @@ R1::YouTube::Player).
 Behandele den Content als Text, d.h. schütze &, < und >.
 
 =back
+
+=head4 Description
+
+Generiere HTML-Tag $tag gemäß den Optionen und Attributen @keyVal
+und dem Inhalt $content und liefere das Resultat zurück [2].
+Der Inhalt kann auch fehlen [1] oder sich über mehrere Argumente
+erstrecken [3].
+
+B<Boolsche Attribute>
+
+Boolsche Attribute werden in HTML ohne Wert und in XHTML mit sich
+selbst als Wert generiert.
+
+HTML
+
+    <TAG ... ATTRIBUTE ...>
+
+XHTML
+
+    <TAG ... ATTRIBUTE="ATTRIBUTE" ...>
+
+Boolsche Attribute sind:
+
+    checked
+    declare
+    defer
+    disabled
+    ismap
+    multiple
+    nohref
+    noresize
+    readonly
+    selected
+
+B<Default-Attribute>
+
+Für einige Elemente sind Default-Attribute vereinbart, die nicht
+explizit gesetzt werden müssen.
+
+    Element Attribute
+    
+    form    method=>'post', enctype=>'multipart/form-data'
+    script  type=>'text/javascript'
+    style   type=>'text/css'
 
 =cut
 
@@ -1607,6 +1607,26 @@ sub wrapTag {
 
     $html = $h->cat(@opt,@args);
 
+=head4 Options
+
+=over 4
+
+=item -join => $str (Default: '')
+
+Verwende $str als Trenner zwischen den Fragmenten.  Diese Option
+ist praktisch, wenn die Fragmente optional sind und die
+auftretenden Elemente durch eine Zeichenkette voneinander getrennt
+werden sollen. Beispiel: Eine Icon-Leiste, deren Zusammensetzung
+nicht festgelegt ist und die nicht direkt aneinander stoßen
+sollen, sondern durch Leerzeichen getrennt werden.
+
+=item -placeholders => \@keyVal (Default: undef)
+
+Ersetze im generierten HTML-Code die angegebenen Platzhalter durch
+ihre Werte.
+
+=back
+
 =head4 Description
 
 Füge die HTML-Fragmente @args zusammen und liefere den
@@ -1680,26 +1700,6 @@ Beide liefern
     </p>
     </body>
     </html>
-
-=head4 Options
-
-=over 4
-
-=item -join => $str (Default: '')
-
-Verwende $str als Trenner zwischen den Fragmenten.  Diese Option
-ist praktisch, wenn die Fragmente optional sind und die
-auftretenden Elemente durch eine Zeichenkette voneinander getrennt
-werden sollen. Beispiel: Eine Icon-Leiste, deren Zusammensetzung
-nicht festgelegt ist und die nicht direkt aneinander stoßen
-sollen, sondern durch Leerzeichen getrennt werden.
-
-=item -placeholders => \@keyVal (Default: undef)
-
-Ersetze im generierten HTML-Code die angegebenen Platzhalter durch
-ihre Werte.
-
-=back
 
 =cut
 
@@ -1780,14 +1780,6 @@ sub cat {
 
     $str = $h->doctype(@opt);
 
-=head4 Description
-
-Liefere <!DOCTYPE>-Tag:
-
-    <!DOCTYPE ...>
-
-Der Tag ergibt sich aus der eingestellten HTML-Variante.
-
 =head4 Options
 
 =over 4
@@ -1801,6 +1793,14 @@ Liefere Frameset-Doctype.
 Ergänze Doctype um $n Zeilenumbrüche.
 
 =back
+
+=head4 Description
+
+Liefere <!DOCTYPE>-Tag:
+
+    <!DOCTYPE ...>
+
+Der Tag ergibt sich aus der eingestellten HTML-Variante.
 
 =cut
 
@@ -1885,6 +1885,10 @@ sub doctype {
 
     $html = $h->comment(@keyVal,$content);
 
+=head4 Options
+
+Wie Methode tag()
+
 =head4 Description
 
 Liefere HTML Kommentar-Tag:
@@ -1898,10 +1902,6 @@ bzw.
     -->
 
 wenn TEXT mehrzeilig ist.
-
-=head4 Options
-
-Wie Methode tag()
 
 =cut
 
@@ -2101,7 +2101,7 @@ sub import {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +26,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/bes-internal/Date-Holidays-BY.git
-version: 0.2017.2
+version: 0.2018.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

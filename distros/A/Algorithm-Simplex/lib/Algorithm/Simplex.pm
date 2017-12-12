@@ -4,7 +4,7 @@ use MooX::Types::MooseLike::Base qw( ArrayRef HashRef Num Int Str );
 use namespace::clean;
 use Carp;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 has tableau => (
     is       => 'rw',

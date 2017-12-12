@@ -1,5 +1,9 @@
 Revision history for Perl extension Mac::FSEvents.
 
+0.14    2017-12-02 09:30:00
+        - Look for macOS SDK under command line tools installation in addition to other places
+        - Fix building on Perl 5.26 and beyond (thanks, Fayland Lam!)
+
 0.13    2017-01-17 23:00:00
         - Alter version check so that Mac::FSEvents builds on Sierra.
         - Fix warning due to global time destruction bug.

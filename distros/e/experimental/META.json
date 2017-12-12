@@ -42,7 +42,7 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -57,7 +57,7 @@
          "web" : "https://github.com/Leont/experimental"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_contributors" : [
       "Father Chrysostomos <sprout@cpan.org>",
       "Grant McLean <grant@catalyst.net.nz>",

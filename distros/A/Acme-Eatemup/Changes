@@ -1,0 +1,9 @@
+Revision history for Acme::Eatemup
+
+0.02     3 December, 2017
+         Fix the build in, well, various versions of
+         ExtUtils::ParseXS/xsubpp.  It turns out newXSproto_portable
+         is not very portable.
+
+0.01     3 December, 2017
+         First version.

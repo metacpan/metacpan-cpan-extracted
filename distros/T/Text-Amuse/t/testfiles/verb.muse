@@ -3,6 +3,8 @@
 
 <verbatim>** Hello there</verbatim>
 
+<verbatim></verbatim> Empty verbatim.
+
 <verbatim>[1]</verbatim> Hello there.
 
 Footnote [1] and not a footnote <verbatim>[1]</verbatim>

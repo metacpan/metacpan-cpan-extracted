@@ -3,7 +3,7 @@ package Email::Abstract::Courriel;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Courriel;
 
@@ -59,7 +59,7 @@ Email::Abstract::Courriel - Email::Abstract wrapper for Courriel
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 DESCRIPTION
 
@@ -72,10 +72,13 @@ L<Email::Abstract>, L<Courriel>.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel>
-(or L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>).
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel> or via email to L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Courriel can be found at L<https://github.com/houseabsolute/Courriel>.
 
 =head1 AUTHOR
 
@@ -83,10 +86,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

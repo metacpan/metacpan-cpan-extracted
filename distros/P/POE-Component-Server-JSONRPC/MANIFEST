@@ -6,14 +6,8 @@ inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
-inc/Module/Install/TestBase.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/Spiffy.pm
-inc/Test/Base.pm
-inc/Test/Base/Filter.pm
-inc/Test/Builder.pm
-inc/Test/Builder/Module.pm
 inc/Test/More.pm
 lib/POE/Component/Server/JSONRPC.pm
 lib/POE/Component/Server/JSONRPC/Http.pm
@@ -22,7 +16,9 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+POE-Component-Server-JSONRPC-0.06.tar.gz
 README
 t/00_compile.t
+t/kwalitee.t
 t/pod.t
 t/pod_coverage.t

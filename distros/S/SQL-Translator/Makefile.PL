@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 use inc::Module::Install 1.06;
 use strict;
 use warnings;
@@ -18,7 +19,6 @@ my $deps = {
     'Package::Variant'         => '1.001001',
     'Sub::Quote'               => '0',
     'Try::Tiny'                => '0.04',
-    'List::MoreUtils'          => '0.09',
     'Scalar::Util'             => '0',
   },
   recommends => {
@@ -60,7 +60,7 @@ readme_from 'lib/SQL/Translator.pm';
 for my $type (qw/requires recommends test_requires/) {
   no strict qw/refs/;
   my $f = \&$type;
-  for my $mod (keys %{$deps->{$type} || {} }) {
+  for my $mod (sort keys %{$deps->{$type} || {} }) {
     $f->($mod, $deps->{$type}{$mod});
   }
 }

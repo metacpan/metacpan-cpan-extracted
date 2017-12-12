@@ -1,7 +1,8 @@
-bin/converter.pl
+bin/record_store_convert
 bin/recordstore_explorer
 Build.PL
 CHANGELOG
+IDEAS.txt
 lib/Data/RecordStore.pm
 LICENSE
 Makefile.PL
@@ -9,13 +10,8 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
-t/oldVersion/1_OBJSTORE
-t/oldVersion/1_OBJSTORE.recycle
-t/oldVersion/2_OBJSTORE
-t/oldVersion/2_OBJSTORE.recycle
-t/oldVersion/OBJ_INDEX
-t/oldVersion/OBJ_INDEX.recycle
-t/oldVersion/STORE_INDEX
 t/recordstore.t
+t/silo.t
+t/transactions.t
 TODO.txt
 VERSIONS

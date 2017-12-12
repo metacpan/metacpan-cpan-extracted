@@ -1,6 +1,6 @@
 =======================================================================
                 Net::LDAPapi Module v3.0.x for Perl5
-		by Quanah Gibson-Mount @ Zimbra, Inc.
+		by Quanah Gibson-Mount @ Symas, Inc.
 	based on version 2.00 by Quanah Gibson-Mount @ Stanford University
 	based on version 1.50 by Howard Chu @ Symas Corporation
 	based on version 1.43 by Clayton Donley, <donley@wwa.com>
@@ -8,7 +8,7 @@
 
 COPYRIGHT
 =========
-
+   Copyright (c) 2017 Quanah Gibson-Mount. All rights reserved
    Copyright (c) 2007 Quanah Gibson-Mount. All rights reserved
    Copyright (c) 2007 Board of Trustees, Leland Stanford Jr. University
    Copyright (c) 2003 Howard Chu. All rights reserved.

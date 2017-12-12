@@ -5,8 +5,10 @@ author:
 build_requires:
   Test::Identity: '0'
   Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,61 +17,87 @@ name: circle-be
 provides:
   Circle:
     file: lib/Circle.pm
-    version: '0.170740'
+    version: '0.173320'
   Circle::Collection:
     file: lib/Circle/Collection.pm
+    version: '0.173320'
   Circle::Command:
     file: lib/Circle/Command.pm
+    version: '0.173320'
   Circle::CommandInvocation:
     file: lib/Circle/CommandInvocation.pm
+    version: '0.173320'
   Circle::Commandable:
     file: lib/Circle/Commandable.pm
+    version: '0.173320'
   Circle::Configurable:
     file: lib/Circle/Configurable.pm
+    version: '0.173320'
   Circle::GlobalRules:
     file: lib/Circle/GlobalRules.pm
+    version: '0.173320'
   Circle::Loggable:
     file: lib/Circle/Loggable.pm
+    version: '0.173320'
   Circle::Net:
     file: lib/Circle/Net.pm
+    version: '0.173320'
   Circle::Net::IRC:
     file: lib/Circle/Net/IRC.pm
+    version: '0.173320'
   Circle::Net::IRC::Channel:
     file: lib/Circle/Net/IRC/Channel.pm
+    version: '0.173320'
   Circle::Net::IRC::Target:
     file: lib/Circle/Net/IRC/Target.pm
+    version: '0.173320'
   Circle::Net::IRC::User:
     file: lib/Circle/Net/IRC/User.pm
+    version: '0.173320'
   Circle::Net::Raw:
     file: lib/Circle/Net/Raw.pm
+    version: '0.173320'
   Circle::RootObj:
     file: lib/Circle/RootObj.pm
+    version: '0.173320'
   Circle::Rule::Chain:
     file: lib/Circle/Rule/Chain.pm
+    version: '0.173320'
   Circle::Rule::Resultset:
     file: lib/Circle/Rule/Resultset.pm
+    version: '0.173320'
   Circle::Rule::Store:
     file: lib/Circle/Rule/Store.pm
+    version: '0.173320'
   Circle::Ruleable:
     file: lib/Circle/Ruleable.pm
+    version: '0.173320'
   Circle::Session::Tabbed:
     file: lib/Circle/Session/Tabbed.pm
+    version: '0.173320'
   Circle::TaggedString:
     file: lib/Circle/TaggedString.pm
+    version: '0.173320'
   Circle::Widget:
     file: lib/Circle/Widget.pm
+    version: '0.173320'
   Circle::Widget::Box:
     file: lib/Circle/Widget/Box.pm
+    version: '0.173320'
   Circle::Widget::Entry:
     file: lib/Circle/Widget/Entry.pm
+    version: '0.173320'
   Circle::Widget::Entry::CompleteGroup:
     file: lib/Circle/Widget/Entry.pm
   Circle::Widget::Label:
     file: lib/Circle/Widget/Label.pm
+    version: '0.173320'
   Circle::Widget::Scroller:
     file: lib/Circle/Widget/Scroller.pm
+    version: '0.173320'
   Circle::WindowItem:
     file: lib/Circle/WindowItem.pm
+    version: '0.173320'
 requires:
   Attribute::Storage: '0.09'
   Class::Method::Modifiers: '0'
@@ -77,12 +105,12 @@ requires:
   File::Basename: '0'
   File::Path: '0'
   File::ShareDir: '1.00'
+  IO::Async::Listener: '0.64'
   IO::Async::Loop: '0.37'
-  IO::Async::Notifier: '0.43'
   Module::Pluggable: '4.1'
   Net::Async::IRC: '0.10'
-  Net::Async::Tangence::Server: '0.12'
-  String::Tagged: '0'
+  Net::Async::Tangence::Server: '0.13'
+  String::Tagged: '0.11'
   Struct::Dumb: '0'
   Tangence::Message: '0.11'
   Tangence::Object: '0.18'
@@ -91,5 +119,5 @@ requires:
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.170740'
+version: '0.173320'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

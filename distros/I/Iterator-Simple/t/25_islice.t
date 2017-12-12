@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use strict;
 use warnings;
@@ -43,4 +43,9 @@ my $itr;
 	is_deeply list($itr) => [qw(f g h i j)], 'iskip';
 }
 
+{
+	my $ary = [qw(1 0 3 7)];
+	$itr = islice($ary, 0, 3);
+	is_deeply list($itr) => [qw(1 0 3)], 'islice including 0';
+}
 

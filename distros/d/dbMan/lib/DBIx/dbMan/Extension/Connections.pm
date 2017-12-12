@@ -3,14 +3,16 @@ package DBIx::dbMan::Extension::Connections;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
-use DBI;
+use Term::ReadLine;
+BEGIN { import Term::ReadLine::Gnu qw/:prompt/; }
 use Term::ANSIColor;
+use DBI;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 1;
 
-sub IDENTIFICATION { return "000001-000005-000011"; }
+sub IDENTIFICATION { return "000001-000005-000013"; }
 
 sub preference { return 0; }
 
@@ -139,9 +141,16 @@ sub handle_action {
 			my $reuse = 0;
 			$reuse = 1 if $obj->{-dbi}->current eq $action{what};
 
+            my $trans_msg = '';
+            if ($obj->{-dbi}->in_transaction()) {
+                $obj->{-dbi}->rollback;
+                $obj->{-dbi}->trans_end;
+                $trans_msg = "Transaction end with implicit rollback in connection $action{what}.\n";
+            }
+
 			$action{action} = 'OUTPUT';
 			my $error = $obj->{-dbi}->close($action{what});
-			$action{output} = $obj->solve_close_error($error,$action{what});
+			$action{output} = $trans_msg . $obj->solve_close_error($error,$action{what});
 
 			$error = $obj->{-dbi}->open($action{what});
 			$action{output} .= $obj->solve_open_error($error,$action{what});
@@ -153,9 +162,16 @@ sub handle_action {
 			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
 			$obj->{-interface}->rebuild_menu;
 		} elsif ($action{operation} eq 'close') {
+            my $trans_msg = '';
+            if ($obj->{-dbi}->in_transaction()) {
+                $obj->{-dbi}->rollback;
+                $obj->{-dbi}->trans_end;
+                $trans_msg = "Transaction end with implicit rollback in connection $action{what}.\n";
+            }
+
 			$action{action} = 'OUTPUT';
 			my $error = $obj->{-dbi}->close($action{what});
-			$action{output} = $obj->solve_close_error($error,$action{what});
+			$action{output} = $trans_msg . $obj->solve_close_error($error,$action{what});
 			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
 			$obj->{-interface}->rebuild_menu;
 		} elsif ($action{operation} eq 'use') {
@@ -234,9 +250,9 @@ sub handle_action {
 
 		my $db = '';
 		if ( $obj->{-dbi}->current ) {
-			$db .= color( $obj->{-dbi}->prompt_color ) if $obj->{-dbi}->prompt_color;
+			$db .= RL_PROMPT_START_IGNORE . color( $obj->{-dbi}->prompt_color ) . RL_PROMPT_END_IGNORE if $obj->{-dbi}->prompt_color;
 			$db .= '<'.$obj->{-dbi}->current.'>';
-			$db .= color( 'reset' ) if $obj->{-dbi}->prompt_color;
+			$db .= RL_PROMPT_START_IGNORE . color( 'reset' ) . RL_PROMPT_END_IGNORE if $obj->{-dbi}->prompt_color;
 		}
 		$obj->{-interface}->prompt($obj->{prompt_num},$db);
 	}

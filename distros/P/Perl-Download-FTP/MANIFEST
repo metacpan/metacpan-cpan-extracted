@@ -9,6 +9,7 @@ t/001-new.t
 t/002-ls.t
 t/003-classify-releases.t
 t/004-get.t
+t/005-get-specific.t
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

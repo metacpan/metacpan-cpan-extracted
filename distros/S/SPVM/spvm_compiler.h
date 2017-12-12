@@ -13,8 +13,8 @@ struct SPVM_compiler {
   // String symbol table
   SPVM_HASH* string_symtable;
   
-  // Bytecodes
-  SPVM_BYTECODE_ARRAY* bytecode_array;
+  // Opcodes
+  SPVM_OPCODE_ARRAY* opcode_array;
 
   // Entry point package name
   const char* entry_point_package_name;

@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "git",
       "database",
@@ -38,6 +38,7 @@
             "DateTime" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
+            "File::Spec" : "0",
             "File::pushd" : "0",
             "Git::Raw" : "0",
             "Git::Sub" : "0",
@@ -76,7 +77,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0.88",
             "Test::Requires::Git" : "1.005",
-            "blib" : "1.01",
             "lib" : "0",
             "perl" : "5.006"
          }
@@ -94,10 +94,11 @@
          "web" : "http://github.com/book/Git-Database"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_contributors" : [
       "Olivier Mengu\u00e9 <dolmen@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

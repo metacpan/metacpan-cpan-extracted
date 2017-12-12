@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 use Carp;
 
@@ -62,7 +62,7 @@ Test::Class::Moose::Role - Test::Class::Moose for roles
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 DESCRIPTION
 

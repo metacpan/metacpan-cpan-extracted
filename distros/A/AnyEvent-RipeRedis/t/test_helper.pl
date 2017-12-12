@@ -38,7 +38,7 @@ sub ev_loop {
 
   $sub->($cv);
 
-  my $timer = AE::timer( 10, 0,
+  my $timer = AE::timer( 15, 0,
     sub {
       diag( 'Emergency exit from event loop.' );
       $cv->send;

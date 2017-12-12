@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -89,8 +89,16 @@ rm -rf $DISTVNAME
 tar xfz $DISTVNAME.tar.gz
 unset DISPLAY; export DISPLAY
 cd $DISTVNAME
+
+if test -d examples; then
+  if ! grep _examples debian/rules; then
+    echo "examples directory not in debian/rules"
+  fi
+fi
+
 dpkg-checkbuilddeps debian/control
 fakeroot debian/rules binary
+
 cd ..
 rm -rf $DISTVNAME
 
@@ -98,7 +106,7 @@ rm -rf $DISTVNAME
 # lintian .deb and source
 
 lintian -I -i \
-  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key \
+  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa \
   $DEBFILE
 
 TEMP="/tmp/temp-lintian-$DISTVNAME"
@@ -114,7 +122,7 @@ fi
 dpkg-source -b $DEBNAME-$VERSION \
                ${DEBNAME}_$VERSION.orig.tar.gz; \
 lintian -I -i \
-  --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile *.dsc
+  --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile,testsuite-autopkgtest-missing *.dsc
 cd /
 rm -rf $TEMP
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension POE::Component::Server::JSONRPC
 
+0.06 2017-12-06
+     - Removed uses of JSON::Any
+
 0.05 2012-06-20
      - Added support for SSL certificates and HTTP auth
 

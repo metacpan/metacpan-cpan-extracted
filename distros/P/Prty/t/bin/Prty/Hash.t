@@ -451,13 +451,13 @@ sub test_push : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_increment : Test(1) {
+sub test_addNumber : Test(1) {
     my $self = shift;
 
     my $h = Prty::Hash->new(a=>1);
 
-    my $n = $h->increment('a');
-    $self->is($n,2);
+    my $y = $h->addNumber(a=>45.5);
+    $self->is($y,46.5);
 }
 
 # -----------------------------------------------------------------------------

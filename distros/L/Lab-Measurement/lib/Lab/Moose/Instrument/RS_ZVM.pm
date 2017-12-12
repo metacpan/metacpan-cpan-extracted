@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::RS_ZVM;
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.613';
 #ABSTRACT: Rohde & Schwarz ZVM Vector Network Analyzer
-$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.600';
+
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -10,7 +11,6 @@ use Carp;
 use Config;
 use namespace::autoclean;
 
-
 extends 'Lab::Moose::Instrument';
 
 with 'Lab::Moose::Instrument::SCPI::Format' => {
@@ -18,8 +18,6 @@ with 'Lab::Moose::Instrument::SCPI::Format' => {
     },
     qw(
     Lab::Moose::Instrument::SCPI::Sense::Function
-
-    Lab::Moose::Instrument::SCPI::Trace::Data::Response
 
     Lab::Moose::Instrument::VNASweep
 );
@@ -47,6 +45,21 @@ sub sparam_catalog {
     my $sparam = $+{sparam};
 
     return [ "Re($sparam)", "Im($sparam)" ];
+}
+
+sub trace_data_response_all {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        getter_params(),
+        trace => { isa => 'Str' },
+    );
+
+    my $trace = delete $args{trace};
+
+    return $self->binary_query(
+        command => "TRAC:DATA:RESP:ALL? $trace",
+        %args
+    );
 }
 
 sub sparam_sweep_data {
@@ -83,7 +96,7 @@ Lab::Moose::Instrument::RS_ZVM - Rohde & Schwarz ZVM Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -100,7 +113,7 @@ C<sparam_catalog> methods.
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

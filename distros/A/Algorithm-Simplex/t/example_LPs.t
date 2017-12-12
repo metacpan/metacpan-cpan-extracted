@@ -120,7 +120,7 @@ for my $test (keys %{$tests}) {
     $model                  = 'piddle';
     $full_test_name         = $test . ' - ' . ucfirst $model;
     $final_tableau_object   = solve_LP($model, $initial_tableau);
-    $optimal_tableau_piddle = pdl $optimal_tableau;
+    $optimal_tableau_piddle = PDL->pdl($optimal_tableau);
     ok(
         piddles_are_equal(
             $optimal_tableau_piddle, $final_tableau_object->tableau

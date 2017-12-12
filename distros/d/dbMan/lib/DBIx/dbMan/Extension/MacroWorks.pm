@@ -9,7 +9,7 @@ our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000086-000004"; }
+sub IDENTIFICATION { return "000001-000086-000005"; }
 
 sub preference { return 0; }
 
@@ -58,6 +58,9 @@ sub load_macros {
 
 	for my $file (@files) {
 		if (open F, $file) {
+            if ( $obj->{ -interface }->is_utf8 ) {
+                binmode F, ':utf8';
+            }
 			while (<F>) {
 				chomp;
 				push @macros,$_ if m#^s/(.+)/(.*)/[gei]?#;
@@ -136,6 +139,9 @@ sub handle_action {
 				$obj->{-mempool}->set(macros => \@macros);
 				my $addenum = '';
 				if (open F,">>".$obj->macrofile) {
+                    if ( $obj->{ -interface }->is_utf8 ) {
+                        binmode F, ':utf8';
+                    }
 					print F "$def\n";
 					close F;
 				} else {
@@ -161,9 +167,15 @@ sub handle_action {
 				$obj->{-mempool}->set(macros => \@macros);
 
 				if (open F,$obj->macrofile) {
+                    if ( $obj->{ -interface }->is_utf8 ) {
+                        binmode F, ':utf8';
+                    }
 					my @all = <F>;
 					close F;
 					if (open F,">".$obj->macrofile) {
+                        if ( $obj->{ -interface }->is_utf8 ) {
+                            binmode F, ':utf8';
+                        }
 						for my $line (@all) {
 							chomp $line;
 							my $test = $line;

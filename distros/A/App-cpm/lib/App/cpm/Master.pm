@@ -9,7 +9,7 @@ use App::cpm::Logger;
 use Module::Metadata;
 use IO::Handle;
 use version;
-our $VERSION = '0.953';
+our $VERSION = '0.955';
 
 sub new {
     my ($class, %option) = @_;
@@ -47,21 +47,27 @@ sub fail {
         );
         $detector->add($dist->distfile, $dist->provides, \@requirements);
     }
+    $detector->finalize;
 
-    my @name;
-    if (my $result = $detector->detect) {
-        for my $distfile (sort keys %$result) {
-            my $distvname = $self->distribution($distfile)->distvname;
-            push @name, $distvname;
-            my @requirement = @{ $result->{$distfile} };
-            my $msg = join " -> ", map { $self->distribution($_)->distvname } @requirement, $requirement[0];
-            local $self->{logger}{context} = $distvname;
-            $self->{logger}->log("Detected circular dependencies $msg");
-            $self->{logger}->log("Failed to install distribution");
-        }
+    my $detected = $detector->detect;
+    for my $distfile (sort keys %$detected) {
+        my $distvname = $self->distribution($distfile)->distvname;
+        my @circular = @{$detected->{$distfile}};
+        my $msg = join " -> ", map { $self->distribution($_)->distvname } @circular;
+        local $self->{logger}{context} = $distvname;
+        $self->{logger}->log("Detected circular dependencies $msg");
+        $self->{logger}->log("Failed to install distribution");
+    }
+    for my $dist (sort { $a->distvname cmp $b->distvname } grep { !$detected->{$_->distfile} } @not_installed) {
+        local $self->{logger}{context} = $dist->distvname;
+        $self->{logger}->log("Failed to install distribution, "
+                            ."because of installing some dependencies failed");
     }
 
-    push @name, map { CPAN::DistnameInfo->new($_)->distvname || $_ } @fail_install;
+    my @name = (
+        (map { CPAN::DistnameInfo->new($_)->distvname || $_ } @fail_install),
+        (map { $_->distvname } @not_installed),
+    );
     { resolve => \@fail_resolve, install => [sort @name] };
 }
 

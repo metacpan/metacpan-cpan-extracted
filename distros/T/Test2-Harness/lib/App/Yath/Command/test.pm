@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -10,6 +10,7 @@ use Test2::Harness::Run::Runner;
 use Test2::Harness::Run::Queue;
 use Test2::Harness::Run;
 
+use Test2::Harness::Util::JSON qw/encode_json/;
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 
 use App::Yath::Util qw/is_generated_test_pl find_yath/;
@@ -88,6 +89,19 @@ sub handle_list_args {
     }
 }
 
+sub normalize_settings {
+    my $self = shift;
+
+    $self->SUPER::normalize_settings();
+
+    my $settings = $self->{+SETTINGS};
+
+    unless ($settings->{slack_url}) {
+        die "\n--slack-url is required when using --slack.\n"      if $settings->{slack};
+        die "\n--slack-url is required when using --slack-fail.\n" if $settings->{slack_fail};
+    }
+}
+
 sub options {
     my $self = shift;
 
@@ -112,6 +126,64 @@ sub options {
             usage   => ['--default-at-search xt'],
             default => sub { ['./xt'] },
             long_desc => "Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line",
+        },
+
+        {
+            spec => 'slack-url=s',
+            field => 'slack_url',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--slack-url "URL"'],
+            summary => ["Specify an API endpoint for slack webhook integrations"],
+            long_desc => "This should be your slack webhook url.",
+            action => sub {
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
+                eval { require HTTP::Tiny; 1 } or die "Cannot use --slack-url without HTTP::Tiny: $@";
+                die "HTTP::Tiny reports that it does not support SSL, cannot use --slack-url without ssl."
+                    unless HTTP::Tiny::can_ssl();
+                $settings->{slack_url} = $arg;
+            },
+        },
+
+        {
+            spec => 'slack=s@',
+            field => 'slack',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--slack "#CHANNEL"', '--slack "@USER"'],
+            summary => ['Send results to a slack channel', 'Send results to a slack user'],
+        },
+
+        {
+            spec => 'slack-fail=s@',
+            field => 'slack_fail',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--slack-fail "#CHANNEL"', '--slack-fail "@USER"'],
+            summary => ['Send failing results to a slack channel', 'Send failing results to a slack user'],
+        },
+
+        {
+            spec => 'slack-notify!',
+            field => 'slack_notify',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--slack-notify', '--no-slack-notify'],
+            summary => ['On by default if --slack-url is specified'],
+            long_desc => "Send slack notifications to the slack channels/users listed in test meta-data when tests fail.",
+            default => 1,
+        },
+
+        {
+            spec => 'slack-log!',
+            field => 'slack_log',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--slack-log', '--no-slack-log'],
+            summary => ['Off by default, log file will be attached if available'],
+            long_desc => "Attach the event log to any slack notifications.",
+            default => 0,
         },
 
         {
@@ -156,6 +228,31 @@ sub options {
                 eval { require Email::Stuffer; 1 } or die "Cannot use --email-owner without Email::Stuffer: $@";
                 $settings->{email_owner} = 1;
             },
+        },
+
+        {
+            spec => 'batch-owner-notices!',
+            field => 'batch_owner_notices',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--no-batch-owner-notices'],
+            long_desc => 'Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.',
+            default => 1,
+        },
+
+        {
+            spec => 'qvf',
+            field => 'formatter',
+            used_by => {display => 1},
+            section   => 'Display Options',
+            usage     => ['--qvf'],
+            summary   => ['Quiet, but verbose on failure'],
+            long_desc => 'Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.',
+            action   => sub {
+                my ($self, $settings, $field) = @_;
+                $settings->{formatter} = '+Test2::Formatter::QVF';
+            },
+
         },
     );
 }
@@ -217,6 +314,15 @@ sub run_command {
             post_exit_timeout => $settings->{post_exit_timeout},
             jobs              => $settings->{jobs},
             jobs_todo         => $jobs_todo,
+
+            $settings->{batch_owner_notices} ? () : (
+                email_owner  => $settings->{email_owner},
+                email_from   => $settings->{email_from},
+                slack_url    => $settings->{slack_url},
+                slack_fail   => $settings->{slack_fail},
+                slack_notify => $settings->{slack_notify},
+                slack_log    => $settings->{slack_log},
+            ),
         );
 
         $stat = $harness->run();
@@ -288,16 +394,31 @@ sub run_command {
         $self->paint("Test runner exited badly: ?\n") unless defined $exit;
         $self->paint("An exception was cought\n") if !$ok && !$sig;
         $self->paint("Received SIG$sig\n") if $sig;
-        $self->paint("$lost test files were never run!\n") if $lost;
+        $self->paint("$lost test file(s) were never run!\n") if $lost;
 
         $self->paint("\n");
 
         $exit ||= 255;
     }
 
-    $self->send_owner_email($bad) if $settings->{email_owner} && ($fail || @$bad);
+    if ($settings->{batch_owner_notices} && ($fail || @$bad)) {
+        my (%owners, %slacks);
+        for my $filename (map { $_->file } @$bad) {
+            my $file = Test2::Harness::Util::TestFile->new(file => $filename);
+            my @owners = $file->meta('owner');
+            my @slacks = $file->meta('slack');
+            push @{$owners{$_}} => File::Spec->abs2rel($filename) for @owners;
+            push @{$slacks{$_}} => File::Spec->abs2rel($filename) for @slacks;
+        }
 
-    if (!@$bad && !$fail) {
+        $self->send_owner_email(\%owners) if $settings->{email_owner};
+
+        if ($settings->{slack_url}) {
+            $self->send_slack_fail($bad) if $settings->{slack_fail};
+            $self->send_slack_notify(\%slacks) if $settings->{slack_notify};
+        }
+    }
+    else {
         $self->paint("\nAll tests were successful!\n\n");
 
         if ($settings->{cover}) {
@@ -312,6 +433,7 @@ sub run_command {
     }
 
     $self->send_email if $settings->{email};
+    $self->send_slack if $settings->{slack} && $settings->{slack_url};
 
     print "Keeping work dir: $settings->{dir}\n" if $settings->{keep_dir} && $settings->{dir};
 
@@ -324,6 +446,103 @@ sub run_command {
     return $exit;
 }
 
+sub send_slack {
+    my $self = shift;
+
+    my $settings = $self->{+SETTINGS};
+    require HTTP::Tiny;
+    my $ht = HTTP::Tiny->new();
+
+    for my $dest (@{$settings->{slack}}) {
+        my $r = $ht->post(
+            $settings->{slack_url},
+            {
+                headers => {'content-type' => 'application/json'},
+                content => encode_json(
+                    {
+                        channel     => $dest,
+                        text        => "Test run $settings->{run_id} has completed on " . hostname(),
+                        attachments => [
+                            {
+                                fallback => 'Test Summary',
+                                pretext  => 'Test Summary',
+                                text     => join('' => @{$self->{+PAINTED}}),
+                            },
+                        ],
+                    }
+                ),
+            },
+        );
+        warn "Failed to send slack message to '$dest'" unless $r->{success};
+    }
+}
+
+sub send_slack_fail {
+    my $self = shift;
+
+    my $settings = $self->{+SETTINGS};
+    require HTTP::Tiny;
+    my $ht = HTTP::Tiny->new();
+
+    for my $dest (@{$settings->{slack_fail}}) {
+        my $r = $ht->post(
+            $settings->{slack_url},
+            {
+                headers => {'content-type' => 'application/json'},
+                content => encode_json(
+                    {
+                        channel     => $dest,
+                        text        => "Test run $settings->{run_id} failed on " . hostname(),
+                        attachments => [
+                            {
+                                fallback => 'Test Failure Summary',
+                                pretext  => 'Test Failure Summary',
+                                text     => join('' => @{$self->{+PAINTED}}),
+                            },
+                        ],
+                    }
+                ),
+            },
+        );
+        warn "Failed to send slack message to '$dest'" unless $r->{success};
+    }
+}
+
+sub send_slack_notify {
+    my $self = shift;
+    my ($slacks) = @_;
+
+    my $settings = $self->{+SETTINGS};
+    require HTTP::Tiny;
+    my $ht   = HTTP::Tiny->new();
+    my $host = hostname();
+
+    for my $dest (sort keys %$slacks) {
+        my $fails = join "\n" => @{$slacks->{$dest}};
+
+        my $r = $ht->post(
+            $settings->{slack_url},
+            {
+                headers => {'content-type' => 'application/json'},
+                content => encode_json(
+                    {
+                        channel     => $dest,
+                        text        => "Test(s) failed on $host",
+                        attachments => [
+                            {
+                                fallback => 'Test Failure Notifications',
+                                pretext  => 'Test Failure Notifications',
+                                text     => $fails,
+                            },
+                        ],
+                    }
+                ),
+            },
+        );
+        warn "Failed to send slack message to '$dest'" unless $r->{success};
+    }
+}
+
 sub send_email {
     my $self = shift;
     my $body = join '' => @{$self->{+PAINTED}};
@@ -333,20 +552,11 @@ sub send_email {
 
 sub send_owner_email {
     my $self = shift;
-    my ($bad) = @_;
+    my ($owners) = @_;
 
-    my %owners;
-
-    for my $filename (map { $_->file } @$bad) {
-        my $file = Test2::Harness::Util::TestFile->new(file => $filename);
-        my @owners = $file->meta('owner') or next;
-
-        push @{$owners{$_}} => File::Spec->abs2rel($filename) for @owners;
-    }
-
-    for my $owner (sort keys %owners) {
-        my $host  = hostname();
-        my $fails = join "\n" => map { "  $_" } @{$owners{$owner}};
+    my $host  = hostname();
+    for my $owner (sort keys %$owners) {
+        my $fails = join "\n" => map { "  $_" } @{$owners->{$owner}};
         my $body  = <<"        EOT";
 The following test(s) failed on $host. You are receiving this email because you
 are listed as an owner of these tests.
@@ -575,6 +785,22 @@ Use the specified file as standard input to ALL tests
 
 Do not include 'lib'
 
+=item --slack "#CHANNEL"
+
+=item --slack "@USER"
+
+Send results to a slack channel
+
+Send results to a slack user
+
+=item --slack-fail "#CHANNEL"
+
+=item --slack-fail "@USER"
+
+Send failing results to a slack channel
+
+Send failing results to a slack user
+
 =item --tlib
 
 (Default: off) Include 't/lib' in your module path
@@ -636,6 +862,32 @@ Email the owner of broken tests files upon failure. Add `# HARNESS-META-OWNER fo
 Do not fork to start tests
 
 Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.
+
+=item --no-batch-owner-notices
+
+Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
+
+=item --slack-log
+
+=item --no-slack-log
+
+Off by default, log file will be attached if available
+
+Attach the event log to any slack notifications.
+
+=item --slack-notify
+
+=item --no-slack-notify
+
+On by default if --slack-url is specified
+
+Send slack notifications to the slack channels/users listed in test meta-data when tests fail.
+
+=item --slack-url "URL"
+
+Specify an API endpoint for slack webhook integrations
+
+This should be your slack webhook url.
 
 =item --stream
 
@@ -808,6 +1060,12 @@ Specify the formatter to use
 (Default: "Test2")
 
 Only useful when the renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+
+=item --qvf
+
+Quiet, but verbose on failure
+
+Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.
 
 =item --show-job-end
 

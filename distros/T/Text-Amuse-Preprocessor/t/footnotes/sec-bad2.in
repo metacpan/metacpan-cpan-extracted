@@ -1,0 +1,20 @@
+#title test
+
+Hello [1] [2] {3}
+
+[1] Messed {3}
+
+[1] Up. One footnote is missing <verbatim>{1}</verbatim>
+
+{4} Hello
+
+{5} There
+
+{6} There are more footnotes than references
+
+{{{
+{7}
+}}}
+
+<verbatim>{1}</verbatim>
+

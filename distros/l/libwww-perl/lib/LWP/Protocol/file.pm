@@ -1,8 +1,10 @@
 package LWP::Protocol::file;
-$LWP::Protocol::file::VERSION = '6.29';
+
 use base qw(LWP::Protocol);
 
 use strict;
+
+our $VERSION = '6.31';
 
 require LWP::MediaTypes;
 require HTTP::Request;

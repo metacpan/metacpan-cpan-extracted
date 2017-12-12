@@ -13,6 +13,7 @@ build_requires:
   Test::More: '0'
   Test::NoWarnings: '0'
   Time::HiRes: '0'
+  autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -28,17 +29,15 @@ no_index:
     - inc
 requires:
   Call::Context: '0'
-  Digest::SHA: '0'
+  Digest::SHA1: '0'
   HTTP::Headers::Util: '0'
   MIME::Base64: '0'
   Module::Load: '0'
   URI::Split: '0'
   X::Tiny: '0'
-  autodie: '0'
-  overload: '0'
   parent: '0'
   perl: '5.01'
 resources:
   repository: git://github.com/FGasper/p5-Net-WebSocket.git
-version: '0.053'
+version: '0.061'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

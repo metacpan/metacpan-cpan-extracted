@@ -3,11 +3,16 @@ use Test2::AsyncSubtest;
 use Test2::Tools::AsyncSubtest;
 use Test2::Tools::Compare qw{ array event call T };
 use Test2::IPC;
-use Test2::Util qw/CAN_REALLY_FORK CAN_THREAD/;
+use Test2::Util qw/CAN_REALLY_FORK/;
 use Test2::API qw/context context_do intercept/;
 
+sub DO_THREADS {
+    return 0 unless $ENV{AUTHOR_TESTING} || $ENV{T2_DO_THREAD_TESTS};
+    return Test2::AsyncSubtest->CAN_REALLY_THREAD;
+}
+
 skip_all 'These tests require forking or threading'
-    unless CAN_REALLY_FORK || CAN_THREAD;
+    unless CAN_REALLY_FORK || DO_THREADS();
 
 subtest(
     'fork tests',
@@ -23,7 +28,7 @@ subtest(
         run_tests('thread');
         stress_tests('thread');
     }
-) if Test2::AsyncSubtest->CAN_REALLY_THREAD;
+) if DO_THREADS();
 
 done_testing;
 

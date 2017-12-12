@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Auth::Mongo;
-{
-  $Mojito::Auth::Mongo::VERSION = '0.24';
-}
+$Mojito::Auth::Mongo::VERSION = '0.25';
 use Moo;
 use Data::Dumper::Concise;
 

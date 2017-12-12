@@ -20,6 +20,7 @@ GetOptions(
     'token=s'  => \my $token,
     'all'      => \my $all,
     'format=s' => \my $format,
+    'retry=i'  => \my $retries,
 
     'help'     => \my $help,
     'verbose'  => \my $verbose,
@@ -85,8 +86,9 @@ my $method = shift( @args );
 
 try {
     my $api = GitLab::API::v3->new(
-        url   => $url,
-        token => $token,
+        url     => $url,
+        token   => $token,
+        retries => $retries,
     );
 
     if ($all) {
@@ -106,11 +108,13 @@ try {
     # Replace all non HASH/ARRAY references with strings.  This is
     # implemented generically, but really only causes JSON boolean
     # object to be stringified which makes sense for non-JSON serializers.
-    if ($format ne 'JSON') {
-        $data = clean_data( $data );
+    if (ref $data) {
+        $data = clean_data( $data ) if $format ne 'JSON';
+        print $serializer->serialize( $data );
     }
-
-    print $serializer->serialize( $data );
+    else {
+        print $data;
+    }
 }
 catch {
     $log->fatal( $_ );

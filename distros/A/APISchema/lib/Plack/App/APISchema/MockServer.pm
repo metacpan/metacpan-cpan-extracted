@@ -4,6 +4,7 @@ use warnings;
 use parent qw(Plack::Component);
 use Plack::Util::Accessor qw(schema);
 use Plack::Request;
+use Encode qw(encode_utf8);
 
 use APISchema::JSON;
 
@@ -40,7 +41,7 @@ sub call {
 
     # TODO: serve all headers defined in example
     # TODO: format body with encoding
-    return [200, ['Content-Type' => 'application/json; charset=utf-8'], [$formatter->body]];
+    return [200, ['Content-Type' => 'application/json; charset=utf-8'], [encode_utf8($formatter->body)]];
 }
 
 sub router {

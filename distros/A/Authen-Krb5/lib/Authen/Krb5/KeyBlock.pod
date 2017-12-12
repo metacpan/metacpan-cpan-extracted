@@ -1,0 +1,47 @@
+# PODNAME: Authen::Krb5::KeyBlock
+# ABSTRACT: Kerberos 5 keyblock object.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Authen::Krb5::KeyBlock - Kerberos 5 keyblock object.
+
+=head1 VERSION
+
+version 1.905
+
+=head1 METHODS
+
+=head2 C<enctype()>
+
+Returns the encryption type ID.
+
+=head2 C<enctype_string()>
+
+Returns a text description of the encryption type.
+
+=head2 C<length()>
+
+Returns the length of the session key.
+
+=head2 C<contents()>
+
+Returns the actual contents of the keyblock (the session key).
+
+=head1 AUTHOR
+
+Jeff Horwitz <jeff@smashing.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Jeff Horwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

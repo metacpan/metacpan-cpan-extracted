@@ -26,7 +26,7 @@ no_index:
 provides:
   Minion::Backend::SQLite:
     file: lib/Minion/Backend/SQLite.pm
-    version: '3.001'
+    version: '3.003'
 requires:
   List::Util: '0'
   Minion: '8.0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Minion-Backend-SQLite/issues
   homepage: https://github.com/Grinnz/Minion-Backend-SQLite
   repository: https://github.com/Grinnz/Minion-Backend-SQLite.git
-version: '3.001'
+version: '3.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -98,7 +98,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.030'
+      version: '0.031'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
@@ -190,7 +190,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.001
+          tag: v3.003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

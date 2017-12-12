@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.42  2017-12-02
+	- mapping update
+
 0.41  2017-11-09
 	- mapping update
 	- fix link in Pod (github PR #4)

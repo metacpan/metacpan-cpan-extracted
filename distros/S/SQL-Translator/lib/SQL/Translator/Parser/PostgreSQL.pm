@@ -247,7 +247,8 @@ create : CREATE unique(?) /(index|key)/i index_name /on/i table_id using_method(
                 supertype => $item{'unique'}[0] ? 'constraint' : 'index',
                 type      => $item{'unique'}[0] ? 'unique'     : 'normal',
                 fields    => $item[9],
-                method    => $item{'using_method'}[0],
+                method    => $item{'using_method(?)'}[0],
+                where     => $item{'where_predicate(?)'}[0],
             }
         ;
     }
@@ -613,9 +614,14 @@ pg_data_type :
             $return = { type => 'bytea' };
         }
     |
-    /(timestamptz|timestamp)(?:\(\d\))?( with(?:out)? time zone)?/i
+    / ( timestamp (?:tz)? ) (?: \( \d \) )? ( \s with (?:out)? \s time \s zone )? /ix
         {
             $return = { type => 'timestamp' . ($2||'') };
+        }
+    |
+    / ( time (?:tz)? ) (?: \( \d \) )? ( \s with (?:out)? \s time \s zone )? /ix
+        {
+            $return = { type => 'time' . ($2||'') };
         }
     |
     /text/i
@@ -626,7 +632,7 @@ pg_data_type :
             };
         }
     |
-    /(bit|box|cidr|circle|date|inet|line|lseg|macaddr|money|numeric|decimal|path|point|polygon|timetz|time|varchar|json|hstore)/i
+    /(bit|box|cidr|circle|date|inet|line|lseg|macaddr|money|numeric|decimal|path|point|polygon|varchar|json|hstore|uuid)/i
         {
             $return = { type => $item[1] };
         }
@@ -1000,11 +1006,11 @@ SET : /set/i
 NAME : DQSTRING
     | /\w+/
 
-DQSTRING : '"' /((?:[^"]|"")+)/ '"'
-    { ($return = $item[2]) =~ s/""/"/g; }
+DQSTRING : '"' <skip: ''> /((?:[^"]|"")+)/ '"'
+    { ($return = $item[3]) =~ s/""/"/g; }
 
-SQSTRING : "'" /((?:[^']|'')*)/ "'"
-    { ($return = $item[2]) =~ s/''/'/g }
+SQSTRING : "'" <skip: ''> /((?:[^']|'')*)/ "'"
+    { ($return = $item[3]) =~ s/''/'/g }
 
 VALUE : /[-+]?\d*\.?\d+(?:[eE]\d+)?/
     | SQSTRING
@@ -1075,10 +1081,14 @@ sub parse {
         }
 
         for my $idata ( @{ $tdata->{'indices'} || [] } ) {
+            my @options = ();
+            push @options, { using => $idata->{'method'} } if $idata->{method};
+            push @options, { where => $idata->{'where'} }  if $idata->{where};
             my $index  =  $table->add_index(
-                name   => $idata->{'name'},
-                type   => uc $idata->{'type'},
-                fields => $idata->{'fields'},
+                name    => $idata->{'name'},
+                type    => uc $idata->{'type'},
+                fields  => $idata->{'fields'},
+                options => \@options
             ) or die $table->error . ' ' . $table->name;
         }
 

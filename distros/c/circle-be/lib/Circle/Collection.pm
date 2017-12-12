@@ -7,6 +7,8 @@ package Circle::Collection;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Carp;
 require attributes;
 

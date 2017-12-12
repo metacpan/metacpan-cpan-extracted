@@ -1,0 +1,397 @@
+.\" This file is part of runcap -*- nroff -*-
+.\" Copyright (C) 2017 Sergey Poznyakoff
+.\"
+.\" Runcap is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3, or (at your option)
+.\" any later version.
+.\"
+.\" Runcap is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with runcap.  If not, see <http://www.gnu.org/licenses/>.
+.TH RUNCAP 2 "August 22, 2017" "RUNCAP" "User Commands"
+.SH NAME
+runcap \- run external process and capture its stdout and stderr
+.SH SYNOPSIS
+.nf
+.B #include <runcap.h>
+.sp
+.BI "int runcap(struct runcap *" rc ", int " flags );
+.BI "void runcap_free(struct runcap *" rc );
+.sp
+.BI "int runcap_getc(struct runcap *" rc ", int " stream ", char *" cp );
+.BI "ssize_t runcap_getline(struct runcap *" rc ", int " stream ,
+.BI "                       char **" pstr ", size_t *" psize );
+.sp
+.BI "off_t runcap_tell(struct runcap *" rc ", int " stream );
+.BI "off_t runcap_seek(struct runcap *" rc ", int " stream ", off_t " off ", int " whence);
+.BI "int runcap_rewind(struct runcap *" rc ", int " stream );
+.SH DESCRIPTION
+The function
+.B runcap
+runs an external command, and waits for its termination, capturing
+its standard output and standard error streams, and optionally
+supplying data at its standard input.
+.PP
+The \fIrc\fR argument points to \fBstruct runcap\fR, which serves two
+purposes.  On input, it supplies the necessary data for running the
+command.  The caller is responsible for pointing the 
+.B rc_argv
+member to the vector of command line arguments.  This member must
+always be initialized.  If any of the remaining members are
+initialized, the caller must inform the
+.B runcap
+function about it by setting appropriate bit in the \fIflags\fR
+argument.
+.PP
+The function returns 0 on success, and -1 on error.
+.PP
+Upon return from
+.BR runcap ,
+the remaining members of the structure will be filled with the
+information about the termination status of the program and the
+captured content of its standard output and standard error streams.
+.PP
+Whatever the return status, when no longer used the structure must be
+freed using
+.BR runcap_free .
+.PP
+.SS The struct runcap argument
+The \fBstruct runcap\fR is defined as follows:
+.PP
+.in +4n
+.nf
+struct runcap
+{
+    char *rc_program;    /* [\fIIN\fR] (Path)name of the program to run */ 
+    char **rc_argv;      /* [\fIIN\fR] Argument vector */
+    unsigned rc_timeout; /* [\fIIN\fR] Execution timeout */
+    struct stream_capture rc_cap[3]; 
+    pid_t rc_pid;        /* [\fIOUT\fR] PID of the process */
+    int rc_status;       /* [\fIOUT\fR] Termination status */
+    int rc_errno;        /* [\fIOUT\fR] System error code */
+};
+.fi
+.in
+.PP
+Members that may be initialized on input are marked with
+[\fIIN\fR], those that are set upon return from \fBruncap()\fR are
+marked with [\fIOUT\fR].
+.PP
+The caller is responsible for initializing the \fBrc_argv\fR member
+with a pointer to the command line arguments array.  Other
+input fields are:
+.TP
+.B rc_program
+Actual pathname of the program to be executed.  If initialized, the
+\fBRCF_PROGRAM\fR bit must be set in \fIflags\fR.  Otherwise, the
+value of \fBrc_argv[0]\fR is assumed.
+.TP
+.B rc_timeout
+Time to wait for the program termination, in seconds.  If initialized,
+the \fBRCF_TIMEOUT\fR bit must be set in \fIflags\fR.  If not set,
+.B runcap
+will wait indefinitely.
+.PP
+The three streams associated with the running command are described by
+the
+.B rc_cap
+array.  Its elements correspond to the standard input, output and
+error streams.  Upon successful return, the captured
+data from stdin and stdout can be retrieved using the \fBruncap_getc\fR, and
+\fBruncap_getline\fR functions (see below).  For convenience, the
+following constants are defined in \fBruncap.h\fR to refer to the
+corresponding streams:
+.BR RUNCAP_STDIN ,
+.BR RUNCAP_STDOUT ,
+.BR RUNCAP_STDERR .
+.PP
+The following fields are warranted to be present in \fBstruct
+stream_capture\fR:
+.PP
+.in +4n
+.nf
+struct stream_capture
+{
+    size_t sc_size;      /* [\fIIN\fR] size of the buffer */
+    void (*sc_linemon)(const char *, size_t, void *);
+                         /* [\fIIN\fR] Line monitor function */
+    void  *sc_monarg;    /* [\fIIN\fR] Value for its 3rd parameter */
+
+    off_t  sc_leng;      /* [\fIOUT\fR] total length of captured data */
+    size_t sc_nlines;    /* [\fIOUT\fR] number of captured lines */
+
+    /* The following two are available only in \fBrc_cap[RUNCAP_STDIN]\fR,
+       see the subsection \fBSupplying standard input\fR below, for
+       details). */
+    size_t sc_fd;        /* Input file descriptor */
+    char *sc_base;       /* Input data */
+};
+.fi
+.in
+.PP
+The caller may initialize the following members in
+\fBrc_cap[RUNCAP_STDOUT]\fR and \fBrc_cap[RUNCAP_STDERR]\fR:
+.TP
+.B sc_size
+Size of the buffer (\fBsize_t\fR).  If set, the \fBRCF_STDOUT_SIZE\fR
+(for \fBRUNCAP_STDOUT\fR) or \fBRCF_STDERR_SIZE\fR (for
+\fBRUNCAP_STDERR\fR) bit must be set in \fIflags\fR.  If the amount of
+input data exceeds the buffer size, the data are saved in the disk
+file, therefore setting a larger buffer can improve performance.
+Setting \fBsc_size\fR to 0 disables capturing.
+
+Default buffer size is 4096 bytes.
+.TP
+.B sc_linemon
+A pointer to the line monitor function.  If set, the
+\fBRCF_STDOUT_LINEMON\fR (for \fBRUNCAP_STDOUT\fR), or
+\fBRCF_STDERR_LINEMON\fR (for \fBRUNCAP_STDERR\fR) bit must be set in
+\fIflags\fR.
+.sp
+The line monitor function allows the caller to monitor the arrival of
+the new data in the corresponding stream.  It is declared as follows:
+.sp
+.BI "void linemon(const char *" line ", size_t " size ", void *" data )
+.sp
+where \fIline\fR is the line that has been read, \fIsize\fR is its
+length, and \fIdata\fR is an opaque pointer to application-specific
+data, supplied in the \fBsc_monarg\fR member.
+.sp
+The line monitor function is invoked each time a newline character is
+encountered in the stream, or when the stream buffer becomes full (and,
+therefore is about to be flushed into the storage file) and some
+characters remain unreported.  This means that, if the
+\fBsc_linemon\fR function is designed to log each input line, it
+should keep the state of processing (e.g. in the \fIdata\fR argument),
+and concatenate the \fIline\fR parameters until
+\fBline[size-1] == '\\n'\fR. 
+.TP
+.B sc_monarg
+The value of the \fIdata\fR parameter for the \fBsc_linemon\fR
+function.  It can be initialized only if \fBsc_linemon\fR is
+initialized as well.
+.SS Supplying standard input
+The
+.B rc_cap[RUNCAP_STDIN]
+field can be used to supply standard input for the command.  The input
+can be supplied either as a character string, or as a file
+descriptor.  To use the first method, initialize
+.B rc_cap[RUNCAP_STDIN].sc_base
+with the pointer to the string,
+.B rc_size
+with its length, and set
+.B sc_fd
+to -1.
+.PP
+To use the second method, set
+.B rc_cap[RUNCAP_STDIN].sc_fd
+to the file descriptor opened for reading, and set
+.B rc_cap[RUNCAP_STDIN].sc_base
+to
+.BR NULL .
+.PP
+Whichever approach is used, set the \fBRCF_STDIN\fR bit in \fIflags\fR
+to inform
+.B runcap()
+about the fact.
+.SS Output
+Upon return, the following fields are initialized:
+.TP
+.B rc_status
+Termination status, as returned by
+.BR wait (2).
+.TP
+.B rc_errno
+Value of errno, if terminated on error.
+.PP
+The following fields are defined upon successful return:
+.TP
+.B rc_cap[RUNCAP_STDOUT].sc_leng
+Total length of captured stdout.
+.TP
+.B rc_cap[RUNCAP_STDOUT].sc_nlines
+Number of lines in the captured stdout.
+.TP
+.B rc_cap[RUNCAP_STDERR].sc_leng
+Total length of captured stderr.
+.TP
+.B rc_cap[RUNCAP_STDERR].sc_nlines
+Number of lines in the captured stderr.
+.PP
+The actual data can be retrieved using the \fBruncap_getc\fR, and
+\fBruncap_getline\fR functions, described below.
+.SH Examining output
+Upon return from \fBruncap\fR the following functions can be used to
+retrieve the captured data from the \fBstruct runcap\fR object pointed
+to by its \fIrc\fR argument.  The stream to retrieve data from is
+identified by the \fIstream\fR argument, whose valid values are
+\fBRUNCAP_STDOUT\fR (or \fB1\fR) or \fBRUNCAP_STDERR\fR (or \fB2\fR).
+.PP
+The function \fBruncap_getc\fR reads the next character from the
+captured stream and returns it as an unsigned char cast to an int.
+It returns 0 on end of stream, and -1 on error.  In the latter case,
+the \fBerrno\fR variable contains the error code, as usual.
+.PP
+The function \fBruncap_getline\fR reads all characters from the
+current position in the stream up to and including the next newline
+character (ASCII 10).  It will allocate the buffer for the characters
+as necessary and will store the address of the buffer into
+\fB*pstr\fR, and its allocated size in \fB*psize\fR.  The buffer is
+null-terminated and includes the newline character, if one was found.
+.PP
+If \fB*pstr\fR is \fBNULL\fR, the function will allocate a buffer of
+sufficient size for storing the line.
+.PP
+Otherwise, \fB*pstr\fR should contain a pointer to a buffer
+\fB*psize\fR bytes in size, allocated using
+.BR malloc (3).
+If the buffer is not large enough to hold the characters,
+.B runcap_getline
+will resize it using
+.BR realloc (3),
+updating \fB*pstr\fR and \fB*psize\fR as necessary.
+.PP
+On success,
+.B runcap_getline
+returns the number of characters (including the newline) stored in the
+buffer, or 0 if end of stream is reached.  On error, it returns -1 and
+sets \fBerrno\fR.
+.PP
+The function \fBruncap_tell\fR returns offset in bytes to the current
+position in the requested stream.
+.PP
+The function \fBruncap_seek\fR repositions the offset of the requested
+\fIstream\fR to the argument \fIoffset\fR according to the directive
+\fIwhence\fR as follows:
+.TP
+.B SEEK_SET
+The offset is set to \fIoffset\fR bytes.
+.TP
+.B SEEK_CUR
+The offset is set to its current location plus \fIoffset\fR bytes.
+.TP
+.B SEEK_END
+The offset is set to the size of the stream (\fBsc_leng\fR) plus
+\fIoffset\fR bytes.
+.PP
+The function returns 0 on success.  On error, it returns -1 and sets
+\fBerrno\fR.
+.PP
+The function \fBruncap_rewind\fR repositions the current offset of
+\fIstream\fR to 0.
+.PP
+The following pairs of calls are equivalent:
+.PP
+.in +4n
+.nf
+runcap_tell(rc, stream) <=> runcap_seek(rc, stream, 0, SEEK_CUR)
+.fi
+.in
+.sp
+and
+.sp
+.in +4n
+.nf
+runcap_rewind(rc, stream) <=> runcap_seek(rc, stream, 0, SEEK_SET)
+.fi
+.in
+.SH RETURN VALUE
+Upon successful completion,
+.B runcap()
+returns 0.  The \fBrc.rc_status\fR value should be inspected to see if
+the program terminated successfully.  On error, it sets the
+\fBrc.rc_errno\fR and returns -1.
+.PP
+The
+.B runcap_getc()
+returns the retrieved character on success, 0 if end of stream is hit,
+and -1 on error.
+.PP
+The function
+.B runcap_getline()
+returns the number of retrieved characters (including the newline) on
+success, 0 on end of stream, and -1 on error.
+.PP
+.B runcap_tell()
+and 
+.B runcap_seek()
+return the current offset (a non-negative value) on success, and -1
+on error.
+.PP
+.B runcap_rewind()
+returns 0 on success and -1 on error.
+.PP
+When returning an error (-1), all functions set the global \fBerrno\fR
+variable to the code describing the error. 
+.SH EXAMPLE
+The function below runs the
+.BR tar (1)
+command in verbose mode and returns its output as an array of
+strings.
+.PP
+.in +4n
+.nf
+char **
+archive(void)
+{
+    struct runcap rc;
+    int res;
+    char *av[] = { "tar", "cfv", "src.tar", "src", NULL };
+    char **ret = NULL;
+    
+    rc.rc_program = "/bin/tar";
+    rc.rc_argv = av;
+    res = runcap(&rc, RCF_PROGRAM);
+    if (res == -1) {
+        perror("runcap");
+        abort();
+    }     
+
+    if (WIFEXITED(rc.rc_status) && WEXITSTATUS(rc.rc_status) == 0) {
+        char **ret;
+        size_t nlines = rc.rc_cap[RUNCAP_STDOUT].sc_nlines;     
+        ret = malloc(nlines + 1);
+        for (i = 0; i < nlines; i++) {
+            char *p = NULL;
+            size_t sz = 0;
+            ssize_t n;
+
+            n = runcap_getline(rc, stream, p, &sz);
+            if (n == -1) {
+                perror("runcap_getline");
+                abort();
+            }
+            ret[i] = realloc(p, n + 1);
+        }
+        ret[i] = NULL;
+    }
+    runcap_free(&rc);
+    return ret;
+}
+
+.fi
+.in
+
+.SH AUTHORS
+Sergey Poznyakoff
+.SH COPYRIGHT
+Copyright \(co 2017 Sergey Poznyakoff
+.br
+.na
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+.br
+.ad
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.\" Local variables:
+.\" eval: (add-hook 'write-file-hooks 'time-stamp)
+.\" time-stamp-start: ".TH [A-Z_][A-Z0-9_.\\-]* [0-9] \""
+.\" time-stamp-format: "%:B %:d, %:y"
+.\" time-stamp-end: "\""
+.\" time-stamp-line-limit: 20
+.\" end:

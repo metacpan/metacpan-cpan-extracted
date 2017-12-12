@@ -6,8 +6,9 @@ package Circle::Widget;
 
 use strict;
 use warnings;
-
 use base qw( Tangence::Object );
+
+our $VERSION = '0.173320';
 
 sub new
 {

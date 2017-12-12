@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+# PODNAME: qsimple
+# ABSTRACT: push/pop things to queues, using App::Basis::Queue
+
+=head1 SYNOPSIS
+
+    add a message to queue fred, will be a simple queue,
+    > qsimple -q fred "message to tweet"
+
+    # take an item from a simple queue, output to STDOUT
+    > qsimple -q fred --pop
+
+    to get full help use
+    > qsimple --help
+
+    # add to queue from output of another process
+    # '-' says read from STDIN
+    some_script | qsimple -q barney -
+
+=head1 DESCRIPTION
+
+Add am item to a queue or process an item from a queue
+
+config file is in ~/.abq
+
+    queue:
+        dsn: dbi:SQLite:/tmp/abq.sqlite
+        user:
+        password:
+
+
+The queue entry holds information about the queue database that you want to connect to, this is
+obviously a perl DBI style connection
+
+=cut
+
+#
+# (c) Kevin Mulholland, moodfarm@cpan.org
+# this code is released under the Perl Artistic License
+
+# -----------------------------------------------------------------------------
+
+use 5.10.0 ;
+use strict ;
+use warnings ;
+use App::Basis ;
+use App::Basis::Config ;
+use DBI ;
+use App::Basis::Queue ;
+# what about Data::Dumper::GUI or YAML::Tiny::Color
+use Data::Printer ;
+
+# -----------------------------------------------------------------------------
+
+use constant QUEUE_CONFIG => "$ENV{HOME}/.abq" ;
+
+# -----------------------------------------------------------------------------
+# connect to the queue DB
+
+sub connect_queue
+{
+    my ( $dsn, $user, $passwd, $qname ) = @_ ;
+    my $dbh
+        = DBI->connect( $dsn, $user, $passwd,
+        { RaiseError => 1, PrintError => 0, AutoCommit => 1 } )
+        or die "Could not connect to DB $dsn" ;
+
+    if ( $dsn =~ /SQLite/i ) {
+        $dbh->do("PRAGMA journal_mode = WAL") ;
+        $dbh->do("PRAGMA synchronous = NORMAL") ;
+    }
+
+    my $queue = App::Basis::Queue->new(
+        dbh           => $dbh,
+        default_queue => $qname,
+        debug         => 0,
+    ) ;
+    return $queue ;
+}
+
+# -----------------------------------------------------------------------------
+# main
+
+my $action ;
+
+my %opt = init_app(
+    help_text => "Simple method to push and pop messages to a queue, if message is '-' input read from STDIN
+        use perldoc "
+        . get_program()
+        . " to get the setup for the "
+        . QUEUE_CONFIG
+        . " config file",
+    help_cmdline => "message to pushed onto the queue",
+    options      => {
+        'queue|q=s' => { desc => 'queue to add things to', required => 1 },
+        'pop|p' => 'Pop an item from the queue',
+    }
+) ;
+
+my $msg = join( ' ', @ARGV ) ;
+# optionally ready from stdin, allowing piping to script
+if( !$opt{pop} && $msg eq '-') {
+    $msg = "" ;
+    foreach (<STDIN>) {
+        $msg .= $_ ;
+    }
+    # remove any final linefeed
+    chomp $msg ;
+}
+
+
+show_usage( "No config file found", 1) if( ! -f QUEUE_CONFIG) ;
+
+# config is shared for all App::Basis::Queue
+my $cfg
+    = App::Basis::Config->new( filename => QUEUE_CONFIG, die_on_error => 1 ) ;
+
+my $q = $cfg->get("queue") ;
+msg_exit( "Could not find valid config in " . QUEUE_CONFIG, 2 )
+    if ( !$q ) ;
+
+$q->{prefix} ||= "/simple" ;
+$q->{prefix} .= "/" if ( $opt{queue} !~ /^\// ) ;
+$opt{queue} = $q->{prefix} . $opt{queue} ;
+$opt{queue} =~ s|//|/|g ;
+
+my $theq
+    = connect_queue( $q->{dsn}, $q->{user}, $q->{password}, $opt{queue} ) ;
+
+msg_exit( "Could not connect to queue $q->{dsn}", 2 ) if ( !$theq ) ;
+
+if ( $opt{pop} ) {
+    my $msg = $theq->pop() ;
+    print "$msg->{data}\n" if ($msg) ;
+} elsif ($msg) {
+    my $id = $theq->push( data => { data => $msg } ) ;
+    msg_exit( "Could not push message", 1 ) if ( !$id ) ;
+} else {
+    msg_exit( "No message to push", 1 ) ;
+}

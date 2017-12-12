@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::JSON;
-$Catalyst::Action::Serialize::JSON::VERSION = '1.20';
+$Catalyst::Action::Serialize::JSON::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 
@@ -19,6 +19,12 @@ sub _build_encoder {
 sub execute {
     my $self = shift;
     my ( $controller, $c ) = @_;
+
+    if (my $options = $controller->{json_options_encode}) {
+        foreach my $opt (keys %$options) {
+            $self->encoder->$opt( $options->{$opt} );
+        }
+    }
 
     my $stash_key = (
             $controller->{'serialize'} ?

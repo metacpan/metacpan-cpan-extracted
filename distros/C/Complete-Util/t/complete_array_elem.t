@@ -122,7 +122,7 @@ subtest "opt:word_mode" => sub {
     );
 };
 
-subtest "opt:char_mode" => sub {
+subtest "opt:char_mode (prefix)" => sub {
     local $Complete::Common::OPT_CHAR_MODE;
 
     $Complete::Common::OPT_CHAR_MODE = 0;
@@ -135,10 +135,30 @@ subtest "opt:char_mode" => sub {
 
     $Complete::Common::OPT_CHAR_MODE = 1;
     test_complete(
-        name      => 'opt:char_mode=0',
+        name      => 'opt:char_mode=1',
         word      => 'ab',
         array     => [qw(axb xaxb ba)],
-        result    => [qw(axb xaxb)],
+        result    => [qw(axb)],
+    );
+};
+
+subtest "opt:char_mode" => sub {
+    local $Complete::Common::OPT_CHAR_MODE;
+
+    $Complete::Common::OPT_CHAR_MODE = 0;
+    test_complete(
+        name      => 'opt:char_mode=0',
+        word      => 'ab',
+        array     => [qw(bxb xaxb ba)],
+        result    => [qw()],
+    );
+
+    $Complete::Common::OPT_CHAR_MODE = 1;
+    test_complete(
+        name      => 'opt:char_mode=1',
+        word      => 'ab',
+        array     => [qw(bxb xaxb ba)],
+        result    => [qw(xaxb)],
     );
 };
 

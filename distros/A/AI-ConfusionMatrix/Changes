@@ -1,10 +1,95 @@
 ==================================================
-Changes from 2015-11-09 00:00:00 +0000 to present.
+Changes from 2015-12-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2016-11-08 12:59:01 +0000
+version 0.007 at 2017-12-04 20:01:19 +0000
 ------------------------------------------
+
+  Change: 94701b325fc7641a666e05518533839960be1dc2
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-30 21:27:28 +0000
+
+    Duplicated use strict statement 
+
+  Change: c612c6584426285b4ad4bb81d19e0d06705801bf
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-29 16:20:22 +0000
+
+    Document the computation of Sensitivity 
+
+  Change: ade3e0c6e19c005a02f54662b01ed6623283bb68
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-25 18:05:13 +0000
+
+    Compute the sensitivity once we have collected all the false
+    positives 
+
+  Change: 8e55580eb20cb5011b2c7ad932553654a4f7dfd4
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-12 01:23:34 +0000
+
+    Increase the max age for the auto-generated Changes file
+
+    This keeps two years of history now 
+
+  Change: e468a3e1eff548bbc594ad9c39d4e54155105dbc
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-12 01:01:00 +0000
+
+    Use strict and warnings 
+
+  Change: 625b719fcd376318a866f5658e05c6c37a86889d
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-08 22:02:37 +0000
+
+    Changed email 
+
+  Change: d73032ef2fcefce4a9dadba0be174ae13cd9ab71
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-08 21:52:05 +0000
+
+    Compute the sensitivity 
+
+  Change: cbff868057b49d9ffbe285f8528be62223bab061
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-11-08 21:31:10 +0000
+
+    Append the '%' in the sprintf 
+
+  Change: b85dc7c2c4789db4e877f3b233ccea84c0830c5f
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-04-29 19:18:16 +0000
+
+    adds .travis.yml 
+
+  Change: 76c1eaab4b36e158af61e053e7db7d7dad48c268
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-01-18 21:34:50 +0000
+
+    update year 
+
+  Change: 344d2d22d57c4afca65c6b5086f656774850bb82
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-01-18 21:26:14 +0000
+
+    Email changed 
+
+  Change: 86b968f592252f912bd87160004d32634a610dc8
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-12-06 22:58:10 +0000
+
+    Add the possibility of supplying a custom separator for the output 
+
+------------------------------------------
+version 0.006 at 2016-11-08 12:59:33 +0000
+------------------------------------------
+
+  Change: 54d890c4b92e8a08bb81d0c3d4cd507e5e24dc73
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-11-08 13:59:33 +0000
+
+    Release 0.006 
 
   Change: 2c0eee06e08f6224c876bf7ea9d016b2410a9186
   Author: Vincent Lequertier <sky@riseup.net>

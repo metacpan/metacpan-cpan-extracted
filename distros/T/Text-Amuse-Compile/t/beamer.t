@@ -29,10 +29,12 @@ my %compiler_args = (sl_tex => !TEST_WITH_LATEX, slides => !!TEST_WITH_LATEX);
 my $muse_body = <<'MUSE';
 #title Slides
 
-*** Text::Slides
+*** Text::Slides {2}
 
  - first
  - second
+
+{2} footnotes
 
 *** Section ignored
 
@@ -46,11 +48,13 @@ Text ignored
 
 This is ignored
 
-*** Secon Text::Slides
+*** Second Text::Slides [1]
 
  - third
  - fourth
  Term :: Definition
+
+[1] Footnote
 
 MUSE
 

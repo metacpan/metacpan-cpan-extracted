@@ -8,7 +8,7 @@ our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
 require Exporter;
 @ISA = qw(Exporter);
 
-use IPC::Cmd qw(can_run run);
+use IPC::Cmd qw(can_run);
 
 use FFI::Platypus;
 use FFI::CheckLib;
@@ -86,7 +86,6 @@ use constant {
             ffi_data => [ ['opaque', 'string', 'string'], 'opaque' ]
         },
 
-        # libudev >= 189
         # struct udev_device *udev_device_new_from_device_id(struct udev *udev, const char *id);
         'udev_device_new_from_device_id' => {
             ffi_data => [ ['opaque', 'string'], 'opaque' ],
@@ -401,14 +400,13 @@ use constant {
 
 
 my $init = 0;
-my $is_libudev_load = 1;
 
 
 
 sub udev_version {
     my $full_path = can_run('udevadm');
 
-    if(!$full_path) {
+    if(!defined $full_path) {
         for(@{ +UDEVADM_LOCATIONS }) {
             if(-f) {
                 $full_path = $_;
@@ -417,25 +415,27 @@ sub udev_version {
         }
     }
 
-    if(!$full_path) {
-        $@ = "Can't find udevadm utility";
+    if(!defined $full_path) {
+        $@ = "Can't find `udevadm` utility";
         return undef;
     }
 
 
-    my ( $success, $error_message, undef, $stdout_buf, $stderr_buf ) =
-        run( command => [$full_path, '--version'], timeout => 60, verbose => 0 );
+    {
+        local $SIG{__WARN__} = sub {}; # silence shell output if error
 
-    if(!$success) {
-        $@ = $error_message;
-        return undef;
-    }
-    if($stdout_buf->[0] !~ /^(\d+)\s*$/) {
-        $@ = "Can't get udev version from udevadm utility";
-        return undef;
+        if(open my $ph, '-|', $full_path, '--version') {
+            if(<$ph> !~ /^(\d+)\s*$/) {
+                $@ = "Can't get udev version from `udevadm` utility";
+                return undef;
+            }
+
+            return $1;
+        }
     }
 
-    return $1;
+    $@ = "Can't run `udevadm` utility";
+    return undef;
 }
 
 
@@ -475,15 +475,14 @@ sub get_entries {
 
 
 sub init {
-    return $is_libudev_load if $init;
-    ++$init;
+    return 1 if $init;
 
 
-    my $libudev = find_lib(
+    my ($libudev) = find_lib(
         lib => 'udev'
     );
     if(!$libudev) {
-        $is_libudev_load = 0;
+        $@ = "Can't find udev library";
         return 0;
     }
 
@@ -492,8 +491,8 @@ sub init {
     my $ffi = FFI::Platypus->new;
     $ffi->lib($libudev);
 
-    if(8 != $ffi->sizeof('dev_t')) {
-        $is_libudev_load = 0;
+    if(8 != $ffi->sizeof('dev_t')) { #TODO not attach functions with dev_t
+        $@ = "sizeof(dev_t) != 8 on your OS";
         return 0;
     }
 
@@ -502,15 +501,17 @@ sub init {
             $ffi->attach($funct => FUNCTIONS->{$funct}{ffi_data}[0] => FUNCTIONS->{$funct}{ffi_data}[1]);
         };
         if($@) {
-            die "Can't attach '$funct' function from udev library\n"
-                if !exists(FUNCTIONS->{$funct}{since}) || $udev_version >= FUNCTIONS->{$funct}{since};
+            if(!exists(FUNCTIONS->{$funct}{since}) || $udev_version >= FUNCTIONS->{$funct}{since}) {
+                $@ = "Can't attach '$funct' function from udev library\n";
+                return 0;
+            }
 
             no strict 'refs';
             *$funct = sub { $_function_not_attach->($funct) };
         }
     }
 
-    return 1;
+    return ++$init;
 }
 
 

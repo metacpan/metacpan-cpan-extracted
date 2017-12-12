@@ -1,6 +1,20 @@
 History for OTRS::OPM::Installer
 ================================
 
+0.03 2017-12-11 15:19:00
+
+     [BUGFIXES]
+     * Do not exit ooi when a dependency is already installed
+     * Fix 'uninitialized' warnings
+
+     [IMPROVEMENTS]
+     * Allow installation of several addons per run
+         ooi Addon1 Addon2 ...
+     * Support "ooi Addon1=5.0.25 Addon2=5.0.22" syntax to
+       install addons with different version requirements
+     * Support 'list' command
+     * Add more tests
+
 0.02 2017-10-05
 
      * usability improvements

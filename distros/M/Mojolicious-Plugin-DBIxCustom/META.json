@@ -1,0 +1,58 @@
+{
+   "abstract" : "链接DBIx::Custom到Mojolicious的插件",
+   "author" : [
+      "wfso <461663376@qq.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-DBIxCustom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Custom" : "0.40",
+            "Mojolicious" : "7.48",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wfso/Mojolicious-Plugin-DBIxCustom/issues"
+      },
+      "homepage" : "https://github.com/wfso/Mojolicious-Plugin-DBIxCustom/wiki",
+      "license" : [
+         "https://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wfso/Mojolicious-Plugin-DBIxCustom.git",
+         "web" : "https://github.com/wfso/Mojolicious-Plugin-DBIxCustom"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -13,7 +13,7 @@ Net::WebSocket::Frame::pong
         #Optional, can be either empty (default) or four random bytes
         mask => q<>,
 
-        payload_sr => \$payload,
+        payload => $payload,
     );
 
     $frm->get_type();           #"ping"
@@ -39,11 +39,5 @@ use parent qw(
 );
 
 use constant get_opcode => 10;
-
-sub new {
-    my ($class, @opts) = @_;
-
-    return $class->SUPER::new( @opts, type => 'pong' );
-}
 
 1;

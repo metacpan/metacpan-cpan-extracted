@@ -13,7 +13,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.099001';
+$Udev::FFI::VERSION = '0.099002';
 
 
 
@@ -26,8 +26,7 @@ sub new {
     my $self = {};
 
     if(0 == Udev::FFI::Functions->init()) {
-        $@ = "Can't find udev library";
-        return undef;
+        return undef; # error already in $@
     }
 
     $self->{_context} = udev_new();
@@ -171,19 +170,14 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     use Udev::FFI;
 
-    #get udev version
-    my $udev_version = Udev::FFI::udev_version();
-    if(defined $udev_version) {
-        print $udev_version. "\n";
-    }
-    else {
-        warn "Can't get udev version: $@";
-    }
+    #get udev library version
+    my $udev_version = Udev::FFI::udev_version()
+        or die "Can't get udev library version: $@";
 
 
-    #create udev context
+    #create Udev::FFI object
     my $udev = Udev::FFI->new() or
-        die "Can't create udev context: $@";
+        die "Can't create Udev::FFI object: $@";
 
 
     #create udev monitor
@@ -284,16 +278,65 @@ Udev::FFI exposes OO interface to libudev.
  
 This is the constructor for a new Udev::FFI object.
 
-If the constructor fails undef will be returned and an error message will be in $@.
+If the constructor fails undef will be returned and an error message will be in
+$@.
 
     my $udev = Udev::FFI->new() or
         die "Can't create udev context: $@";
 
 =back
 
+=head1 METHODS
+
+=over 4
+
+=item new_monitor ( [SOURCE] )
+
+=item new_enumerate ()
+
+=item new_device_from_syspath ( SYSPATH )
+
+=item new_device_from_devnum ( TYPE, DEVNUM )
+
+=item new_device_from_subsystem_sysname ( SUBSYSTEM, SYSNAME )
+
+=item new_device_from_device_id ( ID )
+
+=item new_device_from_environment ()
+
+E<nbsp>
+
+=item Udev::FFI::udev_version ()
+
+Return the version of the udev library. Because the udev library does not
+provide a function to get the version number, this function runs the `udevadm`
+utility. Return undef with the error in $@ on failure. Also you can check
+$! value: ENOENT (`udevadm` not found) or EACCES (permission denied).
+
+    # simple
+    my $udev_version = Udev::FFI::udev_version()
+        or die "Can't get udev library version: $@";
+    
+    # or catch the error
+    use Errno qw( :POSIX );
+    my $udev_version = Udev::FFI::udev_version();
+    unless(defined $udev_version) {
+        if($!{ENOENT}) {
+            # udevadm not found
+        }
+        elsif($!{EACCES}) {
+            # permission denied
+        }
+    
+        die "Can't get udev library version: $@";
+    }
+
+=back
+
 =head1 EXAMPLES
 
-Examples are provided with the Udev::FFI distribution in the "examples" directory.
+Examples are provided with the Udev::FFI distribution in the "examples"
+directory.
 
 =head1 SEE ALSO
 
@@ -302,6 +345,15 @@ libudev
 L<FFI::Platypus> (Write Perl bindings to non-Perl libraries without C or XS)
 
 L<FFI::CheckLib> (Check that a library is available for FFI)
+
+=head1 BUGS AND LIMITATIONS
+
+Udev::FFI supports libudev 175 or newer. Older versions may work too, but it
+was not tested.
+
+Please report any bugs through the web interface at
+L<https://github.com/Ilya33/udev-ffi/issues> or via email to the author.
+Patches are always welcome.
 
 =head1 AUTHOR
 

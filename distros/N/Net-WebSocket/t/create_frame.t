@@ -19,7 +19,7 @@ my @tests = (
     ],
     [
         'ping with payload',
-        [ 'ping', payload_sr => \'Ping!' ],
+        [ 'ping', payload => 'Ping!' ],
         "\x89\x05Ping!",
     ],
     [
@@ -29,7 +29,7 @@ my @tests = (
     ],
     [
         'pong with payload',
-        [ 'pong', payload_sr => \'Pong!' ],
+        [ 'pong', payload => 'Pong!' ],
         "\x8a\x05Pong!",
     ],
 );

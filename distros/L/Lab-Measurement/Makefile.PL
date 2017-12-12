@@ -38,7 +38,6 @@ my %WriteMakefileArgs = (
     "IO::Select" => 0,
     "IO::Socket" => 0,
     "IO::Socket::INET" => 0,
-    "IO::Socket::Timeout" => "0.32",
     "List::MoreUtils" => 0,
     "List::Util" => 0,
     "Math::Complex" => 0,
@@ -50,8 +49,6 @@ my %WriteMakefileArgs = (
     "MooseX::Params::Validate" => "0.18",
     "PDL" => "2.007",
     "PDL::Core" => 0,
-    "PDL::IO::Misc" => 0,
-    "PDL::Lite" => 0,
     "POSIX" => 0,
     "Role::Tiny" => "1.003004",
     "Role::Tiny::With" => 0,
@@ -93,9 +90,9 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.600",
+  "VERSION" => "3.613",
   "test" => {
-    "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/SCPI/*.t t/XPRESS/*.t"
+    "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
 );
 
@@ -125,7 +122,6 @@ my %FallbackPrereqs = (
   "IO::Select" => 0,
   "IO::Socket" => 0,
   "IO::Socket::INET" => 0,
-  "IO::Socket::Timeout" => "0.32",
   "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Math::Complex" => 0,
@@ -137,8 +133,6 @@ my %FallbackPrereqs = (
   "MooseX::Params::Validate" => "0.18",
   "PDL" => "2.007",
   "PDL::Core" => 0,
-  "PDL::IO::Misc" => 0,
-  "PDL::Lite" => 0,
   "PDL::Ufunc" => 0,
   "POSIX" => 0,
   "Role::Tiny" => "1.003004",

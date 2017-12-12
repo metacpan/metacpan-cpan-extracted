@@ -1,5 +1,26 @@
 Revision history for Perl extension JSONP.
 
+
+1.81
+
+	- exclude colons as well from allowed chars for keys in autovivification
+
+1.80
+
+	- fix CPAN bug #123796
+	- allow all-digit keys for autovivification
+	- extend further allowed char class for keys in autovivification
+	- add couple tests
+
+1.79
+
+	- remove forgotten $VERSION print
+
+1.78
+
+	- allow much greater character set extent for keys in autovivification notation convenience. Now can be any Unicode codepoint that is not a POSIX punctuation char or control char, up to 1024 Unicode chars
+	- now boolean evaluation context does not turn anymore booleans into referenced scalars (bug)
+
 1.77
 
 	- allow much greater character set extent for keys in autovivification notation convenience. Now can be any Unicode letter, number, and spacing, up to 2048 Unicode chars

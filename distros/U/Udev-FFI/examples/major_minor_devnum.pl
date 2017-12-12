@@ -12,7 +12,7 @@ use Udev::FFI::Devnum qw(:all); #import major, minor and mkdev
 
 
 my $udev = Udev::FFI->new() or
-    die "Can't create udev context: $@.\n";
+    die "Can't create Udev::FFI object: $@.\n";
 
 my $enumerate = $udev->new_enumerate() or
     die "Can't create enumerate context: $@.\n";

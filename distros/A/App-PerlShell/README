@@ -1,0 +1,36 @@
+App::PerlShell
+==============
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+FEATURES
+
+The shell supports Perl commands.  It can be assigned a package on 
+start and change packages while in the shell.  Lexical persistence 
+is supported using "my" to declare all variables and keep them between 
+successive commands (not restarts of the shell environment) if 
+Lexical::Persistence is installed.  Used modules in the shell are 
+updated automatically if they change on disk if Module::Refresh is 
+installed.
+
+DEPENDENCIES
+
+For command recall using the up/down arrows in *nix, you will need 
+Term::ReadLine::Gnu installed.  This module will function fine without 
+it as Term::ReadLine is a core module; however, command recall using 
+the up/down arrows will not work.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2015 Michael Vincent (www.VinsWorld.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

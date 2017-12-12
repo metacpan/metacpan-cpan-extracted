@@ -9,6 +9,12 @@ binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 
+BEGIN {
+    if (!eval q{ use Test::Differences; 1 }) {
+        *eq_or_diff = \&is_deeply;
+    }
+}
+
 
 my $muse =<<'EOF';
 #title test
@@ -35,8 +41,8 @@ my $ltx =<<'EOF';
 
 EOF
 
-is muse_to_tex($muse), $ltx, "latex ok";
-is muse_to_html($muse), $html, "html ok";
+eq_or_diff muse_to_tex($muse), $ltx, "latex ok";
+eq_or_diff muse_to_html($muse), $html, "html ok";
 
 
 $muse =<<'EOF';
@@ -73,8 +79,8 @@ $ltx =<<'EOF';
 
 EOF
 
-is muse_to_tex($muse), $ltx, "latex ok (inlined and standalone)";
-is muse_to_html($muse), $html, "html ok (inlined and standalone)";
+eq_or_diff muse_to_tex($muse), $ltx, "latex ok (inlined and standalone)";
+eq_or_diff muse_to_html($muse), $html, "html ok (inlined and standalone)";
 
 
 $muse =<<'EOF';
@@ -121,6 +127,6 @@ $ltx =<<'EOF';
 
 EOF
 
-is muse_to_tex($muse), $ltx, "latex ok (all 3 cases)";
-is muse_to_html($muse), $html, "html ok (all 3 cases)";
+eq_or_diff muse_to_tex($muse), $ltx, "latex ok (all 3 cases)";
+eq_or_diff muse_to_html($muse), $html, "html ok (all 3 cases)";
 

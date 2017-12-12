@@ -257,4 +257,15 @@ SKIP: {
         'Testing holidays with argument for Date::Japanese::Holiday';
 }
 
+SKIP: {
+    eval { require Date::Holidays::KZ };
+    skip "Date::Holidays::KZ not installed", 2 if $@;
+
+    ok( $dh = Date::Holidays->new( countrycode => 'kz' ),
+        'Testing Date::Holidays::KZ' );
+
+    ok( $dh->holidays( year => 2018 ),
+        'Testing holidays with argument for Date::Holidays::KZ' );
+}
+
 done_testing();

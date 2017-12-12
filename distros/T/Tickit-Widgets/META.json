@@ -10,13 +10,13 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Widgets",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -24,10 +24,16 @@
             "List::Util" : "1.33",
             "Parser::MGC" : "0",
             "Struct::Dumb" : "0",
+            "Tickit::Event" : "0.63",
             "Tickit::RenderBuffer" : "0",
             "Tickit::Utils" : "0.29",
             "Tickit::Window" : "0.57",
             "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -42,7 +48,7 @@
       },
       "Tickit::SingleChildWidget" : {
          "file" : "lib/Tickit/SingleChildWidget.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Tickit::Style" : {
          "file" : "lib/Tickit/Style.pm",
@@ -54,11 +60,11 @@
       },
       "Tickit::Widget" : {
          "file" : "lib/Tickit/Widget.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       },
       "Tickit::Widget::Border" : {
          "file" : "lib/Tickit/Widget/Border.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Box" : {
          "file" : "lib/Tickit/Widget/Box.pm",
@@ -66,19 +72,19 @@
       },
       "Tickit::Widget::Button" : {
          "file" : "lib/Tickit/Widget/Button.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::CheckButton" : {
          "file" : "lib/Tickit/Widget/CheckButton.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Entry" : {
          "file" : "lib/Tickit/Widget/Entry.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Fill" : {
          "file" : "lib/Tickit/Widget/Fill.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Frame" : {
          "file" : "lib/Tickit/Widget/Frame.pm",
@@ -86,7 +92,7 @@
       },
       "Tickit::Widget::GridBox" : {
          "file" : "lib/Tickit/Widget/GridBox.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::HBox" : {
          "file" : "lib/Tickit/Widget/HBox.pm",
@@ -94,7 +100,7 @@
       },
       "Tickit::Widget::HSplit" : {
          "file" : "lib/Tickit/Widget/HSplit.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::LinearBox" : {
          "file" : "lib/Tickit/Widget/LinearBox.pm",
@@ -102,19 +108,19 @@
       },
       "Tickit::Widget::LinearSplit" : {
          "file" : "lib/Tickit/Widget/LinearSplit.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Placegrid" : {
          "file" : "lib/Tickit/Widget/Placegrid.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::RadioButton" : {
          "file" : "lib/Tickit/Widget/RadioButton.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Spinner" : {
          "file" : "lib/Tickit/Widget/Spinner.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::Widget::Static" : {
          "file" : "lib/Tickit/Widget/Static.pm",
@@ -126,7 +132,7 @@
       },
       "Tickit::Widget::VSplit" : {
          "file" : "lib/Tickit/Widget/VSplit.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Tickit::WidgetRole" : {
          "file" : "lib/Tickit/WidgetRole.pm",
@@ -138,7 +144,7 @@
       },
       "Tickit::Widgets" : {
          "file" : "lib/Tickit/Widgets.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -147,6 +153,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

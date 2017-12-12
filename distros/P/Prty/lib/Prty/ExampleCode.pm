@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::String;
@@ -118,11 +118,6 @@ oder (in anderer Reihenfolge):
 
     $exa = $class->new(@opt);
 
-=head4 Description
-
-Instantiiere ein Example-Objekt und liefere eine Referenz auf
-dieses Objekt zurück.
-
 =head4 Options
 
 =over 4
@@ -144,6 +139,11 @@ Gib Informationen über die ausgeführten Beispiele auf
 der FileHandle -fileHandle aus.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Example-Objekt und liefere eine Referenz auf
+dieses Objekt zurück.
 
 =cut
 
@@ -229,14 +229,6 @@ sub setVariable {
 
     $res|@res = $exa->execute($code,@opt);
 
-=head4 Description
-
-Führe Beispielcode $code aus und liefere das Resultat der Ausführung
-$res (Skalar-Kontext) oder @res (Listen-Kontext) zurück.
-
-Ist beim Konstruktor die Option -verbose gesetzt worde, wird
-zusätzlich der Beispielcode und das Resultat ausgegeben.
-
 =head4 Options
 
 =over 4
@@ -269,6 +261,14 @@ Gib Informationen über die ausgeführten Beispiele auf
 der FileHandle -fileHandle aus.
 
 =back
+
+=head4 Description
+
+Führe Beispielcode $code aus und liefere das Resultat der Ausführung
+$res (Skalar-Kontext) oder @res (Listen-Kontext) zurück.
+
+Ist beim Konstruktor die Option -verbose gesetzt worde, wird
+zusätzlich der Beispielcode und das Resultat ausgegeben.
 
 =head4 Example
 
@@ -378,7 +378,7 @@ sub execute {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

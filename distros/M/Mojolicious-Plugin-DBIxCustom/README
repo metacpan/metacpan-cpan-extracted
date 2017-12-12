@@ -1,0 +1,31 @@
+Mojolicious-Plugin-DBIxCustom
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mojolicious::Plugin::DBIxCustom
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Plugin-DBIxCustom
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mojolicious-Plugin-DBIxCustom
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mojolicious-Plugin-DBIxCustom
+
+    Search CPAN
+        http://search.cpan.org/dist/Mojolicious-Plugin-DBIxCustom/

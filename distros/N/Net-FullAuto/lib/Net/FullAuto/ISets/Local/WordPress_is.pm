@@ -38,18 +38,21 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw($select_wordpress_setup);
 
-my $url='get-wisdom.com';
-my $tit='Get-Wisdom.com';
-my $adu='Administrator';
-my $ade='Brian.Kelly@get-wisdom.com';
-my $avail_port='';
-
 use Net::FullAuto::Cloud::fa_amazon;
 use Net::FullAuto::FA_Core qw[$localhost];
 use File::HomeDir;
 use URI::Escape::XS qw/uri_escape/;
 use JSON::XS;
 use Sys::Hostname;
+
+my $url='https://get-wisdom.com';
+$url=uri_escape($url);
+my $tit='Get-Wisdom.com';
+my $adu='Administrator';
+my $ade='Brian.Kelly@get-wisdom.com';
+my $the='memberlite';
+my $avail_port='';
+
 my $hostname=Sys::Hostname::hostname;
 my $home_dir=File::HomeDir->my_home;
 $home_dir||=$ENV{'HOME'}||'';
@@ -57,6 +60,19 @@ $home_dir.='/';
 my $username=getlogin || getpwuid($<);
 my $do;my $ad;my $prompt;my $public_ip='';
 my $builddir='';my @ls_tmp=();
+
+# MENU Log-In Log-Out
+# https://premium.wpmudev.org/blog/
+# how-to-add-a-loginlogout-link-to-your-wordpress-menu/
+# http://vanweerd.com/enhancing-your-wordpress-3-menus/#add_login
+
+# wp plugin list --path=/var/www/html/wordpress --status=active --allow-root
+
+# https://www.digitalocean.com/community/tutorials/
+# how-to-set-up-a-firewall-using-firewalld-on-centos-7
+# sudo firewall-cmd --zone=public --permanent --add-port=80/tcp
+# sudo firewall-cmd --zone=public --permanent --add-port=443/tcp
+# sudo firewall-cmd --zone=public --permanent --list-ports
 
 my $configure_wordpress=sub {
 
@@ -78,7 +94,8 @@ my $configure_wordpress=sub {
       $ip=~s/^.*?(\d+.\d+.\d+.\d+).*$/$1/s;
    }
    my $userhome=$handle->cmd('pwd');
-   ($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
+   ($stdout,$stderr)=$handle->cmd(
+      "perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
    $builddir=$stdout;
    my $fa_ver=$Net::FullAuto::VERSION;
@@ -91,6 +108,19 @@ my $configure_wordpress=sub {
 $do=1;
 if ($do==1) {
    unless ($^O eq 'cygwin') {
+      if ($hostname eq 'jp-01ld.get-wisdom.com') {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "service nginx stop",'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "service mysqld stop",'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "service php-fpm stop",'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rm -rvf /etc/nginx/ ~/WordPress ~/fa\* /var/www/html\*",
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "mkdir -vp /var/www/html",'__display__');
+      }
       ($stdout,$stderr)=$handle->cmd($sudo."chmod 755 ~");
       ($stdout,$stderr)=$handle->cmd("sudo yum clean all");
       ($stdout,$stderr)=$handle->cmd("sudo yum grouplist hidden");
@@ -366,10 +396,18 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "chown -v $username:$username ez_setup.py",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd('/usr/local/bin/python2.7 ez_setup.py',
-      '__display__');
+   if ($hostname eq 'jp-01ld.get-wisdom.com') {
+      ($stdout,$stderr)=$handle->cmd('/usr/local/bin/python2.7 ez_setup.py',
+         '__display__');
+   } else {
+      ($stdout,$stderr)=$handle->cmd('python ez_setup.py',
+         '__display__');
+   }
    ($stdout,$stderr)=$handle->cmd('easy_install pip','__display__');
    ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cmd('pip install pyasn1','__display__');
+   ($stdout,$stderr)=$handle->cmd('pip install pyasn1-modules',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd(
       'git clone https://github.com/google/oauth2client.git','__display__');
    ($stdout,$stderr)=$handle->cwd('oauth2client');
@@ -377,7 +415,7 @@ if ($do==1) {
       '/usr/local/bin/python2.7 setup.py install',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
-   unless ($^O eq 'cygwin') {
+   if ($^O ne 'cygwin' && $hostname ne 'jp-01ld.get-wisdom.com') {
       ($stdout,$stderr)=$handle->cmd($sudo.'pip install httplib2',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo."ls -1 ".
@@ -947,7 +985,7 @@ END
             '__display__');
          ($stdout,$stderr)=$handle->cwd("/etc/nginx");
          sleep 3;
-         &Net::FullAuto::FA_Core::clean_filehandle($handle);
+         ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
          $handle->{_cmd_handle}->print($sudo.
             'certbot --nginx -d get-wisdom.com '.
             '-d www.get-wisdom.com');
@@ -1153,12 +1191,12 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chmod -v 644 wp-config.php",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mkdir -vp wp-content/uploads",'__display__');
+      "mkdir -vp wp-content/uploads/themes",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -Rv www-data:www-data /var/www/html/wp-content/upgrade',
+      "mkdir -vp wp-content/uploads/plugins",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -Rv www-data:www-data /var/www/html',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'sudo chown -Rv www-data:www-data /var/www/html/*','__display__');
    my $install_mysql=<<'END';
 
           o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
@@ -1314,8 +1352,8 @@ END
    #$do=1;
    #if ($do==1) {
    if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -v /usr/local/php7','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'mkdir -p /usr/local/php7');
       ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/php/php-src.git','__display__');
@@ -1438,10 +1476,9 @@ END
       "mv -v wp-cli.phar /usr/local/bin/wp",'__display__');
    ($stdout,$stderr)=$handle->cwd('~');
    $ade=uri_escape($ade);
-   $service_and_cert_password=uri_escape($service_and_cert_password);
+   my $wppass=uri_escape($service_and_cert_password);
    $tit=uri_escape($tit);
    $adu=uri_escape($adu); 
-   $url=uri_escape($url);
    my $urll='';
    if ($hostname eq 'jp-01ld.get-wisdom.com') {
       $urll='www.get-wisdom.com';
@@ -1451,79 +1488,212 @@ END
    my $cmd="sudo wget -d -qO- --random-wait --wait=3 ".
          "--no-check-certificate --post-data='weblog_title=".
          $tit."&user_name=".$adu."&admin_password=".
-         $service_and_cert_password."&pass1-text=".
-         $service_and_cert_password."&admin_password2=".
-         $service_and_cert_password."&admin_email=".$ade.
+         $wppass."&pass1-text=".
+         $wppass."&admin_password2=".
+         $wppass."&admin_email=".$ade.
          "&Submit=Install+WordPress&language=' https://".
          $urll."/wp-admin/install.php?step=2";
    ($stdout,$stderr)=$handle->cmd($cmd);
 #&Net::FullAuto::FA_Core::cleanup;
    if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      ($stdout,$stderr)=$handle->cwd("/var/www/html/wordpress");
+      ($stdout,$stderr)=$handle->cwd("/var/www/html/wordpress/wp-content".
+         "/themes"); 
    } else {
       ($stdout,$stderr)=$handle->cwd("WordPress/wordpress");
    }
+   my $the='memberlite';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      "https://memberlitetheme.com/wp-content/uploads/themes/$the.zip",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://memberlitetheme.com/wp-content/uploads/themes/'.
+      $the.'-child.zip','__display__');
    ($stdout,$stderr)=$handle->cmd(
-      "/usr/local/bin/wp theme install oceanwp --allow-root --activate",
-      '__display__'); 
+      "/usr/local/bin/wp theme install $the.zip --allow-root ".
+      "--activate --path=/var/www/html/wordpress",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      "/usr/local/bin/wp theme install $the-child.zip --allow-root ".
+      "--activate --path=/var/www/html/wordpress",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mkdir -vp wp-content/themes/$the-child/fonts",'__display__');
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   my $oc_style=<<END;
+/*
+ Theme Name:   Memberlite Child
+ Theme URI:    http://get-wisdom.com/$the-child/
+ Description:  My first child theme, based on Memberlite
+ Author:       Brian Kelly
+ Author URI:   http://get-wisdom.com
+ Template:     $the
+ Version:      1.0.0
+ Tags: one-column, two-columns, left-sidebar, right-sidebar, flexible-header, custom-background, custom-colors, custom-header, custom-menu, custom-logo, editor-style, featured-images, footer-widgets, full-width-template, post-formats, theme-options, threaded-comments, translation-ready, e-commerce
+ Text Domain:  $the-child
+*/
+
+.site-branding .site-title a {
+   font-family: 'Montserrat';
+   font-size: x-large;
+   font-weight: bold;
+   /*color: floralwhite;*/
+}
+
+.site-branding .site-description {
+   color: orange;
+}
+
+#buddypress .comment-reply-link, #buddypress .generic-button a, #buddypress .standard-form button, #buddypress a.button, #buddypress input[type=button], #buddypress input[type=reset], #buddypress input[type=submit], #buddypress ul.button-nav li a, a.bp-title-button {
+    background: #18BC9C;
+}
+
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$oc_style\" > ".
+      "/var/www/html/wordpress/wp-content/themes/$the-child/style.css");
+my $oc_func=<<END;
+<?php
+//* Code goes here
+
+add_filter('wp_nav_menu_items', 'add_login_logout_link', 10, 2);
+   ($stdout,$stderr)=$handle->cmd($sudo,
+
+function add_login_logout_link(\\x24items, \\x24args) {
+        ob_start();
+        wp_loginout('index.php');
+        \\x24loginoutlink = ob_get_contents();
+        ob_end_clean();
+        \\x24arr = explode('Log ',\\x24loginoutlink,2);
+        \\x24enn = explode('</a',\\x24arr[1]);
+        \\x24icon='fa-user';
+        if (\\x24enn[0] == 'out') {
+           \\x24icon='fa-user-o';
+        }
+        //alert(\\x24enn[0]);
+        \\x24items.='<li>'.\\x24arr[0].
+           '<span class=\\x22text-wrap\\x22><i class=\\x22icon before fa '.
+           \\x24icon.'\\x22 aria-hidden=\\x22true\\x22></i><span class=\\x22menu-text\\x22>Log '.
+           \\x24enn[0].'</span></span></a></li>';
+    return \\x24items;
+}
+
+function cleanmsg(\\x24msg){
+// you clean code here
+    return \\x24msg;
+}
+
+function alert(\\x24msg,\\x24timeout=1,\\x24url='index.php'){
+    \\x24msg=cleanmsg(\\x24msg);
+    echo \\x22<script>(function(){alert('\\x24msg');})();</script>\\x22;
+    echo \\x22<meta http-equiv='refresh' content='\\x24timeout;\\x24url' />\\x22;
+}
+
+function wmpudev_enqueue_icon_stylesheet() {
+        wp_register_style( 'fontawesome',
+           'http:////maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' );
+        wp_enqueue_style( 'fontawesome');
+}
+add_action( 'wp_enqueue_scripts', 'wmpudev_enqueue_icon_stylesheet' );
+
+?>
+END
+my $googlefont=<<END;
+
+function custom_add_google_fonts() {
+ wp_enqueue_style( 'custom-google-fonts', 'https://fonts.googleapis.com/css?family=Montserrat', false );
+ }
+ add_action( 'wp_enqueue_scripts', 'custom_add_google_fonts' );
+?>
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$googlefont\" >> ".
+      '/var/www/html/wordpress/wp-content/themes/memberlite-child/functions.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '\$ d' ".
+      '/var/www/html/wordpress/wp-content/themes/memberlite-child/functions.php');
+
+   #($stdout,$stderr)=$handle->cmd(
+   #   "/usr/local/bin/wp theme activate $the-child --allow-root",
+   #   '__display__');
+   if ($hostname eq 'jp-01ld.get-wisdom.com') {
+      ($stdout,$stderr)=$handle->cwd("../plugins");
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://www.paidmembershipspro.com/wp-content/uploads/plugins/'.
+      'pmpro-nav-menus.zip','__display__');
    # http://www.theblogmaven.com/best-wordpress-plugins/
+
+   my $listt=<<'END';
++-------------------------------------------------+--------+--------+---------+
+| name                                            | status | update | version |
++-------------------------------------------------+--------+--------+---------+
+| addons-for-elementor                            | active | none   | 1.4.1   |
+| all-in-one-wp-migration                         | active | none   | 6.61    |
+| bbpress                                         | active | none   | 2.5.14  |
+| better-recent-comments                          | active | none   | 1.0.4   |
+| black-studio-tinymce-widget                     | active | none   | 2.6.0   |
+| buddypress                                      | active | none   | 2.9.2   |
+| check-email                                     | active | none   | 0.5.5   |
+| commentluv                                      | active | none   | 2.94.7  |
+| comment-redirect                                | active | none   | 1.1.3   |
+| comment-reply-email-notification                | active | none   | 1.4.1   |
+| contact-form-7                                  | active | none   | 4.9.1   |
+| custom-dashboard-widgets                        | active | none   | 1.3.1   |
+| easy-google-fonts                               | active | none   | 1.4.3   |
+| elementor                                       | active | none   | 1.8.9   |
+| google-analytics-dashboard-for-wp               | active | none   | 5.1.2.3 |
+| jetpack                                         | active | none   | 5.6     |
+| maxbuttons                                      | active | none   | 6.24    |
+| meks-easy-ads-widget                            | active | none   | 2.0.3   |
+| meks-flexible-shortcodes                        | active | none   | 1.3.1   |
+| meks-simple-flickr-widget                       | active | none   | 1.1.3   |
+| meks-smart-author-widget                        | active | none   | 1.1.1   |
+| meks-smart-social-widget                        | active | none   | 1.3.4   |
+| meks-themeforest-smart-widget                   | active | none   | 1.2     |
+| memberlite-shortcodes                           | active | none   | 1.1     |
+| menu-icons                                      | active | none   | 0.10.2  |
+| menu-icons-icomoon                              | active | none   | 0.3.0   |
+| multiple-post-thumbnails                        | active | none   | 1.6.6   |
+| nav-menu-roles                                  | active | none   | 1.9.1   |
+| paid-memberships-pro                            | active | none   | 1.9.4.2 |
+| pmpro-nav-menus                                 | active | none   | .3.2    |
+| read-more-without-refresh                       | active | none   | 2.3     |
+| simple-share-buttons-adder                      | active | none   | 7.3.10  |
+| simple-trackback-validation-with-topsy-blocker  | active | none   | 1.2.7   |
+| text-hover                                      | active | none   | 3.7.1   |
+| theme-my-login                                  | active | none   | 6.4.9   |
+| woocommerce                                     | active | none   | 3.2.5   |
+| woocommerce-gateway-paypal-powered-by-braintree | active | none   | 2.0.4   |
+| woocommerce-services                            | active | none   | 1.9.0   |
+| woocommerce-gateway-stripe                      | active | none   | 3.2.3   |
+| wpfront-notification-bar                        | active | none   | 1.7     |
+| wp-mail-smtp                                    | active | none   | 0.11.2  |
+| wp-to-twitter                                   | active | none   | 3.3.1   |
+| wordpress-seo                                   | active | none   | 5.9.1   |
++-------------------------------------------------+--------+--------+---------+
+END
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp plugin install paid-memberships-pro '.
+      '--allow-root --activate --path=/var/www/html/wordpress',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp plugin install pmpro-nav-menus.zip '.
+      '--allow-root --activate --path=/var/www/html/wordpress',
+      '__display__');
 
 $do=1;
 if ($do==1) {
-
-my $listt=<<'END';
-| akismet                                     | active   | none      | 4.0.1   |
-| all-in-one-wp-migration                     | active   | available | 6.60    |
-| anti-spam                                   | inactive | none      | 4.4     |
-| bbpress                                     | active   | none      | 2.5.14  |
-| better-recent-comments                      | active   | none      | 1.0.4   |
-| black-studio-tinymce-widget                 | active   | none      | 2.6.0   |
-| buddypress                                  | active   | none      | 2.9.2   |
-| commentluv                                  | active   | none      | 2.94.7  |
-| comment-redirect                            | active   | none      | 1.1.3   |
-| comment-reply-email-notification            | active   | none      | 1.3.3   |
-| contact-form-7                              | active   | none      | 4.9.1   |
-| custom-dashboard-widgets                    | active   | none      | 1.3.1   |
-| login-customizer                            | active   | none      | 1.2.0   |
-| elementor                                   | active   | none      | 1.8.5   |
-| google-analytics-dashboard-for-wp           | active   | none      | 5.1.2.2 |
-| hello                                       | inactive | none      | 1.6     |
-| hide-admin-bar-from-non-admins              | active   | none      | 1.0     |
-| jetpack                                     | active   | none      | 5.5     |
-| learnpress                                  | active   | none      | 2.1.9.3 |
-| learnpress-bbpress                          | active   | none      | 2.0     |
-| learnpress-buddypress                       | active   | none      | 2.0     |
-| maxbuttons                                  | active   | available | 6.23    |
-| meks-easy-ads-widget                        | active   | available | 2.0.2   |
-| meks-flexible-shortcodes                    | active   | none      | 1.3.1   |
-| meks-simple-flickr-widget                   | active   | none      | 1.1.3   |
-| meks-smart-author-widget                    | active   | none      | 1.1.1   |
-| meks-smart-social-widget                    | active   | available | 1.3.3   |
-| meks-themeforest-smart-widget               | active   | none      | 1.2     |
-| menu-icons                                  | active   | none      | 0.10.2  |
-| menu-icons-icomoon                          | inactive | none      | 0.3.0   |
-| nav-menu-roles                              | active   | none      | 1.9.1   |
-| ocean-custom-sidebar                        | active   | none      | 1.0.2.1 |
-| ocean-extra                                 | active   | none      | 1.3.8   |
-| ocean-posts-slider                          | active   | none      | 1.0.8   |
-| ocean-product-sharing                       | active   | none      | 1.0.4   |
-| ocean-social-sharing                        | active   | none      | 1.0.7   |
-| paid-memberships-pro                        | active   | none      | 1.9.4.1 |
-| read-more-without-refresh                   | active   | none      | 2.3     |
-| simple-share-buttons-adder                  | active   | none      | 7.3.10  |
-| simple-trackback-validation-with-topsy-bloc | active   | none      | 1.2.7   |
-| ker                                         |          |           |         |
-| text-hover                                  | active   | none      | 3.7.1   |
-| theme-my-login                              | active   | none      | 6.4.9   |
-| ultimate-member                             | inactive | none      | 1.3.88  |
-| woocommerce                                 | active   | none      | 3.2.4   |
-| woocommerce-gateway-paypal-powered-by-brain | active   | none      | 2.0.4   |
-| tree                                        |          |           |         |
-| woocommerce-services                        | active   | none      | 1.8.3   |
-| woocommerce-gateway-stripe                  | active   | none      | 3.2.3   |
-| wp-to-twitter                               | active   | none      | 3.3.1   |
-| wordpress-seo                               | active   | none      | 5.8  
-END
 
    my @wp_plugins = qw(
 
@@ -1532,15 +1702,17 @@ END
          better-recent-comments
          black-studio-tinymce-widget
          buddypress
+         check-email
          commentluv
          comment-redirect
          comment-reply-email-notification
          contact-form-7
          custom-dashboard-widgets
+         easy-google-fonts
          elementor
+         addons-for-elementor
          google-analytics-dashboard-for-wp
          #hide-admin-bar-from-non-admins
-         login-customizer
          maxbuttons
          meks-easy-ads-widget
          meks-flexible-shortcodes
@@ -1548,31 +1720,17 @@ END
          meks-smart-author-widget
          meks-smart-social-widget
          meks-themeforest-smart-widget
+         memberlite-shortcodes
          menu-icons
          menu-icons-icomoon
-         nav-menu-roles
-         ocean-custom-sidebar
-         ocean-extra
-         ocean-posts-slider
-         ocean-product-sharing
-         ocean-social-sharing 
-         #paid-memberships-pro
-         read-more-without-refresh
-         simple-share-buttons-adder
-         simple-trackback-validation-with-topsy-blocker
-         text-hover
-         #theme-my-login
-         woocommerce
-         woocommerce-gateway-paypal-powered-by-braintree
-         woocommerce-services
-         woocommerce-gateway-stripe
-         wp-to-twitter
-         wordpress-seo
+         wp-mail-smtp
 
    );
    foreach my $plugin (@wp_plugins) {
+      next if $plugin=~/^#/;
       ($stdout,$stderr)=$handle->cmd(
-         "/usr/local/bin/wp plugin install $plugin --allow-root --activate",
+         "/usr/local/bin/wp plugin install $plugin --allow-root ".
+         "--activate --path=/var/www/html/wordpress",
          '__display__');
    }
 }
@@ -1584,54 +1742,128 @@ END
       'find /var/www -type d | xargs -e chmod 755','__display__');
 
 #&Net::FullAuto::FA_Core::cleanup;
-print "URLL=$urll\n";
+
+my $md_='';our $thismonth='';our $thisyear='';
+($md_,$thismonth,$thisyear)=(localtime)[3,4,5];
+my $mo_=$thismonth;my $yr_=$thisyear;
+$md_="0$md_" if $md_<10;
+$mo_++;$mo_="0$mo_" if $mo_<10;
+my $yr__=sprintf("%02d",$yr_%100);
+my $yr____=(1900+$yr_);
+my $mdy="$mo_$md_$yr__";
+my $mdyyyy="$mo_$md_$yr____";
+my $tm=scalar localtime($^T);
+my $hms=substr($tm,11,8);
+$hms=~s/^(\d\d):(\d\d):(\d\d)$/h${1}m${2}s${3}/;
+my $hr=$1;my $mn=$2;my $sc=$3;
+my $curyear=$thisyear + 1900;
+($stdout,$stderr)=$handle->cmd($sudo.
+   "mkdir -vp /var/www/html/wordpress/wp-content/uploads/$curyear/$mo_",
+   '__display__');
+($stdout,$stderr)=$handle->cmd($sudo.
+   "/usr/local/bin/wp media import $builddir/$ls_tmp[0]/dependencies/gw/* ".
+   "--path=/var/www/html/wordpress --allow-root",'__display__');
+($stdout,$stderr)=$handle->cmd($sudo."/usr/local/bin/".
+   "wp db query \"select post_id from wp_postmeta where meta_value like ".
+   "'%angelwing75%'\" --path=/var/www/html/wordpress --allow-root");
+$stdout=~s/^.*(\d+)$/$1/s;
+my $post_id=$stdout;
+$handle->{_cmd_handle}->print('mysql -u root --password='.$service_and_cert_password);
+$prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+$cmd_sent=0;
+while (1) {
+   my $output=Net::FullAuto::FA_Core::fetch($handle);
+   my $out=$output;
+   $out=~s/$prompt//sg;
+   print $out if $output!~/^mysql>\s*$/;
+   last if $output=~/$prompt|Bye/;
+   if (!$cmd_sent && $output=~/mysql>\s*$/) {
+      my $cmd='UPDATE wordpress.wp_options SET option_value = \'a:5:{s:18:"nav_menu_locations";a:0:{}s:18:"custom_css_post_id";i:-1;s:10:"meta_login";b:1;s:15:"nav_menu_search";b:1;s:20:"columns_ratio_header";s:3:"7-5";}\' WHERE option_name = \'theme_mods_memberlite-child\';';
+      print "$cmd\n";
+      $handle->{_cmd_handle}->print($cmd);
+      $cmd_sent++;
+      sleep 1;
+      next;
+   } elsif ($cmd_sent==1 && $output=~/mysql>\s*$/) {
+      my $cmd='UPDATE wordpress.wp_options SET option_value = \'1\' WHERE option_name = \'users_can_register\';';
+      print "$cmd\n";
+      $handle->{_cmd_handle}->print($cmd);
+      $cmd_sent++;
+      sleep 1;
+      next;
+   } elsif ($cmd_sent>=2 && $output=~/mysql>\s*$/) {
+      print "quit\n";
+      $handle->{_cmd_handle}->print('quit;');
+      sleep 1;
+      next;
+   } sleep 1;
+   $handle->{_cmd_handle}->print();
+}
+
 $do=1;
 if ($do==1) {
-   #($stdout,$stderr)=$handle->cmd(
-   #   "/usr/local/bin/wp plugin install ultimate-member --allow-root",
-   #   '__display__');
-   #($stdout,$stderr)=$handle->cmd(
-   #   "wget -d -qO- --random-wait --wait=3 --no-check-certificate ".
-   #   "https://$urll/wp-admin/plugins.php?action=activate&".
-   #   "plugin=ultimate-member%2Findex.php&plugin_status=all&paged=1&".
-   #   "s&_wpnonce=340db8b559",'__display__');
+
+   $service_and_cert_password=uri_escape($service_and_cert_password);
    ($stdout,$stderr)=$handle->cmd(
       "wget -d -qO- --no-check-certificate --random-wait --wait=3 ".
-      "--cookies=on --keep-session-cookies --load-cookies cookies.txt ".
-      "--save-cookies cookies.txt -d https://$urll/wp-login.php",
-      '__display__');
+      "--cookies=on --keep-session-cookies --load-cookies ~/cookies.txt ".
+      "--save-cookies ~/cookies.txt -d https://$urll/wp-login.php");
    ($stdout,$stderr)=$handle->cmd(
-      'curl -k --cookie-jar cookies.txt https://'.
+      'curl -k --cookie-jar ~/cookies.txt https://'.
       $urll.'/wp-login.php');
    ($stdout,$stderr)=$handle->cmd(
-      'curl -v -k --cookie-jar cookies.txt --max-redirs 0 '.
+      'curl -v -k --cookie-jar ~/cookies.txt --max-redirs 0 '.
       '--data "log='.$adu.'&pwd='.$service_and_cert_password.
       '&wp-submit=Log+In&redirect_to='.$url.
       '%2Fwp-admin%2F&testcookie=1" https://'.$urll.
       '/wp-login.php');
+   sleep 5;
+   my $nonce_cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.'/wp-admin/'.
+         "customize.php?url=".$url."%2F' ".
+         "-H 'Accept: text/html,".
+         "application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ".
+         "-H 'Accept-Encoding: gzip, deflate, br' ".
+         "-H 'Accept-Language: en-US,en;q=0.5' ".
+         "-H 'Connection: keep-alive' ".
+         "-H 'Host: ".$urll."' ".
+         "-H 'Referer: https://".$urll."/' ".
+         "-H 'Upgrade-Insecure-Requests: 1' ".
+         "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
+         "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'";
+   my $one=1;
+   foreach (1..5) {
+      $handle->{_cmd_handle}->print($nonce_cmd);
+      my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      $handle->{_cmd_handle}->print($nonce_cmd);
+      while (1) {
+         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         $stdout.=$output;
+         last if $output=~/$prompt/;
+         print $output;
+      }
+      $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
+      last if -1<index $stdout,'"nonce":{';
+      ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+      ($stdout,$stderr)=$handle->cmd(
+         'curl -v -k --cookie-jar ~/cookies.txt --max-redirs 0 '.
+         '--data "log='.$adu.'&pwd='.$service_and_cert_password.
+         '&wp-submit=Log+In&redirect_to='.$url.
+         '%2Fwp-admin%2F&testcookie=1" https://'.$urll.
+         '/wp-login.php');
+print "LOGIN STDOUT=$stdout and STDERR=$stderr<==LOGIN STDERR\n";sleep 10;
+      sleep 4;
+   }
+   my $nonce=$stdout;
+   my $uuid=$stdout;
+   $nonce=~s/^.*nonce["]:([{].*?[}]),.*$/$1/s;
+print "NONCE=$nonce\n";sleep 5;
+   my $nonce_hash=decode_json($nonce);
+#print "NONCE=$nonce<==NONCE and SAVE=$nonce_hash->{save} and PREVIEW=$nonce_hash->{preview}\n";<STDIN>;
+   $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b cookies.txt 'https://".$urll.'/wp-admin/'.
-      "customize.php?url=".$url."%2F' ".
-      "-H 'Accept: text/html,".
-      "application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ".
-      "-H 'Accept-Encoding: gzip, deflate, br' ".
-      "-H 'Accept-Language: en-US,en;q=0.5' ".
-      "-H 'Connection: keep-alive' ".
-      "-H 'Host: ".$urll."' ".
-      "-H 'Referer: https://".$urll."/' ".
-      "-H 'Upgrade-Insecure-Requests: 1' ".
-      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
-      "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'");
-    $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
-    my $nonce=$stdout;
-    my $uuid=$stdout;
-    $nonce=~s/^.*nonce["]:([{].*?[}]),.*$/$1/s;
-    my $nonce_hash=decode_json($nonce);
-    $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
-    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b cookies.txt 'https://".$urll.'/wp-admin/'.
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.'/wp-admin/'.
       "customize.php?url=".$url."%2F&changeset_uuid=$uuid".
-      "&customize_theme=twentyseventeen&customize_messenger_channel=preview-0' ".
+      "&customize_theme=memberlite-child&customize_messenger_channel=preview-0' ".
       "-H 'Accept: text/html,".
       "application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
@@ -1642,21 +1874,21 @@ if ($do==1) {
       "-H 'Upgrade-Insecure-Requests: 1' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
       "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'");
-    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b cookies.txt 'https://".$urll."/?customize_changeset_uuid=".$uuid."' ".
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/?customize_changeset_uuid=".$uuid."' ".
       "-H 'Accept: */*' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.5' ".
       "-H 'Connection: keep-alive' ".
       "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
       "-H 'Host: ".$urll."' ".
-      "-H 'Referer: https://".$urll."/?customize_changeset_uuid=".$uuid."&customize_theme=twentyseventeen&customize_messenger_channel=preview-0' ".
+      "-H 'Referer: https://".$urll."/?customize_changeset_uuid=".$uuid."&customize_theme=memberlite-child&customize_messenger_channel=preview-0' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
       "-H 'X-Requested-With: XMLHttpRequest' ".
-      "--data 'wp_customize=on&nonce=".$nonce_hash->{preview}."&customize_theme=twentyseventeen&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D&customize_changeset_uuid=".$uuid."&partials=%7B%22blogdescription%22%3A%5B%7B%7D%5D%7D&wp_customize_render_partials=1&action=&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D'");
+      "--data 'wp_customize=on&nonce=".$nonce_hash->{preview}."&customize_theme=memberlite-child&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D&customize_changeset_uuid=".$uuid."&partials=%7B%22blogdescription%22%3A%5B%7B%7D%5D%7D&wp_customize_render_partials=1&action=&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D'");
 print "CUSTOMIZED STDOUT=$stdout<== and STDERR=$stderr<==\n";
-    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
       "-H 'Accept: */*' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.5' ".
@@ -1666,10 +1898,10 @@ print "CUSTOMIZED STDOUT=$stdout<== and STDERR=$stderr<==\n";
       "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2F".$urll."%2Fchangeset_uuid=".$uuid."' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
       "-H 'X-Requested-With: XMLHttpRequest' ".
-      "--data 'wp_customize=on&customize_theme=twentyseventeen&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=".$uuid."&customize_changeset_data=%7B%22blogdescription%22%3A%7B%22value%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D%7D&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
+      "--data 'wp_customize=on&customize_theme=memberlite-child&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=".$uuid."&customize_changeset_data=%7B%22blogdescription%22%3A%7B%22value%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D%7D&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
 print "CUSTOMIZE_SAVE STDOUT=$stdout<== and STDERR=$stderr<==\n";
-    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
       "-H 'Host: ".$urll."' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
       "-H 'Accept: */*' ".
@@ -1679,10 +1911,383 @@ print "CUSTOMIZE_SAVE STDOUT=$stdout<== and STDERR=$stderr<==\n";
       "-H 'X-Requested-With: XMLHttpRequest' ".
       "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2F$urll%2F&changeset_uuid=$uuid' ".
       "-H 'Connection: keep-alive' ".
-      "--data 'wp_customize=on&customize_theme=twentyseventeen&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=$uuid&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D&customize_changeset_status=publish&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
+      "--data 'wp_customize=on&customize_theme=memberlite-child&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=$uuid&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D&customize_changeset_status=publish&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
+print "WHAT IS HEALING STDOUT=$stdout\n";
 
+##############################################################
+
+   #($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.'/wp-admin/'.
+      "customize.php?url=".$url."%2F' ".
+      "-H 'Accept: text/html,".
+      "application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
+      "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/' ".
+      "-H 'Upgrade-Insecure-Requests: 1'");
+print "WHAT IS STDOUT=$stdout<== and LOGO STDERR =$stderr<==\n";sleep 10;
+   $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
+   $nonce=$stdout;
+   $uuid=$stdout;
+   $nonce=~s/^.*nonce["]:([{].*?[}]),.*$/$1/s;
+   $nonce_hash=decode_json($nonce);
+   $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.'/wp-admin/'.
+      "customize.php?url=".$url."%2F&changeset_uuid=$uuid".
+      "&customize_theme=memberlite-child&customize_messenger_channel=preview-0' ".
+      "-H 'Accept: text/html,".
+      "application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/' ".
+      "-H 'Upgrade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
+      "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'");
+   $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
+   $nonce=$stdout;
+   $uuid=$stdout;
+   $nonce=~s/^.*nonce["]:([{].*?[}]),.*$/$1/s;
+print "NONCE=$nonce<==\n";sleep 5;
+   $nonce_hash=decode_json($nonce);
+   $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/?customize_changeset_uuid=".$uuid."&customize_autosaved=on&customize_preview_nonce=".$nonce_hash->{preview}."' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
+      "-H 'Accept: */*' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
+      "-H 'Referer: https://".$urll."/' ".
+      "-H 'Upgrade-Insecure-Requests: 1' ".
+      "--data 'wp_customize=on&nonce=".$nonce_hash->{preview}."&customize_theme=memberlite-child&customized=%7B%22custom_logo%22%3A".$post_id."%7D&customize_changeset_uuid=".$uuid."&partials=%7B%22custom_logo%22%3A%5B%7B%7D%5D%7D&wp_customize_render_partials=1&action=&customized=%7B%22custom_logo%22%3A".$post_id."%7D'");
+print "STDOUT=$stdout<==CUSTOM LOGO\n";sleep 5;
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
+      "-H 'Accept: */*' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
+      "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2Fwww.get-wisdom.com%2F' ".
+      "-H 'Upgrade-Insecure-Requests: 1' ".
+      "--data 'nonce=".$nonce_hash->{preview}."&id=".$post_id."&context=site-icon&cropDetails%5Bx1%5D=5&cropDetails%5By1%5D=0&cropDetails%5Bx2%5D=80&cropDetails%5By2%5D=75&cropDetails%5Bwidth%5D=75&cropDetails%5Bheight%5D=75&cropDetails%5Bdst_width%5D=512&cropDetails%5Bdst_height%5D=512&action=crop-image'");
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin-ajax.php' ".
+      "-H 'Accept: */*' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2F".$urll."%2Fchangeset_uuid=".$uuid."' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
+      "-H 'X-Requested-With: XMLHttpRequest' ".
+      "--data 'wp_customize=on&customize_theme=memberlite-child&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=".$uuid."&customize_autosaved=on&customized=%7B%22site_icon%22%3A".$post_id."%2C%22custom_logo%22%3A".$post_id."%7D&customize_changeset_status=publish&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
+
+print "STDOUT=$stdout<==CUSTOM LOGO PUBLISH\n";
 
 }
+
+   my @wp_plugins=qw(
+
+         multiple-post-thumbnails
+         nav-menu-roles
+         read-more-without-refresh
+         simple-share-buttons-adder
+         simple-trackback-validation-with-topsy-blocker
+         text-hover
+         theme-my-login
+         wpfront-notification-bar
+         wp-to-twitter
+         wordpress-seo
+         woocommerce
+         woocommerce-gateway-paypal-powered-by-braintree
+         woocommerce-services
+         woocommerce-gateway-stripe
+
+   );
+
+   foreach my $plugin (@wp_plugins) {
+      next if $plugin=~/^#/;
+      ($stdout,$stderr)=$handle->cmd(
+         "/usr/local/bin/wp plugin install $plugin --allow-root ".
+         "--activate --path=/var/www/html/wordpress",
+         '__display__');
+   }
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's#check_admin_referer#//check_admin_referer#' ".
+      '/var/www/html/wordpress/wp-content/plugins/'.
+      'theme-my-login/includes/class-theme-my-login.php');
+
+   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+
+   ($stdout,$stderr)=$handle->cmd(
+      '/usr/local/bin/wp post list --post_type=page,post --allow-root '.
+      '--path=/var/www/html/wordpress');
+   $stdout=~s/^.*\n(\d+).*?register.*?\n.*$/$1/s;
+   print "register page ID=$stdout<==REGISTERID\n";
+   ($stdout,$stderr)=$handle->cmd(
+      "/usr/local/bin/wp post delete $stdout --force --allow-root ".
+      '--path=/var/www/html/wordpress','__display__');
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/wp post create --post_title='Register' --post_type=page ".
+      "--allow-root --post_status=publish --post_content='".
+      "[theme-my-login default_action=\"register\" show_title=\"0\"]' ".
+      "--path=/var/www/html/wordpress",'__display__');
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=wc-setup' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgrade-Insecure-Requests: 1' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=".
+          "wc-settings&tab=checkout&section=stripe' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=wc-setup' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgrade-Insecure-Requests: 1' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=".
+          "wc-settings&tab=checkout&section=stripe' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+print "STDOUT=$stdout<==WC-SETUP\n";
+#&Net::FullAuto::FA_Core::cleanup;
+   $stdout=~s/^.*_wpnonce.*?value=["](.*?)["].*$/$1/s;
+   my $nonce=$stdout;
+print "NONCE=$nonce<==NONCE\n";sleep 5;
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=wc-setup' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=wc-setup' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "--data '_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup&store_country_state=US%3AIL&store_address=714+E.+Diggins+St.&store_address_2=&store_city=Harvard&store_postcode=60033&currency_code=USD&product_type=both&save_step=Let%27s+go%21'");
+print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=wc-setup&step=payment' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=wc-setup' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=payment' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=payment' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "--data 'stripe_email=Brian.Kelly%40get-wisdom.com&wc-wizard-service-stripe-enabled=yes&wc-wizard-service-braintree_paypal-enabled=yes&paypal_email=Brian.Kelly%40get-wisdom.com&wc-wizard-service-paypal-enabled=yes&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dpayment'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=payment' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.5' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "--data 'shipping_zones%5Bdomestic%5D%5Bmethod%5D=live_rates&shipping_zones%5Bdomestic%5D%5Bflat_rate%5D%5Bcost%5D=&shipping_zones%5Bdomestic%5D%5Benabled%5D=yes&shipping_zones%5Bintl%5D%5Bmethod%5D=live_rates&shipping_zones%5Bintl%5D%5Bflat_rate%5D%5Bcost%5D=&shipping_zones%5Bintl%5D%5Benabled%5D=yes&weight_unit=oz&dimension_unit=in&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dshipping'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=extras' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=extras' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=extras' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "--data 'save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dextras'");
+print "STDOUTEXTRAS=$stdout<==EXTRAS-SENT\n";
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=next_steps ' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded;' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=extras' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36'");
+print "STDOUTACTIVATE=$stdout<==ACTIVATE\n";
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=next_steps' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Content-Type: application/x-www-form-urlencoded' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-setup&step=next_steps' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "--data 'save_step=activate&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dactivate'");
+print "DONE=$stdout<==ACTIVATE-SENT\n";
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll."/wp-admin/' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'");
+   $stdout=~s/^.*pmpro_pagesettings_nonce=(.*?)["].*$/$1/s;
+   $nonce=$stdout;
+print "NONCE=$nonce<==NONCE\n";
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings".
+          "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'");
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings".
+          "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'");
 
    my $thanks=<<'END';
 
@@ -1933,3 +2538,4 @@ sub exit_on_error {
 }
 
 1
+

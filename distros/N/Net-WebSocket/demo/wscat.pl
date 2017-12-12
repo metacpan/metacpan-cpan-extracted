@@ -214,7 +214,7 @@ sub run {
             }
             else {
                 $frame = SEND_FRAME_CLASS()->new(
-                    payload_sr => \$self->read(),
+                    payload => $self->read(),
                     mask => Net::WebSocket::Mask::create(),
                 );
             }

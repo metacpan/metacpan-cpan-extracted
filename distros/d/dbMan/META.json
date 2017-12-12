@@ -4,13 +4,13 @@
       "Milan Sorm (sorm@is4u.cz)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "dbMan",
    "no_index" : {
@@ -32,8 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Curses" : "1.08",
-            "Curses::UI" : "0.95",
             "Cwd" : "0",
             "DBI" : "1.20",
             "Data::Dumper" : "0",
@@ -51,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.43",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

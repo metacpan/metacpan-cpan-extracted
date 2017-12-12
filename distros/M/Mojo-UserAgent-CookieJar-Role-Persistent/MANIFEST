@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+lib/Mojo/UserAgent/CookieJar/Role/Persistent.pod
+lib/Mojo/UserAgent/CookieJar/Role/Persistent.pm
+META.json
+META.yml

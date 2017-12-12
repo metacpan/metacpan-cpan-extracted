@@ -44,7 +44,6 @@ t/query_amsat.t
 t/query_celestrak.t
 t/query_human_space_flight.t
 t/query_iridium_status_kelso.t
-t/query_iridium_status_mccants.t
 t/query_iridium_status_sladen.t
 t/query_mccants.t
 t/query_misc.t

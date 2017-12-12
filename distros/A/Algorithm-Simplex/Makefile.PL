@@ -2,7 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 use 5.008001;
 use ExtUtils::MakeMaker;
-(do 'maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
 my %RUN_DEPS = (
   'Moo'                    => 0,
@@ -18,7 +18,7 @@ my %BUILD_DEPS = (
 );
 
 WriteMakefile(
-  NAME           => 'Algorithm-Simplex',
+  NAME           => 'Algorithm::Simplex',
   VERSION_FROM   => 'lib/Algorithm/Simplex.pm',
   PREREQ_PM      => {
     %RUN_DEPS,

@@ -1,0 +1,47 @@
+{
+   "abstract" : "XML Editing Shell",
+   "author" : [
+      "Petr Pajas (pajas@matfyz.cz)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-XSH",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::RecDescent" : "1.94",
+            "XML::LibXML" : "1.54",
+            "XML::LibXML::Iterator" : "0",
+            "XML::LibXML::XPathContext" : "0.04",
+            "XML::LibXSLT" : "1.53",
+            "XML::XUpdate::LibXML" : "v0.4.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.8.5",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::OrderedHash;
 use Prty::FileHandle;
@@ -50,11 +50,6 @@ Liste aller Bilder.
 
     $ims = $class->new($file,$lst);
 
-=head4 Description
-
-Instantiiere ein Sequenz-Objekt aus Datei $file, verknüpfe es mit
-Bildliste $lst und liefere eine Referenz auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -68,6 +63,11 @@ Pfad der Sequenz-Liste.
 Liste aller Bilder.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Sequenz-Objekt aus Datei $file, verknüpfe es mit
+Bildliste $lst und liefere eine Referenz auf dieses Objekt zurück.
 
 =cut
 
@@ -238,11 +238,6 @@ sub spec {
 
     @images|$imageA = $ims->specImages($key);
 
-=head4 Description
-
-Liefere die Liste der Bilder des Range $key. Im Skalarkontext liefere
-eine Referenz auf die Liste.
-
 =head4 Arguments
 
 =over 4
@@ -252,6 +247,11 @@ eine Referenz auf die Liste.
 Range-Bezeichner.
 
 =back
+
+=head4 Description
+
+Liefere die Liste der Bilder des Range $key. Im Skalarkontext liefere
+eine Referenz auf die Liste.
 
 =cut
 
@@ -343,11 +343,6 @@ sub modifier {
     @images|$imageA = $ims->images;
     @images|$imageA = $ims->images($key);
 
-=head4 Description
-
-Liefere alle Bilder der Sequenz oder die Bilder des Range $key. Ist $key
-undef oder ein Leerstring (''), werden ebenfalls alle Bilder geliefert.
-
 =head4 Arguments
 
 =over 4
@@ -357,6 +352,11 @@ undef oder ein Leerstring (''), werden ebenfalls alle Bilder geliefert.
 Range-Bezeichner.
 
 =back
+
+=head4 Description
+
+Liefere alle Bilder der Sequenz oder die Bilder des Range $key. Ist $key
+undef oder ein Leerstring (''), werden ebenfalls alle Bilder geliefert.
 
 =cut
 
@@ -377,7 +377,7 @@ sub images {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

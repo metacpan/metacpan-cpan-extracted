@@ -23,7 +23,7 @@ PONAPI::Client::Request::Role::HasFilter - request - role - has filter
 
 =head1 VERSION
 
-version 0.002009
+version 0.002010
 
 =head1 AUTHORS
 

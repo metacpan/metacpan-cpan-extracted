@@ -31,6 +31,8 @@ ok !pnmatchstar('/', '/foo/bar/baz');
 ok !pnmatchstar('/foo', '/foo/bar/baz');
 ok  pnmatchstar('foo', 'foo/bar/baz');
 
+ok pnmatchstar('*/**/index.md', 'bg/index.md');
+
 my %files = (
     'Globstar.pm' => undef,
     'Globstar.pod' => undef,

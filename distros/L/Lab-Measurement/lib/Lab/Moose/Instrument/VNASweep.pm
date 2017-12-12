@@ -1,17 +1,20 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.600';
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.613';
 #ABSTRACT: Role for network analyzer sweeps
 
-use Moose::Role;
-use Moose::Util::TypeConstraints;
-use MooseX::Params::Validate;
+# Some default exports like 'inner' would collide with PDL
+use Moose::Role qw/with requires/;
+
+use MooseX::Params::Validate 'validated_hash';
+use Moose::Util::TypeConstraints 'enum';
 use Lab::Moose::Instrument qw/
     timeout_param getter_params precision_param
     /;
 
 use Carp;
-use PDL::Lite;
-use PDL::Core qw/pdl cat/;
+
+use PDL;
+
 use namespace::autoclean;
 
 with qw(
@@ -38,8 +41,8 @@ requires qw/sparam_sweep_data sparam_catalog/;
 sub _get_data_columns {
     my ( $self, $catalog, $freq_array, $points ) = @_;
 
-    $freq_array = pdl $freq_array;
-    $points     = pdl $points;
+    $freq_array = pdl($freq_array);
+    $points     = pdl($points);
 
     my $num_rows = $freq_array->nelem();
     if ( $num_rows != $self->cached_sense_sweep_points() ) {
@@ -66,7 +69,10 @@ sub _get_data_columns {
         my $real = $points->slice( [ $start,     $stop,     2 ] );
         my $im   = $points->slice( [ $start + 1, $stop + 1, 2 ] );
 
-        push @data_columns, $real, $im;
+        my $amplitude = 10 * log10( $real**2 + $im**2 );
+        my $phase = atan2( $im, $real );
+
+        push @data_columns, $real, $im, $amplitude, $phase;
     }
 
     return cat( $freq_array, @data_columns );
@@ -144,7 +150,7 @@ Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 METHODS
 
@@ -154,13 +160,26 @@ version 3.600
 
 Perform a single sweep, and return the resulting data as a 2D PDL. The first
 dimension runs over the sweep points. E.g. if only the S11 parameter is
-measured, the resulting PDL has dimensions N x 3:
+measured, the resulting PDL has dimensions N x 5:
 
  [
-  [freq1, freq2, freq3, ..., freqN],
+  [freq1    , freq2    , ..., freqN    ],
   [Re(S11)_1, Re(S11)_2, ..., Re(S11)_N],
   [Im(S11)_1, Im(S11)_2, ..., Im(S11)_N],
+  [Amp_1    , Amp_2    , ..., Amp_N    ],
+  [phase_1  , phase_2  , ..., phase_N  ],
  ]
+
+The row with the amplitudes (power in units of dB) is calculated from the
+S-params as 
+
+ 10 * log10(Re(S11)**2 + Im(S11)**2)
+
+The row with the phases is calculated as from the S-params as
+
+ atan2(Im(S11), Re(S11))
+
+Thus, each recorded S-param will create 4 subsequent rows in the output PDL.
 
 This method accepts a hash with the following options:
 

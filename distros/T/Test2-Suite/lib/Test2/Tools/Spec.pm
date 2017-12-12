@@ -2,7 +2,7 @@ package Test2::Tools::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use Carp qw/croak/;
 use Test2::Workflow qw/parse_args build current_build root_build init_root build_stack/;
@@ -362,7 +362,13 @@ that it can be.
 =item iso => $bool
 
 Set this to true if the block MUST be run in isolation. If this is true then
-the block will run in its own thread or fork.
+the block will run in its own forked process.
+
+These tests will be skipped on any platform that does not have true forking, or
+working/enabled threads.
+
+Threads will ONLY be used if the T2_WORKFLOW_USE_THREADS env var is set. Thread
+tests are only run if the T2_DO_THREAD_TESTS env var is set.
 
 =item todo => $reason
 
@@ -641,7 +647,7 @@ C<done_testing()>).
 =head1 SOURCE
 
 The source code repository for Test2-Workflow can be found at
-F<http://github.com/Test-More/Test2-Workflow/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

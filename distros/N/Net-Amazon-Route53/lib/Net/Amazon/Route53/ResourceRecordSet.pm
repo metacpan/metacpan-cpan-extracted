@@ -2,8 +2,9 @@ use strict;
 use warnings;
 
 package Net::Amazon::Route53::ResourceRecordSet;
-$Net::Amazon::Route53::ResourceRecordSet::VERSION = '0.160530';
-use Any::Moose;
+$Net::Amazon::Route53::ResourceRecordSet::VERSION = '0.173450';
+use Moo;
+use Types::Standard qw(InstanceOf Str Int ArrayRef);
 use XML::Bare;
 use HTML::Entities;
 
@@ -29,14 +30,8 @@ The L<Net::Amazon::Route53::HostedZone> object this hosted zone refers to
 
 =cut
 
-has 'route53' =>
-    (is => 'rw', isa => 'Net::Amazon::Route53', required => 1, weak_ref => 1);
-has 'hostedzone' => (
-    is       => 'rw',
-    isa      => 'Net::Amazon::Route53::HostedZone',
-    required => 1,
-    weak_ref => 1
-);
+has 'route53'    => ( is => 'rw', isa => InstanceOf['Net::Amazon::Route53'],             required => 1, weak_ref => 1 );
+has 'hostedzone' => ( is => 'rw', isa => InstanceOf['Net::Amazon::Route53::HostedZone'], required => 1, weak_ref => 1 );
 
 =head3 name
 
@@ -56,11 +51,10 @@ The values associated with this resource record.
 
 =cut
 
-has 'name' => (is => 'rw', isa => 'Str', required => 1);
-has 'ttl'  => (is => 'rw', isa => 'Int', required => 1);
-has 'type' => (is => 'rw', isa => 'Str', required => 1);
-has 'values' =>
-    (is => 'rw', isa => 'ArrayRef', required => 1, default => sub {[]});
+has 'name'   => ( is => 'rw', isa => Str,      required => 1 );
+has 'ttl'    => ( is => 'rw', isa => Int,      required => 1 );
+has 'type'   => ( is => 'rw', isa => Str,      required => 1 );
+has 'values' => ( is => 'rw', isa => ArrayRef, required => 1, default => sub { [] } );
 
 =head2 METHODS
 
@@ -81,12 +75,12 @@ Returns a L<Net::Amazon::Route53::Change> object representing the change request
 
 =cut
 
-sub create {
+sub create
+{
     my $self = shift;
     my $wait = shift;
     $wait = 0 if !defined $wait;
-    $self->name =~ /\.$/
-        or die "Zone name needs to end in a dot, to be created\n";
+    $self->name =~ /\.$/ or die "Zone name needs to end in a dot, to be created\n";
     my $request_xml_str = <<'ENDXML';
 <?xml version="1.0" encoding="UTF-8"?>
 <ChangeResourceRecordSetsRequest xmlns="https://route53.amazonaws.com/doc/2010-10-01/">
@@ -108,34 +102,22 @@ sub create {
    </ChangeBatch>
 </ChangeResourceRecordSetsRequest>
 ENDXML
-    my $request_xml = sprintf(
-        $request_xml_str,
-        map {$_} $self->type,
-        $self->name,
-        $self->name,
-        $self->type,
-        $self->ttl,
-        join("\n",
-            map {"<ResourceRecord><Value>$_</Value></ResourceRecord>"}
-                @{ $self->values }));
+    my $request_xml = sprintf( $request_xml_str,
+        map { $_ }
+        $self->type, $self->name, $self->name, $self->type, $self->ttl,
+        join( "\n", map { "<ResourceRecord><Value>$_</Value></ResourceRecord>" } @{ $self->values } ) );
     my $resp = $self->route53->request(
         'post',
-        'https://route53.amazonaws.com/2010-10-01/'
-            . $self->hostedzone->id
-            . '/rrset',
+        'https://route53.amazonaws.com/2010-10-01/' . $self->hostedzone->id . '/rrset',
         Content => $request_xml
     );
     my $change = Net::Amazon::Route53::Change->new(
         route53 => $self->route53,
-        (
-            map {lc($_) => decode_entities($resp->{ChangeInfo}{$_})}
-                qw/Id Status SubmittedAt/
-        ),
+        ( map { lc($_) => decode_entities($resp->{ChangeInfo}{$_}) } qw/Id Status SubmittedAt/ ),
     );
     $change->refresh();
     return $change if !$wait;
-
-    while (lc($change->status) ne 'insync') {
+    while ( lc( $change->status ) ne 'insync' ) {
         sleep 2;
         $change->refresh();
     }
@@ -161,7 +143,8 @@ Returns a L<Net::Amazon::Route53::Change> object representing the change request
 
 =cut
 
-sub delete {
+sub delete
+{
     my $self = shift;
     my $wait = shift;
     $wait = 0 if !defined $wait;
@@ -186,41 +169,28 @@ sub delete {
    </ChangeBatch>
 </ChangeResourceRecordSetsRequest>
 ENDXML
-    my $request_xml = sprintf(
-        $request_xml_str,
-        (
-            map {$_} (
-                $self->type, $self->name, $self->name, $self->type, $self->ttl
-            )
-        ),
-        join("\n",
-            map {"<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>"}
-                @{ $self->values }));
+    my $request_xml = sprintf( $request_xml_str,
+        (map { $_ } ( $self->type, $self->name, $self->name, $self->type, $self->ttl )),
+        join( "\n", map { "<ResourceRecord><Value>" . $_ . "</Value></ResourceRecord>" } @{ $self->values } ) );
     my $resp = $self->route53->request(
         'post',
-        'https://route53.amazonaws.com/2010-10-01/'
-            . $self->hostedzone->id
-            . '/rrset',
+        'https://route53.amazonaws.com/2010-10-01/' . $self->hostedzone->id . '/rrset',
         Content => $request_xml
     );
     my $change = Net::Amazon::Route53::Change->new(
         route53 => $self->route53,
-        (
-            map {lc($_) => decode_entities($resp->{ChangeInfo}{$_})}
-                qw/Id Status SubmittedAt/
-        ),
+        ( map { lc($_) => decode_entities($resp->{ChangeInfo}{$_}) } qw/Id Status SubmittedAt/ ),
     );
     $change->refresh();
     return $change if !$wait;
-
-    while (lc($change->status) ne 'insync') {
+    while ( lc( $change->status ) ne 'insync' ) {
         sleep 2;
         $change->refresh();
     }
     return $change;
 }
 
-no Any::Moose;
+no Moo;
 
 =head1 AUTHOR
 

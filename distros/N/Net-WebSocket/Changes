@@ -96,3 +96,15 @@ the entire handshake.
 0.053 Thu Nov 9 2017
 - Update tests and docs for up-to-date IO::Framed syntax
 - Add README.pod
+
+0.054 Wed Nov 29 2017
+- Use Digest::SHA1 instead of Digest::SHA (SHA1 is lighter)
+- Tweak Makefile.PL dependencies
+
+0.06 Thu Nov 30 2017
+- Normalize naming conventions for frame classes.
+- Have frames receive “payload” instead of “payload_sr”.
+
+0.061 Thu Nov 30 2017
+- Copyright update
+- A few other documentation tweaks

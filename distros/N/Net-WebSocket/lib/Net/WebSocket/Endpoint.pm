@@ -15,8 +15,6 @@ See L<Net::WebSocket::Endpoint::Server>.
 use strict;
 use warnings;
 
-use Call::Context ();
-
 use Net::WebSocket::Frame::close ();
 use Net::WebSocket::Frame::ping ();
 use Net::WebSocket::Frame::pong ();
@@ -116,7 +114,7 @@ sub check_heartbeat {
     my $ping_message = $self->{'_ping_store'}->add();
 
     my $ping = Net::WebSocket::Frame::ping->new(
-        payload_sr => \$ping_message,
+        payload => $ping_message,
         $self->FRAME_MASK_ARGS(),
     );
 
@@ -187,7 +185,7 @@ sub on_ping {
 
     $self->_write_frame(
         Net::WebSocket::Frame::pong->new(
-            payload_sr => \$frame->get_payload(),
+            payload => $frame->get_payload(),
             $self->FRAME_MASK_ARGS(),
         ),
     );

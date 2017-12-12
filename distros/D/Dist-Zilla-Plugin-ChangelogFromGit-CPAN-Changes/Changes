@@ -1,5 +1,13 @@
 Changelog for Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes
 
+0.173421 2017-12-08T20:34:16Z
+ - *DO* add a changelog when not releasing, but don't update it. Various
+   author tests need to see a changelog exists, e.g. kwalitee (Ioan Rogers)
+ - don't pollute test dirs with test data (Ioan Rogers)
+
+0.173420 2017-12-08T17:04:41Z
+ - Only generate a Changelog when making a release (Ioan Rogers)
+
 0.110 2016-06-23T17:22:15Z
  - Update travis config (Ioan Rogers)
  - [Closes #24] dzil > 6 has replaced Path::Class with Path::Tiny (Ioan

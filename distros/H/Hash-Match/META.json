@@ -1,0 +1,48 @@
+{
+   "abstract" : "match contents of a hash against rules",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Match",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.8.8"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Warnings" : "0"
+         },
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "1.302015"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Hash-Match/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Hash-Match.git",
+         "web" : "https://github.com/robrwo/Hash-Match"
+      }
+   },
+   "version" : "v0.6.2",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

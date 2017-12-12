@@ -8,7 +8,7 @@ use Carp qw(carp confess);
 use POE;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.37';
+$VERSION = '0.38';
 sub DOSENDBACK () { 1 }
 
 our $globalinfos;
@@ -284,35 +284,34 @@ sub new {
       $err = Net::SSLeay::CTX_use_certificate_chain_file($self->{context}, $params->{chain});
       die "Error using chain: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
-   } else {
-      if ($params->{keymem} || $params->{key}) {
-         if ($params->{keymem}) {
-            $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
-            print "Loaded keymem(".length($params->{keymem})." Bytes) with result ".$err."\n"
-               if $self->{debug};
-         } else {
-            $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
-            print "Loaded key from file ".$params->{key}." with result ".$err."\n"
-               if $self->{debug};
-         }
-         die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
-            if ($err && ($err != 1));
+   }
+   if ($params->{keymem} || $params->{key}) {
+      if ($params->{keymem}) {
+         $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
+         print "Loaded keymem(".length($params->{keymem})." Bytes) with result ".$err."\n"
+            if $self->{debug};
+      } else {
+         $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
+         print "Loaded key from file ".$params->{key}." with result ".$err."\n"
+            if $self->{debug};
       }
-      if ($params->{crtmem} || $params->{crt}) {
-         if ($params->{crtmem}) {
-            my $crt = PEMdataToX509($params->{crtmem});
-            $err = Net::SSLeay::CTX_use_certificate($self->{context}, $crt);
-            print "Loaded crtmem(".length($params->{crtmem})." Bytes/".$crt.") with result ".$err."\n"
-               if $self->{debug};
-         } else {
-            # TODO:XXX:FIXME: Errorchecking!
-            $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
-            print "Loaded crt from file ".$params->{crt}." with result ".$err."\n"
-               if $self->{debug};
-         }
-         die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
-            if ($err && ($err != 1));
+      die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
+   }
+   if ($params->{crtmem} || $params->{crt}) {
+      if ($params->{crtmem}) {
+         my $crt = PEMdataToX509($params->{crtmem});
+         $err = Net::SSLeay::CTX_use_certificate($self->{context}, $crt);
+         print "Loaded crtmem(".length($params->{crtmem})." Bytes/".$crt.") with result ".$err."\n"
+            if $self->{debug};
+      } else {
+         # TODO:XXX:FIXME: Errorchecking!
+         $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
+         print "Loaded crt from file ".$params->{crt}." with result ".$err."\n"
+            if $self->{debug};
       }
+      die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
    }
 
    $err = undef;
@@ -697,7 +696,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =head1 DESCRIPTION
 

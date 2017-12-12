@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface::Common::HD44780 );
 use Carp;
 use HiPi qw( :lcd );
 
-our $VERSION ='0.67';
+our $VERSION ='0.68';
 
 sub new {
     my ($class, %userparams) = @_;
@@ -37,6 +37,7 @@ sub new {
         backlightcontrol =>  0,
         device           =>  undef,
         positionmap      =>  undef,
+        serialbuffermode =>  1,
     );
     
     # get user params

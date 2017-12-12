@@ -1,14 +1,10 @@
 #!perl -T
 
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
 use Struct::Diff qw(diff list_diff);
-use Storable qw(freeze);
-
-use Test::More tests => 9;
-
-local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
+use Test::More tests => 8;
 
 use lib "t";
 use _common qw(sdump);
@@ -75,7 +71,6 @@ is_deeply(
 ) or diag sdump \@list;
 
 my $d = diff($frst, $scnd);
-$frozen = freeze($d);
 @list = list_diff($d);
 is_deeply(
     \@list,
@@ -89,8 +84,6 @@ is_deeply(
     ],
     "MIXED: complex"
 ) or diag sdump \@list;
-
-ok(freeze($d) eq $frozen, "Check diff structure unchanged");
 
 ### depth ###
 @list = list_diff(diff($frst, $scnd), depth => 0);

@@ -9,7 +9,7 @@ use File::Slurp qw( slurp );
 use WebService::Google::Closure::Types qw( ArrayRefOfStrings CompilationLevel );
 use WebService::Google::Closure::Response;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
 
 has js_code => (
@@ -46,7 +46,7 @@ has timeout => (
 has post_url => (
     is         => 'ro',
     isa        => Str,
-    default    => 'http://closure-compiler.appspot.com/compile',
+    default    => 'https://closure-compiler.appspot.com/compile',
     init_arg   => undef,
 );
 

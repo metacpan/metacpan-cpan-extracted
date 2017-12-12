@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 use Carp;
 
@@ -372,26 +372,6 @@ than twice as would be the case calling the above methods individually.
 
 =cut
 
-sub set_on_geom_changed
-{
-   croak "\$win->set_on_geom_changed is deprecated; use ->bind_event";
-}
-
-sub set_on_key
-{
-   croak "\$win->set_on_key is deprecated; use ->bind_event";
-}
-
-sub set_on_mouse
-{
-   croak "\$win->set_on_mouse is deprecated; use ->bind_event";
-}
-
-sub set_on_expose
-{
-   croak "\$win->set_on_expose is deprecated; use ->bind_event";
-}
-
 our $INDENT = "";
 sub _do_expose
 {
@@ -445,11 +425,6 @@ expose, the actual handler will only be invoked once per unique region of the
 window.
 
 =cut
-
-sub set_on_focus
-{
-   croak "\$win->set_on_focus is deprecated; use ->bind_event";
-}
 
 =head2 set_focus_child_notify
 
@@ -833,16 +808,6 @@ Returns true if this window is currently stealing input from its siblings
 Controls whether this window is currently stealing input from its siblings
 
 =cut
-
-sub clearline
-{
-   croak "\$win->clearline has been removed";
-}
-
-sub clear
-{
-   croak "\$win->clear has been removed";
-}
 
 sub sprintf
 {

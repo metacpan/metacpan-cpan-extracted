@@ -38,7 +38,7 @@ sub add_cflags_libs
    push @{ $build_args{extra_linker_flags} }, split( m/ +/, $libs );
 }
 
-if( eu_pc_atleast_version( "tickit", 0 ) ) {
+if( eu_pc_atleast_version( "tickit", "0.2" ) ) {
    # libtickit installed; just use it
    print "Using installed libtickit\n";
 
@@ -119,7 +119,7 @@ my $build = Module::Build->new(
       'Alien::libtermkey' => '0.16',
       'Alien::unibilium' => '0.11',
       'ExtUtils::PkgConfig' => 0,
-      'Module::Build' => 0,
+      'Module::Build' => '0.4004', # test_requires
    },
    test_requires => {
       'Test::Builder::Tester' => 0,
@@ -133,9 +133,7 @@ my $build = Module::Build->new(
       'Alien::libtermkey' => '0.16',
       'Alien::unibilium' => '0.11',
    },
-   auto_configure_requires => 1,
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

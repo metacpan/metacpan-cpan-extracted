@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::CommitBuild;
 # ABSTRACT: Check in build results on separate branch
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Git::Wrapper 0.021 ();      # need -STDIN
 use IPC::Open3;
@@ -97,6 +97,7 @@ around dump_config => sub
         (map { $_ => $self->$_ }
             qw(branch release_branch message release_message build_root)),
         multiple_inheritance => $self->multiple_inheritance ? 1 : 0,
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -197,6 +198,7 @@ sub _create_tree {
     return $sha;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -211,7 +213,7 @@ Dist::Zilla::Plugin::Git::CommitBuild - Check in build results on separate branc
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 SYNOPSIS
 

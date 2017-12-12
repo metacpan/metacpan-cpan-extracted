@@ -2,7 +2,6 @@ package Pcore::HTTP::Response;
 
 use Pcore -class;
 use Pcore::HTTP::Headers;
-use HTTP::Message;    # TODO requires for decode body
 use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
 
 with qw[Pcore::Util::Result::Status];
@@ -20,6 +19,7 @@ has content_length => ( is => 'rwp', isa => PositiveOrZeroInt, default => 0, ini
 has redirect => ( is => 'ro', isa => ArrayRef, init_arg => undef );
 has decoded_body => ( is => 'lazy', isa => Maybe [ScalarRef], init_arg => undef );
 has is_connect_error => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
+has tree => ( is => 'lazy', isa => Maybe [ InstanceOf ['HTML::TreeBuilder::LibXML'] ], init_arg => undef );
 
 sub BUILD ( $self, $args ) {
     $self->{headers} = Pcore::HTTP::Headers->new;
@@ -36,7 +36,25 @@ sub _build_decoded_body ($self) {
 
     return if !is_plain_scalarref $self->{body};
 
+    state $init = !!require HTTP::Message;
+
     return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{CONTENT_TYPE} ], $self->{body}->$* )->decoded_content( raise_error => 1, ref => 1 );
+}
+
+sub _build_tree ($self) {
+    return if !$self->{body};
+
+    return if !is_plain_scalarref $self->{body};
+
+    state $init = !!require HTML::TreeBuilder::LibXML;
+
+    my $tree = HTML::TreeBuilder::LibXML->new;
+
+    $tree->parse( $self->decoded_body->$* );
+
+    $tree->eof;
+
+    return $tree;
 }
 
 1;

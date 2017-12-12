@@ -1,7 +1,7 @@
 package Plack::Middleware::PeriAHS::LogAccess;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.61'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.620'; # VERSION
 
 use 5.010;
 use strict;
@@ -204,7 +204,7 @@ Plack::Middleware::PeriAHS::LogAccess - Log request
 
 =head1 VERSION
 
-This document describes version 0.61 of Plack::Middleware::PeriAHS::LogAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-07-10.
+This document describes version 0.620 of Plack::Middleware::PeriAHS::LogAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-12-09.
 
 =head1 SYNOPSIS
 
@@ -272,7 +272,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
 
 =head1 BUGS
 

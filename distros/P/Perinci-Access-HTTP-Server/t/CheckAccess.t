@@ -2,13 +2,13 @@
 
 package main;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Plack::Builder;
 use Plack::Test;
-use Test::More;
 
 test_CheckAccess_middleware(
     name => "allow_log=0 (default)",

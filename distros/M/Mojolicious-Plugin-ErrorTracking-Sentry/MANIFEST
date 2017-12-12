@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/ErrorTracking/Sentry.pm
+minil.toml
+t/00_compile.t
+t/mojolicious/plugin/error_tracking/sentry.t
+META.yml
+MANIFEST

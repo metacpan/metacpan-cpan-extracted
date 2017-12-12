@@ -7,7 +7,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_matcher {
@@ -74,7 +74,7 @@ eris::log::context::snort - Parses the Snort and Suricata alert logs
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

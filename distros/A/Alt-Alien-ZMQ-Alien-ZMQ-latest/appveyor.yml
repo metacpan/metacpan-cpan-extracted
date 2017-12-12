@@ -1,0 +1,35 @@
+version: build-{build}
+
+clone_depth: 50
+
+environment:
+  PERL_CPANM_OPT: "--notest --force --skip-satisfied"
+
+platform:
+  - x86
+  - x64
+
+install:
+  - set TMPDIR=%APPVEYOR_BUILD_FOLDER%\tmp
+  - choco install --allowemptychecksum strawberryperl
+  - path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - "cpan App::cpanminus"
+  - "cpanm Dist::Zilla"
+  - "dzil authordeps | cpanm"
+  - "dzil listdeps --author | cpanm"
+
+before_build:
+  - "dzil build --in build-dir"
+
+build_script:
+  - "dzil listdeps | cpanm"
+  - "cd build-dir"
+  - "cpanm --installdeps ."
+  - "cd .."
+
+test_script:
+  - "dzil test --release --keep-build-dir"
+  - "set PERL_ALT_INSTALL=OVERWRITE"
+  - "dzil install"
+  - "perl ./maint/install-zmq-libzmq.pl ZMQ::LibZMQ3"
+  - "perl ./maint/install-zmq-libzmq.pl ZMQ::LibZMQ4"

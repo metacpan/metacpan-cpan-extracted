@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
 
@@ -58,14 +58,14 @@ L</primaryKey>() geliefert.
 
 table()
 
+=head4 Returns
+
+Tabellenname (String)
+
 =head4 Description
 
 Bestimme den Namen der Datenbanktabelle, welche die Klasse kapselt,
 und liefere diesen zurück.
-
-=head4 Returns
-
-Tabellenname (String)
 
 =head4 Example
 
@@ -436,7 +436,7 @@ sub delete {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::DirHandle;
@@ -53,14 +53,6 @@ kontrollieren.
 =head4 Synopsis
 
     $tree = $class->new(@dirs,@opt);
-
-=head4 Description
-
-Instantiiere ein Dateibaumobjekt über den Verzeichnissen @dirs
-und liefere eine Referenz auf dieses Objekt zurück. Die Verzeichnisse
-in @dirs müssen nicht existieren. Hat ein Verzeichnis die Form
-"DIR/*" wird nicht rekursiv in DIR abgestiegen, sondern nur
-die Dateien (nicht die Verzeichnisse) in DIR werden verwaltet.
 
 =head4 Options
 
@@ -124,6 +116,14 @@ Schreibe keine Meldungen nach STDERR.
 Filehandle, auf die Ausgaben geschrieben werden.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Dateibaumobjekt über den Verzeichnissen @dirs
+und liefere eine Referenz auf dieses Objekt zurück. Die Verzeichnisse
+in @dirs müssen nicht existieren. Hat ein Verzeichnis die Form
+"DIR/*" wird nicht rekursiv in DIR abgestiegen, sondern nur
+die Dateien (nicht die Verzeichnisse) in DIR werden verwaltet.
 
 =cut
 
@@ -346,26 +346,6 @@ sub paths {
         @opt
     );
 
-=head4 Description
-
-Füge Datei $file mit dem Inhalt $data zum Dateibaum hinzu. Die
-Methode liefert 0, wenn die Datei nicht geschrieben wurde,
-1, wenn die Datei existiert hat und geschrieben wurde, 2, wenn
-die Datei neu erzeugt wurde.
-
-Ist $data C<undef> wird die Datei nicht geschrieben, bleibt
-aber weiter bestehen. Dies ist nützlich, wenn es teuer ist, den Inhalt
-der Datei zu generieren, und bekannt ist, dass sich am Inhalt nichts
-geändert hat.
-
-Die Datei wird effektiv geschrieben, wenn sie nicht existiert oder der
-Inhalt differiert. In dem Fall schreibt die Methode eine entsprechende
-Meldung nach STDERR und liefert als Returnwert 1.
-
-Der Rückgabewert kann benutzt werden, um im Falle des Schreibens
-der Datei weitere Aktionen auszuführen, wie z.B. das Setzen von
-Dateirechten.
-
 =head4 Options
 
 =over 4
@@ -412,6 +392,26 @@ kann. Die manuell bearbeitete Datei soll danach natürlich nicht mehr
 vom Muster überschieben werden.
 
 =back
+
+=head4 Description
+
+Füge Datei $file mit dem Inhalt $data zum Dateibaum hinzu. Die
+Methode liefert 0, wenn die Datei nicht geschrieben wurde,
+1, wenn die Datei existiert hat und geschrieben wurde, 2, wenn
+die Datei neu erzeugt wurde.
+
+Ist $data C<undef> wird die Datei nicht geschrieben, bleibt
+aber weiter bestehen. Dies ist nützlich, wenn es teuer ist, den Inhalt
+der Datei zu generieren, und bekannt ist, dass sich am Inhalt nichts
+geändert hat.
+
+Die Datei wird effektiv geschrieben, wenn sie nicht existiert oder der
+Inhalt differiert. In dem Fall schreibt die Methode eine entsprechende
+Meldung nach STDERR und liefert als Returnwert 1.
+
+Der Rückgabewert kann benutzt werden, um im Falle des Schreibens
+der Datei weitere Aktionen auszuführen, wie z.B. das Setzen von
+Dateirechten.
 
 =cut
 
@@ -640,6 +640,10 @@ sub removePath {
     $n|@paths = $tree->cleanup($ask);
     $n|@paths = $tree->cleanup($ask,\$timer);
 
+=head4 Returns
+
+Anzahl oder Liste der gelöschten Pfade (Skalarkontext/Arraykontext)
+
 =head4 Description
 
 Entferne alle Dateien und Verzeichnisse aus dem Zielbaum, die obsolet
@@ -653,10 +657,6 @@ kein Löschen statt und die Methode liefert 0.
 
 Ist ferner der Parameter $timer angegeben, wird die Antwortzeit
 des Benutzers auf dessen Wert aufaddiert.
-
-=head4 Returns
-
-Anzahl oder Liste der gelöschten Pfade (Skalarkontext/Arraykontext)
 
 =cut
 
@@ -752,13 +752,13 @@ sub close {
 
     $text = $tree->getText($textDe);
 
-=head4 Description
-
-Liefere die Übersetzung zum deutschen Text $textDe.
-
 =head4 Returns
 
 Übersetzten Text (String)
+
+=head4 Description
+
+Liefere die Übersetzung zum deutschen Text $textDe.
 
 =cut
 
@@ -784,7 +784,7 @@ sub getText {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

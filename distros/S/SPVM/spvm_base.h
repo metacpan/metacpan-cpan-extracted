@@ -4,6 +4,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_opcode_array.h
+struct SPVM_opcode_array;
+typedef struct SPVM_opcode_array SPVM_OPCODE_ARRAY;
+
+// spvm_opcode.h
+struct SPVM_opcode;
+typedef struct SPVM_opcode SPVM_OPCODE;
+
 // spvm_undef.h
 struct SPVM_undef;
 typedef struct SPVM_undef SPVM_UNDEF;
@@ -95,14 +103,6 @@ typedef struct SPVM_allocator SPVM_ALLOCATOR;
 // spvm_dumper.h
 struct SPVM_dumper;
 typedef struct SPVM_dumper SPVM_DUMPER;
-
-// spvm_bytecode_array.h
-struct SPVM_bytecode_array;
-typedef struct SPVM_bytecode_array SPVM_BYTECODE_ARRAY;
-
-// spvm_assign.h
-struct SPVM_bytecode;
-typedef struct SPVM_bytecode SPVM_BYTECODE;
 
 // spvm_vmcode.h
 struct SPVM_vmcodes;

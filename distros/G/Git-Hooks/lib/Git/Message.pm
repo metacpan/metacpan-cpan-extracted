@@ -1,6 +1,6 @@
 package Git::Message;
 # ABSTRACT: A Git commit message
-$Git::Message::VERSION = '2.1.8';
+$Git::Message::VERSION = '2.2.0';
 use strict;
 use warnings;
 use Carp;
@@ -192,7 +192,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 2.1.8
+version 2.2.0
 
 =head1 SYNOPSIS
 

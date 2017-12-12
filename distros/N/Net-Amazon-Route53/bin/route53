@@ -49,13 +49,12 @@ GetOptions(
 ) or pod2usage(1);
 $options{value} = \@_value;
 pod2usage(1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
-pod2usage("Either provide a keyname/keyfile, or a key/id\n")
-    if (!length $keyname and (!length $key or !length $id));
-if (length $keyname) {
-    pod2usage("Need a keyfile when a keyname is given\n") if (!length $keyfile);
-    die("No such keyfile: $keyfile\n") if (!-f $keyfile);
+pod2usage("Either provide a keyname/keyfile, or a key/id\n") if ( !length $keyname and ( !length $key or !length $id ) );
+if ( length $keyname ) {
+    pod2usage("Need a keyfile when a keyname is given\n") if ( !length $keyfile );
+    die("No such keyfile: $keyfile\n") if ( !-f $keyfile );
     my $keyfile_contents = do {
         local $/;
         open my $f, '<', $keyfile or die "Cannot open $keyfile for reading: $!";
@@ -65,22 +64,18 @@ if (length $keyname) {
     };
     my %awsSecretAccessKeys;
     eval "$keyfile_contents" or die "Cannot parse $keyfile\'s contents.\n";
-    die("No such friendly key $keyname in $keyfile\n")
-        if !exists $awsSecretAccessKeys{$keyname};
-    die("Friendly key $keyname in $keyfile misses 'id'\n")
-        if !exists $awsSecretAccessKeys{$keyname}{id};
-    die("Friendly key $keyname in $keyfile misses 'key'\n")
-        if !exists $awsSecretAccessKeys{$keyname}{key};
+    die("No such friendly key $keyname in $keyfile\n")      if !exists $awsSecretAccessKeys{$keyname};
+    die("Friendly key $keyname in $keyfile misses 'id'\n")  if !exists $awsSecretAccessKeys{$keyname}{id};
+    die("Friendly key $keyname in $keyfile misses 'key'\n") if !exists $awsSecretAccessKeys{$keyname}{key};
     $id      = $awsSecretAccessKeys{$keyname}{id};
     $key     = $awsSecretAccessKeys{$keyname}{key};
     $keyfile = $keyname = '';
 }
-if (length $key or length $id) {
-    pod2usage("Both id and key must be given\n")
-        if (!length $key or !length $id);
+if ( length $key or length $id ) {
+    pod2usage("Both id and key must be given\n") if ( !length $key or !length $id );
 }
 
-pod2usage("Need an action") if (!@ARGV);
+pod2usage("Need an action") if ( !@ARGV );
 
 my %actions = (
     'list'        => \&do_list,
@@ -89,22 +84,18 @@ my %actions = (
     'record'      => \&do_record,
 );
 my $action = shift @ARGV;
-pod2usage("Need an action\nUse route53 --help to list the allowed actions")
-    unless defined $action;
-pod2usage(
-    "Unrecognised action: $action\nUse route53 --help to list the allowed actions"
-) unless exists $actions{$action};
-pod2usage("Resource Record name need to end in a dot")
-    if $options{name} and $options{name} !~ /\.$/;
-pod2usage("Resource Record TTL need to be numeric")
-    if $options{ttl} and $options{ttl} !~ /^\d+$/;
+pod2usage("Need an action\nUse route53 --help to list the allowed actions") unless defined $action;
+pod2usage("Unrecognised action: $action\nUse route53 --help to list the allowed actions")unless exists $actions{$action};
+pod2usage("Resource Record name need to end in a dot") if $options{name} and $options{name} !~ /\.$/;
+pod2usage("Resource Record TTL need to be numeric") if $options{ttl} and $options{ttl} !~ /^\d+$/;
 
-my $route53 = Net::Amazon::Route53->new(id => $id, key => $key);
+my $route53 = Net::Amazon::Route53->new( id => $id, key => $key );
 
-my $outcome = $actions{$action}->($route53, @ARGV);
+my $outcome = $actions{$action}->( $route53, @ARGV );
 print $outcome;
 
-sub do_list {
+sub do_list
+{
     my $route53      = shift;
     my @hosted_zones = $route53->get_hosted_zones();
     return "No hosted zones associated with this account\n" if !@hosted_zones;
@@ -119,170 +110,156 @@ sub do_list {
     return $output;
 }
 
-sub do_nameservers {
+sub do_nameservers
+{
     my $route53      = shift;
     my $which        = shift;
     my @hosted_zones = $route53->get_hosted_zones($which);
-    return "No hosted zones associated with this account\n"
-        if (!$which and !@hosted_zones);
-    return "No such hosted zone $which\n" if ($which and !@hosted_zones);
+    return "No hosted zones associated with this account\n" if ( !$which and !@hosted_zones );
+    return "No such hosted zone $which\n"                   if ( $which  and !@hosted_zones );
     my $output = '';
     for my $hosted_zone (@hosted_zones) {
-        if (!$which) {
+        if ( !$which ) {
             $output .= "Hosted zone:\n";
             $output .= "  id: " . $hosted_zone->id . "\n";
             $output .= "  name: " . $hosted_zone->name . "\n";
-            $output .=
-                "  callerreference: " . $hosted_zone->callerreference . "\n";
+            $output .= "  callerreference: " . $hosted_zone->callerreference . "\n";
             $output .= "  comment: " . $hosted_zone->comment . "\n";
         }
         my @nameservers = @{ $hosted_zone->nameservers };
         for my $nameserver (@nameservers) {
-            $output .= ($which ? '' : '  nameserver: ') . "$nameserver\n";
+            $output .= ( $which ? '' : '  nameserver: ' ) . "$nameserver\n";
         }
     }
     return $output;
 }
 
-sub do_zone {
+sub do_zone
+{
     my $route53 = shift;
     my $which   = shift;
     die "Need a zone or action name\n" if !$which;
 
     # actions
-    if ($which eq 'create') {
+    if ( $which eq 'create' ) {
         my $zone = shift;
         die "Need a zone name to create\n" if !$zone;
         die "Zone needs to end in a dot\n" if $zone !~ /\.$/;
-        $options{callerreference} = sprintf("%s-%s-%s", $zone, time, $$)
-            if !length $options{callerreference};
-        print "Creating new zone '$zone'\n",
-            "  comment:          '$options{comment}'\n",
-            "  caller reference: '$options{callerreference}'\n";
+        $options{callerreference} = sprintf( "%s-%s-%s", $zone, time, $$ )
+          if !length $options{callerreference};
+        print
+          "Creating new zone '$zone'\n",
+          "  comment:          '$options{comment}'\n",
+          "  caller reference: '$options{callerreference}'\n";
         my $new_zone = Net::Amazon::Route53::HostedZone->new(
             route53         => $route53,
             name            => $zone,
             comment         => $options{comment},
             callerreference => $options{callerreference},
         );
-        eval {$new_zone->create(wait => $options{wait}, @_)}
-            or die "Could not create zone $zone: $@\n";
+        eval { $new_zone->create( wait => $options{wait}, @_ ) }
+          or die "Could not create zone $zone: $@\n";
         return "Zone created\n";
     }
-    if ($which eq 'delete') {
+    if ( $which eq 'delete' ) {
         my $zone = shift;
         die "Need a zone name to delete\n" if !$zone;
         die "Zone needs to end in a dot\n" if $zone !~ /\.$/;
         my @hosted_zones = $route53->get_hosted_zones($zone);
-        return "No such hosted zone $zone\n" if (!@hosted_zones);
-        eval {$hosted_zones[0]->delete(wait => $options{wait}, @_)}
-            or die "Could not delete zone $zone: $@\n";
+        return "No such hosted zone $zone\n" if ( !@hosted_zones );
+        eval { $hosted_zones[0]->delete( wait => $options{wait}, @_ ) }
+          or die "Could not delete zone $zone: $@\n";
         return "Zone deleted\n";
     }
 
     # Not an action; bail out if it doesn't look like a zone
-    die "Unrecognised action/zone $which\n" if ($which !~ /\.$/);
+    die "Unrecognised action/zone $which\n" if ( $which !~ /\.$/ );
 
-    do_nameservers($route53, $which);
+    do_nameservers( $route53, $which );
 }
 
-sub do_record {
+sub do_record
+{
     my $route53 = shift;
     my $which   = shift;
     die "Need a zone or action name\n" if !$which;
 
     # actions
-    if ($which eq 'list' or $which =~ /\.$/) {
-        my $zone = ($which =~ /\.$/ ? $which : shift);
+    if ( $which eq 'list' or $which =~ /\.$/ ) {
+        my $zone = ($which =~ /\.$/ ? $which : shift );
         die "Need a zone name to list\n"   if !$zone;
         die "Zone needs to end in a dot\n" if $zone !~ /\.$/;
         my @hosted_zones = $route53->get_hosted_zones($zone);
-        return "No such hosted zone $zone\n" if (!@hosted_zones);
+        return "No such hosted zone $zone\n" if ( !@hosted_zones );
         my $output = '';
-        for my $rrs (@{ $hosted_zones[0]->resource_record_sets() }) {
+        for my $rrs ( @{ $hosted_zones[0]->resource_record_sets() } ) {
             next if $options{type} and uc($rrs->type) ne uc($options{type});
-            next if $options{ttl}  and $rrs->ttl ne $options{ttl};
-            if (@{ $options{value} } and @{ $options{value} } > 0) {
-                next if !scalar grep {
-                    my $v = $_;
-                    scalar grep {$_ eq $v} @{ $options{value} }
-                } @{ $rrs->values };
+            next if $options{ttl} and $rrs->ttl ne $options{ttl};
+            if ( @{$options{value}} and @{$options{value}} > 0 ) {
+                next if !scalar grep { my $v = $_; scalar grep { $_ eq $v } @{$options{value}} } @{ $rrs->values };
             }
             next if $options{name} and $rrs->name ne $options{name};
             $output .= sprintf("%s %s %s %s\n",
-                $rrs->name, $rrs->type, $rrs->ttl, join(' ', @{ $rrs->values }),
+                $rrs->name,
+                $rrs->type,
+                $rrs->ttl,
+                join(' ', @{$rrs->values}),
             );
         }
         return $output;
     }
-    if ($which eq 'delete') {
+    if ( $which eq 'delete' ) {
         my $zone = shift;
         die "Need a zone name to delete\n" if !$zone;
         die "Zone needs to end in a dot\n" if $zone !~ /\.$/;
         my @hosted_zones = $route53->get_hosted_zones($zone);
-        return "No such hosted zone $zone\n" if (!@hosted_zones);
+        return "No such hosted zone $zone\n" if ( !@hosted_zones );
 
         my @records = @{ $hosted_zones[0]->resource_record_sets() };
-        @records = grep {$_->name eq $options{name}} @records
-            if length $options{name};
-
+        @records = grep { $_->name eq $options{name} } @records if length $options{name};
         # weed out by record type, ttl, and value
-        @records = grep {$_->type eq $options{type}} @records if $options{type};
-        @records = grep {$_->ttl eq $options{ttl}} @records
-            if length $options{ttl};
-        if (@{ $options{value} }) {
-            @records = grep {
-                my $r = $_;
-                grep {
-                    my $v = $_;
-                    scalar grep {$_ eq $v} @{ $options{value} }
-                    } @{ $r->values }
-            } @records;
+        @records = grep { $_->type eq $options{type} } @records if $options{type};
+        @records = grep { $_->ttl eq $options{ttl} } @records if length $options{ttl};
+        if ( @{ $options{value} } ) {
+            @records = grep { my $r = $_; grep { my $v = $_; scalar grep { $_ eq $v } @{$options{value}} } @{ $r->values } } @records;
         }
         die "No record matches\n" if (!@records);
         die "Too many records match:\n", join(
             "\n",
             map {
-                sprintf("%s %s %s %s",
-                    $_->name, $_->type, $_->ttl, join(' ', @{ $_->values }))
-            } @records
-            ),
-            "\n"
-            if @records > 1;
-        eval {$records[0]->delete(wait => $options{wait}, @_)}
-            or die "Could not delete record: $@\n";
+                sprintf( "%s %s %s %s", $_->name, $_->type, $_->ttl, join( ' ', @{ $_->values } ) )
+              } @records
+          ),
+          "\n"
+          if @records > 1;
+        eval { $records[0]->delete( wait => $options{wait}, @_ ) }
+          or die "Could not delete record: $@\n";
         return "Record deleted\n";
     }
-    if ($which eq 'create') {
+    if ( $which eq 'create' ) {
         my $zone = shift;
         die "Need a zone name to create a record for\n" if !$zone;
         die "Zone needs to end in a dot\n" if $zone !~ /\.$/;
         my @hosted_zones = $route53->get_hosted_zones($zone);
-        return "No such hosted zone $zone\n" if (!@hosted_zones);
+        return "No such hosted zone $zone\n" if ( !@hosted_zones );
         my @errors;
-        push @errors, "Need a --name for the new record\n"
-            if !length $options{name};
-        push @errors, "Need a --ttl for the new record\n"
-            if !length $options{ttl};
-        push @errors, "Need a --type for the new record\n"
-            if !length $options{type};
-        push @errors, "Need one or more --value for the new record\n"
-            if !@{ $options{value} };
+        push @errors, "Need a --name for the new record\n" if !length $options{name};
+        push @errors, "Need a --ttl for the new record\n" if !length $options{ttl};
+        push @errors, "Need a --type for the new record\n" if !length $options{type};
+        push @errors, "Need one or more --value for the new record\n" if !@{$options{value}};
         push @errors, "Unrecognised --type for record: $options{type}\n"
-            if (length $options{type}
-            and $options{type} !~
-            /^(A|AAAA|CNAME|MX|NS|PTR|SOA|SPF|SRV|TXT)$/i);
-        die join('', @errors) if @errors;
+            if ( length $options{type} and $options{type} !~ /^(A|AAAA|CNAME|MX|NS|PTR|SOA|SPF|SRV|TXT)$/i );
+        die join('',@errors) if @errors;
         my $new_record = Net::Amazon::Route53::ResourceRecordSet->new(
-            route53    => $route53,
+            route53 => $route53,
             hostedzone => $hosted_zones[0],
-            name       => $options{name},
-            ttl        => $options{ttl},
-            type       => uc $options{type},
-            values     => $options{value},
+            name => $options{name},
+            ttl => $options{ttl},
+            type => uc $options{type},
+            values => $options{value},
         );
-        eval {$new_record->create(wait => $options{wait}, @_)}
-            or die "Could not create record: $@\n";
+        eval { $new_record->create( wait => $options{wait}, @_ ) }
+          or die "Could not create record: $@\n";
         return "Record created\n";
     }
 

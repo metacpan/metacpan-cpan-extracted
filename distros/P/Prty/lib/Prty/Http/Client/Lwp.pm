@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use LWP::UserAgent ();
@@ -32,11 +32,6 @@ L<Prty::Object>
 
     $data = $class->get($url,@opt);
 
-=head4 Description
-
-Führe HTTP-Request für URL $url aus und liefere die vom
-Server gelieferte Antwort zurück.
-
 =head4 Options
 
 =over 4
@@ -63,6 +58,11 @@ Wirf im Fehlerfall keine Exception, sondern liefere die Fehlerantwort.
 Timeout.
 
 =back
+
+=head4 Description
+
+Führe HTTP-Request für URL $url aus und liefere die vom
+Server gelieferte Antwort zurück.
 
 =cut
 
@@ -116,7 +116,7 @@ sub get {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

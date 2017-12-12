@@ -2,7 +2,7 @@ package Datahub::Factory::Command::transport;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use parent 'Datahub::Factory::Cmd';
 
@@ -28,6 +28,10 @@ sub description {
 sub opt_spec {
     return (
         [ "pipeline|p=s", "Location of the pipeline configuration file"],
+        [ "general|g=s", "Location of the general configuration file"],
+        [ "importer|i=s", "Location of the importer configuration file"],
+        [ "fixer|f=s", "Location of the fixer configuration file"],
+        [ "exporter|e=s", "Location of the exporter configuration file"],
         [ "verbose|v", "Verbose output"]
     );
 }
@@ -36,10 +40,22 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
 
     if (! $opt->{'pipeline'}) {
-        $self->usage_error('The --pipeline flag is required.');
+        for my $plugin ('general', 'importer', 'fixer', 'exporter') {
+            if (! $opt->{$plugin}) {
+                $self->usage_error(sprintf('The --%s configuration file is required.', $plugin));
+            }
+
+            if (! -e $opt->{$plugin}) {
+                $self->usage_error(sprintf('The provided %s configuration file does not exist.', $plugin));
+            }
+        }
+    } else {
+        if (! -e $opt->{'pipeline'}) {
+            $self->usage_error('The provided pipeline file does not exist.');
+        }
     }
 
-    # no args allowed but options!
+    # no args allowed, only options!
     $self->usage_error("No args allowed") if @$args;
 }
 
@@ -57,9 +73,18 @@ sub execute {
     #    Validation of the pipeline configuration happens here. Throw and catch
     #    nice errors.
     $self->info("Loading pipeline configuration...");
+
     my ($pipeline, $options);
-    $pipeline = Datahub::Factory->pipeline($opt->{pipeline}, 'Transport');
-    $options = $pipeline->parse();
+
+    if (! $opt->{pipeline}) {
+        for my $plugin ('general', 'importer', 'fixer', 'exporter') {
+            $pipeline = Datahub::Factory->pipeline($opt->{$plugin}, ucfirst($plugin));
+            $pipeline->parse(\$options);
+        }
+    } else {
+        $pipeline = Datahub::Factory->pipeline($opt->{pipeline}, 'Transport');
+        $options = $pipeline->parse();
+    }
 
     # Load modules
     $self->info("Initializing importer/exporter...");
@@ -158,6 +183,26 @@ a Datahub instance.
 =item C<--pipeline>
 
 Location of the pipeline configuration file.
+
+=item C<--general>
+
+Location of the general configuration file.
+
+=item C<--importer>
+
+Location of the importer configuration file.
+
+=item C<--fixer>
+
+Location of the fixer configuration file.
+
+=item C<--exporter>
+
+Location of the exporter configuration file.
+
+=item C<--verbose>
+
+Set this flag for pretty output of the ETL processing.
 
 =back
 

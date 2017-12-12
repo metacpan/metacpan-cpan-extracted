@@ -2,7 +2,7 @@ package Test2::Harness::Run::Queue;
 use strict;
 use warnings;
 
-our $VERSION = '0.001036';
+our $VERSION = '0.001041';
 
 use Carp qw/croak/;
 
@@ -36,6 +36,11 @@ sub seek {
     $self->{+QH}->seek($pos);
 
     return $pos;
+}
+
+sub reset {
+    my $self = shift;
+    delete $self->{+QH};
 }
 
 sub poll {

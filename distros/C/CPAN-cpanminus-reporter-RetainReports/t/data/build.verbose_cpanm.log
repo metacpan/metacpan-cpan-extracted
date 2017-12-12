@@ -1,0 +1,24 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1394982899.7127
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Mojolicious on cpanmetadb ...
+--> Working on Mojolicious
+Fetching http://www.cpan.org/authors/id/S/SR/SRI/Mojolicious-4.89.tar.gz
+-> OK
+Unpacking Mojolicious-4.89.tar.gz
+Entering Mojolicious-4.89
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Configuring Mojolicious-4.89
+Running Makefile.PL
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Building and testing Mojolicious-4.89
+-> OK
+Successfully installed Mojolicious-4.89 (upgraded from 4.87)
+Expiring 13 work directories.
+1 distribution installed

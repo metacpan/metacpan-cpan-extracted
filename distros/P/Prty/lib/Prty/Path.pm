@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -138,10 +138,6 @@ sub compareData {
 
     $class->copy($srcPath,$destPath,@opt);
 
-=head4 Description
-
-Kopiere Datei $srcPath nach $destPath.
-
 =head4 Options
 
 =over 4
@@ -164,6 +160,10 @@ existiert. Andernfalls wird eine Exception geworfen.
 Behalte den Zeitpunkt der letzten Änderung bei.
 
 =back
+
+=head4 Description
+
+Kopiere Datei $srcPath nach $destPath.
 
 =cut
 
@@ -237,16 +237,6 @@ sub copy {
 
     $class->duplicate($method,$srcPath,$destPath,@opt);
 
-=head4 Description
-
-Mache Datei $srcPath nach Methode $method unter $destPath verfügbar.
-Werte für $method:
-
-    copy
-    move -or- rename
-    link
-    symlink
-
 =head4 Options
 
 =over 4
@@ -257,6 +247,16 @@ Behalte den Zeitpunkt der letzten Änderung bei (nur bei 'copy'
 relevant).
 
 =back
+
+=head4 Description
+
+Mache Datei $srcPath nach Methode $method unter $destPath verfügbar.
+Werte für $method:
+
+    copy
+    move -or- rename
+    link
+    symlink
 
 =cut
 
@@ -394,10 +394,6 @@ sub newlineStr {
 
     $data = $class->read($file,@opt);
 
-=head4 Description
-
-Lies den Inhalt der Datei und liefere diesen zurück.
-
 =head4 Options
 
 =over 4
@@ -431,6 +427,10 @@ verwendet werden, um Kommentarzeilen zu überlesen.
 Überlies die ersten $n Zeilen.
 
 =back
+
+=head4 Description
+
+Lies den Inhalt der Datei und liefere diesen zurück.
 
 =cut
 
@@ -667,17 +667,6 @@ sub writeInline {
 
     @paths|$pathA = $class->find($path,@opt);
 
-=head4 Description
-
-Finde alle Dateien und Verzeichnisse unterhalb von und einschließlich
-Verzeichnis $path und liefere die Liste der gefundenen Pfade
-zurück. Im Skalarkontext liefere eine Referenz auf die Liste.
-
-Ist $dir Null (Leerstring oder undef), wird das aktuelle Verzeichnis
-('.') durchsucht.
-
-Die Reihenfolge der Dateien ist undefiniert.
-
 =head4 Options
 
 =over 4
@@ -749,6 +738,17 @@ oder liefere alles (undef).
 Schreibe Meldungen auf Ausgabe-Handle (s. Option -outHandle).
 
 =back
+
+=head4 Description
+
+Finde alle Dateien und Verzeichnisse unterhalb von und einschließlich
+Verzeichnis $path und liefere die Liste der gefundenen Pfade
+zurück. Im Skalarkontext liefere eine Referenz auf die Liste.
+
+Ist $dir Null (Leerstring oder undef), wird das aktuelle Verzeichnis
+('.') durchsucht.
+
+Die Reihenfolge der Dateien ist undefiniert.
 
 =cut
 
@@ -937,14 +937,6 @@ sub maxFilename {
 
     $max = $class->maxFileNumber($dir,@opt);
 
-=head4 Description
-
-Liefere den numerisch größten Dateinamen aus Verzeichnis $dir.
-Die Methode ist nützlich, wenn die Dateinamen mit einer Zahl
-NNNNNN beginnen und man die Datei mit der größten Zahl ermitteln
-möchte um einer neu erzeugten Datei die nächsthöhere Nummer
-zuzuweisen.
-
 =head4 Options
 
 =over 4
@@ -955,6 +947,14 @@ Wirf keine Exception, wenn ein Dateiname nicht mit einer Nummer
 beginnt.
 
 =back
+
+=head4 Description
+
+Liefere den numerisch größten Dateinamen aus Verzeichnis $dir.
+Die Methode ist nützlich, wenn die Dateinamen mit einer Zahl
+NNNNNN beginnen und man die Datei mit der größten Zahl ermitteln
+möchte um einer neu erzeugten Datei die nächsthöhere Nummer
+zuzuweisen.
 
 =cut
 
@@ -1007,12 +1007,6 @@ sub maxFileNumber {
 
     $class->mkdir($dir,@opt);
 
-=head4 Description
-
-Erzeuge Verzeichnis. Existiert das Verzeichnis bereits, hat
-der Aufruf keinen Effekt. Kann das Verzeichnis nicht angelegt
-werden, wird eine Exception ausgelöst.
-
 =head4 Options
 
 =over 4
@@ -1045,6 +1039,12 @@ eine Exception geworfen.
 Erzeuge übergeordnete Verzeichnisse, wenn nötig.
 
 =back
+
+=head4 Description
+
+Erzeuge Verzeichnis. Existiert das Verzeichnis bereits, hat
+der Aufruf keinen Effekt. Kann das Verzeichnis nicht angelegt
+werden, wird eine Exception ausgelöst.
 
 =cut
 
@@ -1129,11 +1129,6 @@ sub mkdir {
 
     $class->rmdir($dir);
 
-=head4 Description
-
-Lösche Verzeichnis $dir, falls dieses leer ist. Kann das
-Verzeichnis nicht gelöscht werden, wird eine Exception ausgelöst.
-
 =head4 Arguments
 
 =over 4
@@ -1147,6 +1142,11 @@ Pfad des Verzeichnisses
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Lösche Verzeichnis $dir, falls dieses leer ist. Kann das
+Verzeichnis nicht gelöscht werden, wird eine Exception ausgelöst.
 
 =cut
 
@@ -1250,7 +1250,7 @@ Die Methode liefert keinen Wert zurück.
 sub delete {
     my ($class,$path) = @_;
 
-    if (!-e $path && !-l $path) {
+    if (!defined($path) || $path eq '' || !-e $path && !-l $path) {
         # bei Nichtexistenz nichts tun, aber nur, wenn es
         # kein Symlink ist. Bei Symlinks schlägt -e fehl, wenn
         # das Ziel nicht existiert!
@@ -1288,14 +1288,14 @@ sub delete {
 
     $path = $class->expandTilde($path);
 
+=head4 Returns
+
+Pfad (String)
+
 =head4 Description
 
 Ersetze eine Tilde am Pfadanfang durch das Home-Verzeichnis des
 Benutzers und liefere den resultierenden Pfad zurück.
-
-=head4 Returns
-
-Pfad (String)
 
 =cut
 
@@ -1304,13 +1304,18 @@ Pfad (String)
 sub expandTilde {
     my ($class,$path) = @_;
 
-    if (!exists $ENV{'HOME'}) {
-        $class->throw(
-            q{PATH-00016: Environment-Variable HOME existiert nicht},
-        );
-    }
-    $path =~ s|^~/|$ENV{'HOME'}/|;
+    # Unter einem Daemon ist $HOME typischerweise nicht gesetzt, daher
+    # prüfen wir zunächst, ob wir $HOME überhaupt expandieren müssen
 
+    if ($path =~ /^~/) {
+        if (!exists $ENV{'HOME'}) {
+            $class->throw(
+                q{PATH-00016: Environment-Variable HOME existiert nicht},
+            );
+        }
+        $path =~ s|^~/|$ENV{'HOME'}/|;
+    }
+    
     return $path;
 }
 
@@ -1544,11 +1549,6 @@ sub newer {
 
     $class->rename($oldPath,$newPath,@opt);
 
-=head4 Description
-
-Benenne Pfad $oldPath in $newPath um. Die Methode liefert keinen
-Wert zurück.
-
 =head4 Options
 
 =over 4
@@ -1565,6 +1565,11 @@ Erzeuge nicht-existente Verzeichnisse des Zielpfads
 und entferne leere Verzeichnisse des Quellpfads.
 
 =back
+
+=head4 Description
+
+Benenne Pfad $oldPath in $newPath um. Die Methode liefert keinen
+Wert zurück.
 
 =head4 Example
 
@@ -1714,17 +1719,6 @@ sub symlink {
 
     $class->symlinkRelative($path,$symlink,@opt);
 
-=head4 Description
-
-Erzeuge einen Symlink $symlink, der auf den Pfad $path verweist.
-Die Methode liefert keinen Wert zurück.
-
-Die Methode zeichnet sich gegenüber der Methode symlink() dadurch
-aus, dass sie, wenn $path ein relativer Pfad zum ist,
-diesen so korrigiert, dass er von Pfad
-auch von $symlink aus korrekt ist. Denn der Pfad $path ist als
-relativer Pfad die Fortsetzung von $symlink!
-
 =head4 Options
 
 =over 4
@@ -1739,6 +1733,17 @@ Führe das Kommando nicht aus. Speziell Verbindung mit
 Gib Informationen über die erzeugten Symlinks auf STDOUT aus.
 
 =back
+
+=head4 Description
+
+Erzeuge einen Symlink $symlink, der auf den Pfad $path verweist.
+Die Methode liefert keinen Wert zurück.
+
+Die Methode zeichnet sich gegenüber der Methode symlink() dadurch
+aus, dass sie, wenn $path ein relativer Pfad zum ist,
+diesen so korrigiert, dass er von Pfad
+auch von $symlink aus korrekt ist. Denn der Pfad $path ist als
+relativer Pfad die Fortsetzung von $symlink!
 
 =head4 Example
 
@@ -1812,7 +1817,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

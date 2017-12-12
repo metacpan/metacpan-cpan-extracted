@@ -1,9 +1,7 @@
 package Types::SQL;
 
-use strictures;
-
-use version;
-$Types::SQL::VERSION = version->declare('v0.0.3');
+use strict;
+use warnings;
 
 use Type::Library
   -base,
@@ -15,7 +13,10 @@ use Types::Standard -types;
 use PerlX::Maybe;
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
+# RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
+
+our $VERSION = 'v0.1.2';
 
 =head1 NAME
 
@@ -237,7 +238,7 @@ sub _generate_type {
 
 =head1 CUSTOM TYPES
 
-Any type that has these types as a parent can have xolumn information
+Any type that has these types as a parent can have column information
 extracted using L<Types::SQL::Util>.
 
 Alternatively, you can specify a custom C<dbic_column_info> method in
@@ -276,7 +277,7 @@ Robert Rothenberg, C<rrwo@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Robert Rothenberg.
+Copyright 2017 Robert Rothenberg.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

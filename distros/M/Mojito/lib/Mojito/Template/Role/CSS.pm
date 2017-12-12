@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Template::Role::CSS;
-{
-  $Mojito::Template::Role::CSS::VERSION = '0.24';
-}
+$Mojito::Template::Role::CSS::VERSION = '0.25';
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(:all);
 

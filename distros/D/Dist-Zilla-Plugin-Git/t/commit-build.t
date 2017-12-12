@@ -6,7 +6,7 @@ use Dist::Zilla::Tester;
 use Path::Tiny qw( path );
 use Test::More   tests => 6;
 
-use lib 't';
+use lib 't/lib';
 use Util qw( chdir_original_cwd clean_environment init_repo );
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

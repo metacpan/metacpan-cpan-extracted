@@ -4,7 +4,20 @@ File::Rotate::Simple - no-frills file rotation
 
 =head1 SYNOPSIS
 
-  use File::Rotate::Simple;
+  use File::Rotate::Simple qw/ rotate_files /;
+
+  rotate_files(
+      file => '/foo/bar/backup.tar.gz',
+      age  => 7,
+      max  => 30,
+  );
+
+  rotate_files(
+      files => [ qw{ /var/log/foo.log /var/log/bar.log } ],
+      max   => 7,
+  );
+
+or the legacy interface:
 
   File::Rotate::Simple->rotate(
       file => '/foo/bar/backup.tar.gz',
@@ -12,10 +25,16 @@ File::Rotate::Simple - no-frills file rotation
       max  => 30,
   );
 
-  File::Rotate::Simple->rotate(
-      files => [ qw{ /var/log/foo.log /var/log/bar.log } ],
-      max   => 7,
+or the object-oriented interface:
+
+  my $r = File::Rotate::Simple->new(
+      file => '/foo/bar/backup.tar.gz',
+      age  => 7,
+      max  => 30,
   );
+
+  $r->rotate;
+
 
 =head1 DESCRIPTION
 
@@ -52,7 +71,7 @@ Robert Rothenberg, C<rrwo@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Robert Rothenberg.
+Copyright 2017 Robert Rothenberg.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

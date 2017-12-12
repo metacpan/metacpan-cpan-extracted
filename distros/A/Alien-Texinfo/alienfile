@@ -1,0 +1,23 @@
+use alienfile;
+
+#our $VERSION = 0.002_000;
+ 
+plugin 'PkgConfig' => (
+    pkg_name =>'libtexinfo',
+    minimum_version => '6.5',
+);
+ 
+share {
+    plugin Download => (
+        url => 'https://wbraswell.github.io/texinfo-mirror/',  # GitHub mirror server
+        filter => qr/^texinfo-.*\.tar\.gz$/,
+        version => qr/^texinfo-([0-9\.]+)/,
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::Autoconf' => ();
+    build [
+        '%{configure} --disable-perl-xs',  # fix segfault on Perl v5.8
+        '%{gmake}',
+        '%{gmake} install',
+    ];
+};

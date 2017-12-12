@@ -1,0 +1,86 @@
+package Yancy::Backend::Test;
+our $VERSION = '0.004';
+# ABSTRACT: A test backend for testing Yancy
+
+use v5.24;
+use Mojo::Base 'Mojo';
+use experimental qw( signatures postderef );
+use List::Util qw( max );
+use Mojo::JSON qw( from_json );
+use Mojo::File qw( path );
+
+our %COLLECTIONS = ();
+
+sub new( $class, $url, $collections ) {
+    my ( $path ) = $url =~ m{^[^:]+://[^/]+(?:/(.+))?$};
+    if ( $path ) {
+        %COLLECTIONS = from_json( path( ( $ENV{MOJO_HOME} || () ), $path )->slurp )->%*;
+    }
+    return bless { collections => $collections }, $class;
+}
+
+sub create( $self, $coll, $params ) {
+    my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
+    if ( !$params->{ $id_field } ) {
+        my $id = max( keys $COLLECTIONS{ $coll }->%* ) + 1;
+        $params->{ $id_field } = $id;
+    }
+    $COLLECTIONS{ $coll }{ $params->{ $id_field } } = $params;
+}
+
+sub get( $self, $coll, $id ) {
+    return $COLLECTIONS{ $coll }{ $id };
+}
+
+sub list( $self, $coll, $params={}, $opt={} ) {
+    my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
+    my @rows = sort { $a->{$id_field} cmp $b->{$id_field} }
+        values $COLLECTIONS{ $coll }->%*;
+    my $first = $opt->{offset} // 0;
+    my $last = $opt->{limit} ? $opt->{limit} + $first - 1 : $#rows;
+    if ( $last > $#rows ) {
+        $last = $#rows;
+    }
+    my $retval = {
+        rows => [ @rows[ $first .. $last ] ],
+        total => scalar keys $COLLECTIONS{ $coll }->%*,
+    };
+    #; use Data::Dumper;
+    #; say Dumper $retval;
+    return $retval;
+}
+
+sub set( $self, $coll, $id, $params ) {
+    $COLLECTIONS{ $coll }{ $id } = $params;
+}
+
+sub delete( $self, $coll, $id ) {
+    delete $COLLECTIONS{ $coll }{ $id };
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Yancy::Backend::Test - A test backend for testing Yancy
+
+=head1 VERSION
+
+version 0.004
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

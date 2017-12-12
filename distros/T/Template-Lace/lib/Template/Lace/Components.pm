@@ -48,8 +48,10 @@ sub get_handler {
     $handler = (ref($handler) eq 'CODE') ? $handler->($args, %{$component_info{attrs}}): $handler;
   }
 
+  die "No handler found for $prefix-$name in" unless $handler;
+
   # TODO should this be in the renderer?
-  if($handler->model_class->can('on_component_add')) {
+  if((ref($handler) ne 'CODE') && $handler->model_class->can('on_component_add')) {
     my $dom_content = $args->{dom}->at("[uuid='$component_info{key}']");
     my %attrs = ( 
       $handler->renderer_class
@@ -81,7 +83,7 @@ sub find_components {
 
 sub find_component {
   my ($class, $child_dom, $num, $handlers, $current_container_id, %components) = @_;
-  if(my ($prefix, $component_name) = (($child_dom->tag||'') =~m/^(.+?)\-(.+)?/)) {
+  if(my ($prefix, $component_name) = (($child_dom->tag||'') =~m/^(.+?)[-.](.+)?/)) {
     ## if uuid exists, that means we already processed it.
     if($class->is_a_component($handlers, $prefix, $component_name)) {
       unless($child_dom->attr('uuid')) {
@@ -122,6 +124,7 @@ sub find_component {
 
 sub is_a_component {
   my ($class, $handlers, $prefix, $name) = @_;
+  return 1 if $prefix eq '$';
   if($handlers->{$prefix}) {
     if(ref($handlers->{$prefix}) eq 'CODE') {
       return 1;

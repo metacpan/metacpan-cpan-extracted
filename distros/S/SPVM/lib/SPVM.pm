@@ -29,7 +29,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -205,20 +205,26 @@ CHECK {
   # Compile SPVM source code
   compile();
   
-  # Build run-time
-  build_runtime();
-  
-  # Free compiler
-  free_compiler();
-  
-  # Compile extension native subroutine
-  # compile_extension_native_subs();
-  
   # Bind native subroutines
   bind_native_subs();
   
+  # Build bytecode
+  build_constant_pool();
+  
+  # Build opcode
+  build_opcode();
+
+  # Build JIT code
+  build_jitcode();
+  
+  # Build run-time
+  build_runtime();
+  
   # Build SPVM subroutines
   build_spvm_subs();
+  
+  # Free compiler
+  free_compiler();
 }
 
 sub new_byte_array_len {

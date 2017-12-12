@@ -1,6 +1,6 @@
 package School::Code::Compare::Out;
-# ABSTRACT: oragnize the output to different formats
-$School::Code::Compare::Out::VERSION = '0.002';
+# ABSTRACT: organize the output to different formats
+$School::Code::Compare::Out::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ sub write {
     my $title       =   $self->{title};
     my $description =   $self->{description};
 
-    my $tt     = Template->new;
+    my $tt     = Template->new( ABSOLUTE => 1 );
     my $tt_dir = School::Code::Compare::Out::Template::Path->get();
     
     # sort by ratio, but make sure undef values are "big" (meaning, bottom/last)
@@ -120,11 +120,11 @@ __END__
 
 =head1 NAME
 
-School::Code::Compare::Out - oragnize the output to different formats
+School::Code::Compare::Out - organize the output to different formats
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 AUTHOR
 

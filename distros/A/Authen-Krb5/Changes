@@ -1,0 +1,84 @@
+Revision history for Perl extension Authen-Krb5.
+
+1.905 2017-12-04T20:30:08Z
+ - Make sure tests and author/release tests are run before making a release
+   (Ioan Rogers)
+ - Try to make sure we don't accidentally use features from a newer perl
+   (Ioan Rogers)
+ - use warnings; requires 5.6 but skip to 5.8 because 5.6 builds fail on
+   travis and it's too old to care about (Ioan Rogers)
+ - Have travis test all supported versions (Ioan Rogers)
+
+1.904 2017-11-29T15:12:05Z
+ - PAUSE error on last release. I only have permissions for Authen::Krb5,
+   not Krb5, so try that (Ioan Rogers)
+ - Add 'provides' to metadata (Ioan Rogers)
+ - Add META.yml for older toolchains (Ioan Rogers)
+ - Explicitly disable prototypes to shut up xsubpp (Ioan Rogers)
+ - $VERSION is added by dzilla, don't declare it ourselves (Ioan Rogers)
+
+1.903 2017-11-28T20:56:14Z
+ - No changes from 1.902-TRIAL
+
+1.902 2017-11-23T17:35:02Z (TRIAL RELEASE)
+ - exit instead of die if prereqs aren't met to generate n/a reports in
+   cpantesters (I hope) (Ioan Rogers)
+ - Map some committers to their CPAN ids (Ioan Rogers)
+ - File::which is needed to find krb5-config (Ioan Rogers)
+ - Main module is Authen::Krb5, but dist is Krb5 (Ioan Rogers)
+ - Add TODO for future XS/C coverage (Ioan Rogers)
+ - Ignore missing POD for a few subs (Ioan Rogers)
+ - Add a fresh travis config courtesy of `App::CISetup` (Ioan Rogers)
+
+1.901 2017-11-20T21:11:01Z
+ - Try `krb5-config` if pkgconf is unavailable (Ioan Rogers)
+ - Only build against MIT kerberos, not compatable with Heimdal (Ioan
+   Rogers)
+ - [Closes rt#58960] fix POD spelling mistake (Ken Dreyer)
+ - Re-arranged and removed things to use `Dist::Zilla` (Ioan Rogers)
+ - [Closes rt#116071] remove references to obsolete krb5_{get,free}_krbhst
+   (Damyan Ivanov)
+
+1.9 Add Authen::Krb5::Creds object (tom.jones@oucs.ox.ac.uk)
+
+1.8 Fix broken get_in_tkt_with_password implementation (rra@debian.org)
+ - Add some missing prototypes (rra@debian.org)
+ - Clean up some compiler warnings (rra@debian.org)
+
+1.7 Use standard search paths for includes and libs
+ - Add get_init_creds_password (rra@debian.org)
+ - Add get_init_creds_keytab (rra@debian.org)
+ - Add a destructor for Authen::Krb5::Creds (rra@debian.org)
+ - Add store_cred() method to Authen::Krb5::Ccache (rra@debian.org)
+ - Reimplement deprecated get_in_tkt_with_password and
+   get_in_tkt_with_keytab functions to use the the more current
+   get_init_creds_{password,keytab}, krb5_cc_initialize, and
+   krb5_cc_store_cred (rra@debian.org)
+ - Set context to NULL after calling krb5_free_context
+   (Wolfgang.Friebel@desy.de)
+
+1.6 Add methods for iterating through credentials cache
+ - (mbrown@fensystems.co.uk) Deprecated init_ets Fix some compiler warnings
+
+1.5 Fix broken compile for Authen::Krb5::Keytab::get_name()
+
+1.4 Added methods for manipulating keytabs (ajk@iu.edu)
+ - Added keyblock accessor functions to allow use of the session key.
+
+1.3 Added get_in_tkt_with_keytab() function (jorgen@greytower.net)
+
+1.2 Minor fix to support building for Perl 5.6.
+
+1.1 Corrected logic in freed() (internal memory management)
+ - Fixed segfault on Linux when calling Authen::Krb5::Ccache::DESTROY after
+   calling Authen::Krb5::Ccache::destroy()
+ - Changed Makefile.PL to support auto-detection of crypto libraries.
+ - Added support for building with MIT Kerberos 5 Version 1.1.1
+
+1.0 Moved module into the Authen:: namespace.
+ - Changed return syntax for some functions.  Compilation was failing on
+   certain platforms.
+ - Fixed some minor bugs.
+
+0.90 1998-03-17T10:25:43Z
+ - original version; created by h2xs 1.18

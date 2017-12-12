@@ -5,11 +5,17 @@
 
 This material is just ignored
 
-* Part
+* Part [1]
 
-** Chapter
+[1] Footnote
 
-*** Section
+** Chapter [2]
+
+[2] Footnote
+
+*** Section [3]
+
+[3] Footnote
 
 **** Subsection
 
@@ -20,17 +26,27 @@ This material is just ignored
  - the
  - list
 
-**** Another
+**** Another [4]
 
  - This 1
  - is 1 
  - the 1
- - list 1
+ - list 1 {5}
 
-*** Section
+Hello [4]
+
+[4]  There
+
+{5} Hey
+
+*** Section {6}
 
  - Very
- - Important
+ - Important {7}
+
+{6} Section fn
+
+{7} List fn
 
 ** Chapter
 

@@ -9,7 +9,7 @@ use AnyEvent;
 use IO::KQueue;
 use Carp;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 # Arbitrary limit on open filehandles before issuing a warning
 our $WARN_FILEHANDLE_LIMIT = 50;
@@ -46,10 +46,11 @@ sub _init {
     return 1;
 }
 
-# Need to add newly created items (directories and files) or remove deleted items.
-# This isn't going to be perfect. If the path is not canonical then we won't deleted it.
-# This is done after filtering. So entire dirs can be ignored efficiently.
-sub _process_events_for_backend {
+# Need to add newly created items (directories and files) or remove deleted
+# items.  This isn't going to be perfect. If the path is not canonical then we
+# won't deleted it.  This is done after filtering. So entire dirs can be
+# ignored efficiently.
+sub _post_process_events {
     my ( $self, @events ) = @_;
 
     for my $event (@events) {
@@ -62,6 +63,7 @@ sub _process_events_for_backend {
     }
 
     $self->_check_filehandle_count;
+    return;
 }
 
 sub _watch {
@@ -95,6 +97,8 @@ sub _check_filehandle_count {
       . "You currently have $count filehandles for this AnyEvent::Filesys::Notify object.\n"
       . "The use of the KQueue backend is not recommended."
       if $count > $WARN_FILEHANDLE_LIMIT;
+
+    return $count;
 }
 
 sub _watcher_count {
@@ -115,11 +119,13 @@ AnyEvent::Filesys::Notify::Role::KQueue - Use IO::KQueue to watch for changed fi
 
 =head1 VERSION
 
-version 1.21
+version 1.23
+
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
-
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<gt> Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
 
 =over 4
 
@@ -135,11 +141,15 @@ Dave Hayes E<lt>dave@jetcafe.orgE<gt>
 
 Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
 
+=item *
+
+Ettore Di Giacinto (@mudler)
+
+=item *
+
+Martin Barth (@ufobat)
+
 =back
-
-=head1 AUTHOR
-
-Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 SOURCE
 
@@ -155,7 +165,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2017 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

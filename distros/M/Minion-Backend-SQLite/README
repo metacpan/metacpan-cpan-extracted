@@ -333,6 +333,39 @@ METHODS
 
       Id of worker that is processing the job.
 
+ list_locks
+
+      my $results = $backend->list_locks($offset, $limit);
+      my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+
+    Returns information about locks in batches.
+
+      # Check expiration time
+      my $results = $backend->list_locks(0, 1, {name => 'foo'});
+      my $expires = $results->{locks}[0]{expires};
+
+    These options are currently available:
+
+    name
+
+        name => 'foo'
+
+      List only locks with this name.
+
+    These fields are currently available:
+
+    expires
+
+        expires => 784111777
+
+      Epoch time this lock will expire.
+
+    name
+
+        name => 'foo'
+
+      Lock name.
+
  list_workers
 
       my $results = $backend->list_workers($offset, $limit);
@@ -397,7 +430,8 @@ METHODS
       my $bool = $backend->lock('foo', 3600, {limit => 20});
 
     Try to acquire a named lock that will expire automatically after the
-    given amount of time in seconds.
+    given amount of time in seconds. An expiration time of 0 can be used to
+    check if a named lock already exists without creating one.
 
     These options are currently available:
 
@@ -497,7 +531,7 @@ METHODS
 
       my $stats = $backend->stats;
 
-    Get statistics for jobs and workers.
+    Get statistics for the job queue.
 
     These fields are currently available:
 

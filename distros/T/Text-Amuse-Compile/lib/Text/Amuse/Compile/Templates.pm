@@ -316,6 +316,10 @@ a {
    text-decoration: underline;
 }
 
+.table-of-contents a {
+   text-decoration: none;
+}
+
 [% IF html %]
 div#page {
    margin:20px;
@@ -486,23 +490,23 @@ a.footnote, a.footnotebody {
     font-size: 80%;
     line-height: 0;
     vertical-align: super;
+    text-decoration: none;
 }
 
-* + p.fnline {
-    margin-top: 3em;
+* + p.fnline, * + p.secondary-fnline {
     border-top: 1px solid black;
-    padding-top: 2em;
+    padding-top: 0.5em;
 }
 
-p.fnline + p.fnline {
-    margin-top: 1em;
+p.fnline + p.fnline,  p.secondary-fnline + p.secondary-fnline {
     border-top: none;
     padding-top: 0;
 }
 
-p.fnline {
+p.fnline, p.secondary-fnline {
     font-size: 80%;
 }
+
 /* end footnotes */
 
 EOF
@@ -717,7 +721,24 @@ sub latex {
 % http://tex.stackexchange.com/questions/3033/forcing-linebreaks-in-url
 \PassOptionsToPackage{hyphens}{url}\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
 \usepackage{bookmark}
-\usepackage[stable]{footmisc}
+
+% footnote handling
+\usepackage{bigfoot}
+\usepackage{perpage}
+\DeclareNewFootnote{default}
+[% IF safe_options.secondary_footnotes_alpha %]
+\DeclareNewFootnote{B}[alph]
+\MakeSortedPerPage[1]{footnoteB}
+[% ELSE %]
+\DeclareNewFootnote{B}
+\MakeSorted{footnoteB}
+\renewcommand*\thefootnoteB{(\arabic{footnoteB})}
+[% END %]
+
+% continuous numbering across the document. Defaults to resetting at chapter. Unclear
+% \usepackage{chngcntr}
+% \counterwithout{footnote}{chapter}
+
 \usepackage[shortlabels]{enumitem}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}

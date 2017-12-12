@@ -8,7 +8,7 @@ use parent 'Perl::Critic::Policy';
 use Readonly;
 use Perl::Critic::Utils qw{ :severities };
 
-our $VERSION = '0.01';
+our $VERSION = '0.2';
 
 Readonly::Scalar my $DESC => q{Smartmatch operator used};
 Readonly::Scalar my $EXPL => q{Avoid using smartmatch operator};

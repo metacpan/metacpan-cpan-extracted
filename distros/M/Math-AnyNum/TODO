@@ -1,7 +1,5 @@
 ## TODO list for Math::AnyNum
 
-# Use `Rmpfr_z_sub()` when MPFR >= 3.1.0 is available.
-
 # Add the following conversion methods:
 
     as_rat   [?]

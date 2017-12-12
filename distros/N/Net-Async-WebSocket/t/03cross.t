@@ -32,7 +32,7 @@ my $server = Net::Async::WebSocket::Server->new(
       $acceptedclient = $thisclient;
 
       $thisclient->configure(
-         on_frame => sub {
+         on_text_frame => sub {
             my ( $self, $frame ) = @_;
 
             push @serverframes, $frame;
@@ -46,7 +46,7 @@ $loop->add( $server );
 my @clientframes;
 
 my $client = Net::Async::WebSocket::Client->new(
-   on_frame => sub {
+   on_text_frame => sub {
       my ( $self, $frame ) = @_;
 
       push @clientframes, $frame;
@@ -61,13 +61,13 @@ $client->connect(
    url => "ws://localhost/test",
 )->get;
 
-$client->send_frame( "Here is my message" );
+$client->send_text_frame( "Here is my message" );
 
 wait_for { @serverframes };
 
 is_deeply( \@serverframes, [ "Here is my message" ], 'received @serverframes' );
 
-$acceptedclient->send_frame( "Here is my response" );
+$acceptedclient->send_text_frame( "Here is my response" );
 
 wait_for { @clientframes };
 

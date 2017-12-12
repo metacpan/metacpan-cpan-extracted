@@ -94,12 +94,12 @@ my $toc = [
            {
             'level' => '3',
             'index' => 3,
-            'string' => 'section <a href="#fn3" class="footnote" id="fn_back3">[3]</a>'
+            'string' => 'section'
            },
            {
             'level' => '4',
             'index' => 4,
-            'string' => 'subsection <a href="#fn5" class="footnote" id="fn_back5">[5]</a>'
+            'string' => 'subsection'
            },
           ];
 

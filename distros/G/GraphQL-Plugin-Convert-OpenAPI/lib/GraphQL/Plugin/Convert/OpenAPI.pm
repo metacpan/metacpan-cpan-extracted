@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI;
 use OpenAPI::Client;
 
-our $VERSION = "0.03";
+our $VERSION = "0.06";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -16,6 +16,7 @@ my %TYPEMAP = (
   integer => 'Int',
   number => 'Float',
   boolean => 'Boolean',
+  file => 'String',
 );
 my %TYPE2SCALAR = map { ($_ => 1) } qw(ID String Int Float Boolean DateTime);
 my %METHOD2MUTATION = map { ($_ => 1) } qw(post put patch delete);
@@ -37,34 +38,53 @@ sub _remove_modifiers {
   _remove_modifiers($typespec->[1]);
 }
 
-sub field_resolver {
-  my ($root_value, $args, $context, $info) = @_;
-  my $field_name = $info->{field_name};
-  DEBUG and _debug('OpenAPI.resolver', $root_value, $field_name, $args);
-  my $property = ref($root_value) eq 'HASH'
-    ? $root_value->{$field_name}
-    : $root_value;
-  return $property->($args, $context, $info) if ref $property eq 'CODE';
-  return $property // die "OpenAPI.resolver could not resolve '$field_name'\n"
-    if ref $root_value eq 'HASH' or !$root_value->can($field_name);
-  return $root_value->$field_name($args, $context, $info)
-    if !UNIVERSAL::isa($root_value, 'OpenAPI::Client');
-  # call OAC method
-  my $got = $root_value->$field_name($args);
-  DEBUG and _debug('OpenAPI.resolver(got)', $got->res->json);
-  $got->res->json;
+sub make_field_resolver {
+  my ($mapping, $type2hashpairs) = @_;
+  DEBUG and _debug('OpenAPI.make_field_resolver', $mapping, $type2hashpairs);
+  sub {
+    my ($root_value, $args, $context, $info) = @_;
+    my $field_name = $info->{field_name};
+    DEBUG and _debug('OpenAPI.resolver', $root_value, $field_name, $args);
+    my $property = ref($root_value) eq 'HASH'
+      ? $root_value->{$field_name}
+      : $root_value;
+    my $result = eval {
+      return $property->($args, $context, $info) if ref $property eq 'CODE';
+      return $property if ref $root_value eq 'HASH';
+      return $property // die "OpenAPI.resolver could not resolve '$field_name'\n"
+        if !$root_value->can($field_name);
+      return $root_value->$field_name($args, $context, $info)
+        if !UNIVERSAL::isa($root_value, 'OpenAPI::Client');
+      # call OAC method
+      my $got = $root_value->call($mapping->{$field_name} => $args);
+      DEBUG and _debug('OpenAPI.resolver(got)', $got->res->json);
+      die $got->res->body."\n" if !$got->res->is_success;
+      $got->res->json;
+    };
+    die $@ if $@;
+    my $return_type = $info->{return_type};
+    $return_type = $return_type->of while $return_type->can('of');
+    if ($type2hashpairs->{$return_type->to_string}) {
+      $result = [ map {
+        +{ key => $_, value => $result->{$_} }
+      } sort keys %{$result || {}} ];
+    }
+    DEBUG and _debug('OpenAPI.resolver(rettype)', $return_type->to_string, $result);
+    $result;
+  };
 }
 
 sub _trim_name {
   my ($name) = @_;
+  return if !defined $name;
   $name =~ s#[^a-zA-Z0-9_]##g;
   $name;
 }
 
 sub _get_type {
-  my ($info, $maybe_name, $name2type) = @_;
+  my ($info, $maybe_name, $name2type, $type2hashpairs) = @_;
   DEBUG and _debug("_get_type($maybe_name)", $info);
-  return 'String' if !%$info; # bodge but unavoidable
+  return 'String' if !$info or !%$info; # bodge but unavoidable
   if ($info->{'$ref'}) {
     DEBUG and _debug("_get_type($maybe_name) ref");
     my $rawtype = $info->{'$ref'};
@@ -72,8 +92,7 @@ sub _get_type {
     return $rawtype;
   }
   if ($info->{additionalProperties}) {
-    DEBUG and _debug("_get_type($maybe_name) aP");
-    return _get_type(
+    my $type = _get_type(
       {
         type => 'array',
         items => {
@@ -86,13 +105,18 @@ sub _get_type {
       },
       $maybe_name,
       $name2type,
+      $type2hashpairs,
     );
+    DEBUG and _debug("_get_type($maybe_name) aP", $type);
+    $type2hashpairs->{$maybe_name} = 1;
+    return $type;
   }
   if ($info->{properties} or $info->{allOf} or $info->{enum}) {
     DEBUG and _debug("_get_type($maybe_name) p");
     return _get_spec_from_info(
       $maybe_name, $info,
       $name2type,
+      $type2hashpairs,
     );
   }
   if ($info->{type} eq 'array') {
@@ -102,6 +126,7 @@ sub _get_type {
       _get_type(
         $info->{items}, $maybe_name,
         $name2type,
+        $type2hashpairs,
       )
     );
   }
@@ -114,7 +139,7 @@ sub _get_type {
 }
 
 sub _refinfo2fields {
-  my ($name, $refinfo, $name2type) = @_;
+  my ($name, $refinfo, $name2type, $type2hashpairs) = @_;
   my %fields;
   my $properties = $refinfo->{properties};
   my %required = map { ($_ => 1) } @{$refinfo->{required}};
@@ -124,6 +149,7 @@ sub _refinfo2fields {
     my $rawtype = _get_type(
       $info, $name.ucfirst($prop),
       $name2type,
+      $type2hashpairs,
     );
     my $fulltype = _apply_modifier(
       $required{$prop} && 'non_null',
@@ -153,6 +179,7 @@ sub _get_spec_from_info {
   my (
     $name, $refinfo,
     $name2type,
+    $type2hashpairs,
   ) = @_;
   DEBUG and _debug("_get_spec_from_info($name)", $refinfo);
   my %implements;
@@ -161,7 +188,7 @@ sub _get_spec_from_info {
     for my $schema (@{$refinfo->{allOf}}) {
       DEBUG and _debug("_get_spec_from_info($name)(allOf)", $schema);
       if ($schema->{'$ref'}) {
-        my $othertype = _get_type($schema, '$ref');
+        my $othertype = _get_type($schema, '$ref', $name2type, $type2hashpairs);
         my $othertypedef = $name2type->{$othertype};
         push @{$implements{interfaces}}, $othertype
           if $othertypedef->{kind} eq 'interface';
@@ -170,6 +197,7 @@ sub _get_spec_from_info {
         $fields = _merge_fields($fields, _refinfo2fields(
           $name, $schema,
           $name2type,
+          $type2hashpairs,
         ));
       }
     }
@@ -189,6 +217,7 @@ sub _get_spec_from_info {
     %$fields = (%$fields, %{_refinfo2fields(
       $name, $refinfo,
       $name2type,
+      $type2hashpairs,
     )});
   }
   my $spec = +{
@@ -222,6 +251,7 @@ sub _make_union {
 sub _make_input {
   my ($type, $name2type) = @_;
   DEBUG and _debug("_make_input", $type);
+  $type = $type->{type} if ref $type eq 'HASH';
   if (ref $type eq 'ARRAY') {
     # modifiers, recurse
     return _apply_modifier(
@@ -232,7 +262,6 @@ sub _make_input {
       ),
     )
   }
-  $type = $type->{type} if ref $type eq 'HASH';
   return $type
     if $TYPE2SCALAR{$type}
     or $name2type->{$type}{kind} eq 'enum'
@@ -270,21 +299,25 @@ sub _resolve_schema_ref {
 }
 
 sub _kind2name2endpoint {
-  my ($paths, $schema, $name2type) = @_;
-  my %kind2name2endpoint;
+  my ($paths, $schema, $name2type, $type2hashpairs) = @_;
+  my (%kind2name2endpoint, %field2operationId);
   for my $path (keys %$paths) {
     for my $method (grep $paths->{$path}{$_}, @METHODS) {
       my $info = $paths->{$path}{$method};
       my $op_id = $info->{operationId} || $method.'_'._trim_name($path);
+      my $fieldname = _trim_name($op_id);
+      $field2operationId{$fieldname} = $op_id;
       my $kind = $METHOD2MUTATION{$method} ? 'mutation' : 'query';
       my @successresponses = map _resolve_schema_ref($_, $schema),
         map $info->{responses}{$_},
         grep /^2/, keys %{$info->{responses}};
-      DEBUG and _debug("_kind2name2endpoint($path)($method)($op_id)", $info->{responses}, \@successresponses);
+      DEBUG and _debug("_kind2name2endpoint($path)($method)($fieldname)($op_id)", $info->{responses}, \@successresponses);
       my @responsetypes = map _get_type(
-        $_->{schema}, 'param',
+        $_->{schema}, $fieldname.'Return',
         $name2type,
+        $type2hashpairs,
       ), @successresponses;
+      @responsetypes = ('String') if !@responsetypes; # void return
       my $union = _make_union(
         \@responsetypes,
         $name2type,
@@ -293,8 +326,9 @@ sub _kind2name2endpoint {
         @{ $info->{parameters} };
       my %args = map {
         my $type = _get_type(
-          $_->{schema} ? $_->{schema} : $_, "${op_id}_$_->{name}",
+          $_->{schema} ? $_->{schema} : $_, "${fieldname}_$_->{name}",
           $name2type,
+          $type2hashpairs,
         );
         $type = _make_input(
           $type,
@@ -305,16 +339,16 @@ sub _kind2name2endpoint {
           $_->{description} ? (description => $_->{description}) : (),
         })
       } @parameters;
-      DEBUG and _debug("_kind2name2endpoint($op_id) params", \%args);
+      DEBUG and _debug("_kind2name2endpoint($fieldname) params", \%args);
       my $description = $info->{summary} || $info->{description};
-      $kind2name2endpoint{$kind}->{$op_id} = +{
+      $kind2name2endpoint{$kind}->{$fieldname} = +{
         type => $union,
         $description ? (description => $description) : (),
         %args ? (args => \%args) : (),
       };
     }
   }
-  \%kind2name2endpoint;
+  (\%kind2name2endpoint, \%field2operationId);
 }
 
 sub to_graphql {
@@ -327,12 +361,14 @@ sub to_graphql {
   my @ast;
   my (
     %name2type,
+    %type2hashpairs,
   );
   # all non-interface-consumers first
   for my $name (grep !$defs->{$_}{allOf}, keys %$defs) {
     _get_spec_from_info(
       _trim_name($name), $defs->{$name},
       \%name2type,
+      \%type2hashpairs,
     );
   }
   # now interface-consumers and can now put in interface fields too
@@ -340,11 +376,13 @@ sub to_graphql {
     _get_spec_from_info(
       _trim_name($name), $defs->{$name},
       \%name2type,
+      \%type2hashpairs,
     );
   }
-  my $kind2name2endpoint = _kind2name2endpoint(
+  my ($kind2name2endpoint, $field2operationId) = _kind2name2endpoint(
     $openapi_schema->get("/paths"), $openapi_schema,
     \%name2type,
+    \%type2hashpairs,
   );
   push @ast, values %name2type;
   push @ast, {
@@ -374,7 +412,7 @@ sub to_graphql {
   +{
     schema => GraphQL::Schema->from_ast(\@ast),
     root_value => OpenAPI::Client->new($spec, %appargs),
-    resolver => \&field_resolver,
+    resolver => make_field_resolver($field2operationId, \%type2hashpairs),
   };
 }
 
@@ -399,9 +437,8 @@ GraphQL::Plugin::Convert::OpenAPI - convert OpenAPI schema to GraphQL schema
 =head1 SYNOPSIS
 
   use GraphQL::Plugin::Convert::OpenAPI;
-  use Schema;
   my $converted = GraphQL::Plugin::Convert::OpenAPI->to_graphql(
-    sub { Schema->connect }
+    'file-containing-spec.json',
   );
   print $converted->{schema}->to_doc;
 
@@ -436,11 +473,13 @@ L<Mojolicious> app can be given as the second argument.
 
 =head1 PACKAGE FUNCTIONS
 
-=head2 field_resolver
+=head2 make_field_resolver
 
-This is available as C<\&GraphQL::Plugin::Convert::OpenAPI::field_resolver>
+This is available as C<\&GraphQL::Plugin::Convert::OpenAPI::make_field_resolver>
 in case it is wanted for use outside of the "bundle" of the C<to_graphql>
-method.
+method. It takes one argument, a hash-ref mapping from a GraphQL operation
+field-name to an C<operationId>, and returns a closure that can be used
+as a field resolver.
 
 =head1 DEBUGGING
 

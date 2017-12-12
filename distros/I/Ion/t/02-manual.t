@@ -4,7 +4,9 @@ use Coro::AnyEvent;
 use Ion;
 
 ok my $server = Listen, 'Listen';
-ok my $conn   = Connect($server->host, $server->port), 'Connect';
+$server->start;
+
+ok my $conn = Connect($server->host, $server->port), 'Connect';
 
 my $service = async {
   while (my $client = <$server>) {

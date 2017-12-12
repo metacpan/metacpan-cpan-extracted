@@ -23,7 +23,7 @@ Net::Etcd::Role::Actions
 
 =cut
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 has etcd => (
     is  => 'ro',
@@ -173,6 +173,8 @@ sub _build_request {
             my ($data, $hdr) = @_;
             $self->{response}{content} = $data;
             $cb->($data, $hdr) if $cb;
+            my $status = $hdr->{Status};
+            $self->check_hdr($status);
             $cv->end;
             1
         },
@@ -180,9 +182,7 @@ sub _build_request {
             my (undef, $hdr) = @_;
             #print STDERR Dumper($hdr);
             my $status = $hdr->{Status};
-            my $success = $status == 200 ? 1 : 0;
-            $self->{response}{success} = $success;
-            $self->{retry_auth}++ if $status == 401;
+            $self->check_hdr($status);
             $cv->end;
         }
     );
@@ -269,6 +269,20 @@ sub content {
     my $response = $self->response;
     my $content  = from_json( $response->{content} );
     return $content if $content;
+    return;
+}
+
+=head2 check_hdr
+
+check response header then define success and retry_auth.
+
+=cut
+
+sub check_hdr {
+    my ($self, $status)   = @_;
+    my $success = $status == 200 ? 1 : 0;
+    $self->{response}{success} = $success;
+    $self->{retry_auth}++ if $status == 401;
     return;
 }
 

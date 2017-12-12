@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Role::DB::OID;
-{
-  $Mojito::Role::DB::OID::VERSION = '0.24';
-} 
+$Mojito::Role::DB::OID::VERSION = '0.25'; 
 use Moo::Role;
 
 sub generate_mongo_like_oid {

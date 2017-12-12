@@ -26,6 +26,10 @@ These options are set in `etc/Memo_Config.pm` and can be overridden by users in 
 
     Set number of lines of the textarea for editing memo.
 
+- `$MemoRichTextHeight`
+
+    Set height (in number of pixels) of the rich text editor for editing memo.
+
 # RIGHTS
 
 The following new rights can be applied at the global level or at the queue level:

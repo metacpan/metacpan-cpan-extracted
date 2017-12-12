@@ -17,9 +17,16 @@ depends on whether one of the event loops is loaded.
 
 ## Supported event loops
 
-Currently only [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny),[Mojolicious](https://metacpan.org/pod/Mojolicious) and [AnyEvent](https://metacpan.org/pod/AnyEvent) are supported.
+Currently, the following backends are supported:
+
+- [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny)
+- [HTTP::Tiny::Paranoid](https://metacpan.org/pod/HTTP::Tiny::Paranoid)
+- [Mojolicious](https://metacpan.org/pod/Mojolicious)
+- [AnyEvent](https://metacpan.org/pod/AnyEvent)
+- [IO::Async](https://metacpan.org/pod/IO::Async)
+
 Support
-is planned for [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) and [IO::Async](https://metacpan.org/pod/IO::Async)
+is planned for [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) and [POE](https://metacpan.org/pod/POE)
 but has not materialized yet.
 
 # METHODS
@@ -116,7 +123,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2016 by Max Maischein `corion@cpan.org`.
+Copyright 2016-2017 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

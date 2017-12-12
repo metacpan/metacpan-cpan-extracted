@@ -3,7 +3,7 @@ package Prty::JavaScript;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Scalar::Util ();
@@ -26,13 +26,6 @@ Prty::JavaScript - Generierung von JavaScript-Code
 
     $line = $class->line($code);
 
-=head4 Description
-
-Wandele mehrzeiligen JavaScript-Code in einzeiligen JavaScript-Code
-und liefere diesen zurück. Die Methode ist nützlich, wenn formatierter,
-mehrzeiliger JavaScript-Code in ein HTML Tag-Attribut (JavaScript-Handler
-wie onclick="..." oder onchange="...") eingesetzt werden soll.
-
 =head4 Arguments
 
 =over 4
@@ -46,6 +39,13 @@ Mehrzeiliger JavaScript-Code (String)
 =head4 Returns
 
 JavaScript-Code einzeilig (String)
+
+=head4 Description
+
+Wandele mehrzeiligen JavaScript-Code in einzeiligen JavaScript-Code
+und liefere diesen zurück. Die Methode ist nützlich, wenn formatierter,
+mehrzeiliger JavaScript-Code in ein HTML Tag-Attribut (JavaScript-Handler
+wie onclick="..." oder onchange="...") eingesetzt werden soll.
 
 =head4 Example
 
@@ -115,6 +115,16 @@ sub line {
 
     $scriptTags = Prty::JavaScript->script($h,@specs);
 
+=head4 Arguments
+
+=over 4
+
+=item @specs
+
+Liste von Script-Spezifikationen.
+
+=back
+
 =head4 Description
 
 Übersetze die Code-Spezifikationen @specs in einen oder mehrere
@@ -141,16 +151,6 @@ mit src-Attribut übersetzt.
 =item \@specs (Arrayreferenz):
 
 Wird zu @specs expandiert.
-
-=back
-
-=head4 Arguments
-
-=over 4
-
-=item @specs
-
-Liste von Script-Spezifikationen.
 
 =back
 
@@ -254,7 +254,7 @@ sub script {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

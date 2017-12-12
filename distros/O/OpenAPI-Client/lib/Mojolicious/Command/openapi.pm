@@ -68,7 +68,7 @@ sub run {
     }
   );
 
-  my $tx = $self->_client->$op(\%parameters, defined $content ? (body => decode_json $content) : ());
+  my $tx = $self->_client->call($op => \%parameters, $content ? (body => decode_json $content) : ());
   if ($tx->error and $tx->error->{message} eq 'Invalid input') {
     _warn _header($tx->req), _header($tx->res) if $verbose;
   }
@@ -89,7 +89,7 @@ sub _info {
 sub _json {
   return unless defined(my $data = Mojo::JSON::Pointer->new(shift)->get(shift));
   return _say $data unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
-  _say encode_json $data;
+  _say Mojo::Util::decode('UTF-8', encode_json $data);
 }
 
 sub _list {

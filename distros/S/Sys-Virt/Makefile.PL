@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $libvirtver = "3.8.0";
+my $libvirtver = "3.9.0";
 my $stat = system "pkg-config --atleast-version=$libvirtver libvirt";
 die "cannot run pkg-config to check libvirt version" if $stat == -1;
 die "libvirt >= $libvirtver is required\n" unless $stat == 0;

@@ -57,7 +57,7 @@ CatalystX::OAuth2::Schema::Result::Token - A table for registering bearer tokens
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 AUTHOR
 

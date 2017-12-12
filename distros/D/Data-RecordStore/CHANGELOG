@@ -1,4 +1,21 @@
-2.00 - the databases for Data::RecordStore now automatically
+3.13 - fix broken transactions
+	
+3.11 - remove backticks from tests, include version info
+
+3.10 - Automatically uuencode incoming data that has a \0 in it.
+	the \0 character is otherwise assumed to be end of record.
+	renamed, updated the record_store_convert program.
+	
+3.00 - Big update
+	introduces transactions
+	fixed record stores are not called Silos
+	silos now have a max file size and span multiple files
+	updates to tests
+	
+ 2.02 - rename methods 'open' to 'open_store' or 'open_fixed_store'
+	in order to avoid collision with the 'open' reserved function. 
+	
+ 2.00 - the databases for Data::RecordStore now automatically
 	hold e^n bytes, where n is the id of the database.
 
 	When items are moved from a database, the file is

@@ -2,7 +2,7 @@ package App::cpm::Worker::Installer;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.953';
+our $VERSION = '0.955';
 
 use App::cpm::Logger::File;
 use App::cpm::Worker::Installer::Menlo;
@@ -216,6 +216,10 @@ sub fetch {
     chdir $dir or die;
 
     my $meta = $self->_load_metafile($distfile, 'META.json', 'META.yml');
+    if (!$meta) {
+        $self->{logger}->log("Distribution does not have META.json nor META.yml");
+        return;
+    }
     my $p = $meta->{provides} || $self->menlo->extract_packages($meta, ".");
     my $provides = [ map +{ package => $_, version => $p->{$_}{version} }, sort keys %$p ];
 

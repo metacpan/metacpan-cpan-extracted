@@ -1,5 +1,5 @@
 package Catalyst::Controller::REST;
-$Catalyst::Controller::REST::VERSION = '1.20';
+$Catalyst::Controller::REST::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 
@@ -147,10 +147,21 @@ L<JSON::XS> installed.  The C<text/x-json> content type is supported but is
 deprecated and you will receive warnings in your log.
 
 You can also add a hash in your controller config to pass options to the json object.
+There are two options. C<json_options> are used when decoding incoming JSON, and C<json_options_encode> 
+is used when encoding JSON for output.
+
 For instance, to relax permissions when deserializing input, add:
+
   __PACKAGE__->config(
     json_options => { relaxed => 1 }
   )
+
+To indent the JSON output so it becomes more human readable, add:
+
+  __PACKAGE__->config(
+    json_options_encode => { indent => 1 }
+  )
+
 
 =item * C<text/javascript> => C<JSONP>
 
@@ -293,6 +304,7 @@ __PACKAGE__->config(
         'application/json'   => 'JSON',
         'text/x-json'        => 'JSON',
     },
+    'compliance_mode' => 0,
 );
 
 sub begin : ActionClass('Deserialize') { }

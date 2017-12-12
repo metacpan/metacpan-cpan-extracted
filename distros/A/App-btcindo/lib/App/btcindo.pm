@@ -1,7 +1,7 @@
 package App::btcindo;
 
-our $DATE = '2017-11-24'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 1;
 # ABSTRACT: CLI for bitcoin.co.id (VIP)
@@ -18,7 +18,7 @@ App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.011 of App::btcindo (from Perl distribution App-btcindo), released on 2017-11-24.
+This document describes version 0.014 of App::btcindo (from Perl distribution App-btcindo), released on 2017-12-09.
 
 =head1 SYNOPSIS
 

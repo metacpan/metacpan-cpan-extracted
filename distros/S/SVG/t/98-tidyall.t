@@ -5,6 +5,9 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => 'Set $ENV{TEST_AUTHOR} to enable this test.'
+    unless $ENV{TEST_AUTHOR};
+
 eval 'use Perl::Tidy';
 plan skip_all => 'Perl::Tidy required' if $@;
 

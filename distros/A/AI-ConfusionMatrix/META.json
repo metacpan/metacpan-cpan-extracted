@@ -1,10 +1,10 @@
 {
    "abstract" : "Make a confusion matrix",
    "author" : [
-      "Vincent Lequertier <sky@riseup.net>"
+      "Vincent Lequertier <vi.le@autistici.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "AI::ConfusionMatrix" : {
          "file" : "lib/AI/ConfusionMatrix.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/SkySymbol/perl-ai-confusionmatrix"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

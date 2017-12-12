@@ -86,7 +86,7 @@ If you want to avoid buffering a large message, you can do this:
         #... however you’re going to handle this chunk
 
         $_[0] = (ref $_[0])->new(
-            payload_sr => \q<>,
+            payload => q<>,
             fin => $_[0]->get_fin(),
         );
     },

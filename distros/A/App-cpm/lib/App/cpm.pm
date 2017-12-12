@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.953';
+our $VERSION = '0.955';
 our $GIT_DESCRIBE;
 our $GIT_URL;
 
@@ -132,7 +132,7 @@ sub parse_options {
     if ($self->{sudo}) {
         !system "sudo", $^X, "-e1" or exit 1;
     }
-    if ($self->{sudo} or $] < 5.012) {
+    if ($self->{sudo} or $self->{man_pages} or $] < 5.012) {
         $self->{prebuilt} = 0;
     }
 
@@ -276,15 +276,13 @@ sub cmd_install {
                 die sprintf "We have to install %s %s or later first, but you requested that of %s\n",
                     $name, $req_range, $user->{version_range} if $@;
                 $req = { package => $name, version_range => $range, dev => $user->{dev} };
+                splice @$packages, $i, 1 if defined $i;
             } else {
                 $req = { package => $name, version_range => $req_range };
             }
             my ($is_satisfied, @need_resolve) = $master->is_satisfied([$req]);
-            if ($is_satisfied) {
-                # nothing to do
-            } else {
+            if (!$is_satisfied) {
                 $master->add_job(type => "resolve", %$_) for @need_resolve;
-                splice @$packages, $i, 1 if defined $i;
             }
         }
 

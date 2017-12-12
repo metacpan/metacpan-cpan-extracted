@@ -42,6 +42,22 @@ around BUILDARGS => sub {
   my $components_class = $class->_get_components_class($args);
   my $dom = $args->{dom} = $class->_build_dom($dom_class, $model_class);
   my $component_handlers = $args->{component_handlers};
+
+  # Add the defalt component handlers
+  $component_handlers->{'$'} = sub {
+    my ($name, $args, %attrs) = @_;
+    return sub {
+      my ($renderer, $dom) = @_;
+      if($renderer->model->can($name)) {
+        $renderer->model->$name($dom);
+        return $dom->content;
+      } else {
+        die "No method '$name' for model '${\ref($renderer->model)}'";
+      }
+    };
+
+  };
+
   $args->{components} = $class->_build_components(
     $components_class,
     $model_class,

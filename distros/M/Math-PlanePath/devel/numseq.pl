@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -462,8 +462,6 @@ use Math::Trig 'pi';
   exit 0;
 }
 
-
-
 {
   # min/max PlanePathCoord
 
@@ -591,7 +589,6 @@ use Math::Trig 'pi';
   exit 0;
 }
 
-
 {
   # PlanePathCoord increasing
   require Math::NumSeq::PlanePathCoord;
@@ -634,8 +631,6 @@ use Math::Trig 'pi';
   exit 0;
 }
 
-
-
 {
   require Math::BigInt;
   my $x = Math::BigInt->new(8);
@@ -658,9 +653,6 @@ use Math::Trig 'pi';
   }
   exit 0;
 }
-
-
-
 
 {
   my $pi = pi();

@@ -1,0 +1,42 @@
+#title Broken inline tags
+
+** <em>Title</em>... {1}
+
+*[1345]*
+
+**[1345]**
+
+***[1345]***
+
+<em>This is a [1] long string with [[http://example.com]] emph</em>
+
+<em>This is a [1] long string with [[http://example.com][**strong**]] emph</em>
+<em>This is a [1] long string with [[http://example.com][**strong**]] emph</em>
+<em>This is a [1] long string with [[http://example.com][***ultra-strong***]] emph</em>
+<em>This is a [1] long string with [[http://example.com][<strong><em>strong</em></strong>]] emph</em>
+
+
+*This is a [1] long string with [[http://example.com][**strong**]] emph*
+
+*This is a [1] long string with [[http://example.com][<verbatim>**strong**</verbatim>]] emph*
+
+*This is a <verbatim>[1] *hello*</verbatim> long string with
+[[http://example.com][<verbatim>**strong**</verbatim>]] emph* *This
+is a <verbatim>[1] *hello*</verbatim> long string with
+[[http://example.com][<verbatim>**strong**</verbatim>]] emph*
+
+<code>This is a [1] long string with | pipes and arrays[2]</code>
+
+<code>And a footnote in code [4] {2}</code>
+
+[4] Footnote
+
+{1} Secondary footnote
+
+{2} Secondary footnote
+
+** ***bolditalic {3} [5] ***
+
+[5] Footnote 5
+
+{3} secondary footnote 3

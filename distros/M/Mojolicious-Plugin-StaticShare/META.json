@@ -1,5 +1,5 @@
 {
-   "abstract" : "browse, upload, copy, move, delete static files/dirs.",
+   "abstract" : "browse, upload, copy, move, delete static files and dirs.",
    "author" : [
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-StaticShare"
       }
    },
-   "version" : "0.04",
+   "version" : "0.056",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -124,3 +124,12 @@ Revision history for PPR
 
     * Added missing optional whitespace to DESTROY and AUTOLOAD declarations
       (thanks, Hauke D)
+
+
+0.000015  Wed Dec  6 08:18:09 2017
+
+    * Fixed disapproval.t test
+      (Thanks, Martin!)
+
+    * Fixed handling of ->$*, ->@*, and ->%*
+      (Thanks, Curtis!)

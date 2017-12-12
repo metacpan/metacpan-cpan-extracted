@@ -1,6 +1,6 @@
 
 package Kevin::Command::kevin::workers;
-$Kevin::Command::kevin::workers::VERSION = '0.4.0';
+$Kevin::Command::kevin::workers::VERSION = '0.4.1';
 # ABSTRACT: Command to list Minion workers
 use Mojo::Base 'Mojolicious::Command';
 
@@ -134,7 +134,7 @@ Kevin::Command::kevin::workers - Command to list Minion workers
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

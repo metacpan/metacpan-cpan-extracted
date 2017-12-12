@@ -8,7 +8,7 @@ with qw(
 use Types::Standard qw(HashRef);
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 
@@ -72,7 +72,7 @@ eris::dictionary - Field dictionary loader
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

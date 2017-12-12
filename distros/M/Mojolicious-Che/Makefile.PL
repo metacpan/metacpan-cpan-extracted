@@ -18,9 +18,19 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious'              => 7.00,
-        'Mojo::Log::Che' => 0.01,
+        'Mojolicious'              => '7.57',
+        'Mojo::Log::Che' => '0.01',
     },
+    META_MERGE => {
+    'meta-spec' => { version => 2 },
+    resources => {
+      repository => {
+        type => 'git',
+        url => 'git://github.com/mche/Mojolicious-Che.git',
+        web => 'https://github.com/mche/Mojolicious-Che',
+      },
+    },
+  },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Che-*' },
 );

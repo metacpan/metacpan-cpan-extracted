@@ -5,7 +5,7 @@
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '1.017';
+$JCM::Boilerplate::VERSION = '1.019';
 
 use v5.22;
 use strict;
@@ -13,29 +13,33 @@ use strict;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+no warnings 'experimental::re_strict';
+use re 'strict';
+
 use English;
 use Import::Into;
 use Smart::Comments;
+use re;
 
-sub import($self, $type='script') {
+sub import ( $self, $type = 'script' ) {
     ### assert: ($type =~ m/^(?:class|role|script)$/ms)
-    
+
     my $target = caller;
 
     strict->import::into($target);
     warnings->import::into($target);
     autodie->import::into($target);
 
-    feature->import::into($target, ':5.22');
+    feature->import::into( $target, ':5.22' );
 
-    utf8->import::into($target); # Allow UTF-8 Source
+    utf8->import::into($target);    # Allow UTF-8 Source
 
-    if ($type eq 'class') {
+    if ( $type eq 'class' ) {
         Moose->import::into($target);
         Moose::Util::TypeConstraints->import::into($target);
         MooseX::StrictConstructor->import::into($target);
         namespace::autoclean->import::into($target);
-    } elsif ($type eq 'role') {
+    } elsif ( $type eq 'role' ) {
         Moose::Role->import::into($target);
         Moose::Util::TypeConstraints->import::into($target);
         MooseX::StrictConstructor->import::into($target);
@@ -44,25 +48,29 @@ sub import($self, $type='script') {
 
     Carp->import::into($target);
     English->import::into($target);
-    Smart::Comments->import::into($target, '-ENV', '###');
+    Smart::Comments->import::into( $target, '-ENV', '###' );
 
-    feature->import::into($target, 'postderef');    # Not needed if feature budle >= 5.23.1
+    feature->import::into( $target, 'postderef' );    # Not needed if feature budle >= 5.23.1
 
     # We haven't been using this
     # feature->import::into($target, 'refaliasing');
-    feature->import::into($target, 'signatures');
+    feature->import::into( $target, 'signatures' );
 
-    feature->import::into($target, 'switch');
-    feature->import::into($target, 'unicode_strings');
+    feature->import::into( $target, 'switch' );
+    feature->import::into( $target, 'unicode_strings' );
     # warnings->unimport::out_of($target, 'experimental::refaliasing');
-    warnings->unimport::out_of($target, 'experimental::signatures');
+    warnings->unimport::out_of( $target, 'experimental::signatures' );
 
-    if ($PERL_VERSION lt v5.24.0) {
-        warnings->unimport::out_of($target, 'experimental::postderef');
+    if ( $PERL_VERSION lt v5.24.0 ) {
+        warnings->unimport::out_of( $target, 'experimental::postderef' );
     }
 
     # For "switch" feature
-    warnings->unimport::out_of($target, 'experimental::smartmatch');
+    warnings->unimport::out_of( $target, 'experimental::smartmatch' );
+
+    # For "re 'strict'" feature
+    warnings->unimport::out_of( $target, 'experimental::re_strict' );
+    re->import( 'strict' );
 
     return;
 }
@@ -81,7 +89,7 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 1.017
+version 1.019
 
 =head1 SYNOPSIS
 

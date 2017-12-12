@@ -4,8 +4,9 @@ use base qw/Prty::Database::Row::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
+use Prty::Array;
 use Prty::Hash;
 
 # -----------------------------------------------------------------------------
@@ -42,6 +43,10 @@ Template auf der Klassenvariable C<$Select> definiert.
 
     $tmpl = $class->selectTemplate;
 
+=head4 Returns
+
+Select-Template (String)
+
 =head4 Description
 
 Liefere das Select-Template der Klasse. Dieses ist auf der
@@ -51,10 +56,6 @@ ersetzt werden.
 
 Die Einsetzung von Selektionskriterien in das Template nimmt
 die Methode L</selectStmt>() vor.
-
-=head4 Returns
-
-Select-Template (String)
 
 =head4 Example
 
@@ -113,15 +114,15 @@ sub selectTemplate {
 
     $stmt = $class->selectStmt($db,@select);
 
+=head4 Returns
+
+Select-Statement (String)
+
 =head4 Description
 
 Liefere ein Select-Statement der Klasse gemäß den Selektionskriterien
 C<@select>. Die Selektionskriterien werden in das Muster-Statement
 eingesetzt (siehe L</selectTemplate>().
-
-=head4 Returns
-
-Select-Statement (String)
 
 =cut
 
@@ -145,12 +146,6 @@ sub selectStmt {
 
     $newRow = $row->cast($db,$newClass);
 
-=head4 Description
-
-Wandele den Datensatz $row in einen Datensatz der Klasse $newClass
-und liefere das Resultat zurück. Es ist ein fataler Fehler, wenn der
-Datensatz keine zur Klasse $newClass gehörende Kolumne besitzt.
-
 =head4 Arguments
 
 =over 4
@@ -168,6 +163,12 @@ Neue Datensatzklasse
 =head4 Returns
 
 Datensatz
+
+=head4 Description
+
+Wandele den Datensatz $row in einen Datensatz der Klasse $newClass
+und liefere das Resultat zurück. Es ist ein fataler Fehler, wenn der
+Datensatz keine zur Klasse $newClass gehörende Kolumne besitzt.
 
 =head4 Details
 
@@ -203,7 +204,8 @@ sub cast {
 
     # Titellisten vergleichen
 
-    my ($onlyA,$onlyNewA,$bothA) = $titles->compare($newTitles);
+    my ($onlyA,$onlyNewA,$bothA) =
+        Prty::Array->compare($titles,$newTitles);
     if (!@$bothA) {
         $self->throw(
             q{ROW-00006: Datensatz-Klassen haben keine gemeinsamen Kolumnen},
@@ -259,7 +261,7 @@ sub cast {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use HTTP::AcceptLanguage;
 use Mojo::Path;
 use Mojo::File qw(path);
-use Mojo::Util qw ( decode encode url_unescape xml_escape);#encode 
+use Mojo::Util qw ( decode encode url_unescape xml_escape);# 
 use Time::Piece;# module replaces the standard localtime and gmtime functions with implementations that return objects
 use Mojo::Asset::File;
 
@@ -41,7 +41,7 @@ sub post {
   my ($c) = @_;
   $c->_stash();
   
-  my $file_path = path(url_unescape($c->stash('file_path')));
+  my $file_path = path(decode('UTF-8', url_unescape($c->stash('file_path'))));
   
   if ($c->admin && (my $dir = $c->param('dir'))) {
     return $c->new_dir($file_path, $dir);
@@ -67,16 +67,21 @@ sub post {
     if $c->req->is_limit_exceeded;
 
   my $file = $c->req->upload('file')
-    or return return $c->render(json=>{error=>$c->i18n('Where your parameters?')});
+    or return $c->render(json=>{error=>$c->i18n('Where is your upload file?')});
   my $name = url_unescape($c->param('name') || $file->filename);
-  my $to = $file_path->child(encode('UTF-8', $name));
+  utf8::upgrade($name);
+  return $c->render(json=>{error=>$c->i18n('Provide the name of upload file')})
+    unless $name =~ /\S/i;
+  
+  my $to = $file_path->child($name);
   
   return $c->render(json=>{error=>$c->i18n('path is not a directory')})
     unless -d $file_path;
   return $c->render(json=>{error=>$c->i18n('file already exists')})
     if -e $to;
   
-  $file->asset->move_to($to);
+  eval { $file->asset->move_to($to) }
+    or return $c->render(json=>{error=>$@  =~ /(.+) at /});
   
   $c->render(json=>{ok=> $c->stash('url_path')->merge($name)->to_route});
 }
@@ -173,7 +178,13 @@ sub dir {
 sub new_dir {
   my ($c, $path, $dir) = @_;
   
-  my $to = $path->child(encode('UTF-8', url_unescape($dir)));
+  my $edir = url_unescape($dir);
+  utf8::upgrade($edir);
+  
+  return $c->render(json=>{error=>$c->i18n('provide the name of new directory')})
+    unless $edir =~ /\S/;
+  
+  my $to = $path->child($edir);#
   
   return $c->render(json=>{error=>$c->i18n('dir or file exists')})
     if -e $to;
@@ -187,13 +198,19 @@ sub new_dir {
 sub rename {
   my ($c, $path, $rename) = @_;
   
-  my $to = $path->sibling(encode('UTF-8', url_unescape($rename)));
+  my $ename = url_unescape($rename);
+  utf8::upgrade($ename);
+  
+  return $c->render(json=>{error=>$c->i18n('provide new name')})
+    unless $ename =~ /\S/;
+  
+  my $to = $path->sibling($ename);
   
   return $c->render(json=>{error=>$c->i18n('dir or file exists')})
     if -e $to;
   
-  my $move = eval {$path->move_to($to)}
-    or return $c->render(json=>{error=>$@});
+  my $move = eval { $path->move_to($to) }
+    or return $c->render(json=>{error=>$@ =~ /(.+) at /});
   
   $c->render(json=>{ok=> $c->stash('url_path')->trailing_slash(0)->to_dir->merge($rename)->to_route});
   
@@ -203,13 +220,17 @@ sub delete {
   my ($c, $path, $delete) = @_;
   my @delete = ();
   for (@$delete) {
-    my $d = $path->sibling(encode('UTF-8', url_unescape($_)));
+    my $del = url_unescape($_);
+    utf8::upgrade($del);
+    push @delete, $c->i18n('provide the name of deleted dir')
+      and next
+      unless $del =~ /\S/;
+    my $d = $path->sibling($del);
     push @delete, $c->i18n('dir or file does not exists')
       and next
       unless -e $d;
     push @delete, eval {$d->remove_tree()} ? 1 : 0,
   }
-
   
   $c->render(json=>{ok=>\@delete});
 }
@@ -251,7 +272,6 @@ sub _markdown {# file
   return $c->plugin->render_markdown
     ? $c->render(ref $c->plugin->render_markdown ? %{$c->plugin->render_markdown} : $c->plugin->render_markdown,)
     : $c->render('Mojolicious-Plugin-StaticShare/markdown', format=>'html', handler=>'ep',);
-  
 }
 
 my $layout_re = qr|^(?:\s*%+\s*layouts/(.+)[;\s]+)|;
@@ -268,7 +288,6 @@ sub _stash_markdown {
   $c->stash(markdown => $dom->at('body') || $dom);
   #~ my $filename = $path->basename;
   #~ $c->stash('title'=>$filename);
-  
 }
 
 my $layout_ext_re = qr|\.([^/\.;\s]+)?\.?([^/\.;\s]+)?$|; # .html.ep
@@ -311,18 +330,16 @@ sub _dom_attrs {# for markdown
   my $content = $child1->content;
   if ($content =~ s|^(?:\s*\{([^\}]+)\}\s*)||) {
     my $attrs = $1;
-    while ($attrs =~ s|([\w\-]+\s*:\s*[^;]+;)|| ) {# styles
-      #~ warn "\tstyle=", $1;
-      $parent->{style} .= " $1";
-    }
-    while ($attrs =~ s|\.?([.\w\-]+)||) {# classes
-      #~ warn "\tclass=", $1;
-      $parent->{class} .= " $1";
-    }
-    while ($attrs =~ s|#([\w\-]+)||) {# id
-      #~ warn "\tid=", $1;
-      $parent->{id}  = $1;
-    }
+    utf8::upgrade($attrs);
+    # styles
+    $parent->{style} .= " $1"
+      while $attrs =~ s|(\S+\s*:\s*[^;]+;)||;
+    # id
+    $parent->{id}  = $1
+      while $attrs =~ s|#(\S+)||;
+    # classes
+    $parent->{class} .= " $1"
+      while $attrs =~ s|\.?([^\.\s]+)||;
     $child1->content($content);# replace
   }
 }

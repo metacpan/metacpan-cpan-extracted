@@ -8,28 +8,28 @@ use Mic::Implementation
 
 sub head {
     my ($self) = @_;
-    $self->{$Q}[0];
+    $self->[Q][0];
 }
 
 sub tail {
     my ($self) = @_;
-    $self->{$Q}[-1];
+    $self->[Q][-1];
 }
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$Q} };
+    scalar @{ $self->[Q] };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$Q} }, $val;
+    push @{ $self->[Q] }, $val;
 }
 
 sub pop {
     my ($self) = @_;
-    shift @{ $self->{$Q} };
+    shift @{ $self->[Q] };
 }
 
 1;

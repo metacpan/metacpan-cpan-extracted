@@ -1,0 +1,21 @@
+bin/plsh.pl
+Changes
+lib/App/PerlShell.pm
+lib/App/PerlShell/Config.pm
+lib/App/PerlShell/LexPersist.pm
+lib/App/PerlShell/ModRefresh.pm
+lib/App/PerlShell/AddOn/ShellCommands.pm
+lib/App/PerlShell/AddOn/TextCSV.pm
+lib/App/PerlShell/AddOn/TextTable.pm
+Makefile.PL
+MANIFEST
+README
+t/01-Config.t
+t/01-LexPersist.t
+t/01-ModRefresh.t
+t/01-Shell.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-config.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

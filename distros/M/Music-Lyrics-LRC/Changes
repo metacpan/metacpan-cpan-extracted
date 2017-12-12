@@ -1,5 +1,13 @@
 Revision history for Music-Lyrics-LRC
 
+0.11    2017-12-08
+
+ - Add basic load() and save() method tests
+
+0.10    2017-12-06
+
+ - Add dependency links to documentation
+
 0.09    2017-11-02
 
  - Tolerate single-digit seconds in lyric timestamps

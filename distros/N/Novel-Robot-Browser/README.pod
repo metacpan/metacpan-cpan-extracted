@@ -84,4 +84,16 @@ get/post url, return unicode content, auto detect CJK charset
             }, 
             );
 
+=head2 set_cookie
+    
+    $browser->set_cookie($cookie);
+
+=head2 read_moz_cookie
+    
+    $browser->read_moz_cookie($mozilla_cookies_sqlite_file, $domain);
+
+=head2 clear_cookie
+    
+    $browser->clear_cookie();
+
 =cut

@@ -5,7 +5,7 @@ use locale;
 use POSIX;
 use DBIx::dbMan::Config;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -27,6 +27,9 @@ sub load_and_store {
 	my @lines = ();
 
 	if (open F,$file) {
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode F, ':utf8';
+        }
 		while (<F>) {
 			chomp;
 			push @lines,$_;
@@ -47,6 +50,9 @@ sub load {
 	my @lines = ();
 
 	if (open F,$file) {
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode F, ':utf8';
+        }
 		while (<F>) {
 			chomp;
 			push @lines,$_;
@@ -73,6 +79,9 @@ sub add {
 	return unless $file;
 	
 	if (open F,">>$file") {
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode F, ':utf8';
+        }
 		print F "$line\n";
 		close F;
 	}

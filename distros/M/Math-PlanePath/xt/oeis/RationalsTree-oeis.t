@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -25,7 +25,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 49;
+plan tests => 58;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -33,6 +33,8 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::RationalsTree;
+use Math::PlanePath::Base::Digits
+  'bit_split_lowtohigh','digit_join_lowtohigh';
 
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
@@ -53,6 +55,198 @@ sub gcd {
   }
 }
 
+
+#------------------------------------------------------------------------------
+# A258996 -- permutation CW<->Drib both ways
+# n=2^m+k, m>1, 0<=k<2^m
+# If m even, then a(2^(m+1)    +k) = a(2^m+k) + 2^m
+#                 a(2^(m+1)+2^m+k) = a(2^m+k) + 2^(m+1)
+# If m odd,  then a(2^(m+1)    +k) = a(2^m+k) + 2^(m+1)
+#                 a(2^(m+1)+2^m+k) = a(2^m+k) + 2^m
+#
+# flip alternate bits starting from second lowest then upwards and most
+# singificant unchanged
+#
+# A258996(n) = my(v=binary(n)); forstep(i=#v-1,2,-2, v[i]=1-v[i]); fromdigits(v,2);
+# vector(20,n,A258996(n))
+#
+# differences abs(n-a(n)) are then +/-1 at alternate bit positions 
+# Set(vector(500,n,abs(n-A258996(n))))/2
+
+MyOEIS::compare_values
+  (anum => 'A258996',
+   func => sub {
+     my ($count) = @_;
+     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
+     my $drib  = Math::PlanePath::RationalsTree->new (tree_type => 'Drib');
+     my @got;
+     for (my $n = $cw->n_start; @got < $count; $n++) {
+       my ($x, $y) = $cw->n_to_xy($n);
+       push @got, $drib->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => q{A258996},
+   func => sub {
+     my ($count) = @_;
+     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
+     my $drib  = Math::PlanePath::RationalsTree->new (tree_type => 'Drib');
+     my @got;
+     for (my $n = $cw->n_start; @got < $count; $n++) {
+       my ($x, $y) = $drib->n_to_xy($n);
+       push @got, $cw->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+# return $n with every second bit flipped, starting from the second least
+# significant, and leaving the most significant unchanged
+sub flip_alternate_bits_lowtohigh {
+  my ($n) = @_;
+  my @bits = bit_split_lowtohigh($n);
+  for (my $i = 1; $i < $#bits; $i+=2) {
+    $bits[$i] ^= 1;
+  }
+  return digit_join_lowtohigh(\@bits,2);
+}
+MyOEIS::compare_values
+  (anum => q{A258996},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, flip_alternate_bits_lowtohigh($n);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A258746 -- permutation SB<->Bird both ways
+# m=floor(log2(n))
+# If m even,  a(2*n)   = 2*a(n)
+#             a(2*n+1) = 2*a(n)+1
+# If m odd,   a(2*n)   = 2*a(n)+1
+#             a(2*n+1) = 2*a(n)
+# flip alternate bits starting from third highest then downwards
+#
+# A258746(n) = my(v=binary(n)); forstep(i=3,#v,2, v[i]=1-v[i]); fromdigits(v,2);
+# vector(20,n,A258746(n))
+#
+# differences abs(n-a(n)) are then +/-1 at alternate bit positions
+# Set(vector(500,n,n+=4; abs(n-A258746(n))))
+#
+# gp 2.9.1 fromdigits() wrong result for negative digits when base=2^k, must subst()
+# A147992(n) = my(v=apply(d->2*d-1,binary(n)));v[1]=1;subst(Pol(v),'x,4);
+# vector(20,n,A147992(n))
+# Set(concat(vector(20,n,A147992(n)),2*vector(20,n,A147992(n))))
+#
+# union A147992 and 2*A147992
+# which since A147992 always odd are disjoint
+# setintersect(Set(vector(20,n,A147992(n))),Set(2*vector(20,n,A147992(n))))
+
+MyOEIS::compare_values
+  (anum => 'A258746',
+   func => sub {
+     my ($count) = @_;
+     my $sb  = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my $bird  = Math::PlanePath::RationalsTree->new (tree_type => 'Bird');
+     my @got;
+     for (my $n = $sb->n_start; @got < $count; $n++) {
+       my ($x, $y) = $sb->n_to_xy($n);
+       push @got, $bird->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => q{A258746},
+   func => sub {
+     my ($count) = @_;
+     my $sb  = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my $bird  = Math::PlanePath::RationalsTree->new (tree_type => 'Bird');
+     my @got;
+     for (my $n = $sb->n_start; @got < $count; $n++) {
+       my ($x, $y) = $bird->n_to_xy($n);
+       push @got, $sb->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+# return $n with every second bit flipped, starting from the third most
+# significant and proceeding downwards
+sub flip_alternate_bits_hightolow {
+  my ($n) = @_;
+  my @bits = bit_split_lowtohigh($n);
+  for (my $i = $#bits-2; $i >= 0; $i-=2) {
+    $bits[$i] ^= 1;
+  }
+  return digit_join_lowtohigh(\@bits,2);
+}
+MyOEIS::compare_values
+  (anum => q{A258746},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, flip_alternate_bits_hightolow($n);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A092569 -- permutation flip bits except most significant and least significant
+#            HCS -> Bird
+
+MyOEIS::compare_values
+  (anum => 'A092569',
+   func => sub {
+     my ($count) = @_;
+     my $hcs  = Math::PlanePath::RationalsTree->new (tree_type => 'HCS');
+     my $bird  = Math::PlanePath::RationalsTree->new (tree_type => 'Bird');
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my @bits = bit_split_lowtohigh($n);
+       foreach my $i (1 .. $#bits-1) {
+         $bits[$i] ^= 1;
+       }
+       push @got, digit_join_lowtohigh(\@bits,2);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A153153 -- permutation CW->AYT
+
+MyOEIS::compare_values
+  (anum => 'A153153',
+   func => sub {
+     my ($count) = @_;
+     my $ayt  = Math::PlanePath::RationalsTree->new (tree_type => 'AYT');
+     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
+     my @got = (0);  # initial 0
+     for (my $n = $cw->n_start; @got < $count; $n++) {
+       my ($x, $y) = $cw->n_to_xy($n);
+       push @got, $ayt->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A153154 -- permutation AYT->CW
+
+MyOEIS::compare_values
+  (anum => 'A153154',
+   func => sub {
+     my ($count) = @_;
+     my $ayt  = Math::PlanePath::RationalsTree->new (tree_type => 'AYT');
+     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
+     my @got = (0);  # initial 0
+     for (my $n = $ayt->n_start; @got < $count; $n++) {
+       my ($x, $y) = $ayt->n_to_xy($n);
+       push @got, $cw->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A044051  N+1 of those N where SB and CW gives same X,Y
@@ -774,40 +968,6 @@ MyOEIS::compare_values
      return \@got;
    });
 
-
-#------------------------------------------------------------------------------
-# A153153 -- permutation CW->AYT
-
-MyOEIS::compare_values
-  (anum => 'A153153',
-   func => sub {
-     my ($count) = @_;
-     my $ayt  = Math::PlanePath::RationalsTree->new (tree_type => 'AYT');
-     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
-     my @got = (0);  # initial 0
-     for (my $n = $cw->n_start; @got < $count; $n++) {
-       my ($x, $y) = $cw->n_to_xy($n);
-       push @got, $ayt->xy_to_n($x,$y);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A153154 -- permutation AYT->CW
-
-MyOEIS::compare_values
-  (anum => 'A153154',
-   func => sub {
-     my ($count) = @_;
-     my $ayt  = Math::PlanePath::RationalsTree->new (tree_type => 'AYT');
-     my $cw  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
-     my @got = (0);  # initial 0
-     for (my $n = $ayt->n_start; @got < $count; $n++) {
-       my ($x, $y) = $ayt->n_to_xy($n);
-       push @got, $cw->xy_to_n($x,$y);
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A154437 -- permutation AYT->Drib

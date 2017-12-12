@@ -11,7 +11,7 @@ use overload (
 use Getopt::Long::Descriptive::Usage ();
 
 # ABSTRACT: Produce usage information for CLI::Osprey apps
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 my %format_doc = (
@@ -110,7 +110,7 @@ sub sub_commands_text {
       return "",
       $self->wrap(
         "Subcommands available: " . join(" | ", sort keys %subcommands),
-        length("Subcommands available: ")
+        " " x length("Subcommands available: ")
       );
     }
   }
@@ -333,7 +333,7 @@ CLI::Osprey::Descriptive::Usage - Produce usage information for CLI::Osprey apps
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

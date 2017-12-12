@@ -19,6 +19,8 @@ This software provides some functionality in database managing (SQL shell/consol
 
 use strict;
 use lib '.';	# where I can find dbMan
+use locale;
+use open qw/:locale :std/;
 use FindBin;
 
 BEGIN {
@@ -47,7 +49,7 @@ $dbman->start;
 
 =head1 VERSION
  
-0.43
+0.44
  
 =head1 LICENSE
 
@@ -69,7 +71,7 @@ Report bugs directly to sorm@is4u.cz.
  
 =head1 LAST MODIFIED
  
-Thu Jul 13 09:14:39 CEST 2017
+Sat Dec  2 13:48:14 CET 2017
 
 =head1 SEE ALSO
  

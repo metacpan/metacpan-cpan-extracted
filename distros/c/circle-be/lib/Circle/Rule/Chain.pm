@@ -7,6 +7,8 @@ package Circle::Rule::Chain;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Circle::Rule::Resultset;
 
 sub new

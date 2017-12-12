@@ -148,7 +148,7 @@ while ( my $sock = $server->accept() ) {
                 }
                 else {
                     $answer_f = $frame_class->new(
-                        payload_sr => \$payload,
+                        payload => $payload,
                     );
                 }
 

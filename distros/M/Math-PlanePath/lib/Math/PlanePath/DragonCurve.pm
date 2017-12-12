@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -1451,6 +1451,10 @@ turn" forms begin at n=0 for turn at N=1 and so are the turn at N=n+1.
     A166242   2^(total turn), by double/halving
     A000975   N of new maximum total turn, binary 10101...
     A268411   direction of horizontals, 0=East, 1=West
+    A043724   N of East
+    A043725   N of North
+    A043726   N of West
+    A043727   N of South
 
     A088431   turn sequence run lengths
     A007400     2*runlength
@@ -1478,7 +1482,12 @@ turn" forms begin at n=0 for turn at N=1 and so are the turn at N=n+1.
     A227036   boundary length N=0 to N=2^k
                 also right boundary length to N=2^(k+1)
     A203175   left boundary length N=0 to N=2^k
-                also differences of total boundary
+                = differences of total boundary
+                = squares on left boundary
+
+    A003476   squares on right boundary
+                = single points N=0 to N=2^(k-1) inclusive
+    A164395   single points N=0 to N=2^k-1 inclusive, for k=4 up
 
     A003230   area enclosed N=0 to N=2^k, for k=4 up
                same as double points
@@ -1491,10 +1500,8 @@ turn" forms begin at n=0 for turn at N=1 and so are the turn at N=n+1.
                also area left side extra over doubling
     A077949    same
 
-    A003476   squares on right boundary
-               also single points N=0 to N=2^(k-1) inclusive
-    A203175   squares on left boundary
-    A164395   single points N=0 to N=2^k-1 inclusive, for k=4 up
+    A289265   growth rate r = 1.695 of boundaries etc
+    A272031   fractal dimension log(r)/log(sqrt(2))
 
 For reference, "dragon-like" A059125 is similar to the turn sequence
 A014707, but differs in having the "middle" values for each replication come

@@ -8,6 +8,8 @@ use strict;
 use base qw( Tangence::Object Circle::Commandable Circle::Configurable );
 use Carp;
 
+our $VERSION = '0.173320';
+
 sub _session_type
 {
    my ( $opts ) = @_;

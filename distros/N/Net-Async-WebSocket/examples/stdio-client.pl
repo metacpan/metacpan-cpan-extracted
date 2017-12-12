@@ -12,7 +12,7 @@ my $PORT = shift @ARGV or die "Need PORT";
 my ( $client, $stdio );
 
 $client = Net::Async::WebSocket::Client->new(
-   on_frame => sub {
+   on_text_frame => sub {
       my ( $self, $frame ) = @_;
       $stdio->write( $frame );
    },
@@ -21,7 +21,7 @@ $client = Net::Async::WebSocket::Client->new(
 $stdio = IO::Async::Stream->new_for_stdio(
    on_read => sub {
       my ( $self, $buffref ) = @_;
-      $client->send_frame( $$buffref );
+      $client->send_text_frame( $$buffref );
       $$buffref = "";
    },
 );
@@ -34,9 +34,8 @@ $client->connect(
    host => $HOST,
    service => $PORT,
    url => "ws://$HOST:$PORT/",
-   on_connected => sub { print "Connected; go ahead...\n"; },
-   on_connect_error => sub { die "Cannot connect - $_[-1]" },
-   on_resolve_error => sub { die "Cannot resolve - $_[-1]" },
-);
+)->get;
 
-$loop->loop_forever;
+print "Connected; go ahead...\n";
+
+$loop->run;

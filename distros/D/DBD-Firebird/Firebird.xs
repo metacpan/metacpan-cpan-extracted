@@ -146,6 +146,25 @@ short length, char ISC_FAR *updated
 
 MODULE = DBD::Firebird     PACKAGE = DBD::Firebird
 
+#ifndef FB_API_VER
+#define FB_API_VER 0
+#endif
+
+BOOT:
+    HV *stash = gv_stashpv( "DBD::Firebird", TRUE );
+    newCONSTSUB( stash, "fb_api_ver", newSViv(FB_API_VER) );
+    newCONSTSUB( stash, "client_major_version", newSViv( isc_get_client_major_version() ) );
+    newCONSTSUB( stash, "client_minor_version", newSViv( isc_get_client_minor_version() ) );
+    {
+        char version_string[1024];
+        isc_get_client_version(version_string);
+        int len = strlen(version_string);
+        if (len > 1023)
+            die("Version string buffer overflow detected");
+        SV *ver = newSVpv(version_string, len);
+        newCONSTSUB( stash, "client_version", ver );
+    }
+
 INCLUDE: Firebird.xsi
 
 MODULE = DBD::Firebird     PACKAGE = DBD::Firebird::db

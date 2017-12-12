@@ -1,6 +1,6 @@
 package Lab::Instrument::YokogawaGS200;
 #ABSTRACT: Yokogawa GS200 DC source
-$Lab::Instrument::YokogawaGS200::VERSION = '3.600';
+$Lab::Instrument::YokogawaGS200::VERSION = '3.613';
 use strict;
 use warnings;
 use 5.010;
@@ -168,7 +168,7 @@ sub program_run {
     my $self = shift;
     my ($tail) = $self->_check_args( \@_ );
 
-    print "Run program\n";
+    # print "Running program\n";
     $self->write( ":PROG:RUN", $tail );
 
 }
@@ -234,7 +234,7 @@ sub config_sweep {
     #print "Program:\n";
     for ( my $i = 1; $i <= $sections; $i++ ) {
         $self->set_setpoint( $start + ( $target - $start ) / $sections * $i );
-        printf "setpoint: %+.4e\n",
+        printf "sweep to setpoint: %+.4e\n",
             $start + ( $target - $start ) / $sections * $i;
     }
     $self->end_program($tail);
@@ -547,7 +547,7 @@ Lab::Instrument::YokogawaGS200 - Yokogawa GS200 DC source
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 

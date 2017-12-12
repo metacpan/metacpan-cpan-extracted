@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -486,8 +486,8 @@ to -0.5.
 =head2 Rectangle to N Range
 
 Within each row increasing X is increasing N, and in each column increasing
-Y is increasing N.  So in a rectangle the lower left corner is the minimum N
-and the upper right is the maximum N.
+Y is increasing N.  So in a rectangle the lower left corner is minimum N and
+the upper right is maximum N.
 
     |            \     \ N max
     |       \ ----------+
@@ -527,7 +527,13 @@ L<http://oeis.org/A002262> (etc)
       A101165    total N in column to Y=X-1
       A185506    total N in rectangle 0,0 to X,Y
 
+    direction=down, x_start=1, y_start=1
+      A057555    X,Y pairs
+      A057046    X at N=2^k
+      A057047    Y at N=2^k
+
     direction=down, n_start=0
+      A057554    X,Y pairs
       A023531    dSum = dX+dY, being 1 at N=triangular+1 (and 0)
       A000096    N on X axis, X*(X+3)/2
       A000217    N on Y axis, the triangular numbers
@@ -544,20 +550,17 @@ L<http://oeis.org/A002262> (etc)
 
     in direction=up the X,Y coordinate forms are the same but swap X,Y
 
-    either direction, n_start=1
+    either direction
       A038722    permutation N at transpose Y,X
                    which is direction=down <-> direction=up
 
-    n_start=1, x_start=1, y_start=1, either direction
+    either direction, x_start=1, y_start=1
       A003991    X*Y coordinate product
       A003989    GCD(X,Y) greatest common divisor starting (1,1)
       A003983    min(X,Y)
       A051125    max(X,Y)
-    n_start=1, x_start=1, y_start=1, direction=down
-      A057046    X for N=2^k
-      A057047    Y for N=2^k
 
-    n_start=0 (either direction)
+    either direction, n_start=0
       A049581    abs(X-Y) coordinate diff
       A004197    min(X,Y)
       A003984    max(X,Y)
@@ -587,7 +590,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

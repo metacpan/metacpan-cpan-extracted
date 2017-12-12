@@ -1,4 +1,7 @@
 Revision History for POE-Component-Server-eris
+2.5     2017-12-03 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fix shebang lines on the installed utilities
+
 2.4     2017-11-24 Brad Lhotsky <brad@divisionbyzero.net>
         - Fix for older versions of Perl
 

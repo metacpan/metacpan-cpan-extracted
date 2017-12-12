@@ -69,7 +69,7 @@ my %depencencies = (
     'PDL::Graphics::Gnuplot' => [
         qw{
             Lab/Moose/Plot.pm
-            Lab/Moose/DataFile/Gnuplot
+            Lab/Moose/DataFile/Gnuplot.pm
             }
     ],
 
@@ -90,7 +90,10 @@ my %depencencies = (
 
     'LinuxGpib' => ['LinuxGPIB'],
 
-    'Lab::VISA' => [qw{VISA Lab/Bus/IsoBus.pm Lab/Connection/IsoBus.pm}],
+    'Lab::VISA' => [
+        qw{VISA Lab/Bus/IsoBus.pm Lab/Connection/IsoBus.pm
+            Lab/Moose/Connection/VISA}
+    ],
 
     'Lab::Zhinst' => ['Zhinst'],
 

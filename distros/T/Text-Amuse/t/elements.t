@@ -74,35 +74,35 @@ test_line(" 1. ciao", {
                        type => "li",
                        block => "oln",
                        removed => " 1. ",
-                       indentation => 1,
+                       indentation => 3,
                       });
 
 test_line(" i. ciao", {
                        type => "li",
                        block => "oli",
                        removed => " i. ",
-                       indentation => 1,
+                       indentation => 3,
                       });
 
 test_line(" X. ciao", {
                        type => "li",
                        block => "olI",
                        removed => " X. ",
-                       indentation => 1,
+                       indentation => 3,
                       });
 
 test_line("  B. ciao", {
                        type => "li",
                        block => "olA",
                        removed => "  B. ",
-                       indentation => 2,
+                       indentation => 4,
                       });
 
 test_line("     c. ciao", {
                            type => "li",
                            block => "ola",
                            removed => "     c. ",
-                           indentation => 5,
+                           indentation => 7,
                       });
 
 foreach my $bl (qw/biblio play comment

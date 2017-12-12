@@ -12,15 +12,15 @@ my $document =
 
 my $htmltoc =<<'EOF';
 <p class="tableofcontentline toclevel1"><span class="tocprefix">&nbsp;&nbsp;</span><a href="#toc1">Part</a></p>
-<p class="tableofcontentline toclevel2"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc2">Chapter [1]</a></p>
-<p class="tableofcontentline toclevel3"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc3">Section [2]</a></p>
-<p class="tableofcontentline toclevel4"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc4">Subsection [3]</a></p>
+<p class="tableofcontentline toclevel2"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc2">Chapter</a></p>
+<p class="tableofcontentline toclevel3"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc3">Section</a></p>
+<p class="tableofcontentline toclevel4"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc4">Subsection</a></p>
 EOF
 
 ok($document->as_html);
 foreach my $i (1..4) {
-    my $fnstring = qq{<a href="#fn$i" class="footnote" id="fn_back$i">[$i]</a>};
-    like ($document->toc_as_html, qr/\Q\E/, "Found footnote $i");
+    my $fnstring = qq{>[$i]</a>};
+    unlike ($document->toc_as_html, qr/\Q$fnstring\E/, "Footnote skipped $i");
 }
 is($document->toc_as_html, $htmltoc, "ToC looks good");
 ok($document->as_latex);
@@ -37,17 +37,17 @@ my $exp = [
            {
             'level' => '2',
             'index' => 2,
-            'string' => 'Chapter <a href="#fn1" class="footnote" id="fn_back1">[1]</a>',
+            'string' => 'Chapter',
            },
            {
             'level' => '3',
             'index' => 3,
-            'string' => 'Section <a href="#fn2" class="footnote" id="fn_back2">[2]</a>',
+            'string' => 'Section',
            },
            {
             'level' => '4',
             'index' => 4,
-            'string' => 'Subsection <a href="#fn3" class="footnote" id="fn_back3">[3]</a>',
+            'string' => 'Subsection',
            },
           ];
 

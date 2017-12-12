@@ -1,4 +1,10 @@
 Revision history for Net::Etcd
+0.018
+[ ENHANCEMENTS ]
+* Added Member class and tests.
+* Added ENV defaults for name 'ETCD_CLIENT_USERNAME', password 'ETCD_CLIENT_PASSWORD' and cacert 'ETCD_CERT_FILE' accessors. 
+* Updated TLS example.
+
 0.017
 [ ENHANCEMENTS ]
 * Add TLS support

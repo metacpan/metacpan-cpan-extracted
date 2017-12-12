@@ -78,6 +78,8 @@
          },
          "suggests" : {
             "Cpanel::JSON::XS" : "0",
+            "Email::Stuffer" : "0.016",
+            "HTTP::Tiny" : "0.070",
             "JSON::MaybeXS" : "0",
             "Term::ANSIColor" : "4.03"
          }
@@ -93,7 +95,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.001036",
+   "version" : "0.001041",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

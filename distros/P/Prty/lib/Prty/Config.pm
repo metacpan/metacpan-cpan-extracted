@@ -4,9 +4,10 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
+use Prty::Path;
 use Prty::Process;
 
 # -----------------------------------------------------------------------------
@@ -89,11 +90,15 @@ Verzeichnis über einen Dienst wie FTP:
 =head4 Description
 
 [1] Instantiiere Konfigurationsobjekt aus Datei $file
-und liefere eine Referenz auf dieses Objekt zurück.
+und liefere eine Referenz auf dieses Objekt zurück. Beginnt $file
+mit einer Tilde (~), wird sie zum Homedir des rufenden Users
+expandiert.
 
-[2] Durchsuche die Verzeichnisse @dirs nach Datei $file.
-Die erste gefundene Datei wird geöffnet. Ein Leerstring '' in @dirs
-hat dieselbe Bedeutung wie '.' und steht für das aktuelle Verzeichnis.
+[2] Durchsuche die Verzeichnisse @dirs nach Datei $file. Beginnt
+ein Verzeichnisname mit einer Tilde (~), wird sie zum Homedir des
+rufenden Users expandiert. Die erste gefundene Datei wird
+geöffnet. Ein Leerstring '' in @dirs hat dieselbe Bedeutung wie
+'.' und steht für das aktuelle Verzeichnis.
 
 [3] Als Parameter ist der Konfigurationscode als Zeichenkette
 der Form "$key => $val, ..." angegeben.
@@ -109,7 +114,7 @@ sub new {
     # @_: $file -or- \@dirs,$file -or- $str
 
     my %cfg;
-    if (@_ == 1 && $_[0] =~ /=>/) { # $str ("$key => $val, ...")
+    if (@_ == 1 && $_[0] =~ /=>/) { # "$key => $val, ..."
         %cfg = eval shift;
     }
     elsif (@_ >= 2 && !ref $_[0]) { # @keyVal
@@ -122,12 +127,13 @@ sub new {
         if (Prty::Perl->isArrayRef($_[0])) { # \@dirs
             $dirA = shift;
         }
-        my $cfgFile = shift;
+        my $cfgFile = Prty::Path->expandTilde(shift);
 
         # Configdatei suchen, wenn \@dirs
 
         if ($dirA) {
-            for my $dir (@$dirA) {
+            for (@$dirA) {
+                my $dir = Prty::Path->expandTilde($_);
                 my $file = $dir? "$dir/$cfgFile": $cfgFile;
                 if (-e $file) {
                     $cfgFile = $file;
@@ -248,7 +254,7 @@ sub try {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

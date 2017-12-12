@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-11-01'; # DATE
-our $VERSION = '1.80'; # VERSION
+our $DATE = '2017-12-11'; # DATE
+our $VERSION = '1.810'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1324,6 +1324,83 @@ sub select_output_handle {
     $r->{output_handle} = $handle;
 }
 
+sub save_output {
+    my ($self, $r, $dir) = @_;
+    $dir //= $ENV{PERINCI_CMDLINE_OUTPUT_DIR};
+
+    unless (-d $dir) {
+        warn "Can't save output to $dir: doesn't exist or not a directory,skipped saving program output";
+        return;
+    }
+
+    my $time = do {
+        if (eval { require Time::HiRes; 1 }) {
+            Time::HiRes::time();
+        } else {
+            time();
+        }
+    };
+
+    my $fmttime = do {
+        my @time = gmtime($time);
+        sprintf(
+            "%04d-%02d-%02dT%02d%02d%02d.%09dZ",
+            $time[5]+1900,
+            $time[4]+1,
+            $time[3],
+            $time[2],
+            $time[1],
+            $time[0],
+            ($time - int($time))*1_000_000_000,
+        );
+    };
+
+    my ($fpath_out, $fpath_meta);
+    my ($fh_out, $fh_meta);
+    {
+        require Fcntl;
+        my $counter = -1;
+        while (1) {
+            if ($counter++ >= 10_000) {
+                warn "Can't create file to save program output, skipped saving program output";
+                return;
+            }
+            my $fpath_out  = "$dir/" . ($counter ? "$fmttime.out.$counter"  : "$fmttime.out");
+            my $fpath_meta = "$dir/" . ($counter ? "$fmttime.meta.$counter" : "$fmttime.meta");
+            if ((-e $fpath_out) || (-e $fpath_meta)) {
+                next;
+            }
+            unless (sysopen $fh_out , $fpath_out , Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL()) {
+                warn "Can't create file '$fpath_out' to save program output: $!, skipped saving program output";
+                return;
+            }
+            unless (sysopen $fh_meta, $fpath_meta, Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL()) {
+                warn "Can't create file '$fpath_meta' to save program output meta information: $!, skipped saving program output";
+                unlink $fpath_out;
+                return;
+            }
+            last;
+        }
+    }
+
+    require JSON::MaybeXS;
+    state $json = JSON::MaybeXS->new->allow_nonref;
+
+    my $out = $self->cleanser->clone_and_clean($r->{res});
+    my $meta = {
+        time        => $time,
+        pid         => $$,
+        argv        => $r->{orig_argv},
+        read_env    => $r->{read_env},
+        read_config => $r->{read_config},
+        read_config_files => $r->{read_config_files},
+    };
+    log_trace "Saving program output to %s ...", $fpath_out;
+    print $fh_out $json->encode($out);
+    log_trace "Saving program output's meta information to %s ...", $fpath_meta;
+    print $fh_meta $json->encode($meta);
+}
+
 sub display_result {
     require Data::Sah::Util::Type;
 
@@ -1522,6 +1599,11 @@ sub run {
     }
   FORMAT:
     my $is_success = $r->{res}[0] =~ /\A2/ || $r->{res}[0] == 304;
+
+    if (defined $ENV{PERINCI_CMDLINE_OUTPUT_DIR}) {
+        $self->save_output($r);
+    }
+
     if ($is_success &&
             ($self->skip_format ||
              $r->{meta}{'cmdline.skip_format'} ||
@@ -1577,7 +1659,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.80 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-11-01.
+This document describes version 1.810 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-12-11.
 
 =head1 DESCRIPTION
 
@@ -2504,13 +2586,38 @@ is active.
 When VIEWER is not set, then this environment variable will be used to select
 external viewer program.
 
-=head2 PERINCI_CMDLINE_PROGRAM_NAME => STR
+=head2 PERINCI_CMDLINE_OUTPUT_DIR => dirname
+
+(Experimental) If set, then aside from displaying output as usual, the
+unformatted result (enveloped result) will also be saved as JSON to an output
+directory. The filename will be I<UTC timestamp in ISO8601 format>C<.out>,
+e.g.:
+
+ 2017-12-11T123456.000000000Z.out
+ 2017-12-11T123456.000000000Z.out.1 (if the same filename already exists)
+
+or each output (C<.out>) file there will also be a corresponding C<.meta> file
+that contains information like: command-line arguments, PID, etc. Some notes:
+
+Output directory must already exist, or Perinci::CmdLine will display a warning
+and then skip saving output.
+
+Data that is not representable as JSON will be cleansed using
+L<Data::Clean::JSON>.
+
+Streaming output will not be saved appropriately, because streaming output
+contains coderef that will be called repeatedly during the normal displaying of
+result.
+
+=head2 PERINCI_CMDLINE_PROGRAM_NAME => str
 
 Can be used to set CLI program name.
 
 =head2 UTF8 => bool
 
 To set default for C<use_utf8> attribute.
+
+=
 
 =head1 HOMEPAGE
 

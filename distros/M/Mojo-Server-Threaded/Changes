@@ -6,3 +6,6 @@ Revision history for Mojo-Server-Threaded
         - Try to fix tests on cygwin
         - fix docs and dependencies in Makefile.PL
         - add LICENSE
+0.12    2017-12-08
+        - Fix fallback to hypnotoad config
+

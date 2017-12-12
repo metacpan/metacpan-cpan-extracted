@@ -1,22 +1,7 @@
 use strict;
-
-my $MODULE;
-
-BEGIN {
-	$MODULE = (-d "src") ? "Digest::SHA" : "Digest::SHA::PurePerl";
-	eval "require $MODULE" || die $@;
-	$MODULE->import(qw(sha256_hex));
-}
-
-BEGIN {
-	if ($ENV{PERL_CORE}) {
-		chdir 't' if -d 't';
-		@INC = '../lib';
-	}
-}
+use Digest::SHA::PurePerl qw(sha256_hex);
 
 my @vecs = map { eval } <DATA>;
-$#vecs -= 2 if $MODULE eq "Digest::SHA::PurePerl";
 
 my $numtests = scalar(@vecs) / 2;
 print "1..$numtests\n";
@@ -33,5 +18,3 @@ __DATA__
 "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
 "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
 "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
-"a" x 1000000
-"cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0"

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Time::RFC822;
 
@@ -92,16 +92,16 @@ gewandelt. Weitere abkürzende Schreibweisen siehe dort.
 
     $cok = $class->new($name=>$value,@keyVal);
 
+=head4 Returns
+
+Referenz auf das Cookie-Objekt.
+
 =head4 Description
 
 Instantiiere einen Cookie mit Name $name, Wert $value und den
 optionalen Attributen @keyVal.
 
 Siehe Abschnitt L</ATTRIBUTES> für mögliche Werte für @keyVal.
-
-=head4 Returns
-
-Referenz auf das Cookie-Objekt.
 
 =cut
 
@@ -136,14 +136,14 @@ sub new {
 
     $str = $cok->asString;
 
+=head4 Returns
+
+Zeichnketten-Repräsentation des Cookie.
+
 =head4 Description
 
 Generiere eine Zeichenketten-Repräsentation des Cookie, die als
 Wert für einen Set-Cookie Header eingesetzt werden kann.
-
-=head4 Returns
-
-Zeichnketten-Repräsentation des Cookie.
 
 =cut
 
@@ -187,7 +187,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 SEE ALSO
 

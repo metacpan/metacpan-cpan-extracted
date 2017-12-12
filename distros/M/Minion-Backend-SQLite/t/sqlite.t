@@ -4,16 +4,22 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
+use Config;
 use Minion;
 use Mojo::IOLoop;
 use Sys::Hostname 'hostname';
 use Time::HiRes qw(time usleep);
 
+use constant HAS_PSEUDOFORK => $Config{d_pseudofork};
+
 my $minion = Minion->new('SQLite');
 
+my $worker;
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 # Nothing to repair
-my $worker = $minion->repair->worker;
+$worker = $minion->repair->worker;
 isa_ok $worker->minion->app, 'Mojolicious', 'has default application';
+} # end SKIP
 
 # Migrate up and down
 is $minion->backend->sqlite->migrations->active, 8, 'active version is 8';
@@ -22,25 +28,30 @@ is $minion->backend->sqlite->migrations->migrate(0)->active, 0,
 is $minion->backend->sqlite->migrations->migrate->active, 8,
   'active version is 8';
 
+my ($id, $host);
+SKIP: { skip 'Minion workers do not support fork emulation', 7 if HAS_PSEUDOFORK;
 # Register and unregister
 $worker->register;
 like $worker->info->{started}, qr/^[\d.]+$/, 'has timestamp';
 my $notified = $worker->info->{notified};
 like $notified, qr/^[\d.]+$/, 'has timestamp';
-my $id = $worker->id;
+$id = $worker->id;
 is $worker->register->id, $id, 'same id';
 is $worker->unregister->info, undef, 'no information';
-my $host = hostname;
+$host = hostname;
 is $worker->register->info->{host}, $host, 'right host';
 is $worker->info->{pid}, $$, 'right pid';
 is $worker->unregister->info, undef, 'no information';
+} # end SKIP
 
+my ($worker2, $job);
+SKIP: { skip 'Minion workers do not support fork emulation', 9 if HAS_PSEUDOFORK;
 # Repair missing worker
 $minion->add_task(test => sub { });
-my $worker2 = $minion->worker->register;
+$worker2 = $minion->worker->register;
 isnt $worker2->id, $worker->id, 'new id';
 $id = $minion->enqueue('test');
-my $job = $worker2->dequeue(0);
+$job = $worker2->dequeue(0);
 is $job->id, $id, 'right id';
 is $worker2->info->{jobs}[0], $job->id, 'right id';
 $id = $worker2->id;
@@ -59,7 +70,9 @@ ok !$minion->backend->list_workers(0, 1, {ids => [$id]})->{workers}[0],
 like $job->info->{finished}, qr/^[\d.]+$/,       'has finished timestamp';
 is $job->info->{state},      'failed',           'job is no longer active';
 is $job->info->{result},     'Worker went away', 'right result';
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
 # Repair abandoned job
 $worker->register;
 $id  = $minion->enqueue('test');
@@ -69,14 +82,17 @@ $worker->unregister;
 $minion->repair;
 is $job->info->{state},  'failed',           'job is no longer active';
 is $job->info->{result}, 'Worker went away', 'right result';
+} # end SKIP
 
+my ($id2, $id3, $finished);
+SKIP: { skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
 # Repair old jobs
 $worker->register;
 $id = $minion->enqueue('test');
-my $id2 = $minion->enqueue('test');
-my $id3 = $minion->enqueue('test');
+$id2 = $minion->enqueue('test');
+$id3 = $minion->enqueue('test');
 $worker->dequeue(0)->perform for 1 .. 3;
-my $finished = $minion->backend->sqlite->db->query(
+$finished = $minion->backend->sqlite->db->query(
   q{select strftime('%s',finished) as finished
     from minion_jobs
     where id = ?}, $id2
@@ -97,13 +113,16 @@ $minion->repair;
 ok $minion->job($id), 'job has not been cleaned up';
 ok !$minion->job($id2), 'job has been cleaned up';
 ok !$minion->job($id3), 'job has been cleaned up';
+} # end SKIP
 
+my ($results, $batch);
+SKIP: { skip 'Minion workers do not support fork emulation', 15 if HAS_PSEUDOFORK;
 # List workers
 $worker = $minion->worker->register;
 $worker2 = $minion->worker->status({whatever => 'works!'})->register;
-my $results = $minion->backend->list_workers(0, 10);
+$results = $minion->backend->list_workers(0, 10);
 is $results->{total}, 2, 'two workers total';
-my $batch = $results->{workers};
+$batch = $results->{workers};
 ok $batch->[0]{id},        'has id';
 is $batch->[0]{host},      $host, 'right host';
 is $batch->[0]{pid},       $$, 'right pid';
@@ -125,6 +144,7 @@ is $batch->[0]{id}, $worker->id, 'right id';
 ok !$batch->[1], 'no more results';
 $worker->unregister;
 $worker2->unregister;
+} # end SKIP
 
 # Exclusive lock
 ok $minion->lock('foo', 3600), 'locked';
@@ -156,6 +176,47 @@ ok !$minion->unlock('bar'), 'not unlocked again';
 ok $minion->unlock('baz'), 'unlocked';
 ok !$minion->unlock('baz'), 'not unlocked again';
 
+# List locks
+$results = $minion->backend->list_locks(0, 2);
+is $results->{locks}[0]{name},      'yada',       'right name';
+like $results->{locks}[0]{expires}, qr/^[\d.]+$/, 'expires';
+is $results->{locks}[1], undef, 'no more locks';
+is $results->{total}, 1, 'one result';
+$minion->unlock('yada');
+$minion->lock('yada', 3600, {limit => 2});
+$minion->lock('test', 3600, {limit => 1});
+$minion->lock('yada', 3600, {limit => 2});
+$results = $minion->backend->list_locks(1, 1);
+is $results->{locks}[0]{name},      'test',       'right name';
+like $results->{locks}[0]{expires}, qr/^[\d.]+$/, 'expires';
+is $results->{locks}[1], undef, 'no more locks';
+is $results->{total}, 3, 'three results';
+$results = $minion->backend->list_locks(0, 10, {name => 'yada'});
+is $results->{locks}[0]{name},      'yada',       'right name';
+like $results->{locks}[0]{expires}, qr/^[\d.]+$/, 'expires';
+is $results->{locks}[1]{name},      'yada',       'right name';
+like $results->{locks}[1]{expires}, qr/^[\d.]+$/, 'expires';
+is $results->{locks}[2], undef, 'no more locks';
+is $results->{total}, 2, 'two results';
+$minion->backend->sqlite->db->query(
+  q{update minion_locks set expires = datetime('now', '-1 second')
+    where name = 'yada'},
+);
+is $minion->backend->list_locks(0, 10, {name => 'yada'})->{total}, 0,
+  'no results';
+$minion->unlock('test');
+is $minion->backend->list_locks(0, 10)->{total}, 0, 'no results';
+
+# Lock with guard
+ok my $guard = $minion->guard('foo', 3600, {limit => 1}), 'locked';
+ok !$minion->guard('foo', 3600, {limit => 1}), 'not locked again';
+undef $guard;
+ok $guard = $minion->guard('foo', 3600), 'locked';
+ok !$minion->guard('foo', 3600), 'not locked again';
+undef $guard;
+ok $minion->guard('foo', 3600, {limit => 1}), 'locked again';
+ok $minion->guard('foo', 3600, {limit => 1}), 'locked again';
+
 # Reset
 $minion->reset->repair;
 ok !$minion->backend->sqlite->db->query(
@@ -165,13 +226,16 @@ ok !$minion->backend->sqlite->db->query(
 ok !$minion->backend->sqlite->db->query(
   'select count(id) as count from minion_workers')->hash->{count}, 'no workers';
 
+SKIP: { skip 'Minion workers do not support fork emulation', 2 if HAS_PSEUDOFORK;
 # Wait for job
 my $before = time;
 $worker = $minion->worker->register;
 is $worker->dequeue(0.5), undef, 'no jobs yet';
 ok !!(($before + 0.4) <= time), 'waited for jobs';
 $worker->unregister;
+} # end SKIP
 
+my $job2;
 # Stats
 $minion->add_task(
   add => sub {
@@ -190,20 +254,25 @@ is $stats->{finished_jobs},    0, 'no finished jobs';
 is $stats->{inactive_jobs},    0, 'no inactive jobs';
 is $stats->{delayed_jobs},     0, 'no delayed jobs';
 is $stats->{uptime}, undef, 'uptime is undefined';
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 $worker = $minion->worker->register;
 is $minion->stats->{inactive_workers}, 1, 'one inactive worker';
+} # end SKIP
 $minion->enqueue('fail');
 is $minion->stats->{enqueued_jobs}, 1, 'one enqueued job';
 $minion->enqueue('fail');
 is $minion->stats->{enqueued_jobs}, 2, 'two enqueued jobs';
 is $minion->stats->{inactive_jobs}, 2, 'two inactive jobs';
+SKIP: { skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
 $job   = $worker->dequeue(0);
 $stats = $minion->stats;
 is $stats->{active_workers}, 1, 'one active worker';
 is $stats->{active_jobs},    1, 'one active job';
 is $stats->{inactive_jobs},  1, 'one inactive job';
+} # end SKIP
 $minion->enqueue('fail');
-my $job2 = $worker->dequeue(0);
+SKIP: { skip 'Minion workers do not support fork emulation', 18 if HAS_PSEUDOFORK;
+$job2 = $worker->dequeue(0);
 $stats = $minion->stats;
 is $stats->{active_workers}, 1, 'one active worker';
 is $stats->{active_jobs},    2, 'two active jobs';
@@ -226,6 +295,7 @@ is $stats->{failed_jobs},      0, 'no failed jobs';
 is $stats->{finished_jobs},    3, 'three finished jobs';
 is $stats->{inactive_jobs},    0, 'no inactive jobs';
 is $stats->{delayed_jobs},     0, 'no delayed jobs';
+} # end SKIP
 
 # List jobs
 $id      = $minion->enqueue('add');
@@ -240,28 +310,40 @@ like $batch->[0]{created}, qr/^[\d.]+$/, 'has created timestamp';
 is $batch->[1]{task},      'fail', 'right task';
 is_deeply $batch->[1]{args}, [], 'right arguments';
 is_deeply $batch->[1]{notes}, {}, 'right metadata';
+SKIP: { skip 'Minion workers do not support fork emulation', 2 if HAS_PSEUDOFORK;
 is_deeply $batch->[1]{result}, ['works'], 'right result';
 is $batch->[1]{state},    'finished', 'right state';
+} # end SKIP
 is $batch->[1]{priority}, 0,          'right priority';
 is_deeply $batch->[1]{parents},  [], 'right parents';
 is_deeply $batch->[1]{children}, [], 'right children';
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 is $batch->[1]{retries},    1,            'job has been retried';
+} # end SKIP
 like $batch->[1]{created},  qr/^[\d.]+$/, 'has created timestamp';
 like $batch->[1]{delayed},  qr/^[\d.]+$/, 'has delayed timestamp';
+SKIP: { skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
 like $batch->[1]{finished}, qr/^[\d.]+$/, 'has finished timestamp';
 like $batch->[1]{retried},  qr/^[\d.]+$/, 'has retried timestamp';
 like $batch->[1]{started},  qr/^[\d.]+$/, 'has started timestamp';
+} # end SKIP
 is $batch->[2]{task},       'fail',       'right task';
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 is $batch->[2]{state},      'finished',   'right state';
+} # end SKIP
 is $batch->[2]{retries},    0,            'job has not been retried';
 is $batch->[3]{task},       'fail',       'right task';
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 is $batch->[3]{state},      'finished',   'right state';
+} # end SKIP
 is $batch->[3]{retries},    0,            'job has not been retried';
 ok !$batch->[4], 'no more results';
 $batch = $minion->backend->list_jobs(0, 10, {state => 'inactive'})->{jobs};
 is $batch->[0]{state},   'inactive', 'right state';
 is $batch->[0]{retries}, 0,          'job has not been retried';
+SKIP: { skip 'Minion workers do not support fork emulation', 1 if HAS_PSEUDOFORK;
 ok !$batch->[1], 'no more results';
+} # end SKIP
 $batch = $minion->backend->list_jobs(0, 10, {task => 'add'})->{jobs};
 is $batch->[0]{task},    'add', 'right task';
 is $batch->[0]{retries}, 0,     'job has not been retried';
@@ -282,8 +364,10 @@ is $batch->[0]{state},   'inactive', 'right state';
 is $batch->[0]{retries}, 0,          'job has not been retried';
 ok !$batch->[1], 'no more results';
 $batch = $minion->backend->list_jobs(1, 1)->{jobs};
+SKIP: { skip 'Minion workers do not support fork emulation', 2 if HAS_PSEUDOFORK;
 is $batch->[0]{state},   'finished', 'right state';
 is $batch->[0]{retries}, 1,          'job has been retried';
+} # end SKIP
 ok !$batch->[1], 'no more results';
 ok $minion->job($id)->remove, 'job removed';
 
@@ -295,6 +379,7 @@ my $info = $minion->job($id)->info;
 is_deeply $info->{args}, [2, 2], 'right arguments';
 is $info->{priority}, 0,          'right priority';
 is $info->{state},    'inactive', 'right state';
+SKIP: { skip 'Minion workers do not support fork emulation', 19 if HAS_PSEUDOFORK;
 $worker = $minion->worker;
 is $worker->dequeue(0), undef, 'not registered';
 ok !$minion->job($id)->info->{started}, 'no started timestamp';
@@ -321,7 +406,9 @@ is_deeply $job->args, [2, 2], 'right arguments';
 is $job->retries, 0, 'job has not been retried';
 is $job->info->{state}, 'finished', 'right state';
 is $job->task, 'add', 'right task';
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 29 if HAS_PSEUDOFORK;
 # Retry and remove
 $id = $minion->enqueue(add => [5, 6]);
 $job = $worker->register->dequeue(0);
@@ -363,7 +450,9 @@ $id = $minion->enqueue(add => [5, 5]);
 $job = $minion->job("$id");
 ok $job->remove, 'job has been removed';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 17 if HAS_PSEUDOFORK;
 # Jobs with priority
 $minion->enqueue(add => [1, 2]);
 $id = $minion->enqueue(add => [2, 4], {priority => 1});
@@ -390,10 +479,12 @@ is $job->info->{retries},  2, 'job has been retried twice';
 is $job->info->{priority}, 0, 'low priority';
 ok $job->finish, 'job finished';
 $worker->unregister;
+} # end SKIP
 
 # Delayed jobs
 $id = $minion->enqueue(add => [2, 1] => {delay => 100});
 is $minion->stats->{delayed_jobs}, 1, 'one delayed job';
+SKIP: { skip 'Minion workers do not support fork emulation', 15 if HAS_PSEUDOFORK;
 is $worker->register->dequeue(0), undef, 'too early for job';
 ok $minion->job($id)->info->{delayed} > time, 'delayed timestamp';
 $minion->backend->sqlite->db->query(
@@ -416,9 +507,11 @@ is $job->info->{retries}, 1, 'job has been retried once';
 ok $job->info->{delayed} > time, 'delayed timestamp';
 ok $minion->job($id)->remove, 'job has been removed';
 $worker->unregister;
+} # end SKIP
 
-# Events
 my $pid;
+SKIP: { skip 'Minion workers do not support fork emulation', 11 if HAS_PSEUDOFORK;
+# Events
 my $failed = 0;
 $finished = 0;
 $minion->once(
@@ -469,7 +562,9 @@ $job = $worker->dequeue(0);
 $job->perform;
 is_deeply $job->info->{result}, {added => 9}, 'right result';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 12 if HAS_PSEUDOFORK;
 # Queues
 $id = $minion->enqueue(add => [100, 1]);
 is $worker->register->dequeue(0 => {queues => ['test1']}), undef, 'wrong queue';
@@ -489,7 +584,9 @@ is $job->id, $id, 'right id';
 is $job->info->{queue}, 'test2', 'right queue';
 ok $job->finish, 'job finished';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 13 if HAS_PSEUDOFORK;
 # Failed jobs
 $id = $minion->enqueue(add => [5, 6]);
 $job = $worker->register->dequeue(0);
@@ -512,7 +609,9 @@ $job->perform;
 is $job->info->{state}, 'failed', 'right state';
 is $job->info->{result}, "Intentional failure!\n", 'right result';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 5 if HAS_PSEUDOFORK;
 # Nested data structures
 $minion->add_task(
   nested => sub {
@@ -541,13 +640,17 @@ my $notes = {
 is_deeply $job->info->{notes}, $notes, 'right metadata';
 is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 2 if HAS_PSEUDOFORK;
 # Perform job in a running event loop
 $id = $minion->enqueue(add => [8, 9]);
 Mojo::IOLoop->delay(sub { $minion->perform_jobs })->wait;
 is $minion->job($id)->info->{state}, 'finished', 'right state';
 is_deeply $minion->job($id)->info->{result}, {added => 17}, 'right result';
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
 # Non-zero exit status
 $minion->add_task(exit => sub { exit 1 });
 $id  = $minion->enqueue('exit');
@@ -557,6 +660,7 @@ $job->perform;
 is $job->info->{state}, 'failed', 'right state';
 is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
 $worker->unregister;
+} # end SKIP
 
 # Multiple attempts while processing
 is $minion->backoff->(0),  15,     'right result';
@@ -566,6 +670,7 @@ is $minion->backoff->(3),  96,     'right result';
 is $minion->backoff->(4),  271,    'right result';
 is $minion->backoff->(5),  640,    'right result';
 is $minion->backoff->(25), 390640, 'right result';
+SKIP: { skip 'Minion workers do not support fork emulation', 16 if HAS_PSEUDOFORK;
 $id = $minion->enqueue(exit => [] => {attempts => 2});
 $job = $worker->register->dequeue(0);
 is $job->id, $id, 'right id';
@@ -595,7 +700,9 @@ is $info->{attempts}, 3,        'job will be attempted three times';
 is $info->{state},    'failed', 'right state';
 is $info->{result}, 'Non-zero exit status (1)', 'right result';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 11 if HAS_PSEUDOFORK;
 # Multiple attempts during maintenance
 $id = $minion->enqueue(exit => [] => {attempts => 2});
 $job = $worker->register->dequeue(0);
@@ -617,7 +724,9 @@ $worker->unregister;
 $minion->repair;
 is $job->info->{state},  'failed',           'right state';
 is $job->info->{result}, 'Worker went away', 'right result';
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 12 if HAS_PSEUDOFORK;
 # A job needs to be dequeued again after a retry
 $minion->add_task(restart => sub { });
 $id  = $minion->enqueue('restart');
@@ -636,7 +745,9 @@ ok $job2->finish, 'job finished';
 ok !$job->retry, 'job not retried';
 is $job->info->{state}, 'finished', 'right state';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 8 if HAS_PSEUDOFORK;
 # Perform jobs concurrently
 $id  = $minion->enqueue(add => [10, 11]);
 $id2 = $minion->enqueue(add => [12, 13]);
@@ -667,7 +778,9 @@ is $minion->job($id4)->info->{state},  'failed',   'right state';
 is $minion->job($id4)->info->{result}, 'Non-zero exit status (1)',
   'right result';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 4 if HAS_PSEUDOFORK;
 # Stopping jobs
 $minion->add_task(long_running => sub { sleep 1000 });
 $worker = $minion->worker->register;
@@ -680,7 +793,9 @@ usleep 5000 until $job->is_finished;
 is $job->info->{state}, 'failed', 'right state';
 like $job->info->{result}, qr/Non-zero exit status/, 'right result';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 25 if HAS_PSEUDOFORK;
 # Job dependencies
 $worker = $minion->remove_after(0)->worker->register;
 is $minion->repair->stats->{finished_jobs}, 0, 'no finished jobs';
@@ -718,7 +833,9 @@ $job = $worker->dequeue(0);
 is $job->id, $id, 'right id';
 ok $job->finish, 'job finished';
 $worker->unregister;
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 25 if HAS_PSEUDOFORK;
 # Foreground
 $id  = $minion->enqueue(test => [] => {attempts => 2});
 $id2 = $minion->enqueue('test');
@@ -756,7 +873,9 @@ is $info->{retries}, 1,                        'job has been retried';
 is $info->{state},   'failed',                 'right state';
 is $info->{queue},   'minion_foreground',      'right queue';
 is $info->{result},  "Intentional failure!\n", 'right result';
+} # end SKIP
 
+SKIP: { skip 'Minion workers do not support fork emulation', 9 if HAS_PSEUDOFORK;
 # Worker remote control commands
 $worker  = $minion->worker->register->process_commands;
 $worker2 = $minion->worker->register;
@@ -785,6 +904,7 @@ is_deeply \@commands,
   'right structure';
 $_->unregister for $worker, $worker2;
 ok !$minion->backend->broadcast('test_id', []), 'command not sent';
+} # end SKIP
 
 $minion->reset;
 

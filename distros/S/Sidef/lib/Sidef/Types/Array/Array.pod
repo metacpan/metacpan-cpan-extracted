@@ -329,11 +329,13 @@ Aliases: I<count_by>
 
 =cut
 
-=head2 cross_operator
+=head2 cross_op
 
-Array.cross_operator() -> I<Obj>
+Array.cross_op() -> I<Obj>
 
 Return the
+
+Aliases: I<cross_operator>
 
 =cut
 
@@ -412,6 +414,24 @@ Array.derangements() -> I<Obj>
 Return the
 
 Aliases: I<complete_permutations>
+
+=cut
+
+=head2 det
+
+Array.det() -> I<Obj>
+
+Return the
+
+Aliases: I<determinant>
+
+=cut
+
+=head2 det_bareiss
+
+Array.det_bareiss() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -677,6 +697,16 @@ Return the
 
 =cut
 
+=head2 inv
+
+Array.inv() -> I<Obj>
+
+Return the
+
+Aliases: I<invert>, I<inverse>
+
+=cut
+
 =head2 is_empty
 
 Array.is_empty() -> I<Obj>
@@ -811,6 +841,16 @@ Aliases: I<leven>, I<levenshtein>
 
 =cut
 
+=head2 madd
+
+Array.madd() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_add>
+
+=cut
+
 =head2 make
 
 Array.make() -> I<Obj>
@@ -835,11 +875,13 @@ Return the
 
 =cut
 
-=head2 map_operator
+=head2 map_op
 
-Array.map_operator() -> I<Obj>
+Array.map_op() -> I<Obj>
 
 Return the
+
+Aliases: I<map_operator>
 
 =cut
 
@@ -891,6 +933,36 @@ Return the
 
 =cut
 
+=head2 mmul
+
+Array.mmul() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_mul>
+
+=cut
+
+=head2 msolve
+
+Array.msolve() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_solve>
+
+=cut
+
+=head2 msub
+
+Array.msub() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_sub>
+
+=cut
+
 =head2 new
 
 Array.new() -> I<Obj>
@@ -927,11 +999,13 @@ Return the
 
 =cut
 
-=head2 pam_operator
+=head2 pam_op
 
-Array.pam_operator() -> I<Obj>
+Array.pam_op() -> I<Obj>
 
 Return the
+
+Aliases: I<pam_operator>
 
 =cut
 
@@ -1049,11 +1123,13 @@ Return the
 
 =cut
 
-=head2 reduce_operator
+=head2 reduce_op
 
-Array.reduce_operator() -> I<Obj>
+Array.reduce_op() -> I<Obj>
 
 Return the
+
+Aliases: I<reduce_operator>
 
 =cut
 
@@ -1082,6 +1158,46 @@ Aliases: I<rindex_by>, I<last_index>
 Array.rotate() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 rscalar_op
+
+Array.rscalar_op() -> I<Obj>
+
+Return the
+
+Aliases: I<rscalar_operator>
+
+=cut
+
+=head2 sadd
+
+Array.sadd() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_add>
+
+=cut
+
+=head2 scalar_op
+
+Array.scalar_op() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_operator>
+
+=cut
+
+=head2 sdiv
+
+Array.sdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_div>
 
 =cut
 
@@ -1127,6 +1243,16 @@ Return the
 
 =cut
 
+=head2 smul
+
+Array.smul() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_mul>
+
+=cut
+
 =head2 sort
 
 Array.sort() -> I<Obj>
@@ -1148,6 +1274,16 @@ Return the
 Array.splice() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ssub
+
+Array.ssub() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_sub>
 
 =cut
 
@@ -1279,11 +1415,13 @@ Aliases: I<unique_prefixes>
 
 =cut
 
-=head2 unroll_operator
+=head2 unroll_op
 
-Array.unroll_operator() -> I<Obj>
+Array.unroll_op() -> I<Obj>
 
 Return the
+
+Aliases: I<unroll_operator>
 
 =cut
 
@@ -1303,11 +1441,23 @@ Return the
 
 =cut
 
+=head2 wise_op
+
+Array.wise_op() -> I<Obj>
+
+Return the
+
+Aliases: I<wise_operator>
+
+=cut
+
 =head2 zip
 
 Array.zip() -> I<Obj>
 
 Return the
+
+Aliases: I<transpose>
 
 =cut
 
@@ -1319,11 +1469,13 @@ Return the
 
 =cut
 
-=head2 zip_operator
+=head2 zip_op
 
-Array.zip_operator() -> I<Obj>
+Array.zip_op() -> I<Obj>
 
 Return the
+
+Aliases: I<zip_operator>
 
 =cut
 

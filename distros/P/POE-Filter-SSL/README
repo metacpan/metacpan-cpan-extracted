@@ -2,7 +2,7 @@ NAME
     POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 VERSION
-    Version 0.37
+    Version 0.38
 
 DESCRIPTION
     This module allows one to secure connections of *POE::Wheel::ReadWrite*

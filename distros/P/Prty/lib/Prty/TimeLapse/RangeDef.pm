@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::OrderedHash;
 use Prty::Path;
@@ -189,13 +189,6 @@ C<junk> ist eine Teilmenge von C<unused>
 
     $trd = $class->new($dir);
 
-=head4 Description
-
-Instantiiere ein Range-Definitions-Objekt aus den range.def-Dateien in
-der Verzeichnisstruktur $dir und liefere eine Referenz auf dieses
-Objekt zurück. Existiert keine range.def Datei, wird I<kein> Objekt
-instantiiert und C<undef> geliefert.
-
 =head4 Arguments
 
 =over 4
@@ -209,6 +202,13 @@ Pfad zu Verzeichnisstruktur
 =head4 Returns
 
 Referenz auf das Range-Definitions-Objekt oder C<undef>
+
+=head4 Description
+
+Instantiiere ein Range-Definitions-Objekt aus den range.def-Dateien in
+der Verzeichnisstruktur $dir und liefere eine Referenz auf dieses
+Objekt zurück. Existiert keine range.def Datei, wird I<kein> Objekt
+instantiiert und C<undef> geliefert.
 
 =cut
 
@@ -360,14 +360,14 @@ sub new {
 
     @files|$fileA = $trd->files;
 
-=head4 Description
-
-Liefere die Liste der Range-Dateien in sortierter Reihenfolge.
-
 =head4 Returns
 
 Liste von Datei-Pfaden. Im Skalarkontext liefere eine
 Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste der Range-Dateien in sortierter Reihenfolge.
 
 =cut
 
@@ -387,15 +387,15 @@ sub files {
 
     @keys|$keyA = $trd->clipKeys;
 
-=head4 Description
-
-Liefere die Liste aller Clip-Bezeichner in der Reihenfolge ihrer
-Definition in der Range-Datei.
-
 =head4 Returns
 
 Liste von Clip-Bezeichnern. Im Skalarkontext liefere eine
 Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste aller Clip-Bezeichner in der Reihenfolge ihrer
+Definition in der Range-Datei.
 
 =cut
 
@@ -413,13 +413,13 @@ sub clipKeys {
 
     $h = $trd->clipProperties($key);
 
-=head4 Description
-
-Liefere eine Referenz auf den Hash mit den Properties des Clip $key.
-
 =head4 Returns
 
 Referenz auf Restricted-Hash
+
+=head4 Description
+
+Liefere eine Referenz auf den Hash mit den Properties des Clip $key.
 
 =cut
 
@@ -438,15 +438,15 @@ sub clipProperties {
 
     @keys|$keyA = $trd->rangeKeys;
 
-=head4 Description
-
-Liefere die Liste aller Range-Bezeichner in der Reihenfolge ihrer
-Definition in der Range-Datei.
-
 =head4 Returns
 
 Liste von Range-Bezeichnern. Im Skalarkontext liefere eine
 Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste aller Range-Bezeichner in der Reihenfolge ihrer
+Definition in der Range-Datei.
 
 =cut
 
@@ -464,14 +464,14 @@ sub rangeKeys {
 
     $n = $trd->rangeCount;
 
+=head4 Returns
+
+Integer >= 0
+
 =head4 Description
 
 Liefere die Anzahl der Range-Bezeichner. Diese Methode kann genutzt
 werden um festzustellen, ob Ranges definiert sind.
-
-=head4 Returns
-
-Integer >= 0
 
 =cut
 
@@ -489,15 +489,15 @@ sub rangeCount {
 
     $expr = $trd->expression($key);
 
+=head4 Returns
+
+Bildfolgen-Ausdruck (String)
+
 =head4 Description
 
 Liefere den Bildfolgen-Ausdruck des Clip- oder Range-Bezeichners
 $key. Geklammerte Teile sind nicht enthalten (siehe Abschnitt
 L</Syntax>).
-
-=head4 Returns
-
-Bildfolgen-Ausdruck (String)
 
 =cut
 
@@ -524,7 +524,7 @@ sub expression {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

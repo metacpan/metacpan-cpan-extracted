@@ -1,0 +1,64 @@
+{
+   "abstract" : "Retrieve stock quotes using the IEX API",
+   "author" : [
+      "Jeffrey T. Palmer <jtpalmer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Finance-Quote-IEX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Finance::Quote" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtpalmer/Finance-Quote-IEX/issues"
+      },
+      "homepage" : "https://github.com/jtpalmer/Finance-Quote-IEX",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jtpalmer/Finance-Quote-IEX.git",
+         "web" : "https://github.com/jtpalmer/Finance-Quote-IEX"
+      }
+   },
+   "version" : "0.001000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

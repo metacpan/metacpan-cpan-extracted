@@ -1,5 +1,5 @@
 package GitLab::API::v3::Constants;
-$GitLab::API::v3::Constants::VERSION = '1.00';
+$GitLab::API::v3::Constants::VERSION = '1.02';
 =head1 NAME
 
 GitLab::API::v3::Constants - GitLab API v3 constants.

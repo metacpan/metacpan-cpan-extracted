@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/fayland/perl-net-github/issues
   homepage: https://github.com/fayland/perl-net-github
   repository: https://github.com/fayland/perl-net-github.git
-version: '0.90'
+version: '0.91'
 x_contributors:
   - 'Alan Berndt <alan@eatabrick.org>'
   - 'Alex Muntada <alexm@alexm.org>'

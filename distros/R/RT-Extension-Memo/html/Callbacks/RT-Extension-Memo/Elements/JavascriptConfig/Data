@@ -1,6 +1,7 @@
 <%INIT>
 $Config->{MemoRichText} = RT->Config->Get('MemoRichText', $session{CurrentUser}) || 0;
 $Config->{MemoHeight} = RT->Config->Get('MemoHeight', $session{CurrentUser}) || 15;
+$Config->{MemoRichTextHeight} = RT->Config->Get('MemoRichTextHeight', $session{CurrentUser}) || 340;
 
 $Catalog->{MemoAdd} = loc("Add a memo");
 $Catalog->{MemoEdit} = loc("Edit");

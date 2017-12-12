@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.012'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: CPAN-Reporter-Smoker-OpenBSD
 provides:
   CPAN::Reporter::Smoker::OpenBSD:
     file: lib/CPAN/Reporter/Smoker/OpenBSD.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   CPAN: '0'
   CPAN::Mini: '1.111016'
@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/glasswalk3r/cpan-openbsd-smoker/issues
   homepage: https://github.com/glasswalk3r/cpan-openbsd-smoker
   repository: https://github.com/glasswalk3r/cpan-openbsd-smoker.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'YAML::Tiny version 1.69'

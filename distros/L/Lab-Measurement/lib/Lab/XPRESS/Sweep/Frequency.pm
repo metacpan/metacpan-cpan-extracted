@@ -1,6 +1,7 @@
 package Lab::XPRESS::Sweep::Frequency;
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.613';
 #ABSTRACT: Frequency sweep
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.600';
+
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -19,9 +20,11 @@ sub new {
         rate                => [1],
         mode                => 'step',
         allowed_instruments => [
-            'Lab::Instrument::SignalRecovery726x', 'Lab::Instrument::SR830',
-            'Lab::Instrument::HP83732A',           'Lab::Instrument::MG369xB',
-            'Lab::Instrument::RSSMB100A'
+            qw/
+                Lab::Instrument::SignalRecovery726x   Lab::Instrument::SR830
+                Lab::Instrument::HP83732A             Lab::Instrument::MG369xB
+                Lab::Instrument::RSSMB100A   Lab::Moose::Instrument::RS_SMB
+                /
         ],
         allowed_sweep_modes => [ 'list', 'step' ],
         number_of_points    => [undef]
@@ -96,7 +99,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -260,7 +263,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
   Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

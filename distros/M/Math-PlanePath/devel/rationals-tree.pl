@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,15 +24,149 @@ use POSIX ();
 use List::Util 'sum';
 use Math::PlanePath::Base::Digits
   'round_down_pow',
+  'bit_split_lowtohigh',
   'digit_split_lowtohigh',
   'digit_join_lowtohigh';
 use Math::PlanePath::RationalsTree;
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
 
 
+{
+  # permutations in N row
+
+  # HtoL  SB, Bird, HCS
+  #    SB <-> Bird A258746 flip alternates
+  #    SB->HCS  A003188 Gray          A006068 Ungray
+  #    Bird->HCS A154436 lamplighter  A154435 inv
+  #
+  # LtoH  CW, Drib, AYT
+  #    CW <-> Drib A258996 flip alternates
+  #    CW -> AYT  A153153       A153154 inv
+  #    Drib -> AYT A154438      A154437 inv
+  #
+  # Bird->CW = SB->Drib  absent
+
+  my %dir = (SB => 1, Bird => 1, HCS => 1,
+             CW => 2, Drib => 2, AYT => 2);
+
+  require Math::OEIS::Grep;
+  my $choices = Math::PlanePath::RationalsTree->parameter_info_hash
+    ->{'tree_type'}->{'choices'};
+  my %seen;
+  foreach my $from_type (@$choices) {
+    my $from_dir = $dir{$from_type} || next;
+    my $from_path = Math::PlanePath::RationalsTree->new (tree_type => $from_type);
+
+    foreach my $to_type (@$choices) {
+      next if $from_type eq $to_type;
+      my $to_dir = $dir{$to_type} || next;
+      next if $from_dir == $to_dir;
+
+      my $to_path = Math::PlanePath::RationalsTree->new (tree_type => $to_type);
+      {
+        my @values;
+        foreach my $from_n (2 .. 25) {
+          my ($x,$y) = $from_path->n_to_xy($from_n);
+          my $to_n = $to_path->xy_to_n($x,$y);
+          push @values, $to_n;
+        }
+        my $str = join(',',@values);
+        my $name = "$from_type->$to_type";
+        if ($seen{$str}) {
+          print "$from_type->$to_type  duplicate of $seen{$str}\n";
+          next;
+        }
+        $seen{$str} = $name;
+        print "$name\n";
+        Math::OEIS::Grep->search(array => \@values,
+                                 name => $name);
+      }
+
+      if (0) {
+        my $str = '';
+        foreach my $from_n (2 .. 25) {
+          my ($x,$y) = $from_path->n_to_xy($from_n);
+          my $to_n = $to_path->xy_to_n($x,$y);
+          $to_n ^= $from_n;
+          # $str .= "$to_n,";
+          $str .= sprintf '%d,', $to_n;
+        }
+        next if $seen{$str}++;
+        print "$from_type->$to_type XOR  http://oeis.org/search?q=$str\n";
+      }
+    }
+    print "\n";
+  }
+  exit 0;
+}
+{
+  # CW <-> Drib
+  # low to high, phase shift encoding of 0<->1 transitions
+
+  my $from  = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+  my $to  = Math::PlanePath::RationalsTree->new (tree_type => 'Bird');
+
+  # my $from  = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
+  # my $to  = Math::PlanePath::RationalsTree->new (tree_type => 'Drib');
+  foreach my $n (0b11100010000011111111110000111,
+                 # 0b10000000,
+                 # 0b11111111,
+                 # 0b1100110011,
+                ) {
+    my ($x, $y) = $from->n_to_xy($n) or die;
+    my $l = $to->xy_to_n($x,$y) // die;
+
+    my @bits = bit_split_lowtohigh($n);
+    my $phase = 0;
+    my $prev = 0;
+    foreach my $i (reverse 0 .. $#bits-1) {  # low to high
+      # if ($bits[$i] != $prev) { $phase ^= 1; }
+      $phase ^= $bits[$i] ^ $prev;
+      $prev = $bits[$i];
+      $bits[$i] = $phase;
+      $phase ^= 1;
+    }
+    my $f = digit_join_lowtohigh(\@bits,2);
+
+    printf "   %b = %d\n", $n, $n;
+    printf "-> %b = %d\n", $l, $l;
+    printf "-> %b = %d\n", $f, $f;
+    print "\n";
+  }
+  exit 0;
+}
+{
+  # perms
+  require Math::NumSeq::OEIS::File;
+  my $perm = Math::NumSeq::OEIS::File->new(anum=>'A092569');
+  foreach my $n (32 .. 63) {
+    my $l = $perm->ith($n) // last;
+    printf "%3d   %b\n", $n, $n;
+    printf "=     %b = %d\n", $l, $l;
+    print "\n";
+  }
+  exit 0;
+}
+{
+  # lamplighter A154435
+  require Math::NumSeq::OEIS::File;
+  my $lamp = Math::NumSeq::OEIS::File->new(anum=>'A154435');
+  {
+    my $n = 0b1000001000;
+    my $l = $lamp->ith($n);
+    printf "%d    %b = %d\n", $n, $l, $l;
+  }
+  foreach my $n (64 .. 127) {
+    my $l = $lamp->ith($n);
+    printf "%3d   %b\n", $n, $n;
+    printf "=     %b = %d\n", $l, $l;
+  }
+  exit 0;
+}
 {
   # X,Y list  cf pythag odd,even
   require Math::PlanePath::RationalsTree;
@@ -268,15 +402,7 @@ use Smart::Comments;
   }
   exit 0;
 }
-{
-  # lamplighter
-  require Math::NumSeq::OEIS::File;
-  my $lamp = Math::NumSeq::OEIS::File->new(anum=>'A154435');
-  my $n = 0b1000001000;
-  my $l = $lamp->ith($n);
-  printf "%d    %b = %d\n", $n, $l, $l;
-  exit 0;
-}
+
 
 {
   # parity search
@@ -785,44 +911,7 @@ use Smart::Comments;
 }
 
 
-{
-  # permutations in N row
-  my $choices = Math::PlanePath::RationalsTree->parameter_info_hash
-    ->{'tree_type'}->{'choices'};
-  my %seen;
-  foreach my $from_type (@$choices) {
-    my $from_path = Math::PlanePath::RationalsTree->new (tree_type => $from_type);
 
-    foreach my $to_type (@$choices) {
-      next if $from_type eq $to_type;
-      my $to_path = Math::PlanePath::RationalsTree->new (tree_type => $to_type);
-      {
-        my $str = '';
-        foreach my $from_n (2 .. 25) {
-          my ($x,$y) = $from_path->n_to_xy($from_n);
-          my $to_n = $to_path->xy_to_n($x,$y);
-          $str .= "$to_n,";
-        }
-        next if $seen{$str}++;
-        print "$from_type->$to_type  http://oeis.org/search?q=$str\n";
-      }
-      {
-        my $str = '';
-        foreach my $from_n (2 .. 25) {
-          my ($x,$y) = $from_path->n_to_xy($from_n);
-          my $to_n = $to_path->xy_to_n($x,$y);
-          $to_n ^= $from_n;
-          # $str .= "$to_n,";
-          $str .= sprintf '%d,', $to_n;
-        }
-        next if $seen{$str}++;
-        print "$from_type->$to_type XOR  http://oeis.org/search?q=$str\n";
-      }
-    }
-    print "\n";
-  }
-  exit 0;
-}
 
 
 

@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $Math::Prime::Util::ZetaBigFloat::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.69';
+  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.70';
 }
 
 BEGIN {
@@ -513,7 +513,7 @@ Math::Prime::Util::ZetaBigFloat - Perl Big Float versions of Riemann Zeta and R 
 
 =head1 VERSION
 
-Version 0.69
+Version 0.70
 
 
 =head1 SYNOPSIS
@@ -532,14 +532,15 @@ These functions are used if:
 
 =item The input is a BigInt, a BigFloat, or the bignum module has been loaded.
 
-=item The Math::MPFR module is not available.
+=item The L<Math::Prime::Util::GMP> module is not available or old.
 
 =back
 
 If you use these functions a lot, I B<highly> recommend you install
-L<Math::MPFR>, which the main L<Math::Prime::Util> functions will find.
+L<Math::Prime::Util::GMP>, which the main L<Math::Prime::Util> functions
+will find.
 These give B<much> better performance, and better accuracy.  You can also
-use L<Math::Pari> for the Riemann Zeta function.
+use L<Math::Pari> and L<Math::MPFR> for the Riemann Zeta function.
 
 
 =head1 FUNCTIONS
@@ -586,6 +587,8 @@ Performance is quite bad.
 =head1 SEE ALSO
 
 L<Math::Prime::Util>
+
+L<Math::Prime::Util::GMP>
 
 L<Math::MPFR>
 

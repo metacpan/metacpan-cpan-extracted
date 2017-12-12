@@ -1,7 +1,7 @@
 requires "Beam::Runner" => "0.014";
 requires "Beam::Wire" => "1.019";
 requires "Getopt::Long" => "2.36";
-requires "Minion" => "0";
+requires "Minion" => "8";
 requires "Module::Runtime" => "0";
 requires "Mojolicious" => "7";
 requires "perl" => "5.010";
@@ -11,7 +11,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
-  requires "Minion::Backend::SQLite" => "0";
+  requires "Minion::Backend::SQLite" => "3.001";
   requires "Mock::MonkeyPatch" => "0";
   requires "Mojo::SQLite" => "2.002";
   requires "Test::Fatal" => "0";

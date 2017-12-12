@@ -1,8 +1,7 @@
 package AnyEvent::ProcessPool;
 # ABSTRACT: Asynchronously runs code concurrently in a pool of perl processes
-$AnyEvent::ProcessPool::VERSION = '0.06';
-use strict;
-use warnings;
+$AnyEvent::ProcessPool::VERSION = '0.07';
+use common::sense;
 use Carp;
 use AnyEvent;
 use AnyEvent::ProcessPool::Process;
@@ -116,7 +115,7 @@ AnyEvent::ProcessPool - Asynchronously runs code concurrently in a pool of perl 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

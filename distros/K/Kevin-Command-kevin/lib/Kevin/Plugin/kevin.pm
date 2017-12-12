@@ -1,5 +1,5 @@
 package Kevin::Plugin::kevin;
-$Kevin::Plugin::kevin::VERSION = '0.4.0';
+$Kevin::Plugin::kevin::VERSION = '0.4.1';
 # ABSTRACT: DEPRECATED! Mojolicious plugin for alternative minion commands
 use Mojo::Base 'Mojolicious::Plugin::Kevin::Commands';
 
@@ -29,7 +29,7 @@ Kevin::Plugin::kevin - DEPRECATED! Mojolicious plugin for alternative minion com
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 DESCRIPTION
 

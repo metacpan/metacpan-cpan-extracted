@@ -13,7 +13,7 @@ use AnyEvent::Filesys::Notify::Event;
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 my $AEFN = 'AnyEvent::Filesys::Notify';
 
 has dirs         => ( is => 'ro', isa => 'ArrayRef[Str]', required => 1 );
@@ -23,6 +23,7 @@ has no_external  => ( is => 'ro', isa => 'Bool',          default  => 0 );
 has backend      => ( is => 'ro', isa => 'Str',           default  => '' );
 has filter       => ( is => 'rw', isa => 'RegexpRef|CodeRef' );
 has parse_events => ( is => 'rw', isa => 'Bool',          default  => 0 );
+has skip_subdirs => ( is => 'ro', isa => 'Bool',          default  => 0 );
 has _fs_monitor  => ( is => 'rw', );
 has _old_fs => ( is => 'rw', isa => 'HashRef' );
 has _watcher => ( is => 'rw', );
@@ -41,24 +42,26 @@ sub _process_events {
 
     # Some implementations provided enough information to parse the raw events,
     # other require rescanning the file system (ie, Mac::FSEvents).
-    # The original behaviour was for rescan for all implementations, so we
+    # The original behavior was to rescan in all implementations, so we
     # have added a flag to avoid breaking old code.
 
     my @events;
 
     if ( $self->parse_events and $self->can('_parse_events') ) {
-        @events = $self->_apply_filter( $self->_parse_events(@raw_events) );
+        @events =
+          $self->_parse_events( sub { $self->_apply_filter(@_) }, @raw_events );
     } else {
         my $new_fs = $self->_scan_fs( $self->dirs );
         @events =
           $self->_apply_filter( $self->_diff_fs( $self->_old_fs, $new_fs ) );
         $self->_old_fs($new_fs);
-    }
 
-    # Some backends need to add files (KQueue) or directories (Inotify2) to the
-    # watch list after they are created. Give them a chance to do that here.
-    $self->_process_events_for_backend(@events)
-      if $self->can('_process_events_for_backend');
+        # Some backends (when not using parse_events) need to add files
+        # (KQueue) or directories (Inotify2) to the watch list after they are
+        # created. Give them a chance to do that here.
+        $self->_post_process_events(@events)
+          if $self->can('_post_process_events');
+    }
 
     $self->cb->(@events) if @events;
 
@@ -91,6 +94,9 @@ sub _scan_fs {
     my $fs_stats = {};
 
     my $rule = Path::Iterator::Rule->new;
+    $rule->skip_subdirs(qr/./)
+        if (ref $self) =~ /^AnyEvent::Filesys::Notify/
+        && $self->skip_subdirs;
     my $next = $rule->iter(@paths);
     while ( my $file = $next->() ) {
         my $stat = $self->_stat($file)
@@ -157,7 +163,7 @@ sub _stat {
 
     # Return undefined if no stats can be retrieved, as it happens with broken
     # symlinks (at least under ext4).
-    return undef unless @stat;
+    return unless @stat;
 
     return {
         path   => $path,
@@ -242,7 +248,7 @@ AnyEvent::Filesys::Notify - An AnyEvent compatible module to monitor files/direc
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =head1 STATUS
 
@@ -355,6 +361,13 @@ cause slight changes in behavior. In particular, the Inotify2 backend will
 generate an additional 'modified' event when a file changes (once when opened
 for write, and once when modified).
 
+=item skip_subdirs
+
+    skip_subdirs => 1,
+
+Skips subdirectories and anything in them while building a list of files/dirs
+to watch. Optional.
+
 =back
 
 =head1 WATCHER IMPLEMENTATIONS
@@ -420,9 +433,11 @@ L<Linux::INotify2>, L<Moose>.
 
 Alternatives to this module L<Filesys::Notify::Simple>, L<File::ChangeNotify>.
 
-=head1 CONTRIBUTORS
+=head1 AUTHOR
 
-=for stopwords Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue Dave Hayes E<lt>dave@jetcafe.orgE<gt> Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
 
 =over 4
 
@@ -438,11 +453,15 @@ Dave Hayes E<lt>dave@jetcafe.orgE<gt>
 
 Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>
 
+=item *
+
+Ettore Di Giacinto (@mudler)
+
+=item *
+
+Martin Barth (@ufobat)
+
 =back
-
-=head1 AUTHOR
-
-Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 SOURCE
 
@@ -458,7 +477,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2017 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

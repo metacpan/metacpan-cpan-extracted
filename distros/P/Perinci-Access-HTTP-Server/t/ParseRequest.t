@@ -25,13 +25,13 @@ sub f1 { [200] }
 
 package main;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Plack::Builder;
 use Plack::Test;
-use Test::More;
 
 test_ParseRequest_middleware(
     name => "default",

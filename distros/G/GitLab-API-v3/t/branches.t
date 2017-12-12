@@ -24,14 +24,15 @@ my $api = GitLab::API::v3->new(
 my $ArrayRefOfHashRefs = ArrayRef[ HashRef ];
 
 my ($project) = (
-    first { $_->{namespace}->{owner_id} }
+    first { $_->{default_branch} }
+    grep { ($_->{namespace}->{kind} // '') eq 'user' }
     sort { $a->{name} cmp $b->{name} }
     grep { $_->{visibility_level} == $GITLAB_VISIBILITY_LEVEL_PRIVATE }
     @{ $api->owned_projects() }
 );
 
 plan skip_all =>
-    'Could not find a private project owned by the tokened user.'
+    'Could not find a private project owned by the tokened user which has a default branch set.'
     if !$project;
 
 my $project_id = $project->{id};

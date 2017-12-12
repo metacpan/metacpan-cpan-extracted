@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Dispatcher::Log4perl;
 use vars '$VERSION';
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 use base 'Log::Report::Dispatcher';
 
@@ -47,9 +47,6 @@ sub init($)
     $self->SUPER::init($args);
 
     my $name   = $self->name;
-    my $config = delete $args->{config}
-       or error __x"Log4perl back-end {name} requires a 'config' parameter"
-            , name => $name;
 
     $self->{LRDL_levels}  = { %default_reasonToLevel };
     if(my $to_level = delete $args->{to_level})
@@ -66,8 +63,9 @@ sub init($)
         }
     }
 
-    Log::Log4perl->init($config)
-        or return;
+    if(my $config = delete $args->{config}) {
+    	Log::Log4perl->init($config) or return;
+	}
 
     $self;
 }

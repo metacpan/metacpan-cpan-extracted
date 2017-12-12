@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Prty::Option;
@@ -131,11 +131,6 @@ Liste alle Entitäten vom Typ $type auf:
 
     $cop = $class->new($storage,@opt);
 
-=head4 Description
-
-Instantiiere ein ContentProcessor-Objekt und liefere eine Referenz
-auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -159,6 +154,11 @@ Umfang der Laufzeit-Meldungen.
 =head4 Returns
 
 ContentProcessor-Objekt
+
+=head4 Description
+
+Instantiiere ein ContentProcessor-Objekt und liefere eine Referenz
+auf dieses Objekt zurück.
 
 =cut
 
@@ -257,26 +257,6 @@ sub processSubSection {
     $cop->registerType($pluginClass,$extension,$entityType,$sectionType,@keyVal);
     $cop->registerType($pluginClass,$extension); # universelles Plugin
 
-=head4 Description
-
-Registriere Plugin-Klasse $pluginClass für Abschnitts-Objekte
-des Typs $sectionType und den Eigenschaften @keyVal.
-
-Entsprechende Dateien werden an der Extension $extension erkannt.
-Als Typ-Bezeichner für Entitäten dieses Typs vereinbaren wir
-$entityType.
-
-Die Plugin-Klasse wird automatisch geladen, falls sie noch nicht
-vorhanden ist (sie kann für Tests also auch "inline", d.h. im
-Quelltext des rufenden Code, definiert werden).
-
-Die Plugin-Definition wird intern auf einem Hash-Objekt
-gespeichert, das vom ContentProcessor mit den instantiierten
-Entitäten verbunden wird.
-
-Es kann auch ein I<Universelles Plugin> definiert werden (siehe
-Abschnitt L</"Universelles Plugin">).
-
 =head4 Arguments
 
 =over 4
@@ -308,6 +288,26 @@ den Dateityp kennzeichnen, z.B. Language=>'Perl'.
 
 nichts
 
+=head4 Description
+
+Registriere Plugin-Klasse $pluginClass für Abschnitts-Objekte
+des Typs $sectionType und den Eigenschaften @keyVal.
+
+Entsprechende Dateien werden an der Extension $extension erkannt.
+Als Typ-Bezeichner für Entitäten dieses Typs vereinbaren wir
+$entityType.
+
+Die Plugin-Klasse wird automatisch geladen, falls sie noch nicht
+vorhanden ist (sie kann für Tests also auch "inline", d.h. im
+Quelltext des rufenden Code, definiert werden).
+
+Die Plugin-Definition wird intern auf einem Hash-Objekt
+gespeichert, das vom ContentProcessor mit den instantiierten
+Entitäten verbunden wird.
+
+Es kann auch ein I<Universelles Plugin> definiert werden (siehe
+Abschnitt L</"Universelles Plugin">).
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -335,7 +335,22 @@ sub registerType {
 
 =head4 Synopsis
 
-    $cop = $cop->commit;
+    $cop = $cop->commit(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -incomplete => $bool (Default: 0)
+
+Lade fehlende Entitäten aus dem Storage nach anstatt sie zum Löschen
+anzubieten.
+
+=back
+
+=head4 Returns
+
+ContentProcessor-Objekt (für Method-Chaining)
 
 =head4 Description
 
@@ -344,16 +359,19 @@ Storage und übertrage etwaige Änderungen dorthin. Geänderte
 Entitäten werden in der in der Datenbank als geändert
 gekennzeichnet.
 
-=head4 Returns
-
-ContentProcessor-Objekt (für Method-Chaining)
-
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub commit {
     my $self = shift;
+    # @_: @opt
+
+    my $incomplete = 0;
+
+    Prty::Option->extract(\@_,
+        -incomplete=>\$incomplete,
+    );
 
     $self->msg(1,'%T ==commit==');
 
@@ -383,11 +401,20 @@ sub commit {
     }
     $self->needsUpdateDb->sync;
 
-    # Lösche überzählige Storage-Dateien (nach Rückfrage)
+    if ($incomplete) {
+       # Lade fehlende Storage-Dateien nach
 
-    $dt->cleanup(1,$self->getRef('t0'));
+       my @files = grep {-f} $dt->obsoletePaths;
+       if (@files) {
+           $self->push(entityA=>$self->parseFiles(@files));
+       }
+    }
+    else {
+        # Lösche fehlende Storage-Dateien (nach Rückfrage)
+        $dt->cleanup(1,$self->getRef('t0'));
+    }
     $dt->close;
-
+    
     return $self;
 }
     
@@ -399,23 +426,6 @@ sub commit {
 =head4 Synopsis
 
     $cop = $cop->fetch($dir,$layout,@opt);
-
-=head4 Description
-
-Übertrage alle Entitäts-Definitionen in Verzeichnis $dir (oder
-STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
-dabei ein konsistenter Stand hergestellt. Existiert Verzeichnis
-$dir nicht, wird es angelegt. Andernfalls wird eine Rückfrage
-gestellt, ob das Verzeichnis überschrieben werden soll (siehe
-auch Option --overwrite).
-
-Wird als Verzeichnis ein Bindestrich (-) angegeben, werden die
-Entitäts-Definitionen nach STDOUT geschrieben.
-
-Die Methode bezieht die zu schreibenden Dateien von der Methode
-L</fetchFiles>(), an die der Parameter $layout weiter gereicht
-wird. Die Methode kann in abgeleiteten Klassen überschrieben
-werden, um andere Strukturen zu generieren.
 
 =head4 Arguments
 
@@ -447,6 +457,23 @@ Stelle keine Rückfrage, wenn Verzeichnis $dir bereits existiert.
 =head4 Returns
 
 ContentProcessor-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Übertrage alle Entitäts-Definitionen in Verzeichnis $dir (oder
+STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
+dabei ein konsistenter Stand hergestellt. Existiert Verzeichnis
+$dir nicht, wird es angelegt. Andernfalls wird eine Rückfrage
+gestellt, ob das Verzeichnis überschrieben werden soll (siehe
+auch Option --overwrite).
+
+Wird als Verzeichnis ein Bindestrich (-) angegeben, werden die
+Entitäts-Definitionen nach STDOUT geschrieben.
+
+Die Methode bezieht die zu schreibenden Dateien von der Methode
+L</fetchFiles>(), an die der Parameter $layout weiter gereicht
+wird. Die Methode kann in abgeleiteten Klassen überschrieben
+werden, um andere Strukturen zu generieren.
 
 =cut
 
@@ -527,14 +554,14 @@ sub fetch {
 
     $cop = $cop->init;
 
+=head4 Returns
+
+ContentProcessor-Objekt (für Method-Chaining)
+
 =head4 Description
 
 Erzeuge den Storage, falls er nicht existiert. Existiert er bereits,
 hat der Aufruf keinen Effekt.
-
-=head4 Returns
-
-ContentProcessor-Objekt (für Method-Chaining)
 
 =cut
 
@@ -560,22 +587,132 @@ sub init {
 
 # -----------------------------------------------------------------------------
 
+=head3 parseFiles() - Parse Dateien zu Entitäten
+
+=head4 Synopsis
+
+    @entities | $entityA = $cop->parseFiles(@files);
+
+=head4 Arguments
+
+=over 4
+
+=item @files
+
+Liste der Dateien. '-' bedeutet STDIN.
+
+=back
+
+=head4 Returns
+
+Liste der Entitäten. Im Skalarkontext eine Referenz auf die Liste.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub parseFiles {
+    my ($self,@files) = @_;
+
+    # Instantiiere Parser
+
+    my $par = Prty::Section::Parser->new(
+        encoding=>'utf-8',
+    );
+
+    # Parse Dateien zu Entitäten
+
+    my (@entities,$fileEnt,$mainSec);
+    for my $file (@files) {
+        $par->parse($file,sub {
+            my $sec = Prty::Section::Object->new(@_);
+            # $sec->removeEofMarker;
+
+            my $brackets = $sec->brackets;
+            if ($brackets eq '[]') {
+                $fileEnt = $mainSec = $sec;
+            }
+            elsif ($brackets eq '()') {
+                $mainSec = $sec;
+            }
+
+            while (1) {
+                if ($sec->brackets eq '[]') {
+                    # Wandele Abschnitts-Objekt in Entität
+
+                    my $plg = $self->plugin($sec);
+                    if (!$plg) {
+                        # Fehler: Für jeden Haupt-Abschnitt muss ein
+                        # Plugin definiert worden sein
+
+                        $sec->error(
+                            q{COP-00001: Missing plugin for section},
+                            Section=>$sec->fullType,
+                        );
+                    }
+                    push @entities,$plg->class->create($sec,$self,$plg);
+                }
+                elsif (@entities) {
+                    # Verarbeite nächsten Sub-Abschnitt
+
+                    $self->processSubSection($fileEnt,$entities[-1],
+                        $mainSec,$sec);
+                    if ($sec->brackets eq '[]') {
+                        # Sub-Abschnitt als Entität verarbeiten
+                        # (Beispiel: ProgramClass => Class)
+                        redo;
+                    }
+                }
+                else {
+                    # Fehler: Erster Abschnitt ist kein []-Abschnitt
+
+                    $sec->error(
+                        q{COP-00002: First section must be a []-section},
+                         Section=>$sec->fullType,
+                    );
+                }
+                last;
+            }
+
+            # Datei-Entity um Abschnitts-Quelltext ergänzen
+            $fileEnt->appendFileSource($sec);
+
+            # Abschnittsobjekt gegen unabsichtliche Erweiterungen sperren
+            $sec->lockKeys;
+
+            return;
+        });
+
+        # "# eof" vom Dateiende entfernen
+
+        my $fileSourceR = $fileEnt->fileSourceRef;
+        $$fileSourceR =~ s/\n+# eof\s*$/\n\n/;
+
+        if (substr($$fileSourceR,-1,1) ne "\n") {
+            $fileEnt->error(
+                q{COP-00003: File entity must end with a newline},
+            );
+        }
+    }
+
+    # Statistische Daten speichern
+
+    $self->addNumber(parsedSections=>$par->get('parsedSections'));
+    $self->addNumber(parsedLines=>$par->get('parsedLines'));
+    $self->addNumber(parsedChars=>$par->get('parsedChars'));
+    $self->addNumber(parsedBytes=>$par->get('parsedBytes'));
+
+    return wantarray? @entities: \@entities;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 load() - Lade Entitäts-Definitionen
 
 =head4 Synopsis
 
     $cop = $cop->load;
     $cop = $cop->load(@paths);
-
-=head4 Description
-
-Lade die Entitäts-Dateien der Pfade @paths. Ist @path leer, also
-kein Path angegeben, werden die Entitäts-Dateien aus dem Storage
-geladen.
-
-Die Methode kann beliebig oft aufgerufen werden, aber nur der
-erste Aufruf lädt die Dateien. Alle weiteren Aufrufe sind
-Null-Operationen.
 
 =head4 Arguments
 
@@ -590,6 +727,16 @@ Liste der Verzeichnisse und Dateien. Pfad '-' bedeutet STDIN.
 =head4 Returns
 
 ContentProcessor-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Lade die Entitäts-Dateien der Pfade @paths. Ist @path leer, also
+kein Path angegeben, werden die Entitäts-Dateien aus dem Storage
+geladen.
+
+Die Methode kann beliebig oft aufgerufen werden, aber nur der
+erste Aufruf lädt die Dateien. Alle weiteren Aufrufe sind
+Null-Operationen.
 
 =cut
 
@@ -609,7 +756,8 @@ sub load {
         $self->msg(1,'%T ==find==');
 
         if (!@paths) {
-            # Per Default laden wir die Dateien aus dem Storage
+            # Wir laden die Dateien aus dem Storage,
+            # wenn kein Pfad angegeben ist
             push @paths,$self->storage('def');
         }
 
@@ -625,97 +773,9 @@ sub load {
             $self->msg(2,'Files: %N',$n);
         }
 
-        $self->msg(1,'%T ==parse==');
+        $self->msg(1,'%T ==load==');
 
-        # Instantiiere Parser
-
-        my $par = Prty::Section::Parser->new(
-            encoding=>'utf-8',
-        );
-
-        # Parse Dateien zu Entitäten
-
-        my (@entities,$fileEnt,$mainSec);
-        for my $file (@files) {
-            $par->parse($file,sub {
-                my $sec = Prty::Section::Object->new(@_);
-                # $sec->removeEofMarker;
-
-                my $brackets = $sec->brackets;
-                if ($brackets eq '[]') {
-                    $fileEnt = $mainSec = $sec;
-                }
-                elsif ($brackets eq '()') {
-                    $mainSec = $sec;
-                }
-    
-                while (1) {
-                    if ($sec->brackets eq '[]') {
-                        # Wandele Abschnitts-Objekt in Entität
-
-                        my $plg = $self->plugin($sec);
-                        if (!$plg) {
-                            # Fehler: Für jeden Haupt-Abschnitt muss ein
-                            # Plugin definiert worden sein
-
-                            $sec->error(
-                                q{COP-00001: Missing plugin for section},
-                                Section=>$sec->fullType,
-                            );
-                        }
-                        push @entities,$plg->class->create($sec,$self,$plg);
-                    }
-                    elsif (@entities) {
-                        # Verarbeite nächsten Sub-Abschnitt
-
-                        $self->processSubSection($fileEnt,$entities[-1],
-                            $mainSec,$sec);
-                        if ($sec->brackets eq '[]') {
-                            # Sub-Abschnitt als Entität verarbeiten
-                            # (Beispiel: ProgramClass => Class)
-                            redo;
-                        }
-                    }
-                    else {
-                        # Fehler: Erster Abschnitt ist kein []-Abschnitt
-
-                        $sec->error(
-                            q{COP-00002: First section must be a []-section},
-                             Section=>$sec->fullType,
-                        );
-                    }
-                    last;
-                }
-
-                # Datei-Entity um Abschnitts-Quelltext ergänzen
-                $fileEnt->appendFileSource($sec);
-    
-                # Abschnittsobjekt gegen unabsichtliche Erweiterungen sperren
-                $sec->lockKeys;
-
-                return;
-            });
-
-            # "# eof" vom Dateiende entfernen
-    
-            my $fileSourceR = $fileEnt->fileSourceRef;
-            $$fileSourceR =~ s/\n+# eof\s*$/\n\n/;
-    
-            if (substr($$fileSourceR,-1,1) ne "\n") {
-                $fileEnt->error(
-                    q{COP-00003: File entity must end with a newline},
-                );
-            }
-        }
-
-        # Statistische Daten sichern
-
-        $self->set(parsedSections=>$par->get('parsedSections'));
-        $self->set(parsedLines=>$par->get('parsedLines'));
-        $self->set(parsedChars=>$par->get('parsedChars'));
-        $self->set(parsedBytes=>$par->get('parsedBytes'));
-
-        return \@entities;
+        return scalar $self->parseFiles(@files);
     });
     
     return $self;
@@ -732,12 +792,6 @@ sub load {
     @entities | $entityA = $cop->entities;
     @entities | $entityA = $cop->entities($type);
 
-=head4 Description
-
-Liefere die Liste aller geladenen Entities oder aller
-geladenen Entities vom Typ $type. Bei der Abfrage der Entities
-eines Typs werden die Entities nach Name sortiert geliefert.
-
 =head4 Arguments
 
 =over 4
@@ -751,6 +805,12 @@ Abschnitts-Typ.
 =head4 Returns
 
 Liste von Entitäten. Im Skalarkontext eine Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste aller geladenen Entities oder aller
+geladenen Entities vom Typ $type. Bei der Abfrage der Entities
+eines Typs werden die Entities nach Name sortiert geliefert.
 
 =cut
 
@@ -809,6 +869,20 @@ sub entities {
     @files = $cop->fetchFiles;
     @files = $cop->fetchFiles($layout);
 
+=head4 Arguments
+
+=over 4
+
+=item $layout
+
+Bezeichner für eine bestimmte Abfolge und/oder Inhalt der Dateien.
+
+=back
+
+=head4 Returns
+
+Array mit zweielementigen Arrays
+
 =head4 Description
 
 Liefere die Liste der Dateien, die von der Methode L</fetch>()
@@ -831,20 +905,6 @@ anders zusammenzustellen (z.B. mehrere Entity-Definitionen in
 einer Datei zusammenzufassen). In abgeleiteten Klassen können
 verschiedene Layouts durch das Argument $layout
 unterschieden werden.
-
-=head4 Arguments
-
-=over 4
-
-=item $layout
-
-Bezeichner für eine bestimmte Abfolge und/oder Inhalt der Dateien.
-
-=back
-
-=head4 Returns
-
-Array mit zweielementigen Arrays
 
 =cut
 
@@ -871,14 +931,14 @@ sub fetchFiles {
 
     $str = $cop->info;
 
+=head4 Returns
+
+Zeichenkette
+
 =head4 Description
 
 Liefere eine Informationszeile mit statistischen Informationen, die
 am Ende der Verarbeitung ausgegeben werden kann.
-
-=head4 Returns
-
-Zeichenkette
 
 =cut
 
@@ -910,15 +970,15 @@ sub info {
 
     @types | $typeA = $cop->entityTypes;
 
-=head4 Description
-
-Liefere die Liste der Abschnitts-Typen (Bezeichner), die per
-registerType() registriert wurden.
-
 =head4 Returns
 
 Liste von Abschnitts-Typen. Im Skalarkontext eine Referenz auf die
 Liste.
+
+=head4 Description
+
+Liefere die Liste der Abschnitts-Typen (Bezeichner), die per
+registerType() registriert wurden.
 
 =cut
 
@@ -949,15 +1009,15 @@ sub entityTypes {
 
     $regex = $cop->extensionRegex;
 
+=head4 Returns
+
+Kompilierter Regex
+
 =head4 Description
 
 Liefere den regulären Ausdruck, der die Dateinamen matcht, die vom
 ContentProcessor verarbeitet werden. Der Regex wird genutzt, wenn
 ein I<Verzeichnis> nach Eingabe-Dateien durchsucht wird.
-
-=head4 Returns
-
-Kompilierter Regex
 
 =cut
 
@@ -1001,11 +1061,6 @@ sub extensionRegex {
 
     @files | $fileA = $cop->findFiles($dir);
 
-=head4 Description
-
-Durchsuche Verzeichnis $dir nach Entitäts-Dateien unter Verwendung
-des Regex, der von L</extensionRegex>() geliefert wird.
-
 =head4 Arguments
 
 =over 4
@@ -1020,6 +1075,11 @@ Das Verzeichnis, das nach Dateien durchsucht wird.
 
 Liste der Datei-Pfade (Strings). Im Skalarkontext eine Referenz
 auf die Liste.
+
+=head4 Description
+
+Durchsuche Verzeichnis $dir nach Entitäts-Dateien unter Verwendung
+des Regex, der von L</extensionRegex>() geliefert wird.
 
 =cut
 
@@ -1046,16 +1106,6 @@ sub findFiles {
     $cop->msg($text,@args);
     $cop->msg($level,$text,@args);
 
-=head4 Description
-
-Gib Information $text auf STDERR aus, wenn $level kleinergleich
-dem beim Konstruktor vorgebenen Verbosity-Level ist. Der Text kann
-printf-Platzhalter enthalten, die durch die Argumente @args
-ersetzt werden.
-
-Zusätzlich wird der Platzhalter %T durch die aktuelle Ausführungsdauer
-in Sekunden ersetzt.
-
 =head4 Arguments
 
 =over 4
@@ -1077,6 +1127,16 @@ Argumente, die für printf-Platzhalter in $text eingesetzt werden.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Gib Information $text auf STDERR aus, wenn $level kleinergleich
+dem beim Konstruktor vorgebenen Verbosity-Level ist. Der Text kann
+printf-Platzhalter enthalten, die durch die Argumente @args
+ersetzt werden.
+
+Zusätzlich wird der Platzhalter %T durch die aktuelle Ausführungsdauer
+in Sekunden ersetzt.
 
 =cut
 
@@ -1111,11 +1171,6 @@ sub msg {
 
     $plg = $cop->plugin($sec);
 
-=head4 Description
-
-Ermittele das Plugin zu Abschnitts-Objekt $sec. Existiert
-kein Plugin zu dem Abschnitts-Objekt, liefere C<undef>.
-
 =head4 Arguments
 
 =over 4
@@ -1129,6 +1184,11 @@ Abschnitts-Objekt
 =head4 Returns
 
 Plugin-Objekt
+
+=head4 Description
+
+Ermittele das Plugin zu Abschnitts-Objekt $sec. Existiert
+kein Plugin zu dem Abschnitts-Objekt, liefere C<undef>.
 
 =cut
 
@@ -1187,14 +1247,14 @@ sub plugin {
 
     $h = $cop->needsTestDb;
 
+=head4 Returns
+
+Hash-Referenz (persistenter Hash)
+
 =head4 Description
 
 Liefere eine Referenz auf den persistenten Hash, der den Status
 von Entitäten speichert.
-
-=head4 Returns
-
-Hash-Referenz (persistenter Hash)
 
 =cut
 
@@ -1219,14 +1279,14 @@ sub needsTestDb {
 
     $h = $cop->needsUpdateDb;
 
+=head4 Returns
+
+Hash-Referenz (persistenter Hash)
+
 =head4 Description
 
 Liefere eine Referenz auf den persistenten Hash, der den Status
 von Entitäten speichert.
-
-=head4 Returns
-
-Hash-Referenz (persistenter Hash)
 
 =cut
 
@@ -1252,11 +1312,6 @@ sub needsUpdateDb {
     $path = $cop->storage;
     $path = $cop->storage($subPath);
 
-=head4 Description
-
-Liefere den Pfad des Storage, ggf. ergänzt um den Sub-Pfad
-$subPath.
-
 =head4 Arguments
 
 =over 4
@@ -1270,6 +1325,11 @@ Ein Sub-Pfad innerhalb des Storage.
 =head4 Returns
 
 Pfad
+
+=head4 Description
+
+Liefere den Pfad des Storage, ggf. ergänzt um den Sub-Pfad
+$subPath.
 
 =cut
 
@@ -1291,7 +1351,7 @@ sub storage {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

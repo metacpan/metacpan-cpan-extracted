@@ -41,7 +41,7 @@ use vars '$VERSION', '@ISA';
 @ISA = ('Math::PlanePath');
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
-$VERSION = 124;
+$VERSION = 125;
 
 use Math::PlanePath::Base::Generic
   'is_infinite';

@@ -32,4 +32,4 @@ requires:
   Path::Class: '0'
   Socket: '0'
   Test::More: '0'
-version: '0.30'
+version: '0.31'

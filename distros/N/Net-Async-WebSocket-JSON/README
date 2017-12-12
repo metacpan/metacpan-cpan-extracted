@@ -1,0 +1,32 @@
+NAME
+
+    Net::Async::WebSocket::JSON - use JSON-encoded data over WebSockets
+    with IO::Async
+
+DESCRIPTION
+
+    This distribution provides subclasses of modules from
+    Net::Async::WebSocket that add convenient wrappers for encoding or
+    decoding JSON data in text frames over websockets.
+
+    To implement a server, use Net::Async::WebSocket::JSON::Server as if it
+    was Net::Async::WebSocket::Server.
+
+    To implement a client, use Net::Async::WebSocket::JSON::Client as if it
+    was Net::Async::WebSocket::Client.
+
+    In either cases, connected client instances will be instances of
+    Net::Async::WebSocket::JSON::Protocol, and have the new send_json
+    method and on_json event available.
+
+    This module itself does not provide any code, and exists only to
+    provide the module $VERSION and top-level documentation.
+
+SEE ALSO
+
+      * Protocol::WebSocket - WebSocket protocol
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

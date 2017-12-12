@@ -61,6 +61,9 @@ sub test_copy : Test(1) {
     Prty::Path->copy($src,$dest);
     my $destData = Prty::Path->read($dest);
     $self->is($srcData,$destData);
+
+    Prty::Path->delete($src);
+    Prty::Path->delete($dest);
 }
 
 # -----------------------------------------------------------------------------

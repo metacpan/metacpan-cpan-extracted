@@ -3,7 +3,7 @@ package Log::Any::Adapter::MojoLog;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;
 
 use Log::Any::Adapter::Util qw(make_method);
@@ -59,7 +59,7 @@ foreach my $method ( Log::Any->detection_methods ) {
     if ($mojo_method eq 'is_fatal') {
       # is_fatal has been removed since 6.0, it was always true
       $mojo_method = $true;
-    } elsif ($Mojolicious::VERSION >= 6.47) {
+    } elsif (eval { require Mojolicious; Mojolicious->VERSION('6.47'); 1 }) {
       # as of 6.47 the is_* methods have been removed in favor of
       # is_level($level)
       ($level = $mojo_method) =~ s/^is_//;
@@ -159,6 +159,10 @@ L<http://github.com/jberger/Log-Any-Adapter-MojoLog>
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
+=head1 CONTRIBUTORS
+
+Dan Book (Grinnz)
+
 =head1 NOTES
 
 This module was forked from L<Log::Any::Adapter::Mojo> which bears the copyright
@@ -174,7 +178,7 @@ I intend to work with the original author to see how much of these changes can b
 
 =head1 COPYRIGHT & LICENSE
 
-Log::Any::Adapter::MojoLog is Copyright (C) 2016 Joel Berger
+Log::Any::Adapter::MojoLog is Copyright (C) 2016 L</AUTHOR> and L</CONTRIBUTORS>.
 
 Log::Any::Adapter::MojoLog is provided "as is" and without any express or
 implied warranties, including, without limitation, the implied warranties

@@ -18,7 +18,7 @@ kevin mulholland, moodfarm@cpan.org
 use v5.10;
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 29;
 
 BEGIN { use_ok('WebColors'); }
 
@@ -91,4 +91,9 @@ ok( $hex eq 'bac8ff', "open colors variant 2") ;
 $hex = colorname_to_hex( 'oc-indigo2') ;
 ok( $hex eq 'bac8ff', "open colors variant 3") ;
 
+# test lighten and darken
+my $dark = darken( '303030') ;
+ok( $dark eq '101010', "darken is OK") ;
+my $lighten = lighten( '909090') ;
+ok( $lighten eq 'b0b0b0', "lighten is OK") ;
 

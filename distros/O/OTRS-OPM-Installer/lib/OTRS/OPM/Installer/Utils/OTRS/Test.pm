@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS::Test;
-$OTRS::OPM::Installer::Utils::OTRS::Test::VERSION = '0.02';
+$OTRS::OPM::Installer::Utils::OTRS::Test::VERSION = '0.03';
 # ABSTRACT: helper functions for Unittests
 
 use strict;
@@ -37,7 +37,7 @@ OTRS::OPM::Installer::Utils::OTRS::Test - helper functions for Unittests
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

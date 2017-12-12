@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,22 +26,22 @@ name: AnyEvent-Filesys-Notify
 provides:
   AnyEvent::Filesys::Notify:
     file: lib/AnyEvent/Filesys/Notify.pm
-    version: '1.21'
+    version: '1.23'
   AnyEvent::Filesys::Notify::Event:
     file: lib/AnyEvent/Filesys/Notify/Event.pm
-    version: '1.21'
+    version: '1.23'
   AnyEvent::Filesys::Notify::Role::FSEvents:
     file: lib/AnyEvent/Filesys/Notify/Role/FSEvents.pm
-    version: '1.21'
+    version: '1.23'
   AnyEvent::Filesys::Notify::Role::Fallback:
     file: lib/AnyEvent/Filesys/Notify/Role/Fallback.pm
-    version: '1.21'
+    version: '1.23'
   AnyEvent::Filesys::Notify::Role::Inotify2:
     file: lib/AnyEvent/Filesys/Notify/Role/Inotify2.pm
-    version: '1.21'
+    version: '1.23'
   AnyEvent::Filesys::Notify::Role::KQueue:
     file: lib/AnyEvent/Filesys/Notify/Role/KQueue.pm
-    version: '1.21'
+    version: '1.23'
 requires:
   AnyEvent: '7.05'
   Carp: '1.20'
@@ -58,9 +58,10 @@ resources:
   bugtracker: http://github.com/mvgrimes/AnyEvent-Filesys-Notify/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/mvgrimes/AnyEvent-Filesys-Notify
-version: '1.21'
+version: '1.23'
 x_contributors:
   - 'Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue'
   - 'Dave Hayes E<lt>dave@jetcafe.orgE<gt>'
   - 'Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Ettore Di Giacinto (@mudler)'
+  - 'Martin Barth (@ufobat)'

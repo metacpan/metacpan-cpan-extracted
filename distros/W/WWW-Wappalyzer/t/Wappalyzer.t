@@ -2,7 +2,7 @@
 
 use utf8;
 use FindBin qw($Bin);
-use Test::More tests => 12;
+use Test::More tests => 16;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
@@ -111,3 +111,21 @@ $html .= q{
     headers  => { Server => 'nginx' },
 );
 is_deeply \%detected, { parkings => [ '1reg.online' ], 'web-servers' => [ 'Nginx' ] }, 'detect parking with confidence, 100% found';
+
+eval { WWW::Wappalyzer::detect(
+    html => 1,
+    headers => 'bad',
+) };
+like $@, qr/Bad headers/;
+
+eval { WWW::Wappalyzer::detect(
+    html => 1,
+    headers => { key => { 1 => 2 } },
+) };
+ok !$@, 'header skip hashes';
+
+%detected = WWW::Wappalyzer::detect( headers => { 'seT-Cookie' => 'C' } );
+is_deeply \%detected, { parkings => [ 'header-value-test' ] }, 'header single value';
+
+%detected = WWW::Wappalyzer::detect( headers => { 'Set-Cookie' => [ 'a', 'b', 'c' ] } );
+is_deeply \%detected, { parkings => [ 'header-value-test' ] }, 'header multi value';

@@ -1,0 +1,72 @@
+=head1 NAME
+
+Doit::Log - logging with Doit
+
+=head1 SYNOPSIS
+
+    use Doit;
+    use Doit::Log;
+
+    info "information";
+    warning "warning";
+    error "this will die";
+
+    Doit::Log::set_label("hostname");
+    Doit::Log::set_label(undef);
+
+=head1 DESCRIPTION
+
+B<Doit::Log> is a package embedded in F<Doit.pm> and provides
+functionality for screen logging. All logging functions create colored
+output, if L<Term::ANSIColor> is available (but not on Windows).
+
+=head2 FUNCTIONS
+
+=head3 info
+
+    info $message;
+
+Write a green "INFO" with the given I<$message>. By default exported.
+
+=head3 warning
+
+    warning $message;
+
+Write a red "WARN" with the given I<$message>. By default exported.
+
+=head3 error
+
+    error $message;
+
+Write a red "ERROR" with the given I<$message> and throw an exception,
+similar to a L<die|perlfunc/die>. By default exported.
+
+=head3 set_label
+
+    Doit::Log::set_label("[additional label]");
+    Doit::Log::set_label(undef);
+
+Set or unset an additional label which is used while logging. The
+first example would cause log output to look like this:
+
+    INFO [additional label]: message
+
+The 2nd example would unset this change:
+
+    INFO: message
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>.
+
+=cut

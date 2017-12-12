@@ -1,166 +1,180 @@
 package Net::Async::Redis;
-# ABSTRACT: redis support for IO::Async
+# ABSTRACT: Redis support for IO::Async
 use strict;
 use warnings;
 
-use parent qw(IO::Async::Notifier);
+use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '0.003';
+our $VERSION = '1.002';
 
 =head1 NAME
 
-Net::Async::Redis - talk to Redis servers via IO::Async
-
-=head1 VERSION
-
-version 0.003
+Net::Async::Redis - talk to Redis servers via L<IO::Async>
 
 =head1 SYNOPSIS
 
+    use Net::Async::Redis;
+    use IO::Async::Loop;
+    my $loop = IO::Async::Loop->new;
+    $loop->add(my $redis = Net::Async::Redis->new);
+    $redis->connect->then(sub {
+        $redis->get('some_key')
+    })->then(sub {
+        my $value = shift;
+        return Future->done($value) if $value;
+        $redis->set(some_key => 'some_value')
+    })->on_done(sub {
+        print "Value: " . shift;
+    })->get;
+
 =head1 DESCRIPTION
 
-Redis functionality. Docs may arrive later.
-
-Supports the basics - auth/get/set/pub/sub/del/keys - but not much else. Expect APIs to change over time.
-
-Also note that L<Protocol::Redis> has a few issues to do with encoding (\r\n portability, quoting of
-values), our handling for SET leaves much to be desired, and in general there's not much in the way
-of error checking.
+See L<Net::Async::Redis::Commands> for the full list of commands.
 
 =cut
 
+use mro;
 use curry::weak;
 use IO::Async::Stream;
-use Protocol::Redis;
-use JSON::MaybeXS;
+use Ryu::Async;
+
+use Log::Any qw($log);
+
 use List::Util qw(pairmap);
-use Mixin::Event::Dispatch::Bus;
+
+use Net::Async::Redis::Multi;
+use Net::Async::Redis::Subscription;
+use Net::Async::Redis::Subscription::Message;
 
 =head1 METHODS
 
+B<NOTE>: For a full list of Redis methods, please see L<Net::Async::Redis::Commands>.
+
 =cut
 
-sub bus { shift->{bus} //= Mixin::Event::Dispatch::Bus->new }
+=head1 METHODS - Subscriptions
+
+See L<https://redis.io/topics/pubsub> for more details on this topic.
+There's also more details on the internal implementation in Redis here:
+L<https://making.pusher.com/redis-pubsub-under-the-hood/>.
+
+=cut
+
+=head2 psubscribe
+
+Subscribes to a pattern.
+
+=cut
 
 sub psubscribe {
 	my ($self, $pattern) = @_;
-	return $self->command(
+	return $self->execute_command(
 		PSUBSCRIBE => $pattern
 	)->then(sub {
-		$self->{subscribed} = 1;
-		Future->done
+        $self->{pubsub} = 1;
+        Future->done(
+            $self->{subscription_pattern_channel}{$pattern} //= Net::Async::Redis::Subscription->new(
+                redis => $self,
+                channel => $pattern
+            )
+        );
 	})
 }
 
-sub attach_protocol {
-	my ($self) = @_;
-	$self->{protocol} = my $proto = Protocol::Redis->new(api => 1);
-	$self->{json} = JSON::MaybeXS->new->pretty(1);
-	$proto->on_message($self->curry::weak::on_message);
-	$proto
+=head2 subscribe
+
+Subscribes to one or more channels.
+
+Resolves to a L<Net::Async::Redis::Subscription> instance.
+
+Example:
+
+ # Subscribe to 'notifications' channel,
+ # print the first 5 messages, then unsubscribe
+ $redis->subscribe('notifications')
+    ->then(sub {
+        my $sub = shift;
+        $sub->map('payload')
+            ->take(5)
+            ->say
+            ->completion
+    })->then(sub {
+        $redis->unsubscribe('notifications')
+    })->get
+
+=cut
+
+sub subscribe {
+	my ($self, @channels) = @_;
+    $self->next::method(@channels)
+        ->then(sub {
+            $self->{pubsub} = 1;
+            my @subs = map {
+                $self->{subscription_channel}{$_} //= Net::Async::Redis::Subscription->new(
+                    redis => $self,
+                    channel => $_
+                )
+            } @channels;
+            Future->done(@subs);
+        })
 }
 
-sub on_message {
-	my ($self, $redis, $data) = @_;
-	# warn "got message: " . $self->json->encode($data);
-	if($self->{subscribed}) {
-		$self->bus->invoke_event(message => $data);
-	} else {
-		my $next = shift @{$self->{pending}} or die "No pending handler";
-		$next->[1]->done($data);
-	}
+=head1 METHODS - Transactions
+
+
+
+=cut
+
+=head2 multi
+
+Executes the given code in a Redis C<MULTI> transaction.
+
+This will cause each of the requests to be queued, then executed in a single atomic transaction.
+
+Example:
+
+ $redis->multi(sub {
+  my $tx = shift;
+  $tx->incr('some::key')->on_done(sub { print "Final value for incremented key was " . shift . "\n"; });
+  $tx->set('other::key => 'test data')
+ })->then(sub {
+  my ($success, $failure) = @_;
+  return Future->fail("Had $failure failures, expecting everything to succeed") if $failure;
+  print "$success succeeded\m";
+  return Future->done;
+ });
+
+=cut
+
+sub multi {
+    use Scalar::Util qw(reftype);
+    use namespace::clean qw(reftype);
+    my ($self, $code) = @_;
+    die 'Need a coderef' unless $code and reftype($code) eq 'CODE';
+    my $multi = Net::Async::Redis::Multi->new(
+        redis => $self,
+    );
+    $self->next::method
+        ->then(sub {
+            $multi->exec($code)
+        })
 }
 
 sub keys : method {
 	my ($self, $match) = @_;
 	$match //= '*';
-	$self->debug_printf("Check for keys: %s", $match);
-	return $self->command(
-		KEYS => $match
-	)->transform(
-		done => sub {
-			map $_->{data}, @{ shift->{data} }
-		}
-	)
-}
-
-sub del : method {
-	my ($self, @keys) = @_;
-	$self->debug_printf("Delete keys: %s", join ' ', @keys);
-	return $self->command(
-		DEL => @keys
-	)->transform(
-		done => sub {
-			shift->{data}
-		}
-	)
-}
-
-sub get : method {
-	my ($self, $key) = @_;
-	$self->debug_printf('GET key: %s', $key);
-	return $self->command(
-		GET => $key
-	)->transform(
-		done => sub {
-			shift->{data}
-		}
-	)
-}
-
-sub exists : method {
-	my ($self, $key) = @_;
-	$self->debug_printf('EXISTS key: %s', $key);
-	return $self->command(
-		EXISTS => $key
-	)->transform(
-		done => sub {
-			shift->{data}
-		}
-	)
-}
-
-sub set : method {
-	my ($self, $k, $v, @opt) = @_;
-	$self->debug_printf('SET key %s, options %s', $k, join ', ', pairmap { "$a=$b" } @opt);
-	$v =~ s/"/\\"/g;
-	$v = '"' . $v . '"';
-	return $self->command(
-		SET => $k, $v,
-		@opt
-	)->transform(
-		done => sub {
-			shift->{data}
-		}
-	)
-}
-
-sub config_set : method {
-	my ($self, $k, $v) = @_;
-	$self->debug_printf('CONFIG SET %s = %s', $k, $v);
-	return $self->command(
-		'CONFIG SET' => $k, $v,
-	)->transform(
-		done => sub {
-			shift->{data}
-		}
-	)
+    return $self->next::method($match);
 }
 
 sub watch_keyspace {
 	my ($self, $pattern, $code) = @_;
 	$pattern //= '*';
 	my $sub = '__keyspace@*__:' . $pattern;
-	my $f;
-	if($self->{have_notify}) {
-		$f = Future->done;
-	} else {
-		$self->{have_notify} = 1;
-		$f = $self->config_set(
-			'notify-keyspace-events', 'Kg$xe'
-		)
-	}
-	$f->then(sub {
+	(
+        $self->{have_notify} ||= $self->config_set(
+            'notify-keyspace-events', 'Kg$xe'
+        )
+    )->then(sub {
 		$self->bus->subscribe_to_event(
 			message => sub {
 				my ($ev, $data) = @_;
@@ -174,13 +188,9 @@ sub watch_keyspace {
 	})
 }
 
-sub stream { shift->{stream} }
+=head2 connect
 
-sub scan {
-	my ($self, %args) = @_;
-	my $code = $args{each};
-	$args{batch} //= $args{count};
-}
+=cut
 
 sub connect {
 	my ($self, %args) = @_;
@@ -193,29 +203,123 @@ sub connect {
 		socktype => 'stream',
 	)->then(sub {
 		my ($sock) = @_;
-		# warn "connected\n";
 		my $stream = IO::Async::Stream->new(
-			handle => $sock,
+			handle    => $sock,
 			on_closed => $self->curry::weak::notify_close,
-			on_read => sub {
+			on_read   => sub {
 				my ($stream, $buffref, $eof) = @_;
-				my $len = length($$buffref);
-				$self->debug_printf("have %d bytes of data from redis", $len);
-				$self->protocol->parse(substr $$buffref, 0, $len, '');
+				$self->protocol->parse($buffref);
 				0
 			}
 		);
 		Scalar::Util::weaken(
 			$self->{stream} = $stream
 		);
-		$self->attach_protocol;
 		$self->add_child($stream);
 		if(defined $auth) {
-			return $self->command('AUTH', $auth)
+			return $self->auth($auth)
 		} else {
 			return Future->done
 		}
 	})
+}
+
+=head2 on_message
+
+Called for each incoming message.
+
+=cut
+
+sub on_message {
+	my ($self, $data) = @_;
+	if($self->{pubsub}) {
+        my ($type, $channel, $payload) = @$data;
+        if($type =~ /message$/) {
+            if($type eq 'message') {
+                if(my $sub = $self->{subscription_channel}{$channel}) {
+                    my $msg = Net::Async::Redis::Subscription::Message->new(
+                        type => $type,
+                        channel => $channel,
+                        payload => $payload,
+                        redis   => $self,
+                        subscription => $sub
+                    );
+                    $sub->events->emit($msg);
+                } else {
+                    $log->errorf('Have message for unknown channel [%s]', $channel);
+                }
+            } elsif($type eq 'pmessage') {
+                if(my $sub = $self->{subscription_pattern_channel}{$channel}) {
+                    my $msg = Net::Async::Redis::PubSub::Message->new(
+                        type => $type,
+                        channel => $channel,
+                        payload => $payload,
+                        redis   => $self,
+                        subscription => $sub
+                    );
+                    $sub->events->emit($msg);
+                } else {
+                    $log->errorf('Have message for unknown pattern channel [%s]', $channel);
+                }
+            }
+        } elsif($type eq 'unsubscribe') {
+            if(my $sub = delete $self->{subscription_channel}{$channel}) {
+                $log->tracef('Removed subscription for [%s]', $channel);
+                delete $self->{pubsub} unless keys(%{$self->{subscription_channel}}) or keys(%{$self->{subscription_pattern_channel}});
+            } else {
+                $log->errorf('Have unsubscription for unknown channel [%s]', $channel);
+            }
+        } elsif($type eq 'punsubscribe') {
+            if(my $sub = delete $self->{subscription_pattern_channel}{$channel}) {
+                $log->tracef('Removed pattern subscription for [%s]', $channel);
+                delete $self->{pubsub} unless keys(%{$self->{subscription_channel}}) or keys(%{$self->{subscription_pattern_channel}});
+            } else {
+                $log->errorf('Have pattern unsubscription for unknown channel [%s]', $channel);
+            }
+        } elsif($type eq 'subscribe') {
+            $log->errorf('Have subscription for unknown channel [%s]', $channel) unless exists $self->{subscription_channel}{$channel};
+        } elsif($type eq 'punsubscribe') {
+            $log->errorf('Have subscription for unknown pattern channel [%s]', $channel) unless exists $self->{subscription_pattern_channel}{$channel};
+        } else {
+            $log->errorf('have unknown pubsub message type %s with channel %s payload %s', $type, $channel, $payload);
+        }
+		$self->bus->invoke_event(message => $data) if exists $self->{bus};
+	} else {
+		my $next = shift @{$self->{pending}} or die "No pending handler";
+		$next->[1]->done($data);
+	}
+}
+
+=head2 stream
+
+Represents the L<IO::Async::Stream> instance for the active Redis connection.
+
+=cut
+
+sub stream { shift->{stream} }
+
+=head2 pipeline_depth
+
+Number of requests awaiting responses before we start queuing.
+
+See L<https://redis.io/topics/pipelining> for more details on this concept.
+
+=cut
+
+sub pipeline_depth { shift->{pipeline_depth} }
+
+=head1 METHODS - Deprecated
+
+This are still supported, but no longer recommended.
+
+=cut
+
+sub bus {
+    shift->{bus} //= do {
+        require Mixin::Event::Dispatch::Bus;
+        Mixin::Event::Dispatch::Bus->VERSION(2.000);
+        Mixin::Event::Dispatch::Bus->new
+    }
 }
 
 =head1 METHODS - Internal
@@ -225,7 +329,7 @@ sub connect {
 sub notify_close {
 	my ($self) = @_;
 	$self->configure(on_read => sub { 0 });
-	$_->[1]->fail('disconnected') for @{$self->{pending}};
+	$_->[1]->fail('Server connection is no longer active', redis => 'disconnected') for @{$self->{pending}};
 	$self->maybe_invoke_event(disconnect => );
 }
 
@@ -235,25 +339,47 @@ sub command_label {
 	return $cmd[0];
 }
 
-sub command {
+sub execute_command {
 	my ($self, @cmd) = @_;
-	my $cmd = join ' ', @cmd;
-	my $f = $self->loop->new_future;
-	$f->label($self->command_label(@cmd));
-	push @{$self->{pending}}, [ $cmd, $f ];
-	# warn "Writing $cmd\n";
-	return $self->stream->write("$cmd\x0D\x0A")->then(sub {
-		$f
-	});
+    return Future->fail(
+        'Currently in pubsub mode, cannot send regular commands until unsubscribed',
+        redis =>
+            0 + (keys %{$self->{subscription_channel}}),
+            0 + (keys %{$self->{subscription_pattern_channel}})
+    ) if keys(%{$self->{subscription_channel}}) + keys(%{$self->{subscription_pattern_channel}});
+	my $f = $self->loop->new_future->set_label($self->command_label(@cmd));
+	push @{$self->{pending}}, [ join(' ', @cmd), $f ];
+    return $self->stream->write(
+        $self->protocol->encode_from_client(@cmd)
+    )->then(sub {
+        $f
+    });
+}
+
+sub ryu {
+    my ($self) = @_;
+    $self->{ryu} ||= do {
+        $self->add_child(
+            my $ryu = Ryu::Async->new
+        );
+        $ryu
+    }
+}
+
+sub future {
+    my ($self) = @_;
+    return $self->loop->new_future(@_);
 }
 
 sub protocol {
 	my ($self) = @_;
-	$self->attach_protocol unless exists $self->{protocol};
-	$self->{protocol}
+	$self->{protocol} ||= do {
+        require Net::Async::Redis::Protocol;
+        Net::Async::Redis::Protocol->new(
+            handler => $self->curry::weak::on_message
+        )
+    };
 }
-
-sub json { shift->{json} }
 
 1;
 
@@ -261,10 +387,23 @@ __END__
 
 =head1 SEE ALSO
 
+Some other Redis implementations on CPAN:
+
+=over 4
+
+=item * L<Mojo::Redis2> - nonblocking, using the L<Mojolicious> framework, actively maintained
+
+=item * L<RedisDB>
+
+=item * L<Cache::Redis>
+
+=back
+
 =head1 AUTHOR
 
-Tom Molesworth <cpan@perlsite.co.uk>
+Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+

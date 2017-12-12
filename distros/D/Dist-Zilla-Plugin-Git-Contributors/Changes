@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Git-Contributors
 
+0.032     2017-12-06 01:30:30Z
+          - fix tests to work on git before 2.0.0, where gpgsign is not
+            implemented
+
 0.031     2017-11-29 02:15:17Z
           - avoid triggering GPG hooks during testing (thanks Ioan Rogers!)
 

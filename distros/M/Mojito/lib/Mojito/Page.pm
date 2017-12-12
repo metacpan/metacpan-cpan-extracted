@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Page;
-{
-  $Mojito::Page::VERSION = '0.24';
-}
+$Mojito::Page::VERSION = '0.25';
 use Moo;
 use Sub::Quote qw(quote_sub);
 

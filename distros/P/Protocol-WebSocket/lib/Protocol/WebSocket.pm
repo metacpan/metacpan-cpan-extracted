@@ -3,7 +3,7 @@ package Protocol::WebSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Protocol::WebSocket::Frame;
 use Protocol::WebSocket::Handshake::Client;
@@ -146,7 +146,7 @@ Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2014, Viacheslav Tykhanovskyi.
+Copyright (C) 2010-2017, Viacheslav Tykhanovskyi.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.

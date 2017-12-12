@@ -1,4 +1,28 @@
 
+8.07  2017-12-11
+  - Fixed guard method in Minion not to release already expired locks.
+
+8.06  2017-12-11
+  - Added active_locks field to stats methods in Minion, Minion::Backend and
+    Minion::Backend::Pg again.
+  - Improved Mojolicious::Plugin::Minion::Admin with support for locks.
+
+8.05  2017-12-10
+  - Removed active_locks field from stats methods again since it did not work
+    correctly and there is no efficient way to fix it.
+  - Fixed list_locks method in Minion::Backend::Pg to exclude already expired
+    locks.
+
+8.04  2017-12-08
+  - Added list_locks method to Minion::Backend and Minion::Backend::Pg.
+  - Added -L and -U options to job command.
+  - Added active_locks field to stats methods in Minion, Minion::Backend and
+    Minion::Backend::Pg.
+  - Updated Font Awesome to version 5.
+  - Improved Minion::Job to clear signal handlers in job processes.
+  - Fixed a bug in Mojolicious::Plugin::Minion::Admin where filtering jobs by
+    task or queue would not reset the offset.
+
 8.03  2017-11-21
   - Removed -f option from worker command.
   - Added broadcast method to Minion.

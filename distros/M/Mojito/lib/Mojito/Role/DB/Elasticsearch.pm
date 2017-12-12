@@ -1,11 +1,9 @@
 use strictures 1;
 package Mojito::Role::DB::Elasticsearch;
-{
-  $Mojito::Role::DB::Elasticsearch::VERSION = '0.24';
-}
+$Mojito::Role::DB::Elasticsearch::VERSION = '0.25';
 use Moo::Role;
 use Mojito::Model::Config;
-use Elasticsearch;
+use Search::Elasticsearch;
 use Data::Dumper::Concise;
 
 with('Mojito::Role::DB::OID');
@@ -23,7 +21,7 @@ has 'db_name' => (
 );
 has 'db' => (
     is => 'lazy',
-    builder => sub { Elasticsearch->new(nodes => [$_[0]->db_host]) },
+    builder => sub { Search::Elasticsearch->new(nodes => [$_[0]->db_host]) },
     clearer => 'clear_db',
 );
 has 'collection' => (
@@ -38,6 +36,10 @@ has 'collection_name' => (
     default => sub { 'notes' },
     clearer => 'clear_collection_name',
 );
+has 'collection_size' => (
+    is => 'lazy',
+    builder => sub { 100 },
+);
 has 'db_host' => (
     is => 'lazy',
     builder => sub { 'localhost:9200' },
@@ -48,10 +50,19 @@ sub _build_collection  {
     if (not defined $self->db) {
         $self->clear_db;
     }
+    my $body = {
+        query => {match_all => {}},
+    };
+    my $collection_name =$self->collection_name;
+    # If we're the notes collection then sort by last_modified
+    if ($collection_name eq 'notes') {
+       $body->{sort} = [{last_modified => {order => 'desc'}}];
+    } 
     my $results = $self->db->search(
         index => $self->db_name, 
-        type => $self->collection_name,
-        body => {query => {match_all => {}}},
+        type => $collection_name,
+        body => $body,
+        size => $self->collection_size, 
     );
     return $results;
 }

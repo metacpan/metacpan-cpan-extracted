@@ -3,24 +3,24 @@ abstract: 'A pure perl BibTeX parser'
 author:
   - 'Gerhard Gossen <gerhard.gossen@googlemail.com> and Boris Veytsman <boris@varphi.com>'
 build_requires:
-  Test::More: '0.88'
+  Test::More: 0.88
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: 6.30
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: BibTeX-Parser
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Spec: '0'
-  IO::File: '0'
-  IO::String: '0'
-  LaTeX::ToUnicode: '0.02'
-  Test::More: '0'
-version: '1.00'
+  File::Spec: 0
+  IO::File: 0
+  IO::String: 0
+  LaTeX::ToUnicode: 0.02
+  Test::More: 0
+version: 1.01

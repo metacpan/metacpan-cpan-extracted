@@ -15,15 +15,20 @@ our @EXPORT_OK   = qw(
   %STATE_CAN
   STATE_FUTURE
   STATE_MOAR
+  STATE_RECEIVE
+  STATE_SEND
   STATE_COMMAND
   STATE_DATUM
+  ERROR_EVENT
+  ERROR_FAIL
 );
 
 our %EXPORT_TAGS = (
     all     => \@EXPORT_OK,
-    receive => [qw($NL %RESPONSE @GENERAL @WITHDATA)],
+    receive => [qw($NL %RESPONSE @GENERAL @WITHDATA ERROR_EVENT ERROR_FAIL)],
     send    => [qw($NL %COMMAND)],
-    state   => [qw(%STATE_CAN STATE_FUTURE STATE_MOAR STATE_COMMAND STATE_DATUM)],
+    state   => [qw(%STATE_CAN STATE_FUTURE STATE_MOAR    STATE_RECEIVE
+                              STATE_SEND   STATE_COMMAND STATE_DATUM)],
 );
 
 our $NL = "\x0d\x0a";
@@ -73,7 +78,12 @@ for my $command (keys %COMMAND) {
 
 use constant STATE_FUTURE  => 0;
 use constant STATE_MOAR    => 1;
-use constant STATE_COMMAND => 2;
-use constant STATE_DATUM   => 3;
+use constant STATE_RECEIVE => 2;
+use constant STATE_SEND    => 3;
+use constant STATE_COMMAND => 4;
+use constant STATE_DATUM   => 5;
+
+use constant ERROR_EVENT   => 0x1;
+use constant ERROR_FAIL    => 0x2;
 
 1;

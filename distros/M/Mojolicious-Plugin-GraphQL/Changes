@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.08    Sat  9 Dec 07:09:08 GMT 2017
+ - add Docker support
+
 0.07    Tue Nov 28 06:57:33 GMT 2017
  - use "latest" version of GraphiQL
 

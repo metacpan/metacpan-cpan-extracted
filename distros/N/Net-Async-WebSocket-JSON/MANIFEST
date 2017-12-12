@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Net/Async/WebSocket/JSON.pm
+lib/Net/Async/WebSocket/JSON/Client.pm
+lib/Net/Async/WebSocket/JSON/Protocol.pm
+lib/Net/Async/WebSocket/JSON/Server.pm
+MANIFEST			This list of files
+t/00use.t
+t/01client.t
+t/02server.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

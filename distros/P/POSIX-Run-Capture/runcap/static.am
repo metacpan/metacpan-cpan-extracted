@@ -1,0 +1,6 @@
+# Automake settings to build runcap as a static convenience library (default).
+# See Make.am for details.
+include Make.am
+noinst_LIBRARIES=libruncap.a
+libruncap_a_SOURCES = $(RUNCAP_SRC)
+noinst_HEADERS=runcap.h

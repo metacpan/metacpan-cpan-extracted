@@ -18,12 +18,12 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '1.06'
-  Mojolicious: '7.00'
-  Mojolicious::Plugin::OpenAPI: '1.10'
+  JSON::Validator: '1.07'
+  Mojolicious: '7.40'
+  Mojolicious::Plugin::OpenAPI: '1.22'
 resources:
   bugtracker: https://github.com/jhthorsen/openapi-client/issues
   homepage: https://github.com/jhthorsen/openapi-client
   repository: https://github.com/jhthorsen/openapi-client.git
-version: '0.10'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

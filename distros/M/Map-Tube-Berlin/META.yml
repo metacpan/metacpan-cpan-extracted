@@ -3,7 +3,7 @@ abstract: 'interface to the Berlin S- and U-Bahn map'
 author:
   - 'Slaven Rezic <srezic@cpan.org>'
 build_requires:
-  Test::Map::Tube: '0.17'
+  Test::Map::Tube: '0.35'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,10 +21,10 @@ no_index:
     - inc
 requires:
   File::Share: '0'
-  Map::Tube: '3.32'
+  Map::Tube: '3.40'
   Moo: '0'
   namespace::clean: '0'
 resources:
   repository: https://github.com/eserte/Map-Tube-Berlin.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

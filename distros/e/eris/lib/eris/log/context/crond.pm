@@ -7,11 +7,11 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_matcher {
-    [qw(crond cron CROND /usr/sbin/cron)]
+    [qw(crond cron CROND /usr/sbin/cron /USR/SBIN/CRON)]
 }
 
 
@@ -56,7 +56,7 @@ eris::log::context::crond - Parse crond messages to structured data
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

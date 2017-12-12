@@ -5,7 +5,7 @@ use Mojolicious::Types;
 use Mojo::Path;
 use Mojo::Util qw(encode);
 
-our $VERSION = '0.04';
+our $VERSION = '0.056';
 my $PKG = __PACKAGE__;
 
 has [qw(app config)];
@@ -129,11 +129,11 @@ sub parse { my $self = shift; no strict 'refs'; ($self->{pkg}.'::markdown')->(@_
 
 =head1 NAME
 
-Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete static files/dirs.
+Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete static files and dirs.
 
 =head1 VERSION
 
-0.04
+0.056
 
 =head1 SYNOPSIS
 
@@ -271,6 +271,21 @@ Everywhere  and everything: module, files, content.
 =head1 WINDOWS OS
 
 It was not tested but I hope you dont worry and have happy.
+
+=head1 Extended markdown & pod
+
+You can place attributes like id, classnames and css-style rules to markup elements as below.
+
+In markdown:
+
+  # {.class1 .class2 padding: 0 0.5rem;} Header 1
+  {.brown-text} brown paragraph text ...
+
+In pod:
+
+  =head2 {.class1 .blue-text border-bottom: 1px dotted;} Header 2
+  
+  {.red-text} red color text...
 
 =head1 METHODS
 

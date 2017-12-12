@@ -20,7 +20,7 @@ no_index:
 provides:
   Mail::Run::Crypt:
     file: lib/Mail/Run/Crypt.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Carp: '0'
   English: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   homepage: https://sanctum.geek.nz/cgit/Mail-Run-Crypt.git/
   repository: https://sanctum.geek.nz/code/Mail-Run-Crypt.git/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution School-Code-Compare,
-version 0.002:
+version 0.006:
 
-  Calculate the difference between two strings
+  'naive' metrics for code similarity
 
 This software is copyright (c) 2017 by Boris Däppen.
 

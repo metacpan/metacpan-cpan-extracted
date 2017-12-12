@@ -271,7 +271,7 @@ sub produce {
     xml_obj_children( $xml, $schema,
         tag    => 'trigger',
         methods => [qw/name database_events action on_table perform_action_when
-            fields order extra/],
+            fields order extra scope/],
     );
 
     #
@@ -396,7 +396,7 @@ Mark Addison E<lt>mark.addison@itn.co.ukE<gt>.
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<SQL::Translator>, L<SQL::Translator::Parser::XML::SQLFairy>,
+C<perl(1)>, L<SQL::Translator>, L<SQL::Translator::Parser::XML::SQLFairy>,
 L<SQL::Translator::Schema>, L<XML::Writer>.
 
 =cut

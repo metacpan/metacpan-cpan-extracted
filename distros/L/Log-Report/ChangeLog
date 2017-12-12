@@ -7,6 +7,21 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.25: Fri  8 Dec 09:18:23 CET 2017
+
+	Fixes:
+	- $msg->tostring on append/prepend object lost $locale.
+
+version 1.24: Fri  8 Dec 09:10:18 CET 2017
+
+	Fixes:
+	- $msg->toString should stringify when append/prepend are objects.
+	  rt.cpan.org#123835 [Andy Beverley]
+
+	Improvements:
+	- Log4perl dispatcher: do accept init of Log::Log4perl outside the
+	  dispatcher [Abe Timmerman]
+
 version 1.23: Thu  2 Nov 10:40:24 CET 2017
 
 	Improvements:
@@ -100,6 +115,7 @@ version 1.14: Tue 12 Apr 15:10:27 CEST 2016
 
 	Fixes:
 	- dancer2: regression test only for recent Dancer2 [cpantesters]
+	  rt.cpan.org#111770 [Riba Sushi]
 
 	Improvements:
 	- typo rt.cpan.org#111985 [Gregor Herrmann, Debian]

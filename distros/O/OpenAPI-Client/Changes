@@ -1,4 +1,15 @@
-Rrefsevision history for perl distribution OpenAPI-Client
+Revision history for perl distribution OpenAPI-Client
+
+0.13 2017-12-11T19:04:35+0100
+ - Add default coercion to input parameters
+ - Add call() for calling "invalid" operationIds names
+ - Fix "openapi" client when printing data structures #8
+
+0.12 2017-12-09T11:15:28+0100
+ - Bumping dependencies
+
+0.11 2017-12-08T14:57:01+0100
+ - Fix openapi command will not try to decode empty strings #5
 
 0.10 2017-11-27T18:01:50+0100
  - Can resolve $ref in spec

@@ -1,0 +1,92 @@
+{
+   "abstract" : "sdif and family tools, cdif and watchdiff",
+   "author" : [
+      "Kaz Utashiro <kaz@utashiro.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-sdif",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::EX" : "v1.2.1",
+            "List::Util" : "1.33",
+            "Text::VisualWidth::PP" : "0.05",
+            "Unicode::EastAsianWidth::Detect" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::cdif::Command" : {
+         "file" : "lib/App/cdif/Command.pm"
+      },
+      "App::cdif::Tmpfile" : {
+         "file" : "lib/App/cdif/Tmpfile.pm"
+      },
+      "App::sdif" : {
+         "file" : "lib/App/sdif.pm",
+         "version" : "v3.2.2"
+      },
+      "App::sdif::LabelStack" : {
+         "file" : "lib/App/sdif/LabelStack.pm"
+      },
+      "App::sdif::colors" : {
+         "file" : "lib/App/sdif/colors.pm"
+      },
+      "App::sdif::osx_autocolor" : {
+         "file" : "lib/App/sdif/osx_autocolor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/sdif-tools/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/sdif-tools",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/sdif-tools.git",
+         "web" : "https://github.com/kaz-utashiro/sdif-tools"
+      }
+   },
+   "version" : "3.2.2",
+   "x_authority" : "cpan:UTASHIRO"
+}

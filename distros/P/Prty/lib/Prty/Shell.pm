@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Time::HiRes ();
 use Prty::Option;
@@ -38,11 +38,6 @@ L<Prty::Hash>
 =head4 Synopsis
 
     $sh = $class->new(@opt);
-
-=head4 Description
-
-Instantiiere ein Shell-Objekt, und liefere eine Referenz auf dieses
-Objekt zurück.
 
 =head4 Options
 
@@ -82,6 +77,11 @@ Gib zum Schluss bei der Destrukturierung des Objekts
 die Gesamtausführungszeit aus.
 
 =back
+
+=head4 Description
+
+Instantiiere ein Shell-Objekt, und liefere eine Referenz auf dieses
+Objekt zurück.
 
 =cut
 
@@ -151,13 +151,6 @@ sub DESTROY {
 
     $str|@arr = $this->exec($cmd,@opt);
 
-=head4 Description
-
-Führe Kommando $cmd aus. Im Falle eines Fehlers löse eine Exception aus.
-
-Beginnt das Kommando $cmd mit einem Bindestrich, wird
-implizit die Option -sloppy gesetzt.
-
 =head4 Options
 
 =over 4
@@ -208,6 +201,13 @@ definiert, wird die angegebene Programmausgabe geliefert. Ist
 -sloppy wahr, wird der Exitcode geliefert. Die Option -capture hat
 Priorität gegenüber der Option -sloppy.  Sind weder -capture noch
 -sloppy angegeben, liefert die Methode keinen Wert.
+
+=head4 Description
+
+Führe Kommando $cmd aus. Im Falle eines Fehlers löse eine Exception aus.
+
+Beginnt das Kommando $cmd mit einem Bindestrich, wird
+implizit die Option -sloppy gesetzt.
 
 =head4 Examples
 
@@ -353,6 +353,9 @@ sub exec {
         return $output;
     }
     elsif (!$except) {
+        if ($exit > 255) {
+            $exit = int($exit/256);
+        }
         return $exit;
     }
 
@@ -369,14 +372,14 @@ sub exec {
 
     $sh->cd($dir);
 
+=head4 Returns
+
+Die Methode liefert keinen Wert zurück.
+
 =head4 Description
 
 Wechsle in Arbeitsverzeichnis $dir. Anmerkung: Diese Änderung gilt
 für den gesamten Prozess, nicht nur für das Shell-Objekt.
-
-=head4 Returns
-
-Die Methode liefert keinen Wert zurück.
 
 =cut
 
@@ -463,14 +466,14 @@ sub back {
 
     $this->checkError($code,$errMsg,@cmd);
 
+=head4 Returns
+
+nichts
+
 =head4 Description
 
 Prüfe den Status einer vorhergehenden Programmausführung und löse
 eine Execption aus, wenn der Status ungleich 0 ist.
-
-=head4 Returns
-
-nichts
 
 =head4 Examples
 
@@ -528,7 +531,7 @@ sub checkError {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

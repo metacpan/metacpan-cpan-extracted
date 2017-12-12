@@ -7,12 +7,12 @@ use Mic::Implementation
 
 sub has {
     my ($self, $e) = @_;
-    exists $self->{$SET}{$e};
+    exists $self->[SET]{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
-    ++$self->{$SET}{$e};
+    ++$self->[SET]{$e};
 }
 
 1;

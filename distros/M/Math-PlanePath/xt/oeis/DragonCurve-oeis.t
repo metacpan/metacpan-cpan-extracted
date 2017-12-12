@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 29;
+plan tests => 51;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -40,6 +40,88 @@ sub is_square {
   my $sqrt = int(sqrt($n));
   return $n == $sqrt*$sqrt;
 }
+
+
+#------------------------------------------------------------------------------
+# Skd num segments in directions to level k
+
+foreach my $elem ([ 'A038503', 0, [1] ],
+                  [ 'A038504', 1, [0] ],
+                  [ 'A038505', 2, []  ],
+                  [ 'A000749', 3, [0] ]) {
+  my ($anum, $want_dir4, $initial) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       max_count => 5,
+       name => "dir=$want_dir4",
+       func => sub {
+         my ($count) = @_;
+         my @got = @$initial;
+         require Math::NumSeq::PlanePathDelta;
+         my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$dragon,
+                                                     delta_type => 'Dir4');
+         my $target = 2;
+         my $total = 0;
+         while (@got < $count) {
+           my ($i, $value) = $seq->next;
+           if ($i == $target) {
+             push @got, $total;
+             $target *= 2;
+           }
+           $total += ($value == $want_dir4);
+         }
+         return \@got;
+       });
+}
+
+
+#------------------------------------------------------------------------------
+# N with dir E,N,W,S
+
+require Math::NumSeq::PlanePathDelta;
+foreach my $elem ([ 'A043724', 0, 1],  # A043724 doesn't include N=0
+                  [ 'A043725', 1],
+                  [ 'A043726', 2],
+                  [ 'A043727', 3]) {
+  my ($anum, $want_dir4, $skip) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => "N of dir4=$want_dir4",
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$dragon,
+                                                     delta_type => 'Dir4');
+         foreach (1 .. $skip||0) { $seq->next; }
+         while (@got < $count) {
+           my ($n, $value) = $seq->next;
+           if ($value == $want_dir4) {
+             push @got, $n;
+           }
+         }
+         return \@got;
+       });
+}
+
+
+#------------------------------------------------------------------------------
+# A268411 - horizontals 2N direction 0=East, 1=West
+
+MyOEIS::compare_values
+  (anum => 'A268411',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathDelta;
+     my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$dragon,
+                                                 delta_type => 'Dir4');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $value/2;
+       $seq->next; # skip odd N
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -66,7 +148,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-   FORMULA    
+# FORMULA
 
 # A227742 permutation fixed point
 #
@@ -89,7 +171,7 @@ MyOEIS::compare_values
        $dir += $value;
        if ($dir %2) {
          push @got, $upto + ($dir-1)/2;
-       }         
+       }
        $upto += $dir;
      }
      $#got = $count-1;
@@ -285,59 +367,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# Skd num segments in directions to level k
-
-foreach my $elem ([ 'A038503', 0, [1] ],
-                  [ 'A038504', 1, [0] ],
-                  [ 'A038505', 2, []  ],
-                  [ 'A000749', 3, [0] ]) {
-  my ($anum, $want_dir4, $initial, $skip) = @$elem;
-  MyOEIS::compare_values
-      (anum => $anum,
-       max_count => 5,
-       name => "dir=$want_dir4",
-       func => sub {
-         my ($count) = @_;
-         my @got = @$initial;
-         require Math::NumSeq::PlanePathDelta;
-         my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$dragon,
-                                                     delta_type => 'Dir4');
-         my $target = 2;
-         my $total = 0;
-         while (@got < $count) {
-           my ($i, $value) = $seq->next;
-           if ($i == $target) {
-             push @got, $total;
-             $target *= 2;
-           }
-           $total += ($value == $want_dir4);
-         }
-         return \@got;
-       });
-}
-
-
-#------------------------------------------------------------------------------
-# A268411 - directions of horizontals, 0=East, 1=West
-
-MyOEIS::compare_values
-  (anum => 'A268411',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     require Math::NumSeq::PlanePathDelta;
-     my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$dragon,
-                                                 delta_type => 'Dir4');
-     while (@got < $count) {
-       my ($i, $value) = $seq->next;
-       push @got, $value/2;
-       $seq->next; # skip odd N
-     }
-     return \@got;
-   });
-
 
 #------------------------------------------------------------------------------
 # A255070 - TurnsR num right turns 1 to N
@@ -801,6 +830,7 @@ MyOEIS::compare_values
 
 #------------------------------------------------------------------------------
 # A003460 -- turn 1=left,0=right packed as octal high to low, in 2^n levels
+# bit-packing per Gardner, pages 215-217 of reprint in "Mathematical Magic Show"
 
 MyOEIS::compare_values
   (anum => 'A003460',

@@ -48,5 +48,5 @@ resources:
   homepage: https://metacpan.org/module/CGI
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/CGI.pm
-version: '4.37'
+version: '4.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

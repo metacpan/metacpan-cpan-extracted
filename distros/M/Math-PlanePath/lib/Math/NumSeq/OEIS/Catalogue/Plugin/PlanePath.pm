@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 246 A-numbers in 4 modules
+# total 249 A-numbers in 4 modules
 
 use constant info_arrayref =>
 [
@@ -375,6 +375,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A057554',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals',
+      'coordinate_type',
+      'ExperimentalPairsXY'
+    ]
+  },
+  {
     'anum' => 'A164306',
     'class' => 'Math::NumSeq::PlanePathCoord',
     'parameters' => [
@@ -390,6 +400,96 @@ use constant info_arrayref =>
     'parameters' => [
       'planepath',
       'Diagonals,x_start=1,y_start=0',
+      'coordinate_type',
+      'ExperimentalDenominator'
+    ]
+  },
+  {
+    'anum' => 'A003991',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'Product'
+    ]
+  },
+  {
+    'anum' => 'A003989',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'GCD'
+    ]
+  },
+  {
+    'anum' => 'A003983',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'Min'
+    ]
+  },
+  {
+    'anum' => 'A051125',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'Max'
+    ]
+  },
+  {
+    'anum' => 'A004199',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'IntXY'
+    ]
+  },
+  {
+    'anum' => 'A057555',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,x_start=1,y_start=1',
+      'coordinate_type',
+      'ExperimentalPairsXY'
+    ]
+  },
+  {
+    'anum' => 'A003988',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,direction=up,x_start=1,y_start=1',
+      'coordinate_type',
+      'IntXY'
+    ]
+  },
+  {
+    'anum' => 'A112543',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,direction=up,x_start=1,y_start=1',
+      'coordinate_type',
+      'ExperimentalNumerator'
+    ]
+  },
+  {
+    'anum' => 'A112544',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Diagonals,direction=up,x_start=1,y_start=1',
       'coordinate_type',
       'ExperimentalDenominator'
     ]
@@ -502,86 +602,6 @@ use constant info_arrayref =>
       'Diagonals,n_start=0',
       'coordinate_type',
       'ExperimentalHammingDist'
-    ]
-  },
-  {
-    'anum' => 'A003991',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,x_start=1,y_start=1',
-      'coordinate_type',
-      'Product'
-    ]
-  },
-  {
-    'anum' => 'A003989',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,x_start=1,y_start=1',
-      'coordinate_type',
-      'GCD'
-    ]
-  },
-  {
-    'anum' => 'A003983',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,x_start=1,y_start=1',
-      'coordinate_type',
-      'Min'
-    ]
-  },
-  {
-    'anum' => 'A051125',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,x_start=1,y_start=1',
-      'coordinate_type',
-      'Max'
-    ]
-  },
-  {
-    'anum' => 'A004199',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,x_start=1,y_start=1',
-      'coordinate_type',
-      'IntXY'
-    ]
-  },
-  {
-    'anum' => 'A003988',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,direction=up,x_start=1,y_start=1',
-      'coordinate_type',
-      'IntXY'
-    ]
-  },
-  {
-    'anum' => 'A112543',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,direction=up,x_start=1,y_start=1',
-      'coordinate_type',
-      'ExperimentalNumerator'
-    ]
-  },
-  {
-    'anum' => 'A112544',
-    'class' => 'Math::NumSeq::PlanePathCoord',
-    'parameters' => [
-      'planepath',
-      'Diagonals,direction=up,x_start=1,y_start=1',
-      'coordinate_type',
-      'ExperimentalDenominator'
     ]
   },
   {
@@ -2356,6 +2376,16 @@ use constant info_arrayref =>
       'AlternatePaper',
       'turn_type',
       'LSR'
+    ]
+  },
+  {
+    'anum' => 'A292077',
+    'class' => 'Math::NumSeq::PlanePathTurn',
+    'parameters' => [
+      'planepath',
+      'AlternatePaper',
+      'turn_type',
+      'Right'
     ]
   },
   {

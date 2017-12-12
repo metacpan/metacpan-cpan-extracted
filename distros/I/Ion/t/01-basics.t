@@ -3,9 +3,7 @@ use Coro;
 use Coro::AnyEvent;
 use Ion;
 
-sub upper { uc $_[0] }
-
-ok my $server = Listen(\&upper), 'Listen';
+ok my $server = Service { uc $_[0] }, 'Server';
 ok my $conn   = Connect($server->host, $server->port), 'Connect';
 
 my $timeout = async {
@@ -22,6 +20,8 @@ is <$conn>, 'HOW NOW BROWN BUREAUCRAT', '<conn>';
 ok $conn->close, 'conn: close';
 
 ok $server->stop, 'server: stop';
+ok $server->join, 'server: join';
+
 $timeout->safe_cancel;
 
 done_testing;

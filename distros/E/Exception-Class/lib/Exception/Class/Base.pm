@@ -3,7 +3,7 @@ package Exception::Class::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 use Class::Data::Inheritable 0.02;
 use Devel::StackTrace 2.00;
@@ -144,6 +144,11 @@ sub _initialize {
             unsafe_ref_capture => $self->UnsafeRefCapture,
             respect_overload   => $self->RespectOverload,
             max_arg_length     => $self->MaxArgLength,
+            map { $p{$_} ? ( $_ => delete $p{$_} ) : () } qw(
+                frame_filter
+                filter_frames_early
+                skip_frames
+                ),
         );
     }
 
@@ -268,7 +273,7 @@ Exception::Class::Base - A base class for exception objects
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 
@@ -384,7 +389,9 @@ for this class if it is given.
 
 The frames included in the trace can be controlled by the C<ignore_class> and
 C<ignore_package> parameters. These are passed directly to Devel::Stacktrace's
-constructor. See C<Devel::Stacktrace> for more details.
+constructor. See C<Devel::Stacktrace> for more details. This class B<always>
+passes C<__PACKAGE__> for C<ignore_class> and C<'Exception::Class'> for
+C<ignore_package>, in addition to any arguments you provide.
 
 If only a single value is given to the constructor it is assumed to be the
 message parameter.

@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.85 of Rinci::function (from Perl distribution Rinci), released on 2017-10-26.
+This document describes version 1.1.86 of Rinci::function (from Perl distribution Rinci), released on 2017-12-09.
 
 =head1 INTRODUCTION
 
@@ -1035,9 +1035,9 @@ Required if C<src> is specified.
 
 Status from envelope. If unspecified, assumed to be 200.
 
-=item * result => envres
+=item * result => DATA
 
-Expected result. This should always be in enveloped form.
+Expected result.
 
 =item * summary => STR
 
@@ -1072,18 +1072,18 @@ Example:
  examples => [
      {
          args => {num=>10},
-         result => [200, "OK", 0],
+         result => 0,
          # summary no needed here, already clear.
      },
      {
          args => {},
-         result => [400],
+         result => 400,
          summary => 'Num argument is required',
      },
 
      {
          argv => [-5],
-         result => [200, "OK", 1],
+         result => 1,
          summary => 'Also works for negative integers',
      },
  ],

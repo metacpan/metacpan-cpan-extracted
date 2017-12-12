@@ -11,7 +11,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 sub _build_priority { 1000 }
@@ -129,7 +129,7 @@ eris::log::context::GeoIP - Apply MaxMind GeoIPv2 Data to events
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

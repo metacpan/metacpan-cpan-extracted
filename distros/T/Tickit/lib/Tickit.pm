@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.63';
+   our $VERSION = '0.64';
 }
 
 use Carp;
@@ -24,10 +24,11 @@ BEGIN {
    XSLoader::load( __PACKAGE__, our $VERSION );
 }
 
+# We export some constants
+use Exporter 'import';
+
 use Tickit::Event;
 use Tickit::Window;
-
-use Tickit::Debug;
 
 use Struct::Dumb;
 struct TimeQueue => [qw( time code )];
@@ -163,18 +164,6 @@ sub new
    $self->bind_key( 'C-c' => $self->can( "stop" ) );
 
    $term->set_output_buffer( 2**16 ); # 64KiB
-
-   weaken( my $weakself = $self );
-
-   $term->bind_event( key => sub {
-      $weakself or return;
-      my ( $term, $ev, $info ) = @_;
-      Tickit::Debug->log( Ik => "Key event %s %s (mod=%d)",
-         map { $info->$_ } qw( type str mod ) ) if DEBUG;
-      $weakself->on_key( $info );
-
-      return 1;
-   } );
 
    $self->set_root_widget( $args{root} ) if defined $args{root};
 
@@ -319,18 +308,6 @@ sub _SIGWINCH
    $self->term->refresh_size;
 }
 
-sub on_key
-{
-   my $self = shift;
-   my ( $info ) = @_;
-
-   my $str = $info->str;
-
-   if( exists $self->{key_binds}{$str} ) {
-      $self->{key_binds}{$str}->( $self, $str ) and return;
-   }
-}
-
 =head2 bind_key
 
    $tickit->bind_key( $key, $code )
@@ -355,11 +332,34 @@ sub bind_key
    my $self = shift;
    my ( $key, $code ) = @_;
 
+   my $keybinds = $self->{key_binds} //= {};
+
    if( $code ) {
-      $self->{key_binds}{$key} = $code;
+      if( !%$keybinds ) {
+         weaken( my $weakself = $self );
+
+         $self->{key_bind_id} = $self->term->bind_event( key => sub {
+            my $self = $weakself or return;
+            my ( $term, $ev, $info ) = @_;
+            my $str = $info->str;
+
+            if( my $code = $self->{key_binds}{$str} ) {
+               $code->( $self, $str );
+            }
+
+            return 0;
+         } );
+      }
+
+      $keybinds->{$key} = $code;
    }
    else {
-      delete $self->{key_binds}{$key};
+      delete $keybinds->{$key};
+
+      if( !%$keybinds ) {
+         $self->term->unbind_event_id( $self->{key_bind_id} );
+         undef $self->{key_bind_id};
+      }
    }
 }
 

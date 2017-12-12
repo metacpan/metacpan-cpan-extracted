@@ -12,6 +12,7 @@ my @MODULES = ( 'Test::Fixme 0.04', );
 
 # Don't run tests during end-user installs
 use Test::More;
+
 # plan( skip_all => 'Author tests not required for installation' )
 #   unless ( $ENV{RELEASE_TESTING} or $ENV{AUTOMATED_TESTING} );
 
@@ -25,6 +26,9 @@ foreach my $MODULE (@MODULES) {
     }
 }
 
-run_tests();
+run_tests(
+    where => [ qw(lib t) ],
+    match => qr/\.(?:pm|pl)$/,
+);
 
 1;

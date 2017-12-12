@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Perl;
 use Prty::Math;
@@ -296,15 +296,15 @@ sub eq {
     $val = $arr->findPairValue($key);
     $val = $class->findPairValue(\@arr,$key);
 
+=head4 Returns
+
+Wert oder C<undef>
+
 =head4 Description
 
 Durchsuche $arr paarweise nach Element $key. Kommt es vor, liefere
 dessen Wert. Kommt es nicht vor, liefere undef. Vergleichsoperator
 ist eq.
-
-=head4 Returns
-
-Wert oder C<undef>
 
 =cut
 
@@ -529,13 +529,6 @@ sub select {
     $class->shuffle(\@arr);
     $class->shuffle(\@arr,$factor);
 
-=head4 Description
-
-Mische die Elemente des Array @arr, d.h. bringe sie in eine
-zufällige Reihenfolge. Die Operation wird in-place ausgeführt.
-
-Die Methode liefert keinen Wert zurück.
-
 =head4 Arguments
 
 =over 4
@@ -550,6 +543,13 @@ Faktor für die Anzahl der Vertauschungsoperationen. Es werden
 I<Arraygröße> * $factor Vertauschungsoperationen ausgeführt.
 
 =back
+
+=head4 Description
+
+Mische die Elemente des Array @arr, d.h. bringe sie in eine
+zufällige Reihenfolge. Die Operation wird in-place ausgeführt.
+
+Die Methode liefert keinen Wert zurück.
 
 =cut
 
@@ -966,7 +966,7 @@ sub restore {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

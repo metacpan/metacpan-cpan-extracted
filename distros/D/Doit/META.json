@@ -1,0 +1,48 @@
+{
+   "abstract" : "a scripting framework",
+   "author" : [
+      "Slaven Rezic <srezic@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Doit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Exporter" : "5.57",
+            "File::Path" : "2"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IPC::Run" : "0",
+            "Net::OpenSSH" : "0"
+         },
+         "requires" : {
+            "Exporter" : "5.57",
+            "File::Path" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/eserte/Doit"
+      }
+   },
+   "version" : "0.024"
+}

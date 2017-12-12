@@ -1,0 +1,59 @@
+#!perl
+use strict;
+use warnings;
+use App::PPE;
+App::PPE->new_with_options(@ARGV)->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ppe - Prettify Perl Error messages
+
+=head1 SYNOPSIS
+
+  % perl ~/foo.pl 2>&1 | ppe
+  foo.pl:5: [WARN] (W) Use of uninitialized value in warn
+
+=head1 DESCRIPTION
+
+L<ppe> is a prettifier for Perl error messages.
+
+When you are writing such as following:
+
+  use strict;
+  use warnings;
+
+  my $str;
+  warn $str;
+
+This code outputs following result:
+
+=begin html
+
+<div><img src="https://raw.github.com/kfly8/App-PPE/master/img/example-warnings.png"></div>
+
+=end html
+
+
+When you are writing such as following:
+
+  use strict;
+  use warnings;
+
+  sub f {
+
+This code outputs following result:
+
+=begin html
+
+<div><img src="https://raw.github.com/kfly8/App-PPE/master/img/example-critical.png"></div>
+
+=end html
+
+
+=head1 SEE ALSO
+
+L<perldiag>

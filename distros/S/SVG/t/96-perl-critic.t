@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => 'Set $ENV{TEST_AUTHOR} to enable this test.'
+    unless $ENV{TEST_AUTHOR};
+
 ## no critic
 #use Perl::Critic;
 eval 'use Perl::Tidy';

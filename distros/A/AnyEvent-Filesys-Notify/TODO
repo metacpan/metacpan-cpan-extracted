@@ -1,6 +1,6 @@
 Wishlist of things to add to this module:
 
-o Add flag to avoid recursing on fs scan (RT#104714)
+x Add flag to avoid recursing on fs scan (RT#104714)
 o Make Linux::Inotify2 flags an attribute that can be changed by user
 o Monitor individual files
 o Filter/exclued files in a dir

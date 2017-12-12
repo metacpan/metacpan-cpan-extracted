@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Template;
-{
-  $Mojito::Template::VERSION = '0.24';
-}
+$Mojito::Template::VERSION = '0.25';
 use Moo;
 use 5.010;
 use MooX::Types::MooseLike::Base qw(:all);

@@ -6,7 +6,7 @@ build_requires:
   Test::More: '1.001014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -16,10 +16,10 @@ name: JCM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.017'
+    version: '1.019'
   JTM::Boilerplate:
     file: lib/JTM/Boilerplate.pm
-    version: '1.017'
+    version: '1.019'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -109,10 +109,11 @@ requires:
   forks: '0.36'
   namespace::autoclean: '0.28'
   perl: v5.22.0
+  re: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/jmaslak/dotfiles/issues
   repository: git://github.com/jmaslak/dotfiles.git
-version: '1.017'
+version: '1.019'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,10 +1,11 @@
 package Ion;
 # ABSTRACT: A clear and concise API for writing TCP servers and clients
-$Ion::VERSION = '0.02';
+$Ion::VERSION = '0.05';
 use common::sense;
 
 use Carp;
 use Coro;
+use AnyEvent;
 use Ion::Server;
 use Ion::Conn;
 
@@ -13,37 +14,43 @@ use parent 'Exporter';
 our @EXPORT = qw(
   Connect
   Listen
+  Service
 );
 
-sub Connect ($$) {
+sub Connect (;$$) {
   my ($host, $port) = @_;
   Ion::Conn->new(host => $host, port => $port);
 }
 
-sub Listen {
-  my $service = pop;
-  my $server  = Ion::Server->new(port => shift, host => shift);
+sub Listen (;$$) {
+  my ($port, $host) = @_;
+  Ion::Server->new(host => $host, port => $port);
+}
+
+sub Service (&;$$) {
+  my $callback = shift;
+  my $server = shift;
+  $server = Listen($server, shift) unless ref $server;
   $server->start;
 
-  if ($service) {
-    async_pool {
-      my ($service, $server) = @_;
+  async_pool {
+    my ($callback, $server) = @_;
 
-      while (defined(my $conn = <$server>)) {
-        async_pool {
-          my ($service, $conn, $server) = @_;
+    while (defined(my $conn = <$server>)) {
+      async_pool {
+        my ($callback, $conn, $server) = @_;
 
-          while (defined(my $line = <$conn>)) {
-            my $reply = $service->($line, $conn, $server);
-            last unless defined $reply;
-            $conn->($reply) if $reply;
-          }
+        while (defined(my $line = <$conn>)) {
+          my $reply = $callback->($line, $conn, $server);
+          last unless defined $reply;
+          $conn->($reply) if $reply;
+        }
 
-          $conn->close;
-        } $service, $conn, $server;
-      }
-    } $service, $server;
-  }
+        $conn->close;
+      } $callback, $conn, $server;
+    }
+
+  } $callback, $server;
 
   return $server;
 }
@@ -62,7 +69,7 @@ Ion - A clear and concise API for writing TCP servers and clients
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -72,20 +79,14 @@ version 0.02
   my $echo = Listen 7777;
 
   while (my $conn = <$echo>) {
-    while (my $line = <$conn>) {
-      $conn->($line);
-    }
+      while (my $line = <$conn>) {
+          $conn->("you said: $line");
+      }
   }
 
 
-  # Or separate the protocol from the listener
-  sub echo {
-    my $line = shift;
-    return $line;
-  }
-
-  # ...and let Ion handle the rest
-  my $server = Listen 7777, \&echo;
+  # Or separate the protocol from the listener and let Ion handle the rest
+  Service { return "you said: $_[0]" } $echo;
 
 
   # Client connections
@@ -120,12 +121,12 @@ waiting for the original client to disconnect.
 
   my $server = Listen 1234, 'localhost';
 
-  while (my $conn = <$server>) {    # cedes until $conn is ready
-    async {
-      while (my $line = <$conn>) {  # cedes until $line is ready
-        $conn->(do_something_with($line));
-      }
-    };
+  while (my $conn = <$server>) {        # cedes until $conn is ready
+      async {
+          while (my $line = <$conn>) {  # cedes until $line is ready
+              $conn->(do_something_with($line));
+          }
+      };
   }
 
 The port number and host interface are optional. If left undefined, these will
@@ -136,25 +137,32 @@ C<host> methods of the server.
   my $port   = $server->port;
   my $host   = $server->host;
 
-If desirable, a request handler function may also be provided as the final
-argument to C<Listen>. This will be called for each incoming line of data and
+=head2 Service
+
+Begins serving requests on the specified listening service by calling the
+supplied code block for each line received from a client connection. The
+service may be specified as the server object itself (the return value of
+L</Listen>) or by passing the port and host name, which are passed unchanged to
+L</Listen>.
+
+The handler block will be called for each incoming line of data and
 additionally is passed the L<client connection|Ion::Conn> and the
 L<server|Ion::Server> objects.
 
-  Listen 7777, sub {
-    my ($line, $conn, $server) = @_;
-    return do_something_with_line($line);
-  };
+  Service {
+      my ($line, $conn, $server) = @_;
+      return do_something_with_line($line);
+  } 7777, '127.0.0.1';
 
 The return value of the handler function is then returned to the client. If the
 handler function returns a false value, the client will be disconnected.
 Alternately, the handler function may return any defined, false value (e.g., 0)
 to retain the client connection but handle the response itself.
 
-  Listen 777, sub {
-    my ($line, $conn, $server) = @_;
-    $conn->(do_something_with_line($line));
-    return 0;
+  Service {
+      my ($line, $conn, $server) = @_;
+      $conn->(do_something_with_line($line));
+      return 0;
   };
 
 =head2 Connect
@@ -175,6 +183,66 @@ C<join> with it later.
 
   my $pending  = async { <$conn> };
   my $response = $pending->join;
+
+=head1 MESSAGE FORMATS
+
+Sending a raw line of text is sometimes desireable, but complex applications
+will want to use an established protocol when transmitting complex data. Rather
+than fill request handling logic with the details of encoding and decoding data
+for transmission, the routines used for translating structured data into line
+data and vice versa may be specified using the >> and << operators,
+respectively.
+
+The syntax is identical for both servers and client connections. When applied
+to a server instance, client connections accepted on the server side inherit
+the server's configuration (note: the connecting client code will need to be
+similarly configured).
+
+Multiple routines may be chained together as a single expression or multiple
+statements with the assignment version of each operator (>>= and <<=). When
+more than one routine is specified, they will each be called in turn on the
+result of the previous routine, with the first routine receiving the raw line
+data.
+
+=head2 EXAMPLE: JSON
+
+  use Ion;
+  use JSON::XS;
+
+  my $server = Listen;
+  $server << sub{ decode_json(shift) };
+  $server >> sub{ encode_json(shift) };
+
+  while (my $conn = <$server>) {
+    while (my $data = <$conn>) {              # $data is perl data
+      $conn->({foo => 'bar', baz => 'bat'});  # $conn is sent json: "{'foo': 'bar', 'baz': 'bat'}"
+    }
+  }
+
+=head2 EXAMPLE: CHAINING
+
+  use Ion;
+  use Data::Dumper;
+  use MIME::Base64 qw(encode_base64 decode_base64);
+
+  my $client = Connect somehost => 4242;
+
+  # Compound expression
+  $client << sub{ decode_base64(shift) }                # decode line format
+    << sub{ my $msg = eval shift; $@ && die $@; $msg }; # eval perl string
+
+  # Individual statements
+  $client >>= sub{ Dumper(shift) };                     # serialize with Dumper
+  $client >>= sub{ encode_base64(shift, '') };          # single line of base64
+
+=head1 ENDLINES
+
+As one would expect using the <> operator, the value of C<$/> controls the character
+or string used to match the end of a line of input from the socket. It is also appended
+to all output.
+
+  local $/ = "\n\n";
+  my $http_request = <$conn>;
 
 =head1 AUTHOR
 

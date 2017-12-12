@@ -32,9 +32,11 @@ Other refinements of this module over and above the basic functionality of Contr
 
 (iii) The connect method of this module automatically takes care of login for Telnet and Serial port access (where authentication is not part of the actual connection, unlike SSH) and so provides a consistent scripting approach whether the underlying connection is SSH or either Telnet or Serial port.
 
-(iv) A number of attributes are made available to find out basic information about the connected Avaya device.
+(iv) Automatic handling of output paged with --more-- prompts, including the ability to retrieve an exact number of pages of output.
 
-(v) Ability to detect whether a CLI command generated an error on the remote host and ability to report success or failure of the issued command as well as the error message details.
+(v) A number of attributes are made available to find out basic information about the connected Avaya device.
+
+(vi) Ability to detect whether a CLI command generated an error on the remote host and ability to report success or failure of the issued command as well as the error message details.
 
 
 INSTALLATION

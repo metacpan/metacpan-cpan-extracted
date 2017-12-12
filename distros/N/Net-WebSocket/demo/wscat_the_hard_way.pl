@@ -259,7 +259,7 @@ sub _chunk_to_remote {
     IO::SigGuard::syswrite(
         $out_fh,
         Net::WebSocket::Frame::binary->new(
-            payload_sr => \$buf,
+            payload => $buf,
             mask => Net::WebSocket::Mask::create(),
         )->to_bytes(),
     );

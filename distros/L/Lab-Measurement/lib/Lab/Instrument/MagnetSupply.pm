@@ -1,7 +1,9 @@
 package Lab::Instrument::MagnetSupply;
+$Lab::Instrument::MagnetSupply::VERSION = '3.613';
 #ABSTRACT: Base class for superconducting magnet power supply instruments
-$Lab::Instrument::MagnetSupply::VERSION = '3.600';
-use Lab::Measurement::KeyboardHandling qw(labkey_soft_check);
+
+use 5.010;
+use warnings;
 use strict;
 
 
@@ -89,7 +91,6 @@ sub BtoI {
 }
 
 
-
 sub set_field {
     my $self    = shift;
     my $field   = shift;
@@ -99,7 +100,6 @@ sub set_field {
     $field = $self->ItoB( $self->set_current($current) );
     return $field;
 }
-
 
 
 sub set_current {
@@ -127,16 +127,18 @@ sub set_current {
             sleep(5);
             $currentcurrent = $self->get_current();
 
-            if ( labkey_soft_check() eq "DIE" ) {
+            say "target: $targetcurrent, current: $currentcurrent";
 
-                # now what do we do here best? we cannot be sure that set_hold is
-                # implemented, and failing is not an option.
-                print
-                    "Setting sweep target to current value I=$currentcurrent\n";
-                $self->start_sweep_to_current($currentcurrent);
-                print "Terminating on keyboard request.\n";
-                exit;
-            }
+            # if ( labkey_soft_check() eq "DIE" ) {
+
+            #     # now what do we do here best? we cannot be sure that set_hold is
+            #     # implemented, and failing is not an option.
+            #     print
+            #         "Setting sweep target to current value I=$currentcurrent\n";
+            #     $self->start_sweep_to_current($currentcurrent);
+            #     print "Terminating on keyboard request.\n";
+            #     exit;
+            # }
 
             } while (
             abs( $targetcurrent - $currentcurrent )
@@ -149,8 +151,6 @@ sub set_current {
         die "fixme: not programmed yet\n";
     }
 }
-
-
 
 
 sub start_sweep_to_field {
@@ -308,7 +308,7 @@ Lab::Instrument::MagnetSupply - Base class for superconducting magnet power supp
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 Coding and calling conventions
 
@@ -361,7 +361,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2012       Andreas K. Huettel
             2013       Christian Butschkow
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

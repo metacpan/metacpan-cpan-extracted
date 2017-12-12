@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Prty::ImagePool::Directory;
@@ -109,12 +109,6 @@ sub root {
 
     $dir = $ipl->directory($name);
 
-=head4 Description
-
-Liefere das Bild-Verzeichnis-Objekt mit Name $name. Das Objekt
-wird gecached. Existiert das Verzeichnis nicht, wird eine
-Exception geworfen.
-
 =head4 Arguments
 
 =over 4
@@ -124,6 +118,12 @@ Exception geworfen.
 Name des Bild-Verzeichnisses
 
 =back
+
+=head4 Description
+
+Liefere das Bild-Verzeichnis-Objekt mit Name $name. Das Objekt
+wird gecached. Existiert das Verzeichnis nicht, wird eine
+Exception geworfen.
 
 =cut
 
@@ -156,11 +156,6 @@ sub directory {
 
     $path = $ipl->cacheFile($img,$op,@args);
 
-=head4 Description
-
-Generiere einen Cache-Pfad für Bild $img und Bild-Operation $op
-mit den Argumenten @args und liefere diesen zurück.
-
 =head4 Arguments
 
 =over 4
@@ -174,6 +169,11 @@ Bezeichner für die angewendete Bild-Operation.
 Argumente für die Bild-Operation.
 
 =back
+
+=head4 Description
+
+Generiere einen Cache-Pfad für Bild $img und Bild-Operation $op
+mit den Argumenten @args und liefere diesen zurück.
 
 =cut
 
@@ -274,7 +274,7 @@ sub images {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

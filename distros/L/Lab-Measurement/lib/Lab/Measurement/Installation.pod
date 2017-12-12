@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 Introduction
 
@@ -27,7 +27,7 @@ see the documentation of these packages for more details.
 
 =over
 
-=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA's installation guide|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod>
+=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA::Installation>
 
 =item * Install gnuplot 5 (not mandatory)
 
@@ -44,9 +44,9 @@ My Computer => Properties => Advanced => Environment Variables
 
  cpan -T Lab::Measurement
 
-=item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod>
+=item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|Lab::VISA::Installation>
 
-=item * For Zurich Instruments devices you need to install L<Lab::Zhinst|http://search.cpan.org/~amba/Lab-Zhinst/lib/Lab/Zhinst.pm>.
+=item * For Zurich Instruments devices you need to install L<Lab::Zhinst>.
 
 =item * Have fun!
 
@@ -56,7 +56,8 @@ My Computer => Properties => Advanced => Environment Variables
 
 =over
 
-=item * In case your Linux distribution provides ready-made packages, use these as far as possible. Full support for Lab::Measurement is e.g. provide by L<Gentoo Linux|https://www.gentoo.org/>.
+=item * In case your Linux distribution provides ready-made packages, use these
+as far as possible. Full support for Lab::Measurement is  provided, e.g., by L<Gentoo Linux|https://www.gentoo.org/>.
 
 =item * Install cpanminus, make, gcc and gnuplot
 (you can use your package manager).
@@ -76,8 +77,9 @@ L<Lab::Measurement::Backends>.
 
 =head2 Notes
 
-If you want to install Lab::Measurement into your home directory you can use
-the L<local::lib> package.
+If you want to install Lab::Measurement and its dependencies into your home
+directory, please take a look at L<plenv|https://github.com/tokuhirom/plenv> or
+L<perlbrew|https://perlbrew.pl/>. 
 
 =head1 COPYRIGHT AND LICENSE
 

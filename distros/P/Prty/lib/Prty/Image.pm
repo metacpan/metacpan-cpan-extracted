@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Option;
 use Prty::Path;
@@ -64,17 +64,6 @@ sub aspectRatio {
     @files|$fileA = $class->findImages(@filesAndDirs);
     @images|$imageA = $class->findImages(@filesAndDirs,-objects=>1);
 
-=head4 Description
-
-Liefere die Liste aller Bild-Dateien, die in @filesAndDirs
-vorkommen. Vereichnisse werden rekursiv nach Bild-Dateien
-durchsucht.
-
-Als Bild-Dateien werden alle Dateien angesehen, die eine
-Bild-Extension (.jpg, .png, .gif) besitzen. Bei Dateien ohne
-Extension wird mittels Prty::Image->type() geprüft, ob es sich
-um eine Bild-Datei handelt.
-
 =head4 Options
 
 =over 4
@@ -89,6 +78,17 @@ Sortiere die Bilder primär nach Zeit (und sekundär nach Name)
 oder nach Name. Per Default werden die Bilder unsortiert geliefert.
 
 =back
+
+=head4 Description
+
+Liefere die Liste aller Bild-Dateien, die in @filesAndDirs
+vorkommen. Vereichnisse werden rekursiv nach Bild-Dateien
+durchsucht.
+
+Als Bild-Dateien werden alle Dateien angesehen, die eine
+Bild-Extension (.jpg, .png, .gif) besitzen. Bei Dateien ohne
+Extension wird mittels Prty::Image->type() geprüft, ob es sich
+um eine Bild-Datei handelt.
 
 =cut
 
@@ -160,6 +160,16 @@ sub findImages {
 
     $standardName = $class->standardName($n,$width,$height,$extension,@opt);
 
+=head4 Options
+
+=over 4
+
+=item -name => $name
+
+Ergänzender Text zum Bild.
+
+=back
+
 =head4 Description
 
 Erzeuge einen Standard-Bild-Namen und liefere diesen zurück.
@@ -193,16 +203,6 @@ werden durch Bindestriche (-) ersetzt.
 
 Die Datei-Endung, die sich aus dem Typ des Bildes ableitet,
 z.B. 'jpg', 'png', 'gif' usw.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -name => $name
-
-Ergänzender Text zum Bild.
 
 =back
 
@@ -247,33 +247,6 @@ sub standardName {
 
     $type = $class->type($file,@opt);
 
-=head4 Description
-
-Ermittele den Typ der Bilddatei $file anhand seiner Magic-Bytes
-und liefere diesen zurück. Drei Bildtypen werden erkannt:
-
-=over 2
-
-=item *
-
-JPEG
-
-=item *
-
-PNG
-
-=item *
-
-GIF
-
-=back
-
-Wird der Bildtyp nicht erkannt, wirft die Methode eine Exception,
-sofern nicht die Option -sloppy gesetzt ist.
-
-Anstelle eines Dateinamens kann auch eine Skalarreferenz
-(in-memory Bild) übergeben werden.
-
 =head4 Options
 
 =over 4
@@ -300,6 +273,33 @@ Wirf keine Exception, wenn der Bild-Typ nicht erkannt wird, sondern
 liefere einen Leerstring ('').
 
 =back
+
+=head4 Description
+
+Ermittele den Typ der Bilddatei $file anhand seiner Magic-Bytes
+und liefere diesen zurück. Drei Bildtypen werden erkannt:
+
+=over 2
+
+=item *
+
+JPEG
+
+=item *
+
+PNG
+
+=item *
+
+GIF
+
+=back
+
+Wird der Bildtyp nicht erkannt, wirft die Methode eine Exception,
+sofern nicht die Option -sloppy gesetzt ist.
+
+Anstelle eines Dateinamens kann auch eine Skalarreferenz
+(in-memory Bild) übergeben werden.
 
 =cut
 
@@ -350,7 +350,7 @@ sub type {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

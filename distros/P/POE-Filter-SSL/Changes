@@ -144,3 +144,6 @@ Revision history for POE-Filter-SSL
 	debugging improved
 	Only import key/crt if key/crt is passed
 
+0.38	09.12.2017
+	chain-option leaded to ignore key/crt option
+

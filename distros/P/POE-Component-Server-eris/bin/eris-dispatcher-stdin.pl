@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: eris-dispatcher-stdin.pl
 # ABSTRACT: Example Implementation for using with STDIN
 
@@ -120,7 +120,7 @@ eris-dispatcher-stdin.pl - Example Implementation for using with STDIN
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Template::Lace;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 1;
 
@@ -459,9 +459,9 @@ you would prefer to pass information from the model to the component via attribu
 If you need to pass complex or structured data to your arguments you may do so using
 JSON:
 
-    <prefix-name
+    <prefix-name scalar='constant value'
         hash={"q":"The query string"}
-        array=["1","2","3"]
+        array=["1","2","3"] >
       [some addtional content such as HTML markup and text]
     </prefix-name>
 
@@ -905,6 +905,57 @@ organized and concise templates that are maintainable over the long term.
 You can review the documentation for each of the main classes in this distribution, and/or
 review the test cases for more examples.  Or if you want to use this for building web sites
 immediately, see L<Catalyst::View::Template::Lace> as you quickest path.
+
+=head1 LOCAL COMPONENTS (Experimental)
+
+Sometimes in a complex template you may have some repeated parts (or parts you'd like to break
+out into its own handler for the purposes of readability) which are not really usefully reusable
+in other templates.  In these cases you may define a component 'locally', that is that the handler
+is a method in the current view model.  For example:
+
+    package  MyApp::View::List;
+
+    use Moo;
+
+    has title => (is=>'ro', required=>1);
+    has list => (is=>'ro', required=>1);
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      $dom->title($self->title);
+    }
+
+    sub list {
+      my ($self, $dom) = @_;
+      $dom->ul(@{$self->list});
+    }
+
+    sub template {
+    my $class = shift;
+    return q[
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>TITLE</title>
+        </head>
+        <body>
+          <$.list>
+          <ul>
+            <li>list</li>
+          </ul>
+          </$.list>
+        </body>
+      </html>]
+    }
+
+    1;
+
+A few things to note.  Local components don't accept args (currently) since you already have access
+to C<$self>.  Patches accepted if you can help me find a valid reason for them.  Additionally you
+should keep in mind that the method that handles the local component gets the actual current DOM
+(not a copy) so you shouldn't return it (for now the return value of a local component is discarded).
+
+This is a experimental feature subject to change.
 
 =head1 IMPORTANT NOTE REGARDING VALID HTML
 

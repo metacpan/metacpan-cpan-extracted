@@ -4,9 +4,10 @@
       "Johan Vromans (jvromans@squirrel.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown"
+      "unknown",
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,7 +17,8 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "lib/App/Music/PlayTab"
       ]
    },
    "prereqs" : {
@@ -27,17 +29,45 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.5503"
          }
       },
       "runtime" : {
          "requires" : {
             "App::Packager" : "1.42",
-            "Clone" : "0"
+            "Clone" : "0",
+            "PDF::API2" : "2.03",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "App::Music::PlayTab" : {
+         "file" : "lib/App/Music/PlayTab.pm",
+         "version" : "2.904"
+      },
+      "playtab" : {
+         "file" : "script/playtab",
+         "version" : "2.904"
+      }
+   },
    "release_status" : "stable",
-   "version" : "2.903",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/playtab/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/sciurius/playtab"
+      }
+   },
+   "version" : "2.904",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

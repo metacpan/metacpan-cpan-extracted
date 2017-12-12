@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use JSON ();
 use Data::Printer ();
@@ -38,11 +38,6 @@ auf die Information in der Antwort zugegriffen werden.
 
     $pag = $class->new($json);
 
-=head4 Description
-
-Instantiiere ein Confluence Seiten-Objekt und liefere eine Referenz
-auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -57,6 +52,11 @@ die JSON-Repräsentation der Seite.
 =head4 Returns
 
 Page-Objekt (Klasse Prty::Confluence::Page)
+
+=head4 Description
+
+Instantiiere ein Confluence Seiten-Objekt und liefere eine Referenz
+auf dieses Objekt zurück.
 
 =cut
 
@@ -80,14 +80,14 @@ sub new {
 
     $h = $pag->hash;
 
+=head4 Returns
+
+Space (String)
+
 =head4 Description
 
 Liefere eine Referenz auf den Hash, der der JSON-Struktur der
 Seite entspricht.
-
-=head4 Returns
-
-Space (String)
 
 =cut
 
@@ -107,13 +107,13 @@ sub hash {
 
     $id = $pag->id;
 
-=head4 Description
-
-Liefere die Id der Seite.
-
 =head4 Returns
 
 Space (integer)
+
+=head4 Description
+
+Liefere die Id der Seite.
 
 =cut
 
@@ -132,13 +132,13 @@ sub id {
 
     $space = $pag->space;
 
-=head4 Description
-
-Liefere den Namen des Space, in dem die Seite liegt.
-
 =head4 Returns
 
 Space (String)
+
+=head4 Description
+
+Liefere den Namen des Space, in dem die Seite liegt.
 
 =cut
 
@@ -157,14 +157,14 @@ sub space {
 
     $title = $pag->title;
 
+=head4 Returns
+
+Seitentitel (String)
+
 =head4 Description
 
 Liefere den Titel der Seite. Der Seitentitel ist unabhängig
 vom Seiteninhalt.
-
-=head4 Returns
-
-Seitentitel (String)
 
 =cut
 
@@ -183,13 +183,13 @@ sub title {
 
     $n = $pag->version;
 
-=head4 Description
-
-Liefere die Version der Seite. Dies ist eine ganze Zahl > 0.
-
 =head4 Returns
 
 Versionsnummer (Integer)
+
+=head4 Description
+
+Liefere die Version der Seite. Dies ist eine ganze Zahl > 0.
 
 =cut
 
@@ -210,15 +210,15 @@ sub version {
 
     $str = $pag->asString;
 
+=head4 Returns
+
+Perl-Datenstruktur (als Text)
+
 =head4 Description
 
 Der Konstruktor der Klasse wandelt die JSON-Darstellung der Seite
 in eine analoge Perl-Datenstruktur. Diese Methode liefert die
 Zeichenketten-Repäsentation dieser Perl-Datenstruktur.
-
-=head4 Returns
-
-Perl-Datenstruktur (als Text)
 
 =cut
 
@@ -233,7 +233,7 @@ sub asString {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

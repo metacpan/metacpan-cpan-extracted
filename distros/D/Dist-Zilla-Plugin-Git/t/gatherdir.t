@@ -6,7 +6,7 @@ use Test::DZil;
 use Path::Tiny 0.012 qw( path );
 use Test::More      tests => 5;
 
-use lib 't';
+use lib 't/lib';
 use Util;
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

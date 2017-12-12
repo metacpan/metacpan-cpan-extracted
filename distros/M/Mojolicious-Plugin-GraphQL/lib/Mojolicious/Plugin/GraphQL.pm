@@ -7,7 +7,7 @@ use Mojo::JSON qw(decode_json to_json);
 use GraphQL::Execution qw(execute);
 use Module::Runtime qw(require_module);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my @DEFAULT_METHODS = qw(get post);
 my $EXECUTE = sub {

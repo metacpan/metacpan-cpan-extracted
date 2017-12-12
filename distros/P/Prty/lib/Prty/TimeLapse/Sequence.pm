@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Duration;
 use Prty::Path;
@@ -48,11 +48,6 @@ L<Prty::Hash>
 
     $tsq = $class->new(\@images);
 
-=head4 Description
-
-Instantiiere Bildsequenz-Objekt aus den Bilddateien \@images und
-liefere eine Referenz auf dieses Objekt zurück.
-
 =head4 Arguments
 
 =over 4
@@ -66,6 +61,11 @@ Array von Bilddatei-Objekten
 =head4 Returns
 
 Referenz auf das Bildsequenz-Objekt
+
+=head4 Description
+
+Instantiiere Bildsequenz-Objekt aus den Bilddateien \@images und
+liefere eine Referenz auf dieses Objekt zurück.
 
 =cut
 
@@ -89,13 +89,13 @@ sub new {
 
     $n = $tdr->count;
 
-=head4 Description
-
-Liefere die Anzahl der in der Sequenz enthaltenen Bilddateien.
-
 =head4 Returns
 
 Integer >= 0
+
+=head4 Description
+
+Liefere die Anzahl der in der Sequenz enthaltenen Bilddateien.
 
 =cut
 
@@ -114,15 +114,15 @@ sub count {
 
     $duration = $tdr->duration($framerate);
 
+=head4 Returns
+
+String
+
 =head4 Description
 
 Berechne die Dauer der Bildsequenz, wenn sie mit Framerate $framerate
 gerendert wird, und liefere das Ergebnis als Zeitdauer in
 dem Format C<HhMmS.XXXs> (drei Nachkommastellen).
-
-=head4 Returns
-
-String
 
 =cut
 
@@ -141,15 +141,15 @@ sub duration {
 
     $tdr->export($destDir);
 
+=head4 Returns
+
+nichts
+
 =head4 Description
 
 Exportiere die Bildsequenz nach Verzeichnis $destDir. Existiert
 $destDir nicht wird es erzeugt. Existiert das Verzeichnis, wird
 die Bildsequenz angehängt.
-
-=head4 Returns
-
-nichts
 
 =cut
 
@@ -184,10 +184,6 @@ sub export {
 =head4 Synopsis
 
     $tsq->generate($file,@opt);
-
-=head4 Description
-
-Erzeuge aus der Bildsequenz das Video $file.
 
 =head4 Arguments
 
@@ -244,6 +240,10 @@ Framerate des Video.
 =head4 Returns
 
 nichts
+
+=head4 Description
+
+Erzeuge aus der Bildsequenz das Video $file.
 
 =cut
 
@@ -371,13 +371,13 @@ sub generate {
 
     @images|$imageA = $tsq->images;
 
-=head4 Description
-
-Liefere die Liste der Bilddatei-Objekte der Sequenz.
-
 =head4 Returns
 
 Liste Bilddatei-Objekte. Im Skalarkontext eine Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste der Bilddatei-Objekte der Sequenz.
 
 =cut
 
@@ -397,15 +397,15 @@ sub images {
 
     $sha1 = $tsq->sha1(@keyVal);
 
+=head4 Returns
+
+SHA1 Digest
+
 =head4 Description
 
 Berechne den SHA1 Hash-Wert für die Sequenz und liefere diesen zurück.
 Der Hash-Wert wird gebildet über Pfad der Bilddatei, deren
 letztem Änderungszeitpunkt und deren Größe für alle Bilddateien.
-
-=head4 Returns
-
-SHA1 Digest
 
 =cut
 
@@ -438,14 +438,14 @@ sub sha1 {
 
     $tdr = $tdr->pick($n);
 
+=head4 Returns
+
+Bildsquenz-Objekt (für Chaining)
+
 =head4 Description
 
 Reduziere die Folge der Bilddatei-Objekte auf jedes n-te Element,
 d.h. entferne alle anderen
-
-=head4 Returns
-
-Bildsquenz-Objekt (für Chaining)
 
 =cut
 
@@ -471,14 +471,14 @@ sub pick {
 
     $tdr = $tdr->reverse;
 
+=head4 Returns
+
+Bildsquenz-Objekt (für Chaining)
+
 =head4 Description
 
 Kehre die Folge der Bilddatei-Objekte um, so dass das erste Bild zum
 letzten wird, das zweite zum vorletzten usw.
-
-=head4 Returns
-
-Bildsquenz-Objekt (für Chaining)
 
 =cut
 
@@ -496,7 +496,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

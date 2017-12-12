@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.24
+    version 2.25
 
 SYNOPSIS
 
@@ -123,6 +123,7 @@ DESCRIPTION
      travis_status = 0
      
      [Author::Plicease::SpecialPrereqs]
+     [Author::Plicease::NoUnsafeInc]
 
     Some exceptions:
 

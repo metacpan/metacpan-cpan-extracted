@@ -1,5 +1,44 @@
 Revision history for Perl module Math::Prime::Util
 
+0.70 2017-12-02
+
+    [FIXES]
+
+    - prime_count(a,b) incorrect for a={3..7} and b < 66000000.
+      First appeared in v0.65 (May 2017).
+      Reported by Trizen.  Fixed.
+
+    - Also impacted were nth_ramanujan_prime and _lower/_upper for
+      small input values.
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Some utility functions used prime counts.  Unlink for more isolation.
+
+    - prime_count_approx uses full precision for bigint or string input.
+
+    - LogarithmicIntegral and ExponentialIntegral will try to use
+      our GMP backend if possible.
+
+    - Work around old Math::BigInt::FastCalc (as_int() doesn't work right).
+
+    - prime_memfree also calls GMP's memfree function.  This will clear the
+      cached constants (e.g. Pi, Euler).
+
+    - Calling srand or csrand will also result in the GMP backend CSPRNG
+      functions being called.  This gives more consistent behavior.
+
+    [OTHER]
+
+    - Turned off threads testing unless release or extended testing is used.
+      A few smokers seem to have threads lib that die before we event start.
+
+    - Removed all Math::MPFR code and references.  The latest GMP backend
+      has everything we need.
+
+    - The MPU_NO_XS and MPU_NO_GMP environment variables are documented.
+
+
 0.69 2017-11-08
 
     [ADDED]

@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Slurp qw( slurp );
+use Getopt::Long;
+use POSIX qw( mktime strftime );
+use POSIX::strptime qw( strptime );
+use Text::Balanced qw( extract_bracketed );
+use YAML qw( LoadFile );
+
+GetOptions(
+   'timestamp|t=s' => \(my $TIMESTAMP = "%Y/%m/%d %H:%M:%S"),
+   'theme=s' => \(my $THEME = "../circle-fe-term/share/circle-fe-term.theme"), # TODO
+) or exit 1;
+
+my $filename = shift @ARGV; defined $filename or die "Require a filename\n";
+
+my %theme;
+{
+   foreach ( slurp $THEME ) {
+      next unless m/^(.*?)=(.*)$/;
+      $theme{$1} = $2;
+   }
+}
+
+open my $inh, "<", $filename or
+   die "Cannot read $filename - $!";
+
+my $headline = <$inh>;
+my ( $start, $items, $timefmt ) = $headline =~ m/^!LOG START="([^"]+)" ITEMS="([^"]+)" TIMESTAMP_FMT="([^"]+)"$/ or
+   die "Unable to parse headline - is this a yamllog file?\n";
+
+# The first string part of each log line is formatted as per $timefmt, but
+#   we'll need to know how many spaces it contains in order to strip it
+my $timere = join " +", ( "\\S+" ) x ( 1 + ( () = $timefmt =~ m/ +/g ) );
+$timere = qr/$timere/;
+
+my @startt = ( strptime $start, "%Y/%m/%d %H:%M:%S" )[0..5];
+
+while( <$inh> ) {
+   my $line = $_; chomp $line;
+   my ( $time, $type, $data ) = $line =~ m/^($timere) +(\S+) +(.*)$/ or
+      die "Unparseable line> $line\n";
+
+   my @thist = strptime $time, $timefmt;
+   $thist[$_] //= $startt[$_] for 0 .. 5;
+   $time = mktime @thist[0..5];
+
+   # YAML::Load doesn't like flow forms at toplevel. Lets cheat
+   $data = YAML::Load( "data: $data" )->{data};
+
+   my $timestamp = strftime $TIMESTAMP, localtime $time;
+
+   my $template = $theme{$type} or (print "<<unrecognised event $type>>\n"), next;
+
+   my $text = process( $template, $data );
+
+   print "$timestamp: $text\n";
+}
+
+sub process
+{
+   my ( $template, $args ) = @_;
+
+   my $ret = "";
+   while( length $template ) {
+      if( $template =~ s/^\$(\w+)// ) {
+         my $val = $args->{$1};
+         my @parts = ref $val eq "ARRAY" ? @$val : ( $val );
+         foreach my $part ( @parts ) {
+            $ret .= ref $part eq "ARRAY" ? $part->[0] : $part;
+         }
+      }
+      elsif( $template =~ m/^{/ ) {
+         my $piece = extract_bracketed( $template, "{}" );
+         s/^{//, s/}$// for $piece;
+
+         my ( $code, $content ) = split( m/ /, $piece, 2 );
+         $ret .= process( $content, $args );
+      }
+      else {
+         $template =~ s/^([^\$\{]+)//;
+         $ret .= $1;
+      }
+   }
+
+   return $ret;
+}

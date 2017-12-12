@@ -1,5 +1,5 @@
 package Catalyst::Action::SerializeBase;
-$Catalyst::Action::SerializeBase::VERSION = '1.20';
+$Catalyst::Action::SerializeBase::VERSION = '1.21';
 use Moose;
 use namespace::autoclean;
 
@@ -39,6 +39,8 @@ sub _load_content_plugins {
     my $sclass = $search_path . "::";
     my $sarg;
     my $map;
+    my $compliance_mode;
+    my $default;
 
     my $config;
     
@@ -53,6 +55,28 @@ sub _load_content_plugins {
         $config = $controller;
     }
     $map = $config->{'map'};
+    $default = $config->{'default'} if $config->{'default'};
+
+    # If we're in RFC 7231 compliance mode we need to determine if we're
+    # serializing or deserializing, then set the request object to
+    # look at the appropriate set of supported content types.
+    $compliance_mode = $config->{'compliance_mode'};
+    if($compliance_mode) {
+	my $serialize_mode = (split '::', $search_path)[-1];
+	if($serialize_mode eq 'Deserialize') {
+	    # Tell the request object to only look at the Content-Type header
+	    $c->request->set_content_type_only();
+
+	    # If we're in compliance mode and doing deserializing we want
+	    # to use the allowed content types for deserializing, not the
+	    # serializer map
+	    $map = $config->{'deserialize_map'};
+	    $default = $config->{'deserialize_default'} if $config->{'deserialize_default'};
+	} elsif($serialize_mode eq 'Serialize') {
+	    # Tell the request object to only look at the Accept header
+	    $c->request->set_accept_only();
+	}
+    }
 
     # pick preferred content type
     my @accepted_types; # priority order, best first
@@ -68,7 +92,7 @@ sub _load_content_plugins {
     # then content types requested by caller
     push @accepted_types, @{ $c->request->accepted_content_types };
     # then the default
-    push @accepted_types, $config->{'default'} if $config->{'default'};
+    push @accepted_types, $default if $default;
     # pick the best match that we have a serializer mapping for
     my ($content_type) = grep { $map->{$_} } @accepted_types;
 

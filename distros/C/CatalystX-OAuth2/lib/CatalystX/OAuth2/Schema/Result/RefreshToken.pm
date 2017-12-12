@@ -81,7 +81,7 @@ CatalystX::OAuth2::Schema::Result::RefreshToken - A table for registering refres
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 AUTHOR
 

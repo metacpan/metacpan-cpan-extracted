@@ -38,8 +38,8 @@ $zva->sense_sweep_points( value => 3 );
 
 for my $i ( 1 .. 3 ) {
     my $data = $zva->sparam_sweep( timeout => 10 );
-
-    is_deeply( [ $data->dims() ], [ 3, 3 ], "data PDL has dims 3 x 3" );
+    say $data;
+    is_deeply( [ $data->dims() ], [ 3, 5 ], "data PDL has dims 3 x 5" );
 
     my $freqs = $data->slice(":,0");
 
@@ -56,6 +56,10 @@ for my $i ( 1 .. 3 ) {
             "real or imaginary part of s-param is in [-0.01, 0.01]"
         ) || diag("pdl: $pdl");
     }
+    my $amp = $data->slice(":,3");
+    ok( all( $amp < -50 ), "amplitude < -50 dB" );
+    my $phase = $data->slice(":,4");
+    ok( all( abs($phase) < 3.14159 ), "phase is in interval [-pi,pi]" );
 }
 
 # Test getters and setters

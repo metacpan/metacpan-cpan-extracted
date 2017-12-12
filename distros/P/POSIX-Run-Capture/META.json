@@ -1,0 +1,55 @@
+{
+   "abstract" : "run command and capture its output",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POSIX-Run-Capture",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "POSIX::Run::Capture" : {
+         "file" : "lib/POSIX/Run/Capture.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/posixruncapture.git",
+         "web" : "http://git.gnu.org.ua/cgit/posixruncapture.git/"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

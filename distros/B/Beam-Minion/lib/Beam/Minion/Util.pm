@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -159,7 +159,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

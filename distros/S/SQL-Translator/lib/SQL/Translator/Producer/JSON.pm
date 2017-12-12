@@ -72,7 +72,7 @@ sub view_table {
         'name'        => $table->name,
         'order'       => $table->order,
         'options'     => $table->options  || [],
-        $table->comments ? ('comments'    => $table->comments ) : (),
+        $table->comments ? ('comments'    => [ $table->comments ] ) : (),
         'constraints' => [
             map { view_constraint($_) } $table->get_constraints
         ],
@@ -119,7 +119,7 @@ sub view_field {
         'is_primary_key'    => scalar $field->is_primary_key,
         'is_unique'         => scalar $field->is_unique,
         $field->is_auto_increment ? ('is_auto_increment' => 1) : (),
-        $field->comments ? ('comments' => $field->comments) : (),
+        $field->comments ? ('comments' => [ $field->comments ]) : (),
         keys %{$field->extra} ? ('extra' => { $field->extra } ) : (),
     };
 }
@@ -149,6 +149,9 @@ sub view_trigger {
         'fields'              => scalar $trigger->fields,
         'on_table'            => scalar $trigger->on_table,
         'action'              => scalar $trigger->action,
+        (defined $trigger->scope ? (
+            'scope'           => scalar $trigger->scope,
+        ) : ()),
         keys %{$trigger->extra} ? ('extra' => { $trigger->extra } ) : (),
     };
 }

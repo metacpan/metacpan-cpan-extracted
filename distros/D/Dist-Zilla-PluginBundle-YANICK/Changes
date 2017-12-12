@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-YANICK
 
+0.28.0 2017-12-03
+  [ ENHANCEMENTS ]
+    - Travis tweaks.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 169 insertions(+), 6 deletions(-)
+
 0.27.0 2017-04-16
   [ ENHANCEMENTS ]
     - YANICK is the default Authority.

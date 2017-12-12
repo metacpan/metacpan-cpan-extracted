@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use Net::GitHub;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.5');
+our $VERSION = version->new('0.6.6');
 
 extends 'Group::Git';
 
@@ -76,6 +76,11 @@ sub _github {
         : (
             login => $conf->{username} ? $conf->{username} : prompt( -prompt => 'github.com username : ' ),
             pass  => $conf->{password} ? $conf->{password} : prompt( -prompt => 'github.com password : ', -echo => '*' ),
+            (
+                $conf->{otp}
+                ? ( pass  => prompt( -prompt => 'github.com password : ', -echo => '*' ) )
+                : ()
+            )
         )
     );
 }
@@ -90,7 +95,7 @@ Group::Git::Github - Adds reading all repositories you have access to on github.
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Github version 0.6.5.
+This documentation refers to Group::Git::Github version 0.6.6.
 
 
 =head1 SYNOPSIS
@@ -102,6 +107,15 @@ This documentation refers to Group::Git::Github version 0.6.5.
        conf => {
            username => 'joeblogs@gmail.com',
            password => 'myverysecurepassword',
+       },
+   );
+
+   # or if you have two factor auth turned on
+   my $ggg = Group::Git::Github->new(
+       conf => {
+           username => 'joeblogs@gmail.com',
+           password => 'myverysecurepassword',
+           ota      => 1,
        },
    );
 

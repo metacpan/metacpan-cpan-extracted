@@ -5,7 +5,9 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
+
+use Novel::Robot::Browser::CookieJar;
 
 use Encode::Detect::CJK qw/detect/;
 use Encode;
@@ -41,7 +43,12 @@ sub _init_browser {
   $headers ||= {};
   my %h = ( %DEFAULT_HEADER, %$headers );
 
-  my $http = HTTP::Tiny->new( default_headers => \%h, );
+  my $cookie_jar = Novel::Robot::Browser::CookieJar->new();
+
+  my $http = HTTP::Tiny->new(
+    default_headers => \%h,
+    cookie_jar      => $cookie_jar,
+  );
 
   return $http;
 }
@@ -54,41 +61,41 @@ sub request_urls {
   my $info = $o{info_sub}->( \$html ) || {};
   $info->{url} = $url;
 
-  my $url_list = $o{url_list_sub} ? $o{url_list_sub}->( \$html ) : [];
+  my $url_list =
+      exists $info->{url_list} ? $info->{url_list}
+    : defined $o{url_list_sub} ? $o{url_list_sub}->( \$html, $info )
+    :                            [];
 
-  #my $arr = $o{select_url_sub} ? $o{select_url_sub}->( $url_list ) : $url_list;
-
-  my $cnt = 0;
+  my $cnt          = 0;
+  my $url_list_num = scalar( @$url_list );
   my $progress;
-  $progress = Term::ProgressBar->new( { count => scalar( @$url_list ) } ) if ( $o{verbose} );
+  $progress = Term::ProgressBar->new( { count => $url_list_num } ) if ( $o{verbose} );
 
   my @result;
+  my $item_id = 0;
   for my $i ( 0 .. $#$url_list ) {
     my $r = $url_list->[$i];
     $r = { url => $r || '' } if ( ref( $r ) ne 'HASH' );
     $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
+    $r->{id} //= $i + 1;
 
-    my $j = exists $r->{id} ? $r->{id} : ( $i + 1 );
-    next if ( $o{min_item_num} and $j < $o{min_item_num} );
-    last if ( $o{max_item_num} and $j > $o{max_item_num} );
+    next if ( $o{min_item_num} and $r->{id} < $o{min_item_num} );
+    last if ( $o{max_item_num} and $r->{id} > $o{max_item_num} );
 
     my $h = $self->request_url( $r->{url}, $r->{post_data} );
     my $c = \$h;
 
-    my @res = exists $o{content_sub} ? $o{content_sub}->( $c ) : ( $c );
-    my $item_id = $j;
-    $_->{id} //= $item_id++ for @res;
-    push @result, $#res == 0 ? $res[0] : \@res;
+    my $cr = exists $o{content_sub} ? $o{content_sub}->( $c ) : ( $c );
+    $cr->{$_} ||= $r->{$_} for keys( %$r );
+    push @result, $cr;
 
     $cnt = $i;
     $progress->update( $cnt ) if ( $o{verbose} );
   } ## end for my $i ( 0 .. $#$url_list)
 
-  $progress->update( scalar( @$url_list ) ) if ( $o{verbose} );
+  $progress->update( $url_list_num ) if ( $o{verbose} );
 
-  $info->{chapter_list} = $url_list;
-
-  return ( $info, \@result );
+  return ( $info, \@result, $url_list_num );
 } ## end sub request_urls
 
 sub request_urls_iter {
@@ -123,6 +130,7 @@ sub request_urls_iter {
   } ## end unless ( $o{stop_sub} and ...)
 
   $data_list = [ reverse @$data_list ] if ( $o{reverse_content_list} );  #lofter倒序
+  $info->{floor_num} = $data_list->[-1]{id} || scalar( @$data_list ) || $i;
 
   if ( $o{item_sub} ) {
     my $item_id = 0;
@@ -138,27 +146,26 @@ sub request_urls_iter {
 } ## end sub request_urls_iter
 
 sub is_item_in_range {
-    my ( $self, $id, $min, $max ) = @_;
-    return 1 unless ( $id );
-    return 0 if ( $min and $id < $min );
-    return 0 if ( $max and $id > $max );
-    return 1;
+  my ( $self, $id, $min, $max ) = @_;
+  return 1 unless ( $id );
+  return 0 if ( $min and $id < $min );
+  return 0 if ( $max and $id > $max );
+  return 1;
 }
 
 sub is_list_overflow {
-    my ( $self, $r, $max ) = @_;
+  my ( $self, $r, $max ) = @_;
 
-    return unless ( $max );
+  return unless ( $max );
 
-    my $floor_num = scalar( @$r );
-    my $id = $r->[-1]{id} // $floor_num;
+  my $floor_num = scalar( @$r );
+  my $id = $r->[-1]{id} // $floor_num;
 
-    return if ( $id < $max );
+  return if ( $id < $max );
 
-    $#{$r} = $max - 1;
-    return 1;
+  $#{$r} = $max - 1;
+  return 1;
 }
-
 
 sub request_url {
   my ( $self, $url, $form ) = @_;
@@ -177,6 +184,8 @@ sub request_url {
 sub format_post_content {
   my ( $self, $form ) = @_;
 
+  return $form unless ( ref( $form ) eq 'HASH' );
+
   my @params;
   while ( my ( $k, $v ) = each %$form ) {
     push @params, uri_escape( $k ) . "=" . uri_escape( $v );
@@ -189,16 +198,15 @@ sub format_post_content {
 sub request_url_simple {
   my ( $self, $url, $form ) = @_;
 
-  my $res = $form
-    ? $self->{browser}->request(
-    'POST', $url,
-    { content => $self->format_post_content( $form ),
-      headers => {
-        %DEFAULT_HEADER,
-        'content-type' => 'application/x-www-form-urlencoded'
-      },
-    } )
-    : $self->{browser}->get( $url );
+  my $res;
+  if ( $form ) {
+    $self->{browser}{headers}{'content-type'} = 'application/x-www-form-urlencoded';
+    $res = $self->{browser}->request(
+      'POST', $url,
+      { content => $self->format_post_content( $form ) } );
+  } else {
+    $res = $self->{browser}->get( $url );
+  }
   return $DEFAULT_URL_CONTENT unless ( $res->{success} );
 
   my $html;
@@ -213,5 +221,51 @@ sub request_url_simple {
 
   return $r || $DEFAULT_URL_CONTENT;
 } ## end sub request_url_simple
+
+
+sub set_cookie {
+  my ( $self, $cookie ) = @_;
+  $self->{browser}{cookie_jar}{cookie} = $cookie;
+  return $self;
+}
+
+sub clear_cookie {
+    my ( $self, $cookie ) = @_;
+    $self->set_cookie('');
+}
+
+sub read_moz_cookie {
+  my ( $self, $cookie, $dom ) = @_;
+
+  if ( -f $cookie ) {                  #firefox sqlite3
+    my $sqlite3_cookie = `sqlite3 "$cookie" "select * from moz_cookies where baseDomain='$dom'"`;
+    my @segment = map { my @c = split /\|/; "$c[3]=$c[4]" } ( split /\n/, $sqlite3_cookie );
+    $cookie = join( "; ", @segment );
+  }
+
+  $self->set_cookie( $cookie );
+  return $cookie;
+
+  #use HTTP::CookieJar;
+  #my @segment;
+  #if ( -f $cookie ) {                  #firefox sqlite3
+  #my $sqlite3_cookie = `sqlite3 "$cookie" "select name,value,host,path from moz_cookies where baseDomain='$dom'"`;
+  #@segment = map { [ split /\|/ ] } ( split /\n/, $sqlite3_cookie );
+  #}else{
+  #@segment = map { [ (split /=/, $_), $dom, '/' ] } ( split /;\s*/, $cookie );
+  #}
+
+  #$self->{browser}{cookie_jar}{store}{ $_->[2] }{ $_->[3] }{ $_->[0] } = {
+  #domain => $_->[2],
+  #path => $_->[3],
+  #name => $_->[0],
+  #value => $_->[1],
+  #creation_time=> time,
+  #last_access_time => time,
+  #}  for @segment;
+
+  #$cookie = join( "; ", map { "$_->[1]=$_->[2]" } @segment );
+
+} ## end sub read_moz_cookie
 
 1;

@@ -1,9 +1,9 @@
 package AnyEvent::ProcessPool::Util;
 # ABSTRACT: A multi-process pool for Perl
-$AnyEvent::ProcessPool::Util::VERSION = '0.06';
-use strict;
-use warnings;
+$AnyEvent::ProcessPool::Util::VERSION = '0.07';
 use v5.10;
+use common::sense;
+
 use parent 'Exporter';
 
 use Data::UUID::MT;
@@ -57,7 +57,7 @@ sub cpu_count {
       last OS_CHECK;
     };
 
-    /linux/i && do {
+    /linux|android/i && do {
       my @output; local *PROC;
       if ( open PROC, "< /proc/cpuinfo" ) { ## no critic
         @output = grep /^processor/ => <PROC>;
@@ -87,7 +87,7 @@ sub cpu_count {
 
     $cpus = "";
     require Carp;
-    Carp::carp( "get_ncpu: unknown operationg system" );
+    Carp::carp('cpu_count: unknown operating system');
   }
 
   return sprintf '%d', ($cpus || 1);
@@ -107,7 +107,7 @@ AnyEvent::ProcessPool::Util - A multi-process pool for Perl
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

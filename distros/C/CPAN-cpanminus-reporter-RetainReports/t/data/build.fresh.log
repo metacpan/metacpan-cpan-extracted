@@ -1,0 +1,3241 @@
+cpanm (App::cpanminus) 1.7030 on perl 5.021011 built for darwin-2level
+Work directory is /Volumes/amaretto/Users/ether/.cpanm/work/1429648766.18629
+You have make /usr/bin/make
+You have /opt/local/bin/wget
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.04)
+Checking if you have ExtUtils::Install 1.46 ... Yes (2.04)
+Searching App::cpanminus::reporter on mirror http://mirrors.gossamer-threads.com/CPAN ...
+Downloading index file http://mirrors.gossamer-threads.com/CPAN/modules/02packages.details.txt.gz ...
+Uncompressing index file...
+--> Working on App::cpanminus::reporter
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GARU/App-cpanminus-reporter-0.13.tar.gz
+-> OK
+Unpacking App-cpanminus-reporter-0.13.tar.gz
+Entering App-cpanminus-reporter-0.13
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring App-cpanminus-reporter-0.13
+Running Makefile.PL
+Warning: prerequisite CPAN::Testers::Common::Client 0.1 not found.
+Warning: prerequisite Capture::Tiny 0 not found.
+Warning: prerequisite Config::Tiny 2.08 not found.
+Warning: prerequisite File::HomeDir 0.58 not found.
+Warning: prerequisite IO::Prompt::Tiny 0 not found.
+Warning: prerequisite LWP::Protocol::https 0 not found.
+Warning: prerequisite Metabase::Resource 0 not found.
+Warning: prerequisite Test::Reporter 1.54 not found.
+Warning: prerequisite Test::Reporter::Transport::Metabase 0 not found.
+Warning: prerequisite Try::Tiny 0 not found.
+Warning: prerequisite URI 0 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for App::cpanminus::reporter
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have URI 0 ... No
+Checking if you have Pod::Usage 0 ... Yes (1.64)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Config::Tiny 2.08 ... No
+Checking if you have CPAN::Testers::Common::Client 0.1 ... No
+Checking if you have File::Spec 3.19 ... Yes (3.56)
+Checking if you have Capture::Tiny 0 ... No
+Checking if you have File::HomeDir 0.58 ... No
+Checking if you have Getopt::Long 0 ... Yes (2.45)
+Checking if you have Parse::CPAN::Meta 0 ... Yes (1.4414)
+Checking if you have Metabase::Resource 0 ... No
+Checking if you have CPAN::Meta::Converter 0 ... Yes (2.150001)
+Checking if you have Test::Reporter 1.54 ... No
+Checking if you have Try::Tiny 0 ... No
+Checking if you have Test::Reporter::Transport::Metabase 0 ... No
+Checking if you have IO::Prompt::Tiny 0 ... No
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have LWP::Protocol::https 0 ... No
+Checking if you have Carp 0 ... Yes (1.36)
+==> Found dependencies: URI, Config::Tiny, CPAN::Testers::Common::Client, Capture::Tiny, File::HomeDir, Metabase::Resource, Test::Reporter, Try::Tiny, Test::Reporter::Transport::Metabase, IO::Prompt::Tiny, LWP::Protocol::https
+Searching URI on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on URI
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/E/ET/ETHER/URI-1.67.tar.gz
+-> OK
+Unpacking URI-1.67.tar.gz
+Entering URI-1.67
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring URI-1.67
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for URI
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have MIME::Base64 2 ... Yes (3.15)
+Checking if you have Test 0 ... Yes (1.26)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have utf8 0 ... Yes (1.16)
+Checking if you have Exporter 5.57 ... Yes (5.72)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have parent 0 ... Yes (0.232)
+Building and testing URI-1.67
+Manifying 11 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/clone.t ......... ok
+t/cwd.t ........... ok
+t/distmanifest.t .. skipped: these tests are for authors only!
+t/data.t .......... ok
+t/abs.t ........... ok
+t/escape-char.t ... ok
+t/escape.t ........ ok
+t/ftp.t ........... ok
+t/generic.t ....... ok
+t/file.t .......... ok
+t/gopher.t ........ ok
+t/http.t .......... ok
+t/heuristic.t ..... ok
+t/idna.t .......... ok
+t/mailto.t ........ ok
+t/ldap.t .......... ok
+t/mms.t ........... ok
+t/mix.t ........... ok
+t/news.t .......... ok
+t/num_eq.t ........ ok
+t/old-absconf.t ... ok
+t/iri.t ........... ok
+t/pop.t ........... ok
+t/old-relbase.t ... ok
+t/old-file.t ...... ok
+t/punycode.t ...... ok
+t/query-param.t ... ok
+t/rel.t ........... ok
+t/query.t ......... ok
+t/rfc2732.t ....... ok
+t/rsync.t ......... ok
+t/rtsp.t .......... ok
+t/sip.t ........... ok
+t/split.t ......... ok
+t/roy-test.t ...... ok
+t/urn-isbn.t ...... skipped: Needs the Business::ISBN module installed
+t/urn-oid.t ....... ok
+t/old-base.t ...... ok
+t/utf8.t .......... ok
+t/storable.t ...... ok
+All tests successful.
+Files=40, Tests=611,  0 wallclock secs ( 0.14 usr  0.05 sys +  0.86 cusr  0.16 csys =  1.21 CPU)
+Result: PASS
+Manifying 11 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/Escape.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/Heuristic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/IRI.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/QueryParam.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/Split.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/URL.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/WithBase.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_foreign.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_generic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_idna.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_ldap.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_login.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_punycode.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_query.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_segment.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_server.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/_userpass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/data.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/ftp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/gopher.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/http.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/https.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/ldap.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/ldapi.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/ldaps.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/mailto.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/mms.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/news.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/nntp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/pop.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/rlogin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/rsync.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/rtsp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/rtspu.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/sip.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/sips.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/snews.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/ssh.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/telnet.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/tn3270.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/urn.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/Base.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/FAT.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/Mac.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/OS2.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/QNX.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/Unix.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/file/Win32.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/urn/isbn.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/URI/urn/oid.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::Escape.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::Heuristic.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::QueryParam.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::Split.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::URL.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::WithBase.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::_punycode.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::data.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::file.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/URI::ldap.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed URI-1.67
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/URI-1.67/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/URI-1.67/install.json
+Searching Config::Tiny on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Config::Tiny
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RS/RSAVAGE/Config-Tiny-2.22.tgz
+-> OK
+Unpacking Config-Tiny-2.22.tgz
+Entering Config-Tiny-2.22
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Config-Tiny-2.22
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Config::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have File::Spec 3.3 ... Yes (3.56)
+Checking if you have File::Temp 0.22 ... Yes (0.2304)
+Checking if you have Test::More 0.47 ... Yes (1.001014)
+Checking if you have utf8 0 ... Yes (1.16)
+Checking if you have UNIVERSAL 0 ... Yes (1.12)
+Building and testing Config-Tiny-2.22
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01.compile.t ...... ok
+t/03.read.string.t .. ok
+t/02.main.t ......... ok
+t/04.utf8.t ......... ok
+All tests successful.
+Files=4, Tests=43,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.10 cusr  0.02 csys =  0.15 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Config/Tiny.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Config::Tiny.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Config-Tiny-2.22
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Config-Tiny-2.22/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Config-Tiny-2.22/install.json
+Searching CPAN::Testers::Common::Client on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on CPAN::Testers::Common::Client
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GARU/CPAN-Testers-Common-Client-0.10.tar.gz
+-> OK
+Unpacking CPAN-Testers-Common-Client-0.10.tar.gz
+Entering CPAN-Testers-Common-Client-0.10
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring CPAN-Testers-Common-Client-0.10
+Running Makefile.PL
+Warning: prerequisite Capture::Tiny 0 not found.
+Warning: prerequisite Devel::Platform::Info 0 not found.
+Warning: prerequisite File::HomeDir 0.58 not found.
+Warning: prerequisite Probe::Perl 0 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for CPAN::Testers::Common::Client
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Devel::Platform::Info 0 ... No
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have IPC::Cmd 0 ... Yes (0.92)
+Checking if you have Capture::Tiny 0 ... No
+Checking if you have Probe::Perl 0 ... No
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have File::HomeDir 0.58 ... No
+Checking if you have File::Glob 0 ... Yes (1.24)
+Checking if you have File::Path 0 ... Yes (2.09)
+Checking if you have File::Spec 3.19 ... Yes (3.56)
+Checking if you have Fcntl 0 ... Yes (1.13)
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (7.04)
+Checking if you have Config::Perl::V 0 ... Yes (0.24)
+==> Found dependencies: Devel::Platform::Info, Capture::Tiny, Probe::Perl, File::HomeDir
+Searching Devel::Platform::Info on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Devel::Platform::Info
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/B/BA/BARBIE/Devel-Platform-Info-0.15.tar.gz
+-> OK
+Unpacking Devel-Platform-Info-0.15.tar.gz
+Entering Devel-Platform-Info-0.15
+Checking configure dependencies from META.json
+Configuring Devel-Platform-Info-0.15
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Devel::Platform::Info
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Test::Builder::Tester 0 ... Yes (1.28)
+Checking if you have Test::More 0.70 ... Yes (1.001014)
+Checking if you have IO::File 0 ... Yes (1.16)
+Building and testing Devel-Platform-Info-0.15
+Manifying 9 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/50mac_test.t ........ ok
+t/51mac_mock.t ........ skipped: Test::MockObject::Extends required for these tests
+# OS: darwin
+t/01base.t ............ ok
+# .. source => 
+#    .. sw_vers -productVersion => 10.10.3
+#    .. uname -a => Darwin jaeger 14.3.0 Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64 x86_64
+#    .. uname -p => i386
+#    .. uname -s => Darwin
+#    .. uname -v => Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64
+# .. is32bit => 1
+# .. oslabel => OS X
+# .. osname => Mac
+# .. is64bit => 0
+# .. osvers => 10.10.3
+# .. archname => i386
+# .. osflag => darwin
+# .. kernel => Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64
+# .. codename => Yosemite
+t/02diag.t ............ ok
+t/55win32_agnostic.t .. ok
+t/90podtest.t ......... skipped: Author tests not required for installation
+t/91podcover.t ........ skipped: Author tests not required for installation
+t/56win32.t ........... ok
+t/94metatest.t ........ skipped: Author tests not required for installation
+t/96metatest.t ........ skipped: Author tests not required for installation
+t/95changedate.t ...... skipped: Author tests not required for installation
+All tests successful.
+Files=11, Tests=45,  1 wallclock secs ( 0.03 usr  0.02 sys +  0.21 cusr  0.05 csys =  0.31 CPU)
+Result: PASS
+Manifying 9 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/BSD.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/BeOS.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/Irix.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/Linux.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/Mac.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/SCO.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/Solaris.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Devel/Platform/Info/Win32.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::BSD.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::BeOS.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::Irix.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::Linux.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::Mac.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::SCO.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::Solaris.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Devel::Platform::Info::Win32.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Devel-Platform-Info-0.15
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Devel-Platform-Info-0.15/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Devel-Platform-Info-0.15/install.json
+Searching Capture::Tiny on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Capture::Tiny
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/Capture-Tiny-0.28.tar.gz
+-> OK
+Unpacking Capture-Tiny-0.28.tar.gz
+Entering Capture-Tiny-0.28
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring Capture-Tiny-0.28
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Capture::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have Test::More 0.62 ... Yes (1.001014)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have IO::Handle 0 ... Yes (1.35)
+Checking if you have lib 0 ... Yes (0.63)
+Building and testing Capture-Tiny-0.28
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01-Capture-Tiny.t ........ ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     ExtUtils::MakeMaker  any     7.04
+#     File::Spec           any     3.56
+#     IO::File             any     1.16
+#     Test::More          0.62 1.001014
+#     lib                  any     0.63
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module       Want   Have
+#     ------------ ---- ------
+#     Carp          any   1.36
+#     Exporter      any   5.72
+#     File::Spec    any   3.56
+#     File::Temp    any 0.2304
+#     IO::Handle    any   1.35
+#     Scalar::Util  any   1.41
+#     strict        any   1.09
+#     warnings      any   1.32
+# 
+t/00-report-prereqs.t ...... ok
+t/02-capture.t ............. ok
+t/09-preserve-exit-code.t .. ok
+t/03-tee.t ................. ok
+t/07-stderr-closed.t ....... ok
+t/06-stdout-closed.t ....... ok
+t/08-stdin-closed.t ........ ok
+t/10-stdout-string.t ....... ok
+t/11-stderr-string.t ....... ok
+t/16-catch-errors.t ........ ok
+t/17-pass-results.t ........ ok
+t/18-custom-capture.t ...... ok
+t/12-stdin-string.t ........ ok
+t/14-stderr-tied.t ......... ok
+t/13-stdout-tied.t ......... ok
+t/15-stdin-tied.t .......... ok
+t/20-stdout-badtie.t ....... ok
+t/21-stderr-badtie.t ....... ok
+t/22-stdin-badtie.t ........ ok
+t/24-all-badtied.t ......... ok
+t/23-all-tied.t ............ ok
+All tests successful.
+Files=22, Tests=11996,  9 wallclock secs ( 1.50 usr  0.14 sys + 24.80 cusr 19.32 csys = 45.76 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Capture/Tiny.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Capture::Tiny.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Capture-Tiny-0.28
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Capture-Tiny-0.28/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Capture-Tiny-0.28/install.json
+Searching Probe::Perl on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Probe::Perl
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/K/KW/KWILLIAMS/Probe-Perl-0.03.tar.gz
+-> OK
+Unpacking Probe-Perl-0.03.tar.gz
+Entering Probe-Perl-0.03
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Probe-Perl-0.03
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Probe::Perl
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Config 0 ... Yes (5.021011)
+Checking if you have Test 0 ... Yes (1.26)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Building and testing Probe-Perl-0.03
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/author-critic.t .. skipped: these tests are for testing by the author
+t/basic.t .......... ok
+All tests successful.
+Files=2, Tests=19,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.03 cusr  0.01 csys =  0.06 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Probe/Perl.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Probe::Perl.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Probe-Perl-0.03
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Probe-Perl-0.03/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Probe-Perl-0.03/install.json
+Searching File::HomeDir on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on File::HomeDir
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/A/AD/ADAMK/File-HomeDir-1.00.tar.gz
+-> OK
+Unpacking File-HomeDir-1.00.tar.gz
+Entering File-HomeDir-1.00
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (7.04)
+Configuring File-HomeDir-1.00
+Running Makefile.PL
+Warning: prerequisite File::Which 0.05 not found.
+Warning: prerequisite Mac::SystemDirectory 0.04 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for File::HomeDir
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.47 ... Yes (1.001014)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have File::Which 0.05 ... No
+Checking if you have Mac::SystemDirectory 0.04 ... No
+Checking if you have File::Path 2.01 ... Yes (2.09)
+Checking if you have File::Temp 0.19 ... Yes (0.2304)
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (7.04)
+Checking if you have File::Spec 3 ... Yes (3.56)
+Checking if you have Cwd 3 ... Yes (3.56)
+==> Found dependencies: File::Which, Mac::SystemDirectory
+Searching File::Which on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on File::Which
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/P/PL/PLICEASE/File-Which-1.16.tar.gz
+-> OK
+Unpacking File-Which-1.16.tar.gz
+Entering File-Which-1.16
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring File-Which-1.16
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for File::Which
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.80 ... Yes (1.001014)
+Checking if you have Getopt::Std 0 ... Yes (1.11)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have File::Spec 0.60 ... Yes (3.56)
+Building and testing File-Which-1.16
+cp script/pwhich blib/script/pwhich
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/pwhich
+Manifying 1 pod document
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01_compile.t ......... ok
+t/01_compile_script.t .. skipped: test requires Test::Script
+t/02_all.t ............. ok
+t/03_simple.t .......... ok
+t/04_pwhich.t .......... ok
+t/04_pwhich_script.t ... skipped: test requires Test::Script
+All tests successful.
+Files=6, Tests=18,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.10 cusr  0.02 csys =  0.16 CPU)
+Result: PASS
+Manifying 1 pod document
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/Which.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/pwhich.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::Which.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/pwhich
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed File-Which-1.16
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-Which-1.16/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-Which-1.16/install.json
+Searching Mac::SystemDirectory on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Mac::SystemDirectory
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/C/CH/CHANSEN/Mac-SystemDirectory-0.06.tar.gz
+-> OK
+Unpacking Mac-SystemDirectory-0.06.tar.gz
+Entering Mac-SystemDirectory-0.06
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.42 ... Yes (7.04)
+Configuring Mac-SystemDirectory-0.06
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Mac::SystemDirectory
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.86 ... Yes (1.001014)
+Checking if you have ExtUtils::MakeMaker 6.42 ... Yes (7.04)
+Building and testing Mac-SystemDirectory-0.06
+Running Mkbootstrap for Mac::SystemDirectory ()
+chmod 644 "SystemDirectory.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-Iinc" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/typemap"  SystemDirectory.xs > SystemDirectory.xsc && mv SystemDirectory.xsc SystemDirectory.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"0.06\" -DXS_VERSION=\"0.06\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/darwin-2level/CORE"  -ObjC -DHAS_BOOL SystemDirectory.c
+SystemDirectory.xs:8:8: warning: extra tokens at end of #endif directive [-Wextra-tokens]
+#endif Move
+       ^
+       //
+SystemDirectory.xs:12:8: warning: extra tokens at end of #endif directive [-Wextra-tokens]
+#endif I_POLL
+       ^
+       //
+SystemDirectory.xs:92:12: warning: enumeration values 'NSAutosavedInformationDirectory', 'NSApplicationScriptsDirectory', and 'NSTrashDirectory' not handled in switch [-Wswitch]
+    switch(directory) {
+           ^
+3 warnings generated.
+rm -f blib/arch/auto/Mac/SystemDirectory/SystemDirectory.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong -lobjc -framework CoreFoundation -framework Foundation SystemDirectory.o  -o blib/arch/auto/Mac/SystemDirectory/SystemDirectory.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/Mac/SystemDirectory/SystemDirectory.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-Iinc" -MExtUtils::Command::MM -e 'cp_nonempty' -- SystemDirectory.bs blib/arch/auto/Mac/SystemDirectory/SystemDirectory.bs 644
+Manifying 1 pod document
+Running Mkbootstrap for Mac::SystemDirectory ()
+chmod 644 "SystemDirectory.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+# Mac::SystemDirectory 0.06, Perl 5.021011, /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+t/000_load.t .... ok
+# limiting available functions to Mac OS X 10.10
+t/005_import.t .. ok
+t/020_basic.t ... ok
+t/010_usage.t ... ok
+All tests successful.
+Files=4, Tests=14,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.08 cusr  0.02 csys =  0.13 CPU)
+Result: PASS
+Manifying 1 pod document
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Mac/SystemDirectory/SystemDirectory.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Mac/SystemDirectory.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Mac::SystemDirectory.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Mac-SystemDirectory-0.06
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Mac-SystemDirectory-0.06/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Mac-SystemDirectory-0.06/install.json
+Building and testing File-HomeDir-1.00
+Manifying 10 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+# Implemented by: File::HomeDir::Darwin::Cocoa
+t/01_compile.t ........ ok
+t/02_main.t ........... ok
+t/10_test.t ........... ok
+t/12_darwin_carbon.t .. skipped: Not running on 32-bit Darwin
+t/11_darwin.t ......... ok
+t/13_darwin_cocoa.t ... ok
+All tests successful.
+Files=6, Tests=94,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.19 cusr  0.03 csys =  0.26 CPU)
+Result: PASS
+Manifying 10 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Darwin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Driver.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/FreeDesktop.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/MacOS9.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Test.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Unix.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Windows.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Darwin/Carbon.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/HomeDir/Darwin/Cocoa.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Darwin.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Darwin::Carbon.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Darwin::Cocoa.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Driver.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::FreeDesktop.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::MacOS9.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Test.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Unix.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::HomeDir::Windows.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed File-HomeDir-1.00
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-HomeDir-1.00/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-HomeDir-1.00/install.json
+Building and testing CPAN-Testers-Common-Client-0.10
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/02-config.t ............... ok
+# Testing CPAN::Testers::Common::Client 0.10
+t/00.load.t ................. ok
+t/03-history.t .............. ok
+t/03-undef-prereq-report.t .. ok
+t/01-basic.t ................ ok
+All tests successful.
+Files=5, Tests=80,  0 wallclock secs ( 0.03 usr  0.01 sys +  1.38 cusr  0.18 csys =  1.60 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Common/Client.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Common/Client/Config.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Common/Client/History.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Common/Client/PrereqCheck.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Common::Client.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Common::Client::Config.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Common::Client::History.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Common::Client::PrereqCheck.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed CPAN-Testers-Common-Client-0.10
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-Testers-Common-Client-0.10/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-Testers-Common-Client-0.10/install.json
+Already tried Capture::Tiny. Skipping.
+Already tried File::HomeDir. Skipping.
+Searching Metabase::Resource on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Metabase::Resource
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/Metabase-Fact-0.024.tar.gz
+-> OK
+Unpacking Metabase-Fact-0.024.tar.gz
+Entering Metabase-Fact-0.024
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring Metabase-Fact-0.024
+Running Makefile.PL
+Warning: prerequisite CPAN::DistnameInfo 0 not found.
+Warning: prerequisite Data::GUID 0 not found.
+Warning: prerequisite IO::Prompt::Tiny 0 not found.
+Warning: prerequisite JSON 2 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Metabase::Fact
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have JSON 2 ... No
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Getopt::Long 0 ... Yes (2.45)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Test::Fatal 0 ... No
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Pod::Usage 0 ... Yes (1.64)
+Checking if you have Data::GUID 0 ... No
+Checking if you have CPAN::DistnameInfo 0 ... No
+Checking if you have File::Temp 0.20 ... Yes (0.2304)
+Checking if you have version 0 ... Yes (0.9909)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Checking if you have File::Spec::Functions 0 ... Yes (3.56)
+Checking if you have List::Util 0 ... Yes (1.41)
+Checking if you have Cwd 0 ... Yes (3.56)
+Checking if you have IO::Prompt::Tiny 0 ... No
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have lib 0 ... Yes (0.63)
+Checking if you have overload 0 ... Yes (1.25)
+==> Found dependencies: JSON, Test::Fatal, Data::GUID, CPAN::DistnameInfo, IO::Prompt::Tiny
+Searching JSON on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on JSON
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/M/MA/MAKAMAKA/JSON-2.90.tar.gz
+-> OK
+Unpacking JSON-2.90.tar.gz
+Entering JSON-2.90
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring JSON-2.90
+Running Makefile.PL
+Welcome to JSON (v.2.90)
+=============================
+
+
+ *************************** CAUTION **************************************
+ *                                                                        *
+ * INCOMPATIBLE CHANGE (JSON::XS version 2.90)                            *
+ *                                                                        *
+ * JSON.pm had patched JSON::XS::Boolean and JSON::PP::Boolean internally *
+ * on loading time for making these modules inherit JSON::Boolean.        *
+ * But since JSON::XS v3.0 it use Types::Serialiser as boolean class.     *
+ * Then now JSON.pm breaks boolean classe overload features and           *
+ * -support_by_pp if JSON::XS v3.0 or later is installed.                 *
+ *                                                                        *
+ * JSON::true and JSON::false returned JSON::Boolean objects.             *
+ * For workaround, they return JSON::PP::Boolean objects in this version. *
+ *                                                                        *
+ *     isa_ok(JSON::true, 'JSON::PP::Boolean');                           *
+ *                                                                        *
+ * And it discards a feature:                                             *
+ *                                                                        *
+ *     ok(JSON::true eq 'true');                                          *
+ *                                                                        *
+ * In other word, JSON::PP::Boolean overload numeric only.                *
+ *                                                                        *
+ *     ok( JSON::true == 1 );                                             *
+ *                                                                        *
+ **************************************************************************
+
+
+ ************************** CAUTION **************************
+ * This is 'JSON version 2' and there are many differences   *
+ * to version 1.xx                                           *
+ * Please check your applications useing old version.        *
+ *   See to 'INCOMPATIBLE CHANGES TO OLD VERSION' and 'TIPS' *
+ *************************************************************
+
+
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for JSON
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Building and testing JSON-2.90
+Manifying 5 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_pod.t .................. skipped: Test::Pod 1.00 required for testing POD
+t/00_load.t ................. ok
+t/01_utf8.t ................. ok
+t/02_error.t ................ ok
+t/03_types.t ................ ok
+t/06_pc_pretty.t ............ ok
+t/07_pc_esc.t ............... ok
+t/09_pc_extra_number.t ...... ok
+t/10_pc_keysort.t ........... ok
+t/08_pc_base.t .............. ok
+t/11_pc_expo.t .............. ok
+t/15_prefix.t ............... ok
+t/12_blessed.t .............. ok
+t/14_latin1.t ............... ok
+t/16_tied.t ................. ok
+t/13_limit.t ................ ok
+t/17_relaxed.t .............. ok
+t/20_unknown.t .............. ok
+t/18_json_checker.t ......... ok
+t/21_evans_bugrep.t ......... ok
+t/22_comment_at_eof.t ....... ok
+t/e00_func.t ................ ok
+t/e02_bool.t ................ ok
+t/e01_property.t ............ ok
+t/e03_bool2.t ............... ok
+t/19_incr.t ................. ok
+t/e04_sortby.t .............. ok
+t/e05_esc_slash.t ........... ok
+t/e06_allow_barekey.t ....... ok
+t/e08_decode.t .............. ok
+t/e07_allow_singlequote.t ... ok
+t/e09_encode.t .............. ok
+t/e11_conv_blessed_univ.t ... ok
+t/e12_upgrade.t ............. ok
+t/e13_overloaded_eq.t ....... ok
+t/e10_bignum.t .............. ok
+t/e14_decode_prefix.t ....... ok
+t/e15_tie_ixhash.t .......... ok
+t/e90_misc.t ................ ok
+t/e16_incr_parse_fixed.t .... ok
+t/x02_error.t ............... ok
+t/x00_load.t ................ ok
+t/x16_tied.t ................ ok
+t/x17_strange_overload.t .... ok
+t/x12_blessed.t ............. ok
+t/xe01_property.t ........... ok
+t/xe02_bool.t ............... ok
+t/xe03_bool2.t .............. ok
+t/xe04support_by_pp.t ....... ok
+t/xe08_decode.t ............. ok
+t/xe05_indent_length.t ...... ok
+t/xe11_conv_blessed_univ.t .. ok
+t/xe10_bignum.t ............. ok
+t/xe19_xs_and_suportbypp.t .. ok
+t/xe12_boolean.t ............ ok
+t/xe20_croak_message.t ...... ok
+t/xe21_is_pp.t .............. ok
+t/99_binary.t ............... ok
+All tests successful.
+Files=58, Tests=3801,  2 wallclock secs ( 0.43 usr  0.09 sys +  3.21 cusr  0.31 csys =  4.04 CPU)
+Result: PASS
+Manifying 5 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/JSON.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/JSON/backportPP.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/JSON/backportPP/Boolean.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/JSON/backportPP/Compat5005.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/JSON/backportPP/Compat5006.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/JSON.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/JSON::backportPP.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/JSON::backportPP::Boolean.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/JSON::backportPP::Compat5005.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/JSON::backportPP::Compat5006.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed JSON-2.90
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/JSON-2.90/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/JSON-2.90/install.json
+Searching Test::Fatal on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Test::Fatal
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Test-Fatal-0.014.tar.gz
+-> OK
+Unpacking Test-Fatal-0.014.tar.gz
+Entering Test-Fatal-0.014
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Test-Fatal-0.014
+Running Makefile.PL
+Warning: prerequisite Try::Tiny 0.07 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Test::Fatal
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Try::Tiny 0.07 ... No
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Exporter 5.57 ... Yes (5.72)
+Checking if you have Test::Builder 0 ... Yes (1.001014)
+Checking if you have Test::Builder::Tester 0 ... Yes (1.28)
+Checking if you have overload 0 ... Yes (1.25)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have Carp 0 ... Yes (1.36)
+==> Found dependencies: Try::Tiny
+Searching Try::Tiny on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Try::Tiny
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DO/DOY/Try-Tiny-0.22.tar.gz
+-> OK
+Unpacking Try-Tiny-0.22.tar.gz
+Entering Try-Tiny-0.22
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Try-Tiny-0.22
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Try::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have if 0 ... Yes (0.0604)
+Checking if you have IO::Handle 0 ... Yes (1.35)
+Checking if you have constant 0 ... Yes (1.33)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Exporter 5.57 ... Yes (5.72)
+Checking if you have IPC::Open3 0 ... Yes (1.18)
+Building and testing Try-Tiny-0.22
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/basic.t ...................... ok
+t/context.t .................... ok
+t/erroneous_usage.t ............ ok
+t/finally.t .................... ok
+t/00-compile.t ................. ok
+t/given_when.t ................. ok
+t/global_destruction_forked.t .. ok
+t/named.t ...................... skipped: Sub::Name required
+t/when.t ....................... ok
+t/global_destruction_load.t .... ok
+All tests successful.
+Files=10, Tests=99,  1 wallclock secs ( 0.04 usr  0.01 sys +  0.26 cusr  0.05 csys =  0.36 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Try/Tiny.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Try::Tiny.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Try-Tiny-0.22
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Try-Tiny-0.22/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Try-Tiny-0.22/install.json
+Building and testing Test-Fatal-0.014
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/basic.t .............. ok
+t/like-exception.t ..... ok
+t/todo.t ............... ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module                Want     Have
+#     --------------------- ---- --------
+#     ExtUtils::MakeMaker    any     7.04
+#     File::Spec             any     3.56
+#     Test::Builder::Tester  any     1.28
+#     Test::More            0.96 1.001014
+#     overload               any     1.25
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module        Want     Have
+#     ------------- ---- --------
+#     Carp           any     1.36
+#     Exporter      5.57     5.72
+#     Test::Builder  any 1.001014
+#     Try::Tiny     0.07     0.22
+#     strict         any     1.09
+#     warnings       any     1.32
+# 
+t/00-report-prereqs.t .. ok
+All tests successful.
+Files=4, Tests=16,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.16 cusr  0.02 csys =  0.21 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Fatal.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Fatal.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Test-Fatal-0.014
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Fatal-0.014/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Fatal-0.014/install.json
+Searching Data::GUID on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Data::GUID
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Data-GUID-0.048.tar.gz
+-> OK
+Unpacking Data-GUID-0.048.tar.gz
+Entering Data-GUID-0.048
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Data-GUID-0.048
+Running Makefile.PL
+Warning: prerequisite Data::UUID 1.148 not found.
+Warning: prerequisite Sub::Exporter 0.90 not found.
+Warning: prerequisite Sub::Install 0.03 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Data::GUID
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have bytes 0 ... Yes (1.04)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have overload 0 ... Yes (1.25)
+Checking if you have Sub::Install 0.03 ... No
+Checking if you have Data::UUID 1.148 ... No
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Sub::Exporter 0.90 ... No
+==> Found dependencies: Sub::Install, Data::UUID, Sub::Exporter
+Searching Sub::Install on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Sub::Install
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Sub-Install-0.928.tar.gz
+-> OK
+Unpacking Sub-Install-0.928.tar.gz
+Entering Sub-Install-0.928
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Sub-Install-0.928
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Sub::Install
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have B 0 ... Yes (1.58)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Building and testing Sub-Install-0.928
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# 
+# 
+# Generated by Dist::Zilla::Plugin::ReportVersions::Tiny v1.10
+# perl: 5.021011 (wanted any version) on darwin from /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+# 
+# B                                             => 1.58       (want any version)
+# Carp                                          => 1.36       (want any version)
+# ExtUtils::MakeMaker                           => 7.04       (want 6.30)   
+# Scalar::Util                                  => 1.41       (want any version)
+# Test::More                                    => 1.001014   (want 0.96)   
+# strict                                        => 1.09       (want any version)
+# warnings                                      => 1.32       (want any version)
+# 
+# Thanks for using my code.  I hope it works for you.
+# If not, please try and include this output in the bug report.
+# That will help me reproduce the issue and solve your problem.
+# 
+t/auto_as.t ................... ok
+t/000-report-versions-tiny.t .. ok
+t/inst-blessed.t .............. ok
+t/export.t .................... ok
+t/install.t ................... ok
+t/misc_errors.t ............... ok
+t/reinstall.t ................. ok
+t/SI_install.t ................ ok
+t/SI_reinstall.t .............. ok
+All tests successful.
+Files=9, Tests=65,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.23 cusr  0.03 csys =  0.30 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Sub/Install.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Sub::Install.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Sub-Install-0.928
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Sub-Install-0.928/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Sub-Install-0.928/install.json
+Searching Data::UUID on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Data::UUID
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Data-UUID-1.220.tar.gz
+-> OK
+Unpacking Data-UUID-1.220.tar.gz
+Entering Data-UUID-1.220
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Data-UUID-1.220
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Configured options (run perl Makefile.PL --help for how to change this):
+	UUID state storage: /var/folders/4f/y458q_3n2g75w6m_k19nn8kr0000gp/T
+	default umask: 0007
+Generating a Unix-style Makefile
+Writing Makefile for Data::UUID
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Digest::MD5 0 ... Yes (2.54)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing Data-UUID-1.220
+Running Mkbootstrap for Data::UUID ()
+chmod 644 "UUID.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/typemap" -typemap "typemap"  UUID.xs > UUID.xsc && mv UUID.xsc UUID.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"1.220\" -DXS_VERSION=\"1.220\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/darwin-2level/CORE"  -D_STDIR=\"/var/folders/4f/y458q_3n2g75w6m_k19nn8kr0000gp/T\" -D__darwin__ -D_DEFAULT_UMASK=0007 UUID.c
+rm -f blib/arch/auto/Data/UUID/UUID.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong UUID.o  -o blib/arch/auto/Data/UUID/UUID.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/Data/UUID/UUID.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::Command::MM -e 'cp_nonempty' -- UUID.bs blib/arch/auto/Data/UUID/UUID.bs 644
+Manifying 1 pod document
+Running Mkbootstrap for Data::UUID ()
+chmod 644 "UUID.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/pod-coverage.t .......... skipped: Pod coverage tests are not active. Please set $ENV{AUTHOR_TESTING} to activate.
+t/pod.t ................... skipped: Pod coverage tests are not active. Please set $ENV{AUTHOR_TESTING} to activate.
+t/leaky_dollar_bang.t ..... ok
+t/basic.t ................. ok
+t/from-name-collisions.t .. ok
+t/threads.t ............... skipped: Perl not compiled with useithreads
+t/segv.t .................. ok
+All tests successful.
+Files=7, Tests=32,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.13 cusr  0.02 csys =  0.19 CPU)
+Result: PASS
+Manifying 1 pod document
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Data/UUID/UUID.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Data/UUID.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Data::UUID.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Data-UUID-1.220
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-UUID-1.220/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-UUID-1.220/install.json
+Searching Sub::Exporter on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Sub::Exporter
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Sub-Exporter-0.987.tar.gz
+-> OK
+Unpacking Sub-Exporter-0.987.tar.gz
+Entering Sub-Exporter-0.987
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Sub-Exporter-0.987
+Running Makefile.PL
+Warning: prerequisite Data::OptList 0.100 not found.
+Warning: prerequisite Params::Util 0.14 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Sub::Exporter
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have lib 0 ... Yes (0.63)
+Checking if you have overload 0 ... Yes (1.25)
+Checking if you have IPC::Open3 0 ... Yes (1.18)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Data::OptList 0.100 ... No
+Checking if you have Sub::Install 0.92 ... Yes (0.928)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have IO::Handle 0 ... Yes (1.35)
+Checking if you have subs 0 ... Yes (1.02)
+Checking if you have Params::Util 0.14 ... No
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have strict 0 ... Yes (1.09)
+==> Found dependencies: Data::OptList, Params::Util
+Searching Data::OptList on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Data::OptList
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/R/RJ/RJBS/Data-OptList-0.109.tar.gz
+-> OK
+Unpacking Data-OptList-0.109.tar.gz
+Entering Data-OptList-0.109
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring Data-OptList-0.109
+Running Makefile.PL
+Warning: prerequisite Params::Util 0 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Data::OptList
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Sub::Install 0.921 ... Yes (0.928)
+Checking if you have Params::Util 0 ... No
+Checking if you have List::Util 0 ... Yes (1.41)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+==> Found dependencies: Params::Util
+Searching Params::Util on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Params::Util
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/A/AD/ADAMK/Params-Util-1.07.tar.gz
+-> OK
+Unpacking Params-Util-1.07.tar.gz
+Entering Params-Util-1.07
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::CBuilder 0.27 ... Yes (0.280221)
+Checking if you have ExtUtils::MakeMaker 6.52 ... Yes (7.04)
+Configuring Params-Util-1.07
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Params::Util
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 6.52 ... Yes (7.04)
+Checking if you have Scalar::Util 1.18 ... Yes (1.41)
+Checking if you have File::Spec 0.80 ... Yes (3.56)
+Checking if you have Test::More 0.42 ... Yes (1.001014)
+Building and testing Params-Util-1.07
+Running Mkbootstrap for Params::Util ()
+chmod 644 "Util.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/typemap"  Util.xs > Util.xsc && mv Util.xsc Util.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"1.07\" -DXS_VERSION=\"1.07\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/darwin-2level/CORE"  -DPERL_EXT Util.c
+rm -f blib/arch/auto/Params/Util/Util.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong Util.o  -o blib/arch/auto/Params/Util/Util.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/Params/Util/Util.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::Command::MM -e 'cp_nonempty' -- Util.bs blib/arch/auto/Params/Util/Util.bs 644
+Manifying 1 pod document
+Running Mkbootstrap for Params::Util ()
+chmod 644 "Util.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01_compile.t .... ok
+t/04_codelike.t ... ok
+t/03_all.t ........ ok
+t/05_typelike.t ... ok
+t/06_invocant.t ... ok
+t/07_handle.t ..... ok
+t/09_insideout.t .. ok
+t/11_compile.t .... ok
+t/08_driver.t ..... ok
+t/13_all.t ........ ok
+t/14_codelike.t ... ok
+t/02_main.t ....... ok
+t/15_typelike.t ... ok
+t/16_invocant.t ... ok
+t/17_handle.t ..... ok
+t/19_insideout.t .. ok
+t/18_driver.t ..... ok
+t/12_main.t ....... ok
+All tests successful.
+Files=18, Tests=1704,  0 wallclock secs ( 0.14 usr  0.02 sys +  0.55 cusr  0.08 csys =  0.79 CPU)
+Result: PASS
+Manifying 1 pod document
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Params/Util/Util.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Params/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Params::Util.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Params-Util-1.07
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Params-Util-1.07/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Params-Util-1.07/install.json
+Building and testing Data-OptList-0.109
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# 
+# 
+# Generated by Dist::Zilla::Plugin::ReportVersions::Tiny v1.10
+# perl: 5.021011 (wanted any version) on darwin from /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+# 
+# ExtUtils::MakeMaker                           => 7.04       (want 6.30)   
+# List::Util                                    => 1.41       (want any version)
+# Params::Util                                  => 1.07       (want any version)
+# Sub::Install                                  => 0.928      (want 0.921)  
+# Test::More                                    => 1.001014   (want 0.96)   
+# strict                                        => 1.09       (want any version)
+# warnings                                      => 1.32       (want any version)
+# 
+# Thanks for using my code.  I hope it works for you.
+# If not, please try and include this output in the bug report.
+# That will help me reproduce the issue and solve your problem.
+# 
+t/000-report-versions-tiny.t .. ok
+t/hash.t ...................... ok
+t/mkopt.t ..................... ok
+All tests successful.
+Files=3, Tests=35,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.12 cusr  0.01 csys =  0.16 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Data/OptList.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Data::OptList.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Data-OptList-0.109
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-OptList-0.109/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-OptList-0.109/install.json
+Already tried Params::Util. Skipping.
+Building and testing Sub-Exporter-0.987
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# 
+# 
+# Generated by Dist::Zilla::Plugin::ReportVersions::Tiny v1.10
+# perl: 5.021011 (wanted 5.006) on darwin from /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+# 
+# Carp                                          => 1.36       (want any version)
+# Data::OptList                                 => 0.109      (want 0.100)  
+# Exporter                                      => 5.72       (want any version)
+# ExtUtils::MakeMaker                           => 7.04       (want 6.30)   
+# File::Spec                                    => 3.56       (want any version)
+# IO::Handle                                    => 1.35       (want any version)
+# IPC::Open3                                    => 1.18       (want any version)
+# Params::Util                                  => 1.07       (want 0.14)   
+# Sub::Install                                  => 0.928      (want 0.92)   
+# Test::More                                    => 1.001014   (want 0.96)   
+# base                                          => 2.22       (want any version)
+# lib                                           => 0.63       (want any version)
+# overload                                      => 1.25       (want any version)
+# strict                                        => 1.09       (want any version)
+# subs                                          => 1.02       (want any version)
+# warnings                                      => 1.32       (want any version)
+# 
+# Thanks for using my code.  I hope it works for you.
+# If not, please try and include this output in the bug report.
+# That will help me reproduce the issue and solve your problem.
+# 
+t/00-compile.t ................ ok
+t/000-report-versions-tiny.t .. ok
+t/col-init.t .................. ok
+t/collection.t ................ ok
+t/expand-group.t .............. ok
+t/gen-callable.t .............. ok
+t/faux-export.t ............... ok
+t/inherited.t ................. ok
+t/group-generator.t ........... ok
+t/into-level.t ................ ok
+t/real-export-groupgen.t ...... ok
+t/util-curry.t ................ ok
+t/real-export-href.t .......... ok
+t/util-currychain.t ........... ok
+t/real-export-setup.t ......... ok
+t/util-mixin.t ................ skipped: the mixin exporter requires Package::Generator
+t/util-namemap.t .............. skipped: not actually offerring this feature yet
+t/util-like.t ................. ok
+t/util-merge.t ................ ok
+t/valid-config.t .............. ok
+All tests successful.
+Files=20, Tests=252,  1 wallclock secs ( 0.07 usr  0.02 sys +  0.63 cusr  0.10 csys =  0.82 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Sub/Exporter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Sub/Exporter/Cookbook.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Sub/Exporter/Tutorial.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Sub/Exporter/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Sub::Exporter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Sub::Exporter::Cookbook.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Sub::Exporter::Tutorial.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Sub::Exporter::Util.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Sub-Exporter-0.987
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Sub-Exporter-0.987/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Sub-Exporter-0.987/install.json
+Building and testing Data-GUID-0.048
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# 
+# 
+# Generated by Dist::Zilla::Plugin::ReportVersions::Tiny v1.10
+# perl: 5.021011 (wanted any version) on darwin from /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+# 
+# Carp                                          => 1.36       (want any version)
+# Data::UUID                                    => 1.220      (want 1.148)  
+# ExtUtils::MakeMaker                           => 7.04       (want 6.30)   
+# Sub::Exporter                                 => 0.987      (want 0.90)   
+# Sub::Install                                  => 0.928      (want 0.03)   
+# Test::More                                    => 1.001014   (want 0.96)   
+# bytes                                         => 1.04       (want any version)
+# overload                                      => 1.25       (want any version)
+# strict                                        => 1.09       (want any version)
+# warnings                                      => 1.32       (want any version)
+# 
+# Thanks for using my code.  I hope it works for you.
+# If not, please try and include this output in the bug report.
+# That will help me reproduce the issue and solve your problem.
+# 
+# Testing Data::GUID 0.048
+t/00-load.t ................... ok
+t/000-report-versions-tiny.t .. ok
+t/import.t .................... ok
+t/basic.t ..................... ok
+t/multipass_from.t ............ ok
+All tests successful.
+Files=5, Tests=96,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.19 cusr  0.03 csys =  0.26 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Data/GUID.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Data::GUID.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Data-GUID-0.048
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-GUID-0.048/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Data-GUID-0.048/install.json
+Searching CPAN::DistnameInfo on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on CPAN::DistnameInfo
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GB/GBARR/CPAN-DistnameInfo-0.12.tar.gz
+-> OK
+Unpacking CPAN-DistnameInfo-0.12.tar.gz
+Entering CPAN-DistnameInfo-0.12
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring CPAN-DistnameInfo-0.12
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for CPAN::DistnameInfo
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Building and testing CPAN-DistnameInfo-0.12
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/path.t .. ok
+t/ext.t ... ok
+All tests successful.
+Files=2, Tests=829,  0 wallclock secs ( 0.06 usr  0.01 sys +  0.12 cusr  0.00 csys =  0.19 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/DistnameInfo.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::DistnameInfo.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed CPAN-DistnameInfo-0.12
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-DistnameInfo-0.12/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-DistnameInfo-0.12/install.json
+Searching IO::Prompt::Tiny on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on IO::Prompt::Tiny
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/IO-Prompt-Tiny-0.003.tar.gz
+-> OK
+Unpacking IO-Prompt-Tiny-0.003.tar.gz
+Entering IO-Prompt-Tiny-0.003
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring IO-Prompt-Tiny-0.003
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for IO::Prompt::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have Capture::Tiny 0.12 ... Yes (0.28)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have warnings 0 ... Yes (1.32)
+Building and testing IO-Prompt-Tiny-0.003
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/prompt.t ............. ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     Capture::Tiny       0.12     0.28
+#     ExtUtils::MakeMaker  any     7.04
+#     File::Spec           any     3.56
+#     File::Temp           any   0.2304
+#     Test::More          0.96 1.001014
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module   Want Have
+#     -------- ---- ----
+#     Carp      any 1.36
+#     Exporter  any 5.72
+#     strict    any 1.09
+#     warnings  any 1.32
+# 
+t/00-report-prereqs.t .. ok
+All tests successful.
+Files=2, Tests=5,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.13 cusr  0.01 csys =  0.16 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Prompt/Tiny.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::Prompt::Tiny.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed IO-Prompt-Tiny-0.003
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-Prompt-Tiny-0.003/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-Prompt-Tiny-0.003/install.json
+Building and testing Metabase-Fact-0.024
+cp bin/metabase-profile blib/script/metabase-profile
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/metabase-profile
+Manifying 1 pod document
+Manifying 16 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t t/fact/*.t t/report/*.t t/resource/*.t t/user/*.t
+t/fact/string.t ............... ok
+t/base.t ...................... ok
+t/report/report-as-string.t ... ok
+t/fact/hash.t ................. ok
+t/resource/base.t ............. ok
+t/resource/cpan.t ............. ok
+t/report/report-check-spec.t .. ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+#    Version Module                  
+#   -------- ------------------------
+#       0.12 CPAN::DistnameInfo      
+#   2.150001 CPAN::Meta              
+#      2.132 CPAN::Meta::Requirements
+#       1.36 Carp                    
+#       3.56 Cwd                     
+#      0.048 Data::GUID              
+#       7.04 ExtUtils::MakeMaker     
+#       3.56 File::Spec              
+#       3.56 File::Spec::Functions   
+#     0.2304 File::Temp              
+#       2.45 Getopt::Long            
+#      0.003 IO::Prompt::Tiny        
+#       2.90 JSON                    
+#       1.41 List::Util              
+#       1.64 Pod::Usage              
+#      0.014 Test::Fatal             
+#   1.001014 Test::More              
+#       0.63 lib                     
+#       1.25 overload                
+#       1.09 strict                  
+#     0.9909 version                 
+#       1.32 warnings                
+t/00-report-prereqs.t ......... ok
+t/report/report-open-close.t .. ok
+t/resource/perl.t ............. ok
+t/user/profile.t .............. ok
+All tests successful.
+Files=11, Tests=136,  0 wallclock secs ( 0.05 usr  0.02 sys +  0.67 cusr  0.09 csys =  0.83 CPU)
+Result: PASS
+Manifying 1 pod document
+Manifying 16 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Fact.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Report.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Fact/Hash.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Fact/String.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/cpan.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/metabase.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/perl.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/cpan/distfile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/metabase/fact.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/metabase/user.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Resource/perl/commit.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/User/EmailAddress.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/User/FullName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/User/Profile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/User/Secret.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/metabase-profile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Fact.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Fact::Hash.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Fact::String.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Report.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::cpan.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::cpan::distfile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::metabase.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::metabase::fact.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::metabase::user.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::perl.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Resource::perl::commit.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::User::EmailAddress.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::User::FullName.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::User::Profile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::User::Secret.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/metabase-profile
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Metabase-Fact-0.024
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Metabase-Fact-0.024/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Metabase-Fact-0.024/install.json
+Searching Test::Reporter on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Test::Reporter
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/Test-Reporter-1.62.tar.gz
+-> OK
+Unpacking Test-Reporter-1.62.tar.gz
+Entering Test-Reporter-1.62
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring Test-Reporter-1.62
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Test::Reporter
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Time::Local 0 ... Yes (1.2300)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Sys::Hostname 0 ... Yes (1.20)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have constant 0 ... Yes (1.33)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Cwd 0 ... Yes (3.56)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Checking if you have FileHandle 0 ... Yes (2.02)
+Checking if you have File::Find 0 ... Yes (1.29)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have vars 0 ... Yes (1.03)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Building and testing Test-Reporter-1.62
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/3-file-transport.t ... ok
+t/rt-89404.t ........... ok
+t/6-write-read-crlf.t .. ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     Data::Dumper         any    2.158
+#     ExtUtils::MakeMaker  any     7.04
+#     File::Find           any     1.29
+#     File::Spec           any     3.56
+#     Test::More          0.88 1.001014
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module        Want   Have
+#     ------------- ---- ------
+#     Carp           any   1.36
+#     Cwd            any   3.56
+#     File::Temp     any 0.2304
+#     FileHandle     any   2.02
+#     Sys::Hostname  any   1.20
+#     Time::Local    any 1.2300
+#     base           any   2.22
+#     constant       any   1.33
+#     strict         any   1.09
+#     vars           any   1.03
+#     warnings       any   1.32
+# 
+# === Runtime Recommends ===
+# 
+#     Module      Want    Have
+#     ----------- ---- -------
+#     Mail::Send   any missing
+#     Net::DNS     any missing
+#     Net::Domain  any    3.05
+#     Net::SMTP    any    3.05
+# 
+t/00-report-prereqs.t .. ok
+t/1-reporter.t ......... ok
+All tests successful.
+Files=5, Tests=140,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.42 cusr  0.09 csys =  0.55 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Reporter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Reporter/Transport.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Reporter/Transport/File.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Reporter/Transport/Null.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Reporter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Reporter::Transport.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Reporter::Transport::File.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Reporter::Transport::Null.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Test-Reporter-1.62
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Reporter-1.62/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Reporter-1.62/install.json
+Already tried Try::Tiny. Skipping.
+Searching Test::Reporter::Transport::Metabase on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Test::Reporter::Transport::Metabase
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/Test-Reporter-Transport-Metabase-1.999009.tar.gz
+-> OK
+Unpacking Test-Reporter-Transport-Metabase-1.999009.tar.gz
+Entering Test-Reporter-Transport-Metabase-1.999009
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring Test-Reporter-Transport-Metabase-1.999009
+Running Makefile.PL
+Warning: prerequisite CPAN::Testers::Report 1.999001 not found.
+Warning: prerequisite Metabase::Client::Simple 0.008 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Test::Reporter::Transport::Metabase
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have CPAN::Testers::Report 1.999001 ... No
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have Config::Perl::V 0 ... Yes (0.24)
+Checking if you have Test::Reporter::Transport 1.57 ... Yes (1.62)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have File::Glob 0 ... Yes (1.24)
+Checking if you have Metabase::User::Secret 0.016 ... Yes (0.024)
+Checking if you have Metabase::Client::Simple 0.008 ... No
+Checking if you have Metabase::User::Profile 0.016 ... Yes (0.024)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have JSON 2 ... Yes (2.90)
+==> Found dependencies: CPAN::Testers::Report, Metabase::Client::Simple
+Searching CPAN::Testers::Report on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on CPAN::Testers::Report
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/CPAN-Testers-Report-1.999003.tar.gz
+-> OK
+Unpacking CPAN-Testers-Report-1.999003.tar.gz
+Entering CPAN-Testers-Report-1.999003
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring CPAN-Testers-Report-1.999003
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for CPAN::Testers::Report
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Metabase::Report 0.016 ... Yes (0.024)
+Checking if you have Metabase::Fact::String 0.016 ... Yes (0.024)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Checking if you have Metabase::Fact::Hash 0.016 ... Yes (0.024)
+Checking if you have strict 0 ... Yes (1.09)
+Building and testing CPAN-Testers-Report-1.999003
+Manifying 9 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01-CPAN-Testers-Report.t .. ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     ExtUtils::MakeMaker  any     7.04
+#     File::Spec           any     3.56
+#     Test::More          0.88 1.001014
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module                  Want  Have
+#     ---------------------- ----- -----
+#     Carp                     any  1.36
+#     Metabase::Fact::Hash   0.016 0.024
+#     Metabase::Fact::String 0.016 0.024
+#     Metabase::Report       0.016 0.024
+#     strict                   any  1.09
+#     warnings                 any  1.32
+# 
+t/00-report-prereqs.t ....... ok
+All tests successful.
+Files=2, Tests=10,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.13 cusr  0.01 csys =  0.16 CPU)
+Result: PASS
+Manifying 9 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Report.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/InstalledModules.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/LegacyReport.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/PerlConfig.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/Prereqs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/TestEnvironment.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/TestOutput.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/TestSummary.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/CPAN/Testers/Fact/TesterComment.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::InstalledModules.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::LegacyReport.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::PerlConfig.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::Prereqs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::TestEnvironment.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::TestOutput.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::TestSummary.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Fact::TesterComment.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/CPAN::Testers::Report.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed CPAN-Testers-Report-1.999003
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-Testers-Report-1.999003/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/CPAN-Testers-Report-1.999003/install.json
+Searching Metabase::Client::Simple on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Metabase::Client::Simple
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/D/DA/DAGOLDEN/Metabase-Client-Simple-0.010.tar.gz
+-> OK
+Unpacking Metabase-Client-Simple-0.010.tar.gz
+Entering Metabase-Client-Simple-0.010
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Configuring Metabase-Client-Simple-0.010
+Running Makefile.PL
+Warning: prerequisite HTTP::Request::Common 0 not found.
+Warning: prerequisite HTTP::Status 5.817 not found.
+Warning: prerequisite LWP::UserAgent 5.54 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Metabase::Client::Simple
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Metabase::User::Profile 0 ... Yes (0.024)
+Checking if you have JSON 2 ... Yes (2.90)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Metabase::User::Secret 0 ... Yes (0.024)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Checking if you have HTTP::Status 5.817 ... No
+Checking if you have HTTP::Request::Common 0 ... No
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have File::Spec 0 ... Yes (3.56)
+Checking if you have URI 0 ... Yes (1.67)
+Checking if you have LWP::UserAgent 5.54 ... No
+==> Found dependencies: HTTP::Status, HTTP::Request::Common, LWP::UserAgent
+Searching HTTP::Status on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTTP::Status
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTTP-Message-6.06.tar.gz
+-> OK
+Unpacking HTTP-Message-6.06.tar.gz
+Entering HTTP-Message-6.06
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTTP-Message-6.06
+Running Makefile.PL
+Warning: prerequisite Encode::Locale 1 not found.
+Warning: prerequisite HTTP::Date 6 not found.
+Warning: prerequisite IO::HTML 0 not found.
+Warning: prerequisite LWP::MediaTypes 6 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Message
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have IO::Uncompress::Inflate 0 ... Yes (2.068)
+Checking if you have IO::Compress::Gzip 0 ... Yes (2.068)
+Checking if you have IO::Uncompress::RawInflate 0 ... Yes (2.068)
+Checking if you have MIME::Base64 2.1 ... Yes (3.15)
+Checking if you have IO::HTML 0 ... No
+Checking if you have IO::Uncompress::Bunzip2 2.021 ... Yes (2.068)
+Checking if you have LWP::MediaTypes 6 ... No
+Checking if you have MIME::QuotedPrint 0 ... Yes (3.13)
+Checking if you have Encode 2.21 ... Yes (2.72)
+Checking if you have IO::Uncompress::Gunzip 0 ... Yes (2.068)
+Checking if you have Encode::Locale 1 ... No
+Checking if you have Compress::Raw::Zlib 0 ... Yes (2.068)
+Checking if you have IO::Compress::Deflate 0 ... Yes (2.068)
+Checking if you have URI 1.10 ... Yes (1.67)
+Checking if you have HTTP::Date 6 ... No
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have IO::Compress::Bzip2 2.021 ... Yes (2.068)
+==> Found dependencies: IO::HTML, LWP::MediaTypes, Encode::Locale, HTTP::Date
+Searching IO::HTML on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on IO::HTML
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/C/CJ/CJM/IO-HTML-1.001.tar.gz
+-> OK
+Unpacking IO-HTML-1.001.tar.gz
+Entering IO-HTML-1.001
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (7.04)
+Configuring IO-HTML-1.001
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for IO::HTML
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Checking if you have Exporter 5.57 ... Yes (5.72)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have Encode 2.10 ... Yes (2.72)
+Building and testing IO-HTML-1.001
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00-all_prereqs.t .. ok
+# Testing IO::HTML 1.001
+t/00-load.t ......... ok
+t/10-find.t ......... ok
+t/30-outfile.t ...... ok
+t/20-open.t ......... ok
+All tests successful.
+Files=5, Tests=139,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.15 cusr  0.03 csys =  0.22 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/HTML.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::HTML.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed IO-HTML-1.001
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-HTML-1.001/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-HTML-1.001/install.json
+Searching LWP::MediaTypes on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on LWP::MediaTypes
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/LWP-MediaTypes-6.02.tar.gz
+-> OK
+Unpacking LWP-MediaTypes-6.02.tar.gz
+Entering LWP-MediaTypes-6.02
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring LWP-MediaTypes-6.02
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for LWP::MediaTypes
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing LWP-MediaTypes-6.02
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/mediatypes.t .. ok
+All tests successful.
+Files=1, Tests=39,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.01 cusr  0.00 csys =  0.03 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/MediaTypes.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/media.types
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::MediaTypes.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed LWP-MediaTypes-6.02
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/LWP-MediaTypes-6.02/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/LWP-MediaTypes-6.02/install.json
+Searching Encode::Locale on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Encode::Locale
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/Encode-Locale-1.04.tar.gz
+-> OK
+Unpacking Encode-Locale-1.04.tar.gz
+Entering Encode-Locale-1.04
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Encode-Locale-1.04
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Encode::Locale
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Encode::Alias 0 ... Yes (2.19)
+Checking if you have Encode 2 ... Yes (2.72)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Building and testing Encode-Locale-1.04
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/alias.t ...... ok
+# ENCODING_LOCALE is UTF-8
+t/arg.t ........ ok
+t/env.t ........ ok
+t/warn_once.t .. ok
+t/tain.t ....... ok
+All tests successful.
+
+Test Summary Report
+-------------------
+t/arg.t      (Wstat: 0 Tests: 4 Failed: 0)
+  TODO passed:   1-4
+Files=5, Tests=28,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.13 cusr  0.02 csys =  0.18 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Encode/Locale.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Encode::Locale.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Encode-Locale-1.04
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Encode-Locale-1.04/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Encode-Locale-1.04/install.json
+Searching HTTP::Date on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTTP::Date
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTTP-Date-6.02.tar.gz
+-> OK
+Unpacking HTTP-Date-6.02.tar.gz
+Entering HTTP-Date-6.02
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTTP-Date-6.02
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Date
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Time::Local 0 ... Yes (1.2300)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing HTTP-Date-6.02
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/date.t .. ok
+All tests successful.
+Files=1, Tests=136,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.01 cusr  0.00 csys =  0.03 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Date.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Date.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTTP-Date-6.02
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Date-6.02/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Date-6.02/install.json
+Building and testing HTTP-Message-6.06
+Manifying 8 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/headers-util.t ........ ok
+t/headers-etag.t ........ ok
+t/headers-auth.t ........ ok
+t/common-req.t .......... ok
+t/headers.t ............. ok
+t/http-config.t ......... ok
+t/message-charset.t ..... ok
+t/message-decode-xml.t .. ok
+t/message-old.t ......... ok
+t/message-parts.t ....... ok
+t/status-old.t .......... ok
+t/status.t .............. ok
+t/response.t ............ ok
+t/request.t ............. ok
+t/message.t ............. ok
+All tests successful.
+Files=15, Tests=554,  1 wallclock secs ( 0.08 usr  0.02 sys +  0.48 cusr  0.08 csys =  0.66 CPU)
+Result: PASS
+Manifying 8 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Config.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Headers.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Message.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Request.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Response.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Status.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Headers/Auth.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Headers/ETag.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Headers/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Request/Common.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Config.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Headers.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Headers::Util.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Message.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Request.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Request::Common.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Response.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Status.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTTP-Message-6.06
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Message-6.06/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Message-6.06/install.json
+Searching HTTP::Request::Common on mirror http://mirrors.gossamer-threads.com/CPAN ...
+Already tried HTTP-Message-6.06. Skipping.
+Searching LWP::UserAgent on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on LWP::UserAgent
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/E/ET/ETHER/libwww-perl-6.13.tar.gz
+-> OK
+Unpacking libwww-perl-6.13.tar.gz
+Entering libwww-perl-6.13
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring libwww-perl-6.13
+Running Makefile.PL
+Warning: prerequisite File::Listing 6 not found.
+Warning: prerequisite HTML::Entities 0 not found.
+Warning: prerequisite HTML::HeadParser 0 not found.
+Warning: prerequisite HTTP::Cookies 6 not found.
+Warning: prerequisite HTTP::Daemon 6 not found.
+Warning: prerequisite HTTP::Negotiate 6 not found.
+Warning: prerequisite Net::HTTP 6.07 not found.
+Warning: prerequisite WWW::RobotRules 6 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for LWP
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have URI 1.10 ... Yes (1.67)
+Checking if you have WWW::RobotRules 6 ... No
+Checking if you have HTML::HeadParser 0 ... No
+Checking if you have HTTP::Negotiate 6 ... No
+Checking if you have HTTP::Date 6 ... Yes (6.02)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have File::Listing 6 ... No
+Checking if you have Digest::MD5 0 ... Yes (2.54)
+Checking if you have Encode 2.12 ... Yes (2.72)
+Checking if you have Encode::Locale 0 ... Yes (1.04)
+Checking if you have FindBin 0 ... Yes (1.51)
+Checking if you have HTTP::Daemon 6 ... No
+Checking if you have LWP::MediaTypes 6 ... Yes (6.02)
+Checking if you have IO::Select 0 ... Yes (1.22)
+Checking if you have HTTP::Cookies 6 ... No
+Checking if you have Net::HTTP 6.07 ... No
+Checking if you have HTTP::Response 6 ... Yes (6.04)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have HTTP::Status 6 ... Yes (6.03)
+Checking if you have URI::Escape 0 ... Yes (3.31)
+Checking if you have IO::Socket 0 ... Yes (1.38)
+Checking if you have HTTP::Request::Common 6 ... Yes (6.04)
+Checking if you have HTML::Entities 0 ... No
+Checking if you have Test 0 ... Yes (1.26)
+Checking if you have Net::FTP 2.58 ... Yes (3.05)
+Checking if you have MIME::Base64 2.1 ... Yes (3.15)
+Checking if you have HTTP::Request 6 ... Yes (6.00)
+==> Found dependencies: WWW::RobotRules, HTML::HeadParser, HTTP::Negotiate, File::Listing, HTTP::Daemon, HTTP::Cookies, Net::HTTP, HTML::Entities
+Searching WWW::RobotRules on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on WWW::RobotRules
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/WWW-RobotRules-6.02.tar.gz
+-> OK
+Unpacking WWW-RobotRules-6.02.tar.gz
+Entering WWW-RobotRules-6.02
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring WWW-RobotRules-6.02
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for WWW::RobotRules
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have URI 1.10 ... Yes (1.67)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Fcntl 0 ... Yes (1.13)
+Checking if you have AnyDBM_File 0 ... Yes (1.01)
+Building and testing WWW-RobotRules-6.02
+Manifying 2 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/rules.t ...... ok
+t/rules-dbm.t .. ok
+All tests successful.
+Files=2, Tests=63,  5 wallclock secs ( 0.02 usr  0.00 sys +  0.03 cusr  0.01 csys =  0.06 CPU)
+Result: PASS
+Manifying 2 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/WWW/RobotRules.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/WWW/RobotRules/AnyDBM_File.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/WWW::RobotRules.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/WWW::RobotRules::AnyDBM_File.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed WWW-RobotRules-6.02
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/WWW-RobotRules-6.02/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/WWW-RobotRules-6.02/install.json
+Searching HTML::HeadParser on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTML::HeadParser
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTML-Parser-3.71.tar.gz
+-> OK
+Unpacking HTML-Parser-3.71.tar.gz
+Entering HTML-Parser-3.71
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTML-Parser-3.71
+Running Makefile.PL
+Warning: prerequisite HTML::Tagset 3 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTML::Parser
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have HTML::Tagset 3 ... No
+Checking if you have XSLoader 0 ... Yes (0.20)
+==> Found dependencies: HTML::Tagset
+Searching HTML::Tagset on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTML::Tagset
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/P/PE/PETDANCE/HTML-Tagset-3.20.tar.gz
+-> OK
+Unpacking HTML-Tagset-3.20.tar.gz
+Entering HTML-Tagset-3.20
+Checking configure dependencies from META.yml
+Configuring HTML-Tagset-3.20
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTML::Tagset
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing HTML-Tagset-3.20
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01_old_junk.t ....... ok
+t/00_about_verbose.t .. ok
+t/pod.t ............... skipped: Test::Pod 1.14 required for testing POD
+All tests successful.
+Files=3, Tests=3,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.02 cusr  0.00 csys =  0.04 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTML/Tagset.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::Tagset.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTML-Tagset-3.20
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTML-Tagset-3.20/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTML-Tagset-3.20/install.json
+Building and testing HTML-Parser-3.71
+Running Mkbootstrap for HTML::Parser ()
+chmod 644 "Parser.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/typemap" -typemap "typemap"  Parser.xs > Parser.xsc && mv Parser.xsc Parser.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" mkhctype >hctype.h
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" mkpfunc >pfunc.h
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"3.71\" -DXS_VERSION=\"3.71\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/darwin-2level/CORE"  -DMARKED_SECTION Parser.c
+In file included from Parser.xs:118:
+./hparser.c:738:36: warning: field precision should have type 'int', but argument has type 'long' [-Wformat]
+                croak("Unrecognized identifier %.*s in argspec", s - name, name);
+                                               ~~^~              ~~~~~~~~
+1 warning generated.
+rm -f blib/arch/auto/HTML/Parser/Parser.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong Parser.o  -o blib/arch/auto/HTML/Parser/Parser.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/HTML/Parser/Parser.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::Command::MM -e 'cp_nonempty' -- Parser.bs blib/arch/auto/HTML/Parser/Parser.bs 644
+Manifying 7 pod documents
+Running Mkbootstrap for HTML::Parser ()
+chmod 644 "Parser.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/argspec-bad.t ...... ok
+t/api_version.t ...... ok
+t/argspec2.t ......... ok
+t/argspec.t .......... ok
+t/attr-encoded.t ..... ok
+t/case-sensitive.t ... ok
+t/comment.t .......... ok
+t/cases.t ............ ok
+t/callback.t ......... ok
+t/declaration.t ...... ok
+t/default.t .......... ok
+t/document.t ......... ok
+t/dtext.t ............ ok
+t/entities.t ......... ok
+t/entities2.t ........ ok
+t/filter-methods.t ... ok
+t/filter.t ........... ok
+t/handler-eof.t ...... ok
+t/handler.t .......... ok
+t/headparser.t ....... ok
+t/headparser-http.t .. ok
+t/ignore.t ........... ok
+t/largetags.t ........ ok
+t/linkextor-rel.t .... ok
+t/magic.t ............ ok
+t/linkextor-base.t ... ok
+t/marked-sect.t ...... ok
+t/msie-compat.t ...... ok
+t/offset.t ........... ok
+t/options.t .......... ok
+t/plaintext.t ........ ok
+t/parsefile.t ........ ok
+t/pod.t .............. skipped: Test::Pod 1.00 required for testing POD
+t/parser.t ........... ok
+t/script.t ........... ok
+t/process.t .......... ok
+t/pullparser.t ....... ok
+t/skipped-text.t ..... ok
+t/crashme.t .......... ok
+t/stack-realloc.t .... ok
+t/textarea.t ......... ok
+t/threads.t .......... skipped: Not configured for threads
+t/uentities.t ........ ok
+t/unicode-bom.t ...... ok
+t/unbroken-text.t .... ok
+t/unicode.t .......... ok
+t/tokeparser.t ....... ok
+t/xml-mode.t ......... ok
+All tests successful.
+Files=48, Tests=448,  0 wallclock secs ( 0.14 usr  0.06 sys +  1.24 cusr  0.20 csys =  1.64 CPU)
+Result: PASS
+Manifying 7 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/HTML/Parser/Parser.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/Entities.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/Filter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/HeadParser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/LinkExtor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/Parser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/PullParser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/HTML/TokeParser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::Entities.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::Filter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::HeadParser.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::LinkExtor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::Parser.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::PullParser.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTML::TokeParser.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTML-Parser-3.71
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTML-Parser-3.71/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTML-Parser-3.71/install.json
+Searching HTTP::Negotiate on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTTP::Negotiate
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTTP-Negotiate-6.01.tar.gz
+-> OK
+Unpacking HTTP-Negotiate-6.01.tar.gz
+Entering HTTP-Negotiate-6.01
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTTP-Negotiate-6.01
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Negotiate
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have HTTP::Headers 6 ... Yes (6.05)
+Building and testing HTTP-Negotiate-6.01
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+Redundant argument in printf at t/negotiate.t line 109.
+Redundant argument in printf at t/negotiate.t line 109.
+Redundant argument in printf at t/negotiate.t line 109.
+Redundant argument in printf at t/negotiate.t line 109.
+Redundant argument in printf at t/negotiate.t line 109.
+Redundant argument in printf at t/negotiate.t line 109.
+t/negotiate.t .. ok
+All tests successful.
+Files=1, Tests=5,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.02 cusr  0.00 csys =  0.04 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Negotiate.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Negotiate.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTTP-Negotiate-6.01
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Negotiate-6.01/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Negotiate-6.01/install.json
+Searching File::Listing on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on File::Listing
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/File-Listing-6.04.tar.gz
+-> OK
+Unpacking File-Listing-6.04.tar.gz
+Entering File-Listing-6.04
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring File-Listing-6.04
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for File::Listing
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have HTTP::Date 6 ... Yes (6.02)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing File-Listing-6.04
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/dosftp.t .. ok
+t/ls-lR.t ... ok
+t/apache.t .. ok
+t/perm2.t ... ok
+t/perm1.t ... ok
+t/perm4.t ... ok
+t/perm3.t ... ok
+All tests successful.
+Files=7, Tests=16402,  1 wallclock secs ( 0.84 usr  0.02 sys +  1.86 cusr  0.05 csys =  2.77 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/File/Listing.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/File::Listing.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed File-Listing-6.04
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-Listing-6.04/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/File-Listing-6.04/install.json
+Searching HTTP::Daemon on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTTP::Daemon
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTTP-Daemon-6.01.tar.gz
+-> OK
+Unpacking HTTP-Daemon-6.01.tar.gz
+Entering HTTP-Daemon-6.01
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTTP-Daemon-6.01
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Daemon
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have HTTP::Response 6 ... Yes (6.04)
+Checking if you have LWP::MediaTypes 6 ... Yes (6.02)
+Checking if you have HTTP::Date 6 ... Yes (6.02)
+Checking if you have Sys::Hostname 0 ... Yes (1.20)
+Checking if you have HTTP::Request 6 ... Yes (6.00)
+Checking if you have IO::Socket 0 ... Yes (1.38)
+Checking if you have HTTP::Status 6 ... Yes (6.03)
+Building and testing HTTP-Daemon-6.01
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/chunked.t .. ok
+All tests successful.
+Files=1, Tests=5,  4 wallclock secs ( 0.02 usr  0.00 sys +  0.06 cusr  0.01 csys =  0.09 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Daemon.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Daemon.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTTP-Daemon-6.01
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Daemon-6.01/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Daemon-6.01/install.json
+Searching HTTP::Cookies on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on HTTP::Cookies
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/G/GA/GAAS/HTTP-Cookies-6.01.tar.gz
+-> OK
+Unpacking HTTP-Cookies-6.01.tar.gz
+Entering HTTP-Cookies-6.01
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring HTTP-Cookies-6.01
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Cookies
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have HTTP::Date 6 ... Yes (6.02)
+Checking if you have HTTP::Headers::Util 6 ... Yes (6.03)
+Checking if you have Time::Local 0 ... Yes (1.2300)
+Building and testing HTTP-Cookies-6.01
+Manifying 3 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/cookies.t .. ok
+All tests successful.
+Files=1, Tests=66,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.04 cusr  0.00 csys =  0.06 CPU)
+Result: PASS
+Manifying 3 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Cookies.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Cookies/Microsoft.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/HTTP/Cookies/Netscape.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Cookies.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Cookies::Microsoft.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/HTTP::Cookies::Netscape.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed HTTP-Cookies-6.01
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Cookies-6.01/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/HTTP-Cookies-6.01/install.json
+Searching Net::HTTP on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Net::HTTP
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/M/MS/MSCHILLI/Net-HTTP-6.07.tar.gz
+-> OK
+Unpacking Net-HTTP-6.07.tar.gz
+Entering Net-HTTP-6.07
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Net-HTTP-6.07
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Net::HTTP
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have IO::Select 0 ... Yes (1.22)
+Checking if you have IO::Socket::INET 0 ... Yes (1.35)
+Checking if you have URI 0 ... Yes (1.67)
+Checking if you have Compress::Raw::Zlib 0 ... Yes (2.068)
+Checking if you have IO::Compress::Gzip 0 ... Yes (2.068)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Building and testing Net-HTTP-6.07
+Manifying 3 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/apache-https.t .. skipped: Live tests disabled; pass --live-tests to Makefile.PL to enable
+t/apache.t ........ skipped: Live tests disabled; pass --live-tests to Makefile.PL to enable
+t/http.t .......... ok
+t/http-nb.t ....... ok
+All tests successful.
+Files=4, Tests=51,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.08 cusr  0.01 csys =  0.12 CPU)
+Result: PASS
+Manifying 3 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Net/HTTP.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Net/HTTPS.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Net/HTTP/Methods.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Net/HTTP/NB.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Net::HTTP.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Net::HTTP::NB.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Net::HTTPS.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Net-HTTP-6.07
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Net-HTTP-6.07/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Net-HTTP-6.07/install.json
+Searching HTML::Entities on mirror http://mirrors.gossamer-threads.com/CPAN ...
+Already tried HTML-Parser-3.71. Skipping.
+Building and testing libwww-perl-6.13
+cp bin/lwp-download blib/script/lwp-download
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/lwp-download
+cp bin/lwp-dump blib/script/lwp-dump
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/lwp-dump
+cp bin/lwp-mirror blib/script/lwp-mirror
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/lwp-mirror
+cp bin/lwp-request blib/script/lwp-request
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/lwp-request
+Manifying 4 pod documents
+Manifying 11 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/base/*.t t/html/*.t t/robot/*.t t/local/*.t t/net/*.t
+t/base/protocols.t ...... ok
+t/base/proxy.t .......... ok
+t/local/autoload-get.t .. ok
+t/local/autoload.t ...... ok
+t/net/http-get.t ........ skipped: no net config file
+t/base/ua.t ............. ok
+t/local/get.t ........... ok
+t/local/protosub.t ...... ok
+t/net/http-post.t ....... skipped: no net config file
+t/net/http-timeout.t .... skipped: no net config file
+t/net/mirror.t .......... skipped: no net config file
+t/net/moved.t ........... skipped: no net config file
+t/net/proxy.t ........... skipped: no net config file
+t/local/http.t .......... ok
+t/robot/ua.t ............ ok
+t/robot/ua-get.t ........ ok
+All tests successful.
+Files=16, Tests=131,  7 wallclock secs ( 0.06 usr  0.02 sys +  1.20 cusr  0.20 csys =  1.48 CPU)
+Result: PASS
+Manifying 4 pod documents
+Manifying 11 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/lwpcook.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/lwptut.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/ConnCache.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Debug.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/DebugFile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/MemberMixin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/RobotUA.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Simple.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/UserAgent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Authen/Basic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Authen/Digest.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Authen/Ntlm.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/GHTTP.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/cpan.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/data.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/file.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/ftp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/gopher.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/http.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/loopback.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/mailto.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/nntp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/nogo.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/lwp-download.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/lwp-dump.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/lwp-mirror.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/lwp-request.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::Authen::Ntlm.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::ConnCache.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::Debug.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::MemberMixin.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::Protocol.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::RobotUA.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::Simple.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::UserAgent.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/lwpcook.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/lwptut.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/lwp-download
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/lwp-dump
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/lwp-mirror
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/lwp-request
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed libwww-perl-6.13
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/libwww-perl-6.13/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/libwww-perl-6.13/install.json
+Building and testing Metabase-Client-Simple-0.010
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/client.t ............. ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module                  Want     Have
+#     ----------------------- ---- --------
+#     ExtUtils::MakeMaker      any     7.04
+#     File::Spec               any     3.56
+#     Metabase::User::Profile  any    0.024
+#     Metabase::User::Secret   any    0.024
+#     Test::More              0.88 1.001014
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module                 Want Have
+#     --------------------- ----- ----
+#     HTTP::Request::Common   any 6.04
+#     HTTP::Status          5.817 6.03
+#     JSON                      2 2.90
+#     LWP::UserAgent         5.54 6.13
+#     URI                     any 1.67
+#     strict                  any 1.09
+#     warnings                any 1.32
+# 
+t/00-report-prereqs.t .. ok
+All tests successful.
+Files=2, Tests=7,  0 wallclock secs ( 0.01 usr  0.01 sys +  0.18 cusr  0.02 csys =  0.22 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Metabase/Client/Simple.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Metabase::Client::Simple.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Metabase-Client-Simple-0.010
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Metabase-Client-Simple-0.010/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Metabase-Client-Simple-0.010/install.json
+Building and testing Test-Reporter-Transport-Metabase-1.999009
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# Testing Test::Reporter::Transport::Metabase 1.999009, Perl 5.021011, /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11
+t/00-load.t ............ ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker 6.17 7.04
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.04
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     ExtUtils::MakeMaker  any     7.04
+#     File::Spec           any     3.56
+#     Test::More           any 1.001014
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150001
+# 
+# === Runtime Requires ===
+# 
+#     Module                        Want     Have
+#     ------------------------- -------- --------
+#     CPAN::Testers::Report     1.999001 1.999003
+#     Carp                           any     1.36
+#     Config::Perl::V                any     0.24
+#     File::Glob                     any     1.24
+#     JSON                             2     2.90
+#     Metabase::Client::Simple     0.008    0.010
+#     Metabase::User::Profile      0.016    0.024
+#     Metabase::User::Secret       0.016    0.024
+#     Test::Reporter::Transport     1.57     1.62
+#     strict                         any     1.09
+#     warnings                       any     1.32
+# 
+t/00-report-prereqs.t .. ok
+All tests successful.
+Files=2, Tests=2,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.15 cusr  0.01 csys =  0.18 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Test/Reporter/Transport/Metabase.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Test::Reporter::Transport::Metabase.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Test-Reporter-Transport-Metabase-1.999009
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Reporter-Transport-Metabase-1.999009/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Test-Reporter-Transport-Metabase-1.999009/install.json
+Already tried IO::Prompt::Tiny. Skipping.
+Searching LWP::Protocol::https on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on LWP::Protocol::https
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/M/MS/MSCHILLI/LWP-Protocol-https-6.06.tar.gz
+-> OK
+Unpacking LWP-Protocol-https-6.06.tar.gz
+Entering LWP-Protocol-https-6.06
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring LWP-Protocol-https-6.06
+Running Makefile.PL
+Warning: prerequisite IO::Socket::SSL 1.54 not found.
+Warning: prerequisite Mozilla::CA 20110101 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for LWP::Protocol::https
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have LWP::UserAgent 6.06 ... Yes (6.13)
+Checking if you have IO::Socket::SSL 1.54 ... No
+Checking if you have Net::HTTPS 6 ... Yes (6.04)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Mozilla::CA 20110101 ... No
+==> Found dependencies: IO::Socket::SSL, Mozilla::CA
+Searching IO::Socket::SSL on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on IO::Socket::SSL
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/S/SU/SULLR/IO-Socket-SSL-2.012.tar.gz
+-> OK
+Unpacking IO-Socket-SSL-2.012.tar.gz
+Entering IO-Socket-SSL-2.012
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring IO-Socket-SSL-2.012
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Warning: prerequisite Mozilla::CA 0 not found.
+Warning: prerequisite Net::SSLeay 1.46 not found.
+Generating a Unix-style Makefile
+Writing Makefile for IO::Socket::SSL
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Scalar::Util 0 ... Yes (1.41)
+Checking if you have Net::SSLeay 1.46 ... No
+Checking if you have Mozilla::CA 0 ... No
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+==> Found dependencies: Net::SSLeay, Mozilla::CA
+Searching Net::SSLeay on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Net::SSLeay
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/M/MI/MIKEM/Net-SSLeay-1.68.tar.gz
+-> OK
+Unpacking Net-SSLeay-1.68.tar.gz
+Entering Net-SSLeay-1.68
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (7.04)
+Configuring Net-SSLeay-1.68
+Running Makefile.PL
+*** Found OpenSSL-1.0.1k installed in /opt/local
+*** Be sure to use the same compiler and options to compile your OpenSSL, perl,
+    and Net::SSLeay. Mixing and matching compilers is not supported.
+Do you want to run external tests?
+These tests *will* *fail* if you do not have network connectivity. [n] n
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Net::SSLeay
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.60_01 ... Yes (1.001014)
+Checking if you have MIME::Base64 0 ... Yes (3.15)
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (7.04)
+Building and testing Net-SSLeay-1.68
+AutoSplitting blib/lib/Net/SSLeay.pm (blib/lib/auto/Net/SSLeay)
+blib/lib/Net/SSLeay.pm: some names are not unique when truncated to 8 characters:
+ directory blib/lib/auto/Net/SSLeay:
+  do_https3.al, do_https2.al, do_https4.al, do_https.al truncate to do_https
+  do_httpx3.al, do_httpx2.al, do_httpx4.al truncate to do_httpx
+  get_https.al, get_https3.al, get_https4.al, get_http.al, get_http3.al, get_http4.al, get_httpx.al, get_httpx3.al, get_httpx4.al truncate to get_http
+  head_https.al, head_https3.al, head_https4.al, head_http.al, head_http3.al, head_http4.al, head_httpx.al, head_httpx3.al, head_httpx4.al truncate to head_htt
+  post_https.al, post_https3.al, post_https4.al, post_http.al, post_http3.al, post_http4.al, post_httpx.al, post_httpx3.al, post_httpx4.al truncate to post_htt
+  put_https.al, put_https3.al, put_https4.al, put_http.al, put_http3.al, put_http4.al, put_httpx.al, put_httpx3.al, put_httpx4.al truncate to put_http
+  ssl_read_all.al, ssl_read_until.al, ssl_read_CRLF.al truncate to ssl_read
+  ssl_write_all.al, ssl_write_CRLF.al truncate to ssl_writ
+  tcp_read_all.al, tcp_read_until.al, tcp_read_CRLF.al truncate to tcp_read
+  tcp_write_all.al, tcp_write_CRLF.al truncate to tcp_writ
+Running Mkbootstrap for Net::SSLeay ()
+chmod 644 "SSLeay.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-Iinc" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/ExtUtils/typemap" -typemap "typemap"  SSLeay.xs > SSLeay.xsc && mv SSLeay.xsc SSLeay.c
+cc -c  -I/opt/local/include -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"1.68\" -DXS_VERSION=\"1.68\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/lib/5.21.11/darwin-2level/CORE"   SSLeay.c
+rm -f blib/arch/auto/Net/SSLeay/SSLeay.bundle
+LD_RUN_PATH="/opt/local/lib" env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local -L/opt/local/lib -L/opt/local/lib -fstack-protector-strong SSLeay.o  -o blib/arch/auto/Net/SSLeay/SSLeay.bundle 	\
+	   -L/opt/local -L/opt/local/lib -lssl -lcrypto -lz  	\
+	  
+chmod 755 blib/arch/auto/Net/SSLeay/SSLeay.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-Iinc" -MExtUtils::Command::MM -e 'cp_nonempty' -- SSLeay.bs blib/arch/auto/Net/SSLeay/SSLeay.bs 644
+Manifying 2 pod documents
+Running Mkbootstrap for Net::SSLeay ()
+chmod 644 "SSLeay.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/local/*.t t/handle/local/*.t
+t/local/01_pod.t ....................... skipped: Test::Pod 1.00 required for testing POD
+t/local/02_pod_coverage.t .............. skipped: these tests are for only for release candidate testing. Enable with RELEASE_TESTING=1
+t/handle/local/05_use.t ................ ok
+t/local/03_use.t ....................... ok
+t/local/04_basic.t ..................... ok
+t/local/06_tcpecho.t ................... ok
+t/local/05_passwd_cb.t ................. ok
+t/local/15_bio.t ....................... ok
+t/local/20_autoload.t .................. skipped: Some tests need Test::Exception
+t/local/21_constants.t ................. skipped: Some tests need Test::Exception
+t/local/08_pipe.t ...................... ok
+t/local/30_error.t ..................... skipped: Requires Test::Exception, Test::Warn and Test::NoWarnings
+t/local/07_sslecho.t ................... ok
+t/local/31_rsa_generate_key.t .......... skipped: Test::Exception required
+t/local/34_x509_crl.t .................. ok
+t/local/36_verify.t .................... ok
+t/local/37_asn1_time.t ................. ok
+t/local/38_priv-key.t .................. ok
+t/local/35_ephemeral.t ................. ok
+t/local/32_x509_get_cert_info.t ........ ok
+t/local/39_pkcs12.t .................... ok
+t/local/41_alpn_support.t .............. skipped: openssl 1.0.2 required
+t/local/40_npn_support.t ............... ok
+t/local/61_threads-cb-crash.t .......... skipped: your perl is not compiled with ithreads or is pre-5.8
+t/local/62_threads-ctx_new-deadlock.t .. skipped: your perl is not compiled with ithreads or is pre-5.8
+t/local/42_info_callback.t ............. ok
+t/local/kwalitee.t ..................... skipped: these tests are for only for release candidate testing. Enable with RELEASE_TESTING=1
+t/local/50_digest.t .................... ok
+t/local/33_x509_create_cert.t .......... ok
+All tests successful.
+Files=29, Tests=1834,  1 wallclock secs ( 0.19 usr  0.05 sys +  1.67 cusr  0.20 csys =  2.11 CPU)
+Result: PASS
+Manifying 2 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/SSLeay.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Net/SSLeay.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Net/SSLeay.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/Net/SSLeay/Handle.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/autosplit.ix
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/debug_read.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_https.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_https2.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_https3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_https4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_httpx2.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_httpx3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/do_httpx4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/dump_peer_certificate.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_http.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_http3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_http4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_https.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_https3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_https4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_httpx.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_httpx3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/get_httpx4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_http.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_http3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_http4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_https.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_https3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_https4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_httpx.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_httpx3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/head_httpx4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/http_cat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/https_cat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/httpx_cat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/initialize.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/make_form.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/make_headers.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/new_x_ctx.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/open_proxy_tcp_connection.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/open_tcp_connection.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_http.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_http3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_http4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_https.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_https3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_https4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_httpx.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_httpx3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/post_httpx4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_http.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_http3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_http4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_https.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_https3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_https4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_httpx.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_httpx3.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/put_httpx4.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/randomize.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/set_cert_and_key.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/set_proxy.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/set_server_cert_and_key.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/ssl_read_CRLF.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/ssl_read_all.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/ssl_read_until.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/ssl_write_CRLF.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/ssl_write_all.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/sslcat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcp_read_CRLF.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcp_read_all.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcp_read_until.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcp_write_CRLF.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcp_write_all.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcpcat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/tcpxcat.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/want_X509_lookup.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/want_nothing.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/want_read.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/auto/Net/SSLeay/want_write.al
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Net::SSLeay.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Net::SSLeay::Handle.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Net-SSLeay-1.68
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Net-SSLeay-1.68/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Net-SSLeay-1.68/install.json
+Searching Mozilla::CA on mirror http://mirrors.gossamer-threads.com/CPAN ...
+--> Working on Mozilla::CA
+Fetching http://mirrors.gossamer-threads.com/CPAN/authors/id/A/AB/ABH/Mozilla-CA-20141217.tar.gz
+-> OK
+Unpacking Mozilla-CA-20141217.tar.gz
+Entering Mozilla-CA-20141217
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring Mozilla-CA-20141217
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Mozilla::CA
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test 0 ... Yes (1.26)
+Building and testing Mozilla-CA-20141217
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/locate-file.t .. ok
+All tests successful.
+Files=1, Tests=3,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.01 cusr  0.00 csys =  0.03 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Mozilla/CA.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Mozilla/mk-ca-bundle.pl
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/Mozilla/CA/cacert.pem
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/Mozilla::CA.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Mozilla-CA-20141217
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Mozilla-CA-20141217/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/Mozilla-CA-20141217/install.json
+Building and testing IO-Socket-SSL-2.012
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# openssl version=0x100010bf
+# Net::SSLeay::VERSION=1.68
+t/alpn.t .......................... skipped: ALPN not available in Net::SSLeay
+t/01loadmodule.t .................. ok
+t/auto_verify_hostname.t .......... ok
+t/compatibility.t ................. ok
+t/cert_no_file.t .................. ok
+t/cert_formats.t .................. ok
+t/core.t .......................... ok
+t/dhe.t ........................... ok
+t/ecdhe.t ......................... ok
+t/io-socket-inet6.t ............... skipped: no IO::Socket::INET6 available
+t/io-socket-ip.t .................. ok
+t/memleak_bad_handshake.t ......... ok
+t/npn.t ........................... ok
+# -- test: newINET start_SSL stop_SSL start_SSL
+# server accepted new client
+# wait for initial data from client
+# got 0x666f6f from client
+# server: got plain data at start of connection
+# server: TLS upgrade
+# server: TLS downgrade
+# server: TLS upgrade#2
+# -- test: newSSL stop_SSL connect_SSL
+# server accepted new client
+# wait for initial data from client
+# got 0x160301 from client
+# server: TLS upgrade
+# server: TLS downgrade
+# server: TLS upgrade#2
+# -- test: newSSL:0 connect_SSL stop_SSL connect_SSL
+# server accepted new client
+# wait for initial data from client
+# got 0x666f6f from client
+# server: got plain data at start of connection
+# server: TLS upgrade
+# server: TLS downgrade
+# server: TLS upgrade#2
+# -- test: newSSL:0 start_SSL stop_SSL connect_SSL
+# server accepted new client
+# wait for initial data from client
+# got 0x666f6f from client
+# server: got plain data at start of connection
+# server: TLS upgrade
+# server: TLS downgrade
+# server: TLS upgrade#2
+# server accepted new client
+# wait for initial data from client
+# got 0x656e64 from client
+# client requested end of tests
+t/plain_upgrade_downgrade.t ....... ok
+t/protocol_version.t .............. ok
+t/public_suffix_lib_encode_idn.t .. ok
+t/public_suffix_lib_libidn.t ...... ok
+t/public_suffix_lib_uri.t ......... ok
+t/public_suffix_ssl.t ............. ok
+t/mitm.t .......................... ok
+t/sessions.t ...................... ok
+t/readline.t ...................... ok
+t/sni.t ........................... ok
+t/sni_verify.t .................... ok
+t/signal-readline.t ............... ok
+t/startssl-failed.t ............... ok
+t/startssl.t ...................... ok
+t/sysread_write.t ................. ok
+t/verify_fingerprint.t ............ ok
+t/verify_hostname.t ............... ok
+t/start-stopssl.t ................. ok
+t/verify_hostname_standalone.t .... ok
+t/acceptSSL-timeout.t ............. ok
+t/connectSSL-timeout.t ............ ok
+t/nonblock.t ...................... ok
+All tests successful.
+Files=35, Tests=748, 20 wallclock secs ( 0.16 usr  0.05 sys +  4.28 cusr  0.60 csys =  5.09 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Socket/SSL.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Socket/SSL.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Socket/SSL/Intercept.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Socket/SSL/PublicSuffix.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/IO/Socket/SSL/Utils.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::Socket::SSL.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::Socket::SSL::Intercept.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::Socket::SSL::PublicSuffix.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/IO::Socket::SSL::Utils.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed IO-Socket-SSL-2.012
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-Socket-SSL-2.012/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/IO-Socket-SSL-2.012/install.json
+Already tried Mozilla::CA. Skipping.
+Building and testing LWP-Protocol-https-6.06
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# creating cert for direct.ssl.access
+# creating cert for direct.ssl.access
+# creating cert for foo
+# creating cert for bar
+# creating cert for foo
+# creating cert for foo
+# creating cert for bar
+# creating cert for bar
+t/https_proxy.t .. ok
+t/apache.t ....... ok
+All tests successful.
+Files=2, Tests=61,  2 wallclock secs ( 0.03 usr  0.00 sys +  0.47 cusr  0.08 csys =  0.58 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/LWP/Protocol/https.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/LWP::Protocol::https.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed LWP-Protocol-https-6.06
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/LWP-Protocol-https-6.06/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/LWP-Protocol-https-6.06/install.json
+Building and testing App-cpanminus-reporter-0.13
+cp bin/cpanm-reporter blib/script/cpanm-reporter
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/cpanm-reporter
+Manifying 1 pod document
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/21.11/bin/perl5.21.11" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# Testing App::cpanminus::reporter 0.13
+t/00.load.t ..................... ok
+t/01.basic.t .................... ok
+t/04.parser.nothing_to_do.t ..... ok
+t/02.parser.single.t ............ ok
+t/03.parser.single_extended.t ... ok
+t/05.parser.configure_failed.t .. ok
+t/08.parser.dist_subdir.t ....... ok
+t/06.parser.version_strings.t ... ok
+t/07.parser.verbose_cpanm.t ..... ok
+t/07.parser.module_dir.t ........ ok
+t/11.local.t .................... ok
+t/10.parser.cloudweights.t ...... ok
+t/09.parser.dist_subdir2.t ...... ok
+All tests successful.
+Files=13, Tests=120,  1 wallclock secs ( 0.04 usr  0.02 sys +  2.26 cusr  0.26 csys =  2.58 CPU)
+Result: PASS
+Manifying 1 pod document
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/App/cpanminus/reporter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man1/cpanm-reporter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/man/man3/App::cpanminus::reporter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/bin/cpanm-reporter
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed App-cpanminus-reporter-0.13
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/App-cpanminus-reporter-0.13/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/21.11@std/lib/perl5/darwin-2level/.meta/App-cpanminus-reporter-0.13/install.json
+44 distributions installed

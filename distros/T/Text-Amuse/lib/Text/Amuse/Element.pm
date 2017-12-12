@@ -12,9 +12,9 @@ Text::Amuse::Element - Helper for Text::Amuse
 Everything here is pretty much internal only, underdocumented and
 subject to change.
 
-=head3 new($string)
+=head3 new(%args)
 
-Constructor. Accepts a string to be parsed
+Constructor
 
 =cut
 
@@ -22,7 +22,7 @@ sub new {
     my ($class, %args) = @_;
     my $self = {
                 rawline => '',
-                block => '',      # the block it says to belog
+                block => '',      # the block it says to belong
                 type => 'null', # the type
                 string => '',      # the string
                 removed => '', # the portion of the string removed
@@ -31,6 +31,10 @@ sub new {
                 attribute_type => '',
                 style => 'X',
                 start_list_index => 0,
+                element_number => 0,
+                footnote_number => 0,
+                footnote_symbol => '',
+                footnote_index => '',
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -157,6 +161,38 @@ The indentation level, as a numerical value
 sub indentation {
     return shift->{indentation};
 }
+
+=head3 footnote_number
+
+The footnote number
+
+=cut
+
+sub footnote_number {
+    return shift->{footnote_number};
+}
+
+=head3 footnote_symbol
+
+The footnote symbol
+
+=cut
+
+sub footnote_symbol {
+    return shift->{footnote_symbol};
+}
+
+=head3 footnote_index
+
+The footnote index
+
+=cut
+
+sub footnote_index {
+    return shift->{footnote_index};
+}
+
+
 
 
 =head2 attribute
@@ -413,21 +449,19 @@ sub become_regular {
     $self->block('');
 }
 
-=head3 footnote_index
+=head3 element_number
 
-Return the number of the footnote if the element is a footnote, undef othewise
+Internal numbering of the element.
 
 =cut
 
-sub footnote_index {
-    my $self = shift;
-    if ($self->type eq 'footnote') {
-        if ($self->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
-            return $1;
-        }
-    }
-    return undef;
+sub element_number {
+    return shift->{element_number};
 }
 
+sub _set_element_number {
+    my ($self, $num) = @_;
+    $self->{element_number} = $num;
+}
 
 1;

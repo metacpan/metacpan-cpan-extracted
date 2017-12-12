@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 use Test2::Util::HashBase qw/inref ending items order for_each/;
 
@@ -287,7 +287,7 @@ arrayref.
 =head1 SOURCE
 
 The source code repository for Test2-Suite can be found at
-F<http://github.com/Test-More/Test2-Suite/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

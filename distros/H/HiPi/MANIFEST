@@ -35,6 +35,7 @@ lib/HiPi/Interface/HobbyTronicsBackpackV2.pm
 lib/HiPi/Interface/HopeRF69.pm
 lib/HiPi/Interface/HTADCI2C.pm
 lib/HiPi/Interface/HTBackpackV2.pm
+lib/HiPi/Interface/LCDBackpackPCF8574.pm
 lib/HiPi/Interface/MCP23017.pm
 lib/HiPi/Interface/MCP23S17.pm
 lib/HiPi/Interface/MCP3004.pm
@@ -44,6 +45,7 @@ lib/HiPi/Interface/MCP49XX.pm
 lib/HiPi/Interface/MCP4DAC.pm
 lib/HiPi/Interface/MPL3115A2.pm
 lib/HiPi/Interface/PCA9685.pm
+lib/HiPi/Interface/PCF8574.pm
 lib/HiPi/Interface/SerLCD.pm
 lib/HiPi/Interface/Si470N.pm
 lib/HiPi/Pin.pm

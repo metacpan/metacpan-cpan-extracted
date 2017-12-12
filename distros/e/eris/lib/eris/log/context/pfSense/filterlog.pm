@@ -9,7 +9,7 @@ use Text::CSV_XS;
 use Types::Standard qw(InstanceOf);
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 has 'parser' => (
@@ -96,7 +96,7 @@ eris::log::context::pfSense::filterlog - Parse the pfsense filterlog
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

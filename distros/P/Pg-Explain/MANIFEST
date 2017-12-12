@@ -117,6 +117,8 @@ t/26-explain-with-no-timing.t
 t/27-anonymization-of-subquery-scans.t
 t/28-anonymization-of-group-keys.t
 t/29-extract-subquery-source.t
+t/30-parallel-query.t
+t/31-parallel-query-2.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

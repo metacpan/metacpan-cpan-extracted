@@ -4,7 +4,7 @@ use base qw/Prty::ContentProcessor::BaseType/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ our $VERSION = 1.120;
 
 =head1 NAME
 
-Prty::ContentProcessor::SubType - Basisklasse für Sub-Typen
+Prty::ContentProcessor::SubType - Sub-Typ
 
 =head1 BASE CLASS
 
@@ -27,10 +27,6 @@ L<Prty::ContentProcessor::BaseType>
 =head4 Synopsis
 
     $sty = $class->create($sec,$parent);
-
-=head4 Description
-
-Erweitere Abschnitts-Objekt $sec und blesse es zu einem Subtyp-Objekt.
 
 =head4 Arguments
 
@@ -49,6 +45,10 @@ Referenz auf übergeordnetes (Sub)Typ-Objekt.
 =head4 Returns
 
 Zum Subtyp geblesstes Abschnitts-Objekt.
+
+=head4 Description
+
+Erweitere Abschnitts-Objekt $sec und blesse es zu einem Subtyp-Objekt.
 
 =cut
 
@@ -75,9 +75,9 @@ sub create {
 
 # -----------------------------------------------------------------------------
 
-=head2 Intern
+=head2 Objektmethoden
 
-=head3 name() - Name der Sub-Entitt
+=head3 name() - Name der Sub-Entität
 
 =head4 Synopsis
 
@@ -120,7 +120,7 @@ sub name {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

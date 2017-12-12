@@ -10,7 +10,6 @@ lib/Mic/Assembler.pm
 lib/Mic/Bind.pm
 lib/Mic/Class.pm
 lib/Mic/Contracts.pm
-lib/Mic/HashImpl.pm
 lib/Mic/Impl.pm
 lib/Mic/Implementation.pm
 lib/Mic/Interface.pm

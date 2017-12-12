@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
 #ABSTRACT: XPRESS data file module
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.600';
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.613';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);
@@ -305,7 +305,7 @@ sub start_block {
     }
 
     $self->{BLOCK_NUM} = $self->{logger}->_log_start_block();
-    print "Block_num = $self->{BLOCK_NUM}\n";
+    print "Data block $self->{BLOCK_NUM}\n";
 
     $self->{loop}->{overtime} = 0;
     undef $self->{loop}->{t0};
@@ -609,7 +609,7 @@ Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 COPYRIGHT AND LICENSE
 

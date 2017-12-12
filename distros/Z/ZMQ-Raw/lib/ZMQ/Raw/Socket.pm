@@ -1,5 +1,5 @@
 package ZMQ::Raw::Socket;
-$ZMQ::Raw::Socket::VERSION = '0.19';
+$ZMQ::Raw::Socket::VERSION = '0.21';
 use strict;
 use warnings;
 use Carp;
@@ -31,7 +31,7 @@ ZMQ::Raw::Socket - ZeroMQ Socket class
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 DESCRIPTION
 

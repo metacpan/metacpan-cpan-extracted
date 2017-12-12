@@ -34,7 +34,7 @@
    "provides" : {
       "GitHub::Crud" : {
          "file" : "lib/GitHub/Crud.pm",
-         "version" : "20171125"
+         "version" : "20171129"
       },
       "GitHub::Crud::Response" : {
          "file" : "lib/GitHub/Crud.pm"
@@ -49,5 +49,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171125"
+   "version" : "20171129"
 }

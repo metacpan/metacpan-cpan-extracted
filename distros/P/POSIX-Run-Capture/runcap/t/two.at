@@ -1,0 +1,50 @@
+# Testsuite for runcap - run program and capture its output -*- autotest -*-
+# Copyright (C) 2017 Sergey Poznyakoff
+#
+# Runcap is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at your
+# option) any later version.
+#
+# Runcap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Runcap. If not, see <http://www.gnu.org/licenses/>.
+
+AT_SETUP([capture both stdout and stderr])
+AT_KEYWORDS([two])
+AT_CHECK([rt -n all -- genout -l 337 -o $INPUT -s 628 -l 734 -e $INPUT
+],
+[0],
+[res=0
+exit code: 0
+stdout: 8 lines, 337 bytes
+stderr: 11 lines, 734 bytes
+stdout listing:
+ 1: CHAPTER I. Down the Rabbit-Hole
+ 2: 
+ 3: Alice was beginning to get very tired of sitting by her sister on the
+ 4: bank, and of having nothing to do: once or twice she had peeped into the
+ 5: book her sister was reading, but it had no pictures or conversations
+ 6: in it, 'and what is the use of a book,' thought Alice 'without
+ 7: pictures or conversations?'
+ 8: 
+stdout listing ends
+stderr listing:
+  1: There was nothing so very remarkable in that; nor did Alice think it
+  2: so very much out of the way to hear the Rabbit say to itself, 'Oh
+  3: dear! Oh dear! I shall be late!' (when she thought it over afterwards,
+  4: it occurred to her that she ought to have wondered at this, but at the
+  5: time it all seemed quite natural); but when the Rabbit actually took a
+  6: watch out of its waistcoat-pocket, and looked at it, and then hurried on,
+  7: Alice started to her feet, for it flashed across her mind that she had
+  8: never before seen a rabbit with either a waistcoat-pocket, or a watch
+  9: to take out of it, and burning with curiosity, she ran across the field
+ 10: after it, and fortunately was just in time to see it pop down a large
+ 11: rabbit-hole under the hedge.
+stderr listing ends
+])
+AT_CLEANUP

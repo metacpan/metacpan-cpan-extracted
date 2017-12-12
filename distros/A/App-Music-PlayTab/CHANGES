@@ -1,3 +1,26 @@
+2.904	Dec 05 2017
+
+	Pre-release of the new playtab, now PDF based instead of PostScript.
+
+2.903	Apr 12 2017 (not officially released)
+
+	Fix failing tests with 5.26+ (no dot in @INC).
+
+2.027	Apr 26 2017
+
+	Fix problems with parallel tests.
+
+2.026	Apr 07 2017
+
+	Fix failing tests with 5.26+ (no dot in @INC).
+
+2.902	May 27 2016 (not officially released)
+
+	Major rework to switch from PostScript generation to native
+	PDF.
+	Numerous smaller and larger fixes and enhancements while
+	staying as much compatible as possible.
+
 2.025	Mar 26 2014
 
 	Add --syntax and --lilypond options.

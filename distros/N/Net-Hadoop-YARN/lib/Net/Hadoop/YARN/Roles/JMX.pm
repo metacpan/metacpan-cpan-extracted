@@ -1,5 +1,5 @@
 package Net::Hadoop::YARN::Roles::JMX;
-$Net::Hadoop::YARN::Roles::JMX::VERSION = '0.202';
+$Net::Hadoop::YARN::Roles::JMX::VERSION = '0.203';
 use 5.10.0;
 use strict;
 use warnings;
@@ -274,7 +274,7 @@ Net::Hadoop::YARN::Roles::JMX
 
 =head1 VERSION
 
-version 0.202
+version 0.203
 
 =head1 SYNOPSIS
 
@@ -283,6 +283,14 @@ version 0.202
 =head1 DESCRIPTION
 
 JMX helpers for YARN endpoints.
+
+=head1 ACCESSORS
+
+=head3 target_host
+
+=head3 target_host_port
+
+=head3 target_port
 
 =head1 METHODS
 

@@ -1,5 +1,14 @@
 Revision history for Datahub-Factory-VKC
 
+0.96  2017-12-06 13:51:39 CET
+
+    - Fixed: Added missing prereqs as reported by CPANTS
+
+0.95  2017-12-05 10:01:27 CET
+
+    - Changed: removed stale PID module code.
+    - Changed: removed creating temporary SQLite databases from EIZ module.
+
 0.94  2017-11-13 11:28:19 CET
 
     - Changed: reverted back to 0.92 changes because bugs.

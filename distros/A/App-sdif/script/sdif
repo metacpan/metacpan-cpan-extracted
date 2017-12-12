@@ -1,0 +1,1279 @@
+#!/usr/bin/env perl
+
+##
+## sdif: sdiff clone
+##
+## Copyright (c) 1992- Kazumasa Utashiro
+##
+## Original version on Jul 24 1991
+##
+
+=pod
+
+=head1 NAME
+
+sdif - side-by-side diff viewer for ANSI terminal
+
+=head1 SYNOPSIS
+
+sdif file_1 file_2
+
+diff ... | sdif
+
+    --number, -n	print line number
+    --digit=#		set the line number digits (default 4)
+    --truncate, -t	truncate long line
+    --onword		fold line on word boundaries
+    --context, -c, -C#	context diff
+    --unified, -u, -U#	unified diff
+
+    --width=#, -W#	specify width of output (default 80)
+    --[no]color		use color or not (default on)
+    --colormap, --cm	specify color map
+    --colortable	show color table
+    --[no]256		on/off ANSI 256 color mode (default on)
+    --mark=position	mark position (right, left, center, side) or no
+    --view, -v		viewer mode
+    --ambiguous=s       ambiguous character width (detect, wide, narrow)
+
+    --man		display manual page
+    --diff=s		set diff command
+    --diffopts=s	set diff command options
+
+    --[no]cdif		use ``cdif'' as word context diff backend
+    --cdifopts=s	set cdif command options
+    --mecab		pass --mecab option to cdif
+
+=cut
+
+require 5.014;
+use strict;
+use warnings;
+use utf8;
+use open IO => ':utf8';
+use Carp;
+use List::Util qw(min max reduce sum);
+use Pod::Usage;
+use Text::ParseWords qw(shellwords);
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+
+use App::sdif;
+my $version = $App::sdif::VERSION;
+
+sub read_until (&$) {
+    my($sub, $fh) = @_;
+    my @lines;
+    while (<$fh>) {
+	push @lines, $_;
+	return @lines if &$sub;
+    }
+    (@lines, undef);
+}
+
+my $opt_n;
+my $opt_l;
+my $opt_s;
+my $opt_q;
+my $opt_d;
+my $opt_c;
+my $opt_u;
+my $opt_C;
+my $opt_U;
+my $opt_truncate;
+my $opt_onword;
+my $opt_cdif = 0;
+my @opt_cdifopts = qw(--nocc --nomc --notc);
+my $opt_env = 1;
+my @opt_colormap;
+my @opt_diffopts;
+my $opt_diff = 'diff';
+my $opt_digit = 4;
+my $opt_view;
+my $opt_ambiguous = 'detect';
+my $screen_width;
+my $column_width;
+my @column_width;
+
+my $opt_color = 1;
+my $opt_256 = 1;
+my $opt_mark = "center";
+my $opt_W;
+my $opt_colortable;
+
+binmode STDIN,  ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+
+##
+## Special treatment --noenv option.
+##
+if (grep { $_ eq '--noenv' } @ARGV) {
+    $opt_env = 0;
+}
+if ($opt_env and my $env = $ENV{'SDIFOPTS'}) {
+    unshift(@ARGV, shellwords($env));
+}
+
+my @optargs = (
+    "n|number!" => \$opt_n,
+    "digit=i" => \$opt_digit,
+    "truncate|t!" => \$opt_truncate,
+    "onword|W!" => \$opt_onword,
+    "mark=s" => \$opt_mark,
+    "l" => \$opt_l,
+    "s" => \$opt_s,
+    "width|W=i" => \$opt_W,
+    "view|v" => \$opt_view,
+    "ambiguous=s" => \$opt_ambiguous,
+
+    "d+" => \$opt_d,
+    "h|help" => sub { usage() },
+    "man" => sub { pod2usage({-verbose => 2}) },
+
+    "env!" => \$opt_env,
+    "diff=s" => \$opt_diff,
+    "diffopts=s" => \@opt_diffopts,
+    "color!" => \$opt_color,
+    "colormap|cm=s" => \@opt_colormap,
+    "256!" => \$opt_256,
+    "c|context" => \$opt_c,
+    "u|unified" => \$opt_u,
+    "C=i" => \$opt_C,
+    "U=i" => \$opt_U,
+    "cdif!" => \$opt_cdif,
+    "cdifopts=s" => \@opt_cdifopts,
+    "colortable" => \$opt_colortable,
+
+    "--mecab" => sub { push @opt_cdifopts, "--mecab" },
+);
+
+my @SAVEDARGV = @ARGV;
+use Getopt::EX::Long;
+Getopt::Long::Configure("bundling");
+GetOptions(@optargs) || usage();
+
+warn "\@ARGV = (@SAVEDARGV)\n" if $opt_d;
+
+if ($opt_ambiguous =~ /^(?:detect|auto)$/) {
+    use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
+    $opt_ambiguous = is_cjk_lang() ? 'wide' : 'narrow';
+}
+
+use Text::VisualWidth::PP qw(vwidth);
+if ($opt_ambiguous =~ /^(?:wide|full)/) {
+    $Text::VisualWidth::PP::EastAsian = 1;
+}
+
+my %colormap =
+    $opt_256 ? (
+	OCOMMAND => "555/010",
+	NCOMMAND => "555/010",
+	MCOMMAND => "555/010",
+	OFILE => "555/010D",
+	NFILE => "555/010D",
+	MFILE => "555/010D",
+	OMARK => "010/444",
+	NMARK => "010/444",
+	MMARK => "010/444",
+	UMARK => "",
+	OLINE => "220",
+	NLINE => "220",
+	MLINE => "220",
+	ULINE => "",
+	OTEXT => "K/454",
+	NTEXT => "K/454",
+	MTEXT => "K/454",
+	UTEXT => "",
+    ) : (
+	OCOMMAND => "GS",
+	NCOMMAND => "GS",
+	MCOMMAND => "GS",
+	OFILE => "GDS",
+	NFILE => "GDS",
+	MFILE => "GDS",
+	OMARK => "G/W",
+	NMARK => "G/W",
+	MMARK => "G/W",
+	UMARK => "",
+	OLINE => "Y",
+	NLINE => "Y",
+	MLINE => "Y",
+	ULINE => "",
+	OTEXT => "G",
+	NTEXT => "G",
+	MTEXT => "G",
+	UTEXT => "",
+    );
+
+use Getopt::EX::Colormap;
+use constant RESET => Getopt::EX::Colormap::CSI(0);
+my $color_handler = new Getopt::EX::Colormap
+    HASH => \%colormap;
+$color_handler->load_params(@opt_colormap);
+
+my $painter = do {
+    if ($opt_color) {
+	sub { $color_handler->color(@_) };
+    } else {
+	sub { $_[1] } ;
+    }
+};
+
+$colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
+$colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
+$colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
+$colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
+
+##
+## setup diffopts
+##
+push @opt_diffopts, "-c" if $opt_c;
+push @opt_diffopts, "-u" if $opt_u;
+push @opt_diffopts, "-C$opt_C" if defined $opt_C;
+push @opt_diffopts, "-U$opt_U" if defined $opt_U;
+
+##
+## setup cdifopts
+##
+push @opt_cdifopts, '--no256' if not $opt_256;
+
+my($OLD, $NEW, $DIFF);
+if (@ARGV == 2) {
+    ($OLD, $NEW) = @ARGV;
+    $DIFF = "$opt_diff @opt_diffopts $OLD $NEW |";
+} elsif (@ARGV < 2) {
+    $DIFF = shift || '-';
+    $opt_s++;
+} else {
+    usage("Unexpected arguments.\n\n");
+}
+my $readfile =
+     ($OLD and $NEW)
+     && !($opt_s || $opt_c || $opt_u || (defined $opt_C || defined $opt_U));
+
+sub usage {
+    select STDERR;
+    print @_;
+    pod2usage(-verbose => 0, -exitval => "NOEXIT");
+    exit;
+}
+
+use constant {
+    RIGHT => 'right',
+    LEFT => 'left',
+    NO => 'no',
+};
+my %markpos = (
+    center => [ RIGHT , LEFT  , LEFT  ],
+    side   => [ LEFT  , RIGHT , LEFT  ],
+    right  => [ RIGHT , RIGHT , RIGHT ],
+    left   => [ LEFT  , LEFT  , LEFT  ],
+    no     => [ NO    , NO    , NO    ],
+    );
+unless ($markpos{$opt_mark}) {
+    my @keys = sort keys %markpos;
+    usage "Use one from (@keys) for option --mark\n\n"
+}
+my @markpos = @{$markpos{$opt_mark}};
+my($omarkpos, $nmarkpos, $mmarkpos) = @markpos;
+
+my $num_format = "%${opt_digit}d";
+
+$screen_width = $opt_W || &terminal_width;
+
+sub column_width {
+    my $column = shift;
+    $column_width[$column] //= do {
+	$screen_width -= $column if $opt_mark;
+	max(1, int($screen_width / $column));
+    };
+}
+
+my $oline = 1;
+my $nline = 1;
+my $mline = 1;
+
+if ($opt_colortable) {
+    color_table();
+    exit;
+}
+
+if ($opt_d) {
+    printf STDERR "\$OLD = %s\n", $OLD // "undef";
+    printf STDERR "\$NEW = %s\n", $NEW // "undef";
+    printf STDERR "\$DIFF = %s\n", $DIFF // "undef";
+}
+
+if ($readfile) {
+    open(OLD, $OLD) || die "$OLD: $!\n";
+    open(NEW, $NEW) || die "$NEW: $!\n";
+    if ($opt_view) {
+	$DIFF = "/dev/null";
+    }
+}
+
+if ($opt_cdif) {
+    my $pid = open DIFF, '-|';
+    if (not defined $pid) {
+	die "$!" if not defined $pid;
+    }
+    ## child
+    elsif ($pid == 0) {
+	if ($DIFF ne '-') {
+	    open(STDIN, $DIFF) || die "cannot open diff: $!\n";
+	}
+	do { exec join ' ', 'cdif', @opt_cdifopts } ;
+	warn "exec failed: $!";
+	print while <>;
+	exit;
+    }
+    ## parent
+    else {
+	## nothing to do
+    }
+} else {
+    open(DIFF, $DIFF) || die "cannot open diff: $!\n";
+}
+
+my $column = 2;
+
+while (<DIFF>) {
+    my @old;
+    my @new;
+    my($left, $ctrl, $right);
+    #
+    # normal diff
+    #
+    if (($left, $ctrl, $right) = /^([\d,]+)([adc])([\d,]+)$/) {
+	my($l1, $l2) = range($left);
+	my($r1, $r2) = range($right);
+	if ($readfile) {
+	    my $identical_line = $l1 - $oline + 1 - ($ctrl ne 'a');
+	    print_identical($identical_line);
+	}
+	if ($opt_d || $opt_s) {
+	    print_command_n($_, $_);
+	}
+	if ($ctrl eq 'd' || $ctrl eq 'c') {
+	    ($oline) = $left =~ /^(\d+)/;
+	    my $n = $l2 - $l1 + 1;
+	    @old = read_line(*DIFF, $n);
+	    $readfile and read_line(*OLD, $n);
+	}
+	read_line(*DIFF, 1) if $ctrl eq 'c';
+	if ($ctrl eq 'a' || $ctrl eq 'c') {
+	    ($nline) = $right =~ /^(\d+)/;
+	    my $n = $r2 - $r1 + 1;
+	    @new = read_line(*DIFF, $n);
+	    $readfile and read_line(*NEW, $n);
+	}
+	map { s/^..// } @old, @new;
+	flush_buffer([], \@old, \@new);
+    }
+    #
+    # context diff
+    #
+    elsif (/^\*\*\* /) {
+	my $next = <DIFF>;
+	print_command_n({ type => 'FILE' }, $_, $next);
+    }
+    elsif ($_ eq "***************\n") {
+	my $ohead = $_ = <DIFF>;
+	unless (($left) = /^\*\*\* ([\d,]+) \*\*\*\*$/) {
+	    print;
+	    next;
+	}
+	my $oline = range($left);
+	my $dline = 0;
+	my $cline = 0;
+	my $nhead = $_ = <DIFF>;
+	unless (($right) = /^--- ([\d,]+) ----$/) {
+	    @old = read_line(*DIFF, $oline - 1, $nhead);
+	    $nhead = $_ = <DIFF>;
+	    unless (($right) = /^--- ([\d,]+) ----$/) {
+		print $ohead, @old, $_;
+		next;
+	    }
+	    for (@old) {
+		/^-/ and ++$dline;
+		/^!/ and ++$cline;
+	    }
+	}
+	my $nline = range($right);
+	if (@old == 0 or $cline != 0 or ($oline - $dline != $nline)) {
+	    @new = read_line(*DIFF, $nline);
+	}
+	print_command_n($ohead, $nhead);
+	($oline) = $left =~ /^(\d+)/;
+	($nline) = $right =~ /^(\d+)/;
+
+	my @buf = merge_diffc(\@old, \@new);
+	map { map { s/^..// } @$_ } @buf;
+	flush_buffer(@buf);
+    }
+    #
+    # unified diff
+    #
+    elsif (/^--- /) {
+	my $next = <DIFF>;
+	print_command_n({ type => 'FILE' }, $_, $next);
+    }
+    elsif (/^\@\@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? \@\@/) {
+	($oline, $nline) = ($1, $3);
+	my($a, $b) = ($2//1, $4//1);
+	print_command_n({ type => 'COMMAND' }, $_, $_);
+
+	my @stack = read_diffu(*DIFF, $a, $b);
+	my @buf = map {
+	    [ collect $_ qr/^\ $/ ],	# common
+	    [ collect $_ qr/^\-$/ ],	# old
+	    [ collect $_ qr/^\+$/ ],	# new
+	} @stack;
+
+	map { map { s/^.// } @$_ } @buf;
+	flush_buffer(@buf);
+    }
+    #
+    # diff --combined (only support 3 files)
+    #
+    elsif (/^diff --(?:cc|combined)/) {
+	my @lines = ($_);
+	push @lines, read_until { /^\+\+\+/ } *DIFF;
+	if (not defined $lines[-1]) {
+	    pop @lines;
+	    print @lines;
+	    next;
+	}
+	print @lines;
+    }
+    elsif (/^\@{3} -(\d+)(?:,(\d+))? -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? \@{3}/)  {
+	print_command_n({ type => 'COMMAND' }, $_, $_, $_);
+
+	($oline, $nline, $mline) = ($1, $3, $5);
+	my @stack = read_diffu(*DIFF, $2 // 1, $4 // 1, $6 // 1);
+	my @buf = map {
+	    [ collect $_ qr/^  $/ ],		# common
+	    [ collect $_ qr/^(?:--|- |\ \+)/ ],	# old
+	    [ collect $_ qr/^(?:--| -|\+\ )/ ],	# new
+	    [ collect $_ qr/\+/ ]		# merge
+	} @stack;
+	flush_buffer_3(@buf);
+    }
+    else {
+	print;
+    }
+}
+
+close DIFF;
+my $exit = $? >> 8;
+
+if ($readfile) {
+    if ($exit < 2) {
+	print_identical(-1);
+    }
+    close OLD;
+    close NEW;
+}
+
+exit($exit == 2);
+
+######################################################################
+
+sub marklines {
+    local $_ = shift;
+    /-/ ? tr/-/-/ : tr/ / / + 1;
+}
+sub read_diffu {
+    my $FH = shift;
+    my $column = @_;
+    my $total = sum @_;
+
+    use App::sdif::LabelStack;
+
+    my $mark_length = $column - 1;
+    my $start_label = ' ' x $mark_length;
+    my @lsopt = (START => $start_label);
+    my @stack = (new App::sdif::LabelStack @lsopt);
+    while (<$FH>) {
+	# `git diff' produces message like this:
+	# "\ No newline at end of file"
+	/^[ \-\+]{$mark_length}/ or do {
+	    warn "Unexpected line: $_" unless /^\\ /;
+	    next;
+	};
+	my $mark = substr $_, 0, $mark_length;
+	if ($mark ne $stack[-1]->lastlabel and $stack[-1]->exists($mark)) {
+	    push @stack, new App::sdif::LabelStack @lsopt;
+	}
+	$stack[-1]->append($mark, $_);
+	last if ($total -= marklines($mark)) <= 0;
+    }
+    @stack;
+}
+
+sub merge_diffc {
+    my @o = @{+shift};
+    my @n = @{+shift};
+    my @buf;
+
+    die if grep { not /^[ \-\+\!] / } @o, @n;
+
+    while (@o or @n) {
+	my @slot = ([], [], []);
+	push @buf, @slot;
+
+	if (@o and @n) {
+	    while (@o and @n and $o[0] =~ /^  / and $n[0] =~ /^  /) {
+		push @{$slot[0]}, shift @o;
+		shift @n;
+	    }
+	}
+	elsif (@o) {
+	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^  /;
+	}
+	elsif (@n) {
+	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^  /;
+	}
+
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\- /;
+	next if @{$slot[1]};
+
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+ /;
+	next if @{$slot[2]};
+
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^! /;
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^! /;
+    }
+
+    @buf;
+}
+
+sub flush_buffer {
+
+    my($omark, $nmark) = ('-', '+');
+
+    push @_, [] while @_ % 3;
+
+    if ($opt_view) {
+	@_ = do {
+	    map { @$_ }
+	    reduce {
+		[ [] ,
+		  [ map { @$_ } $a->[1], $b->[0], $b->[1] ] ,
+		  [ map { @$_ } $a->[2], $b->[0], $b->[2] ] ] }
+	    map { $_ ? [ ( splice @_, 0, 3 ) ] : [ [], [], [] ] }
+	    0 .. @_ / 3 ;
+	};
+	($omark, $nmark) = (' ', ' ');
+    }
+
+    while (my($s, $o, $n) = splice @_, 0, 3) {
+	for (@$s) {
+	    print_column_23(' ', $_, ' ', $_);
+	    $oline++;
+	    $nline++;
+	}
+
+	while (@$o or @$n) {
+	    my $old = shift @$o;
+	    my $new = shift @$n;
+	    my $omark = $old ? $omark : ' ';
+	    my $nmark = $new ? $nmark : ' ';
+
+	    print_column_23($omark, $old, $nmark, $new);
+
+	    $oline++ if defined $old;
+	    $nline++ if defined $new;
+	}
+    }
+}
+
+sub flush_buffer_3 {
+
+    push @_, [] while @_ % 4;
+
+    if ($opt_view) {
+	@_ = do {
+	    map { @$_ }
+	    reduce {
+		[ [] ,
+		  [ map { @$_ } $a->[1], $b->[0], $b->[1] ] ,
+		  [ map { @$_ } $a->[2], $b->[0], $b->[2] ] ,
+		  [ map { @$_ } $a->[3], $b->[0], $b->[3] ] ] }
+	    map { $_ ? [ splice @_, 0, 4 ] : [ [], [], [], [] ] }
+	    0 .. @_ / 4;
+	};
+    }
+
+    while (@_) {
+	my @d = splice @_, 0, 4;
+
+	for my $common (@{shift @d}) {
+	    print_column_23(' ', $common, ' ', $common, ' ', $common);
+	    $oline++;
+	    $nline++;
+	    $mline++;
+	}
+
+	while (grep { @$_ > 0 } @d) {
+	    my $old = shift @{$d[0]};
+	    my $new = shift @{$d[1]};
+	    my $mrg = shift @{$d[2]};
+	    my $om = $old ? $old =~ s/^(.).// && $1  : ' ';
+	    my $nm = $new ? $new =~ s/^.(.)// && $1  : ' ';
+	    my $mm = $mrg ? $mrg =~ s/^..//   && '+' : ' ';
+
+	    $om = $nm = $mm = ' ' if $opt_view;
+
+	    print_column_23($om, $old, $nm, $new, $mm, $mrg);
+
+	    $oline++ if defined $old;
+	    $nline++ if defined $new;
+	    $mline++ if defined $mrg;
+	}
+    }
+}
+
+sub print_identical {
+    my $n = shift;
+    while ($n--) {
+	my $old = <OLD>;
+	my $new = <NEW>;
+	defined $old or defined $new or last;
+	if ($opt_l) {
+	    print linenum($oline), " " if $opt_n;
+	    print expand_tab($old);
+	} else {
+	    print_column_23(' ', $old, ' ', $new);
+	}
+	$oline++;
+	$nline++;
+	$mline++;
+    }
+}
+
+sub linenum {
+    my $n = shift;
+    defined $n ? (sprintf $num_format, $n) : (' ' x $opt_digit);
+}
+
+sub print_column_23 {
+    my $column = @_ / 2;
+    my $width = column_width $column;
+    my($omark, $old, $nmark, $new, $mmark, $mrg) = @_;
+    my $print_number = $opt_n;
+
+    my($onum, $nnum, $mnum) = ('', '', '');
+    my $nspace = $print_number ? ' ' : '';
+    if (defined $old) {
+	chomp $old;
+	$old = expand_tab($old);
+	$onum = linenum($oline) if $print_number;
+    }
+    if (defined $new) {
+	chomp $new;
+	$new = expand_tab($new);
+	$nnum = linenum($nline) if $print_number;
+    }
+    if (defined $mrg) {
+	chomp $mrg;
+	$mrg = expand_tab($mrg);
+	$mnum = linenum($mline) if $print_number;
+    }
+
+    my($OTEXT, $OLINE, $OMARK) =
+	$omark =~ /\S/ ? qw(OTEXT OLINE OMARK) : qw(UTEXT OULINE OUMARK);
+    my($NTEXT, $NLINE, $NMARK) =
+	$nmark =~ /\S/ ? qw(NTEXT NLINE NMARK) : qw(UTEXT NULINE NUMARK);
+    my($MTEXT, $MLINE, $MMARK) =
+	$mmark =~ /\S/ ? qw(MTEXT MLINE MMARK) : qw(UTEXT NULINE NUMARK)
+	if $column >= 3;
+
+    while (1) {
+	(my $o, $old) = fold($old,
+			     max(1, $width - length($onum . $nspace)),
+			     onword => $opt_onword, pad => 1);
+	(my $n, $new) = fold($new,
+			     max(1, $width - length($nnum . $nspace)),
+			     onword => $opt_onword, pad => 1);
+	(my $m, $mrg) = fold($mrg,
+			     max(1, $width - length($mnum . $nspace)),
+			     onword => $opt_onword, pad => 1)
+	    if $column >= 3;
+
+	my @f;
+	$f[0]{MARK} = $painter->($OMARK, $omark);
+	$f[0]{LINE} = $painter->($OLINE, $onum) . $nspace if $print_number;
+	$f[0]{TEXT} = $painter->($OTEXT, $o) if $o ne "";
+	$f[1]{MARK} = $painter->($NMARK, $nmark);
+	$f[1]{LINE} = $painter->($NLINE, $nnum) . $nspace if $print_number;
+	$f[1]{TEXT} = $painter->($NTEXT, $n) if $n ne "";
+	if ($column >= 3) {
+	    $f[2]{MARK} = $painter->($MMARK, $mmark);
+	    $f[2]{LINE} = $painter->($MLINE, $mnum) . $nspace if $print_number;
+	    $f[2]{TEXT} = $painter->($MTEXT, $m) if $m ne "";
+	}
+	print_field_n(@f);
+
+	last if $opt_truncate;
+	last unless $old ne '' or $new ne '' or ($mrg and $mrg ne '');
+
+	if ($print_number) {
+	    $onum =~ s/./ /g;
+	    $nnum =~ s/./ /g;
+	    $mnum =~ s/./ /g if $column >= 3;
+	}
+	$omark = $old ne '' ? '.' : ' ';
+	$nmark = $new ne '' ? '.' : ' ';
+	$mmark = $mrg ne '' ? '.' : ' ' if $column >= 3;
+    }
+}
+
+sub print_command_n {
+    my $opt = ref $_[0] ? shift : {};
+    my $column = @_;
+    my $width = column_width $column;
+    my @f;
+
+    $opt->{type} //= 'COMMAND';
+    my @color = map { $_ . $opt->{type} } "O", "N", "M";
+
+    for my $i (0 .. $#_) {
+	local $_ = $_[$i];
+	if (defined $_) {
+	    chomp $_;
+	    $_ = expand_tab($_);
+	}
+	($_) = fold($_, $width, pad => 1);
+	my %f;
+	my $color = $i < @color ? $color[$i] : $color[-1];
+	$f{TEXT} = $painter->($color, $_);
+	$f{MARK} = ' ';
+	push @f, \%f;
+    }
+
+    print_field_n(@f);
+}
+
+sub print_field_n {
+    for my $i (0 .. $#_) {
+	my $f = $_[$i];
+	my $markpos = $i < @markpos ? $markpos[$i] : $markpos[-1];
+	$_ = $f->{"MARK"} and print if $markpos eq LEFT;
+	$_ = $f->{"LINE"} and print;
+	$_ = $f->{"TEXT"} and print;
+	$_ = $f->{"MARK"} and print if $markpos eq RIGHT;
+    }
+    print "\n";
+}
+
+my $alphanum;
+my $reset_re;
+my $color_re;
+my $control_re;
+BEGIN {
+    $alphanum = '_\d\p{Latin}';
+    $reset_re = qr/\e\[[0;]*m/;
+    $color_re = qr{ \e \[ [\d;]* m }x;
+    $control_re = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
+}
+
+sub IsWideSpacing {
+    return <<"END";
++utf8::East_Asian_Width=Wide
++utf8::East_Asian_Width=FullWidth
+-utf8::Nonspacing_Mark
+END
+}
+
+sub IsWideAmbiguousSpacing {
+    return <<"END";
++utf8::East_Asian_Width=Wide
++utf8::East_Asian_Width=FullWidth
++utf8::East_Asian_Width=Ambiguous
+-utf8::Nonspacing_Mark
+END
+}
+
+sub _startWideSpacing {
+    # look at $_
+    if ($Text::VisualWidth::PP::EastAsian) {
+	/^\p{IsWideAmbiguousSpacing}/;
+    } else {
+	/^\p{IsWideSpacing}/;
+    }
+}
+
+sub fold {
+    local $_ = shift // "";
+    my $width = shift;
+    my %opt = @_ ? @_ : {};
+
+    $width < 1 and croak "width should be greater than 0";
+
+    my $folded = '';
+    my $room = $width;
+    my @color_stack;
+    while (length) {
+
+	if (s/^([\f\r]+)//) {
+	    $folded .= $1;
+	    $room = $width;
+	    next;
+	}
+	if (s/^($control_re)//) {
+	    $folded .= $1;
+	    next;
+	}
+	if (s/^($reset_re)//) {
+	    $folded .= $1;
+	    @color_stack = ();
+	    next;
+	}
+
+	last if $room < 1;
+	last if $room != $width and &_startWideSpacing and $room < 2;
+
+	if (s/^($color_re)//) {
+	    $folded .= $1;
+	    push @color_stack, $1;
+	    next;
+	}
+
+	if (s/^(\e*[^\e\f\r]+)//) {
+	    my $s = $1;
+	    if ((my $w = vwidth($s)) <= $room) {
+		$folded .= $s;
+		$room -= $w;
+		next;
+	    }
+	    my($a, $b, $w) = simple_fold($s, $room);
+	    if ($w > $room and $room < $width) {
+		$_ = $s . $_;
+		last;
+	    }
+	    ($folded, $_) = ($folded . $a, $b . $_);
+	    $room -= $w;
+	} else {
+	    die "panic ($_)";
+	}
+    }
+
+    if ($opt{onword}
+	and my($tail) = /^([$alphanum]+)/o
+	and $folded =~ m{
+		^
+		( (?: [^\e]* $color_re ) *+ )
+		( .*? )
+		( [$alphanum]+ )
+		$
+	}xo
+	) {
+	## Break line before word only when enough space will be
+	## provided for the word in the next call.
+	my($s, $e) = ($-[3], $+[3]);
+	my $l = $e - $s;
+	if ($room + $l < $width and $l + length($tail) <= $width) {
+	    $_ = substr($folded, $s, $l, '') . $_;
+	    $room += $l;
+	}
+    }
+
+    if (@color_stack) {
+	$folded .= RESET;
+	$_ = join '', @color_stack, $_ if $_ ne '';
+    }
+
+    $folded .= ' ' x $room if $room > 0 and $opt{pad};
+
+    ($folded, $_);
+}
+
+##
+## Trim off one or more *logical* characters from the top.
+##
+sub simple_fold {
+    my $orig = shift;
+    my $width = shift;
+    $width <= 0 and croak "parameter error";
+
+    my($s1, $s2) = $orig =~ m/^(\X{0,$width})(.*)/ or die;
+
+    my $w = vwidth($s1);
+    while ($w > $width) {
+	my $trim = int(($w - $width) / 2 + 0.5) || 1;
+	$s1 =~ s/\X \K ( \X{$trim} ) \z//x or last;
+	$s2 = $1 . $s2;
+	$w -= vwidth($1);
+    }
+
+    ($s1, $s2, $w);
+}
+
+sub read_line {
+    local *FH = shift;
+    my $c = shift;
+    my @buf = @_;
+    while ($c--) {
+	last if eof FH;
+	push @buf, scalar <FH>;
+    }
+    wantarray ? @buf : join '', @buf;
+}
+
+sub range {
+    local $_ = shift;
+    my($from, $to) = /,/ ? split(/,/) : ($_, $_);
+    wantarray ? ($from, $to) : $to - $from + 1;
+}
+
+my @tabspace;
+BEGIN {
+    @tabspace = map { ' ' x (8 - $_) } 0..7;
+}
+sub expand_tab {
+    local $_ = shift;
+    1 while s{^([^\t]*)\t(\t*)}{
+	$1 . $tabspace[pwidth($1) % 8] . $tabspace[0] x length($2)
+    }e;
+    $_;
+}
+
+sub pwidth {
+    local $_ = shift;
+    if (/[\010\e\f\r]/) {
+	s/^.*[\f\r]//;
+	s/$color_re//g;
+	1 while s/[^\010]\010//;
+	s/^\010+//;
+    }
+    vwidth($_);
+}
+
+sub terminal_width {
+    my $default = 80;
+    my $cols = `tput cols`;
+    chomp $cols;
+    $cols > 0 ? int($cols) : $default;
+}
+
+sub unesc {
+    local $_ = shift;
+    s/\e/\\e/g;
+    $_;
+}
+
+##
+## Implement minimum function because Text::Glob is not in standard library
+##
+sub match_glob {
+    local $_ = shift;
+    s/\?/./g;
+    s/\*/.*/g;
+    my $regex = qr/^$_$/;
+    grep { $_ =~ $regex } @_;
+}
+
+sub color_table {
+    for my $c (0..5) {
+	for my $b (0..5) {
+	    my @format =
+		("%d$b$c", "$c%d$b", "$b$c%d", "$b%d$c", "$c$b%d", "%d$c$b")
+		[0 .. min(5, $screen_width / (4 * 6) - 1)];
+	    for my $format (@format) {
+		for my $a (0..5) {
+		    my $rgb = sprintf $format, $a;
+		    print $painter->("$rgb/$rgb", " $rgb");
+		}
+	    }
+	    print "\n";
+	}
+    }
+    for my $g (0..5) {
+	my $grey = $g x 3;
+	print $painter->("$grey/$grey", sprintf(" %-19s", $grey));
+    }
+    print "\n";
+    for my $g (0..23) {
+	my $grey = sprintf "L%02d", $g;
+	print $painter->("$grey/$grey", " $grey");
+    }
+    print "\n";
+    for my $alt (0, 1) {
+	for my $C (split //, "RGBCMYKW") {
+	    my $c = $alt ? lc $C : $C;
+	    print $painter->("$c/$c", "  $c ");
+	}
+	print "\n";
+    }
+    for my $rgb (qw(500 050 005 055 505 550 000 555)) {
+	print $painter->("$rgb/$rgb", " $rgb");
+    }
+    print "\n";
+}
+
+__END__
+
+=pod
+
+=head1 DESCRIPTION
+
+B<sdif> is inspired by System V L<sdiff(1)> command.  The basic
+feature of sdif is making a side-by-side listing of two different
+files.  All contents of two files are listed on left and right sides.
+Center column is used to indicate how different those lines.  No mark
+means no difference.  Added, deleted and modified lines are marked
+with `-' and `+' character.
+
+    1 deleted  -
+    2 same          1 same
+    3 changed  -+   2 modified
+    4 same          3 same
+                +   4 added
+
+It also reads and formats the output from B<diff> command from
+standard input.  Besides normal diff output, context diff I<-c> and
+unified diff I<-u> output will be handled properly.  Combined diff
+format is also supported, but currently limited up to three files.
+
+Each lines can be displayed in different colors.  Read B<--colormap>
+section in this manual for detail.
+
+While B<sdif> doesn't care about the contents of each modified lines,
+it can read the output from B<cdif> command which show the word
+context differences of each lines.  Option B<--cdif> set the
+appropriate options for B<cdif>.  Set I<--nocc>, I<--nomc> options at
+least when invoking B<cdif> manually.  Option I<--notc> is preferable
+because text color can be handled by B<sdif>.
+
+Environment valuable B<SDIFOPTS> is used to set default options.
+
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--width>=I<width>, B<-W> I<width>
+
+Use width as a width of output listing.  Default width is 80.  If the
+standard error is assigned to a terminal, the width is taken from it
+if possible.
+
+=item B<--number>, B<-n>
+
+Print line number on each lines.
+
+=item B<--digit>=I<n>
+
+Line number is displayed in 4 digits by default.  Use this option to
+change it.
+
+=item B<-c>, B<-C>I<n>, B<-u>, B<-U>I<n>
+
+Passed through to the back-end diff command.  Sdif can interpret the
+output from normal, context (I<diff -c>) and unified diff (I<diff
+-u>).
+
+=item B<--truncate>, B<-t>
+
+Truncate lines if they are longer than printing width.
+
+=item B<--onword>
+
+Fold long line at word boundaries.
+
+=item B<-->[B<no>]B<cdif>
+
+Use B<cdif> command instead of normal diff command.
+
+=item B<--cdifopts>=I<option>
+
+Specify options for back-end B<cdif> command.
+
+=item B<--mecab>
+
+Pass B<--mecab> option to back-end B<cdif> command.  Use B<--cdifopts>
+to set other options.
+
+=item B<--diff>=I<command>
+
+Any command can be specified as a diff command to be used.  Piping
+output to B<sdif> is easier unless you want to get whole text.
+
+=item B<--diffopts>=I<option>
+
+Specify options for back-end B<diff> command.
+
+=item B<--mark>=I<position>
+
+Specify the position for a mark.  Choose from I<left>, I<right>,
+I<center>, I<side> or I<no>.  Default is I<center>.
+
+=item B<-->[B<no>]B<color>
+
+Use ANSI color escape sequence for output.  Default is true.
+
+=item B<-->[B<no>]B<256>
+
+Use ANSI 256 color mode.  Default is true.
+
+=item B<--colortable>
+
+Show table of ANSI 216 colors.
+
+=item B<--view>, B<-v>
+
+Viewer mode.  Display two files side-by-side in straightforward order.
+
+=item B<--ambiguous>=I<width_spec>
+
+This is experimental option to specify how to treat Unicode ambiguous
+width characters.  Default value is 'detect'.
+
+=over 4
+
+=item B<detect> or B<auto>
+
+Detect from user's locate.  Set 'wide' when used in CJK enviroment.
+
+=item B<wide> or B<full>
+
+Treat ambiguous characters as wide.
+
+=item B<narrow> or B<half>
+
+Treat ambiguous characters as narrow.
+
+=back
+
+=item B<--colormap>=I<colormap>, B<--cm>=I<colormap>
+
+Basic I<colormap> format is :
+
+    FIELD=COLOR
+
+where the FIELD is one from these :
+
+    OLD       NEW       MERGED    UNCHANGED
+    --------- --------- --------- ---------
+    OCOMMAND  NCOMMAND  MCOMMAND           : Command line
+    OFILE     NFILE     MFILE              : File name
+    OMARK     NMARK     MMARK     UMARK    : Mark
+    OLINE     NLINE     MLINE     ULINE    : Line number
+    OTEXT     NTEXT     MTEXT     UTEXT    : Text
+
+If UMARK and/or ULINE is empty, OMARK/NMARK and/or OLINE/NLINE are
+used instead.
+
+You can make multiple fields same color joining them by = :
+
+    FIELD1=FIELD2=...=COLOR
+
+Also wildcard can be used for field name :
+
+    *CHANGE=BDw
+
+Multiple fields can be specified by repeating options
+
+    --cm FILED1=COLOR1 --cm FIELD2=COLOR2 ...
+
+or combined with comma (,) :
+
+    --cm FILED1=COLOR1,FIELD2=COLOR2, ...
+
+COLOR is a combination of single character representing uppercase
+foreground color :
+
+    R  Red
+    G  Green
+    B  Blue
+    C  Cyan
+    M  Magenta
+    Y  Yellow
+    K  Black
+    W  White
+
+and alternative (usually brighter) colors in lowercase :
+
+    r, g, b, c, m, y, k, w
+
+or RGB values and 24 grey levels if using ANSI 256 or full color
+terminal :
+
+    FORMAT:
+        foreground[/background]
+
+    COLOR:
+        000 .. 555       : 6 x 6 x 6 216 colors
+        000000 .. FFFFFF : 24bit RGB mapped to 216 colors
+        L00 .. L23       : 24 grey levels
+
+    Sample:
+        005     0000FF        : blue foreground
+           /505       /FF00FF : magenta background
+        000/555 000000/FFFFFF : black on white
+        500/050 FF0000/00FF00 : red on green
+
+and other effects :
+
+    S  Stand-out (reverse video)
+    U  Underline
+    D  Double-struck (boldface)
+    F  Flash (blink)
+    E  Expand
+
+B<E> is effective for command, file and text line.  That line will be
+expanded to window width filling up by space characters.  Left column
+is expanded always.  You may want to use this to set background color
+for right column.
+
+Defaults are :
+
+    OCOMMAND => "555/010E"  or "GSE"
+    NCOMMAND => "555/010E"  or "GSE"
+    MCOMMAND => "555/010E"  or "GSE"
+    OFILE    => "555/010DE" or "GSDE"
+    NFILE    => "555/010DE" or "GSDE"
+    MFILE    => "555/010DE" or "GSDE"
+    OMARK    => "010/444"   or "G/W"
+    NMARK    => "010/444"   or "G/W"
+    MMARK    => "010/444"   or "G/W"
+    UMARK    => ""
+    OLINE    => "220"       or  "Y"
+    NLINE    => "220"       or  "Y"
+    MLINE    => "220"       or  "Y"
+    ULINE    => ""
+    OTEXT    => "KE/454"    or "G"
+    NTEXT    => "KE/454"    or "G"
+    MTEXT    => "KE/454"    or "G"
+    UTEXT    => ""
+
+This is equivalent to :
+
+    sdif --cm '?COMMAND=555/010E,?FILE=555/010DE' \
+         --cm '?MARK=010/444,UMARK=' \
+         --cm '?LINE=220,ULINE=' \
+         --cm '?TEXT=KE/454,UTEXT='
+
+=back
+
+
+=head1 AUTHOR
+
+=over
+
+=item Kazumasa Utashiro
+
+=item L<https://github.com/kaz-utashiro/sdif-tools>
+
+=back
+
+
+=head1 SEE ALSO
+
+L<cdif(1)>, L<watchdiff(1)>
+
+L<Getopt::EX::Colormap>
+
+=cut

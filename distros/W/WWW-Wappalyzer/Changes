@@ -1,5 +1,9 @@
 Revision history for WWW-Wappalyzer
 
+0.21    11 Dec 2017 Alexander Nalobin
+        Added multi-valued headers field support.
+        'headers' parameter does not allow blessed hashref anymore.
+
 0.20    25 Feb 2017 Oleg Gavrin
         Make detect() faster and still case insensitive
 

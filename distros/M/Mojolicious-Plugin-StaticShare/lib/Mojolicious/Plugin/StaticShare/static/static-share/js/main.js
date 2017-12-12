@@ -108,7 +108,9 @@ $( document ).ready(function() {
     var err = $('.error', tr).html('');
     $.post( a.attr('_href'), { "rename": input.val(), })
       .done(function(data) {
+        if (data.error) return err.html(data.error);
         if (data.ok) f_ToggleFileCheckbox(chb, input.val(), data.ok);
+        
       })
       .fail(function() {
         err.html('something fail');

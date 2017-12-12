@@ -1,5 +1,29 @@
 Revision history for Types-SQL
 
+v0.1.2    2017-12-11 23:04:53+00:00 Europe/London
+  [Other Changes]
+  - Change how Dist::Zilla manages versions
+
+0.1.1     2017-12-11 18:05:03+00:00 Europe/London
+  [Other Changes]
+  - Include more metadata in META.yml
+
+  - Use Dist::Zilla to set module versions and update contributor
+    metadata. This will also remove the dependency on version.
+
+  - Move strictures to make Perl::Critic happy.
+
+v0.1.0    2017-12-10 23:43:59+00:00 Europe/London
+  [Documentation]
+  - Fixed typo.
+
+  - Bumped copyright year.
+
+  [Other Changes]
+  - No longer requires strictures module.
+
+  - Ref::Uil::XS is recommended.
+
 v0.0.3    2016-01-14 13:40:05+00:00 Europe/London
   [Enhancements]
   - Added support for datetime data types [GitHub #1].

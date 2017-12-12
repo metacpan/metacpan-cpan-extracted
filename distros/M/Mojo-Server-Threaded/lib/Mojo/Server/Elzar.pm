@@ -17,9 +17,9 @@ sub configure {
 
   # Elzar settings
   my $threaded = $self->threaded;
-  my $c = $threaded->app->config($name)
-       || $threaded->app->config($fallback_name)
-       || {};
+  my $c    = $threaded->app->config($name) || {};
+  my $fb_c = $threaded->app->config($fallback_name || '');
+  $c->{$_} //= $fb_c->{$_} for keys %$fb_c;
 
   $self->upgrade_timeout($c->{upgrade_timeout}) if $c->{upgrade_timeout};
 

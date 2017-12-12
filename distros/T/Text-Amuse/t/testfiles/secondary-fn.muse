@@ -1,0 +1,119 @@
+#title Secondary footnotes
+#lang en
+
+This is a paragraph [1] with a regular and a secondary {1} footnote.
+
+{1} Fist secondary
+
+          * * * * *
+
+* [First Part]
+
+A new page, then again [2] and a secondary. {2}
+
+{2} Second secondary, from the body
+
+[1] First footnote: [2] will no be a footnote
+
+[2] Second footnote [2] with a secondary footnote itself {3} and another {4}
+
+{3} Third secondary, from the footnote itself.
+
+{4} Last one from the footnote itself.
+
+* [Part with a primary [15] and a secondary {5}] [{}\_&^%#@$] [{}\_&^%#@$]
+
+{5} From part
+
+[15] Regular footnote
+
+** [Chapter] with secondary {6} [3] [{}\_&^%#@$]
+
+{6} From chapter [{}\_&^%#@$]
+
+[3] Regular
+
+* Another [part] {21} [22] [{}\_&^%#@$]
+
+{21} From the part [{}\_&^%#@$]
+
+[22] Regular from the part
+
+*** [Section] with secondary {7} [4] [{}\_&^%#@$]
+
+{7} From section [{}\_&^%#@$]
+
+[4] Regular footnote from section
+
+**** Subsection with secondary {8} [5] [{}\_&^%#@$]
+
+[5] Regular [{}\_&^%#@$]
+
+{8} From subsection [{}\_&^%#@$]
+
+***** Sub sub section with secondary {9} [6] [{}\_&^%#@$]
+
+{9} From secondary
+
+[6] From subsection <verbatim>{1} [{}\_&^%#@$]</verbatim> Neutralized
+
+<verbatim>{10}</verbatim> Neutralized
+
+Neutralized as well <verbatim>{10} [{}\_&^%#@$]</verbatim>.
+
+{{{
+verbatim block {10} [{}\_&^%#@$]
+
+{10} Nothing happens [{}\_&^%#@$]
+}}}
+
+
+<example>
+verbatim block {11}
+
+{11} Nothing happens
+</example>
+
+<verse>
+verbatim block {12} [{}\_&^%#@$]
+
+{12} Parsed [{}\_&^%#@$]
+
+</verse>
+
+> verbatim block {13}
+> another {14}
+
+{14} Parsed 1.
+
+     Same indent for secondary. This appears.
+
+
+{15} Parsed 2. This disappears.
+
+     Same indent for secondary.  Not referenced.
+
+{212}
+
+Nothing {233} happens here.
+
+
+** Chapter [55] {55}
+
+[55] Here we are 
+
+{55} Is it resetting?
+
+ - In a list {60} [50]
+
+{60} Fn in a list
+
+     With the same indentation, it continues
+
+[50] Fn from list
+
+     Same indent, continues.
+
+** Done [56] {56}
+
+

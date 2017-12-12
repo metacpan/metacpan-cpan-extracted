@@ -7,19 +7,20 @@ package Circle;
 use strict;
 use warnings;
 use base qw( Net::Async::Tangence::Server );
-IO::Async::Notifier->VERSION( '0.43' ); # ->loop
-Net::Async::Tangence::Server->VERSION( '0.12' ); # subclass of IaListener
+IO::Async::Listener->VERSION( '0.64' ); # {handle_constructor}
+Net::Async::Tangence::Server->VERSION( '0.13' ); # Future-returning API
 
-our $VERSION = '0.170740';
+our $VERSION = '0.173320';
 
 use Carp;
 
 use Tangence::Registry 0.20; # Support for late-loading classes
-use Circle::RootObj;
 
 use File::ShareDir qw( module_file );
 
 use IO::Async::OS;
+
+require Circle::RootObj; # must be late-bound, after $VERSION is set
 
 =head1 NAME
 
@@ -65,7 +66,7 @@ sub make_local_client
 
    # Internal hackery; stolen from IaListener
    my $acceptor = $self->acceptor;
-   my $handle = $self->{new_handle}->( $self );
+   my $handle = $self->{handle_constructor}->( $self );
    $S1->blocking( 0 );
    $handle->set_handle( $S1 );
    $self->on_accept( $handle );
@@ -102,6 +103,36 @@ sub warn
    $rootobj->push_displayevent( warning => { text => $text } );
    $rootobj->bump_level( 2 );
 }
+
+=head1 QUESTIONS
+
+=head2 How do I connect to freenode.net #perl and identify with NickServ
+
+   # in Global tab
+   /networks add -type irc Freenode
+
+   # in Freenode tab
+   /set nick YourNickHere
+   /servers add irc.freenode.net -ident yournamehere -pass secretpasswordhere
+   /connect
+
+   # Don't forget to
+   /config save
+
+=head2 How do I get notifications whenever someone uses the word perl in a channel that isn't on magnet or freenode#perl
+
+   /rules add input not(channel("#perl")) matches("perl"): highlight
+
+Rules are network-specific so just don't do that on Magnet.
+
+=head2 How do I set up a command to ban the hostmask for a given nick in the current channel for 24h
+
+You'll have to read the hostmask of the user specifically, but then
+
+   /mode +b ident@host.name.here
+   /delay 86400 mode -b ident@host.name.here
+
+Note the lack of C</> on the inner C<mode> to C<delay>
 
 =head1 AUTHOR
 

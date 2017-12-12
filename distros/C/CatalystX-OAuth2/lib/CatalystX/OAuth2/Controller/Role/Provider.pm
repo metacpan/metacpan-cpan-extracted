@@ -62,7 +62,7 @@ CatalystX::OAuth2::Controller::Role::Provider - A role for writing oauth2 provid
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 AUTHOR
 

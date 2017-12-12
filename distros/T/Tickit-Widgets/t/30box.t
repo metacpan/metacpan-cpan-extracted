@@ -92,6 +92,21 @@ $widget->set_child( undef );
        'child render rect with constructor-set proportions' );
 }
 
+# ->add
+{
+   my $widget = Tickit::Widget::Box->new;
+
+   ok( !$widget->children, '$widget->children empty initially' );
+
+   $widget->add( $child );
+
+   is( ( $widget->children )[0], $child, '$widget has one child after ->add' );
+
+   $widget->remove( $child );
+
+   ok( !$widget->children, '$widget->children empty finally' );
+}
+
 done_testing;
 
 package TestWidget;

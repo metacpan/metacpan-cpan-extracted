@@ -4,7 +4,6 @@ use strict;
 use warnings qw(FATAL all);
 use lib 'lib';
 use Test::More tests => 17;
-use File::Spec;
 
 use Data::Alias qw/alias copy/;
 
@@ -15,7 +14,7 @@ alias { BEGIN { $x = $y } };
 
 BEGIN { is \$x, \$y; alias $y = copy 42 }
 
-alias { BEGIN { do File::Spec->catfile(qw(t lib assign.pm)) or die $! } };
+alias { BEGIN { do "./t/lib/assign.pm" or die $! } };
 isnt \$x, \$y;
 is $x, 42;
 

@@ -1,6 +1,6 @@
 
 package Kevin::Commands::Util;
-$Kevin::Commands::Util::VERSION = '0.4.0';
+$Kevin::Commands::Util::VERSION = '0.4.1';
 use Mojo::Base -strict;
 
 # Borrowed from https://github.com/docker/go-units/blob/master/duration.go
@@ -21,7 +21,7 @@ sub _human_duration {
   return sprintf '%d hours', $hours      if $hours < 48;
   return sprintf '%d days',  $hours / 24 if $hours < 24 * 7 * 2;
   return sprintf '%d weeks',  $hours / (24 * 7) if $hours < 24 * 30 * 2;
-  return sprintf '%d months', $hours / (24 * 3) if $hours < 24 * 365 * 2;
+  return sprintf '%d months', $hours / (24 * 30) if $hours < 24 * 365 * 2;
 
   return sprintf '%d years', $hours / (24 * 365);
 }
@@ -67,7 +67,7 @@ Kevin::Commands::Util
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 AUTHOR
 

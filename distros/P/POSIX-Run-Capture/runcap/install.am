@@ -1,0 +1,7 @@
+# Automake settings for a standalone installable build of runcap.
+# See Make.am for details.
+include Make.am
+lib_LTLIBRARIES=libruncap.la
+libruncap_la_SOURCES = $(RUNCAP_SRC)
+include_HEADERS=runcap.h
+dist_man_MANS=runcap.3

@@ -1,9 +1,60 @@
 ==================================================
-Changes from 2015-11-17 00:00:00 +0000 to present.
+Changes from 2015-12-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2017-11-16 17:45:55 +0000
+version 0.006 at 2017-12-04 00:18:54 +0000
+------------------------------------------
+
+  Change: b1231e5a3f970d07f07ec4e00cc4746634293c09
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-12-04 01:18:50 +0000
+
+    Release 0.006 with the indexers fixed and the iptables context. 
+
+  Change: a121f4f64caa7b60bbbe9da6b422fb7e33991799
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-12-04 01:14:28 +0000
+
+    Fix the eris-es-indexer.pl
+
+    The config was pointing to the wrong depth in the hash. Ensure when the
+    config is passed from the commandline, eris::schemas are instantiated
+    correctly. Fix the mapping for the geo_point field in the geoip mapping.
+
+    Add the eris::log::context::iptables to parse iptables logs into the
+    indexes. 
+
+------------------------------------------
+version 0.005 at 2017-12-03 23:10:58 +0000
+------------------------------------------
+
+  Change: a4aa7aa00b3bb87e3a11f1e40fc1bd2d1d949688
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-12-04 00:10:58 +0000
+
+    Release version 0.005
+
+    Update documentaiton to demonstrate enabling the debug dictionary in the
+    syslog schema. 
+
+  Change: 537771e0cbd49dea95f9f2d8358cfa7275d5a260
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-24 11:15:46 +0000
+
+    Correct the shebang line for install 
+
+  Change: b2090fc15bdee9533c4732afbbc73c74114051cf
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-24 09:34:31 +0000
+
+    Use auto-detection of MinimumPerl
+
+    I incorrectly set the minimum Perl version. Removing this hard-coded config
+    detects the correct minimum Perl version. 
+
+------------------------------------------
+version 0.004 at 2017-11-16 17:43:11 +0000
 ------------------------------------------
 
   Change: b7737fd29826f94cfab9f91d02bfb142ff7a9dac

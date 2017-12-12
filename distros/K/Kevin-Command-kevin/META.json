@@ -63,31 +63,31 @@
    "provides" : {
       "Kevin::Command::kevin" : {
          "file" : "lib/Kevin/Command/kevin.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Kevin::Command::kevin::jobs" : {
          "file" : "lib/Kevin/Command/kevin/jobs.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Kevin::Command::kevin::worker" : {
          "file" : "lib/Kevin/Command/kevin/worker.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Kevin::Command::kevin::workers" : {
          "file" : "lib/Kevin/Command/kevin/workers.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Kevin::Commands::Util" : {
          "file" : "lib/Kevin/Commands/Util.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Kevin::Plugin::kevin" : {
          "file" : "lib/Kevin/Plugin/kevin.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Mojolicious::Plugin::Kevin::Commands" : {
          "file" : "lib/Mojolicious/Plugin/Kevin/Commands.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/aferreira/cpan-Kevin-Command-kevin"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.4.1",
    "x_contributors" : [
       "Adriano Ferreira <a.r.ferreira@gmail.com>"
    ],

@@ -18,17 +18,17 @@ meta-spec:
   version: '1.4'
 name: Ion
 recommends:
-  Class::XSAccessor: '0'
+  EV: '4.22'
 requires:
   AnyEvent: '7.14'
   Carp: '0'
   Coro: '6.514'
-  Moo: '0'
+  List::Util: '0'
   Scalar::Util: '0'
   common::sense: '0'
 resources:
   bugtracker: https://github.com/sysread/Ion/issues
   homepage: https://github.com/sysread/Ion
   repository: https://github.com/sysread/Ion.git
-version: '0.02'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

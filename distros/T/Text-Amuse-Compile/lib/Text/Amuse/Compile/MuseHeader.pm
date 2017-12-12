@@ -3,6 +3,7 @@ package Text::Amuse::Compile::MuseHeader;
 use Moo;
 use Types::Standard qw/HashRef Bool Str ArrayRef/;
 use Text::Amuse::Functions qw/muse_format_line/;
+use Text::Amuse::InlineElement;
 
 =head1 NAME
 
@@ -304,7 +305,10 @@ sub tex_metadata {
                keywords => (scalar(@{$self->topics}) ? join('; ', @{$self->topics}) : ''),
               );
     foreach my $k (keys %out) {
-        $out{$k} = muse_format_line(ltx => $out{$k});
+        # just escape
+        $out{$k} = Text::Amuse::InlineElement->new(string => $out{$k},
+                                                   type => 'text',
+                                                   fmt => 'ltx')->stringify;
     }
     return \%out;
 }

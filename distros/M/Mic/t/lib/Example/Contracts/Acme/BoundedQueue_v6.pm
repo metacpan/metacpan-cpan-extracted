@@ -20,15 +20,15 @@ sub BUILD {
     my ($self) = @_;
 
     # make constructor postcondition fail
-    $self->{$Q}->push(1);
+    $self->[Q]->push(1);
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    $self->{$Q}->push($val);
+    $self->[Q]->push($val);
 
-    if ($self->size > $self->{$MAX_SIZE}) {
+    if ($self->size > $self->[MAX_SIZE]) {
         $self->pop;        
     }
 }

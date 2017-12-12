@@ -1,5 +1,22 @@
 Revision history for Perl extension GitLab::API::v3.
 
+1.02 2017-12-09
+
+ - Deprecated.
+
+1.01 2017-12-09
+
+ - Add a very simple retries argument for retrying a request when a 5xx response is
+   received. @jjatria
+ - Support user snippets. @d5ve
+ - Disable deserialisation when dealing with non-serialized data. @jjatria
+ - Add support for login in with user credentials. @jjatria
+ - Allow protect_branch to accept parameters.
+ - Add share_project_with_group and delete_shared_project_link_within_group
+   methods. @sotola
+ - Change CONTRIBUTORS section to show the commit author rather than a link
+   to their GitHub profile.
+
 1.00 2016-06-23
 
  - Move tag methods into their own section and add the tag, delete_tag,

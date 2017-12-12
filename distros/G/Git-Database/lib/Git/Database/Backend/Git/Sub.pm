@@ -1,5 +1,5 @@
 package Git::Database::Backend::Git::Sub;
-$Git::Database::Backend::Git::Sub::VERSION = '0.009';
+$Git::Database::Backend::Git::Sub::VERSION = '0.010';
 use Git::Sub qw(
    cat_file
    hash_object
@@ -10,6 +10,7 @@ use Git::Sub qw(
 );
 use Git::Version::Compare qw( ge_git );
 use File::pushd qw( pushd );
+use File::Spec;
 
 use Moo;
 use namespace::clean;
@@ -25,6 +26,19 @@ with
 # the store attribute is a directory name
 # or an object representing a directory
 # (e.g. Path::Class, Path::Tiny, File::Fu)
+has '+store' => (
+    is        => 'ro',
+    required  => 1,
+    predicate => 1,
+    coerce    => sub {
+        my $dir = shift;
+        return    # coerce to an absolute path
+          File::Spec->file_name_is_absolute($dir) ? $dir
+          : ref $dir ? eval { ref($dir)->new( File::Spec->rel2abs($dir) ) }
+                         || File::Spec->rel2abs($dir)
+          :            File::Spec->rel2abs($dir);
+    },
+);
 
 # Git::Database::Role::Backend
 sub hash_object {
@@ -164,7 +178,7 @@ Git::Database::Backend::Git::Sub - A Git::Database backend based on Git::Sub
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -176,8 +190,20 @@ version 0.009
 
 =head1 DESCRIPTION
 
-This backend reads and write data from a Git repository using the
+This backend reads and writes data from a Git repository using the
 L<Git::Sub> Git wrapper.
+
+Since L<Git::Sub> has a functional interface, the
+L<store|Git::Database::Role::Backend/store> attribute is simply the path
+in which the git commands will run. If the path is a relative path,
+it will be coerced to an absolute path.
+
+Note that overloaded objects (such as L<Path::Tiny>, L<Path::Class> and
+others) that stringify to the actual path are supported. When coercion
+to an absolute path occurs, it attempts to create an object of the same
+class representing the absolute path. If the coercion fails to create an
+object of the same class, the store attribute will be a string containing
+the absolute path.
 
 =head2 Git Database Roles
 

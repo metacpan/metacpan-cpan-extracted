@@ -37,17 +37,18 @@ More info on Wappalyzer:  L<https://github.com/AliasIO/Wappalyzer>
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
     use WWW::Wappalyzer;
     use LWP::UserAgent;
+    use List::Util 'pairmap';
 
     my $response = LWP::UserAgent->new->get( 'http://www.drupal.org' );
     my %detected = WWW::Wappalyzer::detect(
         html    => $response->decoded_content,
-        headers => $response->headers,
+        headers => { pairmap { $a => [ $response->headers->header($a) ] } $response->headers->flatten },
     );
 
     # %detected = (
@@ -72,13 +73,17 @@ Tries to detect CMS, framework, etc for given html code, http headers, url.
 
 Available parameters:
 
-    html    - html code of web page
-    headers - hash ref to http headers list
-    url     - url of web page
-    cats    - array ref to a list of trying categories, defaults to all categories;
-              less cats => less cpu usage
+    html    - HTML code of web page.
 
-Returns the hash of detected applications by categorie:
+    headers - Hash ref to http headers list. The value may be a plain string or a array ref 
+              of strings for a multi-valued field.
+
+    url     - URL of web page.
+
+    cats    - Array ref to a list of trying categories, defaults to all categories;
+              Less cats => less cpu usage.
+
+Returns the hash of detected applications by category:
 
     (
         cms  => [ 'Joomla' ],
@@ -96,34 +101,39 @@ sub detect {
     if ( $params{html} ) {
         $params{html} = lc $params{html};
     }
+
     if ( $params{url} ) {
         $params{url} = lc $params{url};
     }
+
+    my $headers_ref;
     if ( $params{headers} ) {
-        # do not modify orig headers
-        my %tmp;
-        $tmp{$_} = lc $params{headers}{$_} for keys %{ $params{headers} };
-        $params{headers} = \%tmp;
+        die 'Bad headers param'  unless ref $params{headers} eq 'HASH';
+
+        # Make all headers lowercase and array ref valued
+        $headers_ref = {};
+        while ( my ( $header, $header_vals_ref ) = each %{ $params{headers} } ) {
+            unless ( ref $header_vals_ref ) {
+                $header_vals_ref = [ $header_vals_ref ];
+            }
+            elsif ( ref $header_vals_ref ne 'ARRAY' ) {
+                next;
+            }
+
+            $headers_ref->{ lc $header } = [ map { lc } @$header_vals_ref ];
+        }
     }
 
     # Lazy load and process clues from JSON file
-    _load_categories() unless scalar keys %_categories;
+    _load_categories()  unless scalar keys %_categories;
 
     my @cats = $params{cats} && ( ref( $params{cats} ) || '' ) eq 'ARRAY'
         ? @{ $params{cats} } : get_categories();
 
-    my $headers_ref;
-    if ( $params{headers} ) {
-        # make all headers name lowercase
-        while ( my ( $name, $value ) = each %{ $params{headers} } ) {        
-            $headers_ref->{ lc $name } = $value;
-        }
-    }
-
     my %detected;
     my %tried_multi_cat_apps;
     for my $cat ( @cats ) {
-        my $apps_ref = $_categories{ $cat } or die "Unknown categorie $cat";
+        my $apps_ref = $_categories{ $cat } or die "Unknown category $cat";
 
         APP:
         for my $app_ref ( @$apps_ref ) {
@@ -142,14 +152,18 @@ sub detect {
 
                 if ( defined $headers_ref && exists $app_ref->{headers_rules} ) {
                     my %headers_rules = %{ $app_ref->{headers_rules} };
-                    while ( my ( $header, $rule ) = each %headers_rules ) {
-                        my $header_val = $headers_ref->{ $header } or next;
 
-                        if ( $header_val =~ m/$rule->{re}/ ) {
-                            $confidence += $rule->{confidence};
-                            if ( $confidence >= 100 ) {
-                                $detected = 1;
-                                last;
+                    HEADER_RULE:
+                    while ( my ( $header, $rule ) = each %headers_rules ) {
+                        my $header_vals_ref = $headers_ref->{ $header } or next;
+
+                        for my $header_val ( @$header_vals_ref ) {
+                            if ( $header_val =~ m/$rule->{re}/ ) {
+                                $confidence += $rule->{confidence};
+                                if ( $confidence >= 100 ) {
+                                    $detected = 1;
+                                    last HEADER_RULE;
+                                }
                             }
                         }
                     }

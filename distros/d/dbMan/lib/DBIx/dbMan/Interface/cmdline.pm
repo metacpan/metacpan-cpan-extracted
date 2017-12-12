@@ -4,9 +4,11 @@ use strict;
 use DBIx::dbMan::History;
 use Term::Size;
 use Term::ReadKey;
+use Term::ReadLine;
+use POSIX qw/setlocale LC_ALL/;
 use base 'DBIx::dbMan::Interface';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
@@ -17,10 +19,12 @@ sub init {
 
     $SIG{ INT } = sub { die 'Catched signal INT'; };
 
-	eval {
-		require Term::ReadLine;
-	};
-	$obj->{readline} = new Term::ReadLine 'dbMan' unless $@;
+    if ( $obj->is_utf8 ) {
+        binmode STDIN, ':utf8';
+        binmode STDOUT, ':utf8';
+    }
+
+	$obj->{readline} = new Term::ReadLine 'dbMan', \*STDIN, \*STDOUT unless $@;
 	
 	if ($obj->{readline}) {
 		for ($obj->{history}->load()) {
@@ -29,6 +33,14 @@ sub init {
 		my $attr = $obj->{readline}->Attribs;
 		$attr->{completion_function} = sub { $obj->gather_complete(@_); };
 	}
+}
+
+sub hello {
+    my $obj = shift;
+
+    $obj->SUPER::hello( @_ );
+
+    $obj->print( "UTF-8 workaround enabled.\n" ) if $obj->is_utf8;
 }
 
 sub history_add {
@@ -57,7 +69,8 @@ sub get_command {
 
 	my $cmd = '';
 	if ($obj->{readline}) {
-		$cmd = eval { $obj->{readline}->readline($obj->{-lang}->str($obj->get_prompt())); };
+        my $prompt = $obj->{-lang}->str($obj->get_prompt());
+		$cmd = eval { $obj->{readline}->readline( $prompt ); };
         return '' if $@ =~ /^Catched signal INT/;
 		unless (defined $cmd) { $cmd = 'QUIT';  $obj->print("\n"); } 
 		$obj->{history}->add($cmd);
@@ -78,7 +91,9 @@ sub bind_key {
 
 	if ($obj->{readline}) {
 		my $bind = '"'.$key.'": "'.$text.'"';
-		$obj->{readline}->parse_and_bind($bind);
+        if ( $obj->{ readline }->can( 'parse_and_bind' ) ) {
+    		$obj->{readline}->parse_and_bind($bind);
+        }
 	}
 }
 
@@ -110,3 +125,22 @@ sub get_key {
 	return $seq;
 }
 
+sub is_utf8 {
+    my $obj = shift;
+
+    if ( ! exists $obj->{ _is_utf8 } ) {
+        my $locale = $ENV{ LC_ALL } || $ENV{ LC_CTYPE } || $ENV{ LANG } || '';
+        $obj->{ _is_utf8 } = ( $locale =~ /\.utf-?8$/i ) ? 1 : 0;
+    }
+
+    return $obj->{ _is_utf8 };
+}
+
+sub print {
+    my $obj = shift;
+
+    if ( $obj->is_utf8 ) {
+        binmode *STDOUT, ':utf8';
+    }
+    return $obj->SUPER::print( @_ );
+}

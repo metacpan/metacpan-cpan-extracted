@@ -3,7 +3,7 @@
 # Crypt::Unsnoopable - Completely unsnoopable messaging
 # Copyright (c) 2017 Ashish Gulhati <crypt-unsnoopable at hash.neo.tc>
 #
-# $Id: lib/Crypt/Unsnoopable.pm v1.007 Sat Nov  4 20:41:32 PDT 2017 $
+# $Id: lib/Crypt/Unsnoopable.pm v1.008 Sun Dec 10 01:36:27 PST 2017 $
 
 package Crypt::Unsnoopable;
 
@@ -19,7 +19,7 @@ use vars qw( $VERSION $AUTOLOAD @ISA @EXPORT_OK );
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(dec heX);
 
-our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.008 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -127,8 +127,8 @@ Crypt::Unsnoopable - Completely unsnoopable messaging
 
 =head1 VERSION
 
- $Revision: 1.007 $
- $Date: Sat Nov  4 20:41:32 PDT 2017 $
+ $Revision: 1.008 $
+ $Date: Sun Dec 10 01:36:27 PST 2017 $
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,8 @@ returns the decrypted plaintext if successful, or undef if not.
 =head1 SEE ALSO
 
 =head2 L<http://www.unsnoopable.org>
+
+=head2 L<http://www.noodlepi.com>
 
 =head2 L<unsnoopable.pl>
 

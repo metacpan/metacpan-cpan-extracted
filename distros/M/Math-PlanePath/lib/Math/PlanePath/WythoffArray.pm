@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -49,7 +49,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -365,9 +365,9 @@ ratio, meaning its multiples rounded down to an integer.
 
     Eg. Y=5  N=5+floor((5+1)*phi)=14
 
-The recurrence in each row starts as if the row was preceded by two values Y
-and spectrum(Y+1) which can be thought of adding to be Y+spectrum(Y+1) on
-the Y axis, then Y+2*spectrum(Y+1) in the X=1 column, etc.
+The recurrence in each row starts as if the row was preceded by two values
+Y,spectrum(Y+1) which can be thought of adding to be Y+spectrum(Y+1) on the
+Y axis, then Y+2*spectrum(Y+1) in the X=1 column, etc.
 
 If the first two values in a row have a common factor then that factor
 remains in all subsequent sums.  For example the Y=2 row starts with two
@@ -618,7 +618,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

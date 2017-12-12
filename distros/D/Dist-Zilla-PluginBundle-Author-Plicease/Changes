@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.25      2017-11-29 14:49:19 -0500
+  - Require plicease plugins 2.25
+  - Use [Author::Plicease::NoUnsafeInc]
+  - Check that PERL_USE_UNSAFE_INC is set correctly in travis.yml
+
 2.24      2017-11-07 08:09:45 -0500
   - Require plicease plugins 2.24
 

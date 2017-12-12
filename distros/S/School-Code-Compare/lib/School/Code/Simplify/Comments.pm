@@ -1,7 +1,8 @@
 package School::Code::Simplify::Comments;
 # ABSTRACT: roughly trim whitespace, depending on commenting style
-$School::Code::Simplify::Comments::VERSION = '0.002';
+$School::Code::Simplify::Comments::VERSION = '0.006';
 use strict;
+use warnings;
 
 sub new {
     my $class = shift;
@@ -51,6 +52,7 @@ sub slashy {
 
     foreach my $row (@{$lines_ref}) {
       next if ($row =~ m!^/!);
+      next if ($row =~ m!^\s*\*!);
       $row = $1 if ($row =~ m!(.*)//.*!);
       $row = $1 if ($row =~ m!(.*)/\*.*!);
       $row =~ s/\s*//g;
@@ -138,7 +140,7 @@ School::Code::Simplify::Comments - roughly trim whitespace, depending on comment
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 AUTHOR
 

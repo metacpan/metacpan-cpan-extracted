@@ -74,14 +74,14 @@ pre {
   background-color: #fafafa;
   border: 1px solid #c1c1c1;
   border-radius: 3px;
-  font: 100% Consolas, Menlo, Monaco, Courier, monospace;
+  font-size: 100%;
   padding: 1em;
 }
 
 :not(pre) > code {
   background-color: rgba(0, 0, 0, 0.04);
   border-radius: 3px;
-  font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
+  font-size: 0.9em;
   padding: 0.3em;
 }
 
@@ -120,6 +120,7 @@ pre {
 % layout 'Mojolicious-Plugin-StaticShare/main';
 
 <div class="row">
+% if (@$dirs || $c->admin) {
 <div class="dirs-col col s6">
 
 % if ($c->admin) {
@@ -199,7 +200,9 @@ pre {
 </table>
 
 </div>
+% }
 
+% if (@$files || $c->admin || $c->public_uploads) {
 <div class="files-col col s6">
 
 % if ($c->admin || $c->public_uploads) {
@@ -283,7 +286,8 @@ pre {
 </tbody>
 </table>
 
-</div><!-- col 2 -->
+</div><!-- col files -->
+% }
 </div><!-- row -->
 
 % if (stash 'index') {
@@ -307,7 +311,7 @@ pre {
 % }
 
 % if ($c->plugin->root_url->to_route ne $url_path->to_route) {
-  <a href="<%= $url_path->clone->trailing_slash(0)->to_dir %>" class="btn-flat000 ">
+  <a href="<%= $url_path->clone->trailing_slash(0)->to_dir %>" class="btn-flat000 " style="white-space:nowrap;">
     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon15 maroon-fill" viewBox="0 0 50 50"><use xlink:href="/static-share/fonts/icons.svg#up-left-round" /></svg>
     <span class="maroon-text"><%= i18n 'Up'%></span>
   </a>

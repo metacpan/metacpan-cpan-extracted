@@ -63,3 +63,4 @@
 
 ^\.travis\.yml$
 ^Map-Metro-Plugin-Map-Berlin-.*.tar.gz$
+^appveyor\.yml$

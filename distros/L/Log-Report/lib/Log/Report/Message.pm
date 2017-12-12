@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Message;
 use vars '$VERSION';
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 
 use Log::Report 'log-report';
@@ -126,9 +126,20 @@ sub toString(;$)
     my $count  = $self->{_count} || 0;
 	$locale    = $self->{_lang} if $self->{_lang};
 
+    my $prepend = $self->{_prepend} // '';
+    my $append  = $self->{_append}  // '';
+
+	if(blessed $prepend) {
+        $prepend = $prepend->isa(__PACKAGE__) ? $prepend->toString($locale)
+          : "$prepend";
+	}
+	if(blessed $append) {
+        $append  = $append->isa(__PACKAGE__) ? $append->toString($locale)
+          : "$append";
+	}
+
     $self->{_msgid}   # no translation, constant string
-        or return (defined $self->{_prepend} ? $self->{_prepend} : '')
-                . (defined $self->{_append}  ? $self->{_append}  : '');
+        or return "$prepend$append";
 
     # assumed is that switching locales is expensive
     my $oldloc = setlocale(LC_MESSAGES);
@@ -146,7 +157,7 @@ sub toString(;$)
     # fill-in the fields
 	my $text = $self->{_expand}
       ? $domain->interpolate($format, $self)
-      : ($self->{_prepend} // '') . $format . ($self->{_append} // '');
+      : "$prepend$format$append";
 
     setlocale(LC_MESSAGES, $oldloc)
         if defined $oldloc && (!defined $locale || $oldloc ne $locale);

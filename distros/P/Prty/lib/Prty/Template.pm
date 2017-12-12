@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Path;
 use Scalar::Util ();
@@ -54,8 +54,8 @@ Code:
     $tpl = Prty::Template->new('html',\$str);
     
     $tpl->replace(
-        __TITLE__=>'Testseite',
-        __BODY__=>'Hello World!',
+        __TITLE__ => 'Testseite',
+        __BODY__ => 'Hello World!',
     );
     $str = $tpl->asString;
 
@@ -155,7 +155,11 @@ sub placeholders {
 
 =head4 Synopsis
 
-    $tpl->replace(@keyVal);
+    $tpl = $tpl->replace(@keyVal);
+
+=head4 Returns
+
+Referenz auf das Template-Objekt (für Method-Chaining)
 
 =head4 Description
 
@@ -240,7 +244,7 @@ sub replace {
             # Platzhalter eingerückt ist.
 
             while (1) {
-                if ($self->{'string'} !~ /(^[ \t]*)?$key/m) {
+                if ($self->{'string'} !~ /(^[ \t]*)?\Q$key/m) {
                     # Ende: Key kommt nicht mehr vor
                     last;
                 }
@@ -257,7 +261,7 @@ sub replace {
 
                 # Platzhalter durch eingerückten Wert ersetzen
 
-                $self->{'string'} =~ s/$key/$indVal/;
+                $self->{'string'} =~ s/\Q$key/$indVal/;
 
                 if ($singleReplace) {
                     # wir führen nur eine Ersetzung durch
@@ -276,19 +280,21 @@ sub replace {
 
                 if ($singleReplace) {
                     # wir führen nur eine Ersetzung durch
-                    $exists += $self->{'string'} =~ s/(\n{2,})$key\n{2,}/$1/m;
+                    $exists += $self->{'string'} =~
+                        s/(\n{2,})\Q$key\E\n{2,}/$1/m;
                 }
                 else {
-                    $exists += $self->{'string'} =~ s/(\n{2,})$key\n{2,}/$1/mg;
+                    $exists += $self->{'string'} =~
+                        s/(\n{2,})\Q$key\E\n{2,}/$1/mg;
                 }
             }
 
             if ($singleReplace) {
                 # wir führen nur eine Ersetzung durch
-                $exists += $self->{'string'} =~ s/$key/$val/;
+                $exists += $self->{'string'} =~ s/\Q$key/$val/;
             }
             else {
-                $exists += $self->{'string'} =~ s/$key/$val/g;
+                $exists += $self->{'string'} =~ s/\Q$key/$val/g;
             }
         }
 
@@ -311,7 +317,7 @@ sub replace {
         }
     }
 
-    return;
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
@@ -741,7 +747,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

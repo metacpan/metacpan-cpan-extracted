@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
@@ -26,9 +26,7 @@ my @scripts = (
 
 # no fake home requested
 
-my @switches = (
-    -d 'blib' ? '-Mblib' : '-Ilib',
-);
+my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
 
 use File::Spec;
 use IPC::Open3;
@@ -42,11 +40,7 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
-            $^X, @switches, '-e', "require q[$lib]"))
-        if $ENV{PERL_COMPILE_TEST_DEBUG};
-
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
@@ -68,15 +62,11 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    @switches = (@switches, split(' ', $1)) if $1;
+    my @flags = $1 ? split(' ', $1) : ();
 
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
-            $^X, @switches, '-c', $file))
-        if $ENV{PERL_COMPILE_TEST_DEBUG};
-
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);

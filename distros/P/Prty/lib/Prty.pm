@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 =encoding utf8
 
@@ -21,6 +21,10 @@ sich unter kontinuierlicher Weiterentwicklung.
 =head1 CLASSES
 
 =over 4
+
+=item *
+
+L<Prty::AnsiColor> - Erzeuge Text mit ANSI Colorcodes
 
 =item *
 
@@ -48,6 +52,10 @@ L<Prty::ColumnFormat> - Format einer Text-Kolumne
 
 =item *
 
+L<Prty::CommandLine> - Konstruiere eine Unix-Kommandozeile
+
+=item *
+
 L<Prty::Config> - Konfigurationsdatei in "Perl Object Notation"
 
 =item *
@@ -68,7 +76,7 @@ L<Prty::ContentProcessor> - Prozessor für Abschnitts-Dateien
 
 =item *
 
-L<Prty::ContentProcessor::BaseType> - Basisklasse für ContentProcessor-Typen
+L<Prty::ContentProcessor::BaseType> - Typ
 
 =item *
 
@@ -76,11 +84,11 @@ L<Prty::ContentProcessor::File> - Basisklasse für Ausgabe-Dateien
 
 =item *
 
-L<Prty::ContentProcessor::SubType> - Basisklasse für Sub-Typen
+L<Prty::ContentProcessor::SubType> - Sub-Typ
 
 =item *
 
-L<Prty::ContentProcessor::Type> - Basisklasse für Entitäts-Typen
+L<Prty::ContentProcessor::Type> - Entität
 
 =item *
 
@@ -173,6 +181,22 @@ L<Prty::ExampleCode> - Führe Beispielcode aus
 =item *
 
 L<Prty::FFmpeg> - Konstruiere eine FFmpeg-Kommandozeile
+
+=item *
+
+L<Prty::Fibu::Bankbuchung> - Buchung von einem Postbank-Konto
+
+=item *
+
+L<Prty::Fibu::BankbuchungListe> - Liste von Buchungen von einem Postbank-Konto
+
+=item *
+
+L<Prty::Fibu::Buchung> - Fibu-Buchung
+
+=item *
+
+L<Prty::Fibu::BuchungListe> - Liste von Fibu-Buchungen
 
 =item *
 
@@ -612,6 +636,10 @@ L<Prty::Timeseries::Synchronizer> - Rasterung/Synchronisation von Zeitreihen
 
 =item *
 
+L<Prty::TreeFormatter> - Erzeugung von Baumdarstellungen
+
+=item *
+
 L<Prty::Udl> - Universal Database Locator
 
 =item *
@@ -638,7 +666,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

@@ -1,46 +1,46 @@
 package Mojolicious::Plugin::Model;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use List::Util 'first';
+use List::Util 'any';
 use Mojo::Loader ();
 use Mojo::Util 'camelize';
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 sub register {
   my ($plugin, $app, $conf) = @_;
 
-  my $ns   = $conf->{namespaces}   // [camelize($app->moniker) . '::Model'];
-  my $base = $conf->{base_classes} // [qw(MojoX::Model)];
-
   $app->helper(
     model => sub {
       my ($self, $name) = @_;
-
-      $name = $conf->{default} unless defined $name;
-      $name = camelize($name) if $name =~ /^[a-z]/;
+      $name //= $conf->{default};
 
       my $model;
       return $model if $model = $plugin->{models}{$name};
 
-      for my $class (map { "${_}::$name" } @$ns) {
-        next unless _load_class($class);
+      my $class = _load_class_for_name($plugin, $app, $conf, $name)
+        or return undef;
 
-        unless (first { $class->isa($_) } @$base) {
-          $app->log->debug(qq[Class "$class" is not a model]);
-          next;
-        }
-
-        my $params = $conf->{params}{$name};
-        $model = $class->new(ref $params eq 'HASH' ? %$params : (), app => $app);
-        $plugin->{models}{$name} = $model;
-        return $model;
-      }
-
-      $app->log->debug(qq[Model "$name" does not exists]);
-      return undef;
+      my $params = $conf->{params}{$name};
+      $model = $class->new(ref $params eq 'HASH' ? %$params : (), app => $app);
+      $plugin->{models}{$name} = $model;
+      return $model;
     }
   );
+
+  $app->helper(
+    entity => sub {
+      my ($self, $name) = @_;
+      $name //= $conf->{default};
+
+      my $class = _load_class_for_name($plugin, $app, $conf, $name)
+        or return undef;
+
+      my $params = $conf->{params}{$name};
+      return $class->new(ref $params eq 'HASH' ? %$params : (), app => $app);
+    }
+  );
+
 }
 
 sub _load_class {
@@ -52,6 +52,29 @@ sub _load_class {
   die $error if ref $error;
   return;
 }
+
+sub _load_class_for_name {
+  my ($plugin, $app, $conf, $name) = @_;
+  return $plugin->{classes_loaded}{$name} if $plugin->{classes_loaded}{$name};
+
+  my $ns   = $conf->{namespaces}   // [camelize($app->moniker) . '::Model'];
+  my $base = $conf->{base_classes} // [qw(MojoX::Model)];
+
+  $name = camelize($name) if $name =~ /^[a-z]/;
+
+  for my $class ( map "${_}::$name", @$ns ) {
+    next unless _load_class($class);
+
+    unless ( any { $class->isa($_) } @$base ) {
+      $app->log->debug(qq[Class "$class" is not a model]);
+      next;
+    }
+    $plugin->{classes_loaded}{$name} = $class;
+    return $class;
+  }
+  $app->log->debug(qq[Model "$name" does not exist]);
+  return undef;
+};
 
 1;
 
@@ -189,6 +212,14 @@ L<Mojolicious::Plugin::Model> implements the following helpers.
 
 Load, create and cache a model object with given name. Default class for
 model C<camelize($moniker)::Model>. Return C<undef> if model not found.
+
+=head2 entity
+
+  my $disposable_model = $c->entity($name);
+
+Create a new model object with given name. Default class for
+model C<camelize($moniker)::Model>. Return C<undef> if model not found.
+Use C<entity> instead of C<model> when you need stateful objects.
 
 =head1 METHODS
 

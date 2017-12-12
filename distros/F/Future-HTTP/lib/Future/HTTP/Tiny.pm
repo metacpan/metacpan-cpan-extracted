@@ -7,8 +7,9 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-use vars qw($VERSION);
-$VERSION = '0.07';
+our $VERSION = '0.08';
+
+with 'Future::HTTP::Handler';
 
 has ua => (
     is => 'lazy',
@@ -80,13 +81,10 @@ sub _request($self, $method, $url, %options) {
         \%options
     );
     
+    my $res = Future->new;
     my( $body, $headers ) = $self->_ae_from_http_tiny( $result, $url );
-    
-    if( $headers->{Status} =~ /^2../ ) {
-        return Future->done($body, $headers);
-    } else {
-        return Future->fail($body, $headers);
-    }
+    $self->http_response_received( $res, $body, $headers );
+    $res
 }
 
 sub http_request($self,$method,$url,%options) {
@@ -231,7 +229,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2017 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

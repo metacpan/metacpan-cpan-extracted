@@ -20,7 +20,7 @@ Net::Etcd::Lease
 
 =cut
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 =head1 DESCRIPTION
 
@@ -144,6 +144,21 @@ sub keepalive {
     $self->{endpoint} = '/lease/keepalive';
     confess 'ID is required for ' . __PACKAGE__ . '->keepalive'
       unless $self->{ID};
+    $self->request;
+    return $self;
+}
+
+=head2 leases
+lists all existing leases.
+
+    $etcd->lease()->leases
+
+=cut
+
+sub leases {
+    my $self = shift;
+    $self->{endpoint} = '/kv/lease/leases';
+    $self->{json_args} = '{}';
     $self->request;
     return $self;
 }

@@ -42,7 +42,7 @@ CatalystX::OAuth2::Schema::Result::RefreshTokenToAccessToken - A table for regis
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 AUTHOR
 

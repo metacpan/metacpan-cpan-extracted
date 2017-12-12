@@ -4,11 +4,11 @@ use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 
-sub IDENTIFICATION { return "000001-000087-000002"; }
+sub IDENTIFICATION { return "000001-000087-000003"; }
 
 sub preference { return 0; }
 
@@ -45,6 +45,9 @@ sub load_keys {
 	$obj->clear_keys;
 
 	if (open F,$obj->keysfile) {
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode F, ':utf8';
+        }
 		while (<F>) {
 			chomp;
 			if (/^(.*?)\s+(.*)$/) {
@@ -127,10 +130,16 @@ sub handle_action {
 				
 			my @all = ();
 			if (open F,$obj->keysfile) {
+                if ( $obj->{ -interface }->is_utf8 ) {
+                    binmode F, ':utf8';
+                }
 				@all = <F>;
 				close F;
 			}
 			if (open F,">".$obj->keysfile) {
+                if ( $obj->{ -interface }->is_utf8 ) {
+                    binmode F, ':utf8';
+                }
 				for my $line (@all) {
 					chomp $line;
 					if ($line =~ /^(.*?)\s+(.*)$/) {
@@ -157,9 +166,15 @@ sub handle_action {
 			$obj->{-mempool}->set(keys => \@newkeys);
 
 			if (open F,$obj->keysfile) {
+                if ( $obj->{ -interface }->is_utf8 ) {
+                    binmode F, ':utf8';
+                }
 				my @all = <F>;
 				close F;
 				if (open F,">".$obj->keysfile) {
+                    if ( $obj->{ -interface }->is_utf8 ) {
+                        binmode F, ':utf8';
+                    }
 					for my $line (@all) {
 						chomp $line;
 						if ($line =~ /^(.*?)\s+(.*)$/) {

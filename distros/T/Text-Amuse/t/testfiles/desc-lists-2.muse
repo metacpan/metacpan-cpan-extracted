@@ -1,0 +1,11 @@
+#title Description list (2)
+#lang en
+
+ - Bullet list start
+
+   term :: first definition paragraph start
+   first definition paragraph continuation
+
+      second definition paragraph
+
+   paragraph outside definition but inside bullet list

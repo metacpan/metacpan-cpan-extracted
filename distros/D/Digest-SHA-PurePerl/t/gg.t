@@ -1,22 +1,5 @@
 # Test against short bitwise vectors from Jim Gillogly and Francois Grieu
 
-use strict;
-
-my $MODULE;
-
-BEGIN {
-	$MODULE = (-d "src") ? "Digest::SHA" : "Digest::SHA::PurePerl";
-	eval "require $MODULE" || die $@;
-	$MODULE->import(qw());
-}
-
-BEGIN {
-	if ($ENV{PERL_CORE}) {
-		chdir 't' if -d 't';
-		@INC = '../lib';
-	}
-}
-
 #	SHA-1 Test Vectors
 #
 #	In the following we use the notation bitstring#n to mean a bitstring
@@ -38,6 +21,9 @@ BEGIN {
 #	011#490|01  : 75FACE18 02B9F84F 326368AB 06E73E05 02E9EA34
 #	011#491     : 7C2C3D62 F6AEC28D 94CDF93F 02E739E7 490698A1
 
+use strict;
+use Digest::SHA::PurePerl;
+
 my @vecs = (
 	"110",148,"11","ce7387ae577337be54ea94f82c842e8be76bc3e1",
 	"110",149,"","de244f063142cb2f4c903b7f7660577f9e0d8791",
@@ -57,7 +43,7 @@ my $numtests = scalar(@vecs) / 4;
 print "1..$numtests\n";
 
 my $testnum = 1;
-my $sha = $MODULE->new(1);
+my $sha = Digest::SHA::PurePerl->new(1);
 
 while (@vecs) {
 	my $frag = shift @vecs;

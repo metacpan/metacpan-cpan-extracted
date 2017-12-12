@@ -1,5 +1,14 @@
 Revision history for Perl module Digest::SHA::PurePerl.
 
+6.00  Fri Dec  8 22:44:44 MST 2017
+	- added "tag" option (BSD-style checksums) to shasumpp
+		-- consistent with GNU sha1sum, sha224sum, etc.
+		-- thanks to Christopher Tubbs for suggestion
+	- decoupled Digest::SHA::PurePerl and Digest::SHA
+		-- scripts/tests in each module now fully independent
+		-- Digest::SHA::PurePerl to be phased out eventually
+			-- past versions will remain available
+
 5.98  Wed Oct  4 00:40:02 MST 2017
 	- Digest::SHA::PurePerl now has its own shasum
 		-- renamed to shasumpp

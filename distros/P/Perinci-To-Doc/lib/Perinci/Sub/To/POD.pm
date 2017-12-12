@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2017-10-26'; # DATE
-our $VERSION = '0.861'; # VERSION
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.862'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -143,6 +143,7 @@ sub after_gen_doc {
       GET_RESULT:
         {
             last unless $eg->{'x.doc.show_result'} // 1;
+            log_trace("result_naked: %s", $meta->{result_naked});
             log_trace("orig_result_naked: %s", $orig_result_naked);
             my $res;
             my $tff;
@@ -174,7 +175,7 @@ sub after_gen_doc {
                     $tff = $res->[3]{'table.fields'};
                 }
             }
-            $res = $res->[2] if $orig_result_naked;
+            $res = $res->[2] unless $orig_result_naked;
             local $Data::Dump::SortKeys::SORT_KEYS = do {
                 if ($tff) {
                     require Sort::ByExample;
@@ -426,7 +427,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.861 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2017-10-26.
+This document describes version 0.862 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2017-12-09.
 
 =head1 SYNOPSIS
 
@@ -444,7 +445,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

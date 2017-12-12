@@ -23,8 +23,6 @@ sub render_to_rb
    $rb->eraserect( $rect );
 
    $rb->text_at( ( $win->lines - $self->lines ) / 2, ( $win->cols - $self->cols ) / 2, $text );
-
-   $win->focus( 0, 0 );
 }
 
 sub on_key

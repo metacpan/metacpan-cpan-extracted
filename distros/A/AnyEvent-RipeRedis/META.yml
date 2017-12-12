@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/iph0/AnyEvent-RipeRedis
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iph0/AnyEvent-RipeRedis
-version: '0.42'
+version: '0.46'

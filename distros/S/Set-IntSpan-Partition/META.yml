@@ -1,19 +1,30 @@
 ---
-abstract: Partition int sets using Set::IntSpan objects
+abstract: 'Partition int sets using Set::IntSpan objects'
 author:
   - 'Bjoern Hoehrmann <bjoern@hoehrmann.de>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Set-IntSpan-Partition
 no_index:
   directory:
     - t
     - inc
+requires:
+  Heap::MinMax: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Set::IntSpan: '0'
+  Test::More: '0'
+  perl: '5.008'
 resources:
   repository: https://github.com/hoehrmann/Set-IntSpan-Partition.git
-version: 0.02
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

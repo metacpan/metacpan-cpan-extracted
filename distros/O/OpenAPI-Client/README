@@ -2,15 +2,15 @@ NAME
     OpenAPI::Client - A client for talking to an Open API powered server
 
 DESCRIPTION
-    OpenAPI::Client is a class for generating classes that can talk to an
-    Open API server. This is done by generating a custom class, based on a
-    Open API specification, with methods that transform parameters into a
-    HTTP request.
+    OpenAPI::Client can generating classes that can talk to an Open API
+    server. This is done by generating a custom class, based on a Open API
+    specification, with methods that transform parameters into a HTTP
+    request.
 
     The generated class will perform input validation, so invalid data won't
     be sent to the server.
 
-    Not that this implementation is currently EXPERIMENTAL, but unlikely to
+    Note that this implementation is currently EXPERIMENTAL, but unlikely to
     change! Feedback is appreciated.
 
 SYNOPSIS
@@ -96,10 +96,18 @@ ATTRIBUTES
     Returns a Mojo::UserAgent object which is used to execute requests.
 
 METHODS
+  call
+      $tx = $self->call($operationId => @args);
+      $self = $self->call($operationId => @args, sub { my ($self, $tx) = @_; });
+
+    Used to either call an $operationId that has an "invalid name", such as
+    "list pets" instead of "listPets" or to call an $operationId that you
+    are unsure is supported yet. $tx will have error set to "No such
+    operationId" and code "400".
+
   new
-      $client = OpenAPI::Client->new($specification, \%attrs);
-      $client = OpenAPI::Client->new($specification, %attrs);
-      $client = OpenAPI::Client->new($specification, app => Mojolicious->new);
+      $client = OpenAPI::Client->new($specification, \%attributes);
+      $client = OpenAPI::Client->new($specification, %attributes);
 
     Returns an object of a generated class, with methods generated from the
     Open API specification located at $specification. See "schema" in
@@ -108,8 +116,16 @@ METHODS
     Note that the class is cached by perl, so loading a new specification
     from the same URL will not generate a new class.
 
-    Specifying an "app" is useful when running against a local Mojolicious
-    instance.
+    Extra %attributes:
+
+    * app
+
+      Specifying an "app" is useful when running against a local Mojolicious
+      instance.
+
+    * coerce
+
+      See "coerce" in JSON::Validator. Default to 1.
 
   validator
       $validator = $self->validator;

@@ -7,7 +7,7 @@ use 5.022000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Calculate the difference between two strings",
+  "ABSTRACT" => "'naive' metrics for code similarity",
   "AUTHOR" => "Boris D\x{e4}ppen <bdaeppen.perl\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "DateTime" => 0,
     "File::Slurp" => 0,
     "Getopt::Args" => 0,
-    "IO::Prompter" => 0,
+    "IO::Prompt::Simple" => 0,
     "Template" => 0,
     "Text::Levenshtein::XS" => 0,
     "feature" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/simplify/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "DateTime" => 0,
   "File::Slurp" => 0,
   "Getopt::Args" => 0,
-  "IO::Prompter" => 0,
+  "IO::Prompt::Simple" => 0,
   "Template" => 0,
   "Test::More" => 0,
   "Text::Levenshtein::XS" => 0,

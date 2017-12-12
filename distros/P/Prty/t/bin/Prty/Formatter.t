@@ -63,24 +63,6 @@ sub test_readableNumber : Test(10) {
 
 # -----------------------------------------------------------------------------
 
-sub test_roundTo : Test(4) {
-    my $self = shift;
-    
-    my $y = Prty::Formatter->roundTo(5.735,2);
-    $self->is($y,'5.74');
-
-    $y = Prty::Formatter->roundTo(5.7,2);
-    $self->is($y,'5.70');
-
-    $y = Prty::Formatter->roundTo(599,2);
-    $self->is($y,'599.00');
-
-    $y = Prty::Formatter->roundTo(599,2,1);
-    $self->is($y,'599');
-}
-
-# -----------------------------------------------------------------------------
-
 package main;
 Prty::Formatter::Test->runTests;
 

@@ -5,7 +5,7 @@ NAME
 
 SYNOPSIS
 
-    dhconveyor \[ARGUMENTS\] \[OPTIONS\]
+    dhconveyor command OPTIONS
 
 DESCRIPTION
 
@@ -19,15 +19,12 @@ DESCRIPTION
     The output is pushed to a data sink.
 
     Datahub::Factory fetches data from several sources as specified by the
-    _Importer_ settings, executes a Catmandu::Fix and sends it to a data
-    sink, set by _Exporter_. Several importer and exporter modules are
-    supported.
+    Importer settings, executes a Catmandu::Fix and sends it to a data
+    sink, set via an Exporter. Several importer and exporter modules are
+    provided, but developers can extend the functionality with their own
+    modules.
 
-    Datahub::Factory contains Log4perl support to monitor conveyor belt
-    operations.
-
-    Note: This toolset is not a generic tool. It has been tailored towards
-    the functional requirements of the Flemish Art Collection use case.
+    Datahub::Factory contains Log4perl support.
 
 CONFIGURATION
 
@@ -44,7 +41,7 @@ CONFIGURATION
 
       Selects an output for the log messages. By default, it will send them
       to STDERR (pass STDERR as parameter), but STDOUT (STDOUT) and a log
-      file (logs/import_-date-.log) (STATISTICS) are also supported.
+      file.
 
     --verbose
 
@@ -57,33 +54,30 @@ COMMANDS
 
     Documentation about command line options.
 
-    It is possible to provide either all importer and/or exporter options
-    on the command line, or to create a _pipeline configuration file_ that
-    sets those options.
-
- transport [OPTIONS]
+ transport OPTIONS
  <https://metacpan.org/pod/Datahub::Factory::Command::transport>
 
     Fetch data from a local or remote source, convert it to an exchange
     format and export the data.
 
-PLUGINS
+ transport OPTIONS
+ <https://metacpan.org/pod/Datahub::Factory::Command::index>
 
-    _Datahub::Factory_ uses a plugin-based architecture, making it easy to
+    Fetch data from a local source, and push it to an enterprise search
+    engine via a bulk API.
+
+API
+
+    Datahub::Factory uses a plugin-based architecture, making it easy to
     extend with new functionality.
 
     New commands can be added by creating a Perl module that contains a
     `command_name.pm` file in the `lib/Datahub/Factory/Command` path.
-    _Datahub::Factory_ uses the Datahub::Factory::Command namespace and
-    App::Cmd internally.
+    Datahub::Factory uses the Datahub::Factory::Command namespace and
+    leverages App::Cmd internally.
 
     New Datahub::Factory::Importer, Datahub::Factory::Exporter and
-    Datahub::Factory::Fixer plugins can be added in the same way, in the
-    lib/Datahub/Factory/Importer, lib/Datahub/Factory/Exporter or
-    lib/Datahub/Factory/Fixer path. All plugins use the
-    Datahub::Factory::Importer Datahub::Factoryy::Exporter or
-    Datahub::Factory::Fixer namespace and the namespace package as a
-    Moose::Role.
+    Datahub::Factory::Fixer plugins can be added in the same way.
 
 AUTHORS
 

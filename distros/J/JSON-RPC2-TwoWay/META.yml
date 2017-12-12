@@ -19,5 +19,5 @@ resources:
   bugtracker: https://github.com/a6502/JSON-RPC2-TwoWay/issues
   homepage: https://github.com/a6502/JSON-RPC2-TwoWay
   repository: https://github.com/a6502/JSON-RPC2-TwoWay.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -26,13 +26,13 @@
       },
       "runtime" : {
          "recommends" : {
-            "Class::XSAccessor" : "0"
+            "EV" : "4.22"
          },
          "requires" : {
             "AnyEvent" : "7.14",
             "Carp" : "0",
             "Coro" : "6.514",
-            "Moo" : "0",
+            "List::Util" : "0",
             "Scalar::Util" : "0",
             "common::sense" : "0"
          }
@@ -62,7 +62,7 @@
          "web" : "https://github.com/sysread/Ion"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

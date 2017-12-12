@@ -18,9 +18,11 @@ do { my $x = {
                                       'Clone' => '0',
                                       'Constant::FromGlobal' => '0',
                                       'Data::Dumper' => '0',
+                                      'HTML::PullParser' => '0',
                                       'HTTP::Request' => '0',
                                       'Hash::Path' => '0',
                                       'JSON::XS' => '0',
+                                      'LWP::Authen::Negotiate' => '0',
                                       'LWP::UserAgent' => '0',
                                       'Moo' => '0',
                                       'Moo::Role' => '0',
@@ -29,10 +31,12 @@ do { my $x = {
                                       'Regexp::Common' => '0',
                                       'Scalar::Util' => '0',
                                       'Socket' => '0',
+                                      'Text::Trim' => '0',
                                       'Time::Duration' => '0',
                                       'Time::HiRes' => '0',
                                       'URI' => '0',
                                       'XML::LibXML::Simple' => '0',
+                                      'constant' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -47,8 +51,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::More' => '0',
-                                   'blib' => '1.01'
+                                   'Test::More' => '0'
                                  }
                  }
      };

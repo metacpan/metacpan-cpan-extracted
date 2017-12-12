@@ -37,7 +37,6 @@ use warnings;
 use parent qw( Net::WebSocket::Handshake );
 
 use Call::Context ();
-use Digest::SHA ();
 
 use Net::WebSocket::Constants ();
 use Net::WebSocket::X ();

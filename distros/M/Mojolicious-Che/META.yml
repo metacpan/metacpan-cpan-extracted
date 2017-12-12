@@ -19,7 +19,9 @@ no_index:
     - inc
 requires:
   Mojo::Log::Che: '0.01'
-  Mojolicious: '7'
+  Mojolicious: '7.57'
   perl: '5.006'
-version: '0.032'
+resources:
+  repository: git://github.com/mche/Mojolicious-Che.git
+version: '0.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

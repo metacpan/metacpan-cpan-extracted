@@ -4,7 +4,7 @@ Archive::BagIt
 
 # VERSION
 
-version 0.052
+version 0.053.3
 
 # SYNOPSIS
 
@@ -36,7 +36,7 @@ We use it fairly widely in-house, but it doesn't necessarily implement all of th
 
 Email me with anything you need done urgently.
 
-Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependendies to get
+Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
 better speed by mmap-ing files.
 
 # NAME
@@ -46,47 +46,52 @@ Archive::BagIt - An interface to make and verify bags according to the BagIt sta
 # SUBROUTINES
 
 ## new
-   An Object Oriented Interface to a bag. Opens an existing bag.
+
+An Object Oriented Interface to a bag. Opens an existing bag.
+
+    my $bag = Archive::BagIt->new('/path/to/bag');
 
 ## make\_bag
-   A constructor that will make and return a bag from a directory
 
-    If a data directory exists, assume it is already a bag (no checking for invalid files in root)
+A constructor that will make and return a bag from a directory
+
+If a data directory exists, assume it is already a bag (no checking for invalid files in root)
 
 ## verify\_bag
 
 An interface to verify a bag.
 
-You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+You might also want to check [Archive::BagIt::Fast](https://metacpan.org/pod/Archive::BagIt::Fast) to see a more direct way of
+accessing files (and thus faster).
 
 ## get\_checksum
 
-    This is the checksum for the bag, md5 of the manifest-md5.txt
+This is the checksum for the bag, md5 of the manifest-md5.txt
 
 ## version
 
-    Returns the bagit version according to the bagit.txt file.
+Returns the bagit version according to the bagit.txt file.
 
 ## payload\_files
 
-    Returns an array with all of the payload files (those files that are below the data directory)
+Returns an array with all of the payload files (those files that are below the data directory)
 
 ## non\_payload\_files
 
-    Returns an array with files that are in the root of the bag, non-manifest files
+Returns an array with files that are in the root of the bag, non-manifest files
 
 ## manifest\_files
 
-    return an array with the list of manifest files that exist in the bag
+Return an array with the list of manifest files that exist in the bag
 
 ## tagmanifest\_files
 
-    return an array with the list of tagmanifest files
+Return an array with the list of tagmanifest files
 
 # AUTHOR
 
-Robert Schmidt, <rjeschmi at gmail.com>
-William Wueppelmann, <william at c7a.ca>
+Robert Schmidt, &lt;rjeschmi at gmail.com>
+William Wueppelmann, &lt;william at c7a.ca>
 
 # BUGS
 
@@ -135,7 +140,7 @@ site near you, or see [https://metacpan.org/module/Archive::BagIt/](https://meta
 
 # SOURCE
 
-The development version is on github at [http://github.com/rjeschmi/Archive-BagIt](http://github.com/rjeschmi/Archive-BagIt)
+The development version is on github at [https://github.com/rjeschmi/Archive-BagIt](https://github.com/rjeschmi/Archive-BagIt)
 and may be cloned from [git://github.com/rjeschmi/Archive-BagIt.git](git://github.com/rjeschmi/Archive-BagIt.git)
 
 # BUGS AND LIMITATIONS
@@ -149,7 +154,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2017 by Rob Schmidt and William Wueppelmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

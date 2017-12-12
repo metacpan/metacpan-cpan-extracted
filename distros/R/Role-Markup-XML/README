@@ -2,7 +2,7 @@ NAME
     Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 VERSION
-    Version 0.06
+    Version 0.07
 
 SYNOPSIS
         package My::MarkupEnabled;
@@ -109,6 +109,11 @@ METHODS
   _ELEM $TAG [, $DOC, \%NSMAP ]
     Generate a single XML element. Generates a new document unless $DOC is
     specified. Defaults to XHTML if no namespace map is provided.
+
+  _XPC [ %NS | \%NS ]
+    Return an XPath context with the given (optional) namespaces
+    registered.The XHTML namespace is registered by default with the prefix
+    "html". This context will persist if called from an instance.
 
   _XML $SPEC [, $PARENT, $DOC, \@ARGS | @ARGS ] | %PARAMS
     Generate an XML tree according to the specification format. Returns the

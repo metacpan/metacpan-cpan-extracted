@@ -10,7 +10,7 @@ use POE qw(
 );
 use Sys::Hostname qw(hostname);
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 my @_STREAM_NAMES = qw(subscribers match debug full regex);
 my %_STREAM_ASSISTERS = (
@@ -783,7 +783,7 @@ POE::Component::Server::eris - POE eris message dispatcher
 
 =head1 VERSION
 
-version 2.4
+version 2.5
 
 =head1 SYNOPSIS
 

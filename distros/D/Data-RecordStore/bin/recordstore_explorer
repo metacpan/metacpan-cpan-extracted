@@ -15,7 +15,7 @@ die "No recordstore found at $db_dir;" unless -d $db_dir;
 
 my $store = Data::RecordStore->open( $db_dir );
 
-print "Enter an id to see the data at\n";
+print "Enter the id of a record to view in the database at '$db_dir'\n";
 print ">";
 
 while( my $in = <STDIN> ) {

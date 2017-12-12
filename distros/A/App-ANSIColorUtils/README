@@ -1,0 +1,59 @@
+NAME
+    App::ANSIColorUtils - Utilities related to ANSI color
+
+VERSION
+    This document describes version 0.001 of App::ANSIColorUtils (from Perl
+    distribution App-ANSIColorUtils), released on 2017-12-03.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   ansi16-to-rgb
+
+    *   ansi256-to-rgb
+
+    *   rgb-to-ansi-bg-code
+
+    *   rgb-to-ansi-fg-code
+
+    *   rgb-to-ansi16
+
+    *   rgb-to-ansi16-bg-code
+
+    *   rgb-to-ansi16-fg-code
+
+    *   rgb-to-ansi24b-bg-code
+
+    *   rgb-to-ansi24b-fg-code
+
+    *   rgb-to-ansi256
+
+    *   rgb-to-ansi256-bg-code
+
+    *   rgb-to-ansi256-fg-code
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ANSIColorUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ANSIColorUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

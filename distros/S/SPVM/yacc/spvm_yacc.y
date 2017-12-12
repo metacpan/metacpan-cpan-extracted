@@ -51,7 +51,7 @@ grammar
   : opt_declarations_in_grammar
     {
       $$ = SPVM_OP_build_grammar(compiler, $1);
-
+      
       // Syntax error
       if (compiler->error_count) {
         YYABORT;

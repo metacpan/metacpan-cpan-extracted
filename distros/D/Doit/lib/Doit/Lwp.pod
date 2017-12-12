@@ -1,0 +1,62 @@
+=head1 NAME
+
+Doit::Lwp - commands for dealing with WWW access
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('lwp');
+
+    $doit->lwp_mirror('http://example.com', 'mirrored-file');
+
+=head1 DESCRIPTION
+
+B<Doit::Lwp> is a L<Doit> component providing commands for dealing
+with WWW access. It has to be added to a script using L<Doit's
+add_component|Doit/add_component>:
+
+    $doit->add_component('lwp');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 lwp_mirror
+
+    $doit->lwp_mirror($url, $filename);
+    $doit->lwp_mirror($url, $filename, refresh => always|never, ua => $ua);
+
+Make sure that the resource at I<$url> is fetched and stored on the
+local system as I<$filename>. L<LWP::UserAgent's
+mirror|LWP::UserAgent/mirror> is used to fetch the resource, so if the
+remote resource did not change and the remote server deals correctly
+with C<If-Modified-Since> requests, then nothing happens.
+
+The C<refresh> option may be set to C<never> --- in this case the
+resource will fetched only once, and never refreshed.
+
+By default, L<LWP::UserAgent> is used for doing the mirror. It is
+possible to use L<HTTP::Tiny> by passing an object of this class to
+the C<ua> option.
+
+Please note that LWP::UserAgent's mirror is L<not
+atomic|https://github.com/libwww-perl/libwww-perl/issues/217>.
+
+The command returns 1 if the resource was downloaded, otherwise 0.
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<LWP::UserAgent>, L<HTTP::Tiny>.
+
+=cut

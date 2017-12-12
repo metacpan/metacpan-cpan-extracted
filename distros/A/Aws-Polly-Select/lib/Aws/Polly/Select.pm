@@ -13,126 +13,81 @@ use Data::Table::Text qw(:all);
 use Data::Dump qw(dump);
 use utf8;
 
-our $VERSION = '20171111';
+our $VERSION = '20171129';
+
+BEGIN
+ {my @fields = qw(Gender Id LanguageCode LanguageName Name Written Country);    # Field names
+
+  for my $field(@fields)                                                        # Generate methods to get attributes from each speaker
+   {package Aws::Polly::Select::Speaker;
+    Data::Table::Text::genLValueScalarMethods($field);
+   }
+
+  for my $field(@fields)                                                        # Generate methods that get all the values of each attribute of each speaker
+   {my $s = <<'END';
+sub XXX {&fieldValues("XXX")}
+END
+    $s =~ s(XXX) ($field)gs;
+    eval $s;
+    $@ and confess $@;
+   }
+ }
+
+sub fieldValues($)                                                              # All the values a specified field can take
+ {my ($field) = @_;
+  my %l;
+  my @s = @{&speakerDetails};
+  for my $speaker(@s)
+   {if (my $v = $speaker->{$field})
+     {$l{$v}++
+     }
+   }
+  sort keys %l;
+ }
 
 #-------------------------------------------------------------------------------
 # Select speakers
 #-------------------------------------------------------------------------------
 
-sub select(@)                                                                   # Select speakers by fields
+sub speaker(@)                                                                  # Select speakers by fields
  {my (%selection) = @_;                                                         # Selection fields: name=>"regular expression" where the field of that name must match the regular expression regardless of case
   my @s;
-  for my $speaker(&speakers)
-   {my $m = 1;
-    for my $field(keys %selection)
+  for my $speaker(@{&speakerDetails})                                           # Check each speaker
+   {my $m = 1;                                                                  # Speaker matches so far
+    for my $field(keys %selection)                                              # Continue with the speaker as long as they match on all the supplied fields -  these fields are our shorter simpler names not AWS's longer more complicated names
      {last unless $m;
-      my $r = $selection{$field};
-      my $v = $speaker->{$field};
+      my $r = $selection{$field};                                               # Regular expression to match
+      my $v = $speaker->{$field};                                               # Value of this field for this speaker
       confess "No such field: $field" unless $v;
       $m = $v =~ m/$r/i;                                                        # Case insensitive
      }
     push @s, $speaker if $m;                                                    # Exclude potential speaker unless they match all valid fields
    }
-  sort {$a->name cmp $b->name} @s
+  sort {$a->Id cmp $b->Id} @s
  }
 
 #-------------------------------------------------------------------------------
-# Load speakers
+# Blessed speaker details
 #-------------------------------------------------------------------------------
 
-sub speaker($)                                                                  # Construct a speaker
- {my ($speaker) = @_;                                                           # Speaker details
-  package Aws::Polly::Select::Speaker;
-  my %l;
-  my %p = %$speaker;
-  my ($gender, $name, $code, $language) = @p{qw(Gender Id LanguageCode LanguageName)};
-  my ($base, $country) = split /-/, $code;
-  $gender = lc($gender);
-  $language =~ s/\s/-/g;
-  bless{name=>$name, gender=>$gender, speaking=>$language,
-        written=>$base, country=>lc($country), code=>$code};
-
-  BEGIN                                                                         # Fields and projections
-   {for(qw(name gender speaking written country code))
-     {Data::Table::Text::genLValueScalarMethods($_);
-      package Aws::Polly::Select;
-      eval <<END;                                                               # Possible field values as a string
-sub $_
- {my %l = map {\$_->$_=>1} &speakers;
-  join ' ', sort keys %l;
- }
-END
-      $@ and confess $@;
-
-      eval <<END;                                                               # Possible field values as an array
-sub ${_}AsArray
- {my %l = map {\$_->$_=>1} &speakers;
-  sort keys %l;
- }
-END
-      $@ and confess $@;
-     }
+sub speakerDetails
+ {my $s = &speakerDetailsFromAWS;
+  for(@$s)
+   {package Aws::Polly::Select::Speaker;
+    bless $_;
+    ($_->Written) = split /-/, $_->LanguageCode;                                # Add written code
    }
- }
-
-sub speakers {map {speaker($_)} @{&speakerDetails}}                             # Speakers
-#-------------------------------------------------------------------------------
-# Renew speaker details, but only when AWS changes the list of speakers
-#-------------------------------------------------------------------------------
-
-sub Aws::Polly::Select::Speaker::generateSpeech($$$)
- {my ($speaker, $text, $outFile) = @_;                                          # Speaker definition, text, output file
-
-  my $tmpFile = $outFile.'.temp';
-  my $speakerId = $speaker->name;
-  makePath($outFile);
-
-  if (1)                                                                        # Create speech using Polly
-   {my $c = "aws polly synthesize-speech ".
-      "--output-format mp3 --text \"$text\" --voice-id $speakerId $tmpFile";
-    say STDERR $c;
-    print STDERR $_ for qx($c);
-   }
-
-  my $maxVol = 1 ? sub                                                          # Find volume
-   {my $c = "ffmpeg -i $tmpFile -af \"volumedetect\" -f null /dev/null";
-    say STDERR $c;
-    my @l = grep {/max_volume: /} qx($c 2>&1);
-    if ($l[0] =~ /max_volume: (\S+) dB/)
-     {my $v = -$1;
-      return "volume=${v}dB"
-     }
-    ''
-   }->() : "volume=1dB";
-
-  if (1)                                                                        # Normalize volume
-   {my $filter  = " -af \"$maxVol\"";
-    my $c = "ffmpeg -nostats -y -i $tmpFile $filter $outFile";                  # ffmpeg command
-    say STDERR $c;
-    print STDERR $_ for qx($c);
-    unlink $tmpFile;
-   }
+  $s
  }
 
 #-------------------------------------------------------------------------------
-# Renew speaker details, but only when AWS changes the list of speakers
+# Speaker details from AWS via:
+#  renewSpeakerDetailsButOnlyWhenAWSChangesTheListOfSpeakers()
 #-------------------------------------------------------------------------------
 
-sub renewSpeakerDetailsButOnlyWhenAWSChangesTheListOfSpeakers
- {my $c = "aws polly describe-voices";
-  my $j = qx($c);
-  my $p = decode_json $j;
-  my @voices = sort {$a->{LanguageCode} cmp $b->{LanguageCode}} @{$p->{Voices}};
-  say STDERR dump([@voices]);
- }
-
-#-------------------------------------------------------------------------------
-# Speaker details from AWS via the method above
-#-------------------------------------------------------------------------------
-
-sub speakerDetails{[
-  {
-    Gender => "Female",
+sub speakerDetailsFromAWS
+ {[
+  {  Gender => "Female",
     Id => "Gwyneth",
     LanguageCode => "cy-GB",
     LanguageName => "Welsh",
@@ -151,6 +106,13 @@ sub speakerDetails{[
     LanguageCode => "da-DK",
     LanguageName => "Danish",
     Name => "Mads",
+  },
+  {
+    Gender => "Female",
+    Id => "Vicki",
+    LanguageCode => "de-DE",
+    LanguageName => "German",
+    Name => "Vicki",
   },
   {
     Gender => "Female",
@@ -210,6 +172,13 @@ sub speakerDetails{[
   },
   {
     Gender => "Female",
+    Id => "Aditi",
+    LanguageCode => "en-IN",
+    LanguageName => "Indian English",
+    Name => "Aditi",
+  },
+  {
+    Gender => "Female",
     Id => "Raveena",
     LanguageCode => "en-IN",
     LanguageName => "Indian English",
@@ -228,6 +197,13 @@ sub speakerDetails{[
     LanguageCode => "en-US",
     LanguageName => "US English",
     Name => "Salli",
+  },
+  {
+    Gender => "Male",
+    Id => "Matthew",
+    LanguageCode => "en-US",
+    LanguageName => "US English",
+    Name => "Matthew",
   },
   {
     Gender => "Female",
@@ -283,7 +259,7 @@ sub speakerDetails{[
     Id => "Penelope",
     LanguageCode => "es-US",
     LanguageName => "US Spanish",
-    Name => "Pen\xE9lope",
+    Name => "Penélope,",
   },
   {
     Gender => "Male",
@@ -311,7 +287,7 @@ sub speakerDetails{[
     Id => "Celine",
     LanguageCode => "fr-FR",
     LanguageName => "French",
-    Name => "C\xE9line",
+    Name => "Céline",
   },
   {
     Gender => "Male",
@@ -325,7 +301,7 @@ sub speakerDetails{[
     Id => "Dora",
     LanguageCode => "is-IS",
     LanguageName => "Icelandic",
-    Name => "D\xF3ra",
+    Name => "Dóra",
   },
   {
     Gender => "Male",
@@ -342,11 +318,25 @@ sub speakerDetails{[
     Name => "Carla",
   },
   {
+    Gender => "Male",
+    Id => "Takumi",
+    LanguageCode => "ja-JP",
+    LanguageName => "Japanese",
+    Name => "Takumi",
+  },
+  {
     Gender => "Female",
     Id => "Mizuki",
     LanguageCode => "ja-JP",
     LanguageName => "Japanese",
     Name => "Mizuki",
+  },
+  {
+    Gender => "Female",
+    Id => "Seoyeon",
+    LanguageCode => "ko-KR",
+    LanguageName => "Korean",
+    Name => "Seoyeon",
   },
   {
     Gender => "Female",
@@ -402,7 +392,7 @@ sub speakerDetails{[
     Id => "Vitoria",
     LanguageCode => "pt-BR",
     LanguageName => "Brazilian Portuguese",
-    Name => "Vit\xF3ria",
+    Name => "Vitória",
   },
   {
     Gender => "Male",
@@ -416,7 +406,7 @@ sub speakerDetails{[
     Id => "Ines",
     LanguageCode => "pt-PT",
     LanguageName => "Portuguese",
-    Name => "In\xEAs",
+    Name => "Inês",
   },
   {
     Gender => "Male",
@@ -433,18 +423,18 @@ sub speakerDetails{[
     Name => "Carmen",
   },
   {
-    Gender => "Male",
-    Id => "Maxim",
-    LanguageCode => "ru-RU",
-    LanguageName => "Russian",
-    Name => "Maxim",
-  },
-  {
     Gender => "Female",
     Id => "Tatyana",
     LanguageCode => "ru-RU",
     LanguageName => "Russian",
     Name => "Tatyana",
+  },
+  {
+    Gender => "Male",
+    Id => "Maxim",
+    LanguageCode => "ru-RU",
+    LanguageName => "Russian",
+    Name => "Maxim",
   },
   {
     Gender => "Female",
@@ -460,7 +450,8 @@ sub speakerDetails{[
     LanguageName => "Turkish",
     Name => "Filiz",
   },
- ]}
+  ];
+ }
 
 #-------------------------------------------------------------------------------
 # Test
@@ -502,67 +493,49 @@ Aws::Polly::Select - Select AWS Polly speakers with specified characteristics
 
  use Aws::Polly::Select;
 
- ok qw(Penelope) eq  join " ", map {$_->name}
+ my ($speaker)  =  Aws::Polly::Select::speaker
+   LanguageCode => qr(us)i,
+   Gender       => qr(female)i,
+   LanguageName => qr(Spanish)i;
 
-   Aws::Polly::Select::select
-
-     country=>qr(us), gender=>qr(female), speaking=>qr(Spanish);
+ ok $speaker->Id eq q(Penelope);
 
 =head1 Description
 
- Aws::Polly::Select::select(key=>qr(value), ...)
+ Aws::Polly::Select::speaker(key=>qr(value), ...)
 
 Returns zero or more Amazon Web Services Polly speaker definitions which match
-the hash of characteristics provided. Each hash key must name one of the
-b<KEY>s given below, the value for the key should be a regular expression to
-select against the possible b<VALUES> listed beside each key.  Please take care
-with case or code qr()i;
+the hash of characteristics provided. Each hash B<key> must name one of the
+B<KEY>s given below, the value for the key should be a regular expression to
+select against the possible B<VALUES> listed beside each key.  Please take care
+with the case of the values or use B<qr(...)i> to make the selection case
+insensitive.
 
- KEY        VALUES
+  KEY           VALUES
 
- written    cy da de en es fr is it ja nb nl pl pt ro ru sv tr
+  Gender        Female Male
 
- code       cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US
-            es-ES es-US fr-CA fr-FR is-IS it-IT     ja-JP nb-NO
-            nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU     sv-SE tr-TR
+  Id            Aditi Amy Astrid Brian Carla Carmen Celine Chantal Conchita
+                Cristiano Dora Emma Enrique Ewa Filiz Geraint Giorgio Gwyneth Hans Ines Ivy
+                Jacek Jan Joanna Joey Justin Karl Kendra Kimberly Liv Lotte Mads Maja Marlene
+                Mathieu Matthew Maxim Miguel Mizuki Naja Nicole Penelope Raveena Ricardo Ruben
+                Russell Salli Seoyeon Takumi Tatyana Vicki Vitoria
 
- country    au br ca de dk es fr gb in is it jp nl no pl pt ro ru se tr us
+  LanguageCode  cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US es-ES es-US
+                fr-CA fr-FR is-IS it-IT ja-JP ko-KR nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU
+                sv-SE tr-TR
 
- gender     Female Male
+  LanguageName  Australian English Brazilian Portuguese British English Canadian
+                French Castilian Spanish Danish Dutch French German Icelandic Indian English
+                Italian Japanese Korean Norwegian Polish Portuguese Romanian Russian Swedish
+                Turkish US English US Spanish Welsh Welsh English
 
- speaking   Australian-English Brazilian-Portuguese British-English
-            Canadian-French Castilian-Spanish Danish Dutch French German
-            Icelandic Indian-English Italian Japanese Norwegian Polish Portuguese
-            Romanian Russian Swedish Turkish US-English US-Spanish Welsh
-            Welsh-English
+  Written       cy da de en es fr is it ja ko nb nl pl pt ro ru sv tr
 
-The returned speaker definitions have the following B<METHOD>s which will yield
-one of the specified b<VALUES> for each speaker definition:
+The above B<KEY>s can be used as methods to get the corresponding B<VALUE>'s
+from each speaker defintion returned by L<select|/select>.
 
- METHOD     VALUES
-
- written    cy da de en es fr is it ja nb nl pl pt ro ru sv tr
-
- code       cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US es-ES es-US
-            fr-CA fr-FR is-IS it-IT ja-JP nb-NO     nl-NL pl-PL pt-BR pt-PT
-            ro-RO ru-RU sv-SE tr-TR
-
- name       Amy Astrid Brian Carla Carmen Celine Chantal Conchita Cristiano
-            Dora Emma Enrique Ewa Filiz Geraint Giorgio Gwyneth Hans Ines Ivy
-            Jacek Jan Joanna Joey Justin Karl Kendra Kimberly Liv Lotte Mads
-            Maja Marlene Mathieu Maxim Miguel Mizuki Naja Nicole Penelope
-            Raveena Ricardo Ruben Russell Salli Tatyana Vitoria
-
- speaking   Australian-English Brazilian-Portuguese British-English
-            Canadian-French Castilian-Spanish Danish Dutch French German
-            Icelandic Indian-English Italian Japanese Norwegian Polish
-            Portuguese Romanian Russian Swedish Turkish US-English US-Spanish
-            Welsh Welsh-English
-
- gender     female male
-
- country    au br ca de dk es fr gb in is it jp nl no pl pt ro ru se tr us
-
+  ok $speaker->LanguageCode eq q(es-US);
 
 =head1 Installation
 
@@ -589,18 +562,104 @@ under the same terms as Perl itself.
 =cut
 
 __DATA__
-use Test::More tests=>12;
+use Test::More tests=>10;
 
-ok join(" ", Aws::Polly::Select::written)  eq join(" ", qw(cy da de en es fr is it ja nb nl pl pt ro ru sv tr));
-ok join(" ", Aws::Polly::Select::code)     eq join(" ", qw(cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US es-ES es-US fr-CA fr-FR is-IS it-IT ja-JP nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sv-SE tr-TR));
-ok join(" ", Aws::Polly::Select::name)     eq join ' ', qw(Amy Astrid Brian Carla Carmen Celine Chantal Conchita Cristiano Dora Emma Enrique Ewa Filiz Geraint Giorgio Gwyneth Hans Ines Ivy Jacek Jan Joanna Joey Justin Karl Kendra Kimberly Liv Lotte Mads Maja Marlene Mathieu Maxim Miguel Mizuki Naja Nicole Penelope Raveena Ricardo Ruben Russell Salli Tatyana Vitoria);
-ok join(" ", Aws::Polly::Select::speaking)   eq join ' ', qw(Australian-English Brazilian-Portuguese British-English Canadian-French Castilian-Spanish Danish Dutch French German Icelandic Indian-English Italian Japanese Norwegian Polish Portuguese Romanian Russian Swedish Turkish US-English US-Spanish Welsh Welsh-English);
-ok join(" ", Aws::Polly::Select::gender)   eq join ' ', qw(female male);
-ok join(" ", Aws::Polly::Select::country)  eq join ' ', qw(au br ca de dk es fr gb in is it jp nl no pl pt ro ru se tr us);
-ok join(" ", map{$_->name} &Aws::Polly::Select::select(qw(written en)))                              eq join(' ', qw(Amy Brian Emma Geraint Ivy Joanna Joey Justin Kendra Kimberly Nicole Raveena Russell Salli));
-ok join(" ", map{$_->name} &Aws::Polly::Select::select(qw(code en-GB)))                              eq join(' ', qw(Amy Brian Emma Geraint));
-ok join(" ", map{$_->name} &Aws::Polly::Select::select(qw(country gb gender female)))                eq join(' ', qw(Amy Emma Gwyneth));
-ok qw(Penelope) eq  join " ", map {$_->name} Aws::Polly::Select::select qw(country us gender female speaking Spanish);
-ok qw(Penelope) eq  join " ", map {$_->name} Aws::Polly::Select::select country=>qr(us), gender=>qr(female), speaking=>qr(Spanish);
+my @gender = Aws::Polly::Select::Gender;
+is_deeply [@gender], [qw(Female Male)], "Gender";
 
-ok convertUnicodeToXml('setenta e três') eq "setenta e tr&#234;s";
+my @id = Aws::Polly::Select::Id;
+is_deeply [@id], [qw(Aditi Amy Astrid Brian Carla Carmen Celine Chantal),
+                  qw(Conchita Cristiano Dora Emma Enrique Ewa Filiz),
+                  qw(Geraint Giorgio Gwyneth Hans Ines Ivy Jacek Jan Joanna),
+                  qw(Joey Justin Karl Kendra Kimberly Liv Lotte Mads Maja),
+                  qw(Marlene Mathieu Matthew Maxim Miguel Mizuki Naja Nicole),
+                  qw(Penelope Raveena Ricardo Ruben Russell Salli Seoyeon),
+                  qw(Takumi Tatyana Vicki Vitoria)], "Id";
+
+my @lc = Aws::Polly::Select::LanguageCode;
+is_deeply [@lc], [qw(cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US),
+                  qw(es-ES es-US fr-CA fr-FR is-IS it-IT ja-JP ko-KR nb-NO),
+                  qw(nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sv-SE tr-TR)],
+                  "LanguageCode";
+
+my @ln = Aws::Polly::Select::LanguageName;
+is_deeply [@ln], [
+  "Australian English",
+  "Brazilian Portuguese",
+  "British English",
+  "Canadian French",
+  "Castilian Spanish",
+  "Danish",
+  "Dutch",
+  "French",
+  "German",
+  "Icelandic",
+  "Indian English",
+  "Italian",
+  "Japanese",
+  "Korean",
+  "Norwegian",
+  "Polish",
+  "Portuguese",
+  "Romanian",
+  "Russian",
+  "Swedish",
+  "Turkish",
+  "US English",
+  "US Spanish",
+  "Welsh",
+  "Welsh English",
+], "LanguageName";
+
+my @written = Aws::Polly::Select::Written;
+is_deeply [@written],
+          [qw(cy da de en es fr is it ja ko nb nl pl pt ro ru sv tr)],
+          "Written";
+
+is_deeply [map{$_->Id} &Aws::Polly::Select::speaker(qw(Written en))],
+          [qw(Aditi Amy Brian Emma Geraint Ivy Joanna Joey Justin),
+           qw(Kendra Kimberly Matthew Nicole Raveena Russell Salli)], "en";
+
+is_deeply [map{$_->Id} &Aws::Polly::Select::speaker(qw(LanguageCode en-GB))],
+          [qw(Amy Brian Emma Geraint)], "en-GB";
+
+is_deeply [map{$_->Id} &Aws::Polly::Select::speaker(
+           LanguageCode=>qr(gb)i, Gender=>qr(female)i)],
+           [qw(Amy Emma Gwyneth)], "en-GB, female";
+
+is_deeply [qw(Penelope)],
+          [map {$_->Id} Aws::Polly::Select::speaker
+             LanguageCode=>qr(us)i,
+             Gender      =>qr(female)i,
+             LanguageName=>qr(Spanish)i], "Penelope";
+
+if (0)                                                                          # Get new speakers
+ {my %old =                              map {$_->{Name}=>1} @{&speakerDetails};
+  my %new = map {$_=>1} grep {!$old{$_}} map {$_->{Name}}    renewSpeakerDetailsButOnlyWhenAWSChangesTheListOfSpeakers;
+  say STDERR "New speakers  = ", dump(\%new) ;
+ }
+
+if (0)                                                                          # Write speaker specifications for documentation
+ {my $s;
+  my @fields = qw(Gender Id LanguageCode LanguageName Written);
+  for my $f(@fields)
+   {$s->{$f} = {map {$_->{$f}=>1} @{&speakerDetails}};
+   }
+  my %lc =  map {substr($_, 0, 2)=>1} keys %{$s->{LanguageCode}};
+  my @r;
+  push @r, [qw(KEY VALUES)],
+           ["Written", join ' ', sort keys %lc];
+  for my $f (@fields)
+   {push @r, [$f,        join ' ', sort keys %{$s->{$f}}];
+   }
+  say STDERR indentString(formatTableBasic(\@r), '  ');
+ }
+
+if (1)
+ {my ($speaker) = Aws::Polly::Select::speaker
+    LanguageCode=>qr(us)i,
+    Gender      =>qr(female)i,
+    LanguageName=>qr(Spanish)i;
+
+  ok $speaker->Id eq q(Penelope);
+ }

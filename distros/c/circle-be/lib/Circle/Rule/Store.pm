@@ -7,6 +7,8 @@ package Circle::Rule::Store;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Carp;
 
 use Circle::Rule::Chain;

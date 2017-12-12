@@ -1,3 +1,58 @@
+1.121 2017-12-03
+================
+[Prty::AnsiColor]
+Klasse hinzugefgt.
+
+[Prty::CommandLine]
+Klasse hinzugefügt.
+
+[Prty::Config]
+Konstruktor um Tilde-Expansion erweitert.
+
+[Prty::ContentProcessor]
+Methode commit() um Option -incomplete erweitert.
+Methode load() überarbeitet.
+
+[Prty::ContentProcessor::*]
+Dokumentation bearbeitet.
+
+[Prty::Database::ResultSet::Object]
+Methode index() um Option -unique erweitert.
+
+[Prty::Fibu::*]
+Klassen hinzugefügt.
+
+[Prty::FFmpeg]
+Methode extract169To43() um Default für fehlenden xOffset erweitert.
+
+[Prty::Hash]
+Methode push() um das Pushen mehrerer Elemente erweitert.
+Methode unshift() hinzugefügt.
+Methode addNumber() hinzugefügt.
+
+[Prty::Math]
+Diverse Methoden hinzugefügt.
+
+[Prty::Path]
+Bei Methode delete() undefinierten Pfad berücksichtigt.
+Bei Methode expandTilde() Exception, wenn $HOME nicht definiert ist.
+
+[Prty::Shell]
+In Methode exec() Ermittlung des Exitcode korrigiert.
+
+[Prty::Sql]
+In Methode opIN() zurückgenommen, das Wert als Ausdruck interpretiert wird.
+
+[Prty::Template]
+Methode replace() liefert nun Referenz auf das Template-Objekt und
+Keys werden in Regex geschützt.
+
+[Prty::Test::Class]
+Methode floatIs() um Angabe von Nachkommastellen erweitert.
+
+[Prty::TreeFormatter]
+Klasse hinzugefügt.
+
 1.120 2017-08-13
 ================
 [Prty::Array]

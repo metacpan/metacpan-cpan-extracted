@@ -81,4 +81,58 @@ $f->get;
    is_deeply( \@frames, [ "" ], 'received frame with false value' );
 }
 
+# U+2010 = HYPHEN = 0xe2 0x80 0x90
+my $UTF_8_char  = "UTF\x{2010}8";
+my $UTF_8_bytes = "UTF\xe2\x80\x908";
+
+# receiving frame types
+{
+   my ( $got_text, $got_binary );
+   $client->configure(
+      on_text_frame   => sub { $got_text   = $_[1] },
+      on_binary_frame => sub { $got_binary = $_[1] },
+   );
+
+   $serversock->write( Protocol::WebSocket::Frame->new(
+      type   => "text",
+      buffer => $UTF_8_char,  # Protocol::WebSocket::Frame will encode this
+   )->to_bytes );
+
+   wait_for { defined $got_text };
+   is( $got_text, $UTF_8_char, 'received text frame' );
+
+   # Valid UTF-8 encoding but should not be decoded
+   $serversock->write( Protocol::WebSocket::Frame->new(
+      type   => "binary",
+      buffer => $UTF_8_bytes,
+   )->to_bytes );
+
+   wait_for { defined $got_binary };
+   is( $got_binary, $UTF_8_bytes, 'received binary frame' );
+}
+
+# sending frame types
+{
+   my $fb = Protocol::WebSocket::Frame->new;
+   my $bytes;
+
+   $client->send_text_frame( $UTF_8_char );
+
+   $stream = "";
+   wait_for_stream { $fb->append( $stream ); $stream = ""; $bytes = $fb->next_bytes } $serversock => $stream;
+
+   ok( $fb->is_text, 'sent text frame' );
+   ok( $fb->masked, 'sent frame was masked' );
+   is( $bytes, $UTF_8_bytes, 'content of text frame' );
+
+   $client->send_binary_frame( $UTF_8_bytes );
+
+   $stream = "";
+   wait_for_stream { $fb->append( $stream ); $stream = ""; $bytes = $fb->next_bytes } $serversock => $stream;
+
+   ok( $fb->is_binary, 'sent binary frame' );
+   ok( $fb->masked, 'sent frame was masked' );
+   is( $bytes, $UTF_8_bytes, 'content of binary frame' );
+}
+
 done_testing;

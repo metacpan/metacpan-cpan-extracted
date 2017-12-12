@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::Stdout;
 
 # ABSTRACT: Simple adapter for logging to STDOUT
-our $VERSION = '1.702';
+our $VERSION = '1.703';
 
 use Log::Any::Adapter::Util ();
 
@@ -62,7 +62,7 @@ Log::Any::Adapter::Stdout - Simple adapter for logging to STDOUT
 
 =head1 VERSION
 
-version 1.702
+version 1.703
 
 =head1 SYNOPSIS
 

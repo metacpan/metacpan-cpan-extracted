@@ -1,4 +1,12 @@
 Revision history for perl distribution Mojo-Redis2
+0.30 2017-12-05T21:03:44-0500
+ - Check version of redis in tests and skip tests of unsupported functions. #31
+   Contributor: Mike Magowan
+ - Fix bgrewriteaof backend test to wait for background processes to complete. #32
+   Contributor: Mike Magowan
+ - Add scripting support with methods eval and evalsha. #33
+   Contributor: Mike Magowan
+
 0.29 2017-11-19T20:16:11-0500
  - Prevent forked processes from terminating the Mojo::Redis2::Server test
    server when they destroy the object. #29

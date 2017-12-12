@@ -27,7 +27,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 8;
+$VERSION = 10;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -165,7 +165,8 @@ to go from one specified configuration to another.
 Each graph vertex is a configuration of balls on spindles.  Each edge is a
 legal move from one configuration to another.  A legal move is to take the
 top ball from any spindle and move it to the top of another, provided it
-fits in the capacity (1,2,3 on spindle numbers 1,2,3) of the destination.
+fits in the capacity of the destination (1,2,3 for spindle numbers 1,2,3
+respectively).
 
 =cut
 
@@ -184,8 +185,8 @@ the vertices are numbered ...
 Spindles=1 is allowed but is a trivial 1-vertex graph since all balls are on
 that spindle and no moves are possible.
 
-Spindles=2 is allowed but is 2^N vertices of disconnected pairs since only
-the smallest ball can ever move.
+Spindles=2 is allowed but is 2^N vertices in pairs since only the smallest
+ball can ever move.
 
 Balls=1 is always a complete-S graph since the single ball can move from
 anywhere to anywhere.

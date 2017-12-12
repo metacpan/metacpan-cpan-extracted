@@ -3,24 +3,24 @@ abstract: 'Interact with CLI of Avaya Networking products over any of Telnet, SS
 author:
   - 'Ludovico Stevens <lstevens@cpan.org>'
 build_requires:
-  IO::Interactive: 0
-  Net::Telnet: 0
+  IO::Interactive: '0'
+  Net::Telnet: '0'
   perl: v5.6.0
 configure_requires:
-  Module::Build: 0.36
+  Module::Build: '0.36'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Control-CLI-AvayaData
 provides:
   Control::CLI::AvayaData:
     file: lib/Control/CLI/AvayaData.pm
-    version: 2.03
+    version: '2.04'
 requires:
-  Control::CLI: 2.02
+  Control::CLI: '2.02'
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.03
+version: '2.04'

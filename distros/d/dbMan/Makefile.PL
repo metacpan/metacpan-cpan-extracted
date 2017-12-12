@@ -41,10 +41,9 @@ if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
 			'Text::CSV_XS' => 0, 'Data::ShowTable' => 0,
 			'Data::Dumper' => 0, 'Term::Screen' => 0,
 			'Term::ReadLine' => 0, 'Term::ReadKey' => 0,
-			'Term::ANSIColor' => 0, 'Cwd' => 0 };
-	if (uc prompt("Do you want tab completation in command line version [Y/n]?",'Y') eq 'Y') {
-		$opts{PREREQ_PM}->{'Term::ReadLine::Gnu'} = 0;
-	}
+			'Term::ANSIColor' => 0, 'Cwd' => 0,
+            'Term::ReadLine::Gnu' => 0 };
+
 	if (uc prompt("Do you want also curses version [Y/n]?",'Y') eq 'Y') {
 		$opts{PREREQ_PM}->{Curses} = '1.08';
 		$opts{PREREQ_PM}->{'Curses::UI'} = '0.95';

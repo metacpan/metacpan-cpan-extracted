@@ -11,6 +11,7 @@ lib/Net/Etcd/Auth/RolePermission.pm
 lib/Net/Etcd/Config.pm
 lib/Net/Etcd/Lease.pm
 lib/Net/Etcd/Maintenance.pm
+lib/Net/Etcd/Member.pm
 lib/Net/Etcd/Role/Actions.pm
 lib/Net/Etcd/KV.pm
 lib/Net/Etcd/KV/Compare.pm
@@ -33,6 +34,7 @@ t/pod.t
 t/04-txn.t
 t/05-user.t
 t/06-watch.t
+t/07-member.t
 t/99-auth.t
 .travis.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -12,7 +12,7 @@ use Test::More;
 plan skip_all => "Dist::Zilla 5 required" if Dist::Zilla->VERSION < 5;
 plan tests => 1;
 
-use lib 't';
+use lib 't/lib';
 use Util qw(clean_environment init_repo);
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

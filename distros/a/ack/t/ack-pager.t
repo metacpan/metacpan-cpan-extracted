@@ -20,17 +20,21 @@ plan tests => 15;
 prep_environment();
 
 NO_PAGER: {
-    my @args = qw(--nocolor --sort-files Sue t/text);
+    my @args = qw(--nocolor --sort-files -i nevermore t/text);
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -39,17 +43,21 @@ END_TEXT
 }
 
 PAGER: {
-    my @args = qw(--nocolor --pager=./test-pager --sort-files Sue t/text);
+    my @args = qw(--nocolor --pager=./test-pager --sort-files -i nevermore t/text);
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -58,13 +66,15 @@ END_TEXT
 }
 
 PAGER_WITH_OPTS: {
-    my @args = ('--nocolor', '--pager=./test-pager --skip=2', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--pager=./test-pager --skip=2', '--sort-files', '-i', 'nevermore', 't/text');
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-13:I tell ya, life ain't easy for a boy named Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-70:Bill or George! Anything but Sue! I still hate that name!
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+62:    With such name as "Nevermore."
+76:    Of 'Never -- nevermore.'
+90:    She shall press, ah, nevermore!
+104:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -74,17 +84,21 @@ END_TEXT
 
 FORCE_NO_PAGER: {
     my @args = ('--nocolor', '--pager=./test-pager --skip=2', '--nopager', '--sort-files',
-        'Sue', 't/text');
+        '-i', 'nevermore', 't/text');
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -96,13 +110,15 @@ PAGER_ENV: {
     local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
     local $TODO             = q{Setting ACK_PAGER in tests won't work for the time being};
 
-    my @args = ('--nocolor', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--sort-files', '-i', 'nevermore', 't/text');
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-13:I tell ya, life ain't easy for a boy named Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-70:Bill or George! Anything but Sue! I still hate that name!
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+62:    With such name as "Nevermore."
+76:    Of 'Never -- nevermore.'
+90:    She shall press, ah, nevermore!
+104:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -113,17 +129,21 @@ END_TEXT
 PAGER_ENV_OVERRIDE: {
     local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
 
-    my @args = ('--nocolor', '--nopager', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--nopager', '--sort-files', '-i', 'nevermore', 't/text');
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -131,18 +151,21 @@ END_TEXT
     lists_match( \@got, \@expected, 'PAGER_ENV_OVERRIDE' );
 }
 
+
 PAGER_ACKRC: {
-    my @args = ('--nocolor', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--sort-files', '-i', 'nevermore', 't/text');
 
     my $ackrc = <<'END_ACKRC';
 --pager=./test-pager --skip=2
 END_ACKRC
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-13:I tell ya, life ain't easy for a boy named Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-70:Bill or George! Anything but Sue! I still hate that name!
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+62:    With such name as "Nevermore."
+76:    Of 'Never -- nevermore.'
+90:    She shall press, ah, nevermore!
+104:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
 END_TEXT
 
     my @got = run_ack_interactive(@args, {
@@ -152,22 +175,27 @@ END_TEXT
     lists_match( \@got, \@expected, 'PAGER_ACKRC' );
 }
 
+
 PAGER_ACKRC_OVERRIDE: {
-    my @args = ('--nocolor', '--nopager', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--nopager', '--sort-files', '-i', 'nevermore', 't/text');
 
     my $ackrc = <<'END_ACKRC';
 --pager=./test-pager --skip=2
 END_ACKRC
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args, {
@@ -180,17 +208,21 @@ END_TEXT
 PAGER_NOENV: {
     local $ENV{'ACK_PAGER'} = './test-pager --skip=2';
 
-    my @args = ('--nocolor', '--noenv', '--sort-files', 'Sue', 't/text');
+    my @args = ('--nocolor', '--noenv', '--sort-files', '-i', 'nevermore', 't/text');
 
-    my @expected = split /\n/, <<'END_TEXT';
-t/text/boy-named-sue.txt
-6:Was before he left, he went and named me Sue.
-13:I tell ya, life ain't easy for a boy named Sue.
-27:Sat the dirty, mangy dog that named me Sue.
-34:And I said: "My name is Sue! How do you do! Now you gonna die!"
-62:Cause I'm the son-of-a-bitch that named you Sue."
-70:Bill or George! Anything but Sue! I still hate that name!
-72:    -- "A Boy Named Sue", Johnny Cash
+    my @expected = line_split( <<'END_TEXT' );
+t/text/raven.txt
+55:    Quoth the Raven, "Nevermore."
+62:    With such name as "Nevermore."
+69:    Then the bird said, "Nevermore."
+76:    Of 'Never -- nevermore.'
+83:    Meant in croaking "Nevermore."
+90:    She shall press, ah, nevermore!
+97:    Quoth the Raven, "Nevermore."
+104:    Quoth the Raven, "Nevermore."
+111:    Quoth the Raven, "Nevermore."
+118:    Quoth the Raven, "Nevermore."
+125:    Shall be lifted--nevermore!
 END_TEXT
 
     my @got = run_ack_interactive(@args);
@@ -201,13 +233,13 @@ END_TEXT
 my $wd      = getcwd_clean();
 my $tempdir = File::Temp->newdir;
 my $pager   = File::Spec->rel2abs('test-pager');
-mkdir File::Spec->catdir($tempdir->dirname, 'subdir');
+safe_mkdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
 
 PROJECT_ACKRC_PAGER_FORBIDDEN: {
     my @files = untaint( File::Spec->rel2abs('t/text/') );
     my @args = qw/ --env question(\\S+) /;
 
-    chdir $tempdir->dirname;
+    safe_chdir( $tempdir->dirname );
     write_file '.ackrc', "--pager=$pager\n";
 
     my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
@@ -215,7 +247,7 @@ PROJECT_ACKRC_PAGER_FORBIDDEN: {
     is_empty_array( $stdout );
     first_line_like( $stderr, qr/\QOptions --output, --pager and --match are forbidden in project .ackrc files/ );
 
-    chdir $wd;
+    safe_chdir( $wd );
 }
 
 HOME_ACKRC_PAGER_PERMITTED: {
@@ -223,7 +255,7 @@ HOME_ACKRC_PAGER_PERMITTED: {
     my @args = qw/ --env question(\\S+) /;
 
     write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--pager=$pager\n");
-    chdir File::Spec->catdir($tempdir->dirname, 'subdir');
+    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
     local $ENV{'HOME'} = $tempdir->dirname;
 
     my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
@@ -231,7 +263,7 @@ HOME_ACKRC_PAGER_PERMITTED: {
     is_nonempty_array( $stdout );
     is_empty_array( $stderr );
 
-    chdir $wd;
+    safe_chdir( $wd );
 }
 
 ACKRC_ACKRC_PAGER_PERMITTED: {
@@ -239,7 +271,7 @@ ACKRC_ACKRC_PAGER_PERMITTED: {
     my @args = qw/ --env question(\\S+) /;
 
     write_file(File::Spec->catfile($tempdir->dirname, '.ackrc'), "--pager=$pager\n");
-    chdir File::Spec->catdir($tempdir->dirname, 'subdir');
+    safe_chdir( File::Spec->catdir($tempdir->dirname, 'subdir') );
     local $ENV{'ACKRC'} = File::Spec->catfile($tempdir->dirname, '.ackrc');
 
     my ( $stdout, $stderr ) = run_ack_with_stderr(@args, @files);
@@ -247,5 +279,8 @@ ACKRC_ACKRC_PAGER_PERMITTED: {
     is_nonempty_array( $stdout );
     is_empty_array( $stderr );
 
-    chdir $wd;
+    safe_chdir( $wd );
 }
+
+done_testing();
+exit 0;

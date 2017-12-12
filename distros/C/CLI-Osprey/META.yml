@@ -23,6 +23,6 @@ resources:
   homepage: http://metacpan.org/release/CLI-Osprey
   license: http://dev.perl.org/licenses/
   repository: git://github.com/arodland/CLI-Osprey.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:ARODLAND
 x_serialization_backend: 'YAML::Tiny version 1.70'

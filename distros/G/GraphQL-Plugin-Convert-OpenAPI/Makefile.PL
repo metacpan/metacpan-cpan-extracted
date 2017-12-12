@@ -16,13 +16,13 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::More' => '0.98',
     'JSON::Validator' => '1.07',
-    'GraphQL' => '0.21', # DateTime scalar type
-    'OpenAPI::Client' => '0.10',
+    'GraphQL' => '0.22', # multi-line comments
+    'OpenAPI::Client' => '0.13', # "call" interface
   },
   PREREQ_PM => {
     'JSON::Validator' => '1.07',
-    'GraphQL' => '0.21', # DateTime scalar type
-    'OpenAPI::Client' => '0.10',
+    'GraphQL' => '0.22', # multi-line comments
+    'OpenAPI::Client' => '0.13', # "call" interface
   },
   clean => { FILES => 'GraphQL-Plugin-Convert-OpenAPI-*' },
   META_MERGE => {

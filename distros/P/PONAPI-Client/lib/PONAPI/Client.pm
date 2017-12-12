@@ -1,7 +1,7 @@
 # ABSTRACT: Client to a {JSON:API} service (http://jsonapi.org/) v1.0
 package PONAPI::Client;
 
-our $VERSION = '0.002009';
+our $VERSION = '0.002010';
 
 use Moose;
 
@@ -119,7 +119,7 @@ sub delete_relationships {
 
 ### private methods
 
-sub build_hijk_ua {
+sub _build_hijk_ua {
     require PONAPI::Client::UA::Hijk;
     return PONAPI::Client::UA::Hijk->new();
 }
@@ -220,7 +220,7 @@ PONAPI::Client - Client to a {JSON:API} service (http://jsonapi.org/) v1.0
 
 =head1 VERSION
 
-version 0.002009
+version 0.002010
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,25 @@
+0.000097  2017-12-10 20:23:21-08:00 America/Los_Angeles
+
+    - Documentation fixes
+
+0.000096  2017-12-09 10:13:21-08:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.000095  2017-12-08 14:14:16-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Discoruage use of fragile thread features (rarely used)
+    - Skip fragile/discrouaged tests outside author testing.
+    - Document the above, and an env var to activate tests when desired
+
+0.000094  2017-11-29 18:51:54-08:00 America/Los_Angeles
+
+    - No Changes since last trial
+
+0.000093  2017-11-28 20:21:09-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Minor test changes for thread safety
+
 0.000092  2017-11-28 10:17:37-08:00 America/Los_Angeles
 
     - No changes since last trial

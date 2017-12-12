@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Check;
 # ABSTRACT: Check your git repository before releasing
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Moose;
 use namespace::autoclean 0.09;
@@ -46,6 +46,7 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         # build_warnings does not affect the build outcome; do not need to track it
         untracked_files => $self->untracked_files,
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -124,6 +125,7 @@ sub before_release {
     $self->_perform_checks('log_fatal');
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -138,7 +140,7 @@ Dist::Zilla::Plugin::Git::Check - Check your git repository before releasing
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 SYNOPSIS
 

@@ -48,6 +48,7 @@ lib/Test2/Manual.pm
 lib/Test2/Manual/Anatomy.pm
 lib/Test2/Manual/Anatomy/EndToEnd.pm
 lib/Test2/Manual/Anatomy/Event.pm
+lib/Test2/Manual/Concurrency.pm
 lib/Test2/Manual/Contributing.pm
 lib/Test2/Manual/Testing.pm
 lib/Test2/Manual/Testing/Introduction.pm

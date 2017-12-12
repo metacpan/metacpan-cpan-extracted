@@ -43,6 +43,7 @@ my @files = (
     't/base/proxy.t',
     't/base/simple.t',
     't/base/ua.t',
+    't/base/ua_handlers.t',
     't/local/autoload-get.t',
     't/local/autoload.t',
     't/local/get.t',

@@ -28,7 +28,7 @@ local $SIG{__WARN__} = sub {
 open my $own_file, '<:encoding(utf8)', $0 or die $!;
 my $own_code = do { local $/; readline($own_file); };
 
-ok $own_file =~ m{ \A (?&PerlOWS) (?&PerlStatement) (?&PerlOWS) \Z  $PPR::GRAMMAR }xo
+ok $own_code =~ m{ ^ (?&PerlOWS) (?&PerlStatement) (?&PerlOWS) $  $PPR::GRAMMAR }xm
     => 'Matched code with the look of disapproval!';
 
 

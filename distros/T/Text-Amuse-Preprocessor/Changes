@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.50 2017-12-10
+
+ - Add support for secondary footnote rewrite/renumbering
+
 0.41 2017-06-10
 
  - Clean tabs, carriage returns and \x{00} from verbatim pieces as

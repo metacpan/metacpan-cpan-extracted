@@ -1,14 +1,20 @@
-SYNOPSIS
+NAME
+    Color::ANSI::Util - Routines for dealing with ANSI colors
 
+VERSION
+    This document describes version 0.160 of Color::ANSI::Util (from Perl
+    distribution Color-ANSI-Util), released on 2017-12-03.
+
+SYNOPSIS
      use Color::ANSI::Util qw(
          ansifg
          ansibg
      );
-    
+
      say ansifg("f0c010"); # => "\e[33;1m" (on 16-color terminal)
                            # => "\e[38;5;11m" (on 256-color terminal)
                            # => "\e[38;2;240;192;16m" (on 24-bit-color terminal)
-    
+
      say ansibg("ff5f87"); # => "\e[47m" (on 16-color terminal)
                            # => "\e[48;5;7m" (on 256-color terminal)
                            # => "\e[48;2;255;95;135m" (on 24-bit-color terminal)
@@ -17,139 +23,287 @@ SYNOPSIS
     converting between RGB and ANSI color (16/256/24bit color depth).
 
 DESCRIPTION
-
-    This module provides routines for dealing with ANSI colors. The two
-    main functions are ansifg and ansibg. With those functions, you can
+    This module provides routines for dealing with ANSI colors. The two main
+    functions are "ansifg" and "ansibg". With those functions, you can
     specify colors in RGB and let it output the correct ANSI color escape
     code according to the color depth support of the terminal (whether
-    16-color, 256-color, or 24bit). There are other functions to convert
-    RGB to ANSI in specific color depths, or reverse functions to convert
-    from ANSI to RGB codes.
+    16-color, 256-color, or 24bit). There are other functions to convert RGB
+    to ANSI in specific color depths, or reverse functions to convert from
+    ANSI to RGB codes.
 
     Keywords: xterm, xterm-256color, terminal
 
+BUGS/NOTES
+    Algorithm for finding closest indexed color from RGB color currently not
+    very efficient. Probably can add some threshold square distance, below
+    which we can shortcut to the final answer.
+
 FUNCTIONS
+  ansi16_to_rgb
+    Usage:
 
- ansi16_to_rgb($color) => STR
+     ansi16_to_rgb($color) -> color::rgb24
 
-    Convert ANSI-16 color to RGB. $color is number from 0-15, or color
-    names "black", "red", "green", "yellow", "blue", "magenta", "cyan",
-    "white" with "bold" to indicate bold/bright. Return 6-hexdigit, e.g.
-    "ff00cc".
+    Convert ANSI-16 color to RGB.
 
-    Die on invalid input.
+    Returns 6-hexdigit, e.g. 'ff00cc'.
 
- rgb_to_ansi16($color) => INT
+    This function is not exported by default, but exportable.
 
-    Convert RGB to ANSI-16 color. $color is 6-hexdigit RGB color like
-    "ff00cc". Will pick the closest color. Return number from 0-15.
+    Arguments ('*' denotes required arguments):
 
-    Die on invalid input.
+    *   $color* => *color::ansi16*
 
- ansi256_to_rgb($color) => STR
+    Return value: (color::rgb24)
 
-    Convert ANSI-256 color to RGB. $color is a number from 0-255. Return
-    6-hexdigit, e.g. "ff00cc".
+  ansi256_to_rgb
+    Usage:
 
-    Die on invalid input.
+     ansi256_to_rgb($color) -> color::rgb24
 
- rgb_to_ansi256($color) => INT
+    Convert ANSI-256 color to RGB.
 
-    Convert RGB to ANSI-256 color. $color is 6-hexdigit RGB color like
-    "ff00cc". Will pick the closest color. Return number between 0-255.
+    This function is not exported by default, but exportable.
 
-    Die on invalid input.
+    Arguments ('*' denotes required arguments):
 
- rgb_to_ansi16_fg_code($rgb) => STR
+    *   $color* => *color::ansi256*
 
- ansi16fg($rgb) => STR
+    Return value: (color::rgb24)
 
+  rgb_to_ansi16
+    Usage:
+
+     rgb_to_ansi16($color) -> color::ansi16
+
+    Convert RGB to ANSI-16 color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (color::ansi16)
+
+  rgb_to_ansi16_bg_code
+    Usage:
+
+     rgb_to_ansi16_bg_code($color) -> str
+
+    Convert RGB to ANSI-16 color escape sequence to change background color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi16_fg_code
+    Usage:
+
+     rgb_to_ansi16_fg_code($color) -> str
+
+    Convert RGB to ANSI-16 color escape sequence to change foreground color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi24b_bg_code
+    Usage:
+
+     rgb_to_ansi24b_bg_code($color) -> str
+
+    Convert RGB to ANSI 24bit-color escape sequence to change background
+    color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi24b_fg_code
+    Usage:
+
+     rgb_to_ansi24b_fg_code($color) -> str
+
+    Convert RGB to ANSI 24bit-color escape sequence to change foreground
+    color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi256
+    Usage:
+
+     rgb_to_ansi256($color) -> color::ansi256
+
+    Convert RGB to ANSI-256 color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (color::ansi256)
+
+  rgb_to_ansi256_bg_code
+    Usage:
+
+     rgb_to_ansi256_bg_code($color) -> str
+
+    Convert RGB to ANSI-256 color escape sequence to change background
+    color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi256_fg_code
+    Usage:
+
+     rgb_to_ansi256_fg_code($color) -> str
+
+    Convert RGB to ANSI-256 color escape sequence to change foreground
+    color.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi_bg_code
+    Usage:
+
+     rgb_to_ansi_bg_code($color) -> str
+
+    Convert RGB to ANSI color escape sequence to change background color.
+
+    Autodetect terminal capability and can return either empty string,
+    16-color, 256-color, or 24bit-code.
+
+    Which color depth used is determined by "COLOR_DEPTH" environment
+    setting or from Term::Detect::Software if that module is available). In
+    other words, this function automatically chooses
+    rgb_to_ansi{24b,256,16}*bg*code().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  rgb_to_ansi_fg_code
+    Usage:
+
+     rgb_to_ansi_fg_code($color) -> str
+
+    Convert RGB to ANSI color escape sequence to change foreground color.
+
+    Autodetect terminal capability and can return either empty string,
+    16-color, 256-color, or 24bit-code.
+
+    Color depth used is determined by "COLOR_DEPTH" environment setting or
+    from Term::Detect::Software if that module is available. In other words,
+    this function automatically chooses rgb_to_ansi{24b,256,16}*fg*code().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $color* => *color::rgb24*
+
+    Return value: (str)
+
+  ansi16fg($rgb) => STR
     Alias for rgb_to_ansi16_fg_code().
 
- rgb_to_ansi16_bg_code($rgb) => STR
-
- ansi16bg($rgb) => STR
-
+  ansi16bg($rgb) => STR
     Alias for rgb_to_ansi16_bg_code().
 
- rgb_to_ansi256_fg_code($rgb) => STR
-
- ansi256fg($rgb) => STR
-
+  ansi256fg($rgb) => STR
     Alias for rgb_to_ansi256_fg_code().
 
- rgb_to_ansi256_bg_code($rgb) => STR
-
- ansi256bg($rgb) => STR
-
+  ansi256bg($rgb) => STR
     Alias for rgb_to_ansi256_bg_code().
 
- rgb_to_ansi24b_fg_code($rgb) => STR
-
-    Return ANSI escape code to set 24bit foreground color. Supported by
-    Konsole and Yakuake.
-
- ansi24bfg($rgb) => STR
-
+  ansi24bfg($rgb) => STR
     Alias for rgb_to_ansi24b_fg_code().
 
- rgb_to_ansi24b_bg_code($rgb) => STR
-
-    Return ANSI escape code to set 24bit background color. Supported by
-    Konsole and Yakuake.
-
- ansi24bbg($rgb) => STR
-
+  ansi24bbg($rgb) => STR
     Alias for rgb_to_ansi24b_bg_code().
 
- rgb_to_ansi_fg_code($rgb) => STR
-
-    Return ANSI escape code to set 24bit/256/16 foreground color (which
-    color depth used is determined by COLOR_DEPTH environment setting or
-    from Term::Detect::Software if that module is available). In other
-    words, this function automatically chooses
-    rgb_to_ansi{24b,256,16}_fg_code().
-
- ansifg($rgb) => STR
-
+  rgb_to_ansi_fg_code($rgb) => STR
+  ansifg($rgb) => STR
     Alias for rgb_to_ansi_fg_code().
 
- rgb_to_ansi_bg_code($rgb) => STR
-
-    Return ANSI escape code to set 24bit/256/16 background color (which
-    color depth used is determined by COLOR_DEPTH environment setting or
-    from Term::Detect::Software if that module is available). In other
-    words, this function automatically chooses
-    rgb_to_ansi{24b,256,16}_bg_code().
-
- ansibg($rgb) => STR
-
+  ansibg($rgb) => STR
     Alias for rgb_to_ansi_bg_code().
 
 ENVIRONMENT
-
- COLOR => bool
-
+  COLOR => bool
     Can be used to explicitly disable color by setting it to 0.
 
     Observed by: ansi{fg,bg}.
 
- COLOR_DEPTH => INT
-
+  COLOR_DEPTH => INT
     Can be used to explicitly set color depth instead of trying to detect
     appropriate color depth.
 
     Observed by: ansi{fg,bg}.
 
-BUGS/NOTES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Color-ANSI-Util>.
 
-    Algorithm for finding closest indexed color from RGB color currently
-    not very efficient. Probably can add some threshold square distance,
-    below which we can shortcut to the final answer.
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Color-ANSI-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-ANSI-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Term::ANSIColor
 
-    http://en.wikipedia.org/wiki/ANSI_escape_code
+    <http://en.wikipedia.org/wiki/ANSI_escape_code>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -31,6 +31,7 @@ recommends:
   Config::Versioned: '0.5'
   DBI: '0'
   Net::LDAP: '0'
+  Net::SSL: '0'
   Proc::SafeExec: '0'
   Template: '0'
   Text::CSV_XS: '0'
@@ -41,4 +42,4 @@ requires:
   perl: '5.008008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.23'
+version: '1.24'

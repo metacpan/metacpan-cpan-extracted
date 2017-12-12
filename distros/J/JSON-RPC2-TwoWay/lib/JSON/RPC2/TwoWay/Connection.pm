@@ -27,6 +27,7 @@ sub new {
 		debug => $opt{debug} // 0,
 		next_id => 1,
 		owner => $opt{owner},
+		request => undef,
 		rpc => $opt{rpc},
 		state => undef,
 		#stream => $opt->{stream},
@@ -36,7 +37,7 @@ sub new {
 }
 
 sub call {
-	my ($self, $name, $args, $cb) = @_;
+	my ($self, $name, $args, $cb, $raw) = @_;
 	croak 'no self?' unless $self;
 	croak 'args should be a array or hash reference'
 		unless ref $args eq 'ARRAY' or ref $args eq 'HASH';
@@ -50,9 +51,9 @@ sub call {
 		params => $args,
 		id  => $id,
 	});
-	$self->{calls}->{$id} = $cb; # more?
+	$self->{calls}->{$id} = [ $cb, $raw ]; # more?
 	#say STDERR "call: $request" if $self->{debug};
-	$self->_write($request);
+	$self->write($request);
 	return;
 }
 
@@ -67,29 +68,31 @@ sub notify {
 		params => $args,
 	});
 	#say STDERR "notify: $request" if $self->{debug};
-	$self->_write($request);
+	$self->write($request);
 	return;
 }
 
 sub handle {
 	my ($self, $json) = @_;
-	my @err = $self->_handle($json);
+	my @err = $self->_handle(\$json);
 	$self->{rpc}->_error($self, undef, ERR_REQ, 'Invalid Request: ' . $err[0]) if $err[0];
         return @err;
 }
 
 sub _handle {
-	my ($self, $json) = @_;
-	say STDERR '    handle: ', $json if $self->{debug};
+	my ($self, $jsonr) = @_;
+	say STDERR '    handle: ', $$jsonr if $self->{debug};
 	local $@;
-	my $r = eval { decode_json($json) };
+	my $r = eval { decode_json($$jsonr) };
 	return "json decode failed: $@" if $@;
 	return 'not a json object' if ref $r ne 'HASH';
 	return 'expected jsonrpc version 2.0' unless defined $r->{jsonrpc} and $r->{jsonrpc} eq '2.0';
-	return 'id is not a string or number' if exists $r->{id} and (not defined $r->{id} or ref $r->{id});
+	#return 'id is not a string or number' if exists $r->{id} and (not defined $r->{id} or ref $r->{id});
+	# id can be null in the error case
+	return 'id is not a string or number' if exists $r->{id} and ref $r->{id};
 	if (defined $r->{method}) {
 		return $self->{rpc}->_handle_request($self, $r);
-	} elsif (defined $r->{id} and (exists $r->{result} or defined $r->{error})) {
+	} elsif (exists $r->{id} and (exists $r->{result} or defined $r->{error})) {
 		return $self->_handle_response($r);
 	} else {
 		return 'invalid jsonnrpc object';
@@ -100,23 +103,32 @@ sub _handle_response {
 	my ($self, $r) = @_;
 	#say STDERR '_handle_response: ', Dumper($r) if $self->{debug};
 	my $id = $r->{id};
-	my $cb;
+	my ($cb, $raw);
 	$cb = delete $self->{calls}->{$id} if $id;
+	return unless $cb;
+	($cb, $raw) = @$cb;
 	if (defined $r->{error}) {
 		my $e = $r->{error};
 		return 'error is not an object' unless ref $e eq 'HASH';
 		return 'error code is not a integer' unless defined $e->{code} and $e->{code} =~ /^-?\d+$/;
         	return 'error message is not a string' if ref $e->{message};
         	return 'extra members in error object' if (keys %$e == 3 and !exists $e->{data}) or (keys %$e > 2);
-		$cb->($r->{error}) if $cb and ref $cb eq 'CODE';
+		if ($raw) {
+			$cb->($r);
+		} else {
+			$cb->($e);
+		}
 	} else {
-		return undef, 'unknown call' unless $cb and ref $cb eq 'CODE';
-		$cb->(0, $r->{result});
+		if ($raw) {
+			$cb->(0, $r);
+		} else {
+			$cb->(0, $r->{result});
+		}
 	}
 	return;
 }
 
-sub _write {
+sub write {
 	my $self = shift;
 	say STDERR '    writing: ', @_ if $self->{debug};
 	$self->{write}->(@_);
@@ -205,7 +217,7 @@ This coderef will be called for all output: both requests and responses.
 
 =head2 call
 
-$con->call('method', { arg => 'foo' }, $cb);
+$con->call('method', { arg => 'foo' }, $cb, $raw);
 
 Calls the remote method indicated in the first argument.
 
@@ -215,6 +227,10 @@ empty reference when there are no arguments.
 
 The third argument is a callback: this callback will
 be called with the results of the called method.
+
+The optional fourth argument is the raw-mode flag.  If set to a true value
+the callback of the third argument will the called with the full JSON RPC
+2.0 response object.
 
 Call throws an error in case of missing arguments, otherwise it returns
 immediately with no return value.

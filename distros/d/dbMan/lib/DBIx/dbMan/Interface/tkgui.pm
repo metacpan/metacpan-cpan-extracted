@@ -7,7 +7,7 @@ use base 'DBIx::dbMan::Interface';
 
 require Tk::ROText;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -123,6 +123,10 @@ sub prompt {
 
 sub can_pager {
 	return 0;
+}
+
+sub is_utf8 {
+    return 1;
 }
 
 # what is needed in this tkgui ?

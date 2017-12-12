@@ -1,6 +1,7 @@
 package Lab::XPRESS::Sweep::Voltage;
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.613';
 #ABSTRACT: Voltage sweep
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.600';
+
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use warnings;
@@ -22,9 +23,11 @@ sub new {
         mode                => 'continuous',
         jump                => 0,
         allowed_instruments => [
-            'Lab::Instrument::Yokogawa7651',  'Lab::Instrument::Keithley2400',
-            'Lab::Instrument::YokogawaGS200', 'Lab::Instrument::DummySource',
-            'Lab::Instrument::SR830::AuxOut'
+            qw/
+                Lab::Instrument::Yokogawa7651 Lab::Instrument::Keithley2400
+                Lab::Instrument::YokogawaGS200 Lab::Instrument::DummySource
+                Lab::Instrument::SR830::AuxOut Lab::Moose::Instrument::DummySource
+                Lab::Moose::Instrument::YokogawaGS200/
         ],
         allowed_sweep_modes => [ 'continuous', 'list', 'step' ],
         number_of_points    => [undef]
@@ -40,7 +43,7 @@ sub go_to_sweep_start {
     my $self = shift;
 
     # go to start:
-    print "going to start ... ";
+    print "Setting voltage to start value ... ";
     if (   $self->{config}->{mode} =~ /step|list/
         && $self->{config}->{jump} ) {
         my $target    = $self->{config}{points}[ $self->{iterator} ];
@@ -65,7 +68,7 @@ sub go_to_sweep_start {
         $self->{config}->{instrument}->trg();
         $self->{config}->{instrument}->wait();
     }
-    print "done\n";
+    print "Done                                                     \n";
 
 }
 
@@ -164,7 +167,7 @@ Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -348,7 +351,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2014       Alois Dirnaichner, Andreas K. Huettel
             2015       Alois Dirnaichner
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

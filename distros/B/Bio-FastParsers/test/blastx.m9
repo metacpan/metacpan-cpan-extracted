@@ -1,0 +1,17 @@
+# BLASTX 2.2.26+
+# Query: gi|6995995|ref|NM_000492.2| Homo sapiens cystic fibrosis transmembrane conductance regulator, ATP-binding cassette (sub-family C, member 7) (CFTR), mRNA
+# RID: J9HM7M3F01R
+# Database: nr
+# Fields: query id, subject id, % identity, alignment length, mismatches, gap opens, q. start, q. end, s. start, s. end, evalue, bit score
+# 10 hits found
+gi|6995995|ref|NM_000492.2|	gi|180332|gb|AAA35680.1|	100.00	1480	0	0	133	4572	1	1480	0.0	2932
+gi|6995995|ref|NM_000492.2|	gi|306538|gb|AAC13657.1|	99.86	1480	2	0	133	4572	1	1480	0.0	2928
+gi|6995995|ref|NM_000492.2|	gi|90421313|ref|NP_000483.3|	99.80	1480	3	0	133	4572	1	1480	0.0	2925
+gi|6995995|ref|NM_000492.2|	gi|397474456|ref|XP_003808695.1|	99.73	1480	4	0	133	4572	1	1480	0.0	2923
+gi|6995995|ref|NM_000492.2|	gi|89348175|gb|ABD72213.1|	99.73	1480	4	0	133	4572	1	1480	0.0	2921
+gi|6995995|ref|NM_000492.2|	gi|189303585|ref|NP_001073386.1|	99.59	1480	6	0	133	4572	1	1480	0.0	2919
+gi|6995995|ref|NM_000492.2|	gi|118572195|sp|Q2IBF6.1|CFTR_GORGO	99.53	1480	7	0	133	4572	1	1480	0.0	2919
+gi|6995995|ref|NM_000492.2|	gi|281182582|ref|NP_001162017.1|	98.85	1480	17	0	133	4572	1	1480	0.0	2901
+gi|6995995|ref|NM_000492.2|	gi|86169629|gb|ABC87055.1|	99.86	1462	2	0	187	4572	1	1462	0.0	2893
+gi|6995995|ref|NM_000492.2|	gi|332224265|ref|XP_003261288.1|	98.92	1480	16	0	133	4572	1	1480	0.0	2887
+# BLAST processed 1 queries

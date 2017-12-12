@@ -1,5 +1,12 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.02  Fri Dec  8 22:44:46 MST 2017
+	- added "tag" option (BSD-style checksums) to sha3sum
+		-- consistent with GNU sha1sum, sha224sum, etc.
+		-- thanks to Christopher Tubbs for suggestion
+	- modified SHA3.pm to use XSLoader
+		-- falls back to DynaLoader if necessary
+
 1.01  Sun Oct 22 16:04:22 MST 2017
 	- added optional $lsb argument for add_bits() method
 		-- many public vectors in least-significant-bit format

@@ -5,9 +5,9 @@ use Mojito::Auth;
 use Mojito::Model::Config;
 use Data::Dumper::Concise;
 BEGIN {
-    if (!$ENV{RELEASE_TESTING}) {
+    if (!$ENV{AUTHORZ_TESTING}) {
         require Test::More;
-        Test::More::plan(skip_all => 'these tests are for release testing');
+        Test::More::plan(skip_all => 'these tests are for author testing');
     }
 }
 

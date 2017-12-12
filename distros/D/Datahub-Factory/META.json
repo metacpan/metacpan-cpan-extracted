@@ -52,9 +52,14 @@
             "Catmandu::OAI" : "0",
             "Catmandu::Solr" : "0",
             "Catmandu::Store::Datahub" : "0",
+            "Config::Onion" : "0",
             "Config::Simple" : "0",
+            "DBI" : "0",
             "DateTime" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
             "HTTP::Request::StreamingUpload" : "0",
+            "JSON" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
@@ -68,7 +73,9 @@
             "Sub::Exporter" : "0",
             "Term::ANSIColor" : "0",
             "Try::Tiny" : "0",
+            "Try::Tiny::ByClass" : "0",
             "URI::URL" : "0",
+            "XML::LibXML" : "0",
             "namespace::clean" : "0",
             "perl" : "5.008005"
          }
@@ -98,11 +105,13 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.72",
+   "version" : "1.73",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>",
+      "Tine Robbe <tine.robbe@vlaamsekunstcollectie.be>",
       "Yogendra Sharma <eh.yogendra@gmail.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"

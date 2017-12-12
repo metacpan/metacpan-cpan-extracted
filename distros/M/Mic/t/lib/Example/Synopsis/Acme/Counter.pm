@@ -9,7 +9,7 @@ use Mic::Implementation
 sub next {
     my ($self) = @_;
 
-    $self->{$COUNT}++;
+    $self->[COUNT]++;
 }
 
 1;

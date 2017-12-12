@@ -7,14 +7,14 @@ WriteMakefile(
   PREREQ_PM         => {
     'Test::More'         =>  0,
     'Set::IntSpan'       =>  0,
-    'Heap::Simple'       =>  0,
-    'Heap::Simple::XS'   =>  0,
+    'Heap::MinMax'       =>  0,
     'List::Util'         =>  0,
     'List::MoreUtils'    =>  0,
   },
   ABSTRACT_FROM     => 'lib/Set/IntSpan/Partition.pm',
   AUTHOR            => 'Bjoern Hoehrmann <bjoern@hoehrmann.de>',
   LICENSE           => 'perl',
+  MIN_PERL_VERSION  => 5.008000,
 
   'dist'            => {
     PREOP     => 'chmod 600 Makefile.PL',

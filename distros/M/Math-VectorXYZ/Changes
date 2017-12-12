@@ -1,0 +1,8 @@
+Revision history for Math-VectorXYZ
+
+1.01    04-DEC-2017
+        Minor change to run on perl < v5.10
+
+1.00    01-DEC-2017
+        Initial release
+

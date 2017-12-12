@@ -27,9 +27,273 @@ use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
 
+{
+  # n=8 line graphs with pseudosimilar vertices
+  # subgraphs
+  #
+  #   9-->
+  #       12 --> 17
+  #  10-->
+  #
+  #  9 https://hog.grinvin.org/ViewGraphInfo.action?id=30306
+  # 10 https://hog.grinvin.org/ViewGraphInfo.action?id=30339
+  # 12 https://hog.grinvin.org/ViewGraphInfo.action?id=30337
+  # 17 https://hog.grinvin.org/ViewGraphInfo.action?id=30335
+
+  my @graphs = map { MyGraphs::Graph_from_graph6_str($_) }
+    'GCQREO',  # edges= 9
+    'GCQbUG',  #       10    
+    'GCpddW',  #       12
+    'GEhtr{',  #       17
+    ;
+  foreach my $graph (@graphs) {
+    my $num_vertices = $graph->vertices;
+    my $num_edges = $graph->edges;
+
+    my $canon_g6 = MyGraphs::graph6_str_to_canonical
+      (MyGraphs::Graph_to_graph6_str($graph));
+    my $hog = MyGraphs::hog_grep($canon_g6)?"HOG":"not";
+
+    print "$num_vertices vertices, $num_edges edges  $hog\n";
+    foreach my $g2 (@graphs) {
+      next if $graph eq $g2;
+      my $map = MyGraphs::Graph_is_subgraph($graph, $g2);
+      if ($map) {
+        my $num_edges2 = $g2->edges;
+        print "  subgraph $num_edges2 -- $map\n";
+      }
+    }
+    # MyGraphs::Graph_view($graph);
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # n=8 line graphs with pseudosimilar vertices
+  # GCQbUG
+  #   linegraph 1
+  # GCQREO
+  #   linegraph 1
+  # GCpddW
+  #   linegraph 1
+  # GEhtr{
+  #   linegraph 1
+
+  foreach my $g6_str ('GCQbUG',
+                      'GCQREO',
+                      'GCpddW',
+                      'GEhtr{') {
+    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
+  }
+  exit 0;
+}
+{
+  # n=8 graphs with pseudosimilar vertices, num edges
+  my @graphs = ('G?`ebS',
+                'G?q`to',
+                'G?qcyw',
+                'G?otRK',
+                'GCOedK',
+                'GCQeVK',
+                'GCQbUG',
+                'GCQeNO',
+                'GCQevK',
+                'GCQREO',
+                'GCRcro',
+                'GCRcz{',
+                'GCRVFK',
+                'GCpddW',
+                'GCpbdg',
+                'GCpdmg',
+                'GCpdnS',
+                'GCrbUk',
+                'GCrfVk',
+                'GCrVNW',
+                'GCrJ`s',
+                'GCZffo',
+                'GCZetw',
+                'GCZej{',
+                'GCZbmw',
+                'GCZVFo',
+                'GCZVVG',
+                'GCZJeo',
+                'GCZJfG',
+                'GCZLno',
+                'GCXmeo',
+                'GCdebW',
+                'GCze~w',
+                'GCxvfo',
+                'GCvfR{',
+                'GEjev[',
+                'GEjbvg',
+                'GEjdno',
+                'GEhvC{',
+                'GEhtr{',
+                'GEhrvW',
+                'GEh}t{',
+                'GEzfvw',
+                'GEnffw',
+               );
+  @graphs = map { MyGraphs::Graph_from_graph6_str($_) } @graphs;
+  @graphs = sort {scalar($a->edges) <=> scalar($b->edges)} @graphs;
+  foreach my $graph (@graphs) {
+    my $num_vertices = $graph->vertices;
+    my $num_edges = $graph->edges;
+
+    my $canon_g6 = MyGraphs::graph6_str_to_canonical
+      (MyGraphs::Graph_to_graph6_str($graph));
+    my $hog = MyGraphs::hog_grep($canon_g6)?"HOG":"not";
+
+    print "$num_vertices vertices, $num_edges edges  $hog\n";
+  }
+  exit 0;
+}
+
+
+{
+  # genrang tree distribution
+  require IPC::Run;
+  my $h = IPC::Run::start
+    (['sh','-c','nauty-genrang -t 6 1000000 | nauty-labelg'],
+     '>pipe',\*OUT);
+  my %hash;
+  while (defined (my $str = <OUT>)) {
+    $hash{$str}++;
+  }
+  foreach my $str (sort {$hash{$a} <=> $hash{$b}} keys %hash) {
+    my $count = $hash{$str};
+    my $graph = MyGraphs::Graph_from_graph6_str($str);
+    my $diameter = $graph->diameter;
+    print "$count diam=$diameter  $str";
+  }
+  # ### %hash
+  print "distinct ",scalar(keys %hash),"\n";
+  exit 0;
+}
+{
+  # regular not maximum median
+  # GCZJd_
+  # GCXmd_
+
+  foreach my $g6_str ('GCZJd_',  # n=8
+                      'GCXmd_',
+                      'HCOethk',   # n=9 irregular but median full
+                     ) {
+    # MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
+    my $can = MyGraphs::graph6_str_to_canonical($g6_str);
+    print MyGraphs::hog_grep($can)?"HOG":"not", "\n";
+  }
+  exit 0;
+}
+{
+  # n=8 graphs with pseudosimilar vertices, structure of subtree relations
+  my @graphs = ('G?`ebS',
+                'G?q`to',
+                'G?qcyw',
+                'G?otRK',
+                'GCOedK',
+                'GCQeVK',
+                'GCQbUG',
+                'GCQeNO',
+                'GCQevK',
+                'GCQREO',
+                'GCRcro',
+                'GCRcz{',
+                'GCRVFK',
+                'GCpddW',
+                'GCpbdg',
+                'GCpdmg',
+                'GCpdnS',
+                'GCrbUk',
+                'GCrfVk',
+                'GCrVNW',
+                'GCrJ`s',
+                'GCZffo',
+                'GCZetw',
+                'GCZej{',
+                'GCZbmw',
+                'GCZVFo',
+                'GCZVVG',
+                'GCZJeo',
+                'GCZJfG',
+                'GCZLno',
+                'GCXmeo',
+                'GCdebW',
+                'GCze~w',
+                'GCxvfo',
+                'GCvfR{',
+                'GEjev[',
+                'GEjbvg',
+                'GEjdno',
+                'GEhvC{',
+                'GEhtr{',
+                'GEhrvW',
+                'GEh}t{',
+                'GEzfvw',
+                'GEnffw',
+               );
+  @graphs = map { MyGraphs::Graph_from_graph6_str($_) } @graphs;
+  @graphs = sort {scalar($a->edges) <=> scalar($b->edges)} @graphs;
+  my $graph = Graph->new;
+  $graph->set_graph_attribute (flow => 'south');
+
+  my $a = ord('a');
+  my @copy;
+  my @names = map {
+    my $num_edges = $_->edges;
+    my $c = $a + $copy[$num_edges]++;
+    # $num_edges . chr($c)
+    $c *= 3;
+    "$c,$num_edges"
+  } @graphs;
+  $graph->set_graph_attribute (vertex_name_type_xy => 1);
+
+  foreach my $d (1 .. 15) {
+    my $count = 0;
+    print "d=$d\n";
+    foreach my $i (0 .. $#graphs) {
+      my $i_num_edges = $graphs[$i]->edges;
+      # print "i=$i  $i_num_edges\n";
+      foreach my $j ($i+1 .. $#graphs) {
+        my $j_num_edges = $graphs[$j]->edges;
+        my $got_d = $j_num_edges - $i_num_edges;
+        ### $got_d
+        next if $got_d != $d;
+
+        if ($d >= 2) {
+          my $path_length = $graph->path_length($names[$i],$names[$j]);
+          ### $path_length
+          next if defined $path_length;
+        }
+        next unless MyGraphs::Graph_is_subgraph($graphs[$j], $graphs[$i]);
+        $graph->add_edge($names[$j],$names[$i]);
+        $count++;
+      }
+    }
+    print "  count $count\n";
+  }
+  MyGraphs::Graph_view($graph);
+  MyGraphs::Graph_print_tikz($graph);
+  exit 0;
+}
+
+{
+  require Graph;
+  my @graphs;
+  for (my $n=4; $n <= 20; $n+=2) {
+    my $graph = Graph->new (undirected=>1);
+    foreach my $v (2 .. $n-1) {
+      $graph->add_edge(1,$v);
+    }
+    $graph->add_edge(2,$n);
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # identity graphs, asymmetric
   MyGraphs::hog_searches_html
@@ -60,21 +324,7 @@ $|=1;
       );
   exit 0;
 }
-{
-  # regular not maximum median
-  # GCZJd_
-  # GCXmd_
 
-  foreach my $g6_str ('GCZJd_',  # n=8
-                      'GCXmd_',
-                      'HCOethk',   # n=9
-                     ) {
-    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
-    my $can = MyGraphs::graph6_str_to_canonical($g6_str);
-    print MyGraphs::hog_grep($can)?"HOG":"not", "\n";
-  }
-  exit 0;
-}
 {
   my $want = "GEhtr{\n";
   $want = MyGraphs::graph6_str_to_canonical($want);
@@ -100,24 +350,7 @@ $|=1;
   }
   exit 0;
 }
-{
-  # GCQbUG
-  #   linegraph 1
-  # GCQREO
-  #   linegraph 1
-  # GCpddW
-  #   linegraph 1
-  # GEhtr{
-  #   linegraph 1
 
-  foreach my $g6_str ('GCQbUG',
-                      'GCQREO',
-                      'GCpddW',
-                      'GEhtr{') {
-    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
-  }
-  exit 0;
-}
 {
   # Harary and Palmer two triangles
   #

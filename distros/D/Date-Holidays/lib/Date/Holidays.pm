@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -269,8 +269,15 @@ __END__
 # Date::Holidays
 
 [![CPAN version](https://badge.fury.io/pl/Date-Holidays.svg)](http://badge.fury.io/pl/Date-Holidays)
-[![Build Status](https://travis-ci.org/jonasbn/Date-Holidays.svg?branch=master)](https://travis-ci.org/jonasbn/Date-Holidays)
-[![Coverage Status](https://coveralls.io/repos/github/jonasbn/Date-Holidays/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/Date-Holidays?branch=master)
+[![Build Status](https://travis-ci.org/jonasbn/perl-date-holidays.svg?branch=master)](https://travis-ci.org/jonasbn/perl-date-holidays)
+![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
+[![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-date-holidays/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-date-holidays?branch=master)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-date-holidays)
+[![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
+
+<!-- MarkdownTOC autoanchor=false -->
+
+<!-- /MarkdownTOC -->
 
 =end markdown
 
@@ -280,7 +287,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-This POD describes version 1.06 of Date::Holidays
+The documentation describes version 1.07 of Date::Holidays
 
 =head1 FEATURES
 
@@ -719,49 +726,64 @@ implement the B<is_pt_holiday> method. The pattern used is an object adapter
 pattern and inheritance is therefor not used, it is my hope that I can
 make this work with some Perl magic.
 
-=head1 BUG REPORTING
+=head1 ISSUE REPORTING
 
-Please report issues via CPAN RT:
+Please report any bugs or feature requests using B<Github>.
 
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays
+=over
 
-or by sending mail to
+=item * L<Github Issues|https://github.com/jonasbn/perl-date-holidays/issues>
 
-  bug-Date-Holidays@rt.cpan.org
+=back
+
+You are also welcome to contact me with L<Gitter|https://gitter.im/perl-date-holidays>.
+
+=begin markdown
+
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-date-holidays)
+
+=end markdown
 
 =head1 TEST COVERAGE
 
-Test coverage in version 1.02
+Coverage reports are available via L<Coveralls.io|https://coveralls.io/github/jonasbn/perl-date-holidays?branch=master>
 
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    File                           stmt   bran   cond    sub    pod   time  total
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    lib/Date/Holidays.pm           95.9   77.5   60.0  100.0  100.0   87.0   90.9
-    lib/Date/Holidays/Adapter.pm   84.2   64.7   44.4  100.0  100.0   12.0   79.2
-    ...te/Holidays/Adapter/AU.pm   93.1   62.5    n/a  100.0  100.0    0.0   89.1
-    ...te/Holidays/Adapter/BR.pm   72.7   25.0    n/a   83.3  100.0    0.0   70.5
-    ...te/Holidays/Adapter/CN.pm   70.8   25.0    n/a   83.3  100.0    0.0   69.4
-    ...te/Holidays/Adapter/DE.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
-    ...te/Holidays/Adapter/DK.pm   91.6   50.0    n/a  100.0  100.0    0.0   88.8
-    ...te/Holidays/Adapter/ES.pm   72.7   25.0    n/a   83.3  100.0    0.0   70.5
-    ...te/Holidays/Adapter/FR.pm   90.9   50.0    n/a   85.7  100.0    0.0   87.8
-    ...te/Holidays/Adapter/GB.pm   92.3   50.0    n/a  100.0  100.0    0.0   89.4
-    ...te/Holidays/Adapter/JP.pm   73.5   37.5    n/a   77.7  100.0    0.0   69.8
-    ...te/Holidays/Adapter/KR.pm   86.3   50.0    n/a   85.7  100.0    0.0   84.8
-    ...Holidays/Adapter/LOCAL.pm   86.9   50.0   12.5  100.0  100.0    0.3   64.5
-    ...te/Holidays/Adapter/NO.pm   70.8   25.0    n/a   83.3  100.0    0.0   69.4
-    ...te/Holidays/Adapter/PL.pm   90.9   50.0    n/a   85.7  100.0    0.0   87.8
-    ...te/Holidays/Adapter/PT.pm   90.9   50.0    n/a  100.0  100.0    0.0   88.2
-    Total                          87.2   59.2   33.3   93.1  100.0  100.0   81.7
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+=begin markdown
+
+[![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-date-holidays/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-date-holidays?branch=master)
+
+=end markdown
+
+Without the actual holiday implementations installed/available coverage will be very low.
+
+Please see L<Task::Date::Holidays>, which is a distribution, which can help in installing
+all the wrapped (adapted and aggregated) distributions.
 
 =head1 SEE ALSO
 
 =over
 
+=item * L<Date::Holidays::AT>
+
 =item * L<Date::Holidays::AU>
 
 =item * L<Date::Holidays::Adapter::AU>
+
+=item * L<Date::Holidays::BR>
+
+=item * L<Date::Holidays::Adapter::BR>
+
+=item * L<Date::Holidays::BY>
+
+=item * L<Date::Holidays::Adapter::BY>
+
+=item * L<Date::Holidays::CA>
+
+=item * L<Date::Holidays::CA_ES>
+
+=item * L<Date::Holidays::CN>
+
+=item * L<Date::Holidays::Adapter::CN>
 
 =item * L<Date::Holidays::DE>
 
@@ -771,13 +793,21 @@ Test coverage in version 1.02
 
 =item * L<Date::Holidays::Adapter::DK>
 
-=item * L<Date::Holidays::CN>
+=item * L<Date::Holidays::ES>
 
-=item * L<Date::Holidays::Adapter::CN>
+=item * L<Date::Holidays::Adapter::ES>
 
 =item * L<Date::Holidays::FR>
 
 =item * L<Date::Holidays::Adapter::FR>
+
+=item * L<Date::Holidays::GB>
+
+=item * L<Date::Holidays::Adapter::GB>
+
+=item * L<Date::Holidays::KR>
+
+=item * L<Date::Holidays::Adapter::KR>
 
 =item * L<Date::Holidays::NO>
 
@@ -785,19 +815,25 @@ Test coverage in version 1.02
 
 =item * L<Date::Holidays::NZ>
 
-=item * L<Date::Holidays::Adapter::NZ>
+=item * L<Date::Holidays::PL>
+
+=item * L<Date::Holidays::Adapter::PL>
 
 =item * L<Date::Holidays::PT>
 
 =item * L<Date::Holidays::Adapter::PT>
 
+=item * L<Date::Holidays::RU>
+
+=item * L<Date::Holidays::Adapter::RU>
+
+=item * L<Date::Holidays::SK>
+
+=item * L<Date::Holidays::Adapter::SK>
+
 =item * L<Date::Holidays::UK>
 
-=item * L<Date::Holidays::Adapter::GB>
-
-=item * L<Date::Holidays::ES>
-
-=item * L<Date::Holidays::Adapter::ES>
+=item * L<Date::Holidays::USFederal>
 
 =item * L<Date::Japanese::Holiday>
 
@@ -809,17 +845,13 @@ Test coverage in version 1.02
 
 =item * L<Date::Holidays::Super>
 
-=item * L<Date::Holidays::AT>
-
-=item * L<Date::Holidays::CN>
-
-=item * L<Date::Holidays::RU>
-
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 =over
+
+=item * Vladimir Varlamov, PR introducing Date::Holidays::KZ resulting in 1.07
 
 =item * CHORNY (Alexandr Ciornii), Github issue #10, letting me know I included local/ by accident,
 resulting in release 1.05
@@ -865,6 +897,6 @@ Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 
-Image used on L<website|https://jonasbn.github.io/Date-Holidays/> is under copyright by L<Markus Spiske|https://unsplash.com/@markusspiske?photo=AF_4tBQjdtc>
+Image used on L<website|https://jonasbn.github.io/perl-date-holidays/> is under copyright by L<Markus Spiske|https://unsplash.com/@markusspiske?photo=AF_4tBQjdtc>
 
 =cut

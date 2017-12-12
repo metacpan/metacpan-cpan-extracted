@@ -23,22 +23,46 @@ depends on whether one of the event loops is loaded.
 
 =head2 Supported event loops
 
-Currently only L<HTTP::Tiny>,L<Mojolicious> and L<AnyEvent> are supported.
+Currently, the following backends are supported:
+
+=over 4
+
+=item *
+
+L<HTTP::Tiny>
+
+=item *
+
+L<HTTP::Tiny::Paranoid>
+
+=item *
+
+L<Mojolicious>
+
+=item *
+
+L<AnyEvent>
+
+=item *
+
+L<IO::Async>
+ 
+=back
+
 Support
-is planned for L<LWP::UserAgent> and L<IO::Async>
+is planned for L<LWP::UserAgent> and L<POE>
 but has not materialized yet.
 
 =cut
 
-use vars qw($implementation @loops $VERSION);
-$VERSION = '0.07';
+our $VERSION = '0.08';
 
-@loops = (
+our @loops = (
+    ['IO/Async.pm'    => 'Future::HTTP::NetAsync' ],
     ['Mojo/IOLoop.pm' => 'Future::HTTP::Mojo' ],
     ['AnyEvent.pm'    => 'Future::HTTP::AnyEvent'],
     ['AE.pm'          => 'Future::HTTP::AnyEvent'],
     # POE support would be nice
-    # IO::Async support would be nice, using Net::Async::HTTP
     # LWP::UserAgent support would be nice
 
     # A threaded backend would also be nice but likely brings in other
@@ -46,9 +70,12 @@ $VERSION = '0.07';
     # now, threads.pm and HTTP::Tiny...
     ['threads.pm' => 'Future::HTTP::Tiny::threaded' ],
     
+    ['HTTP/Tiny/Paranoid.pm' => 'Future::HTTP::Tiny::Paranoid'],
+
     # The fallback, will always catch due to loading Future::HTTP
     ['Future/HTTP.pm' => 'Future::HTTP::Tiny'],
 );
+our $implementation;
 
 =head1 METHODS
 
@@ -179,7 +206,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2017 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

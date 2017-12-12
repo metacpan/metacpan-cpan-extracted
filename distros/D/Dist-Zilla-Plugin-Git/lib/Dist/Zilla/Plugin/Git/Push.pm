@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Push;
 # ABSTRACT: Push current branch
 
-our $VERSION = '2.042';
+our $VERSION = '2.043';
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -53,6 +53,7 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         push_to => $self->push_to,
         remotes_must_exist => $self->remotes_must_exist ? 1 : 0,
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -106,6 +107,7 @@ sub after_release {
     }
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -120,7 +122,7 @@ Dist::Zilla::Plugin::Git::Push - Push current branch
 
 =head1 VERSION
 
-version 2.042
+version 2.043
 
 =head1 SYNOPSIS
 

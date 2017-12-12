@@ -1,10 +1,10 @@
 {
-   "abstract" : "redis support for IO::Async",
+   "abstract" : "Redis support for IO::Async",
    "author" : [
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "perl" : "5.010001"
+            "perl" : "5.014000"
          }
       },
       "configure" : {
@@ -29,7 +29,6 @@
             "Test::Mojibake" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "Test::Synopsis" : "0",
             "Test::Version" : "1"
          }
       },
@@ -37,11 +36,11 @@
          "requires" : {
             "Future" : "0.30",
             "IO::Async" : "0",
-            "JSON::MaybeXS" : "0",
             "List::Util" : "1.29",
-            "Mixin::Event::Dispatch" : "2.000",
-            "Protocol::Redis" : "0",
+            "Log::Any" : "1.050",
+            "Ryu::Async" : "0.006",
             "curry" : "0",
+            "namespace::clean" : "0",
             "parent" : "0"
          }
       },
@@ -55,6 +54,8 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
+            "Test::Deep" : "0",
+            "Test::HexString" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -62,16 +63,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-net-async-redis at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Redis"
+         "web" : "https://github.com/team-at-cpan/Net-Async-Redis/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Net-Async-Redis/",
+      "homepage" : "http://search.cpan.org/perldoc?Net-Async-Redis",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/team-at-cpan/Net-Async-Redis.git",
+         "url" : "git://github.com/team-at-cpan/Net-Async-Redis.git",
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "0.003"
+   "version" : "1.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

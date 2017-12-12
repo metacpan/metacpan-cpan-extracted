@@ -1,0 +1,114 @@
+cpanm (App::cpanminus) 1.7043 on perl 5.026000 built for x86_64-linux
+Work directory is /home/username/.cpanm/work/1512140342.7244
+You have make /usr/bin/make
+You have LWP 6.26
+You have /bin/tar: tar (GNU tar) 1.28
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+You have /usr/bin/unzip
+--> Working on /home/username/minicpan/authors/id/J/JK/JKEENAN/Data-Presenter-1.03.tar.gz
+Fetching file:///home/username/minicpan/authors/id/J/JK/JKEENAN/Data-Presenter-1.03.tar.gz
+-> OK
+Unpacking Data-Presenter-1.03.tar.gz
+Entering Data-Presenter-1.03
+Checking configure dependencies from META.yml
+Configuring Data-Presenter-1.03
+Running Makefile.PL
+Warning: prerequisite IO::Capture::Extended 0.09 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Data::Presenter
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have List::Compare 0.15 ... Yes (0.53)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.24)
+Checking if you have Tie::File 0 ... Yes (1.02)
+Checking if you have IO::Capture::Extended 0.09 ... No
+Checking if you have IO::Capture 0.05 ... Yes (0.05)
+==> Found dependencies: IO::Capture::Extended
+Searching IO::Capture::Extended (0.09) on cpanmetadb ...
+--> Working on IO::Capture::Extended
+Fetching http://www.cpan.org/authors/id/J/JK/JKEENAN/IO-Capture-Extended-0.13.tar.gz
+-> OK
+Unpacking IO-Capture-Extended-0.13.tar.gz
+Entering IO-Capture-Extended-0.13
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.24)
+Configuring IO-Capture-Extended-0.13
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for IO::Capture::Extended
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.24)
+Checking if you have Test::Simple 0.44 ... Yes (1.302111)
+Checking if you have IO::Capture 0.05 ... Yes (0.05)
+Building and testing IO-Capture-Extended-0.13
+cp lib/IO/Capture/Extended/Overview.pm blib/lib/IO/Capture/Extended/Overview.pm
+cp lib/IO/Capture/Extended.pm blib/lib/IO/Capture/Extended.pm
+cp lib/IO/Capture/Stdout/Extended.pm blib/lib/IO/Capture/Stdout/Extended.pm
+cp lib/IO/Capture/Stderr/Extended.pm blib/lib/IO/Capture/Stderr/Extended.pm
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/home/username/perl5/perlbrew/perls/perl-5.26.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01.t .. ok
+t/02.t .. ok
+All tests successful.
+Files=2, Tests=70,  1 wallclock secs ( 0.02 usr  0.00 sys +  0.09 cusr  0.00 csys =  0.11 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/IO/Capture/Extended.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/IO/Capture/Stderr/Extended.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/IO/Capture/Stdout/Extended.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/IO/Capture/Extended/Overview.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/IO::Capture::Stdout::Extended.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/IO::Capture::Extended::Overview.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/IO::Capture::Extended.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/IO::Capture::Stderr::Extended.3
+Appending installation info to /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/5.26.0/x86_64-linux/perllocal.pod
+-> OK
+Successfully installed IO-Capture-Extended-0.13
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/x86_64-linux/.meta/IO-Capture-Extended-0.13/install.json
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/x86_64-linux/.meta/IO-Capture-Extended-0.13/MYMETA.json
+Building and testing Data-Presenter-1.03
+cp lib/Data/Presenter/Combo/Intersect.pm blib/lib/Data/Presenter/Combo/Intersect.pm
+cp lib/Data/Presenter/Combo/Union.pm blib/lib/Data/Presenter/Combo/Union.pm
+cp lib/Data/Presenter/Combo.pm blib/lib/Data/Presenter/Combo.pm
+cp lib/Data/Presenter.pm blib/lib/Data/Presenter.pm
+Manifying 4 pod documents
+PERL_DL_NONLAZY=1 "/home/username/perl5/perlbrew/perls/perl-5.26.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01.t ....................... ok
+t/02.t ....................... ok
+t/03.t ....................... ok
+t/04.t ....................... ok
+t/05.t ....................... ok
+t/06_fails.t ................. ok
+t/07_sort_order.t ............ ok
+t/08_sort_order_alt_order.t .. ok
+t/09_null.t .................. ok
+t/10_select.t ................ ok
+t/11_select_alpha.t .......... ok
+All tests successful.
+Files=11, Tests=1541,  1 wallclock secs ( 0.13 usr  0.01 sys +  0.96 cusr  0.06 csys =  1.16 CPU)
+Result: PASS
+Manifying 4 pod documents
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Data/Presenter.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Data/Presenter/Combo.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Data/Presenter/Combo/Union.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Data/Presenter/Combo/Intersect.pm
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/Data::Presenter::Combo.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/Data::Presenter.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/Data::Presenter::Combo::Intersect.3
+Installing /home/username/perl5/perlbrew/perls/perl-5.26.0/man/man3/Data::Presenter::Combo::Union.3
+Appending installation info to /home/username/perl5/perlbrew/perls/perl-5.26.0/lib/5.26.0/x86_64-linux/perllocal.pod
+-> OK
+Successfully installed Data-Presenter-1.03
+2 distributions installed

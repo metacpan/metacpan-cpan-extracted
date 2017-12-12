@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -287,7 +287,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

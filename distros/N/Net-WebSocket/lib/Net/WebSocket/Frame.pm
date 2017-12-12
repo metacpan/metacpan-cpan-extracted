@@ -14,7 +14,7 @@ Net::WebSocket::Frame
         fin => 0,                   #to start a fragmented message
         rsv => 0b11,                #RSV2 and RSV3 are on
         mask => "\x01\x02\x03\x04   #clients MUST include; servers MUST NOT
-        payload_sr => \'Woot!',
+        payload => \'Woot!',
     );
 
     $frame->get_fin();
@@ -84,13 +84,51 @@ use constant {
     _RSV3 => chr(1 << 4),
 };
 
-#fin, rsv, mask, payload_sr
+#fin, rsv, mask, payload
 #rsv is a bitmask of the three values, with RSV1 as MOST significant bit.
 #So, represent RSV1 and RSV2 being on via 0b110 (= 4 + 2 = 6)
 sub new {
-    my ($class, %opts) = @_;
+    my $class = shift;
 
-    my ( $fin, $rsv, $mask, $payload_sr ) = @opts{ qw( fin rsv mask payload_sr ) };
+    my ( $fin, $rsv, $mask, $payload_sr );
+
+    #We loop through like this so that we can get a nice
+    #syntax for “payload” without copying the string.
+    #This logic should be equivalent to a hash.
+    while (@_) {
+        my $key = shift;
+
+        #“payload_sr” (as a named argument) is legacy
+        if ($key eq 'payload' || $key eq 'payload_sr') {
+            if (!ref $_[0]) {
+                if (defined $_[0]) {
+                    $payload_sr = \shift;
+                }
+                else {
+                    shift;
+                    next;
+                }
+            }
+            elsif ('SCALAR' eq ref $_[0]) {
+                $payload_sr = shift;
+            }
+            else {
+                die Net::WebSocket::X->create('BadArg', $key => shift, 'Must be a scalar or SCALAR reference.');
+            }
+        }
+        elsif ($key eq 'fin') {
+            $fin = shift;
+        }
+        elsif ($key eq 'rsv') {
+            $rsv = shift;
+        }
+        elsif ($key eq 'mask') {
+            $mask = shift;
+        }
+        else {
+            warn sprintf("Unrecognized argument “%s” (%s)", $key, shift);
+        }
+    }
 
     my $type = $class->get_type();
 
@@ -127,22 +165,6 @@ sub new {
     substr( $first2, 1, 0, $byte2 );
 
     return bless [ \$first2, \$len_len, \$mask, $payload_sr ], $class;
-}
-
-sub set_payload_sr {
-    my ($self, $new_payload_sr) = @_;
-
-    my ($byte2, $len_len) = $self->_assemble_length($new_payload_sr);
-
-    if (length ${ $self->[2] }) {
-        $byte2 |= "\x80";
-        Net::WebSocket::Mask::apply($new_payload_sr, ${ $self->[2] });
-    }
-
-    substr( ${ $self->[0] }, 1, 1, $byte2 );
-    @{$self}[1, 3] = (\$len_len, $new_payload_sr);
-
-    return $self;
 }
 
 # All string refs: first2, length octets, mask octets, payload

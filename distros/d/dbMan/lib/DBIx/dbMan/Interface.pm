@@ -2,8 +2,9 @@ package DBIx::dbMan::Interface;
 
 use strict;
 use DBIx::dbMan::History;
+use Term::ANSIColor qw/colorstrip/;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 1;
 
@@ -21,12 +22,12 @@ sub init {
 	$obj->prompt($obj->register_prompt(99999999),'SQL:');
 	
 	$obj->{history} = new DBIx::dbMan::History 
-		-config => $obj->{-config};
+		-config => $obj->{-config}, -interface => $obj;
 }
 
 sub print {
 	my $obj = shift;
-	print $obj->{-lang}->str(@_);
+    print $obj->{ -lang }->str( @_ );
 }
 
 sub trace {
@@ -75,6 +76,7 @@ sub prompt {
 
 sub get_prompt {
 	my $obj = shift;
+    my %params = @_;
 
 	my $prompt = '';
 	for (sort { 
@@ -82,7 +84,10 @@ sub get_prompt {
 			? ($b <=> $a)
 			: ($obj->{prompt_priority_list}->[$a] <=> $obj->{prompt_priority_list}->[$b])
 		} 1..$obj->{prompt_num}) {
-		$prompt .= $obj->{prompt}->[$_].' ' if $obj->{prompt}->[$_];
+
+        next unless $obj->{ prompt }->[ $_ ];
+
+		$prompt .= $obj->{prompt}->[$_] . ' ';
 	}
 	return $prompt;
 }
@@ -258,4 +263,10 @@ sub infobox {
 	my $obj = shift;
 
 	$obj->print( @_ );
+}
+
+sub is_utf8 {
+    my $obj = shift;
+
+    return 0;       # we don't know
 }

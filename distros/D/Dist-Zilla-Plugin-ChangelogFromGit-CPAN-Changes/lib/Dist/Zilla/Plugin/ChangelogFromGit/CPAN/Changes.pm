@@ -1,5 +1,5 @@
-package Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes;
-$Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes::VERSION = '0.110';
+package Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes 0.173421;
+
 # ABSTRACT: Generate valid CPAN::Changes Changelogs from git
 
 use v5.10.1;
@@ -138,6 +138,20 @@ sub _build__last_release {
 sub gather_files {
     my $self = shift;
 
+    if (!$ENV{DZIL_RELEASING}) {
+        $self->log(
+            'We are not performing a release, so not wasting time updating changelog'
+        );
+
+        $self->add_file(
+            Dist::Zilla::File::InMemory->new({
+                    content => $self->_changes->serialize,
+                    name    => $self->file_name,
+                }));
+
+        return;
+    }
+
     $self->_get_tags;
     $self->_get_changes;
 
@@ -169,6 +183,7 @@ sub gather_files {
 sub after_build {
     my ($self, $args) = @_;
 
+    return unless $ENV{DZIL_RELEASING};
     return unless $self->copy_to_root;
 
     my $build_file = $args->{build_root}->child($self->file_name);
@@ -378,8 +393,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Ioan Rogers Alexandr Retout Shantanu Tim Tuomas Voss Bell Bhadoria Ciornii
-Doug Hare Jakob Jormola Lisa
+=for :stopwords Ioan Rogers
 
 =head1 NAME
 
@@ -387,7 +401,7 @@ Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes - Generate valid CPAN::Chan
 
 =head1 VERSION
 
-version 0.110
+version 0.173421
 
 =head1 SYNOPSIS
 
@@ -474,7 +488,7 @@ site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Changel
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes>
+The development version is on github at L<https://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes>
 and may be cloned from L<git://github.com/ioanrogers/Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes.git>
 
 =head1 AUTHOR
@@ -483,7 +497,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ioan Rogers.
+This software is copyright (c) 2017 by Ioan Rogers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

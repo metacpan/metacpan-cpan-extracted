@@ -4,11 +4,11 @@ use strict;
 use base 'DBIx::dbMan::Extension';
 use Data::ShowTable;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000053-000004"; }
+sub IDENTIFICATION { return "000001-000053-000005"; }
 
 sub preference { return 0; }
 
@@ -49,6 +49,9 @@ sub handle_action {
 			my $i = 0;
 			my $table = '';
 			open F,">/tmp/dbman.$$.showtable";
+            if ( $obj->{ -interface }->is_utf8 ) {
+                binmode F, ':utf8';
+            }
 			*OLD = *STDOUT;
 			*STDOUT = *F;
 			if ($obj->{-mempool}->get('output_format') eq 'sqlplus') {
@@ -82,9 +85,12 @@ sub handle_action {
 						return @{$action{result}->[$i++]};
 					}});
 			};
-			*STDOUT = *OLD;
 			close F;
+			*STDOUT = *OLD;
 			if (open F,"/tmp/dbman.$$.showtable") {
+                if ( $obj->{ -interface }->is_utf8 ) {
+                    binmode F, ':utf8';
+                }
 				$table = join '',<F>;
 				close F;
 			}

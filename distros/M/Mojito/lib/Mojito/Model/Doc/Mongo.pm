@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Model::Doc::Mongo;
-{
-  $Mojito::Model::Doc::Mongo::VERSION = '0.24';
-}
+$Mojito::Model::Doc::Mongo::VERSION = '0.25';
 use Moo;
 use MongoDB::OID;
 use Data::Dumper::Concise;

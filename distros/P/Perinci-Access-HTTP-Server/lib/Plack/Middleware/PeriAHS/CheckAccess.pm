@@ -1,6 +1,9 @@
 package Plack::Middleware::PeriAHS::CheckAccess;
 
-use 5.010;
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.620'; # VERSION
+
+use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
@@ -16,10 +19,8 @@ use Plack::Util::Accessor qw(
                                 deny_action
                         );
 use Plack::Util::PeriAHS qw(errpage);
-use SHARYANTO::Array::Util qw(match_array_or_regex);
+use String::Util::Match qw(match_array_or_regex);
 use URI::Split qw(uri_split);
-
-our $VERSION = '0.61'; # VERSION
 
 sub prepare_app {
     my $self = shift;
@@ -90,7 +91,7 @@ Plack::Middleware::PeriAHS::CheckAccess - Deny access based on some criteria
 
 =head1 VERSION
 
-This document describes version 0.61 of Plack::Middleware::PeriAHS::CheckAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-07-10.
+This document describes version 0.620 of Plack::Middleware::PeriAHS::CheckAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-12-09.
 
 =head1 DESCRIPTION
 
@@ -145,7 +146,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
 
 =head1 BUGS
 

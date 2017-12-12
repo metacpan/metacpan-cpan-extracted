@@ -405,7 +405,7 @@ EOF
 {
     like(
         exception { build_email(); },
-        qr/got 0 parameters but expected at least 1/,
+        qr/Got 0 parameters but expected at least 1/,
         'got error when passing no arguments to build_email'
     );
 }

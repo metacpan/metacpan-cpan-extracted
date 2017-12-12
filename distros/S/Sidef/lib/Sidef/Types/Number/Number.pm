@@ -76,7 +76,7 @@ package Sidef::Types::Number::Number {
             if (index($num, '/') != -1) {
                 my $r = Math::GMPq::Rmpq_init();
                 eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
-                if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
+                if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*(?:/\s*[-+]?[1-9]+[0-9]*\s*)?\z}) {
                     goto &nan;
                 }
                 Math::GMPq::Rmpq_canonicalize($r);
@@ -235,8 +235,7 @@ package Sidef::Types::Number::Number {
             $sign = '';
         }
 
-        my $i;
-        if (($i = index($str, 'e')) != -1) {
+        if ((my $i = index($str, 'e')) != -1) {
 
             my $exp = substr($str, $i + 1);
 
@@ -259,36 +258,34 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            my $numerator   = "$before$after";
-            my $denominator = "1";
+            my $numerator = "$sign$before$after";
 
-            if ($exp < 1) {
-                $denominator .= '0' x (CORE::abs($exp) + CORE::length($after));
-            }
-            else {
-                my $diff = ($exp - CORE::length($after));
-                if ($diff >= 0) {
-                    $numerator .= '0' x $diff;
-                }
-                else {
-                    my $s = "$before$after";
-                    substr($s, $exp + CORE::length($before), 0, '.');
-                    return __SUB__->("$sign$s");
-                }
+            if ($exp < 0) {
+                return ("$numerator/1" . ('0' x (CORE::abs($exp) + CORE::length($after))));
             }
 
-            "$sign$numerator/$denominator";
+            my $diff = ($exp - CORE::length($after));
+
+            if ($diff >= 0) {
+                return ($numerator . ('0' x $diff));
+            }
+
+            my $s = "$before$after";
+            substr($s, $exp + CORE::length($before), 0, '.');
+            return __SUB__->("$sign$s");
         }
-        elsif (($i = index($str, '.')) != -1) {
+
+        if ((my $i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
-            if (($after =~ tr/0//) == CORE::length($after)) {
+
+            if ($after == 0) {
                 return "$sign$before";
             }
-            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x CORE::length($after));
+
+            return ("$sign$before$after/1" . ('0' x CORE::length($after)));
         }
-        else {
-            "$sign$str";
-        }
+
+        return "$sign$str";
     }
 
     #
@@ -784,82 +781,22 @@ package Sidef::Types::Number::Number {
       Math_GMPq: {
 
             #~ return Math::GMPq::Rmpq_get_str($x, 10);
-            Math::GMPq::Rmpq_integer_p($x) && return Math::GMPq::Rmpq_get_str($x, 10);
+
+            Math::GMPq::Rmpq_integer_p($x)
+              && return Math::GMPq::Rmpq_get_str($x, 10);
 
             $PREC = CORE::int($PREC) if ref($PREC);
 
-            my $prec = $PREC >> 2;
-            my $sgn  = Math::GMPq::Rmpq_sgn($x);
+            state $z = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set_q($z, $x);
 
-            my $n = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($n, $x);
-            Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
+            my $size = Math::GMPz::Rmpz_sizeinbase($z, 10);
 
-            my $p = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_str($p, '1' . ('0' x CORE::abs($prec)), 10);
+            my $f = Math::MPFR::Rmpfr_init2(CORE::int(($size + $PREC / 4) * CORE::log(10) / CORE::log(2)) + 10);
+            Math::MPFR::Rmpfr_set_q($f, $x, $ROUND);
 
-            if ($prec < 0) {
-                Math::GMPq::Rmpq_div($n, $n, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_mul($n, $n, $p);
-            }
-
-            state $half = do {
-                my $q = Math::GMPq::Rmpq_init_nobless();
-                Math::GMPq::Rmpq_set_ui($q, 1, 2);
-                $q;
-            };
-
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPq::Rmpq_add($n, $n, $half);
-            Math::GMPz::Rmpz_set_q($z, $n);
-
-            # Too much rounding... Give up and return an MPFR stringified number.
-            !Math::GMPz::Rmpz_sgn($z) && $PREC >= 2 && do {
-                my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_q($mpfr, $x, $ROUND);
-                return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
-            };
-
-            if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-            }
-
-            Math::GMPq::Rmpq_set_z($n, $z);
-
-            if ($prec < 0) {
-                Math::GMPq::Rmpq_mul($n, $n, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_div($n, $n, $p);
-            }
-
-            my $num = Math::GMPz::Rmpz_init();
-            my $den = Math::GMPz::Rmpz_init();
-
-            Math::GMPq::Rmpq_numref($num, $n);
-            Math::GMPq::Rmpq_denref($den, $n);
-
-            my @r;
-            while (1) {
-                Math::GMPz::Rmpz_div($z, $num, $den);
-                push @r, Math::GMPz::Rmpz_get_str($z, 10);
-
-                Math::GMPz::Rmpz_mul($z, $z, $den);
-                Math::GMPz::Rmpz_sub($num, $num, $z);
-                last if !Math::GMPz::Rmpz_sgn($num);
-
-                my $s = -1;
-                while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
-                    Math::GMPz::Rmpz_mul_ui($num, $num, 10);
-                    ++$s;
-                }
-
-                push(@r, '0' x $s) if ($s > 0);
-            }
-
-            return (($sgn < 0 ? "-" : '') . shift(@r) . (('.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r));
+            local $PREC = 4 * $size + $PREC;
+            return __SUB__->($f);
         }
 
       Math_MPFR: {
@@ -879,7 +816,7 @@ package Sidef::Types::Number::Number {
                 $sgn = substr($mantissa, 0, 1, '');
             }
 
-            $mantissa =~ /[^0]/ or return '0';
+            $mantissa == 0 and return '0';
 
             if (CORE::abs($exponent) < CORE::length($mantissa)) {
 
@@ -4005,7 +3942,7 @@ package Sidef::Types::Number::Number {
             return (
                     Math::MPFR::Rmpfr_integer_p($x)
                       and (
-                           $y < 0
+                           ($y || return !Math::MPFR::Rmpfr_sgn($x)) < 0
                            ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                            : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                       ) == 0
@@ -4036,7 +3973,7 @@ package Sidef::Types::Number::Number {
             return (
                     Math::GMPq::Rmpq_integer_p($x)
                       and (
-                           $y < 0
+                           ($y || return !Math::GMPq::Rmpq_sgn($x)) < 0
                            ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                            : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                       ) == 0
@@ -4066,7 +4003,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Scalar: {
             return (
                     (
-                     $y < 0
+                     ($y || return !Math::GMPz::Rmpz_sgn($x)) < 0
                      ? Math::GMPz::Rmpz_cmp_si($x, $y)
                      : Math::GMPz::Rmpz_cmp_ui($x, $y)
                     ) == 0
@@ -4156,7 +4093,7 @@ package Sidef::Types::Number::Number {
             return (
                     !Math::MPFR::Rmpfr_integer_p($x)
                       or (
-                          $y < 0
+                          ($y || return !!Math::MPFR::Rmpfr_sgn($x)) < 0
                           ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                           : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                       ) != 0
@@ -4187,7 +4124,7 @@ package Sidef::Types::Number::Number {
             return (
                     !Math::GMPq::Rmpq_integer_p($x)
                       or (
-                          $y < 0
+                          ($y || return !!Math::GMPq::Rmpq_sgn($x)) < 0
                           ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                           : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                       ) != 0
@@ -4217,7 +4154,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Scalar: {
             return (
                     (
-                     $y < 0
+                     ($y || return !!Math::GMPz::Rmpz_sgn($x)) < 0
                      ? Math::GMPz::Rmpz_cmp_si($x, $y)
                      : Math::GMPz::Rmpz_cmp_ui($x, $y)
                     ) != 0
@@ -4314,7 +4251,7 @@ package Sidef::Types::Number::Number {
       Math_MPFR__Scalar: {
             Math::MPFR::Rmpfr_nan_p($x) && return undef;
             return (
-                    $y < 0
+                    ($y || return Math::MPFR::Rmpfr_sgn($x)) < 0
                     ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                     : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                    );
@@ -4343,7 +4280,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Scalar: {
             return (
-                    $y < 0
+                    ($y || return Math::GMPq::Rmpq_sgn($x)) < 0
                     ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                     : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                    );
@@ -4372,7 +4309,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPz__Scalar: {
             return (
-                    $y < 0
+                    ($y || return Math::GMPz::Rmpz_sgn($x)) < 0
                     ? Math::GMPz::Rmpz_cmp_si($x, $y)
                     : Math::GMPz::Rmpz_cmp_ui($x, $y)
                    );
@@ -5050,17 +4987,49 @@ package Sidef::Types::Number::Number {
     sub digits {
         my ($x, $y) = @_;
 
-        my $str = as_int($x, $y) // return undef;
-        my @digits = split(//, "$str");
-        shift(@digits) if $digits[0] eq '-';
+        $x = _any2mpz($$x) // return undef;
 
-        Sidef::Types::Array::Array->new(
-            map {
-                defined($y)
-                  ? Sidef::Types::String::String->new($_)
-                  : __PACKAGE__->_set_uint($_)
-              } @digits
-        );
+        if (defined($y)) {
+            _valid(\$y);
+
+            $y = _any2mpz($$y) // return undef;
+
+            # Not defined for y <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
+                return undef;
+            }
+        }
+        else {
+            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+            $y = $ten;
+        }
+
+        # Return faster when y <= 10
+        if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, Math::GMPz::Rmpz_get_ui($y)));
+            pop(@digits) if $digits[-1] eq '-';
+            return Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } @digits]);
+        }
+
+        my @digits;
+        my $t = Math::GMPz::Rmpz_init_set($x);
+
+        my $sgn = Math::GMPz::Rmpz_sgn($t);
+
+        if ($sgn == 0) {
+            return Sidef::Types::Array::Array->new([ZERO]);
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($t, $t);
+        }
+
+        while (Math::GMPz::Rmpz_sgn($t) > 0) {
+            my $m = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
+            push @digits, bless \$m;
+        }
+
+        Sidef::Types::Array::Array->new(\@digits);
     }
 
     sub digit {
@@ -5068,18 +5037,46 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        my $str = as_int($x, $z) // return undef;
-        my @digits = split(//, "$str");
-        shift(@digits) if $digits[0] eq '-';
+        $x = _any2mpz($$x) // return undef;
+        $y = _any2si($$y)  // return undef;
 
-        $y = _any2si($$y) // return undef;
-        exists($digits[$y])
-          ? (
-             defined($z)
-             ? Sidef::Types::String::String->new($digits[$y])
-             : __PACKAGE__->_set_uint($digits[$y])
-            )
-          : undef;
+        if (defined($z)) {
+            _valid(\$z);
+
+            $z = _any2mpz($$z) // return undef;
+
+            # Not defined for z <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
+                return undef;
+            }
+        }
+        else {
+            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+            $z = $ten;
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init_set($x);
+
+        my $sgn = Math::GMPz::Rmpz_sgn($u);
+
+        if ($sgn == 0) {
+            return ZERO;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($u, $u);
+        }
+
+        if ($y < 0) {
+            $y += __ilog__($u, $z) + 1;
+            return undef if ($y < 0);
+        }
+
+        Math::GMPz::Rmpz_pow_ui($t, $z, $y);
+        Math::GMPz::Rmpz_tdiv_q($u, $u, $t);
+        Math::GMPz::Rmpz_mod($u, $u, $z);
+
+        bless \$u;
     }
 
     sub length {
@@ -5946,19 +5943,6 @@ package Sidef::Types::Number::Number {
 
     *mobius = \&moebius;
 
-    # Currently, this method is very slow for wide ranges.
-    # It's included with the hope that it will become faster in the future.
-    sub prime_count {
-        my ($x, $y) = @_;
-        my $n = defined($y)
-          ? do {
-            _valid(\$y);
-            Math::Prime::Util::GMP::prime_count(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
-          }
-          : Math::Prime::Util::GMP::prime_count(2, _big2istr($x) // (goto &nan));
-        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
-    }
-
     sub square_free_count {
         my ($from, $to) = @_;
 
@@ -6037,9 +6021,13 @@ package Sidef::Types::Number::Number {
 
         state $mpfr = Math::MPFR::Rmpfr_init2_nobless(64);
 
+        my $prev = 0;
+
         # Find Li^-1(x) using binary search
         while ($first < $last) {
-            my $mid = $first + (($last - $first) >> 1);
+            my $mid = $first + CORE::int(($last - $first) / 2);
+
+            last if $prev == $mid;
 
             Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
             Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
@@ -6050,10 +6038,212 @@ package Sidef::Types::Number::Number {
             else {
                 $last = $mid;
             }
+
+            $prev = $mid;
         }
 
         return $first;
     }
+
+    sub _prime_count_checkpoint {
+        my ($n) = @_;
+
+#<<<
+        state $checkpoints = [
+            [1000000000000000, 29844570422669], [100000000000000, 3204941750802], [10000000000000, 346065536839],
+              [1000000000000,  37607912018],    [100000000000,    4118054813],    [50000000000,    2119654578],
+              [45000000000,    1916268743],     [40000000000,     1711955433],    [35000000000,    1506589876],
+              [30000000000,    1300005926],     [25000000000,     1091987405],    [22000000000,    966358351],
+              [21000000000,    924324489],      [20000000000,     882206716],     [19000000000,    840000027],
+              [18000000000,    797703398],      [17000000000,     755305935],     [16000000000,    712799821],
+              [15000000000,    670180516],      [14000000000,     627440336],     [13000000000,    584570200],
+              [12000000000,    541555851],      [11000000000,     498388617],     [10000000000,    455052511],
+              [9900000000,     450708777],      [9700000000,      442014876],     [9500000000,     433311792],
+              [9300000000,     424603409],      [9000000000,      411523195],     [8700000000,     398425675],
+              [8500000000,     389682427],      [8300000000,      380930729],     [8000000000,     367783654],
+              [7500000000,     345826612],      [7300000000,      337024801],     [7000000000,     323804352],
+              [6700000000,     310558733],      [6500000000,      301711468],     [6400000000,     297285198],
+              [6300000000,     292856421],      [6000000000,      279545368],     [5700000000,     266206294],
+              [5500000000,     257294520],      [5300000000,      248370960],     [5200000000,     243902342],
+              [5000000000,     234954223],      [4900000000,      230475545],     [4700000000,     221504167],
+              [4500000000,     212514323],      [4300000000,      203507248],     [4200000000,     198996103],
+              [4000000000,     189961812],      [3900000000,      185436625],     [3800000000,     180906194],
+              [3700000000,     176369517],      [3500000000,      167279333],     [3400000000,     162725196],
+              [3300000000,     158165829],      [3100000000,      149028641],     [3000000000,     144449537],
+              [2900000000,     139864011],      [2800000000,      135270258],     [2700000000,     130670192],
+              [2600000000,     126062167],      [2500000000,      121443371],     [2400000000,     116818447],
+              [2200000000,     107540122],      [2000000000,      98222287],      [1900000000,     93547928],
+              [1800000000,     88862422],       [1700000000,      84163019],      [1600000000,     79451833],
+              [1500000000,     74726528],       [1400000000,      69985473],      [1300000000,     65228333],
+              [1200000000,     60454705],       [1100000000,      55662470],      [1000000000,     50847534],
+              [950000000,      48431471],       [900000000,       46009215],      [850000000,      43581966],
+              [800000000,      41146179],       [750000000,       38703181],      [700000000,      36252931],
+              [650000000,      33793395],       [600000000,       31324703],      [550000000,      28845356],
+              [500000000,      26355867],       [450000000,       23853038],      [400000000,      21336326],
+              [370000000,      19818405],       [360000000,       19311288],      [350000000,      18803526],
+              [330000000,      17785475],       [300000000,       16252325],      [290000000,      15739663],
+              [270000000,      14711384],       [250000000,       13679318],      [230000000,      12642573],
+              [200000000,      11078937],       [190000000,       10555473],      [170000000,      9503083],
+              [160000000,      8974458],        [150000000,       8444396],       [140000000,      7912199],
+              [120000000,      6841648],        [100000000,       5761455],       [95000000,       5489749],
+              [90000000,       5216954],        [85000000,        4943731],       [80000000,       4669382],
+              [75000000,       4394304],        [70000000,        4118064],       [65000000,       3840554],
+              [60000000,       3562115],        [55000000,        3282200],       [50000000,       3001134],
+              [45000000,       2718160],        [40000000,        2433654],       [35000000,       2146775],
+              [30000000,       1857859],        [25000000,        1565927],       [20000000,       1270607],
+              [19000000,       1211050],        [18000000,        1151367],       [17000000,       1091314],
+              [16000000,       1031130],        [15000000,        970704],        [14000000,       910077],
+              [13000000,       849252],         [12000000,        788060],        [11000000,       726517],
+              [10000000,       664579],         [9000000,         602489],        [8000000,        539777],
+              [7000000,        476648],         [6000000,         412849],        [5000000,        348513],
+              [4000000,        283146],         [3500000,         250150],        [3000000,        216816],
+              [2500000,        183072],         [2000000,         148933],        [1000000,        78498],
+              [500000,          41538],         [100000,            9592],        [50000,           5133],
+              [10000,            1229],         [5000,               669],        [1000,             168],
+        ];
+#>>>
+
+        state $end = $#{$checkpoints};
+
+        my $left  = 0;
+        my $right = $end;
+
+        my ($middle, $item, $cmp);
+
+        while (1) {
+            $middle = (($right + $left) >> 1);
+            $item   = $checkpoints->[$middle][0];
+            $cmp    = ($n <=> $item) || last;
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        my $point = $checkpoints->[$middle] // return (undef, undef);
+        return ($point->[0], $point->[1]);
+    }
+
+    sub _prime_count_range {
+        my ($x, $y) = @_;
+
+        if ($y <= $x) {
+            if ($x == $y and Math::Prime::Util::GMP::is_prime($x)) {
+                return 1;
+            }
+            return 0;
+        }
+
+        my $nth_prime_lower = sub {
+            my ($n) = @_;
+            CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+        };
+
+        my $count = 0;
+        my $step  = $nth_prime_lower->($y + CORE::log($y) * 2e3) - $nth_prime_lower->($y);
+
+        for (my $i = $x - 1 ; $i <= $y ; $i += $step) {
+
+            my $from = $i + 1;
+            my $to   = $i + $step;
+
+            $to = $y if $to > $y;
+
+            $count += () = Math::Prime::Util::GMP::sieve_primes($from, $to);
+        }
+
+        return $count;
+    }
+
+    sub prime_count {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            $x = _big2istr($x) // return ZERO;
+            $x = 2 if $x < 2;
+            $y = _big2uistr($y) // return ZERO;
+        }
+        else {
+            $y = _big2uistr($x) // return ZERO;
+            $x = 2;
+        }
+
+        return ZERO if ($y < $x);
+
+        # Support for arbitrary large integers (slow for wide ranges)
+        if ($y >= ULONG_MAX) {
+
+            my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
+
+            return (
+                    $prime_count < ULONG_MAX
+                    ? __PACKAGE__->_set_uint($prime_count)
+                    : __PACKAGE__->_set_str('int', $prime_count)
+                   );
+        }
+
+        my ($x_n, $x_pi);
+        my ($y_n, $y_pi);
+
+        if ($y >= 1e3) {
+
+            ($y_n, $y_pi) = _prime_count_checkpoint($y);
+
+            if ($x >= 1e3) {
+                ($x_n, $x_pi) = _prime_count_checkpoint($x);
+            }
+            else {
+                $x_n = $x;
+                ($x == 2) ? ($x_pi = 1) : ($x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x));
+            }
+        }
+
+        if (defined($x_n) and defined($y_n)) {
+
+            my $d_x = $x - $x_n;
+            my $d_y = $y - $y_n;
+
+            if (($d_x + $d_y) <= ($y - $x)) {
+
+#<<<
+                # Sieve the ranges [x_n, x] and [y_n, y]
+                my $x_count = _prime_count_range(Math::Prime::Util::GMP::next_prime($x_n), Math::Prime::Util::GMP::prev_prime($x + 1)) + $x_pi;
+                my $y_count = _prime_count_range(Math::Prime::Util::GMP::next_prime($y_n), Math::Prime::Util::GMP::prev_prime($y + 1)) + $y_pi;
+#>>>
+
+                my $prime_count = $y_count - $x_count;
+                ++$prime_count if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
+
+                return (
+                        $prime_count < ULONG_MAX
+                        ? __PACKAGE__->_set_uint($prime_count)
+                        : __PACKAGE__->_set_str('int', $prime_count)
+                       );
+            }
+        }
+
+#<<<
+        # Sieve the range [x, y]
+        my $prime_count = _prime_count_range(Math::Prime::Util::GMP::next_prime($x - 1), Math::Prime::Util::GMP::prev_prime($y + 1));
+#>>>
+
+        return (
+                $prime_count < ULONG_MAX
+                ? __PACKAGE__->_set_uint($prime_count)
+                : __PACKAGE__->_set_str('int', $prime_count)
+               );
+    }
+
+    *primepi = \&prime_count;
 
     sub nth_prime {
         my ($n) = @_;
@@ -6066,10 +6256,6 @@ package Sidef::Types::Number::Number {
 
         if ($n > 100_000) {
 
-            my $i          = 2;
-            my $count      = 0;
-            my $prev_count = 0;
-
             #my $approx    = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
             #my $up_approx = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
 
@@ -6081,185 +6267,24 @@ package Sidef::Types::Number::Number {
             my $approx    = CORE::int($li_inv_n + $li_inv_sn / 4);
             my $up_approx = CORE::int($li_inv_n + $li_inv_sn);       # conjecture
 
-            state $checkpoints = [[1000000000000, 37607912018],
-                                  [100000000000,  4118054813],
-                                  [50000000000,   2119654578],
-                                  [45000000000,   1916268743],
-                                  [40000000000,   1711955433],
-                                  [35000000000,   1506589876],
-                                  [30000000000,   1300005926],
-                                  [25000000000,   1091987405],
-                                  [22000000000,   966358351],
-                                  [21000000000,   924324489],
-                                  [20000000000,   882206716],
-                                  [19000000000,   840000027],
-                                  [18000000000,   797703398],
-                                  [17000000000,   755305935],
-                                  [16000000000,   712799821],
-                                  [15000000000,   670180516],
-                                  [14000000000,   627440336],
-                                  [13000000000,   584570200],
-                                  [12000000000,   541555851],
-                                  [11000000000,   498388617],
-                                  [10000000000,   455052511],
-                                  [9900000000,    450708777],
-                                  [9700000000,    442014876],
-                                  [9500000000,    433311792],
-                                  [9300000000,    424603409],
-                                  [9000000000,    411523195],
-                                  [8700000000,    398425675],
-                                  [8500000000,    389682427],
-                                  [8300000000,    380930729],
-                                  [8000000000,    367783654],
-                                  [7500000000,    345826612],
-                                  [7300000000,    337024801],
-                                  [7000000000,    323804352],
-                                  [6700000000,    310558733],
-                                  [6500000000,    301711468],
-                                  [6400000000,    297285198],
-                                  [6300000000,    292856421],
-                                  [6000000000,    279545368],
-                                  [5700000000,    266206294],
-                                  [5500000000,    257294520],
-                                  [5300000000,    248370960],
-                                  [5200000000,    243902342],
-                                  [5000000000,    234954223],
-                                  [4900000000,    230475545],
-                                  [4700000000,    221504167],
-                                  [4500000000,    212514323],
-                                  [4300000000,    203507248],
-                                  [4200000000,    198996103],
-                                  [4000000000,    189961812],
-                                  [3900000000,    185436625],
-                                  [3800000000,    180906194],
-                                  [3700000000,    176369517],
-                                  [3500000000,    167279333],
-                                  [3400000000,    162725196],
-                                  [3300000000,    158165829],
-                                  [3100000000,    149028641],
-                                  [3000000000,    144449537],
-                                  [2900000000,    139864011],
-                                  [2800000000,    135270258],
-                                  [2700000000,    130670192],
-                                  [2600000000,    126062167],
-                                  [2500000000,    121443371],
-                                  [2400000000,    116818447],
-                                  [2200000000,    107540122],
-                                  [2000000000,    98222287],
-                                  [1900000000,    93547928],
-                                  [1800000000,    88862422],
-                                  [1700000000,    84163019],
-                                  [1600000000,    79451833],
-                                  [1500000000,    74726528],
-                                  [1400000000,    69985473],
-                                  [1300000000,    65228333],
-                                  [1200000000,    60454705],
-                                  [1100000000,    55662470],
-                                  [1000000000,    50847534],
-                                  [950000000,     48431471],
-                                  [900000000,     46009215],
-                                  [850000000,     43581966],
-                                  [800000000,     41146179],
-                                  [750000000,     38703181],
-                                  [700000000,     36252931],
-                                  [650000000,     33793395],
-                                  [600000000,     31324703],
-                                  [550000000,     28845356],
-                                  [500000000,     26355867],
-                                  [450000000,     23853038],
-                                  [400000000,     21336326],
-                                  [370000000,     19818405],
-                                  [360000000,     19311288],
-                                  [350000000,     18803526],
-                                  [330000000,     17785475],
-                                  [300000000,     16252325],
-                                  [290000000,     15739663],
-                                  [270000000,     14711384],
-                                  [250000000,     13679318],
-                                  [230000000,     12642573],
-                                  [200000000,     11078937],
-                                  [190000000,     10555473],
-                                  [170000000,     9503083],
-                                  [160000000,     8974458],
-                                  [150000000,     8444396],
-                                  [140000000,     7912199],
-                                  [120000000,     6841648],
-                                  [100000000,     5761455],
-                                  [95000000,      5489749],
-                                  [90000000,      5216954],
-                                  [85000000,      4943731],
-                                  [80000000,      4669382],
-                                  [75000000,      4394304],
-                                  [70000000,      4118064],
-                                  [65000000,      3840554],
-                                  [60000000,      3562115],
-                                  [55000000,      3282200],
-                                  [50000000,      3001134],
-                                  [45000000,      2718160],
-                                  [40000000,      2433654],
-                                  [35000000,      2146775],
-                                  [30000000,      1857859],
-                                  [25000000,      1565927],
-                                  [20000000,      1270607],
-                                  [19000000,      1211050],
-                                  [18000000,      1151367],
-                                  [17000000,      1091314],
-                                  [16000000,      1031130],
-                                  [15000000,      970704],
-                                  [14000000,      910077],
-                                  [13000000,      849252],
-                                  [12000000,      788060],
-                                  [11000000,      726517],
-                                  [10000000,      664579],
-                                  [9000000,       602489],
-                                  [8000000,       539777],
-                                  [7000000,       476648],
-                                  [6000000,       412849],
-                                  [5000000,       348513],
-                                  [4000000,       283146],
-                                  [3000000,       216816],
-                                  [2000000,       148933],
-                                  [1000000,       78498],
-                                 ];
+            my ($i, $count) = _prime_count_checkpoint($approx);
 
-            {
-                state $end = $#{$checkpoints};
+            my $nth_prime_lower = sub {
+                my ($n) = @_;
+                CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+            };
 
-                my $left  = 0;
-                my $right = $end;
+            my $step = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
 
-                my ($middle, $item, $cmp);
+            for (my $prev_count = $count ; ; $i += $step) {
 
-                while (1) {
-                    $middle = (($right + $left) >> 1);
-                    $item   = $checkpoints->[$middle][0];
-                    $cmp    = ($approx <=> $item) || last;
+                my $from = $i + 1;
+                my $to   = $i + $step;
 
-                    if ($cmp < 0) {
-                        $left = $middle + 1;
-                        if ($left > $right) {
-                            ++$middle;
-                            last;
-                        }
-                    }
-                    else {
-                        $right = $middle - 1;
-                        $left > $right && last;
-                    }
-                }
+                $to = $up_approx if ($to > $up_approx);
 
-                my $point = $checkpoints->[$middle];
+                my @primes = Math::Prime::Util::GMP::sieve_primes($from, $to);
 
-                $count      = $point->[1];
-                $i          = $point->[0];
-                $prev_count = $count;
-            }
-
-            my $count_approx = $up_approx - $i;
-            my $step = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
-
-            for (; ; $i += $step) {
-                my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
                 $count += @primes;
 
                 if ($count >= $n) {
@@ -6276,6 +6301,7 @@ package Sidef::Types::Number::Number {
         }
 
         state $table = [Math::Prime::Util::GMP::sieve_primes(2, 1_299_709)];    # primes up to prime(100_000)
+
         __PACKAGE__->_set_uint($table->[$n - 1]);
     }
 
@@ -7102,7 +7128,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
             Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
 
-            Math::MPFR::Rmpfr_sgn($u) || return $n;          # `u` is zero
+            Math::MPFR::Rmpfr_zero_p($u) && return $n;       # `u` is zero
             Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);       # t = t/u
             return $t;
         }
@@ -7568,38 +7594,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub times {
-        my ($num, $block) = @_;
+        my ($x, $block) = @_;
 
-        if (__is_inf__($$num)) {
-            for (my $i = 0 ; ; ++$i) {
-                $block->run(
-                            $i <= 8192
-                            ? __PACKAGE__->_set_uint($i)
-                            : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                           );
-            }
-            return $_[0];
+        $x = CORE::int(__numify__($$x));
+
+        for (my $i = 0 ; $i < $x ; ++$i) {
+            $block->run(
+                        $i <= 8192
+                        ? __PACKAGE__->_set_uint($i)
+                        : bless \Math::GMPz::Rmpz_init_set_ui($i)
+                       );
         }
 
-        $num = _any2mpz($$num) // return undef;
-
-        if (defined(my $ui = _any2ui($num))) {
-            for (my $i = 0 ; $i < $ui ; ++$i) {
-                $block->run(
-                            $i <= 8192
-                            ? __PACKAGE__->_set_uint($i)
-                            : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                           );
-            }
-            return $_[0];
-        }
-
-        for (my $i = Math::GMPz::Rmpz_init_set_ui(0) ; Math::GMPz::Rmpz_cmp($i, $num) < 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1))
-        {
-            $block->run(bless(\Math::GMPz::Rmpz_init_set($i)));
-        }
-
-        $_[0];
+        return $_[0];
     }
 
     foreach my $name (

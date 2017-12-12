@@ -7,6 +7,8 @@ package Circle::Commandable;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Carp;
 
 use Attribute::Storage 0.06 qw( get_subattr get_subattrs );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Sdoc::Line;
 use Prty::Sdoc::Node;
@@ -78,11 +78,6 @@ Die Klasse repräsentiert einen Sdoc-Parsingbaum.
     $tree = $class->new(\$str,@opt);
     $tree = $class->new(\@lines,@opt);
 
-=head4 Description
-
-Erzeuge einen Sdoc-Parsingbaum und liefere eine Referenz auf
-diesen zurück.
-
 =head4 Options
 
 =over 4
@@ -138,6 +133,11 @@ Stelle dem Titel "Tabelle N:" bzw. "Abbildung N:" voran.
 Der Text ist UTF-8 kodiert.
 
 =back
+
+=head4 Description
+
+Erzeuge einen Sdoc-Parsingbaum und liefere eine Referenz auf
+diesen zurück.
 
 =cut
 
@@ -617,7 +617,7 @@ sub dump {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

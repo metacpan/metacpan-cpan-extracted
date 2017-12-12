@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
+our $VERSION = 1.121;
 
 use Prty::Shell;
 use Prty::File::Image;
@@ -267,29 +267,6 @@ sub execute {
 
     $cmd = $class->resizeFill($input,$output,$size,$background);
 
-=head4 Description
-
-Generiere ein convert-Kommando, dass das Input-Bild auf Größe
-$size bringt.
-
-=over 2
-
-=item *
-
-Ist das Bild in mindestens einer Dimension größer als $size,
-wird es verkleinert.
-
-=item *
-
-Andernfalls wird das Bild in seiner Größe nicht verändert.
-
-=item *
-
-Vom Bild nicht abgedeckte Bereiche werden in Hintergrundfarbe
-$background dargestellt.
-
-=back
-
 =head4 Arguments
 
 =over 4
@@ -310,6 +287,29 @@ Größe des generierten Output-Bildes.
 
 Farbe des Hintergrunds, wenn das Bild den Bereich $size nicht
 vollständig ausfüllt.
+
+=back
+
+=head4 Description
+
+Generiere ein convert-Kommando, dass das Input-Bild auf Größe
+$size bringt.
+
+=over 2
+
+=item *
+
+Ist das Bild in mindestens einer Dimension größer als $size,
+wird es verkleinert.
+
+=item *
+
+Andernfalls wird das Bild in seiner Größe nicht verändert.
+
+=item *
+
+Vom Bild nicht abgedeckte Bereiche werden in Hintergrundfarbe
+$background dargestellt.
 
 =back
 
@@ -354,19 +354,6 @@ sub resizeFill {
 
     $cmd = $class->resizeStretch($input,$output,$size);
 
-=head4 Description
-
-Generiere ein convert-Kommando, dass das Input-Bild auf Größe
-$size bringt.
-
-=over 2
-
-=item *
-
-Weicht das Seitenverhltmis ab, wird das Bild verzerrt.
-
-=back
-
 =head4 Arguments
 
 =over 4
@@ -382,6 +369,19 @@ Bilddatei-Pfad des Output-Bildes. Das Verzeichnis wird erzeugt
 =item $size
 
 Größe des generierten Output-Bildes.
+
+=back
+
+=head4 Description
+
+Generiere ein convert-Kommando, dass das Input-Bild auf Größe
+$size bringt.
+
+=over 2
+
+=item *
+
+Weicht das Seitenverhltmis ab, wird das Bild verzerrt.
 
 =back
 
@@ -418,10 +418,6 @@ sub resizeStretch {
 
     $cmd = $class->negate($input,$output);
 
-=head4 Description
-
-Generiere ein convert-Kommando, dass das Input-Bild negiert.
-
 =head4 Arguments
 
 =over 4
@@ -435,6 +431,10 @@ Image-Objekt oder Bilddatei-Pfad des Input-Bildes.
 Bilddatei-Pfad des Output-Bildes. Das Verzeichnis wird erzeugt
 
 =back
+
+=head4 Description
+
+Generiere ein convert-Kommando, dass das Input-Bild negiert.
 
 =cut
 
@@ -469,12 +469,6 @@ sub negate {
 
     $cmd = $class->morph($input1,$input2,$outPattern,$morph);
 
-=head4 Description
-
-Generiere ein convert-Kommando, das Zwischenbilder für die
-Bilder $input1 und $input2 erzeugt und unter dem Pfad-Muster
-speichert.
-
 =head4 Arguments
 
 =over 4
@@ -492,6 +486,12 @@ Image-Objekt oder Bilddatei-Pfad des zweiten Input-Bildes.
 Pfad-Muster für die generierte Bildfolge.
 
 =back
+
+=head4 Description
+
+Generiere ein convert-Kommando, das Zwischenbilder für die
+Bilder $input1 und $input2 erzeugt und unter dem Pfad-Muster
+speichert.
 
 =cut
 
@@ -527,7 +527,7 @@ sub morph {
 
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

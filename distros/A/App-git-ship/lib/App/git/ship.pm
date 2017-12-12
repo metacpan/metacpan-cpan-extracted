@@ -12,7 +12,7 @@ use IPC::Run3  ();
 
 use constant DEBUG => $ENV{GIT_SHIP_DEBUG} || 0;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 my %DATA;
 
@@ -55,7 +55,7 @@ __PACKAGE__->attr(
     my $self = shift;
     my $repository;
 
-    open my $REPOSITORIES, '-|', q( git remote -v ) or $self->abort("git remote -v: $!");
+    open my $REPOSITORIES, '-|', qw(git remote -v) or $self->abort("git remote -v: $!");
 
     while (<$REPOSITORIES>) {
       next unless /^origin\s+(\S+).*push/;
@@ -162,7 +162,7 @@ sub render {
 
   local @_ = ($self, $args);
   $str =~ s!<%=(.+?)%>!{
-            my $x = eval $1 // die DEBUG ? "($1) => $@" : $@;
+            my $x = eval $1 // die "($1) => $@";
             ref $x ? Data::Dumper->new([$x])->Indent(1)->Terse(1)->Sortkeys(1)->Dump : $x;
           }!sge;
 
@@ -298,7 +298,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.24
+0.25
 
 =head1 DESCRIPTION
 
@@ -362,7 +362,7 @@ Will be updated with the main module documentation using the command below:
   $ perldoc -tT $main_module_path > README;
 
 If you don't like this format, you can create and write C<README.md> manually
-instead. The presense of that file will prevent "my-app/README" from getting
+instead. The presence of that file will prevent "my-app/README" from getting
 generated.
 
 Both C<README> and C<README.pod> are automatically created for you if you set

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw/Class::Accessor::Fast/;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use POE qw/
     Filter::Line
@@ -18,6 +18,8 @@ POE::Component::Server::JSONRPC - POE tcp or http based JSON-RPC server
 
     #http version:
     POE::Component::Server::JSONRPC::Http->new(
+        # consider using something like JSON::MaybeXS for better performance
+        json    => JSON::MaybeXS->new->utf8->allow_nonref,
         Port    => 3000,
         Handler => {
             'echo' => 'echo',
@@ -256,10 +258,11 @@ Should be defined in Http or Tcp
 
 sub poe_send { print "error poe_send\n"; }
 
+=encoding UTF-8
 =head1 AUTHOR
 
+Côme Chilliet <mcmic@cpan.org>
 Daisuke Murase <typester@cpan.org>
-Côme BERNIGAUD <come.bernigaud@laposte.net>
 
 =head1 COPYRIGHT
 

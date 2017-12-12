@@ -1,5 +1,14 @@
 Revision history for Perl extension APISchema
 
+1.34 2017-11-30T16:29:26Z
+  - Define prototype of type before calling it
+
+1.33 2017-11-30T14:39:09Z
+  - Resolve anyOf, allOf and oneOf keywords when serving Mock Server and API Document
+
+1.32 2017-11-30T06:08:51Z
+  - MockServer always returns bytes
+
 1.31 2017-11-29T02:30:47Z
   - MockServer support `response => {body => 'bmi', encoding => 'json'}` syntax
 

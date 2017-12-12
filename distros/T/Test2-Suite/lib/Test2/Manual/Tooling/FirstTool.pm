@@ -1,6 +1,6 @@
 package Test2::Manual::Tooling::FirstTool;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 1;
 
@@ -115,7 +115,7 @@ L<Test2::Manual> - Primary index of the manual.
 =head1 SOURCE
 
 The source code repository for Test2-Manual can be found at
-F<http://github.com/Test-More/Test2-Manual/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.36';
+$Map::Tube::CLI::VERSION   = '0.38';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.38
 
 =cut
 
@@ -96,6 +96,8 @@ sure you have the latest maps when you install.
 
 =over 4
 
+=item * L<Athens|Map::Tube::Athens>
+
 =item * L<Barcelona|Map::Tube::Barcelona>
 
 =item * L<Beijing|Map::Tube::Beijing>
@@ -129,6 +131,8 @@ sure you have the latest maps when you install.
 =item * L<Lyon|Map::Tube::Lyon>
 
 =item * L<Malaga|Map::Tube::Malaga>
+
+=item * L<Milan|Map::Tube::Milan>
 
 =item * L<Minsk|Map::Tube::Minsk>
 
@@ -313,6 +317,7 @@ sub _validate_param {
 sub _supported_maps {
 
     return {
+        'ATHENS'          => 'Map::Tube::Athens',
         'BARCELONA'       => 'Map::Tube::Barcelona',
         'BEIJING'         => 'Map::Tube::Beijing',
         'BERLIN'          => 'Map::Tube::Berlin',
@@ -330,6 +335,7 @@ sub _supported_maps {
         'LONDON'          => 'Map::Tube::London',
         'LYON'            => 'Map::Tube::Lyon',
         'MALAGA'          => 'Map::Tube::Malaga',
+        'MILAN'           => 'Map::Tube::Milan',
         'MINSK'           => 'Map::Tube::Minsk',
         'MOSCOW'          => 'Map::Tube::Moscow',
         'NYC'             => 'Map::Tube::NYC',

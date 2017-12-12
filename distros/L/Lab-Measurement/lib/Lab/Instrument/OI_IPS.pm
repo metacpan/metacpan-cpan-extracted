@@ -1,6 +1,6 @@
 package Lab::Instrument::OI_IPS;
 #ABSTRACT: Oxford Instruments IPS superconducting magnet power supply
-$Lab::Instrument::OI_IPS::VERSION = '3.600';
+$Lab::Instrument::OI_IPS::VERSION = '3.613';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::MagnetSupply;
@@ -369,7 +369,7 @@ Lab::Instrument::OI_IPS - Oxford Instruments IPS superconducting magnet power su
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 STATUS
 

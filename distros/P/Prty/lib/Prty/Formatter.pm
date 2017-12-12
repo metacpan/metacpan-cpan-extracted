@@ -4,9 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.120;
-
-use Prty::Formatter;
+our $VERSION = 1.121;
 
 # -----------------------------------------------------------------------------
 
@@ -112,50 +110,9 @@ sub readableNumber {
 
 # -----------------------------------------------------------------------------
 
-=head3 roundTo() - Runde Zahl auf n Nachkommastellen
-
-=head4 Synopsis
-
-    $y = $class->roundTo($x,$n);
-    $y = $class->roundTo($x,$n,$normalize);
-
-=head4 Description
-
-Runde $x auf $n Nachkommastellen und liefere das Resultat zurück.
-
-Ist $normalize "wahr", wird die Zahl nach der Rundung mit
-normalizeNumber() normalisiert.
-
-Bei $n > 0 rundet die Methode mittels
-
-    $y = sprintf '%.*f',$n,$x;
-
-bei $n == 0 mittels roundToInt().
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub roundTo {
-    my ($class,$x,$n,$normalize) = @_;
-
-    if ($n == 0) {
-        return $class->roundToInt($x);
-    }
-
-    $x = sprintf '%.*f',$n,$x;
-    if ($normalize) {
-        $x = Prty::Formatter->normalizeNumber($x);
-    }
-
-    return $x;
-}
-
-# -----------------------------------------------------------------------------
-
 =head1 VERSION
 
-1.120
+1.121
 
 =head1 AUTHOR
 

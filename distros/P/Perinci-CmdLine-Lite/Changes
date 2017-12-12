@@ -1,3 +1,9 @@
+1.810   2017-12-11 (PERLANCAR)
+
+        - [Experimental] Observe PERINCI_CMDLINE_OUTPUT_DIR to save program
+          output to a JSON file.
+
+
 1.80    2017-11-01 (PERLANCAR)
 
 	- [Bugfix] Wrap stream arguments as iterator.

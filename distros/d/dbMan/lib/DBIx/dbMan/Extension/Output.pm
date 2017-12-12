@@ -17,7 +17,7 @@ sub handle_action {
 	my ($obj,%action) = @_;
 
 	if ($action{action} eq 'OUTPUT') {
-		$obj->{-interface}->print($action{output});
+		$obj->{-interface}->print( $action{output} );
 		$action{action} = 'NONE';
 	}
 

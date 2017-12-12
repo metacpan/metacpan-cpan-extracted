@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -431,7 +431,8 @@ sub connect { # Connect to host
 	else {
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
-				 'errmode', 'connection_timeout', 'blocking', 'terminal_type', 'window_size', 'callback', 'forcebaud');
+				 'errmode', 'connection_timeout', 'blocking', 'terminal_type', 'window_size',
+				 'callback', 'forcebaud', 'atomic_connect');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -466,6 +467,7 @@ sub connect { # Connect to host
 		window_size		=>	$args{window_size},
 		callback		=>	$args{callback},
 		forcebaud		=>	$args{forcebaud},
+		atomic_connect		=>	$args{atomic_connect},
 		# Declare method storage keys which will be used
 		stage			=>	0,
 		authPublicKey		=>	0,
@@ -1101,7 +1103,7 @@ sub poll { # Poll objects for completion
 	my $objComplete = $Default{poll_obj_complete};
 	my $objError = $Default{poll_obj_error};
 	my $pollTimer = $PollTimer/1000; # Convert to secs
-	my ($mainLoopSleep, $mainLoopTime);
+	my ($mainLoopSleep, $mainLoopTime, $pollStartTime, $pollActHost, $objLastPollTime);
 
 	if ($_[0]->isa($Package)) { # Method invoked as object method
 		$self = shift;
@@ -1149,6 +1151,7 @@ sub poll { # Poll objects for completion
 	my $msgFormat = defined $args{errmsg_format} ? $args{errmsg_format} : ( defined $self ? $self->{errmsg_format} : $Default{errmsg_format} );
 	return _error(__FILE__, __LINE__, $errmode, "$pkgsub: No 'object_list' provided", $msgFormat) unless defined $self || defined $args{object_list};
 
+	$pollStartTime = time;
 	while (1) {
 		$mainLoopTime = time;	# Record time before going over loop below
 		($running, $completed, $failed) = (0,0,0);
@@ -1158,7 +1161,7 @@ sub poll { # Poll objects for completion
 				return _error(__FILE__, __LINE__, $errmode, "$pkgsub: No polling method was ever called for object", $msgFormat) if defined $args{errmode};
 				return $self->error("$pkgsub: No polling method was ever called for object");
 			}
-			my $ok = _call_poll_method($self, defined $args{errmode} ? $errmode : undef);
+			my $ok = _call_poll_method($self, 0, defined $args{errmode} ? $errmode : undef);
 			# Return if completed or failed
 			return $ok if $ok || !defined $ok;
 			$running = 1;	# Ensures we always loop below
@@ -1171,7 +1174,9 @@ sub poll { # Poll objects for completion
 					return _error(__FILE__, __LINE__, $errmode, "$pkgsub: No polling method was ever called for object array element $i", $msgFormat) if defined $args{errmode};
 					return $obj->error("$pkgsub: No polling method was ever called for object array element $i");
 				}
-				my $ok = _call_poll_method($obj, defined $args{errmode} ? $errmode : undef);
+				my $objStartTime = time;
+				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->[$i] ? $objLastPollTime->[$i] : $pollStartTime);
+				my $ok = _call_poll_method($obj, $objTimeCredit, defined $args{errmode} ? $errmode : undef);
 				if ($ok) {
 					$completed++;
 					unless ($obj->{POLLREPORTED}) {
@@ -1187,6 +1192,14 @@ sub poll { # Poll objects for completion
 					}
 				}
 				else { $running++ }
+				$objLastPollTime->[$i] = time;
+				if ( ($objLastPollTime->[$i] - $objStartTime) > $pollTimer && $args{poll_code}) { # On slow poll methods, call activity between every host
+					callCodeRef($args{poll_code}, $running, $completed, $failed, \@lastCompleted, \@lastFailed);
+					$pollActHost = 1; # Make sure we don't run activity at end of cycle then
+				}
+				else {
+					$pollActHost = 0; # Make sure we run activity at end of cycle
+				}
 			}
 		}
 		elsif ( ref $args{object_list} eq 'HASH' ) { # Called in non-objectoriented form; hash as arg
@@ -1197,7 +1210,9 @@ sub poll { # Poll objects for completion
 					return _error(__FILE__, __LINE__, $errmode, "$pkgsub: No polling method was ever called for object hash key $key", $msgFormat) if defined $args{errmode};
 					return $obj->error("$pkgsub: No polling method was ever called for object hash key $key");
 				}
-				my $ok = _call_poll_method($obj, defined $args{errmode} ? $errmode : undef);
+				my $objStartTime = time;
+				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->{$key} ? $objLastPollTime->{$key} : $pollStartTime);
+				my $ok = _call_poll_method($obj, $objTimeCredit, defined $args{errmode} ? $errmode : undef);
 				if ($ok) {
 					$completed++;
 					unless ($obj->{POLLREPORTED}) {
@@ -1213,6 +1228,14 @@ sub poll { # Poll objects for completion
 					}
 				}
 				else { $running++ }
+				$objLastPollTime->{$key} = time;
+				if ( ($objLastPollTime->{$key} - $objStartTime) > $pollTimer && $args{poll_code}) { # On slow poll methods, call activity between every host
+					callCodeRef($args{poll_code}, $running, $completed, $failed, \@lastCompleted, \@lastFailed);
+					$pollActHost = 1; # Make sure we don't run activity at end of cycle then
+				}
+				else {
+					$pollActHost = 0; # Make sure we run activity at end of cycle
+				}
 			}
 		}
 		else {
@@ -1222,9 +1245,10 @@ sub poll { # Poll objects for completion
 		# Check if we are done, before calling pollcode or doing cycle wait
 		last if ($running == 0) || ($objComplete eq 'next' && @lastCompleted) || ($objError eq 'return' && @lastFailed);
 
-		if ($args{poll_code}) { # If a valid activity coderef was supplied..
+		if ($args{poll_code} && !$pollActHost) { # If a valid activity coderef was supplied and we did not just perform this on last object..
 			callCodeRef($args{poll_code}, $running, $completed, $failed, \@lastCompleted, \@lastFailed);
 		}
+		$pollActHost = 0;					# Reset flag
 		$mainLoopSleep = $pollTimer - (time - $mainLoopTime);	# Timer less time it took to run through loop
 		sleep($mainLoopSleep) if $mainLoopSleep > 0;		# Only if positive
 	}
@@ -1880,7 +1904,8 @@ sub poll_read { # Method to handle reads for poll methods (handles both blocking
 		# We read nothing from device
 		if (time > $self->{POLL}{endtime}) { # Timeout has expired
 			$self->{POLL}{endtime} = undef; # Clear timeout endtime
-			return $self->error("$pkgsub: $errmsg") if defined $errmsg;
+			$self->errmsg("$pollsub: Poll Read Timeout");
+			return $self->error("$pkgsub: $errmsg // ".$self->errmsg) if defined $errmsg;
 			return; # Otherwise
 		}
 		else { # Still within timeout
@@ -1970,7 +1995,8 @@ sub poll_readwait { # Method to handle readwait for poll methods (handles both b
 		else { # No data read yet, regular timeout checking
 			if (time > $self->{POLL}{endtime}) { # Timeout has expired
 				$self->{POLL}{endtime} = undef; # Clear timeout endtime
-				return $self->error("$pkgsub: $errmsg") if defined $errmsg;
+				$self->errmsg("$pollsub: Poll Read Timeout");
+				return $self->error("$pkgsub: $errmsg // ".$self->errmsg) if defined $errmsg;
 				return; # Otherwise
 			}
 			else { # Still within timeout
@@ -1994,7 +2020,8 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 	unless (defined $self->{POLL}{$pollsub}) { # Only applicable if called from another method already in polling mode
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
-				 'errmode', 'connection_timeout', 'terminal_type', 'window_size', 'callback', 'forcebaud');
+				 'errmode', 'connection_timeout', 'terminal_type', 'window_size', 'callback',
+				 'forcebaud', 'atomic_connect');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{host}, $args{port}, $args{username}, $args{password}, $args{publickey}, $args{privatekey}, $args{passphrase}, $args{baudrate},
@@ -2020,6 +2047,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 			window_size		=>	$args{window_size},
 			callback		=>	$args{callback},
 			forcebaud		=>	$args{forcebaud},
+			atomic_connect		=>	$args{atomic_connect},
 			# Declare method storage keys which will be used
 			stage			=>	0,
 			authPublicKey		=>	0,
@@ -2053,6 +2081,13 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 			$connect->{port} = $Default{tcp_port}{TELNET} unless defined $connect->{port};
 			$self->{HOST} = $connect->{host};
 			$self->{TCPPORT} = $connect->{port};
+			if (!$self->{POLL}{blocking} && $connect->{atomic_connect}) {
+				$self->{POLL}{blocking} = 1; # Switch into blocking mode during connect phase
+				return $self->poll_return(0); # Next poll will be the atomic connect
+			}
+			else {
+				$connect->{atomic_connect} = undef; # In blocking mode undefine it
+			}
 		}
 		# TCP Socket setup and handoff to Net::Telnet object
 		# Open Socket ourselves
@@ -2077,6 +2112,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 
 		# Handle Telnet options
 		$self->_handle_telnet_options;
+		$self->{POLL}{blocking} = 0 if $connect->{atomic_connect}; # Restore non-blocking mode once connect complete
 	}
 	elsif ($self->{TYPE} eq 'SSH') {
 		if ($connect->{stage} < 1) { # Initial setup - do only once
@@ -2085,6 +2121,13 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 			$connect->{port} = $Default{tcp_port}{SSH} unless defined $connect->{port};
 			$self->{HOST} = $connect->{host};
 			$self->{TCPPORT} = $connect->{port};
+			if (!$self->{POLL}{blocking} && $connect->{atomic_connect}) {
+				$self->{POLL}{blocking} = 1; # Switch into blocking mode during connect phase
+				return $self->poll_return(0); # Next poll will be the atomic connect
+			}
+			else {
+				$connect->{atomic_connect} = undef; # In blocking mode undefine it
+			}
 		}
 		if ($connect->{stage} < 2) { # TCP Socket setup and handoff to Net::SSH2 object
 			# Open Socket ourselves
@@ -2225,6 +2268,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 		$self->{SSHCHANNEL}->ext_data('merge');			# Merge stderr onto regular channel
 		$self->{SSHCHANNEL}->pty($self->{terminal_type}, undef, @{$self->{window_size}}); # Start interactive terminal; also set term type & window size
 		$self->{SSHCHANNEL}->shell();				# Start shell on channel
+		$self->{POLL}{blocking} = 0 if $connect->{atomic_connect}; # Restore non-blocking mode once connect complete
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
 		$connect->{handshake} = $Default{handshake} unless defined $connect->{handshake};
@@ -2884,19 +2928,29 @@ sub _error { # Internal method to perfom error mode action
 
 
 sub _call_poll_method { # Call object's poll method and optionally alter and then restore its error mode in doing so
-	my ($self, $errmode) = @_;
+	my ($self, $timeCredit, $errmode) = @_;
 	my $errmodecache;
 
-	if (defined $errmode) { # Store object's poll errormode and replace it with new error mode
-		$errmodecache = $self->{POLL}{errmode};
-		$self->{POLL}{errmode} = $errmode;
+	unless ($self->{POLLREPORTED}) {
+		if (defined $errmode) { # Store object's poll errormode and replace it with new error mode
+			$errmodecache = $self->{POLL}{errmode};
+			$self->{POLL}{errmode} = $errmode;
+		}
+		if ($timeCredit && defined $self->{POLL}{endtime}) { # We are going to increase the object's timeout by a credit amount
+			$self->{POLL}{endtime} = $self->{POLL}{endtime} + $timeCredit;
+			$self->debugMsg(1," - Timeout Credit of : ", \$timeCredit, " seconds\n");
+		}
+		$self->debugMsg(1," - Timeout Remaining : ", \($self->{POLL}{endtime} - time), " seconds\n") if defined $self->{POLL}{endtime};
 	}
 
 	# Call object's poll method
 	my $ok = $self->{POLL}{coderef}->($self);
 
-	# Restore original object poll error mode if necessary
-	$self->{POLL}{errmode} = $errmodecache if defined $errmode;
+	unless ($self->{POLLREPORTED}) {
+		$self->debugMsg(1," - Error: ", \$self->errmsg, "\n") unless defined $ok;
+		# Restore original object poll error mode if necessary
+		$self->{POLL}{errmode} = $errmodecache if defined $errmode;
+	}
 	return $ok;
 }
 
@@ -3238,6 +3292,7 @@ Methods which can be run on a previously created Control::CLI object instance
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
+  	[Atomic_connect		=> $flag,]
   );
 
   $ok = $obj->connect_poll();	# Only applicable in non-blocking mode
@@ -3270,6 +3325,7 @@ For Telnet, these forms are allowed with the following arguments:
   	[Errmode		=> $errmode,]
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
+  	[Atomic_connect		=> $flag,]
   );
 
 If not specified, the default port number for Telnet is 23.
@@ -3298,6 +3354,7 @@ For SSH, these forms are allowed with the following arguments:
   	[Terminal_type		=> $string,]
   	[Window_size		=> [$width, $height],]
   	[Callback		=> \&codeRef,]
+  	[Atomic_connect		=> $flag,]
   );
 
 If not specified, the default port number for SSH is 22.
@@ -3335,6 +3392,8 @@ Instead of a code reference, an array reference can also be used provided that t
 
 Your callback should return a true value (for $ok) if the SSH connection is to proceed.
 Whereas a false/undefined value indicates that the connection should not go ahead; in this case an optional error message can be provided which will be used to perform the error mode action of this class. Otherwise a standard error message will be used.
+
+The "atomic_connect" argument is only useful if using the connect() method in non-blocking mode across many objects of this class and using the Control::CLI poll() method to poll progress across all of them. Since SSH authentication is not handled in non-blocking fashion in Net::SSH2, polling many SSH connections would result in all of them setting up the socket at the first poll cycles, and then one by one would have to go through SSH authentication; however the far end SSH server will typically timeout the socket if it sees no SSH authentication within the next 10 secs or so. Setting the "atomic_connect" argument will ensure that the connect() method will treat socket setup + SSH authentication as one single poll action and avoid the problem. The same argument can also work with Telnet by treating socket setup + hand-over to Telnet as one single poll action, however Telnet does not suffer from the same problem.
 
 =item *
 
@@ -4007,6 +4066,8 @@ object_complete = 'next' AND object_error = 'ignore' : Method will return as soo
 object_complete = 'next' AND object_error = 'return' : Method will return as soon as one (or some) of the objects has/have completed successfully or failed with an error (and the errmode was set to 'return')
 
 =back
+
+Since the SSH connect() method is not truly non-blocking (during the authentication phase) and in order to avoid this class from timing out all objects when polling many, the poll method keeps track of cycle durations (for each object, time taken to poll other objects) and at every cycle re-credits the amount on each object timeout. Still, SSH connections polled in this way are still likely to fail beyond 10 objects due to the far end host timing out the incomming SSH connection; in which case you will need to stagger the jobs or make use of the connect() "atomic_connect" flag.
 
 When the method returns it will provide the number of objects still running ($running), those that have completed successfully ($completed) and those that have failed with an error ($failed) as well as an array reference of last objects that completed (\@lastCompleted) and one of last objects that failed (\@lastFailed). If the poll method was called with a hash structure, these arrays will hold the keys which completed/failed; if instead a list of objects was supplied then these arrays will hold the indexes which completed/failed.
 

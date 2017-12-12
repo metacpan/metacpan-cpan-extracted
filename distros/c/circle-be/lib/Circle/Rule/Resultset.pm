@@ -7,6 +7,8 @@ package Circle::Rule::Resultset;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Carp;
 
 sub new

@@ -1,5 +1,5 @@
 package Git::Database::Role::PurePerlBackend;
-$Git::Database::Role::PurePerlBackend::VERSION = '0.009';
+$Git::Database::Role::PurePerlBackend::VERSION = '0.010';
 use Sub::Quote;
 use Path::Class qw( file );    # used by Git::PurePerl/Cogit
 
@@ -119,7 +119,7 @@ Git::Database::Role::PurePerlBackend - Code shared by the Cogit and Git::PurePer
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

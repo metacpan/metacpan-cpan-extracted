@@ -22,8 +22,8 @@ use Test::More tests => 15;
 use File::Temp qw( tempdir tempfile );
 
 my $perl  = $^X || 'perl';
-my $inc = join(' -I ', @INC) || '';
-$inc = "-I $inc" if $inc;
+require Config;
+my $inc = join($Config::Config{path_sep}, @INC) || '';
 
 require Test::Strict;
 
@@ -50,7 +50,8 @@ sub test1 {
 
   my $dir = make_bad_file();
   my ($fh, $outfile) = tempfile( UNLINK => 1 );
-  ok( `$perl $inc -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile`, 'all_perl_files_ok' );
+  local $ENV{PERL5LIB} = $inc;
+  ok( `$perl -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile`, 'all_perl_files_ok' );
   local $/ = undef;
   my $content = <$fh>;
   like( $content, qr/^ok 1 - Syntax check /m, "Syntax ok" );
@@ -60,7 +61,8 @@ sub test1 {
 sub test2 {
   my $dir = make_another_bad_file();
   my ($fh, $outfile) = tempfile( UNLINK => 1 );
-  ok( `$perl $inc -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
+  local $ENV{PERL5LIB} = $inc;
+  ok( `$perl -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
   local $/ = undef;
   my $content = <$fh>;
   like( $content, qr/not ok 1 \- Syntax check /, "Syntax error" );
@@ -70,7 +72,8 @@ sub test2 {
 sub test3 {
   my $file = make_bad_warning();
   my ($fh, $outfile) = tempfile( UNLINK => 1 );
-  ok( `$perl $inc -e "use Test::Strict no_plan =>1; warnings_ok( '$file' )" 2>&1 > $outfile` );
+  local $ENV{PERL5LIB} = $inc;
+  ok( `$perl -e "use Test::Strict no_plan =>1; warnings_ok( '$file' )" 2>&1 > $outfile` );
   local $/ = undef;
   my $content = <$fh>;
   like( $content, qr/not ok 1 \- use warnings /, "Does not have use warnings" );
@@ -79,7 +82,8 @@ sub test3 {
 sub test4 {
   my $test_file = make_warning_files();
   my ($fh, $outfile) = tempfile( UNLINK => 1 );
-  ok( `$perl $inc $test_file 2>&1 > $outfile` );
+  local $ENV{PERL5LIB} = $inc;
+  ok( `$perl $test_file 2>&1 > $outfile` );
   local $/ = undef;
   my $content = <$fh>;
   like( $content, qr/not ok \d+ \- use warnings/, "Does not have use warnings" );
@@ -92,7 +96,8 @@ sub test5 {
     skip 'Moose::Autobox is needed for this test', 3 if $err;
     my $dir = make_moose_bad_file();
     my ($fh, $outfile) = tempfile( UNLINK => 1 );
-    ok( `$perl $inc -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
+  local $ENV{PERL5LIB} = $inc;
+    ok( `$perl -MTest::Strict -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
     local $/ = undef;
     my $content = <$fh>;
     like( $content, qr/^ok 1 - Syntax check /m, "Syntax ok" );

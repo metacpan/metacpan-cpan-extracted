@@ -7,24 +7,21 @@
 use strict;
 use warnings;
 
-use Error qw( :warndie );
-
 use Circle;
 use IO::Async::Loop 0.37;
 use IO::Async::Stream;
 
 use Errno qw( ECONNREFUSED );
 use Getopt::Long;
-use Socket qw( AF_INET SOCK_STREAM );
 
-my $PORT;
-my $SOCKPATH;
-my $STDIO;
+# Optional but handy
+eval { require Devel::Confess } and Devel::Confess->import;
 
 GetOptions(
-   'p|port=i'   => \$PORT,
-   's|socket=s' => \$SOCKPATH,
-   'stdio'      => \$STDIO,
+   'p|port=i'   => \my $PORT,
+   's|socket=s' => \my $SOCKPATH,
+   'stdio'      => \my $STDIO,
+   'C|config=s' => \my $CONFIG,
    'help' => sub { usage(0) },
 ) or usage(1);
 
@@ -43,6 +40,8 @@ Options:
 
    --stdio                   Listen on STDIN/STDOUT
 
+   --config, -C FILE         Override path to config file
+
 EOF
 
    exit $exitcode;
@@ -56,7 +55,10 @@ defined($PORT) or defined($SOCKPATH) or defined($STDIO) or
 
 my $loop = IO::Async::Loop->new();
 
-my $circle = Circle->new( loop => $loop );
+my $circle = Circle->new(
+   loop   => $loop,
+   config => $CONFIG,
+);
 
 if( defined $PORT ) {
    $circle->listen(

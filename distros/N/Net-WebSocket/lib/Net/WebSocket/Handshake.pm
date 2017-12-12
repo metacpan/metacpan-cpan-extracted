@@ -20,7 +20,7 @@ This base class is NOT directly instantiable.
 
 =cut
 
-use Digest::SHA ();
+use Digest::SHA1 ();
 use HTTP::Headers::Util ();
 use Module::Load ();
 
@@ -102,14 +102,6 @@ sub get_subprotocol {
 
     return $self->{'_subprotocol'};
 }
-
-#sub get_match_extensions {
-#    my $self = shift;
-#
-#    Call::Context::must_be_list();
-#
-#    return { %{ $self->{'_match_extensions'} } };
-#}
 
 =head2 I<OBJ>->consume_headers( HDR1 => VAL1, HDR2 => VAL2, .. )
 
@@ -203,7 +195,7 @@ sub _get_accept {
 
     $key_b64 =~ s<\A\s+|\s+\z><>g;
 
-    my $accept = Digest::SHA::sha1_base64( $key_b64 . _WS_MAGIC_CONSTANT() );
+    my $accept = Digest::SHA1::sha1_base64( $key_b64 . _WS_MAGIC_CONSTANT() );
 
     #pad base64
     $accept .= '=' x (4 - (length($accept) % 4));

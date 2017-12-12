@@ -3,12 +3,10 @@ package Mic::Assembler;
 use strict;
 use Class::Method::Modifiers qw(install_modifier);
 use Carp;
-use Hash::Util qw( lock_keys );
 use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
-use Scalar::Util qw( reftype );
 use Storable qw( dclone );
 use Sub::Name;
 
@@ -57,7 +55,6 @@ sub assemble {
         has     => {
             %{ $meta->{has} || { } },
         },
-        arrayimp => $meta->{arrayimp},
         slot_offset => $meta->{slot_offset},
     };
     _collect_non_instance_methods($spec, $meta);
@@ -248,13 +245,9 @@ sub _add_methods {
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
 
-            my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{ $meta->{reader} } = sub { 
                 my ($self) = @_;
 
-                if ( reftype $self eq 'HASH' ) {
-                    return $self->{$obfu_name};
-                }
                 return $self->[ $spec->{implementation}{slot_offset}{$name} ];
             };
         }
@@ -265,13 +258,9 @@ sub _add_methods {
 
             confess "'property' can only be used from Perl 5.16 onwards"
               if $] lt '5.016';
-            my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{ $meta->{property} } = sub : lvalue {
                 my ($self) = @_;
 
-                if ( reftype $self eq 'HASH' ) {
-                    return $self->{$obfu_name};
-                }
                 return $self->[ $spec->{implementation}{slot_offset}{$name} ];
             };
         }
@@ -283,12 +272,7 @@ sub _add_methods {
             $spec->{implementation}{methods}{ $meta->{writer} } = sub {
                 my ($self, $new_val) = @_;
 
-                if ( reftype $self eq 'HASH' ) {
-                    $self->{ Mic::_Guts::obfu_name($name, $spec) } = $new_val;
-                }
-                else {
-                    $self->[ $spec->{implementation}{slot_offset}{$name} ] = $new_val;
-                }
+                $self->[ $spec->{implementation}{slot_offset}{$name} ] = $new_val;
                 return $self;
             };
         }
@@ -492,14 +476,11 @@ sub _add_delegates {
                 confess "Cannot override implemented method '$meth' with a delegated method";
             }
             else {
-                my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
                 my $target = $target_method->{$meth} || $meth;
                 $spec->{implementation}{methods}{$meth} = sub { 
                     my $obj = shift;
 
-                    my $delegate = reftype $obj eq 'HASH'
-                        ? $obj->{$obfu_name}
-                        : $obj->[ $spec->{implementation}{slot_offset}{ $name } ];
+                    my $delegate = $obj->[ $spec->{implementation}{slot_offset}{ $name } ];
                     if (wantarray) {
                         my @results = $delegate->$target(@_);
                         return @results;
@@ -561,13 +542,7 @@ sub _add_default_constructor {
                 }
                 if ( $attr ) {
                     my $attr_val = $arg->{$name};
-                    if ( reftype $obj eq 'HASH' ) {
-                        my $obfu_name = Mic::_Guts::obfu_name($attr, $spec);
-                        $obj->{$obfu_name} = $attr_val;
-                    }
-                    else {
-                        $obj->[ $spec->{implementation}{slot_offset}{$attr} ] = $attr_val;
-                    }
+                    $obj->[ $spec->{implementation}{slot_offset}{$attr} ] = $attr_val;
                 }
             }
 
@@ -587,9 +562,7 @@ sub _object_maker {
 
     my $spec = $stash->get_symbol('%__meta__');
     my $pkg_key = Mic::_Guts::obfu_name('', $spec);
-    my $obj = $spec->{implementation}{arrayimp}
-      ? [ ]
-      : { };
+    my $obj = [ ];
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
         my $init_val = $init->{$attr}
@@ -597,22 +570,13 @@ sub _object_maker {
                 : (ref $meta->{default} eq 'CODE'
                   ? $meta->{default}->()
                   : $meta->{default});
-        if ( $spec->{implementation}{arrayimp} ) {
-            my $offset = $spec->{implementation}{slot_offset}{$attr};
-            $obj->[$offset] = $init_val;
-        }
-        else {
-            my $obfu_name = Mic::_Guts::obfu_name($attr, $spec);
-            $obj->{$obfu_name} = $init_val;
-        }
+        my $offset = $spec->{implementation}{slot_offset}{$attr};
+        $obj->[$offset] = $init_val;
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
     $Mic::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
 
-    if ( reftype $obj eq 'HASH' ) {
-        lock_keys(%$obj);
-    }
     return $obj;
 }
 

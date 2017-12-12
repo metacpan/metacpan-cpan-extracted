@@ -7,7 +7,7 @@ use File::pushd qw{ pushd };
 use Path::Tiny 0.012 qw(path); # cwd
 use Test::More 0.88 tests => 50; # done_testing
 use Test::Fatal;
-use lib 't';
+use lib 't/lib';
 use Util qw( clean_environment init_repo );
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems

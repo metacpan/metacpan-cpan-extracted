@@ -4,3 +4,6 @@ based on Graham Barr's AnyEvent::Beanstalk.
 This is the first release of this software and lacks any tests so
 although the API is unlikely to change it is nevertheless marked as
 version 0.1.
+
+Version 0.2 brings in a marginally more sane UI and basic usage
+documented and tested.

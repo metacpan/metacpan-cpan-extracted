@@ -1,16 +1,27 @@
-NAME
-    App::Nopaste::Service::Perlbot - Service provider for perlbot.pl -
-    https://perlbot.pl/
+App::Nopaste::Service::Perlbot
 
-VERSION
-    version 0.001
 
-AUTHOR
-    Ryan Voots simcop@cpan.org <mailto:simcop@cpan.org>
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+This software is copyright (c) 2017.
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

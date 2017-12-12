@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =head1 SYNOPSIS
 
@@ -1474,6 +1474,8 @@ Returns the integer part of C<x>. Returns NaN when C<x> cannot be truncated to a
 Converts C<x> to a rational number. Returns NaN when this conversion is not possible.
 
 When the given argument is a decimal expansion string, it will be specially parsed as an exact fraction.
+
+If C<x> is a floating-point number, use C<rat_approx()> instead.
 
 Example:
 

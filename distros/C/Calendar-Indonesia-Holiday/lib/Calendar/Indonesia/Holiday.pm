@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2017-07-31'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2017-12-04'; # DATE
+our $VERSION = '0.320'; # VERSION
 
 use 5.010001;
 use strict;
@@ -725,19 +725,20 @@ my %year_holidays;
     ];
 }
 
-# draft
+# decreed oct 3, 2017
 #
 # ref:
 # - https://id.wikipedia.org/wiki/2018
 # - https://www.kemenkopmk.go.id/artikel/rakor-skb-3-menteri-tentang-hari-libur-nasional-dan-cuti-bersama-2018 (mar 13, 2017)
+# - http://news.liputan6.com/read/3116580/pemerintah-tetapkan-hari-libur-nasional-dan-cuti-bersama-2018
 {
     my $eidulf2018;
     $year_holidays{2018} = [
         # - new year
         _h_chnewyear ({_expand_dm("16-02")}, {hyear=>2569}),
-        _h_nyepi     ({_expand_dm("18-03")}, {hyear=>1940}),
+        _h_nyepi     ({_expand_dm("17-03")}, {hyear=>1940}),
         _h_goodfri   ({_expand_dm("30-03")}),
-        _h_isramiraj ({_expand_dm("13-04")}, {hyear=>1439}),
+        _h_isramiraj ({_expand_dm("14-04")}, {hyear=>1439}),
 
         # - labor day
         _h_ascension ({_expand_dm("10-05")}),
@@ -749,7 +750,7 @@ my %year_holidays;
         _h_eidulf    ({_expand_dm("16-06")}, {hyear=>1439, day=>2}),
         # - independence day
         _h_eidula    ({_expand_dm("22-08")}, {hyear=>1439}),
-        _h_hijra     ({_expand_dm("12-09")}, {hyear=>1440}),
+        _h_hijra     ({_expand_dm("11-09")}, {hyear=>1440}),
         _h_mawlid    ({_expand_dm("20-11")}, {hyear=>1440}),
 
         # - christmas
@@ -757,10 +758,10 @@ my %year_holidays;
         # note: this is currently just a wild guess because i'm having
         # difficulty finding sources
         _make_tentative(
+            _jointlv     ({_expand_dm("13-06")}, {holiday=>$eidulf2018}),
             _jointlv     ({_expand_dm("14-06")}, {holiday=>$eidulf2018}),
             _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidulf2018}),
             _jointlv     ({_expand_dm("19-06")}, {holiday=>$eidulf2018}),
-            _jointlv     ({_expand_dm("20-06")}, {holiday=>$eidulf2018}),
             _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
         ),
     ];
@@ -1090,7 +1091,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.31 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2017-07-31.
+This document describes version 0.320 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2017-12-04.
 
 =head1 SYNOPSIS
 
@@ -1777,7 +1778,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Calendar-I
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Calendar-Indonesia-Holiday>.
+Source repository is at L<https://github.com/perlancar/perl-Calendar-Indonesia-Holiday>.
 
 =head1 BUGS
 

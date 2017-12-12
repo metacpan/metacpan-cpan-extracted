@@ -1,8 +1,6 @@
 use strictures 1;
 package Mojito::Model::Doc::Deep;
-{
-  $Mojito::Model::Doc::Deep::VERSION = '0.24';
-}
+$Mojito::Model::Doc::Deep::VERSION = '0.25';
 use Moo;
 use Data::Dumper::Concise;
 

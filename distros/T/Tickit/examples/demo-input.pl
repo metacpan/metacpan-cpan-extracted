@@ -22,8 +22,6 @@ $vbox->add( $mousedisplay = Tickit::Widget::Static->new( text => "" ) );
 
 my $tickit = Tickit->new();
 
-$tickit->set_root_widget( $vbox );
-
 sub _modstr
 {
    my ( $mod ) = @_;
@@ -36,6 +34,7 @@ $tickit->term->bind_event( key => sub {
    $keydisplay->set_text( sprintf "%s %s (mod=%s)",
       $info->type, $info->str, _modstr( $info->mod )
    );
+   return 1;
 } );
 
 $tickit->term->bind_event( mouse => sub {
@@ -43,6 +42,9 @@ $tickit->term->bind_event( mouse => sub {
    $mousedisplay->set_text( sprintf "%s button %s at (%d,%d) (mod=%s)",
       $info->type, $info->button, $info->line, $info->col, _modstr( $info->mod )
    );
+   return 1;
 } );
+
+$tickit->set_root_widget( $vbox );
 
 $tickit->run;

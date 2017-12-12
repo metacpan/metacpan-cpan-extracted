@@ -1,5 +1,8 @@
 -*- change-log -*-
 
+1.26 2017-12-03 rurban
+	* Avoid too many -I when calling subprocess (sprout, RT#123816)
+
 1.25 2017-07-26 rurban
 	* add 5.27.1c support: B::class instead of class keyword.
         * add cperl OP->rettype, UNOP_AUX.

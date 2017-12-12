@@ -10,7 +10,7 @@ use Ref::Util qw(is_hashref);
 
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 has raw => (
@@ -164,7 +164,7 @@ eris::log - Structured log or event object implementation
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

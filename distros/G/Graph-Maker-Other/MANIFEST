@@ -44,7 +44,6 @@ devel/lib/Graph/Maker/Dragon.t
 devel/lib/Graph/Maker/DragonByPath.pm
 devel/lib/Graph/Maker/Firecracker.pm
 devel/lib/Graph/Maker/PlanePath.pm
-devel/lib/Graph/Maker/QuartetTree.pm
 devel/lib/Graph/Maker/R5Twindragon.pm
 devel/lib/Graph/Maker/Starlike.pm
 devel/lib/Graph/Maker/StarOfStars.pm
@@ -86,6 +85,7 @@ lib/Graph/Maker/Kneser.pm
 lib/Graph/Maker/KnightGrid.pm
 lib/Graph/Maker/NoughtsAndCrosses.pm
 lib/Graph/Maker/Petersen.pm
+lib/Graph/Maker/QuartetTree.pm
 lib/Graph/Maker/RookGrid.pm
 lib/Graph/Maker/TwinAlternateAreaTree.pm
 lib/Graph/Maker/TwindragonAreaTree.pm
@@ -107,6 +107,7 @@ t/KnightGrid.t
 t/MyTestHelpers.pm
 t/NoughtsAndCrosses.t
 t/Petersen.t
+t/QuartetTree.t
 t/RookGrid.t
 t/TwinAlternateAreaTree.t
 t/TwindragonAreaTree.t
@@ -122,6 +123,7 @@ xt/Beineke-slow.t
 xt/BinaryBeanstalk-isomorphic.t
 xt/BinomialTree-various.t
 xt/BiStar-isomorphic.t
+xt/Crown-isomorphic.t
 xt/GosperIsland-isomorphic.t
 xt/Hanoi-slow.t
 xt/HexGrid-isomorphic.t
@@ -140,6 +142,7 @@ xt/oeis/NoughtsAndCrosses-oeis.t
 xt/oeis/Petersen-oeis.t
 xt/oeis/TwinAlternateAreaTree-oeis.t
 xt/Petersen-isomorphic.t
+xt/QuartetTree-isomorphic.t
 xt/RookGrid-isomorphic.t
 xt/TwinAlternateAreaTree-isomorphic.t
 xt/TwindragonAreaTree-isomorphic.t

@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.67';
+our $VERSION ='0.68';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -44,6 +44,7 @@ my %_revstash = (
     '0012'      => { release => 'Q4 2014', model_name => 'Raspberry Pi Model A +', revision => '0012', board_type => $btype3, memory => 256, manufacturer => 'Sony' },
     
     '0014'      => { release => 'Q2 2015', model_name => 'Compute Module', revision => '0014', board_type => $btype2, memory => 512, manufacturer => 'Sony' },
+    '0015'      => { release => 'Q4 2015', model_name => 'Raspberry Pi Model A +', revision => '0015', board_type => $btype3, memory => 512, manufacturer => 'Sony' },
     'unknown'   => { release => 'Q1 2012', model_name => 'Virtual or Unknown Raspberry Pi', revision => 'UNKNOWN', board_type => $btype2, memory => 512,  manufacturer => 'HiPi Virtual' },
     'unknownex' => { release => 'Q1 2012', model_name => 'Virtual or Unknown Raspberry Pi', revision => 'UNKNOWN', board_type => $btype3, memory => 1024, manufacturer => 'HiPi Virtual' },
 );

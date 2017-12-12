@@ -1,10 +1,13 @@
-0.2017.2    19 July 2017
-        * wrong 2017 short business days
+0.2018.0	2017-12-01
+	* correct short business days in 2018 from 2017 release
+	+ add and correct all days for 2018
+	typo
 
-0.2017.1    18 July 2017
-        * wrong Independence Day date
+0.2017.2	2017-07-19
+	* wrong 2017 short business days
 
-0.2017.0    06 May 2017
-        initial
+0.2017.1	2017-06-18
+	* wrong Independence Day date
 
-
+0.2017.0	2017-05-06
+	initial

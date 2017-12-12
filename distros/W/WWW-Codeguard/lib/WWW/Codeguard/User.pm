@@ -584,6 +584,29 @@ sub browse_website_backup {
     return $self->_do_method('browse_website_backup', $params);
 }
 
+
+=head2 list_website_database_backup_commits
+
+List all backups of the database associated with selected website backup commit_id.
+
+Required:
+
+    website_id - Id of the Website associated with the database to list backups for.
+    commit_id  - The website backup commit to retrieve associated database backups for.
+
+Optional:
+
+    None
+
+=cut
+
+sub list_website_database_backup_commits {
+
+	my ($self, $params) = @_;
+	return $self->_do_method('list_website_database_backup_commits', $params);
+}
+
+
 =head2 create_database_backup
 
 Will initiate an on-demand backup for a Database.
@@ -712,27 +735,28 @@ sub _create_request {
 
 	my ($self, $action, $params) = @_;
 	my $action_map = {
-        'create_website'                    => 'POST',
-        'list_websites'                     => 'GET',
-        'edit_website'                      => 'PUT',
-        'delete_website'                    => 'DELETE',
-        'list_website_rules'                => 'GET',
-        'set_website_rules'                 => 'POST',
-        'create_database'                   => 'POST',
-        'list_databases'                    => 'GET',
-        'show_database'                     => 'GET',
-        'edit_database'                     => 'PUT',
-        'delete_database'                   => 'DELETE',
-        'create_website_backup'             => 'POST',
-        'restore_website_backup'            => 'POST',
-        'selective_restore_website_backup'  => 'POST',
-        'download_website_backup'           => 'GET',
-        'download_selective_website_backup' => 'POST',
-        'list_website_backups'              => 'GET',
-        'browse_website_backup'             => 'GET',
-        'create_database_backup'            => 'POST',
-        'restore_database_backup'           => 'POST',
-        'list_database_backups'             => 'GET',
+        'create_website'                       => 'POST',
+        'list_websites'                        => 'GET',
+        'edit_website'                         => 'PUT',
+        'delete_website'                       => 'DELETE',
+        'list_website_rules'                   => 'GET',
+        'set_website_rules'                    => 'POST',
+        'create_database'                      => 'POST',
+        'list_databases'                       => 'GET',
+        'show_database'                        => 'GET',
+        'edit_database'                        => 'PUT',
+        'delete_database'                      => 'DELETE',
+        'create_website_backup'                => 'POST',
+        'restore_website_backup'               => 'POST',
+        'selective_restore_website_backup'     => 'POST',
+        'download_website_backup'              => 'GET',
+        'download_selective_website_backup'    => 'POST',
+        'list_website_backups'                 => 'GET',
+        'browse_website_backup'                => 'GET',
+        'list_website_database_backup_commits' => 'GET',
+        'create_database_backup'               => 'POST',
+        'restore_database_backup'              => 'POST',
+        'list_database_backups'                => 'GET',
 	};
 	my $request = HTTP::Request->new( $action_map->{$action} );
 	$request->header('Content-Type' => 'application/json' );
@@ -746,32 +770,33 @@ sub _set_uri {
 	my ($self, $action, $request, $params) = @_;
 	my $base_url = $self->get_api_url();
 
-    my $website_id  = delete $params->{website_id}  || '';
-    my $database_id = delete $params->{database_id} || '';
-    my $commit_id   = delete $params->{commit_id}   || '';
+    my $website_id  = $params->{website_id}  || '';
+    my $database_id = $params->{database_id} || '';
+    my $commit_id   = $params->{commit_id}   || '';
 
 	my $uri_map  = {
-        'create_website'                    => '/websites',
-        'list_websites'                     => '/websites',
-        'edit_website'                      => "/websites/$website_id",
-        'delete_website'                    => "/websites/$website_id",
-        'list_website_rules'                => "/websites/$website_id/rules",
-        'set_website_rules'                 => "/websites/$website_id/rules",
-        'create_database'                   => '/database_backups',
-        'list_databases'                    => '/database_backups',
-        'show_database'                     => "/database_backups/$database_id",
-        'edit_database'                     => "/database_backups/$database_id",
-        'delete_database'                   => "/database_backups/$database_id",
-        'create_website_backup'             => "/websites/$website_id/request_backup",
-        'restore_website_backup'            => "/websites/$website_id/commits/$commit_id/initiate_restore",
-        'selective_restore_website_backup'  => "/websites/$website_id/commits/$commit_id/restore_selected",
-        'download_website_backup'           => "/websites/$website_id/commits/$commit_id/download",
-        'download_selective_website_backup' => "/websites/$website_id/commits/$commit_id/download_selected",
-        'list_website_backups'              => "/websites/$website_id/commits",
-        'browse_website_backup'             => "/websites/$website_id/commits/$commit_id/browse",
-        'create_database_backup'            => "/websites/$website_id/database_backups/$database_id/request_backup",
-        'restore_database_backup'           => "/websites/$website_id/database_backups/$database_id/commits/$commit_id/initiate_restore",
-        'list_database_backups'             => "/websites/$website_id/database_backups/$database_id/commits",
+        'create_website'                       => '/websites',
+        'list_websites'                        => '/websites',
+        'edit_website'                         => "/websites/$website_id",
+        'delete_website'                       => "/websites/$website_id",
+        'list_website_rules'                   => "/websites/$website_id/rules",
+        'set_website_rules'                    => "/websites/$website_id/rules",
+        'create_database'                      => '/database_backups',
+        'list_databases'                       => '/database_backups',
+        'show_database'                        => "/database_backups/$database_id",
+        'edit_database'                        => "/database_backups/$database_id",
+        'delete_database'                      => "/database_backups/$database_id",
+        'create_website_backup'                => "/websites/$website_id/request_backup",
+        'restore_website_backup'               => "/websites/$website_id/commits/$commit_id/initiate_restore",
+        'selective_restore_website_backup'     => "/websites/$website_id/commits/$commit_id/restore_selected",
+        'download_website_backup'              => "/websites/$website_id/commits/$commit_id/download",
+        'download_selective_website_backup'    => "/websites/$website_id/commits/$commit_id/download_selected",
+        'list_website_backups'                 => "/websites/$website_id/commits",
+        'browse_website_backup'                => "/websites/$website_id/commits/$commit_id/browse",
+        'list_website_database_backup_commits' => "/websites/$website_id/commits/$commit_id/database_backup_commits",
+        'create_database_backup'               => "/websites/$website_id/database_backups/$database_id/request_backup",
+        'restore_database_backup'              => "/websites/$website_id/database_backups/$database_id/commits/$commit_id/initiate_restore",
+        'list_database_backups'                => "/websites/$website_id/database_backups/$database_id/commits",
 	};
 
     my $method = ($request) ? $request->method : 'GET';
@@ -798,24 +823,25 @@ sub _fetch_required_params {
 
 	my ($self, $action, $params) = @_;
 	my $required_keys_map = {
-        create_website                    => { map { ($_ => 1) } qw(url hostname account provider) },
-        list_websites                     => { },
-        list_website_rules                => { map { ($_ => 1) } qw(website_id) },
-        set_website_rules                 => { map { ($_ => 1) } qw(website_id exclude_rules) },
-        create_database                   => { map { ($_ => 1) } qw(server_address account password port database_name) },
-        list_databases                    => { },
-        show_database                     => { map { ($_ => 1) } qw(database_id) }, # Added in v0.03.
-        edit_database                     => { map { ($_ => 1) } qw(database_id) },
-        create_website_backup             => { map { ($_ => 1) } qw(website_id) },
-        restore_website_backup            => { map { ($_ => 1) } qw(website_id commit_id) },
-        selective_restore_website_backup  => { map { ($_ => 1) } qw(website_id commit_id paths) },
-        download_website_backup           => { map { ($_ => 1) } qw(website_id commit_id) },
-        download_selective_website_backup => { map { ($_ => 1) } qw(website_id commit_id paths) },
-        list_website_backups              => { map { ($_ => 1) } qw(website_id) },
-        browse_website_backup             => { map { ($_ => 1) } qw(website_id commit_id) },
-        create_database_backup            => { map { ($_ => 1) } qw(website_id database_id) },
-        restore_database_backup           => { map { ($_ => 1) } qw(website_id database_id commit_id) },
-        list_database_backups             => { map { ($_ => 1) } qw(website_id database_id) },
+        create_website                       => { map { ($_ => 1) } qw(url hostname account provider) },
+        list_websites                        => { },
+        list_website_rules                   => { map { ($_ => 1) } qw(website_id) },
+        set_website_rules                    => { map { ($_ => 1) } qw(website_id exclude_rules) },
+        create_database                      => { map { ($_ => 1) } qw(server_address account password port database_name) },
+        list_databases                       => { },
+        show_database                        => { map { ($_ => 1) } qw(database_id) }, # Added in v0.03.
+        edit_database                        => { map { ($_ => 1) } qw(database_id) },
+        create_website_backup                => { map { ($_ => 1) } qw(website_id) },
+        restore_website_backup               => { map { ($_ => 1) } qw(website_id commit_id) },
+        selective_restore_website_backup     => { map { ($_ => 1) } qw(website_id commit_id paths) },
+        download_website_backup              => { map { ($_ => 1) } qw(website_id commit_id) },
+        download_selective_website_backup    => { map { ($_ => 1) } qw(website_id commit_id paths) },
+        list_website_backups                 => { map { ($_ => 1) } qw(website_id) },
+        browse_website_backup                => { map { ($_ => 1) } qw(website_id commit_id) },
+        list_website_database_backup_commits => { map { ($_ => 1) } qw(website_id commit_id) },
+        create_database_backup               => { map { ($_ => 1) } qw(website_id database_id) },
+        restore_database_backup              => { map { ($_ => 1) } qw(website_id database_id commit_id) },
+        list_database_backups                => { map { ($_ => 1) } qw(website_id database_id) },
 	};
 
 	# The 'edit_website', and 'delete_website' calls have the same set of required params as the 'list_website_rules' call

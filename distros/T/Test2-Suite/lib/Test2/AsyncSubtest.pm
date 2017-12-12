@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::IPC;
 
-our $VERSION = '0.000092';
+our $VERSION = '0.000097';
 
 our @CARP_NOT = qw/Test2::Util::HashBase/;
 
@@ -157,7 +157,7 @@ sub detach {
     my $self = shift;
 
     if ($self->{+PID} == $$ && $self->{+TID} == get_tid) {
-        cluck "You must detach INSIDE the child process/thread";
+        cluck "You must detach INSIDE the child process/thread ($$, " . get_tid . " instead of $self->{+PID}, $self->{+TID})";
         return;
     }
 
@@ -494,9 +494,9 @@ want the subtest to keep receiving events while other events are also being
 generated. This class implements subtests that stay open until you decide to
 close them.
 
-This is mainly useful for tools that start a subtest in one process or thread
-and then spawn children. In many cases it is nice to let the parent process
-continue instead of waiting on the children.
+This is mainly useful for tools that start a subtest in one process and then
+spawn children. In many cases it is nice to let the parent process continue
+instead of waiting on the children.
 
 =head1 SYNOPSIS
 
@@ -512,10 +512,6 @@ continue instead of waiting on the children.
 
     $ast->run_fork(sub {
         ok(1, "Event in child process");
-    });
-
-    $ast->run_thread(sub {
-        ok(1, "Event in child thread");
     });
 
     ...
@@ -719,6 +715,11 @@ C<< $ast->wait >>, or C<< $ast->finish >> are called.
 
 =item my $thr = $ast->run_thread(sub { ... });
 
+B<** DISCOURAGED **> Threads cause problems. This method remains for anyone who
+REALYL wants it, but it is no longer supported. Tests for this functionality do
+not even run unless the AUTHOR_TESTING or T2_DO_THREAD_TESTS env vars are
+enabled.
+
 Same as C<< $ast->run() >>, except that the codeblock is run in a child
 thread.
 
@@ -745,7 +746,7 @@ C<< $ast->run_fork >>, or C<< $ast->run_thread >>.
 =head1 SOURCE
 
 The source code repository for Test2-AsyncSubtest can be found at
-F<http://github.com/Test-More/Test2-AsyncSubtest/>.
+F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 MAINTAINERS
 

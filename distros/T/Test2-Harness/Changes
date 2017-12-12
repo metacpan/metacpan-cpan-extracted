@@ -1,3 +1,26 @@
+0.001041  2017-12-06 11:01:16-08:00 America/Los_Angeles
+
+    - Make realtime slack/email of failures possible
+    - Add QVF (Quiet but verbose on failure) formatter
+
+0.001040  2017-12-04 23:20:35-08:00 America/Los_Angeles
+
+    - Fix filehandle IPC leak issue
+
+0.001039  2017-12-04 21:54:24-08:00 America/Los_Angeles
+
+    - Simplify scheduling
+
+0.001038  2017-11-30 10:13:09-08:00 America/Los_Angeles
+
+    - Minor fixes
+    - Fix race condition/off by 1 when using the 'run' command
+
+0.001037  2017-11-29 09:44:23-08:00 America/Los_Angeles
+
+    - Add slack integrations
+    - Add support for .yath.user.rc
+
 0.001036  2017-11-28 10:26:36-08:00 America/Los_Angeles
 
     - Harness directives for meta-data

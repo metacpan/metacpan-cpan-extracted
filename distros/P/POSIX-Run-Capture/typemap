@@ -1,0 +1,9 @@
+POSIX::Run::Capture		T_PTROBJ
+ARGV				T_ARGV
+
+INPUT
+T_ARGV
+	$var = XS_unpack_ARGV($arg);
+OUTPUT
+T_ARGV
+	XS_pack_ARGV($arg, $var);

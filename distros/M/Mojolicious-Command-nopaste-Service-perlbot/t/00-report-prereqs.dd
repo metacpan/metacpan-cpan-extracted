@@ -10,6 +10,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'blib' => '1.01',
                                       'perl' => '5.006',

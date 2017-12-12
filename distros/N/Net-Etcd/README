@@ -60,6 +60,9 @@ SYNOPSIS
         # member version
         $v = $etcd->version;
 
+        # list members
+        $etcd->member()->list;
+
 DESCRIPTION
     Net::Etcd is object oriented interface to the v3 REST API provided by
     the etcd grpc-gateway <https://github.com/grpc-ecosystem/grpc-gateway>.
@@ -72,10 +75,13 @@ ACCESSORS
     Default 2379.
 
   name
-    Username for authentication
+    Username for authentication, defaults to $ENV{ETCD_CLIENT_USERNAME}
 
   password
-    Authentication credentials
+    Authentication credentials, defaults to $ENV{ETCD_CLIENT_PASSWORD}
+
+  cacert
+    Path to cacert, defaults to $ENV{ETCD_CERT_FILE}
 
   ssl
     To enable set to 1
@@ -135,6 +141,11 @@ PUBLIC METHODS
 
         $etcd->maintenance()->snapshot
 
+  member
+    See Net::Etcd::Member
+
+        $etcd->member()->list
+
   user
     See Net::Etcd::User
 
@@ -173,7 +184,7 @@ PUBLIC METHODS
         $etcd->compare( { key => 'foo', target => 'CREATE', result => 'NOT_EQUAL', create_revision => '2' });
 
   configuration
-    Initialize configuration checks to see it etcd is installed locally.
+    Initialize configuration checks to see if etcd is installed locally.
 
 AUTHOR
     Sam Batschelet (hexfusion)

@@ -7,6 +7,8 @@ package Circle::Command;
 use strict;
 use warnings;
 
+our $VERSION = '0.173320';
+
 use Attribute::Storage qw( get_subattrs get_subattr find_subs_with_attr );
 require mro;
 

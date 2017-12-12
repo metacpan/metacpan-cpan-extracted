@@ -50,6 +50,11 @@ use SPVM 'Double';
 use SPVM 'Float';
 use SPVM 'CORE';
 
+# Field
+{
+  ok(SPVM::TestCase::object_field_set_and_get());
+}
+
 # time
 {
   cmp_ok(abs(time - SPVM::CORE::time()), '<', 2);
@@ -717,6 +722,14 @@ is_deeply(
 {
   ok(SPVM::TestCase::special_assign());
 }
+
+# Increment
+{
+  ok(SPVM::TestCase::pre_inc());
+  ok(SPVM::TestCase::post_inc());
+}
+
+
 # Add
 {
   is(SPVM::TestCase::add_byte_max(), 127);
@@ -1605,6 +1618,11 @@ is_deeply(
   cmp_ok($total, '==', 6);
 }
 
+# next
+{
+  SPVM::TestCase::next_statement();
+}
+
 # All object is freed
 my $end_objects_count = SPVM::get_objects_count();
 is($end_objects_count, $start_objects_count);
@@ -1672,26 +1690,8 @@ is($end_objects_count, $start_objects_count);
   }
   
   {
-    eval { SPVM::TestCase::exception_call_stack() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_int/);
-    like($@, qr/exception_call_stack/);
-  }
-
-  {
-    eval { SPVM::TestCase::exception_croak_return_byte() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_byte/);
-  }
-  {
     eval { SPVM::TestCase::exception_croak_return_short() };
     like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_int() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_int/);
-    like($@, qr/TestCase\.spvm/);
   }
   {
     eval { SPVM::TestCase::exception_croak_return_long() };

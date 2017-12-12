@@ -4,7 +4,7 @@
       "David Morel <david.morel@amakuru.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "yarn"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Hadoop-YARN",
    "prereqs" : {
@@ -37,9 +37,11 @@
             "Clone" : "0",
             "Constant::FromGlobal" : "0",
             "Data::Dumper" : "0",
+            "HTML::PullParser" : "0",
             "HTTP::Request" : "0",
             "Hash::Path" : "0",
             "JSON::XS" : "0",
+            "LWP::Authen::Negotiate" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
@@ -48,10 +50,12 @@
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "Socket" : "0",
+            "Text::Trim" : "0",
             "Time::Duration" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
             "XML::LibXML::Simple" : "0",
+            "constant" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -66,8 +70,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "blib" : "1.01"
+            "Test::More" : "0"
          }
       }
    },
@@ -82,11 +85,11 @@
          "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-YARN"
       }
    },
-   "version" : "0.202",
+   "version" : "0.203",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>",
       "David Morel <dmor@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

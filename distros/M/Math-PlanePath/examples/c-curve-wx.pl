@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,20 +20,20 @@
 
 # Usage: perl c-curve-wx.pl
 #
-# This is a WxWidges GUI drawing the C curve and some variations.  It's a
+# This is a WxWidgets GUI drawing the C curve and some variations.  It's a
 # little rough but can pan and zoom, and rolling the expansion level
 # expansion level in the toolbar is an interesting way to see to see the
 # curve or curves develop.
 #
-# Segments are drawn either as lines or as triangles (on the expansion side
-# of the segment).  When multiple copies of the curve are selected they're
-# in different colours.  (Though presently when line segments overlap only
-# one colour is shown.)
+# Segments are drawn either as lines or triangles.  Triangles are on the
+# side of expansion of each segment.  When multiple copies of the curve are
+# selected they're in different colours.  (Though presently when line
+# segments overlap only one colour is shown.)
 #
 # Drawing is done with Math::PlanePath::CCurve and
 # Geometry::AffineTransform.  The drawing is not particularly efficient
 # since it runs through all segments, even those which are off-screen.  The
-# drawing is piece-wise in an idle loop, so you can move or change without
+# drawing is piece-wise in an idle loop, so you can change or move without
 # waiting for it to finish.
 #
 # Some of the drawing options can be set initially from the command line.
@@ -58,7 +58,7 @@ use Wx::Event;
 # use Smart::Comments;
 
 
-our $VERSION = 124;
+our $VERSION = 125;
 
 my $level = 5;
 my $scale = 1;

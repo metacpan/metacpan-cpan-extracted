@@ -10,6 +10,9 @@ package HiPi::Interface::Si470N;
 
 #########################################################################################
 
+
+# DOES NOT WORK WITH CURRENT I2C DRIVER
+
 use strict;
 use warnings;
 use parent qw( HiPi::Interface );
@@ -19,14 +22,14 @@ use Time::HiRes qw( usleep );
 use HiPi::GPIO;
 use HiPi::Device::I2C;
 
-our $VERSION ='0.67';
+our $VERSION ='0.68';
 
 __PACKAGE__->create_accessors( qw(
     devicename address
     _mapped_registers _register_names
     _register_name_order _datamap
-    sdapin
-    resetpin gpiodev sclpin
+    sdapin resetpin
+    gpiodev
 ) );
 
 use constant {
@@ -54,14 +57,14 @@ sub new {
     my $pi = HiPi::RaspberryPi->new();
     
     my %params = (
-        devicename   => ( $pi->board_type == RPI_BOARD_TYPE_1 ) ? '/dev/i2c-0' : '/dev/i2c-1',
+        devicename  => ( $pi->board_type == RPI_BOARD_TYPE_1 ) ? '/dev/i2c-0' : '/dev/i2c-1',
         address     => 0x10,
         device      => undef,
-        sdapin      => RPI_PIN_3,
-        sclpin      => RPI_PIN_5,
+        sdapin      => I2C_SDA,
     );
     
     # get user params
+    
     foreach my $key( keys (%userparams) ) {
         $params{$key} = $userparams{$key};
     }
@@ -80,9 +83,13 @@ sub new {
         
     $self->_init();
     
-    $self->_set_Si4701();
+    unless( $self->device->check_address( $self->address ) ) {
+        $self->reset;
+    } else {
+        $self->device->select_address( $self->address );
+        $self->read_registers;
+    }
     
-    $self->read_registers();
     return $self;
 }
 
@@ -139,7 +146,7 @@ sub _init {
     
     my $datamap = {
     # DEVICEID
-        PN          => { word => DEVICEID   , shiftbits => [  0, 12,  3 ] },
+        PN          => { word => DEVICEID   , shiftbits => [  0, 12,  4 ] },
         MFGID       => { word => DEVICEID   , shiftbits => [  4,  0, 12 ] },
         
     # CHIPID
@@ -221,47 +228,49 @@ sub _init {
     return;
 }
 
-sub _set_Si4701 {
-    my $self = shift;
-    unless( $self->device->check_address( $self->address ) ) {
-        # disconnect from i2c device
-        $self->device->close;
-        $self->device( undef );
-
-    
-        # we need to put the module in i2c mode
-        my $rstpin = $self->resetpin;
-        my $sdapin = $self->sdapin;
-        my $sclpin = $self->sclpin;
-        
-        # set reset pin and sda pin as output
-        $self->gpiodev->set_pin_mode( $rstpin, RPI_MODE_OUTPUT );
-        $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_OUTPUT );
-        
-        # set reset and sda pins low
-        $self->gpiodev->set_pin_level( $sdapin, RPI_LOW );
-        $self->gpiodev->set_pin_level( $rstpin, RPI_LOW );
-        $self->sleep_seconds( 1 );
-        $self->gpiodev->set_pin_level( $rstpin, RPI_HIGH );
-        # restore I2C operation
-        $self->sleep_seconds( 1 );
-        $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_ALT0 );
-        $self->sleep_seconds( 0.5 );
-        $self->gpiodev->set_pin_level( $rstpin, RPI_LOW);
-        
-        $self->device(HiPi::Device::I2C->new( address => $self->address, busmode => 'i2c' ) );
-        
-    }
-    
-    $self->read_registers;
-}
-
 sub reset {
     my $self = shift;
+    
+    # disconnect from i2c device
+    $self->device->close;
+    $self->device( undef );
+    
+    my $rstpin = $self->resetpin;
+    my $sdapin = $self->sdapin;  
+
+    # set reset pin and sda pin as output
+    $self->gpiodev->set_pin_mode( $rstpin, RPI_MODE_OUTPUT );
+    $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_OUTPUT );
+         
+    # set reset and sda pins low
    
+    $self->gpiodev->set_pin_level( $sdapin, RPI_LOW );
+    
+    # delay
+    $self->sleep_seconds( 0.1 );
+    
+    $self->gpiodev->set_pin_level( $rstpin, RPI_LOW );
+    
+    # delay
+    $self->sleep_seconds( 0.1 );
+    
+    # set reset high
+    $self->gpiodev->set_pin_level( $rstpin, RPI_HIGH );
+
+    # delay
+    $self->sleep_seconds( 0.1 );
+
+    # restore I2C operation
+    $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_ALT0 );
+    
+    # delay
+    $self->sleep_seconds( 0.1 );
+    
+    $self->device(HiPi::Device::I2C->new( address => $self->address, busmode => 'i2c' ) );
+    
     $self->read_registers;
-    $self->set_register(TEST1, 0xC100);
-    $self->update_registers( 1.5 );
+    $self->set_register(TEST1, 0x8100);
+    $self->update_registers( 0.5 );
     
     # setup mode
     $self->set_register(POWERCFG, 1);
@@ -274,7 +283,8 @@ sub reset {
     $self->set_config_value('SKSNR', 0x4);
     $self->set_config_value('SKCNT', 0x8);
     
-    $self->update_registers( 1.5 );
+    $self->update_registers( 0.1 );
+    $self->read_registers();
     
     return;
 }
@@ -285,13 +295,13 @@ sub power_off {
     $self->set_config_value('DISABLE', 1);
     $self->set_config_value('RDS', 0);
     
-    $self->update_registers( 1.5 );
+    $self->update_registers( 0.1 );
 }
 
 sub power_on {
     my $self = shift;
     $self->set_config_value('ENABLE', 1);
-    $self->update_registers( 1.5 );
+    $self->update_registers( 0.1 );
 }
 
 sub name_to_register {
@@ -379,7 +389,7 @@ sub set_config_value {
     my $currentword = $self->get_register($register);
 
     my( $bitsbefore, $bitsafter, $bitlen ) = @{ $config->{shiftbits} };
-    my $shiftdown = $bitsbefore + $bitsafter;
+    
     my $mask = ( (2 ** $bitlen) -1 ) << $bitsafter;
     
     my $currentvalue = ($currentword & $mask) >> $bitsafter;

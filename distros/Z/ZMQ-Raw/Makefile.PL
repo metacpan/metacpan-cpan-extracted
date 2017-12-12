@@ -37,6 +37,10 @@ if ($is_gcc)
 		$ld =~ s/gcc/g++/;
 	}
 
+	if (!$is_windows)
+	{
+		$ccflags .= ' -pthread';
+	}
 	$lib .= ' -lpthread';
 
 	if ($is_linux || $is_solaris)
@@ -253,10 +257,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
-    "blib" => "1.01",
     "threads" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -323,6 +326,11 @@ my @constants = (qw(
 	ZMQ_EVENT_DISCONNECTED
 	ZMQ_EVENT_MONITOR_STOPPED
 	ZMQ_EVENT_ALL
+
+	ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL
+	ZMQ_EVENT_HANDSHAKE_SUCCEEDED
+	ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL
+	ZMQ_EVENT_HANDSHAKE_FAILED_AUTH
 
 	FEATURE_IPC
 	FEATURE_PGM

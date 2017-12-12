@@ -1,30 +1,131 @@
 package Git::Database;
-$Git::Database::VERSION = '0.009';
+$Git::Database::VERSION = '0.010';
 use strict;
 use warnings;
 
 use Module::Runtime qw( use_module );
+use File::Spec;
+
+sub _absdir {
+    my ($dir) = @_;
+    return    # coerce to an absolute path
+      File::Spec->file_name_is_absolute($dir) ? $dir
+      : ref $dir ? eval { ref($dir)->new( File::Spec->rel2abs($dir) ) }
+                     || File::Spec->rel2abs($dir)
+      :            File::Spec->rel2abs($dir);
+}
 
 use Moo::Object ();
 use namespace::clean;
+
+# all known backend stores
+my @STORES = (
+
+    # complete backends, fastest first
+    'Git::Raw::Repository',
+    'Git',
+    'Git::Repository',
+    'Git::Wrapper',
+    'Git::Sub',
+
+    # incomplete backends (don't do the Git::Database::Role::RefWriter role)
+    'Cogit',
+    'Git::PurePerl',
+);
+
+my %MIN_VERSION = (
+    'Git::Raw::Repository' => 0.74,
+    'Git::Repository'      => 1.300,
+    'Git::Sub'             => 0.163320,
+);
+
+# all installed backend stores
+my $STORES;
+
+sub available_stores {
+    $STORES ||= [ map eval { use_module( $_ => $MIN_VERSION{$_} || 0 ) }, @STORES ];
+    return @$STORES;
+}
+
+# creating store from a standard set of paramaters
+my %STORE_FOR = (
+    'Cogit' => sub {
+        my %args = (
+            ( directory => _absdir($_[0]->{work_tree}) )x!! $_[0]->{work_tree},
+            ( gitdir    => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
+        );
+        return Cogit->new( %args ? %args : ( directory => _absdir('.') ) );
+    },
+    'Git' => sub {
+        return Git->repository(
+            ( WorkingCopy => _absdir($_[0]->{work_tree}) )x!! $_[0]->{work_tree},
+            ( Repository  => _absdir($_[0]->{git_dir})   )x!! $_[0]->{git_dir},
+        );
+     },
+    'Git::PurePerl' => sub {
+        my %args;
+        $args{directory} = _absdir("$_[0]->{work_tree}") if $_[0]->{work_tree};
+        $args{gitdir}    = _absdir("$_[0]->{git_dir}")   if $_[0]->{git_dir};
+        return Git::PurePerl->new( %args ? %args : ( directory => _absdir('.') ) );
+    },
+    'Git::Raw::Repository' => sub {
+        return Git::Raw::Repository->open(
+            $_[0]->{work_tree} || $_[0]->{git_dir} || '.'
+        );
+    },
+    'Git::Repository' => sub {
+        return Git::Repository->new(
+            ( work_tree => $_[0]->{work_tree} )x!! $_[0]->{work_tree},
+            ( git_dir   => $_[0]->{git_dir}   )x!! $_[0]->{git_dir},
+        );
+    },
+    'Git::Sub'     => sub { $_[0]->{work_tree} || $_[0]->{git_dir} || _absdir('.') },
+    'Git::Wrapper' => sub {
+        return Git::Wrapper->new(
+            { dir => _absdir( $_[0]->{work_tree} || $_[0]->{git_dir} || '.' ) }
+        );
+    },
+);
 
 sub new {
     my $args = Moo::Object::BUILDARGS(@_);
 
     # store: an object that gives actual access to a git repo
-    if ( my $store = delete $args->{store} ) {
-        if ( !ref $store || -d $store ) {
-            require Git::Database::Backend::Git::Sub;
-            return Git::Database::Backend::Git::Sub->new( store => $store );
+    my ( $backend, $store );
+    if ( defined( $store = $args->{store} ) ) {
+        if ( $store eq '' ) {
+            return use_module('Git::Database::Backend::None')->new;
         }
-        else {
-            return use_module( "Git::Database::Backend::" . ref $store )
+        elsif ( !ref $store || -d $store ) {
+            return use_module('Git::Database::Backend::Git::Sub')
               ->new( store => $store );
         }
+        $backend = ref($store) || 'Git::Sub';
     }
 
-    # some really basic default
-    return use_module('Git::Database::Backend::None')->new;
+    # build the store using: backend, work_tree, git_dir
+    else {
+        if ( $backend = $args->{backend} ) {
+            return use_module('Git::Database::Backend::None')->new
+              if $backend eq 'None';
+            use_module $backend, $MIN_VERSION{$backend} || 0
+        }
+        else {
+
+            # build the list of all installed store classes
+            my @stores = available_stores();
+
+            # some really basic default
+            return use_module('Git::Database::Backend::None')->new
+              if !@stores;
+
+            # pick the best available
+            $backend = shift @stores;
+        }
+        $store = $STORE_FOR{$backend}->($args);
+    }
+
+    return use_module("Git::Database::Backend::$backend")->new( store => $store );
 }
 
 1;
@@ -39,7 +140,7 @@ Git::Database - Provide access to the Git object database
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -52,6 +153,23 @@ version 0.009
     # or let Git::Database figure it out by itself
     my $db = Git::Database->new( store => $r );
 
+    # or let Git::Database assemble the store from its parts
+    my $db = Git::Database->new(
+        backend   => 'Git::Repository',
+        work_tree => $work_tree,
+    );
+
+    my $db = Git::Database->new(
+        backend => 'Git::Repository',
+        git_dir => $git_dir,
+    );
+
+    # work in the current directory
+    my $db = Git::Database->new( backend => 'Git::Repository' );
+
+    # pick the best available backend
+    my $db = Git::Database->new;
+
 =head1 DESCRIPTION
 
 Git::Database provides access from Perl to the object database stored
@@ -60,6 +178,8 @@ the Git object database maintained by Git.
 
 Git::Database is actually a factory class: L</new> returns
 L<backend|Git::Database::Tutorial/backend> instances.
+
+Check L<Git::Database::Tutorial> for details.
 
 =head1 METHODS
 
@@ -71,7 +191,27 @@ L<backend|Git::Database::Tutorial/backend> instances.
     my $db = Git::Database->new( store => $r );
 
 Return a L<backend|Git::Database::Tutorial/backend> object, based on
-the class of the L<store|Git::Database::Tutorial/store> object.
+the parameters passed to C<new()>.
+
+If the C<store> parameter is given, all other paramaters are ignored,
+and the returned backend is of the class corresponding to the
+L<store|Git::Database::Tutorial/store> object.
+
+If the C<store> parameter is missing, the backend class is selected
+according to the C<backend> parameter, or picked automatically among the
+L<available store classes|available_stores> (picking the fastest
+and more feature-complete among them). The actual store object
+is then instantiated using the C<work_tree> and C<git_dir> optional
+parameters. If none is given, the repository is assumed to be in the
+current directory.
+
+=head2 available_stores
+
+    say for Git::Database->available_stores;
+
+This class methods returns the list of L<store|Git::Database::Tutorial/store>
+classes that are available (i.e. installed with a version matching the
+minimum version requirements).
 
 =head1 BACKEND METHODS
 

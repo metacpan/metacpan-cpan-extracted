@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "Data::Sah" => "0.84",
     "Data::Sah::Util::Type" => "0.45",
     "Encode" => 0,
+    "Fcntl" => 0,
     "File::Temp" => 0,
     "File::Which" => 0,
     "Getopt::Long" => 0,
@@ -65,7 +66,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.47",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.80",
+  "VERSION" => "1.810",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,6 +84,7 @@ my %FallbackPrereqs = (
   "Data::Sah" => "0.84",
   "Data::Sah::Util::Type" => "0.45",
   "Encode" => 0,
+  "Fcntl" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "File::Which" => 0,

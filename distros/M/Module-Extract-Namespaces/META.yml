@@ -3,15 +3,16 @@ abstract: 'extract the package declarations from a module'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Module-Extract-Namespaces
 no_index:
   directory:
@@ -22,6 +23,11 @@ no_index:
     - corpus
     - examples
 requires:
-  PPI: 0
-  Test::More: 0
-version: 1.02
+  PPI: '1.126'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/module-extract-namespaces/issues
+  homepage: https://github.com/briandfoy/module-extract-namespaces
+  repository: https://github.com/briandfoy/module-extract-namespaces.git
+version: '1.021'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

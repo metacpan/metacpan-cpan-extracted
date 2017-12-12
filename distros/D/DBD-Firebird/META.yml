@@ -6,6 +6,7 @@ build_requires:
   File::Path: '0'
   File::Temp: '0'
   Math::BigFloat: '1.55'
+  Test::CheckDeps: '0.007'
   Test::Deep: '0'
   Test::Exception: '0.31'
   Test::More: '0.4'
@@ -29,5 +30,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: https://github.com/mariuz/perl-dbd-firebird
-version: '1.26'
+version: '1.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

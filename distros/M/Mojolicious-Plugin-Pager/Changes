@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Pager
 
+0.04 2017-12-06T10:12:59+0100
+ - Can construct pager from stash values
+ - Can return pages as an array-ref. Useful for template systems, such as TT
+ - Add option for always showing prev/next buttons
+
 0.03 2017-06-18T03:27:05+0200
  - Fix custom pager text
 

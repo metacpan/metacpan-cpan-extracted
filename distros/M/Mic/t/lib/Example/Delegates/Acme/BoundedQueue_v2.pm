@@ -21,9 +21,9 @@ use Mic::Implementation
 sub push {
     my ($self, $val) = @_;
 
-    $self->{$Q}->push($val);
+    $self->[Q]->push($val);
 
-    if ($self->q_size > $self->{$MAX_SIZE}) {
+    if ($self->q_size > $self->[MAX_SIZE]) {
         $self->q_pop;        
     }
 }

@@ -1,3 +1,7 @@
+0.61 20171129
+    + Make the "->download" method actually work in the sense that it will send
+	  downloads with a name other than "$1".
+
 0.60 20171127
     + Add method to "download" a file
 	  This is in preparation for WWW::Mechanize::Chrome trying to download

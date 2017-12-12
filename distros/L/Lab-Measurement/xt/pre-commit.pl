@@ -62,6 +62,12 @@ safe_system(qw/prove --lib --recurse -j8 t/);
 
 safe_system( qw/prove -j8/, catfile(qw/xt critic/) );
 
+#
+# Run pod manual test
+#
+
+safe_system( qw/prove -v/, catfile(qw/xt pod-manual-coverage.pl/) );
+
 sub safe_system {
     my @command = @_;
     warn "running command: @command\n";

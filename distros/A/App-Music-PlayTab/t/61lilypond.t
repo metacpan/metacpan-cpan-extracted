@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $base = "60lilypond";
+our $base = "61lilypond";
 
 use lib qw(.);			# for perl 5.26+
 use File::Basename;

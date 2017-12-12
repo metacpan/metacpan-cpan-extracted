@@ -48,8 +48,8 @@ sub __parseExecMap
 		# extract the ones we want
 		#
 		my $match = $emSec->{match};
-		my $cmd = $emSec->{cmd};
-		die("The execmap section '$em' must have both the 'match' and the 'cmd' keys\n") unless ($match && $cmd);
+		my $cmd = $emSec->{cmd} || '';
+		die("The execmap section '$em' must have at least the 'match' key\n") unless $match;
 
 		# compile the query
 		#
@@ -84,7 +84,7 @@ sub __defaultCfg
 		(
 			'' =>
 				{
-					execmap => [qw(perl python java groovy shell autoit3 batch)] 
+					execmap => [qw(perl python java groovy shell autoit3 batch binary)] 
 				},
 			'EXECMAP perl' =>
 				{
@@ -137,6 +137,14 @@ sub __defaultCfg
 					#
 					'match' => 'regexp[\.(bat|cmd)$]',
 					'cmd' => [qw(cmd.exe /c)],
+				},
+			'EXECMAP binary' =>
+				{
+					# for directly executable binaries, no actual 'cmd' is needed
+					# On Windows: rename 'xyz.exe' => 'xyz.tbin'
+					# On Unix: rename 'xyz' => 'xyz.tbin'
+					#
+					'match' => 'regexp[\.tbin$]',
 				},
 		);
 	

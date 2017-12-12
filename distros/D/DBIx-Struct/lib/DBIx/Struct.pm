@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 our @EXPORT = qw{
     one_row
@@ -1100,25 +1100,59 @@ sub _parse_interface ($) {
 
 sub make_object_to_json {
     my ($table, $field_types, $fields) = @_;
-    my $field_to_types = join ",\n\t\t\t\t ", map {
-        qq|"$_" => !defined(\$self->[@{[_row_data]}][$fields->{$_}])? undef: |
-            . (
-              $field_types->{$_} eq 'number'  ? "0+\$self->[@{[_row_data]}][$fields->{$_}]"
-            : $field_types->{$_} eq 'boolean' ? "\$self->[@{[_row_data]}][$fields->{$_}]? \\1: \\0"
-            : $field_types->{$_} eq 'json'
-            ? "CORE::ref(\$self->[@{[_row_data]}]->[$fields->{$_}])? \$self->[@{[_row_data]}][$fields->{$_}]->data"
-                . ": JSON::from_json(\$self->[@{[_row_data]}][$fields->{$_}])"
-            : "\"\$self->[@{[_row_data]}][$fields->{$_}]\""
-            )
+    my @to_types = map {
+        [   $_,
+            qq|!defined(\$self->[@{[_row_data]}][$fields->{$_}])? undef: |
+                . (
+                  $field_types->{$_} eq 'number'  ? "0+\$self->[@{[_row_data]}][$fields->{$_}]"
+                : $field_types->{$_} eq 'boolean' ? "\$self->[@{[_row_data]}][$fields->{$_}]? \\1: \\0"
+                : $field_types->{$_} eq 'json'
+                ? "CORE::ref(\$self->[@{[_row_data]}]->[$fields->{$_}])? \$self->[@{[_row_data]}][$fields->{$_}]->data"
+                    . ": JSON::from_json(\$self->[@{[_row_data]}][$fields->{$_}])"
+                : "\"\$self->[@{[_row_data]}][$fields->{$_}]\""
+                )
+        ]
     } keys %$field_types;
-    my $set = <<TOJSON;
-		sub TO_JSON {
-			my \$self = \$_[0];
-			return +{
-				$field_to_types
-			};
-		}
+    my $field_to_types = join ",\n\t\t\t\t ", map {qq|"$_->[0]" => $_->[1]|} @to_types;
+    my $sub_to_types = '';
+    for my $tt (@to_types) {
+        my $k = $tt->[0];
+        $k =~ s/[^\w\d]/_/g;
+        $sub_to_types .= <<JSTT
+        sub _to_json_$k { my \$self = \$_[0]; $tt->[1] }
+JSTT
+    }
+    my $to_json = <<TOJSON;
+        sub TO_JSON {
+            my \$self = shift;
+            my \$ret;
+            my \@columns = CORE::grep { not ref } \@_;
+            my \@refs = CORE::grep { 'HASH' eq ref } \@_;
+            if(\@columns) {
+                \$ret = +{
+                    map {
+                        DBIx::Struct::error_message {
+                            result  => 'SQLERR',
+                            message => "unknown column \$_ in table $table"
+                        } if not CORE::exists \$fields{\$_};
+                        my \$k = \$_;
+                        \$k =~ s/[^\\w\\d]/_/g;
+                        my \$m = "_to_json_\$k";
+                        \$_ => \$self->\$m
+                    } \@columns
+                };
+            } else {
+                \$ret = +{
+                    $field_to_types
+                };
+            }
+            if(\@refs) {
+                \$ret = +{ %\$ret, map { %\$_ } \@refs };
+            }
+            return \$ret;
+        }
 TOJSON
+    return $sub_to_types . $to_json;
 }
 
 sub _field_type_from_name {
@@ -1134,6 +1168,12 @@ sub _field_type_from_name {
         return 'json';
     } elsif ($type_name =~ /bool/i) {
         return 'boolean';
+    } elsif ($type_name =~ /date/i && $type_name =~ /time/i) {
+        return 'datetime';
+    } elsif ($type_name =~ /date/i) {
+        return 'date';
+    } elsif ($type_name =~ /time/i) {
+        return 'time';
     } else {
         return 'string';
     }
@@ -1511,7 +1551,7 @@ DESTROY
         $set,    $data,   $fetch,   $autoload,  $to_json,        $filter_timestamp,
         $update, $delete, $destroy, $accessors, $foreign_tables, $references_tables;
 
-    # print $eval_code;
+    #    print $eval_code;
     eval $eval_code;
     error_message {
         result  => 'SQLERR',

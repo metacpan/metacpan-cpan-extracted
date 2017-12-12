@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.017   December 5, 2017
+        - New (experimental) Feature: Local components.  You may declare a
+          component to be handled by a method in your view model.
 0.016   September 25, 2017
         - Some Template::Lace::DOM optimizations
         - Fixed issue where setup time components didn't have the correct

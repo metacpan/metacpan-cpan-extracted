@@ -1,5 +1,9 @@
 Revision history for PONAPI-Client
 
+
+0.002010     2017-Dec-05
+             * Fixed sub name (Adam Taylor)
+
 0.002009     2017-Sep-22
              * Added support for external UAs and a wrapper
                for YAHC (Matt Koscica, Eric Herman)

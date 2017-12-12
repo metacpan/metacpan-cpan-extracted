@@ -9,6 +9,8 @@ use warnings;
 
 use base qw( Circle::Commandable );
 
+our $VERSION = '0.173320';
+
 use Carp;
 
 use Attribute::Storage qw( get_subattr get_subattrs apply_subattrs_for_pkg find_subs_with_attr );

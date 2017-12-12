@@ -1,0 +1,117 @@
+#!perl
+
+our $DATE = '2017-12-11'; # DATE
+our $VERSION = '0.111'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %opts = (
+    format => "text",
+);
+
+GetOptions(
+    "format|f=s" => \$opts{format},
+    "help|h|?" => sub {
+        print <<'_';
+Usage:
+  % peri-fmt-envres [opts] <filename>
+  % peri-fmt-envres --help (or -h, -?)
+  % peri-fmt-envres --version (or -v)
+
+Options:
+  --format=s, -f
+
+See manpage for more information.
+_
+        exit 0;
+    },
+    "version|v" => sub {
+        print "peri-fmt-envres version ", ($main::VERSION // "dev"), "\n";
+        exit 0;
+    },
+);
+
+require JSON::MaybeXS;
+my $json = JSON::MaybeXS->new;
+
+my $content = join "", <>;
+
+my $res = $json->decode($content);
+
+require Perinci::Result::Format::Lite;
+print Perinci::Result::Format::Lite::format($res, $opts{format});
+
+# ABSTRACT: Format enveloped result in a JSON file using Perinci::Result::Format::Lite
+# PODNAME: peri-fmt-envres
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-fmt-envres - Format enveloped result in a JSON file using Perinci::Result::Format::Lite
+
+=head1 VERSION
+
+This document describes version 0.111 of peri-fmt-envres (from Perl distribution App-PerinciUtils), released on 2017-12-11.
+
+=head1 SYNOPSIS
+
+  % peri-fmt-envres [opts] <filename>
+  % peri-fmt-envres --help (or -h, -?)
+  % peri-fmt-envres --version (or -v)
+
+Examples:
+
+ % peri-fmt-envres output.json
+ % peri-fmt-envres -f html output.json
+
+=head1 OPTIONS
+
+=head2 --format=s, -f
+
+=head2 --help, -h, -?
+
+=head2 --version, -v
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PerinciUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PerinciUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::Result::Format::Lite>
+
+L<Perinci::Result::Format>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

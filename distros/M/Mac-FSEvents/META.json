@@ -4,7 +4,7 @@
       "Andy Grundman <andy@hybridized.org>, Rob Hoelz <rob@hoelz.ro>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,15 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Cwd" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "File::Path" : "0",
-            "File::Spec" : "0",
-            "File::Temp" : "0",
-            "IO::Select" : "0",
-            "Scalar::Util" : "0",
-            "Test::More" : "0.99",
-            "autodie" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -46,6 +38,18 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Select" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.99",
+            "autodie" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -54,6 +58,6 @@
          "url" : "https://github.com/hoelzro/Mac-FSEvents"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

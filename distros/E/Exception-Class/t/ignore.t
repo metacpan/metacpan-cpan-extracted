@@ -52,7 +52,7 @@ sub check_trace {
     }
 
     ok( !$bad_frame, 'Check for unwanted frames' );
-    diag("Unwanted frame found: $bad_frame")
+    diag( 'Unwanted frame found: ' . $bad_frame->as_string )
         if $bad_frame;
 }
 
@@ -76,5 +76,23 @@ eval { Foo->foo( ignore_package => [ 'Foo', 'Baz' ] ) };
 $e = $@;
 
 check_trace( $e->trace, [ 'Foo', 'Baz' ], [] );
+
+eval { Foo->foo( skip_frames => 5 ) };
+$e = $@;
+
+check_trace( $e->trace, ['Baz'], [] );
+
+eval {
+    Foo->foo(
+        frame_filter => sub {
+            my $p = shift;
+            return 0 if defined $p->{args}[0] && $p->{args}[0] eq 'Baz';
+            return 1;
+        }
+    );
+};
+$e = $@;
+
+check_trace( $e->trace, ['Baz'], [] );
 
 done_testing();

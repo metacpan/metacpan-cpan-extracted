@@ -1,6 +1,7 @@
 package Lab::Moose::Plot;
+$Lab::Moose::Plot::VERSION = '3.613';
 #ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
-$Lab::Moose::Plot::VERSION = '3.600';
+
 
 use warnings;
 use strict;
@@ -15,7 +16,6 @@ use PDL::Graphics::Gnuplot ();
 
 # need to load for ClassName type constraint.
 use PDL ();
-
 
 has terminal => (
     is      => 'ro',
@@ -56,7 +56,7 @@ sub build_terminal_options {
     my $term = $self->terminal();
 
     if ( $term =~ /^(qt|x11)$/ ) {
-        return { persist => 1, raise => 0 };
+        return { persist => 1, raise => 0, enhanced => 0 };
     }
     else {
         return {};
@@ -112,7 +112,6 @@ sub _plot {
     my ( $plot_options, $curve_options, $data, $plot_function ) = @_;
 
     my $gpwin = $self->gpwin();
-
     $gpwin->$plot_function( $plot_options, %{$curve_options}, @{$data} );
 }
 
@@ -125,7 +124,6 @@ for my $func (qw/plot splot replot/) {
             my $self = shift;
             my ( $plot_options, $curve_options, $data )
                 = $self->_parse_options(@_);
-
             $self->_plot( $plot_options, $curve_options, $data, $func );
         }
     );
@@ -147,7 +145,7 @@ Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 SYNOPSIS
 
@@ -240,7 +238,7 @@ Otherwise they behave like plot.
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

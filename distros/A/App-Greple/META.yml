@@ -1,0 +1,80 @@
+---
+abstract: 'extensible grep with lexical expression and region handling'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Greple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Greple:
+    file: lib/App/Greple.pm
+    version: '8.2'
+  App::Greple::Common:
+    file: lib/App/Greple/Common.pm
+  App::Greple::Filter:
+    file: lib/App/Greple/Filter.pm
+  App::Greple::Grep:
+    file: lib/App/Greple/Grep.pm
+  App::Greple::Pattern:
+    file: lib/App/Greple/Pattern.pm
+  App::Greple::Pattern::Holder:
+    file: lib/App/Greple/Pattern/Holder.pm
+  App::Greple::PgpDecryptor:
+    file: lib/App/Greple/PgpDecryptor.pm
+  App::Greple::Regions:
+    file: lib/App/Greple/Regions.pm
+  App::Greple::Regions::Holder:
+    file: lib/App/Greple/Regions.pm
+  App::Greple::Text:
+    file: lib/App/Greple/Grep.pm
+  App::Greple::Util:
+    file: lib/App/Greple/Util.pm
+  App::Greple::colors:
+    file: lib/App/Greple/colors.pm
+  App::Greple::debug:
+    file: lib/App/Greple/debug.pm
+  App::Greple::dig:
+    file: lib/App/Greple/dig.pm
+  App::Greple::find:
+    file: lib/App/Greple/find.pm
+  App::Greple::line:
+    file: lib/App/Greple/line.pm
+  App::Greple::perl:
+    file: lib/App/Greple/perl.pm
+  App::Greple::pgp:
+    file: lib/App/Greple/pgp.pm
+  App::Greple::subst:
+    file: lib/App/Greple/subst.pm
+  UniqIndex:
+    file: lib/App/Greple/Util.pm
+requires:
+  Getopt::EX: v1.2.1
+  List::Util: '1.33'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/greple/issues
+  homepage: https://github.com/kaz-utashiro/greple
+  repository: git://github.com/kaz-utashiro/greple.git
+version: '8.2'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kaz Utashiro <kaz@utashiro.com>'
+  - 'Toshifumi Sakaguchi <sischkg@gmail.com>'

@@ -137,8 +137,8 @@ DESTROY (self)
 		timer = ZMQ_SV_TO_PTR (Timer, self);
 		recv = MUTABLE_SV (zmq_raw_timer_get_sv (timer));
 
+		zmq_raw_timers_remove (timer);
+
 		SvREFCNT_dec (recv);
 		SvREFCNT_dec (ZMQ_SV_TO_MAGIC (self));
-
-		zmq_raw_timers_remove (timer);
 

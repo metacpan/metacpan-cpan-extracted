@@ -12,9 +12,9 @@ my $server = Net::Async::WebSocket::Server->new(
       my ( undef, $client ) = @_;
 
       $client->configure(
-         on_frame => sub {
+         on_text_frame => sub {
             my ( $self, $frame ) = @_;
-            $self->send_frame( $frame );
+            $self->send_text_frame( $frame );
          },
       );
    }
@@ -26,9 +26,6 @@ $loop->add( $server );
 $server->listen(
    family => "inet",
    service => $PORT,
+)->get;
 
-   on_listen_error => sub { die "Cannot listen - $_[-1]" },
-   on_resolve_error => sub { die "Cannot resolve - $_[-1]" },
-);
-
-$loop->loop_forever;
+$loop->run;

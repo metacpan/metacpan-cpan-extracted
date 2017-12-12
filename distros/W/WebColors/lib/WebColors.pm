@@ -31,10 +31,14 @@ See Also
 
 Google material colors L<http://www.google.com/design/spec/style/color.html>
 
+L<Color::Mix>
+
 =cut
 
+# note _)rgb, darken and lighten have been lifted from Color::Mix and fitted into this module
+
 package WebColors ;
-$WebColors::VERSION = '0.4.4';
+$WebColors::VERSION = '0.4.7';
 use 5.0.4 ;
 use warnings ;
 use strict ;
@@ -56,6 +60,8 @@ use vars qw( @EXPORT @ISA) ;
     rgb_percent_to_colorname
     inverse_rgb
     luminance
+    lighten
+    darken
     ) ;
 
 # ----------------------------------------------------------------------------
@@ -65,13 +71,14 @@ my %web_colors = (
     # basic
     black   => [ 0,   0,   0 ],
     silver  => [ 192, 192, 192 ],
+    grey    => [ 128, 128, 128 ],
     gray    => [ 128, 128, 128 ],
     white   => [ 255, 255, 255 ],
     maroon  => [ 128, 0,   0 ],
     red     => [ 255, 0,   0 ],
     purple  => [ 128, 0,   128 ],
     fuchsia => [ 255, 0,   255 ],
-    green   => [ 0,   128, 0 ],
+    green   => [ 0,   128, 0 ],     # not sure why green is not 255, but lime is
     lime    => [ 0,   255, 0 ],
     olive   => [ 128, 128, 0 ],
     yellow  => [ 255, 255, 0 ],
@@ -81,63 +88,65 @@ my %web_colors = (
     aqua    => [ 0,   255, 255 ],
 
     # extended
-    aliceblue            => [ 240, 248, 255 ],
-    antiquewhite         => [ 250, 235, 215 ],
-    aqua                 => [ 0,   255, 255 ],
-    aquamarine           => [ 127, 255, 212 ],
-    azure                => [ 240, 255, 255 ],
-    beige                => [ 245, 245, 220 ],
-    bisque               => [ 255, 228, 196 ],
-    black                => [ 0,   0,   0 ],
-    blanchedalmond       => [ 255, 235, 205 ],
-    blue                 => [ 0,   0,   255 ],
-    blueviolet           => [ 138, 43,  226 ],
-    brown                => [ 165, 42,  42 ],
-    burlywood            => [ 222, 184, 135 ],
-    cadetblue            => [ 95,  158, 160 ],
-    chartreuse           => [ 127, 255, 0 ],
-    chocolate            => [ 210, 105, 30 ],
-    coral                => [ 255, 127, 80 ],
-    cornflowerblue       => [ 100, 149, 237 ],
-    cornsilk             => [ 255, 248, 220 ],
-    crimson              => [ 220, 20,  60 ],
-    cyan                 => [ 0,   255, 255 ],
-    darkblue             => [ 0,   0,   139 ],
-    darkcyan             => [ 0,   139, 139 ],
-    darkgoldenrod        => [ 184, 134, 11 ],
-    darkgray             => [ 169, 169, 169 ],
-    darkgreen            => [ 0,   100, 0 ],
-    darkgrey             => [ 169, 169, 169 ],
-    darkkhaki            => [ 189, 183, 107 ],
-    darkmagenta          => [ 139, 0,   139 ],
-    darkolivegreen       => [ 85,  107, 47 ],
-    darkorange           => [ 255, 140, 0 ],
-    darkorchid           => [ 153, 50,  204 ],
-    darkred              => [ 139, 0,   0 ],
-    darksalmon           => [ 233, 150, 122 ],
-    darkseagreen         => [ 143, 188, 143 ],
-    darkslateblue        => [ 72,  61,  139 ],
-    darkslategray        => [ 47,  79,  79 ],
-    darkslategrey        => [ 47,  79,  79 ],
-    darkturquoise        => [ 0,   206, 209 ],
-    darkviolet           => [ 148, 0,   211 ],
-    deeppink             => [ 255, 20,  147 ],
-    deepskyblue          => [ 0,   191, 255 ],
-    dimgray              => [ 105, 105, 105 ],
-    dimgrey              => [ 105, 105, 105 ],
-    dodgerblue           => [ 30,  144, 255 ],
-    firebrick            => [ 178, 34,  34 ],
-    floralwhite          => [ 255, 250, 240 ],
-    forestgreen          => [ 34,  139, 34 ],
-    fuchsia              => [ 255, 0,   255 ],
-    gainsboro            => [ 220, 220, 220 ],
-    ghostwhite           => [ 248, 248, 255 ],
-    gold                 => [ 255, 215, 0 ],
-    goldenrod            => [ 218, 165, 32 ],
-    gray                 => [ 128, 128, 128 ],
-    green                => [ 0,   128, 0 ],
-    greenyellow          => [ 173, 255, 47 ],
-    grey                 => [ 128, 128, 128 ],
+    aliceblue    => [ 240, 248, 255 ],
+    antiquewhite => [ 250, 235, 215 ],
+    # aqua                 => [ 0,   255, 255 ],
+    aquamarine => [ 127, 255, 212 ],
+    azure      => [ 240, 255, 255 ],
+    beige      => [ 245, 245, 220 ],
+    bisque     => [ 255, 228, 196 ],
+    # black                => [ 0,   0,   0 ],
+    blanchedalmond => [ 255, 235, 205 ],
+    # blue                 => [ 0,   0,   255 ],
+    blueviolet     => [ 138, 43,  226 ],
+    brown          => [ 165, 42,  42 ],
+    burlywood      => [ 222, 184, 135 ],
+    cadetblue      => [ 95,  158, 160 ],
+    chartreuse     => [ 127, 255, 0 ],
+    chocolate      => [ 210, 105, 30 ],
+    coral          => [ 255, 127, 80 ],
+    cornflowerblue => [ 100, 149, 237 ],
+    cornsilk       => [ 255, 248, 220 ],
+    crimson        => [ 220, 20,  60 ],
+    cyan           => [ 0,   255, 255 ],
+    darkblue       => [ 0,   0,   139 ],
+    darkcyan       => [ 0,   139, 139 ],
+    darkgoldenrod  => [ 184, 134, 11 ],
+    darkgray       => [ 169, 169, 169 ],
+    darkgrey       => [ 169, 169, 169 ],
+    darkgreen      => [ 0,   100, 0 ],
+    darkgrey       => [ 169, 169, 169 ],
+    darkkhaki      => [ 189, 183, 107 ],
+    darkmagenta    => [ 139, 0,   139 ],
+    darkolivegreen => [ 85,  107, 47 ],
+    darkorange     => [ 255, 140, 0 ],
+    darkorchid     => [ 153, 50,  204 ],
+    darkred        => [ 139, 0,   0 ],
+    darksalmon     => [ 233, 150, 122 ],
+    darkseagreen   => [ 143, 188, 143 ],
+    darkslateblue  => [ 72,  61,  139 ],
+    darkslategray  => [ 47,  79,  79 ],
+    darkslategrey  => [ 47,  79,  79 ],
+    darkturquoise  => [ 0,   206, 209 ],
+    darkviolet     => [ 148, 0,   211 ],
+    deeppink       => [ 255, 20,  147 ],
+    deepskyblue    => [ 0,   191, 255 ],
+    dimgray        => [ 105, 105, 105 ],
+    dimgrey        => [ 105, 105, 105 ],
+    dodgerblue     => [ 30,  144, 255 ],
+    firebrick      => [ 178, 34,  34 ],
+    floralwhite    => [ 255, 250, 240 ],
+    forestgreen    => [ 34,  139, 34 ],
+    # fuchsia              => [ 255, 0,   255 ],
+    gainsboro  => [ 220, 220, 220 ],
+    ghostwhite => [ 248, 248, 255 ],
+    gold       => [ 255, 215, 0 ],
+    goldenrod  => [ 218, 165, 32 ],
+    # gray                 => [ 128, 128, 128 ],
+    # grey                 => [ 128, 128, 128 ],
+    # green                => [ 0,   128, 0 ],
+    greenyellow => [ 173, 255, 47 ],
+    # grey                 => [ 128, 128, 128 ],
     honeydew             => [ 240, 255, 240 ],
     hotpink              => [ 255, 105, 180 ],
     indianred            => [ 205, 92,  92 ],
@@ -153,8 +162,8 @@ my %web_colors = (
     lightcyan            => [ 224, 255, 255 ],
     lightgoldenrodyellow => [ 250, 250, 210 ],
     lightgray            => [ 211, 211, 211 ],
-    lightgreen           => [ 144, 238, 144 ],
     lightgrey            => [ 211, 211, 211 ],
+    lightgreen           => [ 144, 238, 144 ],
     lightpink            => [ 255, 182, 193 ],
     lightsalmon          => [ 255, 160, 122 ],
     lightseagreen        => [ 32,  178, 170 ],
@@ -163,74 +172,90 @@ my %web_colors = (
     lightslategrey       => [ 119, 136, 153 ],
     lightsteelblue       => [ 176, 196, 222 ],
     lightyellow          => [ 255, 255, 224 ],
-    lime                 => [ 0,   255, 0 ],
-    limegreen            => [ 50,  205, 50 ],
-    linen                => [ 250, 240, 230 ],
-    magenta              => [ 255, 0,   255 ],
-    maroon               => [ 128, 0,   0 ],
-    mediumaquamarine     => [ 102, 205, 170 ],
-    mediumblue           => [ 0,   0,   205 ],
-    mediumorchid         => [ 186, 85,  211 ],
-    mediumpurple         => [ 147, 112, 219 ],
-    mediumseagreen       => [ 60,  179, 113 ],
-    mediumslateblue      => [ 123, 104, 238 ],
-    mediumspringgreen    => [ 0,   250, 154 ],
-    mediumturquoise      => [ 72,  209, 204 ],
-    mediumvioletred      => [ 199, 21,  133 ],
-    midnightblue         => [ 25,  25,  112 ],
-    mintcream            => [ 245, 255, 250 ],
-    mistyrose            => [ 255, 228, 225 ],
-    moccasin             => [ 255, 228, 181 ],
-    navajowhite          => [ 255, 222, 173 ],
-    navy                 => [ 0,   0,   128 ],
-    oldlace              => [ 253, 245, 230 ],
-    olive                => [ 128, 128, 0 ],
-    olivedrab            => [ 107, 142, 35 ],
-    orange               => [ 255, 165, 0 ],
-    orangered            => [ 255, 69,  0 ],
-    orchid               => [ 218, 112, 214 ],
-    palegoldenrod        => [ 238, 232, 170 ],
-    palegreen            => [ 152, 251, 152 ],
-    paleturquoise        => [ 175, 238, 238 ],
-    palevioletred        => [ 219, 112, 147 ],
-    papayawhip           => [ 255, 239, 213 ],
-    peachpuff            => [ 255, 218, 185 ],
-    peru                 => [ 205, 133, 63 ],
-    pink                 => [ 255, 192, 203 ],
-    plum                 => [ 221, 160, 221 ],
-    powderblue           => [ 176, 224, 230 ],
-    purple               => [ 128, 0,   128 ],
-    red                  => [ 255, 0,   0 ],
-    rebeccapurple        => [ 102, 51,  153 ],
-    rosybrown            => [ 188, 143, 143 ],
-    royalblue            => [ 65,  105, 225 ],
-    saddlebrown          => [ 139, 69,  19 ],
-    salmon               => [ 250, 128, 114 ],
-    sandybrown           => [ 244, 164, 96 ],
-    seagreen             => [ 46,  139, 87 ],
-    seashell             => [ 255, 245, 238 ],
-    sienna               => [ 160, 82,  45 ],
-    silver               => [ 192, 192, 192 ],
-    skyblue              => [ 135, 206, 235 ],
-    slateblue            => [ 106, 90,  205 ],
-    slategray            => [ 112, 128, 144 ],
-    slategrey            => [ 112, 128, 144 ],
-    snow                 => [ 255, 250, 250 ],
-    springgreen          => [ 0,   255, 127 ],
-    steelblue            => [ 70,  130, 180 ],
-    tan                  => [ 210, 180, 140 ],
-    teal                 => [ 0,   128, 128 ],
-    thistle              => [ 216, 191, 216 ],
-    tomato               => [ 255, 99,  71 ],
-    turquoise            => [ 64,  224, 208 ],
-    violet               => [ 238, 130, 238 ],
-    wheat                => [ 245, 222, 179 ],
-    white                => [ 255, 255, 255 ],
-    whitesmoke           => [ 245, 245, 245 ],
-    yellow               => [ 255, 255, 0 ],
-    yellowgreen          => [ 154, 205, 50 ],
+    # lime                 => [ 0,   255, 0 ],
+    limegreen => [ 50,  205, 50 ],
+    linen     => [ 250, 240, 230 ],
+    magenta   => [ 255, 0,   255 ],
+    # maroon               => [ 128, 0,   0 ],
+    mediumaquamarine  => [ 102, 205, 170 ],
+    mediumblue        => [ 0,   0,   205 ],
+    mediumorchid      => [ 186, 85,  211 ],
+    mediumpurple      => [ 147, 112, 219 ],
+    mediumseagreen    => [ 60,  179, 113 ],
+    mediumslateblue   => [ 123, 104, 238 ],
+    mediumspringgreen => [ 0,   250, 154 ],
+    mediumturquoise   => [ 72,  209, 204 ],
+    mediumvioletred   => [ 199, 21,  133 ],
+    midnightblue      => [ 25,  25,  112 ],
+    mintcream         => [ 245, 255, 250 ],
+    mistyrose         => [ 255, 228, 225 ],
+    moccasin          => [ 255, 228, 181 ],
+    navajowhite       => [ 255, 222, 173 ],
+    # navy                 => [ 0,   0,   128 ],
+    oldlace => [ 253, 245, 230 ],
+    # olive                => [ 128, 128, 0 ],
+    olivedrab     => [ 107, 142, 35 ],
+    orange        => [ 255, 165, 0 ],
+    orangered     => [ 255, 69,  0 ],
+    orchid        => [ 218, 112, 214 ],
+    palegoldenrod => [ 238, 232, 170 ],
+    palegreen     => [ 152, 251, 152 ],
+    paleturquoise => [ 175, 238, 238 ],
+    palevioletred => [ 219, 112, 147 ],
+    papayawhip    => [ 255, 239, 213 ],
+    peachpuff     => [ 255, 218, 185 ],
+    peru          => [ 205, 133, 63 ],
+    pink          => [ 255, 192, 203 ],
+    plum          => [ 221, 160, 221 ],
+    powderblue    => [ 176, 224, 230 ],
+    # purple               => [ 128, 0,   128 ],
+    # red                  => [ 255, 0,   0 ],
+    rebeccapurple => [ 102, 51,  153 ],
+    rosybrown     => [ 188, 143, 143 ],
+    royalblue     => [ 65,  105, 225 ],
+    saddlebrown   => [ 139, 69,  19 ],
+    salmon        => [ 250, 128, 114 ],
+    sandybrown    => [ 244, 164, 96 ],
+    seagreen      => [ 46,  139, 87 ],
+    seashell      => [ 255, 245, 238 ],
+    sienna        => [ 160, 82,  45 ],
+    # silver               => [ 192, 192, 192 ],
+    skyblue     => [ 135, 206, 235 ],
+    slateblue   => [ 106, 90,  205 ],
+    slategray   => [ 112, 128, 144 ],
+    slategrey   => [ 112, 128, 144 ],
+    snow        => [ 255, 250, 250 ],
+    springgreen => [ 0,   255, 127 ],
+    steelblue   => [ 70,  130, 180 ],
+    tan         => [ 210, 180, 140 ],
+    # teal                 => [ 0,   128, 128 ],
+    thistle   => [ 216, 191, 216 ],
+    tomato    => [ 255, 99,  71 ],
+    turquoise => [ 64,  224, 208 ],
+    violet    => [ 238, 130, 238 ],
+    wheat     => [ 245, 222, 179 ],
+    # white                => [ 255, 255, 255 ],
+    whitesmoke => [ 245, 245, 245 ],
+    # yellow               => [ 255, 255, 0 ],
+    yellowgreen => [ 154, 205, 50 ],
+# I notice that this is a thing! https://stackoverflow.com/questions/8318911/why-does-html-think-chucknorris-is-a-color
+    chucknorris => [ 192, 0, 0 ],
 
-# google material colors from http://www.google.com/design/spec/style/color.html
+# in memory of prince, pantone released https://www.pantone.com/images/pages/21326/prince-announces-pantone-custom-color-purple.jpg
+    prince          => [ 85, 58, 99 ],
+    lovesymbol2     => [ 85, 58, 99 ],
+    'love-symbol-2' => [ 85, 58, 99 ],
+    # more pantone colors
+    ultraviolet       => [ 101, 78,  163 ],
+    'ultra-violet'    => [ 101, 78,  163 ],
+    greenery          => [ 132, 189, 0 ],
+    masarla           => [ 173, 101, 95 ],
+    tangerinetango    => [ 221, 65,  36 ],
+    'tangerine-tango' => [ 221, 65,  36 ],
+    chillipepper      => [ 168, 41,  24 ],
+    'chilli-pepper'   => [ 168, 41,  24 ],
+
+    # google material colors from http://www.google.com/design/spec/style/color.html
 
     red50   => [ 0xff, 0xeb, 0xee ],
     red100  => [ 0xff, 0xcd, 0xd2 ],
@@ -494,6 +519,17 @@ my %web_colors = (
     grey800 => [ 0x42, 0x42, 0x42 ],
     grey900 => [ 0x21, 0x21, 0x21 ],
 
+    gray50  => [ 0xfa, 0xfa, 0xfa ],
+    gray100 => [ 0xf5, 0xf5, 0xf5 ],
+    gray200 => [ 0xee, 0xee, 0xee ],
+    gray300 => [ 0xe0, 0xe0, 0xe0 ],
+    gray400 => [ 0xbd, 0xbd, 0xbd ],
+    gray500 => [ 0x9e, 0x9e, 0x9e ],
+    gray600 => [ 0x75, 0x75, 0x75 ],
+    gray700 => [ 0x61, 0x61, 0x61 ],
+    gray800 => [ 0x42, 0x42, 0x42 ],
+    gray900 => [ 0x21, 0x21, 0x21 ],
+
     bluegrey50  => [ 0xec, 0xef, 0xf1 ],
     bluegrey100 => [ 0xcf, 0xd8, 0xdc ],
     bluegrey200 => [ 0xb0, 0xbe, 0xc5 ],
@@ -504,6 +540,17 @@ my %web_colors = (
     bluegrey700 => [ 0x45, 0x5a, 0x64 ],
     bluegrey800 => [ 0x37, 0x47, 0x4f ],
     bluegrey900 => [ 0x26, 0x32, 0x38 ],
+
+    bluegray50  => [ 0xec, 0xef, 0xf1 ],
+    bluegray100 => [ 0xcf, 0xd8, 0xdc ],
+    bluegray200 => [ 0xb0, 0xbe, 0xc5 ],
+    bluegray300 => [ 0x90, 0xa4, 0xae ],
+    bluegray400 => [ 0x78, 0x90, 0x9c ],
+    bluegray500 => [ 0x60, 0x7d, 0x8b ],
+    bluegray600 => [ 0x54, 0x6e, 0x7a ],
+    bluegray700 => [ 0x45, 0x5a, 0x64 ],
+    bluegray800 => [ 0x37, 0x47, 0x4f ],
+    bluegray900 => [ 0x26, 0x32, 0x38 ],
 
     # open colors https://yeun.github.io/open-color/
     # variations in names handled in colorname_to_rgb
@@ -517,6 +564,15 @@ my %web_colors = (
     'oc-gray-7'   => [ 0x49, 0x50, 0x57 ],
     'oc-gray-8'   => [ 0x34, 0x3a, 0x40 ],
     'oc-gray-9'   => [ 0x21, 0x25, 0x29 ],
+    'oc-grey-1'   => [ 0xf1, 0xf3, 0xf5 ],
+    'oc-grey-2'   => [ 0xe9, 0xec, 0xef ],
+    'oc-grey-3'   => [ 0xde, 0xe2, 0xe6 ],
+    'oc-grey-4'   => [ 0xce, 0xd4, 0xda ],
+    'oc-grey-5'   => [ 0xad, 0xb5, 0xbd ],
+    'oc-grey-6'   => [ 0x86, 0x8e, 0x96 ],
+    'oc-grey-7'   => [ 0x49, 0x50, 0x57 ],
+    'oc-grey-8'   => [ 0x34, 0x3a, 0x40 ],
+    'oc-grey-9'   => [ 0x21, 0x25, 0x29 ],
     'oc-red-0'    => [ 0xff, 0xf5, 0xf5 ],
     'oc-red-1'    => [ 0xff, 0xe3, 0xe3 ],
     'oc-red-2'    => [ 0xff, 0xc9, 0xc9 ],
@@ -658,7 +714,8 @@ list the colors covered in this module
 
 sub list_webcolors
 {
-    return sort keys %web_colors ;
+    my @c = sort keys %web_colors ;
+    return @c ;
 }
 
 
@@ -670,6 +727,7 @@ sub _hex_to_rgb
 {
     my ($hex) = @_ ;
 
+    $hex ||= '000000' ;
     $hex =~ s/^#// ;
     $hex = lc($hex) ;
 
@@ -705,6 +763,7 @@ entries will be null if there is no match
 sub to_rgb
 {
     my ($name) = @_ ;
+    $name ||= 'black' ;
     # first up try as hex
     my ( $r, $g, $b ) = _hex_to_rgb($name) ;
 
@@ -738,6 +797,8 @@ sub colorname_to_rgb
 {
     my ($name) = @_ ;
 
+    $name =~ s/#//g ;
+    $name ||= "black" ;
     $name = lc($name) ;
 
     # allow variations on open color names
@@ -746,7 +807,14 @@ sub colorname_to_rgb
     $name =~ s/^oc-(\w+)(\d)$/oc-$1-$2/ ;
 
     # deref the arraryref
-    my $rgb = $web_colors{ $name } ;
+    my $rgb = $web_colors{$name} ;
+    if ( !$rgb && $name =~ /^[0-9a-f]{6}$/i ) {
+        $rgb = [
+            hex( substr( $name, 0, 2 ) ),
+            hex( substr( $name, 2, 2 ) ),
+            hex( substr( $name, 4, 2 ) )
+        ] ;
+    }
 
     $rgb = [ undef, undef, undef ] if ( !$rgb ) ;
     return @$rgb ;
@@ -770,6 +838,8 @@ entries will be null if there is no match
 sub colorname_to_hex
 {
     my ($name) = @_ ;
+    # $name ||= 'black' ;
+    $name =~ s/grey/gray/ ;
     my @c = colorname_to_rgb($name) ;
     my $str ;
     $str = sprintf( "%02x%02x%02x", $c[0], $c[1], $c[2] )
@@ -792,6 +862,7 @@ entries will be null if there is no match
 sub colorname_to_rgb_percent
 {
     my ($name) = @_ ;
+    $name ||= 'black' ;
 
     my @c = colorname_to_rgb($name) ;
 
@@ -827,6 +898,13 @@ returns null if there is no match
 sub rgb_to_colorname
 {
     my ( $r, $g, $b ) = @_ ;
+    if ( $r eq 'black' ) {
+        ( $r, $g, $b ) = ( 0, 0, 0 ) ;
+    }
+
+    $r //= 0 ;
+    $g //= 0 ;
+    $b //= 0 ;
 
     my $color ;
     foreach my $c ( sort keys %web_colors ) {
@@ -834,8 +912,7 @@ sub rgb_to_colorname
         # no need for fancy compares
         my ( $r1, $g1, $b1 ) = @{ $web_colors{$c} } ;
 
-        if ( _almost( $r, $r1 ) && _almost( $g, $g1 ) && _almost( $b, $b1 ) )
-        {
+        if ( _almost( $r, $r1 ) && _almost( $g, $g1 ) && _almost( $b, $b1 ) ) {
             $color = $c ;
             last ;
         }
@@ -859,12 +936,15 @@ returns null if there is no match
 sub rgb_percent_to_colorname
 {
     my ( $r, $g, $b ) = @_ ;
+    if ( $r eq 'black' ) {
+        ( $r, $g, $b ) = ( 0, 0, 0 ) ;
+    }
 
-    return rgb_to_colorname(
-        int( $r * 255 / 100 ),
-        int( $g * 255 / 100 ),
-        int( $b * 255 / 100 )
-    ) ;
+    $r //= 0 ;
+    $g //= 0 ;
+    $b //= 0 ;
+
+    return rgb_to_colorname( int( $r * 255 / 100 ), int( $g * 255 / 100 ), int( $b * 255 / 100 ) ) ;
 }
 
 # ----------------------------------------------------------------------------
@@ -882,6 +962,7 @@ returns null if there is no match
 sub hex_to_colorname
 {
     my ($hex) = @_ ;
+    $hex ||= '000000' ;
 
     my ( $r, $g, $b ) = _hex_to_rgb($hex) ;
 
@@ -901,6 +982,13 @@ Get the inverse of the RGB values
 sub inverse_rgb
 {
     my ( $r, $g, $b ) = @_ ;
+    if ( $r eq 'black' ) {
+        ( $r, $g, $b ) = ( 0, 0, 0 ) ;
+    }
+
+    $r //= 0 ;
+    $g //= 0 ;
+    $b //= 0 ;
 
     return ( 255 - $r, 255 - $g, 255 - $b ) ;
 }
@@ -948,6 +1036,47 @@ sub luminance
 =back
 
 =cut
+
+# -----------------------------------------------------------------------------
+
+=item lighten
+
+lighten a color by an optional amount, returns a hex color string
+amount to adjust is a multiple of 32
+
+    my $hex = lighten( 'goldenrod', 3) ;
+
+=cut
+
+sub lighten
+{
+    my ( $color, $by ) = @_ ;
+    $by ||= 1 ;
+    my $shade = 32 ;    # $self->get_shade;
+    return sprintf( '%.2x%.2x%.2x',
+        map { ( $_ + $shade * $by > 255 ) ? 255 : $_ + $shade * $by } colorname_to_rgb($color) ) ;
+}
+
+# -----------------------------------------------------------------------------
+=item darken
+
+darken a color by an optional amount, returns a hex color string
+amount to adjust is a multiple of 32
+
+
+    my $hex = darken( 'goldenrod', 2) ;
+
+=cut
+
+sub darken
+{
+    my ( $color, $by ) = @_ ;
+    $by ||= 1 ;
+    my $shade = 32 ;    # $self->get_shade;
+    return sprintf( '%.2x%.2x%.2x',
+        map { ( $_ - $shade * $by < 0 ) ? 0 : $_ - $shade * $by } colorname_to_rgb($color) ) ;
+}
+
 
 # ----------------------------------------------------------------------------
 

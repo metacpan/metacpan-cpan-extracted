@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '3.4.0';
+use version; our $VERSION = version->declare('v3.5.3');
 
 use Carp              ();
 use File::Spec        ();
@@ -57,6 +57,8 @@ sub USE_XS() { $use_xs }
 sub input_layer { ref($_[0]) ? $_[0]->{input_layer} : ':utf8' }
 
 package Text::Xslate::Engine; # XS/PP common base class
+
+use version; our $VERSION = version->declare('v3.5.3');
 
 use Text::Xslate::Util qw(
     make_error
@@ -662,13 +664,15 @@ package Text::Xslate;
 1;
 __END__
 
+=for stopwords sandboxing vs metacharacters name-coderef html xml cb tx TTerse HTML xslate HTMLTemplate gardejo jjn1056 clouder chiba turugina cho45 shmorimo ueda punytan
+
 =head1 NAME
 
 Text::Xslate - Scalable template engine for Perl5
 
 =head1 VERSION
 
-This document describes Text::Xslate version 3.4.0.
+This document describes Text::Xslate version v3.5.3.
 
 =head1 SYNOPSIS
 
@@ -963,7 +967,7 @@ in order to pre-process template.
 
 For example:
 
-    # Remove withespace from templates
+    # Remove whitespace from templates
     my $tx = Text::Xslate->new(
         pre_process_handler => sub {
             my $text = shift;

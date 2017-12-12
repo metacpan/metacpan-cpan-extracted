@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,6 +29,9 @@
 #
 # plain hexagonal tiling http://tilingsearch.org/HTML/data136/F666.html
 
+# http://complex-systems.com/pdf/24-4-1.pdf
+# http://complex-systems.com/issues/24-4.html
+
 # Jeffrey Ventrella
 # root-7 family
 # "inner-flip" which is initial state reversal
@@ -40,7 +43,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 124;
+$VERSION = 125;
 
 # inherit: new(), rect_to_n_range(), arms_count(), n_start(),
 #          parameter_info_array(), xy_is_visited()
@@ -852,7 +855,7 @@ there.
       3       -1      2         -1        1       multiple of
       4       -2      1         -1        1       60 degrees
       5        0     -2          1       -1
-      6        1     -1         -1       -1
+      6       -1     -1         -1       -1
 
 For example N=9079 is base-7 "35320" so a single low 0 for zcount=1 and
 strip it to "3532".  Take zdigit=2 leaving "353".  Skip low 3s leaving "35".
@@ -901,7 +904,7 @@ L<http://oeis.org/A261180> (etc)
 
     A261180   direction 0 to 5
     A261185   direction mod 2
-    A229214   direction 1,2,3,-1,-2,-3 clockwise
+    A229214   direction 1,2,3,-1,-2,-3 spiralling clockwise
 
     A261120   count of triple-visited points in the fractal limit
     A262147   \ fractions making a spiral in the fractal
@@ -934,7 +937,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-PlanePath.
 
@@ -952,8 +955,3 @@ You should have received a copy of the GNU General Public License along with
 Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-
-
-# http://complex-systems.com/pdf/24-4-1.pdf
-# http://complex-systems.com/issues/24-4.html

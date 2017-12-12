@@ -83,6 +83,11 @@ use_ok 'Template::Lace::Factory';
       ->append_content('<footer>INFO</footer>');
   }
 
+  sub header {
+    my ($self, $dom) = @_;
+    $dom->at('p')->content('bbb');
+  }
+
   sub template {q[
     <layout-master
         title=\'title:content'
@@ -92,6 +97,9 @@ use_ok 'Template::Lace::Factory';
           <title>Page Title</title>
         </head>
         <body>
+          <$.header>
+            <p id='header'>aaa</p>
+          </$.header>
           <layout-nav>
             <ul>
               <li>aaa</li>
@@ -250,6 +258,7 @@ $renderer->call('add_debug');
 ok my $html = $renderer->render;
 ok my $dom = Template::Lace::DOM->new($html);
 
+is $dom->at('#header')->content, 'bbb';
 is $dom->at('nav li')->content, 'aaa';
 is $dom->find('meta')->[0]->attr('charset'), 'utf-8';
 is $dom->find('meta')->[1]->attr('name'), 'viewport';

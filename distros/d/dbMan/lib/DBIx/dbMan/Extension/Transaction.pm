@@ -3,15 +3,15 @@ package DBIx::dbMan::Extension::Transaction;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 
-sub IDENTIFICATION { return "000001-000022-000009"; }
+sub IDENTIFICATION { return "000001-000022-000010"; }
 
 sub preference { return 0; }
 
-sub known_actions { return [ qw/TRANSACTION/ ]; }
+sub known_actions { return [ qw/TRANSACTION NOTIFY/ ]; }
 
 sub init {
 	my $obj = shift;
@@ -79,6 +79,8 @@ sub handle_action {
 			}
 			$action{action} = 'OUTPUT';
 			$obj->{-interface}->rebuild_menu();
+	    } elsif ( $action{action} eq 'NOTIFY' and $action{notify} eq 'connection_change' ) {
+            # prompt will be applied later in this handler
 		} elsif ($action{operation} eq 'change') {
 			$action{action} = 'NONE';
 			$obj->{-interface}->rebuild_menu();

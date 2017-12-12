@@ -5,10 +5,10 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	
+
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -39,7 +39,7 @@ sub _add {
 
   } @_;
 
-  push @parts, $rest unless $rest->empty;  
+  push @parts, $rest unless $rest->empty;
   return @parts;
 }
 
@@ -55,18 +55,15 @@ sub intspan_partition {
 
 sub intspan_partition_map {
 
-  use Heap::Simple qw//;
+  use Heap::MinMax qw//;
   use List::Util qw/min max/;
   use List::MoreUtils qw/uniq/;
 
-  my $heap = Heap::Simple->new(order => sub {
+  my $heap = Heap::MinMax->new(fcompare => sub {
     my ($x, $y) = @_;
-    return 1 if $x->[0] < $y->[0];
-    return 0 if $x->[0] > $y->[0];
-    return 1 if $x->[1] < $y->[1];
-    return 0;
+    return ( ($x->[0] <=> $y->[0]) || ($x->[1] <=> $y->[1]) );
   });
-  
+
   for (my $ix = 0; $ix < @_; ++$ix) {
     my $obj = $_[$ix];
     for ($obj->spans) {
@@ -77,8 +74,8 @@ sub intspan_partition_map {
   my @result;
 
   while (1) {
-    my $x = $heap->extract_first;
-    my $y = $heap->extract_first;
+    my $x = $heap->pop_min;
+    my $y = $heap->pop_min;
 
     last unless defined $x;
     push @result, $x unless defined $y;
@@ -96,20 +93,20 @@ sub intspan_partition_map {
     my $prefX = [ $x->[0], $XandY->[0] - 1, $x->[2] ];
     my $suffX = [ $XandY->[1] + 1, $x->[1], $x->[2] ];
     my $onlyY = [ $XandY->[1] + 1, $y->[1], $y->[2] ];
-    
+
     for ($prefX, $suffX, $onlyY, $XandY) {
       next unless $_->[0] <= $_->[1];
       $heap->insert($_);
     }
   }
-  
+
   # group spans back into classes
   my %group;
   for my $item (@result) {
     my $key = join ',', uniq sort @{ $item->[2] };
     push @{ $group{$key} }, $item;
   }
-  
+
   my %map;
   while (my ($k, $v) = each %group) {
     my $class = Set::IntSpan->new([map {
@@ -117,7 +114,7 @@ sub intspan_partition_map {
     } @$v]);
     push @{ $map{$_} }, $class for uniq map { @{ $_->[2] } } @$v;
   }
-  
+
   return %map;
 }
 
@@ -167,9 +164,14 @@ C<intspan_partition> and C<intspan_partition_map>.
 Slow. Patches welcome. I don't like the name C<intspan_partition>,
 ideas welcome.
 
+=head1 THANKS
+
+Thanks to Paul Cochrane for his many improvements to this distribution as
+part of Neil Bowers' L<http://neilb.org/2014/11/29/pr-challenge-2015.html>.
+
 =head1 AUTHOR / COPYRIGHT / LICENSE
 
-  Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>.
+  Copyright (c) 2008-2015 Bjoern Hoehrmann <bjoern@hoehrmann.de>.
   This module is licensed under the same terms as Perl itself.
 
 =cut

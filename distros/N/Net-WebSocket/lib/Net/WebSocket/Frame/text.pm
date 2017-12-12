@@ -16,7 +16,7 @@ Net::WebSocket::Frame::text
         #Optional, can be either empty (default) or four random bytes
         mask => q<>,
 
-        payload_sr => \$payload_text,
+        payload => $payload_text,
     );
 
     $frm->get_type();           #"text"

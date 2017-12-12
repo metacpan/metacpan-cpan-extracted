@@ -11,13 +11,13 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Class::XSAccessor' => '0'
+                                        'EV' => '4.22'
                                       },
                       'requires' => {
                                       'AnyEvent' => '7.14',
                                       'Carp' => '0',
                                       'Coro' => '6.514',
-                                      'Moo' => '0',
+                                      'List::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'common::sense' => '0'
                                     }

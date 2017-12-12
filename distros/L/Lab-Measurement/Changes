@@ -4,6 +4,32 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.613 2017-12-09
+
+  * Add DESTROY method in Lab::XPRESS::Sweep to avoid ugly warning
+  * Improve metadata and documentation
+
+3.612 2017-12-07
+
+  * Re-upload without duplicate files
+
+3.611 2017-12-07
+
+  * Fix floating point precision issues in the tests
+
+3.610 2017-12-07
+
+  * Simplify network timeout handling
+  * Add Moose version of NI VISA connection
+  * Add Moose drivers of R&S SMB100A, HP3458A, YokogawaGS200, HP34410A
+  * Moose datafile: Add support for pm3d plots, optimize
+  * R&S SMB100A: Add device cache
+  * Add initial OI Mercury magnet support
+  * VNAs: Calculate amplitude and phase data directly in instrument driver
+  * Autoload Lab::Moose instruments in XPRESS again
+  * Fix harmless error messages and decrease terminal noise
+  * Add more examples and more documentation
+
 3.600 2017-09-21
 
   * Add vector cache functionality

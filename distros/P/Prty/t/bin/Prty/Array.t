@@ -382,11 +382,11 @@ sub test_meanValue : Test(3) {
 
     $arr = Prty::Array->new([qw/18 21 21 27 27 27 30 31 45/]);
     $x = $arr->meanValue;
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,27.44);
 
     $x = Prty::Array->meanValue([qw/18 21 21 27 27 27 30 31 45/]);
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,27.44);
 }
 
@@ -405,11 +405,11 @@ sub test_standardDeviation : Test(4) {
 
     $arr = Prty::Array->new([qw/18 21 21 27 27 27 30 31 45/]);
     $x = $arr->standardDeviation;
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,7.91);
 
     $x = Prty::Array->standardDeviation([qw/18 21 21 27 27 27 30 31 45/]);
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,7.91);
 }
 
@@ -425,11 +425,11 @@ sub test_variance : Test(4) {
     $self->is($x,0);
 
     $x = Prty::Array->new([qw/18 21 21 27 27 27 30 31 45/])->variance;
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,62.53);
 
     $x = Prty::Array->variance([qw/18 21 21 27 27 27 30 31 45/]);
-    $x = Prty::Formatter->roundTo($x,2);
+    $x = Prty::Math->roundTo($x,2);
     $self->is($x,62.53);
 }
 

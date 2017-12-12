@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Tutorial on using the Lab::Measurement package stac
 
 =head1 VERSION
 
-version 3.600
+version 3.613
 
 =head1 Introduction
 
@@ -99,7 +99,7 @@ PC. It provides a point-to-point connection to one instrument.
 
 A schematic view of the various software layers between your perl
 measurement script and the instrument hardware is depicted in the graphics
-L<http://www.labmeasurement.de/structure.png>.
+L<https://www.labmeasurement.de/structure.png>.
 
 The lowermost layer is provided by the hardware driver library and its Perl
 binding. One option for this is under Linux the package LinuxGPIB, which comes

@@ -1,14 +1,15 @@
 package Perinci::Access::Base::Patch::PeriAHS;
 
+our $DATE = '2017-12-09'; # DATE
+our $VERSION = '0.620'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
 
-use Module::Patch 0.12 qw();
+use Module::Patch 0.26 qw();
 use base qw(Module::Patch);
 use Perinci::Result::Format;
-
-our $VERSION = '0.61'; # VERSION
 
 sub patch_data {
     return {
@@ -56,7 +57,7 @@ Perinci::Access::Base::Patch::PeriAHS - Patch for Perinci::Access::Base
 
 =head1 VERSION
 
-This document describes version 0.61 of Perinci::Access::Base::Patch::PeriAHS (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-07-10.
+This document describes version 0.620 of Perinci::Access::Base::Patch::PeriAHS (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-12-09.
 
 =head1 DESCRIPTION
 
@@ -69,7 +70,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
 
 =head1 BUGS
 

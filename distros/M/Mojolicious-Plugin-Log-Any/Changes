@@ -1,0 +1,6 @@
+0.002     2017-12-05 02:28:09 EST
+  - Quick breaking change: Unsubscribe the default message handler in the
+    plugin, not the role
+
+0.001     2017-12-05 02:03:16 EST
+  - First release

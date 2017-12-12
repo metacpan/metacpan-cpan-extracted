@@ -15,19 +15,19 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
-SHA1 251462b48bf5cc1479c02c9b4589abf5e6747e90 Changes
-SHA1 ebd224fe2410bccd6548db88ebdb90ad86423c43 MANIFEST
+SHA1 549780ee4b14b7f8f40e7fb74b36a4e9ea529fc2 Changes
+SHA1 c614e16749cf2e155f96644dbd3194bd6ca7839e MANIFEST
 SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
-SHA1 d9b3b8fc4f4ffc04f673f708258a1dea5927b676 META.json
-SHA1 8daa85e64bf2d40b7eed10c8ffcab8de4f36cb77 META.yml
-SHA1 8eafa160337479d6e8eec493cdf38b025993e9c8 Makefile.PL
-SHA1 b96430725a449673ee24a006c7bc68b573b4245a debian/changelog
+SHA1 d232b6cc05b457db7534b2b679473defe44c8e89 META.json
+SHA1 a8c87a72feb7f2e68c543fc64e419e3136b478f8 META.yml
+SHA1 2c09115ddc968870733ad81c03a634bc70adbddc Makefile.PL
+SHA1 45118a3d588cdcd8101bec74c7be78c7463b5b51 debian/changelog
 SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
-SHA1 711cb9ab2e49c3094f0e22e64457aaeb503bb408 debian/control
+SHA1 f6aca05203838437619bb964e27f2f9a4b183567 debian/control
 SHA1 9cc91f8f2ac64769aaf504b68d6c7f372e24b2c7 debian/copyright
 SHA1 4a7111fa9cb2f06674997ddfc12b56cad0ba1467 debian/rules
 SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
-SHA1 c7ec585e50bc0a2a15ac726904363edeeb865246 debian/watch
+SHA1 3692bab65aada974fc49015ee0f1dc6dfc0e1757 debian/watch
 SHA1 758d00b8f3a25cdc4e61239912ddc82d5eb7e469 devel/Makefile
 SHA1 3dc7a530de06bb4b31a9e017242bb1bd10754d8d devel/all-small-trees.pl
 SHA1 5fc5ff5576b82db842a128394bf3757a9234f63b devel/beineke.pl
@@ -35,18 +35,18 @@ SHA1 1f260df05fc42330a12f0532fbc8e203275988f3 devel/best-of.pl
 SHA1 832114668eea8bca7f150bffb1a3cb237d3a666e devel/binary-beanstalk.pl
 SHA1 d5a7988a5599cedb8a7ea8067c96d3b72eb65ae9 devel/binomial-tree.pl
 SHA1 f9fbffb564094b90049a5ae874f16d69e4eb8d77 devel/bistar.pl
-SHA1 a03751fc56a88186c2f2cebbb964f06fea03170a devel/crown.pl
+SHA1 c07bef9ac478d4965426508174f633a6aa2d482d devel/crown.pl
 SHA1 e0d4d1802d0f441b5ff701a4ceee4618a77799b4 devel/dragon.pl
 SHA1 de177aa4a6a554ca011520b1caf23e2e5b4518d1 devel/fibonacci-tree.pl
 SHA1 433e4eb7ad4a0403f493776889ba3fc703545cb1 devel/fibonacci-wiener-S.gp
 SHA1 279d3b044de23dc94b65ec4f8526c4c3a268869e devel/fibonacci-wiener-full.gp
 SHA1 2ebc95a5347c1cc42bf081222b1f14c7036bcb3e devel/fibonacci-wiener.gp
 SHA1 f7a4859737788155ebd91ce4c9df3ca82b3820b2 devel/flowsnake.pl
-SHA1 d9672778cbf5256386cc58731b19523f841c408c devel/four-colour-hoax.pl
+SHA1 66c5087565abaa63da7654d5524f43667d1d0c9e devel/four-colour-hoax.pl
 SHA1 7c757cd95b61660c0b12654077dbd2efe9a60b03 devel/grid-layout.pl
 SHA1 5916474b5e29d8cc8b7c8445239b4f57506a1635 devel/hampton-court.pl
 SHA1 c85d1b08848cdfbfeabf82e7a842970da9d4af49 devel/hanoi.pl
-SHA1 375b6b199e68052bc6a4b76f26b4765a578ca065 devel/hex-grid.pl
+SHA1 b582686214f8c64daf21cc2b80e34ce630120f64 devel/hex-grid.pl
 SHA1 bae5fecd075b302625cb1f4ecda9cf6af1dad6f1 devel/hog-fetch-search.pl
 SHA1 12b133658637dbb167999e010a36471ed07c0f9a devel/hog-fetch.pl
 SHA1 9997a09efb5db84097ccd6041c65313ae5385a71 devel/hypercube.pl
@@ -55,33 +55,32 @@ SHA1 52969a7d3c8902f1d74d2f4a8ea3d4474ba3cde2 devel/keller.pl
 SHA1 9853322b63372cfa7ed34ea6d7500d18ed474b1d devel/kneser.pl
 SHA1 7a53125358beb46a36a589676e492504e22f63f5 devel/knight-grid.pl
 SHA1 16d5558e570999f7f16eb32b50dd6aa173ff96d4 devel/konigsberg.pl
-SHA1 63dbaf36123c1e78c016d9e75289a54ade910532 devel/lib/Graph/Maker/BestOf.pm
-SHA1 db5e753bd75c7fa0510e7df7c8f1afb42afff651 devel/lib/Graph/Maker/Caterpillar.pm
-SHA1 3391bccec87f176d6e455d5b8726f18a03ae99f5 devel/lib/Graph/Maker/Caterpillar.t
-SHA1 397e848122dd03f4f29acfdc9c9e2a09c142ff9f devel/lib/Graph/Maker/Circulant.pm
-SHA1 5c0e7b56b756cdeeee7ab66a502a5cdf2a4b397b devel/lib/Graph/Maker/Crown.pm
+SHA1 5f12efd28bcac994c4b923d7c345ee2bded494c3 devel/lib/Graph/Maker/BestOf.pm
+SHA1 7be0c9c770914d9451936bc7b0c0eb685fa7c3b8 devel/lib/Graph/Maker/Caterpillar.pm
+SHA1 17422e275327cf8f798580707cc6f3a92399db96 devel/lib/Graph/Maker/Caterpillar.t
+SHA1 7e0d4553db19969db4324d2362f307949efeb3ac devel/lib/Graph/Maker/Circulant.pm
+SHA1 ece842aab1b29dd85cffeacfb46658f664fed75c devel/lib/Graph/Maker/Crown.pm
 SHA1 75df0b173fe58653998512a93d81dcbbdd8700de devel/lib/Graph/Maker/Dragon-path.t
-SHA1 e986b4745ce980178471ce13b5634ef93dbee8ef devel/lib/Graph/Maker/Dragon.pm
-SHA1 bde4eb77fde698350cbb268bc3960cacc97ffc6a devel/lib/Graph/Maker/Dragon.t
-SHA1 9bf78b0b2314f58dc8a9c21680cc5d2fdb3817c8 devel/lib/Graph/Maker/DragonByPath.pm
-SHA1 40571e786922cce2feabdaa806572f9dde21f7cc devel/lib/Graph/Maker/Firecracker.pm
-SHA1 abdffc3f5e1f97a6e7f9575e1a7b07e51bdea9fb devel/lib/Graph/Maker/PlanePath.pm
-SHA1 142113db8a74e555baf74ab8212aab3e03e1b3b7 devel/lib/Graph/Maker/QuartetTree.pm
-SHA1 3142c150273e6e5ebb6b471e667e5910d75591aa devel/lib/Graph/Maker/R5Twindragon.pm
-SHA1 cea97c2fa1245521e207ae993c6ec978d4c9aa61 devel/lib/Graph/Maker/StarOfStars.pm
-SHA1 3ab5275c13387229ee3855bed7c47c9f71c3bdc3 devel/lib/Graph/Maker/Starlike.pm
-SHA1 eafea2483a9129a497855db2eb41cb389aea1201 devel/lib/Graph/Maker/TowerOfLondon.pm
-SHA1 55ce8da0762e733845dcc37d2df39f6e848dc628 devel/lib/Graph/Maker/Twindragon.pm
-SHA1 ecce44b07ab4e265c9f5dc0c3d18a2483bb47888 devel/lib/Graph/Maker/TwindragonAreaTreeByPath.pm
-SHA1 309801643da15bd1d2de51b2dae9737dffff9e70 devel/lib/MyGraphs.pm
-SHA1 2b5e7015a472b6f1bc8eccd8305e7740febd0254 devel/lib/MyPlanar.pm
+SHA1 87a39a8617b757ea0c2b6e33463f6bfb4951d138 devel/lib/Graph/Maker/Dragon.pm
+SHA1 4c3b3864c91a0e8a0e04bfe6f40a9d23a98cbf64 devel/lib/Graph/Maker/Dragon.t
+SHA1 7bd43743f315c3972ca789e5b9fc55ca1b6e6c0e devel/lib/Graph/Maker/DragonByPath.pm
+SHA1 91ee472c897b158a6563683fd93db5cb93894c41 devel/lib/Graph/Maker/Firecracker.pm
+SHA1 8f92f76e5de74b483461da5723a449a77c809e99 devel/lib/Graph/Maker/PlanePath.pm
+SHA1 2d1692fe344af3e7c23378ba246e636b168c84d3 devel/lib/Graph/Maker/R5Twindragon.pm
+SHA1 18b4637e966f32e18713027a56518e26b0fe3a1d devel/lib/Graph/Maker/StarOfStars.pm
+SHA1 6354923931fffd6b775da15fb65497dfb7edefc5 devel/lib/Graph/Maker/Starlike.pm
+SHA1 1f3c73185181a5ce877bce6f253899e7981c1114 devel/lib/Graph/Maker/TowerOfLondon.pm
+SHA1 43e1ea58adac6c5ffc4e25321c5f3db378772ef1 devel/lib/Graph/Maker/Twindragon.pm
+SHA1 d50e73e0ab7c2fed79070b2a74c51a1e5365b61b devel/lib/Graph/Maker/TwindragonAreaTreeByPath.pm
+SHA1 7e09a903557b014ea6898006f67dfcc3d0e59494 devel/lib/MyGraphs.pm
+SHA1 2b62833b0fd916c7bb4ed88a76c23ad280489798 devel/lib/MyPlanar.pm
 SHA1 eb7a221f232d5fccdd317ea5126fd6a5d447098d devel/line-graph.pl
-SHA1 c5f25537d15dd45f10860cc1872a8f24f88b2a32 devel/misc.pl
+SHA1 97f94c51a09904291b61340515c3e2b9ef066d81 devel/misc.pl
 SHA1 f8ec74a3869a56a41a48f575b069641cea8bd8c4 devel/noughts-and-crosses.pl
 SHA1 df459a2241778a95e2eba3d901398425dc72db79 devel/petersen.pl
-SHA1 53882e04f92556b12c74bf2ea46e80a22b1fe923 devel/pictures.tex
+SHA1 cdbe3040a4f97cb3f32329b2a65ef0831ce64de0 devel/pictures.tex
 SHA1 b28e41bf8fabc861237c1a460d6c6a4a9a5de890 devel/planepath.pl
-SHA1 58c407dcf8257f0c1f415e54b573d5c7e7986159 devel/quartet-tree.pl
+SHA1 e25cf2eedb66435f3ddd5d7cc12928fa1d8145a7 devel/quartet-tree.pl
 SHA1 5792e262dbfec37f36a0c3ab4a4320bcaaa614ef devel/rook-grid.pl
 SHA1 4f0581c01d009c407a357ca18162e507bd0573bb devel/star-of-stars.pl
 SHA1 71294ef63130a21dc0794fede416a4ec4433e4d4 devel/steiner.pl
@@ -90,43 +89,45 @@ SHA1 517eb51dac89966536081b8add38f074950c581f devel/tower-of-london.pl
 SHA1 b872855eabb5d2612f0db58677b464db0556f35c devel/twin-alternate-area-tree.pl
 SHA1 cdd958b877f1b8d3bda5ab2fff1587a8d595254b devel/twindragon-area-tree.pl
 SHA1 2b1db7b8d71c2d551bbb0624796e82a03c1020ad devel/twindragon.pl
-SHA1 1d030061522eb5c35b33720dda046c432cd225df devel/view-graph.pl
+SHA1 9acd9255febee57dc9c67bc1bb70f68797f2cda1 devel/view-graph.pl
 SHA1 b7e0ca51996fb4b0f696a7870a422c4381f1b770 devel/wiener-line-iterated.pl
 SHA1 a17d265395953feaf7337dd9c7317c8b1bb5b287 devel/wiener.pl
-SHA1 3b44db2b6af3a6a4f3cabda510c49d114247dc33 lib/Graph/Maker/Beineke.pm
-SHA1 45db362e8a61df4f3b2193b3eea5de16372e8b1b lib/Graph/Maker/BiStar.pm
-SHA1 9f85e10858521d3bbaf3346a557e3fc7e33727ed lib/Graph/Maker/BinaryBeanstalk.pm
-SHA1 d2f5aa28ebe4581c541f202056d8ae397c38ef80 lib/Graph/Maker/BinomialTree.pm
-SHA1 d2526f48f679b7946847c4dc03dd9e8844c62789 lib/Graph/Maker/FibonacciTree.pm
-SHA1 14856cb7b2feb026a44efdf50df475d226bd8a8b lib/Graph/Maker/GosperIsland.pm
-SHA1 d0b79404ec43961a5ac2179402da0a5563c1c0a1 lib/Graph/Maker/Hanoi.pm
-SHA1 6719c44e1e99b7824ec19b24a8f4fa0324ee3751 lib/Graph/Maker/HexGrid.pm
-SHA1 a503585d0590db97711f405fdd8ede6b73cbd651 lib/Graph/Maker/Johnson.pm
-SHA1 58c94f22baabbec5ba02d124b0641f3beca34063 lib/Graph/Maker/Keller.pm
-SHA1 233455f10978ee2ed556365c0ad85b00dea78534 lib/Graph/Maker/Kneser.pm
-SHA1 21ea89f3befb0c55b0312601a9eb84fddd2aeab3 lib/Graph/Maker/KnightGrid.pm
-SHA1 a572bbd0af4d02afffe9a30b02613582b8b0e2c2 lib/Graph/Maker/NoughtsAndCrosses.pm
-SHA1 2c390fad1338141c82ad4b33cfa1287d88f48d6c lib/Graph/Maker/Petersen.pm
-SHA1 7e7d933951d7921936d78416fd76d6c6bd6ec334 lib/Graph/Maker/RookGrid.pm
-SHA1 3fbcc559f6594e9b6cf2e3377de27999259b94b2 lib/Graph/Maker/TwinAlternateAreaTree.pm
-SHA1 7cbe0458c4cc65b53f4b2cc4a294e725ab4dcced lib/Graph/Maker/TwindragonAreaTree.pm
-SHA1 b0a125fc49ff870107bf1398e92ce73a4acb2c4d t/Beineke.t
-SHA1 1f4c2331118e6296834bcdd635d74a5cda2e40ee t/BiStar.t
-SHA1 85ee5f950feab5e608191d944ff42141b1965768 t/BinaryBeanstalk.t
-SHA1 fc8ffa9cf12d94e1f0fd7a6e621d6fb5b59c6b5a t/BinomialTree.t
-SHA1 b3ce40e8ce72b37b0d250a1240a51687399d4341 t/FibonacciTree.t
-SHA1 eb9e381986516a528e307a13b70e2c0b43b444b1 t/GosperIsland.t
-SHA1 51bae1158f39d6af8e56c9db4d1ffdb5107f7b7b t/Hanoi.t
-SHA1 597897529b52e58ed2731635a83ce2cac9f655f2 t/Johnson.t
-SHA1 35195dadf3f31f2c36d858ace6b8af8814092fb4 t/Keller.t
-SHA1 812184d0cdac24e8630a2f98007837ef1d787dbc t/Kneser.t
-SHA1 796a74273147a3befce092416bff0addbeae3aac t/KnightGrid.t
+SHA1 4e44385807e37b0d2cbf7cf3d4778e7eaddf6083 lib/Graph/Maker/Beineke.pm
+SHA1 b163af7dff3ed59bc7b6054b8e7d17c550c214ef lib/Graph/Maker/BiStar.pm
+SHA1 b790bba6d24244b0f4c018aab0f7ebad051421de lib/Graph/Maker/BinaryBeanstalk.pm
+SHA1 35ae536293dae8014550db74b3fc17b17a849b5e lib/Graph/Maker/BinomialTree.pm
+SHA1 62fb81ba4833480c5ae91e0652481ce1ff296c05 lib/Graph/Maker/FibonacciTree.pm
+SHA1 dec12ddaf58dd8f86d33b7990ce9a51c5b955de1 lib/Graph/Maker/GosperIsland.pm
+SHA1 212f8fb1ba97192f5090507c8cf343bea4eec42e lib/Graph/Maker/Hanoi.pm
+SHA1 0d1625a85a2c69080353cd93519a46f41a8cbd36 lib/Graph/Maker/HexGrid.pm
+SHA1 a585b0eab856c7d2145dc8cbc0d7ebe90f8aee74 lib/Graph/Maker/Johnson.pm
+SHA1 d06855f9f2e44a120099b593ba494565df8451d5 lib/Graph/Maker/Keller.pm
+SHA1 f820763adedf07f590efa5e4f19cb072225fb294 lib/Graph/Maker/Kneser.pm
+SHA1 f9704d16f37eebb472cc0c3bee8681fe1ce2f6eb lib/Graph/Maker/KnightGrid.pm
+SHA1 b263a75ca3c948f6342897cfa67455b0c2d97ff7 lib/Graph/Maker/NoughtsAndCrosses.pm
+SHA1 f610dc5bc56d86a5f60da19a560bc17f086de640 lib/Graph/Maker/Petersen.pm
+SHA1 feecf480f0a894877e715f6b2adf1956b603ff87 lib/Graph/Maker/QuartetTree.pm
+SHA1 67ee4b1303c87fe0075273900a7c715af4abfa3b lib/Graph/Maker/RookGrid.pm
+SHA1 f334ea6de552ec8480e7b4d87bfd0d17cb743f7e lib/Graph/Maker/TwinAlternateAreaTree.pm
+SHA1 934c39b4001629b1b4e8e274dae4d0c2c6254226 lib/Graph/Maker/TwindragonAreaTree.pm
+SHA1 2a0c7bb86d6b815a3188dadae11cc9baa093d6fd t/Beineke.t
+SHA1 1f581f2ee9adda4749b285c136aaee2bc363adf4 t/BiStar.t
+SHA1 9392c66b993b5259ee5dce10471b64680f3361fe t/BinaryBeanstalk.t
+SHA1 265579098e02372c8acb6d2a4acf709bdbdf743c t/BinomialTree.t
+SHA1 50fe7b11c1c50694dd4e30256773f338f5894d76 t/FibonacciTree.t
+SHA1 1f77f16e1b8120dbac760c662ae6af6e17d0cdc0 t/GosperIsland.t
+SHA1 ce78c88e9075c3d1a5279d6231c9a40e00c217f4 t/Hanoi.t
+SHA1 cfc9af37a31b2433f2654b4548cef096f4d774ed t/Johnson.t
+SHA1 e2315c7a8562b0c050b7ea7381b69b0c2625e94f t/Keller.t
+SHA1 9b348fa4dfd369283ec4e8bee73f6e4d3c3f277a t/Kneser.t
+SHA1 23bc7b75f708763251e294c5df528b8b05a6a623 t/KnightGrid.t
 SHA1 165fa1519ab2a986d52a69c14d410b17f9dfdcb1 t/MyTestHelpers.pm
-SHA1 bf7a70dbd38974dad41f35be270eeeab0ab210e6 t/NoughtsAndCrosses.t
-SHA1 6a36d18f1d44c3bd4c9971ede0b54eef7c152722 t/Petersen.t
-SHA1 a1613b47ce20624c6ace55641992b521ff22ec6d t/RookGrid.t
-SHA1 c0eec72caa54e2a3c3ef322408c9d010b952f30a t/TwinAlternateAreaTree.t
-SHA1 32c61e0cdeef689a046dcb3a5104215319179bdf t/TwindragonAreaTree.t
+SHA1 e2ac54ae15a2a04c72da8233cf2a4964ae5c7909 t/NoughtsAndCrosses.t
+SHA1 53457f69f73f31b88678ff56087acda038fde81e t/Petersen.t
+SHA1 4ff71281b6a62597fe6689bab05290dfb542090f t/QuartetTree.t
+SHA1 f2a370f9e5ea57b577a3f9176e003ef660f14774 t/RookGrid.t
+SHA1 2bf93db3c1cd02a83398a0954326b1e7e255d074 t/TwinAlternateAreaTree.t
+SHA1 77815e990c8707e14b96b6663203e4958a9691c2 t/TwindragonAreaTree.t
 SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
 SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
 SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
@@ -139,6 +140,7 @@ SHA1 6cf6099138c6bc4a466d8f17dcc2076705ec6ed3 xt/Beineke-slow.t
 SHA1 e54d70dda52dda7b660778629d5639580b3378d6 xt/BiStar-isomorphic.t
 SHA1 4c1c9554d304115f89bf027faa9df41562971abb xt/BinaryBeanstalk-isomorphic.t
 SHA1 dac8bea75735c001b5442bde1a292bfa6074ce48 xt/BinomialTree-various.t
+SHA1 e6853ab5feb1182ba262e2b585264f1dc3414397 xt/Crown-isomorphic.t
 SHA1 491ad0cbe3d863707379feebd2fe59de830c39f7 xt/GosperIsland-isomorphic.t
 SHA1 a3094e4c94046ebdb3261c540a61e032469fb815 xt/Hanoi-slow.t
 SHA1 7cfa3077656a0322c879906e4acef40034311e8a xt/HexGrid-isomorphic.t
@@ -151,6 +153,7 @@ SHA1 1ccf62ed94782ab89fa43937af09efa2e7feb0ad xt/MyGraphs-various.t
 SHA1 a13edf262e10a7c3180c6363ecaf9bcecd94ed1f xt/MyOEIS.pm
 SHA1 182cd22b17e06afa32e7ecd0bfab55b912cc1fd9 xt/NoughtsAndCrosses-isomorphic.t
 SHA1 d0498b8fece29b11fcdb612feebf13372e56b1ed xt/Petersen-isomorphic.t
+SHA1 b3ac188bdb02b2b37274570279757385ee21ed3a xt/QuartetTree-isomorphic.t
 SHA1 beef4bb712c94d7cfd57af92aad6da9cff6c3843 xt/RookGrid-isomorphic.t
 SHA1 b0daf6d87edcca0abeb5faa0dd4a19e1d61fc8e8 xt/TwinAlternateAreaTree-isomorphic.t
 SHA1 18a6f3ca8fab29d4e1011934aac496bfcc3abbfd xt/TwindragonAreaTree-isomorphic.t
@@ -171,17 +174,17 @@ SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZ2F2hAAoJEPjQtOfS0hGR4c0P/13MGMzlTZzvMSe2KHFhUPxy
-8n9+0pWLulLxr4J1WPvdEcxevdMK/S6lW9pJambVkV/hvTn//GB8V7dUWRJQs7/x
-vKXBhFEbTZ3tvdG3j7rSQw0A7MWOKgULkW+PCojH7bsCpoZGZhOiZf/gpJqTNukc
-FgPQngYqBcYrddw9ZlFsTJk9aBmUxpiMYURGIaNxSRvthGzZ6q5GTN71ux0Qhbm8
-h5SOI6pC2lkaF+aJvE04R0DxyUPQjuqJrLPvD0H075ndCTLhT8jQIZ4BVbnCOg9k
-AXRH4Bt8V53xwGNMYemXFmJ1BzSvHpW5vKX2psPrs43sGUP6WpH5ZGtsspCNZ8CP
-nNb3PO7L1nXJSwrk+96p+AAs5Poc17JeNbHJI21wd+627y5YLkU3aA2OvdPv7vth
-5OQtFjtzArnypWr8dfZE5NXgeSpvdJ0hRbYjUWX7XocgtjYQvIbiVRZ2dwSHeovA
-HCg6Ad56btDFT0ax5MUo/63pHjYTR6wV5dYtBqq6+K8Kf4GvTptlVgIXnVcMTFVC
-N9W/wGo5hEyAR2EuyMNqA1Dmj9rtJ4gHVqrJLsTHMSX7zpZtErGkEVJGeGjX//FG
-/mHKfVP860V+sZ+GxsV5quMEbwVjuFGgmRtu1vC+UcGvG26Hw7MaojiINt+Iwwsz
-nsyKQvtD/5iTqOCViz6L
-=M+er
+iQIcBAEBAgAGBQJaLOIsAAoJEPjQtOfS0hGRPzEP/jfvAd94dABKMdJEcXCBqOe4
+MX7HRKa2Sh21IE83vqNdVvvrLK6mTJjjtrV8rp7YhX93rgFweMRJRsrb3CAPkZU4
+WmzwvLdbh0Sm5TESUSfzYIV5rfzNpk4Zd6bZ7jsJo5JZ6sbZ7L66Uj3EMkpVHclp
+8Pg2WUluTjnJMA/gxR6jqyANTv0Re+zhpFZicyr+JgM1aCREoGn1To1A903ko+zR
+t9VaAMnxlLWCVS1trzAMG23zOS2t2TOgu66ceN97UbExhtJHI3C9OBBWmJqUzsKV
+2BU5cDrV6VuisOOfwDEZ4PNIe8rMLdUe4zyKd8IhTJzM1gb6kICNeOoizOSexh6b
+HfYw89CjA1qgHqe/kcssGUhNhC04a7XsCdu+ZUzgV6YDJLM1C/H/unZ/3Np4hUyE
+9xGZEfA/nI6JNSHadrBO/tu0zFiYI8lbWbkefExpAglyknCZQE8H+8vAwJn9t8AK
+p/DdPBXypdP6Dn7t5kggMtZIsRQnyoFv6N8hqlcaEuLS4U41+nnRRKEID91/yC1m
+LJGqNTnFgShWdH95RiAOxS2M1+AGEZgMN54NttwOe5EfGWiYYt4xqkuqkHaHi2GT
+GjhWSKyRexH1XQ+P8ZnKOuB1MEEhE+DJBhr4WLSAqHP1bPEiVfWDY56DZC/fHjXd
+tx5ua/V5bvq+bR3bSmmU
+=L+Al
 -----END PGP SIGNATURE-----

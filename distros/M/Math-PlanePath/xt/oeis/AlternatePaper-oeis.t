@@ -20,10 +20,9 @@
 use 5.004;
 use strict;
 use Math::PlanePath::AlternatePaper 124;  # v.124 for n_to_n_list()
-use Math::PlanePath::Base::Digits;
 use List::Util 'min';
 use Test;
-plan tests => 14;
+plan tests => 16;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -41,6 +40,33 @@ my $bigclass = Math::NumSeq::PlanePathN::_bigint();
 
 #------------------------------------------------------------------------------
 
+# A068915   Y when N even, X when N odd
+MyOEIS::compare_values
+  (anum => 'A068915',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x, $y) = $paper->n_to_xy ($n);
+       push @got, ($n%2==0 ? $y : $x);
+     }
+     return \@got;
+   });
+
+# also equivalent to X when N even, Y when N odd, starting from N=1
+MyOEIS::compare_values
+  (anum => q{A068915},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       my ($x, $y) = $paper->n_to_xy ($n);
+       push @got, ($n%2==0 ? $x : $y);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
 
 # A080079   X-Y of last time on X+Y=s anti-diagonal
 MyOEIS::compare_values
@@ -258,6 +284,7 @@ MyOEIS::compare_values
   (anum => 'A181666',
    func => sub {
      my ($count) = @_;
+     require Math::PlanePath::Base::Digits;
      my $path = Math::PlanePath::AlternatePaper->new;
      my %seen;
      my @got;

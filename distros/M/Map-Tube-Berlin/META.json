@@ -34,14 +34,14 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.32",
+            "Map::Tube" : "3.40",
             "Moo" : "0",
             "namespace::clean" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Map::Tube" : "0.17"
+            "Test::Map::Tube" : "0.35"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://github.com/eserte/Map-Tube-Berlin"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

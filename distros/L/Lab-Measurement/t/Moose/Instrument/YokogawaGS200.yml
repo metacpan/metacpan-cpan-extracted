@@ -1,0 +1,169 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: SOUR:FUNC CURR
+id: 2
+method: Write
+---
+command: SOUR:FUNC?
+id: 3
+method: Query
+retval: "CURR\n"
+---
+command: SOUR:FUNC VOLT
+id: 4
+method: Write
+---
+command: SOUR:FUNC?
+id: 5
+method: Query
+retval: "VOLT\n"
+---
+command: SOUR:RANG 10e-3
+id: 6
+method: Write
+---
+command: SOUR:RANG?
+id: 7
+method: Query
+retval: '10E-3
+
+'
+---
+command: SOUR:RANG 1
+id: 8
+method: Write
+---
+command: SOUR:RANG?
+id: 9
+method: Query
+retval: '1E+0
+
+'
+---
+command: SOUR:RANG 10
+id: 10
+method: Write
+---
+command: SOUR:RANG?
+id: 11
+method: Query
+retval: '10E+0
+
+'
+---
+command: SOUR:RANG 30
+id: 12
+method: Write
+---
+command: SOUR:RANG?
+id: 13
+method: Query
+retval: '30E+0
+
+'
+---
+command: SOUR:LEV 1.111
+id: 14
+method: Write
+---
+command: :SOUR:LEV?
+id: 15
+method: Query
+retval: '+1.111E+0
+
+'
+---
+command: SOUR:LEV 2.222
+id: 16
+method: Write
+---
+command: :SOUR:LEV?
+id: 17
+method: Query
+retval: '+2.222E+0
+
+'
+---
+command: SOUR:LEV 3.333
+id: 18
+method: Write
+---
+command: :SOUR:LEV?
+id: 19
+method: Query
+retval: '+3.333E+0
+
+'
+---
+command: SOUR:LEV 0
+id: 20
+method: Write
+---
+command: SOUR:LEV 0.1
+id: 21
+method: Write
+---
+command: SOUR:LEV 0.2
+id: 22
+method: Write
+---
+command: SOUR:LEV 0.3
+id: 23
+method: Write
+---
+command: SOUR:LEV 0.4
+id: 24
+method: Write
+---
+command: SOUR:LEV 0.5
+id: 25
+method: Write
+---
+command: SOUR:LEV 0.6
+id: 26
+method: Write
+---
+command: SOUR:LEV 0.7
+id: 27
+method: Write
+---
+command: SOUR:LEV 0.8
+id: 28
+method: Write
+---
+command: SOUR:LEV 0.9
+id: 29
+method: Write
+---
+command: SOUR:LEV 1
+id: 30
+method: Write
+---
+command: SOUR:LEV 1.1
+id: 31
+method: Write
+---
+command: SOUR:LEV 1.2
+id: 32
+method: Write
+---
+command: SOUR:LEV 1.234
+id: 33
+method: Write
+---
+command: :SOUR:LEV?
+id: 34
+method: Query
+retval: '+1.234E+0
+
+'
+---
+command: '*RST'
+id: 35
+method: Write

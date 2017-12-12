@@ -1,3 +1,10 @@
+1.44    2017-12-10
+
+- You can now pass "frame_filter", "filter_frames_early", and "skip_frames" to
+  the throw() method of an exception class. These will be passed on to the
+  Devel::StackTrace constructor. Requested by Frédéric Brière. GH #6.
+
+
 1.43    2017-07-09
 
 - The full_message() method in Exception::Class::Base now calls message()

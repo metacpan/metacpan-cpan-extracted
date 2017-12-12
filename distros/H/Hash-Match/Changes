@@ -1,5 +1,23 @@
 Revision history for Hash::Match
 
+v0.6.2    2017-12-08 08:49:54+00:00 Europe/London
+
+        - Added missing test prereqs.
+
+v0.6.1    2017-12-06 08:03:04+00:00 Europe/London
+
+        - Added missing prereqs (Mohammad S Anwar)
+
+        - Updated Copyright year in POD
+
+v0.6.0    2017-12-04 17:27:59+00:00 Europe/London
+
+        - Switch to use List::AllUtils
+
+        - Removed use of Const::Fast from xt/pod-spelling.t.
+
+        - Switch to use Dist::Zilla for building release.
+
 v0.5.3  2014-08-16
 
         - Added SEE ALSO section to the POD.

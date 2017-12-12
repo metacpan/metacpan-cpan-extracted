@@ -46,9 +46,11 @@ requires 'utf8', '1.17';
 requires 'WWW::Mechanize', '1.86';
 requires 'YAML::Syck', '1.26';
 
-requires 'AWS::S3', '0.13';
+requires 'Crypt::PBKDF2', '0.161520';
 
-requires 'WWW::Scraper::ISBN::GoogleBooks_Driver','0.30';
+recommends 'AWS::S3', '0.13';
+recommends 'WWW::Scraper::ISBN::GoogleBooks_Driver','0.30';
+
 requires 'LWP::Protocol::https','6.07';
 
 on 'test' => sub {

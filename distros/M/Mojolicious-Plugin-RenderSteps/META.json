@@ -4,7 +4,7 @@
       "Marcus Ramberg <mramberg@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "4.99"
+            "Mojolicious" : "6.10"
          }
       }
    },
@@ -48,5 +48,6 @@
          "url" : "https://github.com/marcusramberg/Mojolicious-Plugin-RenderSteps"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

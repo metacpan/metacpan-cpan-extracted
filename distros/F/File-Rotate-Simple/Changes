@@ -1,5 +1,46 @@
 Revision history for File::Rotate::Simple
 
+v0.2.2    2017-12-10 22:39:20+00:00 Europe/London
+  - Fixed broken prerequisit declarations (Mohammad S Anwar).
+
+  - Updated copyright year in POD.
+
+v0.2.1    2017-12-08 17:24:48+00:00 Europe/London
+  - Fixed broken prerequisit declarations.
+
+v0.2.0    2017-12-04 17:35:19+00:00 Europe/London
+  [Documentation]
+  - Improved documentation of internal methods.
+
+  [Enhancements]
+  - Added optional export "rotate_files" to provide a functional interface.
+
+  - Added "start_num" attribute for specifying the starting number.
+
+  - Added the "if_missing" attribute to rotate if the file is missing.
+    (Enabled by default for backwards compatability.)
+
+  - Added "touch" attribute to touch the file after rotating.
+
+  - The file rotation algorithm has been completely rewritten to be more
+    flexible in naming.
+
+    The processing order of files is sorted by dependency order
+    (e.g. "foo.2" is renamed to "foo.3" before "foo.1" is renamed to
+    "foo.2"), so as to allow more kinds of file rotation schemes.
+
+  [Incompatable Changes]
+  - Rotation numbers above the maximum may not be deleted if there are gaps.
+
+  [Other Changes]
+  - META.yml includes recommended XS modules.
+
+  - Specified a minimum version of Path::Tiny.
+
+  - Added META.json to the distribution.
+
+  - Updated tests appropriately.
+
 v0.1.5    2015-11-20 00:42:35+00:00 Europe/London
   [Bug Fixes]
   - Removed backup files from the distribution

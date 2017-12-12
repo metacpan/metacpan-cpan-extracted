@@ -1,6 +1,6 @@
 package School::Code::Compare::Judge;
-# ABSTRACT: Guess if two strings are so similary, that it's maybe cheating
-$School::Code::Compare::Judge::VERSION = '0.002';
+# ABSTRACT: guess if two strings are so similary, that it's maybe cheating
+$School::Code::Compare::Judge::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -60,11 +60,11 @@ __END__
 
 =head1 NAME
 
-School::Code::Compare::Judge - Guess if two strings are so similary, that it's maybe cheating
+School::Code::Compare::Judge - guess if two strings are so similary, that it's maybe cheating
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 AUTHOR
 

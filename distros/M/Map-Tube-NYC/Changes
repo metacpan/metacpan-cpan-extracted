@@ -1,5 +1,9 @@
 Revision history for Map::Tube::NYC
 
+0.47  Mon Dec 04 11:45:00 2017
+      - Updated dependency on Map::Tube v3.42.
+      - Replaced namespace:clean with namespace::autoclean.
+
 0.46  Mon Nov 20 01:35:00 2017
       - Updated dependency on Map::Tube v3.40.
 
