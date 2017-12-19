@@ -1,0 +1,9 @@
+Changes
+lib/Net/Ethereum.pm
+Makefile.PL
+MANIFEST
+Net-Ethereum-0.01.tar.gz
+README
+t/Net-Ethereum.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

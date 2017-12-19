@@ -85,59 +85,59 @@
    "provides" : {
       "Git::Hooks" : {
          "file" : "lib/Git/Hooks.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckAcls" : {
          "file" : "lib/Git/Hooks/CheckAcls.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckCommit" : {
          "file" : "lib/Git/Hooks/CheckCommit.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckFile" : {
          "file" : "lib/Git/Hooks/CheckFile.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckJira" : {
          "file" : "lib/Git/Hooks/CheckJira.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckLog" : {
          "file" : "lib/Git/Hooks/CheckLog.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckReference" : {
          "file" : "lib/Git/Hooks/CheckReference.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckRewrite" : {
          "file" : "lib/Git/Hooks/CheckRewrite.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::CheckWhitespace" : {
          "file" : "lib/Git/Hooks/CheckWhitespace.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::GerritChangeId" : {
          "file" : "lib/Git/Hooks/GerritChangeId.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::Notify" : {
          "file" : "lib/Git/Hooks/Notify.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Hooks::Test" : {
          "file" : "lib/Git/Hooks/Test.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Message" : {
          "file" : "lib/Git/Message.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "Git::Repository::Plugin::GitHooks" : {
          "file" : "lib/Git/Repository/Plugin/GitHooks.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       }
    },
    "release_status" : "stable",
@@ -152,7 +152,7 @@
          "web" : "https://github.com/gnustavo/Git-Hooks"
       }
    },
-   "version" : "2.2.0",
+   "version" : "2.3.0",
    "x_contributors" : [
       "Mikko Koivunalho <mikkoi@cpan.org>",
       "Dave Rolsky <autarch@urth.org>",

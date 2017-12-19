@@ -1,5 +1,13 @@
 Changelog for Log-Any-Adapter-LinuxJournal
 
+0.173471 2017-12-13T22:04:10Z
+ - Fix incorrect copyright
+
+0.173470 2017-12-13T21:50:06Z
+ - [closes rt#123181] fix Log::Any::Adapter version requirement. Thanks to
+   SREZIC for reporting and HAARG for explaining the issue and telling me
+   how to fix it.
+
 0.172762 2017-10-03T04:04:35Z
  - Require Linux::Systemd with `caller()` control
 

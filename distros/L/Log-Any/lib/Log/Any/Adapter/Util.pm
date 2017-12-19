@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::Util;
 
 # ABSTRACT: Common utility functions for Log::Any
-our $VERSION = '1.703';
+our $VERSION = '1.704';
 
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -65,7 +65,7 @@ BEGIN {
     @logging_and_detection_methods = ( @logging_methods, @detection_methods );
 }
 
-#pod =func logging_methods
+#pod =sub logging_methods
 #pod
 #pod Returns a list of all logging method. E.g. "trace", "info", etc.
 #pod
@@ -73,7 +73,7 @@ BEGIN {
 
 sub logging_methods               { @logging_methods }
 
-#pod =func detection_methods
+#pod =sub detection_methods
 #pod
 #pod Returns a list of detection methods.  E.g. "is_trace", "is_info", etc.
 #pod
@@ -81,7 +81,7 @@ sub logging_methods               { @logging_methods }
 
 sub detection_methods             { @detection_methods }
 
-#pod =func logging_and_detection_methods
+#pod =sub logging_and_detection_methods
 #pod
 #pod Returns a list of logging and detection methods (but not aliases).
 #pod
@@ -89,7 +89,7 @@ sub detection_methods             { @detection_methods }
 
 sub logging_and_detection_methods { @logging_and_detection_methods }
 
-#pod =func log_level_aliases
+#pod =sub log_level_aliases
 #pod
 #pod Returns key/value pairs mapping aliases to "official" names.  E.g. "err" maps
 #pod to "error".
@@ -98,7 +98,7 @@ sub logging_and_detection_methods { @logging_and_detection_methods }
 
 sub log_level_aliases             { %LOG_LEVEL_ALIASES }
 
-#pod =func logging_aliases
+#pod =sub logging_aliases
 #pod
 #pod Returns a list of logging alias names.  These are the keys from
 #pod L</log_level_aliases>.
@@ -107,7 +107,7 @@ sub log_level_aliases             { %LOG_LEVEL_ALIASES }
 
 sub logging_aliases               { @logging_aliases }
 
-#pod =func detection_aliases
+#pod =sub detection_aliases
 #pod
 #pod Returns a list of detection aliases.  E.g. "is_err", "is_fatal", etc.
 #pod
@@ -115,7 +115,7 @@ sub logging_aliases               { @logging_aliases }
 
 sub detection_aliases             { @detection_aliases }
 
-#pod =func numeric_level
+#pod =sub numeric_level
 #pod
 #pod Given a level name (or alias), returns the numeric value described above under
 #pod log level constants.  E.g. "err" would return 3.
@@ -129,7 +129,7 @@ sub numeric_level {
     return $LOG_LEVELS{ uc($canonical) };
 }
 
-#pod =func dump_one_line
+#pod =sub dump_one_line
 #pod
 #pod Given a reference, returns a one-line L<Data::Dumper> dump with keys sorted.
 #pod
@@ -153,7 +153,7 @@ sub numeric_level {
     return $string;
 };
 
-#pod =func make_method
+#pod =sub make_method
 #pod
 #pod Given a method name, a code reference and a package name, installs the code
 #pod reference as a method in the package.
@@ -168,7 +168,7 @@ sub make_method {
     *{ $pkg . "::$method" } = $code;
 }
 
-#pod =func require_dynamic (DEPRECATED)
+#pod =sub require_dynamic (DEPRECATED)
 #pod
 #pod Given a class name, attempts to load it via require unless the class
 #pod already has a constructor available.  Throws an error on failure. Used
@@ -187,7 +187,7 @@ sub require_dynamic {
     }
 }
 
-#pod =func read_file (DEPRECATED)
+#pod =sub read_file (DEPRECATED)
 #pod
 #pod Slurp a file.  Does *not* apply any layers.  Used for testing and may
 #pod become private in the future.
@@ -204,7 +204,7 @@ sub read_file {
     return $contents;
 }
 
-#pod =func cmp_deeply (DEPRECATED)
+#pod =sub cmp_deeply (DEPRECATED)
 #pod
 #pod Compares L<dump_one_line> results for two references.  Also takes a test
 #pod label as a third argument.  Used for testing and may become private in the
@@ -241,7 +241,7 @@ Log::Any::Adapter::Util - Common utility functions for Log::Any
 
 =head1 VERSION
 
-version 1.703
+version 1.704
 
 =head1 DESCRIPTION
 
@@ -249,58 +249,60 @@ This module has utility functions to help develop L<Log::Any::Adapter>
 subclasses or L<Log::Any::Proxy> formatters/filters.  It also has some
 functions used in internal testing.
 
-=func logging_methods
+=head1 SUBROUTINES
+
+=head2 logging_methods
 
 Returns a list of all logging method. E.g. "trace", "info", etc.
 
-=func detection_methods
+=head2 detection_methods
 
 Returns a list of detection methods.  E.g. "is_trace", "is_info", etc.
 
-=func logging_and_detection_methods
+=head2 logging_and_detection_methods
 
 Returns a list of logging and detection methods (but not aliases).
 
-=func log_level_aliases
+=head2 log_level_aliases
 
 Returns key/value pairs mapping aliases to "official" names.  E.g. "err" maps
 to "error".
 
-=func logging_aliases
+=head2 logging_aliases
 
 Returns a list of logging alias names.  These are the keys from
 L</log_level_aliases>.
 
-=func detection_aliases
+=head2 detection_aliases
 
 Returns a list of detection aliases.  E.g. "is_err", "is_fatal", etc.
 
-=func numeric_level
+=head2 numeric_level
 
 Given a level name (or alias), returns the numeric value described above under
 log level constants.  E.g. "err" would return 3.
 
-=func dump_one_line
+=head2 dump_one_line
 
 Given a reference, returns a one-line L<Data::Dumper> dump with keys sorted.
 
-=func make_method
+=head2 make_method
 
 Given a method name, a code reference and a package name, installs the code
 reference as a method in the package.
 
-=func require_dynamic (DEPRECATED)
+=head2 require_dynamic (DEPRECATED)
 
 Given a class name, attempts to load it via require unless the class
 already has a constructor available.  Throws an error on failure. Used
 internally and may become private in the future.
 
-=func read_file (DEPRECATED)
+=head2 read_file (DEPRECATED)
 
 Slurp a file.  Does *not* apply any layers.  Used for testing and may
 become private in the future.
 
-=func cmp_deeply (DEPRECATED)
+=head2 cmp_deeply (DEPRECATED)
 
 Compares L<dump_one_line> results for two references.  Also takes a test
 label as a third argument.  Used for testing and may become private in the

@@ -53,7 +53,7 @@
 #define VERSION_MAJOR 6
 #define VERSION_MINOR 02
 #endif
-#define VERSION_DATE "2017-11-13"
+#define VERSION_DATE "2017-11-26"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -21023,7 +21023,7 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 5:
         return "04.12.2017";
       case 6:
-        return "13. November 2017";            /* Klartext-Datum der Bibliotheksversion */
+        return "26. November 2017";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:

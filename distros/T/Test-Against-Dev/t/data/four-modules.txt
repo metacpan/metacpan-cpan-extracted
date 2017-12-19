@@ -1,0 +1,4 @@
+Try::Tiny
+Devel::Cover
+AnyEvent::HTTP
+Data::Printer

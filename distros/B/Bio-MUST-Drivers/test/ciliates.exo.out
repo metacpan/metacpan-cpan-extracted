@@ -1,0 +1,68 @@
+Command line: [exonerate --showvulgar no --showalignment yes --geneticcode FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG --model protein2genome --target test/ciliates.dna --query test/ciliates.pep]
+Hostname: [leela.local]
+
+C4 Alignment:
+------------
+         Query: Condylostoma magnum_col2@Cmag5047.H1.1
+        Target: gnl|est|Xxxx16986 [Condylostoma_magnum_COL2] CAMNT_0008288021 /NCGR_SEQ_ID=MMETSP0210-20121227|10954 /TAXON_ID=40633 /ORGANISM="Condylostoma magnum, Strain COL2" /LENGTH=695:[revcomp]
+         Model: protein2genome:local
+     Raw score: 1045
+   Query range: 0 -> 216
+  Target range: 679 -> 31
+
+   1 : SerLysLeuAsnGlnGluIleLeuLysArgAlaIleHisGluValSerThrLeuGlnGlyThrL :  22
+       ||||||||||||||||||:!!||||||||||||||||||||||||:!!||||||||||||||||
+       SerLysLeuAsnGlnGluValLeuLysArgAlaIleHisGluValAlaThrLeuGlnGlyThrL
+ 679 : TCTAAGCTAAATCAGGAAGTCCTCAAACGTGCAATACATGAGGTAGCCACCCTACAAGGAACCA : 616
+
+  23 : ysLysArgLysPheAsnGluThrValGluLeuGlnIleGlyLeuLysAspTyrAspProGlnLy :  43
+       |||||||||||||||||||||||||||||||| !!|||||||||||||||||||||||||||||
+       ysLysArgLysPheAsnGluThrValGluLeu***IleGlyLeuLysAspTyrAspProGlnLy
+ 615 : AAAAGAGGAAGTTCAATGAGACCGTAGAGCTTTAAATCGGACTTAAGGACTACGACCCCCAAAA : 553
+
+  44 : sAspLysArgPheAlaGlyAsnValArgLeuProPheGlnValArgProArgLeuGlnIleIle :  64
+       ||||||||||||||||||||||||||||||||||||| !!||||||||||||||||||||||||
+       sAspLysArgPheAlaGlyAsnValArgLeuProPhe***ValArgProArgLeuGlnIleIle
+ 552 : GGATAAGAGGTTTGCTGGAAATGTTAGACTACCATTCTAAGTAAGACCAAGACTCCAAATAATC : 490
+
+  65 : LeuLeuAlaAspGlnGluHisValProGlnAlaGluGlnIleAspLeuProTyrIleAspAlaG :  86
+       ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+       LeuLeuAlaAspGlnGluHisValProGlnAlaGluGlnIleAspLeuProTyrIleAspAlaG
+ 489 : CTACTGGCCGATCAAGAGCATGTCCCCCAGGCTGAACAAATAGACTTGCCTTATATTGACGCAG : 424
+
+  87 : luGlyLeuLysLysPheSerLysGlnArgLysProMetLysLysPhePheLysGlnTyrLysVa : 107
+       ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+       luGlyLeuLysLysPheSerLysGlnArgLysProMetLysLysPhePheLysGlnTyrLysVa
+ 423 : AAGGCCTCAAGAAGTTTAGTAAGCAACGTAAGCCAATGAAGAAGTTTTTCAAACAGTATAAAGT : 361
+
+ 108 : lLeuLeuAlaSerAspSerIleIleLysGlnLeuProArgLeuValGlyProValLeuSerLys : 128
+       |||||||||||||||||||||||||||| !!|||||||||||||||||||||||||||||||||
+       lLeuLeuAlaSerAspSerIleIleLys***LeuProArgLeuValGlyProValLeuSerLys
+ 360 : ACTTCTAGCCTCAGATAGCATTATTAAGTAACTACCCAGATTAGTTGGACCAGTTTTAAGTAAG : 298
+
+ 129 : LeuGlyLysPheProValAlaValThrHisSerAspAsnLeuGlnAspLysValAsnGluAlaA : 150
+       |||||||||||||||||||||||||||||||||||||||||| !!|||||||||||||||||||
+       LeuGlyLysPheProValAlaValThrHisSerAspAsnLeu***AspLysValAsnGluAlaA
+ 297 : CTTGGAAAATTCCCAGTTGCCGTAACTCATAGTGACAATTTATAAGACAAGGTGAATGAGGCCA : 232
+
+ 151 : rgSerThrValLysPheGlnLeuLysLysValThrCysLeuGlyHisAlaValGlyHisLeuGl : 171
+       ||||||||||||||||| !!||||||||||||||||||||||||||||||||||||||||||||
+       rgSerThrValLysPhe***LeuLysLysValThrCysLeuGlyHisAlaValGlyHisLeuGl
+ 231 : GRTCCACTGTTAAGTTCTAATTGAAGAAGGTTACTTGCTTAGGACACGCTGTTGGGCATTTAGA : 169
+
+ 172 : uLeuSerGluGluGlnLeuArgGlnAsnLeuThrLeuSerIleAsnPheLeuAlaSerLeuLeu : 192
+       ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+       uLeuSerGluGluGlnLeuArgGlnAsnLeuThrLeuSerIleAsnPheLeuAlaSerLeuLeu
+ 168 : GCTAAGTGAGGAGCAGTTGAGGCAAAATCTTACTCTTTCCATCAACTTTTTGGCTTCATTGTTG : 106
+
+ 193 : LysLysThrTrpAsnAsnIleLysSerLeuHisIleLysSerThrMetGlyLysProGlnArgI : 214
+       ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+       LysLysThrTrpAsnAsnIleLysSerLeuHisIleLysSerThrMetGlyLysProGlnArgI
+ 105 : AAAAAGACATGGAATAATATCAAATCRCTGCATATCAAGTCGACTATGGGAAAACCGCAGAGAA :  40
+
+ 215 : leTyrGly : 216
+       ||||||||
+       leTyrGly
+  39 : TTTATGGT :  32
+
+-- completed exonerate analysis

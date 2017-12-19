@@ -1,5 +1,5 @@
 package App::OATH::Crypt::CBC;
-our $VERSION = '1.20151002'; # VERSION
+our $VERSION = '1.20171216'; # VERSION
 
 use strict;
 use warnings;

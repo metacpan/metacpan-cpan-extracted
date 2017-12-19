@@ -2,6 +2,7 @@ package App::cdif::Tmpfile;
 
 use strict;
 use warnings;
+use utf8;
 use Carp;
 use Fcntl;
 use IO::File;
@@ -11,6 +12,7 @@ sub new {
     my $class = shift;
     my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
     $fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
+    binmode $fh, ':encoding(utf8)';
     bless { FH => $fh }, $class;
 }
 

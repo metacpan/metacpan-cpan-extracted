@@ -46,95 +46,91 @@ support any and all policies found for a message.
 
 =cut
 
-sub fetch
-{
-	my $class = shift;
-	my $waiter = $class->fetch_async(@_);
-	return $waiter->();
+sub fetch {
+    my $class  = shift;
+    my $waiter = $class->fetch_async(@_);
+    return $waiter->();
 }
 
-sub fetch_async
-{
-	my $class = shift;
-	my %prms = @_;
+sub fetch_async {
+    my $class = shift;
+    my %prms  = @_;
 
-	($prms{'Protocol'} eq "dns")
-		or die "invalid protocol '$prms{Protocol}'\n";
+    ( $prms{'Protocol'} eq 'dns' )
+      or die "invalid protocol '$prms{Protocol}'\n";
 
-	my $host = $class->get_lookup_name(\%prms);
-	my %callbacks = %{$prms{Callbacks} || {}};
-	my $on_success = $callbacks{Success} || sub { $_[0] };
-	$callbacks{Success} = sub {
-			my @resp = @_;
-			unless (@resp)
-			{
-				# no requested resource records or NXDOMAIN,
-				# use default policy
-				return $on_success->($class->default);
-			}
+    my $host       = $class->get_lookup_name( \%prms );
+    my %callbacks  = %{ $prms{Callbacks} || {} };
+    my $on_success = $callbacks{Success} || sub { $_[0] };
+    $callbacks{Success} = sub {
+        my @resp = @_;
+        unless (@resp) {
 
-			my $strn;
-			foreach my $rr (@resp) {
-				next unless $rr->type eq "TXT";
+            # no requested resource records or NXDOMAIN,
+            # use default policy
+            return $on_success->( $class->default );
+        }
 
-				# join with no intervening spaces, RFC 5617
-				if (Net::DNS->VERSION >= 0.69) {
-					# must call txtdata() in a list context
-					$strn = join "", $rr->txtdata;
-				} else {
-					# char_str_list method is 'historical'
-					$strn = join "", $rr->char_str_list;
-				}
-			}
+        my $strn;
+        foreach my $rr (@resp) {
+            next unless $rr->type eq 'TXT';
 
-			unless ($strn)
-			{
-				# empty record found in DNS, use default policy
-				return $on_success->($class->default);
-			}
+            # join with no intervening spaces, RFC 5617
+            if ( Net::DNS->VERSION >= 0.69 ) {
 
-			my $self = $class->parse(
-					String => $strn,
-					Domain => $prms{Domain},
-					);
-			return $on_success->($self);
-		};
+                # must call txtdata() in a list context
+                $strn = join '', $rr->txtdata;
+            }
+            else {
+                # char_str_list method is 'historical'
+                $strn = join '', $rr->char_str_list;
+            }
+        }
 
-	#
-	# perform DNS query for domain policy...
-	#
-	my $waiter = Mail::DKIM::DNS::query_async(
-			$host, "TXT",
-			Callbacks => \%callbacks,
-			);
-	return $waiter;
+        unless ($strn) {
+
+            # empty record found in DNS, use default policy
+            return $on_success->( $class->default );
+        }
+
+        my $self = $class->parse(
+            String => $strn,
+            Domain => $prms{Domain},
+        );
+        return $on_success->($self);
+    };
+
+    #
+    # perform DNS query for domain policy...
+    #
+    my $waiter =
+      Mail::DKIM::DNS::query_async( $host, 'TXT', Callbacks => \%callbacks, );
+    return $waiter;
 }
 
-sub parse
-{
-	my $class = shift;
-	my %prms = @_;
+sub parse {
+    my $class = shift;
+    my %prms  = @_;
 
-	my $text = $prms{"String"};
-	my %tags;
-	foreach my $tag (split /;/, $text)
-	{
-		# strip whitespace
-		$tag =~ s/^\s+|\s+$//g;
+    my $text = $prms{'String'};
+    my %tags;
+    foreach my $tag ( split /;/, $text ) {
 
-		my ($tagname, $value) = split /=/, $tag, 2;
-		unless (defined $value)
-		{
-			die "policy syntax error\n";
-		}
+        # strip whitespace
+        $tag =~ s/^\s+|\s+$//g;
 
-		$tagname =~ s/\s+$//;
-		$value =~ s/^\s+//;
-		$tags{$tagname} = $value;
-	}
+        my ( $tagname, $value ) = split /=/, $tag, 2;
+        unless ( defined $value ) {
+            die "policy syntax error\n";
+        }
 
-	$prms{tags} = \%tags;
-	return bless \%prms, $class;	
+        $tagname =~ s/\s+$//;
+        $value =~ s/^\s+//;
+        $tags{$tagname} = $value;
+    }
+
+    $prms{tags} = \%tags;
+    return bless \%prms, $class;
 }
 
 =head1 METHODS
@@ -172,28 +168,26 @@ policy. It can be considered suspicious.
 
 =cut
 
-sub apply
-{
-	my $self = shift;
-	my ($dkim) = @_;
+sub apply {
+    my $self = shift;
+    my ($dkim) = @_;
 
-	my $first_party;
-	foreach my $signature ($dkim->signatures)
-	{
-		next if $signature->result ne "pass";
+    my $first_party;
+    foreach my $signature ( $dkim->signatures ) {
+        next if $signature->result ne 'pass';
 
-		my $oa = $dkim->message_sender->address;
-		if ($signature->identity_matches($oa))
-		{
-			# found a first party signature
-			$first_party = 1;
-			last;
-		}
-	}
+        my $oa = $dkim->message_sender->address;
+        if ( $signature->identity_matches($oa) ) {
 
-	return "accept" if $first_party;
-	return "reject" if ($self->signall && !$self->testing);
-	return "neutral";
+            # found a first party signature
+            $first_party = 1;
+            last;
+        }
+    }
+
+    return 'accept' if $first_party;
+    return 'reject' if ( $self->signall && !$self->testing );
+    return 'neutral';
 }
 
 =head2 as_string()
@@ -205,12 +199,13 @@ the tags ordered the same as the text record found in DNS.
 
 =cut
 
-sub as_string
-{
-       my $self = shift;
+sub as_string {
+    my $self = shift;
 
-       return join("; ", map { "$_=" . $self->{tags}->{$_} }
-               keys %{$self->{tags}});
+    return join(
+        '; ', map { "$_=" . $self->{tags}->{$_} }
+          keys %{ $self->{tags} }
+    );
 }
 
 =head2 is_implied_default_policy()
@@ -225,11 +220,10 @@ in effect. Use this method to detect when that happens.
 
 =cut
 
-sub is_implied_default_policy
-{
-	my $self = shift;
-	my $default_policy = ref($self)->default;
-	return ($self == $default_policy);
+sub is_implied_default_policy {
+    my $self           = shift;
+    my $default_policy = ref($self)->default;
+    return ( $self == $default_policy );
 }
 
 =head2 location()
@@ -244,10 +238,9 @@ was returned instead, the location will be C<undef>.
 
 =cut
 
-sub location
-{
-	my $self = shift;
-	return $self->{Domain};
+sub location {
+    my $self = shift;
+    return $self->{Domain};
 }
 
 =head2 name()

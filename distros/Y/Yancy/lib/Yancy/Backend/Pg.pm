@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -25,6 +25,9 @@ our $VERSION = '0.004';
 #pod
 #pod This Yancy backend allows you to connect to a Postgres database to manage
 #pod the data inside. This backend uses L<Mojo::Pg> to connect to Postgres.
+#pod
+#pod See L<Yancy::Backend> for the methods this backend has and their return
+#pod values.
 #pod
 #pod =head2 Backend URL
 #pod
@@ -125,8 +128,8 @@ sub get( $self, $coll, $id ) {
 
 sub list( $self, $coll, $params={}, $opt={} ) {
     my $pg = $self->pg;
-    my $query = $pg->abstract->select( $coll, undef );
-    my $total_query = $pg->abstract->select( $coll, [ \'COUNT(*) as total' ] );
+    my ( $query, @params ) = $pg->abstract->select( $coll, undef, $params, $opt->{order_by} );
+    my ( $total_query, @total_params ) = $pg->abstract->select( $coll, [ \'COUNT(*) as total' ], $params );
     if ( scalar grep defined, $opt->@{qw( limit offset )} ) {
         die "Limit must be number" if $opt->{limit} && !looks_like_number $opt->{limit};
         $query .= ' LIMIT ' . ( $opt->{limit} // 2**32 );
@@ -137,8 +140,8 @@ sub list( $self, $coll, $params={}, $opt={} ) {
     }
     #; say $query;
     return {
-        rows => $pg->db->query( $query )->hashes,
-        total => $pg->db->query( $total_query )->hash->{total},
+        rows => $pg->db->query( $query, @params )->hashes,
+        total => $pg->db->query( $total_query, @total_params )->hash->{total},
     };
 
 }
@@ -165,7 +168,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -190,6 +193,9 @@ version 0.004
 
 This Yancy backend allows you to connect to a Postgres database to manage
 the data inside. This backend uses L<Mojo::Pg> to connect to Postgres.
+
+See L<Yancy::Backend> for the methods this backend has and their return
+values.
 
 =head2 Backend URL
 

@@ -414,6 +414,7 @@ has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
 has sansfontsections => (is => 'rw', isa => Bool, default => sub { 0 });
 has secondary_footnotes_alpha => (is => 'rw', isa => Bool, default => sub { 0 });
+has nobold => (is => 'rw', isa => Bool, default => sub { 0 });
 
 sub all_headings {
     my @headings = (
@@ -597,6 +598,7 @@ sub config_setters {
                nofinalpage
                impressum sansfontsections
                secondary_footnotes_alpha
+               nobold
                opening beamertheme beamercolortheme/);
 }
 

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Json;
-$Config::Model::Backend::Json::VERSION = '2.114';
+$Config::Model::Backend::Json::VERSION = '2.116';
 use Carp;
 use strict;
 use warnings;
@@ -20,8 +20,6 @@ use base qw/Config::Model::Backend::Any/;
 use JSON;
 
 my $logger = get_logger("Backend::Json");
-
-sub suffix { return '.json'; }
 
 sub read {
     my $self = shift;
@@ -93,7 +91,7 @@ Config::Model::Backend::Json - Read and write config as a JSON data structure
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

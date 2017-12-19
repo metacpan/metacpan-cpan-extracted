@@ -66,7 +66,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head2 new(\%attr)
 

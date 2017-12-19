@@ -11,73 +11,64 @@ use strict;
 use warnings;
 
 package Mail::DKIM::Canonicalization::Base;
-use base "Mail::DKIM::MessageParser";
+use base 'Mail::DKIM::MessageParser';
 use Carp;
 
-sub new
-{
-	my $class = shift;
-	return $class->new_object(@_);
+sub new {
+    my $class = shift;
+    return $class->new_object(@_);
 }
 
-sub init
-{
-	my $self = shift;
-	$self->SUPER::init;
+sub init {
+    my $self = shift;
+    $self->SUPER::init;
 
-	unless ($self->{output} || $self->{output_fh} || $self->{output_digest}
-		|| $self->{buffer})
-	{
-		$self->{result} = "";
-		$self->{buffer} = \$self->{result};
-	}
+    unless ( $self->{output}
+        || $self->{output_fh}
+        || $self->{output_digest}
+        || $self->{buffer} )
+    {
+        $self->{result} = '';
+        $self->{buffer} = \$self->{result};
+    }
 }
 
-sub output
-{
-	my $self = shift;
-	# my ($output) = @_;  # optimized away for speed
+sub output {
+    my $self = shift;
 
-	my $out_fh = $self->{output_fh};
-	if ($out_fh)
-	{
-		print $out_fh @_;
-	}
-	if (my $digest = $self->{output_digest})
-	{
-		$digest->add(@_);
-	}
-	if (my $out_obj = $self->{output})
-	{
-		$out_obj->PRINT(@_);
-	}
-	if (my $buffer = $self->{buffer})
-	{
-		${$self->{buffer}} .= $_[0];
-	}
+    # my ($output) = @_;  # optimized away for speed
 
-	# this supports Debug_Canonicalization
-	if (my $debug = $self->{Debug_Canonicalization})
-	{
-		if (UNIVERSAL::isa($debug, "SCALAR"))
-		{
-			$$debug .= $_[0];
-		}
-		elsif (UNIVERSAL::isa($debug, "GLOB"))
-		{
-			print $debug @_;
-		}
-		elsif (UNIVERSAL::isa($debug, "IO::Handle"))
-		{
-			$debug->print(@_);
-		}
-	}
+    my $out_fh = $self->{output_fh};
+    if ($out_fh) {
+        print $out_fh @_;
+    }
+    if ( my $digest = $self->{output_digest} ) {
+        $digest->add(@_);
+    }
+    if ( my $out_obj = $self->{output} ) {
+        $out_obj->PRINT(@_);
+    }
+    if ( my $buffer = $self->{buffer} ) {
+        ${ $self->{buffer} } .= $_[0];
+    }
+
+    # this supports Debug_Canonicalization
+    if ( my $debug = $self->{Debug_Canonicalization} ) {
+        if ( UNIVERSAL::isa( $debug, 'SCALAR' ) ) {
+            $$debug .= $_[0];
+        }
+        elsif ( UNIVERSAL::isa( $debug, 'GLOB' ) ) {
+            print $debug @_;
+        }
+        elsif ( UNIVERSAL::isa( $debug, 'IO::Handle' ) ) {
+            $debug->print(@_);
+        }
+    }
 }
 
-sub result
-{
-	my $self = shift;
-	return $self->{result};
+sub result {
+    my $self = shift;
+    return $self->{result};
 }
 
 1;

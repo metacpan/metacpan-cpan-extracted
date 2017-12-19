@@ -58,7 +58,7 @@ BEGIN {
 
 use base Term::ReadLine::;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 =item $rl = new AnyEvent::ReadLine::Gnu key => value...
 
@@ -138,7 +138,7 @@ sub new {
 
    $in     = $arg{in}  || *STDIN;
    $out    = $arg{out} || *STDOUT;
-   $prompt = $arg{prompt} || "> ";
+   $prompt = $arg{prompt} // "> ";
    $cb     = $arg{on_line} || $arg{cb}
       or do { require Carp; Carp::croak ("AnyEvent::ReadLine::Gnu->new on_line callback argument mandatry, but missing") };
 

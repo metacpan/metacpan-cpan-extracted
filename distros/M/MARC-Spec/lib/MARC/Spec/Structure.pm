@@ -5,7 +5,7 @@ use Const::Fast;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION = '1.0.0';
+our $VERSION = '2.0.3';
 
 const my $NO_LENGTH => -1;
 const my $LAST => '#';
@@ -32,11 +32,6 @@ sub _base {
             $base .= '/'.$char_start;
             if($char_end ne $char_start) { $base .= '-'.$char_end }
         }
-    }
-    if($self->can('indicator1')) {
-        my $indicators = (defined $self->indicator1) ? $self->indicator1 : '_';
-        $indicators   .= (defined $self->indicator2) ? $self->indicator2 : '';
-        if($indicators ne '_') { $base .= '_'.$indicators }
     }
 
     return $base;
@@ -246,7 +241,7 @@ __END__
 
 =head1 NAME
 
-L<MARC::Spec::Structure|MARC::Spec::Structure> - base class
+MARC::Spec::Structure - base class
 
 =head1 SYNOPSIS
 
@@ -367,11 +362,22 @@ Please report any bugs to L<https://github.com/MARCspec/MARC-Spec/issues|https:/
 
 =head1 SEE ALSO
 
-L<MARC::Spec|MARC::Spec>,
-L<MARC::Spec::Field|MARC::Spec::Field>,
-L<MARC::Spec::Subfield|MARC::Spec::Subfield>,
-L<MARC::Spec::Subspec|MARC::Spec::Subspec>,
-L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>,
-L<MARC::Spec::Parser|MARC::Spec::Parser>
+=over
+
+=item * L<MARC::Spec|MARC::Spec>
+
+=item * L<MARC::Spec::Field|MARC::Spec::Field>
+
+=item * L<MARC::Spec::Subfield|MARC::Spec::Subfield>
+
+=item * L<MARC::Spec::Indicator|MARC::Spec::Indicator>
+
+=item * L<MARC::Spec::Subspec|MARC::Spec::Subspec>
+
+=item * L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>
+
+=item * L<MARC::Spec::Parser|MARC::Spec::Parser>
+
+=back
 
 =cut

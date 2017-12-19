@@ -144,7 +144,7 @@ CatalystX::OAuth2::Store::DBIC - An interface to a DBIC-based OAuth2 store
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

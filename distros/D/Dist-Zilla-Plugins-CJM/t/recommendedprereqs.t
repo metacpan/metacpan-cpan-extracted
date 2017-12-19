@@ -13,14 +13,16 @@ my $tzil = Builder->from_config(
   {
     add_files => {
       'source/dist.ini' => simple_ini(qw(GatherDir RecommendedPrereqs),
-                                      [ MetaYAML => { version => 2 }]),
+                                      [ MetaJSON => { version => 2 }]),
     },
   },
 );
 
 $tzil->build;
 
-my $meta = Parse::CPAN::Meta->load_file($tzil->tempdir->file('build/META.yml'));
+my $meta = Parse::CPAN::Meta->load_file(
+  $tzil->tempdir->child('build/META.json')
+);
 
 is_deeply(
   $meta->{prereqs}{runtime}{recommends},

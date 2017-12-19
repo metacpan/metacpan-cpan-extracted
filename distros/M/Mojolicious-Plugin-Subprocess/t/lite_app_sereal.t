@@ -1,10 +1,7 @@
 use Mojolicious::Lite;
 use Test::More;
 use Test::Mojo;
-use Test::Needs {
-  'Sereal::Encoder' => '3.001',
-  'Sereal::Decoder' => '3.001',
-};
+use Test::Needs 'Mojo::IOLoop::Subprocess::Role::Sereal';
 
 plugin 'Subprocess' => {use_sereal => 1};
 

@@ -1,5 +1,5 @@
 package GitLab::API::v4::RESTClient;
-$GitLab::API::v4::RESTClient::VERSION = '0.01';
+$GitLab::API::v4::RESTClient::VERSION = '0.02';
 =head1 NAME
 
 GitLab::API::v4::RESTClient - GitLab API v4 REST client.

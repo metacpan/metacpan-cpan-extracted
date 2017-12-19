@@ -18,7 +18,7 @@ package Dist::Zilla::Plugin::MakeMaker::Custom;
 #---------------------------------------------------------------------
 
 our $VERSION = '4.26';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 
 use Moose;
@@ -183,8 +183,8 @@ Dist::Zilla::Plugin::MakeMaker::Custom - Allow a dist to have a custom Makefile.
 =head1 VERSION
 
 This document describes version 4.26 of
-Dist::Zilla::Plugin::MakeMaker::Custom, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+Dist::Zilla::Plugin::MakeMaker::Custom, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 SYNOPSIS
 
@@ -423,7 +423,7 @@ template_error
 
 =head1 DEPENDENCIES
 
-MakeMaker::Custom requires L<Dist::Zilla> (4.300009 or later) and
+MakeMaker::Custom requires L<Dist::Zilla> (6 or later) and
 L<Text::Template>.  I also recommend applying F<Template_strict.patch>
 to Text::Template.  This will add support for the STRICT option, which
 will help catch errors in your templates.
@@ -452,7 +452,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

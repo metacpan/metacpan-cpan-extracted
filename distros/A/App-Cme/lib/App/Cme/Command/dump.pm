@@ -10,7 +10,7 @@
 # ABSTRACT: Dump the configuration of an application
 
 package App::Cme::Command::dump ;
-$App::Cme::Command::dump::VERSION = '1.024';
+$App::Cme::Command::dump::VERSION = '1.025';
 use strict;
 use warnings;
 use 5.10.1;
@@ -44,7 +44,7 @@ sub opt_spec {
         [
             "format=s" => "dump using specified format",
             {
-                regex => qr/^(?:json|yaml|perl|cml)$/,
+                regex => qr/^(?:json|ya?ml|perl|cml|cds)$/i,
                 default => 'yaml'
             },
         ],
@@ -75,7 +75,7 @@ sub execute {
     my $format = $opt->{format};
     my $mode = $opt->{dumptype} || 'custom';
 
-    if ($format eq 'cml') {
+    if ($format =~ /cml|cds/i) {
         $dump_string = $target_node->dump_tree( mode => $mode );
     }
     else {
@@ -83,9 +83,10 @@ sub execute {
             ordered_hash_as_list => 0,
             mode => $mode
         );
-        $dump_string = $format eq 'yaml' ? Dump($perl_data)
-            : $format eq 'JSON' ? encode_json($perl_data)
-            :                     Dumper($perl_data) ;
+        $dump_string
+            = $format =~ /ya?ml/i ? Dump($perl_data)
+            : $format =~ /json/i  ? encode_json($perl_data)
+            :                       Dumper($perl_data) ; # Perl data structure
     }
     print $dump_string ;
 }
@@ -104,7 +105,7 @@ App::Cme::Command::dump - Dump the configuration of an application
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -130,8 +131,9 @@ Choose to dump every values (full), or only customized values (default)
 C<non_upstream_default> is like C<full> mode, but value identical with
 application default are omitted. But this should seldom happen.
 
-By default, dump in yaml format. This can be changed in C<JSON>,
-C<Perl>, C<cml> (aka L<Config::Model::Loader> format) with C<-format> option.
+By default, dump in yaml format. This can be changed in C<json>,
+C<perl>, C<cml> (aka L<Config::Model::Loader> format, C<cds> is also
+accepted) with C<-format> option.
 
 =head1 Common options
 

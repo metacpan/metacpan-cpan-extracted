@@ -123,3 +123,48 @@ sub one_of : Tests {
         is $res->content, q!{"value":19.5}!;
     };
 }
+
+sub status_201 : Tests {
+    my $schema = t::test::fixtures::prepare_bmi;
+    $schema->register_route(
+        method => 'PUT',
+        route => '/put_bmi',
+        request_resource => {
+            encoding => 'json',
+            body => 'figure',
+        },
+        response_resource => {
+            201 => {
+                encoding => 'json',
+                body => 'bmi',
+            },
+        },
+    );
+    my $app = Plack::App::APISchema::MockServer->new(schema => $schema)->to_app;
+
+    test_psgi $app => sub {
+        my $server = shift;
+        my $res = $server->(PUT '/put_bmi');
+        is $res->content, q!{"value":19.5}!;
+        is $res->code, 201;
+    };
+}
+
+sub status_204 : Tests {
+    my $schema = t::test::fixtures::prepare_bmi;
+    $schema->register_route(
+        method => 'GET',
+        route => '/empty',
+        response_resource => {
+            204 => {},
+        },
+    );
+    my $app = Plack::App::APISchema::MockServer->new(schema => $schema)->to_app;
+
+    test_psgi $app => sub {
+        my $server = shift;
+        my $res = $server->(GET '/empty');
+        is $res->content, '';
+        is $res->code, 204;
+    };
+}

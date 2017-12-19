@@ -1,29 +1,43 @@
 Revision history for FSM-Basic
 
-0.11  Tue Jul 21 11:10:04 UTC 2017
-         better open file ( 3 arguments )
+0.15    Sun Dec 1 21:03:18 UTC 2017
+            Correct perl version required 5.010 and not 5.100
+            
+0.14    Sat Dec 16 21:03:18 UTC 2017
+            Correct perl version required
 
-0.10  Tue Jul 21 09:43:07 UTC 2017
-         add executable tag 'catRAND' and 'catSEQ'
-         fix output from 'cat' 'exec' and 'cmd_'exec'
+0.13    Fri Dec 15 13:55:45 UTC 2017
+            Force usage of perl >= 5.10 (because we use // operator)
 
-0.09   Tue May 30 17:05:41 2017 +0200
-         add executable tag 'cat' because it is often used
+0.12    Sat Oct 14 21:07:01 UTC 2017
+            Add carWRAND (pick file randomly but weithed)
+            Add 01-cat, 01-catRAND, 01-catWRAND and 01-catSEQ test
+            Avoid buffer trouble in readline when out id big (separate prompt from data)
 
-0.08   Wed Apr 26 21:39:04 2017 +0200
-         tidy perldoc
+0.11    Tue Jul 21 11:10:04 UTC 2017
+            better open file ( 3 arguments )
 
-0.07   Wed Apr 19 10:25:00 2017 +0200
-         no more module autovivification
+0.10    Tue Jul 21 09:43:07 UTC 2017
+            add executable tag 'catRAND' and 'catSEQ'
+            fix output from 'cat' 'exec' and 'cmd_'exec'
+
+0.09    Tue May 30 17:05:41 2017 +0200
+            add executable tag 'cat' because it is often used
+
+0.08    Wed Apr 26 21:39:04 2017 +0200
+            tidy perldoc
+
+0.07    Wed Apr 19 10:25:00 2017 +0200
+            no more module autovivification
 
 0.06    Fri Apr 7 18:44:58 2017 +0200
-         Add 'set' method and more examples
+            Add 'set' method and more examples
 
 0.05    Wed Mar 1 19:13:14 2017 +0100
-         Add fake_bash_ssh example + examples/README
+            Add fake_bash_ssh example + examples/README
 
 0.04    Mon Feb 27 11:05:23 CET 2017
-         Add missiing dependency for autovivification
+            Add missiing dependency for autovivification
 
 0.03    Fri Feb 17 19:37:20 2017 +0100
-         Add example (fakr_bash.pl ...)
+            Add example (fakr_bash.pl ...)

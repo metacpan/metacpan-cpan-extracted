@@ -1053,6 +1053,23 @@ multi-line C<qw> quotes to be left unchanged.  This option will not
 normally be necessary, but was added for testing purposes, because in
 some versions of perl, trimming C<qw> quotes changes the syntax tree.
 
+=item B<-sbq=n>  or B<--space-backslash-quote=n>
+
+Lines like
+
+       $str1=\"string1";
+       $str2=\'string2';
+
+can confuse syntax highlighters unless a space is included between the backslash and the single or double quotation mark.
+
+This can be controlled with the value of B<n> as follows:
+
+    -sbq=0 means no space between the backslash and quote
+    -sbq=1 means follow the example of the source code
+    -sbq=2 means always put a space between the backslash and quote
+
+The default is B<-sbq=1>, meaning that a space will be used 0if there is one in the source code.
+
 =item Trimming trailing whitespace from lines of POD
 
 B<-trp> or B<--trim-pod> will remove trailing whitespace from lines of POD.
@@ -1214,7 +1231,7 @@ order to update, delete, and format them.  Any comment identified as a
 closing side comment will be placed just a single space to the right of
 its closing brace.
 
-=item B<-cscl=string>, or B<--closing-side-comment-list-string> 
+=item B<-cscl=string>, or B<--closing-side-comment-list> 
 
 where C<string> is a list of block types to be tagged with closing side
 comments.  By default, all code block types preceded by a keyword or
@@ -1274,6 +1291,7 @@ side comments.
 
 If B<n=1> is used, the results will be the same as B<n=2> whenever the
 resulting line length is less than the maximum allowed.
+
 =item B<-cscb>, or B<--closing-side-comments-balanced> 
 
 When using closing-side-comments, and the closing-side-comment-maximum-text
@@ -3196,7 +3214,7 @@ perlstyle(1), Perl::Tidy(3)
 
 =head1 VERSION
 
-This man page documents perltidy version 20170521.
+This man page documents perltidy version 20171214.
 
 =head1 BUG REPORTS
 

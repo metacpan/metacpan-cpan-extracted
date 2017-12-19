@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.114';
+$Config::Model::Node::VERSION = '2.116';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -91,7 +91,7 @@ has gist => (
 sub fetch_gist {
     my $self = shift;
     my $gist = $self->gist // '';
-    $gist =~ s!{([\w -]+)}!$self->grab_value($1) // '<undef>'!ge;
+    $gist =~ s!{([\w -]+)}!$self->grab($1)->fetch // ''!ge;
     return $gist;
 }
 
@@ -334,8 +334,7 @@ sub init {
 
     my $model = $self->{model};
 
-    return
-        unless defined $model->{rw_config};
+    return unless defined $model->{rw_config};
 
     my $initial_load_backup = $self->instance->initial_load;
     $self->instance->initial_load_start;
@@ -344,13 +343,12 @@ sub init {
         # config_dir spec given by application info
         config_dir      => $self->instance->config_dir,
         node => $self,
+        rw_config => $model->{rw_config}
     );
 
-    if ( $model->{rw_config} ) {
-        $self->read_config_data( check => $self->read_check );
-        # setup auto_write
-        $self->backend_mgr->auto_write_init(rw_config => $model->{rw_config});
-    }
+    $self->read_config_data( check => $self->read_check );
+    # setup auto_write
+    $self->backend_mgr->auto_write_init();
 
     $self->instance->initial_load($initial_load_backup);
 }
@@ -368,7 +366,6 @@ sub read_config_data {
     # setup auto_read
     # may use an overridden config file
     $self->backend_mgr->read_config_data(
-        rw_config       => $model->{rw_config},
         check           => $args{check},
         config_file     => $args{config_file} || $self->{config_file},
         auto_create     => $args{auto_create} || $self->instance->auto_create,
@@ -1211,7 +1208,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,37 @@
+---
+abstract: 'IO::Async support for ZeroMQ'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  IO::Async::Loop: '0'
+  Module::Load: '0'
+  Test::Most: '0'
+  Test::Requires: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-ZMQ
+requires:
+  Fcntl: '0'
+  IO::Async::Handle: '0'
+  IO::Async::Notifier: '0'
+  Package::Stash: '0'
+  ZMQ::Constants: '0'
+  base: '0'
+  if: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/zmughal/p5-Net-Async-ZMQ
+  repository: https://github.com/zmughal/p5-Net-Async-ZMQ.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

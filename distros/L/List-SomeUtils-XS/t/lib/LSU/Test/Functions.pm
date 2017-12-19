@@ -98,6 +98,9 @@ sub test_any_u {
         }
     );
     is_dying( sub { &any_u( 42, 4711 ); } );
+
+    my @empty;
+    is_undef( any_u { defined($_) } @empty );
 }
 
 sub test_all_u {
@@ -116,6 +119,9 @@ sub test_all_u {
         }
     );
     is_dying( sub { &all_u( 42, 4711 ); } );
+
+    my @empty;
+    is_undef( all_u { defined($_) } @empty );
 }
 
 sub test_none_u {
@@ -134,6 +140,9 @@ sub test_none_u {
         }
     );
     is_dying( sub { &none_u( 42, 4711 ); } );
+
+    my @empty;
+    is_undef( none_u { defined($_) } @empty );
 }
 
 sub test_notall_u {
@@ -152,6 +161,9 @@ sub test_notall_u {
         }
     );
     is_dying( sub { &notall_u( 42, 4711 ); } );
+
+    my @empty;
+    is_undef( notall_u { defined($_) } @empty );
 }
 
 sub test_one_u {
@@ -173,6 +185,9 @@ sub test_one_u {
         }
     );
     is_dying( sub { &one_u( 42, 4711 ); } );
+
+    my @empty;
+    is_undef( one_u { defined($_) } @empty );
 }
 
 sub test_true {
@@ -196,6 +211,9 @@ sub test_true {
         }
     );
     is_dying( sub { &true( 42, 4711 ); } );
+
+    my @empty;
+    is( 0, true { defined($_) } @empty );
 }
 
 sub test_false {
@@ -219,6 +237,9 @@ sub test_false {
         }
     );
     is_dying( sub { &false( 42, 4711 ); } );
+
+    my @empty;
+    is( 0, false { defined($_) } @empty );
 }
 
 sub test_firstidx {
@@ -241,6 +262,9 @@ sub test_firstidx {
         }
     );
     is_dying( sub { &firstidx( 42, 4711 ); } );
+
+    my @empty;
+    is( -1, first_index { defined($_) } @empty );
 }
 
 sub test_lastidx {
@@ -263,6 +287,9 @@ sub test_lastidx {
         }
     );
     is_dying( sub { &lastidx( 42, 4711 ); } );
+
+    my @empty;
+    is( -1, last_index { defined($_) } @empty );
 }
 
 sub test_onlyidx {
@@ -289,6 +316,9 @@ sub test_onlyidx {
         }
     );
     is_dying( sub { &onlyidx( 42, 4711 ); } );
+
+    my @empty;
+    is( -1, only_index { defined($_) } @empty );
 }
 
 sub test_insert_after {
@@ -317,6 +347,10 @@ sub test_insert_after {
             &insert_after( sub { }, 4711, "13" );
         }
     );
+
+    my @empty;
+    insert_after { defined($_) } 'foo' => @empty;
+    is_deeply( \@empty, [] );
 }
 
 sub test_insert_after_string {
@@ -338,6 +372,10 @@ sub test_insert_after_string {
         }
     );
     is_dying( sub { &insert_after_string( 42, 4711, "13" ); } );
+
+    my @empty;
+    insert_after_string 'bar', 'foo' => @empty;
+    is_deeply( \@empty, [] );
 }
 
 sub test_apply {
@@ -386,6 +424,10 @@ SCOPE:
         }
     );
     is_dying( sub { &apply( 42, 4711 ); } );
+
+    my @empty;
+    apply { $_++ } @empty;
+    is_deeply( \@empty, [] );
 }
 
 sub test_indexes {
@@ -428,6 +470,9 @@ sub test_indexes {
     is( $ref, undef, "weakened away" );
 
     is_dying( sub { &indexes( 42, 4711 ); } );
+
+    my @empty;
+    is_deeply( [ indexes { $_ > 5 } @empty ], [] );
 }
 
 # In the following, the @dummy variable is needed to circumvent
@@ -446,6 +491,9 @@ sub test_before {
         }
     );
     is_dying( sub { &before( 42, 4711 ); } );
+
+    my @empty;
+    is_deeply( [ before { $_ > 5 } @empty ], [] );
 }
 
 # In the following, the @dummy variable is needed to circumvent
@@ -464,6 +512,9 @@ sub test_before_incl {
         }
     );
     is_dying( sub { &before_incl( 42, 4711 ); } );
+
+    my @empty;
+    is_deeply( [ before_incl { $_ > 5 } @empty ], [] );
 }
 
 # In the following, the @dummy variable is needed to circumvent
@@ -485,6 +536,9 @@ sub test_after {
 
     @x = ( 1, after {/foo/} qw(abc def) );
     is_deeply( \@x, [1], "check XS implementation doesn't mess up stack" );
+
+    my @empty;
+    is_deeply( [ after { $_ > 5 } @empty ], [] );
 }
 
 # In the following, the @dummy variable is needed to circumvent
@@ -503,6 +557,9 @@ sub test_after_incl {
         }
     );
     is_dying( sub { &after_incl( 42, 4711 ); } );
+
+    my @empty;
+    is_deeply( [ after_incl { $_ > 5 } @empty ], [] );
 }
 
 sub test_firstval {
@@ -524,6 +581,9 @@ sub test_firstval {
         }
     );
     is_dying( sub { &firstval( 42, 4711 ); } );
+
+    my @empty;
+    is( ( firstval { $_ > 5 } @empty ), undef );
 }
 
 sub test_onlyval {
@@ -550,6 +610,9 @@ sub test_onlyval {
         }
     );
     is_dying( sub { &onlyval( 42, 4711 ); } );
+
+    my @empty;
+    is( ( onlyval { $_ > 5 } @empty ), undef );
 }
 
 sub test_lastval {
@@ -571,6 +634,9 @@ sub test_lastval {
         }
     );
     is_dying( sub { &lastval( 42, 4711 ); } );
+
+    my @empty;
+    is( ( lastval { $_ > 5 } @empty ), undef );
 }
 
 sub test_firstres {
@@ -591,6 +657,9 @@ sub test_firstres {
         }
     );
     is_dying( sub { &firstres( 42, 4711 ); } );
+
+    my @empty;
+    is( ( firstres { $_ * 2 } @empty ), undef );
 }
 
 sub test_lastres {
@@ -611,6 +680,9 @@ sub test_lastres {
         }
     );
     is_dying( sub { &lastres( 42, 4711 ); } );
+
+    my @empty;
+    is( ( lastres { $_ * 2 } @empty ), undef );
 }
 
 sub test_onlyres {
@@ -635,6 +707,9 @@ sub test_onlyres {
         }
     );
     is_dying( sub { &onlyres( 42, 4711 ); } );
+
+    my @empty;
+    is( ( onlyres { $_ * 2 } @empty ), undef );
 }
 
 sub test_each_array {
@@ -759,6 +834,16 @@ SCOPE:
     );
     is_dying( sub { &each_array( 42, 4711 ); } );
     is_dying( sub { &each_arrayref( 42, 4711 ); } );
+
+    {
+        my ( @empty1, @empty2 );
+        my $i = each_array @empty1, @empty2;
+        my @r;
+        while ( my ( $x, $y ) = $i->() ) {
+            push @r, $x, $y;
+        }
+        is_deeply( \@r, [] );
+    }
 }
 
 sub test_pairwise {
@@ -877,36 +962,51 @@ SKIP:
             }
         );
     }
+
+    my ( @empty1, @empty2 );
+    is_deeply( [ pairwise { $a + $b } @empty1, @empty2 ], [] );
 }
 
 sub test_natatime {
-    my @x = ( 'a' .. 'g' );
-    my $it = natatime 3, @x;
-    my @r;
-    local $" = " ";
-    while ( my @vals = $it->() ) {
-        push @r, "@vals";
-    }
-    is( is_deeply( \@r, [ 'a b c', 'd e f', 'g' ] ), 1, "natatime1" );
-
-    my @a = ( 1 .. 1000 );
-    $it = natatime 1, @a;
-    @r = ();
-    while ( my @vals = &$it ) {
-        push @r, @vals;
-    }
-    is( is_deeply( \@r, \@a ), 1, "natatime2" );
-
-    leak_free_ok(
-        natatime => sub {
-            my @y = 1;
-            my $it = natatime 2, @y;
-            while ( my @vals = $it->() ) {
-
-                # do nothing
-            }
+    {
+        my @x = ( 'a' .. 'g' );
+        my $it = natatime 3, @x;
+        my @r;
+        local $" = " ";
+        while ( my @vals = $it->() ) {
+            push @r, "@vals";
         }
-    );
+        is( is_deeply( \@r, [ 'a b c', 'd e f', 'g' ] ), 1, "natatime1" );
+
+        my @a = ( 1 .. 1000 );
+        $it = natatime 1, @a;
+        @r = ();
+        while ( my @vals = &$it ) {
+            push @r, @vals;
+        }
+        is( is_deeply( \@r, \@a ), 1, "natatime2" );
+
+        leak_free_ok(
+            natatime => sub {
+                my @y = 1;
+                my $it = natatime 2, @y;
+                while ( my @vals = $it->() ) {
+
+                    # do nothing
+                }
+            }
+        );
+    }
+
+    {
+        my @empty;
+        my $i = natatime 1, @empty;
+        my @r;
+        while ( my @v = $i->() ) {
+            push @r, @v;
+        }
+        is_deeply( \@r, [] );
+    }
 }
 
 sub test_zip {
@@ -957,6 +1057,11 @@ SCOPE:
         }
     );
     is_dying( sub { &zip( 1, 2 ); } );
+
+    {
+        my ( @empty1, @empty2 );
+        is_deeply( [ zip @empty1, @empty2 ], [] );
+    }
 }
 
 sub test_mesh {
@@ -1007,6 +1112,11 @@ SCOPE:
         }
     );
     is_dying( sub { &mesh( 1, 2 ); } );
+
+    {
+        my ( @empty1, @empty2 );
+        is_deeply( [ mesh @empty1, @empty2 ], [] );
+    }
 }
 
 sub test_uniq {
@@ -1103,6 +1213,9 @@ SCOPE:
             };
         }
     );
+
+    my @empty;
+    is_deeply( [ uniq @empty ], [] );
 }
 
 sub test_singleton {
@@ -1205,6 +1318,9 @@ SCOPE:
             };
         }
     );
+
+    my @empty;
+    is_deeply( [ singleton @empty ], [] );
 }
 
 sub test_part {
@@ -1285,6 +1401,9 @@ SKIP:
             my @part = part { grow_stack(); 1024 } 'one', 'two';
         }
     );
+
+    my @empty;
+    is_deeply( [ part {3} @empty ], [] );
 }
 
 sub test_minmax {
@@ -1363,6 +1482,9 @@ sub test_minmax {
             ( $min, $max ) = minmax @list;
         }
     );
+
+    my @empty;
+    is_deeply( [ minmax @empty ], [] );
 }
 
 sub test_bsearch {
@@ -1408,6 +1530,9 @@ sub test_bsearch {
         }
     );
     is_dying( sub { &bsearch( 42, ( 1 .. 100 ) ); } );
+
+    my @empty;
+    is_deeply( [ bsearch { $_ - 5 } @empty ], [] );
 }
 
 sub test_bsearchidx {
@@ -1449,6 +1574,9 @@ sub test_bsearchidx {
         }
     );
     is_dying( sub { &bsearchidx( 42, ( 1 .. 100 ) ); } );
+
+    my @empty;
+    is( ( bsearchidx { $_ - 5 } @empty ), -1 );
 }
 
 sub test_any {
@@ -1478,6 +1606,9 @@ sub test_any {
         }
     );
     is_dying( sub { &any( 42, 4711 ); } );
+
+    my @empty;
+    is_false( any { defined($_) } @empty );
 }
 
 sub test_all {
@@ -1496,6 +1627,9 @@ sub test_all {
         }
     );
     is_dying( sub { &all( 42, 4711 ); } );
+
+    my @empty;
+    is_true( all { defined($_) } @empty );
 }
 
 sub test_none {
@@ -1514,6 +1648,9 @@ sub test_none {
         }
     );
     is_dying( sub { &none( 42, 4711 ); } );
+
+    my @empty;
+    is_true( none { defined($_) } @empty );
 }
 
 sub test_notall {
@@ -1532,6 +1669,9 @@ sub test_notall {
         }
     );
     is_dying( sub { &notall( 42, 4711 ); } );
+
+    my @empty;
+    is_false( notall { defined($_) } @empty );
 }
 
 sub test_one {
@@ -1552,6 +1692,9 @@ sub test_one {
         }
     );
     is_dying( sub { &one( 42, 4711 ); } );
+
+    my @empty;
+    is_false( one { defined($_) } @empty );
 }
 
 sub test_sort_by {
@@ -1560,6 +1703,9 @@ sub test_sort_by {
         [ sort_by { $_->[0] } @list ],
         [ map { [$_] } sort { $a cmp $b } 1 .. 100 ]
     );
+
+    my @empty;
+    is_deeply( [ sort_by { $_ . 'a' } @empty ], [] );
 }
 
 sub test_nsort_by {
@@ -1568,6 +1714,9 @@ sub test_nsort_by {
         [ nsort_by { $_->[0] } @list ],
         [ map { [$_] } sort { $a <=> $b } 1 .. 100 ]
     );
+
+    my @empty;
+    is_deeply( [ nsort_by { $_ ** 2 } @empty ], [] );
 }
 
 sub test_mode {
@@ -1659,6 +1808,9 @@ sub test_mode {
             $modality = mode();
         }
     );
+
+    my @empty;
+    is_deeply( [ mode @empty ], [] );
 }
 
 {

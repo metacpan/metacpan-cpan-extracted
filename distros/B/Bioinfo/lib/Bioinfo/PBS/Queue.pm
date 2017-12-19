@@ -6,7 +6,7 @@ use IO::All;
 use List::Util 'uniq';
 use namespace::autoclean;
 
-our $VERSION = '0.1.11'; # VERSION:
+our $VERSION = '0.1.13'; # VERSION:
 # ABSTRACT: used to submit a batch of task to Torque cluster
 
 
@@ -147,7 +147,7 @@ Bioinfo::PBS::Queue - used to submit a batch of task to Torque cluster
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.13
 
 =head1 SYNOPSIS
 

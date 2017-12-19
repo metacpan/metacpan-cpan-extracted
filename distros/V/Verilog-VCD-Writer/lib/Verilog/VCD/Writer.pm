@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Verilog::VCD::Writer;
-$Verilog::VCD::Writer::VERSION = '0.002';
+$Verilog::VCD::Writer::VERSION = '0.004';
 use DateTime;
 use Verilog::VCD::Writer::Module;
 
@@ -126,45 +126,38 @@ Verilog::VCD::Writer - VCD waveform File creation module.
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
-	use Verilog::VCD::Writer;
+    use Verilog::VCD::Writer;
 
-	my $writer=Verilog::VCD::Writer->new(timescale=>'1 ns',vcdfile=>"test.vcd");
-	$writer->addComment("Author:Vijayvithal");
+    my $writer = Verilog::VCD::Writer->new(timescale=>'1 ns',vcdfile=>"test.vcd");
+    $writer->addComment("Author:Vijayvithal");
 
-	my $top=$writer->addModule("top"); # Create toplevel module
-	my $TX=$writer->addSignal("TX",7,0); #Add Signals to top
-	my $RX=$writer->addSignal("RX",7,0);
+    my $top = $writer->addModule("top"); # Create toplevel module
+    my $TX  = $top->addSignal("TX",7,0); #Add Signals to top
+    my $RX  = $top->addSignal("RX",7,0);
 
-	my $dut=$top->addModule("DUT");  Create SubModule
-	$dut->dupSignal($TX,"TX",7,0); #Duplicate signals from Top in submodule
-	$dut->dupSignal($RX,"RX",7,0);
-	
-	$writer->writeHeaders(); # Output the VCD Header.
-	$writer->setTime(0); # Time 0
-	$writer->addValue($TX,0); # Record Transition
-	$writer->addValue($RX,0);
-	$writer->setTime(5); # Time 1ns
-	$writer->addValue($TX,1);
-	$writer->addValue($RX,0);
+    my $dut = $writer->addModule("DUT");  #Create SubModule
+    $dut->dupSignal($TX,"TX",7,0); #Duplicate signals from Top in submodule
+    $dut->dupSignal($RX,"RX",7,0);
 
-=head1 METHODS
-
-=head2 addComment(comment)
-
-Adds a comment to the VCD file header. This method should be called before writeHeaders();
-
-=head2 flush()
-
-Flushes the output buffer.
+    $writer->writeHeaders(); # Output the VCD Header.
+    $writer->setTime(0); # Time 0
+    $writer->addValue($TX,0); # Record Transition
+    $writer->addValue($RX,0);
+    $writer->setTime(5); # Time 1ns
+    $writer->addValue($TX,1);
+    $writer->addValue($RX,0);
 
 =head1 DESCRIPTION
+
 This module originated out of my need to view the <Time,Voltage> CSV dump from the scope using GTKWave. 
 
 This module provides an interface for creating a VCD (Value change Dump) file.
+
+Please see examples/serial.pl for a complete example
 
 =head2 new (timescale=>'1ps',vcdfile=>'test.vcd',date=>DateTime->now());
 
@@ -203,6 +196,16 @@ This module takes the time information as an integer value and writes it out to 
 
 This method takes two parameters, an Object of the type Verilog::VCD::Writer::Signal and the decimal value of the signal at the current time.
 This module prints the <Signal,Value> information as a formatted line to the VCD file
+
+=head1 METHODS
+
+=head2 addComment(comment)
+
+Adds a comment to the VCD file header. This method should be called before writeHeaders();
+
+=head2 flush()
+
+Flushes the output buffer.
 
 =head1 AUTHOR
 

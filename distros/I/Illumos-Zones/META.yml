@@ -26,4 +26,4 @@ resources:
   bugtracker: https://github.com/hadfl/Illumos-Zones/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/hadfl/Illumos-Zones
-version: v0.1.5
+version: v0.1.6

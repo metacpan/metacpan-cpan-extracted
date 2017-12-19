@@ -25,7 +25,7 @@ no_index:
 provides:
   Protocol::WebSocket:
     file: lib/Protocol/WebSocket.pm
-    version: '0.22'
+    version: '0.23'
   Protocol::WebSocket::Client:
     file: lib/Protocol/WebSocket/Client.pm
   Protocol::WebSocket::Cookie:
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/vti/protocol-websocket/issues
   homepage: https://github.com/vti/protocol-websocket
   repository: git://github.com/vti/protocol-websocket.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Anton Petrusevich <anton.petrusevich@lycos.com>'
   - 'BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>'

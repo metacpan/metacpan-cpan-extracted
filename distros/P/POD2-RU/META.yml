@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,9 +38,13 @@ resources:
   bugtracker: https://github.com/mishin/POD-to-RU/issues
   homepage: https://github.com/mishin/POD-to-RU
   repository: https://github.com/mishin/POD-to-RU.git
-version: 5.18.0.1.83
+version: 5.18.0.1.84
 x_contributors:
   - 'Andrey Asyakin <asan999@gmail.com>'
+  - 'Ilgizar Zakirov <ivzakirov@gmail.com>'
   - 'ira <ira>'
+  - 'Mishin737 <n.mishin@roseurobank.ru>'
   - 'Nikolay Mishin <mi@ya.ru>'
+  - 'Nikolay Mishin <nmishin@masterdm.ru>'
   - 'Zoffix Znet <cpan@zoffix.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

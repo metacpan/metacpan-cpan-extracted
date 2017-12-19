@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
+# $Id: 00-load.t 1606 2017-11-30 10:13:43Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -35,12 +35,10 @@ my @module = qw(
 
 diag("\n\nThese tests were run using:\n");
 foreach my $module (@module) {
-	my $loaded = eval("require $module") || next;
-	my $revnum = $loaded ? $module->VERSION : "\t\tn/a";
-	diag sprintf "\t%-25s  %s", $module, $revnum || '?';
+	eval "require $module";
+	my $version = eval { $module->VERSION } || next;
+	diag sprintf "\t%-25s  %s", $module, $version;
 }
-
-diag("set environment variable NET_DNS_DEBUG to get all versions\n\n");
 
 
 plan tests => 20 + scalar(@Net::DNS::EXPORT);
@@ -48,7 +46,7 @@ plan tests => 20 + scalar(@Net::DNS::EXPORT);
 
 use_ok('Net::DNS');
 
-is( Net::DNS->version, $Net::DNS::VERSION, 'Net::DNS->version');
+is( Net::DNS->version, $Net::DNS::VERSION, 'Net::DNS->version' );
 
 
 #
@@ -89,4 +87,6 @@ foreach my $rr (@rrs) {
 
 
 exit;
+
+__END__
 

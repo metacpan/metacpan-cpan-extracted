@@ -3,7 +3,7 @@ package Catmandu::Importer::MARC::Decoder;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 sub fake_marc_file {
     my ($self,$fh,$class) = @_;
@@ -23,12 +23,12 @@ sub decode {
     return unless eval { $record->isa('MARC::Record') };
     my @result = ();
 
-    push @result , [ 'LDR' , undef, undef, '_' , $record->leader ];
+    push @result , [ 'LDR' , ' ', ' ' , '_' , $record->leader ];
 
     for my $field ($record->fields()) {
         my $tag  = $field->tag;
-        my $ind1 = $field->indicator(1);
-        my $ind2 = $field->indicator(2);
+        my $ind1 = $field->indicator(1) // ' ';
+        my $ind2 = $field->indicator(2) // ' ';
 
         my @sf = ();
 

@@ -41,11 +41,8 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "AWS::S3" : "0.13",
-            "WWW::Scraper::ISBN::GoogleBooks_Driver" : "0.30"
-         },
          "requires" : {
+            "AWS::S3" : "0.13",
             "Archive::Zip" : "1.58",
             "Benchmark" : "1.20",
             "Crypt::PBKDF2" : "0.161520",
@@ -87,6 +84,7 @@
             "Term::ReadKey" : "2.37",
             "Try::Tiny" : "0.24",
             "WWW::Mechanize" : "1.86",
+            "WWW::Scraper::ISBN::GoogleBooks_Driver" : "0.30",
             "YAML::Syck" : "1.26",
             "perl" : "5.022001",
             "utf8" : "1.17"
@@ -101,7 +99,7 @@
    "provides" : {
       "omnitool::installer" : {
          "file" : "lib/omnitool/installer.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.0.7"
       }
    },
    "release_status" : "stable",
@@ -115,7 +113,7 @@
          "web" : "https://github.com/ericschernoff/omnitool-installer"
       }
    },
-   "version" : "1.0.5",
+   "version" : "1.0.7",
    "x_contributors" : [
       "Eric Chernoff <echernof@cisco.com>",
       "Eric Chernoff <ericschernoff@gmail.com>",

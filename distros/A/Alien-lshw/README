@@ -1,0 +1,47 @@
+NAME
+
+    Alien::lshw - Perl distribution for GNU lshw
+
+USAGE
+
+        use Alien::lshw;
+        use Env qw( @PATH );
+    
+        unshift @PATH, Alien::lshw->bin_dir;
+        system lshw, '-version';
+
+DESCRIPTION
+
+    lshw is a small tool to provide detailed information on the hardware
+    configuration of the machine. It can report exact memory configuration,
+    firmware version, mainboard configuration, CPU version and speed, cache
+    configuration, bus speed, etc. on DMI-capable x86 or EFI (IA-64)
+    systems and on some ARM and PowerPC machines (PowerMac G4 is known to
+    work).
+
+    Information can be output in plain text, XML or HTML.
+
+    It currently supports DMI (x86 and EFI only), OpenFirmware device tree
+    (PowerPC only), PCI/AGP, ISA PnP (x86), CPUID (x86), IDE/ATA/ATAPI,
+    PCMCIA (only tested on x86), USB and SCSI.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-lshw
+
+SEE ALSO
+
+    lshw Project home <http://lshw.ezix.org/> lshw Git repository
+    <https://github.com/lyonel/lshw>
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

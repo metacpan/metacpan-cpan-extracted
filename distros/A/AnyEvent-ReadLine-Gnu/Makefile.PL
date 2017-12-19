@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use Canary::Stability AnyEvent::ReadLine::Gnu => 1, 5.010;
 
 WriteMakefile(
     dist	=> {
@@ -15,6 +15,10 @@ WriteMakefile(
        common::sense  => 3,
        AnyEvent       => 6,
        Term::ReadLine::Gnu  => 1.2,
+    },
+    CONFIGURE_REQUIRES => {
+       "ExtUtils::MakeMaker" => 6.6,
+       "Canary::Stability" => 0,
     },
 );
 

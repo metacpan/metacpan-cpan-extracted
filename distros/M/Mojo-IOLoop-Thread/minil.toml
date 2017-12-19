@@ -1,0 +1,4 @@
+name = "Mojo-IOLoop-Thread"
+badges = ["appveyor"]
+module_maker="ModuleBuildTiny"
+

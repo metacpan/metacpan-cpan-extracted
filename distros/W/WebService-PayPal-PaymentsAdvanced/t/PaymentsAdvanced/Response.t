@@ -6,7 +6,6 @@ use Test::Fatal;
 use Test::More;
 
 my %params = (
-    RESPMSG       => 'Approved',
     RESPMSG       => 'User authentication failed',
     RESULT        => 1,
     SECURETOKEN   => 'token',

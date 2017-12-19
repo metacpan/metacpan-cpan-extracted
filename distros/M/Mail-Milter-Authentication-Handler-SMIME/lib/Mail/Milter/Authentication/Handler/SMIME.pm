@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::SMIME;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.5');
 
 use English qw{ -no_match_vars };
 use Sys::Syslog qw{:standard :macros};
@@ -246,6 +246,9 @@ sub _decode_certs {
         my $serial  = $cert_info->serial();
         my @aia     = $cert_info->aia();
 
+        $from = 'TEST' if exists $self->handler_config()->{ 'TEST_DATE' };
+        $to   = 'TEST' if exists $self->handler_config()->{ 'TEST_DATE' };
+
         next SIGNATURE if $seen->{ $serial };
         $seen->{ $serial } = 1;
 
@@ -282,6 +285,9 @@ sub _decode_certs {
         my $eku     = $cert_info->eku();
         my $serial  = $cert_info->serial();
         my @aia     = $cert_info->aia();
+
+        $from = 'TEST' if exists $self->handler_config()->{ 'TEST_DATE' };
+        $to   = 'TEST' if exists $self->handler_config()->{ 'TEST_DATE' };
 
         next CERT if $seen->{ $serial };
         $seen->{ $serial } = 1;

@@ -1,0 +1,130 @@
+package Bio::MUST::Core::Utils;
+# ABSTRACT: Utility functions for enabling multiple file processing
+$Bio::MUST::Core::Utils::VERSION = '0.173500';
+use strict;
+use warnings;
+use autodie;
+
+use File::Basename;
+use File::HomeDir;
+use Path::Class qw(file);
+use Test::Files;
+
+use Exporter::Easy (
+    OK   => [ qw(fix_homedir secure_outfile :filenames cmp_store) ],
+    TAGS => [
+        filenames => [ qw(insert_suffix change_suffix append_suffix) ],
+    ],
+);
+
+
+# TODO: replace by calls to Path::Class::dir
+
+sub fix_homedir {
+    my $dir = shift;
+
+    # workaround for '~-like' paths
+    if ($dir =~ m{ \A ~ (.*) }xms) {
+        $dir = File::HomeDir->my_home . $1;
+    }
+
+    return $dir;
+}
+
+
+sub secure_outfile {
+    my $infile = shift;
+    my $suffix = shift;
+
+    return insert_suffix($infile, $suffix) if defined $suffix;
+
+    rename $infile, append_suffix($infile, '.bak') if -e $infile;
+    return $infile;
+}
+
+
+sub insert_suffix {
+    my $infile = shift;
+    my $string = shift;
+
+    my ($filename, $directories, $suffix) = fileparse($infile, qr{\.[^.]*}xms);
+    return $directories . $filename . $string . $suffix;
+}
+
+
+sub change_suffix {
+    my $infile = shift;
+    my $suffix = shift;
+
+    my ($filename, $directories) = fileparse($infile, qr{\.[^.]*}xms);
+    return $directories . $filename . $suffix;
+}
+
+
+sub append_suffix {
+    my $infile = shift;
+    my $suffix = shift;
+
+    my ($filename, $directories) = fileparse($infile);
+    return $directories . $filename . $suffix;
+}
+
+
+sub cmp_store {
+	my %args = @_;
+	my ($obj, $method, $file, $test, $args)
+	    = @args{ qw(obj method file test args) };
+
+    $args //= {};               # optional hash reference
+
+	# named output file
+	my $outfile;
+	unless ($method =~ m/\A temp_/xms) {
+	    $outfile = file('test', "my_$file");
+		( file($outfile) )->remove if -e $outfile;
+		$obj->$method($outfile, $args);
+	}
+
+	# anonymous temporary file
+    $outfile //= $obj->$method($args);
+
+    # compare file contents
+	compare_ok($outfile, file('test', $file), "$test: $file");
+
+	return;
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Bio::MUST::Core::Utils - Utility functions for enabling multiple file processing
+
+=head1 VERSION
+
+version 0.173500
+
+=head1 SYNOPSIS
+
+    # TODO
+
+=head1 DESCRIPTION
+
+    # TODO
+
+=head1 AUTHOR
+
+Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by University of Liege / Unit of Eukaryotic Phylogenomics / Denis BAURAIN.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

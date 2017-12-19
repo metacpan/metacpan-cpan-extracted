@@ -1,6 +1,12 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.50
+
+ * ARC code passing all tests and production ready.
+ * Added strict mode to DKIM to reject sha1 and
+   key sizes smaller than 1024 bit.
+
 Version 0.44
 
  * Added experimental support for ARC

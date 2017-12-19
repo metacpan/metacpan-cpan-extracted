@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Any;
-$Config::Model::Backend::Any::VERSION = '2.114';
+$Config::Model::Backend::Any::VERSION = '2.116';
 use Carp;
 use strict;
 use warnings;
@@ -27,16 +27,12 @@ has 'node' => (
     isa      => 'Config::Model::Node',
     weak_ref => 1,
     required => 1,
-    handles => ['show_message', 'instance'],
+    handles => [ qw/show_message instance get_element_names/],
 );
 
 sub skip_open { return 0; }
 
 sub suffix {
-    my $self = shift;
-    $logger->info(
-        "Internal warning: suffix called for backend $self->{name}.This method can be overloaded"
-    );
     return undef;
 }
 
@@ -187,7 +183,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 
@@ -195,11 +191,6 @@ version 2.114
  use Mouse ;
 
  extends 'Config::Model::Backend::Any';
-
- # optional
- sub suffix {
-   return '.conf';
- }
 
  # mandatory
  sub read {
@@ -393,10 +384,6 @@ L<Config::Model::Node>.
 Whether the backend supports reading and writing annotation (a.k.a
 comments). Default is 0. Override this method to return 1 if your
 backend supports annotations.
-
-=head2 suffix
-
-Suffix of the configuration file. This method returns C<undef> by default.
 
 =head2 read
 

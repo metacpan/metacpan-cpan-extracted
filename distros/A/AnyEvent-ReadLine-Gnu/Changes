@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::ReadLine::Gnu
 
+1.1  Tue Dec 12 16:42:04 CET 2017
+	- it was not possible to specify a completely empty prompt
+          (reported by Mons Anderson).
+        - added stability canary support.
+
 1.0  Fri May 11 17:37:36 CEST 2012
         - make sure any readline adornment is off even on first redisplay.
 	- added caveat section.

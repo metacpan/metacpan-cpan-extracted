@@ -3,7 +3,7 @@ use Test::More;
 use strict;
 use warnings;
 
-my $HZ = 120;
+my $HZ = $ENV{GAME_OF_LIFE_HZ} // 120;
 my $SIZE = 160;
 my $MUTATION_CHANCE = 0.000;
 my $GENERATIONS = $ENV{GAME_OF_LIFE_GENERATIONS} // 50;

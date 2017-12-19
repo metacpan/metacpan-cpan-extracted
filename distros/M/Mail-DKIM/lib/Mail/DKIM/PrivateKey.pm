@@ -17,7 +17,7 @@ Mail::DKIM::PrivateKey - a private key loaded in memory for DKIM signing
 =head1 SYNOPSIS
 
  my $key1 = Mail::DKIM::PrivateKey->load(
-               File => "/path/to/private.key");
+               File => '/path/to/private.key');
 
  my $key2 = Mail::DKIM::PrivateKey->load(
                Data => $base64);
@@ -30,7 +30,7 @@ Mail::DKIM::PrivateKey - a private key loaded in memory for DKIM signing
 =cut
 
 package Mail::DKIM::PrivateKey;
-use base "Mail::DKIM::Key";
+use base 'Mail::DKIM::Key';
 use Carp;
 *calculate_EM = \&Mail::DKIM::Key::calculate_EM;
 
@@ -39,7 +39,7 @@ use Carp;
 =head2 load() - loads a private key into memory
 
  my $key1 = Mail::DKIM::PrivateKey->load(
-               File => "/path/to/private.key");
+               File => '/path/to/private.key');
 
 Loads the Base64-encoded key from the specified file.
 
@@ -55,35 +55,37 @@ L<Crypt::OpenSSL::RSA>.
 
 =cut
 
-sub load
-{
-	my $class = shift;
-	my %prms = @_;
+sub load {
+    my $class = shift;
+    my %prms  = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	$self->{'TYPE'} = ($prms{'Type'} or "rsa");
+    $self->{'TYPE'} = ( $prms{'Type'} or 'rsa' );
 
-	if ($prms{'Data'}) {
-		$self->{'DATA'} = $prms{'Data'};
-	} elsif (defined $prms{'File'}) {	
-		my @data;
-		open my $file, "<", $prms{'File'}
-			or die "Error: cannot read $prms{File}: $!\n";
-		while (my $line = <$file>) {
-			chomp $line;
-                        next if $line =~ /^---/;
-                        push @data, $line;
-		}
-		$self->{'DATA'} = join '', @data;
-                close $file;
-	} elsif ($prms{'Cork'}) {
-		$self->{'CORK'} = $prms{'Cork'};
-	} else {
-		croak "missing required argument";
-	}
+    if ( $prms{'Data'} ) {
+        $self->{'DATA'} = $prms{'Data'};
+    }
+    elsif ( defined $prms{'File'} ) {
+        my @data;
+        open my $file, '<', $prms{'File'}
+          or die "Error: cannot read $prms{File}: $!\n";
+        while ( my $line = <$file> ) {
+            chomp $line;
+            next if $line =~ /^---/;
+            push @data, $line;
+        }
+        $self->{'DATA'} = join '', @data;
+        close $file;
+    }
+    elsif ( $prms{'Cork'} ) {
+        $self->{'CORK'} = $prms{'Cork'};
+    }
+    else {
+        croak 'missing required argument';
+    }
 
-	return $self;
+    return $self;
 }
 
 =head1 METHODS
@@ -97,70 +99,63 @@ The returned object is of type L<Crypt::OpenSSL::RSA>.
 =cut
 
 sub convert {
-	use Crypt::OpenSSL::RSA;
+    use Crypt::OpenSSL::RSA;
 
-	my $self = shift;
+    my $self = shift;
 
+    $self->data
+      or return;
 
-	$self->data or
-		return;
+    # have to PKCS1ify the privkey because openssl is too finicky...
+    my $pkcs = "-----BEGIN RSA PRIVATE KEY-----\n";
 
-	# have to PKCS1ify the privkey because openssl is too finicky...
-	my $pkcs = "-----BEGIN RSA PRIVATE KEY-----\n";
+    for ( my $i = 0 ; $i < length $self->data ; $i += 64 ) {
+        $pkcs .= substr $self->data, $i, 64;
+        $pkcs .= "\n";
+    }
 
-	for (my $i = 0; $i < length $self->data; $i += 64) {
-		$pkcs .= substr $self->data, $i, 64;
-		$pkcs .= "\n";
-	}	
+    $pkcs .= "-----END RSA PRIVATE KEY-----\n";
 
-	$pkcs .= "-----END RSA PRIVATE KEY-----\n";
+    my $cork;
 
-	
-	my $cork;
+    eval { $cork = new_private_key Crypt::OpenSSL::RSA($pkcs); };
 
-	eval {
-		$cork = new_private_key Crypt::OpenSSL::RSA($pkcs);
-	};
+    $@
+      and $self->errorstr($@),
+      return;
 
-	$@ and
-		$self->errorstr($@),
-		return;
+    $cork
+      or return;
 
-	$cork or
-		return;
+    # segfaults on my machine
+    #	$cork->check_key or
+    #		return;
 
-	# segfaults on my machine
-#	$cork->check_key or
-#		return;
+    $self->cork($cork);
 
-	$self->cork($cork);
-
-	return 1;
+    return 1;
 }
 
 #deprecated
-sub sign
-{
-	my $self = shift;
-	my $mail = shift;
+sub sign {
+    my $self = shift;
+    my $mail = shift;
 
-
-	return $self->cork->sign($mail);
+    return $self->cork->sign($mail);
 }
 
 #deprecated- use sign_digest() instead
-sub sign_sha1_digest
-{
-	my $self = shift;
-	my ($digest) = @_;
-	return $self->sign_digest("SHA-1", $digest);
+sub sign_sha1_digest {
+    my $self = shift;
+    my ($digest) = @_;
+    return $self->sign_digest( 'SHA-1', $digest );
 }
 
 =head2 sign_digest()
 
 Cryptographically sign the given message digest.
 
-  $key->sign_digest("SHA-1", sha1("my message text"));
+  $key->sign_digest('SHA-1', sha1('my message text'));
 
 The first parameter is the name of the digest: one of "SHA-1", "SHA-256".
 
@@ -170,17 +165,16 @@ The result should be the signed digest as a binary string.
 
 =cut
 
-sub sign_digest
-{
-	my $self = shift;
-	my ($digest_algorithm, $digest) = @_;
+sub sign_digest {
+    my $self = shift;
+    my ( $digest_algorithm, $digest ) = @_;
 
-	my $rsa_priv = $self->cork;
-	$rsa_priv->use_no_padding;
+    my $rsa_priv = $self->cork;
+    $rsa_priv->use_no_padding;
 
-	my $k = $rsa_priv->size;
-	my $EM = calculate_EM($digest_algorithm, $digest, $k);
-	return $rsa_priv->decrypt($EM);
+    my $k = $rsa_priv->size;
+    my $EM = calculate_EM( $digest_algorithm, $digest, $k );
+    return $rsa_priv->decrypt($EM);
 }
 
 =head1 AUTHOR

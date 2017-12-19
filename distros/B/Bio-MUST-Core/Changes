@@ -1,0 +1,10 @@
+0.173500  2017-12-17 00:35:51+01:00 Europe/Brussels
+	- Additions
+	  binaries: new script split-matrix.pl (to extract genes from a supermatrix)
+	- Changes
+	  Taxonomy: LCA inference algorithm can now follow a majority-rule approach
+	- Fixes
+	  Taxonomy: tests are now disabled by default
+
+0.173470  2017-12-13 09:14:04+01:00 Europe/Brussels
+	- first release

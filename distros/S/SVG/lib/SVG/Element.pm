@@ -3,7 +3,7 @@ package SVG::Element;
 use strict;
 use warnings;
 
-our $VERSION = '2.80';
+our $VERSION = '2.81';
 
 =pod
 

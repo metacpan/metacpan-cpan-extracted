@@ -35,6 +35,7 @@ sub new
     eval { $conf = YAML::XS::LoadFile( $conf ) };
 
     confess "error: $@" if $@;
+    $conf = +{} unless defined $conf;
     confess "error: not HASH" if ref $conf ne 'HASH';
 
     bless $conf, ref $class || $class;

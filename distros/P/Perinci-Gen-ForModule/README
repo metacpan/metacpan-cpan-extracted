@@ -2,8 +2,8 @@ NAME
     Perinci::Gen::ForModule - Generate metadata for a module
 
 VERSION
-    This document describes version 0.10 of Perinci::Gen::ForModule (from
-    Perl distribution Perinci-Gen-ForModule), released on 2017-07-10.
+    This document describes version 0.110 of Perinci::Gen::ForModule (from
+    Perl distribution Perinci-Gen-ForModule), released on 2017-12-15.
 
 SYNOPSIS
     In Foo/Bar.pm:

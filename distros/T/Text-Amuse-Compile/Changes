@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.99 2017-12-15
+
+ - Add nobold option to disable bold typeface in PDFs
+
 0.98 2017-12-10
 
  - Support for secondary footnotes (and option for styling)

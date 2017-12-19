@@ -4,8 +4,8 @@ Authentication-Results: test.module;
         body.smime-part=2.TEXT
         body.smime-serial=90cf589269ba42b1
         body.smime-issuer="C=AU,CN=testca.example.net,O=FastMail SMIME Test Signing Authority"
-        x-smime-valid-from=XXX
-        x-smime-valid-to=XXX
+        x-smime-valid-from="TEST"
+        x-smime-valid-to="TEST"
 References: <56CA812E.10308@fastmail.com>
 Subject: SMIME Forward Test
 To: test2@example.com

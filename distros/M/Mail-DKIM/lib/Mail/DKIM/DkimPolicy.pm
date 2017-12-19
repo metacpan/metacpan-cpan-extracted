@@ -11,7 +11,8 @@ use strict;
 use warnings;
 
 package Mail::DKIM::DkimPolicy;
-use base "Mail::DKIM::Policy";
+use base 'Mail::DKIM::Policy';
+
 # base class is used for parse(), as_string()
 
 use Mail::DKIM::DNS;
@@ -44,7 +45,7 @@ L<http://tools.ietf.org/html/draft-ietf-dkim-ssp-02>.
 Lookup a DKIM signing practices record.
 
   my $policy = Mail::DKIM::DkimPolicy->fetch(
-            Protocol => "dns",
+            Protocol => 'dns',
             Author => 'jsmith@example.org',
           );
 
@@ -52,25 +53,22 @@ Lookup a DKIM signing practices record.
 
 # get_lookup_name() - determine name of record to fetch
 #
-sub get_lookup_name
-{
-	my $self = shift;
-	my ($prms) = @_;
+sub get_lookup_name {
+    my $self = shift;
+    my ($prms) = @_;
 
-	# in DKIM, the record to fetch is determined based on the From header
+    # in DKIM, the record to fetch is determined based on the From header
 
-	if ($prms->{Author} && !$prms->{Domain})
-	{
-		$prms->{Domain} = ($prms->{Author} =~ /\@([^@]*)$/ and $1);
-	}
+    if ( $prms->{Author} && !$prms->{Domain} ) {
+        $prms->{Domain} = ( $prms->{Author} =~ /\@([^@]*)$/ and $1 );
+    }
 
-	unless ($prms->{Domain})
-	{
-		die "no domain to fetch policy for\n";
-	}
+    unless ( $prms->{Domain} ) {
+        die "no domain to fetch policy for\n";
+    }
 
-	# IETF seems poised to create policy records this way
-	return "_policy._domainkey." . $prms->{Domain};
+    # IETF seems poised to create policy records this way
+    return '_policy._domainkey.' . $prms->{Domain};
 }
 
 =head2 new()
@@ -81,19 +79,18 @@ Construct a default policy object.
 
 =cut
 
-sub new
-{
-	my $class = shift;
-	return $class->parse(String => "o=~");
+sub new {
+    my $class = shift;
+    return $class->parse( String => 'o=~' );
 }
 
 #undocumented private class method
 our $DEFAULT_POLICY;
-sub default
-{
-	my $class = shift;
-	$DEFAULT_POLICY ||= $class->new;
-	return $DEFAULT_POLICY;
+
+sub default {
+    my $class = shift;
+    $DEFAULT_POLICY ||= $class->new;
+    return $DEFAULT_POLICY;
 }
 
 =head1 METHODS
@@ -129,46 +126,45 @@ policy. It can be considered somewhat suspicious.
 
 =cut
 
-sub apply
-{
-	my $self = shift;
-	my ($dkim) = @_;
+sub apply {
+    my $self = shift;
+    my ($dkim) = @_;
 
-	# first_party indicates whether there is a DKIM signature with
-	# an i= tag matching the address in the From: header
-	my $first_party;
+    # first_party indicates whether there is a DKIM signature with
+    # an i= tag matching the address in the From: header
+    my $first_party;
 
-	#FIXME - if there are multiple verified signatures, each one
-	# should be checked
+    #FIXME - if there are multiple verified signatures, each one
+    # should be checked
 
-	foreach my $signature ($dkim->signatures)
-	{
-		# only valid/verified signatures are considered
-		next unless ($signature->result && $signature->result eq "pass");
+    foreach my $signature ( $dkim->signatures ) {
 
-		my $oa = $dkim->message_originator->address;
-		if ($signature->identity_matches($oa))
-		{
-			# found a first party signature
-			$first_party = 1;
-			last;
-		}
-	}
+        # only valid/verified signatures are considered
+        next unless ( $signature->result && $signature->result eq 'pass' );
 
-	#TODO - consider testing flag
+        my $oa = $dkim->message_originator->address;
+        if ( $signature->identity_matches($oa) ) {
 
-	return "accept" if $first_party;
-	return "reject" if ($self->signall_strict && !$self->testing);
+            # found a first party signature
+            $first_party = 1;
+            last;
+        }
+    }
 
-	if ($self->signall)
-	{
-		# is there ANY valid signature?
-		my $verify_result = $dkim->result;
-		return "accept" if $verify_result eq "pass";
-	}
+    #TODO - consider testing flag
 
-	return "reject" if ($self->signall && !$self->testing);
-	return "neutral";
+    return 'accept' if $first_party;
+    return 'reject' if ( $self->signall_strict && !$self->testing );
+
+    if ( $self->signall ) {
+
+        # is there ANY valid signature?
+        my $verify_result = $dkim->result;
+        return 'accept' if $verify_result eq 'pass';
+    }
+
+    return 'reject' if ( $self->signall && !$self->testing );
+    return 'neutral';
 }
 
 =head2 flags()
@@ -193,14 +189,13 @@ not to subdomains.
 
 =cut
 
-sub flags
-{
-	my $self = shift;
+sub flags {
+    my $self = shift;
 
-	(@_) and 
-		$self->{tags}->{t} = shift;
+    (@_)
+      and $self->{tags}->{t} = shift;
 
-	$self->{tags}->{t};
+    $self->{tags}->{t};
 }
 
 =head2 is_implied_default_policy()
@@ -215,11 +210,10 @@ in effect. Use this method to detect when that happens.
 
 =cut
 
-sub is_implied_default_policy
-{
-	my $self = shift;
-	my $default_policy = ref($self)->default;
-	return ($self == $default_policy);
+sub is_implied_default_policy {
+    my $self           = shift;
+    my $default_policy = ref($self)->default;
+    return ( $self == $default_policy );
 }
 
 =head2 location()
@@ -236,15 +230,13 @@ was returned instead, the location will be C<undef>.
 
 =cut
 
-sub location
-{
-	my $self = shift;
-	return $self->{Domain};
+sub location {
+    my $self = shift;
+    return $self->{Domain};
 }
 
-sub name
-{
-	return "author";
+sub name {
+    return 'author';
 }
 
 =head2 policy()
@@ -276,25 +268,21 @@ All mail from the entity is signed with Originator signatures.
 
 =cut
 
-sub policy
-{
-	my $self = shift;
+sub policy {
+    my $self = shift;
 
-	(@_) and
-		$self->{tags}->{dkim} = shift;
+    (@_)
+      and $self->{tags}->{dkim} = shift;
 
-	if (defined $self->{tags}->{dkim})
-	{
-		return $self->{tags}->{dkim};
-	}
-	elsif (defined $self->{tags}->{o})
-	{
-		return $self->{tags}->{o};
-	}
-	else
-	{
-		return "unknown";
-	}
+    if ( defined $self->{tags}->{dkim} ) {
+        return $self->{tags}->{dkim};
+    }
+    elsif ( defined $self->{tags}->{o} ) {
+        return $self->{tags}->{o};
+    }
+    else {
+        return 'unknown';
+    }
 }
 
 =head2 signall()
@@ -303,13 +291,12 @@ True if policy is "all".
 
 =cut
 
-sub signall
-{
-	my $self = shift;
+sub signall {
+    my $self = shift;
 
-	return $self->policy &&
-		($self->policy =~ /all/i
-		|| $self->policy eq "-"); # an older symbol for "all"
+    return $self->policy
+      && ( $self->policy =~ /all/i
+        || $self->policy eq '-' );    # an older symbol for "all"
 }
 
 =head2 signall_strict()
@@ -318,26 +305,24 @@ True if policy is "strict".
 
 =cut
 
-sub signall_strict
-{
-	my $self = shift;
+sub signall_strict {
+    my $self = shift;
 
-	return $self->policy &&
-		($self->policy =~ /strict/i
-		|| $self->policy eq "!");  # "!" is an older symbol for "strict"
+    return $self->policy
+      && ( $self->policy =~ /strict/i
+        || $self->policy eq '!' );    # "!" is an older symbol for "strict"
 }
 
-sub signsome
-{
-	my $self = shift;
+sub signsome {
+    my $self = shift;
 
-	$self->policy or
-		return 1;
+    $self->policy
+      or return 1;
 
-	$self->policy eq "~" and
-		return 1;
+    $self->policy eq '~'
+      and return 1;
 
-	return;
+    return;
 }
 
 =head2 testing()
@@ -351,13 +336,12 @@ verify should not consider a message suspicious based on this policy.
 
 =cut
 
-sub testing
-{
-	my $self = shift;
-	my $t = $self->flags;
-	($t && $t =~ /y/i)
-		and return 1;
-	return;
+sub testing {
+    my $self = shift;
+    my $t    = $self->flags;
+    ( $t && $t =~ /y/i )
+      and return 1;
+    return;
 }
 
 1;

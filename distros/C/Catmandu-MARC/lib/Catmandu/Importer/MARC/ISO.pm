@@ -70,7 +70,7 @@ use Moo;
 use MARC::File::USMARC;
 use Catmandu::Importer::MARC::Decoder;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Importer';
 
@@ -90,50 +90,8 @@ sub generator {
     # MARC::File doesn't provide support for inline files
     $file = $self->decoder->fake_marc_file($self->fh,'MARC::File::USMARC') unless $file;
     sub  {
-      $self->decode_marc($file->next());
+      $self->decoder->decode($file->next(),$self->id);
     }
-}
-
-sub decode_marc {
-    my ($self, $record) = @_;
-    return unless eval { $record->isa('MARC::Record') };
-    my @result = ();
-
-    push @result , [ 'LDR' , undef, undef, '_' , $record->leader ];
-
-    for my $field ($record->fields()) {
-        my $tag  = $field->tag;
-        my $ind1 = $field->indicator(1);
-        my $ind2 = $field->indicator(2);
-
-        my @sf = ();
-
-        if ($field->is_control_field) {
-            push @sf , '_', $field->data;
-        }
-
-        for my $subfield ($field->subfields) {
-            push @sf , @$subfield;
-        }
-
-        push @result, [$tag,$ind1,$ind2,@sf];
-    }
-
-    my $sysid = undef;
-    my $id = $self->id;
-
-    if ($id =~ /^00/ && $record->field($id)) {
-        $sysid = $record->field($id)->data();
-    }
-    elsif ($id =~ /^([0-9]{3})([0-9a-zA-Z])$/) {
-        my $field = $record->field($1);
-        $sysid = $field->subfield($2) if ($field);
-    }
-    elsif (defined $id  && $record->field($id)) {
-        $sysid = $record->field($id)->subfield("a");
-    }
-
-    return { _id => $sysid , record => \@result };
 }
 
 1;

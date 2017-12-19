@@ -1,0 +1,14 @@
+
+Copyright (c) [% year %] [% company.name or contact.fullname %] ([% company.address || contact.address %]).
+All rights reserved.
+
+[%- SWITCH licence -%]
+[% CASE 'perl' -%]
+[% INCLUDE licence/perl.txt -%]
+[% CASE 'gpl'  -%]
+[% INCLUDE licence/gpl.txt -%]
+[% CASE 'lgpl' -%]
+[% INCLUDE licence/lgpl.txt -%]
+[% CASE -%]
+[% INCLUDE licence/perl.txt -%]
+[% END  -%]

@@ -1,6 +1,6 @@
 package Net::WebSocket;
 
-our $VERSION = '0.061';
+our $VERSION = '0.063';
 
 =encoding utf-8
 
@@ -29,15 +29,13 @@ Net::WebSocket - WebSocket in Perl
     Net::WebSocket::HTTP_R::handshake_parse_response( $handshake, $resp );
 
     #See below about IO::Framed
-    my $parser = Net::WebSocket::Parser->new(
-        IO::Framed->new($inet),
-    );
+    my $iof = IO::Framed->new($inet);
 
-    my $iof_w = IO::Framed->new($inet);
+    my $parser = Net::WebSocket::Parser->new($iof);
 
     my $ept = Net::WebSocket::Endpoint::Client->new(
         parser => $parser,
-        out => $iof_w,
+        out => $iof,
     );
 
     $iof_w->write(
@@ -79,10 +77,10 @@ Net::WebSocket emphasizes flexibility and lightness rather than the more
 monolithic approach in modules like L<Mojolicious>.
 Net::WebSocket should support anything
 that the WebSocket protocol itself can do, as lightly as possible and without
-prejudice as to how you want to do it: extensions, blocking/non-blocking I/O,
-arbitrary HTTP headers, etc. Net::WebSocket will likely require more of an
-investment up-front, but the end result should be a clean, light
-implementation that will grow (or shrink!) as your needs dictate.
+prejudice as to how you want to do it: extensions, streaming, blocking or
+non-blocking I/O, arbitrary HTTP headers, etc. The end result should be a
+clean, light implementation that will grow (or shrink!) as your needs
+dictate.
 
 =head1 OVERVIEW
 
@@ -216,8 +214,8 @@ L<Net::WebSocket::PMCE::deflate> for more details.
 
 =head1 TODO
 
-At this point Net::WebSocket should support every widely implemented
-WebSocket feature.
+At this point Net::WebSocket seems to support everything the WebSocket
+protocol can (usefully) do, including compression.
 
 =over
 

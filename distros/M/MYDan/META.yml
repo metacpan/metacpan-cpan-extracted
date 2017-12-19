@@ -40,7 +40,10 @@ requires:
   IO::Socket::Multicast: '1.12'
   IO::Stty: '0'
   JSON: '2.9'
+  LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Module::Runtime: '0'
   Net::IP::Match::Regexp: '0'
   Term::ANSIColor: '3'
   Term::Completion: '0'
@@ -49,10 +52,11 @@ requires:
   Thread::Queue: '2.12'
   Time::HiRes: '0'
   Time::TAI64: '0'
+  URI::Escape: '0'
   YAML::XS: '0.65'
   threads: '1.8'
 resources:
   bugtracker: https://github.com/mydan/mayi/issues
   homepage: https://github.com/mydan/mayi
   repository: https://github.com/mydan/mayi.git
-version: v0.1.18
+version: v0.1.22

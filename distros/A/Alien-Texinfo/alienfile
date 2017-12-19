@@ -1,10 +1,14 @@
 use alienfile;
 
-#our $VERSION = 0.002_000;
- 
-plugin 'PkgConfig' => (
-    pkg_name =>'libtexinfo',
-    minimum_version => '6.5',
+#our $VERSION = 0.004_000;
+
+plugin 'Probe::CommandLine' => (
+    command => 'makeinfo',
+    args    => ['--version'],
+    # EXAMPLE: texi2any (GNU texinfo) 6.1
+    # EXAMPLE: makeinfo (GNU texinfo) 5.2
+    match   => qr/\(GNU\ texinfo\)/,
+    version => qr/^\w+\ \(GNU\ texinfo\)\ ([0-9\.]+)$/,
 );
  
 share {

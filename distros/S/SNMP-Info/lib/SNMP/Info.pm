@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.38';
+$VERSION = '3.39';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.38
+SNMP::Info - Version 3.39
 
 =head1 AUTHOR
 
@@ -634,7 +634,7 @@ See documentation in L<SNMP::Info::Layer2::Trapeze> for details.
 
 =item SNMP::Info::Layer2::Ubiquiti
 
-SNMP Interface to Ubiquiti Access Points
+SNMP Interface to Ubiquiti Access Points and other devices
 
 See documentation in L<SNMP::Info::Layer2::Ubiquiti> for details.
 
@@ -1550,6 +1550,7 @@ sub device_type {
         30065 => 'SNMP::Info::Layer3::Arista',
         35098 => 'SNMP::Info::Layer3::Pica8',
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
+        4413 => 'SNMP::Info::Layer2::Ubiquiti',
     );
 
     my %l2sysoidmap = (
@@ -2940,7 +2941,7 @@ allows all developers to have visibility into the request.  Please include
 pointers to the applicable platform MIBs.  For development we will need an
 C<snmpwalk> of the device.  There is a tool now included in the SNMP::Info
 distribution to help with this task, although you'll most likely need to
-download the distribution from CPAN as it's included in the "C<t/util>"
+download the distribution from CPAN as it's included in the "C<contrib/util>"
 directory.
 
 The utility is named C<make_snmpdata.pl>. Run it with a command line like:

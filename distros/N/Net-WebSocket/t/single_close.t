@@ -18,7 +18,7 @@ my @tests = (
     [
         'empty',
         "\x88\0",
-        [],
+        [ undef, q<> ],
     ],
     [
         'just status',

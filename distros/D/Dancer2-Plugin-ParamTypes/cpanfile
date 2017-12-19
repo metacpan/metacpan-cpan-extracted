@@ -1,4 +1,6 @@
 requires 'Dancer2';
+requires 'Ref::Util';
+requires 'constant';
 
 on 'test' => sub {
     requires 'Test::More';

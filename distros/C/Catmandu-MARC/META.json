@@ -4,7 +4,7 @@
       "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.16",
             "Test::Pod" : "1.41"
          }
       },
@@ -52,7 +52,7 @@
             "MARC::Lint" : "0",
             "MARC::Parser::RAW" : "0",
             "MARC::Record" : "v2.0.6",
-            "MARC::Spec" : "v1.0.0",
+            "MARC::Spec" : "v2.0.3",
             "Memoize" : "0",
             "Moo" : "1.0",
             "MooX::Singleton" : "0",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.171",
+   "version" : "1.231",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -96,8 +96,8 @@
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Robin Sheat <robin@catalyst.net.nz>"
-   ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   ]
 }
 

@@ -1,0 +1,5 @@
+do ansible script in order to install test system
+cpan install Test::Exception
+
+cpan install Test::MockObject::Extends
+posible to change the perl project setup?

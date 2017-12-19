@@ -1,14 +1,14 @@
 package Perinci::Gen::ForModule;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-12-15'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use SHARYANTO::Array::Util   qw(match_array_or_regex);
+use String::Util::Match qw(match_array_or_regex);
 use Package::MoreUtil qw(package_exists list_package_contents);
 
 use Exporter qw(import);
@@ -169,7 +169,7 @@ Perinci::Gen::ForModule - Generate metadata for a module
 
 =head1 VERSION
 
-This document describes version 0.10 of Perinci::Gen::ForModule (from Perl distribution Perinci-Gen-ForModule), released on 2017-07-10.
+This document describes version 0.110 of Perinci::Gen::ForModule (from Perl distribution Perinci-Gen-ForModule), released on 2017-12-15.
 
 =head1 SYNOPSIS
 

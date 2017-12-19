@@ -17,8 +17,8 @@ package Dist::Zilla::PluginBundle::Author::CJM;
 # ABSTRACT: Build a distribution like CJM
 #---------------------------------------------------------------------
 
-our $VERSION = '4.37';
-# This file is part of Dist-Zilla-PluginBundle-Author-CJM 4.37 (November 21, 2015)
+our $VERSION = '6.000';
+# This file is part of Dist-Zilla-PluginBundle-Author-CJM 6.000 (December 17, 2017)
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -122,8 +122,8 @@ Dist::Zilla::PluginBundle::Author::CJM - Build a distribution like CJM
 
 =head1 VERSION
 
-This document describes version 4.37 of
-Dist::Zilla::PluginBundle::Author::CJM, released November 21, 2015.
+This document describes version 6.000 of
+Dist::Zilla::PluginBundle::Author::CJM, released December 17, 2017.
 
 =head1 SYNOPSIS
 
@@ -285,7 +285,7 @@ L<< https://github.com/madsen/dist-zilla-pluginbundle-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

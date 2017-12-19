@@ -20,12 +20,13 @@ $MYDan::Util::OptConf::ARGC = -1;
     [--timeout seconds (default 300) ]
     [--max number (default 128) ]
     [--interchange (default {})]
+    [--xx]
 
   echo "input" |$0 -r range cmd
 
 =cut
 my $option = MYDan::Util::OptConf->load();
-my %o = $option->get( qw( range=s timeout=i max=i interchange=s noop verbose ) )->dump();
+my %o = $option->get( qw( range=s timeout=i max=i interchange=s noop verbose xx ) )->dump();
 
 $option->assert( 'range' );
 

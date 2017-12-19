@@ -1,11 +1,13 @@
 package Bio::FastParsers;
 # ABSTRACT: classes for parsing bioinformatics program output
+# CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::VERSION = '0.173450';
+$Bio::FastParsers::VERSION = '0.173510';
 use strict;
 use warnings;
 
 use Bio::FastParsers::Blast;
+use Bio::FastParsers::CdHit;
 use Bio::FastParsers::Hmmer;
 
 1;
@@ -20,7 +22,7 @@ Bio::FastParsers - classes for parsing bioinformatics program output
 
 =head1 VERSION
 
-version 0.173450
+version 0.173510
 
 =head1 SYNOPSIS
 
@@ -34,11 +36,21 @@ version 0.173450
 
 Denis BAURAIN <denis.baurain@uliege.be>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Arnaud DI FRANCO
+=for stopwords Amandine BERTRAND Arnaud DI FRANCO
+
+=over 4
+
+=item *
+
+Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+
+=item *
 
 Arnaud DI FRANCO <arnaud.difranco@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

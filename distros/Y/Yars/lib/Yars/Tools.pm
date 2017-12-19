@@ -22,7 +22,7 @@ use Yars::Util qw( format_tx_error );
 use File::Glob qw( bsd_glob );
 
 # ABSTRACT: various utility functions dealing with servers, hosts, etc
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
 
 sub new
@@ -434,7 +434,7 @@ Yars::Tools - various utility functions dealing with servers, hosts, etc
 
 =head1 VERSION
 
-version 1.31
+version 1.33
 
 =head1 DESCRIPTION
 

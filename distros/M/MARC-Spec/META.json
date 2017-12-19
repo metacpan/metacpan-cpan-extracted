@@ -4,7 +4,7 @@
       "Carsten Klee C<< <klee at cpan.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -64,11 +64,13 @@
          "web" : "https://github.com/MARCspec/MARC-Spec"
       }
    },
-   "version" : "1.0.0",
+   "version" : "2.0.3",
    "x_contributors" : [
+      "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
-      "Mirko Tietgen <mirko@abunchofthings.net>"
+      "Mirko Tietgen <mirko@abunchofthings.net>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

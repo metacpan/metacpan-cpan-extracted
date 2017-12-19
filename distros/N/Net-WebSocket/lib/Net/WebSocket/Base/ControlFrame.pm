@@ -5,7 +5,6 @@ use warnings;
 
 use parent qw(
     Net::WebSocket::Frame
-    Net::WebSocket::Base::Typed
 );
 
 use Net::WebSocket::X ();

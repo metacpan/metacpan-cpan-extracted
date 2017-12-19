@@ -5,7 +5,6 @@ use Test::More 0.88;
 use Test::DZil;
 use File::pushd 'pushd';
 use Path::Tiny;
-use Test::Script 1.05;
 
 my $tzil
     = Builder->from_config(
@@ -27,16 +26,21 @@ my $tzil
 $tzil->build;
 
 my $build_dir = path($tzil->tempdir)->child('build');
-my $fn = $build_dir->child(qw(xt author pod-spell.t));
+my $file = $build_dir->child(qw(xt author pod-spell.t));
 
-ok ( -e $fn, 'test file exists');
+ok(-e $file, 'test file exists');
 
+local $TODO;
+
+subtest 'run the generated test' => sub
 {
     my $wd = pushd $build_dir;
+    #$tzil->plugin_named('MakeMaker')->build;
 
-    $tzil->plugin_named('MakeMaker')->build;
-
-    script_compiles( '' . $fn->relative, 'check test compiles' );
-}
+    local $ENV{AUTHOR_TESTING} = 1;
+    do $file;
+    note 'ran tests successfully' if not $@;
+    fail($@) if $@;
+};
 
 done_testing;

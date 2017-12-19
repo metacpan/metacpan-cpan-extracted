@@ -77,6 +77,10 @@ for my $p (64 .. 71) {
 $t->get_ok('/custom')->status_is(200)->element_count_is('a', 3)->text_is('a', 'hey!')
   ->element_exists('a[href="/custom?x=3"]');
 
+note 'avoid negative numbers in pager on ?page=3';
+$t->get_ok('/custom?page=3')->status_is(200)->element_count_is('a', 3)
+  ->element_exists_not('a[href="/custom?page=3&x=-1"]');
+
 $t->get_ok('/stash')->status_is(200)->element_count_is('a', 3)->text_is('a', 'hey!')
   ->element_exists('a[href="/stash?x=3"]');
 

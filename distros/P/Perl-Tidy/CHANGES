@@ -1,4 +1,65 @@
 Perltidy Change Log
+  2017 12 14
+      - RT #123749, partial fix.  "Continuation indentation" is removed from lines 
+        with leading closing parens which are part of a call chain. 
+        For example, the call to pack() is is now outdented to the starting 
+        indentation in the following experession:  
+
+            # OLD
+            $mw->Button(
+                -text    => "New Document",
+                -command => \&new_document
+              )->pack(
+                -side   => 'bottom',
+                -anchor => 'e'
+              );
+
+            # NEW
+            $mw->Button(
+                -text    => "New Document",
+                -command => \&new_document
+            )->pack(
+                -side   => 'bottom',
+                -anchor => 'e'
+            );
+
+        This modification improves readability of complex expressions, especially
+        when the user uses the same value for continuation indentation (-ci=n) and 
+        normal indentation (-i=n).  Perltidy was already programmed to
+        do this but a minor bug was preventing it.
+
+      - RT #123774, added flag to control space between a backslash and a single or
+        double quote, requested by Robert Rothenberg.  The issue is that lines like
+
+           $str1=\"string1";
+           $str2=\'string2';
+
+        confuse syntax highlighters unless a space is left between the backslash and
+        the quote.
+
+        The new flag to control this is -sbq=n (--space-backslash-quote=n), 
+        where n=0 means no space, n=1 means follow existing code, n=2 means always
+        space.  The default is n=1, meaning that a space will be retained if there
+        is one in the source code.
+
+      - Fixed RT #123492, support added for indented here doc operator <<~ added 
+        in v5.26.  Thanks to Chris Weyl for the report.
+
+      - Fixed docs; --closing-side-comment-list-string should have been just
+        --closing-side-comment-list.  Thanks to F.Li.
+
+      - Added patch RT #122030] Perl::Tidy sometimes does not call binmode.
+        Thanks to Irilis Aelae.
+
+      - Fixed RT #121959, PERLTIDY doesn't honor the 'three dot' notation for 
+        locating a config file using environment variables.  Thanks to John 
+        Wittkowski.
+
+      - Minor improvements to formatting, in which some additional vertical
+        aligmnemt is done. Thanks to Keith Neargarder.
+
+      - RT #119588.  Vertical alignment is no longer done for // operator.
+
   2017 05 21
       - Fixed debian #862667: failure to check for perltidy.ERR deletion can lead 
         to overwriting abritrary files by symlink attack. Perltidy was continuing 
@@ -1313,8 +1374,8 @@ Perltidy Change Log
 
      -improved breakpoint choices involving '->'
 
-     -Corrected tokenization of things like ${#} or ${©}. For example,
-      ${©} is valid, but ${© } is a syntax error.
+     -Corrected tokenization of things like ${#}. For example,
+      ${#} is valid, but ${# } is a syntax error.
 
      -Corrected minor tokenization errors with indirect object notation.
       For example, 'new A::()' works now.

@@ -1,5 +1,5 @@
 package Verilog::VCD::Writer::Module;
-$Verilog::VCD::Writer::Module::VERSION = '0.002';
+$Verilog::VCD::Writer::Module::VERSION = '0.004';
 use strict;
 use warnings;
 use DateTime;
@@ -89,7 +89,7 @@ Verilog::VCD::Writer::Module - Module abstraction layer for Verilog::VCD::Writer
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head2 addSignal(name,bitmax,bitmin)
 

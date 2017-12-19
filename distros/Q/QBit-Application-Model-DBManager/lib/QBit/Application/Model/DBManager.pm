@@ -1,9 +1,9 @@
 package Exception::DBManager::Grammar;
-$Exception::DBManager::Grammar::VERSION = '0.018';
+$Exception::DBManager::Grammar::VERSION = '0.019';
 use base qw(Exception);
 
 package QBit::Application::Model::DBManager;
-$QBit::Application::Model::DBManager::VERSION = '0.018';
+$QBit::Application::Model::DBManager::VERSION = '0.019';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -258,7 +258,7 @@ sub _get_db_filter_from_data {
 
     return undef unless $data;
 
-    return [AND => [undef]] if ref($data) && ref($data) eq 'ARRAY' && @$data == 1 && !defined($data->[0]);
+    return [AND => [\undef]] if ref($data) && ref($data) eq 'ARRAY' && @$data == 1 && !defined($data->[0]);
 
     return $self->_get_db_filter_from_data([AND => [map {[$_ => '=' => $data->{$_}]} keys(%$data)]], %opts)
       if ref($data) eq 'HASH';

@@ -38,7 +38,8 @@ undef $@;
 eval {
     $duk->eval_string(q{
         // and now should fail
-        var x = new Buffer((++n * 5) * 2);
+        print( (++n * 5) * 3 )
+        var x = new Buffer( (256 * 1024 * 2) + 50 );
     });
 };
 

@@ -15,8 +15,12 @@ lib/JavaScript/Duktape/C/lib/duktape.c
 lib/JavaScript/Duktape/C/lib/duktape.h
 lib/JavaScript/Duktape/C/lib/module-duktape/duk_module_duktape.c
 lib/JavaScript/Duktape/C/lib/module-duktape/duk_module_duktape.h
+lib/JavaScript/Duktape/C/lib/module-duktape/README.rst
+lib/JavaScript/Duktape/C/lib/module-duktape/test.c
 lib/JavaScript/Duktape/C/lib/print-alert/duk_print_alert.c
 lib/JavaScript/Duktape/C/lib/print-alert/duk_print_alert.h
+lib/JavaScript/Duktape/C/lib/print-alert/README.rst
+lib/JavaScript/Duktape/C/lib/print-alert/test.c
 lib/JavaScript/Duktape/C/libPath.pm
 lib/JavaScript/Duktape/C/ppport.h
 lib/JavaScript/Duktape/C/typemap
@@ -49,6 +53,8 @@ t/api/pushers.pl
 t/api/require-lstring.t
 t/api/safe-call.t
 t/api/safe-to-string.t
+t/api/symbol-getownpropertysymbols.t
+t/bool.t
 t/buffer.t
 t/circular-push.t
 t/circular-to-perl.t
@@ -59,6 +65,7 @@ t/dll.c
 t/dll.t
 t/eval-function.t
 t/helper.pl
+t/json.t
 t/nested.t
 t/number-or-string.t
 t/objects/01.t

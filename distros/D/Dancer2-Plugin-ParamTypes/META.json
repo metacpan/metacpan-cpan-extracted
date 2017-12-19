@@ -4,13 +4,13 @@
       "Sawyer X"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-ParamTypes",
    "prereqs" : {
@@ -29,7 +29,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer2" : "0"
+            "Dancer2" : "0",
+            "Ref::Util" : "0",
+            "constant" : "0"
          }
       },
       "test" : {
@@ -54,7 +56,7 @@
    "provides" : {
       "Dancer2::Plugin::ParamTypes" : {
          "file" : "lib/Dancer2/Plugin/ParamTypes.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -68,7 +70,7 @@
          "web" : "https://github.com/xsawyerx/dancer2-plugin-paramtypes"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

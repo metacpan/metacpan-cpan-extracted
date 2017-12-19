@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Kolkatta
 
+0.11  Thu Dec 14 10:15:00 2017
+      - Replaced namespace::clean with namespace::autoclean.
+
+0.10  Wed Dec 13 14:05:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.09  Sun Dec 10 02:05:00 2017
       - Added key 'provides' to the Makefile.PL script.
 

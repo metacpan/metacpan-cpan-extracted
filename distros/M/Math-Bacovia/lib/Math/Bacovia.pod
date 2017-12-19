@@ -1,0 +1,503 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Bacovia - Symbolic math library with support for alternative representations.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+B<Math::Bacovia> is an experimental symbolic math library, with support for alternative representations, simplification of expressions and numerical evaluation.
+
+    use 5.014;
+    use Math::Bacovia qw(:all);
+
+    my $x = Symbol('x');
+    my $y = Symbol('y');
+
+    say $x+$y;               #=> Sum(Symbol("x"), Symbol("y"))
+    say $x-$y;               #=> Difference(Symbol("x"), Symbol("y"))
+    say $x*$y;               #=> Product(Symbol("x"), Symbol("y"))
+    say $x/$y;               #=> Fraction(Symbol("x"), Symbol("y"))
+
+    say $x**$y;              #=> Power(Symbol("x"), Symbol("y"))
+
+    say Log($x);             #=> Log(Symbol("x"))
+    say Log($x)+Log($y);     #=> Log(Product(Symbol("x"), Symbol("y")))
+
+    say Exp($x);             #=> Exp(Symbol("x"))
+    say Exp($x)*Exp($y);     #=> Exp(Sum(Symbol("x"), Symbol("y")))
+
+    say "\n=> Sum:";
+    my $sum = Fraction(0, 1);
+
+    for my $n (1..10) {
+        $sum += Fraction(1, $n);
+    }
+    say $sum;                     #=> Fraction(10628640, 3628800)
+    say $sum->numeric;            #=> 7381/2520
+
+    say "\n=> Product:";
+    my $prod = Product();
+
+    for my $n (1..3) {
+        $prod *= Exp(Fraction(1, $n));
+    }
+
+    say $prod->pretty;            #=> (exp(1) * exp(1/2) * exp(1/3))
+    say $prod->simple->pretty;    #=> exp(11/6)
+    say $prod->numeric;           #=> 6.25470095193632871640207...
+
+    say "\n=> Alternative representations:";
+    say join ', ', Power(3, 5)->alternatives(full => 1);   #=> Power(3, 5), Exp(Product(Log(3), 5)), 243
+
+=head1 TYPES
+
+The types supported by this library are described bellow:
+
+=head2 Symbol(name, value=undef)
+
+Represents a symbolic value. Optionally, it can have a numerical value (or any other value).
+
+=head2 Number(value)
+
+Represents a numerical value.
+
+=head2 Fraction(numerator, denominator)
+
+Represents a symbolic fraction.
+
+=head2 Difference(minuend, subtrahend)
+
+Represents a symbolic difference.
+
+=head2 Power(base, power)
+
+Represents a symbolic exponentiation in a symbolic base.
+
+=head2 Log(x)
+
+Represents the natural logarithm of a symbolic value.
+
+=head2 Exp(x)
+
+Represents the natural exponentiation of a symbolic value.
+
+=head2 Sum(a, b, c, ...)
+
+Represents a summation of an arbitrary (finite) number of symbolic values.
+
+=head2 Product(a, b, c, ...)
+
+Represents a product of an arbitrary (finite) number of symbolic values.
+
+=head1 EXPORT
+
+Importing a name from B<Math::Bacovia> can be done using the following syntax:
+
+    use Math::Bacovia qw(Fraction);     # imports the Fraction() function
+
+By specifying the B<:all> special keyword, B<Math::Bacovia> will export all the provided functions and constants.
+
+    use Math::Bacovia qw(:all);
+
+Nothing is exported by default.
+
+=head1 CONSTANTS
+
+=head2 i / e / pi / tau
+
+B<Math::Bacovia> also provides a small list of useful constants which can be imported:
+
+    i      the imaginary unit                sqrt(-1)
+    e      the e mathematical constant       Exp(1)
+    pi     the PI mathematical constant      Log(-1) * -sqrt(-1)
+    tau    the TAU mathmematical constant    Log(-1) * -sqrt(-1) * 2
+
+For importing a constant, the same syntax can be used as in importing a function:
+
+    use Math::Bacovia qw(i tau);
+
+=head1 METHODS
+
+This section description of the special methods provided by Math::Bacovia.
+
+=head2 inv
+
+    1 / $x
+    $x->inv
+
+Multiplicative inverse of C<x>, defined as:
+
+    Fraction(1, $x)
+
+=head2 neg
+
+    -$x
+    $x->neg
+
+Additive inverse of C<x>, defined as:
+
+    Difference(0, $x)
+
+=head2 add
+
+    $x + $y
+    $x->add($y)
+
+Summation of C<x> and C<y>, defined as:
+
+    Sum($x, $y)
+
+=head2 sub
+
+    $x - $y
+    $x->sub($y)
+
+Difference of C<x> from C<y>, defined as:
+
+    Difference($x, $y)
+
+=head2 mul
+
+    $x * $y
+    $x->mul($y)
+
+Product of C<x> and C<y>, defined as:
+
+    Product($x, $y)
+
+=head2 div
+
+    $x / $y
+    $x->div($y)
+
+Fraction C<x> over C<y>, defined as:
+
+    Fraction($x, $y)
+
+=head2 pow
+
+    $x ** $y
+    $x->pow($y)
+
+C<x> to the power C<y>, defined as:
+
+    Power($x, $y)
+
+=head2 sqrt
+
+    $x->sqrt
+
+Square root of C<x>, defined as:
+
+    $x ** Fraction(1, 2)
+
+=head2 log
+
+    $x->log
+
+Natural logarithm of C<x>, defined as:
+
+    Log($x)
+
+=head2 exp
+
+    $x->exp
+
+Natural exponentiation of C<x>, defined as:
+
+    Exp($x)
+
+=head2 int
+
+    int($x)
+    $x->int
+
+Evaluates C<x> numerically and truncates the result to an integer, returing a C<Math::AnyNum> object.
+
+It may return C<NaN> when this conversion is not possible.
+
+Defined as:
+
+    $x->numeric->int
+
+=head1 TRIGONOMETRIC METHODS
+
+=head2 sin / sinh / asin / asinh
+
+    sin($x)
+    $x->sin
+    $x->sinh
+    $x->asin
+    $x->asinh
+
+Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
+
+=head2 cos / cosh / acos / acosh
+
+    cos($x)
+    $x->cos
+    $x->cosh
+    $x->acos
+    $x->acosh
+
+Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
+
+=head2 tan / tanh / atan / atanh
+
+    $x->tan
+    $x->tanh
+    $x->atan
+    $x->atanh
+
+Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
+
+=head2 cot / coth / acot / acoth
+
+    $x->cot
+    $x->coth
+    $x->acot
+    $x->acoth
+
+Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
+
+=head2 sec / sech / asec / asech
+
+    $x->sec
+    $x->sech
+    $x->asec
+    $x->asech
+
+Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
+
+=head2 csc / csch / acsc / acsch
+
+    $x->csc
+    $x->csch
+    $x->acsc
+    $x->acsch
+
+Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
+
+=head2 atan2
+
+    atan2($x, $y)
+    $x->atan2($y)
+
+The arctangent of the quotient of its arguments (i.e.: C<atan(x/y)>).
+
+=head1 SPECIAL METHODS
+
+Each type provided by B<Math::Bacovia> includes the same set of methods, defined bellow:
+
+=head2 alternatives
+
+    $x->alternatives(%opt)
+
+This method uses common mathematical identities to create symbolically equivalent expressions from the self-expression.
+
+Example:
+
+    say for Exp(Log(Fraction(1,3)) * 2)->alternatives;
+
+Output:
+
+    Exp(Product(2, Log(Fraction(1, 3))))
+    Power(Fraction(1, 3), 2)
+    Exp(Product(2, Log(1/3)))
+    Power(1/3, 2)
+
+The options supported by this method are:
+
+    log  => 1,    # will try to generate logarithmic alternatives
+    full => 1,    # will try to generate more alternatives (it may be slow)
+
+Example:
+
+    say for Power(3, 5)->alternatives(full => 1);
+
+Output:
+
+    Power(3, 5)
+    Exp(Product(Log(3), 5))
+    243
+
+B<WARNING:> The number of alternative representations grows exponentially! For non-trivial expressions,
+this process may take a very long time and use lots of memory. In combination with the B<full> option
+(set to a true value), the returned list may contain hundreds of even thousands of alternative representations.
+
+=head2 simple
+
+    $x->simple(%opt)
+
+Returns a simplification of the self-expression, taking the same options as the C<alternatives()> method.
+
+    say Exp(Log(Log(Exp(Exp(Log(Symbol('x')))))))->simple;
+
+Output:
+
+    Symbol("x")
+
+The simplification of an expression is done by generating the list of
+alternative representations for it, then selecting the shortest expression from this list.
+
+This approach works pretty well even on relatively complex expressions, such as:
+
+    say Log(Symbol('x'))->cosh->simple->pretty;     #=> ((1 + x^2)/(2 * x))
+
+However, the returned simplified expression is not guaranteed to be "optimal". In some cases, calling the C<simple()>
+method on an already simplified expression, the simplified expression may get simplified even further:
+
+    $x->simple(full => 1)->simple(full => 1);
+
+B<WARNING:> On long expressions, this process may take a very long time and use lots of memory.
+
+=head2 expand
+
+    $x->expand(%opt)
+
+Returns an expanded version of the self-expression, taking the same options as the C<alternatives()> method.
+
+    say Power(Fraction(5, 7), Fraction(1, 3))->expand(full => 1);
+
+Output:
+
+    Exp(Product(Log(Fraction(5, 7)), Fraction(1, 3)))
+
+The expansion of an expression is done by generating the list of
+alternative representations for it, then selecting the longest expression from this list.
+
+B<WARNING:> On long expressions, this process may take a very long time and use lots of memory.
+
+=head2 numeric
+
+    $x->numeric
+
+Evaluates the self-expression numerically and returns the result as a L<Math::AnyNum> object.
+
+Example:
+
+    my $x = Symbol('x', 13);
+    my $expr = ($x**2 - $x + 41);
+
+    say $expr->numeric;   #=> 197
+
+=head2 pretty
+
+    $x->pretty
+
+Returns a human-readable stringification of the self-expression.
+
+Example:
+
+    say Power(3, Log(Fraction(1, 2)))->pretty;    #=> 3^log(1/2)
+
+=head1 SEE ALSO
+
+For a detailed documentation of each class, please see:
+
+=over 4
+
+=item * L<Math::Bacovia::Fraction>
+
+=item * L<Math::Bacovia::Difference>
+
+=item * L<Math::Bacovia::Power>
+
+=item * L<Math::Bacovia::Log>
+
+=item * L<Math::Bacovia::Exp>
+
+=item * L<Math::Bacovia::Sum>
+
+=item * L<Math::Bacovia::Product>
+
+=item * L<Math::Bacovia::Number>
+
+=item * L<Math::Bacovia::Symbol>
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu, C<< <trizen at protonmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to L<https://github.com/trizen/Math-Bacovia>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Math::Bacovia
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Math-Bacovia>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Math-Bacovia>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Math-Bacovia/>
+
+=item * GitHub
+
+L<https://github.com/trizen/Math-Bacovia>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Daniel Șuteu.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

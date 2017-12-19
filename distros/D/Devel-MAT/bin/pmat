@@ -59,21 +59,12 @@ sub Devel::MAT::Cmd::format_note
    );
 }
 
-sub Devel::MAT::Cmd::format_sv
+sub Devel::MAT::Cmd::_format_sv
 {
    shift;
-   my ( $sv ) = @_;
+   my ( $ret, $sv ) = @_;
 
-   my $ret = String::Tagged->new_tagged( $sv->desc_class_addr,
-      bold   => 1,
-      italic => 1,
-   );
-
-   if( my $rootname = $sv->rootname ) {
-      $ret .= "=" . Devel::MAT::Cmd->format_note( $rootname, 1 );
-   }
-
-   return $ret;
+   return String::Tagged->new_tagged( $ret, bold => 1, italic => 1 );
 }
 
 sub Devel::MAT::Cmd::_format_value

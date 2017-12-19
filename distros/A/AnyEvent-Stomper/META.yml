@@ -31,4 +31,4 @@ resources:
   homepage: https://github.com/iph0/AnyEvent-Stomper
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iph0/AnyEvent-Stomper
-version: '0.34'
+version: '0.36'

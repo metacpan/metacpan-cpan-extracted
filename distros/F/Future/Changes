@@ -1,5 +1,12 @@
 Revision history for Future
 
+0.38    2017-12-18 01:41:52
+        [CHANGES]
+         * Added counting ability to Future::Mutex (RT123876)
+
+        [BUGFIXES]
+         * Support perl 5.8.1 again (thanks ilmari)
+
 0.37    2017/11/28 15:39:22
         [CHANGES]
          * Finally got around to removing the old Makefile.PL

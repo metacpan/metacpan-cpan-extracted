@@ -29,7 +29,7 @@ If you don't want to participate in the contest, say "no" and we won't send mess
 
 =head2 ENCRYPT - support for encrypted submissions
 
-encrypt popcon submission. Eventually, this feature wil be enabled by default. I< Optional. Type enum. choice: 'no', 'maybe', 'yes'.  > 
+encrypt popcon submission. Eventually, this feature will be enabled by default. I< Optional. Type enum. choice: 'no', 'maybe', 'yes'.  > 
 
 =over 4
 

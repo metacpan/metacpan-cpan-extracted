@@ -53,7 +53,7 @@ my $params = {
 foreach my $method (
     'get_response_from_redirect',
     'get_response_from_silent_post'
-    ) {
+) {
     {
         my $res = $payments->$method( { params => $params } );
 

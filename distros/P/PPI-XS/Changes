@@ -1,16 +1,20 @@
-Changes for Perl extension PPI-XS
+Revision history for PPI-XS
 
-0.904 Mon Apr 10 11:50:43 EDT 2017
+0.910     2017-12-14 04:24:41Z
+        - switch packaging to Dist::Zilla, which makes the distribution
+          installable again on perl 5.27.7  (See RT#123867)
+
+0.904     2017-04-10 15:50:43Z
 	- Fix Makefile.PL for perls without '.' in @INC
 
-0.903 Mon Apr 10 10:50:00 EDT 2017
+0.903     2017-04-10 14:50:00Z
 	- bad tarball
 
-0.902 Tue 26 Feb 2013
+0.902     2013-02-26
 	- Fix "defined @array" deprecation warning
 
-0.901 Tue  5 May 2009
+0.901     2009-05-05
 	- Incremental release to flush out packaging bugs
 
-0.900 Fri 28 Jan 2005
+0.900     2005-01-28
 	- Created initial implementation

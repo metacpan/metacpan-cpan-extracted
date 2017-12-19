@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use feature qw( say state );
 
@@ -447,7 +447,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 =head1 VERSION
 
-version 0.000022
+version 0.000023
 
 =head1 SYNOPSIS
 
@@ -661,7 +661,7 @@ This method returns a
 L<WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal>
 object for PayPal transactions.  It returns a
 L<WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard>
-object for credit card transactions.  You can either inspect the class return
+object for credit card transactions.  You can either inspect the class returned
 to you or use the C<is_credit_card_transaction> or C<is_paypal_transaction>
 methods to learn which method the customer paid with.  Both methods return a
 C<Boolean>.
@@ -835,7 +835,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer;
 # ABSTRACT: classes for parsing HMMER output
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::VERSION = '0.173450';
+$Bio::FastParsers::Hmmer::VERSION = '0.173510';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Bio::FastParsers::Hmmer - classes for parsing HMMER output
 
 =head1 VERSION
 
-version 0.173450
+version 0.173510
 
 =head1 SYNOPSIS
 

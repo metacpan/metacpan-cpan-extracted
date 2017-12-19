@@ -1,7 +1,7 @@
 package Mail::Milter::Authentication::Handler;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v1.1.4');
+use version; our $VERSION = version->declare('v1.1.5');
 
 use Digest::MD5 qw{ md5_hex };
 use English qw{ -no_match_vars };
@@ -32,6 +32,7 @@ sub get_version {
         no strict 'refs'; ## no critic;
         return ${ ref( $self ) . "::VERSION" }; # no critic;
     }
+    return;
 }
 
 sub get_json {
@@ -1000,7 +1001,7 @@ sub format_ctext {
 
     # Return ctext (but with spaces intact)
     my ( $self, $text ) = @_;
-    $text = q{} if ! $text;
+    $text = q{} if ! defined $text;
     $text =~ s/\t/ /g;
     $text =~ s/\n/ /g;
     $text =~ s/\r/ /g;

@@ -242,6 +242,14 @@ sub SaveIndex {
 	}
 }
 
+sub SyntaxExists {
+	my ($self, $syntax) = @_;
+	my $i = $self->{INDEX};
+	return exists $i->{$syntax}
+}
+
+
+
 sub XMLFolder {
 	my $self = shift;
 	if (@_) { $self->{XMLFOLDER} = shift; }

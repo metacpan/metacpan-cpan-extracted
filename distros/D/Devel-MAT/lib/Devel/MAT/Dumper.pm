@@ -8,7 +8,7 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use File::Basename qw( basename );
 use File::Spec;
@@ -109,8 +109,7 @@ regardless of size.
 
 Opens the dump file immediately at C<import> time, instead of waiting until
 the time it actually writes the heap dump. This may be useful if the process
-changes working directory or user ID, or to debug problems involving too many
-open filehandles.
+changes user ID, or to debug problems involving too many open filehandles.
 
 =cut
 

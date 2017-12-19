@@ -20,11 +20,11 @@ Teamcity::Executor - Executor of TeamCity build configurations
         }
         poll_interval => 10,
         loop => $loop,
-    )
+    );
 
     $tc->register_polling_timer();
 
-    $tc->run('hello_name', { name => 'TeamCity' })->then(
+    my $future = $tc->run('hello_name', { name => 'TeamCity' })->then(
         sub {
             my ($build) = @_;
             print "Build succeeded\n";

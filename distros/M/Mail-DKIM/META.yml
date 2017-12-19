@@ -26,5 +26,5 @@ requires:
   Net::DNS::Resolver::Mock: '0'
   Test::Simple: '0'
   YAML::XS: '0'
-version: '0.44'
+version: '0.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

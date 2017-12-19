@@ -79,7 +79,7 @@ use MARC::File::USMARC;
 use MARC::Lint;
 use Catmandu::Importer::MARC::Decoder;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Importer';
 
@@ -99,6 +99,9 @@ sub generator {
     $file = $self->decoder->fake_marc_file($self->fh,'MARC::File::USMARC') unless $file;
     sub  {
        my $marc = $file->next();
+
+       return undef unless $marc;
+       
        my $doc  = $self->decoder->decode($marc,$self->id);
        $lint->check_record( $marc );
        $doc->{lint} = [$lint->warnings];

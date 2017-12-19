@@ -11,7 +11,8 @@ use strict;
 use warnings;
 
 package Mail::DKIM::AuthorDomainPolicy;
-use base "Mail::DKIM::Policy";
+use base 'Mail::DKIM::Policy';
+
 # base class is used for parse(), as_string()
 
 use Mail::DKIM::DNS;
@@ -39,7 +40,7 @@ itself at L<http://tools.ietf.org/html/rfc5617>.
 Lookup an ADSP record in DNS.
 
   my $policy = Mail::DKIM::AuthorDomainPolicy->fetch(
-            Protocol => "dns",
+            Protocol => 'dns',
             Author => 'jsmith@example.org',
           );
 
@@ -53,66 +54,58 @@ will "die".
 
 =cut
 
-sub fetch
-{
-	my $class = shift;
-	my %prms = @_;
+sub fetch {
+    my $class = shift;
+    my %prms  = @_;
 
-	my $self = eval { $class->SUPER::fetch(%prms) };
-	my $E = $@;
+    my $self = eval { $class->SUPER::fetch(%prms) };
+    my $E = $@;
 
-	if ($self && !$self->is_implied_default_policy)
-	{
-		return $self;
-	}
+    if ( $self && !$self->is_implied_default_policy ) {
+        return $self;
+    }
 
-	# didn't find a policy; check the domain itself
-	{
-		#FIXME- not good to have this code duplicated between
-		#here and get_lookup_name()
-		#
-		if ($prms{Author} && !$prms{Domain})
-		{
-			$prms{Domain} = ($prms{Author} =~ /\@([^@]*)$/ and $1);
-		}
+    # didn't find a policy; check the domain itself
+    {
+        #FIXME- not good to have this code duplicated between
+        #here and get_lookup_name()
+        #
+        if ( $prms{Author} && !$prms{Domain} ) {
+            $prms{Domain} = ( $prms{Author} =~ /\@([^@]*)$/ and $1 );
+        }
 
-		unless ($prms{Domain})
-		{
-			die "no domain to fetch policy for\n";
-		}
+        unless ( $prms{Domain} ) {
+            die "no domain to fetch policy for\n";
+        }
 
-		my @resp = Mail::DKIM::DNS::query($prms{Domain}, "MX");
-		if (!@resp && $@ eq "NXDOMAIN")
-		{
-			return $class->nxdomain_policy;
-		}
-	}
+        my @resp = Mail::DKIM::DNS::query( $prms{Domain}, 'MX' );
+        if ( !@resp && $@ eq 'NXDOMAIN' ) {
+            return $class->nxdomain_policy;
+        }
+    }
 
-	die $E if $E;
-	return $self;
+    die $E if $E;
+    return $self;
 }
-	
+
 # get_lookup_name() - determine name of record to fetch
 #
-sub get_lookup_name
-{
-	my $self = shift;
-	my ($prms) = @_;
+sub get_lookup_name {
+    my $self = shift;
+    my ($prms) = @_;
 
-	# in ADSP, the record to fetch is determined based on the From header
+    # in ADSP, the record to fetch is determined based on the From header
 
-	if ($prms->{Author} && !$prms->{Domain})
-	{
-		$prms->{Domain} = ($prms->{Author} =~ /\@([^@]*)$/ and $1);
-	}
+    if ( $prms->{Author} && !$prms->{Domain} ) {
+        $prms->{Domain} = ( $prms->{Author} =~ /\@([^@]*)$/ and $1 );
+    }
 
-	unless ($prms->{Domain})
-	{
-		die "no domain to fetch policy for\n";
-	}
+    unless ( $prms->{Domain} ) {
+        die "no domain to fetch policy for\n";
+    }
 
-	# IETF seems poised to create policy records this way
-	return "_adsp._domainkey." . $prms->{Domain};
+    # IETF seems poised to create policy records this way
+    return '_adsp._domainkey.' . $prms->{Domain};
 }
 
 =head2 new()
@@ -123,10 +116,9 @@ Construct a default policy object.
 
 =cut
 
-sub new
-{
-	my $class = shift;
-	return $class->parse(String => "");
+sub new {
+    my $class = shift;
+    return $class->parse( String => '' );
 }
 
 =head2 parse()
@@ -134,34 +126,33 @@ sub new
 Construct an ADSP record from a string.
 
   my $policy = Mail::DKIM::AuthorDomainPolicy->parse(
-          String => "dkim=all",
-          Domain => "aaa.example",
+          String => 'dkim=all',
+          Domain => 'aaa.example',
       );
 
 =cut
 
 #undocumented private class method
 our $DEFAULT_POLICY;
-sub default
-{
-	my $class = shift;
-	$DEFAULT_POLICY ||= $class->new;
-	return $DEFAULT_POLICY;
+
+sub default {
+    my $class = shift;
+    $DEFAULT_POLICY ||= $class->new;
+    return $DEFAULT_POLICY;
 }
 
 #undocumented private class method
 our $NXDOMAIN_POLICY;
-sub nxdomain_policy
-{
-	my $class = shift;
-	if (!$NXDOMAIN_POLICY)
-	{
-		$NXDOMAIN_POLICY = $class->new;
-		$NXDOMAIN_POLICY->policy("NXDOMAIN");
-	}
-	return $NXDOMAIN_POLICY;
+
+sub nxdomain_policy {
+    my $class = shift;
+    if ( !$NXDOMAIN_POLICY ) {
+        $NXDOMAIN_POLICY = $class->new;
+        $NXDOMAIN_POLICY->policy('NXDOMAIN');
+    }
+    return $NXDOMAIN_POLICY;
 }
-	
+
 =head1 METHODS
 
 =head2 apply()
@@ -204,34 +195,31 @@ Note: in the future, these values may become:
 
 =cut
 
-sub apply
-{
-	my $self = shift;
-	my ($dkim) = @_;
+sub apply {
+    my $self = shift;
+    my ($dkim) = @_;
 
-	# first_party indicates whether there is a DKIM signature with
-	# a d= tag matching the address in the From: header
-	my $first_party;
+    # first_party indicates whether there is a DKIM signature with
+    # a d= tag matching the address in the From: header
+    my $first_party;
 
-	my @passing_signatures = grep {
-		$_->result && $_->result eq "pass"
-		} $dkim->signatures;
+    my @passing_signatures =
+      grep { $_->result && $_->result eq 'pass' } $dkim->signatures;
 
-	foreach my $signature (@passing_signatures)
-	{
-		my $author_domain = $dkim->message_originator->host;
-		if (lc $author_domain eq lc $signature->domain)
-		{
-			# found a first party signature
-			$first_party = 1;
-			last;
-		}
-	}
+    foreach my $signature (@passing_signatures) {
+        my $author_domain = $dkim->message_originator->host;
+        if ( lc $author_domain eq lc $signature->domain ) {
 
-	return "accept" if $first_party;
-	return "reject" if ($self->signall_strict);
+            # found a first party signature
+            $first_party = 1;
+            last;
+        }
+    }
 
-	return "neutral";
+    return 'accept' if $first_party;
+    return 'reject' if ( $self->signall_strict );
+
+    return 'neutral';
 }
 
 =head2 is_implied_default_policy()
@@ -246,11 +234,10 @@ in effect. Use this method to detect when that happens.
 
 =cut
 
-sub is_implied_default_policy
-{
-	my $self = shift;
-	my $default_policy = ref($self)->default;
-	return ($self == $default_policy);
+sub is_implied_default_policy {
+    my $self           = shift;
+    my $default_policy = ref($self)->default;
+    return ( $self == $default_policy );
 }
 
 =head2 location()
@@ -267,15 +254,13 @@ was returned instead, the location will be C<undef>.
 
 =cut
 
-sub location
-{
-	my $self = shift;
-	return $self->{Domain};
+sub location {
+    my $self = shift;
+    return $self->{Domain};
 }
 
-sub name
-{
-	return "ADSP";
+sub name {
+    return 'ADSP';
 }
 
 =head2 policy()
@@ -314,21 +299,18 @@ DNS.
 
 =cut
 
-sub policy
-{
-	my $self = shift;
+sub policy {
+    my $self = shift;
 
-	(@_) and
-		$self->{tags}->{dkim} = shift;
+    (@_)
+      and $self->{tags}->{dkim} = shift;
 
-	if (defined $self->{tags}->{dkim})
-	{
-		return $self->{tags}->{dkim};
-	}
-	else
-	{
-		return "unknown";
-	}
+    if ( defined $self->{tags}->{dkim} ) {
+        return $self->{tags}->{dkim};
+    }
+    else {
+        return 'unknown';
+    }
 }
 
 =head2 signall()
@@ -337,12 +319,11 @@ True if policy is "all".
 
 =cut
 
-sub signall
-{
-	my $self = shift;
+sub signall {
+    my $self = shift;
 
-	return $self->policy &&
-		($self->policy =~ /all/i);
+    return $self->policy
+      && ( $self->policy =~ /all/i );
 }
 
 =head2 signall_discardable()
@@ -351,12 +332,11 @@ True if policy is "strict".
 
 =cut
 
-sub signall_strict
-{
-	my $self = shift;
+sub signall_strict {
+    my $self = shift;
 
-	return $self->policy &&
-		($self->policy =~ /discardable/i);
+    return $self->policy
+      && ( $self->policy =~ /discardable/i );
 }
 
 1;

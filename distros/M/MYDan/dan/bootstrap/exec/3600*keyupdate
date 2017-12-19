@@ -1,0 +1,3 @@
+#!/bin/sh
+ulimit -n 655350;ulimit -u 102400;ulimit -s 10240;
+exec $MYDanPATH/dan/agent/bin/keyupdate  --url https://raw.githubusercontent.com/MYDan/key/master/keyupdate 2>&1

@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Reachability;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use constant FOR_UI => 1;
 

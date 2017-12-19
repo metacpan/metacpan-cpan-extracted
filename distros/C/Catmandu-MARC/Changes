@@ -1,8 +1,37 @@
 Revision history for Catmandu-MARC
 
+1.231  2017-12-16 13:40:53 CET
+  - Implementing marc_spec 2.0 in the fixes
+
+1.23  2017-12-15 09:52:08 CET
+  - Forcing MARC::Spec 1.0.0 for now
+
+1.22  2017-12-02 10:23:48 CET
+  - Add support for passing a loop variable in marc_each
+  - Making the syntax of marc_copy and marc_paste more intuitive for marc_each loops
+
+1.21  2017-11-13 14:21:16 CET
+  - Fixing ^ to space conversion in ALEPHSEQ imports
+
+1.20  2017-11-08 10:29:27 CET
+  - More stable ISO exports for bad records
+  - More POD
+
+1.19  2017-10-02 11:16:17 CEST
+  - Adding marc_all_match
+  - Adding marc_any_match
+  - Deprecating marc_match (in favor of marc_all_match)
+  - Fixing ALEPHSEQ exporter: adding a default 'FMT' field
+  - Moving all tests into a new tree for each seperate module
+
+1.18  2017-07-22 11:46:52 CEST
+  - Adding skip_errors option in the importer and exporter
+  - More POD
+  - Added more examples to the Catmandu::MARC::Tutorial
+
 1.171  2017-07-13 08:50:35 CEST
   - Fixing 0 as false bug in marc_spec
-  
+
 1.17  2017-07-12 11:45:56 CEST
   - Fixing 0 as false bug when using from/until
   - Fixing double fix execution bug

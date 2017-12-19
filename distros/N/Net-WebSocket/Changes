@@ -108,3 +108,15 @@ the entire handshake.
 0.061 Thu Nov 30 2017
 - Copyright update
 - A few other documentation tweaks
+
+0.062 Wed Dec 13 2017
+- Fix Parser.pm bug that corrupted parsed frames’ to_bytes() representation.
+- Fix compatibility with reader objects that don’t die() on empty read.
+- Fix spurious warnings when creating close frames via code/reason.
+- Add SERVICE_RESTART, TRY_AGAIN_LATER, and BAD_GATEWAY statuses.
+- Remove more old/inaccurate documentation in Endpoint.pm.
+- Clarify (intended) divergence from RFC vis-à-vis 1005 status codes.
+- Document do_not_die_on_close().
+
+0.063 Wed Dec 13 2017
+- Fix frame ->to_bytes() logic for large frames on 32-bit perls.

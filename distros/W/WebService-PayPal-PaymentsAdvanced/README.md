@@ -4,7 +4,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 # VERSION
 
-version 0.000022
+version 0.000023
 
 # SYNOPSIS
 
@@ -218,7 +218,7 @@ This method returns a
 [WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal)
 object for PayPal transactions.  It returns a
 [WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard)
-object for credit card transactions.  You can either inspect the class return
+object for credit card transactions.  You can either inspect the class returned
 to you or use the `is_credit_card_transaction` or `is_paypal_transaction`
 methods to learn which method the customer paid with.  Both methods return a
 `Boolean`.
@@ -366,7 +366,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for SQL-Abstract-More
 
+1.31 12.12.2017
+  - align _insert_values / _insert_value on new parent SQLA architecture
+  - does() also handles overloaded SCALAR and CODE dereferencing
+
 1.30 29.10.2017
   - fix typo in dependency on SQL::Abstract (require v1.84, not 1.74)
 

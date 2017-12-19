@@ -1,0 +1,16 @@
+Changes
+lib/Test/Against/Dev.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001-new.t
+t/002-perform-tarball-download.t
+t/003-test-against-dev.t
+t/004-new-from-existing.t
+t/data/four-modules.txt
+t/data/two-modules.txt
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::DomTable::Hit;
 # ABSTRACT: internal class for tabular HMMER domain parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::DomTable::Hit::VERSION = '0.173450';
+$Bio::FastParsers::Hmmer::DomTable::Hit::VERSION = '0.173510';
 use Moose;
 use namespace::autoclean;
 with 'Bio::FastParsers::Hmmer::Roles::Domainable';
@@ -46,7 +46,7 @@ Bio::FastParsers::Hmmer::DomTable::Hit - internal class for tabular HMMER domain
 
 =head1 VERSION
 
-version 0.173450
+version 0.173510
 
 =head1 SYNOPSIS
 

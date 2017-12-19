@@ -1,0 +1,38 @@
+---
+abstract: 'Test CPAN modules against Perl dev releases'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::RequiresInternet: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Against-Dev
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  CPAN::cpanminus::reporter::RetainReports: '0.05'
+  Carp: '0'
+  Data::Dump: '0'
+  File::Basename: '0'
+  File::Fetch: '0'
+  File::Path: '2.15'
+  File::Spec: '0'
+  File::Temp: '0'
+  JSON: '0'
+  Path::Tiny: '0'
+  Perl::Download::FTP: '0.03'
+  Text::CSV_XS: '0'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

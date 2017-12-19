@@ -138,9 +138,9 @@ We can inspect the callstack at the time the heap dump was made:
 
   pmat> callstack
   program.pl line 152: &main::func => void
-    $_[0]: 'arguments'
-    $_[1]: 'go'
-    $_[2]: 'here'
+    $_[0]: SCALAR(PV) at 0x55c2bdce2778 = "arguments"
+    $_[1]: SCALAR(PV) at 0x55c2bdce2868 = "go"
+    $_[2]: SCALAR(PV) at 0x55c2bdce26e8 = "here"
   ...
 
 =head1 COMMAND HELP

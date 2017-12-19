@@ -1,5 +1,24 @@
 Revision history for Alien::Texinfo.
 
+0.005000 2017-12-16
+
+    - Allow Minimum Version 4
+        As Of Dec 2017, Candl Uses Texinfo v4.11 & At Least 10% Of CPAN Testers Has Texinfo v4.x
+
+0.004000 2017-12-15
+
+    - Allow Minimum Version 5
+    - Allow Any Version Name Reporting
+        makeinfo, texi2any, etc.
+
+0.003000 2017-12-15
+
+    - Test Suite, Command-Line Version Tests
+
+0.002000 2017-12-14
+
+    - Replace PkgConfig Plugin w/ CommandLine Plugin
+
 0.001000 2017-12-12
 
     - Initial Release!

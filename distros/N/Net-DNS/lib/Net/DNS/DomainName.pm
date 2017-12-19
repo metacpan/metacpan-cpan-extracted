@@ -1,9 +1,9 @@
 package Net::DNS::DomainName;
 
 #
-# $Id: DomainName.pm 1558 2017-04-03 11:38:22Z willem $
+# $Id: DomainName.pm 1605 2017-11-27 11:37:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1558 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
 
 
 =head1 NAME
@@ -155,7 +155,7 @@ sub _wire {				## Generate list of wire-format labels
 ########################################
 
 package Net::DNS::DomainName1035;
-use base qw(Net::DNS::DomainName);
+our @ISA = qw(Net::DNS::DomainName);
 
 =head1 Net::DNS::DomainName1035
 
@@ -217,7 +217,7 @@ sub encode {
 ########################################
 
 package Net::DNS::DomainName2535;
-use base qw(Net::DNS::DomainName);
+our @ISA = qw(Net::DNS::DomainName);
 
 =head1 Net::DNS::DomainName2535
 

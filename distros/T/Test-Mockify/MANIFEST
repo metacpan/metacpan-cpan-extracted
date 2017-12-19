@@ -18,6 +18,7 @@ lib/Test/Mockify/Tools.pm
 lib/Test/Mockify/TypeTests.pm
 lib/Test/Mockify/Verify.pm
 minil.toml
+open.txt
 scripts/sonar-report.sh
 sonar-project.properties
 t/00_compile.t

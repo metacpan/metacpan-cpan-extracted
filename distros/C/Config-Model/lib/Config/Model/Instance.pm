@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.114';
+$Config::Model::Instance::VERSION = '2.116';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -54,6 +54,7 @@ has check => (
     reader  => 'read_check',
 );
 
+# used by cme -create option
 has auto_create => (
     is      => 'ro',
     isa     => 'Bool',
@@ -87,7 +88,8 @@ has appli_info => (
 
 # preset mode:  to load values found by HW scan or other automatic scheme
 # layered mode: to load values found in included files (e.g. a la multistrap)
-has [qw/preset layered/] => (
+# canonical mode: write config data back using model order instead of user order
+has [qw/preset layered canonical/] => (
     is      => 'ro',
     isa     => 'Bool',
     default => 0,
@@ -229,23 +231,27 @@ sub register_write_back {
 }
 
 # used for auto_read auto_write feature
-has [qw/name application root_dir backend backend_arg backup/] => (
+has [qw/name application backend backend_arg backup/] => (
     is  => 'ro',
     isa => 'Maybe[Str]',
 );
 
-has read_root_dir => (
-    is  => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
+has 'root_dir' => (
+    is => 'bare',
+    isa => 'Maybe[Str]',
 );
 
-sub _build_read_root_dir {
+sub root_dir {
     my $self = shift;
-    my $root_dir = $self->root_dir // '';
-    # cleanup paths
-    $root_dir .= '/' if $root_dir and $root_dir !~ m!/$! ;
-    return $root_dir;
+    my $d = $self->{root_dir} // '';
+    # add trailing '/' if it's missing
+    return $d && $d !~ m!/$! ? "$d/" : $d;
+}
+
+sub read_root_dir {
+    my $self = shift;
+    carp "deprecated";
+    return $self->root_dir;
 }
 
 has root_path => (
@@ -413,18 +419,19 @@ sub iterator {
 
 sub read_directory {
     carp "read_directory is deprecated";
-    return shift->read_root_dir;
+    return shift->root_dir;
 }
 
 sub write_directory {
     my $self = shift;
     carp "write_directory is deprecated";
-    return $self->read_root_dir;
+    return $self->root_dir;
 }
 
 sub write_root_dir {
     my $self = shift;
-    return $self->read_root_dir;
+    carp "deprecated";
+    return $self->root_dir;
 }
 
 # FIXME: record changes to implement undo/redo ?
@@ -506,6 +513,10 @@ sub write_back {
 
     my $force_write   = delete $args{force}   || 0;
 
+    if (delete $args{root}) {
+        say "write_back: root argument is no longer supported";
+    }
+
     # make sure that root node is loaded
     $self->config_root->init;
 
@@ -514,12 +525,12 @@ sub write_back {
         my $dump = $self->config_root->dump_tree;
     }
 
-    foreach ( keys %args ) {
-        if (/^(root|config_dir)$/) {
+    foreach my $k ( keys %args ) {
+        if ($k eq 'config_dir') {
             $args{$_} ||= '';
             $args{$_} .= '/' if $args{$_} and $args{$_} !~ m(/$);
         }
-        elsif ( not /^(config_file|backend)$/ ) {
+        elsif ( $k !~ /^(config_file|backend)$/ ) {
             croak "write_back: wrong parameters $_";
         }
     }
@@ -650,7 +661,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 
@@ -757,6 +768,12 @@ Do not check.
 
 =back
 
+=item canonical
+
+When true: write config data back using model order. By default, write
+items back using the order found in the configuration file. This
+feature is experimental and not supported by all backends.
+
 =item on_change_cb
 
 Call back this function whenever C<notify_change> is called. Called with
@@ -782,7 +799,7 @@ is overridden by C<root_dir> parameter.
 
 If you need to load configuration data that are not correct, you can
 use C<< force_load => 1 >>. Then, wrong data are discarded (equivalent to
-C<check => 'no'> ).
+C<< check => 'no' >> ).
 
 =head1 METHODS
 
@@ -953,14 +970,26 @@ Clear all layered values stored.
 
 =head2 get_data_mode 
 
-Returns 'normal' or 'preset' or 'layered'. Does not take into account initial_load.
+Returns 'normal' or 'preset' or 'layered'. Does not take into account
+initial_load.
 
-=head2 initial_load_stop ()
+=head2 initial_load_start
+
+Start initial_load mode. This mode tracks the first modifications of
+the tree done with data read from the configuration file.
+
+Instance is built with initial_load as 1. Read backend clears this
+value once the first read is done.
+
+Other modifications, when initial_load is zero, are assumed to be user
+modifications.
+
+=head2 initial_load_stop
 
 Stop initial_load mode. Instance is built with initial_load as 1. Read backend
 clears this value once the first read is done.
 
-=head2 initial_load ()
+=head2 initial_load
 
 Get initial_load mode
 
@@ -969,7 +998,7 @@ Get initial_load mode
 The data method provide a way to store some arbitrary data in the
 instance object.
 
-=head1 Auto read and write feature
+=head1 Read and write backend features
 
 Usually, a program based on config model must first create the
 configuration model, then load all configuration data. 
@@ -986,6 +1015,11 @@ constructor).
 =head2 root_dir()
 
 Returns root directory where configuration data is read from or written to.
+
+=head2 root_path()
+
+Returns a L<Path::Tiny> object for the root directory where
+configuration data is read from or written to.
 
 =head2 register_write_back ( node_location )
 
@@ -1007,15 +1041,9 @@ with C<register_write_back> to write the configuration information.
 (See L<Config::Model::BackendMgr>
 for details).
 
-You can specify here a pseudo root directory or another config
-directory to write configuration data back with C<root> and
-C<config_dir> parameters. This overrides the model specifications.
-
-You can force to use a backend by specifying C<< backend => xxx >>. 
-For instance, C<< backend => 'augeas' >> or C<< backend => 'custom' >>.
-
-You can force to use all backend to write the files by specifying 
-C<< backend => 'all' >>.
+You can specify here another config directory to write configuration
+data back with C<config_dir> parameter. This overrides the model
+specifications.
 
 C<write_back> croaks if no write call-back are known.
 

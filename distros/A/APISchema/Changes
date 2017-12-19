@@ -1,5 +1,8 @@
 Revision history for Perl extension APISchema
 
+1.35 2017-12-13T14:30:28Z
+  - MockServer serves default status codes in definitions
+
 1.34 2017-11-30T16:29:26Z
   - Define prototype of type before calling it
 
@@ -75,4 +78,3 @@ Revision history for Perl extension APISchema
 0.01 2015-02-18T10:41:05Z
 
     - original version
-

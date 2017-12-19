@@ -200,7 +200,7 @@ rc=1, result='RangeError: getter error'
 rc=1, result='RangeError: invalid stack index -6'
 ==> rc=0, result='undefined'
 *** test_8 (duk_safe_call)
-rc=1, result='TypeError: undefined not callable'
+rc=1, result='TypeError: undefined not callable (property [object Object] of [object Object])'
 ==> rc=0, result='undefined'
 *** test_9 (duk_safe_call)
 ==> rc=1, result='TypeError: invalid args'

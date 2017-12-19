@@ -1,7 +1,6 @@
 requires "Data::Dumper" => "0";
 requires "Function::Parameters" => "0";
 requires "LWP::Online" => "0";
-requires "Modern::Perl" => "0";
 requires "Moo" => "0";
 requires "WebService::Client" => "0";
 

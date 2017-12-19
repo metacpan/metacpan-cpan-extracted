@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use AnyEvent::RipeRedis;
 use AnyEvent::RipeRedis::Error;
@@ -230,11 +230,9 @@ sub crc16 {
 }
 
 sub hash_slot {
-  my $key = shift;
+  my $hashtag = shift;
 
-  my $hashtag = $key;
-
-  if ( $key =~ m/\{([^}]*?)\}/ ) {
+  if ( $hashtag =~ m/\{([^}]*?)\}/ ) {
     if ( length $1 > 0 ) {
       $hashtag = $1;
     }
@@ -336,6 +334,14 @@ sub _discover_cluster {
                 return;
               }
 
+              unless ( @{$slots} ) {
+                $err = _new_error( 'ERR Returned empty list of slots',
+                    E_UNEXPECTED_DATA );
+                $cb->( undef, $err );
+
+                return;
+              }
+
               $self->_prepare_nodes( $slots,
                 sub {
                   unless ( defined $self->{_commands} ) {
@@ -375,7 +381,7 @@ sub _prepare_nodes {
     my $range_end   = shift @{$range};
 
     my @nodes;
-    my $is_master = 1;
+    my $node_cnt = 0;
 
     foreach my $node_info ( @{$range} ) {
       my $hostport = "$node_info->[0]:$node_info->[1]";
@@ -386,15 +392,13 @@ sub _prepare_nodes {
         }
         else {
           $nodes_pool{$hostport} = $self->_new_node( @{$node_info}[ 0, 1 ] );
-
-          unless ($is_master) {
-            push( @slave_nodes, $hostport );
-          }
         }
 
-        if ($is_master) {
+        if (++$node_cnt > 1) {
+          push( @slave_nodes, $hostport );
+        }
+        else {
           push( @masters_nodes, $hostport );
-          $is_master = 0;
         }
       }
 

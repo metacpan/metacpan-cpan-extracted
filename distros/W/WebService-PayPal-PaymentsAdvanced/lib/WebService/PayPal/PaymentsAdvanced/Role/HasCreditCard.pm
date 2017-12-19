@@ -4,10 +4,9 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
-use Types::Common::Numeric qw( PositiveInt );
-use Types::Common::String qw( NonEmptyStr );
+use Types::Common::String qw( NonEmptyStr SimpleStr );
 
 has card_type => (
     is       => 'lazy',
@@ -23,9 +22,8 @@ has card_expiration => (
 
 has card_last_four_digits => (
     is       => 'lazy',
-    isa      => PositiveInt,
+    isa      => SimpleStr,
     init_arg => undef,
-    default  => sub { shift->params->{ACCT} },
 );
 
 has reference_transaction_id => (
@@ -59,6 +57,18 @@ sub _build_card_expiration {
     return sprintf( '20%s-%s', substr( $date, 2, 2 ), substr( $date, 0, 2 ) );
 }
 
+sub _build_card_last_four_digits {
+    my $self = shift;
+
+    my $acct = $self->params->{ACCT};
+
+    if ( $acct !~ /^[0-9]{4}$/ ) {
+        die 'credit_last_four_digits must be 4 digits';
+    }
+
+    return $acct;
+}
+
 1;
 
 =pod
@@ -71,7 +81,7 @@ WebService::PayPal::PaymentsAdvanced::Role::HasCreditCard - Role which provides 
 
 =head1 VERSION
 
-version 0.000022
+version 0.000023
 
 =head2 card_type
 
@@ -106,7 +116,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,38 @@
 Revision history for Doit.
 
+0.025	 2017-12-16
+	- stable release, no changes since 0.024_51
+
+0.024_51 2017-12-15
+	- as_user: check for failure when setting $< et al
+	- add_component may take a full module name
+	- new experimental component Doit::Docker
+	- a sample component DoitX::Example
+	- build: support for PERL_MB_OPT and --install_base
+	  So now the module should be correctly installable
+	  in local::lib setups.
+	- tests
+	  - improved testing for as_user
+	  - file_atomic_write tests: use XDG_RUNTIME_DIR if available
+
+0.024_50 2017-12-10
+	- Doit::Git functions may throw exceptions now (BACKWARD INCOMPATIBILITY)
+	  The functions git_root, git_short_status and git_get_commit_hash
+	  fail now instead of returning undef if not within a git directory.
+	- git_config has now sensible return values in
+	  set/unset cases
+	- documentation for the following components
+	  - Doit::Rpm
+	  - Doit::Git
+	  - Doit::Fbsdpkg
+	- build: more checks for dist action
+	- tests
+	  - new tests for the rpm and fbsdpkg components
+ 	  - improved tests for the git component
+	  - test case for in_directory with undefined directory
+	- fix prereq version for File::Path
+	- internal changes in Doit and Doit::Runner packages
+
 0.024    2017-12-08
 	- constant IS_WIN
 	- test changes: use bigger epoch times

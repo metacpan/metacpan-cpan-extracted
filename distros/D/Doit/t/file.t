@@ -256,13 +256,89 @@ SKIP: {
 }
 
 SKIP: {
-    skip "Hangs on travis-ci", 1 if $ENV{TRAVIS}; # reason unknown
-    skip "Mounting fs only implemented for linux", 1 if $^O ne 'linux';
-    skip "Cannot mount in linux containers", 1 if TestUtil::in_linux_container($doit);
-    skip "dd not available", 1 if !Doit::Extcmd::is_in_path("dd");
-    skip "mkfs not available", 1 if !-x "/sbin/mkfs";
+    my $res = get_another_filesystem(); # note: %$res contains also a scope_cleanup guard
+    skip $res->{skip}, 1 if $res->{skip};
+
+    my $other_fs_dir = $res->{other_fs_dir};
+
+    $doit->utime(0,0,"$tempdir/1st");
+    my $mode_before = (stat("$tempdir/1st"))[2];
+    my $time = time;
+    $doit->file_atomic_write("$tempdir/1st",
+			     sub {
+				 my $fh = shift;
+				 print $fh "File::Copy::move testing\n";
+			     }, tmpdir => $other_fs_dir);
+    is slurp("$tempdir/1st"), "File::Copy::move testing\n", "content OK after using cross-mount move";
+    my $mode_after = (stat("$tempdir/1st"))[2];
+    is $mode_after, $mode_before, 'mode was preserved';
+    my $mtime_after = (stat("$tempdir/1st"))[9];
+    cmp_ok $mtime_after, ">=", $time, 'current mtime';
+
+    $doit->file_atomic_write("$tempdir/fresh",
+			     sub {
+				 my $fh = shift;
+				 print $fh "fresh file with File::Copy::move\n";
+			     }, tmpdir => $other_fs_dir);
+    is slurp("$tempdir/fresh"), "fresh file with File::Copy::move\n", "cross-mount move with fresh file";
+
+    {
+	my @stat;
+
+	$doit->file_atomic_write("$tempdir/my_fresh_mode",
+				 sub {
+				     my $fh = shift;
+				     print $fh "using mode and File::Copy::move (fresh)\n";
+				 }, tmpdir => $other_fs_dir, mode => 0400);
+	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (fresh)\n", "cross-mount move with fresh file";
+	@stat = stat("$tempdir/my_fresh_mode");
+	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0444 : 0400), 'mode option on newly created file');
+
+	$doit->file_atomic_write("$tempdir/my_fresh_mode",
+				 sub {
+				     my $fh = shift;
+				     print $fh "using mode and File::Copy::move (existing)\n";
+				 }, tmpdir => $other_fs_dir, mode => 0600);
+	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (existing)\n", "cross-mount move with existing file";
+	@stat = stat("$tempdir/my_fresh_mode");
+	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0666 : 0600), 'mode option on existing file');
+    }
+
+    { # dry-run check
+	my $old_content = slurp("$tempdir/1st");
+	$doit_dryrun->file_atomic_write("$tempdir/1st", sub {
+					    my $fh = shift;
+					    print $fh "this is dry run mode\n";
+					}, tmpdir => $other_fs_dir);
+	is slurp("$tempdir/1st"), $old_content, 'nothing changed in dry run mode';
+	no_leftover_tmp $other_fs_dir, '';
+    }
+}
+
+# Find or even create another filesystem for
+# cross-mount tests. Currently implemted:
+# - if /run/user/$uid exists, then use this one (usually
+#   it's on a separate tmpfs)
+# - if a lot of conditions match (linux, no container,
+#   sudo possible...), then create a filesystem on
+#   the fly; it will cleaned up later
+sub get_another_filesystem {
+    if ($ENV{XDG_RUNTIME_DIR} && -d $ENV{XDG_RUNTIME_DIR} && -w $ENV{XDG_RUNTIME_DIR}) {
+	my $xdg_dev     = (stat $ENV{XDG_RUNTIME_DIR})[0];
+	my $tempdir_dev = (stat $tempdir)[0];
+	if ($xdg_dev != $tempdir_dev) {
+	    my $other_fs_dir = tempdir('doit_XXXXXXXX', DIR => $ENV{XDG_RUNTIME_DIR}, CLEANUP => 1);
+	    return { other_fs_dir => $other_fs_dir };
+	}
+    }
+
+    return { skip => "Hangs on travis-ci" } if $ENV{TRAVIS}; # reason unknown
+    return { skip => "Mounting fs only implemented for linux" } if $^O ne 'linux';
+    return { skip => "Cannot mount in linux containers" } if TestUtil::in_linux_container($doit);
+    return { skip => "dd not available" } if !Doit::Extcmd::is_in_path("dd");
+    return { skip => "mkfs not available" } if !-x "/sbin/mkfs";
     my $sudo = TestUtil::get_sudo($doit, info => \my %info);
-    skip $info{error}, 1 if !$sudo;
+    return { skip => $info{error} } if !$sudo;
 
     my $fs_file = "$tempdir/testfs";
     $doit->system(qw(dd if=/dev/zero), "of=$fs_file", qw(count=1 bs=1MB));
@@ -276,56 +352,5 @@ SKIP: {
     $sudo->mkdir("$mnt_point/dir");
     $sudo->chown($<, undef, "$mnt_point/dir");
 
-    $doit->utime(0,0,"$tempdir/1st");
-    my $mode_before = (stat("$tempdir/1st"))[2];
-    my $time = time;
-    $doit->file_atomic_write("$tempdir/1st",
-			     sub {
-				 my $fh = shift;
-				 print $fh "File::Copy::move testing\n";
-			     }, tmpdir => "$mnt_point/dir");
-    is slurp("$tempdir/1st"), "File::Copy::move testing\n", "content OK after using cross-mount move";
-    my $mode_after = (stat("$tempdir/1st"))[2];
-    is $mode_after, $mode_before, 'mode was preserved';
-    my $mtime_after = (stat("$tempdir/1st"))[9];
-    cmp_ok $mtime_after, ">=", $time, 'current mtime';
-
-    $doit->file_atomic_write("$tempdir/fresh",
-			     sub {
-				 my $fh = shift;
-				 print $fh "fresh file with File::Copy::move\n";
-			     }, tmpdir => "$mnt_point/dir");
-    is slurp("$tempdir/fresh"), "fresh file with File::Copy::move\n", "cross-mount move with fresh file";
-
-    {
-	my @stat;
-
-	$doit->file_atomic_write("$tempdir/my_fresh_mode",
-				 sub {
-				     my $fh = shift;
-				     print $fh "using mode and File::Copy::move (fresh)\n";
-				 }, tmpdir => "$mnt_point/dir", mode => 0400);
-	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (fresh)\n", "cross-mount move with fresh file";
-	@stat = stat("$tempdir/my_fresh_mode");
-	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0444 : 0400), 'mode option on newly created file');
-
-	$doit->file_atomic_write("$tempdir/my_fresh_mode",
-				 sub {
-				     my $fh = shift;
-				     print $fh "using mode and File::Copy::move (existing)\n";
-				 }, tmpdir => "$mnt_point/dir", mode => 0600);
-	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (existing)\n", "cross-mount move with existing file";
-	@stat = stat("$tempdir/my_fresh_mode");
-	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0666 : 0600), 'mode option on existing file');
-    }
-
-    { # dry-run check
-	my $old_content = slurp("$tempdir/1st");
-	$doit_dryrun->file_atomic_write("$tempdir/1st", sub {
-					    my $fh = shift;
-					    print $fh "this is dry run mode\n";
-					}, tmpdir => "$mnt_point/dir");
-	is slurp("$tempdir/1st"), $old_content, 'nothing changed in dry run mode';
-	no_leftover_tmp "$mnt_point/dir", '';
-    }
+    return { other_fs_dir => "$mnt_point/dir", scope_cleanup => $mount_scope };
 }

@@ -2,377 +2,379 @@
 
 =head1 NAME
 
-perlmodstyle - Perl module style guide
+perlmodstyle - стиль написания модулей на Perl
 
-=head1 INTRODUCTION
+=head1 ВВЕДЕНИЕ
 
-This document attempts to describe the Perl Community's "best practice"
-for writing Perl modules.  It extends the recommendations found in 
-L<perlstyle> , which should be considered required reading
-before reading this document.
+Этот документ пытается описать "наилучшие практики" ("best practice") 
+ Perl-сообщества для написания Perl модулей. Она расширяет рекомендации, 
+ найденные в L<perlstyle> , который должен быть внимательно рассмотрен 
+перед чтением этого документа.
 
-While this document is intended to be useful to all module authors, it is
-particularly aimed at authors who wish to publish their modules on CPAN.
+Хотя этот документ призван быть полезным для всех авторов модулей, 
+в частности он направлен на авторов, которые хотят опубликовать свои модули на CPAN.
 
-The focus is on elements of style which are visible to the users of a 
-module, rather than those parts which are only seen by the module's 
-developers.  However, many of the guidelines presented in this document
-can be extrapolated and applied successfully to a module's internals.
+Основной упор делается на элементы стиля, которые видны для остальных пользователей
+модуля, а не те части, которые будут видны только его разработчикам. 
+Тем не менее, многие из руководящих принципов, представленных в настоящем документе
+могут быть экстраполированы и успешно применяться для разработки внутренних (не-CPAN) модулей.
 
-This document differs from L<perlnewmod> in that it is a style guide
-rather than a tutorial on creating CPAN modules.  It provides a
-checklist against which modules can be compared to determine whether
-they conform to best practice, without necessarily describing in detail
-how to achieve this.  
+Этот документ отличается от L<perlnewmod> тем, что это руководство по стилю
+ создания модулей CPAN, а не учебник их созданию. Он представляет
+чеклист с которым можно сравнить, удовлетворяет ли данный модуль
+ наилучшим практикам или нет, без подробностей того, как этого добиться.
 
-All the advice contained in this document has been gleaned from
-extensive conversations with experienced CPAN authors and users.  Every
-piece of advice given here is the result of previous mistakes.  This
-information is here to help you avoid the same mistakes and the extra
-work that would inevitably be required to fix them.
+Все рекомендации, содержащиеся в данном документе, была почерпнуты из
+обширных бесед с опытными авторами и пользователями CPAN. Каждая
+часть рекомендаций данных здесь является результатом предыдущих ошибок. 
+Информация, содержащаяся здесь поможет вам тех же ошибок и дополнительной
+работы, которая неизбежно потребуется, чтобы исправить их.
 
-The first section of this document provides an itemized checklist; 
-subsequent sections provide a more detailed discussion of the items on 
-the list.  The final section, "Common Pitfalls", describes some of the 
-most popular mistakes made by CPAN authors.
+В первом разделе настоящего документа приводится подробный перечень;
+в последующих разделах приводится более подробное обсуждение пунктов этого 
+списка. В заключительном разделе "Общие Ловушки" ("Common Pitfalls"), описываются некоторые
+самые популярные ошибки, сделанные авторами CPAN.
 
-=head1 QUICK CHECKLIST
+=head1 БЫСТРЫЙ ЧЕКЛИСТ
 
-For more detail on each item in this checklist, see below.
+Для более подробной информации по каждому пункту в этом чеклисте, смотрите ниже.
 
-=head2 Before you start
+=head2 Прежде чем ты начнешь
 
 =over 4
 
 =item *
 
-Don't re-invent the wheel
+Не изобретайте колесо (Don't re-invent the wheel)
 
 =item *
 
-Patch, extend or subclass an existing module where possible
+Создайте патч, расширение или подкласс существующего модуля там, где это возможно
+(Patch, extend or subclass an existing module where possible)
 
 =item *
 
-Do one thing and do it well
+Делайте одну вещь и делайте ее хорошо
 
 =item *
 
-Choose an appropriate name
+Выберите подходящее имя
 
 =back
 
-=head2 The API
+=head2 API - интерфейс модуля 
 
 =over 4
 
 =item *
 
-API should be understandable by the average programmer
+API должен быть понятным среднего программиста
 
 =item *
 
-Simple methods for simple tasks
+Простые методы для решения простых задач
 
 =item *
 
-Separate functionality from output
+Разделяйте функции по своему результату
 
 =item *
 
-Consistent naming of subroutines or methods
+Последовательное наименование подпрограмм или методов
 
 =item *
 
-Use named parameters (a hash or hashref) when there are more than two
-parameters
+Используйте именованные параметры (хэш-или hashref) при наличии более двух
+параметров
 
 =back
 
-=head2 Stability
+=head2 Стабильность
 
 =over 4
 
 =item *
 
-Ensure your module works under C<use strict> and C<-w>
+Убедитесь, что ваш модуль работает под C<use strict> и C<-w>
 
 =item *
 
-Stable modules should maintain backwards compatibility
+Стабильные модули должны поддерживать обратную совместимость
 
 =back
 
-=head2 Documentation
+=head2 Документация
 
 =over 4
 
 =item *
 
-Write documentation in POD
+Пишите документацию в POD
 
 =item *
 
-Document purpose, scope and target applications
+Назначения документа, сфера применения и целевые приложения
+(Document purpose, scope and target applications)
 
 =item *
 
-Document each publically accessible method or subroutine, including params and return values
+Документируйте каждый публично доступный метод или подпрограмму, 
+ в том числе параметры и возвращаемые значения
 
 =item *
 
-Give examples of use in your documentation
+Приведите примеры использования в документации
 
 =item *
 
-Provide a README file and perhaps also release notes, changelog, etc
+Предоставьте файл README и, возможно, также заметки о выпуске(release notes), изменения(changelog) и т.д.
 
 =item *
 
-Provide links to further information (URL, email)
+Обеспечить ссылки на дополнительную информацию (URL, адрес электронной почты)
 
 =back
 
-=head2 Release considerations
+=head2 Соображения о релизе (Release considerations)
 
 =over 4
 
 =item *
 
-Specify pre-requisites in Makefile.PL or Build.PL
+Укажите зависимости в Makefile.PL или Build.PL
 
 =item *
 
-Specify Perl version requirements with C<use>
+Указывайте версию Perl в кляузе C<use>
 
 =item *
 
-Include tests with your module
+Включите в ваш модуль тесты
 
 =item *
 
-Choose a sensible and consistent version numbering scheme (X.YY is the common Perl module numbering scheme)
+Выберите разумную и последовательную схему нумерации версий (X.YY - это общая схема нумерации модулей Perl)
 
 =item *
 
-Increment the version number for every change, no matter how small
+Увеличивайте номер версии для каждого изменения, независимо от того, насколько мал
 
 =item *
 
-Package the module using "make dist"
+Упакуйте модуль, используя команду "make dist"
 
 =item *
 
-Choose an appropriate license (GPL/Artistic is a good default)
+Выберите соответствующую лицензию (GPL/Artistic будет хорошим значением по умолчанию)
 
 =back
 
-=head1 BEFORE YOU START WRITING A MODULE
+=head1 ПЕРЕД НАЧАЛОМ НАПИСАНИЯ МОДУЛЯ
 
-Try not to launch headlong into developing your module without spending
-some time thinking first.  A little forethought may save you a vast
-amount of effort later on.
+Старайтесь не кидаться с головой в разработку своего модуля, не тратя
+ некоторого времени на обдумывание в первую очередь. 
+ Небольшая предусмотрительность может сэкономить вам огромное
+количество усилий в дальнейшем. ( A little forethought may save you a vast amount of effort later on.)
 
-=head2 Has it been done before?
+=head2 Был ли было сделано раньше?
 
-You may not even need to write the module.  Check whether it's already 
-been done in Perl, and avoid re-inventing the wheel unless you have a 
-good reason.
+Возможно, вам даже не нужно писать модуль. Проверьте, где это уже
+было сделано в Perl, и не изобретайте колесо, если у Вас нет на это
+хорошей причины.
 
-Good places to look for pre-existing modules include
-http://search.cpan.org/ and asking on modules@perl.org
+Хорошее места, чтобы искать уже существующие модули будет
+http://search.cpan.org/ и спрашивайте на modules@perl.org
 
-If an existing module B<almost> does what you want, consider writing a
-patch, writing a subclass, or otherwise extending the existing module
-rather than rewriting it.
+Если существующий модуль B<почти> делает то, что вы хотите, рассмотрите возможность написания
+патча, подкласса, или иным образом расширьте существующий модуль
+ не переписывая его.
 
-=head2 Do one thing and do it well
+=head2 Сделайте одну вещь и сделайте это хорошо
 
-At the risk of stating the obvious, modules are intended to be modular.
-A Perl developer should be able to use modules to put together the
-building blocks of their application.  However, it's important that the
-blocks are the right shape, and that the developer shouldn't have to use
-a big block when all they need is a small one.
+Рискуем констатировать очевидное , что модули предназначены для модульности.
+Разработчик Perl должен иметь возможность использовать модули, что поставить вместе
+строительные блоки своего применения. Тем не менее , важно , чтобы
+блоки были правильной формы , и что разработчик не должен использовать
+большой блок , когда все он нуждается маленьком.
 
-Your module should have a clearly defined scope which is no longer than
-a single sentence.  Can your module be broken down into a family of
-related modules?
+Ваш модуль должен иметь четко определенную сферу , которую описывает не более чем
+одно предложение. Можно ли ваш модуль разбить на семейство 
+связанных модулей?
 
-Bad example:
+Плохой пример:
 
-"FooBar.pm provides an implementation of the FOO protocol and the
-related BAR standard."
+"FooBar.pm обеспечивает реализацию протокола FOO 
+ в соответствии со стандартом BAR ".
 
-Good example:
+Хороший пример:
 
-"Foo.pm provides an implementation of the FOO protocol.  Bar.pm
-implements the related BAR protocol."
+"Foo.pm обеспечивает реализацию протокола Foo. Bar.pm
+реализует соответствующий протокол BAR ".
 
-This means that if a developer only needs a module for the BAR standard,
-they should not be forced to install libraries for FOO as well.
+Это означает, что если разработчику необходим только модуль для стандарта BAR,
+он не должен для этого быть вынужден устанавливать библиотеку также и для FOO.
 
-=head2 What's in a name?
+=head2 Какое будет имя?
 
-Make sure you choose an appropriate name for your module early on.  This
-will help people find and remember your module, and make programming
-with your module more intuitive.
+Убедитесь, что вы выбрали подходящее имя для вашего модуля на ранних стадиях. Это
+поможет людям находить и помнить выш ​​модуль и сделает программирование
+ с вашим модулем более интуитивным.
 
-When naming your module, consider the following:
+При выборе названия вашего модуля , необходимо учитывать следующее:
 
 =over 4
 
 =item *
 
-Be descriptive (i.e. accurately describes the purpose of the module).
+Будьте описательными ( т.е. точно описывайте цель модуля ) .
 
 =item * 
 
-Be consistent with existing modules.
+Согласовывайте имя с существующими модулями.
 
 =item *
 
-Reflect the functionality of the module, not the implementation.
+Имя отражает функциональность модуля , а не его реализацию.
 
 =item *
 
-Avoid starting a new top-level hierarchy, especially if a suitable
-hierarchy already exists under which you could place your module.
+Старайтесь не начинать новую иерархию верхнего уровня , особенно если подходящая
+иерархия уже существует в соответствии с которой вы могли бы поместить ваш модуль.
 
 =back
 
-You should contact modules@perl.org to ask them about your module name
-before publishing your module.  You should also try to ask people who 
-are already familiar with the module's application domain and the CPAN
-naming system.  Authors of similar modules, or modules with similar
-names, may be a good place to start.
+Вы должны связаться с modules@perl.org, чтобы спросить их о вашем имени
+перед публикацией модуля. Вы должны также попытаться спросить людей, которые
+уже знакомы с областью применения модуля, а также исследовать систему наименований моделей CPAN. 
+Авторы подобных модулей , или модули с аналогичными характеристиками
+имена , могут быть хорошим местом для начала.
 
-=head1 DESIGNING AND WRITING YOUR MODULE
+=head1 ПРОЕКТИРОВАНИЕ И НАПИСАНИЕ ВАШЕГО МОДУЛЯ
 
-Considerations for module design and coding:
+Соображения по конструкции(дизайну) модуля и его кодирования:
 
-=head2 To OO or not to OO?
+=head2 OO или не OO?
 
-Your module may be object oriented (OO) or not, or it may have both kinds 
-of interfaces available.  There are pros and cons of each technique, which 
-should be considered when you design your API.
+Ваш модуль может быть объектно-ориентированным (ОО) или нет , или же он может иметь оба этих
+ интерфейса. Есть плюсы и минусы у каждого метода, которые
+следует учитывать при разработке вашего API.
 
-In I<Perl Best Practices> (copyright 2004, Published by O'Reilly Media, Inc.),
-Damian Conway provides a list of criteria to use when deciding if OO is the
-right fit for your problem:
+В I<Perl Best Practices> (copyright 2004, Published by O'Reilly Media, Inc.)
+Дамиан Конвей предоставляет список критериев, который используется при принятии решения,
+ подходит ли OO для вашей проблемы:
 
 =over 4
 
 =item *
 
-The system being designed is large, or is likely to become large.
+Система разрабатывается большая, или, вероятно, станет большой.
 
 =item *
 
-The data can be aggregated into obvious structures, especially if
-there's a large amount of data in each aggregate.
+Данные могут быть объединены в очевидные структуры, особенно, если
+есть большое количество данных в каждом агрегате.
 
 =item *
 
-The various types of data aggregate form a natural hierarchy that
-facilitates the use of inheritance and polymorphism.
+Различные типы совокупности данных образующие естественную иерархию,
+облегчают использование наследования и полиморфизма .
 
 =item *
 
-You have a piece of data on which many different operations are
-applied.
+У вас есть часть данных, к которым применяются много различных операций.
 
 =item *
 
-You need to perform the same general operations on related types of
-data, but with slight variations depending on the specific type of data
-the operations are applied to.
+Вы должны выполнить те же самые общие операции со связанными типами
+данных, но с небольшими изменениями в зависимости от их конкретного типа.
 
 =item *
 
-It's likely you'll have to add new data types later.
+Вполне вероятно, что позже вам придется добавлять новые типы данных.
 
 =item *
 
-The typical interactions between pieces of data are best represented by
-operators.
+
+Типичные взаимодействия между частями данных лучше всего представить в виде
+операторов.
 
 =item *
 
-The implementation of individual components of the system is likely to
-change over time.
+Реализация отдельных компонентов системы, скорее всего,
+ будет изменена с течением времени.
 
 =item *
 
-The system design is already object-oriented.
+Дизайн системы уже объектно-ориентированный.
 
 =item *
 
-Large numbers of other programmers will be using your code modules.
+Большое количество других программистов будут использовать ваши модули.
 
 =back
 
-Think carefully about whether OO is appropriate for your module.
-Gratuitous object orientation results in complex APIs which are
-difficult for the average module user to understand or use.
+Подумайте тщательно о том, подходит ли OO  для вашего модуля.
+Беспричинным результатом объектной ориентации будет сложное API, которое
+ будет трудно для среднего пользователя для понимания или использования.
 
-=head2 Designing your API
+=head2 Проектирование вашего API
 
-Your interfaces should be understandable by an average Perl programmer.  
-The following guidelines may help you judge whether your API is
-sufficiently straightforward:
+Ваши интерфейсы должны быть понятны средним Perl программистам.
+Следующие рекомендации могут помочь вам определить, является ли ваш API
+достаточно простым:
 
 =over 4
 
-=item Write simple routines to do simple things.
+=item Напишите простые процедуры, чтобы делать простые вещи.
 
-It's better to have numerous simple routines than a few monolithic ones.
-If your routine changes its behaviour significantly based on its
-arguments, it's a sign that you should have two (or more) separate
-routines.
+Лучше иметь много простых процедур, чем немного, но очень больших и сложных монолитов.
+Если ваша подпрограмма существенно меняет свое поведение  на основе своих
+аргументов, то это признак того, что вы должны иметь две (или более ) отдельные
+подпрограммы.
 
-=item Separate functionality from output.  
+=item Создавайте отдельные функции для потока вывода (output).  
 
-Return your results in the most generic form possible and allow the user 
-to choose how to use them.  The most generic form possible is usually a
-Perl data structure which can then be used to generate a text report,
-HTML, XML, a database query, or whatever else your users require.
+Возвращайте результаты в наиболее общей форме насколько это возможно и позволяйте пользователю
+ выбирать, как использовать их. Наиболее общая форма - это,возможно , как правило,
+структура данных Perl, которая затем может быть использована для создания текстового отчета,
+HTML, XML, запроса к базе данных , или то, что требуется пользователям.
 
-If your routine iterates through some kind of list (such as a list of
-files, or records in a database) you may consider providing a callback
-so that users can manipulate each element of the list in turn.
-File::Find provides an example of this with its 
-C<find(\&wanted, $dir)> syntax.
+Если процедура перебирает какой-то список (например, список
+файлов или записей в базе данных), вы можете рассмотреть вопрос о предоставлении обратного вызова
+так, чтобы пользователи могли манипулировать каждым элементом списка в свою очередь.
+File::Find дает пример этого с его
+C<find(\&wanted, $dir)> синтаксисом.
 
-=item Provide sensible shortcuts and defaults.
+=item Обеспечьте разумные сокращения и значения по умолчанию.
 
-Don't require every module user to jump through the same hoops to achieve a
-simple result.  You can always include optional parameters or routines for 
-more complex or non-standard behaviour.  If most of your users have to
-type a few almost identical lines of code when they start using your
-module, it's a sign that you should have made that behaviour a default.
-Another good indicator that you should use defaults is if most of your 
-users call your routines with the same arguments.
+Не требовать от каждого пользователя модуля прыгать через обручи для достижения
+простого результата . Вы всегда можете включить дополнительные параметры или процедуры для
+более сложного или нестандартного поведения. Если большинство ваших пользователей должны
+введите несколько почти одинаковых строк кода, когда они начинают использовать ваш модуль, то это признак того, 
+что вы должны были сделать это поведение по умолчанию.
+Еще один хороший показатель того, что вы должны использовать значения по умолчанию, если большинство ваших
+пользователей вызывают ваши подпрограммы с одинаковыми же аргументами.
 
-=item Naming conventions
+=item Соглашения об именовании
 
-Your naming should be consistent.  For instance, it's better to have:
+Ваше именование должно быть последовательным. Например, лучше иметь:
 
 	display_day();
 	display_week();
 	display_year();
 
-than
+чем
 
 	display_day();
 	week_display();
 	show_year();
 
-This applies equally to method names, parameter names, and anything else
-which is visible to the user (and most things that aren't!)
+Это в равной степени относится к именам методов, именам параметров, и всего остального, 
+которое видно пользователю (и к большинству вещей , которые этим не являются! )
 
-=item Parameter passing
+=item Передача параметров
 
-Use named parameters. It's easier to use a hash like this:
+Используйте именованные параметры . Проще использовать хэш следующим образом:
 
     $obj->do_something(
 	    name => "wibble",
@@ -380,195 +382,195 @@ Use named parameters. It's easier to use a hash like this:
 	    size => 1024,
     );
 
-... than to have a long list of unnamed parameters like this:
+... чем иметь длинный список безымянных параметров таких, как этот:
 
     $obj->do_something("wibble", "text", 1024);
 
-While the list of arguments might work fine for one, two or even three
-arguments, any more arguments become hard for the module user to
-remember, and hard for the module author to manage.  If you want to add
-a new parameter you will have to add it to the end of the list for
-backward compatibility, and this will probably make your list order
-unintuitive.  Also, if many elements may be undefined you may see the
-following unattractive method calls:
+В то время как список аргументов может прекрасно работать с одним, двумя или даже с тремя 
+аргументами, все больше аргументов становятся трудными для запоминания
+, и трудными для управления автором модуля. Если вы хотите добавить
+новый параметр, вам придется добавить его в конец списка для
+обратной совместимости, и это, вероятно, сделает ваш список заказа
+неинтуитивным. Кроме того, если многие элементы могут быть неопределенными вы можете увидеть
+следующие непривлекательные вызовы методов:
 
     $obj->do_something(undef, undef, undef, undef, undef, undef, 1024);
+    
+Обеспечьте разумные значения по умолчанию для параметров. Не вынуждате
+пользователей указывать параметры, которые почти всегда будут одинаковыми.
 
-Provide sensible defaults for parameters which have them.  Don't make
-your users specify parameters which will almost always be the same.
+Вопрос о том, чтобы передать аргументы в виде хэша или ссылки на хэш(hashref)
+в значительной степени вопрос личного стиля.
 
-The issue of whether to pass the arguments in a hash or a hashref is
-largely a matter of personal style. 
-
-The use of hash keys starting with a hyphen (C<-name>) or entirely in 
-upper case (C<NAME>) is a relic of older versions of Perl in which
-ordinary lower case strings were not handled correctly by the C<=E<gt>>
-operator.  While some modules retain uppercase or hyphenated argument
-keys for historical reasons or as a matter of personal style, most new
-modules should use simple lower case keys.  Whatever you choose, be
-consistent!
+Использование хэш-ключей, начинающихся с дефиса (C<-name>) или полностью в
+верхнем регистре (C<NAME>) является пережитком старых версий Perl, в котором
+обычные нижние строки могли быть не правильно обработаны с помощью оператора C<=E<gt>>.
+В то время как некоторые модули оставляют переменные в верхнем регистре 
+или аргументы с дефисом (-) по историческим причинам или как вопрос личного стиля, 
+большинству новых модулей следует использовать простые нижний регистр для ключей.
+Что бы вы ни выбрали, будьте последовательны!
 
 =back
 
-=head2 Strictness and warnings
+=head2 Строгость и предупреждения (Strictness and warnings)
 
-Your module should run successfully under the strict pragma and should
-run without generating any warnings.  Your module should also handle 
-taint-checking where appropriate, though this can cause difficulties in
-many cases.
+Ваш модуль должен успешно работать под прагмой use strict и должен
+ работать без создания каких-либо предупреждений.
+ Ваш модуль должен также обрабатывать проверки заразности (taint-checking), где это уместно, хотя это может вызвать трудности во
+многих случаях.
 
-=head2 Backwards compatibility
+=head2 Обратная совместимость
 
-Modules which are "stable" should not break backwards compatibility
-without at least a long transition phase and a major change in version
-number.
+Модули, которые являются "стабильными"("stable") не должны нарушать обратную совместимость
+по крайней мере без длительного переходного этапа и главного (major) изменения в номере версии.
 
-=head2 Error handling and messages
+=head2 Обработка ошибок и сообщения
 
-When your module encounters an error it should do one or more of:
+Когда ваш модуль обнаружил ошибку он должен сделать одно или более из следующего:
 
 =over 4
 
 =item *
 
-Return an undefined value.
+Возврат неопределенного(undefined) значения.
 
 =item *
 
-set C<$Module::errstr> or similar (C<errstr> is a common name used by
-DBI and other popular modules; if you choose something else, be sure to
-document it clearly).
+установите C<$Module::errstr> или подобное имя (C<errstr> как общее имя для ошибок, как это сделано
+ в моделу DBI и других популярных модулях; если вы выберете другое имя, то не забудьте
+ это понятно задокументировать).
 
 =item *
 
-C<warn()> or C<carp()> a message to STDERR.  
+Используйте C<warn()> или C<carp()> сообщение для посылки в  STDERR.  
 
 =item *
 
-C<croak()> only when your module absolutely cannot figure out what to
-do.  (C<croak()> is a better version of C<die()> for use within 
-modules, which reports its errors from the perspective of the caller.  
-See L<Carp> for details of C<croak()>, C<carp()> and other useful
-routines.)
+Используйте C<croak()> только тогда, когда ваш модуль абсолютно не может понять, что
+делать.  (C<croak()> - это лучшая версия C<die()> для использования внутри модулей
+, который передает свои ошибки с точки зрения вызывающей процедуры (caller). 
+Смотри L<Carp> для деталей по C<croak()>, C<carp()> и другие полезные процедуры.)
 
 =item *
 
-As an alternative to the above, you may prefer to throw exceptions using 
-the Error module.
+В качестве альтернативы, указанной выше, вы можете предпочесть бросать исключения, используя
+модуль Error.
 
 =back
 
-Configurable error handling can be very useful to your users.  Consider
-offering a choice of levels for warning and debug messages, an option to
-send messages to a separate file, a way to specify an error-handling
-routine, or other such features.  Be sure to default all these options
-to the commonest use.
+Настраиваемая обработка ошибок может быть очень полезной для пользователей. Можно 
+ предлагать выбор уровней для предупреждений(warning) и отладочных(debug) сообщений, возможность
+отправлять сообщения в отдельный файл, способ задания процедур обработки ошибок
+, или другие подобные функции. Убедитесь, что по умолчанию все эти параметры
+  применяются в обычном использования.
 
-=head1 DOCUMENTING YOUR MODULE
+
+=head1 ДОКУМЕНТИРОВАНИЕ ВАШЕГО МОДУЛЯ
 
 =head2 POD
 
-Your module should include documentation aimed at Perl developers.
-You should use Perl's "plain old documentation" (POD) for your general 
-technical documentation, though you may wish to write additional
-documentation (white papers, tutorials, etc) in some other format.  
-You need to cover the following subjects:
+Ваш модуль должен включать в себя документацию, направленную на разработчиков Perl.
+Вы должны использовать перловую "обычную старую документацию" ("plain old documentation) (POD) для общей
+технической документации, хотя вы можете написать дополнительную
+документацию (технические документы(white papers), учебные пособия(tutorials) и т.д.) в каком-то другом формате.
+Вы должны охватывать следующие темы:
 
 =over 4
 
 =item *
 
-A synopsis of the common uses of the module
+Краткое описание(synopsis) того, для чего нужен модуль
 
 =item *
 
-The purpose, scope and target applications of your module
+Цель, сфера применения(scope) и целевые приложения(target applications) модуля
 
 =item *
 
-Use of each publically accessible method or subroutine, including
-parameters and return values
+Использование каждого публично доступного метода или подпрограммы, в том числе
+ его параметры и возвращаемые значения
 
 =item *
 
-Examples of use
+Примеры использования
 
 =item *
 
-Sources of further information
+Источники дополнительной информации
 
 =item *
 
-A contact email address for the author/maintainer
+Контактный адрес электронной почты автора/сопровождающего(maintainer)
 
 =back
 
-The level of detail in Perl module documentation generally goes from
-less detailed to more detailed.  Your SYNOPSIS section should contain a
-minimal example of use (perhaps as little as one line of code; skip the
-unusual use cases or anything not needed by most users); the
-DESCRIPTION should describe your module in broad terms, generally in
-just a few paragraphs; more detail of the module's routines or methods,
-lengthy code examples, or other in-depth material should be given in 
-subsequent sections.
+Уровень детализации в документации модуля Perl? как правило, идет от
+менее до более подробного. Ваш раздел СИНТАКСИСА(SYNOPSIS) должен содержать
+минимальный пример использования (возможно это всего лишь одна строка кода, пропустить
+необычные случаи использования или что-нибудь не нужное большинству пользователей);
+ОПИСАНИЕ(DESCRIPTION) должно описывать ваш модуль в широком смысле, как правило, в
+всего в нескольких абзацах; более подробное описание процедур или методов работы модуля,
+длинные примеры кода, или другой углубленный материал должен быть приведен в
+последующих разделах.
 
-Ideally, someone who's slightly familiar with your module should be able
-to refresh their memory without hitting "page down".  As your reader
-continues through the document, they should receive a progressively
-greater amount of knowledge.
-
-The recommended order of sections in Perl module documentation is:
+В идеале, любой, кто немного знаком с модулем должен быть в состоянии
+ освежить свою память, не проворачивая "страницу вниз". Читатель
+ , просматривающий документ, они должен получать максимально
+  насыщенное количество знаний.
+  
+Рекомендуемый порядок разделов в документации модуля Perl является:
 
 =over 4
 
 =item * 
 
-NAME
+ИМЯ (NAME)
 
 =item *
 
-SYNOPSIS
+СИНТАКСИС (SYNOPSIS)
 
 =item *
 
-DESCRIPTION
+ОПИСАНИЕ (DESCRIPTION)
 
 =item *
 
-One or more sections or subsections giving greater detail of available 
-methods and routines and any other relevant information.
+Один или несколько разделов или подразделов, дающие более подробную
+ информацию о присутствующих методах и процедурах и 
+  может быть любая другая подходящая информация.
 
 =item *
 
-BUGS/CAVEATS/etc
+ОШИБКИ/ПРЕДОСТЕРЕЖЕНИЯ/ и т.д. (BUGS/CAVEATS/etc)
 
 =item *
 
-AUTHOR
+АВТОР (AUTHOR)
 
 =item *
 
-SEE ALSO
+СМОТРИТЕ ТАКЖЕ (SEE ALSO)
 
 =item *
 
-COPYRIGHT and LICENSE
+Авторское право и лицензии (COPYRIGHT and LICENSE)
 
 =back
 
-Keep your documentation near the code it documents ("inline"
-documentation).  Include POD for a given method right above that 
-method's subroutine.  This makes it easier to keep the documentation up
-to date, and avoids having to document each piece of code twice (once in
-POD and once in comments).
+Держите документацию рядом с кодом, который вы документируете ( "инлайн" 
+документация). Включите POD для данного метода прямо над этим
+ методом. Это облегчает поддержание актуальности документации, 
+ и позволяет избежать необходимости документировать каждый фрагмент кода дважды (один раз в
+POD и один раз в комментариях).
 
-=head2 README, INSTALL, release notes, changelogs
+=head2 README, INSTALL, примечания к выпуску(release notes), записи изменений (changelogs)
 
-Your module should also include a README file describing the module and
-giving pointers to further information (website, author email).  
+Ваш модуль должен также включать файл README, описывающий модуль и
+ дающий указатели на дополнительную информацию (веб-сайт, электронную почту автора).
 
-An INSTALL file should be included, and should contain simple installation 
-instructions. When using ExtUtils::MakeMaker this will usually be:
+Такжен должен быть включен файл INSTALL, который должен содержать простую инструкцию установки.
+При использовании ExtUtils::MakeMaker это будет так:
 
 =over 4
 
@@ -582,7 +584,7 @@ instructions. When using ExtUtils::MakeMaker this will usually be:
 
 =back
 
-When using Module::Build, this will usually be:
+При использовании Module::Build это обычно будет:
 
 =over 4
 
@@ -596,190 +598,173 @@ When using Module::Build, this will usually be:
 
 =back
 
-Release notes or changelogs should be produced for each release of your
-software describing user-visible changes to your module, in terms
-relevant to the user.
+Заметки о выпуске(Release notes) или записи изменений(changelogs) следует создавать для каждого выпуска(release) вашего
+программного обеспечения, описывающее видимые пользователю изменения в вашем модуле, в терминах
+ понятны пользователю.
 
-=head1 RELEASE CONSIDERATIONS
+=head1 РАССМОТРЕНИЕ ВЫПУСКА (RELEASE CONSIDERATIONS)
 
-=head2 Version numbering
+=head2 Нумерация версий (Version numbering)
 
-Version numbers should indicate at least major and minor releases, and
-possibly sub-minor releases.  A major release is one in which most of
-the functionality has changed, or in which major new functionality is
-added.  A minor release is one in which a small amount of functionality
-has been added or changed.  Sub-minor version numbers are usually used
-for changes which do not affect functionality, such as documentation
-patches.
+Номера версий должны содержать как минимум основные(major) и второстепенные(minor) версии, а также
+возможно незначительные релизы. Основной релиз(major release) - это выпуск, в котором большая часть
+функциональности изменилась или в котором добавлены новые функциональные возможности
+. Небольшой(minor) релиз - это тот, в котором небольшое количество функциональных возможностей
+было добавлено или изменено. Номера вспомогательных (Sub-minor) версия используются 
+для изменений, которые не влияют на функциональность, или для таких, где измененяется документация.
 
-The most common CPAN version numbering scheme looks like this:
+Наиболее распространенная схема нумерации версий CPAN выглядит так:
 
     1.00, 1.10, 1.11, 1.20, 1.30, 1.31, 1.32
 
-A correct CPAN version number is a floating point number with at least 
-2 digits after the decimal. You can test whether it conforms to CPAN by 
-using
+Верный номер версии CPAN - это число с плавающей точкой, по крайней мере
+2 цифры после запятой. Вы можете проверить, соответствует ли он CPAN
+с помощью
 
     perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' 'Foo.pm'
 
-If you want to release a 'beta' or 'alpha' version of a module but
-don't want CPAN.pm to list it as most recent use an '_' after the
-regular version number followed by at least 2 digits, eg. 1.20_01. If
-you do this, the following idiom is recommended:
+Если вы хотите выпустить 'бету' или 'альфу'-версию модуля, но
+не хотите, чтобы CPAN.pm отображал его как самый последний, используйте '_' после
+номера обычной версии и еще минимум две цифры, например. 1.20_01. Если
+вы делаете это, рекомендуется следующая идиома:
 
   $VERSION = "1.12_01";
-  $XS_VERSION = $VERSION; # only needed if you have XS code
+  $XS_VERSION = $VERSION; # нужен только, если у вас есть XS-код (only needed if you have XS code)
   $VERSION = eval $VERSION;
 
-With that trick MakeMaker will only read the first line and thus read
-the underscore, while the perl interpreter will evaluate the $VERSION
-and convert the string into a number. Later operations that treat
-$VERSION as a number will then be able to do so without provoking a
-warning about $VERSION not being a number.
+С помощью этого трюка MakeMaker будет читать только первую строку и таким образом читать
+подчеркивание, в то время как интерпретатор perl будет выполнять(evaluate) $VERSION
+и преобразовывать строку в число. Более поздние операции, которые используют
+$VERSION, как число, будет иметь возможность сделать это без
+предупреждение о том, что $VERSION не является числом.
 
-Never release anything (even a one-word documentation patch) without
-incrementing the number.  Even a one-word documentation patch should
-result in a change in version at the sub-minor level.
+Никогда не выпускайте ничего (даже патч с одним словом документации) без
+увеличения номера версии. Патч даже и измененным одним словом должен
+приводить к изменению версии на уровне полуминорной версии (sub-minor level).
+ (Even a one-word documentation patch should result in a change in version at the sub-minor level.)
 
-=head2 Pre-requisites
+=head2 Требования (Pre-requisites)
 
-Module authors should carefully consider whether to rely on other
-modules, and which modules to rely on.
+Авторы модулей должны тщательно рассмотреть вопрос о том, полагаться ли на другие
+модули и на какие модули опираться.
 
-Most importantly, choose modules which are as stable as possible.  In
-order of preference: 
+Наиболее важно выбрать модули, которые настолько стабильны, насколько это возможно. В
+порядке предпочтения:
 
 =over 4
 
 =item *
 
-Core Perl modules
+Модули ядра Perl (Core Perl modules)
 
 =item *
 
-Stable CPAN modules
+Стабильные модули CPAN (Stable CPAN modules)
 
 =item *
 
-Unstable CPAN modules
+Нестабильные модули CPAN (Unstable CPAN modules)
 
 =item *
 
-Modules not available from CPAN
+Модули, недоступные в CPAN (Modules not available from CPAN)
 
 =back
 
-Specify version requirements for other Perl modules in the
-pre-requisites in your Makefile.PL or Build.PL.
+Укажите требования к версии для других модулей Perl в
+предварительных условиях (pre-requisites) в Makefile.PL или Build.PL.
 
-Be sure to specify Perl version requirements both in Makefile.PL or
-Build.PL and with C<require 5.6.1> or similar. See the section on
-C<use VERSION> of L<perlfunc/require> for details.
+Обязательно укажите требования к версии Perl как в Makefile.PL, так и в
+Build.PL C<require 5.6.1> или аналогичный. См. Раздел
+C<use VERSION> для L<perlfunc/require>.
 
-=head2 Testing
+=head2 Тестирование
 
-All modules should be tested before distribution (using "make disttest"),
-and the tests should also be available to people installing the modules 
-(using "make test").  
-For Module::Build you would use the C<make test> equivalent C<perl Build test>.
+Все модули должны быть протестированы перед распространением 
+(с использованием "make disttest"), и тесты также должны быть доступны для людей, 
+устанавливающих модули (с помощью "make test"). 
+Для Module::Build вы должны использовать эквивалент C<make test> такой как C<perl Build test>.
 
-The importance of these tests is proportional to the alleged stability of a 
-module. A module which purports to be stable or which hopes to achieve wide 
-use should adhere to as strict a testing regime as possible.
+Важность этих тестов пропорциональна предполагаемой стабильности модуля. 
+Модуль, который стремится быть стабильным или который надеется достичь широкого использования, 
+должен придерживаться как можно более жесткого режима тестирования.
 
-Useful modules to help you write tests (with minimum impact on your 
-development process or your time) include Test::Simple, Carp::Assert 
-and Test::Inline.
-For more sophisticated test suites there are Test::More and Test::MockObject.
+Полезные модули, которые помогут вам писать тесты 
+(с минимальным воздействием на ваш процесс разработки или ваше время), 
+включают Test::Simple, Carp::Assert и Test::Inline. 
+Для более сложных тестовых наборов( test suites) есть Test::More и Test::MockObject.
 
-=head2 Packaging
+=head2 Пакетизация (Packaging)
 
-Modules should be packaged using one of the standard packaging tools.
-Currently you have the choice between ExtUtils::MakeMaker and the
-more platform independent Module::Build, allowing modules to be installed in a
-consistent manner.
-When using ExtUtils::MakeMaker, you can use "make dist" to create your
-package. Tools exist to help you to build your module in a MakeMaker-friendly
-style. These include ExtUtils::ModuleMaker and h2xs.  See also L<perlnewmod>.
+Модули следует упаковывать с использованием одного из стандартных инструментов упаковки(packaging tools). 
+В настоящее время у вас есть выбор между ExtUtils::MakeMaker и более независимым от платформы модулем Module::Build,
+что позволяет устанавливать модули последовательно. При использовании ExtUtils::MakeMaker вы можете использовать "make dist" для создания своего пакета. Существуют инструменты, которые помогут вам создать свой модуль в стиле MakeMaker. К ним относятся ExtUtils::ModuleMaker и h2xs. См. Также L<perlnewmod>.
 
-=head2 Licensing
+=head2 Лицензирование
 
-Make sure that your module has a license, and that the full text of it
-is included in the distribution (unless it's a common one and the terms
-of the license don't require you to include it).
+Убедитесь, что ваш модуль имеет лицензию, и что полный текст её включен в дистрибутив 
+(если только он не является общим(it's a common one), и в условиях лицензии не требуется включать его).
 
-If you don't know what license to use, dual licensing under the GPL
-and Artistic licenses (the same as Perl itself) is a good idea.
-See L<perlgpl> and L<perlartistic>.
+Если вы не знаете, какую лицензию использовать, двойное лицензирование под лицензиями GPL и Artistic (то же самое, что и сам Perl) - хорошая идея. См. L<perlgpl> и L<perlartistic>.
 
-=head1 COMMON PITFALLS
+=head1 РАСПРОСТРАНЕННЫЕ ОШИБКИ (COMMON PITFALLS)
 
-=head2 Reinventing the wheel
+=head2 Изобретение колеса (Reinventing the wheel)
 
-There are certain application spaces which are already very, very well
-served by CPAN.  One example is templating systems, another is date and
-time modules, and there are many more.  While it is a rite of passage to
-write your own version of these things, please consider carefully
-whether the Perl world really needs you to publish it.
+Есть определенные области применения, которые уже очень хорошо обслуживаются CPAN. 
+Один пример - это системы шаблонов, другой - модули даты и времени, и их гораздо больше. 
+Хотя это может быть и обряд - напсение своей собственной версии этих вещей, пожалуйста, внимательно рассмотрите
+будет ли мир на Perl действительно нуждается в вас, чтобы опубликовать его
 
-=head2 Trying to do too much
+=head2 Попытка сделать слишком много
 
-Your module will be part of a developer's toolkit.  It will not, in
-itself, form the B<entire> toolkit.  It's tempting to add extra features
-until your code is a monolithic system rather than a set of modular
-building blocks.
+Ваш модуль будет частью инструментария разработчика. Он сам по себе не будет составлять набор инструментов B<всего>. Заманчиво добавлять дополнительные функции, пока ваш код не будет монолитной системой, а не набором модульных строительных блоков.
 
-=head2 Inappropriate documentation
+=head2 Несоответствующая документация
 
-Don't fall into the trap of writing for the wrong audience.  Your
-primary audience is a reasonably experienced developer with at least 
-a moderate understanding of your module's application domain, who's just 
-downloaded your module and wants to start using it as quickly as possible.
+Не попадайтесь в ловушку, чтобы писать не той аудитории. 
+Ваша основная аудитория - опытный разработчик с минимальным пониманием области приложения вашего модуля, который только что загрузил ваш модуль и хочет начать использовать его как можно быстрее.
 
-Tutorials, end-user documentation, research papers, FAQs etc are not 
-appropriate in a module's main documentation.  If you really want to 
-write these, include them as sub-documents such as C<My::Module::Tutorial> or
-C<My::Module::FAQ> and provide a link in the SEE ALSO section of the
-main documentation.  
+Учебники, документация конечного пользователя, научные статьи, часто задаваемые вопросы и т. не подходят в основной документации модуля. Если вы действительно хотите их написать, включите их в качестве суб-документов, таких как C<My::Module::Tutorial> и
+C<My::Module::FAQ>, и укажите ссылку в разделе СМОТРИТЕ ТАКЖЕ(SEE ALSO) основной документации.
 
-=head1 SEE ALSO
+=head1 СМОТРИТЕ ТАКЖЕ
 
 =over 4
 
 =item L<perlstyle>
 
-General Perl style guide
+Общее руководство по стилю Perl разработки
 
 =item L<perlnewmod>
 
-How to create a new module
+Как создать новый модуль
 
 =item L<perlpod>
 
-POD documentation
+документация POD
 
 =item L<podchecker>
 
-Verifies your POD's correctness
+Проверка корректности вашего POD
 
-=item Packaging Tools
+=item Инструменты создания модулей (Packaging Tools)
 
 L<ExtUtils::MakeMaker>, L<Module::Build>
 
-=item Testing tools
+=item Инструменты тестирования
 
 L<Test::Simple>, L<Test::Inline>, L<Carp::Assert>, L<Test::More>, L<Test::MockObject>
 
 =item http://pause.perl.org/
 
-Perl Authors Upload Server.  Contains links to information for module
-authors.
+Сервер загрузки Perl.(Perl Authors Upload Server. - PAUSE) Содержит ссылки на информацию для авторов модулей.
 
-=item Any good book on software engineering
+=item Любая хорошая книга по разработке программного обеспечения
 
 =back
 
-=head1 AUTHOR
+=head1 АВТОР
 
 Kirrily "Skud" Robert <skud@cpan.org>
 

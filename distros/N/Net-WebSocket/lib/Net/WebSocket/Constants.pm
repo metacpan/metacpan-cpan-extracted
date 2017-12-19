@@ -21,6 +21,8 @@ use constant {
 
 #These names are taken from:
 #https://msdn.microsoft.com/en-us/library/windows/desktop/hh449350(v=vs.85).aspx
+# … however, the up-to-date list of canonical codes is at:
+#https://www.iana.org/assignments/websocket/websocket.xml
 use constant STATUS => {
     SUCCESS                => 1000,
     ENDPOINT_UNAVAILABLE   => 1001,
@@ -40,6 +42,11 @@ use constant STATUS => {
     #We accept both names; code-to-name conversion always returns this one.
     INTERNAL_ERROR         => 1011,
     SERVER_ERROR           => 1011,
+
+    #These are part of the IANA registry but are not in Microsoft’s enum.
+    SERVICE_RESTART         => 1012,
+    TRY_AGAIN_LATER         => 1013,
+    BAD_GATEWAY             => 1014,
 
     #RFC says not to use this one,
     #but MS has it in their enum.

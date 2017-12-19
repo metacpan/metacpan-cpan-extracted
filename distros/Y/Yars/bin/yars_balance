@@ -19,7 +19,7 @@ yars_balance - Fix all files
 
 =head1 VERSION
 
-version 1.31
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -44,6 +44,16 @@ After copying files to the correct bucket (either as a local file copy, or as
 a Yars file transfer), rename the original file to a backup directory, instead of
 unlinking it.  This is particularly useful when adding new untested disks to
 a yars cluster.
+
+=head2 --delay | -d
+
+Delay deletes or renames to avoid race conditions with GETs.  Note that this
+introduces a race condition with DELETEs.
+
+=head2 --load | -l number
+
+Pause balance when load average exceeds I<number>.  Only implemented on systems
+that provide C</proc/loadavg>, such as Linux.
 
 =head1 AUTHOR
 

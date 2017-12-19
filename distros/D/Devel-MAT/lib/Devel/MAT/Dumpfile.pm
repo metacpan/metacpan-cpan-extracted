@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -224,7 +224,7 @@ sub load
       }
 
       my $pos = $fh->IO::Seekable::tell; # fully-qualified method for 5.010
-      $progress->( sprintf "Loading file %d of %d (%.2f%%)",
+      $progress->( sprintf "Loading file %d of %d bytes (%.2f%%)",
          $pos, $filelen, 100*$pos / $filelen ) if $progress and (keys(%heap) % 5000) == 0;
    }
 

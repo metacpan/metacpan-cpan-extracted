@@ -1,8 +1,10 @@
 
 =head1 DESCRIPTION
 
-This test ensures that the standalone Yancy CMS works as expected, including
-the default welcome page and the template handlers.
+This test ensures that the standalone Yancy CMS works as expected,
+including the default welcome page and the template handlers.
+
+This test uses the config file located in C<t/lib/share/config.pl>.
 
 =head1 SEE ALSO
 
@@ -17,6 +19,7 @@ use Test::Mojo;
 use Mojo::JSON qw( true false );
 use FindBin qw( $Bin );
 use Mojo::File qw( path );
+use lib "".path( $Bin, 'lib' );
 
 use Yancy::Backend::Test;
 %Yancy::Backend::Test::COLLECTIONS = (
@@ -65,6 +68,10 @@ subtest 'default page' => sub {
       ;
 
     $t->app->mode( $orig_mode );
+
+    $t->get_ok( '/yancy' )
+      ->status_is( 200 )
+      ;
 };
 
 subtest 'template handler' => sub {
@@ -74,6 +81,31 @@ subtest 'template handler' => sub {
       ->text_is( h1 => 'People' )
       ->text_is( 'li:first-child' => 'Doug Bell' )
       ->text_is( 'li:nth-child(2)' => 'Joel Berger' )
+      ;
+    $t->get_ok( '/people/1' )
+      ->status_is( 200 )
+      ->text_is( h1 => 'Doug Bell' )
+      ;
+    $t->get_ok( '/people/1/doug/bell/is/great' )
+      ->status_is( 404 )
+      ;
+
+    subtest 'default index' => sub {
+        local $ENV{MOJO_HOME} = "".path( $Bin, 'share/withindex' );
+
+        Test::Mojo->new( 'Yancy' )->get_ok( '/' )
+          ->status_is( 200 )
+          ->text_is( h1 => 'Index' )
+          ;
+    };
+};
+
+subtest 'plugins' => sub {
+    $t->get_ok( '/perldoc' )
+      ->status_is( 200, 'PODRenderer returns 200 OK' )
+      ->get_ok( '/test' )
+      ->status_is( 200 )
+      ->json_is( [ { args => "one" } ] )
       ;
 };
 

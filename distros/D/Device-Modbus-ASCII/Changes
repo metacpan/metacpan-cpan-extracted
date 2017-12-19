@@ -1,0 +1,11 @@
+Revision history for Perl extension Device::Modbus::ASCII
+
+0.006  2017-12-18
+    - fixed typo in Device::Modbus::ASCII::Client
+
+0.005  2017-12-16
+    - released to CPAN
+
+0.004  2017-12-15
+	- original version
+

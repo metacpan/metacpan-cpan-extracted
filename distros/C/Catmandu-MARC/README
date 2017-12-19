@@ -38,6 +38,8 @@ SYNOPSIS
 
 MODULES
 
+      * Catmandu::MARC::Tutorial
+
       * Catmandu::Importer::MARC
 
       * Catmandu::Exporter::MARC

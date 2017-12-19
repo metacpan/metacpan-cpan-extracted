@@ -53,12 +53,7 @@ package Foo::Bar;
 
 1;
 MODULE
-                path(qw(source Changes)) => <<'CHANGES',
-Revision history for {{$dist->name}}
-
-{{$NEXT}}
-        - some changelog entry
-CHANGES
+                path(qw(source Changes)) => '',
             },
         },
     );
@@ -107,7 +102,7 @@ my %network_plugins;
 cmp_deeply(
     [ grep { exists $network_plugins{$_} } @plugin_classes ],
     [],
-    'no network-using plugins were actually loaded',
+    'no network-using plugins were actually added',
 );
 
 cmp_deeply(

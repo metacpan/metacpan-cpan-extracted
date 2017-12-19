@@ -8,14 +8,7 @@ use Test::More;
 my $js  = JavaScript::Duktape->new();
 my $duk = $js->duk;
 
-$duk->push_function(
-    sub {
-        ok( 1, "success from javascript land" );
-    },
-    1
-);
-
-$duk->put_global_string("perlok");
+$js->set( ok => \&Test::More::ok );
 
 my $data = {
     num  => 9,
@@ -52,30 +45,20 @@ my $data = {
 
 $js->set( 'perl', $data );
 
-$duk->peval_string(
-    qq~
-    //print(JSON.stringify(perl));
-    if (perl.str === 'Hello') perlok();
-    if (typeof perl.un === 'undefined') perlok();
-    if (perl.n === null) perlok();
-    if (perl.t === true) perlok();
-    if (perl.f === false) perlok();
-    if (typeof perl.func === 'function') perlok();
+$duk->peval_string(q{
+    ok (perl.str === 'Hello')
+    ok (typeof perl.un === 'undefined')
+    ok (perl.n === null)
+    ok (perl.t === true)
+    ok (perl.f === false)
+    ok (typeof perl.func === 'function')
 
     var obj = perl.func(1, "Hi", true, false, null, function(d){
         var ret = d('Hi again');
-        if (typeof ret === 'object') perlok();
-        if (ret.length === 3){
-            perlok();
-        }
+        ok (typeof ret === 'object')
+        ok (ret.length === 3)
     });
-    if(obj.h === 9999) perlok();
-~
-);
-$duk->dump();
-
-if (false) {
-    print "OK\n";
-}
+    ok (obj.h === 9999)
+});
 
 done_testing(18);

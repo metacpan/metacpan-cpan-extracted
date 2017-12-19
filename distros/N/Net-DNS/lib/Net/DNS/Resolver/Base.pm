@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1595 2017-09-12 09:10:56Z willem $
+# $Id: Base.pm 1608 2017-12-07 10:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1595 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
 
 
 #
@@ -26,7 +26,7 @@ our $VERSION = (qw$LastChangedRevision: 1595 $)[1];
 # [Revised March 2016]
 
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
 
@@ -889,7 +889,7 @@ sub _create_tcp_socket {
 
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
-			LocalPort => $self->{srcport},
+			LocalPort => $self->{srcport} || undef,
 			PeerAddr  => $ip,
 			PeerPort  => $self->{port},
 			Proto	  => 'tcp',
@@ -932,7 +932,7 @@ sub _create_udp_socket {
 
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
-			LocalPort => $self->{srcport},
+			LocalPort => $self->{srcport} || undef,
 			Proto	  => 'udp',
 			Type	  => SOCK_DGRAM
 			)
@@ -945,28 +945,31 @@ sub _create_udp_socket {
 }
 
 
-my @udp = (
-	flags	 => Socket::AI_NUMERICHOST,
-	protocol => Socket::IPPROTO_UDP,
-	socktype => SOCK_DGRAM
-	)
-		if USE_SOCKET_IP;
+{
+	no strict qw(subs);
+	my @udp = (
+		flags	 => Socket::AI_NUMERICHOST,
+		protocol => Socket::IPPROTO_UDP,
+		socktype => SOCK_DGRAM
+		);
 
-my $ip4 = USE_SOCKET_IP ? {family => AF_INET,  @udp} : {};
-my $ip6 = USE_SOCKET_IP ? {family => AF_INET6, @udp} : {};
+	my $ip4 = USE_SOCKET_IP ? {family => AF_INET,  @udp} : {};
+	my $ip6 = USE_SOCKET_IP ? {family => AF_INET6, @udp} : {};
 
-my $inet6 = USE_SOCKET_INET6 ? [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] : [];
+	my $inet6 = USE_SOCKET_INET6 ? [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] : [];
 
-sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
-	my ( $self, $ip, $port ) = @_;
+	sub _create_dst_sockaddr {	## create UDP destination sockaddr structure
+		my ( $self, $ip, $port ) = @_;
 
-	unless (USE_SOCKET_IP) {
-		return sockaddr_in( $port, inet_aton($ip) ) unless _ipv6($ip);
-		return ( Socket6::getaddrinfo( $ip, $port, @$inet6 ) )[3] if USE_SOCKET_INET6;
+		unless (USE_SOCKET_IP) {
+			return sockaddr_in( $port, inet_aton($ip) ) unless _ipv6($ip);
+			return ( Socket6::getaddrinfo( $ip, $port, @$inet6 ) )[3]
+					if USE_SOCKET_INET6;
+		}
+
+		( grep ref, Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {} )[0]->{addr}
+				if USE_SOCKET_IP;		# NB: errors raised in socket->send
 	}
-
-	( grep ref, Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {} )[0]->{addr}
-			if USE_SOCKET_IP;			# NB: errors raised in socket->send
 }
 
 

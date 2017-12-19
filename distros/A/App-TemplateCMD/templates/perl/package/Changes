@@ -1,0 +1,15 @@
+[% module = module || 'module' -%]
+[% file     = module -%]
+[% IF file.match('::') -%]
+[%     file = file.replace('::', '/') -%]
+[% END -%]
+[% file = file _ '.pm' -%]
+[% package  = module -%]
+[% IF package.match('::') -%]
+[%     package = package.replace('::', '-') -%]
+[% END -%]
+Revision history for [% package %]
+
+0.0.1   Date/time
+        First version, released on an unsuspecting world.
+

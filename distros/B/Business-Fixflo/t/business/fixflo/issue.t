@@ -32,6 +32,7 @@ can_ok(
 		report
 
         AdditionalDetails
+        BlockName
 		CallbackId
 		FaultTitle
 		TermsAccepted

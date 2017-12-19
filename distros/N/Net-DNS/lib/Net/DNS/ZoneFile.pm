@@ -1,9 +1,9 @@
 package Net::DNS::ZoneFile;
 
 #
-# $Id: ZoneFile.pm 1526 2017-01-16 09:17:54Z willem $
+# $Id: ZoneFile.pm 1605 2017-11-27 11:37:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1526 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
 
 
 =head1 NAME
@@ -92,7 +92,7 @@ sub new {
 	}
 
 	$self->{filename} = $file ||= '';
-	$self->{handle} = new IO::File($file) or croak qq($! "$file");
+	$self->{handle} = new IO::File($file) or croak "$! $file";
 	$self->{fileopen}{$file}++;
 	return $self;
 }
@@ -524,7 +524,7 @@ sub _include {				## open $INCLUDE file
 	croak qq(recursive \$INCLUDE $file) if $opened->{$file}++;
 
 	my @discipline = PERLIO ? ( join ':', '<', PerlIO::get_layers $self->{handle} ) : ();
-	my $handle = new IO::File( $file, @discipline ) or croak qq($! "$file");
+	my $handle = new IO::File( $file, @discipline ) or croak "$! $file";
 
 	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Future::Mutex;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Future;
 
@@ -51,6 +51,13 @@ the first one, until it completes. Once the initial code indicates completion
 (by its returned future providing a result or failing), the next queued code
 is invoked.
 
+An instance may also be a counting mutex if initialised with a count greater
+than one. In this case, it can keep multiple blocks outstanding up to that
+limit, with subsequent requests queued as before. This allows it to act as a
+concurrency-bounding limit around some operation that can run concurrently,
+but an application wishes to apply overall limits to stop it growing too much,
+such as communications with external services or executing other programs.
+
 =cut
 
 =head1 CONSTRUCTOR
@@ -59,18 +66,31 @@ is invoked.
 
 =head2 new
 
-   $mutex = Future::Mutex->new
+   $mutex = Future::Mutex->new( count => $n )
 
 Returns a new C<Future::Mutex> instance. It is initially unlocked.
+
+Takes the following named arguments:
+
+=over 8
+
+=item count => INT
+
+Optional number to limit outstanding concurrency. Will default to 1 if not
+supplied.
+
+=back
 
 =cut
 
 sub new
 {
    my $class = shift;
+   my %params = @_;
 
    return bless {
-      f => Future->done,
+      avail => $params{count} // 1,
+      queue => [],
    }, $class;
 }
 
@@ -98,13 +118,39 @@ sub enter
    my $self = shift;
    my ( $code ) = @_;
 
-   my $old_f = $self->{f};
-   $self->{f} = my $new_f = Future->new;
+   my $down_f;
+   if( $self->{avail} ) {
+      $self->{avail}--;
+      $down_f = Future->done;
+   }
+   else {
+      push @{ $self->{queue} }, $down_f = Future->new;
+   }
 
-   $old_f->then( $code )
-      ->then_with_f(
-         ( sub { my $f = shift; $new_f->done; $f; } ) x 2
-      );
+   my $up = sub {
+      if( my $next_f = shift @{ $self->{queue} } ) {
+         $next_f->done;
+      }
+      else {
+         $self->{avail}++;
+      }
+   };
+
+   $down_f->then( $code )->on_ready( $up );
+}
+
+=head2 available
+
+   $avail = $mutex->available
+
+Returns true if the mutex is currently unlocked, or false if it is locked.
+
+=cut
+
+sub available
+{
+   my $self = shift;
+   return $self->{avail};
 }
 
 =head1 AUTHOR

@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use XML::Twig;
 
-our $VERSION = '0.1.11'; # VERSION:
+our $VERSION = '0.1.13'; # VERSION:
 # ABSTRACT: parse XML file of blast+(with outfmt=5) into tabular format
 
 
@@ -100,7 +100,7 @@ Bioinfo::App::Cmd::Blast::Cmd::ParseXML - parse XML file of blast+(with outfmt=5
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.13
 
 =head1 SYNOPSIS
 

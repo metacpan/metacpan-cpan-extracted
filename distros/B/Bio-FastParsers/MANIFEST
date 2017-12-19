@@ -19,6 +19,7 @@ lib/Bio/FastParsers/Blast/Xml/Hsp.pm
 lib/Bio/FastParsers/Blast/Xml/Iteration.pm
 lib/Bio/FastParsers/Blast/Xml/Parameters.pm
 lib/Bio/FastParsers/Blast/Xml/Statistics.pm
+lib/Bio/FastParsers/CdHit.pm
 lib/Bio/FastParsers/Constants.pm
 lib/Bio/FastParsers/Hmmer.pm
 lib/Bio/FastParsers/Hmmer/DomTable.pm
@@ -38,6 +39,7 @@ t/author-pod-syntax.t
 t/author-portability.t
 t/blast_table.t
 t/blast_xml.t
+t/cd_hit.t
 t/hmmer_dom_table.t
 t/hmmer_model.t
 t/hmmer_std.t
@@ -55,6 +57,9 @@ test/blastp.xml
 test/blastx.m9
 test/blastx.xml
 test/bug-next-hit-blastp.m9
+test/cdHit.out
+test/cdHit.out.clstr
+test/cdHit.out.groups
 test/empty.xml
 test/hmmer1.domtblout
 test/hmmer1.tblout

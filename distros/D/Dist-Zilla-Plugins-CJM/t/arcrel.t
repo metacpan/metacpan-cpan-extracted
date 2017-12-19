@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88 tests => 6; # done_testing
 
 use Test::DZil 'Builder';
+use Path::Tiny ();
 
 sub make_ini
 {
@@ -79,10 +80,10 @@ sub new_tzil
 
   $tzil->release;
 
-  my $tarball = $tzil->root->file('releases/DZT-Sample-0.001.tar.gz');
+  my $tarball = $tzil->root->child('releases/DZT-Sample-0.001.tar.gz');
   ok(-e $tarball, 'archived tarball');
   is($tarball->stat->mode & 0777, 0444, 'tarball is read-only');
-  ok((not -e $tzil->root->file('DZT-Sample-0.001.tar.gz')),
+  ok((not -e $tzil->root->child('DZT-Sample-0.001.tar.gz')),
      'tarball was moved');
 }
 
@@ -94,7 +95,7 @@ sub new_tzil
   my $arcrel = $tzil->plugins_with(-Releaser)->[0];
 
   is($arcrel->directory,
-     Path::Class::dir(File::HomeDir->my_home, qw(some dir)),
+     Path::Tiny::path(File::HomeDir->my_home, qw(some dir)),
      '~ expansion');
 }
 

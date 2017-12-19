@@ -32,4 +32,4 @@ resources:
   homepage: https://github.com/iph0/AnyEvent-RipeRedis-Cluster
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iph0/AnyEvent-RipeRedis-Cluster
-version: '0.28'
+version: '0.30'

@@ -1,14 +1,24 @@
+0.004 2017-12-15 10:28:20-0600
+
+  Features
+
+   - Remove Alien::gmake dependency
+     <https://github.com/zmughal/p5-Alien-ZMQ-latest/pull/6>.
+
+
 0.003 2017-12-08 06:57:55-0600
 
   Features
 
    - Disable static builds on Windows.
+     <https://github.com/zmughal/p5-Alien-ZMQ-latest/pull/5>.
 
 0.002 2017-12-06 10:27:55-0600
 
   Features
 
    - Enable static and shared builds on all platforms.
+     <https://github.com/zmughal/p5-Alien-ZMQ-latest/pull/3>.
 
 0.001 2017-12-03 10:45:10-0600
 

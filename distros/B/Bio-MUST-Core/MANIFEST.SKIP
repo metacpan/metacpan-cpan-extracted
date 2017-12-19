@@ -1,0 +1,10 @@
+\btest\/taxdump/readme\.txt
+\btest\/taxdump/(?!mis)[^_]+\.dmp
+\btest\/taxdump/assembly_.*
+\btest\/taxdump/.*?\.bin
+\btest\/my_.*
+dist\.ini
+weaver\.ini
+nytprof*
+tags
+.DS_Store

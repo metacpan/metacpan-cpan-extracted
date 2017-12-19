@@ -31,6 +31,9 @@ DESCRIPTION
     "FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder is supported to
     control serialization of blessed objects.
 
+    See Mojo::IOLoop::Subprocess::Role::Sereal for a role to apply Sereal
+    data serialization to any Mojo::IOLoop::Subprocess.
+
 EXPORTS
 
     Mojo::IOLoop::Subprocess::Sereal exports the following variable by
@@ -39,14 +42,15 @@ EXPORTS
  $_subprocess
 
       my $subprocess = Mojo::IOLoop->$_subprocess(sub {...}, sub {...});
+      my $subprocess = Mojo::IOLoop->$_subprocess;
       my $subprocess = $loop->$_subprocess(sub {...}, sub {...});
 
     Build Mojo::IOLoop::Subprocess object to perform computationally
     expensive operations in subprocesses, without blocking the event loop.
-    Sets "deserialize" in Mojo::IOLoop::Subprocess and "serialize" in
-    Mojo::IOLoop::Subprocess to callbacks that use Sereal for data
-    serialization. Arguments will be passed along to "run" in
-    Mojo::IOLoop::Subprocess.
+    Composes and calls "with_sereal" in
+    Mojo::IOLoop::Subprocess::Role::Sereal to use Sereal for data
+    serialization. If arguments are provided, they will be used to call
+    "run" in Mojo::IOLoop::Subprocess.
 
 BUGS
 
@@ -66,5 +70,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Mojo::IOLoop, Sereal
+    Mojo::IOLoop, Mojo::IOLoop::Subprocess::Role::Sereal, Sereal
 

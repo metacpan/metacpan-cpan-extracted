@@ -1,0 +1,35 @@
+Revision history for Assert-Refute
+
+0.0304  Sun Dec 17 2017
+        - BUG Fix tests again - splitting t/602 in two didn't work
+
+0.0304  Sun Dec 17 2017
+        - BUG Fix tests on perl < 5.8.9 (qr/.../m)
+
+0.0303  Sun Dec 17 2017
+        - BUG Fix tests so that they run on windows, too
+
+0.0302  Sun Dec 17 2017
+        - BUG Patch hanging test on win (no real fix yet)
+
+0.0301  Sun Dec 17 2017
+        - BUG Fixed deep recursion on perl < 5.010
+
+0.03    Sun Dec 17 2017
+        - API BREAK Rename want_self => need_object, clone => adjust
+        - MOD Add exception test module T::Errors (dies_like, warns_like)
+        - API contract: add args => [n,m] to limit number of parameters to apply()
+        - DRV Add Test::More backend so that A::R::Build builds tests ready to run with T::M
+        - BUG bugs fixed, test coverage improved, docs improved.
+
+0.02    Fri Dec 15 2017
+        - API Add contract, refute, and suncontract primitives
+        - API Add an arsenal of checks corresponding to that of Test::More
+        - API Add Assert::Refute::Contract/Assert::Refute::Exec oo interface
+        - API Add Assert::Refute::Builder to extend the checks
+        - API Add signature method for testing the tests
+
+0.01    Tue Dec 12 2017
+        - API contract { ... }
+        - API builder, some basic tests
+

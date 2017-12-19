@@ -1,0 +1,53 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::More' => '0.96',
+                                      'Test::Synopsis' => '0'
+                                    },
+                      'suggests' => {
+                                      'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
+                                      'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
+                                      'Dist::Zilla::Plugin::Git::Commit' => '2.020',
+                                      'Dist::Zilla::Plugin::Git::Tag' => '0',
+                                      'Dist::Zilla::Plugin::NextRelease' => '5.033',
+                                      'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'JSON::PP' => '0',
+                                   'List::Util' => '1.49',
+                                   'Path::Tiny' => '0',
+                                   'Test::FailWarnings' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'Test::NoWarnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

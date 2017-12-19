@@ -17,9 +17,13 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '1.012'
+    version: '1.100'
+recommends:
+  AnyEvent: '0'
 requires:
+  AnyEvent: '0'
   Carp: '0'
+  IO::Handle: '0'
   IO::Pipe: '0'
   IO::Select: '0'
   Moose: '0'
@@ -35,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '1.012'
+version: '1.100'
 x_serialization_backend: 'YAML::Tiny version 1.70'

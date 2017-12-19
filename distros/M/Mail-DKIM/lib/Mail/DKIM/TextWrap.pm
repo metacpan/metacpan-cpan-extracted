@@ -121,24 +121,23 @@ STDOUT is used.
 
 =cut
 
-sub new
-{
-	my $class = shift;
-	my %args = @_;
-	my $self = {
-		Margin => 72,
-		Break => qr/\s/,
-		BreakBefore => undef,
-		Swallow => qr/\s/,
-		Separator => "\n",
-		cur => 0,
-		may_break => 0,
-		soft_space => "",
-		word => "",
-		%args,
-	};
-	$self->{Output} ||= \*STDOUT;
-	return bless $self, $class;
+sub new {
+    my $class = shift;
+    my %args  = @_;
+    my $self  = {
+        Margin      => 72,
+        Break       => qr/\s/,
+        BreakBefore => undef,
+        Swallow     => qr/\s/,
+        Separator   => "\n",
+        cur         => 0,
+        may_break   => 0,
+        soft_space  => "",
+        word        => "",
+        %args,
+    };
+    $self->{Output} ||= \*STDOUT;
+    return bless $self, $class;
 }
 
 # Internal properties:
@@ -158,26 +157,22 @@ sub new
 #
 # my $new_cur = _calculate_new_column($cur, "some additional\ntext");
 #
-sub _calculate_new_column
-{
-	my ($cur, $text) = @_;
-	confess "invalid argument" unless defined($text);
+sub _calculate_new_column {
+    my ( $cur, $text ) = @_;
+    confess "invalid argument" unless defined($text);
 
-	while ($text =~ /^(.*?)([\n\r\t])(.*)$/s)
-	{
-		$cur += length($1);
-		if ($2 eq "\t")
-		{
-			$cur = (int($cur / 8) + 1) * 8;
-		}
-		else
-		{
-			$cur = 0;
-		}
-		$text = $3;
-	}
-	$cur += length($text);
-	return $cur;
+    while ( $text =~ /^(.*?)([\n\r\t])(.*)$/s ) {
+        $cur += length($1);
+        if ( $2 eq "\t" ) {
+            $cur = ( int( $cur / 8 ) + 1 ) * 8;
+        }
+        else {
+            $cur = 0;
+        }
+        $text = $3;
+    }
+    $cur += length($text);
+    return $cur;
 }
 
 =head1 METHODS
@@ -191,72 +186,68 @@ add() multiple times.
 
 =cut
 
-sub add
-{
-	my ($self, $text) = @_;
-	my $break_after = $self->{Break};
-	my $break_before = $self->{BreakBefore};
-	my $swallow = $self->{Swallow};
-	$self->{word} .= $text;
-	while (length $self->{word})
-	{
-		my $word;
-		if (defined($break_before) and $self->{word} =~ s/^(.+?)($break_before)/$2/s)
-		{
-			# note- $1 should have at least one character
-			$word = $1;
-		}
-		elsif (defined($break_after) and $self->{word} =~ s/^(.*?)($break_after)//s)
-		{
-			$word = $1 . $2;
-		}
-		elsif ($self->{NoBuffering})
-		{
-			$word = $self->{word};
-			$self->{word} = "";
-		}
-		else
-		{
-			last;
-		}
+sub add {
+    my ( $self, $text ) = @_;
+    my $break_after  = $self->{Break};
+    my $break_before = $self->{BreakBefore};
+    my $swallow      = $self->{Swallow};
+    $self->{word} .= $text;
+    while ( length $self->{word} ) {
+        my $word;
+        if ( defined($break_before)
+            and $self->{word} =~ s/^(.+?)($break_before)/$2/s )
+        {
+            # note- $1 should have at least one character
+            $word = $1;
+        }
+        elsif ( defined($break_after)
+            and $self->{word} =~ s/^(.*?)($break_after)//s )
+        {
+            $word = $1 . $2;
+        }
+        elsif ( $self->{NoBuffering} ) {
+            $word = $self->{word};
+            $self->{word} = "";
+        }
+        else {
+            last;
+        }
 
-		die "assertion failed" unless length($word) >= 1;
+        die "assertion failed" unless length($word) >= 1;
 
-		my $next_soft_space;
-		if (defined($swallow) && $word =~ s/($swallow)$//s)
-		{
-			$next_soft_space = $1;
-		}
-		else
-		{
-			$next_soft_space = "";
-		}
+        my $next_soft_space;
+        if ( defined($swallow) && $word =~ s/($swallow)$//s ) {
+            $next_soft_space = $1;
+        }
+        else {
+            $next_soft_space = "";
+        }
 
-		my $to_print = $self->{soft_space} . $word;
-		my $new_pos = _calculate_new_column($self->{cur}, $to_print);
+        my $to_print = $self->{soft_space} . $word;
+        my $new_pos = _calculate_new_column( $self->{cur}, $to_print );
 
-		if ($new_pos > $self->{Margin} && $self->{may_break})
-		{
-			# what would happen if we put the separator in?
-			my $w_sep = _calculate_new_column($self->{cur},
-					$self->{Separator});
-			if ($w_sep < $self->{cur})
-			{
-				# inserting the separator gives us more room,
-				# so do it
-				$self->output($self->{Separator});
-				$self->{soft_space} = "";
-				$self->{cur} = $w_sep;
-				$self->{word} = $word . $next_soft_space . $self->{word};
-				next;
-			}
-		}
+        if ( $new_pos > $self->{Margin} && $self->{may_break} ) {
 
-		$self->output($to_print);
-		$self->{soft_space} = $next_soft_space;
-		$self->{cur} = $new_pos;
-		$self->{may_break} = 1;
-	}
+            # what would happen if we put the separator in?
+            my $w_sep =
+              _calculate_new_column( $self->{cur}, $self->{Separator} );
+            if ( $w_sep < $self->{cur} ) {
+
+                # inserting the separator gives us more room,
+                # so do it
+                $self->output( $self->{Separator} );
+                $self->{soft_space} = "";
+                $self->{cur}        = $w_sep;
+                $self->{word}       = $word . $next_soft_space . $self->{word};
+                next;
+            }
+        }
+
+        $self->output($to_print);
+        $self->{soft_space} = $next_soft_space;
+        $self->{cur}        = $new_pos;
+        $self->{may_break}  = 1;
+    }
 }
 
 =head2 finish() - call when no more text is to be added
@@ -268,11 +259,10 @@ in TextWrap's buffers will be output.
 
 =cut
 
-sub finish
-{
-	my $self = shift;
-	$self->flush;
-	$self->reset;
+sub finish {
+    my $self = shift;
+    $self->flush;
+    $self->reset;
 }
 
 =head2 flush() - output the current partial word, if any
@@ -286,37 +276,32 @@ the current break pattern.
 
 =cut
 
-sub flush
-{
-	my $self = shift;
+sub flush {
+    my $self = shift;
 
-	local $self->{NoBuffering} = 1;
-	local $self->{Swallow} = undef;
-	$self->add("");
+    local $self->{NoBuffering} = 1;
+    local $self->{Swallow}     = undef;
+    $self->add("");
 }
 
-sub output
-{
-	my $self = shift;
-	my $to_print = shift;
+sub output {
+    my $self     = shift;
+    my $to_print = shift;
 
-	my $out = $self->{Output};
-	if (UNIVERSAL::isa($out, "GLOB"))
-	{
-		print $out $to_print;
-	}
-	elsif (UNIVERSAL::isa($out, "SCALAR"))
-	{
-		$$out .= $to_print;
-	}
+    my $out = $self->{Output};
+    if ( UNIVERSAL::isa( $out, "GLOB" ) ) {
+        print $out $to_print;
+    }
+    elsif ( UNIVERSAL::isa( $out, "SCALAR" ) ) {
+        $$out .= $to_print;
+    }
 }
 
-sub reset
-{
-	my $self = shift;
-	$self->{cur} = 0;
-	$self->{soft_space} = "";
-	$self->{word} = "";
+sub reset {
+    my $self = shift;
+    $self->{cur}        = 0;
+    $self->{soft_space} = "";
+    $self->{word}       = "";
 }
 
 1;

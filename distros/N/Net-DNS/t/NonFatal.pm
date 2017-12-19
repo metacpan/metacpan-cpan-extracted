@@ -1,4 +1,4 @@
-# $Id: NonFatal.pm 1381 2015-08-25 07:36:09Z willem $	-*-perl-*-
+# $Id: NonFatal.pm 1608 2017-12-07 10:10:38Z willem $	-*-perl-*-
 
 # Test::More calls functions from Test::Builder. Those functions all eventually
 # call Test::Builder::ok (on a builder instance) for reporting the status.
@@ -23,6 +23,15 @@ use Test::More;
 
 use constant NONFATAL => eval { -e 't/online.nonfatal' };
 
+my @failed;
+
+END {
+	my $n = scalar(@failed);
+	my $s = $n > 1 ? 's' : '';
+	diag( join "\n\t", "\tDisregarding $n failed sub-test$s", @failed ) if $n;
+}
+
+
 {
 	package Test::NonFatal;
 
@@ -31,11 +40,12 @@ use constant NONFATAL => eval { -e 't/online.nonfatal' };
 	sub ok {
 		my ( $self, $test, $name ) = ( @_, '' );
 
-		$name = "NOT OK, but tolerating failure, $name" unless $test;
+		return $self->SUPER::ok( 1, $name ) if $test;
 
-		$self->SUPER::ok( 1, $name );
+		$self->SUPER::ok( 1, "NOT OK, but tolerating failure, $name" );
 
-		return $test ? 1 : 0;
+		push @failed, $name;
+		return $test;
 	}
 }
 

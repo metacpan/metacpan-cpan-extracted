@@ -1,5 +1,11 @@
 Revision history for Perl extension Devel-Mockify
 
+0.10.3 2017-12-18T08:51:45Z
+    - merge PR from manwar
+
+0.10.2 2017-12-15T13:18:46Z
+    - fix Isse object matcher dont match [#20]
+
 0.10.1 2017-03-14T12:34:29Z
     - add method spy [#17]
     - fix issue typo in docu [#18]

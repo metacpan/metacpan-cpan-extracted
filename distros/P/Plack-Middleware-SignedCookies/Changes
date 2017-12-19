@@ -1,5 +1,21 @@
 Revision history for Plack-Middleware-SignedCookies
 
+1.202 Mon 18 Dec 2017
+	- Fix for another accidental 5.10-ism in the tests.
+	  No module code changes.
+
+1.201 Sun 17 Dec 2017
+	- Removal of microöptimsations that require 5.10
+
+1.200 Sat 16 Dec 2017
+	- Correct RFC 6265-compliant parsing and fingerprinting
+	- Easier-to-read formatting of signed cookie values
+	  (signature is now separated by a blank)
+	- Improved tests, using HTTP::Cookies instead of a bespoke parser
+	- Minimum perl version requirement drop to 5.6
+	- Various microöptimsations
+	- Packaging fixes
+
 1.103 Sat 10 Jan 2015
 	- No functional changes
 	- No longer contains INSTALL file with install-as-root instructions

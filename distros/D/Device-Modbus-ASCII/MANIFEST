@@ -1,0 +1,13 @@
+Changes
+lib/Device/Modbus/ASCII.pm
+lib/Device/Modbus/ASCII/ADU.pm
+lib/Device/Modbus/ASCII/Client.pm
+lib/Device/Modbus/Serial.pm
+Makefile.PL
+MANIFEST
+README
+t/ADU-lcr.t
+t/client_ascii.t
+t/lib/Device/SerialPort.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

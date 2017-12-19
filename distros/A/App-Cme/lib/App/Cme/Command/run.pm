@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.024';
+$App::Cme::Command::run::VERSION = '1.025';
 use strict;
 use warnings;
 use 5.10.1;
@@ -43,6 +43,7 @@ sub opt_spec {
         [ "arg=s@"  => "script argument. run 'cme run $app -doc' for possible arguments" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "commit|c:s" => "commit change with passed message" ],
+        [ "cat" => "Show the script file" ],
         [ "no-commit|nc!" => "skip commit to git" ],
         [ "quiet!"  => "Suppress progress messages" ],
         [ "doc!"    => "show documention of script" ],
@@ -105,6 +106,11 @@ sub execute {
     die "Error: cannot find script $script_name\n" unless $script->is_file;
 
     my $content = $script->slurp_utf8;
+
+    if ($opt->{cat}) {
+        print $content;
+        return;
+    }
 
     # parse variables passed on command line
     my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
@@ -187,6 +193,7 @@ sub execute {
 
     if ($opt->doc) {
         say join "\n", @doc;
+        say "will commit with message: '$commit_msg'" if $commit_msg;
         return;
     }
 
@@ -221,7 +228,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.024';
+$App::Cme::Run::Var::VERSION = '1.025';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -248,7 +255,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -404,6 +411,10 @@ Arguments for the cme scripts which are used to substitute variables.
 
 Show the script documentation. (Note that C<--help> options show the
 documentation of C<cme run> command)
+
+=head2 cat
+
+Pop the hood and show the content of the script.
 
 =head2 commit
 

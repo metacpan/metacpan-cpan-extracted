@@ -1,5 +1,5 @@
 package Verilog::VCD::Writer::Symbol;
-$Verilog::VCD::Writer::Symbol::VERSION = '0.002';
+$Verilog::VCD::Writer::Symbol::VERSION = '0.004';
 # ABSTRACT: Signal name to symbol mapper. Private class nothing to see here.
 use Math::BaseCalc;
 
@@ -45,7 +45,7 @@ Verilog::VCD::Writer::Symbol - Signal name to symbol mapper. Private class nothi
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

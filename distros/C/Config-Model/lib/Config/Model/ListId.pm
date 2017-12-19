@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ListId;
-$Config::Model::ListId::VERSION = '2.114';
+$Config::Model::ListId::VERSION = '2.116';
 use 5.10.1;
 use Mouse;
 
@@ -366,11 +366,15 @@ sub _assert_leaf_cargo {
     ) unless $ct eq 'leaf';
 }
 
+sub sort_algorithm {
+    return sub { $_[0]->fetch cmp $_[1]->fetch; };
+}
+
 sub sort {
     my $self = shift;
 
     $self->_assert_leaf_cargo;
-    $self->_sort_data( sub { $_[0]->fetch cmp $_[1]->fetch; } );
+    $self->_sort_data( $self->sort_algorithm );
 
     my $has_changed = $self->_reindex;
     $self->notify_change( note => "sorted" ) if $has_changed;
@@ -505,7 +509,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 
@@ -648,6 +652,12 @@ For instance
    $elt->load_data( data => 'foo,bar', split_reg => qr(,) ) ;
 
 loads C< [ 'foo','bar']> in C<$elt>
+
+=head2 sort_algorithm
+
+Returns a sub used to sort the list elements. See
+L<perlfunc/sort>. Used only for list of leaves. This method can be
+overridden to alter sort order.
 
 =head1 AUTHOR
 

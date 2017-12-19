@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 my %configure_requires = (
+    'ExtUtils::MakeMaker' => '0',
     'Module::Build::Tiny' => '0.034',
 );
 
@@ -77,6 +78,7 @@ EOW
 
     my %module_build_args = (
       "configure_requires" => {
+        "ExtUtils::MakeMaker" => 0,
         "Module::Build::Tiny" => "0.034",
         "perl" => "5.010"
       },
@@ -85,12 +87,13 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-PluginBundle-Git-VersionManager",
-      "dist_version" => "0.002",
+      "dist_version" => "0.003",
       "license" => "perl",
       "module_name" => "Dist::Zilla::PluginBundle::Git::VersionManager",
       "recursive_test_files" => 1,
       "requires" => {
         "CPAN::Meta::Requirements" => 0,
+        "Dist::Zilla::Plugin::BumpVersionAfterRelease" => "0.016",
         "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004",
         "Dist::Zilla::Plugin::CopyFilesFromRelease" => 0,
         "Dist::Zilla::Plugin::Git::Commit" => "2.020",
@@ -99,6 +102,7 @@ EOW
         "Dist::Zilla::Plugin::NextRelease" => "5.033",
         "Dist::Zilla::Plugin::Prereqs" => 0,
         "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004",
+        "Dist::Zilla::Plugin::VersionFromMainModule" => "0.03",
         "Dist::Zilla::Role::FileMunger" => 0,
         "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
         "Dist::Zilla::Role::PluginBundle::Easy" => 0,

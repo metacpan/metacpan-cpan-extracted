@@ -14,8 +14,8 @@ build_requires:
   Test::Trap: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,6 +34,8 @@ requires:
   JSON: '0'
   POSIX: '0'
   String::Random: '0'
-  Term::ReadPassword: '0'
-  Term::ReadPassword::Win32: '0'
-version: '1.20151002'
+  Term::ANSIColor: '0'
+  Text::QRCode: '0'
+  URL::Encode: '0'
+version: '1.20171216'
+x_serialization_backend: 'YAML::Tiny version 1.70'

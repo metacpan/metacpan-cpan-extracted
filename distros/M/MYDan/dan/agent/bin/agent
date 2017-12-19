@@ -13,6 +13,8 @@ use MYDan::Util::OptConf;
 
 $MYDan::Util::OptConf::THIS = 'agent';
 
+$0 = 'mydan.agent';
+
 my %o = MYDan::Util::OptConf->load()->dump();
 MYDan::Agent->new( $o{path} )->run();
 exit 1;

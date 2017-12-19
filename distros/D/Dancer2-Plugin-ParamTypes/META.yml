@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,11 +23,13 @@ name: Dancer2-Plugin-ParamTypes
 provides:
   Dancer2::Plugin::ParamTypes:
     file: lib/Dancer2/Plugin/ParamTypes.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Dancer2: '0'
+  Ref::Util: '0'
+  constant: '0'
 resources:
   bugtracker: https://github.com/xsawyerx/dancer2-plugin-paramtypes/issues
   repository: git://github.com/xsawyerx/dancer2-plugin-paramtypes.git
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.004'
+x_serialization_backend: 'YAML::Tiny version 1.70'

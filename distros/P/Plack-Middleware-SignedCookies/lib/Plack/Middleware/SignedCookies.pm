@@ -1,9 +1,7 @@
-use 5.010;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Plack::Middleware::SignedCookies;
-$Plack::Middleware::SignedCookies::VERSION = '1.103';
+$Plack::Middleware::SignedCookies::VERSION = '1.202';
 # ABSTRACT: accept only server-minted cookies
 
 use parent 'Plack::Middleware';
@@ -12,40 +10,42 @@ use Plack::Util ();
 use Plack::Util::Accessor qw( secret secure httponly );
 use Digest::SHA ();
 
-sub _hmac { y{+/}{-~}, return $_ for Digest::SHA::hmac_sha256_base64( @_[0,1] ) }
+sub _hmac { y{+/}{-~}, return $_ for &Digest::SHA::hmac_sha256_base64 }
 
 my $length = length _hmac 'something', 'something';
 
 sub call {
-	my $self = shift;
-	my $env  = shift;
+	my ( $self, $env ) = ( shift, @_ );
 
-	my $secure   = $self->secure   // do { $self->secure  ( 0 ) };
-	my $httponly = $self->httponly // do { $self->httponly( 1 ) };
-	my $secret   = $self->secret
-		// do { $self->secret( join '', map { chr int rand 256 } 1..17 ) };
+	my $secret = $self->secret;
 
-	my $cookie =
+	local $env->{'HTTP_COOKIE'} =
 		join '; ',
-		grep { s/(.{$length})\z//o and $1 eq _hmac $_, $secret }
-		split /\s*[;,]\s*/,
-		$env->{'HTTP_COOKIE'} // '';
+		grep { s/[ \t]*=[ \t]*/=/; s/[ \t]*([-~A-Za-z0-9]{$length})\z//o and $1 eq _hmac $_, $secret }
+		map  { defined && /\A[ \t]*(.*[^ \t])/s ? split /[ \t]*;[ \t]*/, "$1" : () }
+		$env->{'HTTP_COOKIE'};
 
-	length $cookie
-		? local $env->{'HTTP_COOKIE'} = $cookie
-		: delete local $env->{'HTTP_COOKIE'};
+	delete $env->{'HTTP_COOKIE'} if '' eq $env->{'HTTP_COOKIE'};
 
 	return Plack::Util::response_cb( $self->app->( $env ), sub {
-		my ( $i, $headers ) = ( 0, $_[0][1] );
-		while ( $i < $#$headers ) {
-			++$i, next if 'set-cookie' ne lc $headers->[$i++];
-			for ( $headers->[$i++] ) {
-				s!\A\s*([^;]+?)\K\s*(?=;|\z)!_hmac $1, $secret!e;
-				$_ .= '; secure'   if $secure   and not /;\s* secure   \s* (?:;|\z)/ix;
-				$_ .= '; HTTPonly' if $httponly and not /;\s* httponly \s* (?:;|\z)/ix;
+		my $do_sign;
+		for ( @{ $_[0][1] } ) {
+			if ( $do_sign ) {
+				my $flags = s/(;.*)//s ? $1 : '';
+				s/\A[ \t]+//, s/[ \t]+\z//, s/[ \t]*=[ \t]*|\z/=/; # normalise
+				$_ .= ' ' . _hmac( $_, $secret ) . $flags;
+				$_ .= '; secure'   if $self->secure   and $flags !~ /;[ \t]* secure   [ \t]* (?![^;])/ix;
+				$_ .= '; HTTPonly' if $self->httponly and $flags !~ /;[ \t]* httponly [ \t]* (?![^;])/ix;
 			}
+			$do_sign = defined $do_sign ? undef : 'set-cookie' eq lc;
 		}
 	} );
+}
+
+sub prepare_app {
+	my $self = shift;
+	defined $self->httponly or $self->httponly( 1 );
+	defined $self->secret   or $self->secret  ( join '', map { chr int rand 256 } 1..17 );
 }
 
 1;
@@ -62,7 +62,7 @@ Plack::Middleware::SignedCookies - accept only server-minted cookies
 
 =head1 VERSION
 
-version 1.103
+version 1.202
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,21 @@ B<Defaults to true.> Provide a defined false value if you wish to override this.
 
 =back
 
+=head1 A NOTE ON EXPIRATION
+
+Several other modules that offer similar functionality will also handle server-side cookie expiration.
+This is obviously useful for centralising all cookie policy in one place.
+
+However, expiration is quite likely to be a concern at the application level,
+if only just to tell a user that they timed out rather than just suddenly forgetting them.
+Communicating server-side expiration from the middleware to the application requires a protocol.
+No standard protocol exists for this purpose, so it would have to be specific to this middleware.
+
+But middlewares are most useful when they can be added or removed without modifying the application.
+(Frameworks, in contrast, require tight coupling of the application by definition,
+thus making it a reasonable choice to include cookie expiration plus interface in a framework.)
+Therefore, it was an explicit design choice for this middleware to omit expiration handling.
+
 =head1 SEE ALSO
 
 =over 4
@@ -126,7 +141,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Aristotle Pagaltzis.
+This software is copyright (c) 2017 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

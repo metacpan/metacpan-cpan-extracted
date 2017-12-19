@@ -1,5 +1,23 @@
 Revision history for Perl extension Getopt-EX
 
+v1.4.2 2017-12-16T07:38:27Z
+
+    Colormap.pm
+    - Copy {EL} sequence to ending RESET, to keep the effect on multiple lines.
+    - Improve Colormap.pm and write test.
+
+v1.4.1 2017-12-14T18:05:54Z
+
+    - [Loader.pm] Add config option PARSE_MODULE_OPT and IGNORE_NO_MODULE.
+    - [Colormap.pm] Support generic ANSI CSI sequence in the form of "{NAME}".
+
+v1.3.1 2017-12-12T15:05:01Z
+
+    - [Colormap.pm] Add E effect char to erase line.
+    - [Colormap.pm] Support more flexible ANSI RESET.
+    - [Loader.pm] More portable error handling.
+    - [Module.pm] Support alternate names for builtin options.
+
 v1.2.1 2017-11-16T11:07:06Z
 
     Most of these changes are made to implement `optex' command.

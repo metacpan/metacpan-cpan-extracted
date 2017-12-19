@@ -2,6 +2,8 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'Devel::CheckBin' => '0',
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.03',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.010'
                                       }
@@ -12,6 +14,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Dist::Zilla::Plugin::BlockRelease' => '0',
+                                      'Encode' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',

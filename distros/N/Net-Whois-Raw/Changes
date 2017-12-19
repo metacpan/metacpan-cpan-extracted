@@ -1,5 +1,11 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99013  Dec 13 2017 Alexander Nalobin
+    - Added "notfound" and "strip" patterns for whois.registry.ripn.net
+
+2.99012  Dec 11 2017 Vadim Likhota
+    - update notfound data and whois servers for some tlds
+
 2.99011  Nov 23 2017 Alexander Nalobin
     - Skip urls as recursive whois servers
 
@@ -7,7 +13,7 @@ Revision history for Perl module Net::Whois::Raw.
     - CI regexp in recursive whois server match
 
 2.99009  Jun 24 2017 Gregory Oschwald
-    - Do not warn if newsrv is undefined 
+    - Do not warn if newsrv is undefined
 
 2.99008  Jun 7 2017 Alexander Nalobin
     - can bypass recursing to custom servers ($Net::Whois::Raw::Data::whois_servers_no_recurse)

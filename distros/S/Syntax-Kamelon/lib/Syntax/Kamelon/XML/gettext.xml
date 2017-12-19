@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<!--
-  This file is part of KDE's kate project.
-
-  Copyright 2004, Dominik Haumann <dhdev@gmx.de>
-  Copyright 2008, Chusslove Illich <caslav.ilic@gmx.net>
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
-
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA  02110-1301, USA.
- -->
-<language name="GNU Gettext" version="4" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhdev@gmx.de)" license="LGPLv2+">
+<language name="GNU Gettext" version="5" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
   <highlighting>
 
     <contexts>
@@ -150,36 +129,37 @@
     </contexts>
 
     <itemDatas>
+<!--		 Adapted to work with Syntax::Kamelon-->
       <itemData name = "Normal Text" defStyleNum ="dsNormal"/>
       <itemData name = "Keyword" defStyleNum ="dsKeyword"/>
-		<itemData name = "KeywordPrevious" defStyleNum ="dsFunction" italic="true" color="#006060"/>
+		<itemData name = "KeywordPrevious" defStyleNum ="dsOperator" italic="true" color="#006060"/>
       <itemData name = "String" defStyleNum ="dsString"/>
-		<itemData name = "StringPrevious" defStyleNum ="dsSpecialString" italic="true" color="#008080"/>
+		<itemData name = "StringPrevious" defStyleNum ="dsSpecialChar" italic="true" color="#008080"/>
       <itemData name = "Translator Comment" defStyleNum ="dsComment" color="#888888"/>
-		<itemData name = "Automatic Comment" defStyleNum ="dsInformation" color="#0000ff"/>
-		<itemData name = "Reference" defStyleNum ="dsDocumentation" color="#0000ff"/>
-		<itemData name = "Flag" defStyleNum ="dsRegionMarker" color="#0000ff"/>
-		<itemData name = "FlagFuzzy" defStyleNum ="dsVariable" color="#800080" bold="true"/>
+		<itemData name = "Automatic Comment" defStyleNum ="dsCommentVar" color="#0000ff"/>
+		<itemData name = "Reference" defStyleNum ="dsBaseN" color="#0000ff"/>
+		<itemData name = "Flag" defStyleNum ="dsBuiltIn" color="#0000ff"/>
+		<itemData name = "FlagFuzzy" defStyleNum ="dsConstant" color="#800080" bold="true"/>
       <itemData name = "Char" defStyleNum ="dsChar" color="#ff00ff"/>
-		<itemData name = "CharPrevious" defStyleNum ="dsSpecialChar" italic="true" color="#00c040"/>
-		<itemData name = "Entity" defStyleNum ="dsBaseN" color="#ff0040" bold="true"/>
-		<itemData name = "EntityPrevious" defStyleNum ="dsConstant" color="#40c080" bold="true" italic="true"/>
-		<itemData name = "StringTag" defStyleNum ="dsFloat" color="#c00000" bold="true"/>
-		<itemData name = "StringTagPrevious" defStyleNum ="dsDataType" color="#006060" bold="true" italic="true"/>
+		<itemData name = "CharPrevious" defStyleNum ="dsVariable" italic="true" color="#00c040"/>
+		<itemData name = "Entity" defStyleNum ="dsSpecialString" color="#ff0040" bold="true"/>
+		<itemData name = "EntityPrevious" defStyleNum ="dsVerbatimString" color="#40c080" bold="true" italic="true"/>
+		<itemData name = "StringTag" defStyleNum ="dsBuiltIn" color="#c00000" bold="true"/>
+		<itemData name = "StringTagPrevious" defStyleNum ="dsFloat" color="#006060" bold="true" italic="true"/>
       <itemData name = "Index" defStyleNum ="dsDecVal" color="#0000ff"/>
-		<itemData name = "IndexPrevious" defStyleNum ="dsVerbatimString" italic="true" color="#000000"/>
-      <itemData name = "StringDiffNewWrap" defStyleNum ="dsString" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrap" defStyleNum ="dsString" color="#f00080"/>
-      <itemData name = "StringDiffNew" defStyleNum ="dsString" underline="true" color="#0080f8"/>
-      <itemData name = "StringDiffOld" defStyleNum ="dsString" underline="true" color="#f00080"/>
-      <itemData name = "StringDiffNewWrapComment" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrapComment" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewComment" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldComment" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewWrapPrevious" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrapPrevious" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewPrevious" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldPrevious" defStyleNum ="dsString" italic="true" color="#f00080"/>
+		<itemData name = "IndexPrevious" defStyleNum ="dsDataType" italic="true" color="#000000"/>
+		<itemData name = "StringDiffNewWrap" defStyleNum ="dsOperator" color="#0080f8"/>
+		<itemData name = "StringDiffOldWrap" defStyleNum ="dsAttribute" color="#f00080"/>
+		<itemData name = "StringDiffNew" defStyleNum ="dsPreprocessor" underline="true" color="#0080f8"/>
+		<itemData name = "StringDiffOld" defStyleNum ="dsRegionMarker" underline="true" color="#f00080"/>
+		<itemData name = "StringDiffNewWrapComment" defStyleNum ="dsDocumentation" italic="true" color="#0080f8"/>
+		<itemData name = "StringDiffOldWrapComment" defStyleNum ="dsInformation" italic="true" color="#f00080"/>
+		<itemData name = "StringDiffNewComment" defStyleNum ="dsControlFlow" italic="true" color="#0080f8"/>
+		<itemData name = "StringDiffOldComment" defStyleNum ="dsCommentVar" italic="true" color="#f00080"/>
+		<itemData name = "StringDiffNewWrapPrevious" defStyleNum ="dsAnnotation" italic="true" color="#0080f8"/>
+		<itemData name = "StringDiffOldWrapPrevious" defStyleNum ="dsDocumentation" italic="true" color="#f00080"/>
+		<itemData name = "StringDiffNewPrevious" defStyleNum ="dsFunction" italic="true" color="#0080f8"/>
+		<itemData name = "StringDiffOldPrevious" defStyleNum ="dsOthers" italic="true" color="#f00080"/>
     </itemDatas>
   </highlighting>
   <general>

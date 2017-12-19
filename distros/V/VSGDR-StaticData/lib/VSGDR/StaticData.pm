@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 
 sub databaseName {
@@ -769,13 +769,14 @@ select  Column_name
 ,       data_type
 ,       case when character_maximum_length is not null then '('+ case when character_maximum_length = -1 then 'max' else cast(character_maximum_length as varchar(10)) end+')' else '' end 
         as datasize
-,       case	when lower(Data_type) = 'float'
+,       isnull(case	when lower(Data_type) = 'float'
 				then '('+cast(Numeric_precision as varchar(10))+')' 
 				when lower(Data_type) not like '%int%' and Numeric_precision is not null 
 				then '('+cast(Numeric_precision as varchar(10))+','+cast(Numeric_scale as varchar(10))+')' 
 				else '' 
 				end 
-        as dataprecision
+				,'')
+                as dataprecision
 ,       case when DATABASEPROPERTYEX(db_name(), 'Collation') != collation_name then 'collate ' + collation_name else '' end 
         as collation
 ,       case when LOWER(IS_NULLABLE) = 'no' then 'not null' else 'null' end

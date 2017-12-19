@@ -1,5 +1,8 @@
 Revision history for Druid
 
+0.002   2017-09-17
+        Initial release with implementation for Timeseries, topN & groupBy queries
+
 0.001   2017-04-19
         First version, released on an unsuspecting world.
 

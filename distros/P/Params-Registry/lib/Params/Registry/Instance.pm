@@ -21,11 +21,11 @@ Params::Registry::Instance - An instance of registered parameters
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has _registry => (
     is       => 'ro',
@@ -102,13 +102,17 @@ sub get {
     my $content = $self->_content;
     return $content->{$key} if exists $content->{$key};
 
+    # otherwise...
+
     my $t = $self->_registry->template($key);
     my %c = map { $_ => 1 } $self->keys;
     my $c = scalar grep { $c{$_} } $t->conflicts;
 
     if (!$c and my $d = $t->default) {
-        my $val = $d->($t);
+        # call the default with both the template *and* the instance
+        my $val = $d->($t, $self);
 
+        # this is me being clever
         my $c = $t->composite;
         if ($c = $c->coercion) {
             return $c->coerce($val);
@@ -452,14 +456,19 @@ my %TYPES = (
                 next;
             }
             elsif ($closed and $min > $ninf and $max < $inf) {
-                $rec{-between} = [$min, $max];
+                if ($min == $max) {
+                    push @ranges, $min;
+                }
+                else {
+                    $rec{-between} = [$min, $max];
+                }
             }
             else {
                 $rec{$mop} = $min + 0 unless $min == $ninf;
                 $rec{$xop} = $max + 0 unless $max == $inf;
             }
 
-            push @ranges, \%rec;
+            push @ranges, \%rec if keys %rec;
 
             ($span, $tail) = $tail ? $tail->first : ();
         } while ($span);
@@ -577,6 +586,8 @@ sub as_string {
     # for sets/composites, check if displaying '&complement=key' is
     # shorter than just displaying the contents of the set
     # (e.g. &key=val&key=val&key=val... it almost certainly will be).
+
+    # XXX we *also* need to handle escaping
 
     return join '&', map { my $x = $_->[0]; map { "$x=$_" } @{$_->[1]} } @out;
 }

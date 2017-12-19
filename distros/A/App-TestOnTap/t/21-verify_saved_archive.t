@@ -46,15 +46,17 @@ my $expected_tree =
 	[
 		qw
 			(
-				env.json
-				meta.json
-				private/
-				result/
-				result/t.pl.json
-				summary.json
-				tap/
-				tap/t.pl.tap
-				testinfo.json
+				suite/
+				suite/persist
+				testontap/
+				testontap/env.json
+				testontap/meta.json
+				testontap/result/
+				testontap/result/t.pl.json
+				testontap/summary.json
+				testontap/tap/
+				testontap/tap/t.pl.tap
+				testontap/testinfo.json
 			)
 	];
 

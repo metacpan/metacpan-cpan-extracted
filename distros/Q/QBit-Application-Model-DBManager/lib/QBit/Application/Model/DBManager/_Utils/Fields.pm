@@ -1,5 +1,5 @@
 package QBit::Application::Model::DBManager::_Utils::Fields;
-$QBit::Application::Model::DBManager::_Utils::Fields::VERSION = '0.018';
+$QBit::Application::Model::DBManager::_Utils::Fields::VERSION = '0.019';
 use qbit;
 
 use base qw(QBit::Class);

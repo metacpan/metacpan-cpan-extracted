@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use List::Util qw( max );
 
@@ -341,7 +341,7 @@ sub run
       my $sv = $av->elem( $idx );
       push @rows, [
          "  " . Devel::MAT::Cmd->format_value( $idx, index => 1 ),
-         $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL",
+         $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
       ];
    }
 
@@ -428,7 +428,7 @@ sub run
       push @rows, [
          "  " . Devel::MAT::Cmd->format_value( $key, key => 1,
                stash => ( $type eq "STASH" ) ),
-         $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL",
+         $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
       ];
       $count++;
    }

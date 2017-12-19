@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.34';
+our $VERSION = '0.36';
 
 use AnyEvent::Stomper;
 use AnyEvent::Stomper::Error;

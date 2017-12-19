@@ -1,4 +1,8 @@
 
+1.20171216 2017-12-16 Australia/Melbourne
+
+ - Allow display of raw OATH codes for migration
+
 1.20151002 2015-10-02 Australia/Melbourne
 
  - Add a lock file to avoid race conditions

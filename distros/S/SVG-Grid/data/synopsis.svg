@@ -28,17 +28,17 @@
 	<text id="note_212_188" style="fill-opacity: 0; font: Arial; font-size: 14; font-weight: normal; stroke: rgb(  0,   0, 255); stroke-width: 1" x="212" y="188">3</text>
 	<line id="grid_y_200" style="fill-opacity: 0; font: Arial; font-size: 14; font-weight: normal; stroke: blue; stroke-width: 1" x1="40" x2="239" y1="200" y2="200" />
 	<line id="grid_y_240" style="fill-opacity: 0; font: Arial; font-size: 14; font-weight: normal; stroke: blue; stroke-width: 1" x1="40" x2="239" y1="240" y2="240" />
-	<a id="anchor_1_2" xlink:href="http://savage.net.au/Flowers/Chorizema.cordatum.html" xlink:title="MouseOver® an image">
+	<a id="anchor_1_2" xlink:href="http://savage.net.au/Flowers/Chorizema.cordatum.html" xlink:show="new" xlink:title="MouseOver® an image">
 		<image height="40" id="image_1_2" width="40" x="80" xlink:href="http://savage.net.au/Flowers/images/Chorizema.cordatum.0.jpg" y="120" />
 	</a>
-	<a id="anchor_2_3" xlink:href="http://savage.net.au/Flowers/Alyogyne.huegelii.html" xlink:title="MouseOver™ a rectangle">
+	<a id="anchor_2_3" xlink:href="http://savage.net.au/Flowers/Alyogyne.huegelii.html" xlink:show="new" xlink:title="MouseOver™ a rectangle">
 		<rect fill="rgb(205, 92, 92)" fill-opacity="0.5" height="40" id="rectangle_2_3" stroke="rgb(105, 105, 105)" stroke-width="1" width="40" x="120" y="160" />
 	</a>
-	<a id="anchor_3_1" xlink:href="http://savage.net.au/Flowers/Aquilegia.McKana.html" xlink:title="MouseOvér some text">
+	<a id="anchor_3_1" xlink:href="http://savage.net.au/Flowers/Aquilegia.McKana.html" xlink:show="new" xlink:title="MouseOvér some text">
 		<text id="text_3_1" style="fill-opacity: 0; font: Arial; font-size: 14; font-weight: normal; stroke: rgb(255, 0, 0); stroke-width: 1" x="167" y="101">3,1</text>
 	</a>
 	<!-- 
-	Generated using the Perl SVG Module V2.78
+	Generated using the Perl SVG Module V2.80
 	by Ronan Oger
 	Info: http://www.roitsystems.com/
  -->

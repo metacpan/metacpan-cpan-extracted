@@ -28,8 +28,8 @@ plan tests => scalar @modules;
 my %trustme = ();
 
 my @also_private = (
-                  qr/(?^x:\A (?: BUILD(?:ARGS)? | DEMOLISH ) \z)/,
-                  qr/(?^u:^BUILD$)/
+                  qr/\A (?: BUILD(?:ARGS)? | DEMOLISH ) \z/x,
+                  qr/^BUILD$/u
                 );
 
 for my $module ( sort @modules ) {

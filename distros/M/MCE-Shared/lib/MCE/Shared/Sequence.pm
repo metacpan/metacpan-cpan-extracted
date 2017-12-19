@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.833';
+our $VERSION = '1.834';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -126,7 +126,7 @@ sub next {
 
       if ( $chunk_size == 1 || $begv == $endv ) {
          $seqn = _sprintf( "%$fmt", $seqn ) if ( defined $fmt );
-         return ( $bounds_only ) ? ( $seqn, $seqn ) : $seqn;
+         return ( $bounds_only ) ? ( $seqn, $seqn, $iter ) : $seqn;
       }
 
       if ( $bounds_only ) {
@@ -165,7 +165,7 @@ sub next {
 
          return ( defined $fmt )
             ? ( _sprintf("%$fmt",$seqb), _sprintf("%$fmt",$seqe) )
-            : ( $seqb, $seqe );
+            : ( $seqb, $seqe, $iter );
       }
 
       my @n;
@@ -230,7 +230,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.833
+This document describes MCE::Shared::Sequence version 1.834
 
 =head1 DESCRIPTION
 
@@ -312,9 +312,9 @@ boundaries only).
  use MCE::Shared;
 
  # demo 1
+
  $seq1 = MCE::Shared->sequence(
-    { chunk_size => 10, bounds_only => 0 },
-    1, 20
+    { chunk_size => 10, bounds_only => 0 }, 1, 20
  );
 
  # @chunk = $seq1->next;  # ( qw/  1  2  3  4  5  6  7  8  9 10 / )
@@ -325,9 +325,9 @@ boundaries only).
  }
 
  # demo 2
+
  $seq2 = MCE::Shared->sequence(
-    { chunk_size => 10, bounds_only => 1 },
-    1, 100
+    { chunk_size => 10, bounds_only => 1 }, 1, 100
  );
 
  # ( $beg, $end ) = $seq2->next;  # (  1,  10 )
@@ -337,7 +337,11 @@ boundaries only).
  # ( $beg, $end ) = $seq2->next;  # ( 81,  90 )
  # ( $beg, $end ) = $seq2->next;  # ( 91, 100 )
 
- while ( my ( $beg, $end ) = $seq2->next ) {
+ # The optional chunk_id value, starting at 1, applies to sequence
+ # objects configured with the bounds_only option set to a true
+ # value. API available since 1.834.
+
+ while ( my ( $beg, $end, $chunk_id ) = $seq2->next ) {
     for my $i ( $beg .. $end ) {
        ...
     }
@@ -380,6 +384,7 @@ the computed C<begin> value exceeds the value held by C<end>.
  }
 
  # chunking
+
  $seq = MCE::Shared->sequence(
     { chunk_size => 10 }, 1, 100
  );
@@ -389,11 +394,12 @@ the computed C<begin> value exceeds the value held by C<end>.
  }
 
  # chunking, boundaries only
+
  $seq = MCE::Shared->sequence(
     { chunk_size => 10, bounds_only => 1 }, 1, 100
  );
 
- while ( my ( $beg, $end ) = $seq->next ) {
+ while ( my ( $beg, $end, $chunk_id ) = $seq->next ) {
     for my $i ( $beg .. $end ) {
        ...
     }

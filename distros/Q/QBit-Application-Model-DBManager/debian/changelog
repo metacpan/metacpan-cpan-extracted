@@ -1,3 +1,9 @@
+libqbit-application-model-dbmanager-perl (0.019) raring; urgency=low
+
+  * fix filter
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 16 Dec 2017 14:38:19 +0300
+
 libqbit-application-model-dbmanager-perl (0.018) raring; urgency=low
 
   * use '*' as all fields

@@ -1,9 +1,9 @@
 package Net::DNS::Domain;
 
 #
-# $Id: Domain.pm 1603 2017-10-17 14:45:45Z willem $
+# $Id: Domain.pm 1605 2017-11-27 11:37:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1603 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
 
 
 =head1 NAME
@@ -399,7 +399,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::LibIDN>, L<Net::DNS>, RFC1034, RFC1035, RFC5891,
+L<perl>, L<Net::LibIDN2>, L<Net::DNS>, RFC1034, RFC1035, RFC5891,
 Unicode Technical Report #16
 
 =cut

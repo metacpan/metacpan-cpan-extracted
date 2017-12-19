@@ -22,7 +22,7 @@ BEGIN {
     eval { require JSON::XS, 1; }
       || _croak('JSON::XS package not found');
 }
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # singleton and accessor
 {

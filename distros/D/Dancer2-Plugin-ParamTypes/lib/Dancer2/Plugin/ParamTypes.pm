@@ -1,14 +1,19 @@
 package Dancer2::Plugin::ParamTypes;
 # ABSTRACT: Parameter type checking plugin for Dancer2
-$Dancer2::Plugin::ParamTypes::VERSION = '0.003';
+$Dancer2::Plugin::ParamTypes::VERSION = '0.004';
 use strict;
 use warnings;
+use constant {
+    'ARGS_NUM_BASIC'    => 3,
+    'ARGS_NUM_OPTIONAL' => 4,
+    'HTTP_BAD_REQUEST'  => 400,
+};
 
 use Carp ();
 use Dancer2::Plugin;
 use Scalar::Util ();
+use Ref::Util qw< is_ref is_arrayref >;
 
-## no critic qw(Subroutines::ProhibitCallsToUndeclaredSubs)
 plugin_keywords(qw<register_type_check register_type_action with_types>);
 
 has 'type_checks' => (
@@ -29,7 +34,10 @@ sub _build_type_actions {
             my ( $self, $details ) = @_;
             my ( $type, $name )    = @{$details}{qw<type name>};
 
-            $plugin->dsl->send_error( "Parameter $name must be $type", 400 );
+            $plugin->dsl->send_error(
+                "Parameter $name must be $type",
+                HTTP_BAD_REQUEST(),
+            );
         },
 
         'missing' => sub {
@@ -38,7 +46,7 @@ sub _build_type_actions {
 
             $self->dsl->send_error(
                 "Missing parameter: $name ($type)",
-                400,
+                HTTP_BAD_REQUEST(),
             );
         },
     };
@@ -60,29 +68,30 @@ sub with_types {
     my ( $self, $full_type_details, $cb ) = @_;
     my %params_to_check;
 
-    ref $full_type_details eq 'ARRAY'
+    is_arrayref($full_type_details)
         or Carp::croak('Input for with_types must be arrayref');
 
+    ## no critic qw(ControlStructures::ProhibitCStyleForLoops)
     for ( my $idx = 0; $idx <= $#{$full_type_details}; $idx++ ) {
         my $item = $full_type_details->[$idx];
         my ( $is_optional, $type_details )
-            = ref $item eq 'ARRAY' ? ( 0, $item )
+            = is_arrayref($item)   ? ( 0, $item )
             : $item eq 'optional'  ? ( 1, $full_type_details->[ ++$idx ] )
             : Carp::croak("Unsupported type option: $item");
 
         my ( $sources, $name, $type, $action ) = @{$type_details};
 
-        @{$type_details} == 4 || @{$type_details} == 3
+        @{$type_details} == ARGS_NUM_BASIC() ||
+        @{$type_details} == ARGS_NUM_OPTIONAL()
             or Carp::croak("Incorrect number of elements for type ($name)");
 
         # default action
         defined $action && length $action
             or $action = 'error';
 
-        if ( ref $sources ) {
-            my $src_ref = ref $sources;
-            $src_ref eq 'ARRAY'
-                or Carp::croak("Source cannot be of $src_ref");
+        if ( is_ref($sources) ) {
+            is_arrayref($sources)
+                or Carp::croak("Source cannot be of @{[ ref $sources ]}");
 
             @{$sources} > 0
                 or Carp::croak('You must provide at least one source');
@@ -132,7 +141,7 @@ sub with_types {
         # Only check if anything was supplied
         foreach my $source ( keys %params_to_check ) {
             foreach my $name ( keys %{ $params_to_check{$source} } ) {
-                my @sources = split /:/, $source;
+                my @sources = split /:/xms, $source;
                 my $details = $params_to_check{$source}{$name};
 
                 if ( @sources == 1 ) {
@@ -213,7 +222,7 @@ Dancer2::Plugin::ParamTypes - Parameter type checking plugin for Dancer2
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

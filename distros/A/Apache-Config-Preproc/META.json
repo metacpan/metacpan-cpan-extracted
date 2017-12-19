@@ -1,0 +1,91 @@
+{
+   "abstract" : "Preprocess Apache configuration files",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-Config-Preproc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Admin::Config" : "0.95",
+            "File::Spec" : "0",
+            "IPC::Open3" : "0",
+            "Text::ParseWords" : "3.27",
+            "perl" : "5.014002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Test" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Apache::Config::Preproc" : {
+         "file" : "lib/Apache/Config/Preproc.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::compact" : {
+         "file" : "lib/Apache/Config/Preproc/compact.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::ifdefine" : {
+         "file" : "lib/Apache/Config/Preproc/ifdefine.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::ifmodule" : {
+         "file" : "lib/Apache/Config/Preproc/ifmodule.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::include" : {
+         "file" : "lib/Apache/Config/Preproc/include.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::macro" : {
+         "file" : "lib/Apache/Config/Preproc/macro.pm",
+         "version" : "1.02"
+      },
+      "Apache::Config::Preproc::macro::defn" : {
+         "file" : "lib/Apache/Config/Preproc/macro.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/acpp.git",
+         "web" : "http://git.gnu.org.ua/cgit/acpp.git/"
+      }
+   },
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

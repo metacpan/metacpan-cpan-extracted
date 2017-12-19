@@ -62,7 +62,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1.11",
+   "version" : "0.1.13",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

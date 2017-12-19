@@ -60,7 +60,7 @@ use MARC::Record;
 use MARC::Field;
 use MARC::File::MARCMaker;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 
@@ -82,6 +82,8 @@ sub add {
 sub commit {
 	my ($self) = @_;
 	$self->fh->flush;
+
+    1;
 }
 
 1;

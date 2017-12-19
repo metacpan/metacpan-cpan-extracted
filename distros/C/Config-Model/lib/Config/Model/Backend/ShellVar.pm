@@ -8,18 +8,32 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::ShellVar;
-$Config::Model::Backend::ShellVar::VERSION = '2.114';
+$Config::Model::Backend::ShellVar::VERSION = '2.116';
 use Carp;
 use Mouse;
 use Config::Model::Exception;
 use File::Path;
 use Log::Log4perl qw(get_logger :levels);
+use Config::Model::BackendTrackOrder;
 
 extends 'Config::Model::Backend::Any';
 
 my $logger = get_logger("Backend::ShellVar");
 
-sub suffix { return '.conf'; }
+has tracker => (
+    is => 'ro',
+    isa => 'Config::Model::BackendTrackOrder',
+    lazy_build => 1,
+    handles => [qw/get_ordered_element_names/],
+);
+
+sub _build_tracker {
+    my $self = shift;
+    return Config::Model::BackendTrackOrder->new(
+        backend_obj => $self,
+        node => $self->node,
+    ) ;
+}
 
 sub annotation { return 1; }
 
@@ -47,11 +61,17 @@ sub read {
     my @assoc = $self->associates_comments_with_data( \@lines, '#' );
     foreach my $item (@assoc) {
         my ( $data, $c ) = @$item;
-        $data =~ s/\s*=\s*/=/;                   # make reader quite tolerant
-        my $load = qq!$data!;
-        $load .= qq!#"$c"! if $c;
-        $logger->debug("Loading:$load\n");
-        $self->node->load( step => $load, check => $check );
+        my ($k,$v) = split /\s*=\s*/, $data, 2; # make reader quite tolerant
+        $v =~ s/^["']|["']$//g;
+        if ($logger->is_debug) {
+            my $msg = "Loading key '$k' value '$v'";
+            $msg .= " comment: '$c'" if $c;
+            $logger->debug($msg);
+        }
+        $self->tracker->register_element($k);
+        my $obj = $self->node->fetch_element($k);
+        $obj->store( value => $v, check => $check );
+        $obj->annotation($c) if $c;
     }
 
     return 1;
@@ -78,7 +98,7 @@ sub write {
     my @to_write;
 
     # Using Config::Model::ObjTreeScanner would be overkill
-    foreach my $elt ( $node->get_element_name ) {
+    foreach my $elt ( $self->get_ordered_element_names ) {
         my $obj = $node->fetch_element($elt);
         my $v   = $node->grab_value($elt);
 
@@ -114,7 +134,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

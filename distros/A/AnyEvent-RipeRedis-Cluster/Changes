@@ -1,5 +1,10 @@
 Revision history for AnyEvent::RipeRedis::Cluster.
 
+0.30 Fri Dec 15 10:58:27 MSK 2017
+  - Now the client raise error if "CLUSTER SLOTS" command returns empty list.
+  - Fixed error in code of discovering of slaves.
+  - Improved tests.
+
 0.28 Mon May 22 10:51:27 MSK 2017
   - Refactoring and minor fixes in module and tests.
   - Changes in POD.

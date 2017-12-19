@@ -1,5 +1,5 @@
 package GitLab::API::v4::Constants;
-$GitLab::API::v4::Constants::VERSION = '0.01';
+$GitLab::API::v4::Constants::VERSION = '0.02';
 =head1 NAME
 
 GitLab::API::v4::Constants - GitLab API v4 constants.

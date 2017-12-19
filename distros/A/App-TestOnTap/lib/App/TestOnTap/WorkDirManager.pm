@@ -49,9 +49,11 @@ sub new
 						suiteroot => $suiteRoot,
 						root => $workdir,
 						tmp => slashify("$workdir/tmp"),
-						private => slashify("$workdir/data/private"),
-						tap =>  slashify("$workdir/data/tap"),
-						result =>  slashify("$workdir/data/result"),
+						save => slashify("$workdir/save"),
+						save_suite => slashify("$workdir/save/suite"),
+						save_testontap => slashify("$workdir/save/testontap"),
+						tap =>  slashify("$workdir/save/testontap/tap"),
+						result =>  slashify("$workdir/save/testontap/result"),
 						json => JSON->new()->utf8()->pretty()->canonical(),
 						orderstrategy => undef,
 						dispensedorder => [],
@@ -64,7 +66,7 @@ sub new
 					$class
 				);
 
-	foreach my $p (qw(tmp private tap result))
+	foreach my $p (qw(tmp save save_suite save_testontap tap result))
 	{
 		mkpath($self->{$p}) || die("Failed to mkdir '$self->{$p}': $!\n");
 	}
@@ -78,7 +80,7 @@ sub beginTestRun
 	
 	$self->{begin} = time();
 	
-	$self->__save("$self->{root}/data/env", { %ENV });
+	$self->__save("$self->{save_testontap}/env", { %ENV });
 }
 
 sub endTestRun
@@ -102,7 +104,7 @@ sub endTestRun
 			todo => [ $aggregator->todo() ],
 			todo_passed => [ $aggregator->todo_passed() ],
 		};
-	$self->__save("$self->{root}/data/summary", $summary);
+	$self->__save("$self->{save_testontap}/summary", $summary);
 
 	my $testinfo =
 		{
@@ -113,12 +115,12 @@ sub endTestRun
 			fullgraph => $self->{fullgraph},
 			prunedgraph => $self->{prunedgraph},
 		};
-	$self->__save("$self->{root}/data/testinfo", $testinfo);
+	$self->__save("$self->{save_testontap}/testinfo", $testinfo);
 
 	my $elapsed = $aggregator->elapsed();
 	my $meta =
 		{
-			format => { major => -1, minor => 0 }, # Change when format of result tree is changed in any way.
+			format => { major => 1, minor => 0 }, # Change when format of result tree is changed in any way.
 			runid => $args->getId(),
 			suiteid => $args->getConfig()->getId(),
 			suitename => basename($args->getSuiteRoot()),
@@ -140,9 +142,9 @@ sub endTestRun
 			uname => [ uname() ],
 			order => $self->{orderstrategy} ? $self->{orderstrategy}->getStrategyName() : undef,
 		};
-	$self->__save("$self->{root}/data/meta", $meta);
+	$self->__save("$self->{save_testontap}/meta", $meta);
 
-	$self->__saveText("$self->{root}/data/preprocess", $self->{preprocess}) if $self->{preprocess};
+	$self->__saveText("$self->{save_testontap}/preprocess", $self->{preprocess}) if $self->{preprocess};
 }
 
 # retain the tap handles we issue so we can 'manually' close them
@@ -249,7 +251,7 @@ sub saveResult
 	my $runid = $self->{runid};
 	my $ts = stringifyTime($self->{begin});
 	my $name = "$pfx.$ts.$runid";
-	my $from = slashify("$self->{root}/data");
+	my $from = slashify($self->{save});
 
 	my $to;
 	if ($asArchive)
@@ -279,11 +281,11 @@ sub getTmp
 	return $self->{tmp};
 }
 
-sub getPrivate
+sub getSaveSuite
 {
 	my $self = shift;
 	
-	return $self->{private};
+	return $self->{save_suite};
 }
 
 sub recordOrderStrategy
@@ -339,7 +341,7 @@ sub recordPostprocess
 	my $self = shift;
 	my $postproc = shift;
 	
-	$self->__saveText("$self->{root}/data/postprocess", $postproc);
+	$self->__saveText("$self->{save_testontap}/postprocess", $postproc);
 }
 
 sub recordCommandLine

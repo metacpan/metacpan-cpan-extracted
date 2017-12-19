@@ -4,13 +4,13 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-SignedCookies",
    "prereqs" : {
@@ -26,18 +26,15 @@
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
             "parent" : "0",
-            "perl" : "5.010",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "HTTP::Cookies" : "0",
             "HTTP::Request::Common" : "0",
-            "Plack::Builder" : "0",
-            "Plack::Request" : "0",
             "Plack::Test" : "0",
             "Test::More" : "0"
          }
@@ -46,14 +43,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Plack-Middleware-SignedCookies/issues"
+         "web" : "https://github.com/ap/Plack-Middleware-SignedCookies/issues"
       },
-      "homepage" : "http://github.com/ap/Plack-Middleware-SignedCookies",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-Middleware-SignedCookies"
+         "url" : "git://github.com/ap/Plack-Middleware-SignedCookies.git",
+         "web" : "https://github.com/ap/Plack-Middleware-SignedCookies"
       }
    },
-   "version" : "1.103"
+   "version" : "1.202"
 }
 

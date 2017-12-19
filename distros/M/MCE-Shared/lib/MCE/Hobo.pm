@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.833';
+our $VERSION = '1.834';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -682,24 +682,21 @@ sub new {
       $delay = ($^O =~ /mswin|mingw|msys|cygwin/i) ? 0.015 : 0.008;
    }
 
-   bless [ $delay, Time::HiRes::time() + $delay ], $class;
+   bless [ $delay, undef ], $class;
 }
 
 sub seconds {
    my ( $self, $how_long ) = @_;
-   my ( $time, $delay, $next ) = ( Time::HiRes::time(), @{ $self } );
+   my ( $delay, $time ) = ( $how_long // $self->[0], Time::HiRes::time() );
 
-   $how_long = 0.004007 if ( defined $how_long && $how_long < 0.004007 );
-   my $adj = defined $how_long ? $how_long - $delay : 0;
-
-   if ( $next + $adj > $time ) {
-      $self->[1] += $delay + $adj;
-      return $next + $adj - $time;
+   if ( !defined $self->[1] || $time >= $self->[1] ) {
+      $self->[1] = $time + $delay;
+      return $delay;
    }
 
-   $self->[1] = $time + $delay + $adj;
+   $self->[1] += $delay;
 
-   return 0;
+   return $self->[1] - $time;
 }
 
 ###############################################################################
@@ -778,7 +775,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.833
+This document describes MCE::Hobo version 1.834
 
 =head1 SYNOPSIS
 

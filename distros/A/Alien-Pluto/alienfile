@@ -1,0 +1,43 @@
+use alienfile;
+
+#our $VERSION = 0.005_000;
+ 
+plugin 'Probe::CBuilder' => (
+    # DEV NOTE: can not mix 'aliens' and 'cflags' or 'libs' options below;
+    # Alien::Texinfo provides a command-line utility `makeinfo`, not source and/or library files to be used during compilation
+#    aliens => [ 'Alien::Texinfo' ],  # incorrect
+    program => "#include <libpluto.h>\nint main() { return 0; }\n",
+    lang => 'C++',  # mostly C, but some C++, according to GitHub
+    # paths for pre-existing AKA system install
+    # NEED FIXES: remove hard-coded paths below; add Windows-compatible paths
+    cflags => '-I/usr/local/include/pluto/ -std=c++11',
+    libs => '-L/usr/local/lib/',
+);
+
+share {
+    # DEV NOTE, CORRELATION #ap020: must update Alien::Texinfo & Alien::bison & Alien::flex versions in BOTH alienfile & Makefile.PL
+    requires 'Alien::Texinfo' => '0.005';
+    requires 'Alien::bison'   => '0.19';
+    requires 'Alien::flex'    => '0.12';
+
+    plugin Download => (
+        url => 'https://wbraswell.github.io/pluto-mirror/',  # GitHub mirror server
+        filter => qr/^pluto-.*\.tar\.gz$/,
+        version => qr/^pluto-([0-9\.]+)/,
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::Autoconf' => ();
+
+    plugin 'Build::SearchDep' => (
+        aliens => [qw( Alien::Texinfo Alien::bison )],
+        public_I => 1,
+        public_l => 1,
+    );
+
+    build [
+        '%{configure}',
+        '%{gmake}',
+        '%{gmake} test',
+        '%{gmake} install',
+    ];
+};

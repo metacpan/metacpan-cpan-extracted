@@ -58,6 +58,7 @@ lib/Syntax/Kamelon/XML/abap.xml
 lib/Syntax/Kamelon/XML/abc.xml
 lib/Syntax/Kamelon/XML/actionscript.xml
 lib/Syntax/Kamelon/XML/ada.xml
+lib/Syntax/Kamelon/XML/adblock.xml
 lib/Syntax/Kamelon/XML/agda.xml
 lib/Syntax/Kamelon/XML/ahdl.xml
 lib/Syntax/Kamelon/XML/ahk.xml
@@ -68,6 +69,7 @@ lib/Syntax/Kamelon/XML/ansforth94.xml
 lib/Syntax/Kamelon/XML/ansic89.xml
 lib/Syntax/Kamelon/XML/ansys.xml
 lib/Syntax/Kamelon/XML/apache.xml
+lib/Syntax/Kamelon/XML/apparmor.xml
 lib/Syntax/Kamelon/XML/asm-avr.xml
 lib/Syntax/Kamelon/XML/asm-dsp56k.xml
 lib/Syntax/Kamelon/XML/asm-m68k.xml
@@ -114,6 +116,7 @@ lib/Syntax/Kamelon/XML/djangotemplate.xml
 lib/Syntax/Kamelon/XML/dockerfile.xml
 lib/Syntax/Kamelon/XML/dosbat.xml
 lib/Syntax/Kamelon/XML/dot.xml
+lib/Syntax/Kamelon/XML/doxyfile.xml
 lib/Syntax/Kamelon/XML/doxygen.xml
 lib/Syntax/Kamelon/XML/doxygenlua.xml
 lib/Syntax/Kamelon/XML/dtd.xml
@@ -165,6 +168,7 @@ lib/Syntax/Kamelon/XML/ilerpg.xml
 lib/Syntax/Kamelon/XML/indexrc
 lib/Syntax/Kamelon/XML/inform.xml
 lib/Syntax/Kamelon/XML/ini.xml
+lib/Syntax/Kamelon/XML/intelhex.xml
 lib/Syntax/Kamelon/XML/isocpp.xml
 lib/Syntax/Kamelon/XML/j.xml
 lib/Syntax/Kamelon/XML/jam.xml
@@ -210,6 +214,7 @@ lib/Syntax/Kamelon/XML/mel.xml
 lib/Syntax/Kamelon/XML/mergetagtext.xml
 lib/Syntax/Kamelon/XML/meson.xml
 lib/Syntax/Kamelon/XML/metafont.xml
+lib/Syntax/Kamelon/XML/metamath.xml
 lib/Syntax/Kamelon/XML/mips.xml
 lib/Syntax/Kamelon/XML/modelica.xml
 lib/Syntax/Kamelon/XML/modelines.xml
@@ -241,17 +246,21 @@ lib/Syntax/Kamelon/XML/pig.xml
 lib/Syntax/Kamelon/XML/pike.xml
 lib/Syntax/Kamelon/XML/pli.xml
 lib/Syntax/Kamelon/XML/ply.xml
+lib/Syntax/Kamelon/XML/pony.xml
 lib/Syntax/Kamelon/XML/postscript.xml
 lib/Syntax/Kamelon/XML/povray.xml
+lib/Syntax/Kamelon/XML/powershell.xml
 lib/Syntax/Kamelon/XML/ppd.xml
 lib/Syntax/Kamelon/XML/praat.xml
 lib/Syntax/Kamelon/XML/progress.xml
 lib/Syntax/Kamelon/XML/prolog.xml
 lib/Syntax/Kamelon/XML/protobuf.xml
+lib/Syntax/Kamelon/XML/pug.xml
 lib/Syntax/Kamelon/XML/puppet.xml
 lib/Syntax/Kamelon/XML/purebasic.xml
 lib/Syntax/Kamelon/XML/python.xml
 lib/Syntax/Kamelon/XML/q.xml
+lib/Syntax/Kamelon/XML/qdocconf.xml
 lib/Syntax/Kamelon/XML/qmake.xml
 lib/Syntax/Kamelon/XML/qml.xml
 lib/Syntax/Kamelon/XML/qt4.xml
@@ -299,6 +308,7 @@ lib/Syntax/Kamelon/XML/template-toolkit.xml
 lib/Syntax/Kamelon/XML/texinfo.xml
 lib/Syntax/Kamelon/XML/textile.xml
 lib/Syntax/Kamelon/XML/tibasic.xml
+lib/Syntax/Kamelon/XML/tiger.xml
 lib/Syntax/Kamelon/XML/toml.xml
 lib/Syntax/Kamelon/XML/txt2tags.xml
 lib/Syntax/Kamelon/XML/uscript.xml
@@ -329,6 +339,7 @@ lib/Syntax/Kamelon/XML/xul.xml
 lib/Syntax/Kamelon/XML/yacas.xml
 lib/Syntax/Kamelon/XML/yacc.xml
 lib/Syntax/Kamelon/XML/yaml.xml
+lib/Syntax/Kamelon/XML/yang.xml
 lib/Syntax/Kamelon/XML/zonnon.xml
 lib/Syntax/Kamelon/XML/zsh.xml
 lib/Syntax/Kamelon/XMLData.pm
@@ -533,5 +544,6 @@ tools/clean_up
 tools/generate_manifest
 tools/generate_syntaxes_pod
 tools/recreate_index
+tools/update_selector
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

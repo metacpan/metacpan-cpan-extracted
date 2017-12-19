@@ -1,0 +1,2 @@
+[% IF not version %][% version = 1.0 %][% END -%]
+<?xml version="[% version %]" encoding="utf-8"?>

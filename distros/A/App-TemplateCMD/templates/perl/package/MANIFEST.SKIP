@@ -1,0 +1,73 @@
+[% module = module || 'module' -%]
+[% file     = module -%]
+[% IF file.match('::') -%]
+[%     file = file.replace('::', '/') -%]
+[% END -%]
+[% file = file _ '.pm' -%]
+[% package  = module -%]
+[% IF package.match('::') -%]
+[%     package = package.replace('::', '-') -%]
+[% END -%]
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.cvsignore$
+\B\.git\b
+\B\.gitignore$
+\B\.bzr\b
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+^MANIFEST\.SKIP$
+
+# Avoid VMS specific Makemaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid Devel::Cover generated files
+\bcover_db
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+#   Mac OSX metadata
+\B\.DS_Store
+#   Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid vim temporary file
+.*\.sw[po]$
+
+# This generated file
+\bMYMETA.yml$
+
+# Avoid Test::Kwalitee generated files
+Debian_CPANTS.txt
+
+# Avoid Devel::NYTProf generated files
+\bnytprof*
+
+# Avoid archives of this distribution
+\b[% package %]-[\d\.\_]+

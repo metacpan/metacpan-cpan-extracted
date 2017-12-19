@@ -74,7 +74,6 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
   requires "strict" => "0";
   requires "warnings" => "0";

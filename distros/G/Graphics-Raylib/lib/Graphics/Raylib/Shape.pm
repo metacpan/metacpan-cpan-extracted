@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Shape;
 
 # ABSTRACT: Collection of drawable shapes
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -21,7 +21,7 @@ Graphics::Raylib::Shape - Collection of drawable shapes
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -308,7 +308,7 @@ sub _bitmap {
     }
 
     my $color = $self->{color} // Graphics::Raylib::Color::GOLD;
-    $self->{color} = ref($color) eq 'CODE' ? $color : sub { shift > 0 ? $color : undef };
+    $self->{color} = ref($color) eq 'CODE' ? $color : sub { (shift // 0) > 0 ? $color : undef };
 
     my $func = $self->{transposed} && $self->{uninitialized} ? \&LoadImageFromAV_transposed_uninitialized_mem
              : $self->{transposed}                           ? \&LoadImageFromAV_transposed

@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Res
 
+0.08  Fri Dec 15 19:05:00 2017
+      - Fixed the typo in the code in SYNOPSIS section.
+
 0.07  Fri Sep 22 10:25:00 2016
       - Addressed issue RT #117991 raised by DBOOK.
 

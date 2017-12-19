@@ -24,12 +24,13 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
 
   # create a signer object
   my $signer = Mail::DKIM::ARC::Signer->new(
-                  Algorithm => "rsa-sha1",
-                  Chain => "none",    # or pass|fail
-                  Domain => "example.org",
-                  Selector => "selector1",
-                  KeyFile => "private.key",
-                  Headers => "x-header:x-header2",
+                  Algorithm => 'rsa-sha256',
+                  Chain => 'none',    # or pass|fail|ar
+                  Domain => 'example.org',
+                  SrvId => 'example.org',
+                  Selector => 'selector1',
+                  KeyFile => 'private.key',
+                  Headers => 'x-header:x-header2',
              );
 
   # read an email from a file handle
@@ -51,7 +52,7 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
   }
   $signer->CLOSE;
 
-  die "Failed" $signer->result_details() unless $signer->result() eq 'sealed';
+  die 'Failed' $signer->result_details() unless $signer->result() eq 'sealed';
 
   # Get all the signature headers to prepend to the message
   # ARC-Seal, ARC-Message-Signature and ARC-Authentication-Results
@@ -100,12 +101,13 @@ Construct an object-oriented signer.
 
   # create a signer using the default policy
   my $signer = Mail::DKIM::ARC::Signer->new(
-                  Algorithm => "rsa-sha1",
-                  Chain => "none",    # or pass|fail
-                  Domain => "example.org",
-                  Selector => "selector1",
-                  KeyFile => "private.key",
-                  Headers => "x-header:x-header2",
+                  Algorithm => 'rsa-sha256',
+                  Chain => 'none',    # or pass|fail|ar
+                  Domain => 'example.org',
+                  SrvId => 'example.org',
+                  Selector => 'selector1',
+                  KeyFile => 'private.key',
+                  Headers => 'x-header:x-header2',
              );
 
 =over
@@ -114,6 +116,16 @@ Construct an object-oriented signer.
 
 rather than using C<KeyFile>, use C<Key> to use an already-loaded
 L<Mail::DKIM::PrivateKey> object.
+
+=item Chain
+
+The cv= value for the Arc-Seal header.  "ar" means to copy it from
+an Authentication-Results header, or use none if there isn't one.
+
+=item SrvId
+
+The authserv-id in the Authentication-Results headers, defaults to
+Domain.
 
 =item Headers
 
@@ -143,9 +155,9 @@ The list of headers signed by default is as follows
 =cut
 
 package Mail::DKIM::ARC::Signer;
-use base "Mail::DKIM::Common";
+use base 'Mail::DKIM::Common';
 use Carp;
-our $VERSION = 0.44;
+our $VERSION = 0.50;
 
 # PROPERTIES
 #
@@ -153,10 +165,13 @@ our $VERSION = 0.44;
 #
 # $signer->{Algorithm}
 #   identifies what algorithm to use when signing the message
-#   default is "rsa-sha1"
+#   default is "rsa-sha256"
 #
 # $signer->{Domain}
 #   identifies what domain the message is signed for
+#
+# $signer->{SrvId}
+#   identifies what authserv-id is in the A-R headers
 #
 # $signer->{KeyFile}
 #   name of the file containing the private key used to sign
@@ -179,214 +194,292 @@ our $VERSION = 0.44;
 # $signer->{result}
 #   result of the signing policy: "signed" or "skipped"
 #
+# $signer->{result_reason}
+#   why we skipped this signature
+#
 # $signer->{signature}
 #   the created signature (of type Mail::DKIM::Signature)
 
+sub init {
+    my $self = shift;
+    $self->SUPER::init;
 
-sub init
-{
-	my $self = shift;
-	$self->SUPER::init;
+    if ( defined $self->{KeyFile} ) {
+        $self->{Key} ||=
+          Mail::DKIM::PrivateKey->load( File => $self->{KeyFile} );
+    }
 
-	if (defined $self->{KeyFile})
-	{
-		$self->{Key} ||= Mail::DKIM::PrivateKey->load(
-				File => $self->{KeyFile});
-	}
-	
-	unless ($self->{"Algorithm"})
-	{
-		# use default algorithm
-		$self->{"Algorithm"} = "rsa-sha1";
-	}
-	unless ($self->{"Domain"})
-	{
-		# use default domain
-		$self->{"Domain"} = "example.org";
-	}
-	unless ($self->{"Selector"})
-	{
-		# use default selector
-		$self->{"Selector"} = "unknown";
-	}
+    unless ( $self->{'Algorithm'} ) {
 
-        die "Need a chain value" unless $self->{Chain};
+        # use default algorithm
+        $self->{'Algorithm'} = 'rsa-sha256';
+    }
+    unless ( $self->{'Domain'} ) {
+
+        # use default domain
+        $self->{'Domain'} = 'example.org';
+    }
+    unless ( $self->{'SrvId'} ) {
+
+        # use default domain
+        $self->{'SrvId'} = $self->{'Domain'};
+    }
+    unless ( $self->{'Selector'} ) {
+
+        # use default selector
+        $self->{'Selector'} = 'unknown';
+    }
+    $self->{result} = '?';    # better update this before we finish
+    die 'Invalid signing algorithm'
+      unless $self->{Algorithm} eq 'rsa-sha256';    # add ed25519 sometime
+    die 'Need a valid chain value'
+      unless $self->{Chain} and $self->{Chain} =~ m{^(pass|fail|none|ar)$};
 }
 
-sub finish_header
-{
-	my $self = shift;
+sub finish_header {
+    my $self = shift;
 
-        # add the AAR header
-        my @aar;
-        my @ams;
-        my @as;
+    # add the AAR header
+    my @aar;
+    my @ams;
+    my @as;
 
-        my $ar;
-        foreach my $header (@{$self->{headers}}) {
-            $header =~ s/[\r\n]+$//;
-            if (!$ar) {
-                die "ARC header seen before Authentication-Results" if $header =~ m/^ARC-/;
-                next unless $header =~ m/^Authentication-Results:\s*(.*)/is;
-                $ar = $1;
+    my $ar;
+    foreach my $header ( @{ $self->{headers} } ) {
+        $header =~ s/[\r\n]+$//;
+        if ( $header =~ m/^Authentication-Results:/ ) {
+            my ( $ardom, $arval ) = $header =~
+              m/^Authentication-Results:\s*([-.0-9a-z]+)\s*;\s*(.*)/is;
+
+            next
+              unless "\L$ardom" eq $self->{SrvId};   # make sure it's our domain
+
+            $arval =~ s/;?\s*$//;    # ignore trailing semicolon and whitespace
+            if ($ar) {
+                $ar .= "; $arval";
             }
             else {
-                # parse ARC headers to make sure we have completeness
-                if ($header =~ m/^ARC-Seal:/) {
-                    my $seal = Mail::DKIM::ARC::Seal->parse($header);
-                    my $i = $seal->instance;
-                    die "Duplicate seal $i" if $as[$i];
-                    $as[$i] = $seal;
+                $ar = "$ardom; $arval";
+            }
+
+            # get chain value from A-R header
+            $self->{Chain} = $1
+              if $self->{Chain} eq 'ar' and $arval =~ m{\barc=(none|pass|fail)};
+
+        }
+        else {
+            # parse ARC headers to make sure we have completeness
+
+            if ( $header =~ m/^ARC-/ ) {
+                if ( !$ar ) {
+                    $self->{result} = 'skipped';
+                    $self->{result_reason} =
+                      'ARC header seen before Authentication-Results';
+                    return;
                 }
-                if ($header =~ m/^ARC-Message-Signature:/) {
-                    my $sig = Mail::DKIM::ARC::MessageSignature->parse($header);
-                    my $i = $sig->instance;
-                    die "Duplicate signature $i" if $ams[$i];
-                    $ams[$i] = $sig;
+                if ( $self->{Chain} eq 'ar' ) {
+                    $self->{result} = 'skipped';
+                    $self->{result_reason} =
+                      'No ARC result found in Authentication-Results';
+                    return;
                 }
-                if ($header =~ m/^ARC-Authentication-Results:\s*i=(\d+)/) {
-                    my $i = $1;
-                    die "Duplicate authetnication results $i" if $aar[$i];
-                    $aar[$i] = $header;
+
+            }
+
+            if ( $header =~ m/^ARC-Seal:/ ) {
+                my $seal = Mail::DKIM::ARC::Seal->parse($header);
+                my $i    = $seal->instance;
+                if ( $as[$i] ) {
+                    $self->{result}        = 'skipped';
+                    $self->{result_reason} = "Duplicate ARC-Seal $i";
+                    return;
                 }
+                $as[$i] = $seal;
+            }
+            elsif ( $header =~ m/^ARC-Message-Signature:/ ) {
+                my $sig = Mail::DKIM::ARC::MessageSignature->parse($header);
+                my $i   = $sig->instance;
+                if ( $ams[$i] ) {
+                    $self->{result} = 'skipped';
+                    $self->{result_reason} =
+                      "Duplicate ARC-Message-Signature $i";
+                    return;
+                }
+                $ams[$i] = $sig;
+            }
+            elsif ( $header =~ m/^ARC-Authentication-Results:\s*i=(\d+)/ ) {
+                my $i = $1;
+                if ( $aar[$i] ) {
+                    $self->{result} = 'skipped';
+                    $self->{result_reason} =
+                      "Duplicate ARC-Authentication-Results $i";
+                    return;
+                }
+
+                $aar[$i] = $header;
             }
         }
+    }
 
-        die "No authentication results seen" unless $ar;
+    unless ($ar) {
+        $self->{result}        = 'skipped';
+        $self->{result_reason} = 'No authentication results seen';
+        return;
+    }
 
-        die "More message signatures than seals" if $#ams > $#as;
-        die "More authentication results than seals" if $#aar > $#as;
+    if ( $#ams > $#as ) {
+        $self->{result}        = 'skipped';
+        $self->{result_reason} = 'More message signatures than seals';
+        return;
+    }
+    if ( $#aar > $#as ) {
+        $self->{result}        = 'skipped';
+        $self->{result_reason} = 'More authentication results than seals';
+        return;
+    }
 
-        foreach my $i (1..$#as) {
-            die "Missing seal $i" unless $as[$i];
-            die "Missing signature $i" unless $ams[$i];
-            # don't care about authentication results, they are compulsary
+    foreach my $i ( 1 .. $#as ) {
+        unless ( $as[$i] ) {
+            $self->{result}        = 'skipped';
+            $self->{result_reason} = "Missing ARC-Seal $i";
+            return;
+        }
+        unless ( $ams[$i] ) {
+            $self->{result}        = 'skipped';
+            $self->{result_reason} = "Missing Arc-Message-Signature $i";
+            return;
         }
 
-        $self->{_Instance} = @as || 1; # next instance value
+        # don't care about authentication results, they are compulsary
+    }
 
-        # first add the AAR header
-        $self->{_AAR} = "ARC-Authentication-Results: i=$self->{_Instance}; $ar";
-        unshift @{$self->{headers}}, $self->{_AAR};
+    $self->{_Instance} = @as || 1;    # next instance value
 
-        # set up the signer for AMS
-        $self->add_signature(
-                 Mail::DKIM::ARC::MessageSignature->new(
-                         Algorithm => $self->{"Algorithm"},
-                         Headers => $self->headers,
-                         Instance => $self->{_Instance},
-                         Method => "relaxed/relaxed",
-                         Domain => $self->{"Domain"},
-                         Selector => $self->{"Selector"},
-                         Key => $self->{"Key"},
-                         KeyFile => $self->{"KeyFile"},
-                         ($self->{"Timestamp"} ?
-                                 (Timestamp => $self->{"Timestamp"}) : ()),
-                )
-        );
+    # first add the AAR header
+    $self->{_AAR} = "ARC-Authentication-Results: i=$self->{_Instance}; $ar";
+    unshift @{ $self->{headers} }, $self->{_AAR};
 
-        foreach my $algorithm (@{$self->{algorithms}})
-        {
-                # output header as received so far into canonicalization
-                foreach my $header (@{$self->{headers}})
-                {
-                        $algorithm->add_header($header);
-                }
-                $algorithm->finish_header(Headers => $self->{headers});
+    # set up the signer for AMS
+    $self->add_signature(
+        Mail::DKIM::ARC::MessageSignature->new(
+            Algorithm => $self->{Algorithm},
+            Headers   => $self->headers,
+            Instance  => $self->{_Instance},
+            Method    => 'relaxed/relaxed',
+            Domain    => $self->{Domain},
+            Selector  => $self->{Selector},
+            Key       => $self->{Key},
+            KeyFile   => $self->{KeyFile},
+            ( $self->{Timestamp} ? ( Timestamp => $self->{Timestamp} ) : () ),
+        )
+    );
+
+    foreach my $algorithm ( @{ $self->{algorithms} } ) {
+
+        # output header as received so far into canonicalization
+        foreach my $header ( @{ $self->{headers} } ) {
+            $algorithm->add_header($header);
         }
+        $algorithm->finish_header( Headers => $self->{headers} );
+    }
 }
 
-sub finish_body
-{
-	my $self = shift;
+sub finish_body {
+    my $self = shift;
 
-	foreach my $algorithm (@{$self->{algorithms}})
-	{
-		# finished canonicalizing
-		$algorithm->finish_body;
+    if ( $self->{result} eq 'skipped' ) {    # already failed
+        $self->{_AS} = undef;
+        return;
+    }
 
-		# load the private key file if necessary
-		my $signature = $algorithm->signature;
-		my $key = $signature->{Key}
-			|| $signature->{KeyFile}
-			|| $self->{Key}
-			|| $self->{KeyFile};
-		if (defined($key) && !ref($key))
-		{
-			$key = Mail::DKIM::PrivateKey->load(
-					File => $key);
-		}
-		$key
-			or die "no key available to sign with\n";
+    foreach my $algorithm ( @{ $self->{algorithms} } ) {
 
-		# compute signature value
-		my $signb64 = $algorithm->sign($key);
-		$signature->data($signb64);
+        # finished canonicalizing
+        $algorithm->finish_body;
 
-		# insert linebreaks in signature data, if desired
-		$signature->prettify_safe();
+        # load the private key file if necessary
+        my $signature = $algorithm->signature;
+        my $key =
+             $signature->{Key}
+          || $signature->{KeyFile}
+          || $self->{Key}
+          || $self->{KeyFile};
+        if ( defined($key) && !ref($key) ) {
+            $key = Mail::DKIM::PrivateKey->load( File => $key );
+        }
+        $key
+          or die "no key available to sign with\n";
 
-                $self->{_AMS} = $signature->as_string();
-                unshift @{$self->{headers}}, $self->{_AMS};
-	}
+        # compute signature value
+        my $signb64 = $algorithm->sign($key);
+        $signature->data($signb64);
 
-        # reset the internal state
-        $self->{signatures} = [];
-        $self->{algorithms} = [];
+        # insert linebreaks in signature data, if desired
+        $signature->prettify_safe();
 
-        $self->add_signature(
-                 Mail::DKIM::ARC::Seal->new(
-                         Algorithm => $self->{"Algorithm"},
-                         Chain => $self->{Chain},
-                         Headers => $self->headers,
-                         Instance => $self->{_Instance},
-                         Domain => $self->{"Domain"},
-                         Selector => $self->{"Selector"},
-                         Key => $self->{"Key"},
-                         KeyFile => $self->{"KeyFile"},
-                         ($self->{"Timestamp"} ?
-                                 (Timestamp => $self->{"Timestamp"}) : ()),
-                )
+        $self->{_AMS} = $signature->as_string();
+        unshift @{ $self->{headers} }, $self->{_AMS};
+    }
+
+    # reset the internal state
+    $self->{signatures} = [];
+    $self->{algorithms} = [];
+
+    $self->add_signature(
+        Mail::DKIM::ARC::Seal->new(
+            Algorithm => $self->{Algorithm},
+            Chain     => $self->{Chain},
+            Headers   => $self->headers,
+            Instance  => $self->{_Instance},
+            Domain    => $self->{Domain},
+            Selector  => $self->{Selector},
+            Key       => $self->{Key},
+            KeyFile   => $self->{KeyFile},
+            ( $self->{Timestamp} ? ( Timestamp => $self->{Timestamp} ) : () ),
+        )
+    );
+
+    foreach my $algorithm ( @{ $self->{algorithms} } ) {
+
+        # output header as received so far into canonicalization
+        foreach my $header ( @{ $self->{headers} } ) {
+            $algorithm->add_header($header);
+        }
+
+        # chain needed for seal canonicalization
+        $algorithm->finish_header(
+            Headers => $self->{headers},
+            Chain   => $self->{Chain}
         );
 
-	foreach my $algorithm (@{$self->{algorithms}})
-	{
-                # output header as received so far into canonicalization
-                foreach my $header (@{$self->{headers}})
-                {
-                        $algorithm->add_header($header);
-                }
-                $algorithm->finish_header(Headers => $self->{headers});
+        # no body is required for ARC-Seal
+        # finished canonicalizing
+        $algorithm->finish_body;
 
-                # no body is required for ARC-Seal
-		# finished canonicalizing
-		$algorithm->finish_body;
+        # load the private key file if necessary
+        my $signature = $algorithm->signature;
+        my $key =
+             $signature->{Key}
+          || $signature->{KeyFile}
+          || $self->{Key}
+          || $self->{KeyFile};
+        if ( defined($key) && !ref($key) ) {
+            $key = Mail::DKIM::PrivateKey->load( File => $key );
+        }
+        $key
+          or die "no key available to sign ARC-Seal\n";
 
-		# load the private key file if necessary
-		my $signature = $algorithm->signature;
-		my $key = $signature->{Key}
-			|| $signature->{KeyFile}
-			|| $self->{Key}
-			|| $self->{KeyFile};
-		if (defined($key) && !ref($key))
-		{
-			$key = Mail::DKIM::PrivateKey->load(
-					File => $key);
-		}
-		$key
-			or die "no key available to sign with\n";
+        # compute signature value
+        my $signb64 = $algorithm->sign($key);
+        $signature->data($signb64);
 
-		# compute signature value
-		my $signb64 = $algorithm->sign($key);
-		$signature->data($signb64);
+        # insert linebreaks in signature data, if desired
+        $signature->prettify_safe();
 
-		# insert linebreaks in signature data, if desired
-		$signature->prettify_safe();
+        $self->{_AS} = $signature->as_string();
+    }
 
-                $self->{_AS} = $signature->as_string();
-	}
-
-        $self->{result} = "sealed";
+    $self->{result} = 'sealed';
 }
 
 =head1 METHODS
@@ -458,21 +551,20 @@ see L<Mail::DKIM::SignerPolicy>.
 
 =cut
 
-sub add_signature
-{
-	my $self = shift;
-	my $signature = shift;
+sub add_signature {
+    my $self      = shift;
+    my $signature = shift;
 
-	# create a canonicalization filter and algorithm
-	my $algorithm_class = $signature->get_algorithm_class(
-			$signature->algorithm)
-		or die "unsupported algorithm " . ($signature->algorithm || "") . "\n";
-	my $algorithm = $algorithm_class->new(
-			Signature => $signature,
-			Debug_Canonicalization => $self->{Debug_Canonicalization},
-		);
-	push @{$self->{algorithms}}, $algorithm;
-	return;
+    # create a canonicalization filter and algorithm
+    my $algorithm_class =
+      $signature->get_algorithm_class( $signature->algorithm )
+      or die 'unsupported algorithm ' . ( $signature->algorithm || '' ) . "\n";
+    my $algorithm = $algorithm_class->new(
+        Signature              => $signature,
+        Debug_Canonicalization => $self->{Debug_Canonicalization},
+    );
+    push @{ $self->{algorithms} }, $algorithm;
+    return;
 }
 
 =head2 algorithm()
@@ -481,18 +573,16 @@ Get or set the selected algorithm.
 
   $alg = $signer->algorithm;
 
-  $signer->algorithm("rsa-sha1");
+  $signer->algorithm('rsa-sha256');
 
 =cut
 
-sub algorithm
-{
-	my $self = shift;
-	if (@_ == 1)
-	{
-		$self->{Algorithm} = shift;
-	}
-	return $self->{Algorithm};
+sub algorithm {
+    my $self = shift;
+    if ( @_ == 1 ) {
+        $self->{Algorithm} = shift;
+    }
+    return $self->{Algorithm};
 }
 
 =head2 domain()
@@ -501,18 +591,16 @@ Get or set the selected domain.
 
   $alg = $signer->domain;
 
-  $signer->domain("example.org");
+  $signer->domain('example.org');
 
 =cut
 
-sub domain
-{
-	my $self = shift;
-	if (@_ == 1)
-	{
-		$self->{Domain} = shift;
-	}
-	return $self->{Domain};
+sub domain {
+    my $self = shift;
+    if ( @_ == 1 ) {
+        $self->{Domain} = shift;
+    }
+    return $self->{Domain};
 }
 
 =head2 load()
@@ -541,59 +629,51 @@ will be signed, separated by colons.
 # these are headers that "should" be included in the signature,
 # according to the DKIM spec.
 my @DEFAULT_HEADERS = qw(From Sender Reply-To Subject Date
-	Message-ID To Cc MIME-Version
-	Content-Type Content-Transfer-Encoding Content-ID Content-Description
-	Resent-Date Resent-From Resent-Sender Resent-To Resent-cc
-	Resent-Message-ID
-	In-Reply-To References
-	List-Id List-Help List-Unsubscribe List-Subscribe
-	List-Post List-Owner List-Archive);
+  Message-ID To Cc MIME-Version
+  Content-Type Content-Transfer-Encoding Content-ID Content-Description
+  Resent-Date Resent-From Resent-Sender Resent-To Resent-cc
+  Resent-Message-ID
+  In-Reply-To References
+  List-Id List-Help List-Unsubscribe List-Subscribe
+  List-Post List-Owner List-Archive);
 
-sub process_headers_hash
-{
+sub process_headers_hash {
     my $self = shift;
     my @headers;
 
     # these are the header fields we found in the message we're signing
-    my @found_headers = @{$self->{header_field_names}};
+    my @found_headers = @{ $self->{header_field_names} };
 
     # Convert all keys to lower case
-    foreach my $header ( keys %{ $self->{'ExtendedHeaders'} } )
-    {
+    foreach my $header ( keys %{ $self->{'ExtendedHeaders'} } ) {
         next if $header eq lc $header;
-        if ( exists $self->{'ExtendedHeaders'}->{ lc $header } )
-        {
+        if ( exists $self->{'ExtendedHeaders'}->{ lc $header } ) {
+
             # Merge
             my $first  = $self->{'ExtendedHeaders'}->{ lc $header };
-            my $second = $self->{'ExtendedHeaders'}->{ $header };
-            if ( $first eq '+' || $second eq '+' )
-            {
-                $self->{'ExtendedHeaders'}->{ lc $header} = '+';
+            my $second = $self->{'ExtendedHeaders'}->{$header};
+            if ( $first eq '+' || $second eq '+' ) {
+                $self->{'ExtendedHeaders'}->{ lc $header } = '+';
             }
-            elsif ( $first eq '*' || $second eq '*' )
-            {
-                $self->{'ExtendedHeaders'}->{ lc $header} = '*';
+            elsif ( $first eq '*' || $second eq '*' ) {
+                $self->{'ExtendedHeaders'}->{ lc $header } = '*';
             }
-            else
-            {
+            else {
                 $self->{'ExtendedHeaders'}->{ lc $header } = $first + $second;
             }
         }
-        else
-        {
+        else {
             # Rename
-            $self->{'ExtendedHeaders'}->{ lc $header } = $self->{'ExtendedHeaders'}->{ $header }
+            $self->{'ExtendedHeaders'}->{ lc $header } =
+              $self->{'ExtendedHeaders'}->{$header};
         }
-        delete $self->{'ExtendedHeaders'}->{ $header };
+        delete $self->{'ExtendedHeaders'}->{$header};
     }
 
     # Add the default headers
-    if ( ! $self->{ 'NoDefaultHeaders' } )
-    {
-        foreach my $default ( @DEFAULT_HEADERS )
-        {
-            if ( ! exists $self->{'ExtendedHeaders'}->{ lc $default } )
-            {
+    if ( !$self->{'NoDefaultHeaders'} ) {
+        foreach my $default (@DEFAULT_HEADERS) {
+            if ( !exists $self->{'ExtendedHeaders'}->{ lc $default } ) {
                 $self->{'ExtendedHeaders'}->{ lc $default } = '*';
             }
         }
@@ -601,96 +681,81 @@ sub process_headers_hash
 
     # Build a count of found headers
     my $header_counts = {};
-    foreach my $header ( @found_headers )
-    {
-        if ( ! exists $header_counts->{ lc $header } )
-        {
+    foreach my $header (@found_headers) {
+        if ( !exists $header_counts->{ lc $header } ) {
             $header_counts->{ lc $header } = 1;
         }
-        else
-        {
+        else {
             $header_counts->{ lc $header } = $header_counts->{ lc $header } + 1;
         }
     }
 
-    foreach my $header ( sort keys %{ $self->{'ExtendedHeaders'} } )
-    {
+    foreach my $header ( sort keys %{ $self->{'ExtendedHeaders'} } ) {
         my $want_count = $self->{'ExtendedHeaders'}->{$header};
         my $have_count = $header_counts->{ lc $header } || 0;
         my $add_count  = 0;
-        if ( $want_count eq '+' )
-        {
+        if ( $want_count eq '+' ) {
             $add_count = $have_count + 1;
         }
-        elsif ( $want_count eq '*' )
-        {
+        elsif ( $want_count eq '*' ) {
             $add_count = $have_count;
         }
-        else
-        {
-            if ( $want_count > $have_count )
-            {
+        else {
+            if ( $want_count > $have_count ) {
                 $add_count = $have_count;
             }
-            else
-            {
+            else {
                 $add_count = $want_count;
             }
         }
-        for ( 1 .. $add_count )
-        {
+        for ( 1 .. $add_count ) {
             push @headers, $header;
         }
     }
-    return join(":", @headers);
+    return join( ':', @headers );
 }
 
-sub extended_headers
-{
+sub extended_headers {
     my $self = shift;
     $self->{'ExtendedHeaders'} = shift;
     return;
 }
 
-sub headers
-{
-	my $self = shift;
-	croak "unexpected argument" if @_;
+sub headers {
+    my $self = shift;
+    croak 'unexpected argument' if @_;
 
-        if (exists $self->{'ExtendedHeaders'})
-        {
-            return $self->process_headers_hash();
-        }
+    if ( exists $self->{'ExtendedHeaders'} ) {
+        return $self->process_headers_hash();
+    }
 
-	# these are the header fields we found in the message we're signing
-	my @found_headers = @{$self->{header_field_names}};
+    # these are the header fields we found in the message we're signing
+    my @found_headers = @{ $self->{header_field_names} };
 
-	# these are the headers we actually want to sign
-        my @wanted_headers;
-        if ( ! $self->{ 'NoDefaultHeaders' } )
-        {
-	    @wanted_headers = @DEFAULT_HEADERS;
-        }
-	if ($self->{Headers})
-	{
-		push @wanted_headers, split /:/, $self->{Headers};
-	}
+    # these are the headers we actually want to sign
+    my @wanted_headers;
+    if ( !$self->{'NoDefaultHeaders'} ) {
+        @wanted_headers = @DEFAULT_HEADERS;
+    }
+    if ( $self->{Headers} ) {
+        push @wanted_headers, split /:/, $self->{Headers};
+    }
 
-	my @headers =
-		grep { my $a = $_;
-			scalar grep { lc($a) eq lc($_) } @wanted_headers }
-		@found_headers;
-	return join(":", @headers);
+    my @headers =
+      grep {
+        my $a = $_;
+        scalar grep { lc($a) eq lc($_) } @wanted_headers
+      } @found_headers;
+    return join( ':', @headers );
 }
 
 # return nonzero if this is header we should sign
-sub want_header
-{
-	my $self = shift;
-	my ($header_name) = @_;
+sub want_header {
+    my $self = shift;
+    my ($header_name) = @_;
 
-	#TODO- provide a way for user to specify which headers to sign
-	return scalar grep { lc($_) eq lc($header_name) } @DEFAULT_HEADERS;
+    #TODO- provide a way for user to specify which headers to sign
+    return scalar grep { lc($_) eq lc($header_name) } @DEFAULT_HEADERS;
 }
 
 =head2 key()
@@ -699,7 +764,7 @@ Get or set the private key object.
 
   my $key = $signer->key;
 
-  $signer->key(Mail::DKIM::PrivateKey->load(File => "private.key"));
+  $signer->key(Mail::DKIM::PrivateKey->load(File => 'private.key'));
 
 The key object can be any object that implements the
 L<sign_digest() method|Mail::DKIM::PrivateKey/"sign_digest()">.
@@ -711,15 +776,13 @@ do not use L</"key_file()">.
 
 =cut
 
-sub key
-{
-	my $self = shift;
-	if (@_)
-	{
-		$self->{Key} = shift;
-		$self->{KeyFile} = undef;
-	}
-	return $self->{Key};
+sub key {
+    my $self = shift;
+    if (@_) {
+        $self->{Key}     = shift;
+        $self->{KeyFile} = undef;
+    }
+    return $self->{Key};
 }
 
 =head2 key_file()
@@ -728,22 +791,20 @@ Get or set the filename containing the private key.
 
   my $filename = $signer->key_file;
 
-  $signer->key_file("private.key");
+  $signer->key_file('private.key');
 
 If you use this method to specify a private key file,
 do not use L</"key()">.
 
 =cut
 
-sub key_file
-{
-	my $self = shift;
-	if (@_)
-	{
-		$self->{Key} = undef;
-		$self->{KeyFile} = shift;
-	}
-	return $self->{KeyFile};
+sub key_file {
+    my $self = shift;
+    if (@_) {
+        $self->{Key}     = undef;
+        $self->{KeyFile} = shift;
+    }
+    return $self->{KeyFile};
 }
 
 =head2 message_originator()
@@ -794,18 +855,16 @@ Get or set the current key selector.
 
   $alg = $dkim->selector;
 
-  $dkim->selector("alpha");
+  $dkim->selector('alpha');
 
 =cut
 
-sub selector
-{
-	my $self = shift;
-	if (@_ == 1)
-	{
-		$self->{Selector} = shift;
-	}
-	return $self->{Selector};
+sub selector {
+    my $self = shift;
+    if ( @_ == 1 ) {
+        $self->{Selector} = shift;
+    }
+    return $self->{Selector};
 }
 
 =head2 signatures()
@@ -818,11 +877,10 @@ Returns all generated signatures, as a list.
 
 =cut
 
-sub signatures
-{
-	my $self = shift;
-	croak "no arguments allowed" if @_;
-	return map { $_->signature } @{$self->{algorithms}};
+sub signatures {
+    my $self = shift;
+    croak 'no arguments allowed' if @_;
+    return map { $_->signature } @{ $self->{algorithms} };
 }
 
 =head2 as_string()
@@ -837,10 +895,27 @@ message.
 
 =cut
 
-sub as_string
-{
-        my $self = shift;
-        return join("\015\012", $self->{_AS}, $self->{_AMS}, $self->{_AAR}, '');
+sub as_string {
+    my $self = shift;
+    return '' unless $self->{_AS};    # skipped, no signature
+
+    return join( "\015\012", $self->{_AS}, $self->{_AMS}, $self->{_AAR}, '' );
+}
+
+=head2 as_strings()
+
+Returns the new ARC headers
+
+  my @pre_headers = $signer->as_string();
+
+The headers are returned as a list so you can add whatever line ending
+your local MTA prefers.
+
+=cut
+
+sub as_strings {
+    my $self = shift;
+    return ( $self->{_AS}, $self->{_AMS}, $self->{_AAR} );
 }
 
 =head1 AUTHOR

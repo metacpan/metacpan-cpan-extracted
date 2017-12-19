@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.114';
+$Config::Model::BackendMgr::VERSION = '2.116';
 use Mouse;
 use strict;
 use warnings;
@@ -23,18 +23,12 @@ use File::Copy;
 use File::HomeDir;
 use IO::File;
 use Storable qw/dclone/;
-use Scalar::Util qw/weaken/;
+use Scalar::Util qw/weaken reftype/;
 use Log::Log4perl qw(get_logger :levels);
 use Path::Tiny 0.070;
 
-with "Config::Model::Role::ComputeFunction";
-
 my $logger = get_logger('BackendMgr');
 my $user_logger = get_logger('User');
-
-# used only for tests
-my $__test_home = '';
-sub _set_test_home { $__test_home = shift; }
 
 # one BackendMgr per file
 
@@ -45,12 +39,33 @@ has 'node' => (
     required => 1
 );
 has 'file_backup' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
-has 'backend' => (
+
+has 'rw_config' => (
+    is => 'ro',
+    isa => 'HashRef',
+    required => 1
+);
+
+has 'backend_obj' => (
     is      => 'rw',
-    isa     => 'HashRef[Config::Model::Backend::Any]',
-    traits  => ['Hash'],
-    default => sub { {} },
-    handles => { set_backend => 'set', get_backend => 'get' } );
+    isa     => 'Config::Model::Backend::Any',
+    lazy    => 1 ,
+    builder => '_build_backend_obj',
+);
+
+sub _build_backend_obj {
+    my $self = shift;
+
+    my $backend = $self->rw_config->{backend};
+    warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
+        if $self->rw_config->{function};
+    # try to load a specific Backend class
+    my $f = $self->rw_config->{function} || 'read';
+    my $c = load_backend_class( $backend, $f );
+
+    no strict 'refs';
+    return $c->new( node => $self->node, name => $backend );
+}
 
 # Configuration directory where to read and write files. This value
 # does not override the configuration directory specified in the model
@@ -63,19 +78,8 @@ has support_annotation => (
     default => 0,
 );
 
-sub get_tuned_config_dir {
-    my ($self, %args) = @_;
-
-    my $dir = $args{os_config_dir}{$^O} || $args{config_dir} || $self->config_dir || '';
-    if ( $dir =~ /^~/ ) {
-        my $home = $__test_home || File::HomeDir->my_home;
-        $dir =~ s/^~/$home/;
-    }
-
-    $dir .= '/' if $dir and $dir !~ m(/$);
-
-    return $dir;
-}
+with "Config::Model::Role::ComputeFunction";
+with "Config::Model::Role::FileHandler";
 
 # check if dir is present. May create it in auto_create write mode
 sub get_cfg_dir_path {
@@ -140,37 +144,14 @@ sub get_cfg_file_path {
         return ( $dir_ok, $res );
     }
 
-    if ( not defined $args{suffix} or not $args{suffix} ) {
-        $logger->trace("get_cfg_file_path: returns undef (no suffix, no file argument)");
-        return (0);
+    if (defined $args{suffix}) {
+        $logger->warn("Suffix method is deprecated. you can remove it from backend  $args{backend}");
     }
-
-    # constructing config file name with >instance name>.<suffix>
-    my $i    = $self->node->instance;
-    my $name = $dir . $i->name;
-
-    # append ":foo bar" if not root object
-    my $loc = $self->node->location;    # not very good
-    if ($loc) {
-        if ( ( $w and not -d $name and $args{auto_create} ) ) {
-            $logger->info( "get_cfg_file_path: auto_write create subdirectory ",
-                "$name (location $loc)" );
-            mkpath( $name, 0, 0755 );
-        }
-        $name .= '/' . $loc;
-    }
-
-    $name .= $args{suffix};
-
-    $logger->trace( "get_cfg_file_path: auto_"
-            . ( $w ? 'write' : 'read' )
-            . " $args{backend} target file is $name" );
-
-    return ( 1, $name );
+    return 0;
 }
 
 sub open_read_file {
-    my ($self, $backend, $file_path) = @_;
+    my ($self, $file_path) = @_;
 
     if ( $file_path eq '-' ) {
         my $io = IO::Handle->new();
@@ -238,14 +219,18 @@ sub load_backend_class {
         }
     }
 
-    return unless defined $class_to_load;
+    if (not defined  $class_to_load) {
+        Config::Model::Exception::Model->throw(
+            error => "backend error: cannot find Perl class for backend $backend ",
+        );
+    };
     my $file_to_load = $c{$class_to_load};
 
     $logger->trace("load_backend_class: loading class $class_to_load, $file_to_load");
     eval { require $file_to_load; };
 
     if ($@) {
-        die "Could not parse $file_to_load: $@\n";
+        die "Error with backend $backend: could not parse $file_to_load: $@\n";
     }
     return $class_to_load;
 }
@@ -255,22 +240,21 @@ sub read_config_data {
 
     $logger->trace( "called for node ", $self->node->location );
 
-    my $rw_config_orig       = delete $args{rw_config};
     my $check                = delete $args{check};
     my $config_file_override = delete $args{config_file};
     my $auto_create_override = delete $args{auto_create};
 
     croak "unexpected args " . join( ' ', keys %args ) . "\n" if %args;
 
-    my $rw_config = dclone $rw_config_orig ;
+    my $rw_config = dclone $self->rw_config ;
 
     my $instance = $self->node->instance();
 
     # root override is passed by the instance
-    my $root_dir = $instance->read_root_dir || '';
+    my $root_dir = $instance->root_dir ;
 
     my $auto_create  = $rw_config->{auto_create};
-    my $backend = delete $rw_config->{backend};
+    my $backend = $rw_config->{backend};
 
     if ( $rw_config->{default_layer} ) {
         $self->read_config_sub_layer( $rw_config, $root_dir, $config_file_override, $check,
@@ -343,29 +327,22 @@ sub try_read_backend {
 
     my ( $res, $file_path, $error );
 
-    warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
-        if $rw_config->{function};
-    # try to load a specific Backend class
-    my $f = delete $rw_config->{function} || 'read';
-    my $c = load_backend_class( $backend, $f );
-    return ( 0, 'unknown' ) unless defined $c;
+    my $backend_obj = $self->backend_obj();
 
-    no strict 'refs';
-    my $backend_obj = $c->new( node => $self->node, name => $backend );
-    $self->set_backend( $backend => $backend_obj );
     my ($file_ok, $fh, $suffix);
     $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
     ( $file_ok, $file_path ) = $self->get_cfg_file_path(
         @read_args,
         suffix => $suffix,
-        skip_compute => $c->skip_open,
+        skip_compute => $backend_obj->skip_open,
     );
-    $fh = $self->open_read_file($backend, $file_path)
-        if $file_ok and not $c->skip_open;
+    $fh = $self->open_read_file($file_path)
+        if $file_ok and not $backend_obj->skip_open;
 
+    my $f = $self->rw_config->{function} || 'read';
     if ($logger->is_info) {
         my $fp = defined $file_path ? " on $file_path":'' ;
-        $logger->info( "Read with $backend " . $c . "::$f".$fp);
+        $logger->info( "Read with $backend " . reftype($backend_obj) . "::$f".$fp);
     }
 
     eval {
@@ -404,17 +381,16 @@ sub try_read_backend {
 
 sub auto_write_init {
     my ( $self, %args ) = @_;
-    my $rw_config_orig = delete $args{rw_config};
 
     croak "auto_write_init: unexpected args " . join( ' ', sort keys %args ) . "\n"
         if %args;
 
-    my $rw_config = dclone $rw_config_orig ;
+    my $rw_config = dclone $self->rw_config ;
 
     my $instance = $self->node->instance();
 
     # root override is passed by the instance
-    my $root_dir = $instance->write_root_dir || '';
+    my $root_dir = $instance->root_dir;
 
     my $backend = $rw_config->{backend};
 
@@ -445,8 +421,7 @@ sub auto_write_init {
 
         my $force_delete = delete $cb_args{force_delete} ;
         $logger->debug( "write cb ($backend) called for $location ", $force_delete ? '' : ' (deleted)' );
-        my $backend_obj = $self->get_backend($backend)
-            || $c->new( node => $self->node, name => $backend );
+        my $backend_obj = $self->backend_obj();
         my $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
         my ( $file_ok, $file_path, $fh );
         ( $file_ok, $file_path, $fh ) =
@@ -585,7 +560,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

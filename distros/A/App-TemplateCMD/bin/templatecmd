@@ -11,7 +11,7 @@ use warnings;
 use version;
 use App::TemplateCMD;
 
-our $VERSION = version->new('0.6.8');
+our $VERSION = version->new('0.6.9');
 
 my $itempl = App::TemplateCMD->new();
 $itempl->process(@ARGV);

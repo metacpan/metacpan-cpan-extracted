@@ -1,5 +1,33 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.173490 2017-12-15T18:36:52Z
+ - Make sure DZP::Prereqs::AuthorDeps is added to prereqs
+ - Add a git mailmap, mapping to committers' pause addresses
+ - Kwalitee test handles checking META.json, drop obsolete dep
+ - Split up release plugins to control whether or not to make local or
+   remote git changes
+
+1.173480 2017-12-14T16:53:11Z
+ - Fix use of DZP::GitHub to actually use metacpan as homepage
+ - Remove DZP::Test::MinimumVersion while it does not handle META.json
+ - Testing META.json and MANIFEST is done in Test::Kwalitee
+ - Contributors always come from Git::, Meta:: was not used
+ - Make sure to use latest ChangeLogFromGit
+ - This is only used for releasing from my workstattion, so bump perl
+   requirement to v5.24 and use postfix deref becuase I can
+ - Move required Pod::Weaver plugins from dist.ini to the .pm for easier
+   tracking
+ - Never actually seen any duplicate sections, so drop EnsureUniqueSections
+ - Removed unused dep, not actually adding contributers to POD
+ - DZP::Test::Pod::404s was being required twice
+ - Drop Test::Pod::LinkCheck, it is unmaintained and fails to find some
+   modules which do actually exist on CPAN
+ - WarrantyDisclaimer is redundant, equivalent text is in LICENSE file
+ - Drop
+   Pod::Weaver::Section::{BugsAndLimitations,Availability,SourceGitHub} in
+   favour of Support
+ - test signatures and add author deps to devel prereqs
+
 1.172580 2017-09-15T05:18:24Z
  - Control AutoVersion with a major_version option, or {V} override (Ioan
    Rogers)

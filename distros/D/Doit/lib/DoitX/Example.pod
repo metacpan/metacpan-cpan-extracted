@@ -1,0 +1,44 @@
+=head1 NAME
+
+DoitX::Example - an example Doit component
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('DoitX::Example');
+    $doit->example_hello_world('arg');
+
+=head1 DESCRIPTION
+
+B<DoitX::Example> is a L<Doit> component just serving as a small
+example. It has to be added to a script using L<Doit's
+add_component|Doit/add_component>:
+
+    $doit->add_component('DoitX::Example');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 example_hello_world
+
+    my $ret = $doit->example_hello_world($arg);
+
+Do something, and return something.
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>.
+
+=cut

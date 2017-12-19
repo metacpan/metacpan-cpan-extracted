@@ -29,7 +29,7 @@ CatalystX::OAuth2::Client - An http client for requesting oauth2-protected resou
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

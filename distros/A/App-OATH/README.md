@@ -73,6 +73,14 @@ You most likely won't ever want to call these directly, you should use the inclu
 
     Display usage and exit
 
+- _set\_raw()_
+
+    Show the raw OATH code rather than decoding
+
+- _set\_rawqr()_
+
+    Show the raw OATH code as a QR code rather than decoding
+
 - _set\_search()_
 
     Set the search parameter
@@ -100,6 +108,10 @@ You most likely won't ever want to call these directly, you should use the inclu
 - _display\_codes()_
 
     Display a list of codes
+
+- _make\_qr( $srting )_
+
+    Format the given string as a QR code
 
 - _oath\_auth()_
 
@@ -175,7 +187,7 @@ You most likely won't ever want to call these directly, you should use the inclu
 
 # AUTHORS
 
-Marc Bradshaw &lt;marc@marcbradshaw.net>
+Marc Bradshaw <marc@marcbradshaw.net>
 
 # COPYRIGHT
 

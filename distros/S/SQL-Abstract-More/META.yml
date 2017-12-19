@@ -24,9 +24,11 @@ no_index:
     - inc
     - t
 requires:
+  Carp: 0
   MRO::Compat: 0
   Params::Validate: 0
   SQL::Abstract: 1.84
+  Scalar::Util: 0
   namespace::clean: 0
   parent: 0
   perl: 5.8.0
@@ -35,4 +37,4 @@ resources:
   homepage: https://metacpan.org/author/DAMI
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/damil/SQL-Abstract-More.git
-version: '1.30'
+version: '1.31'

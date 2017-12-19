@@ -1,0 +1,160 @@
+package Bio::MUST::Core::GeneticCode::Factory;
+# ABSTRACT: Genetic code factory based on NCBI gc.prt file
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.173500';
+use Moose;
+use namespace::autoclean;
+
+use autodie;
+use feature qw(say);
+
+use Carp;
+use File::Spec;
+use LWP::Simple qw(get);
+use Path::Class qw(file);
+
+use Bio::MUST::Core::Types;
+use Bio::MUST::Core::Utils qw(fix_homedir);
+use aliased 'Bio::MUST::Core::GeneticCode';
+
+
+# public path to NCBI Taxonomy dump directory
+has 'tax_dir' => (
+    is       => 'ro',
+    isa      => 'Str',
+);
+
+
+# private hash hosting NCBI codes
+has '_code_for' => (
+    traits   => ['Hash'],
+    is       => 'ro',
+    isa      => 'HashRef[Bio::MUST::Core::GeneticCode]',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_code_for',
+    handles  => {
+             code_for => 'get',
+        list_codes    => 'keys',
+    },
+);
+
+
+## no critic (ProhibitUnusedPrivateSubroutines)
+
+sub _build_code_for {
+    my $self = shift;
+
+    # split file content into code blocks
+    my @codes = $self->_get_gcprt_content =~ m/ \{ ( [^{}]+ ) \} /xmsgc;
+    croak "Error: cannot read 'gc.prt' file; aborting!" unless @codes;
+
+# Genetic-code-table ::= {
+# ...
+#  {
+#     name "Mold Mitochondrial; Protozoan Mitochondrial; Coelenterate
+#  Mitochondrial; Mycoplasma; Spiroplasma" ,
+#   name "SGC3" ,
+#   id 4 ,
+#   ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+#   sncbieaa "--MM---------------M------------MMMM---------------M------------"
+#   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+#   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+#   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+#  },
+#  ...
+# }
+    my %code_for;
+
+    for my $code (@codes) {
+
+        # get all names and id for current code
+        my ($id)      = $code =~ m/   id    \s*   (\d+)   /xms;
+        my @names     = $code =~ m/ name    \s* \"(.*?)\" /xmsg;
+        @names = map {       s{\n}{}xmsgr } @names;     # remove newline chars
+        @names = map { split m{;\s*}xms }   @names;     # demultiplex names
+
+        # retrieve the amino acid line
+        my ($aa_line) = $code =~ m/ ncbieaa \s* \"(.*?)\" /xms;
+        $aa_line =~ s{\*}{x}xmsg;               # make STOPs MUST-compliant
+
+        # retrieve the three codon lines
+        my ($b1_line) = $code =~ m/ Base1   \s* ([TACG]+) /xms;
+        my ($b2_line) = $code =~ m/ Base2   \s* ([TACG]+) /xms;
+        my ($b3_line) = $code =~ m/ Base3   \s* ([TACG]+) /xms;
+
+        # split lines into aas and bases
+        my @aas    = split //, $aa_line;
+        my @bases1 = split //, $b1_line;
+        my @bases2 = split //, $b2_line;
+        my @bases3 = split //, $b3_line;
+
+        # build translation table for current code
+        my %aa_for = map {
+            join( '', $bases1[$_], $bases2[$_], $bases3[$_] ) => $aas[$_]
+        } 0..$#aas;
+
+        # add gap 'codons' to code
+        $aa_for{'***'} = q{*};
+        $aa_for{'---'} = q{*};
+        $aa_for{'   '} = q{ };
+
+        # store translation table under its various id and names
+        $code_for{$_} = GeneticCode->new(
+            ncbi_id => $id,
+            _code   => \%aa_for
+        ) for ($id, @names);
+    }
+
+    return \%code_for;
+}
+
+## use critic
+
+sub _get_gcprt_content {
+    my $self = shift;
+
+    # if available use local copy in NCBI Taxonomy dump
+    if (defined $self->tax_dir) {
+        my $tax_dir = fix_homedir($self->tax_dir);
+        return file($tax_dir, 'gc.prt')->slurp;
+    }
+
+    # otherwise fetch it from the NCBI FTP server
+    return get('ftp://ftp.ncbi.nih.gov/entrez/misc/data/gc.prt');
+}
+
+__PACKAGE__->meta->make_immutable;
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.prt file
+
+=head1 VERSION
+
+version 0.173500
+
+=head1 SYNOPSIS
+
+    # TODO
+
+=head1 DESCRIPTION
+
+    # TODO
+
+=head1 AUTHOR
+
+Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by University of Liege / Unit of Eukaryotic Phylogenomics / Denis BAURAIN.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

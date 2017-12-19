@@ -1,0 +1,14 @@
+Changes
+lib/Map/Tube/Copenhagen.pm
+share/copenhagen-map.json
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/map.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

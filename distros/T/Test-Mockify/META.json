@@ -4,7 +4,7 @@
       "ePages GmbH"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.9",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -79,7 +79,7 @@
    "provides" : {
       "Test::Mockify" : {
          "file" : "lib/Test/Mockify.pm",
-         "version" : "v0.10.1"
+         "version" : "v0.10.3"
       },
       "Test::Mockify::CompatibilityTools" : {
          "file" : "lib/Test/Mockify/CompatibilityTools.pm"
@@ -123,14 +123,15 @@
          "web" : "https://github.com/ePages-de/Mockify"
       }
    },
-   "version" : "0.10.1",
-   "x_authority" : "cpan:CHRISBR",
+   "version" : "0.10.3",
+   "x_authority" : "cpan:CHRBR",
    "x_contributors" : [
-      "Christian Breitkreutz <c.breitkreutz@epages.com>",
       "Alexander Sandau <a.sandau@epages.com>",
       "Birgit Bader <b.bader@epages.com>",
-      "Oliver Trosien <otrosien@epages.com>",
-      "Christian Breitkreutz <cbreitkreutz@epages.com>"
+      "Christian Breitkreutz <c.breitkreutz@epages.com>",
+      "Christian Breitkreutz <cbreitkreutz@epages.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Oliver Trosien <otrosien@epages.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

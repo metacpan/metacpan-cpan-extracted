@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8;
+plan tests => 9;
 
 my @module_files = (
     'Graphics/Raylib.pm',
     'Graphics/Raylib/Color.pm',
+    'Graphics/Raylib/Key.pm',
     'Graphics/Raylib/Keyboard.pm',
     'Graphics/Raylib/Mouse.pm',
     'Graphics/Raylib/Shape.pm',

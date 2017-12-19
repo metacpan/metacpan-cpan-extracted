@@ -150,4 +150,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Christian Breitkreutz <christianbreitkreutz@gmx.de>
+Christian Breitkreutz &lt;christianbreitkreutz@gmx.de>

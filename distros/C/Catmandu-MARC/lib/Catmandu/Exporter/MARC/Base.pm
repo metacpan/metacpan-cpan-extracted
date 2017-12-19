@@ -3,16 +3,24 @@ use Moo::Role;
 use MARC::Record;
 use MARC::Field;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 sub _raw_to_marc_record {
     my ($self,$data) = @_;
-    my $marc = MARC::Record->new(); 
+    my $marc = MARC::Record->new();
 
     for my $field (@$data) {
         my ($tag, $ind1, $ind2, @data) = @$field;
 
-        if ($tag eq 'LDR') {
+        $ind1 //= ' ';
+        $ind2 //= ' ';
+
+        @data = $self->_clean_raw_data($tag,@data);
+
+        if (@data < 2) {
+            $self->log->warn("$tag doesn't have any data");
+        }
+        elsif ($tag eq 'LDR') {
             $marc->leader($data[1]);
         }
         elsif ($tag =~ /^00/) {
@@ -33,7 +41,7 @@ sub _json_to_raw {
     my @record = ();
 
     push (@record , [ 'LDR', ' ', ' ', '_' , $data->{leader}] ) if defined $data->{leader};
-    
+
     for my $field (@{$data->{fields}}) {
         my ($tag) = keys %$field;
         my $val = $field->{$tag};
@@ -66,7 +74,6 @@ sub _clean_raw_data {
             push(@result, $data[$i], $data[$i+1]);
         }
     }
-    
     @result;
 }
 

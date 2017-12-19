@@ -20,8 +20,16 @@ no_index:
 requires:
   Mojolicious: '7.20'
 resources:
-  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-pager/issues
-  homepage: https://github.com/jhthorsen/mojolicious-plugin-pager
-  repository: https://github.com/jhthorsen/mojolicious-plugin-pager.git
-version: '0.04'
+  X_dynamic_config: 0
+  X_metaspec:
+    version: 2
+  X_resources:
+    bugtracker:
+      web: https://github.com/jhthorsen/mojolicious-plugin-pager/issues
+    homepage: https://github.com/jhthorsen/mojolicious-plugin-pager
+    repository:
+      type: git
+      url: https://github.com/jhthorsen/mojolicious-plugin-pager.git
+      web: https://github.com/jhthorsen/mojolicious-plugin-pager
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

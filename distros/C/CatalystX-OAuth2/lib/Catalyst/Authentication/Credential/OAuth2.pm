@@ -20,6 +20,7 @@ has token_uri_post_content_type => (is=>'ro', required=>1, default=>'application
 has extra_find_user_token_fields => (is=>'ro', required=>0, predicate=>'has_extra_find_user_token_fields');
 has scope => (is=>'ro', required=>0, predicate=>'has_scope');
 has audience => (is=>'ro', required=>0, predicate=>'has_audience');
+has response_type => (is=>'ro', required=>1, default=>'code');
 
 has client_secret => (
   is        => 'ro',
@@ -70,7 +71,7 @@ sub extend_permissions {
   my ( $self, $callback_uri, $auth_info ) = @_;
   my $uri   = URI->new( $self->grant_uri );
   my $query = {
-    response_type => 'code',
+    response_type => $self->response_type,
     client_id     => $self->client_id,
     redirect_uri  => $callback_uri,
   };
@@ -134,7 +135,7 @@ Catalyst::Authentication::Credential::OAuth2 - Authenticate against OAuth2 serve
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 
@@ -171,6 +172,10 @@ Required attributes that you get from your Oauth2 provider
 
 optional secret code from your Oauth2 provider (you need to review the docs from
 your provider).
+
+=head2 response_type
+
+The Oauth2 response_type.  Defaults to 'code'.
 
 =head2 scope
 

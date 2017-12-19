@@ -111,6 +111,14 @@ the printed value interactive in some way.
 Returns a string showing the given byte count in suitably scaled units. This
 will use base-1024 sizes in C<KiB>, C<MiB>, C<GiB> or C<TiB> if necessary.
 
+=head2 format_sv_with_value
+
+  $str = Devel::MAT::Cmd->format_sv_with_value( $sv )
+
+Similar to L</format_sv>, but more helpful on C<SCALAR> and C<REF> SVs. For
+C<SCALAR> SVs it will show the value directly by using L</format_value>, and
+for C<REF> SVs it will show the referrant SV.
+
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>

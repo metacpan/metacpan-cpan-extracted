@@ -69,6 +69,10 @@ be the only one that has much widespread web browser support.
 use strict;
 use warnings;
 
+use parent qw(
+    Net::WebSocket::Base::Typed
+);
+
 use Net::WebSocket::Constants ();
 use Net::WebSocket::Mask ();
 use Net::WebSocket::X ();

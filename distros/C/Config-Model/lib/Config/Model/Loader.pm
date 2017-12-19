@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.114';
+$Config::Model::Loader::VERSION = '2.116';
 use Carp;
 use strict;
 use warnings;
@@ -442,21 +442,30 @@ my %dispatch_action = (
         ':.copy'          => sub { $_[1]->copy( $_[5], $_[6] ); return 'ok'; },
         ':.clear'         => sub { $_[1]->clear; return 'ok';},
     },
+    # part of list or hash. leaf element have their own dispatch table
+    # (%load_value_dispatch) because the signture of the sub ref are
+    # different between the 2 dispatch tables.
     leaf => {
-        ':-=' => \&_remove_by_value,
-        ':-~' => \&_remove_matched_value,
-        ':=~' => \&_substitute_value,
+        ':.rm_value' => \&_remove_by_value,
+        ':.rm_match' => \&_remove_matched_value,
+        ':.subtitute' => \&_substitute_value,
     },
     fallback => {
-        ':-' => \&_remove_by_id,
-        '~'  => \&_remove_by_id,
+        ':.rm' => \&_remove_by_id,
     }
 );
 
-my @equiv = qw/:@ :.sort :< :.push :> :.unshift/;
-while (@equiv) {
-    my ( $to, $from ) = splice @equiv, 0, 2;
-    $dispatch_action{list_leaf}{$to} = $dispatch_action{list_leaf}{$from};
+my %equiv = (
+    list_leaf => { qw/:@ :.sort :< :.push :> :.unshift/ },
+    # fix for cme gh#2
+    leaf => { qw/:-= :.rm_value :-~ :.rm_match :=~ :.subtitute/ },
+    fallback => { qw/:- :.rm ~ :.rm/ },
+);
+
+while ( my ($target, $sub_equiv) = each %equiv) {
+    while ( my ($new_action, $existing_action) = each %$sub_equiv) {
+        $dispatch_action{$target}{$new_action} = $dispatch_action{$target}{$existing_action};
+    }
 }
 
 sub _insert_before {
@@ -636,13 +645,15 @@ sub _load_hash {
         );
     }
 
-    if ( $action eq ':~' ) {
+    # loop requires $subaction so does not fit in the dispath table
+    if ( $action eq ':~' or $action eq ':.foreach_match' ) {
         my @keys = $element->fetch_all_indexes;
         my $ret  = 'ok';
-        $id =~ s!^/|/$!!g if $id;
-        my @loop_on = $id ? grep { /$id/ } @keys : @keys;
+        my $pattern = $id // $f_arg;
+        $pattern =~ s!^/|/$!!g if $pattern;
+        my @loop_on = $pattern ? grep { /$pattern/ } @keys : @keys;
         if ($logger->is_debug) {
-            my $str = $id ? " with regex /$id/" : '';
+            my $str = $pattern ? " with regex /$pattern/" : '';
             $logger->debug("_load_hash: looping$str on keys @loop_on");
         }
 
@@ -887,7 +898,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 
@@ -1039,7 +1050,7 @@ Go down using C<xxx> element and id C<yy> (For C<hash> or C<list>
 element with C<node> cargo_type). Literal C<\n> are replaced by
 real C<\n> (LF in Unix).
 
-=item xxx:~yy
+=item xxx:.foreach_match(yy) or xxx:~yy
 
 Go down using C<xxx> element and loop over the ids that match the regex
 specified by C<yy>. (For C<hash>).
@@ -1067,24 +1078,24 @@ In the examples below only C<DX=BV> is executed by the loop:
 The loop is done on all elements of the hash when no value is passed
 after "C<:~>" (mnemonic: an empty regexp matches any value).
 
-=item xxx:-yy
+=item xxx:.rm(yy) or xxx:-yy
 
 Delete item referenced by C<xxx> element and id C<yy>. For a list,
 this is equivalent to C<splice xxx,yy,1>. This command does not go
 down in the tree (since it has just deleted the element). I.e. a
 'C<->' is generally not needed afterwards.
 
-=item xxx:-=yy
+=item xxx:.rm_value(yy) or xxx:-=yy
 
 Remove the element whose value is C<yy>. For list or hash of leaves.
 Does not not complain if the value to delete is not found.
 
-=item xxx:-~/yy/
+=item xxx:..rm_match(yy) or xxx:-~/yy/
 
 Remove the element whose value matches C<yy>. For list or hash of leaves.
 Does not not complain if no value were deleted.
 
-=item xxx:=~s/yy/zz/
+=item xxx:.substitute(/yy/zz/) or xxx=~s/yy/zz/
 
 Substitute a value with another. Perl switches can be used(e.g. C<xxx:=~s/yy/zz/gi>)
 

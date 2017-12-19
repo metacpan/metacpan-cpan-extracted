@@ -18,7 +18,7 @@ package Dist::Zilla::Plugin::GitVersionCheckCJM;
 #---------------------------------------------------------------------
 
 our $VERSION = '4.27';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 
 use version 0.77 ();
@@ -173,8 +173,8 @@ Dist::Zilla::Plugin::GitVersionCheckCJM - Ensure version numbers are up-to-date
 =head1 VERSION
 
 This document describes version 4.27 of
-Dist::Zilla::Plugin::GitVersionCheckCJM, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+Dist::Zilla::Plugin::GitVersionCheckCJM, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,7 @@ they were last changed.
 
 =head1 DEPENDENCIES
 
-GitVersionCheckCJM requires L<Dist::Zilla> (4.300009 or later).
+GitVersionCheckCJM requires L<Dist::Zilla> (6 or later).
 It also requires L<Git::Wrapper>, although it
 is only listed as a recommended dependency for the distribution (to
 allow people who don't use Git to use the other plugins.)
@@ -260,7 +260,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

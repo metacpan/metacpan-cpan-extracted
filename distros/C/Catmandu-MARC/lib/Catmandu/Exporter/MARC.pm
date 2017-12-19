@@ -3,9 +3,10 @@ use Catmandu::Sane;
 use Catmandu::Util;
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
+has skip_errors    => (is => 'ro');
 has _exporter      => (is => 'ro');
 
 with 'Catmandu::Exporter';
@@ -31,7 +32,20 @@ sub BUILD {
 }
 
 sub add {
-    $_[0]->_exporter->add($_[1]);
+  my ($self) = @_;
+
+  if ($self->skip_errors) {
+    eval {
+      $self->_exporter->add($_[1]);
+    };
+
+    if ($@) {
+      $self->log->error("error at record " . $self->count . " : $@");
+    }
+  }
+  else {
+    $self->_exporter->add($_[1]);
+  }
 }
 
 sub commit {
@@ -48,17 +62,14 @@ Catmandu::Exporter::MARC - Exporter for MARC records
 
 =head1 SYNOPSIS
 
-    # From the command line
-    $ catmandu convert MARC --type ISO to MARC --type XML < /foo/bar.mrc
+  # Convert MARC to MARC
+  $ catmandu convert MARC to MARC < /foo/bar.mrc > /foo/output.mrc
 
-    # From Perl
-    use Catmandu;
+  # Add fixes
+  $ catmandu convert MARC to MARC --fix myfixes.txt < /foo/bar.mrc > /foo/output.mrc
 
-    my $importer = Catmandu->importer('MARC', file => "/foo/bar.mrc" , type => 'ISO');
-    my $exporter = Catmandu->exporter('MARC', file => "marc.xml", type => "XML" );
-
-    $exporter->add($importer);
-    $exporter->commit;
+  # Convert on format to another format
+  $ catmandu convert MARC --type ISO to MARC --type ALEPHSEQ < /foo/bar.mrc > /foo/bar.aleph
 
 =head1 DESCRIPTION
 
@@ -67,38 +78,46 @@ to a file or the standard output.
 
 =head1 CONFIGURATION
 
-In addition to the configuration provided by L<Catmandu::Exporter> (C<file>,
-C<fh>, etc.) the exporter can be configured with the following parameters:
-
-The 'type' parameter describes the MARC syntax variant. Supported values include:
-
 =over
 
-=item
+=item file
 
-ISO: L<Catmandu::Exporter::MARC::ISO> (default)
+Write output to a local file given by its path or file handle.  Alternatively a
+scalar reference can be passed to write to a string and a code reference can be
+used to write to a callback function.
 
-=item
+=item fh
 
-XML: L<Catmandu::Exporter::MARC::XML>
+Write the output to an L<IO::Handle>. If not specified,
+L<Catmandu::Util::io|Catmandu::Util/IO-functions> is used to create the output
+handle from the C<file> argument or by using STDOUT.
 
-=item
+=item fix
 
-MARCMaker: L<Catmandu::Exporter::MARC::MARCMaker>
+An ARRAY of one or more fixes or file scripts to be applied to exported items.
 
-=item
+=item type
 
-MiJ: L<Catmandu::Exporter::MARC::MiJ> (MARC in JSON)
+The MARC format to parse. The following MARC parsers are available:
 
-=item
+  ISO: L<Catmandu::Importer::MARC::ISO> (default) - a strict ISO 2709 exporter
+  ALEPHSEQ: L<Catmandu::Importer::MARC::ALEPHSEQ> - an exporter for Ex Libris Aleph sequential files
+  MARCMaker: L<Catmandu::Importer::MARC::MARCMaker> - an exporter for MARCMaker/MARCBreaker records
+  MiJ: L<Catmandu::Importer::MARC::MiJ> (MARC in JSON) - an export for the MARC-in-JSON format
+  XML: L<Catmandu::Importer::MARC::XML> - an exporter for the MARC XML format
 
-ALEPHSEQ: L<Catmandu::Exporter::MARC::ALEPHSEQ>
+=item skip_errors
+
+If set, then any errors when parsing MARC output will be skipped and ignored. Use the
+debug setting of catmandu to view all error messages:
+
+  $ catmandu -D convert MARC to MARC --skip_errors 1 --fix myfixes.txt < /foo/bar.mrc
+
+=item <other>
+
+Every MARC importer can have its own options. Check the documentation of the specific importer.
 
 =back
-
-    E.g.
-
-    catmandu convert MARC --type XML to MARC --type ISO < marc.xml > marc.iso
 
 =head1 SEE ALSO
 

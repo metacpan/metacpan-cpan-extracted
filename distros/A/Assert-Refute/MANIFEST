@@ -1,0 +1,42 @@
+Changes
+lib/Assert/Refute.pm
+lib/Assert/Refute/Build.pm
+lib/Assert/Refute/Contract.pm
+lib/Assert/Refute/Driver/More.pm
+lib/Assert/Refute/Exec.pm
+lib/Assert/Refute/T/Basic.pm
+lib/Assert/Refute/T/Errors.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/000-load.t
+t/001-contract-signature.t
+t/101-Exec-refute.t
+t/102-Contract-apply.t
+t/103-Exec-signature.t
+t/104-Exec-indent.t
+t/105-Exec-readonly.t
+t/106-Build-to_scalar.t
+t/107-Basic-deep_diff.t
+t/108-T-Basic-deep_diff-looped.t
+t/201-current_contract.t
+t/202-Build-build_refute.t
+t/203-T-Basic-smoke.t
+t/204-T-Basic-all.t
+t/205-inspect.t
+t/206-signature.t
+t/207-subcontract.t
+t/208-T-Basic-contract-is.t
+t/210-T-Basic-cmp_ok.t
+t/301-dies_like.t
+t/302-warns_like.t
+t/401-minargs.t
+t/601-Driver-More-happy-case.t
+t/602-Driver-More-fork.t
+t/README
+xt/pod-coverage.t
+xt/pod-spelling.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

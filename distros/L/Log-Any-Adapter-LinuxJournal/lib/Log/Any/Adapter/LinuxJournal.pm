@@ -1,4 +1,4 @@
-package Log::Any::Adapter::LinuxJournal 0.172762;
+package Log::Any::Adapter::LinuxJournal 0.173471;
 
 # ABSTRACT: Log::Any adapter for the systemd journal on Linux
 
@@ -6,7 +6,7 @@ use v5.12;
 use warnings;
 
 use Linux::Systemd::Journal::Write 1.172760;
-use Log::Any::Adapter::Util '1.700';
+use Log::Any::Adapter::Util 1.700;
 use base 'Log::Any::Adapter::Base';
 
 sub init {
@@ -59,7 +59,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Ioan Rogers
+=for :stopwords Ioan Rogers cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee
+diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -67,7 +68,7 @@ Log::Any::Adapter::LinuxJournal - Log::Any adapter for the systemd journal on Li
 
 =head1 VERSION
 
-version 0.172762
+version 0.173471
 
 =head1 SYNOPSIS
 
@@ -87,21 +88,43 @@ It will log messages to the systemd journal via L<Linux::Systemd::Journal::Write
 
 L<Log::Any::Adapter::Journal>
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal/issues>.
+=head2 Perldoc
 
-=head1 AVAILABILITY
+You can find documentation for this module with the perldoc command.
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Log::Any::Adapter::LinuxJournal/>.
+  perldoc Log::Any::Adapter::LinuxJournal
 
-=head1 SOURCE
+=head2 Websites
 
-The development version is on github at L<http://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal>
-and may be cloned from L<git://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal.git>
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Log-Any-Adapter-LinuxJournal>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the web interface at L<https://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal/issues>.
+You will be automatically notified of any progress on the request by the system.
+
+=head2 Source Code
+
+The source code is available for from the following locations:
+
+L<https://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal>
+
+  git clone git://github.com/ioanrogers/Log-Any-Adapter-LinuxJournal.git
 
 =head1 AUTHOR
 
@@ -113,28 +136,5 @@ This software is copyright (c) 2017 by Ioan Rogers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
-WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
-PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
-EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
-SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
-THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
-TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
-SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGES.
 
 =cut

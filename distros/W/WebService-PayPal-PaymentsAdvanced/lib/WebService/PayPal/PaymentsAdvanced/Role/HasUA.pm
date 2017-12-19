@@ -4,7 +4,7 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use LWP::UserAgent;
 use Types::Standard qw( InstanceOf );

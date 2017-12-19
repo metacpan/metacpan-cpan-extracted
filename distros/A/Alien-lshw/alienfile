@@ -1,0 +1,30 @@
+use alienfile;
+use Env '@PATH';
+push @PATH, qw(/sbin /usr/sbin /usr/local/sbin);
+$^O eq 'linux' or die "OS unsupported. This is a Linux-only module\n";
+
+my $version = qr/\w([0-9\.]+)/;
+
+plugin 'Probe::CommandLine' => (
+  command        => 'lshw',
+  args           => ['-version'],
+  match_stderr   => qr/[.]/,
+  version_stderr => $version,
+);
+
+share {
+  plugin Download => (
+      url => 'https://github.com/lyonel/lshw/releases',
+      filter => qr/^B\..*\.tar\.gz$/,
+      version => $version,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  build [
+    '%{gmake}',
+    '%{gmake} install SBIN=%{.install.prefix}/bin PREFIX=%{.install.prefix}',
+  ];
+
+  plugin 'Gather::IsolateDynamic' => ();
+};

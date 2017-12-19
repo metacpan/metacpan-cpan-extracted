@@ -23,22 +23,25 @@ B<optex> I<options> [ -l | -m ] ...
     --ls            list link files
     --rc            list rc files
     --nop, -x       disable option processing
+    --[no]module    disable module option on arguments
 
 =cut
 
 
-use v5.10;
+use 5.014;
 use strict;
 use warnings;
 
 use Pod::Usage;
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 use Cwd qw(abs_path);
 
 our $rcloader;
 our $debug;
 our $no_operation;
 our $mod_opt = '-M';
+our $mod_arg = 1;	# Process -M option in target command
 
 my($cmd_dir, $cmd_name) = ($0           =~ m{ (.*) / ([^/]+) $ }x) or die;
 my($abs_dir, $abs_name) = (abs_path($0) =~ m{ (.*) / ([^/]+) $ }x) or die;
@@ -53,7 +56,10 @@ my $module_dir = $config_dir;
 my $bin_dir = $ENV{$env_BINDIR} || "$config_dir/bin";
 
 require Getopt::EX::Loader;
-$rcloader = Getopt::EX::Loader->new(BASECLASS => "");
+$rcloader = Getopt::EX::Loader->new(
+    BASECLASS => "",
+    IGNORE_NO_MODULE => 1,
+    );
 if (my $opt = $ENV{$env_MODULE_OPT}) {
     $mod_opt = $opt;
     $rcloader->configure(MODULE_OPT => $opt);
@@ -102,13 +108,14 @@ my @command_mod_path =
 
 prepend_path(@command_mod_path, @private_mod_path, @system_mod_path);
 
-if (@ARGV > 0 and $ARGV[0] eq $mod_opt) {
+if ($mod_arg and @ARGV > 0 and $ARGV[0] eq $mod_opt) {
     show_modules();
     exit;
 }
 
 unless ($no_operation) {
     load_rc "$config_dir/$target_name.rc";
+    $rcloader->configure(PARSE_MODULE_OPT => $mod_arg);
     $rcloader->deal_with(\@ARGV);
 }
 
@@ -135,12 +142,7 @@ sub remove_path {
 
 warn "$abs_name: exec $target_name @ARGV\n" if $debug;
 
-no warnings 'exec';
-
-exec $target_name, @ARGV
-    or warn "$target_name: $!\n";
-
-exit 1;
+exit system($target_name, @ARGV) >> 8;
 
 ######################################################################
 
@@ -165,7 +167,8 @@ sub self_option {
 	"rc"        => \$opt{rc},
 	"l|long"    => \$opt{long},
 	"m|cat"     => \$opt{cat},
-	"M|module"  => \$opt{module},
+	"M"         => \$opt{M},
+	"module!"   => \$main::mod_arg,
 	"x|nop!"    => \$main::no_operation,
 	);
     GetOptionsFromArray $argv, @optargs;
@@ -190,7 +193,7 @@ sub self_option {
 	_rc($argv, \%opt);
 	exit 0;
     }
-    elsif ($opt{module}) {
+    elsif ($opt{M}) {
 	show_modules();
 	exit 0;
     }
@@ -340,7 +343,7 @@ or symbolic link file linked to B<optex>:
 
     command -> optex
 
-If the configuration file F<~/.optex.d/>I<command>F<.rc> exits, it is
+If the configuration file F<~/.optex.d/>I<command>F<.rc> exists, it is
 read before execution and command arguments are pre-processed using
 that configuration.
 
@@ -583,6 +586,15 @@ List rc files in F<~/.optex.d> directory.
 =item B<--nop>, B<-x> I<command>
 
 Stop option manipulation.  Use full pathname otherwise.
+
+
+=item B<-->[B<no>]B<module>
+
+B<optex> deals with module option (-M) on target command by default.
+However, there is a command which also uses same option for own
+purpose.  Option B<--nomodule> disables that behaviour.  Other option
+interpretation is still effective, and there is no problem using
+module option in rc or module files.
 
 
 =back

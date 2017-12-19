@@ -32,13 +32,14 @@ $llht = $fpr->link_layer_header_type();
 ok(0 == ("LINKTYPE_RAW" cmp $llht),"name of link layer type is '$llht' should be 'LINKTYPE_RAW'");
 
 $pkg_count = 0;
-do {
-    $pkg = $fpr->next_packet();
+$pkg = $fpr->next_packet();
+while (not $pkg->{eof}) {
     $pkg_count++;
     last if $pkg_count > 2;
-} while (not $pkg->{eof});
+    $pkg = $fpr->next_packet();
+}
 
-ok(1 == $pkg_count, "pkg_count = $pkg_count, should be 1");
+ok(2 == $pkg_count, "pkg_count = $pkg_count, should be 2");
 
 done_testing;
 

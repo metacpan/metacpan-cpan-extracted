@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.114';
+$Config::Model::Backend::IniFile::VERSION = '2.116';
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -19,8 +19,6 @@ use Log::Log4perl qw(get_logger :levels);
 use base qw/Config::Model::Backend::Any/;
 
 my $logger = get_logger("Backend::IniFile");
-
-sub suffix { return '.ini'; }
 
 sub annotation { return 1; }
 
@@ -89,11 +87,13 @@ sub read {
             $section = $force_lc{section} ? lc($1) : $1;
             my $remap = $section_map->{$section} || '';
             if ( $remap eq '!' ) {
+                # section_map maps section to root node
                 $section_ref = $ini_data;
                 $comment_path = $section_path = '';
                 $logger->debug("step 1: found node <top> [$section]");
             }
             elsif ($remap) {
+                # section_map maps section to some node
                 $section_ref = {};
                 $logger->debug("step 1: found node $remap [$section]");
                 $section_path = $comment_path =
@@ -412,7 +412,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

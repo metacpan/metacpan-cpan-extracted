@@ -1,5 +1,15 @@
 Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
 
+0.06 Fri Dec 15 14:36:40 EST 2017
+    - Account for possible absence of 'author' in formation of name of .json
+      files.
+
+0.05 Fri Dec 15 12:33:18 EST 2017
+    - Improve handling of 'file' scheme URIs, since the Metabase::Resource
+      underlying App-cpanminus-reporter doesn't handle 'file' and hence cannot
+      get a value for 'author' (which is also needed for composition of
+      'distfile').
+
 0.04 Tue Dec  5 09:44:15 EST 2017
     - Require recent version of App-cpanminus-reporter.  Older versions handle
       UNKNOWN/NA reports differently; CPANtesters using those older versions

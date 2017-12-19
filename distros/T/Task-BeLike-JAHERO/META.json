@@ -1,0 +1,50 @@
+{
+   "abstract" : "JAHERO's frequently-used or favorite modules",
+   "author" : [
+      "Jan Herout <jan.herout@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Task-BeLike-JAHERO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0",
+            "Beam::Wire" : "0",
+            "DBI" : "0",
+            "DBIx::Simple" : "0",
+            "DateTime" : "0",
+            "File::Compare" : "0",
+            "File::Find::Rule" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Log4perl" : "0",
+            "Moo" : "0",
+            "MooX::Role::Logger" : "0",
+            "MooX::Types::Mooselike::Base" : "0",
+            "Parse::CSV" : "0",
+            "Path::Tiny" : "0",
+            "Test2" : "0",
+            "Test2::Suite" : "0",
+            "Try::Tiny" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.173490",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -27,16 +27,19 @@ is_deeply $pg->db->query('select 1 as one, 2 as two, 3 as three')->hash,
 
 # Non-blocking select
 my ($fail, $result);
+my $same;
 my $db = $pg->db;
 $db->query(
   'select 1 as one, 2 as two, 3 as three' => sub {
     my ($db, $err, $results) = @_;
     $fail   = $err;
     $result = $results->hash;
+    $same   = $db->dbh eq $results->db->dbh;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
+ok $same, 'same database handles';
 ok !$fail, 'no error';
 is_deeply $result, {one => 1, two => 2, three => 3}, 'right structure';
 
@@ -121,6 +124,20 @@ isnt $db->query('select 5 as five')->sth, $sth, 'different statement handles';
 isnt $db->query('select 6 as six')->sth,  $sth, 'different statement handles';
 is $db->query('select 3 as three')->sth,  $sth, 'same statement handle';
 
+# Connection reuse
+$db      = $pg->db;
+$dbh     = $db->dbh;
+$results = $db->query('select 1');
+undef $db;
+my $db2 = $pg->db;
+isnt $db2->dbh, $dbh, 'new database handle';
+undef $results;
+my $db3 = $pg->db;
+is $db3->dbh, $dbh, 'same database handle';
+$results = $db3->query('select 2');
+is $results->db->dbh, $dbh, 'same database handle';
+is $results->array->[0], 2, 'right result';
+
 # Dollar only
 $db = $pg->db;
 is $db->dollar_only->query('select $1::int as test', 23)->hash->{test}, 23,
@@ -199,7 +216,7 @@ isnt $db->dbh, $dbh, 'different database handle';
 $db = $pg->db;
 ok !$db->is_listening, 'not listening';
 ok $db->listen('dbtest')->is_listening, 'listening';
-my $db2 = $pg->db->listen('dbtest');
+$db2 = $pg->db->listen('dbtest');
 my @notifications;
 Mojo::IOLoop->delay(
   sub {

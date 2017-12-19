@@ -14,5 +14,5 @@ use POD2::RU;
 # its man page ( perldoc Test::More ) for help writing this test script.
 my $pod2 = POD2::RU->new();
 #use Data::Dumper;
-like($pod2->pod_info(), qr/\Q5.18.0.1\E/, '5.18.0.1');
+like($pod2->pod_info(), qr/\d+[.]\d+[.]\d+/, $pod2->pod_info());
 

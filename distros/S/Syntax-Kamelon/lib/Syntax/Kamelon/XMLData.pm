@@ -242,7 +242,7 @@ sub XMLSetContext {
 	my $i = $data->{items};
 	my $num = 1;
 	foreach my $item (@$i) {
-		$item->{path} = "$path::$num";
+		$item->{path} = $path . "::$num";
 		$num ++;
 	}
 	$self->ContextData->{$context} = $data;

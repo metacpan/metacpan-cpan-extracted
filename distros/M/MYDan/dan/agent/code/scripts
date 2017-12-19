@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use File::Temp qw( tempfile );
+use Digest::MD5;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+unless( $param{argv} && ref $param{argv} eq 'ARRAY' && @{$param{argv}} )
+{
+    print "noargv";
+    exit 1;
+}
+
+map
+{
+    my ( $type, $cont, $argv, $md5 ) = @$_{qw( type cont argv md5 )};
+
+    my ( $fh, $filename ) = tempfile();
+    print $fh $cont;
+    seek $fh, 0, 0;
+    my $m = Digest::MD5->new()->addfile( $fh )->hexdigest();
+    close $fh;
+
+    unless( $md5 && $m && ( $md5 eq $m ) )
+    {
+        print "md5 nomatch\n";
+        exit 1;
+    }
+
+    if( $type )
+    {
+        system "$type $filename $argv";
+    }
+    else
+    {
+        chmod 0755, $filename;
+        system "$filename $argv";
+    }
+
+    unlink $filename;
+
+    if( $? == -1 )
+    {
+        print "failed to execute: $!\n";
+        exit 1;
+    }
+    elsif ( $? & 127 )
+    {
+        printf "child died with signal %d, %s coredump\n",
+            ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
+        exit 1;
+    }
+
+    my $exit = $? >> 8;
+    exit $exit if $exit && print "child exited with value $exit\n";
+
+}@{$param{argv}};
+
+exit 0;

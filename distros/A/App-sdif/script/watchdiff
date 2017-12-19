@@ -12,12 +12,12 @@ use strict;
 use warnings;
 require 5.014;
 
+use open ":std" => ":encoding(utf8)";
 use Fcntl;
-use IO::File;
-use IO::Handle;
-use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+
+use List::Util qw(pairmap);
 
 use App::sdif;
 my $version = $App::sdif::VERSION;
@@ -34,9 +34,7 @@ my $opt_newline = 1;
 my $opt_mark = 0;
 my $opt_old = 0;
 my @opt_exec;
-
-my $default_diff =
-    'cdif --no-command --no-unknown -U100';
+my @opt_colormap;
 
 my @optargs = (
     "d" => \$opt_d,
@@ -51,42 +49,87 @@ my @optargs = (
     "O|old!" => \$opt_old,
     "D|date!" => \$opt_date,
     "N|newline!" => \$opt_newline,
+    "colormap|cm=s" => \@opt_colormap,
     "p|plain" => sub { $opt_date = $opt_newline = 0 },
     "h|help" => sub { pod2usage() },
     "H|man" => sub { pod2usage( {-verbose => 2} ) },
     );
 
+use Getopt::EX::Long;
 Getopt::Long::Configure(qw(bundling require_order));
 GetOptions(@optargs) || pod2usage();
 
+my %colormap;
+pairmap { $colormap{$a} = $b } qw(
+    APPEND	K/544
+    DELETE	K/544
+    OCHANGE	K/445
+    NCHANGE	K/445
+    OTEXT	K/455E
+    NTEXT	K/554E
+    );
+
+use Getopt::EX::Colormap;
+my $cm = Getopt::EX::Colormap
+    ->new(HASH => \%colormap)
+    ->load_params(@opt_colormap);
+
+my @default_diff = (
+    qw(cdif --no-command --no-unknown -U100),
+    map { ('--cm', "$_=$colormap{$_}") } sort keys %colormap
+    );
+
 if (@ARGV) {
-    push(@opt_exec, join ' ', @ARGV);
+    push @opt_exec, [ @ARGV ];
 } else {
-    pod2usage() unless @opt_exec;
+    @opt_exec or pod2usage();
 }
 
-my $stdout = new IO::Handle;
-$stdout->fdopen(fileno(STDOUT), "w") or die;
+use IO::Handle;
+(my $stdout = new IO::Handle)->fdopen(fileno(STDOUT), "w") or die;
 sub flush { $stdout->printflush(@_) }
-
-my $diffcmd;
-if ($opt_diff) {
-    $diffcmd = $opt_diff;
-} else {
-    $diffcmd = join(' ',
-		    $default_diff,
-		    $opt_mark ? () : qw(--nomark),
-		    $opt_old  ? () : qw(--noold),
-	);
-}
 
 use App::cdif::Command;
 my $old = new App::cdif::Command @opt_exec;
 my $new = new App::cdif::Command @opt_exec;
 
-my @termcap = qw( home clear el ed cd );
-my %termcap = map { $_ => `tput $_` // '' } @termcap if $opt_refresh;
-$termcap{ed} ||= $termcap{cd};
+my @diffcmd = do {
+    if ($opt_diff) {
+	use Text::ParseWords;
+	shellwords $opt_diff;
+    } else {
+	(
+	 @default_diff,
+	 $opt_mark ? () : qw(--no-mark),
+	 $opt_old  ? () : qw(--no-old),
+	);
+    }
+};
+
+use Getopt::EX::Colormap qw(ansi_code);
+my %termcap = pairmap { $a => ansi_code($b) } qw(
+    home	{CUP}
+    clear	{CUP}{ED2}
+    el		{EL}
+    ed		{ED}
+    );
+
+sub run {
+    use IO::File;
+    my $pid = (my $fh = new IO::File)->open('-|') // die "open: $@\n";
+    if ($pid == 0) {
+	open STDERR, ">&STDOUT" or die "dup: $!";
+	close STDIN;
+	exec @_ or warn "$_[0]: $!\n";
+	exit 3;
+    }
+    binmode $fh, ':encoding(utf8)';
+    my $result = do { local $/; <$fh> };
+    for my $child (wait) {
+	$child != $pid and die "child = $child, pid = $pid";
+    }
+    ($? >> 8) == 3 ? undef : $result;
+}
 
 print $termcap{clear} if $opt_refresh;
 my $count = 0;
@@ -94,19 +137,21 @@ my $refresh_count = 0;
 while (1) {
     $old->rewind;
     $new->update;
-    my $exec = sprintf "%s %s %s", $diffcmd, $old->path, $new->path;
-    my $data = `$exec` // die;
+    my $data = run(@diffcmd, $old->path, $new->path) // die "diff: $!\n";
     if ($data eq '') {
 	if ($opt_silent) {
 	    flush $new->date, "\r";
 	    next;
 	}
 	$data = $new->data;
+	$data =~ s/^/ /mg if $opt_mark;
     }
     $data .= "\n" if $opt_newline;
     if ($opt_refresh) {
 	$data =~ s/^/$termcap{el}/mg;
-	print $termcap{home} if $refresh_count++ % $opt_refresh == 0;
+	if ($refresh_count++ % $opt_refresh == 0) {
+	    print $termcap{clear};
+	}
     }
     print $new->date, "\n\n" if $opt_date;
     print $data;
@@ -149,6 +194,8 @@ Options:
 	--diff=command      diff command used to compare result
 
 =head1 EXAMPLES
+
+	watchdiff ifconfig -a
 
 	watchdiff df
 

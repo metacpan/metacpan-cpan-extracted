@@ -1,0 +1,154 @@
+# hmmsearch :: search profile(s) against a sequence database
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query HMM file:                  aligned-nuc.hmm
+# target sequence database:        aligned-nuc_target.fasta
+# output directed to file:         aligned-nuc_notextw.out
+# per-seq hits tabular output:     aligned-nuc_table.out
+# per-dom hits tabular output:     aligned-nuc_domtable.out
+# max ASCII text line length:      unlimited
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       aligned-nuc  [M=471]
+Scores for complete sequences (score includes all domains):
+   --- full sequence ---   --- best 1 domain ---    -#dom-
+    E-value  score  bias    E-value  score  bias    exp  N  Sequence                              Description
+    ------- ------ -----    ------- ------ -----   ---- --  --------                              -----------
+     1e-116  380.3   0.8   1.1e-116  380.2   0.8    1.0  1  Salamandra_salamandra_Miguel@3508991   
+     1e-116  380.3   0.8   1.3e-116  380.0   0.8    1.0  1  Salamandra_salamandra_Galtier@2928138  
+   2.2e-116  379.2   0.7   2.4e-116  379.1   0.7    1.0  1  Salamandra_atra@2661876                
+   2.6e-116  379.0   0.7   2.9e-116  378.8   0.7    1.0  1  Lyciasalamandra_atifi@2537255          
+   2.6e-116  379.0   0.7   2.9e-116  378.8   0.7    1.0  1  Lyciasalamandra_billae@2556928         
+     3e-116  378.8   0.7   3.3e-116  378.6   0.7    1.0  1  Salamandra_lanzai@2861447              
+   3.3e-116  378.7   0.8   3.6e-116  378.5   0.8    1.0  1  Salamandra_algira@2332629              
+   1.7e-115  376.3   0.8   1.9e-115  376.2   0.8    1.0  1  Salamandra_infraimmaculata@3570305     
+     2e-115  376.1   0.7   2.2e-115  375.9   0.7    1.0  1  Salamandra_corsica@2906900             
+
+
+Domain annotation for each sequence (and alignments):
+>> Salamandra_salamandra_Miguel@3508991  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  380.2   0.8  1.1e-116  1.1e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 380.2 bits;  conditional E-value: 1.1e-116
+                           aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                           gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattac+cacttgaagaggtggacgaaat
+  Salamandra_salamandra_Miguel@3508991   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAAGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTACAGGGACATGACACGATCCTGGATTACACACTTGAAGAGGTGGACGAAAT 470
+                                           78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********9*************************************************9*****9********************************99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99************************************************99876 PP
+
+>> Salamandra_salamandra_Galtier@2928138  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  380.0   0.8  1.3e-116  1.3e-116       2     470 ..      14     482 ..      13     483 .] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 380.0 bits;  conditional E-value: 1.3e-116
+                            aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                            gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattac+cacttgaagaggtggacgaaat
+  Salamandra_salamandra_Galtier@2928138  14 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAAGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTACAGGGACATGACACGATCCTGGATTACACACTTGAAGAGGTGGACGAAAT 482
+                                            78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********9*************************************************9*****9********************************99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99************************************************99876 PP
+
+>> Salamandra_atra@2661876  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  379.1   0.7  2.4e-116  2.4e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 379.1 bits;  conditional E-value: 2.4e-116
+              aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                              gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctca tggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaatt+cagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat
+  Salamandra_atra@2661876   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAAGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAATGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTTCAGGGACATGACACGATCCTGGATTACGCACTTGAAGAGGTGGACGAAAT 470
+                              78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********9*************************************************9*****9********************************99999********************************9********9******9****9****9********9999***9999**********************************9**************9888889****************9***99999*********************************************99876 PP
+
+>> Lyciasalamandra_atifi@2537255  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  378.8   0.7  2.9e-116  2.9e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 378.8 bits;  conditional E-value: 2.9e-116
+                    aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                    gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttgga+gagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatgga gtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaatt+cagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat
+  Lyciasalamandra_atifi@2537255   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAGGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGAAGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTTCAGGGACATGACACGATCCTGGATTACGCACTTGAAGAGGTGGACGAAAT 470
+                                    78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********99************************************************9*****9************************9*******99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99999*********************************************99876 PP
+
+>> Lyciasalamandra_billae@2556928  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  378.8   0.7  2.9e-116  2.9e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 378.8 bits;  conditional E-value: 2.9e-116
+                     aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                     gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttgga+gagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatgga gtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaatt+cagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat
+  Lyciasalamandra_billae@2556928   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAGGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGAAGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTTCAGGGACATGACACGATCCTGGATTACGCACTTGAAGAGGTGGACGAAAT 470
+                                     78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********99************************************************9*****9************************9*******99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99999*********************************************99876 PP
+
+>> Salamandra_lanzai@2861447  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  378.6   0.7  3.3e-116  3.3e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 378.6 bits;  conditional E-value: 3.3e-116
+                aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgta actggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattac+cacttgaagaggtggacgaaat
+  Salamandra_lanzai@2861447   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAAGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTACACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTACAGGGACATGACACGATCCTGGATTACACACTTGAAGAGGTGGACGAAAT 470
+                                78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********9*************************************************9*****9********************************99999********************************9********9******9*********9********9999***9999***************************9******9**************9888889****************9***99************************************************99876 PP
+
+>> Salamandra_algira@2332629  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  378.5   0.8  3.6e-116  3.6e-116       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 378.5 bits;  conditional E-value: 3.6e-116
+                aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                gcatgtttacctc aagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattac+cacttgaagaggtggacgaaat
+  Salamandra_algira@2332629   2 GCATGTTTACCTCGAAGCTGTTTACACTGGTGCTGGTGGTTCAGCCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAAGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTACAGGGACATGACACGATCCTGGATTACACACTTGAAGAGGTGGACGAAAT 470
+                                78999999*************9***********************9******9****999999*********9********************************9*****9********99999************************9****9***********9*************************************************9*****9********************************99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99************************************************99876 PP
+
+>> Salamandra_infraimmaculata@3570305  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  376.2   0.8  1.9e-115  1.9e-115       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 376.2 bits;  conditional E-value: 1.9e-115
+                         aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                         gcatgtttacctctaagctgtttacactggtgctggtggttca cccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttgga+gagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctca tggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaatt+cagggacatgacacgatcctggattacgcacttgaagaggtgga gaaat
+  Salamandra_infraimmaculata@3570305   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAACCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAGGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAGTTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAATGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTTCAGGGACATGACACGATCCTGGATTACGCACTTGAAGAGGTGGATGAAAT 470
+                                         78999999*************9********************99999*****9****999999*********9********************************9*****9********99999************************9****9***********99************************************************9*****9********************************99999********************************9********9******9****9****9********9999***9999**********************************9**************9888889****************9***99999*****************************************999998776 PP
+
+>> Salamandra_corsica@2906900  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !  375.9   0.7  2.2e-115  2.2e-115       2     470 ..       2     470 ..       1     471 [] 0.96
+
+  Alignments for each domain:
+  == domain 1  score: 375.9 bits;  conditional E-value: 2.2e-115
+                 aligned-nuc   2 gcatgtttacctctaagctgtttacactggtgctggtggttcagcccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttggaagagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacagagttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggacatgacacgatcctggattacgcacttgaagaggtggacgaaat 470
+                                 gcatgtttacctctaagctgtttacactggtgctggtggttca cccaagcaaattcttttgggcatgaagaaacgtggattcggtgctggacgatggaatggctttggtgggaaggtacaaaaaggcgagaccattgaggaagcagcaaagagggaactgttgga+gagagtggcctgacagtagatgagctacacaagattggtaacatcaagtttgaatttgttggcagcacaga ttgatggatgtccacatttttcgagcagacaactattctggcgaaccaacagaaagtgaagaaatgcgccctcagtggtttgagctggaaaacgtccccttcgtgcagatgtggccggacgatgtatactggtttccaattatgcttcaaaaaaagaagttccttggctatttcaaattacagggaca gacacgatcctggattacgcacttgaagaggtggacgaaat
+  Salamandra_corsica@2906900   2 GCATGTTTACCTCTAAGCTGTTTACACTGGTGCTGGTGGTTCAACCCAAGCAAATTCTTTTGGGCATGAAGAAACGTGGATTCGGTGCTGGACGATGGAATGGCTTTGGTGGGAAGGTACAAAAAGGCGAGACCATTGAGGAAGCAGCAAAGAGGGAACTGTTGGAGGAGAGTGGCCTGACAGTAGATGAGCTACACAAGATTGGTAACATCAAGTTTGAATTTGTTGGCAGCACAGAATTGATGGATGTCCACATTTTTCGAGCAGACAACTATTCTGGCGAACCAACAGAAAGTGAAGAAATGCGCCCTCAGTGGTTTGAGCTGGAAAACGTCCCCTTCGTGCAGATGTGGCCGGACGATGTATACTGGTTTCCAATTATGCTTCAAAAAAAGAAGTTCCTTGGCTATTTCAAATTACAGGGACACGACACGATCCTGGATTACGCACTTGAAGAGGTGGACGAAAT 470
+                                 78999999*************9********************99999*****9****999999*********9********************************9*****9********99999************************9****9***********99************************************************9*****9**************999***************99999********************************9********9******9*********9********9999***9999**********************************9**************9888889****************9***99******9*****************************************99876 PP
+
+
+
+Internal pipeline statistics summary:
+-------------------------------------
+Query model(s):                              1  (471 nodes)
+Target sequences:                            9  (4251 residues searched)
+Passed MSV filter:                         9  (1); expected 0.2 (0.02)
+Passed bias filter:                        9  (1); expected 0.2 (0.02)
+Passed Vit filter:                         9  (1); expected 0.0 (0.001)
+Passed Fwd filter:                         9  (1); expected 0.0 (1e-05)
+Initial search space (Z):                  9  [actual number of targets]
+Domain search space  (domZ):               9  [number of targets reported over threshold]
+# CPU time: 0.06u 0.00s 00:00:00.06 Elapsed: 00:00:00.06
+# Mc/sec: 33.37
+//
+[ok]

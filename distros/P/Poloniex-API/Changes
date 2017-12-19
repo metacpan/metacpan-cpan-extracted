@@ -1,5 +1,8 @@
 Revision history for Perl extension Poloniex::API.
 
+0.03  15.12.2017
+	- add Dependency on Test::* in Makefile.PL
+
 0.02  11.12.2017
 	- add Dependency on JSON::XS in Makefile.PL
 

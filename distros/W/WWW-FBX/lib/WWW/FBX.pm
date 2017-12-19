@@ -15,7 +15,7 @@ with 'WWW::FBX::Role::Auth';
  
 use namespace::autoclean;
 
-our $VERSION = "0.21";
+our $VERSION = "0.22";
 
 has base_url    => ( isa => 'Str', is => 'ro', default => 'http://mafreebox.free.fr' );
 has lwp_args    => ( isa => 'HashRef', is => 'ro', default => sub { {} } );
@@ -25,6 +25,7 @@ has ua          => ( isa => 'LWP::UserAgent', is => 'rw', lazy => 1, builder => 
 has uar         => ( isa => 'HashRef', is => 'rw' );
 has uarh        => ( isa => 'HTTP::Response', is => 'rw' );
 has debug       => ( isa => 'Bool', is => 'rw', default => 0, trigger => \&_set_debug );
+has noauth      => ( isa => 'Bool', is => 'ro', default => 0 );
 
 has _json_handler   => (
     is      => 'rw',

@@ -29,6 +29,11 @@ WriteMakefile(
     clean => { FILES => 'Map-Tube-API-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Map::Tube::API'            => { file => 'lib/Map/Tube/API.pm'          , version => '0.03' },
+            'Map::Tube::API::UserAgent' => { file => 'lib/Map/Tube/API/UserAgent.pm', version => '0.03' },
+            'Map::Tube::API::Exception' => { file => 'lib/Map/Tube/API/Exception.pm', version => '0.03' },
+        },
         resources => {
             repository => {
                 type => 'git',

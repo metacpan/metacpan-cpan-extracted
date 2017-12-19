@@ -2,6 +2,7 @@ package Test::Mockify::Parameter;
 use Test::Mockify::ReturnValue;
 use Data::Compare;
 use Test::Mockify::TypeTests qw ( IsString );
+use Scalar::Util qw(blessed );
 
 use strict;
 use warnings;
@@ -42,9 +43,9 @@ sub matchWithExpectedParameters {
     return 0 unless (scalar @Params == scalar @{$self->{'ExpectedParams'}});
 
     for(my $i=0; $i < scalar @Params; $i++){
-        if(not $self->{'ExpectedParams'}->[$i]->{'Value'}){
+        if(not $self->{'ExpectedParams'}->[$i]->{'Value'}){ #No Value no Match
             next;
-        }elsif(ref($Params[$i]) eq $self->{'ExpectedParams'}->[$i]->{'Value'}){# map package name
+        }elsif(blessed($Params[$i]) && $Params[$i]->isa($self->{'ExpectedParams'}->[$i]->{'Value'})){# map package name
             next;
         }elsif(Data::Compare->new()->Cmp($Params[$i], $self->{'ExpectedParams'}->[$i]->{'Value'})){
             next;

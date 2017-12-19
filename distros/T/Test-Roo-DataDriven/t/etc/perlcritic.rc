@@ -1,0 +1,5 @@
+; -*- conf -*-
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test::Roo
+equivalent_modules = Test::Roo::Role

@@ -16,7 +16,7 @@
 ]>
             
 <language section="Markup" name="Textile" 
-        version="2" kateversion="3.0"
+        version="3" kateversion="3.0"
         extensions="*.textile" priority="15"
         author="Alexander Kabakov (kabakov.as@gmail.com)"
         license="LGPL" >
@@ -64,18 +64,19 @@
                 <StringDetect attribute="comment" context="#pop" String="--&gt;" endRegion="comment" />
             </context>
             
-            <context attribute="common" name="inc" lineEndContext="#stay" >
+            <context attribute="Normal Text" name="inc" lineEndContext="#stay" >
                 <RegExpr attribute="strong" String="&strongregex;" />
                 <RegExpr attribute="strikeout" minimal="true" String="&strikeoutregex;"/>
             </context>
         </contexts>
 
         <itemDatas>
-            <itemData name="Normal Text" defStyleNum="dsNormal" />
+			  <!--		 Adapted to work with Syntax::Kamelon-->
+			  <itemData name="Normal Text" defStyleNum="dsNormal" />
             
-				<itemData name="sectiontitle" defStyleNum="dsInformation" bold="true" />
+            <itemData name="sectiontitle" defStyleNum="dsKeyword" bold="true" />
             <itemData name="sectionheader" defStyleNum="dsFunction" bold="true" />
-				<itemData name="sectionblockattrs" defStyleNum="dsAttribute" bold="true"/>
+				<itemData name="sectionblockattrs" defStyleNum="dsCommentVar" bold="true"/>
             <itemData name="blockattrs" defStyleNum="dsComment" />
             <itemData name="textblock"  defStyleNum="dsComment" />
             
@@ -84,7 +85,7 @@
             
             <itemData name="itemlist" defStyleNum="dsDataType" />
             
-				<itemData name="macro"  defStyleNum="dsDocumentation" bold="true"/>
+            <itemData name="macro"  defStyleNum="dsComment" bold="true"/>
             <itemData name="comment"  defStyleNum="dsComment" />
             
             <itemData name="image"  defStyleNum="dsFloat" />

@@ -6,11 +6,13 @@ use Moo;
 use MARC::Spec;
 use MARC::Spec::Field;
 require MARC::Spec::Subfield;
+require MARC::Spec::Indicator;
 require MARC::Spec::Comparisonstring;
 require MARC::Spec::Subspec;
+
 use namespace::clean;
 
-our $VERSION = '1.0.0';
+our $VERSION = '2.0.3';
 
 has spec => (
     is => 'rw',
@@ -21,17 +23,18 @@ has marcspec => (
     is => 'rwp'
 );
 
-const my $FIELDTAG => q{^(?<tag>(?:[a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3}))?};
+const my $FIELDTAG => q{(?<tag>(?:[a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3}))};
 const my $POSITIONORRANGE => q{(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))};
 const my $INDEX => qq{(?:\\[(?<index>$POSITIONORRANGE)\\])?};
-const my $CHARPOS => qq{\\/(?<charpos>$POSITIONORRANGE)};
-const my $INDICATORS => q{_(?<indicators>(?:[_a-z0-9][_a-z0-9]{0,1}))};
+const my $CHARPOS => qq{(?:\\/(?<charpos>$POSITIONORRANGE))?};
+const my $INDICATORPOS => q{(?:\^(?<indicatorpos>[12]))};
 const my $SUBSPECS => q{(?<subspecs>(?:\\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\\})+)?};
-const my $SUBFIELDS => q{(?<subfields>\$.+)?};
-const my $FIELD => qr/(?<field>(?:$FIELDTAG$INDEX(?:$CHARPOS|$INDICATORS)?$SUBSPECS$SUBFIELDS))/s;
+const my $SUBFIELDS => q{(?<subfields>\$.+)};
+const my $FIELD => qq{(?<field>$FIELDTAG$INDEX)};
+const my $MARCSPEC => qr/^(?<marcspec>$FIELD(?:$SUBFIELDS|(?:$INDICATORPOS|$CHARPOS)$SUBSPECS))/s;
 const my $SUBFIELDRANGE => q{(?<range>(?:[0-9a-z]\-[0-9a-z]))};
 const my $SUBFIELDTAG => q{(?<code>[\!-\?\[-\\{\\}-~])};
-const my $SUBFIELD => qr/(?<subfield>\$(?:$SUBFIELDRANGE|$SUBFIELDTAG)$INDEX(?:$CHARPOS)?$SUBSPECS)/s;
+const my $SUBFIELD => qr/(?<subfield>\$(?:$SUBFIELDRANGE|$SUBFIELDTAG)$INDEX$CHARPOS$SUBSPECS)/s;
 const my $LEFTSUBTERM => q{^(?<left>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?};
 const my $OPERATOR => q{(?<operator>\!\=|\!\~|\=|\~|\!|\?)};
 const my $SUBTERMS => qq{(?:$LEFTSUBTERM$OPERATOR)?(?<right>.+)}.q{$};
@@ -41,6 +44,7 @@ const my $UNESCAPED => qr/(?<![\\\\\$])[\{\}]/s;
 const my $MIN_LENGTH_FIELD => 3;
 const my $MIN_LENGTH_SUBFIELD => 2;
 const my $NO_LENGTH => -1;
+const my $ERROR => 'Only one of characterSpec, subfieldSpec or indicatorSpec is allowed.';
 
 my %cache;
 
@@ -52,21 +56,11 @@ sub BUILDARGS {
 
 sub BUILD {
     my ($self) = @_;
-    my $field = $self->_match_field();
-    my $ms = MARC::Spec->new($field);
-    if($self->{_parsed}->{subfields}) { 
-        my $subfields = $self->_match_subfields();
-        $ms->add_subfields($subfields);
-    }
-    $self->_set_marcspec($ms);
-}
-
-sub _match_field {
-    my ($self) = @_;
-
+    my ($indicator, $subspecs, $field, $ms);
+    
     _do_checks($self->spec, $MIN_LENGTH_FIELD);
 
-    $self->spec =~ $FIELD;
+    $self->spec =~ $MARCSPEC;
     
     %{$self->{_parsed}} = %+;
 
@@ -74,40 +68,55 @@ sub _match_field {
         _throw("For fieldtag only '.', digits and lowercase alphabetic or digits and upper case alphabetics characters are allowed.", $self->spec);
     }
 
-    if( length $self->{_parsed}->{field}  != length $self->spec ) {
+    if( length $self->{_parsed}->{marcspec}  != length $self->spec ) {
         _throw('Detected useless data fragment or invalid field spec.', $self->spec);
     }
-
+    
     # create a new Field
-    my $field = MARC::Spec::Field->new($self->{_parsed}->{tag});
+    $field = MARC::Spec::Field->new($self->{_parsed}->{tag});
 
-    if(defined $self->{_parsed}->{indicators}) {
-        my $ind1 = substr $self->{_parsed}->{indicators}, 0, 1;
-        if('_' ne $ind1) { $field->indicator1($ind1) }
+    if(defined $self->{_parsed}->{charpos}) {
 
-        if(2 == length($self->{_parsed}->{indicators})) {
-            my $ind2 = substr $self->{_parsed}->{indicators}, 1, 1;
-            if('_' ne $ind2) { $field->indicator2($ind2) }
+        if(defined $self->{_parsed}->{subfields}) {
+            _throw($ERROR, $self->spec);
         }
-    } elsif(defined $self->{_parsed}->{charpos}) {
         $field->set_char_start_end($self->{_parsed}->{charpos});
     }
     
     if(defined $self->{_parsed}->{index}) {
         $field->set_index_start_end($self->{_parsed}->{index});
     }
-
-    if(defined $field->char_start && defined $self->{_parsed}->{subfields}) {
-        _throw("Either characterSpec for field or subfields are allowed.", $self->spec);
-    }
     
     $self->{field_base} = $field->base;
+
+    $ms = MARC::Spec->new($field);
+
+    if(defined $self->{_parsed}->{indicatorpos}) {
+        if(defined $self->{_parsed}->{charpos}) {
+            _throw($ERROR, $self->spec);
+        }
+        $indicator = MARC::Spec::Indicator->new($self->{_parsed}->{indicatorpos});
+
+        $ms->indicator($indicator);
+
+    } elsif($self->{_parsed}->{subfields}) {
+        if(defined $self->{_parsed}->{indicatorpos}) {
+            _throw($ERROR, $self->spec);
+        }
+        my $subfields = $self->_match_subfields();
+        $ms->add_subfields($subfields);
+    }
     
     if($self->{_parsed}->{subspecs}) {
-        my $field_subspecs = $self->_match_subspecs($self->{_parsed}->{subspecs});
-        $self->_populate_subspecs($field, $field_subspecs, [$self->{field_base}]);
+        $subspecs = $self->_match_subspecs($self->{_parsed}->{subspecs});
+        if(defined $indicator) {
+            $self->_populate_subspecs($indicator, $subspecs, [$field->base, $indicator->base]);
+        } else {
+            $self->_populate_subspecs($field, $subspecs, [$field->base]);
+        }
     }
-    return $field;
+
+    $self->_set_marcspec($ms);
 }
 
 sub _populate_subspecs {
@@ -181,7 +190,7 @@ sub _match_subspecs {
     my @subspecs;
 
     foreach ($subspecs =~ /$SUBSPEC/g) {
-        push @subspecs, [split /(?<!\\)\|/];
+        push @subspecs, [split(/(?<!\\)\|/, $_)];
     }
     return \@subspecs;
 }
@@ -204,7 +213,6 @@ sub _match_subterms {
         if(defined $+{$side}) {
             if('\\' ne substr $+{$side},0,1) {
                 my $spec = _spec_context($+{$side},$context);
-
                 # this prevents the spec parsed again
                 if($cache{$spec}) {
                     $subSpec->$side( $cache{$spec} );
@@ -236,21 +244,20 @@ sub _match_subterms {
 
 sub _spec_context {
     my ($spec, $context) = @_;
+
     my $fieldContext = @{$context}[0];
     my $fullcontext = join '', @{$context};
 
     if($spec eq $fullcontext) { return $spec }
 
     my $firstChar = substr $spec,0,1;
-    if($firstChar eq '_') {
+    if($firstChar eq '^') {
         my $refPos = index $fullcontext, $firstChar;
-
         if(0 <= $refPos) {
-            if('$' ne substr $fullcontext,$refPos - 1,1) {
-               return substr($fullcontext,0,$refPos).$spec;
-            }
+            return substr($fullcontext,0,$refPos)."$spec";
         }
-        return $fullcontext.$spec;
+
+        return "$fieldContext"."$spec";
     }
     
     if($firstChar eq '$') { return $fieldContext.$spec }
@@ -260,10 +267,10 @@ sub _spec_context {
 
         if(0 <= $refPos) {
             if('$' ne substr $fullcontext,$refPos - 1,1) {
-                return substr($fullcontext,0,$refPos).$spec;
+                return substr($fullcontext,0,$refPos)."$spec";
             }
         }
-        return $fullcontext.$spec;
+        return "$fullcontext"."$spec";
     }
 
     return $spec;
@@ -299,7 +306,7 @@ __END__
 
 =head1 NAME
 
-L<MARC::Spec::Parser|MARC::Spec::Parser> - parses a MARCspec as string
+MARC::Spec::Parser - parses a MARCspec as string
 
 =head1 SYNOPSIS
 
@@ -313,7 +320,7 @@ L<MARC::Spec::Parser|MARC::Spec::Parser> - parses a MARCspec as string
 
 =head1 DESCRIPTION
 
-L<MARC::Spec::Parser|MARC::Spec::Parser> parses a MARCspec as string into a L<MARC::Spec|MARC::Spec>.
+MARC::Spec::Parser parses a MARCspec as string into a L<MARC::Spec|MARC::Spec>.
 L<MARC::Spec|MARC::Spec> is a L<MARCspec - A common MARC record path language|http://marcspec.github.io/MARCspec/> parser and validator.
 
 =head1 METHODS
@@ -358,10 +365,22 @@ Please report any bugs to L<https://github.com/MARCspec/MARC-Spec/issues|https:/
 
 =head1 SEE ALSO
 
-L<MARC::Spec|MARC::Spec>,
-L<MARC::Spec::Field|MARC::Spec::Field>,
-L<MARC::Spec::Subfield|MARC::Spec::Subfield>,
-L<MARC::Spec::Subspec|MARC::Spec::Subspec>,
-L<MARC::Spec::Structure|MARC::Spec::Structure>,
-L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>
+=over
+
+=item * L<MARC::Spec|MARC::Spec>
+
+=item * L<MARC::Spec::Field|MARC::Spec::Field>
+
+=item * L<MARC::Spec::Subfield|MARC::Spec::Subfield>
+
+=item * L<MARC::Spec::Indicator|MARC::Spec::Indicator>
+
+=item * L<MARC::Spec::Subspec|MARC::Spec::Subspec>
+
+=item * L<MARC::Spec::Structure|MARC::Spec::Structure>
+
+=item * L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>
+
+=back
+
 =cut

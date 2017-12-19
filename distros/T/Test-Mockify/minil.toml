@@ -2,5 +2,5 @@ name = "Test-Mockify"
 badges = ["travis", "metacpan"]
 
 module_maker="ModuleBuildTiny"
-authority = "cpan:CHRISBR"
+authority = "cpan:CHRBR"
 

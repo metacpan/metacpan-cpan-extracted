@@ -1,0 +1,11 @@
+Revision history for Perl module Tribology::Lubricant
+
+
+0.03    2017-12-15
+    * github url added to Makefile.PL
+
+0.02    2017-12-15
+    * Try::Tiny test dependency declared
+
+0.01    2017-12-10
+    * Initial release

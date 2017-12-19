@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use Scalar::Util qw( weaken );
-our $VERSION = '2.2.1';
+our $VERSION = '2.4.2';
 
 my $GlobalRef = {};
 
@@ -294,6 +294,14 @@ use Carp;
 
 my $Duklib;
 
+my $BOOL_PACKAGES = {
+    'JavaScript::Duktape::Bool'  => 1,
+    'boolean'                    => 1,
+    'JSON::PP::Boolean'          => 1,
+    'JSON::Tiny::_Bool'          => 1,
+    'Data::MessagePack::Boolean' => 1
+};
+
 BEGIN {
     my $FunctionsMap = _get_path("FunctionsMap.pl");
     require $FunctionsMap;
@@ -340,7 +348,7 @@ sub push_perl {
             $self->push_null();
         }
 
-        elsif ( $ref eq 'JavaScript::Duktape::Bool' ) {
+        elsif ( $BOOL_PACKAGES->{$ref} ) {
             if ($val) {
                 $self->push_true();
             }
@@ -399,6 +407,14 @@ sub push_perl {
             my $len = defined $$val ? length($$val) : 0;
             my $ptr = $self->push_fixed_buffer($len);
             poke_buffer( $ptr, pv_address($$val), $len );
+        }
+
+        elsif ( $ref eq 'SCALAR' ) {
+            $$val ? $self->push_true() : $self->push_false()
+        }
+
+        else {
+            $self->push_undefined();
         }
     }
     else {
@@ -708,14 +724,17 @@ package JavaScript::Duktape::Bool;
       fallback => 1;
 
     BEGIN {
+        my $use_boolean = eval { require boolean; 1; };
         my $t = 1;
         my $f = 0;
-        $true  = bless \$t, 'JavaScript::Duktape::Bool';
-        $false = bless \$f, 'JavaScript::Duktape::Bool';
+        $true  = $use_boolean ? boolean::true() : bless \$t, 'JavaScript::Duktape::Bool';
+        $false = $use_boolean ? boolean::false() : bless \$f, 'JavaScript::Duktape::Bool';
     }
 
     sub true  { $true }
     sub false { $false }
+
+    sub TO_JSON { ${$_[0]} ? \1 : \0 }
 }
 
 package JavaScript::Duktape::NULL;
@@ -1454,6 +1473,8 @@ or suggestions
 =item * Viacheslav Tykhanovskyi L<@vti|https://github.com/vti>
 
 =item * Slaven Rezić L<@eserte|https://github.com/eserte>
+
+=item * Max Maischein L<@Corion|https://github.com/Corion>
 
 =back
 

@@ -40,6 +40,10 @@ An ARRAY of one or more fixes or file scripts to be applied to exported items.
 
 Binmode of the output stream C<fh>. Set to "C<:utf8>" by default.
 
+=item default_fmt
+
+Set the value of the default C<FMT> field when none is given. Set to C<BK> by default.
+
 =back
 
 =head1 METHODS
@@ -58,13 +62,14 @@ use Catmandu::Util qw(xml_escape is_different :array :is);
 use List::Util;
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 
 has record               => (is => 'ro' , default => sub { 'record'});
-has record_format        => (is => 'ro', default => sub { 'raw'} );
+has record_format        => (is => 'ro' , default => sub { 'raw'} );
 has skip_empty_subfields => (is => 'ro' , default => sub { 0 });
+has default_fmt          => (is => 'ro' , default => sub { 'BK'} );
 
 sub add {
     my ($self,$data) = @_;
@@ -73,10 +78,17 @@ sub add {
         $data = $self->_json_to_raw($data);
     }
 
-    my $_id    = sprintf("%-9.9d", $data->{_id} // 0);
+    my $id_str = $data->{_id};
+    $id_str    =~ s{\D}{0}g if defined $id_str;
+    my $_id    = sprintf("%-9.9d", $id_str // 0);
 	my $record = $data->{$self->record};
 
     my @lines = ();
+
+    # Check required FMT field
+    if (@$record > 0 && $record->[0]->[0] ne 'FMT') {
+        push @lines , join('',$_id, ' ' , 'FMT', ' ', ' ' , ' L ' , $self->default_fmt);
+    }
 
     for my $field (@$record) {
         my ($tag,$ind1,$ind2,@data) = @$field;
@@ -89,6 +101,9 @@ sub add {
         next if $#data == -1;
 
         # Joins are faster than perl string concatenation
+        if (@data < 2) {
+            $self->log->warn("$tag doesn't have any data");
+        }
         if (index($tag,'LDR') == 0) {
             my $ldr = $data[1];
             $ldr =~ s/ /^/og;
@@ -121,6 +136,7 @@ sub add {
 sub commit {
 	my $self = shift;
 	$self->fh->flush;
+    1;
 }
 
 1;

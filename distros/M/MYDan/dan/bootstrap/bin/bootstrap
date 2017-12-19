@@ -41,11 +41,11 @@ if( $o{reload} )
 }
 elsif( $o{install} )
 {
-    system "echo '* * * * * root $MYDan::PATH/dan/bootstrap/bin/bootstrap --run 1>/dev/null 2>&1' > /etc/cron.d/mydan.bootstrap.cron";
+    system "echo '* * * * * root $MYDan::PATH/dan/bootstrap/bin/bootstrap --run' > /etc/cron.d/mydan_bootstrap_cron";
 }
 elsif( $o{uninstall} )
 {
-    unlink '/etc/cron.d/mydan.bootstrap.cron';
+    unlink '/etc/cron.d/mydan_bootstrap_cron';
     system "killall mydan.bootstrap.master";
 }
 elsif( $o{run} )

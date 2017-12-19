@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Mail::DKIM;
-our $VERSION = 0.44;
+our $VERSION = 0.50;
 
 our $SORTTAGS = 0;
 
@@ -103,11 +103,13 @@ Jason Long, E<lt>jlong@messiah.eduE<gt>
 
 Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
 Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
+John Levine, E<lt>john.levine@standcore.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2006-2007, 2009 by Messiah College
 Copyright (C) 2017 by FastMail Pty Ltd
+Copyright (C) 2017 by Standcore LLC
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

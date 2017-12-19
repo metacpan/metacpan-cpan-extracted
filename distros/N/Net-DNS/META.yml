@@ -33,5 +33,5 @@ requires:
   Test::More: '0.52'
   Time::Local: '1.19'
   perl: '5.006'
-version: '1.13'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

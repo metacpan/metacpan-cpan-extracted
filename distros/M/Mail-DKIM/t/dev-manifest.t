@@ -14,9 +14,6 @@ plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
 
 ok_manifest(
     {
-        'filter' => [
-            qr/\.git/,
-            qr/\/\.travis\.yml/,
-        ],
+        'filter' => [ qr/\.git/, qr/\/\.travis\.yml/, ],
     }
 );

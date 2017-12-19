@@ -1,6 +1,6 @@
 package FSM::Basic;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
@@ -10,11 +10,11 @@ FSM::Basic -  Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -111,6 +111,10 @@ The keys are the states name.
 
 =item *
 "catRAND" chose randomly one of the files provided in parameter space separated
+
+=item *
+"catWRAND" chose randomly (weighted) one of the files provided in parameter space separatedwith a : to separate the weight
+e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the file ./t/test_cat1.txt get 50 more chance to be selected than file ./t/test_cat.txt
 
 =item *
 "catSEQ" read sequentialy the next files provided in parameter space separated

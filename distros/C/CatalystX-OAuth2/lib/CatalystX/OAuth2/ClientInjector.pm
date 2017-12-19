@@ -79,7 +79,7 @@ CatalystX::OAuth2::ClientInjector - A role for automatically providing an oauth2
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

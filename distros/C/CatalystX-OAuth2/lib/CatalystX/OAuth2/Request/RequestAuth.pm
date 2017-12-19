@@ -86,7 +86,7 @@ CatalystX::OAuth2::Request::RequestAuth - Role for the initial request in the oa
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

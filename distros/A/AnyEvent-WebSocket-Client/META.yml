@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/plicease/AnyEvent-WebSocket-Client/issues
   homepage: https://metacpan.org/pod/AnyEvent::WebSocket::Client
   repository: git://github.com/plicease/AnyEvent-WebSocket-Client.git
-version: '0.43'
+version: '0.44'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Toshio Ito (debug-ito, TOSHIOITO)'
@@ -48,3 +48,4 @@ x_contributors:
   - 'Kivanc Yazan (KYZN)'
   - 'Yanick Champoux (YANICK)'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

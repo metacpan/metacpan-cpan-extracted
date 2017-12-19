@@ -3,10 +3,10 @@ Mail-DKIM
 
 [![Build Status](https://travis-ci.org/marcbradshaw/mail-dkim.svg?branch=master)](https://travis-ci.org/marcbradshaw/mail-dkim)
 
-Mail-DKIM version 0.44
+Mail-DKIM version 0.50
 ======================
 
-This module implements the various components of the DKIM and DomainKeys
+This module implements the various components of the DKIM, ARC, and DomainKeys
 message-signing and verifying standards for Internet mail. It currently
 tries to implement these specifications:
  * RFC4871, for DKIM
@@ -59,6 +59,8 @@ COPYRIGHT AND LICENCE
 
 Copyright (C) 2010 by Jason Long
 Copyright (C) 2006-2009 by Messiah College
+Copyright (C) 2017 FastMail Pty Ltd.
+Copyright (C) 2017 by Standcore LLC
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

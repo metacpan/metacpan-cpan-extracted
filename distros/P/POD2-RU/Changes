@@ -1,5 +1,8 @@
 Revision history for POD2-RU
 
+5.18.0.1.84  2017-12-17 20:41:36 MSK
+
+           * закончил перевод perldebguts
 5.18.0.1.83  2016-07-04 00:45:03 MSK
 
            * change irc to #ru.pm

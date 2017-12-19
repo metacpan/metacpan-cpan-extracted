@@ -1,5 +1,12 @@
 Revision history for Perl extension Teamcity-Executor
 
+0.2.1 2017-12-18T10:16:01Z
+    - Update code snippet in documentation
+
+0.2.0
+    - add handling for canceling builds
+    - write queued (not running jobs) to output
+
 0.1.1 2017-09-20T12:42:01Z
     - make work with perl 5.20+
     - minor fix in SYNOPSIS
@@ -7,4 +14,3 @@ Revision history for Perl extension Teamcity-Executor
 0.1.0 2017-09-19T12:20:24Z
 
     - original version
-

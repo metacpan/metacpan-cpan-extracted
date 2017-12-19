@@ -1,0 +1,2 @@
+TYPEMAP
+AVLTree*	T_PTROBJ

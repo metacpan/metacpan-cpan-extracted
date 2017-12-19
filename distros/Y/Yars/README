@@ -1,10 +1,10 @@
 NAME
 
-    Yars - Yet Another RESTful-Archive Service
+    Yars - (Deprecated) Yet Another RESTful-Archive Service
 
 VERSION
 
-    version 1.31
+    version 1.33
 
 SYNOPSIS
 
@@ -38,6 +38,12 @@ SYNOPSIS
      % yarsclient download foo.jpg 469f9b131cce1631ddd449fbef9059ba
 
 DESCRIPTION
+
+    NOTE: Development for this tool is winding down, and Yars is
+    deprecated. Please contact me ASAP if you depend on this tool. Please
+    see and/or comment on https://github.com/clustericious/Yars/issues/31
+    for details. Yars as a distribution may be removed from CPAN, but not
+    before December 31, 2018.
 
     Yars is a simple RESTful server for data storage.
 

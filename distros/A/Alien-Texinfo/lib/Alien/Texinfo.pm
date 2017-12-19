@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Alien::Texinfo;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.005000';
 
 use base qw( Alien::Base );
 
@@ -26,7 +26,7 @@ From a Perl script
 
     use Env qw(@PATH);
     unshift @PATH, Alien::Texinfo->bin_dir();
-    system 'makeinfo';
+    system 'makeinfo --version';
 
     print Alien::Texinfo->dist_dir();
 

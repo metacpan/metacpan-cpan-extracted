@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::UserDB::Hash;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler::UserDB';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.4');
 
 use DB_File;
 

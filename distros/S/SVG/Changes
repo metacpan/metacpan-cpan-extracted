@@ -1,5 +1,8 @@
 Revision history for Perl extension SVG.
 
+2.81  2017.12.17 MANWAR
+      - Fixed issue RT #123896 (trailing space in credit comment).
+
 2.80  2017.11.30 MANWAR
       - Added one more test author only as suggested by @DAVE. (RT #123705)
 

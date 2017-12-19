@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = version->new('0.6.8');
+our $VERSION     = version->new('0.6.9');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 #our @EXPORT      = qw//;
@@ -89,7 +89,7 @@ App::TemplateCMD::Command - The base class for command modules
 
 =head1 VERSION
 
-This documentation refers to App::TemplateCMD::Command version 0.6.8.
+This documentation refers to App::TemplateCMD::Command version 0.6.9.
 
 =head1 SYNOPSIS
 

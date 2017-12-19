@@ -13,7 +13,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.099002';
+$Udev::FFI::VERSION = '0.099004';
 
 
 
@@ -46,11 +46,8 @@ sub new_device_from_syspath {
     my $syspath = shift;
 
     my $device = udev_device_new_from_syspath($self->{_context}, $syspath);
-    if(defined($device)) {
-        return Udev::FFI::Device->new( $device );
-    }
 
-    return undef;
+    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
 }
 
 
@@ -61,11 +58,8 @@ sub new_device_from_devnum {
     my $devnum = shift;
 
     my $device = udev_device_new_from_devnum($self->{_context}, ord($type), $devnum);
-    if(defined($device)) {
-        return Udev::FFI::Device->new( $device );
-    }
 
-    return undef;
+    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
 }
 
 
@@ -76,11 +70,8 @@ sub new_device_from_subsystem_sysname {
     my $sysname = shift;
 
     my $device = udev_device_new_from_subsystem_sysname($self->{_context}, $subsystem, $sysname);
-    if(defined($device)) {
-        return Udev::FFI::Device->new( $device );
-    }
 
-    return undef;
+    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
 }
 
 
@@ -90,11 +81,8 @@ sub new_device_from_device_id {
     my $id = shift;
 
     my $device = udev_device_new_from_device_id($self->{_context}, $id);
-    if(defined($device)) {
-        return Udev::FFI::Device->new( $device );
-    }
 
-    return undef;
+    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
 }
 
 
@@ -103,11 +91,8 @@ sub new_device_from_environment {
     my $self = shift;
 
     my $device = udev_device_new_from_environment($self->{_context});
-    if(defined($device)) {
-        return Udev::FFI::Device->new( $device );
-    }
 
-    return undef;
+    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
 }
 
 
@@ -170,29 +155,29 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     use Udev::FFI;
 
-    #get udev library version
+    # get udev library version
     my $udev_version = Udev::FFI::udev_version()
         or die "Can't get udev library version: $@";
 
 
-    #create Udev::FFI object
+    # create Udev::FFI object
     my $udev = Udev::FFI->new() or
         die "Can't create Udev::FFI object: $@";
 
 
-    #create udev monitor
+    # create udev monitor
     my $monitor = $udev->new_monitor() or
         die "Can't create udev monitor: $@.\n";
 
-    #add filter to monitor
+    # add filter to monitor
     unless($monitor->filter_by_subsystem_devtype('block')) {
         warn "Ouch!";
     }
 
-    #start monitor
+    # start monitor
     if($monitor->start()) {
         for(;;) {
-            #poll devices, now insert or remove your block device
+            # poll devices, now insert or remove your block device
             my $device = $monitor->poll(); #blocking read
             my $action = $device->get_action();
 
@@ -200,11 +185,11 @@ Udev::FFI - Perl bindings for libudev using ffi.
             print 'SYSNAME: '.$device->get_sysname(), "\n";
             print 'DEVNODE: '.$device->get_devnode(), "\n";
 
-            last; #for example
+            last; # for example
         }
 
         for(;;) {
-            #poll devices, now insert or remove your block device
+            # poll devices, now insert or remove your block device
             if(defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
 
@@ -215,19 +200,19 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
             sleep 1;
 
-            last; #for example
+            last; # for example
         }
     }
 
 
-    #enumerate devices
+    # enumerate devices
     my $enumerate = $udev->new_enumerate() or
         die "Can't create enumerate context\n";
 
     $enumerate->add_match_subsystem('block');
     $enumerate->scan_devices();
 
-    use Data::Dumper; #for dump values in $href and @a
+    use Data::Dumper; # for dump values in $href and @a
 
     # scalar context
     my $href = $enumerate->get_list_entries();
@@ -237,8 +222,8 @@ Udev::FFI - Perl bindings for libudev using ffi.
     my @a = $enumerate->get_list_entries();
     print Dumper(@a), "\n";
 
-    if(@a) { #get major and minor
-        use Udev::FFI::Devnum qw(:all); #import major, minor and mkdev
+    if(@a) { # get major and minor
+        use Udev::FFI::Devnum qw(:all); # import major, minor and mkdev
 
         my $device = $udev->new_device_from_syspath($a[0]);
         if(defined $device) {
@@ -282,7 +267,7 @@ If the constructor fails undef will be returned and an error message will be in
 $@.
 
     my $udev = Udev::FFI->new() or
-        die "Can't create udev context: $@";
+        die "Can't create Udev::FFI object: $@";
 
 =back
 
@@ -294,24 +279,94 @@ $@.
 
 =item new_enumerate ()
 
+E<nbsp>
+
 =item new_device_from_syspath ( SYSPATH )
+
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The syspath is the absolute path to the device, including the
+sys mount point.
+
+Return new L<Udev::FFI::Device> object or undef, if device does not exist.
+
+    my $device0 = $udev->new_device_from_syspath('/sys/class/block/sda1');
+    my $device1 = $udev->new_device_from_syspath('/sys/class/net/eth0');
+    
+    # ... some code
+    my @devices = $enumerate->get_list_entries();
+    for(@devices) {
+        my $device = $udev->new_device_from_syspath($_);
+    # ... some code
 
 =item new_device_from_devnum ( TYPE, DEVNUM )
 
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked-up by its type and major/minor number.
+
+Return new L<Udev::FFI::Device> object or undef, if device does not exist.
+
+    use Udev::FFI::Devnum qw(mkdev);
+    my $device = $udev->new_device_from_devnum('b', mkdev(8, 1));
+
 =item new_device_from_subsystem_sysname ( SUBSYSTEM, SYSNAME )
+
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked up by the subsystem and name string of the
+device.
+
+Return new L<Udev::FFI::Device> object or undef, if device does not exist.
+
+    my $device0 = $udev->new_device_from_subsystem_sysname('block', 'sda1');
+    my $device1 = $udev->new_device_from_subsystem_sysname('net', 'lo');
+    my $device2 = $udev->new_device_from_subsystem_sysname('mem', 'urandom');
 
 =item new_device_from_device_id ( ID )
 
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked-up by a special string:
+
+=over 8
+
+=item b8:2 - block device major:minor
+
+=item c128:1 - char device major:minor
+
+=item n3 - network device ifindex
+
+=item +sound:card29 - kernel driver core subsystem:device name
+
+=back
+
+Return new L<Udev::FFI::Device> object or undef, if device does not exist.
+
+    my $device = $udev->new_device_from_device_id('b8:1');
+
 =item new_device_from_environment ()
 
-E<nbsp>
+Create new udev device, and fill in information from the current process
+environment. This only works reliable if the process is called from a udev rule.
+
+Return new L<Udev::FFI::Device> object or undef, if device does not exist.
+
+    # in udev.rules (for example)
+    # SUBSYSTEM=="backlight", ACTION=="change", IMPORT{program}="/path/script.pl"
+    
+    # in script
+    my $udev = Udev::FFI->new() or
+        die "Can't create Udev::FFI object: $@";
+    my $device = $udev->new_device_from_environment();
+    if(defined $device) {
+        # $device is the device from the udev rule (backlight in this example)
+        # work with $device
 
 =item Udev::FFI::udev_version ()
 
 Return the version of the udev library. Because the udev library does not
 provide a function to get the version number, this function runs the `udevadm`
-utility. Return undef with the error in $@ on failure. Also you can check
-$! value: ENOENT (`udevadm` not found) or EACCES (permission denied).
+utility.
+
+Return undef with the error in $@ on failure. Also you can check $! value:
+ENOENT (`udevadm` not found) or EACCES (permission denied).
 
     # simple
     my $udev_version = Udev::FFI::udev_version()
@@ -348,12 +403,12 @@ L<FFI::CheckLib> (Check that a library is available for FFI)
 
 =head1 BUGS AND LIMITATIONS
 
-Udev::FFI supports libudev 175 or newer. Older versions may work too, but it
-was not tested.
+Udev::FFI supports libudev 175 or newer. Older versions may work too, but it was
+not tested.
 
 Please report any bugs through the web interface at
-L<https://github.com/Ilya33/udev-ffi/issues> or via email to the author.
-Patches are always welcome.
+L<https://github.com/Ilya33/udev-ffi/issues> or via email to the author. Patches
+are always welcome.
 
 =head1 AUTHOR
 

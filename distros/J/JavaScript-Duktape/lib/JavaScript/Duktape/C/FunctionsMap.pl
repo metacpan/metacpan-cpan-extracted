@@ -189,6 +189,13 @@ see L<http://duktape.org/api.html#duk_del_prop>
 =cut
 *del_prop = \&aperl_duk_del_prop;
 
+=item C<del_prop_heapptr>
+
+see L<http://duktape.org/api.html#duk_del_prop_heapptr>
+
+=cut
+*del_prop_heapptr = \&aperl_duk_del_prop_heapptr;
+
 =item C<del_prop_index>
 
 see L<http://duktape.org/api.html#duk_del_prop_index>
@@ -329,6 +336,13 @@ see L<http://duktape.org/api.html#duk_free_raw>
 =cut
 *free_raw = \&aperl_duk_free_raw;
 
+=item C<freeze>
+
+see L<http://duktape.org/api.html#duk_freeze>
+
+=cut
+*freeze = \&aperl_duk_freeze;
+
 =item C<gc>
 
 see L<http://duktape.org/api.html#duk_gc>
@@ -350,6 +364,13 @@ see L<http://duktape.org/api.html#duk_get_boolean>
 =cut
 *get_boolean = \&aperl_duk_get_boolean;
 
+=item C<get_boolean_default>
+
+see L<http://duktape.org/api.html#duk_get_boolean_default>
+
+=cut
+*get_boolean_default = \&aperl_duk_get_boolean_default;
+
 =item C<get_buffer>
 
 see L<http://duktape.org/api.html#duk_get_buffer>
@@ -364,6 +385,20 @@ see L<http://duktape.org/api.html#duk_get_buffer_data>
 =cut
 *get_buffer_data = \&aperl_duk_get_buffer_data;
 
+=item C<get_buffer_data_default>
+
+see L<http://duktape.org/api.html#duk_get_buffer_data_default>
+
+=cut
+*get_buffer_data_default = \&aperl_duk_get_buffer_data_default;
+
+=item C<get_buffer_default>
+
+see L<http://duktape.org/api.html#duk_get_buffer_default>
+
+=cut
+*get_buffer_default = \&aperl_duk_get_buffer_default;
+
 =item C<get_c_function>
 
 see L<http://duktape.org/api.html#duk_get_c_function>
@@ -371,12 +406,26 @@ see L<http://duktape.org/api.html#duk_get_c_function>
 =cut
 *get_c_function = \&aperl_duk_get_c_function;
 
+=item C<get_c_function_default>
+
+see L<http://duktape.org/api.html#duk_get_c_function_default>
+
+=cut
+*get_c_function_default = \&aperl_duk_get_c_function_default;
+
 =item C<get_context>
 
 see L<http://duktape.org/api.html#duk_get_context>
 
 =cut
 *get_context = \&aperl_duk_get_context;
+
+=item C<get_context_default>
+
+see L<http://duktape.org/api.html#duk_get_context_default>
+
+=cut
+*get_context_default = \&aperl_duk_get_context_default;
 
 =item C<get_current_magic>
 
@@ -420,12 +469,26 @@ see L<http://duktape.org/api.html#duk_get_heapptr>
 =cut
 *get_heapptr = \&aperl_duk_get_heapptr;
 
+=item C<get_heapptr_default>
+
+see L<http://duktape.org/api.html#duk_get_heapptr_default>
+
+=cut
+*get_heapptr_default = \&aperl_duk_get_heapptr_default;
+
 =item C<get_int>
 
 see L<http://duktape.org/api.html#duk_get_int>
 
 =cut
 *get_int = \&aperl_duk_get_int;
+
+=item C<get_int_default>
+
+see L<http://duktape.org/api.html#duk_get_int_default>
+
+=cut
+*get_int_default = \&aperl_duk_get_int_default;
 
 =item C<get_length>
 
@@ -440,6 +503,13 @@ see L<http://duktape.org/api.html#duk_get_lstring>
 
 =cut
 *get_lstring = \&aperl_duk_get_lstring;
+
+=item C<get_lstring_default>
+
+see L<http://duktape.org/api.html#duk_get_lstring_default>
+
+=cut
+*get_lstring_default = \&aperl_duk_get_lstring_default;
 
 =item C<get_magic>
 
@@ -469,12 +539,26 @@ see L<http://duktape.org/api.html#duk_get_number>
 =cut
 *get_number = \&aperl_duk_get_number;
 
+=item C<get_number_default>
+
+see L<http://duktape.org/api.html#duk_get_number_default>
+
+=cut
+*get_number_default = \&aperl_duk_get_number_default;
+
 =item C<get_pointer>
 
 see L<http://duktape.org/api.html#duk_get_pointer>
 
 =cut
 *get_pointer = \&aperl_duk_get_pointer;
+
+=item C<get_pointer_default>
+
+see L<http://duktape.org/api.html#duk_get_pointer_default>
+
+=cut
+*get_pointer_default = \&aperl_duk_get_pointer_default;
 
 =item C<get_prop>
 
@@ -489,6 +573,13 @@ see L<http://duktape.org/api.html#duk_get_prop_desc>
 
 =cut
 *get_prop_desc = \&aperl_duk_get_prop_desc;
+
+=item C<get_prop_heapptr>
+
+see L<http://duktape.org/api.html#duk_get_prop_heapptr>
+
+=cut
+*get_prop_heapptr = \&aperl_duk_get_prop_heapptr;
 
 =item C<get_prop_index>
 
@@ -525,6 +616,13 @@ see L<http://duktape.org/api.html#duk_get_string>
 =cut
 *get_string = \&aperl_duk_get_string;
 
+=item C<get_string_default>
+
+see L<http://duktape.org/api.html#duk_get_string_default>
+
+=cut
+*get_string_default = \&aperl_duk_get_string_default;
+
 =item C<get_top>
 
 see L<http://duktape.org/api.html#duk_get_top>
@@ -560,12 +658,26 @@ see L<http://duktape.org/api.html#duk_get_uint>
 =cut
 *get_uint = \&aperl_duk_get_uint;
 
+=item C<get_uint_default>
+
+see L<http://duktape.org/api.html#duk_get_uint_default>
+
+=cut
+*get_uint_default = \&aperl_duk_get_uint_default;
+
 =item C<has_prop>
 
 see L<http://duktape.org/api.html#duk_has_prop>
 
 =cut
 *has_prop = \&aperl_duk_has_prop;
+
+=item C<has_prop_heapptr>
+
+see L<http://duktape.org/api.html#duk_has_prop_heapptr>
+
+=cut
+*has_prop_heapptr = \&aperl_duk_has_prop_heapptr;
 
 =item C<has_prop_index>
 
@@ -678,6 +790,13 @@ see L<http://duktape.org/api.html#duk_is_callable>
 
 =cut
 *is_callable = \&aperl_duk_is_callable;
+
+=item C<is_constructable>
+
+see L<http://duktape.org/api.html#duk_is_constructable>
+
+=cut
+*is_constructable = \&aperl_duk_is_constructable;
 
 =item C<is_constructor_call>
 
@@ -923,6 +1042,90 @@ see L<http://duktape.org/api.html#duk_normalize_index>
 
 =cut
 *normalize_index = \&aperl_duk_normalize_index;
+
+=item C<opt_boolean>
+
+see L<http://duktape.org/api.html#duk_opt_boolean>
+
+=cut
+*opt_boolean = \&aperl_duk_opt_boolean;
+
+=item C<opt_buffer>
+
+see L<http://duktape.org/api.html#duk_opt_buffer>
+
+=cut
+*opt_buffer = \&aperl_duk_opt_buffer;
+
+=item C<opt_buffer_data>
+
+see L<http://duktape.org/api.html#duk_opt_buffer_data>
+
+=cut
+*opt_buffer_data = \&aperl_duk_opt_buffer_data;
+
+=item C<opt_c_function>
+
+see L<http://duktape.org/api.html#duk_opt_c_function>
+
+=cut
+*opt_c_function = \&aperl_duk_opt_c_function;
+
+=item C<opt_context>
+
+see L<http://duktape.org/api.html#duk_opt_context>
+
+=cut
+*opt_context = \&aperl_duk_opt_context;
+
+=item C<opt_heapptr>
+
+see L<http://duktape.org/api.html#duk_opt_heapptr>
+
+=cut
+*opt_heapptr = \&aperl_duk_opt_heapptr;
+
+=item C<opt_int>
+
+see L<http://duktape.org/api.html#duk_opt_int>
+
+=cut
+*opt_int = \&aperl_duk_opt_int;
+
+=item C<opt_lstring>
+
+see L<http://duktape.org/api.html#duk_opt_lstring>
+
+=cut
+*opt_lstring = \&aperl_duk_opt_lstring;
+
+=item C<opt_number>
+
+see L<http://duktape.org/api.html#duk_opt_number>
+
+=cut
+*opt_number = \&aperl_duk_opt_number;
+
+=item C<opt_pointer>
+
+see L<http://duktape.org/api.html#duk_opt_pointer>
+
+=cut
+*opt_pointer = \&aperl_duk_opt_pointer;
+
+=item C<opt_string>
+
+see L<http://duktape.org/api.html#duk_opt_string>
+
+=cut
+*opt_string = \&aperl_duk_opt_string;
+
+=item C<opt_uint>
+
+see L<http://duktape.org/api.html#duk_opt_uint>
+
+=cut
+*opt_uint = \&aperl_duk_opt_uint;
 
 =item C<pcall>
 
@@ -1239,6 +1442,13 @@ see L<http://duktape.org/api.html#duk_push_pointer>
 =cut
 *push_pointer = \&aperl_duk_push_pointer;
 
+=item C<push_proxy>
+
+see L<http://duktape.org/api.html#duk_push_proxy>
+
+=cut
+*push_proxy = \&aperl_duk_push_proxy;
+
 =item C<push_string>
 
 see L<http://duktape.org/api.html#duk_push_string>
@@ -1336,6 +1546,13 @@ see L<http://duktape.org/api.html#duk_put_prop>
 
 =cut
 *put_prop = \&aperl_duk_put_prop;
+
+=item C<put_prop_heapptr>
+
+see L<http://duktape.org/api.html#duk_put_prop_heapptr>
+
+=cut
+*put_prop_heapptr = \&aperl_duk_put_prop_heapptr;
 
 =item C<put_prop_index>
 
@@ -1491,6 +1708,13 @@ see L<http://duktape.org/api.html#duk_require_number>
 =cut
 *require_number = \&aperl_duk_require_number;
 
+=item C<require_object>
+
+see L<http://duktape.org/api.html#duk_require_object>
+
+=cut
+*require_object = \&aperl_duk_require_object;
+
 =item C<require_object_coercible>
 
 see L<http://duktape.org/api.html#duk_require_object_coercible>
@@ -1602,6 +1826,13 @@ see L<http://duktape.org/api.html#duk_samevalue>
 
 =cut
 *samevalue = \&aperl_duk_samevalue;
+
+=item C<seal>
+
+see L<http://duktape.org/api.html#duk_seal>
+
+=cut
+*seal = \&aperl_duk_seal;
 
 =item C<set_finalizer>
 

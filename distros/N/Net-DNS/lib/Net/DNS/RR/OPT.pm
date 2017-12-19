@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPT;
 
 #
-# $Id: OPT.pm 1578 2017-06-20 12:49:23Z willem $
+# $Id: OPT.pm 1605 2017-11-27 11:37:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1578 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
 
 
 use strict;
@@ -230,10 +230,10 @@ sub _image { &_decompose; }
 
 
 package Net::DNS::RR::OPT::DHU;					# RFC6975
-use base qw(Net::DNS::RR::OPT::DAU);
+our @ISA = qw(Net::DNS::RR::OPT::DAU);
 
 package Net::DNS::RR::OPT::N3U;					# RFC6975
-use base qw(Net::DNS::RR::OPT::DAU);
+our @ISA = qw(Net::DNS::RR::OPT::DAU);
 
 
 package Net::DNS::RR::OPT::CLIENT_SUBNET;			# RFC7871

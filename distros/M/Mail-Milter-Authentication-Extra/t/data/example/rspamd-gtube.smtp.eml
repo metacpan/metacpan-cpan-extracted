@@ -7,6 +7,8 @@ RCPT TO:marc@fastmail.com
 DATA
 Received: from test.module (localhost [127.0.0.1])
     by server.example.com (Authentication Milter) with ESMTP
+############
+############
 Authentication-Results: server.example.com;
     x-rspam=fail score=15.00 required=15.00
 X-Spam-Action: reject

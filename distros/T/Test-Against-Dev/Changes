@@ -1,0 +1,12 @@
+Revision history for Perl module Test::Against::Dev
+
+0.03 Sun Dec 17 21:53:17 EST 2017
+    - First actual release to CPAN
+
+0.02 Fri Dec 15 15:30:08 EST 2017
+    - Intermediate work product; not released to CPAN
+
+0.01 Sat Dec  9 17:04:34 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+
+

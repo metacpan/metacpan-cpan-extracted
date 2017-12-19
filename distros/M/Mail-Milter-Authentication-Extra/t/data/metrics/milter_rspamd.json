@@ -1,0 +1,21 @@
+{
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"body\",handler=\"rspamd\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"setup\",handler=\"userdb\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eoh\",handler=\"rspamd\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"close\",handler=\"rspamd\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eoh\",handler=\"userdb\"}" : "2",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\",result=\"fail\"}" : "1",
+   "authmilter_rspamd_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_rspamd_total{ident=\"test_authentication_milter_test\",header_removed=\"yes\",result=\"fail\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"header\",handler=\"rspamd\"}" : "30",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"rcptto\",handler=\"rspamd\"}" : "2",
+   "authmilter_callback_error_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"close\",handler=\"userdb\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"envfrom\",handler=\"rspamd\"}" : "2",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\",result=\"pass\"}" : "1",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eom\",handler=\"rspamd\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"rcptto\",handler=\"userdb\"}" : "2",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"helo\",handler=\"rspamd\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\"}" : "0"
+}

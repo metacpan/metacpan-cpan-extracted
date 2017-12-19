@@ -46,6 +46,8 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
   "debug",
   { data_type => "boolean", is_nullable => 1 },
+  "device_key",
+  { data_type => "text", is_nullable => 1 },
 );
 
 
@@ -103,13 +105,13 @@ __PACKAGE__->belongs_to( target => 'App::Netdisco::DB::Result::Device',
 
 =head1 METHODS
 
-=head2 summary
+=head2 display_name
 
 An attempt to make a meaningful statement about the job.
 
 =cut
 
-sub summary {
+sub display_name {
     my $job = shift;
     return join ' ',
       $job->action,

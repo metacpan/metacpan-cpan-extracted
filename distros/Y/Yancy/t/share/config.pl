@@ -1,4 +1,8 @@
 {
+    plugins => [
+        [ 'PODRenderer' ],
+        [ 'Test' => { args => "one" } ],
+    ],
     backend => 'test://localhost/',
     collections => {
         people => {
@@ -18,6 +22,10 @@
             properties => {
                 username => { type => 'string' },
                 email => { type => 'string' },
+                password => {
+                    type => 'string',
+                    format => 'password',
+                },
             },
         },
     },

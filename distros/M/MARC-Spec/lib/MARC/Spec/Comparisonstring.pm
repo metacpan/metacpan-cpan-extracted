@@ -4,7 +4,7 @@ use Carp qw(croak);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '1.0.0';
+our $VERSION = '2.0.3';
 
 has raw => (
     is => 'rwp',
@@ -48,7 +48,7 @@ __END__
 
 =head1 NAME
 
-L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring> - comparison string specification
+MARC::Spec::Comparisonstring - comparison string specification
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring> - comparison string
 
 =head1 DESCRIPTION
 
-L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring> is the comparison string specification of a L<MARC::Spec|MARC::Spec>.
+MARC::Spec::Comparisonstring is the comparison string specification of a L<MARC::Spec|MARC::Spec>.
 See L<MARCspec - A common MARC record path language|http://marcspec.github.io/MARCspec/> for further 
 details on the syntax.
 
@@ -109,10 +109,22 @@ Please report any bugs to L<https://github.com/MARCspec/MARC-Spec/issues|https:/
 
 =head1 SEE ALSO
 
-L<MARC::Spec|MARC::Spec>,
-L<MARC::Spec::Field|MARC::Spec::Field>,
-L<MARC::Spec::Subfield|MARC::Spec::Subfield>,
-L<MARC::Spec::Structure|MARC::Spec::Structure>,
-L<MARC::Spec::Subspec|MARC::Spec::Subspec>
+=over
+
+=item * L<MARC::Spec|MARC::Spec>
+
+=item * L<MARC::Spec::Field|MARC::Spec::Field>
+
+=item * L<MARC::Spec::Subfield|MARC::Spec::Subfield>
+
+=item * L<MARC::Spec::Indicator|MARC::Spec::Indicator>
+
+=item * L<MARC::Spec::Subspec|MARC::Spec::Subspec>
+
+=item * L<MARC::Spec::Structure|MARC::Spec::Structure>
+
+=item * L<MARC::Spec::Parser|MARC::Spec::Parser>
+
+=back
 
 =cut

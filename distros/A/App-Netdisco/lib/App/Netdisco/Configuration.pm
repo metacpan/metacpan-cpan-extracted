@@ -1,6 +1,7 @@
 package App::Netdisco::Configuration;
 
 use App::Netdisco::Environment;
+use App::Netdisco::Util::SNMP ();
 use Dancer ':script';
 
 use Path::Class 'dir';
@@ -59,17 +60,14 @@ if ((setting('snmp_auth') and 0 == scalar @{ setting('snmp_auth') })
   config->{'community_rw'} = [ @{setting('community_rw')}, 'private' ];
 }
 
+# fix up device_auth (or create it from old snmp_auth and community settings)
+config->{'device_auth'} = [ App::Netdisco::Util::SNMP::fixup_device_auth() ];
+
 # defaults for workers
 setting('workers')->{queue} ||= 'PostgreSQL';
-if (exists setting('workers')->{interactives}
-    or exists setting('workers')->{pollers}) {
-
-    setting('workers')->{tasks} =
-      (setting('workers')->{pollers} || 0)
-      + (setting('workers')->{interactives} || 0);
-
-    delete setting('workers')->{pollers};
-    delete setting('workers')->{interactives};
+if ($ENV{ND2_SINGLE_WORKER}) {
+  setting('workers')->{tasks} = 1;
+  delete config->{'schedule'};
 }
 
 # force skipped DNS resolution, if unset
@@ -128,6 +126,18 @@ delete config->{'deviceport_vlan_membership_threshold'};
 config->{'schedule'} = config->{'housekeeping'}
   if setting('housekeeping') and not setting('schedule');
 delete config->{'housekeeping'};
+
+# used to have separate types of worker
+if (exists setting('workers')->{interactives}
+    or exists setting('workers')->{pollers}) {
+
+    setting('workers')->{tasks} ||=
+      (setting('workers')->{pollers} || 0)
+      + (setting('workers')->{interactives} || 0);
+
+    delete setting('workers')->{pollers};
+    delete setting('workers')->{interactives};
+}
 
 # schedule expire used to be called expiry
 setting('schedule')->{expire} ||= setting('schedule')->{expiry}

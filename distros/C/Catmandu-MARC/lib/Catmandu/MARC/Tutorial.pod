@@ -49,24 +49,45 @@ The C<marc_map> Fix can get one or more subfields to extract from MARC:
 In the example below the 650a field can be repeated in some marc records.
 We will join all the repetitions in an comma delimited list for each record.
 
-First we create a Fix file containing all the Fixes, then we execute the
-catmandu command.
+   $ catmandu convert MARC to CSV --fix 'marc_map(650a,subject,join:","); retain(subject)' < data.mrc
 
-Open a text editor and create the C<myfix.fix> file with content:
+=head2 Create a list of all ISBN numbers in the data
 
-    marc_map(650a,subject.$append)
-    join_field(subject,",")
-    retain(subject)
+In the previous example we saw how all subjects can be printed using a few Fix commands.
+When a subject is repeated in a record, it will be written on one line joined by a comma:
 
-And execute the command:
+    subject1
+    subject2, subject3
+    subject4
 
-   $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
+In the example over record 1 contained 'subject1', record 2 'subject2' and 'subject3' and
+record 3 'subject4'. What should we use when we want a list of all values in a long list?
+
+In the example below we'll print all ISBN numbers in a batch of MARC records in one long list
+using the Text exporter:
+
+  $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.\$append); retain(isbn)' < data.mrc
+
+The first new thing is the C<$append> in the marc_map. This will create in C<isbn> a
+list of all ISBN numbers found in the C<020a> field. Because C<$> signs have a special meaning on
+the command line they need to be escaped with a backslash C<\>. The C<Text> exporter with the C<field_sep>
+option will make use all the list in the C<isbn> field are written on a new line.
+
+=head2 Create a list of all unique ISBN numbers in the data
+
+Given the result of the previous command, it is now easy to create a unique list of ISBN numbers
+with the UNIX C<uniq> command:
+
+ $ catmandu convert MARC to Text --field_sep "\n" --fix 'marc_map(020a,isbn.\$append); retain(isbn)' < data.mrc | uniq
 
 =head2 Create a list of the number of subjects per record
 
 We will create a list of subjects (650a) and count the number of items
 in this list for each record. The CSV file will contain the C<_id> (record
 identifier) and C<subject> the number of 650a fields.
+
+Writing all Fixes on the command line can become tedious. In Catmandu it is possible
+to create a Fix script which contains all the Fix commands.
 
 Open a text editor and create the C<myfix.fix> file with content:
 
@@ -78,37 +99,6 @@ And execute the command:
 
    $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
 
-=head2 Create a list of all ISBN numbers in the data
-
-We will create first a Fix script which C<select>s only the records
-that contain an ISBN field (022$a). All the isbns found we will
-print inline using the C<add_to_exporter> Fix.
-
-Open a text editor and create the C<myfix.fix> file with content:
-
-    marc_map(020a,isbn.$append)
-
-    select exists(isbn)
-
-    # Loop over the ISBNs and print them to a CSV exporter
-    do list(path:isbn,var:c)
-     move_field(c,result.isbn)
-     add_to_exporter(result,CSV)
-    end
-
-Execute the following catmandu command, notice that we ignore the normal
-output with help of the C<Null> exporter (all output will be generated)
-by the Fix script:
-
-   $ catmandu convert MARC to Null --fix myfix.fix < data.mrc
-
-=head2 Create a list of all unique ISBN numbers in the data
-
-Here we can use the Fix script as in the previous example and use the
-UNIX "sort -u" command:
-
-   $ catmandu convert MARC to Null --fix myfix.fix < data.mrc | sort -u
-
 =head2 Create a list of all ISBN numbers for records with type 920a == book
 
 In the example we need an extra condition for match the content of the
@@ -119,18 +109,16 @@ Open a text editor and create the C<myfix.fix> file with content:
     marc_map(020a,isbn.$append)
     marc_map(920a,type)
 
-    select all_match(type,"book")
-    select exists(isbn)
+    select all_match(type,"book") # select only the books
+    select exists(isbn)           # select only the records with ISBN numbers
 
-    # Loop over the ISBNs and print them to a CSV exporter
-    do list(path:isbn,var:c)
-     move_field(c,result.isbn)
-     add_to_exporter(result,CSV)
-    end
+    retain(isbn)                  # only keep this field
+
+All the text after the C<#> sign are inline code comments.
 
 And run the command:
 
-    $ catmandu convert MARC to Null --fix myfix.fix < data.mrc
+    $ catmandu convert MARC to Text --field_sep "\n" --fix myfix.fix < data.mrc
 
 =head2 Show which MARC record don't contain a 900a field matching some list of values
 
@@ -168,7 +156,8 @@ And now run the command:
 =head1 Create a CSV file of all ISSN numbers found at any MARC field
 
 To process this information we need to create a Fix script like the
-one below (line numbers are added here to explain the working of this script):
+one below (line numbers are added here to explain the working of this script
+but don't need to be included in the script):
 
     01: marc_map('***',text.$append)
     02:
@@ -232,6 +221,199 @@ output
 
     $ catmandu -D convert MARC to Null --fix myfix.fix < data.mrc
 
+=head1 TRANSFORMING
+
+=head2 Add a new MARC field
+
+In the example bellow we add new 856 field to the record with a $u subfield containing
+the Google homepage:
+
+   marc_add(856,u,"http://www.google.com")
+
+A control field can be added by using the '_' subfield
+
+   marc_add(009,_,0123456789)
+
+Maybe you want to copy the data from one subfield to another. Use the marc_map to
+store the data first in a temporary field and add it later to the new field:
+
+   # copy a subfield
+   marc_map(001,tmp)
+
+   # maybe process the data a bit
+   append(tmp,"-mytest")
+
+   # add the contents of the tmp field to the new 009 field
+   marc_add(009,_,$.tmp)
+
+=head2 Set a MARC subfield
+
+Set the $h subfield to a new value (or create it when it doesn't exist yet):
+
+   marc_set(100h, test123)
+
+Only set the 100 field if the first indicator is 3
+
+   marc_set(100[3]h, test123)
+
+=head2 Remove a MARC (sub)field
+
+Remove all fields 500 , 501 , 5** :
+
+   marc_remove(5**)
+
+Remove all 245h fields:
+
+   marc_remove(245h)
+
+=head2 Append text to a MARC field
+
+Append a period to the 500 field is there isn't already there:
+
+  do marc_each()
+    unless marc_match(500, "\.$")    # Only if the current field 500 doesn't end with a period
+      marc_append(500,".")           # Add to the current 500 field a period
+    end
+  end
+
+Use the L<Catmandu::Fix::Bind::marc_each> Bind to loop over all MARC fields. In the
+context of the C<do -- end> only one MARC field at a time is visible for the C<marc_*> fixes.
+
+=head2 The marc_each binder
+
+All C<marc_*> fixes will operate on all MARC fields matching a MARC path. For example,
+
+   marc_remove(856)
+
+will remove all 856 MARC fields. In some cases you may want to change only some of the fields
+in a record. You could write:
+
+  if marc_match(856u,"google")
+     marc_remove(856)
+  end
+
+in the hope it would remove the 856 fields that contain the text "google" in the $u subfield.
+Alas, this is not what will happen. The C<if> condition will match when the record contains one or
+more 856u fields containing "google". The C<marc_remove> Fix will delete B<all> 856 fields. To
+correctly remove only the 856 fields in the context of the C<if> statement the C<marc_each> binder
+is required:
+
+  do marc_each()
+    if marc_match(856u,"google")
+       marc_remove(856)
+    end
+  end
+
+The C<marc_each> will loop over all MARC fields one at a time. The if statement will only match when
+the current MARC field is 856 and the $u field contains "google". The C<marc_remove(856)> will only
+delete the current 856 field.
+
+In C<marc_each> binder, it seems for all Fixes as if there is only one field at a time visible in the record.
+This Fix will not work:
+
+  do marc_each()
+    if marc_match(856u,"google")
+       marc_remove(900)           # <-- there is only a 856 field in the current context
+    end
+  end
+
+=head2 marc_copy, marc_cut and marc_paste
+
+The L<Catmandu::Fix::marc_copy>, L<Catmandu::Fix::marc_cut>, L<Catmandu::Fix::marc_paste> Fixes
+are needed when complicated edits are needed in MARC record.
+
+The C<marc_copy> fill copy parts of a MARC record matching a MARC_PATH to a temporary variable.
+This tempoarary variable will contain an ARRAY of HASHes containing the content of the MARC field.
+
+For instance,
+
+  marc_copy(650, tmp)
+
+The C<tmp> will contain something like:
+
+  tmp:[
+      {
+          "subfields" : [
+              {
+                  "a" : "Perl (Computer program language)"
+              }
+          ],
+          "ind1" : " ",
+          "ind2" : "0",
+          "tag" : "650"
+    },
+    {
+          "ind1" : " ",
+          "subfields" : [
+              {
+                  "a" : "Web servers."
+              }
+          ],
+          "tag" : "650",
+          "ind2" : "0"
+    }
+  ]
+
+This structure can be edited with all the Catmandu fixes. For instance you can set the first
+indicator to '1':
+
+  set_field(tmp.*.ind1 , 1)
+
+The JSON path C<tmp.*.ind1> will match all the first indicators. The JSON path
+C<tmp.*.tag> will match all the MARC tags. The JSON path C<tmp.*.subfields.*.a> will
+match all the $a subfields. For instance, to change all 'Perl' into 'Python' in the $a subfield
+use this Fix:
+
+  replace_all(tmp.*.subfields.*.a,"Perl","Python")
+
+When the fields need to be places back into the record the C<marc_paste> command can be used:
+
+   marc_paste(subjects)
+
+This will add all 650 fields in the C<tmp> temporary variable at the B<end> of the record. You can
+change the MARC fields in place using the C<march_each> binder:
+
+  do marc_each()
+     # Select only the 650 fields
+     if marc_has(650)
+        # Create a working copy
+        marc_copy(650,tmp)
+
+        # Change some fields
+        set_field(tmp.*.ind1 , 1)
+
+        # Paste the result back
+        marc_paste(tmp)
+     end
+  end
+
+The C<marc_cut> Fix works like C<marc_copy> but will delete the matching MARC field from the record.
+
+=head2 Rename MARC subfields
+
+In the example below we rename each $1 subfield in the MARC record to $0 using
+the L<Catmandu::Fix::marc_cut>, L<Catmandu::Fix::marc_paste> and L<Catmandu::Fix::rename>
+fixes:
+
+    # For each marc field...
+    do marc_each()
+       # Cut the field into tmp..
+       marc_cut(***,tmp)
+
+       # Rename every 1 subfield to 0
+       rename(tmp.*.subfields.*,1,0)
+
+       # And paste it back
+       marc_paste(tmp)
+    end
+
+The C<marc_each> bind will loop over all the MARC fields. With C<marc_cut> we
+store any field (C<***> matches every field) into a C<tmp> field. The C<marc_cut>
+creates an array structure in C<tmp> which is easy to process using the Fix
+language. Using the C<rename> function we search for all the subfields, and replace
+the field matching the regular expression C<1> with C<0>. At the end, we paste
+back the C<tmp> field into the record.
+
 =head1 WRITING
 
 =head2 Convert a MARC record into a MARC record (do nothing)
@@ -253,3 +435,34 @@ output
 =head2 Select only the records with 900a == book
 
     $ catmandu convert MARC to MARC --fix 'marc_map(900a,type); select all_match(type,book)' < data.mrc > output.mrc
+
+The C<all_match> also allows a regular expressions:
+
+    $ catmandu convert MARC to MARC --fix 'marc_map(900a,type); select all_match(type,"[Bb]ook")' < data.mrc > output.mrc
+
+=head2 Select only the rcords with 900a values in a given CSV file
+
+Create a CSV file with name,value pairs (need two columns):
+
+    $ cat values.csv
+    name,values
+    book,1
+    journal,1
+    movie,1
+
+    $ catmandu convert MARC to MARC --fix myfixes.txt < data.mrc > output.mrc
+
+    with myfixes.txt like:
+
+    do marc_each()
+       marc_map(900a,test)
+       lookup(test,values.csv,default:0)
+       select all_match(test,1)
+       remove_field(test)
+    end
+
+We use a "do marc_each() ... end" loop because 900a fields can be repeated. If a
+MARC tag isn't repeatable this loop not isn't needed. With marc_map we copy
+first the value of a marc subfield to a 'test' field. This test we lookup against
+the CSV file. Then, we select only the records that are found in the CSV file
+(and return the correct value).

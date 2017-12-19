@@ -1,0 +1,47 @@
+---
+abstract: 'Symbolic math library with support for alternative representations.'
+author:
+  - 'Daniel Șuteu <trizen@protonmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Bacovia
+provides:
+  Math::Bacovia:
+    file: lib/Math/Bacovia.pm
+    version: '0.01'
+  Math::Bacovia::Difference:
+    file: lib/Math/Bacovia/Difference.pm
+  Math::Bacovia::Exp:
+    file: lib/Math/Bacovia/Exp.pm
+  Math::Bacovia::Fraction:
+    file: lib/Math/Bacovia/Fraction.pm
+  Math::Bacovia::Log:
+    file: lib/Math/Bacovia/Log.pm
+  Math::Bacovia::Number:
+    file: lib/Math/Bacovia/Number.pm
+  Math::Bacovia::Power:
+    file: lib/Math/Bacovia/Power.pm
+  Math::Bacovia::Product:
+    file: lib/Math/Bacovia/Product.pm
+  Math::Bacovia::Sum:
+    file: lib/Math/Bacovia/Sum.pm
+  Math::Bacovia::Symbol:
+    file: lib/Math/Bacovia/Symbol.pm
+requires:
+  Class::Multimethods: '1.7'
+  List::UtilsBy::XS: '0'
+  Math::AnyNum: '0.14'
+  Set::Product::XS: '0.04'
+  perl: '5.014'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

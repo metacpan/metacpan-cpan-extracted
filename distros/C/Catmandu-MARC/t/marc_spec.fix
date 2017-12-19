@@ -21,9 +21,9 @@ marc_spec('650', my.split.subjects, split:1)
 
 marc_spec('650', my.append.split.subjects.$append, split:1)
 
-marc_spec('..._10', my.fields.indicators10.$append)
+marc_spec('...{^1=\1}{^2=\0}', my.fields.indicators10.$append)
 
-marc_spec('...__0', my.fields.indicators_0, split:1)
+marc_spec('...{^2=\0}', my.fields.indicators_0, split:1)
 
 marc_spec('LDR', my.ldr.all)
 
@@ -33,7 +33,7 @@ marc_spec('LDR/#-3', my.lastcharpos.ldr)
 
 marc_spec('245$a', my.title.proper)
 
-marc_spec('245_10$a', my.title.indicator.proper)
+marc_spec('245$a{^1=\1}{^2=\0}', my.title.indicator.proper)
 
 marc_spec('245$a/0-1', my.title.charpos)
 

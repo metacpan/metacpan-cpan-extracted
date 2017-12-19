@@ -45,7 +45,7 @@ use SNMP::Info::Layer3;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.38';
+$VERSION = '3.39';
 
 %MIBS = ( %SNMP::Info::Layer3::MIBS, %SNMP::Info::CiscoStats::MIBS, );
 
@@ -74,7 +74,7 @@ sub b_mac {
         my $mac = $macs->{$i};
 
         # don't catch the bad macs with bogus OUI
-        if ( $mac !~ m/(0{1,2}:){2}(00|01)/ )
+        if ( $mac !~ m/(0{1,2}:){2}(00|01)/ ) {
             push( @macs, $mac );
         }
         @macs = sort(@macs);

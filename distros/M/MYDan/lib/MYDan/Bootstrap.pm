@@ -45,7 +45,6 @@ sub run
 
     our ( $logf, $logH ) = ( "$logs/current" );
     
-    print "log $logs/current\n";
     confess "open log: $!" unless open $logH, ">>$logf"; 
     $logH->autoflush;
 
@@ -57,7 +56,7 @@ sub run
         }
     };
 
-
+    my ( $rand, %time, %rand ) = int rand time;
     my $t = AnyEvent->timer(
         after => 2,
         interval => 3,
@@ -66,6 +65,25 @@ sub run
             for my $name ( keys %name )
             {
                 next if $proc{$name};
+
+                if( $name =~ /^(\d+)([_\-\*\+]{1})/ )
+                { 
+                    my ( $i, $t, $r ) = ( $1, $2, $rand );
+                    if( $t eq '*' || $t eq '_' )
+                    {
+                        $rand{$name} = int( rand time ) unless defined $rand{$name} ;
+                        $r = $rand{$name};
+
+                        $t = '+' if $t eq '*';
+                        $t = '-' if $t eq '_';
+                    }
+                    
+                    my $tt = int( ( time + $r ) / $i );
+                    $time{$name} = $tt if $t eq '-' && ! defined $time{$name};
+                    next if $time{$name} && $time{$name} eq $tt;
+                    $time{$name} = $tt;
+                }
+
                 my ( $err, $wtr, $rdr ) = gensym;
                 my $pid = IPC::Open3::open3( undef, $rdr, $err, "$exec/$name" );
            

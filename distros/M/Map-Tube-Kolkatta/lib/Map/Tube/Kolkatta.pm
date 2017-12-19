@@ -1,6 +1,6 @@
 package Map::Tube::Kolkatta;
 
-$Map::Tube::Kolkatta::VERSION   = '0.09';
+$Map::Tube::Kolkatta::VERSION   = '0.11';
 $Map::Tube::Kolkatta::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Kolkatta - Interface to the Kolkatta Metro Map.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use File::Share ':all';
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has json => (is => 'ro', default => sub { return dist_file('Map-Tube-Kolkatta', 'kolkatta-map.json') });
 

@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '1.98';
+$DateTime::TimeZone::Local::Win32::VERSION = '1.99';
 use 5.006;
 
 use strict;
@@ -186,6 +186,7 @@ sub EnvVars { return 'TZ' }
         'South Africa Standard Time'      => 'Africa/Harare',
         'Sri Lanka'                       => 'Asia/Colombo',
         'Sri Lanka Standard Time'         => 'Asia/Colombo',
+        'Sudan Standard Time'             => 'Africa/Khartoum',
         'Syria Standard Time'             => 'Asia/Damascus',
         'Sydney Standard Time'            => 'Australia/Sydney',
         'Taipei'                          => 'Asia/Taipei',
@@ -317,7 +318,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 1.98
+version 1.99
 
 =head1 SYNOPSIS
 

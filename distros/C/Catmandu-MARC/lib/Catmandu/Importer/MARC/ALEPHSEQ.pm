@@ -64,7 +64,7 @@ package Catmandu::Importer::MARC::ALEPHSEQ;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Importer';
 
@@ -95,7 +95,7 @@ sub generator {
                warn "skipping $sysid $tag unknown data";
                next;
            }
-           if ($tag eq 'LDR') {
+           if ($tag eq 'LDR' || $tag eq '008') {
                $data =~ s/\^/ /g;
            }
            my @parts = ('_' , split(/\$\$(.)/, $data) );

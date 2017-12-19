@@ -1,0 +1,18 @@
+[% module = module || 'module' -%]
+---
+[% module %]/gulpfile.js:
+    template: npm/gulpfile.js
+[% module %]/lib/[% module %].js:
+    template: js/module.js
+[% module %]/package.json:
+    template: npm/package.js
+[% module %]/.npmignore:
+    template: npm/.npmignore
+[% module %]/README.md:
+    template: npm/readme.md
+[% module %]/test/options.js:
+    template: js/test.js
+[%- IF global %]
+[% module %]/bin/[% module %]:
+    template: js/bin.js
+[%- END %]

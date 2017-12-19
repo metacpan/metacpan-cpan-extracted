@@ -1,4 +1,4 @@
-# $Id: 08-IPv6.t 1603 2017-10-17 14:45:45Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1608 2017-12-07 10:10:38Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -265,10 +265,12 @@ NonFatalBegin();
 }
 
 
-{
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->domain('net-dns.org');
 	eval { $resolver->tsig( $resolver->query(qw(tsig-md5 KEY))->answer ) };
+	skip( 'automatic TSIG tests', 3 ) if $@;
+
 	$resolver->igntc(1);
 
 	my $udp = $resolver->send(qw(net-dns.org SOA IN));
@@ -289,11 +291,12 @@ NonFatalBegin();
 }
 
 
-{
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->igntc(1);
 
 	eval { $resolver->tsig( 'MD5.example', 'MD5keyMD5keyMD5keyMD5keyMD5=' ) };
+	skip( 'failed TSIG tests', 3 ) if $@;
 
 	my $udp = $resolver->send(qw(net-dns.org SOA IN));
 	ok( !$udp, '$resolver->send(...)	UDP + failed TSIG' );
@@ -439,13 +442,19 @@ NonFatalBegin();
 	ok( $axfr_start, '$resolver->axfr_start()	(historical)' );
 	ok( eval { $resolver->axfr_next() }, '$resolver->axfr_next()	(historical)' );
 	ok( $resolver->answerfrom(), '$resolver->answerfrom() works' );
+
+	$resolver->srcport(-1);
+	my @badsocket = $resolver->axfr();
+	my $badsocket = $resolver->errorstring;
+	ok( !scalar(@badsocket), "bad AXFR socket\t[$badsocket]" );
 }
 
 
-{
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->domain('net-dns.org');
 	eval { $resolver->tsig( $resolver->query(qw(tsig-md5 KEY))->answer ) };
+	skip( 'TSIG AXFR tests', 4 ) if $@;
 	$resolver->tcp_timeout(10);
 
 	my @zone = $resolver->axfr();
@@ -463,17 +472,13 @@ NonFatalBegin();
 	eval { $resolver->tsig(undef) };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "undefined TSIG\t[$exception]" );
-
-	$resolver->srcport(-1);
-	my @badsocket = $resolver->axfr();
-	my $badsocket = $resolver->errorstring;
-	ok( !scalar(@badsocket), "bad AXFR socket\t[$badsocket]" );
 }
 
 
-{
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $NOIP );
 	eval { $resolver->tsig( 'MD5.example', 'MD5keyMD5keyMD5keyMD5keyMD5=' ) };
+	skip( 'TSIG AXFR tests', 2 ) if $@;
 
 	my $query = new Net::DNS::Packet(qw(. SOA IN));
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + automatic TSIG' );
@@ -533,11 +538,14 @@ NonFatalBegin();
 		ok( $exception ||= '', "corrupt data\t[$exception]" );
 	}
 
-	{
+SKIP: {
 		my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
 		my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+		my $tsigrr = $packet->sigrr;
+		skip( 'verify fail', 1 ) unless $tsigrr;
+
 		my $select = new IO::Select($socket);
-		eval { $resolver->_axfr_next( $select, $packet->sigrr ); };
+		eval { $resolver->_axfr_next( $select, $tsigrr ); };
 		my $exception = $1 if $@ =~ /^(.+)\n/;
 		ok( $exception ||= '', "verify fail\t[$exception]" );
 	}

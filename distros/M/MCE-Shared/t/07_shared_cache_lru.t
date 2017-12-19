@@ -131,13 +131,13 @@ BEGIN {
    ok(!$cache->get("car"),    "expired car");
 
    # test raising max_age
-   $cache->max_age(10);
+   $cache->max_age(60);
 
    $cache->incr("cnt");
    is($cache->get("cnt"), 1, "cnt inserted & incremented");
 
    sleep 3;
-   is($cache->len, 1, "len() after raising max age");
+   is($cache->len(), 1, "len() after raising max age");
 }
 
 done_testing;

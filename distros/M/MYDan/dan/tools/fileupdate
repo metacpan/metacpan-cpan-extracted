@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::Util::FileUpdate;
+
+=head1 SYNOPSIS
+
+ $0 [--url https://raw.githubusercontent.com/MYDan/key/master/keyupdate] 
+    [--output /path/myfile]
+    [--interval number]
+
+=cut
+
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( url=s output=s interval=i ) )->dump();
+
+$option->assert( 'url', 'output' );
+
+$0 = 'mydan.fileupdate';
+
+MYDan::Util::FileUpdate->new( %o )->run();

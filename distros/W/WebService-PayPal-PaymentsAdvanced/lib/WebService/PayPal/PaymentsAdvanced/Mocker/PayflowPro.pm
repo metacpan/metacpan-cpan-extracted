@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use feature qw( state );
 
@@ -39,7 +39,7 @@ post '/' => sub {
         !$params->{TRXTYPE}
         || none { $params->{TRXTYPE} eq $_ }
         ( 'A', 'C', 'D', 'I', 'S', 'V', )
-        ) {
+    ) {
         $c->render( text => 'Mocked URL not found', status => 404 );
         return;
     }
@@ -218,7 +218,7 @@ sub _render_response {
             && ( $params->{TRXTYPE} eq 'A' || $params->{TRXTYPE} eq 'S' )
         )
         && $params->{INVNUM}
-        ) {
+    ) {
         $response->{INVNUM}  = $params->{INVNUM};
         $response->{INVOICE} = $params->{INVNUM};
     }
@@ -256,7 +256,7 @@ WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro - A simple app to enabl
 
 =head1 VERSION
 
-version 0.000022
+version 0.000023
 
 =head1 DESCRIPTION
 
@@ -285,7 +285,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

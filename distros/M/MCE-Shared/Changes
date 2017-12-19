@@ -1,6 +1,14 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.834 Fri Dec 15 15:30:00 EST 2017
+
+  * Fixed croak handling inside MCE::Shared::Server.
+  * Enhanced sequence (bounds_only) to return optional 3rd value (id).
+  * Improved seconds method for _delay package inside MCE::Hobo.
+  * Improved clear and get methods for shared objects.
+  * Tweeked shared_cache_lru test script.
+
 1.833 Tue Nov 21 15:30:00 EST 2017
 
   * Condvar timedwait supports floating seconds via Time::HiRes.

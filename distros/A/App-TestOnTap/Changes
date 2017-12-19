@@ -1,5 +1,9 @@
 Revision history for App-TestOnTap
 
+0.049	2017-12-13
+
+	Change the layout of the resulttree to more easily understood naming
+
 0.048	2017-12-05
 
 	Beautify error if a suite zip is broken

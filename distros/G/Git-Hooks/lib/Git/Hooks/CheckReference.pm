@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.2.0';
+$Git::Hooks::CheckReference::VERSION = '2.3.0';
 use 5.010;
 use utf8;
 use strict;
@@ -65,7 +65,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.2.0
+version 2.3.0
 
 =head1 DESCRIPTION
 

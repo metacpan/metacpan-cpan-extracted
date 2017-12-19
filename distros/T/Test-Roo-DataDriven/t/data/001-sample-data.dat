@@ -1,0 +1,7 @@
+#!perl
+
++{
+    regex     => qr/sample/,
+    epoch     => time() - 1,
+    extra_key => 1,
+};

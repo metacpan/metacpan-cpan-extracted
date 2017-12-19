@@ -50,7 +50,7 @@ use SNMP::Info::Aggregate 'agg_ports_ifstack';
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %PORTSTAT %MODEL_MAP %MUNGE/;
 
-$VERSION = '3.38';
+$VERSION = '3.39';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -215,6 +215,7 @@ $VERSION = '3.38';
     'J9085A' => '2610-24',
     'J8762A' => '2600-8-PWR',
     'J9780A' => '2530-8-PoE+',
+    'J9774A' => '2530-8G-PoEP',
     'J9777A' => '2530-8G',
     'J9783A' => '2530-8',
     'J9778A' => '2530-48-PoE+',

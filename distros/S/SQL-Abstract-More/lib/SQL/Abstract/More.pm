@@ -12,32 +12,31 @@ use Params::Validate  qw/validate SCALAR SCALARREF CODEREF ARRAYREF HASHREF
 use Scalar::Util      qw/blessed reftype/;
 use Carp;
 
-our $VERSION = '1.30';
-
 # import the "puke" function from SQL::Abstract (kind of "die")
 BEGIN {*puke = \&SQL::Abstract::puke;}
+
+# remove all previously defined functions
+use namespace::clean;
+
+our $VERSION = '1.31';
 
 
 #----------------------------------------------------------------------
 # utility function : cheap version of Scalar::Does (too heavy to be included)
 #----------------------------------------------------------------------
 my %meth_for = (
-  ARRAY => '@{}',
-  HASH  => '%{}',
+  ARRAY  => '@{}',
+  HASH   => '%{}',
+  SCALAR => '${}',
+  CODE   => '&{}',
  );
 
-sub does ($$) {
+sub does ($$) { # after namespace::clean because also used from DBIx::DataModel
   my ($data, $type) = @_;
   my $reft = reftype $data;
   return defined $reft && $reft eq $type
       || blessed $data && overload::Method($data, $meth_for{$type});
 }
-
-
-#----------------------------------------------------------------------
-# remove all previously defined functions
-#----------------------------------------------------------------------
-use namespace::clean;
 
 
 #----------------------------------------------------------------------
@@ -919,64 +918,61 @@ sub _assert_no_bindtype_columns {
            . 'with ...->new(bindtype => "columns")';
 }
 
-sub _insert_values {
+
+sub _insert_value {
   # unfortunately, we can't just override the ARRAYREF part, so the whole
   # parent method is copied here
-  my ($self, $data) = @_;
+
+  my ($self, $column, $v) = @_;
 
   my (@values, @all_bind);
-  foreach my $column (sort keys %$data) {
-    my $v = $data->{$column};
+  $self->_SWITCH_refkind($v, {
 
-    $self->_SWITCH_refkind($v, {
-
-      ARRAYREF => sub {
-        if ($self->{array_datatypes}
-            || $self->is_bind_value_with_type($v)) { 
-          # if array datatype are activated or this is a [$val, \%type] struct
-          push @values, '?';
-          push @all_bind, $self->_bindtype($column, $v);
-        }
-        else {
-          # otherwise, literal SQL with bind
-          my ($sql, @bind) = @$v;
-          $self->_assert_bindval_matches_bindtype(@bind);
-          push @values, $sql;
-          push @all_bind, @bind;
-        }
-      },
-
-      ARRAYREFREF => sub { # literal SQL with bind
-        my ($sql, @bind) = @${$v};
+    ARRAYREF => sub {
+      if ($self->{array_datatypes} # if array datatype are activated
+            || $self->is_bind_value_with_type($v)) { # or if this is a bind val
+        push @values, '?';
+        push @all_bind, $self->_bindtype($column, $v);
+      }
+      else {                  # else literal SQL with bind
+        my ($sql, @bind) = @$v;
         $self->_assert_bindval_matches_bindtype(@bind);
         push @values, $sql;
         push @all_bind, @bind;
-      },
+      }
+    },
 
-      # THINK : anything useful to do with a HASHREF ?
-      HASHREF => sub {  # (nothing, but old SQLA passed it through)
-        #TODO in SQLA >= 2.0 it will die instead
-        SQL::Abstract::belch("HASH ref as bind value in insert is not supported");
-        push @values, '?';
-        push @all_bind, $self->_bindtype($column, $v);
-      },
+    ARRAYREFREF => sub {        # literal SQL with bind
+      my ($sql, @bind) = @${$v};
+      $self->_assert_bindval_matches_bindtype(@bind);
+      push @values, $sql;
+      push @all_bind, @bind;
+    },
 
-      SCALARREF => sub {  # literal SQL without bind
-        push @values, $$v;
-      },
+    # THINK : anything useful to do with a HASHREF ?
+    HASHREF => sub {       # (nothing, but old SQLA passed it through)
+      #TODO in SQLA >= 2.0 it will die instead
+      SQL::Abstract::belch "HASH ref as bind value in insert is not supported";
+      push @values, '?';
+      push @all_bind, $self->_bindtype($column, $v);
+    },
 
-      SCALAR_or_UNDEF => sub {
-        push @values, '?';
-        push @all_bind, $self->_bindtype($column, $v);
-      },
+    SCALARREF => sub {          # literal SQL without bind
+      push @values, $$v;
+    },
 
-     });
+    SCALAR_or_UNDEF => sub {
+      push @values, '?';
+      push @all_bind, $self->_bindtype($column, $v);
+    },
 
-  }
+  });
 
-  my $sql = $self->_sqlcase('values')." ( ".CORE::join(", ", @values)." )";
+  my $sql = CORE::join(", ", @values);
   return ($sql, @all_bind);
 }
+
+
 
 sub _overridden_update {
   # unfortunately, we can't just override the ARRAYREF part, so the whole
@@ -1106,7 +1102,7 @@ sub _choose_LIMIT_OFFSET_dialect {
   my $method = $limit_offset_dialects{$dialect}
     or croak "no such limit_offset dialect: $dialect";
   $self->{limit_offset} = $method;
-};
+}
 
 
 #----------------------------------------------------------------------
@@ -2038,6 +2034,22 @@ When using this feature, the C<@bind> array will contain references
 that cannot be passed directly to L<DBI> methods; so you should use
 L</bind_params> from the present module to perform the appropriate
 bindings before executing the statement.
+
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 does()
+
+  use SQL::Abstract::More qw/does/;
+
+  if (does $ref, 'ARRAY') {...}
+
+This module contains a very cheap version of a C<does()> method, that
+checks whether a given reference can act as an ARRAY, HASH, SCALAR or
+CODE. This was designed for the limited internal needs of this module
+and of L<DBIx::DataModel>; for more complete implementations of a
+C<does()> method, see L<Scalar::Does>, L<UNIVERSAL::DOES> or
+L<Class::DOES>.
 
 
 =head1 AUTHOR

@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "The great new perl client for Druid!",
    "author" : [
       "Gaurav Kohli <gaurav.in@gmail.com>"
    ],
@@ -32,11 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Moo" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

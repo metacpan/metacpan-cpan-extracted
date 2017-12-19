@@ -1,0 +1,88 @@
+[%#
+    Perl Module Builder Configuration
+    Parameters:
+        * module (Str) - The name of the module to be built
+        * file (Str) - The main module file name (based on module if not specified)
+        * package (Str) - The name of the perl package (uses module if not specified)
+        * moose (Bool) - Make the module be a Moose module
+        * moo (Bool) - Make the module be a Moo module
+        * bin (Bool | Str) - Add a script to the bin directory (If not a string the script is based on the package name)
+        * readme ('pod', 'md') - Create the README file as a POD or Markdown rather than plain txt file
+        * travis (Bool) - Create a .travis.yml config file
+%]
+[% module = module || 'module' -%]
+[% file   = module -%]
+[% IF file.match('::') -%]
+[%     file = file.replace('::', '/') -%]
+[% END -%]
+[% file = file _ '.pm' -%]
+[% package  = module -%]
+[% IF package.match('::') -%]
+[%     package = package.replace('::', '-') -%]
+[% END -%]
+[%- IF bin == 1;
+        bin = package.lower;
+    END;
+%]
+---
+[% package %]/lib/[% file %]:
+    template: perl/package.pm
+    arg:
+    module: [% module %]
+[% package %]/t/00-load.t:
+    template: perl/test/00-load.t
+    module: [% module %]
+[% package %]/t/boilerplate.t:
+    template: perl/test/boilerplate.t
+    module: [% module %]
+    file: lib/[% file %]
+[% package %]/t/critic.t:
+    template: perl/test/critic.t
+    module: [% module %]
+[% package %]/t/perlcriticrc:
+    template: blank
+[% package %]/t/kwalitee.t:
+    template: perl/test/kwalitee.t
+    module: [% module %]
+[% package %]/t/manifest.t:
+    template: perl/test/manifest.t
+    module: [% module %]
+[% package %]/t/pod-coverage.t:
+    template: perl/test/pod-coverage.t
+    module: [% module %]
+[% package %]/t/pod.t:
+    template: perl/test/pod.t
+    module: [% module %]
+[% package %]/t/spelling.t:
+    template: perl/test/spelling.t
+    module: [% module %]
+[% package %]/Build.PL:
+    template: perl/package/Build.PL
+    module: [% module %]
+[% package %]/Changes:
+    template: perl/package/Changes
+    module: [% module %]
+[% package %]/LICENSE:
+    template: perl/package/LICENSE
+    module: [% module %]
+[% package %]/MANIFEST:
+    template: perl/package/MANIFEST
+    module: [% module %]
+[% package %]/MANIFEST.SKIP:
+    template: perl/package/MANIFEST.SKIP
+    module: [% module %]
+[% package %]/README[% readme && '.' _ readme %]:
+    template: perl/package/README[% readme && '.' _ readme %]
+    module: [% module %]
+[% package %]/.gitignore:
+    template: git/ignore
+    package: [% package %]
+[%- IF travis %]
+[% package %]/.travis.yml:
+    template: perl/travis.yml
+[%- END %]
+[%- IF bin %]
+[% package %]/bin/[% bin %]:
+    template: perl.pl
+    module: [% module %]
+[% END %]

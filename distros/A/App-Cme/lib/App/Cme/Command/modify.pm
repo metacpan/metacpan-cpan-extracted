@@ -10,7 +10,7 @@
 # ABSTRACT: Modify the configuration of an application
 
 package App::Cme::Command::modify ;
-$App::Cme::Command::modify::VERSION = '1.024';
+$App::Cme::Command::modify::VERSION = '1.025';
 use strict;
 use warnings;
 use 5.10.1;
@@ -78,15 +78,12 @@ App::Cme::Command::modify - Modify the configuration of an application
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
   # modify configuration with command line
   cme modify dpkg source 'format="(3.0) quilt"'
-
-  # likewise with an application that accepts file override
-  cme modify dpkg-copyright 'Comment="Modified with cme"'
 
 =head1 DESCRIPTION
 
@@ -96,13 +93,13 @@ These command must follow the syntax defined in L<Config::Model::Loader>
 
 Example:
 
-   cme modify dpkg source format="(3.0) quilt"
-   cme modify multistrap my_mstrap.conf sections:base source="http://ftp.fr.debian.org"
+   cme modify dpkg 'source format="(3.0) quilt"'
+   cme modify multistrap my_mstrap.conf 'sections:base source="http://ftp.fr.debian.org"'
 
 Some application like dpkg-copyright allows you to override the
 configuration file name. You must then use C<-file> option:
 
-   cme modify dpkg-copyright -file ubuntu/copyright 'Comment="Silly example"
+   cme modify dpkg-copyright -file ubuntu/copyright 'Comment="Silly example"'
 
 =head1 Common options
 

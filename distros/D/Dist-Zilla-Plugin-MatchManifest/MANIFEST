@@ -12,5 +12,5 @@ t/10-manifest.t
 t/corpus/DZT/MANIFEST.SKIP
 t/corpus/DZT/dist.ini
 t/corpus/DZT/lib/DZT/Sample.pm
-xt/release/pod-coverage.t
-xt/release/pod-syntax.t
+xt/author/pod-coverage.t
+xt/author/pod-syntax.t

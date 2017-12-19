@@ -38,7 +38,7 @@ has pubsub => sub {
   return $pubsub;
 };
 
-our $VERSION = '4.03';
+our $VERSION = '4.04';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -218,6 +218,8 @@ L<SQL features|https://www.postgresql.org/docs/current/static/sql.html>
 PostgreSQL has to offer, generate CRUD queries from data structures, manage your
 database schema with migrations and build scalable real-time web applications
 with the publish/subscribe pattern.
+
+=head1 BASICS
 
 Database and statement handles are cached automatically, and will be reused
 transparently to increase performance. You can handle connection timeouts

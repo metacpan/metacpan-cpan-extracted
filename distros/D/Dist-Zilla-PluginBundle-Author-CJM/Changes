@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-CJM
 
+6.000  2017-12-17
+	- Change major version to 6, because Dist::Zilla 6 is required
+	- Require ArchiveRelease 6 for Dist::Zilla 6
+
 4.37   2015-11-21
 	- No functional changes
 	- Make tests compatible with Dist::Zilla 5.040 and up

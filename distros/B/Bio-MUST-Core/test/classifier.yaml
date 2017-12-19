@@ -1,0 +1,26 @@
+categories:
+- label: strict
+  description: strict species sampling
+  criteria:
+  - tax_filter: [ +Latimeria ]
+    min_seq_count: 1
+    max_seq_count: 
+    min_org_count:
+    max_org_count: 
+    min_copy_mean: 
+    max_copy_mean: 
+  - tax_filter: [ +Protopterus ]
+  # min_seq_count defaults to 1
+  # max_seq_count defaults to no upper bound
+  # all other also default to no bound
+  - tax_filter: [ +Danio, +Oreochromis ]
+  - tax_filter: [ +Xenopus ]
+  - tax_filter: [ +Anolis, +Gallus, +Meleagris, +Taeniopygia ]
+  - tax_filter: [ +Mammalia ]
+- label: loose
+  description: loose species sampling
+  criteria:
+  - tax_filter: [ +Latimeria ]
+  - tax_filter: [ +Protopterus ]
+  - tax_filter: [ +Danio, +Oreochromis ]
+  - tax_filter: [ +Amphibia, +Amniota ]

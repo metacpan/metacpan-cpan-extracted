@@ -207,7 +207,7 @@ my %colormap =
     );
 
 use Getopt::EX::Colormap;
-use constant RESET => Getopt::EX::Colormap::CSI(0);
+use constant SGD_RESET => "\e[m";
 my $color_handler = new Getopt::EX::Colormap
     HASH => \%colormap;
 $color_handler->load_params(@opt_colormap);
@@ -768,15 +768,15 @@ sub print_field_n {
     print "\n";
 }
 
-my $alphanum;
+my $alphanum_re;
 my $reset_re;
 my $color_re;
 my $control_re;
 BEGIN {
-    $alphanum = '_\d\p{Latin}';
-    $reset_re = qr/\e\[[0;]*m/;
-    $color_re = qr{ \e \[ [\d;]* m }x;
-    $control_re = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
+    $alphanum_re = qr{ [_\d\p{Latin}] }x;
+    $reset_re    = qr{ \e \[ [0;]*  m }x;
+    $color_re    = qr{ \e \[ [\d;]* m }x;
+    $control_re  = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
 }
 
 sub IsWideSpacing {
@@ -861,12 +861,12 @@ sub fold {
     }
 
     if ($opt{onword}
-	and my($tail) = /^([$alphanum]+)/o
+	and my($tail) = /^(${alphanum_re}+)/o
 	and $folded =~ m{
 		^
 		( (?: [^\e]* $color_re ) *+ )
 		( .*? )
-		( [$alphanum]+ )
+		( ${alphanum_re}+ )
 		$
 	}xo
 	) {
@@ -881,7 +881,7 @@ sub fold {
     }
 
     if (@color_stack) {
-	$folded .= RESET;
+	$folded .= SGD_RESET;
 	$_ = join '', @color_stack, $_ if $_ ne '';
     }
 

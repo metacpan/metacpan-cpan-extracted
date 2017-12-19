@@ -13,11 +13,11 @@ File::PCAP::Reader - read PCAP files with pure Perl
 
 =head1 VERSION
 
-Version v0.0.5
+Version v0.0.6
 
 =cut
 
-use version; our $VERSION = qv('v0.0.5');
+use version; our $VERSION = qv('v0.0.6');
 
 
 =head1 SYNOPSIS
@@ -226,8 +226,13 @@ sub DESTROY {
 sub _read_pcap_global_header {
     my ($self) = @_;
     my $fh = $self->{fh};
-    my ($magic,$vmajor,$vminor,$tzone,$sigfigs,$snaplen,$dlt) = unpack("LSSlLLL",<$fh>);
-    if (2712847316 == $magic || 2712812621 == $magic) {
+    my $data;
+    unless (24 == read($fh, $data, 24)) {
+        croak "Couldn't read global header of PCAP file";
+    }
+    my ($magic,$vmajor,$vminor,$tzone,$sigfigs,$snaplen,$dlt) = unpack("LSSlLLL",$data);
+
+    if (0xa1b2c3d4 == $magic || 0xa1b23c4d == $magic) {
         if (2 != $vmajor or 4 != $vminor) {
             croak "Can't handle file version $vmajor.$vminor"
         }

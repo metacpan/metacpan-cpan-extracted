@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------
 package Dist::Zilla::Plugin::MatchManifest;
 #
-# Copyright 2009 Christopher J. Madsen
+# Copyright 2017 Christopher J. Madsen
 #
 # Author: Christopher J. Madsen <perl@cjmweb.net>
 # Created: 17 Oct 2009
@@ -17,8 +17,8 @@ package Dist::Zilla::Plugin::MatchManifest;
 # ABSTRACT: Ensure that MANIFEST is correct
 #---------------------------------------------------------------------
 
-our $VERSION = '4.02';
-# This file is part of Dist-Zilla-Plugin-MatchManifest 4.02 (July 19, 2014)
+our $VERSION = '6.000';
+# This file is part of Dist-Zilla-Plugin-MatchManifest 6.000 (December 17, 2017)
 
 
 use Moose 0.65;                 # attr fulfills requires
@@ -78,7 +78,7 @@ END ERROR
   # We've got a mismatch.  Report it:
   require Text::Diff;
 
-  my $onDisk = $self->zilla->root->file('MANIFEST');
+  my $onDisk = $self->zilla->root->child('MANIFEST');
   my $stat   = $onDisk->stat;
 
   my $diff = Text::Diff::diff(\$manifestFile->content, \$manifest, {
@@ -124,8 +124,8 @@ Dist::Zilla::Plugin::MatchManifest - Ensure that MANIFEST is correct
 
 =head1 VERSION
 
-This document describes version 4.02 of
-Dist::Zilla::Plugin::MatchManifest, released July 19, 2014.
+This document describes version 6.000 of
+Dist::Zilla::Plugin::MatchManifest, released December 17, 2017.
 
 =head1 SYNOPSIS
 
@@ -206,7 +206,7 @@ L<< https://github.com/madsen/dist-zilla-plugin-matchmanifest >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

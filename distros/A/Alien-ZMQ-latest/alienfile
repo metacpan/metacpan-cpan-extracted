@@ -1,7 +1,5 @@
 use alienfile;
 
-requires 'Alien::gmake' => 0.14;
-
 plugin 'PkgConfig' => 'libzmq';
 
 # http://zeromq.org/

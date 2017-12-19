@@ -5,6 +5,7 @@ requires 'namespace::clean' => 0.26;
 # Modules from the Dist-Zilla distribution.
 requires 'Dist::Zilla::Role::PluginBundle::Easy' => 5.042;
 requires 'Dist::Zilla::PluginBundle::Basic' => 5.042;
+requires 'Dist::Zilla::Plugin::MetaJSON' => 5.042;
 requires 'Dist::Zilla::Plugin::NextRelease' => 5.042;
 requires 'Dist::Zilla::Plugin::PkgVersion' => 5.042;
 requires 'Dist::Zilla::Plugin::PodSyntaxTests' => 5.042;

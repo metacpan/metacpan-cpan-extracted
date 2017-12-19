@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Copy qw( copy );
+
+my $sourcedir;
+my $targetdir;
+
+my %shortargs = (
+	'-s' => sub  {
+		$sourcedir = shift @ARGV;
+		unless (-e $sourcedir) { die "source folder $sourcedir does not exist" }
+		unless (-d $sourcedir) { die "source folder $sourcedir is not a folder" }
+	},
+	'-t' => sub  {
+		$targetdir = shift @ARGV;
+		unless (-e $targetdir) { die "source folder $targetdir does not exist" }
+		unless (-d $targetdir) { die "source folder $targetdir is not a folder" }
+	},
+);
+
+my %args = (%shortargs,
+	'-source' => $shortargs{'-s'},
+	'-target' => $shortargs{'-t'},
+);
+
+while (@ARGV) {
+	my $t = shift @ARGV;
+	if (exists $args{$t}) {
+		my $call = $args{$t};
+		&$call;
+	} else {
+		die "invalid argument $t, valid arguments -s, -source, -t, -target";
+	}
+}
+
+unless (defined $sourcedir) { die "please specify a source folder" }
+unless (defined $targetdir) { die "please specify a target folder" }
+
+use Syntax::Kamelon::Indexer;
+
+my $odi = Syntax::Kamelon::Indexer->new();
+
+my $sdi = Syntax::Kamelon::Indexer->new(
+	xmlfolder => $sourcedir
+);
+
+my @syntaxes = $sdi->AvailableSyntaxes;
+
+for (@syntaxes) {
+	unless ($odi->SyntaxExists($_)) {
+		print "Added syntax $_\n";
+		&CopyXML($_)
+	} elsif ($odi->InfoVersion($_) < $sdi->InfoVersion($_)) {
+		print "Updated syntax $_ from version " . $odi->InfoVersion($_) . " to version " . $sdi->InfoVersion($_) . "\n";
+		&CopyXML($_)
+	}
+}
+
+sub CopyXML {
+	my $synt = shift;
+	my $file = $sdi->InfoXMLFile($synt);
+	copy("$sourcedir/$file", "$targetdir/$file");
+	
+}

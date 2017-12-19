@@ -1,0 +1,20 @@
+.*.sw[ponxmn]
+Debian_CPANTS.txt
+[% package %]-*
+.vimtagsdisplay
+tags
+Build
+MYMETA.*
+META.*
+Makefile.PL
+_build*
+blib*
+Makefile
+pm_to_blib*
+.lwpcookies
+cover_db
+nytprof*
+.prove
+tmp*
+*~
+errors.err

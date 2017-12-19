@@ -114,7 +114,9 @@ sub run
 
             tie my @log, 'Tie::File', $log,recsep => "\n";
 
-            push @{ $result{output}{ join "\n", @log, "--- $stat", '' } }, $node;
+	    my $tmp = join "\n", @log;
+	    $tmp =~ s/$node/$interchange/g if $run{xx};
+            push @{ $result{output}{ join "\n", $tmp, "--- $stat", '' } }, $node;
             unlink $log;
         }
     }

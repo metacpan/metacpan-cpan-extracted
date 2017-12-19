@@ -19,7 +19,7 @@ package Dist::Zilla::Plugin::Test::PrereqsFromMeta;
 
 use 5.008;
 our $VERSION = '4.23';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 
 use Moose;
@@ -55,8 +55,8 @@ Dist::Zilla::Plugin::Test::PrereqsFromMeta - Check the prereqs from our META.jso
 =head1 VERSION
 
 This document describes version 4.23 of
-Dist::Zilla::Plugin::Test::PrereqsFromMeta, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+Dist::Zilla::Plugin::Test::PrereqsFromMeta, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

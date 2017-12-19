@@ -43,7 +43,7 @@ Catalyst::ActionRole::OAuth2::GrantAuth - Authorization grant endpoint for OAuth
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 

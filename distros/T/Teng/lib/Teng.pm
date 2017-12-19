@@ -28,7 +28,7 @@ use Class::Accessor::Lite 0.05
     )]
 ;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub load_plugin {
     my ($class, $pkg, $opt) = @_;
@@ -922,6 +922,11 @@ By default DBIx::TransactionManager is used.
 Specifies the row object creation mode. By default this value is C<false>.
 If you specifies this to a C<true> value, no row object will be created when
 a C<SELECT> statement is issued..
+
+=item * C<force_deflate_set_column>
+
+Specifies C<set_column>, C<set_columns> and column name method behaviour. By default this value is C<false>.
+If you specifies this to a C<true> value, C<set_column> or column name method will deflate argument.
 
 =item * C<sql_builder>
 

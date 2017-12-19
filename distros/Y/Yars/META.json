@@ -1,5 +1,5 @@
 {
-   "abstract" : "Yet Another RESTful-Archive Service",
+   "abstract" : "(Deprecated) Yet Another RESTful-Archive Service",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -80,13 +80,15 @@
          "web" : "https://github.com/clustericious/Yars"
       }
    },
-   "version" : "1.31",
+   "version" : "1.33",
    "x_contributors" : [
       "Marty Brandon",
       "Graham Ollis <plicease@cpan.org>",
       "Brian Duggan",
       "Curt Tilmes"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_use_unsafe_inc" : 0
 }
 

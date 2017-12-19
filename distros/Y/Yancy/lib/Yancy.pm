@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -42,7 +42,8 @@ our $VERSION = '0.004';
 #pod Yancy can manage data in multiple databases using different backends
 #pod (L<Yancy::Backend> modules). Backends exist for L<Postgres via
 #pod Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
-#pod Mojo::mysql|Yancy::Backend::Mysql>, and L<DBIx::Class, a Perl
+#pod Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
+#pod Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
 #pod ORM|Yancy::Backend::DBIC>
 #pod
 #pod =head2 Standalone App
@@ -56,14 +57,16 @@ our $VERSION = '0.004';
 #pod an HTTP proxy with these features.
 #pod
 #pod Once the application is started, you can navigate to C<<
-#pod http://127.0.0.1:3000/admin >> to see the Yancy administration app.
+#pod http://127.0.0.1:3000/yancy >> to see the Yancy administration app.
 #pod Navigate to C<< http://127.0.0.1:3000/ >> to see the getting started
 #pod page.
 #pod
 #pod =head3 Rendering Content
 #pod
-#pod In the standalone app, all paths besides the C</admin> application are
-#pod treated as paths to templates.
+#pod In the standalone app, all paths besides the C</yancy> application are
+#pod treated as paths to templates. If a specific template path is not found,
+#pod Yancy will search for an C<index> template in the same directory. If that
+#pod template is not found, an error is returned.
 #pod
 #pod The templates are found in the C<templates> directory. You can change
 #pod the root directory that contains the C<templates> directory by setting
@@ -111,6 +114,25 @@ our $VERSION = '0.004';
 #pod More information about L<Mojolicious> helpers is available at
 #pod L<Mojolicious::Guides::Rendering>.
 #pod
+#pod =head3 Plugins
+#pod
+#pod In standalone mode, you can configure plugins in the Yancy configuration
+#pod file. Plugins can be standard L<Mojolicious::Plugins> (with a name
+#pod starting with C<Mojolicious::Plugin>, or they can be specifically for
+#pod Yancy (by extending L<Mojolicious::Plugin> and having a name starting
+#pod with C<Yancy::Plugin>).
+#pod
+#pod Plugins are configured as an array of arrays under the `plugins` key.
+#pod Each inner array should have the plugin's name and any arguments the
+#pod plugin requires, like so:
+#pod
+#pod     {
+#pod         plugins => [
+#pod             [ 'PodRenderer' ],
+#pod             [ CGI => [ "/cgi-bin/script" => "/path/to/cgi/script.pl" ] ],
+#pod         ],
+#pod     }
+#pod
 #pod =head2 Mojolicious Plugin
 #pod
 #pod For information on how to use Yancy as a Mojolicious plugin, see
@@ -120,8 +142,7 @@ our $VERSION = '0.004';
 #pod
 #pod This application creates a REST API using the standard
 #pod L<OpenAPI|http://openapis.org> API specification. The API spec document
-#pod is located at C</api> in the standalone app, and C</yancy/api> in the
-#pod Mojolicious plugin.
+#pod is located at C</yancy/api>.
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -160,6 +181,10 @@ our $VERSION = '0.004';
 #pod =item L<MySQL backend|Yancy::Backend::Mysql>
 #pod
 #pod     backend => 'mysql://user@localhost/mydb',
+#pod
+#pod =item L<SQLite backend|Yancy::Backend::Sqlite>
+#pod
+#pod     backend => 'sqlite:filename.db',
 #pod
 #pod =item L<DBIx::Class backend|Yancy::Backend::Dbic>
 #pod
@@ -257,6 +282,10 @@ our $VERSION = '0.004';
 #pod
 #pod =back
 #pod
+#pod A Markdown editor can be enabled by using C<< type => "string", format
+#pod => "markdown" >>.  The Markdown can then be saved as HTML in another
+#pod field by adding C<< x-html-field => $field_name >>.
+#pod
 #pod =head3 Required Values
 #pod
 #pod JSON Schema allows marking properties as required using the C<required>
@@ -328,6 +357,37 @@ our $VERSION = '0.004';
 #pod
 #pod =back
 #pod
+#pod =head3 Extended Field Configuration
+#pod
+#pod There are some extended fields you can add to a field configuration
+#pod to control how it is treated by Yancy.
+#pod
+#pod =over
+#pod
+#pod =item x-hidden
+#pod
+#pod If true, thie field will be hidden from the rich editing form.
+#pod
+#pod =item x-filter
+#pod
+#pod This key is an array of filter names to run on the field when setting or
+#pod creating an item. Filters can allow for hashing passwords, for example.
+#pod Filters are added by plugins or during configuration of
+#pod L<Mojolicious::Plugin::Yancy>. See
+#pod L<Mojolicious::Plugin::Yancy/yancy.filter.add> for how to add a filter.
+#pod
+#pod =back
+#pod
+#pod =head2 Additional Configuration
+#pod
+#pod There are additional configuration keys to alter how Yancy works.
+#pod
+#pod =head3 C<controller_class>
+#pod
+#pod To customize how Yancy responds to API requests with data, you can create
+#pod a custom controller and set the class here. For details how to create
+#pod a custom controller, see L<Yancy::Controller::Yancy>.
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<JSON schema|http://json-schema.org>, L<Mojolicious>
@@ -342,9 +402,21 @@ sub startup( $app ) {
     $app->plugin( Config => { default => { } } );
     $app->plugin( 'Yancy', {
         %{ $app->config },
-        route => $app->routes->any('/admin'),
+        route => $app->routes->any('/yancy'),
     } );
-    $app->routes->get('/*template');
+
+    unshift @{$app->plugins->namespaces}, 'Yancy::Plugin';
+    for my $plugin ( $app->config->{plugins}->@* ) {
+        $app->plugin( @$plugin );
+    }
+
+    $app->routes->get('/*path', { path => 'index' } )
+    ->to( cb => sub( $c ) {
+        my $path = $c->stash( 'path' );
+        return if $c->render_maybe( $path );
+        $path =~ s{(^|/)[^/]+$}{${1}index};
+        return $c->render( $path );
+    } );
     # Add default not_found renderer
     push @{$app->renderer->classes}, 'Yancy';
 }
@@ -359,7 +431,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -397,7 +469,8 @@ the L<Mojolicious> web framework.
 Yancy can manage data in multiple databases using different backends
 (L<Yancy::Backend> modules). Backends exist for L<Postgres via
 Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
-Mojo::mysql|Yancy::Backend::Mysql>, and L<DBIx::Class, a Perl
+Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
+Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
 ORM|Yancy::Backend::DBIC>
 
 =head2 Standalone App
@@ -411,14 +484,16 @@ If you want to control which users have access to data, you should use
 an HTTP proxy with these features.
 
 Once the application is started, you can navigate to C<<
-http://127.0.0.1:3000/admin >> to see the Yancy administration app.
+http://127.0.0.1:3000/yancy >> to see the Yancy administration app.
 Navigate to C<< http://127.0.0.1:3000/ >> to see the getting started
 page.
 
 =head3 Rendering Content
 
-In the standalone app, all paths besides the C</admin> application are
-treated as paths to templates.
+In the standalone app, all paths besides the C</yancy> application are
+treated as paths to templates. If a specific template path is not found,
+Yancy will search for an C<index> template in the same directory. If that
+template is not found, an error is returned.
 
 The templates are found in the C<templates> directory. You can change
 the root directory that contains the C<templates> directory by setting
@@ -466,6 +541,25 @@ Some example template code:
 More information about L<Mojolicious> helpers is available at
 L<Mojolicious::Guides::Rendering>.
 
+=head3 Plugins
+
+In standalone mode, you can configure plugins in the Yancy configuration
+file. Plugins can be standard L<Mojolicious::Plugins> (with a name
+starting with C<Mojolicious::Plugin>, or they can be specifically for
+Yancy (by extending L<Mojolicious::Plugin> and having a name starting
+with C<Yancy::Plugin>).
+
+Plugins are configured as an array of arrays under the `plugins` key.
+Each inner array should have the plugin's name and any arguments the
+plugin requires, like so:
+
+    {
+        plugins => [
+            [ 'PodRenderer' ],
+            [ CGI => [ "/cgi-bin/script" => "/path/to/cgi/script.pl" ] ],
+        ],
+    }
+
 =head2 Mojolicious Plugin
 
 For information on how to use Yancy as a Mojolicious plugin, see
@@ -475,8 +569,7 @@ L<Mojolicious::Plugin::Yancy>.
 
 This application creates a REST API using the standard
 L<OpenAPI|http://openapis.org> API specification. The API spec document
-is located at C</api> in the standalone app, and C</yancy/api> in the
-Mojolicious plugin.
+is located at C</yancy/api>.
 
 =head1 CONFIGURATION
 
@@ -515,6 +608,10 @@ below. See your backend's documentation for more information.
 =item L<MySQL backend|Yancy::Backend::Mysql>
 
     backend => 'mysql://user@localhost/mydb',
+
+=item L<SQLite backend|Yancy::Backend::Sqlite>
+
+    backend => 'sqlite:filename.db',
 
 =item L<DBIx::Class backend|Yancy::Backend::Dbic>
 
@@ -612,6 +709,10 @@ input fields:
 
 =back
 
+A Markdown editor can be enabled by using C<< type => "string", format
+=> "markdown" >>.  The Markdown can then be saved as HTML in another
+field by adding C<< x-html-field => $field_name >>.
+
 =head3 Required Values
 
 JSON Schema allows marking properties as required using the C<required>
@@ -683,6 +784,37 @@ order. This helps put useful information on the list page.
 
 =back
 
+=head3 Extended Field Configuration
+
+There are some extended fields you can add to a field configuration
+to control how it is treated by Yancy.
+
+=over
+
+=item x-hidden
+
+If true, thie field will be hidden from the rich editing form.
+
+=item x-filter
+
+This key is an array of filter names to run on the field when setting or
+creating an item. Filters can allow for hashing passwords, for example.
+Filters are added by plugins or during configuration of
+L<Mojolicious::Plugin::Yancy>. See
+L<Mojolicious::Plugin::Yancy/yancy.filter.add> for how to add a filter.
+
+=back
+
+=head2 Additional Configuration
+
+There are additional configuration keys to alter how Yancy works.
+
+=head3 C<controller_class>
+
+To customize how Yancy responds to API requests with data, you can create
+a custom controller and set the class here. For details how to create
+a custom controller, see L<Yancy::Controller::Yancy>.
+
 =head1 SEE ALSO
 
 L<JSON schema|http://json-schema.org>, L<Mojolicious>
@@ -690,6 +822,22 @@ L<JSON schema|http://json-schema.org>, L<Mojolicious>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Mohammad S Anwar William Lindley
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+William Lindley <wlindley@wlindley.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -703,51 +851,23 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 
 @@ not_found.development.html.ep
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Yancy CMS</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css" type="text/css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-            rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.8/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
-    </head>
-    <body>
+% layout 'yancy';
+<main id="app" class="container-fluid" style="margin-top: 10px">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Welcome to Yancy</h1>
+            <p>This is the default not found page.</p>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="<%= url_for('admin') %>">Yancy</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="<%= url_for('admin') %>">Admin</a>
-              </li>
+            <h2>Getting Started</h2>
+            <p>To edit your data, go to <a href="/yancy">/yancy</a>.</p>
+            <p>Add your templates to <tt><%= app->home->child( 'templates' ) %></tt>. Each template becomes a URL in your
+            site:</p>
+            <ul>
+                <li><tt><%= app->home->child( 'templates', 'foo.html.ep' ) %></tt> becomes <a href="/foo">/foo</a>.</li>
+                <li><tt><%= app->home->child( 'templates', 'foo', 'bar.html.ep' ) %></tt> becomes <a href="/foo/bar">/foo/bar</a>.</li>
             </ul>
-          </div>
-        </nav>
-
-        <main id="app" class="container-fluid" style="margin-top: 10px">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1>Welcome to Yancy</h1>
-                    <p>This is the default not found page.</p>
-
-                    <h2>Getting Started</h2>
-                    <p>To edit your data, go to <a href="/admin">/admin</a>.</p>
-                    <p>Add your templates to <tt><%= app->home->child( 'templates' ) %></tt>. Each template becomes a URL in your
-                    site:</p>
-                    <ul>
-                        <li><tt><%= app->home->child( 'templates', 'foo.html.ep' ) %></tt> becomes <a href="/foo">/foo</a>.</li>
-                        <li><tt><%= app->home->child( 'templates', 'foo', 'bar.html.ep' ) %></tt> becomes <a href="/foo/bar">/foo/bar</a>.</li>
-                    </ul>
-                    <p>To disable this page, run Yancy in production mode with <kbd>-m production</kbd>.</p>
-                </div>
-            </div>
-        </main>
-    </body>
-</html>
+            <p>To disable this page, run Yancy in production mode with <kbd>-m production</kbd>.</p>
+        </div>
+    </div>
+</main>
 

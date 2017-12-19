@@ -27,7 +27,7 @@ my @tests = (
                         get_payload => "",
                     ),
                     listmethods(
-                        get_code_and_reason => [],
+                        get_code_and_reason => [ undef, q<> ],
                     ),
                 ),
                 'goodbye - close (bare)',

@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Path::Class" => 0,
     "Smart::Comments" => 0,
     "Test::Most" => 0,
+    "Tie::IxHash" => 0,
     "XML::Bare" => "0.53",
     "aliased" => 0,
     "autodie" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.173450",
+  "VERSION" => "0.173510",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Path::Class" => 0,
   "Smart::Comments" => 0,
   "Test::Most" => 0,
+  "Tie::IxHash" => 0,
   "XML::Bare" => "0.53",
   "aliased" => 0,
   "autodie" => 0,

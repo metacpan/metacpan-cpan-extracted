@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More 'tests' => 3;
+use lib '.';
 use t::lib::Utils;
 use Plack::Test;
 use HTTP::Request::Common;

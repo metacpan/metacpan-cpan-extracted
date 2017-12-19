@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::Author::BLUEFEET;
-$Dist::Zilla::PluginBundle::Author::BLUEFEET::VERSION = '0.02';
+$Dist::Zilla::PluginBundle::Author::BLUEFEET::VERSION = '0.03';
 use Moose;
 use strictures 2;
 use namespace::clean;
@@ -45,6 +45,9 @@ sub configure {
 
         # Read CPAN prerequisites from the root cpanfile.
         'Prereqs::FromCPANfile',
+
+        # produce a META.json
+        'MetaJSON',
 
         # After a release, commit updated files.
         'Git::Commit',
@@ -95,6 +98,8 @@ Using this L<Dist::Zilla> plugin bundle is equivalent to:
     [Test::ReportPrereqs]
     [Prereqs::FromCPANfile]
     
+    [MetaJSON]
+    
     [Git::Commit]
     [Git::Tag]
     [Git::Push]
@@ -102,6 +107,16 @@ Using this L<Dist::Zilla> plugin bundle is equivalent to:
 =head1 AUTHOR
 
 Aran Clary Deltac <bluefeetE<64>gmail.com>
+
+=head2 CONTRIBUTORS
+
+=over
+
+=item *
+
+Mohammad S Anwar <mohammad.anwarE<64>yahoo.com>
+
+=back
 
 =head1 LICENSE
 

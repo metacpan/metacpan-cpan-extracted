@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Graphics/Raylib.pm',
     'lib/Graphics/Raylib/Color.pm',
+    'lib/Graphics/Raylib/Key.pm',
     'lib/Graphics/Raylib/Keyboard.pm',
     'lib/Graphics/Raylib/Mouse.pm',
     'lib/Graphics/Raylib/Shape.pm',
@@ -20,7 +21,8 @@ my @files = (
     't/01-colors.t',
     't/02-util.t',
     't/10-mouse.t',
-    't/11-keyboard.t',
+    't/11-key.t',
+    't/12-keyboard.t',
     't/20-init.t',
     't/21-fps.t',
     't/22-background.t',

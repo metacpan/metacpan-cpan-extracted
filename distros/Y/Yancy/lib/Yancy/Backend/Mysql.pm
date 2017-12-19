@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -25,6 +25,9 @@ our $VERSION = '0.004';
 #pod
 #pod This Yancy backend allows you to connect to a MySQL database to manage
 #pod the data inside. This backend uses L<Mojo::mysql> to connect to MySQL.
+#pod
+#pod See L<Yancy::Backend> for the methods this backend has and their return
+#pod values.
 #pod
 #pod =head2 Backend URL
 #pod
@@ -127,8 +130,8 @@ sub get( $self, $coll, $id ) {
 
 sub list( $self, $coll, $params={}, $opt={} ) {
     my $mysql = $self->mysql;
-    my $query = $mysql->abstract->select( $coll, undef );
-    my $total_query = $mysql->abstract->select( $coll, [ \'COUNT(*) as total' ] );
+    my ( $query, @params ) = $mysql->abstract->select( $coll, undef, $params, $opt->{order_by} );
+    my ( $total_query, @total_params ) = $mysql->abstract->select( $coll, [ \'COUNT(*) as total' ], $params );
     if ( scalar grep defined, $opt->@{qw( limit offset )} ) {
         die "Limit must be number" if $opt->{limit} && !looks_like_number $opt->{limit};
         $query .= ' LIMIT ' . ( $opt->{limit} // 2**32 );
@@ -139,8 +142,8 @@ sub list( $self, $coll, $params={}, $opt={} ) {
     }
     #; say $query;
     return {
-        rows => $mysql->db->query( $query )->hashes,
-        total => $mysql->db->query( $total_query )->hash->{total},
+        rows => $mysql->db->query( $query, @params )->hashes,
+        total => $mysql->db->query( $total_query, @total_params )->hash->{total},
     };
 }
 
@@ -166,7 +169,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -191,6 +194,9 @@ version 0.004
 
 This Yancy backend allows you to connect to a MySQL database to manage
 the data inside. This backend uses L<Mojo::mysql> to connect to MySQL.
+
+See L<Yancy::Backend> for the methods this backend has and their return
+values.
 
 =head2 Backend URL
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="LaTeX" version="4" section="Markup" kateversion="5.0" priority="10" extensions="*.tex;*.ltx;*.dtx;*.sty;*.cls;*.bbx;*.cbx;*.lbx;*.tikz" mimetype="text/x-tex" casesensitive="1" author="Jeroen Wijnhout (Jeroen.Wijnhout@kdemail.net)+Holger Danielsson (holger.danielsson@versanet.de)+Michel Ludwig (michel.ludwig@kdemail.net)+Thomas Braun (thomas.braun@virtuell-zuhause.de)" license="LGPL" >
+<language name="LaTeX" version="5" section="Markup" kateversion="5.0" priority="10" extensions="*.tex;*.ltx;*.dtx;*.sty;*.cls;*.bbx;*.cbx;*.lbx;*.tikz" mimetype="text/x-tex" casesensitive="1" author="Jeroen Wijnhout (Jeroen.Wijnhout@kdemail.net)+Holger Danielsson (holger.danielsson@versanet.de)+Michel Ludwig (michel.ludwig@kdemail.net)+Thomas Braun (thomas.braun@virtuell-zuhause.de)" license="LGPL" >
   <highlighting>
     <contexts>
       <!-- Normal text -->
@@ -435,7 +435,7 @@
        </context>
 
       <!-- parse tabular text -->
-      <context name="Tab" attribute="Tab" lineEndContext="#stay">
+      <context name="Tab" attribute="Normal Text" lineEndContext="#stay">
         <DetectChar char="&amp;" attribute="Ampersand" context="#stay"/>
         <StringDetect String="@{" attribute="Column Separator" context="Column Separator"/>
         <RegExpr String="\\end(?=\s*\{(tabularx|tabular|supertabular|mpsupertabular|xtabular|mpxtabular|longtable)\*?\})" attribute="Structure"  context="TabFindEnd"/>
@@ -547,7 +547,8 @@
     </contexts>
 
     <itemDatas>
-      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+		 <!--		 Adapted to work with Syntax::Kamelon-->
+		 <itemData name="Normal Text" defStyleNum="dsNormal"/>
       <itemData name="Option Text" defStyleNum="dsNormal" spellChecking="false"/>
       <itemData name="Macro" defStyleNum="dsFunction" spellChecking="false"/>
       <itemData name="Comment" defStyleNum="dsComment" spellChecking="false"/>
@@ -565,9 +566,9 @@
       <itemData name="Column Separator" defStyleNum="dsChar" spellChecking="false"/>
       <itemData name="Alert" defStyleNum="dsAlert" spellChecking="false"/>
       <!-- in section headers -->
-		<itemData name="Sectioning Text" defStyleNum="dsOthers" bold="1"/>
-      <itemData name="Sectioning Macro" defStyleNum="dsFunction" bold="1" spellChecking="false"/>
-		<itemData name="Sectioning Math" defStyleNum="dsOperator" bold="1"/>
+		<itemData name="Sectioning Text" defStyleNum="dsControlFlow" bold="1"/>
+		<itemData name="Sectioning Macro" defStyleNum="dsOthers" bold="1" spellChecking="false"/>
+      <itemData name="Sectioning Math" defStyleNum="dsSpecialString" bold="1"/>
       <itemData name="Sectioning Macro Mathmode" defStyleNum="dsSpecialChar" bold="1" spellChecking="false"/>
     </itemDatas>
   </highlighting>

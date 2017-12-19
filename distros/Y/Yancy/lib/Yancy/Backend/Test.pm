@@ -1,5 +1,5 @@
 package Yancy::Backend::Test;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A test backend for testing Yancy
 
 use v5.24;
@@ -32,9 +32,20 @@ sub get( $self, $coll, $id ) {
     return $COLLECTIONS{ $coll }{ $id };
 }
 
+sub _match_all( $match, $item ) {
+    return ( grep { $match->{ $_ } eq $item->{ $_ } } keys %$match ) == keys %$match;
+}
+
 sub list( $self, $coll, $params={}, $opt={} ) {
     my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
-    my @rows = sort { $a->{$id_field} cmp $b->{$id_field} }
+    my $sort_field = $opt->{order_by} ? [values $opt->{order_by}[0]->%*]->[0] : $id_field;
+    my $sort_order = $opt->{order_by} ? [keys $opt->{order_by}[0]->%*]->[0] : '-asc';
+    my @rows = sort {
+        $sort_order eq '-asc'
+            ? $a->{$sort_field} cmp $b->{$sort_field}
+            : $b->{$sort_field} cmp $a->{$sort_field}
+        }
+        grep { _match_all( $params, $_ ) }
         values $COLLECTIONS{ $coll }->%*;
     my $first = $opt->{offset} // 0;
     my $last = $opt->{limit} ? $opt->{limit} + $first - 1 : $#rows;
@@ -43,7 +54,7 @@ sub list( $self, $coll, $params={}, $opt={} ) {
     }
     my $retval = {
         rows => [ @rows[ $first .. $last ] ],
-        total => scalar keys $COLLECTIONS{ $coll }->%*,
+        total => scalar @rows,
     };
     #; use Data::Dumper;
     #; say Dumper $retval;
@@ -51,6 +62,8 @@ sub list( $self, $coll, $params={}, $opt={} ) {
 }
 
 sub set( $self, $coll, $id, $params ) {
+    my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
+    $params->{ $id_field } = $id;
     $COLLECTIONS{ $coll }{ $id } = $params;
 }
 
@@ -70,7 +83,7 @@ Yancy::Backend::Test - A test backend for testing Yancy
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 AUTHOR
 

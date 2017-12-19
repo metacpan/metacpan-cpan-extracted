@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.2.1",
+            "Getopt::EX" : "v1.4.2",
             "List::Util" : "1.33",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
@@ -64,7 +64,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v3.2.2"
+         "version" : "v3.3.2"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -87,6 +87,6 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "3.2.2",
+   "version" : "3.3.2",
    "x_authority" : "cpan:UTASHIRO"
 }

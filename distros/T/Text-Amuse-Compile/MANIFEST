@@ -62,6 +62,7 @@ t/merged-dir/third.muse
 t/merged.t
 t/methods.t
 t/missing-fonts.t
+t/nobold-option.t
 t/nofinalpage.t
 t/notoc.t
 t/options-f/dir1/1/options1.muse

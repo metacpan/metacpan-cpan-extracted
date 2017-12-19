@@ -1,9 +1,9 @@
 package Net::DNS::Mailbox;
 
 #
-# $Id: Mailbox.pm 1527 2017-01-18 21:42:48Z willem $
+# $Id: Mailbox.pm 1605 2017-11-27 11:37:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1527 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
 
 
 =head1 NAME
@@ -107,15 +107,13 @@ canonicalisation.
 =cut
 
 package Net::DNS::Mailbox1035;
-
-use base qw(Net::DNS::Mailbox);
+our @ISA = qw(Net::DNS::Mailbox);
 
 sub encode { &Net::DNS::DomainName1035::encode; }
 
 
 package Net::DNS::Mailbox2535;
-
-use base qw(Net::DNS::Mailbox);
+our @ISA = qw(Net::DNS::Mailbox);
 
 sub encode { &Net::DNS::DomainName2535::encode; }
 

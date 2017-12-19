@@ -39,7 +39,7 @@ requires (
     'Convert::X509' => 0,
     'Crypt::SMIME'  => 0.15,
     'Email::MIME'   => 0,
-    'Mail::Milter::Authentication' => '1.1.3',
+    'Mail::Milter::Authentication' => '1.1.5',
 );
 
 install_as_cpan;

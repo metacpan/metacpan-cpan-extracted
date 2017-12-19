@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.130-11-gf3164b9
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.131-8-g2a0015d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 use Moose;
 with
@@ -424,6 +424,8 @@ sub configure
 
         'Git::Tag.tag_message' => 'v%v%t',
 
+        # if the caller set bump_only_matching_versions, then this global setting falls on the floor automatically
+        # because the bundle uses the non-Transitional plugin in that case.
         'BumpVersionAfterRelease::Transitional.global' => 1,
 
         'NextRelease.:version' => '5.033',
@@ -581,7 +583,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.131
+version 0.132
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,7 @@
 =head1 SYNOPSIS
 
  $0 [--port num] [--max num] script
+ [--whitelist file]
 
 =cut
 use strict;
@@ -18,6 +19,6 @@ $| ++;
 #@MYDan::Util::OptConf::CONF = qw( pass_through no_ignore_case );
 
 my $option = MYDan::Util::OptConf->load();
-my %o = $option->set( port => 65111, max => 20 )->get( qw( port=i max=i tmp=s ) )->dump();
+my %o = $option->set( port => 65111, max => 20 )->get( qw( port=i max=i tmp=s whitelist=s ) )->dump();
 
 MYDan::Util::TcpServer->new( %o, 'exec' => shift)->run();

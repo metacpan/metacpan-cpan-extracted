@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use constant CMD => "callstack";
 use constant CMD_DESC => "Display the call stack";
@@ -25,32 +25,16 @@ which functions have been called, and what their arguments were.
 
 =cut
 
-sub _stringify
-{
-   my ( $sv ) = @_;
-
-   if( $sv->type eq "SCALAR" ) {
-      if( defined $sv->pv ) {
-         return Devel::MAT::Cmd->format_value( $sv->pv, pv => 1 );
-      }
-      elsif( defined( my $num = $sv->nv // $sv->uv ) ) {
-         return Devel::MAT::Cmd->format_value( $num, nv => 1 );
-      }
-      else {
-         return Devel::MAT::Cmd->format_value( "undef" );
-      }
-   }
-   elsif( $sv->type eq "REF" ) {
-      return "REF => " . _stringify( $sv->rv );
-   }
-   else {
-      return Devel::MAT::Cmd->format_sv( $sv );
-   }
-}
-
 =head1 COMMANDS
 
 =head2 callstack
+
+   pmat> callstack
+   caller(0): &main::func => void
+     at program.pl line 4
+     $_[0]: SCALAR(PV) at 0x55c2bdce2778 = "arguments"
+     $_[1]: SCALAR(PV) at 0x55c2bdce2868 = "go"
+     $_[2]: SCALAR(PV) at 0x55c2bdce26e8 = "here"
 
 Prints details of the call stack, including arguments to functions.
 
@@ -98,7 +82,7 @@ sub run
 
       $doneargs++, Devel::MAT::Cmd->printf( "  %s: %s\n",
          Devel::MAT::Cmd->format_note( "\$_[$_]", 1 ),
-         _stringify( $args[$_] )
+         Devel::MAT::Cmd->format_sv_with_value( $args[$_] )
       ) for 0 .. $#args;
 
       my $cv = $ctx->cv;
@@ -114,7 +98,7 @@ sub run
             $doneargs++;
             Devel::MAT::Cmd->printf( "  %s: %s\n",
                Devel::MAT::Cmd->format_note( $name, 1 ),
-               _stringify( $sv ),
+               Devel::MAT::Cmd->format_sv_with_value( $sv ),
             );
          }
          else {

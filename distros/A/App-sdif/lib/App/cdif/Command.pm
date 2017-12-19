@@ -2,7 +2,9 @@ package App::cdif::Command;
 
 use strict;
 use warnings;
+use utf8;
 use Carp;
+use Data::Dumper;
 
 use parent "App::cdif::Tmpfile";
 
@@ -26,9 +28,23 @@ sub command {
 sub update {
     use Time::localtime;
     my $obj = shift;
-    $obj->data(join "\n", map { scalar `$_` } $obj->command);
+    $obj->data(join "\n", map { execute($_) } $obj->command);
     $obj->date(ctime());
     $obj;
+}
+
+sub execute {
+    my $command = shift;
+    my @command = ref $command eq 'ARRAY' ? @$command : ($command);
+    use IO::File;
+    my $pid = (my $fh = new IO::File)->open('-|') // die "open: $@\n";
+    if ($pid == 0) {
+	open STDERR, ">&STDOUT";
+	exec @command;
+	die "exec: $@\n";
+    }
+    binmode $fh, ':encoding(utf8)';
+    do { local $/; <$fh> };
 }
 
 sub data {

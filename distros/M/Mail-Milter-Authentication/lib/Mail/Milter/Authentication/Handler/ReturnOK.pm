@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::ReturnOK;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.4');
+use version; our $VERSION = version->declare('v1.1.5');
 
 use Net::DNS;
 use Sys::Syslog qw{:standard :macros};
@@ -116,7 +116,7 @@ sub _check_domain {
                     next unless $rr->type eq "A";
                     $has_a = 1;
                     $result = 'warn';
-                    $self->{ 'metrics' }->{ 'result' } = 'warn' if $self->{ 'metrics' }->{ 'result' } ne 'pass' and ! $is_org;
+                    $self->{ 'metrics' }->{ 'result' } = 'warn' if $self->{ 'metrics' }->{ 'result' } ne 'pass' and ( ! $is_org );
                     last;
                 }
             }

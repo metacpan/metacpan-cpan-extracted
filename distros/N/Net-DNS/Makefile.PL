@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1599 2017-10-06 09:02:23Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1608 2017-12-07 10:10:38Z willem $	-*-perl-*-
 #
 
 
@@ -78,7 +78,7 @@ my @debris = qw(
 delete $optional{'Net::DNS::SEC'};	## Note: MUST NOT be installed automatically
 
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET6 => defined eval 'require IO::Socket::INET6';
 
@@ -240,9 +240,10 @@ sub install {
 	}
 
 	eval 'require Net::DNS';
+	my @version = grep $_, ( 'version', $Net::DNS::VERSION );
 
 	my $nameregex = '\W+Net\WDNS.pm$';
-	my @installed = grep m/$nameregex/io, values %INC;
+	my @installed = grep $_ && m/$nameregex/io, values %INC;
 	my %noinstall;
 
 	foreach (@installed) {
@@ -262,7 +263,7 @@ sub install {
 	warn <<"AMEN";
 ##
 ##	The install location for this version of Net::DNS differs
-##	from the existing version $Net::DNS::VERSION in your perl library.
+##	from the existing @version in your perl library.
 ##	@installed
 ##
 ##	The installation will be rendered ineffective because the

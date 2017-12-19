@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
 #
-# $Id: Nameserver.pm 1593 2017-09-04 14:23:26Z willem $
+# $Id: Nameserver.pm 1608 2017-12-07 10:10:38Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1593 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
 
 
 =head1 NAME
@@ -14,23 +14,32 @@ Net::DNS::Nameserver - DNS server class
 
     use Net::DNS::Nameserver;
 
-    $nameserver = new Net::DNS::Nameserver(
-	LocalAddr	 => ['::1' , '127.0.0.1' ],
-	LocalPort	 => "5353",
-	ReplyHandler => \&reply_handler,
-	Verbose		 => 1,
-	Truncate	 => 0
+    my $nameserver = new Net::DNS::Nameserver(
+	LocalAddr	=> ['::1' , '127.0.0.1'],
+	ZoneFile	=> "filename"
+	);
+
+    my $nameserver = new Net::DNS::Nameserver(
+	LocalAddr	=> '10.1.2.3',
+	LocalPort	=> 5353,
+	ReplyHandler	=> \&reply_handler
     );
 
 
 =head1 DESCRIPTION
 
-Instances of the C<Net::DNS::Nameserver> class represent DNS server
-objects.  See L</EXAMPLE> for an example.
+Net::DNS::Nameserver offers a simple mechanism for instantiation of
+customised DNS server objects intended to provide test responses to
+queries emanating from a client resolver.
+
+It is not, nor will it ever be, a general-purpose DNS nameserver
+implementation.
+
+See L</EXAMPLE> for an example.
 
 =cut
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
 
@@ -42,8 +51,9 @@ use constant IPv6 => USE_SOCKET_IP || USE_SOCKET_INET6;
 use strict;
 use warnings;
 use integer;
-use Carp qw(cluck);
+use Carp;
 use Net::DNS;
+use Net::DNS::ZoneFile;
 
 use IO::Socket;
 use IO::Select;
@@ -72,10 +82,9 @@ sub new {
 			$self{ReplyHandler} = sub { $handler->( $self, @_ ); };
 		}
 	}
-	unless ( ref $self{ReplyHandler} eq "CODE" ) {
-		cluck "No reply handler!";
-		return undef;
-	}
+	croak 'No reply handler!' unless ref( $self{ReplyHandler} ) eq "CODE";
+
+	$self->ReadZoneFile( $self{ZoneFile} ) if exists $self{ZoneFile};
 
 	# local server addresses must also be accepted by a resolver
 	my $LocalAddr = $self{LocalAddr} || [DEFAULT_ADDR];
@@ -113,7 +122,7 @@ sub new {
 			push @sock_tcp, $sock_tcp;
 			print "done.\n" if $self{Verbose};
 		} else {
-			cluck "Couldn't create TCP socket: $!";
+			carp "Couldn't create TCP socket: $!";
 		}
 
 		#--------------------------------------------------------------------------
@@ -132,7 +141,7 @@ sub new {
 			push @sock_udp, $sock_udp;
 			print "done.\n" if $self{Verbose};
 		} else {
-			cluck "Couldn't create UDP socket: $!";
+			carp "Couldn't create UDP socket: $!";
 		}
 
 	}
@@ -154,6 +163,67 @@ sub new {
 
 	return $self;
 }
+
+
+#------------------------------------------------------------------------------
+# ReadZoneFile - Read zone file used by default reply handler
+#------------------------------------------------------------------------------
+
+sub ReadZoneFile {
+	my ( $self, $file ) = @_;
+	my $zonefile = new Net::DNS::ZoneFile($file);
+
+	my $RRhash = $self->{RRhash} = {};
+	my $RRlist = [];
+	while ( my $rr = $zonefile->read ) {
+		my ($leaf) = $rr->{owner}->label;
+		push @{$RRhash->{lc $leaf}}, $rr;
+
+		# Warning: Nasty trick abusing SOA to reference zone RR list
+		if ( $rr->type eq 'SOA' ) { $RRlist = $rr->{RRlist} = [] }
+		else			  { push @$RRlist, $rr }
+	}
+}
+
+
+#------------------------------------------------------------------------------
+# ReplyHandler - Default reply handler serving RRs from zone file
+#------------------------------------------------------------------------------
+
+sub ReplyHandler {
+	my ( $self, $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
+	my $opcode = $query->header->opcode;
+	my $rcode  = 'NOERROR';
+	my @ans;
+
+	my $lcase = lc $qname;					# assume $qclass always 'IN'
+	my ( $leaf, @tail ) = split /\./, $lcase;
+	my $RRhash = $self->{RRhash};
+	my $RRlist = $RRhash->{$leaf} || [];			# hash, then linear search
+	my @match  = grep lc( $_->owner ) eq $lcase, @$RRlist;
+
+	if ( $qtype eq 'AXFR' ) {
+		my ($soa) = grep $_->type eq 'SOA', @match;
+		if ($soa) { push @ans, $soa, @{$soa->{RRlist}}, $soa }
+		else	  { $rcode = 'NOTAUTH' }
+
+	} else {
+		unless ( scalar(@match) ) {
+			my $wildcard = join '.', '*', @tail;
+			my $wildlist = $RRhash->{'*'} || [];
+			foreach ( grep lc( $_->owner ) eq $wildcard, @$wildlist ) {
+				my $clone = bless {%$_}, ref($_);
+				$clone->owner($qname);
+				push @match, $clone;
+			}
+			$rcode = 'NXDOMAIN' unless @match;
+		}
+		@ans = grep $_->type eq $qtype, @match;
+	}
+
+	return ( $rcode, \@ans, [], [], {aa => 1}, {} );
+}
+
 
 #------------------------------------------------------------------------------
 # inet_new - Calls the constructor in the correct module for making sockets.
@@ -212,7 +282,7 @@ sub make_reply {
 		my $qclass = $qr->qclass;
 
 		my $id = $query->header->id;
-		print "query $id : $qname $qclass $qtype - " if $self->{Verbose};
+		print "query $id : $qname $qclass $qtype\n" if $self->{Verbose};
 
 		my ( $rcode, $ans, $auth, $add );
 		my @arglist = ( $qname, $qclass, $qtype, $peerhost, $query, $conn );
@@ -364,10 +434,11 @@ sub tcp_connection {
 				delete $self->{_tcp}{$sock};
 				return;
 			}
-			my $reply_data = $reply->data;
-			my $len	       = length $reply_data;
-			$self->{_tcp}{$sock}{outbuffer} = pack( "n", $len ) . $reply_data;
-			print "Queued ", length $self->{_tcp}{$sock}{outbuffer}, " octets to $peer\n"
+			my $reply_data = $reply->data(65535);	# limit to one TCP envelope
+			warn "multi-packet TCP response not implemented" if $reply->header->tc;
+			my $len = length $reply_data;
+			$self->{_tcp}{$sock}{outbuffer} = pack( 'n a*', $len, $reply_data );
+			print "Queued TCP response (2 + $len octets) to $peer\n"
 					if $self->{Verbose};
 
 			# We are done.
@@ -396,7 +467,7 @@ sub udp_connection {
 
 	print "UDP connection from $peerhost:$peerport to $sockhost\n" if $self->{Verbose};
 
-	my $query = new Net::DNS::Packet(\$buf);
+	my $query = new Net::DNS::Packet( \$buf );
 	if ( my $err = $@ ) {
 		print "Error decoding query packet: $err\n" if $self->{Verbose};
 		undef $query;					# force FORMERR reply
@@ -551,46 +622,43 @@ __END__
 
 =head2 new
 
-    my $ns = new Net::DNS::Nameserver(
-	LocalAddr	=> "10.1.2.3",
-	LocalPort	=> "5353",
-	ReplyHandler	=> \&reply_handler,
-	Verbose		=> 1
+    $nameserver = new Net::DNS::Nameserver(
+	LocalAddr	=> ['::1' , '127.0.0.1'],
+	ZoneFile	=> "filename"
 	);
 
-
-
-    my $ns = new Net::DNS::Nameserver(
-	LocalAddr	=> ['::1' , '127.0.0.1' ],
-	LocalPort	=> "5353",
+    $nameserver = new Net::DNS::Nameserver(
+	LocalAddr	=> '10.1.2.3',
+	LocalPort	=> 5353,
 	ReplyHandler	=> \&reply_handler,
 	Verbose		=> 1,
 	Truncate	=> 0
-	);
-
+    );
 
 Returns a Net::DNS::Nameserver object, or undef if the object
 could not be created.
 
-Attributes are:
+Each instance is configured using the following optional arguments:
 
-    LocalAddr		IP address on which to listen.	Defaults to loopback address.
-    LocalPort		Port on which to listen.	Defaults to 53.
-    ReplyHandler	Reference to reply-handling
-			subroutine			Required.
+    LocalAddr		IP address on which to listen	Defaults to loopback address
+    LocalPort		Port on which to listen		Defaults to 53
+    ZoneFile		Name of file containing RRs
+			accessed using the default
+			reply-handling subroutine
+    ReplyHandler	Reference to customised
+			reply-handling subroutine
     NotifyHandler	Reference to reply-handling
 			subroutine for queries with
 			opcode NOTIFY (RFC1996)
     UpdateHandler	Reference to reply-handling
 			subroutine for queries with
 			opcode UPDATE (RFC2136)
-    Verbose		Print info about received
-			queries.			Defaults to 0 (off).
+    Verbose		Report internal activity	Defaults to 0 (off)
     Truncate		Truncates UDP packets that
 			are too big for the reply	Defaults to 1 (on)
     IdleTimeout		TCP clients are disconnected
 			if they are idle longer than
-			this duration.			Defaults to 120 (secs)
+			this duration			Defaults to 120 (secs)
 
 The LocalAddr attribute may alternatively be specified as a list of IP
 addresses to listen to.
@@ -766,6 +834,8 @@ Portions Copyright (c)2002-2004 Chris Reinhardt.
 Portions Copyright (c)2005 Robert Martin-Legene.
 
 Portions Copyright (c)2005-2009 O.M, Kolkman, RIPE NCC.
+
+Portions Copyright (c)2017 Dick Franks.
 
 All rights reserved.
 

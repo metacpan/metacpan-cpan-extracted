@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.833';
+our $VERSION = '1.834';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -124,8 +124,12 @@ my $_is_MSWin32 = ( $^O eq 'MSWin32') ? 1 : 0;
 my $_tid = $_has_threads ? threads->tid() : 0;
 my $_oid = "$$.$_tid";
 
-sub _croak { kill('INT', $MCE::Signal::main_proc_id); goto &Carp::croak }
-sub  CLONE { $_tid = threads->tid() if $_has_threads }
+sub _croak {
+   Carp::carp($_[0]); MCE::Signal::stop_and_exit('__DIE__');
+}
+sub CLONE {
+   $_tid = threads->tid() if $_has_threads;
+}
 
 END {
    CORE::kill('KILL', $$)
@@ -147,8 +151,8 @@ sub _new {
       _start();
    }
    if ($_has_fh) {
-      _croak("Sharing '$_class' while the server is running requires\n" .
-             "the 'IO::FDPass' module which is missing in Perl")
+      _croak("Sharing module '$_class' while the server is running\n".
+             "requires the 'IO::FDPass' module, missing in Perl")
          if !$INC{'IO/FDPass.pm'};
 
       for my $_k (qw(
@@ -1762,11 +1766,15 @@ sub ins_inplace {
 
 sub FETCHSIZE { _size('FETCHSIZE', @_) }
 sub SCALAR    { _size('SCALAR'   , @_) }
-
 sub CLEAR     { _req3('CLEAR'    , @_) }
-sub clear     { _req3('clear'    , @_) }
 sub FETCH     { _req4('FETCH'    , @_) }
-sub get       { _req4('get'      , @_) }
+
+sub clear {
+   @_ > 1 ? _auto('clear', @_) : _req3('clear', @_);
+}
+sub get {
+   @_ > 2 ? _auto('get', @_) : _req4('get', @_);
+}
 
 sub FIRSTKEY {
    $_[0]->[_ITER] = [ $_[0]->keys ];
@@ -1832,7 +1840,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.833
+This document describes MCE::Shared::Server version 1.834
 
 =head1 DESCRIPTION
 

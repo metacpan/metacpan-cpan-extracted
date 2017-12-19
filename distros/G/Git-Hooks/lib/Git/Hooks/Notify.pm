@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.2.0';
+$Git::Hooks::Notify::VERSION = '2.3.0';
 use 5.010;
 use utf8;
 use strict;
@@ -10,6 +10,7 @@ use warnings;
 use Carp;
 use Git::Hooks;
 use Git::Repository::Log;
+use Encode qw/decode/;
 use Set::Scalar;
 use List::MoreUtils qw/any/;
 use Try::Tiny;
@@ -22,6 +23,8 @@ sub pretty_log {
 
     my @log;
 
+    my $encoding = $git->get_config(i18n => 'commitEncoding') || 'utf-8';
+
     foreach my $commit (@$commits) {
         my $sha1 = $commit->commit;
 
@@ -30,7 +33,7 @@ sub pretty_log {
             ? ''
             : "\nMerge: " . join(' ', $commit->parent);
 
-        my $author = $commit->author_name . ' <' . $commit->author_email . '>';
+        my $author = decode($encoding, $commit->author_name . ' <' . $commit->author_email . '>');
 
         # FIXME: The Git::Repository::Log's *_localtime and *_gmtime methods
         # confuse me. From what I saw, the command "git log --pretty-raw" shows
@@ -42,7 +45,7 @@ sub pretty_log {
         # is right.
         my $datetime = localtime($commit->author_gmtime) . ' ' . $commit->author_tz;
 
-        my $message = $commit->raw_message . $commit->extra;
+        my $message = decode($encoding, $commit->raw_message . $commit->extra);
 
         push @log, <<EOF;
 
@@ -126,7 +129,7 @@ sub notify {
     $body .= <<"EOF";
 REPOSITORY: $repository_name
 BRANCH: $branch
-BY: $pusher
+PUSHED BY: $pusher
 FROM: $old_commit
 TO:   $new_commit
 EOF
@@ -137,7 +140,7 @@ EOF
 
     $body .= $message;
 
-    if ($git->get_config($CFG, 'html')) {
+    if ($git->get_config_boolean($CFG, 'html')) {
         push @headers, (
             'MIME-Version' => '1.0',
             'Content-Type' => 'text/html',
@@ -216,7 +219,7 @@ sub notify_affected_refs {
 
     return 1 unless @rules;
 
-    my $max_count = $git->get_config($CFG, 'max-count') || '10';
+    my $max_count = $git->get_config_integer($CFG, 'max-count') || '10';
 
     my @options = ('--numstat', '--first-parent', "--max-count=$max_count");
 
@@ -264,7 +267,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.2.0
+version 2.3.0
 
 =head1 DESCRIPTION
 
@@ -308,7 +311,7 @@ by them. For example:
 
   REPOSITORY: myproject
   BRANCH: master
-  BY: username
+  PUSHED BY: username
   FROM: 75550b66ab08536787487545904fb062c6e38a7f
   TO:   6eaa6a84fbd7e2a64e66664f3d58707618e20c72
   FILTER: lib/Git/Hooks/
@@ -444,7 +447,7 @@ three placeholders defined are:
 This allows you to specify a preamble for the notification emails. There is no
 default preamble.
 
-=head2 githooks.notify.max-count NUM
+=head2 githooks.notify.max-count INT
 
 This allows you to specify the limit of commits that should be shown for each
 changed branch. Read about the --max-count option in C<git help log>. If not
@@ -480,7 +483,7 @@ angle-bracketed names with values appropriate to your context:
 
 =back
 
-=head2 githooks.notify.html [01]
+=head2 githooks.notify.html BOOL
 
 By default the email messages are sent in plain text. Enabling this option sends
 HTML-formatted messages, which look better on some email readers.

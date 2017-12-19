@@ -17,15 +17,15 @@ package Dist::Zilla::Role::ModuleInfo;
 # ABSTRACT: Create Module::Metadata object from Dist::Zilla::File
 #---------------------------------------------------------------------
 
-our $VERSION = '4.22';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+our $VERSION = '6.000';
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 use Moose::Role;
 
 use autodie ':io';
 use File::Temp 0.19 ();         # need newdir
 use Module::Metadata ();
-use Path::Class qw(dir file);
+use Path::Tiny ();
 
 
 sub get_module_info
@@ -41,14 +41,14 @@ sub get_module_info
   # so we'll write the current contents to a temporary file:
 
   my $tempdirObject = File::Temp->newdir();
-  my $dir     = dir("$tempdirObject");
-  my $modPath = file($file->name);
+  my $dir     = Path::Tiny::path("$tempdirObject");
+  my $modPath = Path::Tiny::path($file->name);
 
   # Module::Metadata only cares about the basename of the file:
-  my $tempname = $dir->file($modPath->basename);
+  my $tempname = $dir->child($modPath->basename);
 
   open(my $temp, '>:raw', $tempname);
-  print $temp Dist::Zilla->VERSION < 5 ? $file->content : $file->encoded_content;
+  print $temp $file->encoded_content;
   close $temp;
 
   return(Module::Metadata->new_from_file("$tempname", @_)
@@ -66,9 +66,9 @@ Dist::Zilla::Role::ModuleInfo - Create Module::Metadata object from Dist::Zilla:
 
 =head1 VERSION
 
-This document describes version 4.22 of
-Dist::Zilla::Role::ModuleInfo, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+This document describes version 6.000 of
+Dist::Zilla::Role::ModuleInfo, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

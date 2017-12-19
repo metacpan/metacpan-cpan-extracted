@@ -10,8 +10,10 @@ dan/agent/argv/check
 dan/agent/argv/deploy
 dan/agent/argv/dump
 dan/agent/argv/mrsync
+dan/agent/argv/scripts
 dan/agent/argv/sdump
 dan/agent/bin/agent
+dan/agent/bin/keyupdate
 dan/agent/code/access
 dan/agent/code/apps
 dan/agent/code/call
@@ -24,12 +26,14 @@ dan/agent/code/exec
 dan/agent/code/load
 dan/agent/code/mrsync
 dan/agent/code/proxy
+dan/agent/code/scripts
 dan/agent/code/sdump
 dan/agent/code/shell
 dan/agent/code/show
 dan/agent/code/version
 dan/agent/path
 dan/bootstrap/bin/bootstrap
+dan/bootstrap/exec/3600*keyupdate
 dan/bootstrap/exec/agent
 dan/collector/bin/co
 dan/collector/bin/stat
@@ -89,6 +93,7 @@ dan/tools/alias
 dan/tools/bigest
 dan/tools/config
 dan/tools/expect
+dan/tools/fileupdate
 dan/tools/gateway
 dan/tools/git
 dan/tools/go
@@ -161,6 +166,7 @@ lib/MYDan/Agent/Client/Proxy.pm
 lib/MYDan/Agent/Grsync.pm
 lib/MYDan/Agent/Grsync/V12.pm
 lib/MYDan/Agent/Grsync/V3.pm
+lib/MYDan/Agent/KeyUpdate.pm
 lib/MYDan/Agent/Load.pm
 lib/MYDan/Agent/Mrsync.pm
 lib/MYDan/Agent/Path.pm
@@ -237,6 +243,7 @@ lib/MYDan/Util/Contact.pm
 lib/MYDan/Util/DirConf.pm
 lib/MYDan/Util/ExpSSH.pm
 lib/MYDan/Util/File.pm
+lib/MYDan/Util/FileUpdate.pm
 lib/MYDan/Util/FLock.pm
 lib/MYDan/Util/Gateway.pm
 lib/MYDan/Util/Go.pm

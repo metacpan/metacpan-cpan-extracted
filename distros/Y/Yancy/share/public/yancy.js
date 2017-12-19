@@ -13,6 +13,10 @@ Vue.component('edit-field', {
             type: 'boolean',
             default: false
         },
+        valid: {
+            type: 'boolean',
+            default: true
+        },
         example: { }
     },
     data: function () {
@@ -44,6 +48,9 @@ Vue.component('edit-field', {
             else if ( this.schema.format == 'date-time' ) {
                 fieldType = 'datetime-local';
             }
+            else if ( this.schema.format == 'markdown' ) {
+                fieldType = 'markdown';
+            }
         }
         else if ( this.schema.type == 'integer' || this.schema.type == 'number' ) {
             fieldType = 'number';
@@ -69,6 +76,13 @@ Vue.component('edit-field', {
             this.$emit( 'input', this.$data._value );
         }
     },
+    computed: {
+        html: function () {
+            return this.$data._value
+                ? marked(this.$data._value, { sanitize: true })
+                : '';
+        }
+    },
     watch: {
         value: function () {
             this.$data._value = this.value;
@@ -89,34 +103,68 @@ Vue.component('item-form', {
         },
         value: {
             required: true
+        },
+        error: {
+            default: { }
         }
     },
     data: function () {
         return {
             _value: this.value ? JSON.parse( JSON.stringify( this.value ) ) : this.value,
-            showRaw: false
+            showRaw: false,
+            rawValue: null,
+            rawError: null
         };
     },
     methods: {
         save: function () {
+            if ( this.showRaw && this.rawError ) { return; }
             this.$emit( 'input', this.$data._value );
             this.$data._value = JSON.parse( JSON.stringify( this.$data._value ) );
-            this.$emit( 'close' );
         },
+
         cancel: function () {
             this.$data._value = JSON.parse( JSON.stringify( this.value ) );
             this.$emit( 'close' );
         },
-        updateRaw: function (event) {
-            this.$data._value = JSON.parse( event.target.value );
+
+        updateRaw: function () {
+            this.rawError = null;
+            try {
+                this.$data._value = JSON.parse( this.rawValue );
+            }
+            catch (e) {
+                this.rawError = e;
+            }
         },
+
         isRequired: function ( field ) {
             return this.schema.required && this.schema.required.indexOf( field ) >= 0;
+        }
+    },
+    computed: {
+        properties: function () {
+            var props = {}, schema = this.schema;
+            for ( var key in schema.properties ) {
+                var prop = schema.properties[ key ];
+                if ( prop[ 'x-hidden' ] ) {
+                    continue;
+                }
+                props[ key ] = prop;
+            }
+            return props;
+        },
+        example: function () {
+            return this.schema.example || {};
         }
     },
     watch: {
         value: function () {
             this.$data._value = JSON.parse( JSON.stringify( this.value ) );
+        },
+        showRaw: function () {
+            this.rawError = null;
+            this.rawValue = JSON.stringify( this.$data._value, null, 4 );
         }
     }
 });
@@ -137,29 +185,64 @@ var app = new Vue({
             total: 0,
             currentPage: ( current.page ? parseInt( current.page ) : 0 ),
             perPage: 25,
-            fetching: false
+            fetching: false,
+            error: {},
+            formError: {},
+            info: {}
         }
     },
     methods: {
         toggleRow: function ( i ) {
-            if ( this.openedRow == i ) {
+            if ( typeof i == 'undefined' || this.openedRow == i ) {
+                this.$set( this, 'error', {} );
+                this.$set( this, 'formError', {} );
                 this.openedRow = null;
             }
             else {
+                this.addingItem = false;
                 this.openedRow = i;
             }
         },
 
         fetchSpec: function () {
             var self = this;
+            delete self.error.fetchSpec;
             $.get( specUrl ).done( function ( data, status, jqXHR ) {
                 self.parseSpec( data );
+            } ).fail( function ( jqXHR, textStatus, errorThrown ) {
+                self.$set( self.error, 'fetchSpec', errorThrown );
             } );
         },
 
         parseSpec: function ( spec ) {
             var pathParts = [], collectionName, collection, pathObj, firstCollection;
             this.collections = {};
+
+            // Preprocess definitions
+            for ( var defKey in spec.definitions ) {
+                var definition = spec.definitions[ defKey ];
+                if ( definition.type != 'object' ) {
+                    continue;
+                }
+                if ( !definition.properties ) {
+                    continue;
+                }
+
+                if ( !definition[ 'x-list-columns' ] ) {
+                    definition[ 'x-list-columns' ] = [
+                        'id', 'name', 'username', 'title', 'slug'
+                    ].filter( function (x) {
+                        return !!definition.properties[x];
+                    } );
+                }
+
+                for ( var propKey in definition.properties ) {
+                    var prop = definition.properties[ propKey ];
+                    if ( prop[ 'x-html-field' ] ) {
+                        definition.properties[ prop['x-html-field' ] ][ 'x-hidden' ] = true;
+                    }
+                }
+            }
 
             for ( var pathKey in spec.paths ) {
                 pathObj = spec.paths[ pathKey ];
@@ -231,6 +314,7 @@ var app = new Vue({
                     offset: this.perPage * this.currentPage
                 };
             this.fetching = true;
+            delete this.error.fetchPage;
             $.get( coll.operations["list"].url, paging ).done(
                 function ( data, status, jqXHR ) {
                     self.rows = data.rows;
@@ -238,6 +322,10 @@ var app = new Vue({
                     self.columns = coll.operations["list"].schema['x-list-columns'] || [];
                     self.fetching = false;
                     self.updateHash();
+                }
+            ).fail(
+                function ( jqXHR, textStatus, errorThrown ) {
+                    self.$set( self.error, 'fetchPage', errorThrown );
                 }
             );
         },
@@ -261,6 +349,8 @@ var app = new Vue({
                 coll = this.collections[ this.currentCollection ],
                 value = this.prepareSaveItem( this.rows[i], coll.operations['set'].schema ),
                 url = this.fillUrl( coll.operations['set'].url, this.rows[i] );
+            delete this.error.saveItem;
+            this.$set( this, 'formError', {} );
             $.ajax(
                 {
                     url: url,
@@ -271,6 +361,21 @@ var app = new Vue({
             ).done(
                 function ( data, status, jqXHR ) {
                     self.rows[i] = data;
+                    self.toggleRow( i );
+                    self.$set( self.info, 'saveItem', true );
+                    setTimeout( function () {
+                        self.$set( self.info, 'saveItem', false );
+                    }, 5000 );
+                }
+            ).fail(
+                function ( jqXHR, textStatus, errorThrown ) {
+                    if ( jqXHR.responseJSON ) {
+                        self.parseErrorResponse( jqXHR.responseJSON );
+                        self.$set( self.error, 'saveItem', 'Data validation failed' );
+                    }
+                    else {
+                        self.$set( self.error, 'saveItem', jqXHR.responseText );
+                    }
                 }
             );
         },
@@ -280,6 +385,8 @@ var app = new Vue({
                 coll = this.collections[ this.currentCollection ],
                 value = this.prepareSaveItem( this.newItem, coll.operations['add'].schema ),
                 url = coll.operations['add'].url;
+            delete this.error.addItem;
+            this.$set( this, 'formError', {} );
             $.ajax(
                 {
                     url: url,
@@ -291,8 +398,32 @@ var app = new Vue({
                 function ( data, status, jqXHR ) {
                     self.rows.unshift( data );
                     self.cancelAddItem();
+                    self.$set( self.info, 'addItem', true );
+                    setTimeout( function () {
+                        self.$set( self.info, 'addItem', false );
+                    }, 5000 );
+                }
+            ).fail(
+                function ( jqXHR, textStatus, errorThrown ) {
+                    if ( jqXHR.responseJSON ) {
+                        self.parseErrorResponse( jqXHR.responseJSON );
+                        self.$set( self.error, 'addItem', 'Data validation failed' );
+                    }
+                    else {
+                        self.$set( self.error, 'addItem', jqXHR.responseText );
+                    }
                 }
             );
+        },
+
+        parseErrorResponse: function ( resp ) {
+            for ( var i = 0; i < resp.errors.length; i++ ) {
+                var error = resp.errors[ i ],
+                    pathParts = error.path.split( /\// ),
+                    field = pathParts[2],
+                    message = error.message;
+                this.$set( this.formError, field, message );
+            }
         },
 
         prepareSaveItem: function ( item, schema ) {
@@ -301,18 +432,35 @@ var app = new Vue({
                 if ( schema.properties[k].readOnly ) {
                     delete copy[k];
                 }
+                else if ( schema.properties[k].format == 'markdown' ) {
+                    if ( schema.properties[k]['x-html-field'] ) {
+                        copy[ schema.properties[k]['x-html-field'] ]
+                            = marked( copy[k], { sanitize: true });
+                    }
+                }
             }
             return JSON.stringify( copy );
         },
 
         showAddItem: function () {
-            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example;
+            this.toggleRow();
+            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example || this.createBlankItem();
             this.addingItem = true;
         },
 
         cancelAddItem: function () {
+            this.$set( this, 'formError', {} );
             this.addingItem = false;
-            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example;
+            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example || this.createBlankItem();
+        },
+
+        createBlankItem: function () {
+            var schema = this.collections[ this.currentCollection ].operations['add'].schema,
+                item = {};
+            for ( var k in schema.properties ) {
+                item[k] = null;
+            }
+            return item;
         },
 
         confirmDeleteItem: function (i) {

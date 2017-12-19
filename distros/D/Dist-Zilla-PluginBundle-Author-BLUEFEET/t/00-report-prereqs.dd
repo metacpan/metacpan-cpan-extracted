@@ -17,6 +17,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Git::Push' => '2.036',
                                       'Dist::Zilla::Plugin::Git::Tag' => '2.036',
                                       'Dist::Zilla::Plugin::GithubMeta' => '0.54',
+                                      'Dist::Zilla::Plugin::MetaJSON' => '5.042',
                                       'Dist::Zilla::Plugin::NextRelease' => '5.042',
                                       'Dist::Zilla::Plugin::PkgVersion' => '5.042',
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '5.042',

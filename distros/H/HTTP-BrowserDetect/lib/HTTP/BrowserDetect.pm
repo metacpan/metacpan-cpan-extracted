@@ -4,7 +4,9 @@ use warnings;
 use 5.006;
 
 package HTTP::BrowserDetect;
-$HTTP::BrowserDetect::VERSION = '3.14';
+
+our $VERSION = '3.16';
+
 use vars qw(@ALL_TESTS);
 
 # Operating Systems
@@ -117,22 +119,83 @@ our @ENGINE_TESTS = qw(
     presto      khtml       edgehtml
 );
 
-our @ROBOT_TESTS = qw(
-    puf             curl           wget
-    getright        robot          slurp
-    yahoo           mj12bot        ahrefs
-    altavista       lycos          infoseek
-    lwp             linkexchange
-    googlemobile    msn            msnmobile
-    facebook        baidu          googleadsbot
-    askjeeves       googleadsense  googlebotvideo
-    googlebotnews   googlebotimage google
-    googlefavicon   yandeximages   specialarchiver
-    yandex          java           lib
-    indy            golib          rubylib
-    apache          malware        phplib
-    msoffice        ipsagent       nutch
-    linkchecker     bingbot
+# These bot names get turned into methods.  Crazy, right?  (I don't even think
+# this is documented anymore.)  We'll leave this in place for back compat, but
+# we won't add any new methods moving forward.
+
+my @OLD_ROBOT_TESTS = qw(
+    ahrefs
+    altavista
+    apache
+    askjeeves
+    baidu
+    bingbot
+    curl
+    facebook
+    getright
+    golib
+    google
+    googleadsbot
+    googleadsense
+    googlebotimage
+    googlebotnews
+    googlebotvideo
+    googlefavicon
+    googlemobile
+    indy
+    infoseek
+    ipsagent
+    java
+    linkchecker
+    linkexchange
+    lwp
+    lycos
+    malware
+    mj12bot
+    msn
+    msnmobile
+    msoffice
+    nutch
+    phplib
+    puf
+    rubylib
+    slurp
+    specialarchiver
+    wget
+    yahoo
+    yandex
+    yandeximages
+);
+
+our @ROBOT_TESTS = (
+    [ 'Applebot',                           'apple' ],
+    [ 'baiduspider',                        'baidu' ],
+    [ 'bitlybot',                           'bitly' ],
+    [ 'developers.google.com//web/snippet', 'google-plus-snippet' ],
+    [ 'Discordbot',                         'discordbot' ],
+    [ 'embedly',                            'embedly' ],
+    [ 'facebookexternalhit',                'facebook' ],
+    [ 'flipboard',                          'flipboard' ],
+    [ 'Google Page Speed',                  'google-page-speed' ],
+    [ 'linkedinbot',                        'linkedin' ],
+    [ 'nuzzel',                             'nuzzel' ],
+    [ 'outbrain',                           'outbrain' ],
+    [ 'pinterest/0.',                       'pinterest' ],
+    [ 'pinterestbot',                       'pinterest' ],
+    [ 'Pro-Sitemaps',                       'pro-sitemaps' ],
+    [ 'quora link preview',                 'quora-link-preview' ],
+    [ 'Qwantify',                           'qwantify' ],
+    [ 'redditbot',                          'reddit', ],
+    [ 'rogerbot',                           'rogerbot' ],
+    [ 'ShowyouBot',                         'showyou' ],
+    [ 'SkypeUriPreview',                    'skype-uri-preview' ],
+    [ 'slackbot',                           'slack' ],
+    [ 'Swiftbot',                           'swiftbot' ],
+    [ 'tumblr',                             'tumblr' ],
+    [ 'twitterbot',                         'twitter' ],
+    [ 'vkShare',                            'vkshare' ],
+    [ 'W3C_Validator',                      'w3c-validator' ],
+    [ 'WhatsApp',                           'whatsapp' ],
 );
 
 our @MISC_TESTS = qw(
@@ -141,65 +204,137 @@ our @MISC_TESTS = qw(
 
 push @ALL_TESTS,
     (
-    @OS_TESTS,      @WINDOWS_TESTS,
-    @MAC_TESTS,     @UNIX_TESTS,
-    @BSD_TESTS,     @GAMING_TESTS,
-    @DEVICE_TESTS,  @BROWSER_TESTS,
-    @IE_TESTS,      @OPERA_TESTS,
-    @AOL_TESTS,     @NETSCAPE_TESTS,
-    @FIREFOX_TESTS, @ENGINE_TESTS,
-    @ROBOT_TESTS,   @MISC_TESTS,
+    @OS_TESTS,        @WINDOWS_TESTS,
+    @MAC_TESTS,       @UNIX_TESTS,
+    @BSD_TESTS,       @GAMING_TESTS,
+    @DEVICE_TESTS,    @BROWSER_TESTS,
+    @IE_TESTS,        @OPERA_TESTS,
+    @AOL_TESTS,       @NETSCAPE_TESTS,
+    @FIREFOX_TESTS,   @ENGINE_TESTS,
+    @OLD_ROBOT_TESTS, @MISC_TESTS,
     );
-
-sub _all_tests {
-    return @ALL_TESTS;
-}
 
 # https://support.google.com/webmasters/answer/1061943?hl=en
 
 my %ROBOT_NAMES = (
-    ahrefs          => 'Ahrefs',
-    altavista       => 'AltaVista',
-    apache          => 'Apache http client',
-    askjeeves       => 'AskJeeves',
-    baidu           => 'Baidu Spider',
-    bingbot         => 'Bingbot',
+    ahrefs                => 'Ahrefs',
+    altavista             => 'AltaVista',
+    'apache-http-client'  => 'Apache HttpClient',
+    apple                 => 'Apple',
+    'archive-org'         => 'Internet Archive',
+    askjeeves             => 'AskJeeves',
+    baidu                 => 'Baidu',
+    baiduspider           => 'Baidu Spider',
+    bingbot               => 'Bingbot',
+    bitly                 => 'Bitly',
+    curl                  => 'curl',
+    discordbot            => 'Discord',
+    embedly               => 'Embedly',
+    facebook              => 'Facebook',
+    facebookexternalhit   => 'Facebook',
+    flipboard             => 'Flipboard',
+    getright              => 'GetRight',
+    golib                 => 'Go language http library',
+    google                => 'Googlebot',
+    'google-adsbot'       => 'Google AdsBot',
+    'google-adsense'      => 'Google AdSense',
+    'googlebot'           => 'Googlebot',
+    'googlebot-image'     => 'Googlebot Images',
+    'googlebot-mobile'    => 'Googlebot Mobile',
+    'googlebot-news'      => 'Googlebot News',
+    'googlebot-video'     => 'Googlebot Video',
+    'google-favicon'      => 'Google Favicon',
+    'google-mobile'       => 'Googlebot Mobile',
+    'google-page-speed'   => 'Google Page Speed',
+    'google-plus-snippet' => 'Google+ Snippet',
+    'indy-library'        => 'Indy Library',
+    infoseek              => 'InfoSeek',
+    java                  => 'Java',
+    'libwww-perl'         => 'LWP::UserAgent',
+    linkchecker           => 'LinkChecker',
+    linkedin              => 'LinkedIn',
+    linkexchange          => 'LinkExchange',
+    lycos                 => 'Lycos',
+    malware               => 'Malware / hack attempt',
+    'microsoft-office'    => 'Microsoft Office',
+    mj12bot               => 'Majestic-12 DSearch',
+    msn                   => 'MSN',
+    'msn-mobile'          => 'MSN Mobile',
+    nutch                 => 'Apache Nutch',
+    nuzzel                => 'Nuzzel',
+    outbrain              => 'Outbrain',
+    phplib                => 'PHP http library',
+    pinterest             => 'Pinterest',
+    'pro-sitemaps'        => 'Pro Sitemap Service',
+    puf                   => 'puf',
+    'quora-link-preview'  => 'Quora Link Preview',
+    qwantify              => 'Qwantify',
+    reddit                => 'Reddit',
+    robot                 => 'robot',
+    rogerbot              => 'Moz',
+    'ruby-http-library'   => 'Ruby http library',
+    showyou               => 'Showyou',
+    'skype-uri-preview'   => 'Skype URI Preview',
+    slack                 => 'slack',
+    swiftbot              => 'Swiftbot',
+    tumblr                => 'Tumblr',
+    twitter               => 'Twitter',
+    unknown               => 'Unknown Bot',
+    'verisign-ips-agent'  => 'Verisign ips-agent',
+    vkshare               => 'VK Share',
+    'w3c-validator'       => 'W3C Validator',
+    wget                  => 'Wget',
+    whatsapp              => 'WhatsApp',
+    yahoo                 => 'Yahoo',
+    'yahoo-slurp'         => 'Yahoo! Slurp',
+    yandex                => 'Yandex',
+    'yandex-images'       => 'YandexImages',
+);
+
+my %ROBOT_IDS = (
+    ahrefs          => 'ahrefs',
+    altavista       => 'altavista',
+    apache          => 'apache-http-client',
+    askjeeves       => 'askjeeves',
+    baidu           => 'baidu',
+    baiduspider     => 'baidu',
+    bingbot         => 'bingbot',
     curl            => 'curl',
-    facebook        => 'Facebook',
-    getright        => 'GetRight',
-    google          => 'Googlebot',
-    googleadsbot    => 'Google AdsBot',
-    googleadsense   => 'Google AdSense',
-    googlebotimage  => 'Googlebot Images',
-    googlebotnews   => 'Googlebot News',
-    googlebotvideo  => 'Googlebot Video',
-    googlefavicon   => 'Google Favicon',
-    googlemobile    => 'Googlebot Mobile',
-    golib           => 'Go language http library',
-    indy            => 'Indy Library',
-    infoseek        => 'InfoSeek',
-    ipsagent        => 'Verisign ips-agent',
-    java            => 'Java',
-    linkchecker     => 'LinkChecker',
-    linkexchange    => 'LinkExchange',
-    lwp             => 'LWP::UserAgent',
-    lycos           => 'Lycos',
-    malware         => 'Malware / hack attempt',
-    mj12bot         => 'Majestic-12 DSearch',
-    msn             => 'MSN',
-    msnmobile       => 'MSN Mobile',
-    msoffice        => 'Microsoft Office',
-    nutch           => 'Apache Nutch',
-    phplib          => 'PHP http library',
+    facebook        => 'facebook',
+    getright        => 'getright',
+    golib           => 'golib',
+    google          => 'googlebot',
+    googleadsbot    => 'google-adsbot',
+    googleadsense   => 'google-adsense',
+    googlebotimage  => 'googlebot-image',
+    googlebotnews   => 'googlebot-news',
+    googlebotvideo  => 'googlebot-video',
+    googlefavicon   => 'google-favicon',
+    googlemobile    => 'googlebot-mobile',
+    indy            => 'indy-library',
+    infoseek        => 'infoseek',
+    ipsagent        => 'verisign-ips-agent',
+    java            => 'java',
+    linkchecker     => 'linkchecker',
+    linkexchange    => 'linkexchange',
+    lwp             => 'libwww-perl',
+    lycos           => 'lycos',
+    malware         => 'malware',
+    mj12bot         => 'mj12bot',
+    msn             => 'msn',
+    msnmobile       => 'msn-mobile',
+    msoffice        => 'microsoft-office',
+    nutch           => 'nutch',
+    phplib          => 'phplib',
     puf             => 'puf',
     robot           => 'robot',
-    rubylib         => 'Ruby http library',
-    slurp           => 'Yahoo! Slurp',
-    specialarchiver => 'archive.org_bot',
+    rubylib         => 'ruby-http-library',
+    slurp           => 'yahoo-slurp',
+    specialarchiver => 'archive-org',
     wget            => 'wget',
-    yahoo           => 'Yahoo',
-    yandex          => 'Yandex',
-    yandeximages    => 'YandexImages',
+    yahoo           => 'yahoo',
+    yandex          => 'yandex',
+    yandeximages    => 'yandex-images',
 );
 
 my %BROWSER_NAMES = (
@@ -380,7 +515,7 @@ foreach my $test ( @BROWSER_TESTS, @FIREFOX_TESTS ) {
     };
 }
 
-foreach my $test (@ROBOT_TESTS) {
+foreach my $test (@OLD_ROBOT_TESTS) {
     no strict 'refs';
 
     # For the 'robot' test, we return undef instead of 0 if it's
@@ -871,7 +1006,8 @@ sub _init_robots {
     my $browser_tests = $self->{browser_tests};
 
     my $robot_tests = $self->{robot_tests} = {};
-    my $r = undef;
+    my $id;
+    my $r;
 
     my $robot_fragment;    # The text that indicates it's a robot (we'll
                            # use this later to detect robot version, and
@@ -1070,6 +1206,24 @@ sub _init_robots {
         $robot_fragment     = 'google';
     }
 
+    # These @ROBOT_TESTS were added in 3.15.  Some of them may need more
+    # individualized treatment, but get them identified as bots for now.
+
+    # XXX
+    else {
+    TEST:
+        for my $set (@ROBOT_TESTS) {
+            my $match = lc $set->[0];
+
+            if ( index( $ua, lc($match) ) != -1 ) {
+                $id             = $set->[1];
+                $r              = $id;
+                $robot_fragment = lc $match;
+                last TEST;
+            }
+        }
+    }
+
     if (   $browser_tests->{applecoremedia}
         || $browser_tests->{dalvik}
         || $browser_tests->{adm} ) {
@@ -1079,8 +1233,17 @@ sub _init_robots {
     if ($r) {
 
         # Got a named robot
-        $robot_tests->{$r}    = 1;
-        $self->{robot_string} = $ROBOT_NAMES{$r};    # Including undef
+        $robot_tests->{$r} = 1;
+        if ( !$id ) {
+            $id = $ROBOT_IDS{$r};
+        }
+
+        if ( !exists $robot_tests->{robot_id} ) {
+            $robot_tests->{robot_id} = $id;
+        }
+
+        # This isn't all keyed on ids (yet)
+        $self->{robot_string} = $ROBOT_NAMES{$id} || $ROBOT_NAMES{$r};
         $robot_tests->{robot} = $r;
         $robot_fragment = $r if !defined($robot_fragment);
     }
@@ -1115,6 +1278,11 @@ sub _init_robots {
         }
     }
 
+    if ( exists $robot_tests->{robot} && $robot_tests->{robot} eq 'unknown' )
+    {
+        $robot_tests->{robot_id} = 'unknown';
+    }
+
     if ( defined($robot_fragment) ) {
 
         # Examine what surrounds the fragment; that leads us to the
@@ -1134,10 +1302,10 @@ sub _init_robots {
                 && $self->{user_agent} =~ m{\/.*\/}
                 && $self->{user_agent} =~ m{
                                       ([\w]*               # Words before fragment
-                                       $robot_fragment     # Match the fragment
-                                       (\/[\d\.]+)?        # Version
-                                       [\w]*)              # Beta stuff
-                                     }ix
+                                           $robot_fragment     # Match the fragment
+                                           (\/[\d\.]+)?        # Version
+                                           [\w]*)              # Beta stuff
+                                         }ix
                 ) {
                 # We matched the whole string, but it seems to
                 # make more sense as whitespace-separated
@@ -2191,6 +2359,13 @@ sub browser_string {
     return $self->{browser_string};
 }
 
+sub robot {
+    my $self = shift;
+
+    $self->_init_robots unless exists( $self->{robot_string} );
+    return $self->{robot_tests}->{robot};
+}
+
 sub robot_string {
     my $self = shift;
 
@@ -2199,8 +2374,16 @@ sub robot_string {
 }
 
 sub robot_name {
-    my ($self) = @_;
+    my $self = shift;
     return $self->robot_string;
+}
+
+sub robot_id {
+    my $self = shift;
+    return
+          $self->{robot_tests}->{robot_id} ? $self->{robot_tests}->{robot_id}
+        : $self->robot                     ? $ROBOT_IDS{ $self->robot }
+        :                                    undef;
 }
 
 sub _robot_version {
@@ -2697,6 +2880,34 @@ sub browser_properties {
     return sort @browser_properties;
 }
 
+sub lib {
+    my $self = shift;
+    $self->_init_robots() unless $self->{robot_tests};
+    return $self->{robot_tests}->{lib};
+}
+
+sub all_robot_ids {
+    my $self = shift;
+    return keys %ROBOT_NAMES;
+}
+
+# These method are only used by the test suite.
+sub _all_tests {
+    return @ALL_TESTS;
+}
+
+sub _robot_names {
+    return %ROBOT_NAMES;
+}
+
+sub _robot_tests {
+    return @ROBOT_TESTS;
+}
+
+sub _robot_ids {
+    return %ROBOT_IDS;
+}
+
 1;
 
 # ABSTRACT: Determine Web browser, version, and platform from an HTTP user agent string
@@ -2713,12 +2924,14 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.14
+version 3.16
 
 =head1 SYNOPSIS
 
     use HTTP::BrowserDetect;
 
+    my $user_agent_string
+        = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36';
     my $ua = HTTP::BrowserDetect->new($user_agent_string);
 
     # Print general information
@@ -2730,9 +2943,13 @@ version 3.14
         if $ua->os_string;
 
     # Detect operating system
-    if ($ua->windows) {
-      if ($ua->winnt) ...
-      if ($ua->win95) ...
+    if ( $ua->windows ) {
+        if ( $ua->winnt ) {
+            # do something
+        }
+        if ( $ua->win95 ) {
+            # do something
+        }
     }
     print "Mac\n" if $ua->macosx;
 
@@ -2740,19 +2957,22 @@ version 3.14
     print "Safari\n" if $ua->safari;
     print "MSIE\n" if $ua->ie;
     print "Mobile\n" if $ua->mobile;
-    if ($ua->browser_major(4)) {
-    if ($ua->browser_minor() > .5) {
-        ...
+    if ( $ua->browser_major(4) ) {
+        if ( $ua->browser_minor() > .5 ) {
+            # ...;
+        }
     }
-    }
-    if ($ua->browser_version() > 4.5) {
-      ...;
+    if ( $ua->browser_version() > 4.5 ) {
+        # ...;
     }
 
 =head1 DESCRIPTION
 
 The HTTP::BrowserDetect object does a number of tests on an HTTP user agent
 string. The results of these tests are available via methods of the object.
+
+For an online demonstration of this module's parsing, you can check out
+L<http://www.browserdetect.org/>
 
 This module was originally based upon the JavaScript browser detection
 code available at
@@ -2941,6 +3161,20 @@ subject to change and are meant for display purposes. This may include
 additional information (e.g. robots which return "unknown" from
 robot() generally can be identified in a human-readable fashion by
 reading robot_string() ).
+
+=head3 robot_id()
+
+This method is currently in beta.
+
+Returns an id consisting of lower case letters, numbers and dashes.  This id
+will remain constant, so you can use it for matching against a particular
+robot.  The ids were introduced in version 3.14.  There may still be a few
+corrections to ids in subsequent releases.  Once this method becomes stable the
+ids will also be frozen.
+
+=head3 all_robot_ids()
+
+This method returns an c<ArrayRef> of all possible C<robot_id> values.
 
 =head2 robot_version(), robot_major(), robot_minor(), robot_beta()
 
@@ -3169,6 +3403,11 @@ devices are also capable of rendering standard HTML.
 =head3 ps3
 
 =head2 Robot properties
+
+These methods are now deprecated and will be removed in a future release.
+Please use the C<robot()> and C<robot_id()> methods to identify the bots.  Use
+C<robot_id()> if you need to match on a string, since the value that is
+returned by C<robot> could possibly change in a future release.
 
 The following additional methods are available, each returning a true or false
 value. This is by no means a complete list of robots that exist on the Web.
@@ -3554,7 +3793,7 @@ Olaf Alders <olaf@wundercounter.com> (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Lee Semel.
+This software is copyright (c) 2017 by Lee Semel.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

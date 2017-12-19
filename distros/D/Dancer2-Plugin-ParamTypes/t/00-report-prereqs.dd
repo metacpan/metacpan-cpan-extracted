@@ -14,7 +14,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Dancer2' => '0'
+                                      'Dancer2' => '0',
+                                      'Ref::Util' => '0',
+                                      'constant' => '0'
                                     }
                     },
        'test' => {

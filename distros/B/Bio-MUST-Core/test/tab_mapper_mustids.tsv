@@ -1,0 +1,100 @@
+# id	domain_type	coordinates	length	module	protein	genes_cluster	function	unknown
+Paenibacillus mucilaginosus_997761@gi|386724556|7-302	Condensation_Starter	7-302	296	1	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|488-882	AMP-binding	488-882	395	1	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|965-1030	PCP	965-1030	66	1	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|1043-1347	Epimerization	1043-1347	305	1	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|1512-1812	Condensation_DCL	1512-1812	301	2	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|2002-2406	AMP-binding	2002-2406	405	2	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|2492-2559	PCP	2492-2559	68	2	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|2570-2873	Epimerization	2570-2873	304	2	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|3040-3341	Condensation_DCL	3040-3341	302	3	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|3527-3924	AMP-binding	3527-3924	398	3	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|4008-4075	PCP	4008-4075	68	3	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|4091-4384	Condensation_LCL	4091-4384	294	4	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|4572-4970	AMP-binding	4572-4970	399	4	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|5052-5120	PCP	5052-5120	69	4	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|5136-5427	Condensation_LCL	5136-5427	292	5	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|5613-6006	AMP-binding	5613-6006	394	5	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|6090-6158	PCP	6090-6158	69	5	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|6173-6465	Condensation_LCL	6173-6465	293	6	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|6655-7047	AMP-binding	6655-7047	393	6	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|7130-7199	PCP	7130-7199	70	6	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|7214-7505	Condensation_LCL	7214-7505	292	7	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|7691-8106	AMP-binding	7691-8106	416	7	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|8188-8256	PCP	8188-8256	69	7	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724556|8272-8479	Thioesterase	8272-8479	208	7	gi|386724556|	NC_017672_7	tyrocidine synthetase 3 	tyrocidine
+Paenibacillus mucilaginosus_997761@gi|386724985|49-466	AMP-binding	49-466	418	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Paenibacillus mucilaginosus_997761@gi|386724985|549-616	PCP	549-616	68	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Paenibacillus mucilaginosus_997761@gi|386724985|631-917	Condensation_LCL	631-917	287	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Paenibacillus mucilaginosus_997761@gi|386724985|1103-1510	AMP-binding	1103-1510	408	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Paenibacillus mucilaginosus_997761@gi|386724985|1594-1661	PCP	1594-1661	68	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Paenibacillus mucilaginosus_997761@gi|386724985|1679-1877	Thioesterase	1679-1877	199	1	gi|386724985|	NC_017672_9	Gramicidin S synthetase 2 	gramicidin s
+Methanobrevibacter ruminantium_634498@gi|288559323|12-264	PKS_ER	12-264	253	none	gi|288559323|	NC_013790_1	NADP-dependent alcohol dehydrogenase Adh1 	dehydrogenase
+Methanobrevibacter ruminantium_634498@gi|288559326|121-310	Condensation_Starter	121-310	190	1	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|677-1114	AMP-binding	677-1114	438	1	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|1198-1265	PCP	1198-1265	68	1	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|1276-1550	Condensation_Starter	1276-1550	275	2	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|1724-2127	AMP-binding	1724-2127	404	2	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|2219-2285	PCP	2219-2285	67	2	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559326|2326-2568	NAD_binding_4	2326-2568	243	2	gi|288559326|	NC_013790_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|250-630	AMP-binding	250-630	381	none	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|708-777	PCP	708-777	70	none	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|793-1071	Condensation_Starter	793-1071	279	1	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|1248-1628	AMP-binding	1248-1628	381	1	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|1706-1773	PCP	1706-1773	68	1	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|1793-2073	Condensation_Starter	1793-2073	281	2	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|2251-2639	AMP-binding	2251-2639	389	2	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|2717-2785	PCP	2717-2785	69	2	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|2805-3081	Condensation_LCL	2805-3081	277	3	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|3255-3635	AMP-binding	3255-3635	381	3	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|3713-3780	PCP	3713-3780	68	3	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanobrevibacter ruminantium_634498@gi|288559609|3827-4069	NAD_binding_4	3827-4069	243	3	gi|288559609|	NC_013790_2	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Methanocella paludicola_304371@gi|282155216|31-422	AMP-binding	31-422	392	none	gi|282155216|	NC_013665_1	putative acyl-CoA synthetase 	acyl-coa
+Methanocella paludicola_304371@gi|282155216|510-578	PCP	510-578	69	none	gi|282155216|	NC_013665_1	putative acyl-CoA synthetase 	acyl-coa
+Methanocella paludicola_304371@gi|282162903|15-314	Condensation_LCL	15-314	300	1	gi|282162903|	NC_013665_1	putative peptide synthetase 	non-ribosomal peptide
+Methanocella paludicola_304371@gi|282162903|499-892	AMP-binding	499-892	394	1	gi|282162903|	NC_013665_1	putative peptide synthetase 	non-ribosomal peptide
+Methanocella paludicola_304371@gi|282162903|977-1045	PCP	977-1045	69	1	gi|282162903|	NC_013665_1	putative peptide synthetase 	non-ribosomal peptide
+Methanocella paludicola_304371@gi|282162903|1062-1325	Thioesterase	1062-1325	264	1	gi|282162903|	NC_013665_1	putative peptide synthetase 	non-ribosomal peptide
+Methanocella paludicola_304371@gi|282155218|114-175	ACPS	114-175	62	none	gi|282155218|	NC_013665_1	phosphopantetheinyl transferase 	transferase
+Acaryochloris marina_329726@gi|158339866|24-245	Thioesterase	24-245	222	none	gi|158339866|	NC_009926_1	thioesterase 	unknown
+Acaryochloris marina_329726@gi|158339490|454-511	ACP	454-511	58	none	gi|158339490|	NC_009926_1	hypothetical protein AM1_A0226 	unknown
+Acaryochloris marina_329726@gi|158309732|79-377	Heterocyclization	79-377	299	1	gi|158309732|	NC_009926_1	barbamide biosynthesis protein BarG 	barbamide
+Acaryochloris marina_329726@gi|158309732|577-1013	AMP-binding	577-1013	437	1	gi|158309732|	NC_009926_1	barbamide biosynthesis protein BarG 	barbamide
+Acaryochloris marina_329726@gi|158309732|1097-1169	PCP	1097-1169	73	1	gi|158309732|	NC_009926_1	barbamide biosynthesis protein BarG 	barbamide
+Acaryochloris marina_329726@gi|158339492|10-434	PKS_KS	10-434	425	1	gi|158339492|	NC_009926_1	beta-ketoacyl synthase, putative 	beta-ketoacyl
+Acaryochloris marina_329726@gi|158339492|535-834	PKS_AT	535-834	300	1	gi|158339492|	NC_009926_1	beta-ketoacyl synthase, putative 	beta-ketoacyl
+Acaryochloris marina_329726@gi|158339492|1165-1353	PKS_KR	1165-1353	189	1	gi|158339492|	NC_009926_1	beta-ketoacyl synthase, putative 	beta-ketoacyl
+Acaryochloris marina_329726@gi|158339492|1386-1548	PKS_DH	1386-1548	163	1	gi|158339492|	NC_009926_1	beta-ketoacyl synthase, putative 	beta-ketoacyl
+Acaryochloris marina_329726@gi|158309734|85-383	Heterocyclization	85-383	299	1	gi|158309734|	NC_009926_1	nonribosomal polyketide synthase protein 	polyketide
+Acaryochloris marina_329726@gi|158309734|576-978	AMP-binding	576-978	403	1	gi|158309734|	NC_009926_1	nonribosomal polyketide synthase protein 	polyketide
+Acaryochloris marina_329726@gi|158309734|1338-1406	PCP	1338-1406	69	1	gi|158309734|	NC_009926_1	nonribosomal polyketide synthase protein 	polyketide
+Acaryochloris marina_329726@gi|158339494|6-430	PKS_KS	6-430	425	1	gi|158339494|	NC_009926_1	polyketide synthase type I, putative 	polyketide
+Acaryochloris marina_329726@gi|158339494|527-823	PKS_AT	527-823	297	1	gi|158339494|	NC_009926_1	polyketide synthase type I, putative 	polyketide
+Acaryochloris marina_329726@gi|158339494|801-931	PKS_DHt	801-931	131	1	gi|158339494|	NC_009926_1	polyketide synthase type I, putative 	polyketide
+Acaryochloris marina_329726@gi|158339494|1180-1380	PKS_KR	1180-1380	201	1	gi|158339494|	NC_009926_1	polyketide synthase type I, putative 	polyketide
+Acaryochloris marina_329726@gi|158339494|1469-1535	PCP	1469-1535	67	1	gi|158339494|	NC_009926_1	polyketide synthase type I, putative 	polyketide
+Acaryochloris marina_329726@gi|158309736|51-355	Condensation_LCL	51-355	305	1	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|540-981	AMP-binding	540-981	442	1	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|1067-1134	PCP	1067-1134	68	1	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|1155-1455	Condensation_LCL	1155-1455	301	2	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|1640-2074	AMP-binding	1640-2074	435	2	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|2160-2227	PCP	2160-2227	68	2	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|2238-2551	Epimerization	2238-2551	314	2	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309736|2695-2716	NRPS-COM_Cterm	2695-2716	22	2	gi|158309736|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158339496|1-32	NRPS-COM_Nterm	1-32	32	1	gi|158339496|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158339496|10-311	Condensation_DCL	10-311	302	1	gi|158339496|	NC_009926_1	non-ribosomal peptide synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158339497|23-356	Aminotran_3	23-356	334	none	gi|158339497|	NC_009926_1	diaminobutyrate--2-oxoglutarate aminotransferase 	aminotransferase
+Acaryochloris marina_329726@gi|158309739|303-738	AMP-binding	303-738	436	none	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|826-895	PCP	826-895	70	none	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|912-1212	Condensation_LCL	912-1212	301	1	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|1397-1805	AMP-binding	1397-1805	409	1	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|1891-1961	PCP	1891-1961	71	1	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|1981-2279	Condensation_LCL	1981-2279	299	2	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|2464-2905	AMP-binding	2464-2905	442	2	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309739|2990-3057	PCP	2990-3057	68	2	gi|158309739|	NC_009926_1	peptide synthetase, putative 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309740|85-386	Condensation_LCL	85-386	302	1	gi|158309740|	NC_009926_1	nonribosomal protein synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309740|577-1001	AMP-binding	577-1001	425	1	gi|158309740|	NC_009926_1	nonribosomal protein synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309740|1087-1155	PCP	1087-1155	69	1	gi|158309740|	NC_009926_1	nonribosomal protein synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158309740|1203-1444	TD	1203-1444	242	1	gi|158309740|	NC_009926_1	nonribosomal protein synthetase 	non-ribosomal peptide
+Acaryochloris marina_329726@gi|158339504|73-401	Aminotran_3	73-401	329	none	gi|158339504|	NC_009926_1	aminotransferase, class III 	aminotransferase
+Acaryochloris marina_329726@gi|158309749|26-93	ACPS	26-93	68	none	gi|158309749|	NC_009926_1	holo-acyl-carrier-protein synthase 	holo-acyl-carrier-protein

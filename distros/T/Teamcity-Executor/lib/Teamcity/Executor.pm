@@ -3,7 +3,7 @@ use 5.020;
 use strict;
 use warnings;
 
-our $VERSION = "0.1.1";
+our $VERSION = "0.2.1";
 
 use Moose;
 use autobox::Core;
@@ -199,7 +199,7 @@ sub run($self, $build_name, $properties = {}) {
 }
 
 sub poll_teamcity_results($self) {
-    say 'TICK';
+    say '.';
     for my $build ($self->teamcity_builds->values) {
         my $url = $self->teamcity_auth_url . $build->{href};
         my $response = $self->http_request(
@@ -213,15 +213,20 @@ sub poll_teamcity_results($self) {
         my $state  = $json->{state};
         my $status = $json->{status};
 
+        say "$build->{name} [$build->{id}]: QUEUED" if $state eq 'queued';
+
         next if $state ne 'finished';
 
-        say "RESULT\t$build->{name} [$build->{id}]: $status";
+        say "RESULT\t$build->{name} [$build->{id}]: $status ($state)";
 
         if ($status eq 'SUCCESS') {
             my $href = $json->{href};
             $build->{future}->done({ id => $build->{id}, href => $href });
         }
         elsif ($status eq 'FAILURE') {
+            $build->{future}->fail($json->{statusText});
+        }
+        elsif ($status eq 'UNKNOWN') {
             $build->{future}->fail($json->{statusText});
         }
 
@@ -269,11 +274,11 @@ Teamcity::Executor - Executor of TeamCity build configurations
         }
         poll_interval => 10,
         loop => $loop,
-    )
+    );
 
     $tc->register_polling_timer();
 
-    $tc->run('hello_name', { name => 'TeamCity' })->then(
+    my $future = $tc->run('hello_name', { name => 'TeamCity' })->then(
         sub {
             my ($build) = @_;
             print "Build succeeded\n";
@@ -307,4 +312,3 @@ it under the same terms as Perl itself.
 Miroslav Tynovsky E<lt>tynovsky@avast.comE<gt>
 
 =cut
-

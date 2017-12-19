@@ -17,6 +17,7 @@ use Test::Mojo;
 use Mojo::JSON qw( true false );
 use FindBin qw( $Bin );
 use Mojo::File qw( path );
+use lib "".path( $Bin, 'lib' );
 
 use Yancy::Backend::Test;
 %Yancy::Backend::Test::COLLECTIONS = (
@@ -49,7 +50,7 @@ $ENV{MOJO_CONFIG} = path( $Bin, '/share/config.pl' );
 my $t = Test::Mojo->new( 'Yancy' );
 
 subtest 'fetch generated OpenAPI spec' => sub {
-    $t->get_ok( '/admin/api' )
+    $t->get_ok( '/yancy/api' )
       ->status_is( 200 )
       ->content_type_like( qr{^application/json} )
       ->json_is( '/definitions/peopleItem' => $t->app->config->{collections}{people} )
@@ -80,47 +81,66 @@ subtest 'fetch generated OpenAPI spec' => sub {
 };
 
 subtest 'fetch list' => sub {
-    $t->get_ok( '/admin/api/people' )
+    $t->get_ok( '/yancy/api/people' )
       ->status_is( 200 )
       ->json_is( {
             rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 1 2 )} ],
             total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
         } );
 
-    $t->get_ok( '/admin/api/people?limit=1' )
-      ->status_is( 200 )
-      ->json_is( {
-            rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 1 )} ],
-            total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
-        } );
+    subtest 'limit/offset' => sub {
+        $t->get_ok( '/yancy/api/people?limit=1' )
+          ->status_is( 200 )
+          ->json_is( {
+                rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 1 )} ],
+                total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
+            } );
 
-    $t->get_ok( '/admin/api/people?offset=1' )
-      ->status_is( 200 )
-      ->json_is( {
-            rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 2 )} ],
-            total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
-        } );
+        $t->get_ok( '/yancy/api/people?offset=1' )
+          ->status_is( 200 )
+          ->json_is( {
+                rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 2 )} ],
+                total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
+            } );
+    };
 
+    subtest 'order_by' => sub {
+
+        $t->get_ok( '/yancy/api/people?order_by=asc:name' )
+          ->status_is( 200 )
+          ->json_is( {
+                rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 1 2 )} ],
+                total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
+            } );
+
+        $t->get_ok( '/yancy/api/people?order_by=desc:name' )
+          ->status_is( 200 )
+          ->json_is( {
+                rows => [ $Yancy::Backend::Test::COLLECTIONS{people}->@{qw( 2 1 )} ],
+                total => scalar keys $Yancy::Backend::Test::COLLECTIONS{people}->%*,
+            } );
+
+    };
 };
 
 subtest 'fetch one' => sub {
-    $t->get_ok( '/admin/api/people/1' )
+    $t->get_ok( '/yancy/api/people/1' )
       ->status_is( 200 )
       ->json_is( $Yancy::Backend::Test::COLLECTIONS{people}{1} );
-    $t->get_ok( '/admin/api/users/doug' )
+    $t->get_ok( '/yancy/api/users/doug' )
       ->status_is( 200 )
       ->json_is( $Yancy::Backend::Test::COLLECTIONS{users}{doug} );
 };
 
 subtest 'set one' => sub {
     my $new_person = { name => 'Foo', email => 'doug@example.com', id => 1 };
-    $t->put_ok( '/admin/api/people/1' => json => $new_person )
+    $t->put_ok( '/yancy/api/people/1' => json => $new_person )
       ->status_is( 200 )
       ->json_is( $new_person );
     is_deeply $Yancy::Backend::Test::COLLECTIONS{people}{1}, $new_person;
 
     my $new_user = { username => 'doug', email => 'douglas@example.com' };
-    $t->put_ok( '/admin/api/users/doug' => json => $new_user )
+    $t->put_ok( '/yancy/api/users/doug' => json => $new_user )
       ->status_is( 200 )
       ->json_is( $new_user );
     is_deeply $Yancy::Backend::Test::COLLECTIONS{users}{doug}, $new_user;
@@ -128,26 +148,26 @@ subtest 'set one' => sub {
 
 subtest 'add one' => sub {
     my $new_person = { name => 'Flexo', email => 'flexo@example.com', id => 3 };
-    $t->post_ok( '/admin/api/people' => json => $new_person )
+    $t->post_ok( '/yancy/api/people' => json => $new_person )
       ->status_is( 201 )
       ->json_is( $new_person )
       ;
     is_deeply $Yancy::Backend::Test::COLLECTIONS{people}{3}, $new_person;
 
     my $new_user = { username => 'flexo', email => 'flexo@example.com' };
-    $t->post_ok( '/admin/api/users' => json => $new_user )
+    $t->post_ok( '/yancy/api/users' => json => $new_user )
       ->status_is( 201 )
       ->json_is( $new_user );
     is_deeply $Yancy::Backend::Test::COLLECTIONS{users}{flexo}, $new_user;
 };
 
 subtest 'delete one' => sub {
-    $t->delete_ok( '/admin/api/people/3' )
+    $t->delete_ok( '/yancy/api/people/3' )
       ->status_is( 204 )
       ;
     ok !exists $Yancy::Backend::Test::COLLECTIONS{people}{3}, 'person 3 not exists';
 
-    $t->delete_ok( '/admin/api/users/flexo' )
+    $t->delete_ok( '/yancy/api/users/flexo' )
       ->status_is( 204 )
       ;
     ok !exists $Yancy::Backend::Test::COLLECTIONS{users}{flexo}, 'flexo not exists';

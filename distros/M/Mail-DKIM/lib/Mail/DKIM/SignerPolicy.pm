@@ -37,18 +37,18 @@ is returned, then the message is "skipped" (i.e. not signed).
 Here is an example of a policy that always returns the same values:
 
   package MySignerPolicy;
-  use base "Mail::DKIM::SignerPolicy";
+  use base 'Mail::DKIM::SignerPolicy';
 
   sub apply
   {
       my $self = shift;
       my $signer = shift;
   
-      $signer->algorithm("rsa-sha1");
-      $signer->method("relaxed");
-      $signer->domain("example.org");
-      $signer->selector("selector1");
-      $signer->key_file("private.key");
+      $signer->algorithm('rsa-sha1');
+      $signer->method('relaxed');
+      $signer->domain('example.org');
+      $signer->selector('selector1');
+      $signer->key_file('private.key');
   
       return 1;
   }
@@ -57,7 +57,7 @@ To use this policy, simply specify the name of the class as the Policy
 parameter...
 
   my $dkim = Mail::DKIM::Signer->new(
-                  Policy => "MySignerPolicy",
+                  Policy => 'MySignerPolicy',
              );
 
 =head1 ADVANCED

@@ -41,7 +41,7 @@ sub call {
 
     # TODO: serve all headers defined in example
     # TODO: format body with encoding
-    return [200, ['Content-Type' => 'application/json; charset=utf-8'], [encode_utf8($formatter->body)]];
+    return [$default_code, ['Content-Type' => 'application/json; charset=utf-8'], [encode_utf8($formatter->body)]];
 }
 
 sub router {

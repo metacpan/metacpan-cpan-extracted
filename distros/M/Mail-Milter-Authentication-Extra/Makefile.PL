@@ -40,7 +40,7 @@ requires (
     'Cwd'                   => 0,
     'ClamAV::Client'        => 0,
     'DB_File'               => 0,
-    'Mail::Milter::Authentication' => '1.1.3',
+    'Mail::Milter::Authentication' => '1.1.5',
     'Mail::SpamAssassin'    => 0,
     'Mail::SpamAssassin::Client' => 0,
 );

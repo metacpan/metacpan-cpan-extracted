@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Test-PodSpelling
 
+2.007005  2017-12-17 19:08:45Z
+          - remove the use of Test::Script in tests
+
 2.007004  2016-10-27 02:00:39Z
           - fix tests to not rely on . in @INC (Graham Knop)
 

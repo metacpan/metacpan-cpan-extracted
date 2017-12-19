@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Proxy;
 
 # ABSTRACT: Log::Any generator proxy object
-our $VERSION = '1.703';
+our $VERSION = '1.704';
 
 use Log::Any::Adapter::Util ();
 use overload;
@@ -89,6 +89,7 @@ foreach my $name ( Log::Any::Adapter::Util::logging_methods(), keys(%aliases) )
     };
     *{$name} = sub {
         my ( $self, @parts ) = @_;
+        return if !$self->{adapter}->$is_realname && !defined wantarray;
 
         my $structured_logging =
             $self->{adapter}->can('structured') && !$self->{filter};
@@ -146,7 +147,7 @@ Log::Any::Proxy - Log::Any generator proxy object
 
 =head1 VERSION
 
-version 1.703
+version 1.704
 
 =head1 SYNOPSIS
 

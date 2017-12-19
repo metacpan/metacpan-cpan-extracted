@@ -19,7 +19,7 @@ BEGIN {
 use Test::DZil 'Builder';
 use File::pushd 'pushd';
 use File::Temp ();
-use Path::Class qw(dir file);
+use Path::Tiny ();
 use Try::Tiny qw(try catch);
 
 my $stoppedRE = qr/Stopped because of errors/;
@@ -31,8 +31,8 @@ my $fakeHome   = File::Temp->newdir;
 $ENV{HOME}     = "$fakeHome"; # Don't want user's ~/.gitconfig to interfere
 
 my $tempdir    = File::Temp->newdir;
-my $gitRoot    = dir("$tempdir")->absolute;
-my $gitHistory = file("corpus/gitvercheck.git")->absolute;
+my $gitRoot    = Path::Tiny::path("$tempdir")->absolute;
+my $gitHistory = Path::Tiny::path("corpus/gitvercheck.git")->absolute;
 
 my $git;
 
@@ -59,7 +59,7 @@ sub edit
 {
   my ($file, $edit) = @_;
 
-  my $fn = $gitRoot->subdir("lib/DZT")->file("$file.pm");
+  my $fn = $gitRoot->child("lib/DZT")->child("$file.pm");
 
   local $_ = do {
     local $/;
@@ -96,7 +96,7 @@ sub new_tzil
   # Something about the copy dzil makes seems to confuse git into
   # thinking files are modified when they aren't.
   # Run "git reset --mixed" in the source directory to unconfuse it:
-  Git::Wrapper->new( $tzil->tempdir->subdir("source")->stringify )
+  Git::Wrapper->new( $tzil->tempdir->child("source")->stringify )
               ->reset('--mixed');
 
   $tzil;
@@ -139,7 +139,7 @@ sub diag_log
   diag(map { "$_\n" } @{ $tzil->log_messages });
 
   {
-    my $wd = pushd($tzil->tempdir->subdir("source"));
+    my $wd = pushd($tzil->tempdir->child("source"));
     diag(
       `git --version`,
       "git diff-index:\n", `git diff-index HEAD --name-only`,

@@ -2,7 +2,7 @@
 
 # PODNAME: yars
 # ABSTRACT: Yet Another RESTful-Archive Service
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
 
 use Yars;
@@ -33,7 +33,7 @@ yars - Yet Another RESTful-Archive Service
 
 =head1 VERSION
 
-version 1.31
+version 1.33
 
 =head1 SYNOPSIS
 

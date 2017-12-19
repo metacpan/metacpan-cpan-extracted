@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-11-04 00:00:00 +0000 to present.
+Changes from 2016-12-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.018 at 2017-11-04 18:21:07 +0000
+version 0.019 at 2017-12-16 11:38:18 +0000
 ------------------------------------------
+
+  Change: 92f8a558d99b4b588fc4ff29a81e7982ae047977
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-12-16 14:36:34 +0000
+
+    Merge pull request #26 from Madskill/fix_filter
+
+    fix filter 
+
+  Change: 19c25196b6e51faeec1118954913a03138c8d91f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-12-16 14:35:28 +0000
+
+    fix filter 
+
+------------------------------------------
+version 0.018 at 2017-11-04 18:21:33 +0000
+------------------------------------------
+
+  Change: 726283859bf62c0968ce8700003486fa9a03e26d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-04 21:21:33 +0000
+
+    Version 0.018 
 
   Change: d6374522c0431effedd1678db1fbfdbd99e89923
   Author: Igor <igor-sverdlov@mail.ru>
@@ -20,48 +44,6 @@ version 0.018 at 2017-11-04 18:21:07 +0000
 
     use '*' as all fields 
 
-------------------------------------------
-version 0.017 at 2016-12-01 19:47:12 +0000
-------------------------------------------
-
-  Change: 9368dc07c58581b4801b943db37aaa46d07cd410
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 22:47:12 +0000
-
-    Version 0.017 
-
-  Change: 9904af3cb024e8d61996018f9f53c4444dfbd595
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 22:45:25 +0000
-
-    Merge pull request #24 from Madskill/speed_up
-
-    Speed up 
-
-  Change: b8b3c6524848c8a2d5dcec8115520dfdc65c48fa
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 22:42:09 +0000
-
-    all_locales and process fields in new 
-
-  Change: 101df05762ea702e45961ea1841c5dbb07565f88
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-29 21:28:17 +0000
-
-    unique delete fields and process_data if need delete fields 
-
-  Change: 3dc3d85d7dc032675f198865121b633ca423df02
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-27 04:11:17 +0000
-
-    cached_locales 
-
-  Change: 442a699d7ede2b19bcba20285a054f8422a0c7e1
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-27 03:22:52 +0000
-
-    speed up 
-
 =================================================
-Plus 16 releases after 2016-11-04 00:00:00 +0000.
+Plus 17 releases after 2016-12-16 00:00:00 +0000.
 =================================================

@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -23,8 +23,11 @@ our $VERSION = '0.004';
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This Yancy backend allows you to connect to a L<DBIx::Class> schema to manage
-#pod the data inside.
+#pod This Yancy backend allows you to connect to a L<DBIx::Class> schema to
+#pod manage the data inside.
+#pod
+#pod See L<Yancy::Backend> for the methods this backend has and their return
+#pod values.
 #pod
 #pod =head2 Backend URL
 #pod
@@ -82,7 +85,7 @@ our $VERSION = '0.004';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod L<DBIx::Class>, L<Yancy>
+#pod L<Yancy::Backend>, L<DBIx::Class>, L<Yancy>
 #pod
 #pod =cut
 
@@ -104,8 +107,8 @@ sub new( $class, $url, $collections ) {
     return $class->SUPER::new( %vars );
 }
 
-sub _rs( $self, $coll, $opt={} ) {
-    my $rs = $self->dbic->resultset( $coll )->search( {}, $opt );
+sub _rs( $self, $coll, $params={}, $opt={} ) {
+    my $rs = $self->dbic->resultset( $coll )->search( $params, $opt );
     $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
     return $rs;
 }
@@ -120,7 +123,9 @@ sub get( $self, $coll, $id ) {
 }
 
 sub list( $self, $coll, $params={}, $opt={} ) {
-    my %rs_opt;
+    my %rs_opt = (
+        order_by => $opt->{order_by},
+    );
     if ( $opt->{limit} ) {
         die "Limit must be number" if !looks_like_number $opt->{limit};
         $rs_opt{ rows } = $opt->{limit};
@@ -129,8 +134,8 @@ sub list( $self, $coll, $params={}, $opt={} ) {
         die "Offset must be number" if !looks_like_number $opt->{offset};
         $rs_opt{ offset } = $opt->{offset};
     }
-    my $rs = $self->_rs( $coll, \%rs_opt );
-    return { rows => [ $rs->all ], total => $self->_rs( $coll )->count };
+    my $rs = $self->_rs( $coll, $params, \%rs_opt );
+    return { rows => [ $rs->all ], total => $self->_rs( $coll, $params )->count };
 }
 
 sub set( $self, $coll, $id, $params ) {
@@ -153,7 +158,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -176,8 +181,11 @@ version 0.004
 
 =head1 DESCRIPTION
 
-This Yancy backend allows you to connect to a L<DBIx::Class> schema to manage
-the data inside.
+This Yancy backend allows you to connect to a L<DBIx::Class> schema to
+manage the data inside.
+
+See L<Yancy::Backend> for the methods this backend has and their return
+values.
 
 =head2 Backend URL
 
@@ -235,7 +243,7 @@ You could map that schema to the following collections:
 
 =head1 SEE ALSO
 
-L<DBIx::Class>, L<Yancy>
+L<Yancy::Backend>, L<DBIx::Class>, L<Yancy>
 
 =head1 AUTHOR
 

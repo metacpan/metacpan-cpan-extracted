@@ -4,7 +4,7 @@ package Dist::Zilla::Plugin::PodSpellingTests;
 # ABSTRACT: (DEPRECATED) The old name of the PodSpelling plugin
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '2.007004';
+our $VERSION = '2.007005';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::PodSpelling';
@@ -33,7 +33,7 @@ Dist::Zilla::Plugin::PodSpellingTests - (DEPRECATED) The old name of the PodSpel
 
 =head1 VERSION
 
-version 2.007004
+version 2.007005
 
 =head1 SYNOPSIS
 

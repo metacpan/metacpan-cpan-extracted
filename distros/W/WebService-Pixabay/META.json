@@ -4,13 +4,13 @@
       "faraco <skelic3@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Pixabay",
    "prereqs" : {
@@ -41,7 +41,6 @@
             "Data::Dumper" : "0",
             "Function::Parameters" : "0",
             "LWP::Online" : "0",
-            "Modern::Perl" : "0",
             "Moo" : "0",
             "WebService::Client" : "0"
          }
@@ -65,7 +64,7 @@
          "web" : "https://github.com/faraco/WebService-Pixabay"
       }
    },
-   "version" : "2.0.2",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "2.1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,0 +1,209 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Bacovia::Difference - Represents a symbolic difference.
+
+=head1 SYNOPSIS
+
+    use 5.014;
+    use Math::Bacovia qw(Difference Symbol);
+
+    my $f = Difference(Symbol('a'), Symbol('b'));
+    my $g = Difference(Symbol('x'), Symbol('y'));
+
+    say (($f + $g)->pretty);    #=> ((a + x) - (b + y))
+
+=head1 METHODS
+
+This section describes the methods provided by the B<Math::Bacovia::Difference> module.
+
+=head2 new
+
+    my $obj = Math::Bacovia::Difference->new($minuend, $subtrahend);
+
+Constructs and returns a new B<Math::Bacovia::Difference> object.
+
+=head2 add
+
+    $x + $y
+    $x->add($y)
+
+Addition of C<x> and C<y>, using the identity:
+
+    (a-b) + (c-d) = (a+c) - (b+d)
+
+=head2 sub
+
+    $x - $y
+    $x->sub($y)
+
+Subtraction of C<y> from C<x>, using the identity:
+
+    (a-b) - (c-d) = (a+d) - (b+c)
+
+=head2 mul
+
+    $x * $y
+    $x->mul($y)
+
+Multiplication of C<x> and C<y>, using the identity:
+
+    (a-b) * (c-d) = (a*c + b*d) - (b*c + a*d)
+
+=head2 neg
+
+    -$x
+    $x->neg
+
+Additive inverse of C<x>, using the identity:
+
+    -(a-b) = b-a
+
+=head2 eq
+
+    $x == $y
+    $x->eq($y)
+
+Return a true value when C<x> and C<y> are symbolically equal.
+
+=head1 SPECIAL METHODS
+
+This section describes the special methods provided by the B<Math::Bacovia::Difference> module.
+
+=head2 inside
+
+    my ($minuend, $subtrahend) = $obj->inside;
+
+Returns the internal values of the self-object.
+
+=head2 alternatives
+
+    my @alt = $obj->alternatives;
+    my @alt = $obj->alternatives(full => 1);
+
+This method uses common mathematical identities to create symbolically equivalent expressions from the self-expression.
+
+=head2 pretty
+
+    my $str = $obj->pretty;
+
+Returns a human-readable stringification of the self-expression.
+
+=head2 stringify
+
+    my $str = $obj->stringify;
+
+Returns a stringification of the self-expression.
+
+=head2 numeric
+
+    my $num = $obj->numeric;
+
+Evaluates the self-expression numerically and returns a L<Math::AnyNum> object.
+
+=head1 SEE ALSO
+
+The other parts of B<Math::Bacovia>:
+
+=over 4
+
+=item * L<Math::Bacovia>
+
+=item * L<Math::Bacovia::Fraction>
+
+=item * L<Math::Bacovia::Power>
+
+=item * L<Math::Bacovia::Log>
+
+=item * L<Math::Bacovia::Exp>
+
+=item * L<Math::Bacovia::Sum>
+
+=item * L<Math::Bacovia::Product>
+
+=item * L<Math::Bacovia::Number>
+
+=item * L<Math::Bacovia::Symbol>
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu, C<< <trizen at protonmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to L<https://github.com/trizen/Math-Bacovia>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Math::Bacovia::Difference
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Math-Bacovia>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Math-Bacovia>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Math-Bacovia/>
+
+=item * GitHub
+
+L<https://github.com/trizen/Math-Bacovia>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Daniel Șuteu.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

@@ -4,18 +4,39 @@ use Catmandu::Sane;
 use Moo;
 use Catmandu::MARC;
 use Catmandu::Fix::Has;
+use Clone qw(clone);
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 has path  => (fix_arg => 1);
 
 # Transform a raw MARC array into MARCXML
 sub fix {
     my ($self, $data) = @_;
-    my $xml = Catmandu::MARC->instance->marc_xml($data);
-    $data->{$self->path} = $xml;
+    my $path = $self->{path};
+
+    return $data unless exists $data->{$path};
+
+    if ($path eq 'record') {
+        my $xml = Catmandu::MARC->instance->marc_xml($data);
+        $data->{$path} = $xml;
+    }
+    elsif (exists $data->{record}) {
+        my $copy           = clone($data->{record});
+        $data->{record}    = $data->{$path};
+        my $xml = Catmandu::MARC->instance->marc_xml($data);
+        $data->{$path}     = $xml;
+        $data->{record}    = $copy;
+    }
+    else {
+        $data->{record}    = $data->{$path};
+        my $xml = Catmandu::MARC->instance->marc_xml($data);
+        $data->{$path}     = $xml;
+        delete $data->{record};
+    }
+
     $data;
 }
 

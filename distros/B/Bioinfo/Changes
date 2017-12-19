@@ -1,233 +1,27 @@
 ==================================================
-Changes from 2017-07-17 00:00:00 +0000 to present.
+Changes from 2017-10-18 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.1.11 at 2017-09-15 16:35:58 +0000
+version 0.1.13 at 2017-12-17 15:50:42 +0000
 -------------------------------------------
 
-  Change: 04c2b88daf4ef97439d4f893a05a27b526ca2e6d
+  Change: fdf2fc3808a6633a2b20da82ee9a631125bc491e
   Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:35:44 +0000
+  Date : 2017-12-17 23:50:29 +0000
 
-    nonsen 
+    Added evalue and outfmt parameters 
 
-------------------------------------------
-version 0.1.8 at 2017-09-15 16:27:40 +0000
-------------------------------------------
+-------------------------------------------
+version 0.1.12 at 2017-12-17 15:20:48 +0000
+-------------------------------------------
 
-  Change: 9c9d63a3e60af917036c8608512aab786cf14a8a
+  Change: 31f4d47b035967b809332fea8534407db8c8b185
   Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:27:02 +0000
+  Date : 2017-12-17 23:20:15 +0000
 
-    nonsen 
+    Added max_target_seq parameters 
 
-  Change: 5911b06ff37bb9fe857008330973b307f0bbe719
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:07:41 +0000
-
-    Added a app which can extract specified sequence from fasta file 
-
-  Change: 977abfe092e531d4a4adc2148eb8836f1fffab21
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:06:23 +0000
-
-    Fixed bug when seq name don't include annotation 
-
-  Change: 3093fd9cee46592d9fa4a3463854634f2c797f3d
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:05:28 +0000
-
-    Modified xls and xls.m8 file path 
-
-  Change: 0a314fd315a6e26ab856e35501c1da8fe82a12dd
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-09-16 00:04:43 +0000
-
-    Change default parallel 1 to tasks number 
-
-  Change: 65e45217b11a591519e8630c5ec7b1a7c9193c4e
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-23 14:49:15 +0000
-
-    nonsense submit 
-
-------------------------------------------
-version 0.1.7 at 2017-08-23 06:47:36 +0000
-------------------------------------------
-
-  Change: 9868adf08b944df9f8c2743404b7d2b0799c5c78
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-23 14:31:30 +0000
-
-    nonsense summit 
-
-  Change: f1234dd5fad28e9b142a0ae5119ec0ed19449365
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-23 14:14:18 +0000
-
-    Fixed blastp should use -parse_deflines and makeblastdb should use -parse_seqids 
-
-  Change: 0bab67f24ba0b416fbd2f4bd012901ae0b690a3d
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-20 10:23:56 +0000
-
-    Fixed some compile error 
-
-  Change: ef8c2490f19aca09c1b14038bf6b6fff28af33c7
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-20 09:47:08 +0000
-
-    Fixed db path problem, you must specified a absolute path 
-
-  Change: 4d67323ce4440f3c051185f47efe170940c8f04d
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-20 09:40:09 +0000
-
-    Renamed SplitSubmitB2.pm to SplitSubmitB.pm 
-
-  Change: a0497195a40ea7539c82d456340036c51380b09d
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-20 01:10:23 +0000
-
-    Modified nonsense output 
-
-------------------------------------------
-version 0.1.6 at 2017-08-19 15:37:25 +0000
-------------------------------------------
-
-  Change: a04acd58160c8c99deec965394405f230b546bdd
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 23:36:40 +0000
-
-    Added batch splitsubmit2 module 
-
-  Change: ae1f2c2bdb3b810479665c7386d321dcc8f34e59
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 23:09:55 +0000
-
-    Fixed a minor error 
-
-  Change: f90c923ae026168a98b63e4e499327236c99859b
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 14:45:46 +0000
-
-    Added \n to log file 
-
-  Change: 95da271f0d1c3fcf8c2c95fdeb936b6c17ee8831
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 14:45:00 +0000
-
-    Added result file of m8 format in ParseXML command 
-
-------------------------------------------
-version 0.1.5 at 2017-08-19 04:38:36 +0000
-------------------------------------------
-
-  Change: 43c79d6a6d89df5f210b94245b515f9cf9bbb911
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 12:38:08 +0000
-
-    Added some pod text to 'parallel' parameter in PBS::Queue 
-
-------------------------------------------
-version 0.1.4 at 2017-08-19 04:00:39 +0000
-------------------------------------------
-
-  Change: 7754583a708acba72c66af619b5ee84fa500ab71
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-19 12:00:06 +0000
-
-    Fixed error that don't running at the specified path 
-
-------------------------------------------
-version 0.1.3 at 2017-08-18 15:38:07 +0000
-------------------------------------------
-
-  Change: 76fb5f8f73f81b81c4eb4c8b24110ea65d29b5db
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-18 23:37:43 +0000
-
-    Solved the prefix warning 
-
-------------------------------------------
-version 0.1.2 at 2017-08-18 14:49:13 +0000
-------------------------------------------
-
-  Change: 77dd52b5912e84ed4529b452d632f406e953f2e7
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-18 22:29:53 +0000
-
-    Removed execute mod of PBS 
-
-  Change: 60f9a2041c1f3cb6dd672f105f0d5b5b5e622a36
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-18 22:28:51 +0000
-
-    Added ParseXML and SplitSubmit module to subcommand of Blast 
-
-  Change: cb6f0c2a3f51866b7fff05ba6875d7c51883d6b7
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-08-11 23:53:51 +0000
-
-    Added control of paralell task number for PBS::Queue module 
-
-  Change: 4b3c1783598cbc2342ea257c489648b8dd9ea124
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-29 18:44:21 +0000
-
-    Modified name of output of blast 
-
-  Change: dab2566518b39c1338a0841cc6d9530522996f17
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 19:06:36 +0000
-
-    Fixed SplitBlast bug 
-
-------------------------------------------
-version 0.1.1 at 2017-07-28 10:38:06 +0000
-------------------------------------------
-
-  Change: 4a97669590f5ebaa31a168a287bbfc58d22c8828
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 18:37:51 +0000
-
-    Added function of uploading to cpan automatically 
-
-  Change: 37fdba6ea06cc1e1cb46e684500445ef0e804ec9
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 18:34:33 +0000
-
-    Fixed SplitBlast bug 
-
-------------------------------------------
-version 0.1.0 at 2017-07-28 09:45:39 +0000
-------------------------------------------
-
-  Change: 3fc5c3a80cb28d189a224d3f13136c874a5d6db2
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 17:45:13 +0000
-
-    Added 'fasta' subcommand, 'split' and 'splitblast' subsubcommand 
-
-  Change: b72cd7dad78814fda13c951351a2d5115f31d7ba
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 17:40:10 +0000
-
-    Added CLI biotools 
-
-  Change: 3f0f1b1b9b5dda6caeda670bd58e084ad8ce34ad
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-28 17:38:25 +0000
-
-    Added PBS and PBS::Queue module 
-
-  Change: a27f6320a4c8650a73789ed43cbc1ddee4164a82
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-07-26 14:35:47 +0000
-
-    Initialize gitrepo with `dzil new` 
-
-================================================
-Plus 2 releases after 2017-07-17 00:00:00 +0000.
-================================================
+=================================================
+Plus 14 releases after 2017-10-18 00:00:00 +0000.
+=================================================

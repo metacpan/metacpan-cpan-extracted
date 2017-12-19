@@ -1,41 +1,24 @@
 package Mojolicious::Plugin::Subprocess;
 
 use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::IOLoop::Subprocess;
-use Scalar::Util 'weaken';
+use Mojo::IOLoop;
 
-our $VERSION = '0.004';
-
-my ($deserialize, $serialize);
+our $VERSION = '1.000';
 
 sub register {
   my ($self, $app, $options) = @_;
   
   my %subprocess_args = %{$options // {}};
-  
-  if (delete $subprocess_args{use_sereal}) {
-    unless (defined $deserialize) {
-      require Sereal::Decoder;
-      Sereal::Decoder->VERSION('3.001');
-      my $deserializer = Sereal::Decoder->new;
-      $deserialize = sub { Sereal::Decoder::sereal_decode_with_object($deserializer, $_[0]) };
-    }
-    $subprocess_args{deserialize} = $deserialize;
-    unless (defined $serialize) {
-      require Sereal::Encoder;
-      Sereal::Encoder->VERSION('3.001');
-      my $serializer = Sereal::Encoder->new({freeze_callbacks => 1});
-      $serialize = sub { Sereal::Encoder::sereal_encode_with_object($serializer, $_[0]) };
-    }
-    $subprocess_args{serialize} = $serialize;
-  }
+  my $use_sereal = delete $subprocess_args{use_sereal};
   
   $app->helper(subprocess => sub {
     my ($c, $child, $parent) = @_;
     
-    my $subprocess = Mojo::IOLoop::Subprocess->new(%subprocess_args);
-    $subprocess->ioloop; # instantiate default
-    weaken $subprocess->{ioloop};
+    my $subprocess = Mojo::IOLoop->subprocess;
+    $subprocess->$_($subprocess_args{$_}) for
+      grep { exists $subprocess_args{$_} } qw(deserialize ioloop serialize);
+    $subprocess->with_roles('Mojo::IOLoop::Subprocess::Role::Sereal')
+      ->with_sereal if $use_sereal;
     
     $c->delay(sub {
       $subprocess->run($child, shift->begin);
@@ -79,9 +62,9 @@ L</"subprocess"> helper method to your application, which uses
 L<Mojo::IOLoop::Subprocess> to perform computationally expensive operations in
 subprocesses without blocking the event loop.
 
-The option C<use_sereal> (requires L<Sereal> version 3.001 or higher) will use
-L<Sereal> for data serialization, which is faster than L<Storable> and supports
-serialization of more reference types such as C<Regexp>. The
+The option C<use_sereal> (requires L<Mojo::IOLoop::Subprocess::Role::Sereal>)
+will use L<Sereal> for data serialization, which is faster than L<Storable> and
+supports serialization of more reference types such as C<Regexp>. The
 L<Sereal::Encoder/"FREEZE/THAW CALLBACK MECHANISM"> is supported to control
 serialization of blessed objects.
 

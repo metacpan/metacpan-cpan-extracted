@@ -7,14 +7,16 @@ RCPT TO:marc@fastmail.com
 DATA
 Received: from test.module (localhost [127.0.0.1])
     by server.example.com (Authentication Milter) with ESMTP
+############
+############
 Authentication-Results: server.example.com;
     smime=fail
         body.smime-identifier=(test@example.com)
         body.smime-part=TEXT
         body.smime-serial=90cf589269ba42b1
         body.smime-issuer="C=AU,CN=testca.example.net,O=FastMail SMIME Test Signing Authority"
-        x-smime-valid-from=XXX
-        x-smime-valid-to=XXX
+        x-smime-valid-from="TEST"
+        x-smime-valid-to="TEST"
 To: test@example.com
 From: Marc Bradshaw <marc@fastmail.com>
 Subject: SMIME Testing

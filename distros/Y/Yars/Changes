@@ -1,5 +1,15 @@
 Revision history for Yars
 
+1.33      2017-12-15 12:19:26 -0500
+  - Add --load to yars_balance
+
+1.32      2017-12-14 11:58:21 -0500
+  - Yars is officially deprecated and may be removed from CPAN,
+    but not before 31 December 2018.  Please see 
+    https://github.com/clustericious/Yars/issues/31
+  - Update diagnostics for yars_balance to add additional information
+  - Added --delay option to yars_balance
+
 1.31      2017-08-31 10:45:18 -0400
   - Migrate to EUMM
 

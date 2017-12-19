@@ -26,6 +26,7 @@ use Business::Fixflo::Property;
     AdditionalDetails
     AssignedAgent
     Block
+    BlockName
     CallbackId
     ContactNumber
     ContactNumberAlt
@@ -67,6 +68,7 @@ has [ qw/
     AdditionalDetails
     AssignedAgent
     Block
+    BlockName
     CallbackId
     ContactNumber
     ContactNumberAlt

@@ -322,7 +322,7 @@ you specify. Make sure you author this function with this expectation.
 The result(s) of L</preproc> will be collected into an array and fed
 into L</process>. Use L</depends> rather than L</consumes> to supply
 other parameters without removing them from the resulting structure.
-Note that when L</depends> ihjks used in conjunction with L</preproc>,
+Note that when L</depends> is used in conjunction with L</preproc>,
 the dependencies I<must> be acyclic.
 
 L</preproc> is called either just before L</process> over supplied
@@ -560,9 +560,14 @@ This C<default> value is passed through to the application only if the
 parameter in question is either missing or empty (if C<empty> is
 set). Likewise if the final translation of the input value matches the
 default, it will not show up in the canonical serialization. Like
-L<Moose>, is expected to be a C<CODE> reference.
+L<Moose>, is expected to be a C<CODE> reference. The subroutine takes
+two arguments: this template object, and the
+L<Params::Registry::Instance> object.
 
-    default => sub { 1 },
+    default => sub {
+        my ($t, $i) = @_;
+        # do something...
+    },
 
 =cut
 
@@ -651,11 +656,10 @@ sub has_complement {
 
 =item unwind
 
-For composite object parameters, specify a C<CODE> reference to a
-subroutine which will turn the object into either a scalar or an
-C<ARRAY> reference of scalars. To encourage code reuse, this function
-is applied before L</reverse> despite the obvious ability to reverse
-the resulting list within the function.
+Specify a C<CODE> reference to a subroutine which will turn the object
+into either a scalar or an C<ARRAY> reference of scalars. To encourage
+code reuse, this function is applied before L</reverse> despite the
+obvious ability to reverse the resulting list within the function.
 
 The first argument to the subroutine is the template object itself,
 and the second is the value to be unwound. Subsequent arguments are
@@ -676,11 +680,12 @@ following idiom:
         # ...
     }
 
-An optional second return value can be used to indicate that the
-special L<complement|Params::Registry/complement> parameter should be
-set for this parameter. This is applicable, for instance, to the
-complement of a range, which would otherwise be impossible to
-serialize into a string.
+For multi-valued parameters, an optional second return value can be
+used to indicate that the special
+L<complement|Params::Registry/complement> parameter should be set for
+this parameter. This is applicable, for instance, to the complement of
+a range, which would otherwise be impossible to serialize into a
+string.
 
 =cut
 
@@ -829,17 +834,24 @@ sub unprocess {
     # i dunno, should we check these types on the way out?
 
     my $complement;
-    if ($self->composite) {
-        if (my $u = $self->unwind) {
-            try {
-                ($obj, $complement) = $u->($self, $obj, @rest);
-            } catch {
-                Params::Registry::Error->throw("Could not execute unwind: $_")
-            };
-        }
+    if (defined $obj and my $u = $self->unwind) {
+        try {
+            ($obj, $complement) = $u->($self, $obj, @rest);
+        } catch {
+            Params::Registry::Error->throw("Could not execute unwind: $_");
+        };
     }
 
-    $obj = [$obj] unless ref $obj eq 'ARRAY';
+    if (defined $obj) {
+        $obj = [$obj] unless ref $obj eq 'ARRAY';
+
+    }
+    else {
+        $obj = [];
+    }
+
+    # prune output again
+    @$obj = grep { defined $_ } @$obj unless $self->empty;
 
     # format values
     my $fmt = $self->format;

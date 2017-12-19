@@ -23,6 +23,7 @@
 
     "handlers" : {
         "SMIME" : {
+            "TEST_DATE" : 1,
             "pki_store" : "pki_store/ca/"
         }
     }

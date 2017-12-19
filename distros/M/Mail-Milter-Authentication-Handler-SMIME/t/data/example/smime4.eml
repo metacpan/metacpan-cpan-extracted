@@ -4,8 +4,8 @@ Authentication-Results: test.module;
         body.smime-part=TEXT
         body.smime-serial=c8
         body.smime-issuer="CN=CarlDSS"
-        x-smime-valid-from=XXX
-        x-smime-valid-to=XXX
+        x-smime-valid-from="TEST"
+        x-smime-valid-to="TEST"
 MIME-Version: 1.0
 To: User2@examples.com
 From: aliceDss@examples.com

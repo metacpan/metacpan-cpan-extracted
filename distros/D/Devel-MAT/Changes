@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.32    2017-12-17 00:31:53
+        [CHANGES]
+         * Only elide single-referrant RVs in `identify` output
+         * "Loading file ..." message should mention that its count is in
+           bytes (thanks DAKKAR)
+         * Extract the `callstack` command's stringify behaviour into a new
+           shared ->format_sv_with_value method
+
 0.31    2017-11-23 22:25:08
         [CHANGES]
          * Annotate each root SV with its rootname in formatted output

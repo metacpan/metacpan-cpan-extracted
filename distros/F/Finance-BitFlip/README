@@ -1,0 +1,62 @@
+NAME
+    Finance::BitFlip - Trade with bitflip.li using Perl
+
+VERSION
+    This document describes version 0.001 of Finance::BitFlip (from Perl
+    distribution Finance-BitFlip), released on 2017-12-17.
+
+SYNOPSIS
+     use Finance::BitFlip;
+
+    You don't need API key (token) & secret if you are only accessing public
+    methods.
+
+     my $bitflip = Finance::BitFlip->new(
+         key    => 'Your API key (token)',
+         secret => 'Your API secret',
+     );
+
+     my $res = $bitflip->get_request("server.getTime");
+     # sample response: [undef, 1513509630600]
+
+     my $res = $bitflip->post_request("market.getUserTrades", pair=>"xrb:usd");
+
+DESCRIPTION
+    <https://bitflip.li> is a Russian cryptocurrency exchange.
+
+METHODS
+  new(%args)
+    Constructor. Known arguments:
+
+    key
+    secret
+
+  get_request($method) => array
+  post_request($method, %args) => array
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-BitFlip>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-BitFlip>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-BitFlip>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    API documentation, <https://bitflip.li/apidoc>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

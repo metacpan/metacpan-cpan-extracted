@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Roles::Domainable;
 # ABSTRACT: Domain attrs common to Standard::Domain and DomTable::Hit
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Roles::Domainable::VERSION = '0.173450';
+$Bio::FastParsers::Hmmer::Roles::Domainable::VERSION = '0.173510';
 use Moose::Role;
 
 use autodie;
@@ -64,7 +64,7 @@ Bio::FastParsers::Hmmer::Roles::Domainable - Domain attrs common to Standard::Do
 
 =head1 VERSION
 
-version 0.173450
+version 0.173510
 
 =head1 SYNOPSIS
 

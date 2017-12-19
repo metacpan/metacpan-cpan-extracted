@@ -77,7 +77,8 @@ if($retval>0){$ok_cnt++;}else{$nok_cnt++;}
 ok($retval gt 0,"init: $retval => $ret_txt (ok: $ok_cnt, nok: $nok_cnt)");
 
 
-$cnt=$start_idx=0;
+#$cnt=$start_idx=0;
+$cnt=0;
 
 ### $r=chk_biq($start_idx,0);
 ### $r2=chk_bic("genodef1s01",0,0);

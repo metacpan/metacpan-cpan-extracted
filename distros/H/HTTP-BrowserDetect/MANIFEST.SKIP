@@ -1,0 +1,10 @@
+.travis.yml
+t/perlcriticrc
+t/pod_coverage.t
+t/02-critic.t
+MANIFEST.SKIP
+README.pod
+README.txt
+http-browserdetect.kpf
+blib
+http-browserdetect.komodoproject

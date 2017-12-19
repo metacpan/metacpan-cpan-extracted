@@ -1,5 +1,14 @@
 Revision history for MARC-Spec-Parser
 
+2.0.3  2017-12-16 09:28:09 CET
+        - fixed bug indictor subspec abbreviation
+2.0.2  2017-12-13 07:36:04 CET
+        - minor: adjusted POD
+        - Tidied up abstract in pod as reported by CPANTS. from manwar
+2.0.1  2017-12-12 15:33:38 CET
+        - removed DPP dependencyy in test
+2.0.0  2017-12-12 13:46:21 CET
+        - new class Indicator (conforms to MARCspec 0.16beta)
 1.0.0  2017-05-11 13:43:22 CEST
         - parse is not an object method
 0.1.4  2017-04-06 08:11:51 CEST

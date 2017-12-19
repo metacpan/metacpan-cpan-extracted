@@ -4,58 +4,58 @@ author:
   - 'Christopher J. Madsen <perl@cjmweb.net>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-CJM
 no_index:
   directory:
     - corpus
 requires:
-  Dist::Zilla: 4.200001
-  Dist::Zilla::Plugin::ArchiveRelease: 0.08
-  Dist::Zilla::Plugin::CheckPrereqsIndexed: 0.006
-  Dist::Zilla::Plugin::ExtraTests: 0
-  Dist::Zilla::Plugin::GatherDir: 0
-  Dist::Zilla::Plugin::GitVersionCheckCJM: 4.27
-  Dist::Zilla::Plugin::License: 0
-  Dist::Zilla::Plugin::MakeMaker: 0
-  Dist::Zilla::Plugin::ManifestSkip: 0
-  Dist::Zilla::Plugin::MatchManifest: 4.01
-  Dist::Zilla::Plugin::MetaConfig: 0
-  Dist::Zilla::Plugin::MetaJSON: 0
-  Dist::Zilla::Plugin::MetaYAML: 0
-  Dist::Zilla::Plugin::PodCoverageTests: 0
-  Dist::Zilla::Plugin::PodLoom: 5.001
-  Dist::Zilla::Plugin::PodSyntaxTests: 0
-  Dist::Zilla::Plugin::PruneCruft: 0
-  Dist::Zilla::Plugin::RecommendedPrereqs: 4.06
-  Dist::Zilla::Plugin::Repository: 0.16
-  Dist::Zilla::Plugin::RunExtraTests: 0
-  Dist::Zilla::Plugin::TemplateCJM: 4.23
-  Dist::Zilla::Plugin::Test::PrereqsFromMeta: 4.23
-  Dist::Zilla::Plugin::TestRelease: 0
-  Dist::Zilla::Plugin::UploadToCPAN: 0
-  Dist::Zilla::Plugin::VersionFromModule: 0.08
-  Dist::Zilla::PluginBundle::Git: 2.027
-  Dist::Zilla::Role::PluginBundle::Easy: 0
-  Git::Wrapper: 0
-  Moose: 0.65
+  Dist::Zilla: '6'
+  Dist::Zilla::Plugin::ArchiveRelease: '6'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0.006'
+  Dist::Zilla::Plugin::ExtraTests: '0'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::GitVersionCheckCJM: '4.27'
+  Dist::Zilla::Plugin::License: '0'
+  Dist::Zilla::Plugin::MakeMaker: '0'
+  Dist::Zilla::Plugin::ManifestSkip: '0'
+  Dist::Zilla::Plugin::MatchManifest: '4.01'
+  Dist::Zilla::Plugin::MetaConfig: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodLoom: '5.001'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PruneCruft: '0'
+  Dist::Zilla::Plugin::RecommendedPrereqs: '4.06'
+  Dist::Zilla::Plugin::Repository: '0.16'
+  Dist::Zilla::Plugin::RunExtraTests: '0'
+  Dist::Zilla::Plugin::TemplateCJM: '4.23'
+  Dist::Zilla::Plugin::Test::PrereqsFromMeta: '4.23'
+  Dist::Zilla::Plugin::TestRelease: '0'
+  Dist::Zilla::Plugin::UploadToCPAN: '0'
+  Dist::Zilla::Plugin::VersionFromModule: '0.08'
+  Dist::Zilla::PluginBundle::Git: '2.027'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Git::Wrapper: '0'
+  Moose: '0.65'
 resources:
   repository: git://github.com/madsen/dist-zilla-pluginbundle-cjm.git
-version: 4.37
+version: '6.000'
 x_Dist_Zilla:
   perl:
-    version: 5.018002
+    version: '5.024003'
   plugins:
     -
       class: Dist::Zilla::Plugin::VersionFromModule
       name: CJM/VersionFromModule
-      version: 0.08
+      version: '0.08'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -66,89 +66,89 @@ x_Dist_Zilla:
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
-          root: '.'
+          root: .
       name: CJM/GatherDir
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: CJM/PruneCruft
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: CJM/ManifestSkip
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: CJM/MetaJSON
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: CJM/MetaYAML
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: CJM/License
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Test::PrereqsFromMeta
       name: CJM/Test::PrereqsFromMeta
-      version: 4.23
+      version: '4.23'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: CJM/PodSyntaxTests
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: CJM/PodCoverageTests
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PodLoom
       config:
-        Pod::Loom version: 0.08
+        'Pod::Loom version': '0.08'
       name: CJM/PodLoom
-      version: 5.001
+      version: '5.001'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: CJM/MakeMaker
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: CJM/RunExtraTests
-      version: 0.011
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: CJM/MetaConfig
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MatchManifest
       name: CJM/MatchManifest
-      version: 4.02
+      version: '6.000'
     -
       class: Dist::Zilla::Plugin::RecommendedPrereqs
       name: CJM/RecommendedPrereqs
-      version: 4.21
+      version: '4.21'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CJM/CheckPrereqsIndexed
-      version: 0.009
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::GitVersionCheckCJM
       name: CJM/GitVersionCheckCJM
-      version: 4.27
+      version: '4.27'
     -
       class: Dist::Zilla::Plugin::TemplateCJM
       name: CJM/TemplateCJM
-      version: 4.24
+      version: '5.002'
     -
       class: Dist::Zilla::Plugin::Repository
       name: CJM/Repository
-      version: 0.19
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -160,39 +160,45 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.13.5
+          repo_root: .
       name: CJM/@Git/Check
-      version: 2.034
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'Updated Changes for %{MMMM d, yyyy}d%{ trial}t release of %v'
-          time_zone: local
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.13.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
       name: CJM/@Git/Commit
-      version: 2.034
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
+          changelog: Changes
           signed: 0
-          tag: 4.37
+          tag: '6.000'
           tag_format: '%v%t'
           tag_message: 'Tagged %N %v%{ (trial release)}t'
-          time_zone: local
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.13.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
       name: CJM/@Git/Tag
-      version: 2.034
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -201,21 +207,22 @@ x_Dist_Zilla:
             - 'github master'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.13.5
+          repo_root: .
       name: CJM/@Git/Push
-      version: 2.034
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: CJM/TestRelease
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: CJM/UploadToCPAN
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ArchiveRelease
       name: CJM/ArchiveRelease
-      version: 4.26
+      version: '6.000'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -223,53 +230,54 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Metadata
       name: Metadata
-      version: 3.03
+      version: '6.000'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: 5.041
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: 5.041
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: 0
-    version: 5.041
+      is_trial: '0'
+    version: '6.010'
+x_serialization_backend: 'YAML::Tiny version 1.70'

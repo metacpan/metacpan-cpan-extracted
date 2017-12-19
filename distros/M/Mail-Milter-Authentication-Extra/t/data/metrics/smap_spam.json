@@ -1,0 +1,20 @@
+{
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"setup\",handler=\"userdb\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eoh\",handler=\"userdb\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"close\",handler=\"userdb\"}" : "4",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"rcptto\",handler=\"spamassassin\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"envfrom\",handler=\"spamassassin\"}" : "2",
+   "authmilter_spamassassin_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\",result=\"pass\"}" : "1",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\",result=\"fail\"}" : "1",
+   "authmilter_userdb_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_spamassassin_total{ident=\"test_authentication_milter_test\",header_removed=\"yes\",result=\"fail\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eom\",handler=\"spamassassin\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"close\",handler=\"spamassassin\"}" : "4",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"body\",handler=\"spamassassin\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"header\",handler=\"spamassassin\"}" : "30",
+   "authmilter_callback_error_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eoh\",handler=\"spamassassin\"}" : "2",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"rcptto\",handler=\"userdb\"}" : "2"
+}

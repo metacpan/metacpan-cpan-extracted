@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -47,6 +47,232 @@ our $VERSION = '0.004';
 #pod to the Yancy web application under C</yancy>, and the REST API under
 #pod C</yancy/api>.
 #pod
+#pod =item filters
+#pod
+#pod A hash of C<< name => subref >> pairs of filters to make available.
+#pod See L</yancy.filter.add> for how to create a filter subroutine.
+#pod
+#pod =back
+#pod
+#pod =head1 HELPERS
+#pod
+#pod This plugin adds some helpers for use in routes, templates, and plugins.
+#pod
+#pod =head2 yancy.config
+#pod
+#pod     my $config = $c->yancy->config;
+#pod
+#pod The current configuration for Yancy. Through this, you can edit the
+#pod C<collections> configuration as needed.
+#pod
+#pod =head2 yancy.backend
+#pod
+#pod     my $be = $c->yancy->backend;
+#pod
+#pod Get the currently-configured Yancy backend object.
+#pod
+#pod =head2 yancy.route
+#pod
+#pod Get the root route where the Yancy CMS will appear. Useful for adding
+#pod authentication or authorization checks:
+#pod
+#pod     my $route = $c->yancy->route;
+#pod     my @need_auth = @{ $route->children };
+#pod     my $auth_route = $route->under( sub {
+#pod         # ... Check auth
+#pod         return 1;
+#pod     } );
+#pod     $auth_route->add_child( $_ ) for @need_auth;
+#pod
+#pod =head2 yancy.list
+#pod
+#pod     my @items = $c->yancy->list( $collection, \%param, \%opt );
+#pod
+#pod Get a list of items from the backend. C<$collection> is a collection
+#pod name. C<\%param> is a L<SQL::Abstract where clause
+#pod structure|SQL::Abstract/WHERE CLAUSES>. Some basic examples:
+#pod
+#pod     # All people named exactly 'Turanga Leela'
+#pod     $c->yancy->list( people => { name => 'Turanga Leela' } );
+#pod
+#pod     # All people with "Wong" in their name
+#pod     $c->yancy->list( people => { name => { like => '%Wong%' } } );
+#pod
+#pod C<\%opt> is a hash of options with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item * limit - The number of rows to return
+#pod
+#pod =item * offset - The number of rows to skip before returning rows
+#pod
+#pod =back
+#pod
+#pod See your backend documentation for more information about the C<list>
+#pod method arguments. This helper only returns the list of items, not the
+#pod total count of items or any other value.
+#pod
+#pod =head2 yancy.get
+#pod
+#pod     my $item = $c->yancy->get( $collection, $id );
+#pod
+#pod Get an item from the backend. C<$collection> is the collection name.
+#pod C<$id> is the ID of the item to get.
+#pod
+#pod =head2 yancy.set
+#pod
+#pod     $c->yancy->set( $collection, $id, $item_data );
+#pod
+#pod Update an item in the backend. C<$collection> is the collection name.
+#pod C<$id> is the ID of the item to update. C<$item_data> is a hash of data
+#pod to update.
+#pod
+#pod This helper will validate the data against the configuration and run any
+#pod filters as needed. If validation fails, this helper will throw an
+#pod exception with an array reference of L<JSON::Validator::Error> objects.
+#pod See L<the validate helper|/yancy.validate> and L<the filter apply
+#pod helper|/yancy.filter.apply>. To bypass filters and validation, use the
+#pod backend object directly via L<the backend helper|/yancy.backend>.
+#pod
+#pod     # A route to update a comment
+#pod     put '/comment/:id' => sub {
+#pod         eval { $c->yancy->set( "comment", $c->stash( 'id' ), $c->req->json ) };
+#pod         if ( $@ ) {
+#pod             return $c->render( status => 400, errors => $@ );
+#pod         }
+#pod         return $c->render( status => 200, text => 'Success!' );
+#pod     };
+#pod
+#pod =head2 yancy.create
+#pod
+#pod     my $item = $c->yancy->create( $collection, $item_data );
+#pod
+#pod Create a new item. C<$collection> is the collection name. C<$item_data>
+#pod is a hash of data for the new item.
+#pod
+#pod This helper will validate the data against the configuration and run any
+#pod filters as needed. If validation fails, this helper will throw an
+#pod exception with an array reference of L<JSON::Validator::Error> objects.
+#pod See L<the validate helper|/yancy.validate> and L<the filter apply
+#pod helper|/yancy.filter.apply>. To bypass filters and validation, use the
+#pod backend object directly via L<the backend helper|/yancy.backend>.
+#pod
+#pod     # A route to create a comment
+#pod     post '/comment' => sub {
+#pod         eval { $c->yancy->create( "comment", $c->req->json ) };
+#pod         if ( $@ ) {
+#pod             return $c->render( status => 400, errors => $@ );
+#pod         }
+#pod         return $c->render( status => 200, text => 'Success!' );
+#pod     };
+#pod
+#pod =head2 yancy.delete
+#pod
+#pod     $c->yancy->delete( $collection, $id );
+#pod
+#pod Delete an item from the backend. C<$collection> is the collection name.
+#pod C<$id> is the ID of the item to delete.
+#pod
+#pod =head2 yancy.validate
+#pod
+#pod     my @errors = $c->yancy->validate( $collection, $item );
+#pod
+#pod Validate the given C<$item> data against the configuration for the C<$collection>.
+#pod If there are any errors, they are returned as an array of L<JSON::Validator::Error>
+#pod objects. See L<JSON::Validator/validate> for more details.
+#pod
+#pod =head2 yancy.filter.add
+#pod
+#pod     my $filter_sub = sub( $field_name, $field_value, $field_conf ) { ... }
+#pod     $c->yancy->filter->add( $name => $filter_sub );
+#pod
+#pod Create a new filter. C<$name> is the name of the filter to give in the
+#pod field's configuration. C<$subref> is a subroutine reference that accepts
+#pod three arguments:
+#pod
+#pod =over
+#pod
+#pod =item * $field_name - The name of the field being filtered
+#pod
+#pod =item * $field_value - The value to filter
+#pod
+#pod =item * $field_conf - The full configuration for the field
+#pod
+#pod =back
+#pod
+#pod For example, here is a filter that will run a password through a one-way hash
+#pod digest:
+#pod
+#pod     use Digest;
+#pod     my $digest = sub( $field_name, $field_value, $field_conf ) {
+#pod         my $type = $field_conf->{ 'x-digest' }{ type };
+#pod         Digest->new( $type )->add( $field_value )->b64digest;
+#pod     };
+#pod     $c->yancy->filter->add( 'digest' => $digest );
+#pod
+#pod And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         collections => {
+#pod             users => {
+#pod                 properties => {
+#pod                     username => { type => 'string' },
+#pod                     password => {
+#pod                         type => 'string',
+#pod                         format => 'password',
+#pod                         'x-filter' => [ 'digest' ], # The name of the filter
+#pod                         'x-digest' => {             # Filter configuration
+#pod                             type => 'SHA-1',
+#pod                         },
+#pod                     },
+#pod                 },
+#pod             },
+#pod         },
+#pod     }
+#pod
+#pod See L<Yancy/CONFIGURATION> for more information on how to add filters to
+#pod fields.
+#pod
+#pod =head2 yancy.filter.apply
+#pod
+#pod     my $filtered_data = $c->yancy->filter->apply( $collection, $item_data );
+#pod
+#pod Run the configured filters on the given C<$item_data>. C<$collection> is
+#pod a collection name. Returns the hash of C<$filtered_data>.
+#pod
+#pod =head1 TEMPLATES
+#pod
+#pod This plugin uses the following templates. To override these templates
+#pod with your own theme, provide a template with the same name. Remember to
+#pod add your template paths to the beginning of the list of paths to be sure
+#pod your templates are found first:
+#pod
+#pod     # Mojolicious::Lite
+#pod     unshift @{ app->renderer->paths }, 'template/directory';
+#pod     unshift @{ app->renderer->classes }, __PACKAGE__;
+#pod
+#pod     # Mojolicious
+#pod     sub startup {
+#pod         my ( $app ) = @_;
+#pod         unshift @{ $app->renderer->paths }, 'template/directory';
+#pod         unshift @{ $app->renderer->classes }, __PACKAGE__;
+#pod     }
+#pod
+#pod =over
+#pod
+#pod =item layouts/yancy.html.ep
+#pod
+#pod This layout template surrounds all other Yancy templates.  Like all
+#pod Mojolicious layout templates, a replacement should use the C<content>
+#pod helper to display the page content. Additionally, a replacement should
+#pod use C<< content_for 'head' >> to add content to the C<head> element.
+#pod
+#pod =item yancy/index.html.ep
+#pod
+#pod This is the main Yancy web application. You should not override this. If
+#pod you need to, consider filing a bug report or feature request.
+#pod
 #pod =back
 #pod
 #pod =head1 SEE ALSO
@@ -70,6 +296,7 @@ use Sys::Hostname qw( hostname );
 
 sub register( $self, $app, $config ) {
     my $route = $config->{route} // $app->routes->any( '/yancy' );
+    $config->{controller_class} //= 'Yancy';
 
     # Resources and templates
     my $share = path( dist_dir( 'Yancy' ) );
@@ -78,6 +305,8 @@ sub register( $self, $app, $config ) {
     push @{$app->routes->namespaces}, 'Yancy::Controller';
 
     # Helpers
+    $app->helper( 'yancy.config' => sub { return $config } );
+    $app->helper( 'yancy.route' => sub { return $route } );
     $app->helper( 'yancy.backend' => sub {
         state $backend;
         if ( !$backend ) {
@@ -92,15 +321,61 @@ sub register( $self, $app, $config ) {
         my ( $c, @args ) = @_;
         return @{ $c->yancy->backend->list( @args )->{rows} };
     } );
-    for my $be_method ( qw( get set delete create ) ) {
+    for my $be_method ( qw( get delete ) ) {
         $app->helper( 'yancy.' . $be_method => sub {
             my ( $c, @args ) = @_;
             return $c->yancy->backend->$be_method( @args );
         } );
     }
+    my %validator;
+    $app->helper( 'yancy.validate' => sub( $c, $coll, $item ) {
+        my $v = $validator{ $coll } ||= JSON::Validator->new->schema(
+            $config->{collections}{ $coll }
+        );
+        my @errors = $v->validate( $item );
+        return @errors;
+    } );
+    $app->helper( 'yancy.set' => sub( $c, $coll, $id, $item ) {
+        if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
+            die \@errors;
+        }
+        $item = $c->yancy->filter->apply( $coll, $item );
+        return $c->yancy->backend->set( $coll, $id, $item );
+    } );
+    $app->helper( 'yancy.create' => sub( $c, $coll, $item ) {
+        if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
+            die \@errors;
+        }
+        $item = $c->yancy->filter->apply( $coll, $item );
+        return $c->yancy->backend->create( $coll, $item );
+    } );
+
+    $config->{filters} ||= {};
+    $app->helper( 'yancy.filter.add' => sub( $c, $name, $sub ) {
+        $config->{filters}{ $name } = $sub;
+    } );
+    $app->helper( 'yancy.filter.apply' => sub( $c, $coll_name, $item ) {
+        my $coll = $config->{collections}{$coll_name};
+        for my $key ( keys $coll->{properties}->%* ) {
+            next unless $coll->{properties}{ $key }{ 'x-filter' };
+            for my $filter ( $coll->{properties}{ $key }{ 'x-filter' }->@* ) {
+                die "Unknown filter: $filter (collection: $coll_name, field: $key)"
+                    unless $config->{filters}{ $filter };
+                $item->{ $key } = $config->{filters}{ $filter }->(
+                    $key, $item->{ $key }, $coll->{properties}{ $key }
+                );
+            }
+        }
+        return $item;
+    } );
 
     # Routes
-    $route->get( '/' )->name( 'yancy.index' )->to( 'yancy#index' );
+    $route->get( '/' )->name( 'yancy.index' )
+        ->to(
+            template => 'yancy/index',
+            controller => $config->{controller_class},
+            action => 'index',
+        );
 
     # Add OpenAPI spec
     $app->plugin( OpenAPI => {
@@ -108,7 +383,6 @@ sub register( $self, $app, $config ) {
         spec => $self->_build_openapi_spec( $config ),
     } );
 
-    $route->get( '/api' )->name( 'yancy.api' );
 }
 
 sub _build_openapi_spec( $self, $config ) {
@@ -128,7 +402,7 @@ sub _build_openapi_spec( $self, $config ) {
         $paths{ '/' . $name } = {
             get => {
                 'x-mojo-to' => {
-                    controller => 'yancy',
+                    controller => $config->{controller_class},
                     action => 'list_items',
                     collection => $name,
                 },
@@ -144,6 +418,12 @@ sub _build_openapi_spec( $self, $config ) {
                         type => 'integer',
                         in => 'query',
                         description => 'The index (0-based) to start returning items',
+                    },
+                    {
+                        name => 'order_by',
+                        type => 'string',
+                        in => 'query',
+                        pattern => '^(?:asc|desc):[^:,]+$',
                     },
                 ],
                 responses => {
@@ -173,7 +453,7 @@ sub _build_openapi_spec( $self, $config ) {
             },
             post => {
                 'x-mojo-to' => {
-                    controller => 'yancy',
+                    controller => $config->{controller_class},
                     action => 'add_item',
                     collection => $name,
                 },
@@ -215,7 +495,7 @@ sub _build_openapi_spec( $self, $config ) {
 
             get => {
                 'x-mojo-to' => {
-                    controller => 'yancy',
+                    controller => $config->{controller_class},
                     action => 'get_item',
                     collection => $name,
                     id_field => $id_field,
@@ -239,7 +519,7 @@ sub _build_openapi_spec( $self, $config ) {
 
             put => {
                 'x-mojo-to' => {
-                    controller => 'yancy',
+                    controller => $config->{controller_class},
                     action => 'set_item',
                     collection => $name,
                     id_field => $id_field,
@@ -271,7 +551,7 @@ sub _build_openapi_spec( $self, $config ) {
 
             delete => {
                 'x-mojo-to' => {
-                    controller => 'yancy',
+                    controller => $config->{controller_class},
                     action => 'delete_item',
                     collection => $name,
                     id_field => $id_field,
@@ -343,7 +623,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -395,6 +675,232 @@ A base route to add Yancy to. This allows you to customize the URL
 and add authentication or authorization. Defaults to allowing access
 to the Yancy web application under C</yancy>, and the REST API under
 C</yancy/api>.
+
+=item filters
+
+A hash of C<< name => subref >> pairs of filters to make available.
+See L</yancy.filter.add> for how to create a filter subroutine.
+
+=back
+
+=head1 HELPERS
+
+This plugin adds some helpers for use in routes, templates, and plugins.
+
+=head2 yancy.config
+
+    my $config = $c->yancy->config;
+
+The current configuration for Yancy. Through this, you can edit the
+C<collections> configuration as needed.
+
+=head2 yancy.backend
+
+    my $be = $c->yancy->backend;
+
+Get the currently-configured Yancy backend object.
+
+=head2 yancy.route
+
+Get the root route where the Yancy CMS will appear. Useful for adding
+authentication or authorization checks:
+
+    my $route = $c->yancy->route;
+    my @need_auth = @{ $route->children };
+    my $auth_route = $route->under( sub {
+        # ... Check auth
+        return 1;
+    } );
+    $auth_route->add_child( $_ ) for @need_auth;
+
+=head2 yancy.list
+
+    my @items = $c->yancy->list( $collection, \%param, \%opt );
+
+Get a list of items from the backend. C<$collection> is a collection
+name. C<\%param> is a L<SQL::Abstract where clause
+structure|SQL::Abstract/WHERE CLAUSES>. Some basic examples:
+
+    # All people named exactly 'Turanga Leela'
+    $c->yancy->list( people => { name => 'Turanga Leela' } );
+
+    # All people with "Wong" in their name
+    $c->yancy->list( people => { name => { like => '%Wong%' } } );
+
+C<\%opt> is a hash of options with the following keys:
+
+=over
+
+=item * limit - The number of rows to return
+
+=item * offset - The number of rows to skip before returning rows
+
+=back
+
+See your backend documentation for more information about the C<list>
+method arguments. This helper only returns the list of items, not the
+total count of items or any other value.
+
+=head2 yancy.get
+
+    my $item = $c->yancy->get( $collection, $id );
+
+Get an item from the backend. C<$collection> is the collection name.
+C<$id> is the ID of the item to get.
+
+=head2 yancy.set
+
+    $c->yancy->set( $collection, $id, $item_data );
+
+Update an item in the backend. C<$collection> is the collection name.
+C<$id> is the ID of the item to update. C<$item_data> is a hash of data
+to update.
+
+This helper will validate the data against the configuration and run any
+filters as needed. If validation fails, this helper will throw an
+exception with an array reference of L<JSON::Validator::Error> objects.
+See L<the validate helper|/yancy.validate> and L<the filter apply
+helper|/yancy.filter.apply>. To bypass filters and validation, use the
+backend object directly via L<the backend helper|/yancy.backend>.
+
+    # A route to update a comment
+    put '/comment/:id' => sub {
+        eval { $c->yancy->set( "comment", $c->stash( 'id' ), $c->req->json ) };
+        if ( $@ ) {
+            return $c->render( status => 400, errors => $@ );
+        }
+        return $c->render( status => 200, text => 'Success!' );
+    };
+
+=head2 yancy.create
+
+    my $item = $c->yancy->create( $collection, $item_data );
+
+Create a new item. C<$collection> is the collection name. C<$item_data>
+is a hash of data for the new item.
+
+This helper will validate the data against the configuration and run any
+filters as needed. If validation fails, this helper will throw an
+exception with an array reference of L<JSON::Validator::Error> objects.
+See L<the validate helper|/yancy.validate> and L<the filter apply
+helper|/yancy.filter.apply>. To bypass filters and validation, use the
+backend object directly via L<the backend helper|/yancy.backend>.
+
+    # A route to create a comment
+    post '/comment' => sub {
+        eval { $c->yancy->create( "comment", $c->req->json ) };
+        if ( $@ ) {
+            return $c->render( status => 400, errors => $@ );
+        }
+        return $c->render( status => 200, text => 'Success!' );
+    };
+
+=head2 yancy.delete
+
+    $c->yancy->delete( $collection, $id );
+
+Delete an item from the backend. C<$collection> is the collection name.
+C<$id> is the ID of the item to delete.
+
+=head2 yancy.validate
+
+    my @errors = $c->yancy->validate( $collection, $item );
+
+Validate the given C<$item> data against the configuration for the C<$collection>.
+If there are any errors, they are returned as an array of L<JSON::Validator::Error>
+objects. See L<JSON::Validator/validate> for more details.
+
+=head2 yancy.filter.add
+
+    my $filter_sub = sub( $field_name, $field_value, $field_conf ) { ... }
+    $c->yancy->filter->add( $name => $filter_sub );
+
+Create a new filter. C<$name> is the name of the filter to give in the
+field's configuration. C<$subref> is a subroutine reference that accepts
+three arguments:
+
+=over
+
+=item * $field_name - The name of the field being filtered
+
+=item * $field_value - The value to filter
+
+=item * $field_conf - The full configuration for the field
+
+=back
+
+For example, here is a filter that will run a password through a one-way hash
+digest:
+
+    use Digest;
+    my $digest = sub( $field_name, $field_value, $field_conf ) {
+        my $type = $field_conf->{ 'x-digest' }{ type };
+        Digest->new( $type )->add( $field_value )->b64digest;
+    };
+    $c->yancy->filter->add( 'digest' => $digest );
+
+And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
+
+    # mysite.conf
+    {
+        collections => {
+            users => {
+                properties => {
+                    username => { type => 'string' },
+                    password => {
+                        type => 'string',
+                        format => 'password',
+                        'x-filter' => [ 'digest' ], # The name of the filter
+                        'x-digest' => {             # Filter configuration
+                            type => 'SHA-1',
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+See L<Yancy/CONFIGURATION> for more information on how to add filters to
+fields.
+
+=head2 yancy.filter.apply
+
+    my $filtered_data = $c->yancy->filter->apply( $collection, $item_data );
+
+Run the configured filters on the given C<$item_data>. C<$collection> is
+a collection name. Returns the hash of C<$filtered_data>.
+
+=head1 TEMPLATES
+
+This plugin uses the following templates. To override these templates
+with your own theme, provide a template with the same name. Remember to
+add your template paths to the beginning of the list of paths to be sure
+your templates are found first:
+
+    # Mojolicious::Lite
+    unshift @{ app->renderer->paths }, 'template/directory';
+    unshift @{ app->renderer->classes }, __PACKAGE__;
+
+    # Mojolicious
+    sub startup {
+        my ( $app ) = @_;
+        unshift @{ $app->renderer->paths }, 'template/directory';
+        unshift @{ $app->renderer->classes }, __PACKAGE__;
+    }
+
+=over
+
+=item layouts/yancy.html.ep
+
+This layout template surrounds all other Yancy templates.  Like all
+Mojolicious layout templates, a replacement should use the C<content>
+helper to display the page content. Additionally, a replacement should
+use C<< content_for 'head' >> to add content to the C<head> element.
+
+=item yancy/index.html.ep
+
+This is the main Yancy web application. You should not override this. If
+you need to, consider filing a bug report or feature request.
 
 =back
 

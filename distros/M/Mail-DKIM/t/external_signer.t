@@ -14,23 +14,23 @@ use Mail::DKIM::Signer;
 # format that is returned.
 
 package MyCustomSigner;
-sub sign_digest
-{
-	my $self = shift;
-	my ($digest_type, $digest_binary) = @_;
-	return "\0\0\0\0\0\0";
+
+sub sign_digest {
+    my $self = shift;
+    my ( $digest_type, $digest_binary ) = @_;
+    return "\0\0\0\0\0\0";
 }
 
 package main;
-my $custom_signer = bless { }, "MyCustomSigner";
+my $custom_signer = bless {}, "MyCustomSigner";
 my $dkim = Mail::DKIM::Signer->new(
-		Algorithm => "rsa-sha1",
-		Method => "relaxed",
-		Domain => "example.org",
-		Selector => "test",
-		Key => $custom_signer,
-		);
-ok($dkim, "new() works");
+    Algorithm => "rsa-sha1",
+    Method    => "relaxed",
+    Domain    => "example.org",
+    Selector  => "test",
+    Key       => $custom_signer,
+);
+ok( $dkim, "new() works" );
 
 my $sample_email = <<END_OF_SAMPLE;
 From: jason <jason\@example.org>
@@ -45,9 +45,8 @@ $dkim->PRINT($sample_email);
 $dkim->CLOSE;
 
 my $signature = $dkim->signature;
-ok($signature, "signature() works");
+ok( $signature, "signature() works" );
 
 print "# signature=" . $signature->as_string . "\n";
-ok($signature->as_string =~ /b=AAAAAAAA/,
-	"got expected signature value");
+ok( $signature->as_string =~ /b=AAAAAAAA/, "got expected signature value" );
 

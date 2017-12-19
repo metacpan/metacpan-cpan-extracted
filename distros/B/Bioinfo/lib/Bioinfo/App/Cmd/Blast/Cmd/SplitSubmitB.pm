@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use Bioinfo::PBS::Queue;
 
-our $VERSION = '0.1.11'; # VERSION: 
+our $VERSION = '0.1.13'; # VERSION: 
 # ABSTRACT: submit blast after splitting a fasta file into multiple files;
 
 
@@ -195,7 +195,7 @@ Bioinfo::App::Cmd::Blast::Cmd::SplitSubmitB - submit blast after splitting a fas
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.13
 
 =head1 SYNOPSIS
 

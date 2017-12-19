@@ -1,0 +1,23 @@
+#!# perl: agent/argv/scripts
+
+use strict;
+use warnings;
+
+use Cwd;
+use Digest::MD5;
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my ( $file, %o, $data ) = shift;
+    die "file undef\n" unless $file;
+    die "file nofind: $file\n" unless -f $file;
+
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, qw( scriptstype=s ) );
+
+    $o{type} = delete $o{scriptstype};
+    $o{argv} = join ' ', map{ "'$_'" }@_;
+    $o{md5} = Digest::MD5->new()->add( $o{cont} = `cat $file` )->hexdigest();
+    return [ \%o ];
+};

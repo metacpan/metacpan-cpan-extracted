@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -82,7 +82,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 DESCRIPTION
 

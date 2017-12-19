@@ -1,5 +1,14 @@
 Revision history for Perl extension HTTP::BrowserDetect.
 
+3.16      2017-12-14 17:38:34Z
+    - Fixes detection for bots added in 3.15
+    - Adds all_robot_ids() method
+
+3.15      2017-12-13 03:25:42Z
+    - Adds browserdetect.org to documentation
+    - Adds more bots to robot detection
+    - Adds robot_id(), which is currently in beta
+
 3.14 2016-05-25 11:44:10 America/Toronto
     - Slightly refactor the detection of several browsers that
       identify as Mozilla initially (andrewmoise)

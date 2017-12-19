@@ -11,6 +11,9 @@ sub BUILD {
   my $challenge;
   my $res;
 
+  #Do not perform connection automatically
+  return if $self->noauth;
+
   #Get API version if we're called first
   $self->api_version;
   
@@ -18,7 +21,7 @@ sub BUILD {
     #Request token 
     $res = $self->req_auth ( {   app_id => $self->app_id, 
                                app_name => $self->app_name, 
-                            app_version => $self->app_version, 
+                            app_version => $self->app_version,
                             device_name => $self->device_name } );
      $self->track_id( $res->{track_id} );
      $self->app_token( $res->{app_token} ); 

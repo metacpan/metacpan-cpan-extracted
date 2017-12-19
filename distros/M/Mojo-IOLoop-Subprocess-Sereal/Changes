@@ -1,3 +1,7 @@
+1.000     2017-12-17 17:05:24 EST
+  - Add Mojo::IOLoop::Subprocess::Role::Sereal and use it to provide the $_subprocess method.
+  - Update $_subprocess to not call ->run if given no callbacks (as in Mojolicious 7.59).
+
 0.005     2017-03-21 01:17:50 EDT
   - Include Sereal::Encoder and Sereal::Decoder versions in tests for debugging purposes
 

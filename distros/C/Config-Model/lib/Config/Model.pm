@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.114';
+$Config::Model::VERSION = '2.116';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -1846,7 +1846,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 
@@ -2935,7 +2935,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model>
 

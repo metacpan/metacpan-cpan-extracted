@@ -164,10 +164,10 @@ use Future;
 
    my $file = __FILE__;
    my $line = __LINE__+1;
-   my $fseq = $f1->else( sub {} );
+   my $fseq = $f1->else( sub { undef } );
    my $fseq2 = $f1->else( sub { Future->done } );
 
-   ok( !exception { $f1->fail( "failed\n" ) },
+   is( exception { $f1->fail( "failed\n" ) }, undef,
        '->fail with non-Future return from ->else does not die' );
 
    like( $fseq->failure,
@@ -177,7 +177,7 @@ use Future;
    ok( $fseq2->is_ready, '$fseq2 is ready after failure of $fseq' );
 
    my $fseq3;
-   ok( !exception { $fseq3 = $f1->else( sub {} ) },
+   is( exception { $fseq3 = $f1->else( sub { undef } ) }, undef,
       'non-Future return from ->else on immediate does not die' );
 
    like( $fseq3->failure,

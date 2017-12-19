@@ -1,0 +1,14 @@
+# BLASTN 2.6.0+
+# Query: seq1
+# Database: nt
+# Fields: query acc.ver, subject acc.ver, % identity, alignment length, mismatches, gap opens, q. start, q. end, s. start, s. end, evalue, bit score
+# 8 hits found
+seq1	U52964.2	100.000	990	0	0	1	990	1	990	0.0	1829
+seq1	FN554973.1	99.899	990	1	0	1	990	1718213	1719202	0.0	1823
+seq1	XM_011779736.1	99.899	990	1	0	1	990	1	990	0.0	1823
+seq1	AB070614.1	99.899	990	1	0	1	990	158	1147	0.0	1823
+seq1	KF686336.1	99.798	990	2	0	1	990	1	990	0.0	1818
+seq1	AB188573.1	99.798	990	2	0	1	990	139	1128	0.0	1818
+seq1	AB070617.1	99.798	990	2	0	1	990	1	990	0.0	1818
+seq1	XM_817851.1	99.697	990	3	0	1	990	1	990	0.0	1812
+# BLAST processed 1 queries

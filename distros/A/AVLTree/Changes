@@ -1,0 +1,4 @@
+Revision history for Perl module AVLTree
+
+0.01 2017-12-18
+   * First release to CPAN, partial port of jsw_avltree AVL tree C library, traversal methods not implemented.

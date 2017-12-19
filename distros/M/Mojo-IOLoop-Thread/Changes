@@ -1,0 +1,29 @@
+Revision history for Perl extension Mojo-IOLoop-Thread
+
+0.06 2017-12-14T08:17:30Z
+
+0.06 2017-12-14T08:16:32Z
+
+    - remove needless 'use YAML'
+
+0.05 2017-12-13T07:38:05Z
+
+    - fix wrong dependency on Mojo::Base::monkey_patch
+
+    - fix typo
+
+0.04 2017-12-12T15:06:29Z
+
+    - update doc
+
+0.03 2017-12-12T14:57:42Z
+
+    - add link to Mojo::IOLoop/subprocess
+
+0.02 2017-12-12T13:13:14Z
+
+    - update docs and dependencies
+
+0.01 2017-12-11T11:55:47Z
+
+    - original version

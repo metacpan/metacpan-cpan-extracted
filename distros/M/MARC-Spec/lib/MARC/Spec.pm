@@ -5,7 +5,7 @@ use Moo;
 use MARC::Spec::Parser;
 use namespace::clean;
 
-our $VERSION = '1.0.0';
+our $VERSION = '2.0.3';
 
 has field => (
     is => 'rw',
@@ -21,6 +21,15 @@ has subfields => (
     isa => sub {
         croak('Subfield is not an instance of MARC::Spec::Subfield.')
             if(grep {ref $_ ne 'MARC::Spec::Subfield'} @{$_[0]})
+    },
+    predicate => 1
+);
+
+has indicator => (
+    is => 'rw',
+    isa => sub {
+        croak('Indicator is not an instance of MARC::Spec::Indicator.')
+            if(ref $_[0] ne 'MARC::Spec::Indicator')
     },
     predicate => 1
 );
@@ -67,6 +76,8 @@ sub to_string {
         foreach my $sf (@{$self->subfields}) {
             $string .= $sf->to_string()
         }
+    } elsif($self->has_indicator) {
+        $string .= $self->indicator->to_string();
     }
     return $string;
 }
@@ -77,21 +88,18 @@ __END__
 
 =head1 NAME
 
-L<MARC::Spec|MARC::Spec> - A MARCspec parser and builder
+MARC::Spec - A MARCspec parser and builder
 
 =head1 SYNOPSIS
 
     use MARC::Spec;
     
     # Parsing MARCspec from a string
-    my $ms = MARC::Spec::parse('246[0-1]_16{007/0=\h}$f{245$h~\[microform\]|245$h~\microfilm}');
+    my $ms = MARC::Spec::parse('246[0-1]$f{245$h~\[microform\]|245$h~\microfilm}');
 
     # Structure
     say ref $ms;                                             # MARC::Spec
     say ref $ms->field;                                      # MARC::Spec::Field
-    say ref $ms->field->subspecs;                            # ARRAY
-    say ref $ms->field->subspecs->[0];                       # MARC::Spec::Subspec
-    say ref $ms->field->subspecs->[0]->right;                # MARC::Spec
     say ref $ms->subfields;                                  # ARRAY
     say ref $ms->subfields->[0];                             # MARC::Spec::Subfield
     say ref $ms->subfields->[0]->subspecs;                   # ARRAY
@@ -101,21 +109,11 @@ L<MARC::Spec|MARC::Spec> - A MARCspec parser and builder
     say ref $ms->subfields->[0]->subspecs->[0]->[1]->right;  # MARC::Spec::Comparisonstring
 
     # Access to attributes
-    say $ms->field->base;                                                    # 246[0-1]_16
+    say $ms->field->base;                                                    # 246[0-1]
     say $ms->field->tag;                                                     # 246
     say $ms->field->index_start;                                             # 0
     say $ms->field->index_end;                                               # 1
     say $ms->field->index_length;                                            # 2
-    say $ms->field->indicator1;                                              # 1
-    say $ms->field->indicator2;                                              # 6
-    say $ms->field->subspecs->[0]->subterms;                                 # '007/0=\h'
-    say $ms->field->subspecs->[0]->left->field->tag;                         # 007
-    say $ms->field->subspecs->[0]->left->field->char_start;                  # 0
-    say $ms->field->subspecs->[0]->left->field->charEnd;                     # 0
-    say $ms->field->subspecs->[0]->left->field->charPos;                     # 0
-    say $ms->field->subspecs->[0]->left->field->char_length;                 # 1
-    say $ms->field->subspecs->[0]->right->comparable;                        # 'h'
-    say $ms->field->subspecs->[0]->operator;                                 # '='
     say $ms->subfields->[0]->base;                                           # 'f[0-#]'
     say $ms->subfields->[0]->code;                                           # 'f'
     say $ms->subfields->[0]->index_start;                                    # 0
@@ -135,7 +133,7 @@ L<MARC::Spec|MARC::Spec> - A MARCspec parser and builder
 
 =head1 DESCRIPTION
 
-L<MARC::Spec|MARC::Spec> is a L<MARCspec - A common MARC record path language|http://marcspec.github.io/MARCspec/> parser and validator.
+MARC::Spec is a L<MARCspec - A common MARC record path language|http://marcspec.github.io/MARCspec/> parser and builder.
 
 =head1 FUNCTIONS
 
@@ -165,17 +163,23 @@ elements must be instances of L<MARC::Spec::Subfield|MARC::Spec::Subfield>.
 
 Returns true if attribute subfields has an value and false otherwise.
 
+=head2 has_indicator
+
+Returns true if attribute indicator has an value and false otherwise.
+
 =head1 ATTRIBUTES
 
 =head2 field
 
 Obligatory. Attribute field is an instance of L<MARC::Spec::Field|MARC::Spec::Field>.
-See L<MARC::Spec::Field|MARC::Spec::Field> for the description of attributes. 
 
 =head2 subfields
 
 If defined, subfields is an array of instances of L<MARC::Spec::Subfield|MARC::Spec::Subfield>.
-See L<MARC::Spec::Subfield|MARC::Spec::Subfield> for the description of attributes.
+
+=head2 indicator
+
+If defined, indicator is an instance of L<MARC::Spec::Indicator|MARC::Spec::Indicator>.
 
 =head1 AUTHOR
 
@@ -202,11 +206,22 @@ Please report any bugs to L<https://github.com/MARCspec/MARC-Spec/issues|https:/
 
 =head1 SEE ALSO
 
-L<MARC::Spec::Field|MARC::Spec::Field>,
-L<MARC::Spec::Subfield|MARC::Spec::Subfield>,
-L<MARC::Spec::Subspec|MARC::Spec::Subspec>,
-L<MARC::Spec::Structure|MARC::Spec::Structure>,
-L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>,
-L<MARC::Spec::Parser|MARC::Spec::Parser>
+=over
+
+=item * L<MARC::Spec::Field|MARC::Spec::Field>
+
+=item * L<MARC::Spec::Subfield|MARC::Spec::Subfield>
+
+=item * L<MARC::Spec::Indicator|MARC::Spec::Indicator>
+
+=item * L<MARC::Spec::Subspec|MARC::Spec::Subspec>
+
+=item * L<MARC::Spec::Structure|MARC::Spec::Structure>
+
+=item * L<MARC::Spec::Comparisonstring|MARC::Spec::Comparisonstring>
+
+=item * L<MARC::Spec::Parser|MARC::Spec::Parser>
+
+=back
 
 =cut

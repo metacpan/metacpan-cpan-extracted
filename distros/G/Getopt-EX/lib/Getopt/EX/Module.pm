@@ -266,7 +266,10 @@ sub parseline {
     ##
     my $optname = $arg[1] // '';
     if ($arg[0] eq "builtin") {
-	$optname =~ s/^(\w+).*/length($1) == 1 ? '-' : '--' . $1/e;
+	for ($optname) {
+	    s/[^\w\|].*//;
+	    s/\b(?=(\w+))/length($1) == 1 ? '-' : '--'/ge;
+	}
     }
     if ($arg[2] and $arg[2] =~ s{ (?:^|\s+) // \s+ (?<message>.*) }{}x) {
 	$obj->help($optname, $+{message});

@@ -28,6 +28,34 @@ plan 'no_plan';
 my $d = Doit->init;
 $d->add_component('git');
 
+my $git_less_directory;
+if (-d '/' && !-d '/.git') {
+    $git_less_directory = '/';
+}
+
+# Unset most GIT_* environment variables
+for my $git_key (sort keys %ENV) {
+    next if $git_key !~ m{^GIT_};
+    # These are OK
+    next if $git_key =~ m{^GIT_(
+			      AUTHOR_.*
+			  |   COMMITTER_.*
+			  |   EDITOR
+			  |   PAGER
+			  |   DIFF_.*
+			  |   EXTERNAL_DIFF
+			  |   MERGE_VERBOSITY
+			  |   SSH
+			  |   ASKPASS
+			  |   CONFIG_NOSYSTEM
+			  |   FLUSH
+			  |   TRACE.*
+			  |   .*_PATHSPECS
+			  |   REFLOG_ACTION
+			  )$}x;
+    $d->unsetenv($git_key);
+}
+
 # realpath() needed on darwin
 my $dir = realpath(tempdir('doit-git-XXXXXXXX', CLEANUP => 1, TMPDIR => 1));
 
@@ -39,8 +67,10 @@ if ($ENV{HOME} && -x "$ENV{HOME}/bin/sh/git-short-status") {
 
 # Tests with the Doit repository (if checked out)
 SKIP: {
-    my $self_git = $d->git_root;
+    my $self_git = eval { $d->git_root };
     skip "Not a git checkout", 1 if !$self_git;
+    skip "Current git checkout is not the Doit git checkout", 1 # ... but probably a git directory in an upper directory
+	if realpath("$FindBin::RealBin/..") ne realpath($self_git);
     skip "shallow repositories cannot be cloned", 1 if $d->git_is_shallow;
 
     my $workdir = "$dir/doit";
@@ -49,14 +79,37 @@ SKIP: {
 }
 
 # Error cases
-eval { $d->git_repo_update('unhandled-option' => 1) };
-like $@, qr{ERROR.*Unhandled options: unhandled-option}, 'unhandled option';
+for my $meth (qw(git_repo_update git_short_status git_root git_get_commit_hash git_get_commit_files git_get_changed_files git_is_shallow git_current_branch git_config)) {
+    eval { $d->$meth('unhandled-option' => 1) };
+    like $@, qr{ERROR.*Unhandled options: unhandled-option}, "unhandled option in method $meth";
+}
 
-eval { $d->git_short_status('unhandled-option' => 1) };
-like $@, qr{ERROR.*Unhandled options: unhandled-option}, 'unhandled option';
+eval {
+    $d->git_repo_update(
+			repository => '/repo1',
+			directory  => '/repo2',
+			refresh    => 'invalid',
+		       );
+};
+like $@, qr{ERROR.*refresh may be 'always' or 'never' at };
 
 eval { $d->git_short_status('untracked_files' => 'blubber') };
 like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
+
+eval { $d->git_get_commit_files(directory => '/non-existent-directory') };
+like $@, qr{ERROR.*Can't chdir to /non-existent-directory};
+
+SKIP: {
+    my @methods = qw(git_short_status git_root git_get_commit_hash git_get_commit_files git_get_changed_files git_is_shallow git_current_branch);
+    skip "No git-less directory available", 2*scalar(@methods)
+	if !defined $git_less_directory;
+    for my $meth (@methods) {
+	ok !eval { $d->$meth(directory => $git_less_directory); 1 }, "method $meth failed on non-git directory";
+	in_directory {
+	    ok !eval { $d->$meth; 1 }, "method $meth failed on non-git directory (using cwd)";
+	} $git_less_directory;
+    }
+}
 
 # Tests with a freshly created git repository
 {
@@ -67,10 +120,13 @@ like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
 
     # after init checks
     is_dir_eq $d->git_root, $workdir, 'git_root in root directory';
+    is_dir_eq $d->git_root(directory => getcwd), $workdir, 'git_root with directory option';
     is_deeply [$d->git_get_changed_files], [], 'no changed files in fresh empty directory';
     git_short_status_check(                         $d, '', 'empty directory, not dirty');
     git_short_status_check({untracked_files=>'no'}, $d, '', 'empty directory, not dirty');
     is $d->git_current_branch, 'master';
+
+    is $d->git_short_status, '', 'git_short_status without directory';
 
     # dirty
     $d->touch('testfile');
@@ -80,10 +136,15 @@ like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
 
     # git-add
     $d->system(qw(git add testfile));
+    is_deeply [$d->git_get_changed_files], ['testfile'], 'added, but not committed file detected';
     git_short_status_check(                         $d, '<<', 'uncommitted file detected');
     git_short_status_check({untracked_files=>'no'}, $d, '<<', 'uncommitted file detected');
 
+    is $d->git_short_status, '<<', 'git_short_status without directory';
+
     $d->touch('untracked-file');
+    ok((grep { $_ eq 'testfile'       } $d->git_get_changed_files), 'added, but not committed file detected');
+    ok((grep { $_ eq 'untracked-file' } $d->git_get_changed_files), 'untracked file detected');
     git_short_status_check(                         $d, '<<*', 'uncommitted and untracked files detected');
     git_short_status_check({untracked_files=>'no'}, $d, '<<',  'no detection of untracked files');
     $d->unlink('untracked-file');
@@ -118,28 +179,46 @@ like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
     in_directory {
 	is_dir_eq $d->git_root, $workdir, 'git_root in subdirectory';
     } 'subdir';
+    is_dir_eq $d->git_root(directory => getcwd . '/subdir'), $workdir, 'git_root with directory option set to subdirectory';
 
     Doit::Util::in_directory(sub {
 	is_dir_eq $d->git_root, $workdir, 'in_directory call without prototype';
     }, 'subdir');
 
+    eval {
+	$d->git_config(key => "test.key", val => "test.val", unset => 1);
+    };
+    like $@, qr{ERROR.*Don't specify both 'unset' and 'val'};
     is $d->git_config(key => "test.key"), undef, 'config key does not exist yet';
-    $d->git_config(key => "test.key", val => "test.val");
+    is $d->git_config(key => "test.key", val => "test.val"), 1, 'there was a change';
     is $d->git_config(key => "test.key"), "test.val", 'config key now exists';
-    $d->git_config(key => "test.key", val => "test.val2");
+    is $d->git_config(key => "test.key", val => "test.val2"), 1, 'there was a change';
     is $d->git_config(key => "test.key"), "test.val2", 'config key now changed';
-    $d->git_config(key => "test.key", val => "test.val2");
+    is $d->git_config(key => "test.key", val => "test.val2"), 0, 'test.key was not changed';
     is $d->git_config(key => "test.key"), "test.val2", 'nothing changed now';
-    $d->git_config(key => "test.key", unset => 1);
+    is $d->git_config(key => "test.key", directory => getcwd), "test.val2", 'with directory option';
+    is $d->git_config(key => "test.key", unset => 1), 1, 'there was a change';
     is $d->git_config(key => "test.key"), undef, 'config key was removed';
-    $d->git_config(key => "test.key", unset => 1);
+    is $d->git_config(key => "test.key", unset => 1), 0, ' no change, key was already unset';
     is $d->git_config(key => "test.key"), undef, 'config key is still removed';
+    eval { $d->git_config(key => 'i n v a l i d.key', val => "test.val3") };
+    like $@, qr{Command exited with exit code};
+ SKIP: {
+	skip "No git-less directory available", 1 if !defined $git_less_directory;
+	eval { $d->git_config(key => "non-exis.tent-key", val => "test.val4", directory => $git_less_directory) };
+	like $@, qr{Command exited with exit code};
+    }
+    is $d->git_config(key => "test.with.newlines", val => "line1\nline2\line3\n"), 1, 'newline key was added';
+    is $d->git_config(key => "test.with.newlines"),       "line1\nline2\line3\n", 'we can deal with newlines';
+    is $d->git_config(key => "test.with.newlines", val => "line1\nline2\line3\another line\n"), 1, 'newline key was changed';
+    is $d->git_config(key => "test.with.newlines"),       "line1\nline2\line3\another line\n", 'last change was successful';
 
     is $d->git_repo_update(
 			   repository => "$workdir/.git",
 			   repository_aliases => [$workdir],
 			   directory => $workdir2,
 			  ), 0, "handling repository_aliases";
+    ok !$d->git_is_shallow(directory => $workdir2), 'cloned directory is not shallow';
 
     is $d->git_repo_update(
 			   repository => $workdir,
@@ -163,6 +242,14 @@ like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
 			   );
     };
     like $@, qr{ERROR:.*remote origin does not point to.*or any of the following aliases: more-unmatching-aliases};
+
+    eval {
+	$d->git_get_commit_files(
+				 directory => $workdir2,
+				 commit => 'this-commit-does-not-exist',
+				);
+    };
+    like $@, qr{ERROR.*Error while running git show this-commit-does-not-exist};
 
     $d->mkdir("$dir/empty_exists");
     $d->git_repo_update(repository => "$workdir/.git", directory => "$dir/empty_exists");
@@ -208,6 +295,7 @@ like $@, qr{ERROR.*only values 'normal' or 'no' supported for untracked_files};
 	    }
 	    is scalar(@history), 1, '--depth=1 was effective'
 		or diag explain(\@history);
+	    ok $d->git_is_shallow, 'git_is_shallow is true';
 	} $workdir4;
     }
 

@@ -1,0 +1,22 @@
+#                                                                                --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name                         accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#                 ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+Salamandra_salamandra_Miguel@3508991  -          aligned-nuc          -             1e-116  380.3   0.8  1.1e-116  380.2   0.8   1.0   1   0   0   1   1   1   1 -
+Salamandra_salamandra_Galtier@2928138 -          aligned-nuc          -             1e-116  380.3   0.8  1.3e-116  380.0   0.8   1.0   1   0   0   1   1   1   1 -
+Salamandra_atra@2661876               -          aligned-nuc          -           2.2e-116  379.2   0.7  2.4e-116  379.1   0.7   1.0   1   0   0   1   1   1   1 -
+Lyciasalamandra_atifi@2537255         -          aligned-nuc          -           2.6e-116  379.0   0.7  2.9e-116  378.8   0.7   1.0   1   0   0   1   1   1   1 -
+Lyciasalamandra_billae@2556928        -          aligned-nuc          -           2.6e-116  379.0   0.7  2.9e-116  378.8   0.7   1.0   1   0   0   1   1   1   1 -
+Salamandra_lanzai@2861447             -          aligned-nuc          -             3e-116  378.8   0.7  3.3e-116  378.6   0.7   1.0   1   0   0   1   1   1   1 -
+Salamandra_algira@2332629             -          aligned-nuc          -           3.3e-116  378.7   0.8  3.6e-116  378.5   0.8   1.0   1   0   0   1   1   1   1 -
+Salamandra_infraimmaculata@3570305    -          aligned-nuc          -           1.7e-115  376.3   0.8  1.9e-115  376.2   0.8   1.0   1   0   0   1   1   1   1 -
+Salamandra_corsica@2906900            -          aligned-nuc          -             2e-115  376.1   0.7  2.2e-115  375.9   0.7   1.0   1   0   0   1   1   1   1 -
+#
+# Program:         hmmsearch
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      aligned-nuc.hmm
+# Target file:     aligned-nuc_target.fasta
+# Option settings: hmmsearch -o aligned-nuc_notextw.out --tblout aligned-nuc_table.out --domtblout aligned-nuc_domtable.out --notextw aligned-nuc.hmm aligned-nuc_target.fasta 
+# Current dir:     /home/adf/git_rep/phylogeno/bio-must-drivers/test
+# Date:            Tue Aug  9 13:03:58 2016
+# [ok]

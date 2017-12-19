@@ -11,7 +11,7 @@ use WWW::Mechanize::Link;
 use IO::Socket::INET;
 
 use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION= '0.17';
+$VERSION= '0.18';
 @CARP_NOT=qw(Selenium::Remote::Driver);
 
 =head1 NAME
@@ -1129,7 +1129,7 @@ sub make_link {
             carp "Unknown link-spec tag '$tag'";
             $url= '';
         } else {
-            $url = $node->{ $link_spec{ $tag }->{url} };
+            $url = $node->get_attribute( $link_spec{ $tag }->{url} );
         };
     };
 
@@ -1147,10 +1147,10 @@ sub make_link {
     if (defined $url) {
         my $res = WWW::Mechanize::Link->new({
             tag   => $tag,
-            name  => $node->{name},
+            name  => $node->get_attribute('name'),
             base  => $base,
             url   => $url,
-            text  => $node->{innerHTML},
+            text  => $node->get_text(),
             attrs => {},
         });
 

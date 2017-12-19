@@ -29,6 +29,9 @@ A call to this method yields one of the following:
 
 =item * If a frame can be read, it will be returned.
 
+=item * If we hit an empty read (i.e., indicative of end-of-file),
+empty string is returned.
+
 =item * If only a partial frame is ready, undef is returned.
 
 =back
@@ -38,9 +41,21 @@ A call to this method yields one of the following:
 L<IO::Framed> was born out of work on this module; see that module’s
 documentation for the particulars of working with it. In particular,
 note the exceptions L<IO::Framed::X::EmptyRead> and
-L<IO::Framed::X::ReadError>. (As described in L<Net::WebSocket>’s
-documentation, you can use an equivalent interface for frame chunking if you
-wish.)
+L<IO::Framed::X::ReadError>.
+
+Again, you can use an equivalent interface for frame chunking if you wish.
+
+=head1 CONCERNING EMPTY READS
+
+An empty read is how we detect that a file handle (or socket, etc.) has no
+more data to read. Generally we shouldn’t get this in WebSocket since it
+means that a peer endpoint has gone away without sending a close frame.
+It is thus recommended that applications regard an empty read on a WebSocket
+stream as an error condition; e.g., if you’re using L<IO::Framed::Read>,
+you should NOT enable the C<allow_empty_read()> behavior.
+
+Nevertheless, this module (and L<Net::WebSocket::Endpoint>) do work when
+that flag is enabled.
 
 =head1 CUSTOM FRAMES SUPPORT
 
@@ -108,7 +123,10 @@ sub get_next_frame {
     #that considers q<> falsey but '0' truthy. :-/
     #That aside, if indeed all we read is '0', then we know that’s not
     #enough, and we can return.
-    my $first2 = $self->_read_with_buffer(2) or return undef;
+    my $first2 = $self->_read_with_buffer(2);
+    if (!$first2) {
+        return defined($first2) ? q<> : undef;
+    }
 
     #Now that we’ve read our header bytes, we’ll read some more.
     #There may not actually be anything to read, though, in which case
@@ -133,9 +151,10 @@ sub get_next_frame {
     my ($longs, $long);
 
     if ($len_len) {
-        $len_buf = $self->_read_with_buffer($len_len) or do {
+        $len_buf = $self->_read_with_buffer($len_len);
+        if (!$len_buf) {
             substr( $self->{'_partial_frame'}, 0, 0, $first2 );
-            return undef;
+            return defined($len_buf) ? q<> : undef;
         };
 
         if ($len_len == 2) {
@@ -151,9 +170,10 @@ sub get_next_frame {
 
     my $mask_buf;
     if ($mask_size) {
-        $mask_buf = $self->_read_with_buffer($mask_size) or do {
+        $mask_buf = $self->_read_with_buffer($mask_size);
+        if (!$mask_buf) {
             substr( $self->{'_partial_frame'}, 0, 0, $first2 . $len_buf );
-            return undef;
+            return defined($mask_buf) ? q<> : undef;
         };
     }
     else {
@@ -168,18 +188,20 @@ sub get_next_frame {
         #MacOS, at least, also chokes on sysread( 2**31, … )
         #(Is their size_t signed??), even on 64-bit.
         for ( 1 .. 4 ) {
-            $self->_append_chunk( 2**30, \$payload ) or do {
+            my $append_ok = $self->_append_chunk( 2**30, \$payload );
+            if (!$append_ok) {
                 substr( $self->{'_partial_frame'}, 0, 0, $first2 . $len_buf . $mask_buf . $payload );
-                return undef;
+                return defined($append_ok) ? q<> : undef;
             };
         }
     }
 
     if ($long) {
-        $self->_append_chunk( $long, \$payload ) or do {
+        my $append_ok = $self->_append_chunk( $long, \$payload );
+        if (!$append_ok) {
             substr( $self->{'_partial_frame'}, 0, 0, $first2 . $len_buf . $mask_buf . $payload );
-            return undef;
-        };
+            return defined($append_ok) ? q<> : undef;
+        }
     }
 
     $self->{'_partial_frame'} = q<>;
@@ -202,7 +224,7 @@ sub get_next_frame {
         $class;
     };
 
-    return $frame_class->create_from_parse(\$first2, \$len_len, \$mask_buf, \$payload);
+    return $frame_class->create_from_parse(\$first2, \$len_buf, \$mask_buf, \$payload);
 }
 
 #This will only return exactly the number of bytes requested.
@@ -218,6 +240,9 @@ sub _read_with_buffer {
 
         if (!defined $read) {
             return undef;
+        }
+        elsif (!length $read) {
+            return q<>;
         }
 
         return substr($self->{'_partial_frame'}, 0, length($self->{'_partial_frame'}), q<>) . $read;
@@ -238,6 +263,8 @@ sub _append_chunk {
 
         $cur_buf = $self->_read_with_buffer($length - $read_so_far);
         return undef if !defined $cur_buf;
+
+        return q<> if !length $cur_buf;
 
         $$buf_sr .= $cur_buf;
 

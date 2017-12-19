@@ -17,6 +17,7 @@ use lib ($FindBin::Bin);
 use parent 'TestBase';
 use Test::Exception;
 use Test::Mockify::Method;
+use Test::Mockify;
 use Test::More;
 #------------------------------------------------------------------------
 sub testPlan{
@@ -25,6 +26,7 @@ sub testPlan{
     $self->_SignaturWithAnyMatcherAndExpectedMatcher();
     $self->_MultipleAnyMatcher();
     $self->_SingleExepctedMatcher();
+    $self->_MockifiedObjectCheck();
     $self->_AnyMatcher();
     $self->_AnyParameter();
     $self->_FunctionCall();
@@ -134,6 +136,18 @@ sub _SingleExepctedMatcher {
     is($Method->call(bless({},'Test::Package')), 'Result for one object.', 'single expected parameter type object');
     is($Method->call(sub{}), 'Result for one function pointer.', 'single expected parameter type sub');
     is($Method->call(undef), 'Result for one undef.', 'single expected parameter type undef');
+}
+#---------------------------------------------------------------------------------
+sub _MockifiedObjectCheck {
+    my $self = shift;
+    my $Method = Test::Mockify::Method->new();
+    $Method->when(Object('FakeModuleForMockifyTest'))->thenReturn('Result for mockified Object.');
+
+    my $Mockify = Test::Mockify->new('FakeModuleForMockifyTest');
+    my $MockedFakeModuleForMockifyTest = $Mockify->getMockObject();
+
+    is($Method->call($MockedFakeModuleForMockifyTest), 'Result for mockified Object.', 'Match mocked Objects');
+    return;
 }
 #---------------------------------------------------------------------------------
 sub _FunctionCall {

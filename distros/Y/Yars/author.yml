@@ -45,6 +45,8 @@ pod_spelling_system:
     - DAGOLDEN
     - XDG
     - Rebalance
+    - GETs
+    - DELETEs
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

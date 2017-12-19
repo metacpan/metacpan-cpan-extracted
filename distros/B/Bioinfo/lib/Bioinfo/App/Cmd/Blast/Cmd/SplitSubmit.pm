@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use Bioinfo::PBS::Queue;
 
-our $VERSION = '0.1.11'; # VERSION: 
+our $VERSION = '0.1.13'; # VERSION: 
 # ABSTRACT: submit blast after splitting a fasta file into multiple files;
 
 
@@ -63,6 +63,32 @@ option cpu => (
   doc => "cpu number used in one node"
 );
 
+
+option max_target_seqs => (
+  is => 'ro',
+  format => 'i',
+  short => 'm',
+  default => sub { '10000' },
+  doc => "max_target_seqs, Default:10000"
+);
+
+
+option evalue => (
+  is => 'ro',
+  format => 's',
+  short => 'e',
+  default => sub { '1e-5' },
+  doc => "evalue, Default:1e-5"
+);
+
+
+option outfmt => (
+  is => 'ro',
+  format => 'i',
+  short => 'f',
+  default => sub { 5 },
+  doc => "outfmt, Default:5"
+);
 
 option outdir => (
   is => 'ro',
@@ -141,6 +167,9 @@ sub execute {
 sub submit_pbs {
   my $self = shift;
   my ($input, $outdir, $cpu, $db) = ($self->input, $self->outdir, $self->cpu, $self->db);
+  my $max_target_seqs = $self->max_target_seqs;
+  my $evalue = $self->evalue;
+  my $outfmt = $self->outfmt;
   my @io_fas = io("$outdir")->filter( sub {
       $_->filename =~/\.fa/;
     }
@@ -153,7 +182,7 @@ sub submit_pbs {
   my $pbs = Bioinfo::PBS::Queue->new(name => $queue_name);
   for my $fa (@io_fas) {
     my $fa_name = $fa->filename;
-    my $cmd = "blastp -query $fa_name -out $fa_name.blast -db $db -outfmt 5 -evalue 1e-5 -num_threads $cpu -max_target_seqs 10";
+    my $cmd = "blastp -query $fa_name -out $fa_name.blast -db $db -outfmt $outfmt -evalue $evalue -num_threads $cpu -max_target_seqs $max_target_seqs";
     $fa_name =~s/\.fa|\.pep|\.fasta//;
     my $para = {
       cpu => $cpu,
@@ -207,7 +236,7 @@ Bioinfo::App::Cmd::Blast::Cmd::SplitSubmit - submit blast after splitting a fast
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.13
 
 =head1 SYNOPSIS
 
@@ -238,6 +267,12 @@ the database that blast will use
 =head2 blast
 
 =head2 cpu
+
+=head2 max_target_seqs
+
+=head2 evalue
+
+=head2 outfmt
 
 =head2 outdir
 

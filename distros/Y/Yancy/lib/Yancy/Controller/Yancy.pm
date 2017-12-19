@@ -1,11 +1,39 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '0.004';
+our $VERSION = '0.008';
 # ABSTRACT: A simple REST controller for Mojolicious
 
 #pod =head1 DESCRIPTION
 #pod
 #pod This module contains the routes that L<Yancy> uses to work with the
-#pod backend data.
+#pod backend data. This API is used by the web application.
+#pod
+#pod =head1 SUBCLASSING
+#pod
+#pod To change how the API provides access to the data in your database, you
+#pod can create a custom controller. To do so, you should extend this class
+#pod and override the desired methods to provide the desired functionality.
+#pod
+#pod     package MyApp::Controller::CustomYancy;
+#pod     use Mojo::Base 'Yancy::Controller::Yancy';
+#pod     sub list_items {
+#pod         my ( $c ) = @_;
+#pod         return unless $c->openapi->valid_input;
+#pod         my $items = $c->yancy->backend->list( $c->stash( 'collection' ) );
+#pod         return $c->render(
+#pod             status => 200,
+#pod             openapi => $items,
+#pod         );
+#pod     }
+#pod
+#pod     package main;
+#pod     use Mojolicious::Lite;
+#pod     push @{ app->routes->namespaces }, 'MyApp::Controller';
+#pod     plugin Yancy => {
+#pod         controller_class => 'CustomYancy',
+#pod     };
+#pod
+#pod For an example, you could extend this class to add authorization based
+#pod on your own requirements.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -20,8 +48,8 @@ use experimental qw( signatures postderef );
 #pod =method list_items
 #pod
 #pod List the items in a collection. The collection name should be in the
-#pod stash key C<collection>. C<limit> and C<offset> may be provided as query
-#pod parameters.
+#pod stash key C<collection>. C<limit>, C<offset>, and C<order_by> may be
+#pod provided as query parameters.
 #pod
 #pod =cut
 
@@ -32,6 +60,13 @@ sub list_items( $c ) {
         limit => $args->{limit},
         offset => $args->{offset},
     );
+    if ( $args->{order_by} ) {
+        $opt{order_by} = [
+            map +{ "-$_->[0]" => $_->[1] },
+            map +[ split /:/ ],
+            split /,/, $args->{order_by}
+        ];
+    }
     return $c->render(
         status => 200,
         openapi => $c->yancy->backend->list( $c->stash( 'collection' ), {}, \%opt ),
@@ -41,15 +76,17 @@ sub list_items( $c ) {
 #pod =method add_item
 #pod
 #pod Add a new item to the collection. The new item should be in the request
-#pod body as JSON.
+#pod body as JSON. The collection name should be in the stash key C<collection>.
 #pod
 #pod =cut
 
 sub add_item( $c ) {
     return unless $c->openapi->valid_input;
+    my $coll = $c->stash( 'collection' );
+    my $item = $c->yancy->filter->apply( $coll, $c->validation->param( 'newItem' ) );
     return $c->render(
         status => 201,
-        openapi => $c->yancy->backend->create( $c->stash( 'collection' ), $c->req->json ),
+        openapi => $c->yancy->backend->create( $coll, $item ),
     );
 }
 
@@ -82,10 +119,12 @@ sub set_item( $c ) {
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
-    $c->yancy->backend->set( $c->stash( 'collection' ), $id, $c->req->json );
+    my $coll = $c->stash( 'collection' );
+    my $item = $c->yancy->filter->apply( $coll, $args->{ newItem } );
+    $c->yancy->backend->set( $coll, $id, $item );
     return $c->render(
         status => 200,
-        openapi => $c->yancy->backend->get( $c->stash( 'collection' ), $id ),
+        openapi => $c->yancy->backend->get( $coll, $id ),
     );
 }
 
@@ -117,25 +156,25 @@ Yancy::Controller::Yancy - A simple REST controller for Mojolicious
 
 =head1 VERSION
 
-version 0.004
+version 0.008
 
 =head1 DESCRIPTION
 
 This module contains the routes that L<Yancy> uses to work with the
-backend data.
+backend data. This API is used by the web application.
 
 =head1 METHODS
 
 =head2 list_items
 
 List the items in a collection. The collection name should be in the
-stash key C<collection>. C<limit> and C<offset> may be provided as query
-parameters.
+stash key C<collection>. C<limit>, C<offset>, and C<order_by> may be
+provided as query parameters.
 
 =head2 add_item
 
 Add a new item to the collection. The new item should be in the request
-body as JSON.
+body as JSON. The collection name should be in the stash key C<collection>.
 
 =head2 get_item
 
@@ -153,6 +192,34 @@ item should be in the request body as JSON.
 Delete an item from a collection. The collection name should be in the
 stash key C<collection>. The ID of the item should be in the stash key
 C<id>.
+
+=head1 SUBCLASSING
+
+To change how the API provides access to the data in your database, you
+can create a custom controller. To do so, you should extend this class
+and override the desired methods to provide the desired functionality.
+
+    package MyApp::Controller::CustomYancy;
+    use Mojo::Base 'Yancy::Controller::Yancy';
+    sub list_items {
+        my ( $c ) = @_;
+        return unless $c->openapi->valid_input;
+        my $items = $c->yancy->backend->list( $c->stash( 'collection' ) );
+        return $c->render(
+            status => 200,
+            openapi => $items,
+        );
+    }
+
+    package main;
+    use Mojolicious::Lite;
+    push @{ app->routes->namespaces }, 'MyApp::Controller';
+    plugin Yancy => {
+        controller_class => 'CustomYancy',
+    };
+
+For an example, you could extend this class to add authorization based
+on your own requirements.
 
 =head1 SEE ALSO
 

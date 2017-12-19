@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 package Mail::DKIM::ARC::Seal;
-use base "Mail::DKIM::ARC::MessageSignature";
+use base 'Mail::DKIM::ARC::MessageSignature';
 
 =head1 NAME
 
@@ -21,13 +21,13 @@ Mail::DKIM::ARC::Seal - represents a ARC-Seal header
 =head2 new() - create a new signature from parameters
 
   my $signature = Mail::DKIM::ARC::Seal->new(
-                      [ Algorithm => "rsa-sha1", ]
+                      [ Algorithm => 'rsa-sha256', ]
                       [ Signature => $base64, ]
-                      [ Domain => "example.org", ]
+                      [ Domain => 'example.org', ]
                       [ Instance => 1, ]
-                      [ Chain => "none", ] # none|fail|pass
-                      [ Query => "dns", ]
-                      [ Selector => "alpha", ]
+                      [ Chain => 'none', ] # none|fail|pass
+                      [ Query => 'dns', ]
+                      [ Selector => 'alpha', ]
                       [ Timestamp => time(), ]
                       [ Expiration => time() + 86400, ]
                   );
@@ -71,35 +71,35 @@ https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06
 
 =cut
 
-sub new
-{
-	my $class = shift;
-	my %prms = @_;
-	my $self = {};
-	bless $self, $class;
+sub new {
+    my $class = shift;
+    my %prms  = @_;
+    my $self  = {};
+    bless $self, $class;
 
-	$self->instance($prms{'Instance'}) if exists $prms{'Instance'};
-	$self->algorithm($prms{'Algorithm'} || "rsa-sha1");
-	$self->signature($prms{'Signature'});
-	$self->canonicalization($prms{'Method'}) if exists $prms{'Method'};
-	$self->chain($prms{'Chain'} || 'none');
-	$self->domain($prms{'Domain'});
-	$self->selector($prms{'Selector'});
-	$self->timestamp( defined $prms{'Timestamp'} ? $prms{'Timestamp'} : time() );
-	$self->expiration($prms{'Expiration'}) if defined $prms{'Expiration'};
-	$self->key($prms{'Key'}) if defined $prms{'Key'};
+    $self->instance( $prms{'Instance'} ) if exists $prms{'Instance'};
+    $self->algorithm( $prms{'Algorithm'} || 'rsa-sha256' );
+    $self->signature( $prms{'Signature'} );
+    $self->canonicalization( $prms{'Method'} ) if exists $prms{'Method'};
+    $self->chain( $prms{'Chain'} || 'none' );
+    $self->domain( $prms{'Domain'} );
+    $self->selector( $prms{'Selector'} );
+    $self->timestamp(
+        defined $prms{'Timestamp'} ? $prms{'Timestamp'} : time() );
+    $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
+    $self->key( $prms{'Key'} )               if defined $prms{'Key'};
 
-	return $self;
+    return $self;
 }
 
 sub body_hash {
+
     # Not defined for ARC-Seal
     return;
 }
 
-sub DEFAULT_PREFIX
-{
-	return "ARC-Seal:";
+sub DEFAULT_PREFIX {
+    return 'ARC-Seal:';
 }
 
 =head2 chain() - get or set the chain parameter (cv=) field
@@ -110,15 +110,15 @@ cv=pass.
 
 =cut
 
-sub chain
-{
-	my $self = shift;
-	if (@_) {
-		my $cv = shift;
-		die "INVALID chain value $cv" unless grep { $cv eq $_ } qw(none fail pass);
-		$self->set_tag('cv', $cv);
-	}
-	return $self->get_tag('cv');
+sub chain {
+    my $self = shift;
+    if (@_) {
+        my $cv = shift;
+        die "INVALID chain value $cv"
+          unless grep { $cv eq $_ } qw(none fail pass);
+        $self->set_tag( 'cv', $cv );
+    }
+    return $self->get_tag('cv');
 }
 
 =head2 instance() - get or set the signing instance (i=) field
@@ -129,9 +129,8 @@ Instances must be integers less than 1024 according to the spec.
 
 =cut
 
-sub canonicalization
-{
-	return ("seal", "seal");
+sub canonicalization {
+    return ( 'seal', 'seal' );
 }
 
 =head1 SEE ALSO

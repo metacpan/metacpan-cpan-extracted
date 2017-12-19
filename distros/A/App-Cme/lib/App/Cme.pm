@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package App::Cme ;
-$App::Cme::VERSION = '1.024';
+$App::Cme::VERSION = '1.025';
 use strict;
 use warnings;
 use 5.10.1;
@@ -33,7 +33,7 @@ App::Cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 AUTHOR
 
@@ -94,7 +94,7 @@ L<http://cpants.cpanauthors.org/dist/App-Cme>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-Cme>
 

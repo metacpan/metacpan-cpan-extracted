@@ -66,6 +66,6 @@
          "web" : "https://github.com/FGasper/p5-Net-WebSocket"
       }
    },
-   "version" : "0.061",
+   "version" : "0.063",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

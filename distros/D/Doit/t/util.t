@@ -97,6 +97,16 @@ plan 'no_plan';
     is getcwd, $orig_dir, 'everything\'s restored again';
 }
 
+{
+    in_directory {
+	my $dir = getcwd;
+	in_directory {
+	    is getcwd, $dir, 'in_directory with undefined argument';
+	} undef;
+	is getcwd, $dir, 'after running in_directory with undef arg';
+    } $FindBin::RealBin;
+}
+
 ######################################################################
 # new_scope_cleanup
 {

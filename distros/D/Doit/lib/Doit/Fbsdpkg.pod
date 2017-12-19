@@ -1,0 +1,57 @@
+=head1 NAME
+
+Doit::Fbsdpkg - commands for dealing with the FreeBSD package system
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('fbsdpkg');
+
+    $doit->fbsdpkg_install_packages(qw(zsh wget));
+
+    my @missing_packages = $doit->fbsdpkg_missing_packages(qw(zsh wget));
+
+=head1 DESCRIPTION
+
+B<Doit::Fbsdpkg> is a L<Doit> component providing commands for dealing
+with FreeBSD packages. It has to be added to a script using L<Doit's
+add_component|Doit/add_component>:
+
+    $doit->add_component('fbsdpkg');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 fbsdpkg_install_packages
+
+    $doit->fbsdpkg_install_packages(@packages);
+
+Make sure that the listed FreeBSD packages are installed (currently
+using L<pkg(8)>). Return a list of the packages which were
+actually installed during the execution of this command (or the number
+of packages in scalar context).
+
+=head3 fbsdpkg_missing_packages
+
+    my @missing_packages = $doit->fbsdpkg_missing_packages(@packages);
+
+Return the packages out of I<@packages> which are not yet installed.
+This is an "informational" command and runs even in dry-run mode.
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<pkg(8)>.
+
+=cut

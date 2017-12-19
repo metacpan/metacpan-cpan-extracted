@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::PodSpelling; # git description: v2.007003-5-g3f8c824
+package Dist::Zilla::Plugin::Test::PodSpelling; # git description: v2.007004-4-g15c75c6
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Author tests for POD spelling
 # KEYWORDS: plugin test spelling words stopwords typos errors documentation
 
-our $VERSION = '2.007004';
+our $VERSION = '2.007005';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
@@ -250,7 +250,7 @@ no Moose;
 #pod
 #pod =attr stopwords
 #pod
-#pod If stopwords is set then C<add_stopwords( E<lt>DATAE<gt> )> is added
+#pod If stopwords is set then C<< add_stopwords( <DATA> ) >> is added
 #pod to the test file and the words are added after the C<__DATA__>
 #pod section.
 #pod
@@ -274,7 +274,7 @@ Dist::Zilla::Plugin::Test::PodSpelling - Author tests for POD spelling
 
 =head1 VERSION
 
-version 2.007004
+version 2.007005
 
 =head1 SYNOPSIS
 
@@ -329,7 +329,7 @@ Defaults to nothing.
 
 =head2 stopwords
 
-If stopwords is set then C<add_stopwords( E<lt>DATAE<gt> )> is added
+If stopwords is set then C<< add_stopwords( <DATA> ) >> is added
 to the test file and the words are added after the C<__DATA__>
 section.
 

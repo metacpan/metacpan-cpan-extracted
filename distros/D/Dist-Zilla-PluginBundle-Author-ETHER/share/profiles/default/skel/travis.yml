@@ -5,7 +5,8 @@ addons:
       - aspell
 language: perl
 perl:
-  - "blead"
+  - "blead"       # builds perl from git
+  - "dev"         # latest point release
 {{
     use Module::CoreList;
     use List::Util 'first';
@@ -16,7 +17,6 @@ perl:
 }}
 env:
   global:
-    - TEST_PARTITIONS=1
     - AUTHOR_TESTING=1
     - AUTOMATED_TESTING=1
     - RELEASE_TESTING=0
@@ -32,6 +32,6 @@ install:{{
 }}
   - cpan-install --deps
 script:
-  - perl Makefile.PL
-  - make
+  - perl Build.PL
+  - ./Build
   - prove -b -r -s -j1 $(test-files)

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Modbus ASCII communications for Perl",
+   "author" : [
+      "Julio FRAIRE <julio.fraire@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Modbus-ASCII",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Modbus" : "0",
+            "Device::SerialPort" : "0",
+            "Role::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jfraire/Device-Modbus-ASCII.git",
+         "web" : "https://github.com/jfraire/Device-Modbus-ASCII"
+      }
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

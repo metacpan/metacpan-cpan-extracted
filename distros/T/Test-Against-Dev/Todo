@@ -1,0 +1,12 @@
+TODO list for Perl module Test::Against::Dev
+
+2017-12-11: configure_build_install_perl() currently only supports 'gz' decompression.
+Extend it to 'bz2' and xz'.
+
+Figure out why I couldn't get ... -MList::Compare -e 'print $List::Compare::VERSION' 
+to work.  DONE: 2017-12-11 22:01
+
+2017-12-12: The temporary directories and files I'm using in the first part of
+t/004 can probably be generated under a true tempdir by use of a test helper
+module.
+

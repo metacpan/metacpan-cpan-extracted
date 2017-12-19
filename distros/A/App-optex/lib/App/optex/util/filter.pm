@@ -7,6 +7,7 @@ package util::filter;
 use v5.10;
 use strict;
 use warnings;
+use Carp;
 use utf8;
 use Encode;
 use Data::Dumper;
@@ -46,6 +47,10 @@ function is called instead.
 
 Set input/output function.  Tis is shortcut for B<--if> B<&>I<function>.
 
+=item B<--io-color>
+
+Set filter to colorize STDOUT in Blue, and STDERR in Red.
+
 =back
 
 =head1 DESCRIPTION
@@ -75,49 +80,40 @@ I<count> also has string "3".
 sub io_filter (&@) {
     my $sub = shift;
     my %opt = @_;
-    my $open = do {
-	if (delete $opt{in}) {
-	    sub { open STDIN, '-|' };
-	} else {
-	    delete $opt{out};
-	    sub { open STDOUT, '|-' }
+    my $pid = do {
+	if (delete $opt{STDIN}) {
+	    open STDIN, '-|';
 	}
-    };
-    my $pid = $open->() // die "fork: $!\n";
+	elsif (delete $opt{STDOUT}) {
+	    open STDOUT, '|-'
+	}
+	elsif (delete $opt{STDERR}) {
+	    open STDERR, '|-';
+	}
+	else {
+	    croak;
+	}
+    } // die "fork: $!\n";;
     return $pid if $pid > 0;
     $sub->(%opt);
     exit 0;
 }
 
-#sub input_filter (&) {
-#    my $sub = shift;
-#    my $pid = open(STDIN, '-|') // die "fork: $!\n";
-#    return $pid if $pid > 0;
-#    $sub->(@_);
-#    exit 0;
-#}
-#
-#sub output_filter (&) {
-#    my $sub = shift;
-#    my $pid = open(STDOUT, '|-') // die "fork: $!\n";
-#    return $pid if $pid > 0;
-#    $sub->(@_);
-#    exit 0;
-#}
-
 sub set {
     my %opt = @_;
-    my $filter = $opt{in} // $opt{out};
-    if ($filter =~ s/^&//) {
-	if ($filter !~ /::/) {
-	    $filter = join '::', __PACKAGE__, $filter;
+    for my $io (qw(STDIN STDOUT STDERR)) {
+	my $filter = $opt{$io} // next;
+	if ($filter =~ s/^&//) {
+	    if ($filter !~ /::/) {
+		$filter = join '::', __PACKAGE__, $filter;
+	    }
+	    use Getopt::EX::Func qw(parse_func);
+	    my $func = parse_func($filter);
+	    io_filter { $func->call($io => $opt{$io}) } %opt;
 	}
-	use Getopt::EX::Func qw(parse_func);
-	my $func = parse_func($filter);
-	io_filter { $func->call(@_) } %opt;
-    }
-    else {
-	io_filter { exec $filter or die "exec: $!\n" } %opt;
+	else {
+	    io_filter { exec $filter or die "exec: $!\n" } %opt;
+	}
     }
 }
 	
@@ -170,6 +166,29 @@ Shuffle lines.
 
 ######################################################################
 
+use Getopt::EX::Colormap qw(colorize);
+
+sub io_color {
+    my %opt = @_;
+    for my $io (qw(STDIN STDOUT STDERR)) {
+	my $color = $opt{$io} // next;
+	io_filter {
+	    while (<>) {
+		print colorize($color, $_);
+	    }
+	} $io => 1;
+    }
+}
+
+=item B<io_color>( B<IO>=I<color> )
+
+Colorize text. B<IO> is either of C<STDOUT> or C<STDERR>.  Use comma
+to set both at a same time: C<STDOUT=C,STDERR=R>.
+
+=cut
+
+######################################################################
+
 sub splice_line {
     my %opt = @_;
     my @line = <>;
@@ -189,10 +208,12 @@ Splice lines.
 ######################################################################
 
 use Time::Piece;
+use Getopt::EX::Colormap qw(colorize);
 
 sub timestamp {
     my %opt = @_;
     my $format = $opt{format} || "%T.%f";
+    my $color = $opt{color} || 'Y';
 
     my $sub = do {
 	my $re_subsec = qr/%f|(?<milli>%L)|%(?<prec>\d*)N/;
@@ -214,8 +235,7 @@ sub timestamp {
     };
 
     while (<>) {
-	my $time = $sub->();
-	print $time, " ", $_;
+	print colorize($color, $sub->()), " ", $_;
     }
 }
 
@@ -252,8 +272,13 @@ Gzip standard input.
 
 __DATA__
 
-option --if -M__PACKAGE__::set(in=$<shift>)
-option --of -M__PACKAGE__::set(out=$<shift>)
+option --if -M__PACKAGE__::set(STDIN=$<shift>)
+option --of -M__PACKAGE__::set(STDOUT=$<shift>)
+option --ef -M__PACKAGE__::set(STDERR=$<shift>)
 
 option --isub --if &$<shift>
 option --osub --of &$<shift>
+option --esub --ef &$<shift>
+
+option --set-io-color -M__PACKAGE__::io_color($<shift>)
+option --io-color --set-io-color STDERR=555/511E

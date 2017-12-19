@@ -11,82 +11,80 @@ package Mail::DKIM::Key;
 use strict;
 
 sub cork {
-	my $self = shift;
+    my $self = shift;
 
-	(@_) and
-		$self->{'CORK'} = shift;
+    (@_)
+      and $self->{'CORK'} = shift;
 
-	$self->{'CORK'} or
-		$self->convert;
+    $self->{'CORK'}
+      or $self->convert;
 
-	$self->{'CORK'};
+    $self->{'CORK'};
 }
 
 sub data {
-	my $self = shift;
+    my $self = shift;
 
-	(@_) and 
-		$self->{'DATA'} = shift;
+    (@_)
+      and $self->{'DATA'} = shift;
 
-	$self->{'DATA'};
+    $self->{'DATA'};
 }
 
 sub errorstr {
-	my $self = shift;
+    my $self = shift;
 
-	(@_) and 
-		$self->{'ESTR'} = shift;
+    (@_)
+      and $self->{'ESTR'} = shift;
 
-	$self->{'ESTR'};
+    $self->{'ESTR'};
 }
 
 sub size {
-	my $self = shift;
+    my $self = shift;
 
-	return $self->cork->size * 8;
+    return $self->cork->size * 8;
 }
 
 sub type {
-	my $self = shift;
+    my $self = shift;
 
-	(@_) and 
-		$self->{'TYPE'} = shift;
+    (@_)
+      and $self->{'TYPE'} = shift;
 
-	$self->{'TYPE'};
+    $self->{'TYPE'};
 }
 
-sub calculate_EM
-{ 
-	my ($digest_algorithm, $digest, $emLen) = @_;
+sub calculate_EM {
+    my ( $digest_algorithm, $digest, $emLen ) = @_;
 
-	# this function performs DER encoding of the algorithm ID for the
-	# hash function and the hash value itself
-	# It has this syntax:
-	#      DigestInfo ::= SEQUENCE {
-	#          digestAlgorithm AlgorithmIdentifier,
-	#          digest OCTET STRING
-	#      }
+    # this function performs DER encoding of the algorithm ID for the
+    # hash function and the hash value itself
+    # It has this syntax:
+    #      DigestInfo ::= SEQUENCE {
+    #          digestAlgorithm AlgorithmIdentifier,
+    #          digest OCTET STRING
+    #      }
 
-	# RFC 3447, page 42, provides the following octet values:
-	my %digest_encoding = (
-		"SHA-1" =>   pack("H*", "3021300906052B0E03021A05000414"),
-		"SHA-256" => pack("H*", "3031300d060960864801650304020105000420"),
-		);
+    # RFC 3447, page 42, provides the following octet values:
+    my %digest_encoding = (
+        'SHA-1'   => pack( 'H*', '3021300906052B0E03021A05000414' ),
+        'SHA-256' => pack( 'H*', '3031300d060960864801650304020105000420' ),
+    );
 
-	defined $digest_encoding{$digest_algorithm}
-		or die "Unsupported digest algorithm '$digest_algorithm'";
+    defined $digest_encoding{$digest_algorithm}
+      or die "Unsupported digest algorithm '$digest_algorithm'";
 
-	my $T = $digest_encoding{$digest_algorithm} . $digest;
-	my $tLen = length($T);
+    my $T    = $digest_encoding{$digest_algorithm} . $digest;
+    my $tLen = length($T);
 
-	if ($emLen < $tLen + 11)
-	{
-		die "Intended encoded message length too short.";
-	}
+    if ( $emLen < $tLen + 11 ) {
+        die 'Intended encoded message length too short.';
+    }
 
-	my $PS = chr(0xff) x ($emLen - $tLen - 3);
-	my $EM = chr(0) . chr(1) . $PS . chr(0) . $T; 
-	return $EM;
+    my $PS = chr(0xff) x ( $emLen - $tLen - 3 );
+    my $EM = chr(0) . chr(1) . $PS . chr(0) . $T;
+    return $EM;
 }
 
 1;

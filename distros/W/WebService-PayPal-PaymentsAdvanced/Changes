@@ -1,7 +1,9 @@
 Revision history for WebService-PayPal-PaymentsAdvanced
 
-0.000022 2017-05-11
+0.000023 2017-12-15
+    - Accept 0000 as the last four digits of a credit card.
 
+0.000022 2017-05-11
     - Provide an option to retry hosted form validation HTTP requests on 5xx
       errors. Also provide a callback function we call when encountering such
       errors prior to retrying.

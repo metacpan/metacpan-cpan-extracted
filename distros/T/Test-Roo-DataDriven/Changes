@@ -1,0 +1,84 @@
+Revision history for Test::Roo::DataDriven
+
+v0.2.1    2017-12-18 01:18:37+00:00 Europe/London
+  [Tests]
+  - Skip error tests if the locale language is not English,
+    as a workaround for locale issues, #6.
+
+v0.2.0    2017-12-17 00:21:59+00:00 Europe/London
+  [Enhancements]
+  - Check that return type is either an array or hash reference.
+
+  - Add the parser option to support alternative data file formats.
+
+  - Improved error diagnostics.
+
+  - Namespaces are cleaned up after data files are parsed.
+
+  [Documentation]
+  - Note that the file argument for the filter and parser options is a
+    Path::Tiny object.
+
+  - Document that data files are parsed in their own namespaces.
+
+  - Reorganized the documentation.
+
+  - Update the POD.
+
+  [Tests]
+  - Added more tests.
+
+  - Added various author/release tests.
+
+  [Other Changes]
+  - Change internal _build_data_files method to use a hash reference.
+
+  [Toolchain]
+  - Explicitly specify more authordeps.
+
+v0.1.4    2017-12-15 16:34:15+00:00 Europe/London
+  [Toolchain]
+  - Modify dist.ini to via double-tagging on releases, #3.
+
+v0.1.3    2017-12-15 16:21:07+00:00 Europe/London
+  [Documentation]
+  - Tidied up abstract in pod as reported by CPANTS (Mohammad S Anwar)
+
+  [Tests]
+  - Added various author/release tests.
+
+  - Increased minimum version of Time::Piece so that tests pass on
+    Perl v5.10.
+
+  - Add tests for failed parsing of data files, #4.
+
+  [Toolchain]
+  - Using Pod::Weaver to build the documentation.
+
+  - Using ReadmeAnyFromPod plugin to build the README, since it seems
+    to work better with Pod::Weaver plugin.
+
+v0.1.2    2017-12-14 17:50:40+00:00 Europe/London
+  [Documentation]
+  - Fix typo in the POD markup.
+
+  - Add note about using ToolSet.
+
+  [Other]
+  - Added MANIFEST.SKIP to remove backup files and cruft from the
+    distribution.
+
+  [Tests]
+  - Added various author/release tests.
+
+v0.1.1    2017-12-14 13:48:51+00:00 Europe/London
+  [Tests]
+  - Explicitly add test requirements for modules used by the test
+    data.
+
+  [Documentation]
+  - Add Known issue about prerequisite scanners and module imports in
+    test data.
+
+v0.1.0    2017-12-14 13:21:37+00:00 Europe/London
+  - Initial release

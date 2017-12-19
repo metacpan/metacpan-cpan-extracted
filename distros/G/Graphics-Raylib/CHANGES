@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2016-12-09 00:00:00 +0000 to present.
+Changes from 2016-12-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2017-12-09 16:44:58 +0000
+version 0.009 at 2017-12-15 09:14:10 +0000
+------------------------------------------
+
+  Change: 304eb9823463fade7d1d2c4b8baf8bf98c9866f3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-14 17:45:35 +0000
+
+    Add support for arbitrary keycodes
+
+    Unprintable characters are stringfied as their hexadecimal order
+    enclosed in angle brackets. An exception are well-known special keys
+    such as <Enter> or <Esc>, which are stringified as Vi notation. 
+
+  Change: c089f6dd71ef9f790af420c37955ff1113766449
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-10 02:50:02 +0000
+
+    Wrap Raylib keyboard keycodes as class 
+
+------------------------------------------
+version 0.008 at 2017-12-09 16:12:32 +0000
 ------------------------------------------
 
   Change: 7c2fb9c50d95e9ba1cb7a123a316bf70b60c6d88

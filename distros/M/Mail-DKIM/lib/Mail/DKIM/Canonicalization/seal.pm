@@ -45,51 +45,60 @@ use strict;
 use warnings;
 
 package Mail::DKIM::Canonicalization::seal;
-use base "Mail::DKIM::Canonicalization::relaxed";
+use base 'Mail::DKIM::Canonicalization::relaxed';
 use Carp;
 
-sub init
-{
-	my $self = shift;
-	$self->SUPER::init;
+sub init {
+    my $self = shift;
+    $self->SUPER::init;
 }
 
-sub _output_indexed_header
-{
-	my $self = shift;
-	my $headers = shift;
-	my $h = shift;
-	my $i = shift;
-	foreach my $hdr (@$headers) {
-		next unless $hdr =~ m/^$h:\s*i=$i/i;
-		$hdr =~ s/\015\012\z//s;
-		$self->output($self->canonicalize_header($hdr) . "\015\012");
-		return;
-	}
+sub _output_indexed_header {
+    my ( $self, $headers, $h, $i ) = @_;
+    foreach my $hdr (@$headers) {
+
+        # this ugly pattern matches header: field; field; ... i=N
+        next unless $hdr =~ m/^$h:\s*(?:[^;]*;\s*)*i=(\d+)/i and $1 == $i;
+        $hdr =~ s/\015\012\z//s;
+        $self->output( $self->canonicalize_header($hdr) . "\015\012" );
+        return;
+    }
 }
 
-sub finish_header
-{
-	my $self = shift;
-	my %args = @_;
+sub finish_header {
+    my $self = shift;
+    my %args = @_;
 
-	my $i = $self->{Signature}->identity();
+    my $i = $self->{Signature}->identity();
+    return unless $i =~ m{^\d+$};    # don't waste time if i= is bogus
 
-	# we include the seal for everything else
-	foreach my $n (1..($i-1)) {
-		$self->_output_indexed_header($args{Headers}, 'ARC-Authentication-Results', $n);
-		$self->_output_indexed_header($args{Headers}, 'ARC-Message-Signature', $n);
-		$self->_output_indexed_header($args{Headers}, 'ARC-Seal', $n);
-	}
-	$self->_output_indexed_header($args{Headers}, 'ARC-Authentication-Results', $i);
-	$self->_output_indexed_header($args{Headers}, 'ARC-Message-Signature', $i);
-	# we don't add ARC-Seal at our index, because that is this signature, and it's
-	# formed with standard DKIM style, so automatically appeneded
+    my $chain = $args{Chain} // $self->{Signature}->chain();
+
+    # we include the seal for everything else
+    # if the previous status was pass
+    if ( $chain eq 'pass' ) {
+        foreach my $n ( 1 .. ( $i - 1 ) ) {
+            $self->_output_indexed_header( $args{Headers},
+                'ARC-Authentication-Results', $n );
+            $self->_output_indexed_header( $args{Headers},
+                'ARC-Message-Signature', $n );
+            $self->_output_indexed_header( $args{Headers}, 'ARC-Seal', $n );
+        }
+    }
+
+    # always include this header set
+    $self->_output_indexed_header( $args{Headers},
+        'ARC-Authentication-Results', $i );
+    $self->_output_indexed_header( $args{Headers}, 'ARC-Message-Signature',
+        $i );
+
+  # we don't add ARC-Seal at our index, because that is this signature, and it's
+  # formed with standard DKIM style, so automatically appeneded
 }
 
-sub add_body
-{
-	# no body add
+sub add_body {
+
+    # no body add
 }
 
 1;

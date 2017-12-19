@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Git-VersionManager
 
+0.003     2017-12-13 02:34:17Z
+          - new 'bump_only_matching_versions' option, for use in distributions
+            such as URI where some modules have different $VERSIONs that
+            should not be altered to match the distribution version
+          - include Build.PL, Makefile.PL in post-release commit so long as
+            the corresponding munge_*_pl settings were not disabled in
+            [BumpVersionAfterRelease::*] configs
+
 0.002     2017-09-08 01:26:11Z
           - add mention of [MetaProvides::Update] in unrolled plugin list
           - plugins used by the bundle are now injected into develop-suggests

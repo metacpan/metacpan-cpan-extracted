@@ -85,6 +85,9 @@ print_stats()
 
 HV*
 refresh_and_get_stats()
+  PREINIT:
+    dMY_CXT;
+
   CODE:
     int i;
 

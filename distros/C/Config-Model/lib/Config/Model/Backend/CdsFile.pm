@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::CdsFile;
-$Config::Model::Backend::CdsFile::VERSION = '2.114';
+$Config::Model::Backend::CdsFile::VERSION = '2.116';
 use 5.10.1;
 use Carp;
 use strict;
@@ -20,8 +20,6 @@ use Log::Log4perl qw(get_logger :levels);
 use base qw/Config::Model::Backend::Any/;
 
 my $logger = get_logger("Backend::CdsFile");
-
-sub suffix { return '.cds'; }
 
 sub read {
     my $self = shift;
@@ -81,7 +79,7 @@ Config::Model::Backend::CdsFile - Read and write config as a Cds data structure
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

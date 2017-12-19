@@ -1,0 +1,18 @@
+#!perl
+
+my $time = time - 1;
+
+[
+ {
+     regex     => qr/array/,
+     epoch     => $time,
+ },
+ {
+     regex     => qr/array/,
+     epoch     => $time - 1,
+ },
+ {
+     regex     => qr/array/,
+     epoch     => $time - 2,
+ },
+];

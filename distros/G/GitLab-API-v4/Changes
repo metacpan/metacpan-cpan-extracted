@@ -1,5 +1,10 @@
 Revision history for Perl extension GitLab::API::v4.
 
+0.02 2017-12-15
+
+- Fix double-slashes in URL paths.
+- Fixed gitlab-api-v4 script to actually work.
+
 0.01 2017-12-11
 
  - Added the sudo method and the sudo_user argument.

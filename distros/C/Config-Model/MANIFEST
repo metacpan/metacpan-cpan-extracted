@@ -28,6 +28,7 @@ lib/Config/Model/Backend/PlainFile.pm
 lib/Config/Model/Backend/ShellVar.pm
 lib/Config/Model/Backend/Yaml.pm
 lib/Config/Model/BackendMgr.pm
+lib/Config/Model/BackendTrackOrder.pm
 lib/Config/Model/CheckList.pm
 lib/Config/Model/Cookbook/CreateModelFromDoc.pod
 lib/Config/Model/Describe.pm
@@ -48,6 +49,7 @@ lib/Config/Model/Node.pm
 lib/Config/Model/ObjTreeScanner.pm
 lib/Config/Model/Report.pm
 lib/Config/Model/Role/ComputeFunction.pm
+lib/Config/Model/Role/FileHandler.pm
 lib/Config/Model/Role/Grab.pm
 lib/Config/Model/Role/HelpAsText.pm
 lib/Config/Model/Role/NodeLoader.pm
@@ -134,6 +136,7 @@ t/model_tests.d/backend-plainfile-examples/with-index/debian/bar.move.list
 t/model_tests.d/backend-plainfile-examples/with-index/debian/foo.install.list
 t/model_tests.d/backend-plainfile-test-conf.pl
 t/model_tests.d/backend-shellvar-examples/debian-719256
+t/model_tests.d/backend-shellvar-examples/keep-order
 t/model_tests.d/backend-shellvar-test-conf.pl
 t/model_tests.d/backend-yaml-data-examples/basic
 t/model_tests.d/backend-yaml-data-test-conf.pl

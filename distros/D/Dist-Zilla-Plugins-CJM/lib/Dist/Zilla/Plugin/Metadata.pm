@@ -1,7 +1,7 @@
 #---------------------------------------------------------------------
 package Dist::Zilla::Plugin::Metadata;
 #
-# Copyright 2010 Christopher J. Madsen
+# Copyright 2017 Christopher J. Madsen
 #
 # Author: Christopher J. Madsen <perl@cjmweb.net>
 # Created:  2 Dec 2010
@@ -17,8 +17,8 @@ package Dist::Zilla::Plugin::Metadata;
 # ABSTRACT: Add arbitrary keys to distmeta
 #---------------------------------------------------------------------
 
-our $VERSION = '3.03';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+our $VERSION = '6.000';
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 
 use Moose;
@@ -62,7 +62,9 @@ sub BUILDARGS
 sub mvp_multivalue_args
 {
   return qw(author keywords license no_index.file no_index.directory
-            no_index.package no_index.namespace resources.license );
+            no_index.package no_index.namespace resources.license
+            x_contributors
+  );
 } # end mvp_multivalue_args
 
 #=====================================================================
@@ -78,9 +80,9 @@ Dist::Zilla::Plugin::Metadata - Add arbitrary keys to distmeta
 
 =head1 VERSION
 
-This document describes version 3.03 of
-Dist::Zilla::Plugin::Metadata, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+This document describes version 6.000 of
+Dist::Zilla::Plugin::Metadata, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 SYNOPSIS
 
@@ -99,7 +101,8 @@ distribution's metadata.
 It splits each key on '.' and uses that as a multi-level hash key.  It
 doesn't try to do any validation; the MetaJSON or MetaYAML plugin will
 do that.  It does know which keys in the spec are List values; those
-keys can be repeated.
+keys can be repeated.  In addition, the custom key C<x_contributors>
+is treated as a List.
 
 =for Pod::Coverage
 mvp_multivalue_args
@@ -110,7 +113,7 @@ Dist::Zilla::Plugin::Metadata requires no configuration files or environment var
 
 =head1 DEPENDENCIES
 
-Metadata requires L<Dist::Zilla> (4.300009 or later).
+Metadata requires L<Dist::Zilla> (6 or later).
 
 =head1 INCOMPATIBILITIES
 
@@ -134,7 +137,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,7 +16,7 @@ use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 my %hafas_instance = (
 	BVG => {
@@ -26,8 +26,8 @@ my %hafas_instance = (
 		productbits => [qw[s u tram bus ferry ice regio ondemand]],
 	},
 	DB => {
-		url        => 'http://reiseauskunft.bahn.de/bin/bhftafel.exe',
-		stopfinder => 'http://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
+		url        => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
+		stopfinder => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
 		name       => 'Deutsche Bahn',
 		productbits =>
 		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
@@ -425,7 +425,7 @@ monitors
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 

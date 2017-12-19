@@ -1,0 +1,57 @@
+{
+   "abstract" : "split English-language domain names etc. into words",
+   "author" : [
+      "Sam Kington <skington@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-EN-Segment",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "File::ShareDir" : "0",
+            "List::Util" : "0",
+            "Memoize" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "Memoize" : "0",
+            "Test::File::ShareDir" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/skington/lingua-en-segment",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skington/lingua-en-segment.git",
+         "web" : "https://github.com/skington/lingua-en-segment"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

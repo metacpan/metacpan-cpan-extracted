@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.833';
+our $VERSION = '1.834';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -362,6 +362,8 @@ sub _tie {
 sub _use {
    my $_class = $_[0];
 
+   return 1 if $_class eq 'main';
+
    if ( $_class =~ /(.*)::_/ ) {
       # e.g. MCE::Hobo::_hash
       eval "require $1" unless $INC{ join('/',split(/::/,$1)).'.pm' };
@@ -414,7 +416,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.833
+This document describes MCE::Shared version 1.834
 
 =head1 SYNOPSIS
 

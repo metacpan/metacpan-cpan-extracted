@@ -29,9 +29,9 @@ DESCRIPTION
     Mojo::IOLoop::Subprocess to perform computationally expensive
     operations in subprocesses without blocking the event loop.
 
-    The option use_sereal (requires Sereal version 3.001 or higher) will
-    use Sereal for data serialization, which is faster than Storable and
-    supports serialization of more reference types such as Regexp. The
+    The option use_sereal (requires Mojo::IOLoop::Subprocess::Role::Sereal)
+    will use Sereal for data serialization, which is faster than Storable
+    and supports serialization of more reference types such as Regexp. The
     "FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder is supported to
     control serialization of blessed objects.
 

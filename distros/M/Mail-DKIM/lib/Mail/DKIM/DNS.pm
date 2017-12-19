@@ -71,25 +71,24 @@ use Net::DNS;
 our $TIMEOUT = 10;
 our $RESOLVER;
 
-sub resolver
-{
-	if (@_) {
-		$RESOLVER = $_[0];
-	}
-	return $RESOLVER;
+sub resolver {
+    if (@_) {
+        $RESOLVER = $_[0];
+    }
+    return $RESOLVER;
 }
 
-sub enable_EDNS0
-{
-	# enable EDNS0, set acceptable UDP packet size to a
-	# conservative payload size that should fit into a single
-	# packet (MTU less the IP header size) in most cases;
-	# See also draft-andrews-dnsext-udp-fragmentation
-	# and RFC 3542 section 11.3.
+sub enable_EDNS0 {
 
-	my $res = Net::DNS::Resolver->new();
-	$res->udppacketsize(1280-40);
-	resolver($res);
+    # enable EDNS0, set acceptable UDP packet size to a
+    # conservative payload size that should fit into a single
+    # packet (MTU less the IP header size) in most cases;
+    # See also draft-andrews-dnsext-udp-fragmentation
+    # and RFC 3542 section 11.3.
+
+    my $res = Net::DNS::Resolver->new();
+    $res->udppacketsize( 1280 - 40 );
+    resolver($res);
 }
 
 # query- returns a list of RR objects
@@ -101,94 +100,91 @@ sub enable_EDNS0
 # if an empty list is returned, $@ is also set to a string explaining
 # why no records were returned (e.g. "NXDOMAIN").
 #
-sub query
-{
-	my ($domain, $type) = @_;
+sub query {
+    my ( $domain, $type ) = @_;
 
-	if (! $RESOLVER)
-	{
-		$RESOLVER = Net::DNS::Resolver->new()
-			or die "Internal error: can't create DNS resolver";
-	}
+    if ( !$RESOLVER ) {
+        $RESOLVER = Net::DNS::Resolver->new()
+          or die "Internal error: can't create DNS resolver";
+    }
 
-	my $rslv = $RESOLVER;
+    my $rslv = $RESOLVER;
 
-	#
-	# perform the DNS query
-	#   if the query takes too long, we should generate an error
-	#
-	my $resp;
-	my $remaining_time = alarm(0);  # check time left, stop the timer
-	my $deadline = time + $remaining_time;
-	my $E;
-	eval
-	{
-		# set a timeout, 10 seconds by default
-		local $SIG{ALRM} = sub { die "DNS query timeout for $domain\n" };
-		alarm $TIMEOUT;
+    #
+    # perform the DNS query
+    #   if the query takes too long, we should generate an error
+    #
+    my $resp;
+    my $remaining_time = alarm(0);    # check time left, stop the timer
+    my $deadline = time + $remaining_time;
+    my $E;
+    eval {
+        # set a timeout, 10 seconds by default
+        local $SIG{ALRM} = sub { die "DNS query timeout for $domain\n" };
+        alarm $TIMEOUT;
 
-		# the query itself could cause an exception, which would prevent
-		# us from resetting the alarm before leaving the eval {} block
-		# so we wrap the query in a nested eval {} block
-		my $E2;
-		eval
-		{
-			$resp = $rslv->send($domain, $type);
-			1;
-		} or do {
-			$E2 = $@;
-		};
-		alarm 0;
-		if ($E2) { chomp $E2; die "$E2\n" }  # no line number here
-		1;
-	} or do {
-		$E = $@;  # the $@ only makes sense if eval returns a false
-	};
-	alarm 0;
-	# restart the timer if it was active
-	if ($remaining_time > 0)
-	{
-		my $dt = $deadline - time;
-		# make sure the timer expiration will trigger a signal,
-		# even at the expense of stretching the interval by one second
-		alarm($dt < 1 ? 1 : $dt);
-	}
-	if ($E) { chomp $E; die $E }  # ensure a line number
+        # the query itself could cause an exception, which would prevent
+        # us from resetting the alarm before leaving the eval {} block
+        # so we wrap the query in a nested eval {} block
+        my $E2;
+        eval {
+            $resp = $rslv->send( $domain, $type );
+            1;
+        } or do {
+            $E2 = $@;
+        };
+        alarm 0;
+        if ($E2) { chomp $E2; die "$E2\n" }    # no line number here
+        1;
+    } or do {
+        $E = $@;    # the $@ only makes sense if eval returns a false
+    };
+    alarm 0;
 
-# RFC 2308: NODATA is indicated by an answer with the RCODE set to NOERROR
-# and no relevant answers in the answer section.  The authority section
-# will contain an SOA record, or there will be no NS records there.
-# NODATA responses have to be algorithmically determined from the
-# response's contents as there is no RCODE value to indicate NODATA.
-# In some cases to determine with certainty that NODATA is the correct
-# response it can be necessary to send another query.
+    # restart the timer if it was active
+    if ( $remaining_time > 0 ) {
+        my $dt = $deadline - time;
 
-	if ($resp)
-	{
-		my $header = $resp->header;
-		if ($header)
-		{
-			# NOERROR, NXDOMAIN, SERVFAIL, FORMERR, REFUSED, ...
-			my $rcode = $header->rcode;
+        # make sure the timer expiration will trigger a signal,
+        # even at the expense of stretching the interval by one second
+        alarm( $dt < 1 ? 1 : $dt );
+    }
+    if ($E) { chomp $E; die $E }    # ensure a line number
 
-			$@ = $rcode;
-			if ($rcode eq 'NOERROR') {
-				# may or may not contain RRs in the answer sect
-				my @result = grep { lc $_->type eq lc $type }
-						  $resp->answer;
-				$@ = 'NODATA'  if !@result;
-				return @result;  # possibly empty
-			} elsif ($rcode eq 'NXDOMAIN') {
-				return;  # empty list, rcode in $@
-			}
-		}
-	}
-	die "DNS error: " . $rslv->errorstring . "\n";
+    # RFC 2308: NODATA is indicated by an answer with the RCODE set to NOERROR
+    # and no relevant answers in the answer section.  The authority section
+    # will contain an SOA record, or there will be no NS records there.
+    # NODATA responses have to be algorithmically determined from the
+    # response's contents as there is no RCODE value to indicate NODATA.
+    # In some cases to determine with certainty that NODATA is the correct
+    # response it can be necessary to send another query.
+
+    if ($resp) {
+        my $header = $resp->header;
+        if ($header) {
+
+            # NOERROR, NXDOMAIN, SERVFAIL, FORMERR, REFUSED, ...
+            my $rcode = $header->rcode;
+
+            $@ = $rcode;
+            if ( $rcode eq 'NOERROR' ) {
+
+                # may or may not contain RRs in the answer sect
+                my @result = grep { lc $_->type eq lc $type } $resp->answer;
+                $@ = 'NODATA' if !@result;
+                return @result;    # possibly empty
+            }
+            elsif ( $rcode eq 'NXDOMAIN' ) {
+                return;            # empty list, rcode in $@
+            }
+        }
+    }
+    die 'DNS error: ' . $rslv->errorstring . "\n";
 }
 
 # query_async() - perform a DNS query asynchronously
 #
-#   my $waiter = query_async("example.org", "TXT",
+#   my $waiter = query_async('example.org', 'TXT',
 #                        Callbacks => {
 #                                Success => \&on_success,
 #                                Error => \&on_error,
@@ -196,28 +192,27 @@ sub query
 #                            );
 #   my $result = $waiter->();
 #
-sub query_async
-{
-	my ($domain, $type, %prms) = @_;
+sub query_async {
+    my ( $domain, $type, %prms ) = @_;
 
-	my $callbacks = $prms{Callbacks} || {};
-	my $on_success = $callbacks->{Success} || sub { $_[0] };
-	my $on_error = $callbacks->{Error} || sub { die $_[0] };
+    my $callbacks = $prms{Callbacks} || {};
+    my $on_success = $callbacks->{Success} || sub { $_[0] };
+    my $on_error   = $callbacks->{Error}   || sub { die $_[0] };
 
-	my $waiter = sub {
-		my @resp;
-		my $rcode;
-		eval {
-			@resp = query($domain, $type);
-			$rcode = $@;
-			1;
-		} or do {
-			return $on_error->($@);
-		};
-		$@ = $rcode;
-		return $on_success->(@resp);
-	};
-	return $waiter;
+    my $waiter = sub {
+        my @resp;
+        my $rcode;
+        eval {
+            @resp = query( $domain, $type );
+            $rcode = $@;
+            1;
+        } or do {
+            return $on_error->($@);
+        };
+        $@ = $rcode;
+        return $on_success->(@resp);
+    };
+    return $waiter;
 }
 
 1;

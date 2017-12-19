@@ -1,10 +1,16 @@
 Revision history for Perl extension Udev-FFI
 
+0.099004 2017-12-16T13:51:52Z
+    - improve documentation
+
+0.099003 2017-12-14T15:25:28Z
+    - improve error handling
+
 0.099002 2017-12-10T20:59:47Z
-    -improve documentation
+    - improve documentation
 
 0.099001 2017-11-23T21:17:15Z
-    -fix typo in test
+    - fix typo in test
 
 0.099000 2017-11-22T21:58:27Z
     - add old libudev support
@@ -21,10 +27,3 @@ Revision history for Perl extension Udev-FFI
 
 0.098000 2017-08-10T13:02:22Z
     - fix udev monitor poll behavior
-
-0.097003 2017-08-07T12:32:42Z
-    - update depends in cpanfile
-    - add examples to SYNOPSIS
-
-0.097002 2017-07-19T19:54:43Z
-    - typo fixes

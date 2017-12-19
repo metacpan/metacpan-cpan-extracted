@@ -1,4 +1,4 @@
-Dist-Zilla-Plugins-CJM version 4.27, released August 29, 2015
+Dist-Zilla-Plugins-CJM version 6.000, released December 17, 2017
 
 
 Dist-Zilla-Plugins-CJM is a collection of plugins I've written for
@@ -35,7 +35,7 @@ DEPENDENCIES
   CPAN::Meta::Converter              2.101550
   CPAN::Meta::Requirements           2.121
   Data::Dumper                       
-  Dist::Zilla                        4.300009
+  Dist::Zilla                        6
   Dist::Zilla::Plugin::InlineFiles   
   Dist::Zilla::Plugin::MakeMaker     4.300009
   File::Copy                         
@@ -45,7 +45,7 @@ DEPENDENCIES
   Module::Metadata                   
   Moose                              
   Moose::Role                        
-  Path::Class                        
+  Path::Tiny                         
   Scalar::Util                       
   autodie                            
   namespace::autoclean               
@@ -54,17 +54,27 @@ DEPENDENCIES
 
 
 CHANGES
-    Here's what's new in version 4.27 of Dist-Zilla-Plugins-CJM:
+    Here's what's new in version 6.000 of Dist-Zilla-Plugins-CJM:
     (See the file "Changes" for the full revision history.)
 
-	[GitVersionCheckCJM]
-	  - Add single_version parameter
+	- Updates for Dist::Zilla 6
+
+	[ArchiveRelease]
+	  - Replace Path::Class with Path::Tiny
+
+	[Metadata]
+	  - Treat x_contributors custom key as List
+	    (GitHub#6: Robert Rothenberg)
+
+	[=Dist::Zilla::Role::ModuleInfo]
+	  - Replace Path::Class with Path::Tiny
+	  - Now requires Dist::Zilla 6
 
 
 
 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

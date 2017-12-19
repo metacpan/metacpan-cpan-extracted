@@ -46,6 +46,8 @@ lib/Mail/DKIM/Signer.pm
 lib/Mail/DKIM/SignerPolicy.pm
 lib/Mail/DKIM/TextWrap.pm
 lib/Mail/DKIM/Verifier.pm
+scripts/arcsign.pl
+scripts/arcverify.pl
 scripts/dkimsign.pl
 scripts/dkimverify.pl
 scripts/sample_mime_lite.pl
@@ -149,5 +151,6 @@ t/test.key
 t/test5.txt
 t/textwrap.t
 t/verifier.t
+t/verifier_strict.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -35,5 +35,5 @@ requires:
   warnings: 0
 resources:
   repository: git://github.com/nalobin/Net-Whois-Raw.git
-version: 2.99011
+version: 2.99013
 x_serialization_backend: 'YAML::Tiny version 1.56'

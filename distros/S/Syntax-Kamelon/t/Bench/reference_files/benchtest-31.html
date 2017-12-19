@@ -181,60 +181,60 @@ font.Warning {
 <div id="19" class="line"><font class="Normal">}</font></br></div>
 <div id="20" class="line"></br></div>
 <div id="21" class="line"><font class="Keyword">sky_sphere</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DecVal">pigment</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">gradient</font><font class="Normal">&nbsp;</font><font class="Keyword">z</font></br></div>
-<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">color_map</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[</font><font class="Float">0.0</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">0.6</font><font class="Normal">,</font><font class="Float">0.7</font><font class="Normal">,</font><font class="Float">1.0</font><font class="Normal">&gt;]</font></br></div>
-<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[</font><font class="Float">0.2</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">0.2</font><font class="Normal">,</font><font class="Float">0.3</font><font class="Normal">,</font><font class="Float">0.9</font><font class="Normal">&gt;]</font></br></div>
+<div id="22" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Preprocessor">pigment</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="23" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">gradient</font><font class="Normal">&nbsp;</font><font class="Keyword">z</font></br></div>
+<div id="24" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">color_map</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="25" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[</font><font class="Float">0.0</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">0.6</font><font class="Normal">,</font><font class="Float">0.7</font><font class="Normal">,</font><font class="Float">1.0</font><font class="Normal">&gt;]</font></br></div>
+<div id="26" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[</font><font class="Float">0.2</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">0.2</font><font class="Normal">,</font><font class="Float">0.3</font><font class="Normal">,</font><font class="Float">0.9</font><font class="Normal">&gt;]</font></br></div>
 <div id="27" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
 <div id="28" class="line"><font class="Normal">&nbsp;&nbsp;}</font></br></div>
 <div id="29" class="line"><font class="Normal">}</font></br></div>
 <div id="30" class="line"></br></div>
-<div id="31" class="line"><font class="Float">light_source</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="31" class="line"><font class="Others">light_source</font><font class="Normal">&nbsp;{</font></br></div>
 <div id="32" class="line"><font class="Normal">&nbsp;&nbsp;&lt;</font><font class="Float">3</font><font class="Normal">,&nbsp;</font><font class="Float">1</font><font class="Normal">,&nbsp;</font><font class="Float">2</font><font class="Normal">&gt;*</font><font class="Float">1000</font></br></div>
-<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="DecVal">color</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">2.2</font><font class="Normal">,&nbsp;</font><font class="Float">1.8</font><font class="Normal">,&nbsp;</font><font class="Float">1.5</font><font class="Normal">&gt;</font></br></div>
+<div id="33" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Preprocessor">color</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;&lt;</font><font class="Float">2.2</font><font class="Normal">,&nbsp;</font><font class="Float">1.8</font><font class="Normal">,&nbsp;</font><font class="Float">1.5</font><font class="Normal">&gt;</font></br></div>
 <div id="34" class="line"><font class="Normal">}&nbsp;&nbsp;&nbsp;</font></br></div>
 <div id="35" class="line"></br></div>
 <div id="36" class="line"><font class="Comment">//&nbsp;----------------------------------------</font></br></div>
 <div id="37" class="line"></br></div>
-<div id="38" class="line"><font class="Function">#declare&nbsp;</font><font class="Operator">TEST</font><font class="Normal">=</font><font class="Float">0</font><font class="Normal">;</font></br></div>
+<div id="38" class="line"><font class="ControlFlow">#declare&nbsp;</font><font class="Variable">TEST</font><font class="Normal">=</font><font class="Float">0</font><font class="Normal">;</font></br></div>
 <div id="39" class="line"></br></div>
 <div id="40" class="line"><font class="Others">#ifdef</font><font class="Normal">&nbsp;(TEST)</font></br></div>
-<div id="41" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Float">plane</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="41" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Others">plane</font><font class="Normal">&nbsp;{</font></br></div>
 <div id="42" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">z</font><font class="Normal">,&nbsp;</font><font class="Float">0</font></br></div>
-<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">texture</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">pigment</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">checker</font></br></div>
-<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">color</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">,&nbsp;</font><font class="DecVal">color</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;</font><font class="Float">0</font></br></div>
+<div id="43" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">texture</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="44" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">pigment</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="45" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">checker</font></br></div>
+<div id="46" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">color</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">,&nbsp;</font><font class="Preprocessor">color</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;</font><font class="Float">0</font></br></div>
 <div id="47" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
 <div id="48" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
 <div id="49" class="line"><font class="Normal">&nbsp;&nbsp;}</font></br></div>
 <div id="50" class="line"><font class="Others">#end</font></br></div>
 <div id="51" class="line"></br></div>
-<div id="52" class="line"><font class="ControlFlow">#macro&nbsp;</font><font class="Preprocessor">Sphere</font><font class="Normal">(Pos,&nbsp;Radius)</font></br></div>
-<div id="53" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Float">sphere</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="52" class="line"><font class="Operator">#macro&nbsp;Sphere</font><font class="Normal">(Pos,&nbsp;Radius)</font></br></div>
+<div id="53" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Others">sphere</font><font class="Normal">&nbsp;{</font></br></div>
 <div id="54" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&lt;Pos.</font><font class="Keyword">x</font><font class="Normal">,&nbsp;Pos.</font><font class="Keyword">y</font><font class="Normal">,&nbsp;Radius*</font><font class="Float">1.3</font><font class="Normal">&gt;,&nbsp;Radius</font></br></div>
-<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">texture</font><font class="Normal">&nbsp;{</font></br></div>
-<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">pigment</font><font class="Normal">&nbsp;{&nbsp;</font><font class="DecVal">color</font><font class="Normal">&nbsp;</font><font class="DecVal">rgb</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;}</font></br></div>
-<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">finish</font><font class="Normal">{</font></br></div>
-<div id="58" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">diffuse</font><font class="Normal">&nbsp;</font><font class="Float">0.3</font></br></div>
-<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">ambient</font><font class="Normal">&nbsp;</font><font class="Float">0.0</font></br></div>
-<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">specular</font><font class="Normal">&nbsp;</font><font class="Float">0.6</font></br></div>
-<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DecVal">reflection</font><font class="Normal">&nbsp;</font><font class="Float">0.8</font></br></div>
+<div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">texture</font><font class="Normal">&nbsp;{</font></br></div>
+<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">pigment</font><font class="Normal">&nbsp;{&nbsp;</font><font class="Preprocessor">color</font><font class="Normal">&nbsp;</font><font class="Preprocessor">rgb</font><font class="Normal">&nbsp;</font><font class="Float">1</font><font class="Normal">&nbsp;}</font></br></div>
+<div id="57" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">finish</font><font class="Normal">{</font></br></div>
+<div id="58" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">diffuse</font><font class="Normal">&nbsp;</font><font class="Float">0.3</font></br></div>
+<div id="59" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">ambient</font><font class="Normal">&nbsp;</font><font class="Float">0.0</font></br></div>
+<div id="60" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">specular</font><font class="Normal">&nbsp;</font><font class="Float">0.6</font></br></div>
+<div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Preprocessor">reflection</font><font class="Normal">&nbsp;</font><font class="Float">0.8</font></br></div>
 <div id="62" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
 <div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;}</font></br></div>
 <div id="64" class="line"><font class="Normal">&nbsp;&nbsp;}</font></br></div>
 <div id="65" class="line"><font class="Others">#end</font></br></div>
 <div id="66" class="line"></br></div>
-<div id="67" class="line"><font class="Function">#local&nbsp;</font><font class="Operator">Cnt</font><font class="Normal">=</font><font class="Float">0</font><font class="Normal">;</font></br></div>
-<div id="68" class="line"><font class="Function">#local&nbsp;</font><font class="Operator">Seed</font><font class="Normal">=</font><font class="SpecialChar">seed</font><font class="Normal">(</font><font class="Float">0</font><font class="Normal">);</font></br></div>
+<div id="67" class="line"><font class="ControlFlow">#local&nbsp;</font><font class="Variable">Cnt</font><font class="Normal">=</font><font class="Float">0</font><font class="Normal">;</font></br></div>
+<div id="68" class="line"><font class="ControlFlow">#local&nbsp;</font><font class="Variable">Seed</font><font class="Normal">=</font><font class="Function">seed</font><font class="Normal">(</font><font class="Float">0</font><font class="Normal">);</font></br></div>
 <div id="69" class="line"></br></div>
 <div id="70" class="line"><font class="Others">#while</font><font class="Normal">&nbsp;(Cnt&lt;</font><font class="Float">10000</font><font class="Normal">)</font></br></div>
 <div id="71" class="line"><font class="Normal">&nbsp;&nbsp;Sphere(</font></br></div>
-<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Float">-100</font><font class="Normal">+&lt;</font><font class="SpecialChar">rand</font><font class="Normal">(Seed),&nbsp;</font><font class="SpecialChar">rand</font><font class="Normal">(Seed)&gt;*</font><font class="Float">200</font><font class="Normal">,&nbsp;</font></br></div>
-<div id="73" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Float">0.3</font><font class="Normal">+</font><font class="SpecialChar">pow</font><font class="Normal">(</font><font class="SpecialChar">rand</font><font class="Normal">(Seed),</font><font class="Float">2</font><font class="Normal">)*</font><font class="Float">0.7</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Float">-100</font><font class="Normal">+&lt;</font><font class="Function">rand</font><font class="Normal">(Seed),&nbsp;</font><font class="Function">rand</font><font class="Normal">(Seed)&gt;*</font><font class="Float">200</font><font class="Normal">,&nbsp;</font></br></div>
+<div id="73" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Float">0.3</font><font class="Normal">+</font><font class="Function">pow</font><font class="Normal">(</font><font class="Function">rand</font><font class="Normal">(Seed),</font><font class="Float">2</font><font class="Normal">)*</font><font class="Float">0.7</font></br></div>
 <div id="74" class="line"><font class="Normal">&nbsp;&nbsp;)&nbsp;&nbsp;</font></br></div>
-<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="Function">#local&nbsp;</font><font class="Operator">Cnt</font><font class="Normal">=Cnt+</font><font class="Float">1</font><font class="Normal">;</font></br></div>
+<div id="75" class="line"><font class="Normal">&nbsp;&nbsp;</font><font class="ControlFlow">#local&nbsp;</font><font class="Variable">Cnt</font><font class="Normal">=Cnt+</font><font class="Float">1</font><font class="Normal">;</font></br></div>
 <div id="76" class="line"><font class="Others">#end</font></br></div>
 </div>
 </body>

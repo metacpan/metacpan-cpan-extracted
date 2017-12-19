@@ -13,5 +13,6 @@ lib/Getopt/EX/Long.pm
 lib/Getopt/EX/Module.pm
 minil.toml
 t/00_compile.t
+t/01_colormap.t
 META.yml
 MANIFEST

@@ -8,7 +8,7 @@ package Future::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Exporter 'import';
 # Can't import the one from Exporter as it relies on package inheritance

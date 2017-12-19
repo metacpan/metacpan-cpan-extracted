@@ -1,4 +1,3 @@
-build-cpan-dist.sh
 coding_standards.md
 lib/Thrift.pm
 lib/Thrift/BinaryProtocol.pm
@@ -21,15 +20,9 @@ lib/Thrift/Transport.pm
 lib/Thrift/Type.pm
 lib/Thrift/UnixServerSocket.pm
 lib/Thrift/UnixSocket.pm
-Makefile-perl.mk
-Makefile.am
-Makefile.in
-Makefile.PL
 MANIFEST			This list of files
 README.md
 test.pl
-test/Makefile.am
-test/Makefile.in
 test/memory_buffer.t
 test/multiplex.t
 test/processor.t

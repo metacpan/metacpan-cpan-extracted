@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Test::Mockify:
     file: lib/Test/Mockify.pm
-    version: v0.10.1
+    version: v0.10.3
   Test::Mockify::CompatibilityTools:
     file: lib/Test/Mockify/CompatibilityTools.pm
   Test::Mockify::Matcher:
@@ -74,12 +74,13 @@ resources:
   bugtracker: https://github.com/ePages-de/Mockify/issues
   homepage: https://github.com/ePages-de/Mockify
   repository: git://github.com/ePages-de/Mockify.git
-version: 0.10.1
-x_authority: cpan:CHRISBR
+version: 0.10.3
+x_authority: cpan:CHRBR
 x_contributors:
-  - 'Christian Breitkreutz <c.breitkreutz@epages.com>'
   - 'Alexander Sandau <a.sandau@epages.com>'
   - 'Birgit Bader <b.bader@epages.com>'
-  - 'Oliver Trosien <otrosien@epages.com>'
+  - 'Christian Breitkreutz <c.breitkreutz@epages.com>'
   - 'Christian Breitkreutz <cbreitkreutz@epages.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Oliver Trosien <otrosien@epages.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

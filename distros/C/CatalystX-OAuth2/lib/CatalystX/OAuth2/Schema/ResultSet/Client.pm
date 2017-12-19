@@ -18,7 +18,7 @@ CatalystX::OAuth2::Schema::ResultSet::Client
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

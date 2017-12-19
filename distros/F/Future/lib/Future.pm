@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -21,7 +21,7 @@ require overload;
 
 our @CARP_NOT = qw( Future::Utils );
 
-use constant DEBUG => $ENV{PERL_FUTURE_DEBUG};
+use constant DEBUG => !!$ENV{PERL_FUTURE_DEBUG};
 
 our $TIMES = DEBUG || $ENV{PERL_FUTURE_TIMES};
 
@@ -237,8 +237,9 @@ sub CvNAME_FILE_LINE
    # in the same file actually shares the same GV. :(
    # Walk the optree looking for the first COP
    my $cop = $cv->START;
-   $cop = $cop->next while $cop and ref $cop ne "B::COP";
+   $cop = $cop->next while $cop and ref $cop ne "B::COP" and ref $cop ne "B::NULL";
 
+   return $cv->GV->NAME if ref $cop eq "B::NULL";
    sprintf "%s(%s line %d)", $cv->GV->NAME, $cop->file, $cop->line;
 }
 

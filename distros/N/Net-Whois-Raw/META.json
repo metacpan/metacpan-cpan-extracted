@@ -56,7 +56,7 @@
          "web" : "https://github.com/nalobin/Net-Whois-Raw"
       }
    },
-   "version" : "2.99011",
+   "version" : "2.99013",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

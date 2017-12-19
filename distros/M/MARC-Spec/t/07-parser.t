@@ -12,18 +12,11 @@ ok $parser->field->index_length == -1  , 'field index_length';
 ok $parser->field->has_char_pos eq ''  , 'field attribute has_char_pos false';
 ok $parser->field->has_char_start eq '', 'field attribute has_char_start false';
 ok $parser->field->has_char_end eq ''  , 'field attribute has_char_end false';
-ok $parser->field->has_indicator1 eq '', 'field attribute has_indicator1 false';
-ok $parser->field->has_indicator2 eq '', 'field attribute has_indicator2 false';
 
 $parser->field->index_start(1);
 ok $parser->field->index_start == 1    , 'field index_start';
 ok $parser->field->index_end eq '#'    , 'field index_end';
 ok $parser->field->index_length == -1  , 'field index_length';
-
-$parser->field->indicator1(0);
-$parser->field->indicator2(0);
-ok $parser->field->has_indicator1      , 'field attribute has_indicator1 true';
-ok $parser->field->has_indicator2      , 'field attribute has_indicator2 true';
 
 $parser->field->index_end(3);
 ok $parser->field->index_end == 3      , 'field index_end';

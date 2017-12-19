@@ -1,4 +1,4 @@
-package PPI::XS;
+package PPI::XS; # git description: release-0.904-4-g378ef4e
 
 # See POD at end for documentation
 
@@ -14,12 +14,9 @@ use XSLoader;
 use PPI 1.000 ();
 
 # Define compatibility information
-use vars qw{$VERSION $PM_COMPATIBLE %EXCLUDE};
-BEGIN {
-	$VERSION       = '0.904';
-	$PM_COMPATIBLE = '0.844';
-	%EXCLUDE       = ();
-}
+our $VERSION = '0.910';
+our $PM_COMPATIBLE = '0.844';
+our %EXCLUDE       = ();
 
 # Does the main package define the minimum set of variables?
 return 1 unless defined $PPI::VERSION;
@@ -83,6 +80,10 @@ __END__
 =head1 NAME
 
 PPI::XS - (Minor) XS acceleration for PPI
+
+=head1 VERSION
+
+version 0.910
 
 =head1 DESCRIPTION
 

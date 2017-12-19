@@ -5,6 +5,7 @@ use constant {
     DT_TZ_MIN => 2.10,
     SECONDS_PER_MINUTE => 60,
     SECONDS_PER_HOUR => 60 * 60,
+    MINUTES_PER_HOUR => 60,
 };
 
 use Test::More 0.88;
@@ -136,7 +137,10 @@ sub test_windows_zone {
     my $windows_tz_name = shift;
     my $iana_name      = shift;
     my $registry_writable = shift;
-    my %KnownBad = map { $_ => 1 } ( );
+    my %KnownBad = map { $_ => 1 } ( 
+            'Namibia Standard Time', 
+            'Turks And Caicos Standard Time'
+        );
 
 
     my $tz;
@@ -203,37 +207,21 @@ sub test_windows_zone {
                 day => 1,
             );
 
-            my $dst_offset = abs($aug_dt->offset() - $feb_dt->offset());
-            my $windows_offset
-                = $WindowsTZKey->{"${windows_tz_name}/Display"};
+            # Windows time zone offsets are defined in a structure defined here and offsets are in minutes):
+            #     https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
+            my ($bias, $standardBias, $daylightBias) = unpack("lll", $WindowsTZKey->{"${windows_tz_name}/TZI"});
+            my $windows_offset = ($bias + $standardBias) * -1;
 
-            if ( $windows_offset =~ /^\((?:GMT|UTC)\).*$/ ) {
-                $windows_offset = 0;
-            }
-            else {
-                if ( my ($sign, $hours, $minutes) = ($windows_offset =~ /^\((?:GMT|UTC)([+-])(.*?):(.*?)\).*$/ ) ) {
-                    $hours =~ s/^0//;
-                    $minutes =~ s/^0//;
-                    $windows_offset = ( $hours * SECONDS_PER_HOUR ) + ( $minutes * SECONDS_PER_MINUTE );
-                    $windows_offset *= -1 if $sign eq '-';
-                }
-                else {
-                    skip (
-                        "Time Zone display for $windows_tz_name not testable",
-                        3
-                    );
-                }
-            }
+            # offsets in DateTime::TimeZone are in seconds
+            my $dt_offset = $dt->is_dst()? $dt->offset() + ($daylightBias * SECONDS_PER_MINUTE) : $dt->offset();
+            my $feb_dt_offset = $feb_dt->is_dst()? $feb_dt->offset() + ($daylightBias * SECONDS_PER_MINUTE) : $feb_dt->offset();
+            my $aug_dt_offset = $aug_dt->is_dst()? $aug_dt->offset()  + ($daylightBias * SECONDS_PER_MINUTE) : $aug_dt->offset();
 
-            my $dt_offset = $dt->is_dst()? $dt->offset() - $dst_offset : $dt->offset();
-            my $feb_dt_offset = $feb_dt->is_dst()? $feb_dt->offset() - $dst_offset : $feb_dt->offset();
-            my $aug_dt_offset = $aug_dt->is_dst()? $aug_dt->offset() - $dst_offset : $aug_dt->offset();
-            
-            # convert offsets from seconds before or after UTC to hours
+            # convert offsets from seconds or minutes before or after UTC to hours
             $dt_offset /= SECONDS_PER_HOUR;
             $feb_dt_offset /= SECONDS_PER_HOUR;
             $aug_dt_offset /= SECONDS_PER_HOUR;
-            $windows_offset /= SECONDS_PER_HOUR;
+            $windows_offset /= MINUTES_PER_HOUR;
 
             if ( $KnownBad{$windows_tz_name} ) {
             TODO: {
@@ -241,17 +229,17 @@ sub test_windows_zone {
                         = "Microsoft has some out-of-date time zones relative to IANA";
 
                     is(
-                        $dt_offset, $windows_offset,
-                        "$windows_tz_name - Windows offset matches IANA offset for time set now"
+                        $windows_offset, $dt_offset,
+                        "$windows_tz_name - Windows offset matches IANA offset for current time"
                     );
 
                     is(
-                        $feb_dt_offset, $windows_offset,
+                        $windows_offset, $feb_dt_offset,
                         "$windows_tz_name - Windows offset matches IANA offset for time set February 1"
                     );
 
                     is(
-                        $aug_dt_offset, $windows_offset,
+                        $windows_offset, $aug_dt_offset,
                         "$windows_tz_name - Windows offset matches IANA offset for time set August 1"
                     );
                     return;
@@ -267,18 +255,18 @@ sub test_windows_zone {
             }
             else {
                 is(
-                    $dt_offset, $windows_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for time set now"
+                    $windows_offset, $dt_offset,
+                    "$windows_tz_name - Windows offset matches IANA offset for current time"
                 );
 
                 is(
-                    $feb_dt_offset, $windows_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for time set January 1"
+                    $windows_offset, $feb_dt_offset,
+                    "$windows_tz_name - Windows offset matches IANA offset for time set February 1"
                 );
 
                 is(
-                    $aug_dt_offset, $windows_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for time set July 1"
+                    $windows_offset, $aug_dt_offset,
+                    "$windows_tz_name - Windows offset matches IANA offset for time set August 1"
                 );
             }
         }

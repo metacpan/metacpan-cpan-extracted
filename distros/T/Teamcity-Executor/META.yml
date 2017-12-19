@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Teamcity::Executor:
     file: lib/Teamcity/Executor.pm
-    version: v0.1.1
+    version: v0.2.1
 requires:
   Cpanel::JSON::XS: '0'
   Future: '0'
@@ -41,8 +41,12 @@ resources:
   bugtracker: https://github.com/avast/Teamcity-Executor/issues
   homepage: https://github.com/avast/Teamcity-Executor
   repository: git://github.com/avast/Teamcity-Executor.git
-version: 0.1.1
+version: 0.2.1
 x_authority: cpan:TYNOVSKY
 x_contributors:
   - 'tynovsky <tynovsky@seznam.cz>'
+  - 'Ondřej Hošák <ondrej-hosak@users.noreply.github.com>'
+  - 'Jan Seidl <seidl@avast.com>'
+  - 'Ondřej Hošák <ondrej.hosak@avast.com>'
+  - 'Jan Seidl <janseidl@volny.cz>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

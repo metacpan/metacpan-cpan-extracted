@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -265,6 +265,8 @@ sub inref_graph
                       $opts{direct} ? $rv->inrefs_direct :
                                       $rv->inrefs;
 
+         return $_ unless @rvrefs == 1;
+
          # Add 'via RV' marker
          return map {
             Devel::MAT::SV::Reference( Devel::MAT::Cmd->format_note( "(via RV)" ) . " " . $_->name,
@@ -469,12 +471,32 @@ sub format_note
    return $str;
 }
 
+sub _format_sv
+{
+   shift;
+   my ( $ret ) = @_;
+
+   return $ret;
+}
+
 sub format_sv
 {
    shift;
    my ( $sv ) = @_;
 
-   return $sv->desc_addr;
+   my $ret = $sv->desc;
+
+   if( my $blessed = $sv->blessed ) {
+      $ret .= "=" . Devel::MAT::Cmd->format_symbol( $blessed->stashname, $blessed );
+   }
+
+   $ret .= sprintf " at %#x", $sv->addr;
+
+   if( my $rootname = $sv->rootname ) {
+      $ret .= "=" . Devel::MAT::Cmd->format_note( $rootname, 1 );
+   }
+
+   return Devel::MAT::Cmd->_format_sv( $ret, $sv );
 }
 
 sub _format_value
@@ -545,6 +567,36 @@ sub format_bytes
       return sprintf "%.1f GiB", $bytes / 1024**3;
    }
    return sprintf "%.1f TiB", $bytes / 1024**4;
+}
+
+sub format_sv_with_value
+{
+   my $self = shift;
+   my ( $sv ) = @_;
+
+   my $repr = $self->format_sv( $sv );
+
+   if( $sv->type eq "SCALAR" ) {
+      my @reprs;
+
+      my $num;
+      defined( $num = $sv->nv // $sv->uv ) and
+         push @reprs, $self->format_value( $num, nv => 1 );
+
+      defined $sv->pv and
+         push @reprs, $self->format_value( $sv->pv, pv => 1 );
+
+      # Dualvars
+      return "$repr = $reprs[0] / $reprs[1]" if @reprs > 1;
+
+      return "$repr = $reprs[0]" if @reprs;
+   }
+   elsif( $sv->type eq "REF" ) {
+      #return "REF => NULL" if !$sv->rv;
+      return "$repr => " . $self->format_sv_with_value( $sv->rv ) if $sv->rv;
+   }
+
+   return $repr;
 }
 
 =head1 AUTHOR

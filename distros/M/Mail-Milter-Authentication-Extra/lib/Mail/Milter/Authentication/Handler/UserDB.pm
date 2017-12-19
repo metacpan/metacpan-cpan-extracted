@@ -5,7 +5,7 @@ use DB_File;
 use Mail::Milter::Authentication::Handler::UserDB::Hash;
 use Sys::Syslog qw{:standard :macros};
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.5');
 
 my $CHECKED_TIME;
 

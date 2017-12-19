@@ -70,6 +70,10 @@ require Getopt::Long;
 my %opt = (verbose => 0, uninst => 0, destdir => '', create_packlist => 1);
 $Build_PL::ARGV=$Build_PL::ARGV if 0; # cease -w
 @ARGV = (@$Build_PL::ARGV, @ARGV);
+if ($ENV{PERL_MB_OPT}) {
+    require Text::ParseWords;
+    push @ARGV, Text::ParseWords::shellwords($ENV{PERL_MB_OPT});
+}
 Getopt::Long::GetOptions(
     \%opt,
     'allow_mb_mismatch=i',
@@ -77,6 +81,7 @@ Getopt::Long::GetOptions(
     'create_packlist=i',
     'destdir=s',
     'installdirs=s',
+    'install_base=s',
     'install_path=s%',
     'prefix=s',
     'uninst:1',
@@ -278,6 +283,40 @@ sub test_pod (;$) {
     }
 }
 
+sub test_cpan_versions {
+    my($distdir) = @_;
+
+    if (is_in_path "cpan_check_versions") {
+	in_directory {
+	    $doit->system('cpan_check_versions', '-remote');
+	} $distdir;
+    } else {
+	warning <<EOF;
+No cpan_check_versions found in PATH, cannot check for properly
+incremented VERSIONs. Please check git://github.com/eserte/srezic-misc.git
+EOF
+    }
+}
+
+sub git_checks {
+    $doit->add_component('git');
+
+    my $status = $doit->git_short_status;
+    if ($status eq '<<') {
+	error 'Working directory has uncomitted changes: ' . `git status`;
+    }
+    if ($status eq '*') {
+	error 'Working directory has files not under git control (and not in .gitignore or .git/info/exclude): ' . `git status`;
+    }
+
+    my $Doit_VERSION = _get_Doit_VERSION();
+
+    my $out = $doit->info_qx(qw(git tag -l), $Doit_VERSION);
+    if (defined $out && $out ne '') {
+	error "A git tag $Doit_VERSION already exists";
+    }
+}
+
 sub distdir {
     my(%options) = @_;
     my $temporary = delete $options{temporary};
@@ -319,11 +358,25 @@ sub distdir {
 }
 
 sub dist {
+    if (!$ENV{DOIT_TEST_SKIP_SOME_CHECKS}) {
+	git_checks();
+    }
+    # else skip because Doit version is usually not incremented in
+    # this phase and the git tag already exists
+
+
     my $tarfile = _get_tarfilename();
     if (-e $tarfile) {
 	error "$tarfile already exists";
     }
     my $distdir = distdir(temporary => 1);
+
+    if (!$ENV{DOIT_TEST_SKIP_SOME_CHECKS}) {
+	test_cpan_versions($distdir);
+    }
+    # else because versions of all Doit modules are usually not
+    # incremented in this phase
+
     require File::Basename;
     in_directory {
 	# Note: tar cfvz C:/... ... does not seem to work on Windows
@@ -336,6 +389,7 @@ sub dist {
 }
 
 sub dist_install_and_test {
+    local $ENV{DOIT_TEST_SKIP_SOME_CHECKS} = 1; # XXX is there a better interface?
     my $tarfile = _get_tarfilename();
     if (!-e $tarfile) {
 	dist();
@@ -434,6 +488,19 @@ sub install {
     my @euii_args = (
 	from_to => {
 	    (
+		$opt{install_base}
+		?
+		(
+		    read          => "$Config{sitearchexp}/auto/$FULLEXT/.packlist",
+		    ($opt{create_packlist} ? (write => "$opt{install_base}/lib/perl5/$Config{archname}/auto/$FULLEXT/.packlist") : ()),
+		    $INST_LIB     => "$opt{install_base}/lib/perl5",
+		    $INST_ARCHLIB => "$opt{install_base}/lib/perl5",
+		    $INST_BIN     => "$opt{install_base}/bin",
+		    $INST_SCRIPT  => "$opt{install_base}/bin",
+		    $INST_MAN1DIR => "$opt{install_base}/man/man1",
+		    $INST_MAN3DIR => "$opt{install_base}/man/man3",
+		)
+	        :
 		($opt{installdirs}||'') eq 'core'
 		?
 		(
@@ -485,27 +552,6 @@ sub install {
     }
 }
 
-sub git_tag {
-    $doit->add_component('git');
-
-    my $status = $doit->git_short_status;
-    if ($status eq '<<') {
-	error 'Working directory has uncomitted changes: ' . `git status`;
-    }
-    if ($status eq '*') {
-	error 'Working directory has files not under git control (and not in .gitignore or .git/info/exclude): ' . `git status`;
-    }
-
-    my $Doit_VERSION = _get_Doit_VERSION();
-
-    my $out = $doit->info_qx(qw(git tag --list), $Doit_VERSION);
-    if (defined $out && $out ne '') {
-	error "A git tag $Doit_VERSION already exists";
-    }
-
-    $doit->system(qw(git tag -a -m), "tag $Doit_VERSION release", $Doit_VERSION);
-}
-
 sub _get_Doit_VERSION () {
     my $Doit_VERSION = $Doit::VERSION;
     if (!defined $Doit_VERSION) {
@@ -549,7 +595,7 @@ sub _generate_META ($;$) {
 		},
 		requires => {
 		    'Exporter'    => 5.57, # use Exporter "import"
-		    'File::Path'  => 2.0,  # make_path
+		    'File::Path'  => 2.07, # make_path
 		},
 	    },
 	    test => {
@@ -561,6 +607,7 @@ sub _generate_META ($;$) {
 	resources => {
 	    repository => { url => 'git://github.com/eserte/Doit' },
 	},
+	generated_by => "Doit version " . _get_Doit_VERSION(),
     });
     if ($doit->is_dry_run) {
 	info "Would create $destfile" . (defined $meta_version ? " (version $meta_version)" : "") . " (dry-run)";

@@ -3,6 +3,20 @@ Revision history for Dist-Zilla-Plugins-CJM
 Note: the version number of a plugin is the version of the dist in
 which it was last changed.
 
+6.000  2017-12-17
+	- Updates for Dist::Zilla 6
+
+	[ArchiveRelease]
+	  - Replace Path::Class with Path::Tiny
+
+	[Metadata]
+	  - Treat x_contributors custom key as List
+	    (GitHub#6: Robert Rothenberg)
+
+	[=Dist::Zilla::Role::ModuleInfo]
+	  - Replace Path::Class with Path::Tiny
+	  - Now requires Dist::Zilla 6
+
 4.27   2015-08-29
 	[GitVersionCheckCJM]
 	  - Add single_version parameter

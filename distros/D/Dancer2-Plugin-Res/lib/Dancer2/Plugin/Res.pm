@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Res;
 
-$Dancer2::Plugin::Res::VERSION   = '0.07';
+$Dancer2::Plugin::Res::VERSION   = '0.08';
 $Dancer2::Plugin::Res::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Res - Dancer2 add-on for setting status/response.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -36,7 +36,7 @@ As used in L<Dancer2 Cookbook|https://github.com/manwar/Dancer2-Cookbook> projec
 
     post '/login' => sub {
 
-        return res 400 => 'Invalid captcha code';
+        return res(400 => 'Invalid captcha code')
             unless (is_valid_captcha(request->params->{captcha}));
 
         ...

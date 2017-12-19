@@ -1,5 +1,9 @@
 Revision history for Params-Registry
 
+0.08    Mon 12 Dec 17:57:50 PST 2017
+        Added Instance to `default` argument spec. Made `unwind` work
+        for single-valued parameters. Additional fixes for default values.
+
 0.07    Mon 20 Nov 16:42:17 PST 2017
         Fixed bug for empty values with max cardinality of 1.
 

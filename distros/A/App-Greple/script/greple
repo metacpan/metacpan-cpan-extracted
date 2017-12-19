@@ -17,7 +17,7 @@
 use strict;
 use warnings;
 
-require 5.010;
+require 5.014;
 
 use File::stat;
 use IO::Handle;
@@ -646,7 +646,7 @@ my $need_color = (($opt_color eq 'always')
 if ($opt_d{c}) {
     my $dump = sub {
 	local $_ = Dumper shift;
-	s/(?<=')([^'\s]+)(?=')/color($1, $1)/ge;
+	s/^\s*'\K([^'\s]+)(?=')/color($1, $1)/mge;
 	$_;
     };
     warn 'colormap = ', $dump->(\%colormap);

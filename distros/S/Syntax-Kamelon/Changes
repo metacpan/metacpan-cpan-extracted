@@ -26,3 +26,223 @@ Version 0.17 November 28, 2017
 
 	Refactored testing
 	Set license in Makefile.PL
+
+Version 0.18 December 14, 2017
+
+	Fixed line 245 of XMLData.pm so Perl 5.8.x will compile (hopefully)
+	Created a helper script for updating xml definition files
+	Updated syntax 4DOS BatchToMemory from version 2 to version 3
+	Updated syntax AHDL from version 2 to version 3
+	Updated syntax AMPLE from version 2 to version 3
+	Updated syntax ANSI C89 from version 3 to version 4
+	Updated syntax ASN.1 from version 2 to version 3
+	Added syntax Adblock Plus
+	Updated syntax Alerts from version 3 to version 5
+	Updated syntax Alerts_indent from version 3 to version 4
+	Updated syntax Ansys from version 2 to version 3
+	Added syntax AppArmor Security Profile
+	Updated syntax Asterisk from version 2 to version 3
+	Updated syntax Bash from version 3 to version 4
+	Updated syntax Bitbake from version 2 to version 4
+	Updated syntax C from version 2 to version 3
+	Updated syntax C++ from version 4 to version 5
+	Updated syntax Cg from version 2 to version 3
+	Updated syntax ChangeLog from version 2 to version 3
+	Updated syntax Clipper from version 2 to version 3
+	Updated syntax Clojure from version 6 to version 8
+	Updated syntax ColdFusion from version 2 to version 3
+	Updated syntax Common Lisp from version 3 to version 5
+	Updated syntax Crack from version 2 to version 3
+	Updated syntax Debian Changelog from version 3 to version 4
+	Updated syntax Diff from version 2 to version 3
+	Updated syntax Dockerfile from version 5 to version 6
+	Added syntax Doxyfile
+	Updated syntax Doxygen from version 3 to version 5
+	Updated syntax DoxygenLua from version 3 to version 4
+	Updated syntax Email from version 2 to version 3
+	Updated syntax FSharp from version 2 to version 3
+	Updated syntax FreeBASIC from version 1 to version 2
+	Updated syntax GAP from version 1 to version 2
+	Updated syntax GNU Gettext from version 4 to version 5
+	Updated syntax Git Ignore from version 1 to version 2
+	Updated syntax Gitolite from version 1 to version 2
+	Updated syntax Gnuplot from version 2 to version 3
+	Updated syntax Groovy from version 2 to version 3
+	Updated syntax Haml from version 2 to version 3
+	Updated syntax Hamlet from version 2 to version 3
+	Updated syntax Haskell from version 5 to version 9
+	Updated syntax Haxe from version 1 to version 2
+	Updated syntax Hunspell Affix File from version 1 to version 2
+	Updated syntax ISO C++ from version 6 to version 10
+	Added syntax Intel HEX
+	Updated syntax Java from version 2 to version 3
+	Updated syntax JavaScript from version 2 to version 6
+	Updated syntax Jira from version 3 to version 4
+	Updated syntax Julia from version 1 to version 3
+	Updated syntax KDev-PG[-Qt from version 1 to version 2
+	Updated syntax LESSCSS from version 2 to version 3
+	Updated syntax LaTeX from version 4 to version 5
+	Updated syntax Literate Curry from version 1 to version 2
+	Updated syntax Literate Haskell from version 3 to version 4
+	Updated syntax MIPS Assembler from version 2 to version 3
+	Updated syntax Makefile from version 5 to version 6
+	Updated syntax MediaWiki from version 3 to version 4
+	Added syntax Metamath
+	Updated syntax MonoBasic from version 2 to version 3
+	Updated syntax Music Publisher from version 2 to version 3
+	Updated syntax NSIS from version 2 to version 3
+	Updated syntax Objective Caml from version 4 to version 6
+	Updated syntax PHP/PHP from version 2 to version 7
+	Updated syntax POV-Ray from version 3 to version 4
+	Updated syntax Perl from version 3 to version 4
+	Updated syntax PicAsm from version 2 to version 3
+	Updated syntax Pig from version 5 to version 6
+	Added syntax Pony
+	Added syntax PowerShell
+	Updated syntax Prolog from version 3 to version 5
+	Updated syntax Protobuf from version 3 to version 4
+	Added syntax Pug
+	Updated syntax Puppet from version 4 to version 5
+	Added syntax QDoc Configuration
+	Updated syntax QML from version 3 to version 4
+	Updated syntax QMake from version 3 to version 5
+	Updated syntax R Script from version 6 to version 7
+	Updated syntax RELAX NG from version 1 to version 2
+	Updated syntax Ruby from version 3 to version 5
+	Updated syntax Ruby/Rails/RHTML from version 5 to version 6
+	Updated syntax SQL from version 2 to version 3
+	Updated syntax SQL (MySQL) from version 2 to version 3
+	Updated syntax SQL (Oracle) from versimon 2 to version 4
+	Updated syntax SQL (PostgreSQL) from version 2 to version 5
+	Updated syntax Scala from version 3 to version 4
+	Updated syntax Scheme from version 3 to version 4
+	Updated syntax Sieve from version 4 to version 6
+	Updated syntax Spice from version 2 to version 3
+	Updated syntax Stata from version 4 to version 6
+	Updated syntax SystemVerilog from version 3 to version 4
+	Updated syntax TOML from version 3 to version 5
+	Updated syntax TT2 from version 1 to version 2
+	Updated syntax TaskJuggler from version 3 to version 4
+	Updated syntax Textile from version 2 to version 3
+	Added syntax Tiger
+	Updated syntax VHDL from version 2 to version 3
+	Updated syntax Varnish 4 Configuration Language from version 1 to version 2
+	Updated syntax Varnish Configuration Language from version 1 to version 2
+	Updated syntax Vera from version 3 to version 4
+	Updated syntax XML from version 5 to version 6
+	Updated syntax XML (Debug) from version 2 to version 3
+	Added syntax YANG
+	Updated syntax Zsh from version 1 to version 2
+	Updated syntax progress from version 2 to version 3
+	Updated syntax reStructuredText from version 2 to version 3
+	Updated syntax scilab from version 2 to version 3
+	Updated syntax txt2tags from version 2 to version 3
+	Updated syntax xslt from version 2 to version 4
+	haje@BigOne:~/Kamelon> perl -Mblib tools/update_selector -s ./syntax -t ./selected_updates
+	Updated syntax 4DOS BatchToMemory from version 2 to version 3
+	Updated syntax AHDL from version 2 to version 3
+	Updated syntax AMPLE from version 2 to version 3
+	Updated syntax ANSI C89 from version 3 to version 4
+	Updated syntax ASN.1 from version 2 to version 3
+	Added syntax Adblock Plus
+	Updated syntax Alerts from version 3 to version 5
+	Updated syntax Alerts_indent from version 3 to version 4
+	Updated syntax Ansys from version 2 to version 3
+	Added syntax AppArmor Security Profile
+	Updated syntax Asterisk from version 2 to version 3
+	Updated syntax Bash from version 3 to version 4
+	Updated syntax Bitbake from version 2 to version 4
+	Updated syntax C from version 2 to version 3
+	Updated syntax C++ from version 4 to version 5
+	Updated syntax Cg from version 2 to version 3
+	Updated syntax ChangeLog from version 2 to version 3
+	Updated syntax Clipper from version 2 to version 3
+	Updated syntax Clojure from version 6 to version 8
+	Updated syntax ColdFusion from version 2 to version 3
+	Updated syntax Common Lisp from version 3 to version 5
+	Updated syntax Crack from version 2 to version 3
+	Updated syntax Debian Changelog from version 3 to version 4
+	Updated syntax Diff from version 2 to version 3
+	Updated syntax Dockerfile from version 5 to version 6
+	Added syntax Doxyfile
+	Updated syntax Doxygen from version 3 to version 5
+	Updated syntax DoxygenLua from version 3 to version 4
+	Updated syntax Email from version 2 to version 3
+	Updated syntax FSharp from version 2 to version 3
+	Updated syntax FreeBASIC from version 1 to version 2
+	Updated syntax GAP from version 1 to version 2
+	Updated syntax GNU Gettext from version 4 to version 5
+	Updated syntax Git Ignore from version 1 to version 2
+	Updated syntax Gitolite from version 1 to version 2
+	Updated syntax Gnuplot from version 2 to version 3
+	Updated syntax Groovy from version 2 to version 3
+	Updated syntax Haml from version 2 to version 3
+	Updated syntax Hamlet from version 2 to version 3
+	Updated syntax Haskell from version 5 to version 9
+	Updated syntax Haxe from version 1 to version 2
+	Updated syntax Hunspell Affix File from version 1 to version 2
+	Updated syntax ISO C++ from version 6 to version 10
+	Added syntax Intel HEX
+	Updated syntax Java from version 2 to version 3
+	Updated syntax JavaScript from version 2 to version 6
+	Updated syntax Jira from version 3 to version 4
+	Updated syntax Julia from version 1 to version 3
+	Updated syntax KDev-PG[-Qt from version 1 to version 2
+	Updated syntax LESSCSS from version 2 to version 3
+	Updated syntax LaTeX from version 4 to version 5
+	Updated syntax Literate Curry from version 1 to version 2
+	Updated syntax Literate Haskell from version 3 to version 4
+	Updated syntax MIPS Assembler from version 2 to version 3
+	Updated syntax Makefile from version 5 to version 6
+	Updated syntax MediaWiki from version 3 to version 4
+	Added syntax Metamath
+	Updated syntax MonoBasic from version 2 to version 3
+	Updated syntax Music Publisher from version 2 to version 3
+	Updated syntax NSIS from version 2 to version 3
+	Updated syntax Objective Caml from version 4 to version 6
+	Updated syntax PHP/PHP from version 2 to version 7
+	Updated syntax POV-Ray from version 3 to version 4
+	Updated syntax Perl from version 3 to version 4
+	Updated syntax PicAsm from version 2 to version 3
+	Updated syntax Pig from version 5 to version 6
+	Added syntax Pony
+	Added syntax PowerShell
+	Updated syntax Prolog from version 3 to version 5
+	Updated syntax Protobuf from version 3 to version 4
+	Added syntax Pug
+	Updated syntax Puppet from version 4 to version 5
+	Added syntax QDoc Configuration
+	Updated syntax QML from version 3 to version 4
+	Updated syntax QMake from version 3 to version 5
+	Updated syntax R Script from version 6 to version 7
+	Updated syntax RELAX NG from version 1 to version 2
+	Updated syntax Ruby from version 3 to version 5
+	Updated syntax Ruby/Rails/RHTML from version 5 to version 6
+	Updated syntax SQL from version 2 to version 3
+	Updated syntax SQL (MySQL) from version 2 to version 3
+	Updated syntax SQL (Oracle) from version 2 to version 4
+	Updated syntax SQL (PostgreSQL) from version 2 to version 5
+	Updated syntax Scala from version 3 to version 4
+	Updated syntax Scheme from version 3 to version 4
+	Updated syntax Sieve from version 4 to version 6
+	Updated syntax Spice from version 2 to version 3
+	Updated syntax Stata from version 4 to version 6
+	Updated syntax SystemVerilog from version 3 to version 4
+	Updated syntax TOML from version 3 to version 5
+	Updated syntax TT2 from version 1 to version 2
+	Updated syntax TaskJuggler from version 3 to version 4
+	Updated syntax Textile from version 2 to version 3
+	Added syntax Tiger
+	Updated syntax VHDL from version 2 to version 3
+	Updated syntax Varnish 4 Configuration Language from version 1 to version 2
+	Updated syntax Varnish Configuration Language from version 1 to version 2
+	Updated syntax Vera from version 3 to version 4
+	Updated syntax XML from version 5 to version 6
+	Updated syntax XML (Debug) from version 2 to version 3
+	Added syntax YANG
+	Updated syntax Zsh from version 1 to version 2
+	Updated syntax progress from version 2 to version 3
+	Updated syntax reStructuredText from version 2 to version 3
+	Updated syntax scilab from version 2 to version 3
+	Updated syntax txt2tags from version 2 to version 3
+	Updated syntax xslt from version 2 to version 4

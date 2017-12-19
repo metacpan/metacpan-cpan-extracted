@@ -45,7 +45,8 @@ use Future;
 
    like( exception { $future->get }, qr/cancelled/, '$future->get throws exception by cancel' );
 
-   ok( !exception { $future->cancel }, '$future->cancel a second time is OK' );
+   is( exception { $future->cancel }, undef,
+      '$future->cancel a second time is OK' );
 
    $done_f->cancel;
    $fail_f->cancel;

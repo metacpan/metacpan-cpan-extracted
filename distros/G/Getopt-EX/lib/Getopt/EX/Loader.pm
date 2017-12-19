@@ -23,6 +23,8 @@ sub new {
 	BASECLASS => undef,
 	MODULE_OPT => '-M',
 	DEFAULT => 'default',
+	PARSE_MODULE_OPT => 1,
+	IGNORE_NO_MODULE => 0,
     }, $class;
 
     configure $obj @_ if @_;
@@ -30,11 +32,19 @@ sub new {
     $obj;
 }
 
+my @OPTIONS = qw(
+    BASECLASS
+    MODULE_OPT
+    DEFAULT
+    PARSE_MODULE_OPT
+    IGNORE_NO_MODULE
+    );
+
 sub configure {
     my $obj = shift;
     my %opt = @_;
 
-    for my $opt (qw(BASECLASS MODULE_OPT DEFAULT)) {
+    for my $opt (@OPTIONS) {
 	if (defined (my $value = delete $opt{$opt})) {
 	    $obj->{$opt} = $value;
 	}
@@ -109,10 +119,10 @@ sub deal_with {
 	if (my $bucket = eval { $obj->load_module($default) }) {
 	    $bucket->run_inits($argv);
 	} else {
-	    die $@ unless $! =~ /^No such file or directory/;
+	    $!{ENOENT} or die $@;
 	}
     }
-    $obj->modopt($argv);
+    $obj->modopt($argv) if $obj->{PARSE_MODULE_OPT};
     $obj->expand($argv);
     $obj;
 }
@@ -126,9 +136,11 @@ sub modopt {
     my $start_re = qr/\Q$start\E/;
     my @modules;
     while (@$argv) {
-	if ($argv->[0] =~ s/^$start_re(.+)/$1/) {
-	    if (my $mod = $obj->parseopt($argv)) {
+	if (my($modpart) = ($argv->[0] =~ /^$start_re(.+)/)) {
+	    if (my $mod = $obj->parseopt($modpart, $argv)) {
 		push @modules, $mod;
+	    } else {
+		last;
 	    }
 	    next;
 	}
@@ -139,14 +151,14 @@ sub modopt {
 
 sub parseopt {
     my $obj = shift;
-    my $argv = shift;
+    my($mod, $argv) = @_;
     my $base = $obj->baseclass;
     my $call;
 
     ##
     ## Check -Mmod::func(arg) or -Mmod::func=arg
     ##
-    if ($argv->[0] =~ s{
+    if ($mod =~ s{
 	^ (?<name> \w+ (?: :: \w+)* )
 	  (?:
 	    ::
@@ -162,8 +174,19 @@ sub parseopt {
 	$call = $+{call};
     }
 
-    my $mod = shift @$argv;
-    my $bucket = eval { $obj->load_module($mod) } or die $@;
+    my $bucket = eval { $obj->load_module($mod) } or do {
+	if ($!{ENOENT}) {
+	    if ($obj->{IGNORE_NO_MODULE}) {
+		return undef;
+	    } else {
+		die "$mod: module not found\n";
+	    }
+	} else {
+	    die $@;
+	}
+    };
+
+    shift @$argv;
 
     if ($call) {
 	$bucket->call(join '::', $bucket->module, $call);
@@ -337,6 +360,19 @@ Define module option string.  String B<-M> is set by default.
 
 Define default module name.  String B<default> is set by default.  Set
 C<undef> if you don't want load any default module.
+
+=item PARSE_MODULE_OPT
+
+Default true, and parse module options given to C<deal_with> method.
+When disabled, module option in command line argument is not
+processed, but module option given in rc or module files are still
+effective.
+
+=item IGNORE_NO_MODULE
+
+Default false, and process dies when given module was not found on the
+system.  When set true, program ignores not-existing module and stop
+parsing at the point leaving the argument untouched.
 
 =back
 

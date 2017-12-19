@@ -1,0 +1,10 @@
+0.002 14-12-2017
+    [Bugfix]
+        Return correct values for bigram possibilities.
+
+    [Plumbing]
+        Generate a meta.json file - thanks Mohammad Anwar (MANWAR)!
+
+0.001 13-12-2017
+
+    Initial release.

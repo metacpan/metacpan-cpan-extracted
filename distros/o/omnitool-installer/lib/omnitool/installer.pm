@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.5";
+our $VERSION = "1.0.7";
 
 # for reading in configs
 use File::Slurp;
@@ -253,7 +253,7 @@ sub do_the_installation {
 
 	# what is left for them to do?
 	$web_urls[0] = 'https://'.$self->{options}{'ot-primary-hostname'}.'/sample_apps_admin';
-	$web_urls[1] = 'https://'.$self->{options}{'ot-primary-hostname'}.'/sample_apps';
+	$web_urls[1] = 'https://'.$self->{options}{'ot-primary-hostname'}.'/sample_tools';
 	$web_urls[2] = 'https://'.$self->{options}{'ot-primary-hostname'}.'/apps_admin';
 	$web_urls[3] = 'https://'.$self->{options}{'ot-primary-hostname'}.'/apps_admin#/tools/view_module_docs';
 	$next_steps = qq{

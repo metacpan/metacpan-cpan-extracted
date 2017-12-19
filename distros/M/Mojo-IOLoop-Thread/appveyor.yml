@@ -1,0 +1,18 @@
+skip_tags: true
+
+shallow_clone: true
+
+cache:
+  - C:\strawberry
+
+install:
+  - if not exist "C:\strawberry" cinst strawberryperl
+  - path C:\MinGW\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;C:\strawberry\c\bin;C:\Windows\System32;C:\Program Files\7-Zip;C:\Program Files (x86)\CMake\bin;C:\Program Files\AppVeyor\BuildAgent
+
+  # Install Perl prereqs
+  - cpanm --installdeps --notest  .
+
+test_script:
+  - prove -l -m -v
+
+build: off

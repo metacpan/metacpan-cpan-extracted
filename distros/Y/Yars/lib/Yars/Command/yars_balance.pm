@@ -13,8 +13,10 @@ use Mojo::URL;
 
 # PODNAME: yars_balance
 # ABSTRACT: Fix all files
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
+
+our @end;
 
 sub _recurse 
 {
@@ -57,15 +59,72 @@ sub _rebalance_dir
         my($filename, $md5) = @_;
         my $dir = $root->subdir('balance-backup', @$md5);
         $dir->mkpath;
-        my $to = $dir->file($filename->basename);
+        my $basename = $filename->basename;
+        my $to = $dir->file($basename);
+        say "MVX @$md5[0] $basename";
         rename "$filename", "$to"
           or warn "unable to rename $filename => $to $!";
       }
     : sub {
-      my($filename) = @_;
+      my($filename, $md5) = @_;
+      say "RMX @$md5[0] @{[ $filename->basename ]}";
       unlink "$filename"
         or warn "error removing $filename";
     };
+  
+  my $max_load = $opt->{load};
+  my $cooldown = $max_load
+    ? sub {
+        while(1)
+        {
+          my($load) = split /\s+/, file('/proc/loadavg')->slurp;
+          return if $load < $max_load;
+          say "PAS pausing for high load: $load > $max_load";
+          sleep 60;
+        }
+      }
+    : sub {
+        # do nothing
+      };
+  
+  if($opt->{delay})
+  {
+    my $original_cleanup_file = $cleanup_file;
+    my @list;
+    
+    my $cleanup_old = sub {
+      my $now = time;
+      my @new;
+      foreach my $item (@list)
+      {
+        my($filename, $md5, $time) = @$item;
+        if($now > $time + 5)
+        {
+          $original_cleanup_file->($filename, $md5);
+        }
+        else
+        {
+          push @new, $item;
+        }
+      }
+      @list = @new;
+    };
+    
+    $cleanup_file = sub {
+      my($filename, $md5) = @_;
+      $cleanup_old->();
+      push @list, [ $filename, $md5, time ];
+    };
+    
+    push @end, sub {
+      while(@list)
+      {
+        say '...';
+        sleep 1;
+        $cleanup_old->();
+      }
+    };
+  }
   
   my $compute_md5_as_list = sub {
     my($filename) = @_;
@@ -95,17 +154,20 @@ sub _rebalance_dir
     if(defined $expected_dir)
     {
       $expected_dir = dir( $expected_dir );
+      $expected_dir->subdir('tmp')->mkpath(0,0700);
           
       # if the expected dir is where it is stored, then it is already in the right place.
       next if $expected_dir eq $dir->parent;
 
       _recurse $dir, sub {
         my($from) = @_;
-        say 'LCL ', $from->basename;
         
         my($md5, @md5) = $compute_md5_as_list->($from);
         return unless $md5;
            
+        say "LCL $md5[0] @{[ $from->basename ]}";
+        $cooldown->();
+
         # temporary filename to copy to first
         my(undef,$tmp) = $expected_dir->subdir('tmp')->tempfile( "balanceXXXXXX", SUFFIX => '.tmp' );
         $tmp = file($tmp);
@@ -143,10 +205,12 @@ sub _rebalance_dir
     {
       _recurse $dir, sub {
         my($file) = @_;
-        say 'RMT ', $file->basename;
 
         my($md5,@md5) = $compute_md5_as_list->($file);
         return unless $md5;
+
+        say "RMT $md5[0] @{[ $file->basename ]}";
+        $cooldown->();
 
         $client->upload('--nostash' => 1, "$file") or do {
           warn "unable to upload $file @{[ $client->errorstring ]}";
@@ -176,17 +240,26 @@ sub main
   my $class = shift;
   local @ARGV = @_;
   my $threads = 1;
-  my $backup = 0;
+  my $backup  = 0;
+  my $delay   = 0;
+  my $load    = 0;
   
   GetOptions(
     'threads|t=i' => \$threads,
-    'backup|b' => \$backup,
+    'backup|b'    => \$backup,
+    'delay|d'     => \$delay,
+    'load|l=i'      => \$load,
     'help|h' => sub { pod2usage({ -verbose => 2 }) },
     'version' => sub {
       say 'Yars version ', ($Yars::Command::yars_fast_balance::VERSION // 'dev');
       exit 1;
     },
   ) || pod2usage(1);
+  
+  if($load && ! -e '/proc/loadavg')
+  {
+    die "--load | -l is unsupported on systems without a /proc filesystem";
+  }
   
   my $yars = Yars->new;
   my $client = Yars::Client->new;
@@ -230,9 +303,16 @@ sub main
     next unless $yars->config->url eq $server->{url};
     foreach my $disk (@{ $server->{disks} })
     {
-      push @work_list, [$yars,$client,$disk,$server, { backup => $backup } ];
+      push @work_list, [$yars,$client,$disk,$server, { backup => $backup, delay => $delay, load => $load } ];
     }
   }
+
+  @end = ();
+
+  local $SIG{'INT'} = sub {
+    $_->() for @end;
+    exit;
+  };
 
   if($threads > 1)
   {
@@ -255,7 +335,12 @@ sub main
     }
   }
 
-  _rebalance_dir(@$_) for @work_list;
+  foreach my $work (@work_list)
+  {
+    _rebalance_dir(@$work);
+    $_->() for @end;
+    @end = ();
+  }
 }
 
 1;

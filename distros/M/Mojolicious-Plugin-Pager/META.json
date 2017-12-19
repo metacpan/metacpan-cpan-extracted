@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "1.30"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -34,18 +32,31 @@
          "requires" : {
             "Mojolicious" : "7.20"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.30"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/jhthorsen/mojolicious-plugin-pager/issues"
+      "X_dynamic_config" : 0,
+      "X_metaspec" : {
+         "version" : 2
       },
-      "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-pager",
-      "repository" : {
-         "url" : "https://github.com/jhthorsen/mojolicious-plugin-pager.git"
+      "X_resources" : {
+         "bugtracker" : {
+            "web" : "https://github.com/jhthorsen/mojolicious-plugin-pager/issues"
+         },
+         "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-pager",
+         "repository" : {
+            "type" : "git",
+            "url" : "https://github.com/jhthorsen/mojolicious-plugin-pager.git",
+            "web" : "https://github.com/jhthorsen/mojolicious-plugin-pager"
+         }
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -15,8 +15,6 @@ my $conn = {
     app_name => "APP NAME",
     app_version => "1.0",
     device_name => "debian",
-    track_id => $ENV{track_id},
-    app_token => $ENV{app_token},
 };
 my $json;
 my $res;
@@ -28,6 +26,8 @@ sub die_helper {
   print "OPTIONS can be --debug, --quiet and --help\n\n";
   print "Without COMMAND, the script will list the permission granted and display your internet connection state as an example.\n\n";
   print "List of COMMAND and PARAMETERS are:\n";
+  $conn->{ noauth }=1;
+  $fbx = WWW::FBX->new( $conn );
   for my $role ( @{ $fbx->meta->roles } ) {
     if ($role->{package} eq "WWW::FBX::Role::API::APIv3") {
       for my $meth ( sort $role->get_method_list ) {
@@ -36,6 +36,10 @@ sub die_helper {
     }
   }
   exit;
+}
+
+for (qw/track_id app_token/) {
+  $conn->{$_} = $ENV{$_} if $ENV{$_};
 }
 
 eval {
@@ -68,6 +72,16 @@ eval {
     }
     $res = $fbx->connection;
     printf "Your %s internet connection is %s\n", $res->{media}, $res->{state};
+  } elsif ( $cmd eq "wifitab" ) {
+    #List wifi stations
+    my $wifi = $fbx->wifi_ap("0/stations");
+    for my $host ( sort {$a->{hostname} cmp $b->{hostname} } @{ $wifi }) {
+      my $ip="N/A";
+      for my $l3c (@{$host->{host}{l3connectivities}}) {
+          $ip = $l3c->{addr} if $l3c->{active};
+        }
+      printf "%16.16s\t%s\t%15.15s\t%6.6sdB\t%6.6sMbps\t%6.6sMbps\n", $host->{hostname}, $host->{mac}, $ip, $host->{signal}, 10*$host->{last_rx}{bitrate}, 10*$host->{last_tx}{bitrate};
+    }
   } else {
     #Execute given command (JSON or not)
     local $Data::Dumper::Sortkeys = 1;

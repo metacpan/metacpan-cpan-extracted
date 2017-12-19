@@ -1,0 +1,19 @@
+---
+abstract: 'syslog for Mojo projects'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojo-Log-Syslog
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: git://git.gnu.org.ua/mojosyslog.git
+version: 1.0

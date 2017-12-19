@@ -1,3 +1,6 @@
+1.000     2017-12-17 17:33:49 EST
+  - INCOMPATIBLE CHANGE: The use_sereal option now requires Mojo::IOLoop::Subprocess::Role::Sereal.
+
 0.004     2017-06-14 16:29:16 EDT
   - Fix syntax oddity occasionally causing use_sereal serialization to fail
 

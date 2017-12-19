@@ -42,12 +42,12 @@ Devel::MAT::Tool::Identify::walk_graph( $graph );
 
 # Due to ordering within walk_graph this string should be relatively stable
 my $want = <<'EOR';
-├─(via RV) a constant of CODE() at _ADDR_, which is:
+├─(via RV) a constant of CODE() at _ADDR_=main_cv, which is:
 │ └─the main code
 ├─(via RV) element [0] of ARRAY(1) at _ADDR_, which is:
 │ └─(via RV) value {array} of HASH(1) at _ADDR_, which is:
 │   └─the symbol '%main::HASH'
-└─(via RV) the lexical $SCALAR at depth 1 of CODE() at _ADDR_, which is:
+└─(via RV) the lexical $SCALAR at depth 1 of CODE() at _ADDR_=main_cv, which is:
   └─the main code
 EOR
 

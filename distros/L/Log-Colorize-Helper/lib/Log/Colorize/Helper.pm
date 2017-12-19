@@ -12,11 +12,11 @@ Log::Colorize::Helper - Makes searching and colorizing logs trivial with out all
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -336,7 +336,7 @@ sub colorize{
 	#tail if needed
 	if ( $args{tail} ){
 		if ( $args{follow} ){
-			$command='tail -f -n '.$args{tail}.' '.shell_quote( $args{log} ).' ';
+			$command='tail -f -F -n '.$args{tail}.' '.shell_quote( $args{log} ).' ';
 		}else{
 			$command=$command.'| tail -n '.$args{tail};
 		}

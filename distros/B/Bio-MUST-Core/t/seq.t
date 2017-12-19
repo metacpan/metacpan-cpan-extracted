@@ -1,0 +1,460 @@
+#!/usr/bin/env perl
+
+use Test::Most;
+
+use autodie;
+use feature qw(say);
+
+use Bio::MUST::Core;
+
+my $class = 'Bio::MUST::Core::Seq';
+
+my @valid_seqs = (
+
+    [ 'Arabidopsis halleri_81970@78182999',         # note the 'U' and 'X'
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEXPIIENILKSLDGVKEYSVIVPSRTVIVU',
+        'Arabidopsis halleri_81970@78182999',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEXPIIENILKSLDGVKEYSVIVPSRTVIVU',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEXPIIENILKSLDGVKEYSVIVPSRTVIVU',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEXPIIENILKSLDGVKEYSVIVPSRTVIVU',
+        58, 1, 0, 0, 0, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',         # note the '?'
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSE?PIIENILKSLDGVKEYSVIVPSRTVIVC',
+        'Arabidopsis halleri_81970@78182999',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSE?PIIENILKSLDGVKEYSVIVPSRTVIVC',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSE?PIIENILKSLDGVKEYSVIVPSRTVIVC',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSE?PIIENILKSLDGVKEYSVIVPSRTVIVC',
+        59, 1, 0, 0, 0, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',
+        'MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'Arabidopsis halleri_81970@78182999',
+        'MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        60, 1, 0, 1, 0, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',
+        '  *MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL*D*GVKEYSVIVPSRTVIVV ',
+        'Arabidopsis halleri_81970@78182999',
+        '  *MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL*D*GVKEYSVIVPSRTVIVV ',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        '  *MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL*D*GVKEYSVIVPSRTVIVV ',
+        60, 1, 0, 1, 3, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',
+        'MASQNKEE---EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'Arabidopsis halleri_81970@78182999',
+        'MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        60, 1, 0, 1, 0, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',
+        '  -MASQNKEE---EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL-D-GVKEYSVIVPSRTVIVV ',
+        'Arabidopsis halleri_81970@78182999',
+        '  *MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL*D*GVKEYSVIVPSRTVIVV ',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        '  *MASQNKEE***EKKKVKKLQKSYFDVLGICCTSEVPIIENILKSL*D*GVKEYSVIVPSRTVIVV ',
+        60, 1, 0, 1, 3, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',
+        '  -masqnkee---ekkkvkklqksyfdvlgicctsevpiienilksl-d-gvkeysvivpsrtvivv ',
+        'Arabidopsis halleri_81970@78182999',
+        '  *masqnkee***ekkkvkklqksyfdvlgicctsevpiienilksl*d*gvkeysvivpsrtvivv ',
+        'masqnkeeekkkvkklqksyfdvlgicctsevpiienilksldgvkeysvivpsrtvivv',
+        '  *masqnkee***ekkkvkklqksyfdvlgicctsevpiienilksl*d*gvkeysvivpsrtvivv ',
+        60, 1, 0, 1, 3, undef, ('') x 6 ],
+
+    [ 'Chlamydomonas reinhardtii_3055@13699872',        # note the 'N', '?', 'X'
+        'ATGCTTCAGAxCGCACCTATGCTTCCGGNCCTTGGGCCACACCTCGTCCCGCAA?TGGGAGCCCTGGC',
+        'Chlamydomonas reinhardtii_3055@13699872',
+        'ATGCTTCAGAxCGCACCTATGCTTCCGGNCCTTGGGCCACACCTCGTCCCGCAA?TGGGAGCCCTGGC',
+        'ATGCTTCAGAxCGCACCTATGCTTCCGGNCCTTGGGCCACACCTCGTCCCGCAA?TGGGAGCCCTGGC',
+        'ATGCTTCAGAxCGCACCTATGCTTCCGGNCCTTGGGCCACACCTCGTCCCGCAA?TGGGAGCCCTGGC',
+        65, 0, 0, 0, 0,
+        'GCCAGGGCTCCCA?TTGCGGGACGAGGTGTGGCCCAAGGNCCGGAAGCATAGGTGCGxTCTGAAGCAT',
+        'ATG-CTT-CAG-AxC-GCA-CCT-ATG-CTT-CCG-GNC-CTT-GGG-CCA-CAC-CTC-GTC-CCG-CAA-?TG-GGA-GCC-CTG',
+        'TGC-TTC-AGA-xCG-CAC-CTA-TGC-TTC-CGG-NCC-TTG-GGC-CAC-ACC-TCG-TCC-CGC-AA?-TGG-GAG-CCC-TGG',
+        'GCT-TCA-GAx-CGC-ACC-TAT-GCT-TCC-GGN-CCT-TGG-GCC-ACA-CCT-CGT-CCC-GCA-A?T-GGG-AGC-CCT-GGC',
+        'GCC-AGG-GCT-CCC-A?T-TGC-GGG-ACG-AGG-TGT-GGC-CCA-AGG-NCC-GGA-AGC-ATA-GGT-GCG-xTC-TGA-AGC',
+        'CCA-GGG-CTC-CCA-?TT-GCG-GGA-CGA-GGT-GTG-GCC-CAA-GGN-CCG-GAA-GCA-TAG-GTG-CGx-TCT-GAA-GCA',
+        'CAG-GGC-TCC-CA?-TTG-CGG-GAC-GAG-GTG-TGG-CCC-AAG-GNC-CGG-AAG-CAT-AGG-TGC-GxT-CTG-AAG-CAT',
+    ],
+    [ 'Chlamydomonas reinhardtii_3055@13699872',
+        'atgcttcagaccgcacctatgcttccgggccttgggccacacctcgtcccgcaattgggagccctggc',
+        'Chlamydomonas reinhardtii_3055@13699872',
+        'atgcttcagaccgcacctatgcttccgggccttgggccacacctcgtcccgcaattgggagccctggc',
+        'atgcttcagaccgcacctatgcttccgggccttgggccacacctcgtcccgcaattgggagccctggc',
+        'atgcttcagaccgcacctatgcttccgggccttgggccacacctcgtcccgcaattgggagccctggc',
+        68, 0, 0, 0, 0,
+        'gccagggctcccaattgcgggacgaggtgtggcccaaggcccggaagcataggtgcggtctgaagcat',
+        'atg-ctt-cag-acc-gca-cct-atg-ctt-ccg-ggc-ctt-ggg-cca-cac-ctc-gtc-ccg-caa-ttg-gga-gcc-ctg',
+        'tgc-ttc-aga-ccg-cac-cta-tgc-ttc-cgg-gcc-ttg-ggc-cac-acc-tcg-tcc-cgc-aat-tgg-gag-ccc-tgg',
+        'gct-tca-gac-cgc-acc-tat-gct-tcc-ggg-cct-tgg-gcc-aca-cct-cgt-ccc-gca-att-ggg-agc-cct-ggc',
+        'gcc-agg-gct-ccc-aat-tgc-ggg-acg-agg-tgt-ggc-cca-agg-ccc-gga-agc-ata-ggt-gcg-gtc-tga-agc',
+        'cca-ggg-ctc-cca-att-gcg-gga-cga-ggt-gtg-gcc-caa-ggc-ccg-gaa-gca-tag-gtg-cgg-tct-gaa-gca',
+        'cag-ggc-tcc-caa-ttg-cgg-gac-gag-gtg-tgg-ccc-aag-gcc-cgg-aag-cat-agg-tgc-ggt-ctg-aag-cat',
+    ],
+
+    [ 'Chlamydomonas reinhardtii_3055@13699872',
+        'AUGCUUCAGACCGCACCUAUGCUUCCGGGCCUUGGGCCACACCUCGUCCCGCAAUUGGGAGCCCUGGC',
+        'Chlamydomonas reinhardtii_3055@13699872',
+        'AUGCUUCAGACCGCACCUAUGCUUCCGGGCCUUGGGCCACACCUCGUCCCGCAAUUGGGAGCCCUGGC',
+        'AUGCUUCAGACCGCACCUAUGCUUCCGGGCCUUGGGCCACACCUCGUCCCGCAAUUGGGAGCCCUGGC',
+        'AUGCUUCAGACCGCACCUAUGCUUCCGGGCCUUGGGCCACACCUCGUCCCGCAAUUGGGAGCCCUGGC',
+        68, 0, 1, 0, 0,
+        'GCCAGGGCTCCCAATTGCGGGACGAGGTGTGGCCCAAGGCCCGGAAGCATAGGTGCGGTCTGAAGCAT',
+        'ATG-CTT-CAG-ACC-GCA-CCT-ATG-CTT-CCG-GGC-CTT-GGG-CCA-CAC-CTC-GTC-CCG-CAA-TTG-GGA-GCC-CTG',
+        'TGC-TTC-AGA-CCG-CAC-CTA-TGC-TTC-CGG-GCC-TTG-GGC-CAC-ACC-TCG-TCC-CGC-AAT-TGG-GAG-CCC-TGG',
+        'GCT-TCA-GAC-CGC-ACC-TAT-GCT-TCC-GGG-CCT-TGG-GCC-ACA-CCT-CGT-CCC-GCA-ATT-GGG-AGC-CCT-GGC',
+        'GCC-AGG-GCT-CCC-AAT-TGC-GGG-ACG-AGG-TGT-GGC-CCA-AGG-CCC-GGA-AGC-ATA-GGT-GCG-GTC-TGA-AGC',
+        'CCA-GGG-CTC-CCA-ATT-GCG-GGA-CGA-GGT-GTG-GCC-CAA-GGC-CCG-GAA-GCA-TAG-GTG-CGG-TCT-GAA-GCA',
+        'CAG-GGC-TCC-CAA-TTG-CGG-GAC-GAG-GTG-TGG-CCC-AAG-GCC-CGG-AAG-CAT-AGG-TGC-GGT-CTG-AAG-CAT',
+    ],
+    [ 'Chlamydomonas reinhardtii_3055@13699872',
+        'augcuucagaccgcaccuaugcuuccgggccuugggccacaccucgucccgcaauugggagcccuggc',
+        'Chlamydomonas reinhardtii_3055@13699872',
+        'augcuucagaccgcaccuaugcuuccgggccuugggccacaccucgucccgcaauugggagcccuggc',
+        'augcuucagaccgcaccuaugcuuccgggccuugggccacaccucgucccgcaauugggagcccuggc',
+        'augcuucagaccgcaccuaugcuuccgggccuugggccacaccucgucccgcaauugggagcccuggc',
+        68, 0, 1, 0, 0,
+        'gccagggctcccaattgcgggacgaggtgtggcccaaggcccggaagcataggtgcggtctgaagcat',
+        'atg-ctt-cag-acc-gca-cct-atg-ctt-ccg-ggc-ctt-ggg-cca-cac-ctc-gtc-ccg-caa-ttg-gga-gcc-ctg',
+        'tgc-ttc-aga-ccg-cac-cta-tgc-ttc-cgg-gcc-ttg-ggc-cac-acc-tcg-tcc-cgc-aat-tgg-gag-ccc-tgg',
+        'gct-tca-gac-cgc-acc-tat-gct-tcc-ggg-cct-tgg-gcc-aca-cct-cgt-ccc-gca-att-ggg-agc-cct-ggc',
+        'gcc-agg-gct-ccc-aat-tgc-ggg-acg-agg-tgt-ggc-cca-agg-ccc-gga-agc-ata-ggt-gcg-gtc-tga-agc',
+        'cca-ggg-ctc-cca-att-gcg-gga-cga-ggt-gtg-gcc-caa-ggc-ccg-gaa-gca-tag-gtg-cgg-tct-gaa-gca',
+        'cag-ggc-tcc-caa-ttg-cgg-gac-gag-gtg-tgg-ccc-aag-gcc-cgg-aag-cat-agg-tgc-ggt-ctg-aag-cat',
+    ],
+
+    # TODO: add more seqs!
+);
+
+# TODO: test cloning
+
+for my $exp_row (@valid_seqs) {
+    my $seq = $class->new( seq_id => $exp_row->[0], seq => $exp_row->[1] );
+    my $got_row = [
+        $seq->seq_id->full_id,
+        $seq->seq,                  # can be different from constructor
+        $seq->raw_seq,              # ... due to coercion
+        $seq->seq,                  # to check non-destructive gap stripping
+        $seq->nomiss_seq_len,
+        $seq->is_protein,
+        $seq->is_rna,
+        $seq->is_aligned,
+        $seq->first_site,
+        (not $seq->is_protein) ? $seq->reverse_complemented_seq->seq : undef,
+        join( '-', @{ $seq->codons(+1) // [] } ),
+        join( '-', @{ $seq->codons(+2) // [] } ),
+        join( '-', @{ $seq->codons(+3) // [] } ),
+        join( '-', @{ $seq->codons(-1) // [] } ),
+        join( '-', @{ $seq->codons(-2) // [] } ),
+        join( '-', @{ $seq->codons(-3) // [] } ),
+    ];
+    is_deeply $got_row, [ @{$exp_row}[2..17] ],
+        'Built and queried a valid Seq';
+}
+
+{
+    my $exp_id_row =
+        [ 'Arabidopsis halleri_81970@78182999', undef,
+            'Arabidopsis', 'halleri', undef, '78182999', '81970', '78182999',
+            'Arabidopsis halleri', 'A. halleri', 'Arabidopsis halleri_81970' ]
+    ;
+    my $exp_row = shift @valid_seqs;
+    my $seq = $class->new( seq_id => $exp_row->[0], seq => $exp_row->[1] );
+    my $got_row = [
+        $seq->full_id,
+        $seq->family,
+        $seq->genus,
+        $seq->species,
+        $seq->strain,
+        $seq->accession,
+        $seq->taxon_id,
+        $seq->gi,
+        $seq->org,
+        $seq->abbr_org,
+        $seq->full_org,
+    ];
+    is_deeply $got_row, $exp_id_row,
+        'Queried Seq for SeqId attributes (through delegation)';
+}
+
+my $full_id = 'Genus species_00000@00000000';
+
+my @seq_pairs = (
+    [ 'ACGT', 'ACGT',  1, 1, 1, 1 ],
+    [ 'ACGT', 'ACG',   0, 0, 1, 1 ],
+    [ 'ACGT', 'ACGTC', 1, 1, 0, 0 ],
+    [ 'ACGT', 'TGCA',  0, 0, 0, 0 ],
+    [ 'ACGT', 'AcgT',  1, 1, 1, 1 ],
+    [ '*ACG**TGCATG*CATGCA*', 'AC*gtg*CATG***CATGCA',  1, 1, 1, 1 ],
+    [ '*ACG**tgcatg*CATGCA*', 'AC*GTG*CATG***CATGC',   0, 0, 1, 1 ],
+    [ '*ACG**TGCATG*catgca*', 'GAC*GTG*CATG***CATGCA', 1, 1, 0, 0 ],
+    [ '*ACG**TGCATG*CATGCA*', 'AC*GTG*CATC***CATGCA',  0, 0, 0 ,0 ],
+);
+
+# using true Seq object as seq2
+for my $exp_row (@seq_pairs) {
+    my $seq1 = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $seq2 = $class->new( seq_id => $full_id, seq => $exp_row->[1] );
+    my $got_row = [
+        $seq1->seq,
+        $seq2->seq,
+        $seq1->is_subseq_of($seq2),
+        $seq2->is_superseq_of($seq1),
+        $seq1->is_superseq_of($seq2),
+        $seq2->is_subseq_of($seq1),
+    ];
+    is_deeply $got_row, $exp_row, 'got expected sub/superseq results';
+}
+
+# using mere string as seq2
+for my $exp_row (@seq_pairs) {
+    my $seq1 = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $seq2 = $exp_row->[1];
+    my $got_row = [
+        $seq1->seq,
+        $seq2,
+        $seq1->is_subseq_of($seq2),
+        $seq1->is_subseq_of($seq2),
+        $seq1->is_superseq_of($seq2),
+        $seq1->is_superseq_of($seq2),
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected sub/superseq results for mere strings';
+}
+
+my @seqs2spacify = (
+    [ ' ** AGCTG***ACNAG* *C* CGAXTG * CAGC?GCA* * ',
+      '    AGCTG***ACNAG   C  CGAXTG   CAGC?GCA    ',
+      'AGCTGACNAGCCGAXTGCAGC?GCA',
+      'AGCTGACNAGCCGANTGCAGCNGCA',
+      'AGCTGAC*AGCCGA*TGCAGC*GCA',
+      'AGCTGACAGCCGATGCAGCGCA', ],
+    [ '* * AGCTG * ACNAG **C *CGAXTG** CAGC?GCA ** ',
+      '    AGCTG   ACNAG   C  CGAXTG   CAGC?GCA    ',
+      'AGCTGACNAGCCGAXTGCAGC?GCA',
+      'AGCTGACNAGCCGANTGCAGCNGCA',
+      'AGCTGAC*AGCCGA*TGCAGC*GCA',
+      'AGCTGACAGCCGATGCAGCGCA', ],
+    [ '*** AGCTG***ACNAG  *C**CGAXTG*  CAGC?GCA  * ',
+      '    AGCTG***ACNAG   C**CGAXTG   CAGC?GCA    ',
+      'AGCTGACNAGCCGAXTGCAGC?GCA',
+      'AGCTGACNAGCCGANTGCAGCNGCA',
+      'AGCTGAC*AGCCGA*TGCAGC*GCA',
+      'AGCTGACAGCCGATGCAGCGCA', ],
+    [ '  **AGCTG* *ACNAG*  C  CGAXTG  *CAGC?GCA  **',
+      '    AGCTG   ACNAG   C  CGAXTG   CAGC?GCA    ',
+      'AGCTGACNAGCCGAXTGCAGC?GCA',
+      'AGCTGACNAGCCGANTGCAGCNGCA',
+      'AGCTGAC*AGCCGA*TGCAGC*GCA',
+      'AGCTGACAGCCGATGCAGCGCA', ],
+);
+
+for my $exp_row (@seqs2spacify) {
+    my $seq = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $got_row = [
+        $seq->seq,
+        $seq->spacify->seq,
+        $seq->degap->seq,
+        $seq->gapify('X')->seq,
+        $seq->gapify->seq,
+        $seq->degap->seq,
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected seq after spacification';
+}
+
+my @seqs2trim = (
+    [ 'AGCTGACTAGCCGACTGCAGCTGCA****', ('AGCTGACTAGCCGACTGCAGCTGCA') x 2 ],
+    [ 'AGCTGACTAGCCGACTGCAGCTGCA**  ', ('AGCTGACTAGCCGACTGCAGCTGCA') x 2 ],
+    [ ' *A***TGACTAGCCGA***AGCT* * *', (' *A***TGACTAGCCGA***AGCT' ) x 2 ],
+);
+
+for my $exp_row (@seqs2trim) {
+    my $seq = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $got_row = [
+        $seq->seq,
+        $seq->trim->seq,
+        $seq->seq,                  # should be trimmed
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected seq after trimming';
+}
+
+my @seqs2pad = (
+    [ 'AGCTGACTAGCCGACTGCAGCTGCA', 25, 'AGCTGACTAGCCGACTGCAGCTGCA',      25 ],
+    [ 'AGCTGACTAGCCGACTGCAGCTGCA', 25, 'AGCTGACTAGCCGACTGCAGCTGCA     ', 30 ],
+    [ 'A***TGACTAGCCGA***AGCT   ', 25, 'A***TGACTAGCCGA***AGCT        ', 30 ],
+);
+
+for my $exp_row (@seqs2pad) {
+    my $seq = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $got_row = [
+        $seq->seq,
+        $seq->seq_len,
+        $seq->pad_to($exp_row->[3])->seq,
+        $seq->seq_len,
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected length before/after padding';
+}
+
+my @seqs2edit = (
+    [ 'AGCTGACTAGCCGACT', 5, 1, '',       'A',    'AGCTGCTAGCCGACT'    ],
+    [ 'AGCTGACTAGCCGACT', 5, 1, 'T',      'A',    'AGCTGTCTAGCCGACT'   ],
+    [ 'AGCTGACTAGCCGACT', 5, 4, '',       'ACTA', 'AGCTGGCCGACT'       ],
+    [ 'AGCTGACTAGCCGACT', 5, 4, 'AAAAAA', 'ACTA', 'AGCTGAAAAAAGCCGACT' ],
+);
+
+for my $exp_row (@seqs2edit) {
+    my $seq = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $got_row = [
+        $seq->seq,
+        @{$exp_row}[1..3],
+        $seq->edit_seq( @{$exp_row}[1..3] ),
+        $seq->seq,
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected seq before/after splicing';
+}
+
+my @seqs2probe = (
+    [ 'AGC GACT', '00000000', '00010000' ],
+#   [ 'AGC-GACT', '00000000', '00010000' ],     # TODO: allow no coercion
+    [ 'AGC*GACT', '00000000', '00010000' ],
+    [ 'agcgnact', '00001000', '00000000' ],
+    [ 'AGCGAXCT', '00000100', '00000000' ],
+    [ 'ALA*INEX', '00000001', '00010000' ],
+);
+
+for my $exp_row (@seqs2probe) {
+    my $seq = $class->new( seq_id => $full_id, seq => $exp_row->[0] );
+    my $got_row = [
+        $seq->seq,
+        join('', map { $seq->is_missing($_) } 0..($seq->seq_len)-1),
+        join('', map { $seq->is_gap($_)     } 0..($seq->seq_len)-1),
+    ];
+    is_deeply $got_row, $exp_row,
+        'got expected site type for all sites';
+}
+
+my @seqs2splice = (
+    [ <<'DNA',
+AAGTAGTCGACGCCTGTAGACATTCTTGCGCGTCTCGCTACAAGTGCAAGCTTCGTAGGCGTGAGGGCGG
+GCGCGTTCAACTAGTGCGATCGACTGCTGGCAACACAAGTTGTGATTGATGGTGCAGTTGGCGTGCTGAT
+GCGCGTGCAAACGTCCTCAACGAGTGTGTGCCTTGCTACCGCCCTGTATGACCAGAAGACTAACTCTGGA
+CGTCTGCGGCACCGATATATGTTAGACGAGGTGCACGGAAAAGCGCAGAACCAGCGCCCTTGTCCAGTGT
+CGTATACTGGAAAACGTCCATGTGGCTGCCCCCGTGGCAACTGACTTCGGTGTTTTCTTGTTATAAGTTC
+CTGTTGGTGTATCAAAAGCTGCTGGTGCACCGTAGGGCGAGCGCGCCGACGGGATACTTCGGTGTGACCC
+CAGAAACCCTACAGGCGCTGCCAGAATGACATCTGAAACCTTTTTGAAGAGAAATTGTGCTTGTAGTTTG
+TTTCCGAGCTATTATCGTGGCCTGCGAGCATGGCGGTTGCGGTGGCGGTTGGGTCCGCCTGGAAGGTCGC
+TTCACCAAAAGTGAGCCGGAGAGGCTTACGACTACACACACGAATATGAAGTGCAAAAATGAAGGGTCGT
+GGGTACTTACGGGTTCCTTGAGATTGTCAAGTGTGTTGGTTCGAGGTTTTCGGCATCCCCTTCATACAGT
+AGCTTTCCCCCTCCTTGCCATGACTATGCTGTGATGCAGTTAGGTAGTTGACATTCATACGTACCGTGCT
+GCGAGGAGCGCGCACCGCCCTTGTGCACGTACGTCCCCAAGATGCAAGATGCAACTGTGGGGCAGGGGAG
+GGGTTCTTAGCACGGAAAGAACGCGCCCAATTAATGAGCCACCAGAGCTGCGGTGTCGTCGAGATGACAG
+CGACCTAGGTACATAGGCCATCAGCGGAAGGCGGATCGCATGCCTCAGCGCAAGGCTCAAGACATGGCTG
+AGTAAGTAAGGCCGGTTGAGTGCTCTATGCCCTCTGCGCTTTGATCCCCGCGACGTCCCCGCACACGCAG
+CAATTGAGCAGTTCGGTCATCAAGCCTCCCAGGCGGCCGCTCGGCATCCAGGGGCTCGGCCTCGACGTGC
+AACCCGATGCGCCGTGCGAGCGGTTGGCCCACCGTGCTTCTGTGCTTGAAGTTGATATCCATAGCTAGAA
+GTATGACGCTGTAGATTACAACGTTGCGGCGGCGGTCGACACCAGTGCATCACGAACACGTCTGACGATG
+GTGACGGAAAGTGCCTTCCGGTGCATGCAACATGTGAGCGCCTGCTCGAATCGTCTACACTGGAACTTCG
+AAACGTATATTACTGTTCCTTTACTATAACGGCGTAAATCCTCTCTCGCACTCACTTACCCAAGAACTCA
+ACGTTACGTCACCGTTCGATATCGCGATGCTTCAGACCGCACCTATGCTTCCGGGCCTTGGGCCACACCT
+CGTCCCGCAATTGGGAGCCCTGGCCAGCGCTTCTCGTCTTCTGGGCTCCATAGCTTCGGTTCCGCCCCAG
+CACGGTGGTGCTGGCTTCCAGGCTGTCCGGGGATTCGCCACGGTGAGCCTTCGCGTGGTTCTTTCACTTC
+TACACCGCCCTGGTTCTAACGTGTTGCGTTCTTTCGGAATAGCGGGTCGGGTCGCGGTGACGTGAGCGAG
+GTGATTGCACCGATAGGCGCATGACGTTGCACGACTGCCCGACACTCGCACACCGGTCCATGACCGCTTT
+CGACTCCTCAACAACTCAACATCTCCCACCCCCATGTTTCGCATGGGCGGGCGGCGGACCGGCGGGGATG
+GTGGCAGAGGGGGCAGTGGTAACAGTGGTAGCAGTGGTAGCAGTAGCGGTGGTGGGAGCAAGGGCCCCTA
+GTTACTACTTGCGGTGGCCGCCGCGTGCCTGACGCTTGAAGTCTTCGCAATTGACCTGGCGACGGCCACG
+CCACATTGACCACGTCACAGGGCGCCGTGAGCACGCCTGCTGCCAGCTCCCCCGGCCACAAGCCCGCTGC
+CACGCATGCGCCGCCCACCCGCCTGGACCTCAAGCCCGGCGCCGGCTCCTTCGCCGCCGGCGCCGTGGCG
+CCCCACCCCGGCATCAACCCAGCCCGCATGGCCGCCGACAGCGCCTCCGCGGCCGCCGGTGCCTCTGGCG
+ACGCGGCTCTGGCGGAGTCGTATATGGCGCACCCGGCCTACAGCGACGAGTACGTGGAGAGCGTGCGGCC
+CACACACGTCACCCCGCAGAAGGTGGGTCATGCCACGGTGTGGTGTCAGAGTGTGGTGTCATGGCGCGCT
+GTAGGCGGGCAGGAGGGTTGGGGCTCATATGCCTCGTTCGTGCCTCTCTTCAGGTTCAGTCCCGGTGAGC
+AACAACGCCCCAACTTCCGGCTCCTCGCCCCCGCAGCTGCACCAGCACGTGGGCCTGCGCACCATCCAGG
+TCTTCCGCTACCTGTTCGACAAGGCCACAGGTGCGCGGGAGGCAGACCAGCGTCCAGCCTTAGACCCATC
+TGGGGTGCTGGACCCTGCCTTCAAGCGCATAAGGGAAGGGGTTCACCCGCACAAGGCGCGACTTGAACGT
+TCCGCACGTGGATCGCATGATTACCCGCCCCTACCCAACCCCGCATACCGCGCCCGACCCGCTGCTTCTG
+AACCTATTCCCCACCTCCTAGGCTACAAGCTCGCTTCTCCTTAATTACGGTAATCGTGAATGCGATCCCC
+ACCTCCCAGGCTACACGCCCACCGGCTCCATGACCGAGGCCCAGTGGCTGCGGCGCATGATCTTCCTGGA
+GACGGTGGCGGGCTGCCCGGGCATGGTGGCGGGCATGCTGCGCCACCTCAAGAGCCTCAGGTCCATGAGC
+CGCGACCGGGGTGAGCTCGGCTGCGCCGTGCCGCAGGGGCAGCAGGAATGGAGGGGGAAAGAGGGGGTTA
+CTGGGCTAGGTCGTTGCCTTGGATGTCGAGAGGCCCTAACCGTAGCACGTTCACTTGGGGACGCGGAGAC
+AAGTCTTTTTCCTCGGGGAGGGTGCGCAGGCGGTGCTGGCACCAGCACCCCATCCCGCCGCCCCATCCCG
+CTGTGTGGCCACGAACTCCCGCTCACGCGGACCCATCCTCAGCCTCTCACAGCCGCTGTGACCCTTTCCC
+TGCAACCCCTTCCATGCACCCCCAGGCTGGATCCACACGCTGCTGGAGGAGGCCGAGAACGAGCGCATGC
+ACCTCATCACCTTCCTGCAGCTGCGGCAGCCCGGACCCGCCTTCAGGGCCATGGTCATTCTGGCGCAGGT
+GGGGATATGTGTTGATGTAGATTGGGGGCATGGCGGGGGTGATGCAGTGCTTGGTGGGGAGCGGTTGGGC
+TGGTGGGCGTGGGTGTGTTACGGTGTGGGCGTCATTTCGCTGCTTCCCATCTCCCGGCCAGGGCCGCCGG
+CTACCACTCTGTTGTGCTTGTCGACCCCACCCCCTCGCACATACCATCACACACGGGACATGCACATTCC
+TGCCTTAATCCTTGACATGCGCACTCATCACACGTTTCTGTTTTCCCTCACCACACAAGCACCCACCCCC
+TCCCCTTCCACAGGGGGTGTTCTTCAACGCCTACTTCATCGCCTACCTGCTGTCGCCGCGCACCTGCCAC
+GCCGTGAGTCAACACTTACAAGCCTCAGTTTGGCGACTCTGTGCTGCACGTGTCCCGCCCGACTCCTGCC
+CGAGGCCTGCCAGAGCCCTGATTGGCACTCTCGGCCACTCCCTCATCCTGCCCCACTTCTCCTGTCCGAC
+ATGCCCTGCCTCCTGCCTCCCCTATGTGTGCCCCACCTCTCTCAGTTCGTGGGTTTCCTGGAGGAGGAGG
+CTGTCAAGACATACACACACGCTCTCGTGGAGATTGACGCGGGCCGGCTGTGGAAGGACACGCCCGCCCC
+CCCGGTGGCCGTGCAGTACTGGGGCCTCAAGCCCGGTGCCAACATGCGCGGTGGGTGTTGCGGTGCTGGT
+GGGGGGGGGGCTGGGGGAGGCGTGGGCGACGGACTGTGGGAGTGGATGCTGGGGAAAATGAGGGGTGCTT
+GTGTGCGTGTGTTGGGAAAGCACAAGGGGAAATGTCATGTGCGTGTGTGTCGGCTAGGGCGTGGGGCGTA
+TGGGCGCCTGTCTGCGTTGCCCTCTCGCCGGCTGCGGGGCATGCTTCTCGCCCTGCCTGACCTTCACATG
+GTGCCCAACTGGCATCCCTCGCTCTTACCAGCCGCCCTCTCCCTGTACCCTGTACACACATCCCGCAGAC
+CTGATTCTGGCGGTGCGTGCCGACGAGGCGTGCCATGCGCACGTGAACCACACCCTGTCGCAGCTCAACC
+CCAGCACTGATGCCAACCCGTTCGCCACCGGCGCCAGCCAGCTGCCCTAGGCGCCAGGTACCAGGCGCTA
+GGCACTGTGCAGCTGCCCTAGGCACGGCAGTATGACAGTGTCAGGGATTGAGCCCGTGCTGTAACGCATG
+CTGATGCCCCATGTACGGATGAAGCATGGGTGTTACGGTAGCTGGTGCCGGTCCTGCAAGGGCCATGTGA
+CAATTGGTTATTTGCAGACAAATGAGTGAAAGTCGGATATGGTTCCAATAAACGGCATACTAGTCATCAG
+CCGCATGGTGCATGACAGGAATGTGACAGGCAGCAATTGCAGCATTTAGTAGAGAGCCGCGAAATTTGTA
+TGCTTATGTGTGTGTGCATGTGTGTCTAGAGGTGATTCGTGTGCCTGGGCTTGTTGTTGTGTGCCCTCTA
+GCCGCATGTGACGCGGCACGCGCGCCATATAGCCGACTGACCAGACCGACGTGGCGATCAGTCATTGCAA
+GTGCACATGCGCGCGCTGGCTTGTTGCTTCTAAGCTTGTTGCGAGGACTTTGAAGTGCTATTCGTGAGAC
+TTGGATCTGTGTGCCTGGAGTGAGGCCGTTGCGCCCGTTAGAGCGACGGCTTCGTGAGGTGAACGTAGAT
+ACCGGCCCAGGCGCAGTTGTGCACCAAGGTGTGCACCTAATTTGGTGATACTTAGGTCCCGGTCTAGCCA
+TACCTTCAGTCCCACACTCCTACAGTGGCCTGGATTGATGAGAGAGCATGTCTGTATGCCGCGATTTCGC
+AGAGGTATTAGTAGCTGCTGCCCGTCACTGCACCAAGGACCACGCGTGTATGCCGTGAGGCGTGAGCTGG
+AGTTGGCGCTGCAAGTTGCACGCAAGCGCCCTGCGCCCTGTCTGGAGAAAAGTGTAATGCTTTGAGAATG
+AACCG
+DNA
+    <<'CDS',
+ATGCTTCAGACCGCACCTATGCTTCCGGGCCTTGGGCCACACCTCGTCCCGCAATTGGGAGCCCTGGCCA
+GCGCTTCTCGTCTTCTGGGCTCCATAGCTTCGGTTCCGCCCCAGCACGGTGGTGCTGGCTTCCAGGCTGT
+CCGGGGATTCGCCACGGGCGCCGTGAGCACGCCTGCTGCCAGCTCCCCCGGCCACAAGCCCGCTGCCACG
+CATGCGCCGCCCACCCGCCTGGACCTCAAGCCCGGCGCCGGCTCCTTCGCCGCCGGCGCCGTGGCGCCCC
+ACCCCGGCATCAACCCAGCCCGCATGGCCGCCGACAGCGCCTCCGCGGCCGCCGGTGCCTCTGGCGACGC
+GGCTCTGGCGGAGTCGTATATGGCGCACCCGGCCTACAGCGACGAGTACGTGGAGAGCGTGCGGCCCACA
+CACGTCACCCCGCAGAAGCTGCACCAGCACGTGGGCCTGCGCACCATCCAGGTCTTCCGCTACCTGTTCG
+ACAAGGCCACAGGCTACACGCCCACCGGCTCCATGACCGAGGCCCAGTGGCTGCGGCGCATGATCTTCCT
+GGAGACGGTGGCGGGCTGCCCGGGCATGGTGGCGGGCATGCTGCGCCACCTCAAGAGCCTCAGGTCCATG
+AGCCGCGACCGGGGCTGGATCCACACGCTGCTGGAGGAGGCCGAGAACGAGCGCATGCACCTCATCACCT
+TCCTGCAGCTGCGGCAGCCCGGACCCGCCTTCAGGGCCATGGTCATTCTGGCGCAGGGGGTGTTCTTCAA
+CGCCTACTTCATCGCCTACCTGCTGTCGCCGCGCACCTGCCACGCCTTCGTGGGTTTCCTGGAGGAGGAG
+GCTGTCAAGACATACACACACGCTCTCGTGGAGATTGACGCGGGCCGGCTGTGGAAGGACACGCCCGCCC
+CCCCGGTGGCCGTGCAGTACTGGGGCCTCAAGCCCGGTGCCAACATGCGCGACCTGATTCTGGCGGTGCG
+TGCCGACGAGGCGTGCCATGCGCACGTGAACCACACCCTGTCGCAGCTCAACCCCAGCACTGATGCCAAC
+CCGTTCGCCACCGGCGCCAGCCAGCTGCCCTAG
+CDS
+        [
+            [1427,1582],
+            [1981,2262],
+            [2417,2480],
+            [2740,2880],
+            [3176,3288],
+            [3584,3643],
+            [3826,3970],
+            [4269,4390],
+        ],
+    ],
+);
+
+for my $exp_row (@seqs2splice) {
+
+    my $dna_seq = $class->new(seq_id => 'seq', seq => $exp_row->[0]);
+    my $cds_seq = $class->new(seq_id => 'seq', seq => $exp_row->[1]);
+
+    # blocks are 1-based (and not 0-based)
+    cmp_ok $dna_seq->spliced_seq( $exp_row->[2] )->seq, 'eq', $cds_seq->seq,
+        'got expected cds from exon list';
+}
+
+done_testing;

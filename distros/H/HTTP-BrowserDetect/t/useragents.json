@@ -5,6 +5,7 @@
       "browser_minor" : ".192",
       "match" : [
          "robot",
+         "robot_id",
          "malware"
       ],
       "robot" : "malware",
@@ -29,7 +30,8 @@
       "match" : [
          "google",
          "googleadsbot",
-         "robot"
+         "robot",
+         "robot_id"
       ],
       "minor" : null,
       "no_match" : null,
@@ -87,7 +89,7 @@
       "no_match" : null,
       "other" : null,
       "robot" : "baidu",
-      "robot_string" : "Baidu Spider",
+      "robot_string" : "Baidu",
       "version" : null
    },
    "BlackBerry7730/3.7.1 UP.Link/5.1.2.5" : {
@@ -2206,6 +2208,22 @@
       "public_version" : "30.0",
       "version" : "30.0"
    },
+   "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Pinterestbot/1.0; +https://www.pinterest.com/bot.html)" : {
+      "match" : [
+         "android",
+         "chrome",
+         "device",
+         "mobile",
+         "pinterest",
+         "robot",
+         "webkit"
+      ],
+      "os" : "android",
+      "os_string" : "Android",
+      "robot" : "pinterest",
+      "robot_id" : "pinterest",
+      "robot_string" : "Pinterest"
+   },
    "Mozilla/5.0 (Linux; U; Android 1.0; en-us; dream) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" : {
       "browser" : "safari",
       "browser_string" : "Mobile Safari",
@@ -3927,6 +3945,36 @@
       "public_version" : "33.0",
       "version" : "33.0"
    },
+   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko; Google Page Speed Insights) Chrome/27.0.1453 Safari/537.36" : {
+      "browser_string" : "Chrome",
+      "browser_version" : "27.0",
+      "country" : null,
+      "engine" : "webkit",
+      "engine_version" : "537.36",
+      "language" : null,
+      "major" : "27",
+      "match" : [
+         "chrome",
+         "google-page-speed",
+         "linux",
+         "robot",
+         "robot_id",
+         "unix",
+         "webkit",
+         "x11"
+      ],
+      "minor" : "0",
+      "no_match" : [
+         "mobile",
+         "tablet"
+      ],
+      "os" : "linux",
+      "os_string" : "Linux",
+      "other" : null,
+      "robot" : "google-page-speed",
+      "robot_id" : "google-page-speed",
+      "robot_string" : "Google Page Speed"
+   },
    "Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101 Firefox/28.0" : {
       "browser" : "firefox",
       "browser_string" : "Firefox",
@@ -4761,6 +4809,16 @@
       "os_string" : "Windows Phone",
       "os_version" : "7.5"
    },
+   "Mozilla/5.0 (compatible; Pro Sitemaps Generator; pro-sitemaps.com) Gecko Pro-Sitemaps/1.0" : {
+      "match" : [
+         "gecko",
+         "pro-sitemaps",
+         "robot",
+         "robot_id"
+      ],
+      "robot_id" : "pro-sitemaps",
+      "robot_string" : "Pro Sitemap Service"
+   },
    "Mozilla/5.0 (compatible; Teleca Q7; Brew 3.1.5; U; en) 320X240 LGE VX9200" : {
       "browser" : "obigo",
       "browser_major" : "7",
@@ -4850,8 +4908,8 @@
       "robot_beta" : ".1",
       "robot_major" : "3",
       "robot_minor" : ".1",
-      "robot_name" : "archive.org_bot",
-      "robot_string" : "archive.org_bot",
+      "robot_name" : "Internet Archive",
+      "robot_string" : "Internet Archive",
       "robot_version" : "3.1"
    },
    "Mozilla/5.0 (hp-tablet; Linux; hpwOS/3.0.2; U; en-NZ) AppleWebKit/534.6 (KHTML, like Gecko) wOSBrowser/234.40.1 Safari/534.6 TouchPad/1.0" : {
@@ -6836,7 +6894,7 @@
       "robot_beta" : ".5",
       "robot_major" : "1",
       "robot_minor" : ".4",
-      "robot_string" : "wget",
+      "robot_string" : "Wget",
       "robot_version" : "1.4",
       "version" : "1.4"
    },

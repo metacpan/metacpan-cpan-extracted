@@ -10,8 +10,8 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
-license: perl
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,12 +20,11 @@ requires:
   Data::Dumper: '0'
   Function::Parameters: '0'
   LWP::Online: '0'
-  Modern::Perl: '0'
   Moo: '0'
   WebService::Client: '0'
 resources:
   bugtracker: https://github.com/faraco/WebService-Pixabay/issues
   homepage: https://github.com/faraco/WebService-Pixabay
   repository: https://github.com/faraco/WebService-Pixabay.git
-version: 2.0.2
+version: 2.1.1
 x_serialization_backend: 'YAML::Tiny version 1.69'

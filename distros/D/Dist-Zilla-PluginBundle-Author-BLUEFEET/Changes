@@ -1,5 +1,9 @@
 Revision history for Perl extension Dist-Zilla-PluginBundle-Author-BLUEFEET.
 
+0.03 2017-12-12
+
+ - Add the MetaJSON plugin per manwar (GitLab-API-v4/pull/2).
+
 0.02 2016-01-04
 
  - Fixup plugin load order, as that seems to mattter.

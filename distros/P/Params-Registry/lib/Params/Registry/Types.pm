@@ -16,22 +16,27 @@ use DateTime;
 use DateTime::Span;
 use DateTime::SpanSet;
 
-# for Set::Infinite
-use constant INF     => 100**100**100;
-use constant NEG_INF => 0 - INF;
-
 use Moose::Util::TypeConstraints qw(class_type);
 
-use MooseX::Types -declare => [
-    qw(Type Template TemplateSet Dependency Format
-       XSDdate XSDgYearMonth XSDgYear XSDgMonth XSDgDay DateSpan DateSpanSet
-       DateRange Currency Decimal3 XSDBool NumberRange Set IntSet
-       LCToken UCToken TokenSet)
-];
+our @TYPES;
 
-use MooseX::Types::Moose
-    qw(Str ClassName RoleName ArrayRef HashRef CodeRef
-       Undef Maybe Bool Num Int Str);
+BEGIN {
+    @TYPES = qw(Type Template TemplateSet Dependency Format XSDdate
+                XSDgYearMonth XSDgYear XSDgMonth XSDgDay DateSpan
+                DateSpanSet DateRange Currency Decimal3 XSDBool
+                NumberRange Set IntSet LCToken UCToken TokenSet
+                PositiveInt NegativeInt NonPositiveInt
+                NonNegativeInt);
+}
+
+use MooseX::Types::Moose qw(ClassName RoleName ArrayRef HashRef CodeRef
+                            Undef Maybe Bool Num Int Str);
+
+use MooseX::Types -declare => [@TYPES];
+
+# for Set::Infinite
+use constant INF     => Set::Infinite->inf;
+use constant NEG_INF => Set::Infinite->minus_inf;
 
 =head1 NAME
 
@@ -39,11 +44,11 @@ Params::Registry::Types - Types for Params::Registry
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -121,6 +126,30 @@ class_type Template, { class => 'Params::Registry::Template' };
 
 subtype Format, as CodeRef;
 coerce Format, from Str, via { my $x = shift; sub { sprintf $x, shift } };
+
+=head2 PositiveInt
+
+=cut
+
+subtype PositiveInt, as Int, where { $_ > 0 };
+
+=head2 NegativeInt
+
+=cut
+
+subtype NegativeInt, as Int, where { $_ < 0 };
+
+=head2 NonPostiveInt
+
+=cut
+
+subtype NonPositiveInt, as Int, where { $_ <= 0 };
+
+=head2 NonNegativeInt
+
+=cut
+
+subtype NonNegativeInt, as Int, where { $_ >= 0 };
 
 =head2 XSDdate
 
@@ -279,7 +308,6 @@ coerce DateRange, from ArrayRef[Maybe[Str]],
 
 coerce DateRange, from ArrayRef[Maybe[XSDdate]],
     via { _make_date_span(@{$_[0]}) };
-
 
 =head1 AUTHOR
 

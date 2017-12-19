@@ -4,6 +4,11 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
        'runtime' => {
                       'requires' => {
                                       'B' => '0',

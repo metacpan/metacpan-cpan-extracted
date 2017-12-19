@@ -1,0 +1,10 @@
+#!perl
+
+use Time::Piece;
+use Time::Seconds qw/ ONE_MINUTE /;
+
++{
+    description => 'test using modules',
+    regex       => qr/another/,
+    epoch       => Time::Piece->new - ONE_MINUTE,
+};

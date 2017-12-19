@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Parallel::WorkUnit",
   "PREREQ_PM" => {
+    "AnyEvent" => 0,
     "Carp" => 0,
+    "IO::Handle" => 0,
     "IO::Pipe" => 0,
     "IO::Select" => 0,
     "Moose" => 0,
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.012",
+  "VERSION" => "1.100",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +44,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "AnyEvent" => 0,
   "Carp" => 0,
+  "IO::Handle" => 0,
   "IO::Pipe" => 0,
   "IO::Select" => 0,
   "Moose" => 0,

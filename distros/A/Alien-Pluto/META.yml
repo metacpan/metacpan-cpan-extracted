@@ -1,0 +1,69 @@
+---
+abstract: 'Find Or Download/Build/Install libpluto In Pluto'
+author:
+  - 'Will Braswell <wbraswell@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.25'
+configure_requires:
+  Alien::Build: '1.32'
+  Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Build::SearchDep: '0.53'
+  Alien::Texinfo: '0.005'
+  Alien::bison: '0.19'
+  Alien::flex: '0.12'
+  ExtUtils::CBuilder: '0'
+  IO::Socket::SSL: '2.043'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - alien
+  - pluto
+  - polycc
+  - candl
+  - cloog
+  - orio
+  - compiler
+  - parallel
+  - parallelization
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Pluto
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  Test2::Suite: '0.000072'
+resources:
+  IRC: irc://irc.perl.org/#native
+  Mailinglist: http://groups.google.com/group/pluto-development
+  Wiki: https://en.wikipedia.org/wiki/Pluto_(disambiguation)
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-Pluto
+  homepage: http://pluto-compiler.sourceforge.net/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/wbraswell/alien-pluto.git
+version: '0.003000'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.32'
+  requires:
+    share:
+      Alien::Texinfo: '0.005'
+      Alien::bison: '0.19'
+      Alien::flex: '0.12'
+      Alien::gmake: '0.11'
+      Archive::Tar: '0'
+      Config: '0'
+      Env::ShellWords: '0.01'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

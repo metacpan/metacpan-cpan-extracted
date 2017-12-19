@@ -1,0 +1,16 @@
+base91-0.6.0/base91.c
+base91-0.6.0/base91.h
+base91-0.6.0/LICENSE
+base91-0.6.0/README
+Base91.xs
+Changes
+lib/Convert/Base91.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Convert-Base91.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,276 @@
+=head1 NAME
+
+Doit::Git - commands for dealing with the git revision control system
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('git');
+
+    $doit->git_repo_update(
+        repository => 'https://github.com/eserte/Doit.git',
+        directory  => '/path/to/workdir',
+    );
+
+    my $status = $doit->git_short_status(
+        directory       => '/path/to/workdir',
+        untracked_files => 'no',
+    );
+
+    my $directory = $doit->get_root;
+    my $sha1      = $doit->git_get_commit_hash;
+    my @files     = $doit->git_get_commit_files;
+    my @files     = $doit->git_get_changed_files;
+    my $boolean   = $doit->git_is_shallow;
+    my $branch    = $doit->git_current_branch;
+
+    $self->git_config(
+        key       => 'user.email',
+    );
+    $self->git_config(
+        key       => 'user.email',
+        val       => 'somebody@example.com',
+    );
+    $self->git_config(
+        key       => 'branch.master.rebase',
+        unset     => '1,
+    );
+
+=head1 DESCRIPTION
+
+B<Doit::Git> is a L<Doit> component providing commands for dealing
+with the git revision control system. It has to be added to a script
+using L<Doit's add_component|Doit/add_component>:
+
+    $doit->add_component('git');
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 git_repo_update
+
+    $doit->git_repo_update(
+        repository              => $git_url,
+        directory               => $local_directory,
+        repository_aliases      => [$git_url ...],
+        allow_remote_url_change => $boolean,
+        origin                  => $nickname,
+        refresh                 => 'always', # or 'never'
+        clone_opts              => [...],
+        quiet                   => $boolean,
+    );
+
+Make sure that the given git repository I<$git_url> is checked out (or
+refreshed) in the local directory I<$local_directory>. This is done
+either by L<git-clone(1)> a non-existent local repository, or by using
+L<git-fetch(1)> resp. L<git-pull(1)> for an existent local repository.
+Only C<repository> and C<directory> are mandatory options.
+
+For existing repositories the list in C<repository_aliases> is
+accepted as equivalent URLs (say, a C<https://...> and an equivalent
+C<git://...> URL). If none matches, then an exception will be thrown,
+unless C<allow_remote_url_change> is set to a true value E<0x2014> in
+this case the remote URL will be adapted.
+
+The default remote name C<origin> may be changed by using the
+C<origin> option.
+
+If C<refresh> is set to C<never>, then only C<git-clone> will be done
+for non-existent local repositories. The default is C<always>, which
+means that an existing repository will be updated using C<git-fetch>
+and C<git-pull>.
+
+C<clone_opts> is an array ref with options which will be passed to
+C<git-clone>. For existing repositories this does nothing.
+
+If C<quiet> is set to a true value, then some operations are quiet
+(currently the C<git-fetch> command).
+
+Return 1 if there were some changes done (C<git-clone> or C<git-pull>
+was executed), otherwise 0.
+
+=head3 git_config
+
+    my $changed = $doit->git_config(
+        directory => $directory,
+        key       => $key,
+        val       => $val,
+    );
+    my $changed = $doit->git_config(
+        directory => $directory,
+        key       => $key,
+        unset     => 1,
+    );
+
+If I<$val> is defined, then make sure that the git config I<$key> has
+the specified value I<$val>.
+
+If C<unset> is set to a true value, then make sure that the git config
+I<$key> is unset (absent).
+
+If neither of both is specified, then C<git_config> turns into an
+informational command (see L<below|/git_config (informational
+command)>).
+
+In all cases C<directory> may be set to a I<$directory>, otherwise the
+current working directory is used. The command fails if the specified
+directory is not a git directory.
+
+Note that C<git_config> handles only simple (but common) cases. See
+L<git-config(1)> for the complete possibilities of git's configuration
+system.
+
+=head2 DOIT INFORMATIONAL COMMANDS
+
+The informational commands listed below are added to the Doit runner
+object. Informational commands also run in dry-run mode. All commands
+fail if operating on a non-git directory.
+
+=head3 git_short_status
+
+    my $status = $doit->git_short_status(
+        directory       => $directory,
+        untracked_files => 'normal', # or 'no'
+    );
+
+Return an indicator about the git working directory status of the
+given I<$directory>, or the current working directory if C<directory>
+is not set. I<$status> may have the following values:
+
+=over
+
+=item C<< << >>
+
+Changed tracked files exist in the working directory (i.e.
+L<git-add(1)> calls are missing).
+
+=item C<< < >>
+
+Local repository is newer than remote (i.e. a L<git-push(1)> call is
+missing).
+
+=item (the empty string)
+
+Local and remote are in sync (but maybe a L<git-fetch(1)> call has to
+be done to refresh the remote status).
+
+=item C<< > >>
+
+Remote is newer than local (i.e. a L<git-pull(1)> or L<git-merge(1)>
+resp. L<git-rebase(1)> call is missing).
+
+=item C<< <> >>
+
+Remote and local diverged.
+
+=back
+
+Additionally, if C<untracked_files> is set to C<normal> (which is the
+default), then the presence of C<*> in the string (located between C<<
+< >> and C<< > >>) indicates that there are untracked files. If
+C<untracked_files> is set to C<no>, then C<*> will not appear in the
+status string. Examples:
+
+    <<*  uncommitted and untracked files
+    <*>  remote and local diverged, and there are untracked files
+
+There's support for L<git-svn(1)> repositories (but there's currently
+no test for this).
+
+=head3 git_root
+
+    my $directory = $doit->git_root(
+        directory => $directory,
+    );
+
+Return the top directory of the git checkout for the given directory
+I<$directory>, or the current working directory if C<directory> is not
+given.
+
+=head3 git_get_commit_hash
+
+    my $sha1 = $doit->git_get_commit_hash(
+        directory => $directory,
+    );
+
+Return the SHA1 of the git checkout for the given directory
+I<$directory>, or the current working directory if C<directory> is not
+given.
+
+=head3 git_get_commit_files
+
+    my @files = $doit->git_get_commit_files(
+        directory => $directory,
+        commit    => $committish,
+    );
+
+Return the list of changed files of the named C<commit> (or C<HEAD>,
+if not specified) for the given directory I<$directory> (or the
+current working directory if not specified).
+
+=head3 git_get_changed_files
+
+    my @files = $doit->git_get_changed_files(
+        directory => $directory,
+    );
+
+Return the list of changed files (uncommitted or untracked) in the
+given directory I<$directory> (or the current working directory if not
+specified).
+
+=head3 git_is_shallow
+
+    my @files = $doit->git_is_shallow(
+        directory => $directory,
+    );
+
+Return 1 if the given directory I<$directory> (or the current working
+directory if not specified) is a "shallow" directory, otherwise return
+0.
+
+Implementation note: then existence of the file F<.git/shallow> is
+checked.
+
+=head3 git_current_branch
+
+    my @files = $doit->git_current_branch(
+        directory => $directory,
+    );
+
+Return the current branch in the given directory I<$directory> (or the
+current working directory if not specified).
+
+=head3 git_config (informational command)
+
+    my $val = $doit->git_config(
+        directory => $directory,
+        key       => $key,
+    );
+
+Return the current value of I<$key>, or C<undef> if I<$key> does not
+exist.
+
+C<directory> may be set to a I<$directory>, otherwise the current
+working directory is used for running L<git-config(1)>.
+
+Note that C<git_config> handles only simple (but common) cases. See
+L<git-config(1)> for the complete possibilities of git's configuration
+system.
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<git(1)>.
+
+=cut

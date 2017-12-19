@@ -83,12 +83,6 @@ mathincg fields from the MARC record
 
 Cut this MARC fields referred by a MARC_PATH to a JSON_PATH.
 
-When the MARC_PATH points to a MARC tag then only the fields mathching the MARC
-tag will be copied. When the MATCH_PATH contains indicators or subfields, then
-only the MARC_FIELDS which contain data in these subfields will be copied. Optional,
-a C<equals> regular expression can be provided that should match the subfields that
-need to be copied:
-
     # Cut all the 300 fields
     marc_cut(300,tmp)
 
@@ -100,6 +94,53 @@ need to be copied:
 
     # Cut all the 300 fields which have subfield c equal to 'ABC'
     marc_cut(300c,tmp,equal:"^ABC")
+
+The JSON_PATH C<tmp> will contain an array with one item per field that was cut.
+Each item is a hash containing the following fields:
+
+  tmp.*.tag        - The names of the MARC field
+  tmp.*.ind1       - The value of the first indicator
+  tmp.*.ind2       - The value of the second indicator
+  tmp.*.subfields  - An array of subfield item. Each subfield item is a
+                     hash of the subfield code and subfield value
+
+E.g.
+
+    tmp:
+    - tag: '300'
+      ind1: ' '
+      ind2: ' '
+      subfields:
+      - a: 'blabla:'
+      - v: 'test123'
+      - c: 'ok123'
+
+These JSON paths can be used like:
+
+    # Set the first indicator of all 300 fields
+    do marc_each(var:this)
+      if all_match(this.tag,300)
+
+        # Set the first indicator to 1
+        set_field(this.ind1,1)
+
+        marc_paste(this)
+      end
+    end
+
+    # Capitalize all the v subfields of 300
+    do marc_each(var:this)
+      if all_match(this.tag,300)
+
+         do list(path:this.subfields, var:loop)
+            if (exists(loop.v))
+                upcase(loop.v)
+            end
+         end
+
+         marc_paste(this)
+      end
+    end
 
 =head1 INLINE
 

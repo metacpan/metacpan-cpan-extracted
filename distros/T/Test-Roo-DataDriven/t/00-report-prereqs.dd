@@ -1,0 +1,58 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::TrailingSpace' => '0.0203'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::Unload' => '0',
+                                      'Path::Tiny' => '0.004',
+                                      'Ref::Util' => '0',
+                                      'Test::Roo::Role' => '0',
+                                      'curry' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.10.1'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Basename' => '0',
+                                   'File::Spec' => '0',
+                                   'JSON::PP' => '2.00',
+                                   'Module::Metadata' => '0',
+                                   'Path::Tiny' => '0.004',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'Test::Roo' => '0',
+                                   'Time::Piece' => '1.16',
+                                   'Time::Seconds' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,3 +1,17 @@
+1.025 2017-12-14
+
+  Some new features for the rather new 'run' subcommand:
+    * add -cat option option to show the script
+    * -doc option also shows commit message
+
+  New feature for the older 'dump' subcommand
+    * -format accepts yaml or yml
+    * -format value is now case insensitive
+    * accept -format cds (alias to cml)
+
+  Misc:
+    * improve doc of modify command
+
 1.024 2017-10-22
 
   Some new features for the rather new 'run' subcommand:
@@ -40,7 +54,7 @@
   Bug fixes:
     * all: fix bash completion of -file option
     * cme run: fix bash_completion of -doc option
-    * cme dump: allow non_upstream_default mode
+    * cme  allow non_upstream_default mode
     * all: remove -dev option which raises security issues. Use
       'perl -Ilib -S cme' for the same effect
 
@@ -192,7 +206,7 @@
     * Common: pass cme messages through on_message_cb
     * update: call C::M::Instance->update
       (require Config::Model 2.068)
-    * dump: remove debug call to YYY
+    *  remove debug call to YYY
 
 1.002 2015-01-10
 

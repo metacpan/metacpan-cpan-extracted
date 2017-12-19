@@ -14,7 +14,7 @@ use Mail::DKIM::PublicKey;
 use Mail::DKIM::Algorithm::dk_rsa_sha1;
 
 package Mail::DKIM::DkSignature;
-use base "Mail::DKIM::Signature";
+use base 'Mail::DKIM::Signature';
 use Carp;
 
 =head1 NAME
@@ -28,34 +28,34 @@ Mail::DKIM::DkSignature - represents a DomainKeys-Signature header
 Create a new DomainKey signature from parameters
 
   my $signature = Mail::DKIM::DkSignature->new(
-                      [ Algorithm => "rsa-sha1", ]
+                      [ Algorithm => 'rsa-sha1', ]
                       [ Signature => $base64, ]
-                      [ Method => "simple", ]
-                      [ Domain => "example.org", ]
-                      [ Headers => "from:subject:date:message-id", ]
-                      [ Query => "dns", ]
-                      [ Selector => "alpha", ]
+                      [ Method => 'simple', ]
+                      [ Domain => 'example.org', ]
+                      [ Headers => 'from:subject:date:message-id', ]
+                      [ Query => 'dns', ]
+                      [ Selector => 'alpha', ]
                       [ Key => $private_key, ]
                   );
 
 =cut
 
 sub new {
-	my $type = shift;
-	my %prms = @_;
-	my $self = {};
-	bless $self, $type;
+    my $type = shift;
+    my %prms = @_;
+    my $self = {};
+    bless $self, $type;
 
-	$self->algorithm($prms{'Algorithm'} || "rsa-sha1");
-	$self->signature($prms{'Signature'});
-	$self->canonicalization($prms{'Method'} || "simple");
-	$self->domain($prms{'Domain'});
-	$self->headerlist($prms{'Headers'});
-	$self->protocol($prms{'Query'} || "dns");
-	$self->selector($prms{'Selector'});
-	$self->key($prms{'Key'}) if defined $prms{'Key'};
+    $self->algorithm( $prms{'Algorithm'} || 'rsa-sha1' );
+    $self->signature( $prms{'Signature'} );
+    $self->canonicalization( $prms{'Method'} || 'simple' );
+    $self->domain( $prms{'Domain'} );
+    $self->headerlist( $prms{'Headers'} );
+    $self->protocol( $prms{'Query'} || 'dns' );
+    $self->selector( $prms{'Selector'} );
+    $self->key( $prms{'Key'} ) if defined $prms{'Key'};
 
-	return $self;
+    return $self;
 }
 
 =head2 parse()
@@ -63,7 +63,7 @@ sub new {
 Create a new signature from a DomainKey-Signature header
 
   my $sig = Mail::DKIM::DkSignature->parse(
-                  "DomainKey-Signature: a=rsa-sha1; b=yluiJ7+0=; c=nofws"
+                  'DomainKey-Signature: a=rsa-sha1; b=yluiJ7+0=; c=nofws'
             );
 
 Constructs a signature by parsing the provided DomainKey-Signature header
@@ -77,31 +77,29 @@ of the as_string method.
 
 =cut
 
-sub parse
-{
-	my $class = shift;
-	croak "wrong number of arguments" unless (@_ == 1);
-	my ($string) = @_;
+sub parse {
+    my $class = shift;
+    croak 'wrong number of arguments' unless ( @_ == 1 );
+    my ($string) = @_;
 
-	# remove line terminator, if present
-	$string =~ s/\015\012\z//;
+    # remove line terminator, if present
+    $string =~ s/\015\012\z//;
 
-	# remove field name, if present
-	my $prefix;
-	if ($string =~ /^(domainkey-signature:)(.*)/si)
-	{
-		# save the field name (capitalization), so that it can be
-		# restored later
-		$prefix = $1;
-		$string = $2;
-	}
+    # remove field name, if present
+    my $prefix;
+    if ( $string =~ /^(domainkey-signature:)(.*)/si ) {
 
-	my $self = $class->Mail::DKIM::KeyValueList::parse($string);
-	$self->{prefix} = $prefix;
+        # save the field name (capitalization), so that it can be
+        # restored later
+        $prefix = $1;
+        $string = $2;
+    }
 
-	return $self;
+    my $self = $class->Mail::DKIM::KeyValueList::parse($string);
+    $self->{prefix} = $prefix;
+
+    return $self;
 }
-
 
 =head1 METHODS
 
@@ -122,19 +120,16 @@ the DomainKey-Signature that gets prepended to a signed message.
 
 =cut
 
-sub as_string_without_data
-{
-	croak "as_string_without_data not implemented";
+sub as_string_without_data {
+    croak 'as_string_without_data not implemented';
 }
 
-sub body_count
-{
-	croak "body_count not implemented";
+sub body_count {
+    croak 'body_count not implemented';
 }
 
-sub body_hash
-{
-	croak "body_hash not implemented";
+sub body_hash {
+    croak 'body_hash not implemented';
 }
 
 =head2 algorithm()
@@ -146,25 +141,23 @@ Defaults to "rsa-sha1", an RSA-signed SHA-1 digest.
 
 =cut
 
-sub algorithm
-{
-	my $self = shift;
+sub algorithm {
+    my $self = shift;
 
-	if (@_)
-	{
-		$self->set_tag("a", shift);
-	}
+    if (@_) {
+        $self->set_tag( 'a', shift );
+    }
 
-	my $a = $self->get_tag("a");
-	return defined $a && $a ne '' ? lc $a : 'rsa-sha1';
-}	
+    my $a = $self->get_tag('a');
+    return defined $a && $a ne '' ? lc $a : 'rsa-sha1';
+}
 
 =head2 canonicalization()
 
 Get or set the canonicalization (c=) field.
 
-  $signature->canonicalization("nofws");
-  $signature->canonicalization("simple");
+  $signature->canonicalization('nofws');
+  $signature->canonicalization('simple');
 
   $method = $signature->canonicalization;
 
@@ -174,22 +167,19 @@ signing.
 
 =cut
 
-sub canonicalization
-{
-	my $self = shift;
-	croak "too many arguments" if (@_ > 1);
+sub canonicalization {
+    my $self = shift;
+    croak 'too many arguments' if ( @_ > 1 );
 
-	if (@_)
-	{
-		$self->set_tag("c", shift);
-	}
+    if (@_) {
+        $self->set_tag( 'c', shift );
+    }
 
-	return lc($self->get_tag("c")) || "simple";
-}	
+    return lc( $self->get_tag('c') ) || 'simple';
+}
 
-sub DEFAULT_PREFIX
-{
-	return "DomainKey-Signature:";
+sub DEFAULT_PREFIX {
+    return 'DomainKey-Signature:';
 }
 
 =head2 domain()
@@ -197,44 +187,40 @@ sub DEFAULT_PREFIX
 Get or set the domain (d=) field.
 
   my $d = $signature->domain;          # gets the domain value
-  $signature->domain("example.org");   # sets the domain value
+  $signature->domain('example.org');   # sets the domain value
 
 The domain of the signing entity, as specified in the signature.
 This is the domain that will be queried for the public key.
 
 =cut
 
-sub domain
-{
-	my $self = shift;
+sub domain {
+    my $self = shift;
 
-	if (@_)
-	{
-		$self->set_tag("d", shift);
-	}
+    if (@_) {
+        $self->set_tag( 'd', shift );
+    }
 
-	my $d = $self->get_tag("d");
-	return defined $d ? lc $d : undef;
-}	
+    my $d = $self->get_tag('d');
+    return defined $d ? lc $d : undef;
+}
 
-sub expiration
-{
-	my $self = shift;
-	croak "cannot change expiration on " . ref($self) if @_;
-	return undef;
+sub expiration {
+    my $self = shift;
+    croak 'cannot change expiration on ' . ref($self) if @_;
+    return undef;
 }
 
 use MIME::Base64;
 
-sub check_canonicalization
-{
-	my $self = shift;
+sub check_canonicalization {
+    my $self = shift;
 
-	my $c = $self->canonicalization;
+    my $c = $self->canonicalization;
 
-	my @known = ("nofws", "simple");
-	return unless (grep { $_ eq $c } @known);
-	return 1;
+    my @known = ( 'nofws', 'simple' );
+    return unless ( grep { $_ eq $c } @known );
+    return 1;
 }
 
 # Returns a filtered list of protocols that can be used to fetch the
@@ -243,48 +229,46 @@ sub check_canonicalization
 # Note: at this time, the only recognized protocol for DomainKey
 # signatures is "dns".
 #
-sub check_protocol
-{
-	my $self = shift;
+sub check_protocol {
+    my $self = shift;
 
-	my $protocol = $self->protocol;
-	return "dns/txt" if $protocol && $protocol eq "dns";
-	return;
+    my $protocol = $self->protocol;
+    return 'dns/txt' if $protocol && $protocol eq 'dns';
+    return;
 }
 
-sub check_version
-{
-	#DomainKeys doesn't have a v= tag
-	return 1;
+sub check_version {
+
+    #DomainKeys doesn't have a v= tag
+    return 1;
 }
 
-sub get_algorithm_class
-{
-	my $self = shift;
-	croak "wrong number of arguments" unless (@_ == 1);
-	my ($algorithm) = @_;
+sub get_algorithm_class {
+    my $self = shift;
+    croak 'wrong number of arguments' unless ( @_ == 1 );
+    my ($algorithm) = @_;
 
-	my $class =
-		$algorithm eq "rsa-sha1" ? "Mail::DKIM::Algorithm::dk_rsa_sha1" :
-		undef;
-	return $class;
+    my $class =
+      $algorithm eq 'rsa-sha1'
+      ? 'Mail::DKIM::Algorithm::dk_rsa_sha1'
+      : undef;
+    return $class;
 }
 
 # get_public_key - same as parent class
 
-sub hash_algorithm
-{
-	my $self = shift;
-	my $algorithm = $self->algorithm;
+sub hash_algorithm {
+    my $self      = shift;
+    my $algorithm = $self->algorithm;
 
-	return $algorithm eq "rsa-sha1" ? "sha1" : undef;
+    return $algorithm eq 'rsa-sha1' ? 'sha1' : undef;
 }
 
 =head2 headerlist()
 
 Get or set the signed header fields (h=) field.
 
-  $signature->headerlist("a:b:c");
+  $signature->headerlist('a:b:c');
 
   my $headerlist = $signature->headerlist;
 
@@ -314,11 +298,10 @@ populated by the L<Verifier|Mail::DKIM::Verifier> when processing a DomainKey si
 
 =cut
 
-sub identity
-{
-	my $self = shift;
-	croak "cannot change identity on " . ref($self) if @_;
-	return $self->{dk_identity};
+sub identity {
+    my $self = shift;
+    croak 'cannot change identity on ' . ref($self) if @_;
+    return $self->{dk_identity};
 }
 
 =head2 identity_source()
@@ -333,11 +316,10 @@ Possible values are "header.sender" and "header.from".
 
 =cut
 
-sub identity_source
-{
-	my $self = shift;
-	croak "unexpected argument" if @_;
-	return $self->{dk_identity_source};
+sub identity_source {
+    my $self = shift;
+    croak 'unexpected argument' if @_;
+    return $self->{dk_identity_source};
 }
 
 # init_identity() - initialize the DomainKeys concept of identity
@@ -349,17 +331,15 @@ sub identity_source
 # header), so use this method when you have the From/Sender value.
 # See also finish_header() in Mail::DKIM::Verifier.
 #
-sub init_identity
-{
-	my $self = shift;
-	$self->{dk_identity} = shift;
-	$self->{dk_identity_source} = shift;
+sub init_identity {
+    my $self = shift;
+    $self->{dk_identity}        = shift;
+    $self->{dk_identity_source} = shift;
 }
 
-sub method
-{
-	croak "method not implemented (use canonicalization instead)";
-}	
+sub method {
+    croak 'method not implemented (use canonicalization instead)';
+}
 
 =head2 protocol()
 
@@ -371,15 +351,15 @@ key (default is "dns").
 =cut
 
 sub protocol {
-	my $self = shift;
+    my $self = shift;
 
-	(@_) and
-		$self->set_tag("q", shift);
+    (@_)
+      and $self->set_tag( 'q', shift );
 
-	# although draft-delany-domainkeys-base-06 does mandate presence of a
-	# q=dns tag, it is quote common that q tag is missing - be merciful
-	return !defined($self->get_tag("q")) ? 'dns' : $self->get_tag("q");
-}	
+    # although draft-delany-domainkeys-base-06 does mandate presence of a
+    # q=dns tag, it is quote common that q tag is missing - be merciful
+    return !defined( $self->get_tag('q') ) ? 'dns' : $self->get_tag('q');
+}
 
 =head2 selector()
 
@@ -402,14 +382,12 @@ returned value.
 
 # same as parent class
 
-sub timestamp
-{
-	croak "timestamp not implemented";
+sub timestamp {
+    croak 'timestamp not implemented';
 }
 
-sub version
-{
-	croak "version not implemented";
+sub version {
+    croak 'version not implemented';
 }
 
 =head1 SEE ALSO

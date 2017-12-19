@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value::LayeredInclude;
-$Config::Model::Value::LayeredInclude::VERSION = '2.114';
+$Config::Model::Value::LayeredInclude::VERSION = '2.116';
 use 5.010;
 use strict;
 use warnings;
@@ -81,7 +81,7 @@ sub _check_value {
 
     # need to test that prest config file is present as the model
     # may not enforce it (when read_config auto_create is 1)
-    my $layered_file = $self->instance->read_root_dir;
+    my $layered_file = $self->instance->root_dir;
     $layered_file .= $value;
 
     my $err = $self->{error_list};
@@ -108,7 +108,7 @@ Config::Model::Value::LayeredInclude - Include a sub layer configuration
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

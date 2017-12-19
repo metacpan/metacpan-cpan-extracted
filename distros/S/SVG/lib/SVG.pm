@@ -7,7 +7,7 @@ use SVG::XML;
 use parent qw(SVG::Element SVG::Extension);
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '2.80';
+our $VERSION = '2.81';
 
 =pod
 
@@ -1497,7 +1497,7 @@ sub xmlify {
         or $self->{-docref}{-creditsinserted} )
     {
         $self->comment(
-            "\n\tGenerated using the Perl SVG Module V$VERSION\n\tby Ronan Oger\n\tInfo: http://www.roitsystems.com/\n"
+            "\n\tGenerated using the Perl SVG Module V$VERSION\n\tby Ronan Oger\n\tInfo: http://www.roitsystems.com/\n\t"
         );
         $self->{-docref}{-creditsinserted} = 1;
     }

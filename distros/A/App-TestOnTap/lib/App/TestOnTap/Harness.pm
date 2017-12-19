@@ -59,7 +59,7 @@ sub runtests
 		local %ENV = %{$self->{testontap}->{args}->getPreprocess()->getEnv()};
 		$ENV{TESTONTAP_SUITE_DIR} = $sr;
 		$ENV{TESTONTAP_TMP_DIR} = $wdmgr->getTmp();
-		$ENV{TESTONTAP_PRIVATE_DIR} = $wdmgr->getPrivate();
+		$ENV{TESTONTAP_SAVE_DIR} = $wdmgr->getSaveSuite();
 		
 		if ($self->{testontap}->{args}->useHarness())
 		{

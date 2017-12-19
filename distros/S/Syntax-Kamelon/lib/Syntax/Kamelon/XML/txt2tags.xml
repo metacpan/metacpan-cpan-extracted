@@ -3,7 +3,7 @@
 <!-- Created by Juliano Dorneles dos Santos <juliano_dorneles@yahoo.com.br> -->
 <!-- Fixed for 3.2 Helio Chissini de Castro <helio@kde.org> -->
 <!-- Extended and adapted (v1.20) by Eric Forgeot < http://esclinux.tk > -->
-<language name="txt2tags" extensions="*.t2t" section="Markup" mimetype="text/txt2tags" version="2" kateversion="3.0" casesensitive="1">
+<language name="txt2tags" extensions="*.t2t" section="Markup" mimetype="text/txt2tags" version="3" kateversion="3.0" casesensitive="1">
 <highlighting>
 
 <contexts>
@@ -41,25 +41,27 @@
 </contexts>
 
 <itemDatas>
+	<!--		 Adapted to work with Syntax::Kamelon-->
 	<itemData name="Normal" defStyleNum="dsNormal" />
-	<itemData name="Date" defStyleNum="dsDecVal" color="#FF0000" italic="1" />
+	<itemData name="Date" defStyleNum="dsDataType" color="#FF0000" italic="1" />
 	<itemData name="Comment" defStyleNum="dsComment" color="#666666" italic="1" />
-	<itemData name="BoldItalic" defStyleNum="dsExtension" bold="1" italic="1" />
-	<itemData name="Bold" defStyleNum="dsFloat" color="#445675" bold="1" />
-	<itemData name="Italic" defStyleNum="dsConstant" color="#653A39" italic="1" />
-	<itemData name="Underline" defStyleNum="dsSpecialString" color="#386742" underline="1" />
-	<itemData name="Strikeout" defStyleNum="dsString" color="#644A9B" strikeOut="1" />
-	<itemData name="Monospaced" defStyleNum="dsOthers" color="#006600" />
-	<itemData name="Verbatim Line" defStyleNum="dsVerbatimString" color="#006600" />
-	<itemData name="Verbatim Area" defStyleNum="dsRegionMarker" color="#006600" />
-	<itemData name="Title" defStyleNum="dsBaseN" color="#990000" />
-	<itemData name="Link" defStyleNum="dsConstant" color="#0930DE" />
+	<itemData name="BoldItalic" defStyleNum="dsConstant" bold="1" italic="1" />
+	<itemData name="Bold" defStyleNum="dsDecVal" color="#445675" bold="1" />
+	<itemData name="Italic" defStyleNum="dsFloat" color="#653A39" italic="1" />
+	<itemData name="Underline" defStyleNum="dsKeyword" color="#386742" underline="1" />
+	<itemData name="Strikeout" defStyleNum="dsWarning" color="#644A9B" strikeOut="1" />
+	<itemData name="Monospaced" defStyleNum="dsOperator" color="#006600" />
+	<itemData name="Verbatim Line" defStyleNum="dsString" color="#006600" />
+	<itemData name="Verbatim Area" defStyleNum="dsSpecialString" color="#006600" />
+	<itemData name="Title" defStyleNum="dsAnnotation" color="#990000" />
+	<itemData name="Link" defStyleNum="dsAttribute" color="#0930DE" />
 	<itemData name="Tabel" defStyleNum="dsControlFlow" color="#FF0000" />
-	<itemData name="DefList" defStyleNum="dsDataType" color="#E300EE" />
-	<itemData name="List" defStyleNum="dsKeyword" color="#E300EE" />
-	<itemData name="NumList" defStyleNum="dsOperator" color="#E300EE" />
-	<itemData name="Quote" defStyleNum="dsString" color="brown" />
-	<itemData name="Bar" defStyleNum="dsFunction" color="#C0C0C0" />
+	<itemData name="DefList" defStyleNum="dsInformation" color="#E300EE" />
+	<itemData name="List" defStyleNum="dsPreprocessor" color="#E300EE" />
+	<itemData name="NumList" defStyleNum="dsSpecialChar" color="#E300EE" />
+	<itemData name="Quote" defStyleNum="dsSpecialStringl" color="brown" />
+	<itemData name="Bar" defStyleNum="dsVariable" color="#C0C0C0" />
+	<itemData name="EOF" defStyleNum="dsOthers" />
 </itemDatas>
 
 </highlighting>

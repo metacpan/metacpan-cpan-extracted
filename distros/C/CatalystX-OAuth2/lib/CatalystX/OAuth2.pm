@@ -46,7 +46,7 @@ CatalystX::OAuth2 - OAuth2 services for Catalyst
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 

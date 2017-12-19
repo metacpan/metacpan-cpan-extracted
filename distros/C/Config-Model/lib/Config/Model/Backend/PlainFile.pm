@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.114';
+$Config::Model::Backend::PlainFile::VERSION = '2.116';
 use 5.10.1;
 use Carp;
 use Mouse;
@@ -21,8 +21,6 @@ extends 'Config::Model::Backend::Any';
 with "Config::Model::Role::ComputeFunction";
 
 my $logger = get_logger("Backend::PlainFile");
-
-sub suffix { return ''; }
 
 sub annotation { return 0; }
 
@@ -216,7 +214,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.114
+version 2.116
 
 =head1 SYNOPSIS
 

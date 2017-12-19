@@ -3,24 +3,22 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
 use Test::More;
 
 use lib 't';
 
-unless ( $ENV{ARC_TESTING} ) {
-    plan( skip_all => "ARC tests currently a work in progress" );
-}
+# number of tests currently in the validation yaml, not counting the sha1 tests
+plan tests => 168;
+
+my $nskip = 0;
+$nskip = $ARGV[0] if @ARGV > 0;
 
 use ArcTestSuite;
 
-my $Tests = ArcTestSuite->new();
+my $Tests = new ArcTestSuite;
 
-$Tests->LoadFile( 't/arc_test_suite/arc-draft-validation-tests.yml' );
-$Tests->SetOperation( 'validate' );
-$Tests->RunAllScenarios();
+$Tests->LoadFile('t/arc_test_suite/arc-draft-validation-tests.yml');
+$Tests->SetOperation('validate');
+$Tests->RunAllScenarios($nskip);
 
 done_testing();
-
-#print Dumper( $Tests->{ 'tests' } );
-

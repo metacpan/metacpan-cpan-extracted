@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(xml_escape is_different :array :is);
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base', 'Catmandu::Buffer';
 
@@ -97,6 +97,8 @@ sub commit {
     }
 
     $self->fh->flush;
+
+    1;
 }
 
 1;
@@ -180,4 +182,3 @@ L<Catmandu::Counter>, and L<Catmandu::Logger> for a full list of methods.
 L<Catmandu::Importer::MARC::XML>
 
 =cut
-

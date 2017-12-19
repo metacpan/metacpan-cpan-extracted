@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.048
+Version 0.049
 
 =head1 SYNOPSIS
 
@@ -484,7 +484,7 @@ this is used).
 
 When all tests are concluded, it will be removed; no data in it will be persisted.
 
-=item * TESTONTAP_PRIVATE_DIR
+=item * TESTONTAP_SAVE_DIR
 
 This variable holds an existing directory path, and is free for the tests to use for whatever reason similar to the above
 temporary directory. The difference is that files/directories in here will be persisted along with the general results. 
@@ -499,8 +499,8 @@ When all tests are concluded, data in it will be persisted before it is removed.
 
 The results can be persisted as either a plain directory tree or a zip archive. The naming will consist of the test suite
 name, the timestamp when the test was run and a 'run id' (an UUID, generated for each test run). If it's an archive file
-it will be suffixed with '.zip'. See L<command line options and arguments|App::TestOnTap::Args> for details on how to control this using '--archive'
-and '--savedirectory'.
+it will be suffixed with '.zip'. See L<command line options and arguments|App::TestOnTap::Args> for details on how to
+control this using '--archive' and '--savedirectory'.
 
 The saved results are actually a part of the 'work directory', the place where all files are managed until they're saved.
 This includes, among other things, the temporary directory used for L</"TESTONTAP_TMP_DIR"> and may therefore sometimes
@@ -532,7 +532,7 @@ Note that for the zip file, it will internally contain a root directory with the
 
 =head3 FORMAT
 
-Assuming a test suite looking like below, and also assume this suite will generate a private persistable 'ioperf.xml':
+Assuming a test suite looking like below, and also assume this suite will generate a suite specific persistable 'ioperf.xml':
 
   fancysuite/
   -- config.testontap
@@ -553,38 +553,51 @@ Running the suite using:
 The test suite result tree in /tmp will look like this:
 
   fancysuite.20161227T103707Z.6a00a78d-cc20-11e6-bceb-fc7c2814a673
-  -- env.json
-  -- meta.json
-  -- summary.json
-  -- testinfo.json
-  -- preprocess.txt
-  -- postprocess.txt
-  -- private/
+  -- suite/
   -- -- ioperf.xml
-  -- result/
-  -- -- init.pl.json
-  -- -- basic_file_handling_setup.pl.json
-  -- -- basic_picture_processing_setup.pl.json
-  -- -- filehandl/
-  -- -- -- fh1.pl.json
-  -- -- -- fh2.pl.json
-  -- -- picproc/
-  -- -- -- pp1.pl.json
-  -- -- -- pp2.pl.json
-  -- tap/
-  -- -- init.pl.tap
-  -- -- basic_file_handling_setup.pl.tap
-  -- -- basic_picture_processing_setup.pl.tap
-  -- -- filehandl/
-  -- -- -- fh1.pl.tap
-  -- -- -- fh2.pl.tap
-  -- -- picproc/
-  -- -- -- pp1.pl.tap
-  -- -- -- pp2.pl.tap
+  -- testontap/
+  -- -- env.json
+  -- -- meta.json
+  -- -- summary.json
+  -- -- testinfo.json
+  -- -- preprocess.txt
+  -- -- postprocess.txt
+  -- -- result/
+  -- -- -- init.pl.json
+  -- -- -- basic_file_handling_setup.pl.json
+  -- -- -- basic_picture_processing_setup.pl.json
+  -- -- -- filehandl/
+  -- -- -- -- fh1.pl.json
+  -- -- -- -- fh2.pl.json
+  -- -- -- picproc/
+  -- -- -- -- pp1.pl.json
+  -- -- -- -- pp2.pl.json
+  -- -- tap/
+  -- -- -- init.pl.tap
+  -- -- -- basic_file_handling_setup.pl.tap
+  -- -- -- basic_picture_processing_setup.pl.tap
+  -- -- -- filehandl/
+  -- -- -- -- fh1.pl.tap
+  -- -- -- -- fh2.pl.tap
+  -- -- -- picproc/
+  -- -- -- -- pp1.pl.tap
+  -- -- -- -- pp2.pl.tap
 
 All 'json' files are in UTF-8.
 
-The described format version here is '0.1', and is indicated in the meta-data below (as format => major, minor).
+The described format version here is '1.0', and is indicated in the meta-data below (as format => major, minor).
+
+=over
+
+=item * suite/
+
+Any files in this directory are written by the test suite and is thus fully defined by the suite itself.
+
+=back
+
+=over
+
+=item * testontap/
 
 =over
 
@@ -785,10 +798,6 @@ The text printed by a preprocess command, if any.
 
 The text printed by a postprocess command, if any.
 
-=item * private/
-
-Any files in this directory are written by the test suite and is thus fully defined by the suite itself.
-
 =item * result/
 
 The structure below this directory mimics the structure in the suite. Every test is represented by
@@ -879,6 +888,8 @@ The structure below this directory mimics the structure in the suite. Every test
 a file with the extension '.tap', and is the actual output given by the test (which ought to be
 TAP, but in case of a broken test or an executable mistaken for a test, may show non-existent
 or broken TAP, and if so, should show up with parse errors in the summary).
+
+=back
 
 =back
 

@@ -78,12 +78,14 @@ lib/Net/WebSocket/X/UnsupportedProtocolVersion.pm
 t/Net-WebSocket-HTTP.t
 t/constants.t
 t/create_frame.t
+t/endpoint_allow_empty_read.t
 t/handshake.t
 t/handshake_case_insensitivity.t
 t/handshake_extension.t
 t/handshake_subprotocols.t
 t/parse_message.t
 t/parse_message_close.t
+t/parser_roundtrip.t
 t/partial_frame.t
 t/partial_huge_frame.t
 t/permessage_deflate_streamer.t

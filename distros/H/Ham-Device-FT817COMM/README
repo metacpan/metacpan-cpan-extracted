@@ -1,0 +1,2529 @@
+
+
+    NAME
+    VERSION
+    SYNOPSIS
+        Constructor and Port Configurations
+        Destructor
+        Lock File
+        Initialization 
+    METHODS
+        1. Using Return Data From a Module
+        2. Using setVerbose()
+        3. Build a sub-routine into a condition 
+    DEBUGGER
+    Modules
+    AUTHOR
+    BUGS
+    SUPPORT
+    ACKNOWLEDGEMENTS
+    LICENSE AND COPYRIGHT 
+
+NAME ^
+
+Ham::Device::FT817COMM - Library to control the Yaesu FT817 Ham Radio
+VERSION ^
+
+Version 1.0.2
+SYNOPSIS ^
+
+use HAM::Device::FT817COMM;
+Constructor and Port Configurations
+
+        my $FT817 = new Ham::Device::FT817COMM (
+        serialport => '/dev/ttyUSB0',
+        baud => '38400',
+        lockfile => '/var/lock/ft817'
+                                               );
+
+        my $port = $FT817->{'serialport'};
+        my $baud = $FT817->{'baud'};
+        my $lockfile = $FT817->{'lockfile'};
+        my $version = $FT817->moduleVersion;
+
+Destructor
+
+        $FT817->closePort;
+
+Lock File
+
+In the event you abruptly end the software or loose connectivity via ssh. When attempting to reconnect you will see the following error.
+
+        Can't open serial port /dev/ttyUSB0: File exists
+
+The lock file can be remove simply by
+
+        rm /var/lock/ft817 
+
+Initialization
+
+The instance of the device and options are created with the constructor and port configurations shown above. The variable which is an instance of the device may be named at that point. In this case $FT817. The serialport must be a valid port and not locked. You must consider that your login must have permission to access the port either being added to the group or giving the user suffucient privilages. The baudrate 'baud' must match the baudrate of the radio CAT RATE which is menu item 14.
+
+Note that you are not limited to one radio. You can create more than one instance using a different name and serial port
+
+        my $anotherFT817 = new Ham::Device::FT817COMM (
+        serialport => '/dev/ttyUSB1',
+        baud => '38400',
+        lockfile => '/var/lock/ft817-2'
+                                                      );
+
+        my $port = $FT817->{'serialport'};
+        my $baud = $FT817->{'baud'};
+        my $lockfile = $FT817->{'lockfile'};
+        my $version = $FT817->moduleVersion;
+
+REMEMBER!!!! Each instance created needs its own destructor.
+
+Finally lockfile is recommended to ensure that no other software may access the port at the same time. The lockfile is removed as part of the invocation of the destructor method.
+METHODS ^
+1. Using Return Data From a Module
+
+This allows for complete control of the rig through the sub routines all done through the cat interface
+
+        $output = 'rigname'->'command'('value');
+
+an example is a follows
+
+        $output = $FT817->catLock('ON');
+
+Using this method, the output which is collected in the varible $output is designed to be minimal for use in applications that provide an already formatted output.
+
+For example:
+
+        $output = $FT817->catLock('ON');
+        print "$output";
+
+Would simply return F0 if the command failed and 00 if the command was sucessfull. The outputs vary from module to module, depending on the function
+2. Using setVerbose()
+
+The module already has pre-formatted outputs for each subroutine. Using the same example in a different form and setting setVerbose(1) we have the following
+
+        setVerbose(1);
+        $FT817->catLock('ON');
+
+The output would be, for example:
+
+        Set Lock (ENABLE) Sucessfull.
+
+Other verbose outputs exist to catch errors.
+
+        setVerbose(1);
+        $FT817->catLock('blabla');
+
+The output would be:
+
+        Set Lock (blabla) Failed. Option:blabla invalid.
+
+An example of both is shown below for the command getHome()
+
+        As return data: Y
+        As verbose(1) : At Home Frequency
+
+We see that return data will be suitable for a program which needs just a boolean value.
+3. Build a sub-routine into a condition
+
+Another use can be to use a subrouting as a value in a condition statment to test
+
+        if (($FT817->gethome()) eq 'Y') {
+                warn "I guess we're home";
+                              }
+
+Call all of the modules, one at a time and look at the outputs, from which you can decide how the data can be used. At this time I have completed a command line front end for this module that makes testing all of the functionality easy.
+DEBUGGER ^
+
+FT817COMM has a built in robust debugger that makes available to the user all transactions between the software and the rig. Where verbose gave the outputs to user initiated subroutines, the debugger does very much the same but with internal functions not designed to be called directly in the userspace. That being said, you should never directly call these system functions or you will quickly turn your 817 into a paperweight or door stop. You have been warned.
+
+Feel free to use the debugger to get an idea as to how the module and the radio communicate.
+
+        $FT817->setDebug(1); # Turns on the debugger
+
+The first output of which is:
+
+        DEBUGGER IS ON
+
+Two distinct type of transactions happen with the debugger, they are:
+
+        CAT commands   :        Commands which use the Yaesu CAT protocol
+        EPROMM commands:        Commands which read and write to the EEPROM
+
+With the command: catgetMode() we get the regular output expected, with verbose(1)
+
+        Mode is FM
+
+However with the setDebug(1) we will see the following output to the same command:
+
+        [FT817]@/dev/ttyUSB0$ get mode
+
+        (sendCat:DEBUG) - DATA OUT ------> 00 00 00 00 03
+
+        (sendCat:DEBUG) - BUILT PACKET --> 0000000003
+
+        (sendCat:DEBUG) - DATA IN <------- 1471200008
+
+        Mode is FM
+        [FT817]@/dev/ttyUSB0$ 
+
+The sendcat:debug shows the request of 00 00 00 00 0x03 sent to the rig, and the rig returning 1471200008. What were looking at is the last two digits 08 which is parsed from the block of data. 08 is mode FM. FT817COMM does all of the parsing and conversion for you.
+
+As you might have guessed, the first 8 digits are the current frequency, which in this case is 147.120 MHZ. The catgetFrequency() module would pull the exact same data, but parse it differently
+
+The debugger works differently on read/write to the eeprom. The next example shown below used the function setArts('OFF'), the function which tunrs arts off.
+
+        [FT817]@/dev/ttyUSB0$ set arts off
+
+        (eepromDecode:DEBUG) - READING FROM ------> [00x79]
+
+        (eepromDecode:DEBUG) - PACKET BUILT ------> [00790000BB]
+
+        (eepromDecode:DEBUG) - OUTPUT HEX  -------> [81]
+
+        (eepromDecode:DEBUG) - OUTPUT BIN  -------> [10000001]
+
+
+        (writeEeprom:DEBUG) - OUTPUT FROM [00x79]
+
+        (writeEeprom:DEBUG) - PACKET BUILT ------> [00790000BB]
+
+        (writeEeprom:DEBUG) - BYTE1 (81) BYTE2 (1F) from [00x79]
+
+        (writeEeprom:DEBUG) - BYTE1 BINARY IS [10000001]
+
+        (writeEeprom:DEBUG) - CHANGING BIT(0) to (0)
+
+        (writeEeprom:DEBUG) - BYTE1: BINARY IS [00000001] AFTER CHANGE
+
+        (writeEeprom:DEBUG) - CHECKING IF [1] needs padding
+
+        (writeEeprom:DEBUG) - Padded to [01]
+
+        (writeEeprom:DEBUG) - BYTE1 (01) BYTE2 (1F) to   [00x79]
+
+        (writeEeprom:DEBUG) - WRITING  ----------> (01) (1F)
+
+        (writeEeprom:DEBUG) - PACKET BUILT ------> [0079011fBC]
+
+        (writeEeprom:DEBUG) - VALUES WRITTEN, CHECKING...
+
+        (writeEeprom:DEBUG) - SHOULD BE: (01) (1F)
+
+        (writeEeprom:DEBUG) - IS: -----> (01) (1F)
+
+        (writeEeprom:DEBUG) - VALUES MATCH!!!
+
+        ARTS set to OFF sucessfull!
+
+The output shows all of the transactions and modifications conducted by the system functions
+Modules ^
+
+agreeWithwarning()
+
+                    $agree = $FT817->agreeWithwarning(#);
+
+            Turns on and off the internal flag that says. You undrstand the risks of writing to the EEPROM
+            Activated when any value is in the (). Good practice says () or (1) for OFF and ON.
+
+            Returns the argument sent to it on success.
+
+bitCheck()
+
+                    $output = $FT817->bitCheck();
+
+            The function that checks the BITWATCHER hash for changes and throws an Alarm if a change is found
+            showing what the change is. The BITWATCHER hash is hard coded in FT817COMM.pm as areas are discovered
+            they are removed from the hash.  If an alarm is thrown, look at what function was done in the history log
+            and output log to figure out why the value was changed
+
+            [FT817]@/dev/ttyUSB0/:$ bitcheck
+            CHANGE FOUND IN MEMORY AREA [0055]: BIT 4 is 0, WAS 1
+
+
+            If it finds no changes, it will return the following
+            [FT817]@/dev/ttyUSB0/:$ bitcheck
+
+            NO CHANGES FOUND
+
+            Returns 'OK' when no change found, 'CHANGE' when a change was found
+
+boundryCheck()
+
+                    $output = $FT817->boundryCheck([BAND],[FREQUENCY]);
+                    $output = $FT817->boundryCheck('14m','14.070');
+
+            This is an internal function to check if a frequency is in the correct range
+            for the Band given. The ranges are listed in a hash of hashes called %BOUNDRIES
+
+            Returns 'OK' when within range, returns 1 on error
+
+catClarifier()
+
+                    $setclar = $FT817->catClarifier([ON/OFF]);
+
+            Enables or disables the clarifier
+
+            Returns '00' on success or 'f0' on failure
+
+catClarifierfreq()
+
+                    $clarifierfreq = $FT817->catClarifierfreq([####]);
+
+            Uses 4 digits as an argument to set the Clarifier frequency.  Leading and trailing zeros required where applicable
+             1.234 KHZ would be 1234
+
+            Returns '00' on success or 'f0' on failure
+
+catCtcssdcs()
+
+                    $ctcssdcs = $FT817->catCtcssdcs({DCS/CTCSS/ENCODER/OFF});
+
+            Sets the CTCSS DCS mode of the radio
+
+            Returns 'OK' on success or something else on failure
+
+catCtcsstone()
+
+                    $ctcsstone = $FT817->catCtcsstone([####]);
+
+            Uses 4 digits as an argument to set the CTCSS tone.  Leading and trailing zeros required where applicable
+             192.8 would be 1928 as an argument
+
+            Returns '00' on success or 'f0' on failure
+            On 'f0' verbose(1) displays all valid tones
+
+catDcscode()
+
+                    $dcscode = $FT817->catDcscode([####]);
+
+            Uses 4 digits as an argument to set the DCS code.  Leading and trailing zeros required where applicable
+             0546 would be 546 as an argument
+
+            Returns '00' on success or 'f0' on failure
+            On 'f0' verbose(1) displays all valid tones
+
+catgetFrequency()
+
+                    $frequency = $FT817->catgetFrequency([#]);
+
+            Returns the current frequency of the rig eg. B<14712000> with B<catgetFrequency()>
+            Returns the current frequency of the rig eg. B<147.120.00> MHZ with B<catgetFrequency(1)>
+
+catgetMode()
+
+                    $mode = $FT817->catgetMode();
+
+            Returns the current Mode of the Radio : AM / FM / USB / CW etc.......
+
+catLock()
+
+                    $setlock = $FT817->catLock([ON/OFF]);
+
+            Enables or disables the radio lock.
+
+            Returns '00' on success or 'f0' on failure
+
+catOffsetfreq()
+
+                    $offsetfreq = $FT817->catOffsetfreq([########]);
+
+            Uses 8 digits as an argument to set the offset frequency.  Leading and trailing zeros required where applicable
+            1.230 MHZ would be 00123000
+
+            Returns '00' on success or 'f0' on failure
+
+catOffsetmode()
+
+                    $setoffsetmode = $FT817->catOffsetmode([POS/NEG/SIMPLEX]);
+
+            Sets the mode of the radio with one of the valid modes.
+
+            Returns '00' on success or 'f0' on failure
+
+catPower()
+
+                    $setPower = $FT817->catPower([ON/OFF]);
+
+            Sets the power of the radio on or off. Note that this function, as stated in the manual only works
+            Correctly when connected to DC power and NO Battery installed
+
+            Returns '00' on success or 'null' on failure
+
+catPtt()
+
+                    $setptt = $FT817->catPtt([ON/OFF]);
+
+            Sets the Push to talk of the radio on or off.
+
+            Returns '00' on success or 'f0' on failure
+
+catRxstatus()
+
+                    $rxstatus = $FT817->catRxstatus([VARIABLES/HASH]);
+
+            Retrieves the status of SQUELCH / S-METER / TONEMATCH / DESCRIMINATOR in one
+            command and posts the information when verbose(1).
+
+            Returns with variables as argument $squelch $smeter $smeterlin $desc $match
+            Returns with hash as argument %rxstatus
+
+catsetFrequency()
+
+                    $setfreq = $FT817->catsetFrequency([########]);
+
+            Uses 8 digits as an argument to set the frequency.  Leading and trailing zeros required where applicable
+            147.120 MHZ would be 14712000
+             14.070 MHZ would be 01407000
+
+            Returns '00' on success or 'f0' on failure
+
+catsetMode()
+
+                    $setmode = $FT817->catsetMode([LSB/USB/CW/CWR/AM/FM/DIG/PKT/FMN/WFM]);
+
+            Sets the mode of the radio with one of the valid modes.
+
+            Returns '00' on success or 'f0' on failure
+
+catSplitfreq()
+
+                    $setsplit = $FT817->catSplitfreq([ON/OFF]);
+
+            Sets the radio to split the transmit and receive frequencies
+
+            Returns '00' on success or 'f0' on failure
+
+catTxstatus()
+
+                    $txstatus = $FT817->catTxstatus([VARIABLES/HASH]);
+
+            Retrieves the status of POWERMETER / PTT / HIGHSWR / SPLIT in one
+            command and posts the information when verbose(1).
+
+            Returns with variables as argument $pometer $ptt $highswr $split
+            Returns with hash as argument %txstatus
+
+catvfoToggle()
+
+                    $vfotoggle = $FT817->catvfotoggle();
+
+            Togles the VFO between A and B
+
+            Returns '00' on success or 'f0' on failure
+
+closePort()
+
+                    $FT817->closePort();
+
+            This function should be executed at the end of the program.  This closes the serial port and removed the lock
+            file if applicable.  If you do not use this, and exit abnormally, you will need to manually remove the lock 
+            file if it was enabled in the settings.
+
+dec2bin()
+
+            Simple internal function for converting decimal to binary. Has no use to the end user.
+
+eepromDecode()
+
+            An internal function to retrieve code from an address of the eeprom and convert the first byte to 
+            binary, dumping the second byte.
+
+eepromDecodenext()
+
+            An internal function to retrieve code from an address of the eeprom  returning hex value of the next
+            memory address up.
+
+eepromDoubledecode()
+
+            An internal function to retrieve code from an address of the eeprom AND the next memory address up 
+            memory address up.
+
+get9600mic()
+
+                    $b9600mic = $FT817->get9600mic();
+
+            MENU ITEM # 3 - Returns the setting of 9600 MIC 0-100
+
+getActivelist()
+
+                    $agc = $FT817->getActivelist();
+
+            Returns a list of all Active/Visible memory Channels
+
+            [FT817]@/dev/ttyUSB0/MEMORY[MEM]:# list
+            
+            ACTIVE MEMORY AREAS
+            ___________________
+
+            #     LABEL      SKIP   MODE   RXFREQ       ENCODER   TONE/DCS  SHIFT     RPTOFFSET   
+
+            1     The Zoo    NO     FM     147.120.00   TONE      103.5     0.5 Mhz   PLUS     
+            2     N4FLA      NO     FM     140.000.00   TONE      103.5     0.5 Mhz   PLUS     
+            3     20M PSK    YES    USB    14.070.15    OFF       OFF       0 Mhz     SIMPLEX  
+            4     20M JT65   YES    USB    14.076.00    OFF       OFF       0 Mhz     SIMPLEX  
+            5     MAR MOBL   YES    USB    14.300.00    OFF       OFF       0 Mhz     SIMPLEX       
+
+getAgc()
+
+                    $agc = $FT817->getAgc();
+
+            Returns the current setting of the AGC: AUTO / FAST / SLOW / OFF
+
+getAmfmdial()
+
+                    $amfmdial = $FT817->getAmfmdial();
+
+            MENU ITEM # 4 - Returns the Disable option of the AM/FM dial ENABLE / DISABLE
+
+getAmmic()
+
+                    $ammic = $FT817->getAmmic();
+
+            MENU ITEM # 5 - Returns the setting of AM MIC 0-100
+
+getAntenna ()
+
+                    $antenna = $FT817->getAntenna({HF/6M/FMBCB/AIR/VHF/UHF});
+                    %antenna = $FT817->getAntenna({ALL});
+                    %antenna = $FT817->getAntenna();
+
+            Returns the FRONT/BACK configuration of the antenna for the different types of
+            bands.  Returns one value when an argument is used.  If the argument ALL or no
+            argument is used will print a list of the configurations or all bands and returns
+            a hash or the configuration
+
+getApotime()
+
+                    $apotime = $FT817->getApotime();
+
+            MENU ITEM # 8 - Returns the Auto Power Off time as OFF or 1 - 6 hours
+
+getArts ()
+
+                    $arts = $FT817->getArts();
+
+            Returns the status of ARTS: ON / OFF
+
+getArs144 ()
+
+                    $ars144 = $FT817->getArs144();
+
+            MENU ITEM # 1 - Returns the status of 144 ARS: OFF / ON
+
+getArs430 ()
+
+                    $ars430 = $FT817->getArs430();
+
+            MENU ITEM # 2 - Returns the status of 430 ARS: OFF / ON
+
+getArtsmode ()
+
+                    $artsmode = $FT817->getArtsmode();
+
+            MENU ITEM # 9 - Returns the status of ARTS BEEP: OFF / RANGE /ALL
+
+getBacklight ()
+
+                    $backlight = $FT817->getBacklight();
+
+            MENU ITEM # 10 - Returns the status of the Backlight: OFF / ON / AUTO
+
+getBeepfreq ()
+
+                    $beepfreq = $FT817->getBeepfreq();
+
+            MENU ITEM # 12 - Returns the BEEP Frequency of the radio : 440 / 880
+
+getBeepvol ()
+
+                    $beepvol = $FT817->getBeepvol();
+
+            MENU ITEM # 13 - Returns the BEEP VOLUME of the radio : 0 - 100
+
+getBk ()
+
+                    $bk = $FT817->getBk();
+
+            Returns the status of Break-in (BK) ON / OFF
+
+getCatrate()
+
+                    $catrate = $FT817->getCatrate();
+
+            MENU ITEM # 14 - Returns the CAT RATE (4800/9600/38400)
+
+getCharger()
+
+                    $charger = $FT817->getCharger();
+
+            Returns the status of the battery charger.  Verbose will show the status and if the
+            status is on, how many hours the battery is set to charge for.
+
+getChargetime()
+
+                    $chargetime = $FT817->getChargetime();
+
+            MENU ITEM # 11 - Returns how many hours the charger is set for in the config. 6/8/10
+
+getChecksum()
+
+                    $checksum = $FT817->getChecksum();
+
+            Returns the checksum bits in EEPROM areas 0x00 through 0x03
+
+getColor()
+
+                    $color = $FT817->getColor();
+
+            MENU ITEM # 15 - Returns the Color of the LCD display (BLUE/AMBER)
+
+getConfig()
+
+                    $config = $FT817->getConfig();
+
+            Returns the two values that make up the Radio configuration.  This is set by the soldier blobs
+            of J4001-J4009 in the radio.
+
+getContrast()
+
+                    $contrast = $FT817->getContrast();
+
+            MENU ITEM # 16 - Returns the Contrast of the LCD display (1-12)
+
+getCurrentmem()
+
+                    $currentmem = $FT817->getCurrentmem();
+
+            Returns the currently selected memory area that appears on startup [0-200] or M-PL, M-PU
+
+getCwdelay()
+
+                    $cwdelay = $FT817->getCwdelay();
+
+            MENU ITEM # 17 - Shows CW Delay 10-2500 ms
+
+getCwid()
+
+                    $cwid = $FT817->getCwid();
+
+            MENU ITEM # 18 - Shows if CW ID is ON / OFF
+
+getCwpaddle()
+
+                    $cwpaddle = $FT817->getCwpaddle();
+
+            MENU ITEM # 19 - Shows if CW Paddle is  NORMAL / REVERSE
+
+getCwpitch()
+
+                    $cwpitch = $FT817->getCwpitch();
+
+            MENU ITEM # 20 - Shows the CW Pitch 300-1000 Hz
+
+getCwspeed()
+
+                    $cwspeed = $FT817->getCwspeed();
+
+            MENU ITEM # 21 - Returns the speed of CW in WPM
+
+getCwweight()
+
+                    $cwweight = $FT817->getCwweight();
+                    $cwweight = $FT817->getCwweight('1');
+
+            MENU ITEM # 22 - Returns the Weight of CW [1:2.5 - 1:4.5] with no option
+                             Returns the Weight of CW [2.5 - 4.5] with no option
+
+getDcsinv()
+
+                    $dcsinv = $FT817->getDcsinv();
+
+            MENU ITEM # 53 - Returns the Setting DCS encoding, normal or inverted  
+                             [TN-RN/TN-RIV/TIV-RN/TIV-RIV]
+
+getDigdisp()
+
+                    $digdisp = $FT817->getDigdisp();
+
+            MENU ITEM # 24 - Shows the Digital Frequency Offset -3000 to +3000 Hz
+
+getDigmic()
+
+                    $digmic = $FT817->getDigmic();
+
+            MENU ITEM # 25 - Returns the setting of DIG MIC 0-100
+
+getDigmode()
+
+                    $digmode = $FT817->getDigmode();
+
+            MENU ITEM # 26 - Returns the Setting of the Digital mode 
+                             [RTTY/PSK31-L/PSK31-U/USER-L/USER-U]
+
+getDigshift()
+
+                    $digshift = $FT817->getDigshift();
+
+            MENU ITEM # 27 - Shows the Digital Shift -3000 to +3000 Hz
+
+getDsp()
+
+                    $dsp = $FT817->getDsp();
+
+            Returns the current setting of the Digital Signal Processor (if applicable) : ON / OFF
+
+getDw()
+
+                    $dw = $FT817->getDw();
+
+            Returns the status of Dual Watch (DW) ON / OFF
+
+getEeprom()
+
+                    $value = $FT817->getEeprom();
+
+            Currently returns just the value you send it. In verbose mode however, it will display a formatted
+            output of the memory address specified.
+
+    With one argument it will display the information about a memory address
+
+            [FT817]@/dev/ttyUSB0$ get eeprom 005f
+
+            ADDRESS     BINARY          DECIMAL     VALUE      
+            ___________________________________________________
+            005F        11100101        229         E5    
+
+    With two arguments it will display information on a range of addresses
+
+            [FT817]@/dev/ttyUSB0$ get eeprom 005f 0062
+
+            ADDRESS     BINARY          DECIMAL     VALUE      
+            ___________________________________________________
+            005F        11100101        229         E5         
+            0060        00011001        25          19         
+            0061        00110010        50          32         
+            0062        10001000        136         88  
+
+getEmergency()
+
+                    $emergency = $FT817->getEmergency();
+
+            MENU ITEM # 28 - Shows if Emergency is set to ON / OFF
+
+getExtmenu()
+
+                    $extmenu = $FT817->getExtmenu();
+
+            MENU ITEM # 52 - Shows the Extended Menu Setting ON /OFF
+
+getFasttuning()
+
+                    $fasttune = $FT817->getFasttuning();
+
+            Returns the current setting of the Fast Tuning mode : ON / OFF
+
+getFlags()
+
+                    $flags = $FT817->getFlags();
+
+            Returns the current status of the flags : DEBUG / VERBOSE / WRITE ALLOW / WARNED
+
+getFmmic()
+
+                    $fmmic = $FT817->getFmmic();
+
+            MENU ITEM # 29 - Returns the setting of FM MIC 0-100
+
+getHome()
+
+                    $home = $FT817->getHome();
+
+            Returns the current status of the rig being on the Home Frequency : Y/N
+
+getId()
+
+                    $id = $FT817->getId();
+
+            MENU ITEM # 31 - Returns the charachers for CWID
+
+getKyr()
+
+                    $kyr = $FT817->getKyr();
+
+            Returns the current status of the Keyer (KYR) : ON/OFF
+
+getLock()
+
+                    $lock = $FT817->getLock();
+
+            Returns the current status of the Lock : ON/OFF
+
+getLockmode()
+
+                    $lockmode = $FT817->getLockmode();
+
+            MENU ITEM # 32 - Returns the Lock Mode  DIAL / FREQ / PANEL
+
+getMainstep()
+
+                    $mainstep = $FT817->getMainstep();
+
+            MENU ITEM # 33 - Returns the Main Step COURSE / FINE
+
+getMemgroup()
+
+                    $memgroup = $FT817->getMemgroup();
+
+            MENU ITEM # 34 - Returns Status of Memory groups ON / OFF
+
+getMemmap()
+
+                    $Memory = $FT817->getMemmap([1-200 / M-PL / M-PU]);
+
+            Returns the given memory number as Active or Inactive
+
+getMickey()
+
+                    $mickey = $FT817->getMickey();
+
+            MENU ITEM # 36 - Returns Status of MIC KEY ON / OFF
+
+getMicscan()
+
+                    $micscan = $FT817->getMicscan();
+
+            MENU ITEM # 37 - Returns Status of MIC SCAN ON / OFF
+
+getMtqmb()
+
+                    $mtqmb = $FT817->getMtqmb();
+
+            Returns the current Status of MTQMB : ON / OFF
+
+getMtune()
+
+                    $mtune = $FT817->getMtune();
+
+            Returns the current Status of MTUNE : MTUNE / MEMORY 
+
+getNb()
+
+                    $nb = $FT817->getNb();
+
+            Returns the current Status of the Noise Blocker : ON / OFF
+
+getOpfilter()
+
+                    $opfilter = $FT817->getOpfilter();
+
+            MENU ITEM # 38 - Returns the OP Filter setting OFF / SSB / CW
+
+getPktmic()
+
+                    $pktmic = $FT817->getPktmic();
+
+            MENU ITEM # 39 - Returns the setting of PKT MIC 0-100
+
+getPktrate()
+
+                    $pktrate = $FT817->getPktrate();
+
+            MENU ITEM # 40 - Returns the Packet Rate  1200 / 9600 Baud
+
+getPbt()
+
+                    $pbt = $FT817->getPbt();
+
+            Returns the status of Pass Band Tuning: ON /OFF
+
+getPri()
+
+                    $pri = $FT817->getPri();
+
+            Returns the status of Priority Scaning Feature: ON /OFF
+
+getPwrmtr()
+
+                    $pwrmtr = $FT817->getPwrmtr();
+
+            Returns the current Setting of the Power meter : PWR / ALC / SWR / MOD
+
+getQmb()
+
+                    $qmb = $FT817->getQmb();
+
+            Returns the current Status of QMB : ON / OFF 
+
+getResumescan()
+
+                    $resumescan = $FT817->getResumescan();
+
+            MENU ITEM # 41 - Returns the RESUME(scan) setting OFF / 3,5,10 SEC
+
+getRfknob()
+
+                    $rfknob = $FT817->getRfknob();
+
+            MENU ITEM # 45 - Returns the current Functionality of the RF-GAIN Knob : RFGAIN / SQUELCH
+
+getRlsbcar()
+
+                    $rlsbcar = $FT817->getRlsbcar();
+
+            MENU ITEM # 54 - Shows the Rx Carrier point for LSB -000 to +300 Hz
+
+getRusbcar()
+
+                    $rusbcar = $FT817->getRlsbcar();
+
+            MENU ITEM # 55 - Shows the Rx Carrier point for USB -000 to +300 Hz
+
+getScn()
+
+                    $pwrmtr = $FT817->getScn();
+
+            Returns the current function of the Scan Feature : OFF / UP / DOWN
+
+getScope()
+
+                    $scope = $FT817->getScope();
+
+            MENU ITEM # 43 - Returns the Setting for SCOPE : Continuous / CHK (every 10 sec)
+
+getSidetonevol()
+
+                    $sidetonevol = $FT817->getSidetonevol();
+
+            MENU ITEM # 44 - Returns the Sidetone Volume 0-100
+
+getSpl()
+
+                    $spl = $FT817->getSpl();
+
+            Returns the current Status of SPL, Split Frequency : ON / OFF
+
+getSsbmic()
+
+                    $ssbmic = $FT817->getSsbmic();
+
+            MENU ITEM # 46 - Returns the Value of SSB MIC 0-100
+
+getSoftcal()
+
+                    $softcal = $FT817->getSoftcal({console/digest/file filename.txt});
+
+            This command currently works with verbose and write to file.  Currently there is no
+            usefull return information Except for digest.  With no argument, it defaults to 
+            console and dumps the entire 76 software calibration memory areas to the screen. 
+            Using digest will return an md5 hash of the calibration settings. Using file along
+            with a file name writes the output to a file.  It's a good idea to keep a copy of 
+            this in case the eeprom gets corrupted and the radio factory defaults.  If you dont have 
+            this information, you will have to send the radio back to the company for recalibration.
+
+getTlsbcar()
+
+                    $tlsbcar = $FT817->getTlsbcar();
+
+            MENU ITEM # 56 - Shows the Tx Carrier point for LSB -000 to +300 Hz
+
+getTusbcar()
+
+                    $tusbcar = $FT817->getTusbcar();
+
+            MENU ITEM # 57 - Shows the Tx Carrier point for USB -000 to +300 Hz
+
+getTottime()
+
+                    $tottime = $FT817->getTottime();
+
+            MENU ITEM # 49 - Returns the Value of the Time out Timer in Minutes
+
+getTuner()
+
+                    $tuner = $FT817->getTuner();
+
+            Returns the current tuner setting : VFO / MEMORY
+
+getTxpower()
+
+                    $txpower = $FT817->getTxpower();
+
+            Returns the current Transmit power level : HIGH / LOW3 / LOW2 / LOW1
+
+getVfo()
+
+                    $vfo = $FT817->getVfo();
+
+            Returns the current VFO : A / B
+
+getVfoband()
+
+                    $vfoband = $FT817->getVfoband([A/B]);
+
+            Returns the current band of a given VFO 
+
+getVlt()
+
+                    $vlt = $FT817->getVlt();
+
+            Returns if the voltage display is ON or OFF
+
+getVox()
+
+                    $vox = $FT817->getVox();
+
+            Returns the status of VOX : ON / OFF
+
+getVoxdelay()
+
+                    $voxdelay = $FT817->getVoxdelay();
+
+            MENU ITEM # 50 - Returns the VOX Delay (100-2500)ms
+
+getVoxgain()
+
+                    $voxgain = $FT817->getVoxgain();
+
+            MENU ITEM # 51 - Returns the VOX Gain (1-100)
+
+hex2bin()
+
+            Simple internal function for convrting hex to binary. Has no use to the end user.
+
+hexAdder()
+
+            Internal function to incriment a given hex value off a base address
+
+hexDiff()
+
+            Internal function to return decimal value as the difference between two hex numbers
+
+loadConfig()
+
+                    $output = $FT817->loadConfig([filename]);
+
+            This will restore the radio configuration from a file using the FT817OS format overwriting 
+            the existing radio config
+
+            Without a filename this will load the config from the default file FT817.cfg 
+
+loadMemory()
+
+                    $output = $FT817->loadMemory([filename]);
+
+            This will restore the radio memory from a file using the FT817OS format overlapping 
+            the existing radio memory.  Whichever valid memory areas were saved at the time will
+            be the ones overwritten.  If you create, between the last save, other memory areas 
+            within the radio they will not be updated.  If you want an accurate reload of the memory
+            be sure to use save memory after making changes to memory areas.
+
+            Without a filename this will load the config from the default file FT817.mem  
+
+moduleVersion()
+
+                    $version = $FT817->moduleVersion();
+
+            Returns the version of FT817COMM.pm to the software calling it.
+
+new()
+
+                    my $FT817 = new Ham::Device::FT817COMM (
+                    serialport => '/dev/ttyUSB0',
+                    baud => '38400',
+                    lockfile => '/var/lock/ft817'
+                                                           );
+
+            Creates an instance of the device that is the Radio.  Called at the beginning of the program.
+            See the Constructors section for more info.
+
+quietToggle()
+
+                    $output = $FT817->quiettoggle();
+
+            This is an internal function to toggle the vfo with verbose off. To cut down on repetative code
+
+            Returns 0
+
+quietHometoggle()
+
+                    $output = $FT817->quiettoggle();
+
+            This is an internal function to toggle the HOME with verbose off. To cut down on repetative code
+
+            Returns 0
+
+quietTunetoggle()
+
+                    $output = $FT817->quiettoggle();
+
+            This is an internal function to toggle the MEMORY / VFO with verbose off. To cut down on repetative code
+
+            Returns 0
+
+rangeCheck()
+
+                    $band = $FT817->rangeCheck([FREQNENCY]);
+
+            This is an internal function to check the FREQRANGE hash to see what band the given frequency is in
+
+            Returns BAND
+
+readMemvfo ()
+
+                    my $option = $FT817->readMemvfo('[A/B]', '[BAND]', '[OPTION]');
+                    my $option = $FT817->readMemvfo('[MTUNE/MTQMB]','[OPTION]');
+
+            Reads and returns information from the VFO memory given a VFO [A/B] and a BAND [20M/40M/70CM] etc..
+            Reads and returns information from the VFO for [MTUNE/MTQMB] doesn't take a band argument. 
+            This is only for VFO memory's and not the Stored Memories nor Home Memories. Leave OPTION empty to 
+            Return a hash with all OPTIONS below
+
+            Returns information based on one of the valid options:
+
+            MODE          - Returns the mode in memory - update only appears after toggling the VFO
+            NARFM         - Returns if Narrow FM os ON or OFF
+            NARCWDIG      - Returns if the CW or Digital Mode is on Narrow
+            RPTOFFSET     - Returns the Repeater offset
+            TONEDCS       - Returns type type of tone being used
+            ATT           - Returns if ATT is on if applicable, if not shows OFF
+            IPO           - Returns if IPO is on if applicable, if not shows OFF
+            FMSTEP        - Returns the setting for FM STEP in KHZ
+            AMSTEP        - Returns the setting for AM STEP in KHZ
+            SSBSTEP       - Returns the setting for SSB STEP in KHZ
+            CTCSSTONE     - Returns the currently set CTCSS Tone
+            DCSCODE       - Returns the currently set DCS Code
+            CLARIFIER     - Returns if the CLARIFIER is on or off
+            CLAROFFSET    - Returns the polarity and offset frequency of the clarifier stored on EEPROM
+            RXFREQ        - Returns the stored Receive Frequency
+            RPTOFFSETFREQ - Returns the stored Repeater offset Frequency
+
+            The CLAROFFSET is the stored value in the VFO not the active one.  The EEPROM doesnt write everytime
+            you turn the clarifer adjustment.  When using the CAT command to set the CLARIFIERFREQ this value will
+            not update, only when set directly in the VFO mem will it show a live update
+
+            If you have never used the QMB/MTQMB option on the radio, the memory addresses will show garbled data.
+            Its simply easier to first send some arbitrary data to the channels in the radio by following the instructions
+            on manual page 44.  This is not a requirment, if you dont use QMB or MTQMB you do not need to do this. 
+
+readMemory()
+
+                    my $option = $FT817->readMemory('[MEM]','[1-200 / M-PL / M-PU]','[OPTION]');
+                    my $option = $FT817->readMemory('[HOME]','[BAND]','[OPTION]');
+                    my $option = $FT817->readMemory('[QMB]','[OPTION]');
+
+            Reads and returns information from the Memory given a Memory area [MEM/HOME] and a TYPE [NUM or BAND] etc..
+            Reads and returns information from the Memory for [QMB] doesn't take a type argument.
+            This is only for Stored Memories not VFO nor Home Memories. Leave OPTION empty to
+            Return a hash with all OPTIONS below
+
+            Returns information based on one of the valid options:
+
+            READY         - Returns if the ready bit is set after proper data is set in memory bank
+            MODE          - Returns the mode in memory
+            HFVHF         - Returns if the memory area is HF or VHF
+            TAG           - Returns if set to show Frequency or Label on the Display
+            FREQRANGE     - Returns the Frequency range of the memory area HF / 6m / FMBCB / AIR / 2m / UHF 
+            NARFM         - Returns if Narrow FM os ON or OFF
+            NARCWDIG      - Returns if the CW or Digital Mode is on Narrow
+            UHF           - Returns if the memory area is UHF or not
+            RPTOFFSET     - Returns the Repeater offset
+            TONEDCS       - Returns type type of tone being used
+            ATT           - Returns if ATT is on if applicable, if not shows OFF
+            IPO           - Returns if IPO is on if applicable, if not shows OFF
+            MEMSKIP       - Returns if the memory is skipped on scan or not
+            FMSTEP        - Returns the setting for FM STEP in KHZ
+            AMSTEP        - Returns the setting for AM STEP in KHZ
+            SSBSTEP       - Returns the setting for SSB STEP in KHZ
+            CTCSSTONE     - Returns the currently set CTCSS Tone
+            DCSCODE       - Returns the currently set DCS Code
+            CLARIFIER     - Returns if the CLARIFIER is on or off
+            CLAROFFSET    - Returns the polarity and offset frequency of the clarifier stored on EEPROM
+            RXFREQ        - Returns the stored Receive Frequency
+            RPTOFFSETFREQ - Returns the stored Repeater offset Frequency
+            LABEL         - Returns the 8 character label for the memory area or ???????? if empty
+
+            If you have never used the QMB/MTQMB option on the radio, the memory addresses will show garbled data.
+            Its simply easier to first send some arbitrary data to the channels in the radio by following the instructions
+            on manual page 44.  This is not a requirment, if you dont use QMB or MTQMB you do not need to do this.
+
+rebuildSoftcal()
+
+                    $status = $FT817->rebuildSoftcal([filename]);
+
+            This command is used to reload all of the software calibration settings for the FT817 in the event
+            that either the software calibration had become corrupted, or a master reset was needed for the rig.
+            This reload uses the FT817OS 'cal' file format to reload data.  If you did not backup your cal settings
+            then this will be of little use and the rig will have to go to the factory to be recalibrated.
+
+            You can call the command without an argument to use the default file name FT817.cal
+
+            The cal file must be in the directory where you are running the program which calls it.  The program will
+            ensure the file exists, and the data is correct before it attempts to write it to the Eeprom.  If it finds 
+            an error it will tell you what line of the cal file produced the error and stop.
+
+            Note that this will start writing data if the cal file is error free and not provide any user prompt
+
+            Returns 0 on sucessfull write of the 76 bytes
+            Returns 1 on Error
+
+restoreEeprom()
+
+                    $restorearea = $FT817->restoreEeprom();
+
+            This restores a specific memory area of the EEPROM back to a known good default value.
+            This is a WRITEEEPROM based function and requires both setWriteallow() and agreeWithwarning()
+            to be set to 1.
+            This command does not allow for an arbitrary address to be written. 
+            
+            Currently 
+                      [0055] [0057] [0058] [0059] [0060]
+                      [005B] [005C] [005D] [005E] [005F] 
+                      [0061] [0062] [0063] [0064] [0065]
+                      [0066] [0067] [0068] [0069] [006A]
+                      [006B] [006C] [006D] [006E] [006F]
+                      [0070] [0071] [0072] [0073] [0074]
+                      [0079] [007A] [007B] [044F]
+            
+             are allowed
+
+            restoreEeprom('005F'); 
+
+            Returns 'OK' on success. Any other output an error.
+
+saveConfig()
+
+                    $output = $FT817->saveConfig([filename]);
+
+            This will backup the radio configuration to a file using the FT817OS format so that it can
+            be restored, if needed.
+
+            Without a filename this will write the config to the default file FT817.cfg and if that file
+            already exists, overwrite it.
+
+saveMemory()
+
+                    $output = $FT817->saveMemory([filename]);
+
+            This will backup the regular memory areas 1-200 and M-PL M-PU to a file using the FT817OS
+            format so that it can be restored, if needed.  This will capture both active and inactive
+            memory areas provided the memory area is correctly formatted and the READY bit is high.
+
+            Without a filename this will write the memory to the default file FT817.mem and if that file
+            already exists, overwrite it.
+
+sendCat()
+
+            Internal function, if you try to call it, you may very well end up with a broken radio.
+            You have been warned.
+
+set9600mic()
+
+                    $status = $FT817->set9600mic([0-100]);
+
+            MENU ITEM # 3 Sets the 9600 MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006C');
+
+setAgc()
+
+                    $status = $FT817->setAgc([AUTO/FAST/SLOW/OFF];
+
+            Sets the agc
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+setAmfmdial()
+
+                    $status = $FT817->setAmfmdial([ENABLE/DISABLE]);
+
+            MENU ITEM # 4 Sets the function of the dial when using AM or FM
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0063');
+
+setAmmic()
+
+                    $status = $FT817->setAmmic([0-100]);
+
+            MENU ITEM # 5 Sets the AM MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0068');
+
+setAntenna()
+
+                    $status = $FT817->setAntenna([HF/6M/FMBCB/AIR/VHF/UHF] [FRONT/BACK]);
+
+            Sets the antenna for the given band as connected on the FRONT or REAR of the radio
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('007A');
+
+setApotime()
+
+                    $status = $FT817->setApotime([OFF/1-6]);
+
+            MENU ITEM # 8 Sets the Auto Power Off time to OFF or 1-6 hours
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0065');
+
+setArs144()
+
+                    $status = $FT817->setArs144([OFF/ON]);
+
+            MENU ITEM # 1 Sets the 144 ARS ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005F');
+
+setArs430()
+
+                    $status = $FT817->setArs430([OFF/ON]);
+
+            MENU ITEM # 2 Sets the 430 ARS ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005F');
+
+setArts()
+
+                    $arts = $FT817->setArts([ON/OFF]);
+
+            Sets the ARTS function of the radio to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0079');
+
+setArtsmode()
+
+                    $artsmode = $FT817->setArts([OFF/RANGE/BEEP]);
+
+            MENU ITEM # 9 Sets the ARTS function of the radio when ARTS is enabled
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+setBacklight()
+
+                    $status = $FT817->setBacklight([OFF/ON/AUTO]);
+
+            MENU ITEM # 10 Sets the Backlight of the radio
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005B');
+
+setBeepfreq()
+
+                    $status = $FT817->setBeepfreq([440/880]);
+
+            MENU ITEM # 13 Sets the frequency of the radio beep
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005C');
+
+setBeepvol()
+
+                    $status = $FT817->setBeepvol([1-100]);
+
+            MENU ITEM # 13 Sets the volume of the radio beep
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005C');
+
+setBitwatch()
+
+                    $bitwatch = $FT817->setBitwatch([#]);
+
+            Turns on and off the internal BITWATCHER. Sends an alert when a value in eeprom changed
+            from that lister in the BITWATCHER hash.  Will Dramatically slow down the software and is
+            there just to help in identifing unknown memory areas.  When in doubt, leave it set to off.
+
+            Activated when any value is in the (). Good practice says () or (1) for OFF and ON.
+
+            Returns the argument sent to it on success.
+
+setBk()
+
+                    $status = $FT817->setBk([ON/OFF]);
+
+            Sets the CW Break-in (BK) ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setCatrate()
+
+                    $status = $FT817->setCatrate([4800/9600/38400]);
+
+            MENU ITEM # 14 Sets the Baud rate of the CAT interface
+            
+            Takes effect on next radio restart, be sure to update value baud in new().
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0064');
+
+setCharger()
+
+                    $charger = $FT817->setCharger([ON/OFF]);
+
+            Turns the battery Charger on or off
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('007B');
+
+setChargetime()
+
+                    $chargetime = $FT817->setChargetime([6/8/10]);
+
+            MENU ITEM # 11 
+
+            Sets the Battery charge time to 6, 8 or 10 hours.  If the charger is currently
+            on, it will return an error and not allow the change. Charger must be off.
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            commands that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0062');
+            restoreEeprom('007B');
+
+            Returns 'OK' on success. Any other output an error.
+
+setColor()
+
+                    $output = $FT817->setColor([BLUE/AMBER]);
+
+            MENU ITEM # 15
+
+            Sets the Color of the LCD screen
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005B');
+
+setContrast()
+
+                    $output = $FT817->setContrast([1-12]);
+
+            MENU ITEM # 16
+
+            Sets the Contrast of the LCD screen, this seems to only update the screen
+            after a power cycle, either manually, or by CAT command
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005B');
+
+setCurrentmem()
+
+                    $output = $FT817->setCurrentmem([0-200] or [M-PU/M-PL]);
+
+            Sets the current memory channel of the radio
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('044F');
+
+setCwdelay()
+
+                    $output = $FT817->setCwdelay([10-2500]);
+
+            MENU ITEM # 17
+
+            Sets the CW Delay between 10 - 2500 ms in incriments of 10
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0060');
+
+setCwid()
+
+                    $output = $FT817->setCwid([ON/OFF]);
+
+            MENU ITEM # 18
+
+            Sets the CW ID to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+setCwpitch()
+
+                    $output = $FT817->setCwpitch([300-1000]);
+
+            MENU ITEM # 20
+
+            Sets the CW Pitch from 300 to 1000 hz in incriments of 50
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005E');
+
+setCwpaddle()
+
+                    $output = $FT817->setCwpaddle([NORMAL/REVERSE]);
+
+            MENU ITEM # 19
+
+            Sets the CW paddle to NORMAL or REVERSE
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setCwspeed()
+
+                    $output = $FT817->setCwpaddle([4-60]);
+
+            MENU ITEM # 21
+
+            Sets the CW Speed
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0062');
+
+setCwweight()
+
+                    $output = $FT817->setCwweight([2.5-4.5]);
+
+            MENU ITEM # 22
+
+            Sets the CW weight
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005F');
+
+setDcsinv()
+
+                    $output = $FT817->setDcsinv([TN-RN/TN-RIV/TIV-RN/TIV-RIV]);
+
+            MENU ITEM # 53
+
+            Sets the DCS Inversion
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0066');
+
+setDebug()
+
+                    $debug = $FT817->setDebug([#]);
+
+            Turns on and off the internal debugger. Provides information on all serial transactions when on.
+            Activated when any value is in the (). Good practice says () or (1) for OFF and ON.
+
+            Returns the argument sent to it on success.
+
+setDigdisp()
+
+                    $output = $FT817->setDigdisp([0]);
+                    $output = $FT817->setDigdisp([+/-][0-3000]);
+
+            MENU ITEM # 24
+
+            Sets the digital frequency offset shift in hz, in incriments of 10 takes 0 or +/- 0-3000
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            commands that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006F');
+            restoreEeprom('0070');
+
+setDigmic()
+
+                    $output = $FT817->setDigmic([0-100]);
+
+            MENU ITEM # 25
+
+            Sets the DIG MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006A');
+
+setDigmode()
+
+                    $output = $FT817->setDigmode([RTTY/PSK31-L/PSK31-U/USER-L/USER-U]);
+
+            MENU ITEM # 26
+
+            Sets the Digital Mode type
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0065');
+
+setDigshift()
+
+                    $output = $FT817->setDigshift([0]); 
+                    $output = $FT817->setDigshift([+/-][0-3000]); 
+
+            MENU ITEM # 27
+
+            Sets the digital shift in hz, in incriments of 10 takes 0 or +/- 0-3000
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            commands that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006D');
+            restoreEeprom('006E');
+
+setDsp()
+
+                    $output = $FT817->setDsp([ON/OFF]);
+
+            Turns the DSP on or off if available
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+setDw()
+
+                    $status = $FT817->setDw([ON/OFF]);
+
+            Sets the Dual Watch (DW) ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0079');
+
+setEmergency()
+
+                    $output = $FT817->setEmergency([ON/OFF]);
+
+            MENU ITEM # 28
+
+            Sets the Emergency to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0064');
+
+setExtmenu()
+
+                    $output = $FT817->setExtmenu([ON/OFF]);
+
+            MENU ITEM # 52
+
+            Sets the Emergency to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006B');
+
+setFasttuning()
+
+                    $output = $FT817->setFasttuning([ON/OFF]);
+
+            Sets the Fast Tuning of the radio to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+setFmmic()
+
+                    $output = $FT817->setFmmic([0-100]);
+
+            MENU ITEM # 29
+
+            Sets the FM MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0069');
+
+setHome()
+
+                    $output = $FT817->setHome([ON/OFF]);
+
+            Sets the Radio to HOME frequency or back to normal frequencies
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+setId()
+
+                    $output = $FT817->setId('CCCCCC');
+
+            MENU ITEM # 31 - Sets the charachers for CWID
+
+setKyr()
+
+                    $output = $FT817->setKyr([ON/OFF]);
+
+            Sets the CW Keyer (KYR) on or off
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setLock()
+
+                    $output = $FT817->setLock([ON/OFF]);
+
+            Sets the Radio Lock on or off. Similar to catLock() but calls it directly
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+setLockmode()
+
+                    $status = $FT817->setLockmode([DIAL/FREQ/PANEL]);
+
+            MENU ITEM # 32 Sets the Radio Lock Mode
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005E');
+
+setMainstep()
+
+                    $status = $FT817->setMainstep([COURSE/FINE]);
+
+            MENU ITEM # 33 Sets the Main step
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+setMemarea()
+
+                    $status = $FT817->setMemarea([2-200/M-PL/M-PU] [ACTIVE/INACTIVE]);
+
+            Sets the given memory area as active or inactive. You cannot set area 1 which
+            is always active. This will check to see if the memory area is formatted and if not call a function
+            within writeMemory to format that area and give it a label 
+
+setMemgroup()
+
+                    $status = $FT817->setMemgroup([ON/OFF]);
+
+            MENU ITEM # 33 Sets the Memory Groups ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0065');
+
+setMickey()
+
+                    $status = $FT817->setMickey([ON/OFF]);
+
+            MENU ITEM # 36 Sets the MIC KEY ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0068');
+
+setMicscan()
+
+                    $status = $FT817->setMicscan([ON/OFF]);
+
+            MENU ITEM # 37 Sets the MIC SCAN ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0067');
+
+setMtqmb()
+
+                    $output = $FT817->setMtqmb([ON/OFF]);
+
+            Sets the MTQMB to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+setMtune()
+
+                    $output = $FT817->setMtune([MTUNE/MEMORY]);
+
+            Sets the MTUNE to MTUNE or MEMORY
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+setNb()
+
+                    $output = $FT817->setNb([ON/OFF]);
+
+            Turns the Noise Blocker on or off
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+            Returns 'OK' on success. Any other output an error.
+
+setOpfilter()
+
+                    $output = $FT817->setOpfilter([OFF/SSB/CW]);
+
+            MENU ITEM # 38
+
+            Sets the Optional Filter
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005E');
+
+setPktmic()
+
+                    $output = $FT817->setPktmic([0-100]);
+
+            MENU ITEM # 39
+
+            Sets the PKT MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('006B');
+
+setPktrate()
+
+                    $output = $FT817->setCwpaddle([NORMAL/REVERSE]);
+
+            MENU ITEM # 40
+
+            Sets the Packet rate
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+setPbt()
+
+                    $status = $FT817->setPbt([OFF/ON];
+
+            Enables or disables the Pass Band Tuning
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0057');
+
+setPri()
+
+                    $output = $FT817->setPri([ON/OFF]);
+
+            Sets the Priority Scanning ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0079');
+
+setPwrmtr()
+
+                    $status = $FT817->setPwrmtr([PWR/ALC/SWR/MOD];
+
+            Sets the active display of the Power Meter
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setQmb()
+
+                    $output = $FT817->setQmb([ON/OFF]);
+
+            Sets the QMB to ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+setResumescan()
+
+                    $status = $FT817->setResumescan([OFF/3/5/10]);
+
+            MENU ITEM # 41 - SETS THE Resume (scan) functionality.  
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+            Returns 'OK' on success. Any other output an error.
+
+setRfknob()
+
+                    $rfknob = $FT817->setRfknob([RFGAIN/SQUELCH]);
+
+            MENU ITEM # 45 - SETS THE RF-GAIN knob functionality.  
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and 
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005F');
+
+            Returns 'OK' on success. Any other output an error.
+
+setRlsbcar()
+
+                    $output = $FT817->setRlsbcar([0]);
+                    $output = $FT817->setRlsbcar([+/-][0-300]);
+
+            MENU ITEM # 54
+
+            Sets the Rx Carrier Point for LSB in hz, in incriments of 10 takes 0 or +/- 0-300
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0071');
+
+setRusbcar()
+
+                    $output = $FT817->setRusbcar([0]);
+                    $output = $FT817->setRusbcar([+/-][0-300]);
+
+            MENU ITEM # 55
+
+            Sets the Rx Carrier Point for USB in hz, in incriments of 10 takes 0 or +/- 0-300
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0072');
+
+setScn()
+
+                    $output = $FT817->setScn([OFF/UP/DOWN]);
+
+            Sets the SCN, Scanningn to OFF UP or DOWN
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0079');
+
+setScope()
+
+                    $output = $FT817->setScope([CONT/CHK]);
+
+            MENU ITEM # 43
+
+            Sets the Scope
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('005D');
+
+setSidetonevol()
+
+                    $output = $FT817->setSidetonevol([1-100]);
+
+            MENU ITEM # 44
+
+            Sets the Sidetone Volume
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0061');
+
+setSpl()
+
+                    $status = $FT817->setSpl([ON/OFF]);
+
+            Sets the Split Frequency (SPL) ON or OFF
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('007A');
+
+setSsbmic()
+
+                    $output = $FT817->setSsbmic([0-100]);
+
+            MENU ITEM # 46
+
+            Sets the SSB MIC
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0067');
+
+setTlsbcar()
+
+                    $output = $FT817->setTlsbcar([0]);
+                    $output = $FT817->setTlsbcar([+/-][0-300]);
+
+            MENU ITEM # 56
+
+            Sets the Tx Carrier Point for LSB in hz, in incriments of 10 takes 0 or +/- 0-300
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0073');
+
+setTusbcar()
+
+                    $output = $FT817->setTusbcar([0]);
+                    $output = $FT817->setTusbcar([+/-][0-300]);
+
+            MENU ITEM # 57
+
+            Sets the Tx Carrier Point for USB in hz, in incriments of 10 takes 0 or +/- 0-300
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with the following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0074');
+
+setTottime()
+
+                    $output = $FT817->setTottime([OFF/1-20]);
+
+            MENU ITEM # 49
+
+            Sets the Time out Timer OFF or in minutes from 1 to 20
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0066');
+
+setTuner()
+
+                    $output = $FT817->setTuner([VFO/MEMORY]);
+
+            Sets the Tuner to VFO or memory
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+            Returns 'OK' on success. Any other output an error.
+
+setTxpower()
+
+                    $status = $FT817->setTxpower([HIGH/LOW1/LOW2/LOW3];
+
+            Sets the Transmitter Power
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0079');
+
+setVerbose()
+
+                    $debug = $FT817->setVerbose([#]);
+
+            Turns on and off the Verbose flag. Provides information where verbose is enabled
+            Activated when any value is in the (). Good practice says () or (1) for OFF and ON.
+
+            Returns the argument sent to it on success.
+
+setVfo()
+
+                    $status = $FT817->setVfo([A/B];
+
+            Sets the VFO to A or B
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0055');
+
+setVfoband()
+
+                    $setvfoband = $FT817->setVfoband([A/B] [160M/75M/40M/30M/20M/17M/15M/12M/10M/6M/2M/70CM/FMBC/AIR/PHAN]);
+
+            Sets the band of the selected VFO
+            Returns 'OK' on success or '1' on failure
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0059');
+
+setVlt()
+
+                    $status = $FT817->setVlt([ON/OFF];
+
+            Enables or disables the voltage display
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setVox()
+
+                    $setvox = $FT817->setVox([ON/OFF]);
+
+            Sets the VOX feature of the radio on or off.
+            Returns 'OK' on success or '1' on failure
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0058');
+
+setVoxdelay()
+
+                    $output = $FT817->setVoxdelay([100-2500]);
+
+            MENU ITEM # 50
+
+            Sets the Vox delay. Done in incriments of 100
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0064');
+
+setVoxgain()
+
+                    $output = $FT817->setVoxgain([1-100]);
+
+            MENU ITEM # 51
+
+            Sets the Vox Gain.
+
+            This is a WRITEEEPROM based function and requires both setWriteallow() and
+            agreeWithwarning() to be set to 1.
+
+            In the event of a failure, the memory area can be restored with. The following
+            command that also requires both flags previously mentioned set to 1.
+
+            restoreEeprom('0063');
+
+setWriteallow()
+
+                    $writeallow = $FT817->setWriteallow([#]);
+
+            Turns on and off the write Flag. Provides a warning about writing to the EEPROM and
+            requires the agreeWithwarning()  to also be set to 1 after reading the warning
+            Activated when any value is in the (). Good practice says () or (1) for OFF and ON.
+
+            Returns the argument sent to it on success.
+
+writeBlock()
+
+            Internal function, if you try to call it, you may very well end up with a broken radio.
+            You have been warned.
+
+writeDoubleblock()
+
+            Internal function, if you try to call it, you may very well end up with a broken radio.
+            You have been warned.
+
+writeEeprom()
+
+            Internal function, if you try to call it, you may very well end up with a broken radio.
+            You have been warned.
+
+writeMemory()
+
+                    my $option = $FT817->writeMemory('[HOME]', '[BAND]', '[OPTION]','[VALUE]');
+                    my $option = $FT817->writeMemory('[MEM]','[1-200/M-PL/M-PU]', '[OPTION]','[VALUE]');
+                    my $option = $FT817->writeMemory('[QMB]','[OPTION]','[VALUE]');
+
+            Writes settings to the memory area given HOME [BAND] and an Option and value.
+            Writes settings to the memory area given MEM [1-200/M-PL/M-PU] and an Option and value.
+            Writes settings to the memory area given QMB and an Option and value.
+            
+            This is only for regular memory's and not the VFO Memories.
+
+            Valid options:
+
+            MODE          - Sets the mode in memory - update only appears after toggling the VFO
+            NARFM         - Sets if Narrow FM os ON or OFF
+            NARCWDIG      - Sets  if the CW or Digital Mode is on Narrow
+            RPTOFFSET     - Sets the Repeater offset
+            TAG           - Sets the radio display to show label or frequency
+            LABEL         - Sets the 8 character label for memory area
+            MEMSKIP       - Sets if the memory area is skipped on scan or not
+            TONEDCS       - Sets type type of tone being used
+            ATT           - Sets if ATT is on if applicable.
+            IPO           - Sets if IPO is on if applicable.
+            FMSTEP        - Sets the setting for FM STEP in KHZ
+            AMSTEP        - Sets the setting for AM STEP in KHZ
+            SSBSTEP       - Sets the setting for SSB STEP in KHZ
+            CTCSSTONE     - Sets the CTCSS Tone
+            DCSCODE       - Sets the DCS Code
+            CLARIFIER     - Sets the CLARIFIER on or off
+            CLAROFFSET    - Sets the polarity and offset frequency of the clarifier
+            RXFREQ        - Sets the stored Receive Frequency
+            RPTOFFSETFREQ - Sets the stored Repeater offset Frequency
+
+            The UHF / HF/VHF and FREQ RANGE options are set automatically by the RXFREQ option and should not be manually set
+
+            If you have never used the QMB/MTQMB option on the radio, the memory addresses will show garbled data.
+            Its simply easier to first send some arbitrary data to the channels in the radio by following the instructions
+            on manual page 44.  This is not a requirment, if you dont use QMB or MTQMB you do not need to do this.
+
+            Never used memory addresses will be automatically formatted with the correct data when the memory area is activated 
+            Using a built in function within writeMem That checks for the ready bit within that area.
+
+writeMemvfo ()
+
+                    my $option = $FT817->writeMemvfo('[A/B]', '[BAND]', '[OPTION]','[VALUE]');
+                    my $option = $FT817->writeMemvfo('[MTUNE/MTQMB]', '[OPTION]','[VALUE]');
+
+            Writes settings to the VFO memory given a VFO [A/B] and a BAND [20M/40M/70CM] etc..
+            Writes settings to the VFO memory given a VFO [MTUNE/MTQMB] no band required for these.
+            This is only for VFO memory's and not the Stored Memories nor Home Memories. 
+
+            Valid options:
+
+            MODE          - Sets the mode in memory - update only appears after toggling the VFO
+            NARFM         - Sets if Narrow FM os ON or OFF
+            NARCWDIG      - Sets  if the CW or Digital Mode is on Narrow
+            RPTOFFSET     - Sets the Repeater offset
+            TONEDCS       - Sets type type of tone being used
+            ATT           - Sets if ATT is on if applicable.
+            IPO           - Sets if IPO is on if applicable.
+            FMSTEP        - Sets the setting for FM STEP in KHZ
+            AMSTEP        - Sets the setting for AM STEP in KHZ
+            SSBSTEP       - Sets the setting for SSB STEP in KHZ
+            CTCSSTONE     - Sets the CTCSS Tone
+            DCSCODE       - Sets the DCS Code
+            CLARIFIER     - Sets the CLARIFIER on or off
+            CLAROFFSET    - Sets the polarity and offset frequency of the clarifier
+            RXFREQ        - Sets the stored Receive Frequency
+            RPTOFFSETFREQ - Sets the stored Repeater offset Frequency
+
+            If you have never used the QMB/MTQMB option on the radio, the memory addresses will show garbled data.
+            Its simply easier to first send some arbitrary data to the channels in the radio by following the instructions
+            on manual page 44.  This is not a requirment, if you dont use QMB or MTQMB you do not need to do this.
+
+AUTHOR ^
+
+Jordan Rubin KJ4TLB, <jrubin at cpan.org>
+BUGS ^
+
+Please report any bugs or feature requests to bug-ham-device-ft817comm at rt.cpan.org, or through the web interface at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Ham-Device-FT817COMM. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+SUPPORT ^
+
+You can find documentation for this module with the perldoc command. perldoc Ham::Device::FT817COMM
+
+You can also look for information at:
+
+    Technologically Induced Coma http://technocoma.blogspot.com
+    RT: CPAN's request tracker (report bugs here) http://rt.cpan.org/NoAuth/Bugs.html?Dist=Ham-Device-FT817COMM
+    AnnoCPAN: Annotated CPAN documentation http://annocpan.org/dist/Ham-Device-FT817COMM
+    CPAN Ratings http://cpanratings.perl.org/d/Ham-Device-FT817COMM
+    Search CPAN http://search.cpan.org/dist/Ham-Device-FT817COMM/
+
+ACKNOWLEDGEMENTS ^
+
+Thank you to Clint Turner KA7OEI for his research on the FT817 and discovering the mysteries of the EEprom FT817 and Yaesu are a registered trademark of Vertex standard Inc.
+LICENSE AND COPYRIGHT ^
+
+Copyright 2014 Jordan Rubin.
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+http://www.perlfoundation.org/artistic_license_2_0
+
+Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by someone other than you, you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service mark, tradename, or logo of the Copyright Holder. This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

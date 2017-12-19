@@ -1,8 +1,33 @@
+1.100 - Dec 16, 2017
+Joelle Maslak <jmaslak@antelope.net>
+ * First release version with AnyEvent support
+
+1.015 - Dec 15, 2017
+Joelle Maslak <jmaslak@antelope.net>
+ * Switch from Thread::Queue to socket pairs to allow select() on
+   Windows when AnyEvent::Util::portable_pipe is available.
+ * Use native Perl fork emulation when AnyEvent::Util::portable_pipe
+   is available
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
+1.014 - Dec 13, 2017
+Joelle Maslak <jmaslak@antelope.net>
+ * Use AnyEvent::Util::portable_pipe on Windows when using available,
+   as EV and other event loops can't select on pipes on Windows
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
+1.013 - Dec 12, 2017
+Joelle Maslak <jmaslak@antelope.net>
+ * Support AnyEvent (optionally, not required)
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
 1.012 - Oct 26, 2017
+Joelle Maslak <jmaslak@antelope.net>
  * Minor test updates
 
 1.011 - Oct 26, 2017
- * Worker pool implication
+Joelle Maslak <jmaslak@antelope.net>
+ * Worker pool implimentation
  * Minor documentation changes
  * Released as DEV version
 

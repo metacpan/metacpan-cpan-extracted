@@ -1,5 +1,19 @@
 Revision history for Perl module JavaScript::Duktape
 
+2.4.2 2017 2017-12-17
+	- fix MinGW build (Max Maischein)
+
+2.4.1 2017 2017-12-16
+	- patch release: fix package name
+
+2.4.0 2017 2017-12-16
+	- add TO_JSON function to Bool package
+	- boolean package will be used if available instead of JavaScript::Duktape::Bool
+	- pushing perl detects boolean objects from JSON, boolean and packages
+
+2.3.0 2017 2017-12-16
+	- update duktape version to v 2.2.0
+
 2.2.1 2017 2017-06-22
 	- remove debug code left by mistake
 	- update docs

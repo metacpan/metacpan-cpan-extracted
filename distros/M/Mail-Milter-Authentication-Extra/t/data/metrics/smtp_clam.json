@@ -1,0 +1,21 @@
+{
+   "authmilter_callback_error_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_clamav_total{ident=\"test_authentication_milter_test\",result=\"fail\"}" : "1",
+   "authmilter_clamav_total{ident=\"test_authentication_milter_test\",result=\"pass\"}" : "1",
+   "authmilter_clamav_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_connect_total{ident=\"test_authentication_milter_test\"}" : "2",
+   "authmilter_forked_children_total{ident=\"test_authentication_milter_test\"}" : "2",
+   "authmilter_mail_processed_total{ident=\"test_authentication_milter_test\",result=\"accepted\"}" : "2",
+   "authmilter_mail_processed_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_processes_processing{ident=\"test_authentication_milter_test\"}" : "1",
+   "authmilter_processes_waiting{ident=\"test_authentication_milter_test\"}" : "1",
+   "authmilter_reaped_children_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"body\",handler=\"clamav\"}" : "19",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"close\",handler=\"clamav\"}" : "32",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"envfrom\",handler=\"clamav\"}" : "71",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eoh\",handler=\"clamav\"}" : "29",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"eom\",handler=\"clamav\"}" : "596",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\",callback=\"header\",handler=\"clamav\"}" : "352",
+   "authmilter_time_microseconds_total{ident=\"test_authentication_milter_test\"}" : "0",
+   "authmilter_uptime_seconds_total{ident=\"test_authentication_milter_test\"}" : "14"
+}

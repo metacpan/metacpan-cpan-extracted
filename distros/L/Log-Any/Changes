@@ -2,6 +2,16 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.704     2017-12-17 18:13:33-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed some invalid POD and added a test to ensure POD validity
+      before release. Thanks @shlomif! [Github #67][Github #68]
+
+    - Improved performance when no work needed to be done. Thanks
+      @mephinet! [Github #70]
+
 1.703     2017-11-29 10:56:17-06:00 America/Chicago
 
     [Fixed]

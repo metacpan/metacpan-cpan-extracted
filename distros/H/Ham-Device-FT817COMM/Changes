@@ -1,0 +1,344 @@
+Revision history for Ham-Device-FT817COMM
+
+0.9.0_01    12MARCH2014/1200
+            First version, released on an unsuspecting world.
+
+0.9.0_02    13MARCH2014/1200
+            Added missing dependancy Device::Serialport to Makefile
+
+0.9.0_03    13MARCH2014/1600
+            Added POD documentation
+
+0.9.0_04    13MARCH2014/2000
+            Corrected POD documentation Pod documentation
+
+0.9.0_05    17MARCH2014/1200
+	    Cleaned up POD remarks
+	    Added digest option to getSoftcal
+	    Added [0062] and [007B] option to restoreEeprom  
+	    Added function getCharger
+	    Added function setCharger
+	    Added function setChargetime
+	    Added internal function writeBlock
+	    Added Digest::MD5 to Makefile		
+
+0.9.0_06    18MARCH2014/1800
+            More POD fixes
+	    Added [007A] and [005D] option to restoreEeprom	
+	    Added function getAntenna
+	    Added function setAntenna
+	    Added function getArts
+	    Added function setArts
+	    Added function getArtsmode
+	    Added function setArtsmode
+	    Added internal function eepromDecodenext 
+	    Function restoreEeprom completely re-written
+
+0.9.0_07    20MARCH2014/1800
+            More POD fixes
+	    Internal functions rewritten, no more unicode sent to the port.  Builds 
+	    	Data backets within the functions and sends them off.  Old method only
+		supported an epprom address up to 0x99, new one supports full MSB/LSB
+		16 bits.
+	    Added hashes of VFO A/B base addresses
+	    Added [0058] and [0059] option to restoreEeprom
+	    Added function getVox
+	    Added function setVox
+	    Added function getVfoband
+	    Added function setVfoband
+
+0.9.0_08    20MARCH2014/2300
+	    Added better prechecking to all functions before sending to CAT
+	    Includes beginning of first radio memory function readMemvfo. Not finished.
+
+0.9.0_09    21MARCH2014/1200
+	    More POD fixes
+	    Added internal function hexAdder
+	    Added hashes for DCS codes, CTCSS Tones, AM STEP, FM STEP and MEMMODES
+	    Fixed flipped bit in vfoToggle
+	    readMemvfo completed for testing
+
+0.9.0_10    24MARCH2014/1200
+	    No more MSB LSB, Uses 4 character hex address instead of pair or 2 char hex address
+	    setCtcsstone displays all valid tones on verbose(1) when tone entered doesn't exist
+            setDcscode displays all valid codes on verbose(1) when code entered doesn't exist
+	    restoreEeprom now uses the writeBlock method instead of an internal one
+            Added [0057] option to restoreEeprom
+	    Fixed spelling error in eepromDecode
+	    writeBlock checks to pad one digit hex values with leading zero
+	    writeEeprom checks to pad one digit hex values with leading zero
+	    Added function setAgc
+	    Added function setNb
+	    Added function setDsp
+	    Added function getPbt
+	    Added function setPbt
+	    Added function setFasttuning
+	    Removed function toggleRfgain, replaced with setRfknob
+	    Renamed function getRfgain to getrfknob
+	    Added function getChecksum
+            Standardized HEX values using Capital letters only
+	    Fixed wrong variable on writeEeprom debug output
+	    Added internal function hexDiff
+	    getEeprom now supports a range of addresses using second argument
+
+0.9.0_11    25MARCH2014/1200
+	    More POD updates
+	    getEeprom checks for 4 characters on both variables given
+	    Added hash for VFO memory options
+	    added CLARIFIER, CLAROFFSET, RXFREQ, RPTOFFSETFREQ option to readMemvfo
+	    added memvfohash as return option on readMemvfo when no option given
+	    Added [0055] option to restoreEeprom
+	    Added function setTuner
+	    Added function setVfo
+	    Added function setHome
+
+0.9.0_12    25MARCH2014/1200
+	    POD updates, removed verbose(2): depricated	
+	    Added [005C] option to restoreEeprom
+	    Added function getMtqmb
+            Added function setMtqmb
+            Added function getQmb
+            Added function setQmb
+            Added function getMtune
+            Added function setMtune
+            Added function getChargetime
+	    Added function getCwspeed
+	    Added function getContrast
+	    Added function getColor
+            Added function getBacklight
+            Added function getBeepvol
+	    Added function getBeepfreq
+	    Added function getResumescan
+            Added function getPktrate
+	    Added function getScope
+            Added function getCwid
+	    Added function getMainstep
+	    Added function getPwrmtr
+	    Added function getCwpaddle
+            Added function getKyr
+	    Added function getBk
+	    Added function getVlt
+	    All CAT functions renamed to begin with cat
+	
+0.9.0_13    26MARCH2014/1200
+	    Pod updates (stale lockfile removal)
+            Added [005B] option to restoreEeprom
+	    Added function setLock
+	    Added function setPwrmtr
+	    Added function setCwpaddle
+	    Added function setKyr
+	    Added function setBk
+	    Added function setVlt
+	    Added function setContrast
+	    Added function setColor
+	    Added function setBacklight
+	    Added function setBeepvol
+	    Added function setBeepfreq
+	    Added function setResumescan
+	    Added function setPktrate
+	    Added function setScope
+	    Added function setCwid
+	    Added function setMainstep
+
+0.9.0_14    27MARCH2014/1200
+	    Pod Fixes
+	    Set ranges for set commands with numeric values
+            Added [005E] [0060] [0064] [0066] option to restoreEeprom
+	    Added function setCwspeed
+	    Added function getEmergency
+	    Added function getCatrate
+	    Added function getVoxdelay
+	    Added function setEmergency
+	    Added function setVoxdelay
+            Added function setCatrate
+	    Added function getArs420
+	    Added function getArs144
+	    Added function getCwweight
+	    Added function setArs430
+            Added function setArs144
+            Added function setCwweight
+	    Added function getCwpitch
+	    Added function getLockmode	
+	    Added function getOpfilter
+	    Added function getCwdelay
+	    Added function getSidetonevol
+	    Added function getVoxgain
+	    Added function getDisabledial
+	    Added function setCwpitch
+	    Added function setLockmode
+	    Added function setOpfilter
+	    Added function setCwdelay
+	    Added function setSidetonevol
+	    Added function setVoxgain
+	    Added function setAmfmdial
+
+0.9.0_15    28MARCH2014/1200
+	    Edited warning Message for writeallow
+	    Added [0065] [0067] [0068] [0069] option to restoreEeprom
+	    Added function getApotime
+	    Added function getMemgroup
+	    Added function getDigmode
+	    Added function setApotime
+	    Added function setMemgroup
+	    Added function setDigmode
+	    Added function getTottime
+	    Added function getDcsinv
+	    Added function setTottime
+	    Added function setDcsinv
+	    Added function getSsbmic
+	    Added function setSsbmic
+	    Added function getAmmic
+	    Added function getMickey
+	    Added function setAmmic
+	    Added function setMickey
+	    Added function getFmmic
+	    Added function getMicscan
+	    Added function setFmmic
+	    Added function setMicscan
+
+0.9.0_16    31MARCH2014/1200
+	    Added RESTOREAREAS hash table
+	    restoreEeprom rewritten, uses hash table
+            Added [006B] [006C] [006D] [006E] [006F] [0070] 
+		  [0071] [0072] [0073] [0074]
+		  option to restoreEeprom
+	    Added function getDigmic
+	    Added function setDigmic
+	    Added function getPktmic
+	    Added function setPktmic
+	    Added function get9600mic
+	    Added function set9600mic
+	    Added function getDigshift
+	    Added function setDigshift
+	    Added function getDigdisp
+	    Added function setDigdisp
+	    Added function getRlsbcar
+	    Added function setRlsbcar
+	    Added function getRusbcar
+	    Added function setRusbcar
+            Added function getTlsbcar
+	    Added function setTlsbcar
+	    Added function getTusbcar
+	    Added function setTusbcar
+
+0.9.0_17    1APR2014/1200
+	    Updated restoreEeprom [006B] for EXT MENU
+	    Added Hash of Hashes BITWATCHER
+	    Updated getFlags for BITWATCH
+            Added function getExtmenu
+	    Added function setExtmenu
+	    Added function setTxpower
+	    Added function getPri
+	    Added function setPri
+	    Added function getDw
+	    Added function setDw
+	    Added function getScn
+	    Added function setScn
+	    Added function getSpl
+	    Added function setSpl
+	    Added function setBitwatch
+	    Added function bitCheck
+	    Added some entry's into BITWATCHER HASH
+	        
+0.9.0_18    1APR2014/1200
+	    bitcheck fully implimented in library
+	    BITWATCHER HASH fully loaded with missing addresses
+	    writeMemvfo function added
+	    BOUNDRIES hash added
+	    Function boundryCheck added
+	    Function quietToggle added
+	
+
+0.9.0_18-1  Fixed package error in 0.9.0_18, no changes to code
+
+
+0.9.0_19    4APR2014/1200
+            Added [044F] option to restoreEeprom
+	    MTUNE and MTQMB addresses added to the VFOABASE Hash
+
+
+0.9.0_20    9 APR2014/1200
+	    readMemvfo and writeMemvfo support MTQMB, MTUNE
+	    MTQMB and MTUNE added to BOUNDRIES hash
+	    Added function getCurrentmem
+	    Added function setCurrentmem
+	    Added hash MEMORYBASE
+	    Added hash MEMORYOPTS
+	    Added function readMemory
+	    Updated hexAdder to drop leading zero then length is 5 digits
+	    Added function getMemmap
+	    Added function quietTunetoggle
+	    Added function quietHometoggle
+	    writeEeprom: Added exception for address 0056 bit 0 on check when toggleing mem/vfo
+	    Added function getActivelist
+	    Added function writeMemory (supports HOME only)
+	    Added hash FREQRANGE
+	    Added internal function rangeCheck
+	    Added function setMemarea
+	    Added hash CWID
+	    Added function getID		
+	    Added function setID
+
+0.9.5       10 APR2014/1000
+	    Assorted bug fixes
+	    Added memory area formatter into writeMemory for new addresses
+            POD updates
+	    added NEWMEM array
+
+0.9.6      13 APR2014/2200
+	   Major code cleanup
+	   Removed verbose(2) code
+	   Remoded CWID addresses from bitwatcher
+	   function new detects windows or posix
+	   Added function rebuildSoftcal
+           Added function saveMemory
+	   Added function saveConfig
+	   Added function loadMemory
+
+0.9.7      17 APR2014/2200
+	   Added internal function writeDoubleblock (16 bit support!)
+	   Added internal function eepromDoubledecode (16 bit support!)
+	   Fixed multiplication error in loadMemory
+	   writememory [LABEL] uses writeDoubleblock
+	   writememory [RPTOFFSETFREQ] uses writeDoubleblock
+           writememory [RXFREQ] uses writeDoubleblock
+           writememory [CLAROFFSET] uses writeDoubleblock
+           writememory [READY] uses writeDoubleblock
+           writeMemvfo [CLAROFFSET] uses writeDoubleblock
+           writeMemvfo [RXFREQ] uses writeDoubleblock
+           writeMemvfo [RPTOFFSETFREQ] uses writeDoubleblock
+           readMemvfo [CLAROFFSET] uses eepromDoubledecode
+           readMemvfo [RXFREQ] uses eepromDoubledecode
+           readMemvfo [RPTOFFSETFREQ] uses eepromDoubledecode
+           readMemory [CLAROFFSET] uses eepromDoubledecode
+           readMemory [RXFREQ] uses eepromDoubledecode
+           readMemory [RPTOFFSETFREQ] uses eepromDoubledecode
+           readMemory [LABEL] uses eepromDoubledecode
+	   setDigshift uses writeDoubleblock
+           setDigdisp uses writeDoubleblock
+	   setId uses writeDoubleblock
+	   loadMemory uses writeDoubleblock
+           saveMemory uses eepromDoubledecode
+           rebuildSoftcal uses writeDoubleblock
+	   getId uses eepromDoubledecode
+           getChecksum uses eepromDoubledecode
+           getConfig uses eepromDoubledecode
+           getDigdisp uses eepromDoubledecode
+	   setId now supports all 7 digits!!!
+           getId now supports all 7 digits!!!
+
+
+0.9.8      17 APR2014/2200
+	   Pushed minimum perl release down to 5.12 from 5.14
+
+
+0.9.9      22 APR2014/2200
+           Pushed minimum perl release up to 5.14 from 5.12
+	   Added README
+	   Removed unused variable declarations
+
+1.0.6	   15 DEC2018/2130	     
+	   Removed Experimental HASHREF causing test failures on CPAN
+
+1.0.7      17 DEC2018/1900
+           Corrected new minimum perl release for this to 5.14 vice 5.06

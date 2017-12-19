@@ -1,5 +1,11 @@
 Revision history for App-TemplateCMD
 
+0.6.9   2017-12-17
+        Updating for release of version 0.6.9
+        Add defult running of test (Ivan Wills)
+        Corrected MANIFEST.SKIP to do what I actually want (Ivan Wills)
+        Adding missing templates from manifest (Ivan Wills)
+
 0.6.8   2017-11-05
         Updating for release of version 0.6.8
         Adding default restart on exit (Ivan Wills)

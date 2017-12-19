@@ -5,7 +5,6 @@ LICENSE
 MANIFEST
 MANIFEST.SKIP
 META.json
-Makefile.PL
 README.md
 cpanfile
 lib/App/Greple.pm
@@ -28,8 +27,13 @@ lib/App/Greple/subst.pm
 lib/App/Greple/subst.sample
 minil.toml
 script/greple
-t/00-load.t
-t/manifest.t
+t/00_load.t
+t/01_run.t
+t/02_search.t
+t/03_ja.t
+t/JA.txt
+t/SAMPLE.txt
+t/Util.pm
 t/pod-coverage.t
 t/pod.t
 META.yml

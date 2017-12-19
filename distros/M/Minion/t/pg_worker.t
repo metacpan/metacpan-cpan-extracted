@@ -31,12 +31,16 @@ $worker->on(
   }
 );
 my $id = $minion->enqueue('test');
+my $max;
+$worker->once(wait => sub { $max = shift->status->{jobs} });
 $worker->run;
+is $max, 4, 'right value';
 is_deeply $minion->job($id)->info->{result}, {just => 'works!'}, 'right result';
 
 # Status
 my $status = $worker->status;
 is $status->{command_interval},   10,  'right value';
+is $status->{dequeue_timeout},    5,   'right value';
 is $status->{heartbeat_interval}, 300, 'right value';
 is $status->{jobs},               4,   'right value';
 is_deeply $status->{queues}, ['default'], 'right structure';

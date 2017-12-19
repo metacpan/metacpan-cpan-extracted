@@ -46,5 +46,5 @@ resources:
   bugtracker: https://github.com/dod38fr/cme-perl/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: https://github.com/dod38fr/cme-perl.git
-version: '1.024'
+version: '1.025'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -2,7 +2,7 @@ package WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink;
 
 use Mojolicious::Lite;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 # A GET request will be a request for the hosted form.
 
@@ -29,7 +29,7 @@ WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink - A simple app to enab
 
 =head1 VERSION
 
-version 0.000022
+version 0.000023
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc..
+This software is copyright (c) 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

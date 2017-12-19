@@ -96,7 +96,7 @@ cmp_deeply(
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Commit' ] => bool(1),
             plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/post-release commit$}),
-            allow_dirty => [ str('Changes') ],
+            allow_dirty => superbagof(str('Changes')),
             allow_dirty_match => [ qr{^lib/.*\.pm$} ],
             commit_msg => 'increment $VERSION after %v release'
         ),

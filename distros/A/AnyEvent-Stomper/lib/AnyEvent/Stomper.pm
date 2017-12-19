@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.34';
+our $VERSION = '0.36';
 
 use AnyEvent::Stomper::Frame;
 use AnyEvent::Stomper::Error;
@@ -689,7 +689,7 @@ sub _wtimeout {
   my $wtimeout = shift;
 
   $self->{_handle}->wtimeout_reset;
-  $self->{_handle}->wtimeout( $wtimeout / 1000 );
+  $self->{_handle}->wtimeout( $wtimeout / ( 1000 * 3 ) );
 
   return;
 }

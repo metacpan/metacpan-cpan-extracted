@@ -18,7 +18,7 @@ my %module_build_args = (
     "Yan Xueqing <yanxueqing621\@163.com>"
   ],
   "dist_name" => "Bioinfo",
-  "dist_version" => "0.1.11",
+  "dist_version" => "0.1.13",
   "license" => "perl",
   "module_name" => "Bioinfo",
   "recursive_test_files" => 1,

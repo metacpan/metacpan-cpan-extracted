@@ -83,7 +83,7 @@ use File::Copy;
 use File::Temp qw(tempfile);
 
 BEGIN {
-    ( $VERSION = q($Id: Tidy.pm,v 1.74 2017/05/21 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
+    ( $VERSION = q($Id: Tidy.pm,v 1.74 2017/12/14 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
 }
 
 sub streamhandle {
@@ -1685,6 +1685,8 @@ sub generate_options {
     $add_option->( 'opening-sub-brace-on-new-line',           'sbl',   '!' );
     $add_option->( 'paren-vertical-tightness',                'pvt',   '=i' );
     $add_option->( 'paren-vertical-tightness-closing',        'pvtc',  '=i' );
+    $add_option->( 'consecutive-container-tightness',         'cct',   '=i' );
+    $add_option->( 'space-backslash-quote',                   'sbq',   '=i' );
     $add_option->( 'stack-closing-block-brace',               'scbb',  '!' );
     $add_option->( 'stack-closing-hash-brace',                'schb',  '!' );
     $add_option->( 'stack-closing-paren',                     'scp',   '!' );
@@ -1811,6 +1813,8 @@ sub generate_options {
         'output-line-ending' => [ 'dos',  'win',  'mac', 'unix' ],
         'character-encoding' => [ 'none', 'utf8' ],
 
+        'space-backslash-quote' => [ 0, 2 ],
+
         'block-brace-tightness'    => [ 0, 2 ],
         'brace-tightness'          => [ 0, 2 ],
         'paren-tightness'          => [ 0, 2 ],
@@ -1825,6 +1829,7 @@ sub generate_options {
         'square-bracket-vertical-tightness-closing' => [ 0, 2 ],
         'vertical-tightness'                        => [ 0, 2 ],
         'vertical-tightness-closing'                => [ 0, 2 ],
+        'consecutive-container-tightness'           => [ 0, 2 ],
 
         'closing-brace-indentation'          => [ 0, 3 ],
         'closing-paren-indentation'          => [ 0, 3 ],
@@ -1905,10 +1910,12 @@ sub generate_options {
       paren-vertical-tightness-closing=0
       paren-vertical-tightness=0
       pass-version-line
+      consecutive-container-tightness=0
       recombine
       valign
       short-concatenation-item-length=8
       space-for-semicolon
+      space-backslash-quote=1
       square-bracket-tightness=1
       square-bracket-vertical-tightness-closing=0
       square-bracket-vertical-tightness=0
@@ -2898,6 +2905,29 @@ sub find_config_file {
         return -f $config_file;
     };
 
+    # Sub to search upward for config file
+    my $resolve_config_file = sub {
+
+        # resolve <dir>/.../<file>, meaning look upwards from directory
+        my $config_file = shift;
+        if ($config_file) {
+            if ( my ( $start_dir, $search_file ) =
+                ( $config_file =~ m{^(.*)\.\.\./(.*)$} ) )
+            {
+                $$rconfig_file_chatter .= "# Searching Upward: $config_file\n";
+                $start_dir = '.' if !$start_dir;
+                $start_dir = Cwd::realpath($start_dir);
+                if ( my $found_file =
+                    find_file_upwards( $start_dir, $search_file ) )
+                {
+                    $config_file = $found_file;
+                    $$rconfig_file_chatter .= "# Found: $config_file\n";
+                }
+            }
+        }
+        return $config_file;
+    };
+
     my $config_file;
 
     # look in current directory first
@@ -2924,15 +2954,18 @@ sub find_config_file {
             # test ENV{ PERLTIDY } as file:
             if ( $var eq 'PERLTIDY' ) {
                 $config_file = "$ENV{$var}";
+                $config_file = $resolve_config_file->($config_file);
                 return $config_file if $exists_config_file->($config_file);
             }
 
             # test ENV as directory:
             $config_file = catfile( $ENV{$var}, ".perltidyrc" );
+            $config_file = $resolve_config_file->($config_file);
             return $config_file if $exists_config_file->($config_file);
 
             if ($is_Windows) {
                 $config_file = catfile( $ENV{$var}, "perltidy.ini" );
+                $config_file = $resolve_config_file->($config_file);
                 return $config_file if $exists_config_file->($config_file);
             }
         }
@@ -3978,6 +4011,10 @@ sub new {
                     binmode STDOUT, ":encoding(UTF-8)";
                 }
             }
+
+            # Patch for RT 122030
+            elsif ( ref($fh) eq 'IO::File' ) { $fh->binmode(); }
+
             elsif ( $output_file eq '-' ) { binmode STDOUT }
         }
     }
@@ -4244,6 +4281,8 @@ sub black_box {
     {
         my $rlevels                      = $line_of_tokens->{_rlevels};
         my $structural_indentation_level = $$rlevels[0];
+        $structural_indentation_level = 0
+          if ( $structural_indentation_level < 0 );
         $self->{_last_input_line_written} = $input_line_number;
         ( my $out_str = $input_line ) =~ s/^\s*//;
         chomp $out_str;
@@ -6255,8 +6294,10 @@ use vars qw{
   $rOpts_keep_interior_semicolons
   $rOpts_ignore_side_comment_lengths
   $rOpts_stack_closing_block_brace
+  $rOpts_space_backslash_quote
   $rOpts_whitespace_cycle
   $rOpts_tight_secret_operators
+  $rOpts_consecutive_container_tightness
 
   %is_opening_type
   %is_closing_type
@@ -6278,6 +6319,8 @@ use vars qw{
   %is_closing_token
   %is_opening_token
 
+  %consecutive_container_opening_joined
+
   $SUB_PATTERN
   $ASUB_PATTERN
 };
@@ -6293,7 +6336,7 @@ BEGIN {
     );
     @is_digraph{@_} = (1) x scalar(@_);
 
-    @_ = qw( ... **= <<= >>= &&= ||= //= <=> );
+    @_ = qw( ... **= <<= >>= &&= ||= //= <=> <<~ );
     @is_trigraph{@_} = (1) x scalar(@_);
 
     @_ = qw(
@@ -6573,6 +6616,8 @@ sub new {
     @reduced_spaces_to_go        = ();
     @inext_to_go                 = ();
     @iprev_to_go                 = ();
+
+    %consecutive_container_opening_joined = ();
 
     @whitespace_level_stack = ();
     $whitespace_last_level  = -1;
@@ -8017,6 +8062,8 @@ EOM
     );
 
     $rOpts_tight_secret_operators = $rOpts->{'tight-secret-operators'};
+    $rOpts_consecutive_container_tightness =
+      $rOpts->{'consecutive-container-tightness'};
 
     # assume flag for '>' same as ')' for closing qw quotes
     %closing_token_indentation = (
@@ -8051,6 +8098,7 @@ EOM
         ']' => $rOpts->{'stack-closing-square-bracket'},
     );
     $rOpts_stack_closing_block_brace = $rOpts->{'stack-closing-block-brace'};
+    $rOpts_space_backslash_quote     = $rOpts->{'space-backslash-quote'};
 }
 
 sub make_static_block_comment_pattern {
@@ -9015,6 +9063,20 @@ sub set_white_space_flag {
           )
         {
             $ws = WS_OPTIONAL;
+        }
+
+        # space_backslash_quote; RT #123774
+        # allow a space between a backslash and single or double quote
+        # to avoid fooling html formatters
+        elsif ( $last_type eq '\\' && $type eq 'Q' && $token =~ /^[\"\']/ ) {
+            if ($rOpts_space_backslash_quote) {
+                if ( $rOpts_space_backslash_quote == 1 ) { $ws = WS_OPTIONAL }
+                elsif ( $rOpts_space_backslash_quote == 2 ) { $ws = WS_YES }
+                else { }    # shouldnt happen
+            }
+            else {
+                $ws = WS_NO;
+            }
         }
 
         my $ws_4 = $ws
@@ -13095,6 +13157,18 @@ sub lookup_opening_indentation {
         my $is_semicolon_terminated = $terminal_type eq ';'
           && $nesting_depth_to_go[$iend] < $nesting_depth_to_go[$ibeg];
 
+        # MOJO: Set a flag if this lines begins with ')->'
+        my $leading_paren_arrow = (
+                 $types_to_go[$ibeg] eq '}'
+              && $tokens_to_go[$ibeg] eq ')'
+              && (
+                ( $ibeg < $i_terminal && $types_to_go[ $ibeg + 1 ] eq '->' )
+                || (   $ibeg < $i_terminal - 1
+                    && $types_to_go[ $ibeg + 1 ] eq 'b'
+                    && $types_to_go[ $ibeg + 2 ] eq '->' )
+              )
+        );
+
         ##########################################################
         # Section 1: set a flag and a default indentation
         #
@@ -13135,12 +13209,20 @@ sub lookup_opening_indentation {
                 $is_semicolon_terminated
 
                 # and 'cuddled parens' of the form:   ")->pack("
+                # Bug fix for RT #123749]: the types here were
+                # incorrectly '(' and ')'.  Corrected to be '{' and '}'
                 || (
-                       $terminal_type eq '('
-                    && $types_to_go[$ibeg] eq ')'
+                       $terminal_type eq '{'
+                    && $types_to_go[$ibeg] eq '}'
                     && ( $nesting_depth_to_go[$iend] + 1 ==
                         $nesting_depth_to_go[$ibeg] )
                 )
+
+                # MOJO
+                # Even remove continuation indentation for any line beginning
+                # with ')->' , such as '}->{$operator}'
+                || (   $types_to_go[$ibeg] eq '}'
+                    && $types_to_go[ $ibeg + 1 ] eq '->' )
 
                 # and when the next line is at a lower indentation level
                 # PATCH: and only if the style allows undoing continuation
@@ -13322,8 +13404,32 @@ sub lookup_opening_indentation {
             $lev         = $levels_to_go[$ibeg];
         }
         elsif ( $adjust_indentation == 1 ) {
-            $indentation = $reduced_spaces_to_go[$i_terminal];
-            $lev         = $levels_to_go[$i_terminal];
+
+            # Change the indentation to be that of a different token on the line
+            # Previously, the indentation of the terminal token was used:
+            # OLD CODING:
+            # $indentation = $reduced_spaces_to_go[$i_terminal];
+            # $lev         = $levels_to_go[$i_terminal];
+
+            # Generalization for MOJO:
+            # Use the lowest level indentation of the tokens on the line.
+            # For example, here we can use the indentation of the ending ';':
+            #    } until ($selection > 0 and $selection < 10);   # ok to use ';'
+            # But this will not outdent if we use the terminal indentation:
+            #    )->then( sub {      # use indentation of the ->, not the {
+            # Warning: reduced_spaces_to_go[] may be a reference, do not
+            # do numerical checks with it
+
+            my $i_ind = $ibeg;
+            $indentation = $reduced_spaces_to_go[$i_ind];
+            $lev         = $levels_to_go[$i_ind];
+            while ( $i_ind < $i_terminal ) {
+                $i_ind++;
+                if ( $levels_to_go[$i_ind] < $lev ) {
+                    $indentation = $reduced_spaces_to_go[$i_ind];
+                    $lev         = $levels_to_go[$i_ind];
+                }
+            }
         }
 
         # handle indented closing token which aligns with opening token
@@ -13469,9 +13575,13 @@ sub lookup_opening_indentation {
 
         # only do this for a ':; which is aligned with its leading '?'
         my $is_unaligned_colon = $types_to_go[$ibeg] eq ':' && !$is_leading;
-        if (   defined($opening_indentation)
+
+        if (
+            defined($opening_indentation)
+            && !$leading_paren_arrow    # MOJO
             && !$is_isolated_block_brace
-            && !$is_unaligned_colon )
+            && !$is_unaligned_colon
+          )
         {
             if ( get_SPACES($opening_indentation) > get_SPACES($indentation) ) {
                 $indentation = $opening_indentation;
@@ -13835,9 +13945,10 @@ sub get_seqno {
     BEGIN {
 
         # Removed =~ from list to improve chances of alignment
+        # Removed // from list to improve chances of alignment (RT# 119588)
         @_ = qw#
           = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
-          { ? : => && || // ~~ !~~
+          { ? : => && || ~~ !~~
           #;
         @is_vertical_alignment_type{@_} = (1) x scalar(@_);
 
@@ -15362,6 +15473,7 @@ sub pad_array_to_go {
                     $i_old_assignment_break = $i_next_nonblank;
                 }
             } ## end if ( $old_breakpoint_to_go...)
+
             next if ( $type eq 'b' );
             $depth = $nesting_depth_to_go[ $i + 1 ];
 
@@ -17431,7 +17543,7 @@ sub undo_forced_breakpoint_stack {
             }
             $nmax_last  = $nmax;
             $more_to_do = 0;
-            my $previous_outdentable_closing_paren;
+            my $skip_Section_3;
             my $leading_amp_count = 0;
             my $this_line_is_semicolon_terminated;
 
@@ -17470,6 +17582,10 @@ sub undo_forced_breakpoint_stack {
                 my $type_ibeg_1 = $types_to_go[$ibeg_1];
                 my $type_ibeg_2 = $types_to_go[$ibeg_2];
 
+                # terminal token of line 2 if any side comment is ignored:
+                my $iend_2t      = $iend_2;
+                my $type_iend_2t = $type_iend_2;
+
                 # some beginning indexes of other lines, which may not exist
                 my $ibeg_0 = $n > 1          ? $$ri_beg[ $n - 2 ] : -1;
                 my $ibeg_3 = $n < $nmax      ? $$ri_beg[ $n + 1 ] : -1;
@@ -17492,14 +17608,15 @@ sub undo_forced_breakpoint_stack {
                     # a terminal '{' should stay where it is
                     next if $type_ibeg_2 eq '{';
 
-                    # set flag if statement $n ends in ';'
-                    $this_line_is_semicolon_terminated = $type_iend_2 eq ';'
-
-                      # with possible side comment
-                      || ( $type_iend_2 eq '#'
+                    if (   $type_iend_2 eq '#'
                         && $iend_2 - $ibeg_2 >= 2
-                        && $types_to_go[ $iend_2 - 2 ] eq ';'
-                        && $types_to_go[ $iend_2 - 1 ] eq 'b' );
+                        && $types_to_go[ $iend_2 - 1 ] eq 'b' )
+                    {
+                        $iend_2t      = $iend_2 - 2;
+                        $type_iend_2t = $types_to_go[$iend_2t];
+                    }
+
+                    $this_line_is_semicolon_terminated = $type_iend_2t eq ';';
                 }
 
                 #----------------------------------------------------------
@@ -17725,8 +17842,7 @@ sub undo_forced_breakpoint_stack {
                     # sub set_adjusted_indentation, which actually does
                     # the outdenting.
                     #
-                    $previous_outdentable_closing_paren =
-                      $this_line_is_semicolon_terminated
+                    $skip_Section_3 ||= $this_line_is_semicolon_terminated
 
                       # only one token on last line
                       && $ibeg_1 == $iend_1
@@ -17790,12 +17906,40 @@ sub undo_forced_breakpoint_stack {
                         )
                       )
                     {
-                        $previous_outdentable_closing_paren ||= 1;
+                        $skip_Section_3 ||= 1;
+                    }
+
+                    # CCT CLOSING
+                    #  Combine two consecutive containers, such as :
+                    #  	 }
+                    #  )->
+
+                    # This is part of constructng something like this:
+                    # 	} )->then( sub {
+                    # or this:
+                    #   } )->wait;
+                    if (
+
+                        # we are joining a to a closing token
+                        $is_closing_token{ $tokens_to_go[$ibeg_2] }
+
+                        # -cct flag is set ...
+                        && $rOpts_consecutive_container_tightness
+
+                        # and we previously joined the opening token pair
+                        && $consecutive_container_opening_joined{
+                            $type_sequence_to_go[$iend_1]
+                        }
+
+                      )
+                    {
+
+                        $skip_Section_3 ||= 1;
                     }
 
                     next
                       unless (
-                        $previous_outdentable_closing_paren
+                        $skip_Section_3
 
                         # handle '.' and '?' specially below
                         || ( $type_ibeg_2 =~ /^[\.\?]$/ )
@@ -17807,7 +17951,35 @@ sub undo_forced_breakpoint_stack {
                 # Added to prevent recombining something like this:
                 #  } || eval { package main;
                 elsif ( $type_iend_1 eq '{' ) {
-                    next if $forced_breakpoint_to_go[$iend_1];
+
+                    # CCT OPENING
+
+                    # Temporary coding for prototype. Eventually we
+                    # will consult a preset hash which tells if the
+                    # closing containers are also consecutive.
+
+                    # An anonymous sub can join with opening paren
+                    # This is one step in constructng something like this:
+                    # 	} )->then( sub {
+                    # or this:
+                    #  get('http://mojolicious.org')->then(sub {
+
+                    if (   $rOpts_consecutive_container_tightness
+                        && $type_iend_2t eq '{'
+                        && $types_to_go[$ibeg_2] eq 'k'
+                        && $tokens_to_go[$ibeg_2] eq 'sub'
+                        && $tokens_to_go[$iend_1] eq '(' )
+                    {
+                        $skip_Section_3 ||= 1;
+
+                        # remember which consecutive containers were joined
+                        my $seqno = $type_sequence_to_go[$iend_2];
+                        $consecutive_container_opening_joined{$seqno} = 1;
+
+                    }
+                    else {
+                        next if $forced_breakpoint_to_go[$iend_1];
+                    }
                 }
 
                 # do not recombine lines with ending &&, ||,
@@ -18027,7 +18199,7 @@ sub undo_forced_breakpoint_stack {
                 # join lines identified above as capable of
                 # causing an outdented line with leading closing paren
                 # Note that we are skipping the rest of this section
-                if ($previous_outdentable_closing_paren) {
+                if ($skip_Section_3) {
                     $forced_breakpoint_to_go[$iend_1] = 0;
                 }
 
@@ -21408,12 +21580,61 @@ sub check_fit {
 
         next if $pad < 0;
 
+        ## OLD NOTES:
         ## This patch helps sometimes, but it doesn't check to see if
         ## the line is too long even without the side comment.  It needs
         ## to be reworked.
         ##don't let a long token with no trailing side comment push
         ##side comments out, or end a group.  (sidecmt1.t)
         ##next if ($j==$jmax-1 && length($$rfields[$jmax])==0);
+
+        # BEGIN PATCH for keith1.txt.
+        # If the group began matching multiple tokens but later this got
+        # reduced to a fewer number of matching tokens, then the fields
+        # of the later lines will still have to fit into their corresponding
+        # fields.  So a large later field will "push" the other fields to
+        # the right, including previous side comments, and if there is no room
+        # then there is no match.
+        # For example, look at the last line in the following snippet:
+
+ # my $b_prod_db = ( $ENV{ORACLE_SID} =~ m/p$/ && !$testing ) ? true    : false;
+ # my $env       = ($b_prod_db)                               ? "prd"   : "val";
+ # my $plant     = ( $OPT{p} )                                ? $OPT{p} : "STL";
+ # my $task      = $OPT{t};
+ # my $fnam      = "longggggggggggggggg.$record_created.$env.$plant.idash";
+
+        # The long term will push the '?' to the right to fit in, and in this
+        # case there is not enough room so it will not match the equals unless
+        # we do something special.
+
+        # Usually it looks good to keep an initial alignment of '=' going, and
+        # we can do this if the long term can fit in the space taken up by the
+        # remaining fields (the ? : fields here).
+
+        # Allowing any matching token for now, but it could be restricted
+        # to an '='-like token if necessary.
+
+        if (
+               $pad > $padding_available
+            && $jmax == 2                        # matching one thing (plus #)
+            && $j == $jmax - 1                   # at last field
+            && $maximum_line_index > 0           # more than 1 line in group now
+            && $jmax < $maximum_field_index      # other lines have more fields
+            && length( $$rfields[$jmax] ) == 0   # no side comment
+
+            # Uncomment to match only equals (but this does not seem necessary)
+            # && $rtokens->[0] =~ /^=\d/           # matching an equals
+          )
+        {
+            my $extra_padding = 0;
+            foreach my $jj ( $j + 1 .. $maximum_field_index - 1 ) {
+                $extra_padding += $old_line->current_field_width($jj);
+            }
+
+            next if ( $pad <= $padding_available + $extra_padding );
+        }
+
+        # END PATCH for keith1.pl
 
         # This line will need space; lets see if we want to accept it..
         if (
@@ -25070,6 +25291,46 @@ sub prepare_for_a_new_file {
               unless ( $i < $max_token_index )
               ;          # here-doc not possible if end of line
 
+            if ( $expecting != OPERATOR ) {
+                my ( $found_target, $here_doc_target, $here_quote_character,
+                    $saw_error );
+                (
+                    $found_target, $here_doc_target, $here_quote_character, $i,
+                    $saw_error
+                  )
+                  = find_here_doc( $expecting, $i, $rtokens, $rtoken_map,
+                    $max_token_index );
+
+                if ($found_target) {
+                    push @{$rhere_target_list},
+                      [ $here_doc_target, $here_quote_character ];
+                    $type = 'h';
+                    if ( length($here_doc_target) > 80 ) {
+                        my $truncated = substr( $here_doc_target, 0, 80 );
+                        complain("Long here-target: '$truncated' ...\n");
+                    }
+                    elsif ( $here_doc_target !~ /^[A-Z_]\w+$/ ) {
+                        complain(
+                            "Unconventional here-target: '$here_doc_target'\n"
+                        );
+                    }
+                }
+                elsif ( $expecting == TERM ) {
+                    unless ($saw_error) {
+
+                        # shouldn't happen..
+                        warning("Program bug; didn't find here doc target\n");
+                        report_definite_bug();
+                    }
+                }
+            }
+            else {
+            }
+        },
+        '<<~' => sub {    # a here-doc, new type added in v26
+            return
+              unless ( $i < $max_token_index )
+              ;           # here-doc not possible if end of line
             if ( $expecting != OPERATOR ) {
                 my ( $found_target, $here_doc_target, $here_quote_character,
                     $saw_error );
@@ -30115,7 +30376,7 @@ BEGIN {
     );
     @is_digraph{@digraphs} = (1) x scalar(@digraphs);
 
-    my @trigraphs = qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.=);
+    my @trigraphs = qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~);
     @is_trigraph{@trigraphs} = (1) x scalar(@trigraphs);
 
     my @tetragraphs = qw( <<>> );

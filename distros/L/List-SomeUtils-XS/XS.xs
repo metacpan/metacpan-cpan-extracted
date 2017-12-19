@@ -431,7 +431,7 @@ CODE:
 {
     int found = 0;
 #define ON_TRUE { if (found++) { POP_MULTICALL; XSRETURN_NO; }; }
-#define ON_EMPTY XSRETURN_YES
+#define ON_EMPTY XSRETURN_NO
     TRUE_JUNCTION;
     if (found)
         XSRETURN_YES;

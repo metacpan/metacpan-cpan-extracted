@@ -4,7 +4,7 @@ use strict;
 use YAML qw(LoadFile Load);
 use IO::File;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -398,6 +398,8 @@ sub _parse_edi
     my $IN_ISA = 0;
     my $IN_GS = 0;
     my $IN_ST = 0;
+    my $IN_DETAIL = 0;
+    my $IN_FOOTER = 0;
 
     my $IN_LOOP;
     my $LOOP_SECTION;
@@ -425,6 +427,8 @@ sub _parse_edi
             $LOOP_SECTION = undef;
             $IN_LOOP = undef;
 
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
         }
         elsif ($type eq 'IEA')
         {
@@ -434,6 +438,8 @@ sub _parse_edi
             $LOOP_SECTION = undef;
             $IN_LOOP = undef;
 
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
         }
         elsif ($type eq 'GS')
         {
@@ -451,6 +457,9 @@ sub _parse_edi
             $LOOP_SECTION = undef;
             $IN_LOOP = undef;
 
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
+
             $current_group = $new_group;
         }
         elsif ($type eq 'GE')
@@ -460,6 +469,9 @@ sub _parse_edi
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
             $IN_LOOP = undef;
+
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
 
             $IN_GS = 0;
         }
@@ -477,6 +489,9 @@ sub _parse_edi
             $LOOP_SECTION = undef;
             $IN_LOOP = undef;
 
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
+
             $current_set = $new_set;
             $current_record = $new_set;
         }
@@ -489,6 +504,8 @@ sub _parse_edi
             $IN_LOOP = undef;
 
             $IN_GS = 0;
+            $IN_DETAIL = 0;
+            $IN_FOOTER = 0;
         }
         else
         {
@@ -517,12 +534,30 @@ sub _parse_edi
                 }
             }
 
+            # state machine bingo!
             my $section  = $segment_to_section{$type};
+
+            if ($section eq 'DETAIL')
+            {
+                $IN_DETAIL = 1;
+            }
+            elsif ($section eq 'HEADER' and $IN_DETAIL)
+            {
+                $section = 'DETAIL';
+            }
+            elsif ($section eq 'FOOTER')
+            {
+                $IN_FOOTER = 1;
+            }
+            elsif ($section eq 'DETAIL' and $IN_FOOTER)
+            {
+                $section = 'FOOTER';
+            }
+
             my $mod_record;
 
             # track tree depth
             # and dump results in loop portion?
-
             {
                if (my $type_def = $spec->{segments}{uc($type)})
                {
@@ -1048,7 +1083,31 @@ sub _write_edi
 
 =head2 LOOPS
 
- Both implicit and explicit loop segments are also supported by this module.  Please review the loops test for an example.
+ Both implicit and explicit loop segments are also supported by this module.
+
+ Loops are specified within the structure segment of the spec definition.
+
+ Example:
+
+ 850:
+     structure:
+         header:
+             - BEG
+             - DTM
+             - N9
+             - N1:
+                 - N1
+                 - N2
+         detail:
+             - PO1
+             - PID
+         footer:
+             - CTT
+
+  In this structure, the N1 element would load as an arrayref of both N1 and N2 hasherefs.
+
+  
+
 
 =head1 HISTORY
 

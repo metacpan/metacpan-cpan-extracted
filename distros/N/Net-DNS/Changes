@@ -1,4 +1,16 @@
-$Id: Changes 1604 2017-10-18 09:00:29Z willem $                       -*-text-*-
+$Id: Changes 1610 2017-12-15 12:25:33Z willem $                       -*-text-*-
+
+
+**** 1.14 Dec 15, 2017
+
+Fix rt.cpan.org #123702
+
+	'use base' should not be used in packages with several
+	subpackages defined
+
+Fix rt.cpan.org #123676
+
+	Net::DNS::Nameserver malformed message on big axfr
 
 
 **** 1.13 Oct 18, 2017

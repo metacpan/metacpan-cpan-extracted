@@ -21,7 +21,7 @@ CatalystX::OAuth2::ClientContainer - A role for providing an oauth2 client objec
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

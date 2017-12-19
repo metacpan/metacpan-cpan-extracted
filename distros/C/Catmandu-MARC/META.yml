@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,7 +40,7 @@ requires:
   MARC::Lint: '0'
   MARC::Parser::RAW: '0'
   MARC::Record: v2.0.6
-  MARC::Spec: v1.0.0
+  MARC::Spec: v2.0.3
   Memoize: '0'
   Moo: '1.0'
   MooX::Singleton: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.171'
+version: '1.231'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'
@@ -61,5 +61,5 @@ x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Robin Sheat <robin@catalyst.net.nz>'
-x_serialization_backend: 'YAML::Tiny version 1.69'

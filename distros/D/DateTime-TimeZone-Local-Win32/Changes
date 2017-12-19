@@ -1,3 +1,16 @@
+1.99    2017-12-13
+
+    - Add new time zone for Sudan Standard Time.
+
+    - Calculate Windows time offsets from TZI value rather than Display.
+    
+    - Month displayed in test results changed to match month being tested.
+
+    - Add known bad time zones for author testing as Microsoft has not fully adopted
+      changes for Namibia Standard Time and Turks And Caicos Standard Time. The zones
+      will work correctly, but the test won't recognize that times are the same
+      in both IANA and on Windows.
+
 1.98    2017-04-26
 
     - Adjust tests to calculate daylight time offsets in different months to avoid

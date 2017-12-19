@@ -66,9 +66,8 @@ use Future::Utils qw( fmap_concat fmap_scalar );
       foreach => [ $f ],
       concurrent => 2;
 
-   ok( !exception {
-      $fmap->cancel;
-   }, '$fmap_concat->cancel does not throw on undef slots' );
+   is( exception { $fmap->cancel }, undef,
+      '$fmap_concat->cancel does not throw on undef slots' );
    ok( $fmap->is_cancelled, 'was cancelled correctly' );
 }
 

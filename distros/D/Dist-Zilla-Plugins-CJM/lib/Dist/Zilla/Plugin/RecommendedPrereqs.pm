@@ -18,7 +18,7 @@ package Dist::Zilla::Plugin::RecommendedPrereqs;
 #---------------------------------------------------------------------
 
 our $VERSION = '4.21';
-# This file is part of Dist-Zilla-Plugins-CJM 4.27 (August 29, 2015)
+# This file is part of Dist-Zilla-Plugins-CJM 6.000 (December 17, 2017)
 
 
 use 5.008;
@@ -103,8 +103,8 @@ Dist::Zilla::Plugin::RecommendedPrereqs - Look for comments recommending prerequ
 =head1 VERSION
 
 This document describes version 4.21 of
-Dist::Zilla::Plugin::RecommendedPrereqs, released August 29, 2015
-as part of Dist-Zilla-Plugins-CJM version 4.27.
+Dist::Zilla::Plugin::RecommendedPrereqs, released December 17, 2017
+as part of Dist-Zilla-Plugins-CJM version 6.000.
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ L<< https://github.com/madsen/dist-zilla-plugins-cjm >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Christopher J. Madsen.
+This software is copyright (c) 2017 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

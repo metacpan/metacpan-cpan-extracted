@@ -39,3 +39,4 @@ t/testss.t
 t/testwide.t
 t/testwide.pl.src
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

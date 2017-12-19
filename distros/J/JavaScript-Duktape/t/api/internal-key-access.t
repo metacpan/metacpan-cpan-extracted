@@ -14,7 +14,7 @@ my $duk = $js->duk;
 
 sub test_1 {
     $duk->eval_string("new Date(123456)");
-    $duk->push_string("\xffValue");
+    $duk->push_string("\x82Value");
     $duk->get_prop(-2);
     printf("Date._Value: %s\n", $duk->safe_to_string(-1));
     printf("final top: %ld\n", $duk->get_top());

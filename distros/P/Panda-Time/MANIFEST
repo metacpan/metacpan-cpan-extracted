@@ -253,6 +253,7 @@ zoneinfo/America/Port_of_Spain
 zoneinfo/America/Porto_Acre
 zoneinfo/America/Porto_Velho
 zoneinfo/America/Puerto_Rico
+zoneinfo/America/Punta_Arenas
 zoneinfo/America/Rainy_River
 zoneinfo/America/Rankin_Inlet
 zoneinfo/America/Recife
@@ -439,7 +440,6 @@ zoneinfo/Brazil/East
 zoneinfo/Brazil/West
 zoneinfo/Canada/Atlantic
 zoneinfo/Canada/Central
-zoneinfo/Canada/East-Saskatchewan
 zoneinfo/Canada/Eastern
 zoneinfo/Canada/Mountain
 zoneinfo/Canada/Newfoundland
@@ -826,6 +826,7 @@ zoneinfo/right/America/Port_of_Spain
 zoneinfo/right/America/Porto_Acre
 zoneinfo/right/America/Porto_Velho
 zoneinfo/right/America/Puerto_Rico
+zoneinfo/right/America/Punta_Arenas
 zoneinfo/right/America/Rainy_River
 zoneinfo/right/America/Rankin_Inlet
 zoneinfo/right/America/Recife
@@ -1012,7 +1013,6 @@ zoneinfo/right/Brazil/East
 zoneinfo/right/Brazil/West
 zoneinfo/right/Canada/Atlantic
 zoneinfo/right/Canada/Central
-zoneinfo/right/Canada/East-Saskatchewan
 zoneinfo/right/Canada/Eastern
 zoneinfo/right/Canada/Mountain
 zoneinfo/right/Canada/Newfoundland
@@ -1283,6 +1283,7 @@ zoneinfo/UTC
 zoneinfo/W-SU
 zoneinfo/WET
 zoneinfo/zone.tab
+zoneinfo/zone1970.tab
 zoneinfo/Zulu
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.44'; # VERSION
 
 
 has handle => (
@@ -227,8 +227,7 @@ sub send
   
   if(ref $message)
   {
-    $frame = Protocol::WebSocket::Frame->new(buffer => $message->body, masked => $self->masked, max_payload_size => 0);
-    $frame->opcode($message->opcode);
+    $frame = Protocol::WebSocket::Frame->new(opcode => $message->opcode, buffer => $message->body, masked => $self->masked, max_payload_size => 0);
   }
   else
   {
@@ -327,7 +326,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 

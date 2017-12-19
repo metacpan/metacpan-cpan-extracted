@@ -805,6 +805,11 @@ sub latex {
 \author{[% doc.header_as_latex.author %]}
 \subtitle{[% doc.header_as_latex.subtitle %]}
 
+[% IF safe_options.nobold %]
+\let\textbf\emph
+\let\bfseries\normalfont
+[% END %]
+
 [% IF tex_metadata %]
 % https://groups.google.com/d/topic/comp.text.tex/6fYmcVMbSbQ/discussion
 \hypersetup{%

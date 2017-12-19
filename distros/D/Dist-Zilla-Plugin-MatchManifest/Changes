@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MatchManifest
 
+6.000  2017-12-17
+	- Update to use Path::Tiny interface (requires Dist::Zilla 6)
+
 4.02   2014-07-19
 	- Update tests to use Test::DZil
 

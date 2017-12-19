@@ -16,7 +16,7 @@ CatalystX::OAuth2::Schema - A L<DBIx::Class> schema for use as the backend of th
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 AUTHOR
 

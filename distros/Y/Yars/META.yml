@@ -1,5 +1,5 @@
 ---
-abstract: 'Yet Another RESTful-Archive Service'
+abstract: '(Deprecated) Yet Another RESTful-Archive Service'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -38,10 +38,12 @@ resources:
   bugtracker: https://github.com/clustericious/Yars/issues
   homepage: https://metacpan.org/pod/Yars
   repository: git://github.com/clustericious/Yars.git
-version: '1.31'
+version: '1.33'
 x_contributors:
   - 'Marty Brandon'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Brian Duggan'
   - 'Curt Tilmes'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

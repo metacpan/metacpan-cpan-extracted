@@ -3,9 +3,10 @@ use Catmandu::Sane;
 use Catmandu::Util;
 use Moo;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
+has skip_errors    => (is => 'ro');
 has _importer      => (is => 'ro');
 
 with 'Catmandu::Importer';
@@ -36,7 +37,27 @@ sub BUILD {
 }
 
 sub generator {
-    $_[0]->_importer->generator;
+    my  ($self) = @_;
+
+    if ($self->skip_errors) {
+      my $gen = $self->_importer->generator;
+      my $nr  = 0;
+      sub {
+        my $item = 0;
+        do {
+          $nr++;
+          try {
+            $item = $gen->();
+          } catch {
+            $self->log->error("error at record $nr : $_");
+          };
+        } while (defined($item) && $item == 0);
+        $item;
+      };
+    }
+    else {
+      $self->_importer->generator;
+    }
 }
 
 1;
@@ -48,27 +69,28 @@ Catmandu::Importer::MARC - Package that imports MARC data
 
 =head1 SYNOPSIS
 
-    use Catmandu;
+    # On the command line
 
-    # import records from file
-    my $importer = Catmandu->importer('MARC',file => '/foo/bar.mrc');
+    # Convert MARC to JSON (default)
+    $ catmandu convert MARC < /foo/bar.mrc
 
-    my $count = $importer->each(sub {
-        my $record = shift;
-        # ...
-    });
+    # Convert MARC to MARC
+    $ catmandu convert MARC to MARC < /foo/bar.mrc > /foo/output.mrc
 
-    # import records and apply a fixer
-    my $fixer = fixer("marc_map('245a','title')");
+    # Add fixes
+    $ catmandu convert MARC to MARC --fix myfixes.txt < /foo/bar.mrc > /foo/output.mrc
 
-    $fixer->fix($importer)->each(sub {
-        my $record = shift;
-        printf "title: %s\n" , $record->{title};
-    });
+    # Create a list of titles
+    $ catmandu convert MARC to TSV --fix "marc_map(245,title); retain(title)" < /foo/bar.mrc
 
-    # Convert MARC to JSON mapping 245a to a title with the L<catmandu> command line client:
+    # Convert MARC XML
+    $ catmandu convert MARC --type XML < /foo/bar.xml
 
-    catmandu convert MARC --fix "marc_map('245a','title')" < /foo/bar.mrc
+    # Convert ALEPH sequential
+    $ catmandu convert MARC --type ALEPHSEQ < /foo/bar.aleph
+
+    # Convert on format to another format
+    $ catmandu convert MARC --type ISO to MARC --type ALEPHSEQ < /foo/bar.mrc > /foo/bar.aleph
 
 =head1 DESCRIPTION
 
@@ -118,51 +140,47 @@ L<Catmandu::Iterable>.
 
 =head1 CONFIGURATION
 
-In addition to the configuration provided by L<Catmandu::Importer> (C<file>,
-C<fh>, etc.) the importer can be configured with the following parameters:
-
-
-The 'type' parameter describes the MARC syntax variant. Supported values include:
-
 =over
 
-=item
+=item file
 
-ISO: L<Catmandu::Importer::MARC::ISO> (default)
+Read input from a local file given by its path. Alternatively a scalar
+reference can be passed to read from a string.
 
-=item
+=item fh
 
-MicroLIF: L<Catmandu::Importer::MARC::MicroLIF>
+Read input from an L<IO::Handle>. If not specified, L<Catmandu::Util::io> is used to
+create the input stream from the C<file> argument or by using STDIN.
 
-=item
+=item fix
 
-MARCMaker: L<Catmandu::Importer::MARC::MARCMaker>
+An ARRAY of one or more fixes or file scripts to be applied to imported items.
 
-=item
+=item type
 
-MiJ: L<Catmandu::Importer::MARC::MiJ> (MARC in JSON)
+The MARC format to parse. The following MARC parsers are available:
 
-=item
+  ISO: L<Catmandu::Importer::MARC::ISO> (default) - a strict ISO 2709 parser
+  RAW: L<Catmandu::Importer::MARC::RAW> - a loose ISO 2709 parser that skips faulty records
+  ALEPHSEQ: L<Catmandu::Importer::MARC::ALEPHSEQ> - a parser for Ex Libris Aleph sequential files
+  Lint: L<Catmandu::Importer::MARC::Lint> - a MARC syntax checker
+  MicroLIF: L<Catmandu::Importer::MARC::MicroLIF> - a parser for the MicroLIF format
+  MARCMaker: L<Catmandu::Importer::MARC::MARCMaker> - a parser for MARCMaker/MARCBreaker records
+  MiJ: L<Catmandu::Importer::MARC::MiJ> (MARC in JSON) - a parser for the MARC-in-JSON format
+  XML: L<Catmandu::Importer::MARC::XML> - a parser for the MARC XML format
 
-XML: L<Catmandu::Importer::MARC::XML>
+=item skip_errors
 
-=item
+If set, then any errors when parsing MARC input will be skipped and ignored. Use the
+debug setting of catmandu to view all error messages:
 
-RAW: L<Catmandu::Importer::MARC::RAW>
+  $ catmandu -D convert MARC --skip_errors 1 < /foo/bar.mrc
 
-=item
+=item <other>
 
-Lint: L<Catmandu::Importer::MARC::Lint>
-
-=item
-
-ALEPHSEQ: L<Catmandu::Importer::MARC::ALEPHSEQ>
+Every MARC importer can have its own options. Check the documentation of the specific importer.
 
 =back
-
-    E.g.
-
-    catmandu convert MARC --type XML to MARC --type ISO < marc.xml > marc.iso
 
 =head1 SEE ALSO
 

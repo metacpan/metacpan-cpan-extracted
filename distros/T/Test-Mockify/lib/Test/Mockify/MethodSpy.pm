@@ -1,6 +1,8 @@
 package Test::Mockify::MethodSpy;
 
 use parent 'Test::Mockify::Method';
+use strict;
+use warnings;
 
 #---------------------------------------------------------------------
 sub new {

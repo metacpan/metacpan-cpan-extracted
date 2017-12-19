@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-# inserted by Dist::Zilla::Plugin::CheckBin 0.007
+# inserted by Dist::Zilla::Plugin::CheckBin 0.008
 use Devel::CheckBin;
 check_bin('git');
 

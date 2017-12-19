@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.2.0';
+$Git::Hooks::CheckFile::VERSION = '2.3.0';
 use 5.010;
 use utf8;
 use strict;
@@ -15,6 +15,23 @@ use List::MoreUtils qw/any none/;
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+
+#############
+# Grok hook configuration, check it and set defaults.
+
+sub _setup_config {
+    my ($git) = @_;
+
+    my $config = $git->get_config();
+
+    $config->{lc $CFG} //= {};
+
+    my $default = $config->{lc $CFG};
+
+    $default->{sizelimit} //= [0];
+
+    return;
+}
 
 sub check_command {
     my ($git, $commit, $file, $command) = @_;
@@ -95,7 +112,7 @@ sub check_new_files {
     }
 
     # See if we have to check a file size limit
-    my $sizelimit = $git->get_config($CFG => 'sizelimit');
+    my $sizelimit = $git->get_config_integer($CFG => 'sizelimit');
 
     # Grok all REGEXP checks
     my %re_checks;
@@ -160,6 +177,8 @@ sub check_new_files {
 sub check_affected_refs {
     my ($git) = @_;
 
+    _setup_config($git);
+
     return 1 if $git->im_admin();
 
     my $errors = 0;
@@ -176,11 +195,15 @@ sub check_affected_refs {
 sub check_commit {
     my ($git) = @_;
 
+    _setup_config($git);
+
     return check_new_files($git, ':0', $git->filter_files_in_index('AM'));
 }
 
 sub check_patchset {
     my ($git, $opts) = @_;
+
+    _setup_config($git);
 
     return 1 if $git->im_admin();
 
@@ -209,7 +232,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.2.0
+version 2.3.0
 
 =head1 DESCRIPTION
 
@@ -334,12 +357,12 @@ And the F<mypylint.sh> script was something like this:
 
     pylint --rcfile=$RC "$@"
 
-=head2 githooks.checkfile.sizelimit BYTES
+=head2 githooks.checkfile.sizelimit INT
 
 This directive specifies a size limit (in bytes) for any file in the
 repository. If set explicitly to 0 (zero), no limit is imposed, which is the
-same as not specifying it. But it can be useful to override a global
-specification in a particular repository.
+default. But it can be useful to override a global specification in a particular
+repository.
 
 =head2 githooks.checkfile.basename.deny REGEXP
 

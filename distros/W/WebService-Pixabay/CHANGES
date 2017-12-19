@@ -1,10 +1,31 @@
 ==================================================
-Changes from 2016-07-14 00:00:00 +0000 to present.
+Changes from 2016-12-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.0.2 at 2017-07-14 03:18:36 +0000
+version 2.1.1 at 2017-12-17 10:41:04 +0000
 ------------------------------------------
+
+  Change: 09d05295274581d6902a9c935ea45f1558fdf0d4
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-17 18:40:14 +0000
+
+    Remove pod's trailing whitespaces. 
+
+  Change: 0c686f8f79b20a6cfff6622e1c233f66afc85e4c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-17 16:08:51 +0000
+
+    Fix module function name typo. 
+
+  Change: 573bca3f3b5b44309fbeab7d8fb691fe5a9de81f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-17 16:05:41 +0000
+
+    Major update.
+
+    - Use GPL 3 license. - Add .perltidyrc. - Removed
+    show_data_structure() method. - Cover wider method testings. 
 
   Change: 5d3a5f83af078a382f3f2995dfa9526dbd300e8f
   Author: faraco <skelic3@gmail.com>

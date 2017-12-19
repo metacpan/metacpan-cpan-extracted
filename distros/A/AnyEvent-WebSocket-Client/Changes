@@ -1,6 +1,10 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.44      2017-12-12 15:37:51 -0500
+  - Compatibility with 0.22.
+
 0.43      2017-10-19 17:06:51 -0400
+  - Production version functionally identical to the 0.42_01 release.
 
 0.42_01   2017-10-18 11:45:16 -0400
   - You can now unregister event callbacks.

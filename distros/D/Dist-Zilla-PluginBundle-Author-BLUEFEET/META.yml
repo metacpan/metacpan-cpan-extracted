@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,7 @@ requires:
   Dist::Zilla::Plugin::Git::Push: '2.036'
   Dist::Zilla::Plugin::Git::Tag: '2.036'
   Dist::Zilla::Plugin::GithubMeta: '0.54'
+  Dist::Zilla::Plugin::MetaJSON: '5.042'
   Dist::Zilla::Plugin::NextRelease: '5.042'
   Dist::Zilla::Plugin::PkgVersion: '5.042'
   Dist::Zilla::Plugin::PodSyntaxTests: '5.042'
@@ -37,4 +38,5 @@ resources:
   bugtracker: https://github.com/bluefeet/Dist-Zilla-PluginBundle-Author-BLUEFEET/issues
   homepage: https://github.com/bluefeet/Dist-Zilla-PluginBundle-Author-BLUEFEET
   repository: https://github.com/bluefeet/Dist-Zilla-PluginBundle-Author-BLUEFEET.git
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

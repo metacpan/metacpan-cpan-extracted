@@ -94,6 +94,8 @@ sub get_next_message {
                 push @{ $self->{'_fragments'} }, $_msg_frame;
             }
         }
+
+        $_msg_frame = undef;
     }
 
     return defined($_msg_frame) ? q<> : undef;

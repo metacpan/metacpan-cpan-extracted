@@ -1,26 +1,31 @@
 package Catmandu::Fix::Bind::marc_each;
 
 use Moo;
+use Catmandu::Sane;
 use Catmandu::Util;
+use Catmandu::MARC;
+use Catmandu::Fix::Has;
+use namespace::clean;
 
-our $VERSION = '1.171';
+our $VERSION = '1.231';
+
+has var    => (fix_opt => 1);
+has __marc => (is => 'lazy');
 
 with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
-has done => (is => 'ro');
+sub _build___marc {
+    Catmandu::MARC->instance;
+}
 
 sub unit {
     my ($self,$data) = @_;
-
-    $self->{done} = 0;
 
     $data;
 }
 
 sub bind {
     my ($self,$mvar,$code) = @_;
-
-    return $mvar if $self->done;
 
     my $rows = $mvar->{record} // [];
 
@@ -30,14 +35,20 @@ sub bind {
 
         $mvar->{record} = [$row];
 
+        if ($self->var) {
+            $mvar->{$self->var} = $self->__marc->marc_copy($mvar,"***")->[0]->[0];
+        }
+
         my $fixed = $code->($mvar);
 
         push @new , @{$fixed->{record}} if defined $fixed && exists $fixed->{record} && defined $fixed->{record};
+
+        if ($self->var) {
+            delete $mvar->{$self->var};
+        }
     }
 
     $mvar->{record} = \@new if exists $mvar->{record};
-
-    $self->{done} = 1;
 
     $mvar;
 }
@@ -61,6 +72,14 @@ Catmandu::Fix::Bind::marc_each - a binder that loops over MARC fields
     do marc_each()
         if marc_match("500",".*")
             reject()
+        end
+    end
+
+    # Loop over all the fields with a variable (see marc_copy, marc_cut and marc_paste for the content)
+    do marc_each(var:this)
+        if all_match(this.tag,300)
+          # The '***' is short for the current tag in a marc_each loop
+          marc_map(***a,test)
         end
     end
 
@@ -94,6 +113,22 @@ you can write:
             marc_map("500",note.$append)
         end
     end
+
+A variable name can be parsed to the marc_each, in which case an automatic marc_copy will be done
+into the variable name. E.g
+
+    do marc_each()
+       marc_copy(***,this)
+       ...
+    end
+
+and
+
+    do marc_each(var:this)
+       ...
+    end
+
+is similar
 
 =head1 SEE ALSO
 

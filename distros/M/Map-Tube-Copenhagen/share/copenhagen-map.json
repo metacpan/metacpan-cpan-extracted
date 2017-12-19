@@ -1,0 +1,36 @@
+{
+	"name": "Copenhagen",
+	"lines": {
+		"line":
+		[
+			{ "id": "m1", "name": "M1" },
+			{ "id": "m2", "name": "M2" }
+		]
+	},
+	"stations": {
+		"station": [
+			{ "id": "vanlose", "name": "Vanløse", "line": "m1,m2", "link": "flintholm" },
+			{ "id": "flintholm", "name": "Flintholm", "line": "m1,m2", "link": "vanlose,lindevang" },
+			{ "id": "lindevang", "name": "Lindevang", "line": "m1,m2", "link": "flintholm,fasanvej" },
+			{ "id": "fasanvej", "name": "Fasanvej (Solbjerg)", "line": "m1,m2", "link": "lindevang,frederiksberg" },
+			{ "id": "frederiksberg", "name": "Frederiksberg", "line": "m1,m2", "link": "fasanvej,forum" },
+			{ "id": "forum", "name": "Forum", "line": "m1,m2", "link": "frederiksberg,norreport" },
+			{ "id": "norreport", "name": "Nørreport", "line": "m1,m2", "link": "forum,kongensnytorv" },
+			{ "id": "kongensnytorv", "name": "Kongens Nytorv", "line": "m1,m2", "link": "norreport,christianshavn" },
+			{ "id": "christianshavn", "name": "Christianshavn", "line": "m1,m2", "link": "kongensnytorv,islandsbrygge,amagerbro" },
+			{ "id": "islandsbrygge", "name": "Islands Brygge", "line": "m1", "link": "christianshavn,drbyen" },
+			{ "id": "drbyen", "name": "DR Byen (Universitetet)", "line": "m1", "link": "islandsbrygge,sundby" },
+			{ "id": "sundby", "name": "Sundby", "line": "m1", "link": "drbyen,bellacenter" },
+			{ "id": "bellacenter", "name": "Bella Center", "line": "m1", "link": "sundby,orestad" },
+			{ "id": "orestad", "name": "Ørestad", "line": "m1", "link": "bellacenter,vestamager" },
+			{ "id": "vestamager", "name": "Vestamager", "line": "m1", "link": "orestad" },
+			{ "id": "amagerbro", "name": "Amagerbro", "line": "m2", "link": "christianshavn,lergravsparken" },
+			{ "id": "lergravsparken", "name": "Lergravsparken", "line": "m2", "link": "amagerbro,oresund" },
+			{ "id": "oresund", "name": "Øresund", "line": "m2", "link": "lergravsparken,amagerstrand" },
+			{ "id": "amagerstrand", "name": "Amager Strand", "line": "m2", "link": "oresund,femoren" },
+			{ "id": "femoren", "name": "Femøren", "line": "m2", "link": "amagerstrand,kastrup" },
+			{ "id": "kastrup", "name": "Kastrup", "line": "m2", "link": "femoren,lufthavnen" },
+			{ "id": "lufthavnen", "name": "Lufthavnen (Københavns Lufthavn, Kastrup)", "line": "m2", "link": "kastrup" }
+		]
+	}
+}

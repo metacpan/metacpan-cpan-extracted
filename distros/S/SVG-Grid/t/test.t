@@ -111,10 +111,10 @@ $svg -> write(output_file_name => $output_file_name);
 # which are embedded in the 2 files.
 
 my($got)				= read_text($output_file_name);
-$got					= "$1$2" if ($got =~ /(.+)SVG Module V\d\.\d\d(.+)/ms);
+$got					= "$1$2" if ($got =~ /(.+)<!--.+-->(.+)/ms);
 my($input_file_name)	= File::Spec -> catfile('data', 'synopsis.svg');
 my($expected)			= read_text($input_file_name);
-$expected				= "$1$2" if ($expected =~ /(.+)SVG Module V\d\.\d\d(.+)/ms);
+$expected				= "$1$2" if ($expected =~ /(.+)<!--.+-->(.+)/ms);
 
 ok($got eq $expected, "$output_file_name matches $input_file_name");
 

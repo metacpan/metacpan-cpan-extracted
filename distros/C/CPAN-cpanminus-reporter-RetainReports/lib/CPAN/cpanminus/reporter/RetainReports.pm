@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.1;
 use parent ('App::cpanminus::reporter');
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use Carp;
 use File::Path qw( make_path );
 use File::Spec;
@@ -274,8 +274,16 @@ sub parse_uri {
     return;
   }
 
-  my $author = $self->get_author( $uri->path );
-  unless ($author) {
+  my $author;
+  if ($scheme eq 'file') {
+    # A local file may not be in the correct format for Metabase::Resource.
+    # Hence, we may not be able to parse it for the author.
+    $author = '';
+  }
+  else {
+    $author = $self->get_author( $uri->path );
+  }
+  unless (defined $author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;
@@ -290,6 +298,7 @@ sub parse_uri {
 
   $self->author($author);
 
+  # If $author eq '', then distfile will be set to $uri.
   $self->distfile(substr("$uri", index("$uri", $author)));
 
   return 1;
@@ -365,7 +374,7 @@ sub make_report {
     my $cpanm_version = $self->{_cpanminus_version} || 'unknown cpanm version';
     my $meta = $self->get_meta_for( $dist );
     my %CTCC_args = (
-        author      => $self->author,
+        author      => $self->author || '',
         distname    => $dist,   # string like: Mason-Tidy-2.57
         grade       => $result,
         via         => "App::cpanminus::reporter $App::cpanminus::reporter::VERSION ($cpanm_version)",
@@ -374,7 +383,9 @@ sub make_report {
     );
     my $tdir = $self->get_report_dir();
     croak "Could not locate $tdir" unless (-d $tdir);
-    my $report = File::Spec->catfile($tdir, join('.' => $self->author, $dist, 'log', 'json'));
+    my $report = (length $author)
+        ? File::Spec->catfile($tdir, join('.' => $self->author, $dist, 'log', 'json'))
+        : File::Spec->catfile($tdir, join('.' =>                $dist, 'log', 'json'));
     open my $OUT, '>', $report or croak "Unable to open $report for writing";
     say $OUT encode_json( {
         %CTCC_args,
