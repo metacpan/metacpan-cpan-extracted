@@ -1,6 +1,6 @@
 % layouts/тест/осн1
 
-# {.white-text .navy padding:0.5rem; #ид123} Заголовок
+# {.yellow-text .navy padding:0.5rem; #ид123} Заголовок
 
 <script type="javascript">
   console.log('привет');

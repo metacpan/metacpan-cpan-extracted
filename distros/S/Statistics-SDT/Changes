@@ -1,15 +1,27 @@
 Revision history for Perl extension Statistics::SDT.
 
-0.05
-    Some more error control.
-	Solving distribution issues.
+0.06 2017.11.12
+    Added sensitivity by "general model" (handling unequal variances), d_a method
+    Added zrate() method
+    Changed 'c' bias alias from 'decision' to 'distance' (no effect on usage)
+    Changed m-AFC sens: Accept any value >= 2 for 'alternatives'; renaming the arg from 'states'
+    Added equations in POD for measures including A', etc.
+    Added return of empty-string for incalculable values
+    Corrected equation in POD (only) for term 'An' in Alexander FC method: (1 - 1/x) not just 1/x
+    Checked sensitivity by Smith (1982) m-AFC method where m >= 12 (see "Bugs and limitations" in POD)
+    Require now List::AllUtils and String::Util
+    Removed documentation of alias "discriminability" for "sens", "dc2k" for "criterion", ahead of removing its support.
 
-0.04 
+0.05 2013.07.18
+    Some more error control.
+
+0.04 2010.09.13
 	Solving distribution issues.
 	Couple more aliases.
 
 0.03 
-	Substantial changes to interface and method calls: Function-oriented interface completely gone; OO only. All sensitivity and bias measures accessed by generic methods. 
+	Substantial changes to interface and method calls: Function-oriented interface completely gone; OO only.
+    All sensitivity and bias measures accessed by generic methods. 
 	Added rate method. 
 	Added 'alexander' forced-choice method (in addition to 'smith').
 	Added criterion method.
@@ -18,7 +30,7 @@ Revision history for Perl extension Statistics::SDT.
 0.02  
 	Aliases for sensitivity functions introduced.
 
-0.01  Mon Jul 24 10:54:20 2006
+0.01 2006.07.24
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n Statistics::SDT
 

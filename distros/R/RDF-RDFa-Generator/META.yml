@@ -1,47 +1,62 @@
 ---
-abstract: 'generate some data in RDFa'
+abstract: 'Generate data for RDFa serialization'
 author:
-  - '<http://purl.org/NET/cpan-uri/person/tobyink>'
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0.61
+  Test::More: '0.96'
+  Test::Output: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Module::Install version 1.06'
-keywords:
-  - Generator
-  - HTML
-  - Output
-  - RDF
-  - RDFa
-  - 'Semantic Web'
-  - Serialiser
-  - Serializer
-  - Writer
-  - XHTML
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: RDF::RDFa::Generator
+  version: '1.4'
 name: RDF-RDFa-Generator
 no_index:
   directory:
+    - eg
     - examples
     - inc
     - t
+    - xt
+optional_features: {}
+provides:
+  RDF::RDFa::Generator:
+    file: lib/RDF/RDFa/Generator.pm
+    version: '0.192'
+  RDF::RDFa::Generator::HTML::Head:
+    file: lib/RDF/RDFa/Generator/HTML/Head.pm
+    version: '0.192'
+  RDF::RDFa::Generator::HTML::Hidden:
+    file: lib/RDF/RDFa/Generator/HTML/Hidden.pm
+    version: '0.192'
+  RDF::RDFa::Generator::HTML::Pretty:
+    file: lib/RDF/RDFa/Generator/HTML/Pretty.pm
+    version: '0.192'
+  RDF::RDFa::Generator::HTML::Pretty::Note:
+    file: lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
+    version: '0.192'
 requires:
-  Data::Dumper: 0
-  Icon::FamFamFam::Silk: 0
-  RDF::Prefixes: 0
-  RDF::Trine: 0.112
-  XML::LibXML: 1.60
-  perl: 5.8.0
+  AtteanX::Compatibility::Trine: '0'
+  Data::Dumper: '0'
+  Icon::FamFamFam::Silk: '0'
+  RDF::Prefixes: '0'
+  RDF::Trine: '0.112'
+  XML::LibXML: '1.60'
+  perl: '5.008'
 resources:
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=RDF-RDFa-Generator
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/project
+  bugtracker: https://github.com/kjetilk/p5-rdf-rdfa-generator/issues
   homepage: https://metacpan.org/release/RDF-RDFa-Generator
   license: http://dev.perl.org/licenses/
-  repository: https://bitbucket.org/tobyink/p5-rdf-rdfa-generator
-version: 0.103
+  repository: git://github.com/kjetilk/p5-rdf-rdfa-generator.git
+version: '0.192'
+x_contributors:
+  - 'ZORAN <zoran@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

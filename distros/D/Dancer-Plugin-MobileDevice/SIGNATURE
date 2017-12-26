@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0dea96a6a57e838428a4516ebcb9a3f3c475a9a5 CONTRIBUTORS
+SHA1 38f861e9a953a3124545bd357272031ff49c55d7 Changes
+SHA1 9cf23fd131717a4ca7c99970ea38413fa04ece4f INSTALL
+SHA1 39b8f8d9f4d37663a19324a4473a3b4128208bf9 LICENSE
+SHA1 554dcbf1728b534b0828e7fb08af92ddc2053b18 MANIFEST
+SHA1 217260fa89ae5d136bec0ac33f75e44bb0f96e5d META.json
+SHA1 b795d02855a344f4cb8eea688bf07eff09d3011d META.yml
+SHA1 911c30321801b26e52fed6f526ccff9566186214 Makefile.PL
+SHA1 5706d07961920769af1359b3fa3bb838725e2c8c README
+SHA1 e9cef9f41a12cc537c4d6f47d9db3e75b0a925ba README.mkdn
+SHA1 a827748b146197aeb3ec997743d2a843f3858cdc cpanfile
+SHA1 30788a657e6e8c8bcdf531195c62d61e965c1788 dist.ini
+SHA1 264ac6d557a60afe66699a13f7a0cd295225168c doap.xml
+SHA1 db18003bafaf3a09d2b46cae9bc72438a104d1bc ignore.txt
+SHA1 7a2b6eb6d3e0ed94cdb0c47bb7fcdfdab52d1a95 lib/Dancer/Plugin/MobileDevice.pm
+SHA1 a1f34e55f16d06a39667b2994b3c3dca6e1e84f5 t/00-compile.t
+SHA1 8cc178d07529621e70cdc89760afa02c8aeb0355 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 f2d93d93c865ae202a0ac2f19ebe9f1a3e6d44af t/01-is-mobile-device.t
+SHA1 0335c7786a08a7a61cb95c806382d1c6a0496046 t/02-tokens.t
+SHA1 41b50822f76f4b16add30d3cea827da200879dbd t/03-dynamic-layout.t
+SHA1 37df79b175af0fd4d30abe811b105f814e99e2fe t/views/index.tt
+SHA1 5b98a9af979fb4ca6b96e322ba5d35d7c746bc01 t/views/layouts/main.tt
+SHA1 bfd76869db490c3a2052899b13af7998b075de7c t/views/layouts/mobile.tt
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlo9iZEACgkQ34Hwf+GwC4zLJgCg9LzgBFRl6MHO34glFwtycFp/
+JEIAoI9KTMK55pD6F7D+iLDUQMzq/eV7
+=j5rb
+-----END PGP SIGNATURE-----

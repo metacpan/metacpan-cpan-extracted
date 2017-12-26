@@ -5,13 +5,13 @@
       "Torsten Raudssus <torsten@raudss.us>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-Cmd",
    "no_index" : {
@@ -30,11 +30,17 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "MooX::Options" : "4.103"
+         },
          "requires" : {
             "Module::CPANTS::Analyse" : "0.96",
+            "Perl::Tidy" : "20171214",
             "Test::CPAN::Changes" : "0",
             "Test::CheckManifest" : "0",
             "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
@@ -42,6 +48,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Hash::Merge" : "0.299",
+            "MooX::ConfigFromFile" : "0.008",
+            "Text::Abbrev" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "List::MoreUtils" : "0.406",
@@ -75,9 +86,10 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com:Getty/p5-moox-cmd.git",
+         "url" : "https://github.com/Getty/p5-moox-cmd.git",
          "web" : "https://github.com/Getty/p5-moox-cmd"
       }
    },
-   "version" : "0.015"
+   "version" : "0.017",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

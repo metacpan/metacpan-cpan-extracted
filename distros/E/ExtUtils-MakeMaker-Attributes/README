@@ -1,0 +1,122 @@
+NAME
+
+    ExtUtils::MakeMaker::Attributes - Determine when ExtUtils::MakeMaker
+    attributes are available
+
+SYNOPSIS
+
+      use ExtUtils::MakeMaker::Attributes ':all';
+      
+      my @eumm_available = eumm_version_supported_attributes(ExtUtils::MakeMaker->VERSION);
+      my @core_available = perl_version_supported_attributes($]);
+      
+      unless (perl_version_supports_attribute('v5.10.1', 'TEST_REQUIRES')) {
+        ...
+      }
+      
+      my $fallback = eumm_attribute_fallback('TEST_REQUIRES');
+      my $required_eumm = eumm_attribute_requires_version('TEST_REQUIRES');
+      unless (eval { ExtUtils::MakeMaker->VERSION($required_eumm); 1 }) {
+        ...
+      }
+
+DESCRIPTION
+
+    This module provides an API to determine what attributes are available
+    to a particular version of ExtUtils::MakeMaker, and conversely, what
+    version of ExtUtils::MakeMaker is required for a particular attribute.
+    See "Using Attributes and Parameters" in ExtUtils::MakeMaker for more
+    details on the available attributes.
+
+FUNCTIONS
+
+    All functions are exported on demand, and can be exported individually
+    or via the :all tag.
+
+ known_eumm_attributes
+
+      my @attributes = known_eumm_attributes;
+
+    Returns a list of attributes known to be accepted by the latest version
+    of ExtUtils::MakeMaker.
+
+ is_known_eumm_attribute
+
+      my $boolean = is_known_eumm_attribute($attribute);
+
+    Returns a boolean whether the attribute is known to be accepted by the
+    latest version of ExtUtils::MakeMaker.
+
+ eumm_attribute_requires_version
+
+      my $version = eumm_attribute_requires_version($attribute);
+
+    Returns the minimum version of ExtUtils::MakeMaker that accepts the
+    attribute.
+
+ eumm_attribute_fallback
+
+      my $hashref = eumm_attribute_fallback($attribute);
+
+    In cases where the active version of ExtUtils::MakeMaker does not
+    support an attribute, the attribute should be deleted from the options
+    passed to WriteMakefile. However, some attributes may still be useful
+    in other ways, as indicated by this function. If the attribute has an
+    associated fallback method, it returns a hashref containing a method
+    and possibly other related keys. Otherwise, it returns undef. Currently
+    it may return these methods:
+
+    merge_prereqs
+
+      The key's contents (as a hashref of prerequisites) should be merged
+      into the merge_target (returned in the fallback hashref), ideally
+      using "add_requirements" in CPAN::Meta::Requirements.
+
+ eumm_version_supports_attribute
+
+      my $boolean = eumm_version_supports_attribute($attribute, $eumm_version);
+
+    Returns a boolean whether the ExtUtils::MakeMaker supports the
+    attribute at the specified version.
+
+ perl_version_supports_attribute
+
+      my $boolean = perl_version_supports_attribute($attribute, $perl_version);
+
+    Returns a boolean whether the version of ExtUtils::MakeMaker shipped in
+    the specified version of Perl supports the attribute.
+
+ eumm_version_supported_attributes
+
+      my @attributes = eumm_version_supported_attributes($eumm_version);
+
+    Returns a list of all attributes supported by the specified version of
+    ExtUtils::MakeMaker.
+
+ perl_version_supported_attributes
+
+      my @attributes = perl_version_supported_attributes($perl_version);
+
+    Returns a list of all attributes supported by the version of
+    ExtUtils::MakeMaker shipped in the specified version of Perl.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    ExtUtils::MakeMaker
+

@@ -3,7 +3,7 @@ package Devel::Chitin::Eval;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Count how many stack frames we should discard when we're
 # interested in the debugged program's stack frames
@@ -113,6 +113,6 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.
 

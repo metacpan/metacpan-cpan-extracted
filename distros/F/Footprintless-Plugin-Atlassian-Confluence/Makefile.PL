@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "HTTP::Daemon" => "6.01",
     "Test::More" => "0.90"
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

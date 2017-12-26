@@ -79,8 +79,7 @@ DESCRIPTION
         Correponds to *dbug:Issue*.
 
 BUGS
-    Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=RDF-DOAP>.
+    Please report any bugs to <https://github.com/kjetilk/p5-rdf-doap/issues>.
 
 SEE ALSO
     *   Edd Dumbill's series of articles on DOAP's design: part 1
@@ -96,10 +95,11 @@ SEE ALSO
     *   The DOAP Bugs Schema <http://ontologi.es/doap-bugs#>.
 
 AUTHOR
-    Toby Inkster <tobyink@cpan.org>.
+    Toby Inkster <tobyink@cpan.org>. Kjetil Kjernsmo <kjetilk@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013 by Toby Inkster.
+    This software is copyright (c) 2013 by Toby Inkster, 2017 by Kjetil
+    Kjernsmo.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

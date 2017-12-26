@@ -2,7 +2,7 @@ package Crypt::Stream::Sosemanuk;
 
 use strict;
 use warnings;
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use CryptX;
 
@@ -62,7 +62,7 @@ Provides an interface to the Sosemanuk stream cipher.
 
 =item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>
 
-=item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
+=item * L<https://en.wikipedia.org/wiki/SOSEMANUK>
 
 =back
 

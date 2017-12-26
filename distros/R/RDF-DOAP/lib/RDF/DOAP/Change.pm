@@ -1,7 +1,7 @@
 package RDF::DOAP::Change;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.100';
 
 use Moose;
 extends qw(RDF::DOAP::Resource);
@@ -9,7 +9,7 @@ extends qw(RDF::DOAP::Resource);
 use RDF::DOAP::Person;
 use RDF::DOAP::Types -types;
 use RDF::DOAP::Utils -traits;
-use List::MoreUtils qw(uniq);
+use List::Util qw(uniq);
 use Text::Wrap qw(wrap);
 
 use RDF::Trine::Namespace qw(rdf rdfs owl xsd);

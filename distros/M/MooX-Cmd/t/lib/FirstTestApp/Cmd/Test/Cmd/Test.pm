@@ -1,8 +1,10 @@
 package FirstTestApp::Cmd::Test::Cmd::Test;
 
-BEGIN {
+BEGIN
+{
     my $moodel = $ENV{WHICH_MOODEL} || "Moo";
-    eval "use $moodel;"; $@ and die $@;
+    eval "use $moodel;";
+    $@ and die $@;
     $moodel->import;
 }
 

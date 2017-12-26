@@ -1,12 +1,12 @@
 {
-   "abstract" : "Search and print related Github user emails.",
+   "abstract" : "Search and print particular Github user emails.",
    "author" : [
       "faraco <skelic3@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -14,20 +14,40 @@
    },
    "name" : "App-Github-Email",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Email::Address" : "1.908",
-            "Getopt::Long" : "v2.49.1",
-            "LWP::UserAgent" : "6.07",
-            "List::MoreUtils" : "0.416",
-            "Modern::Perl" : "1.20170117",
-            "Test::More" : "1.302075",
-            "perl" : "5.008"
+            "Email::Address" : "0",
+            "LWP::Online" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -43,7 +63,7 @@
          "web" : "https://github.com/faraco/App-Github-Email"
       }
    },
-   "version" : "0.0.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "0.1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

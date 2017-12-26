@@ -34,7 +34,7 @@
    "provides" : {
       "Google::Translate::Languages" : {
          "file" : "lib/Google/Translate/Languages.pm",
-         "version" : "20171206"
+         "version" : "20171222"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171206"
+   "version" : "20171222"
 }

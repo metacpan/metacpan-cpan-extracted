@@ -15,7 +15,7 @@ t/03_context_data.t
 t/04_hooks.t
 t/05_compat.t
 t/06_txn.t
-t/Mock.pm
-t/Util.pm
+t/lib/t/Mock.pm
+t/lib/t/Util.pm
 META.yml
 MANIFEST

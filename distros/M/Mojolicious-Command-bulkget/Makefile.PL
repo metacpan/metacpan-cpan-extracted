@@ -16,10 +16,10 @@ WriteMakefile(
     "ExtUtils::MakeMaker" => '6.63_03',
   },
   "PREREQ_PM" => {
-    "Mojolicious" => '7.48', # promises
+    "Mojolicious" => '7.53', # promises
   },
   "TEST_REQUIRES" => {
-    "Mojolicious" => '7.48', # promises
+    "Mojolicious" => '7.53', # promises
     "Test::More" => "0.92",
   },
   META_MERGE => {
@@ -29,11 +29,11 @@ WriteMakefile(
       x_IRC => 'irc://irc.perl.org/#graphql-perl',
       repository => {
         type => 'git',
-        url => 'git@github.com:graphql-perl/Mojolicious-Command-bulkget.git',
-        web => 'https://github.com/graphql-perl/Mojolicious-Command-bulkget',
+        url => 'git@github.com:mohawk2/Mojolicious-Command-bulkget.git',
+        web => 'https://github.com/mohawk2/Mojolicious-Command-bulkget',
       },
       bugtracker  => {
-        web => 'https://github.com/graphql-perl/Mojolicious-Command-bulkget/issues',
+        web => 'https://github.com/mohawk2/Mojolicious-Command-bulkget/issues',
       },
       license => [ 'http://dev.perl.org/licenses/' ],
     },
@@ -53,7 +53,7 @@ sub MY::postamble {
   <<EOF;
 pure_all :: README.md
 
-README.md : lib/Mojolicious/Command/bulkget.pm
+README.md : \$(VERSION_FROM)
 \tpod2markdown \$< >\$\@
 EOF
 }

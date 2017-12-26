@@ -1,3 +1,9 @@
+0.010 2017-12-19 14:07:32-0600
+
+  Fixes
+    - Use an unopened temporary filename for output so that file access is not
+      locked on Windows. See <https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot/pull/3>.
+
 0.008 2017-09-08 02:57:18-0400
   Fixes
     - Changes to deal with not indexing the private IPerl module.

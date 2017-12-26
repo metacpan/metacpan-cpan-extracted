@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.81';
+our $VERSION = '2.82';
 
 =pod
 
@@ -133,10 +133,13 @@ sub xmlcomment {
     # If the comment starts with newline character then do not prefix
     # with space (RT #123896).
     return (
-        $ind
-            . join( $ind,
-            map { (/^\n/) ? (qq(<!--$_ -->)) : (qq(<!-- $_ -->)) }
-                @$r_comment )
+        $ind . join(
+            $ind,
+            map {
+                      ( (/^\n/)      ? (q(<!--)) : (q(<!-- )) ) . qq($_)
+                    . ( (/\n[\t]?$/) ? (q(-->))  : (q( -->)) );
+            } @$r_comment
+        )
     );
 }
 

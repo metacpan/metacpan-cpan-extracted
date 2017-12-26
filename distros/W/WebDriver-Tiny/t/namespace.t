@@ -15,7 +15,8 @@ is_deeply [ sort keys %WebDriver::Tiny:: ], [ qw/
     VERSION
     __ANON__
     _req
-    accept_alert
+    alert_accept
+    alert_dismiss
     alert_text
     back
     base_url
@@ -23,20 +24,17 @@ is_deeply [ sort keys %WebDriver::Tiny:: ], [ qw/
     cookie
     cookie_delete
     cookies
-    dismiss_alert
     find
     forward
     get
+    html
     import
     js
     js_async
-    js_phantom
     new
     refresh
     screenshot
-    source
     status
-    storage
     title
     url
     user_agent
@@ -44,8 +42,8 @@ is_deeply [ sort keys %WebDriver::Tiny:: ], [ qw/
     window_close
     window_fullscreen
     window_maximize
-    window_position
-    window_size
+    window_minimize
+    window_rect
     window_switch
     windows
 / ], "WebDriver::Tiny has the correct stuff in it's namespace";
@@ -62,11 +60,10 @@ is_deeply [ sort keys %WebDriver::Tiny::Elements:: ], [ qw/
     enabled
     find
     first
+    html
     import
     last
-    location
-    location_in_view
-    move_to
+    prop
     rect
     screenshot
     selected
@@ -74,7 +71,6 @@ is_deeply [ sort keys %WebDriver::Tiny::Elements:: ], [ qw/
     size
     slice
     split
-    submit
     tag
     tap
     text

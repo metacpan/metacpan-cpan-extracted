@@ -20,55 +20,27 @@ my $api = App::RPi::EnvUI::API->new(
 
 my $db = App::RPi::EnvUI::DB->new(testing => 1);
 
-{ # default state, and on time not yet reached
+my $aux = $api->_config_control('light_aux');
+my $init = \$App::RPi::EnvUI::API::light_initialized;
+my $on_at = \$App::RPi::EnvUI::API::light_on_at;
+my $on_hours = \$App::RPi::EnvUI::API::light_on_hours;
+my $dt_now = \$App::RPi::EnvUI::API::dt_now_test;
+my $dt_on = \$App::RPi::EnvUI::API::dt_light_on;
+my $dt_off = \$App::RPi::EnvUI::API::dt_light_off;
 
-    # light should be off by default
-
-    is
-        $api->_config_light('on_time'),
-        0,
-        "light on_time is zero";
-
-    is
-        $api->_config_light('off_time'),
-        0,
-        "light off_time is zero";
+{ # light should be off for the test
 
     is
-        $api->aux_state( $api->_config_control( 'light_aux' ) ),
+        $api->aux_state($aux),
         0,
         "light aux is currently in state off";
-
-    my %conf = (
-        now => time() + 86400,
-        on_hours => '1',
-    );
-
-    $api->action_light(%conf);
-
-    # light should be off
-
-    is
-        $api->aux_state( $api->_config_control( 'light_aux' ) ),
-        0,
-        "light on time not reached, light is off";
-}
-
-{ # on_since
-
-    # light should be off for the test
-
-    is
-        $api->aux_state( $api->_config_control( 'light_aux' ) ),
-        0,
-        "light aux is currently in state off for the test";
 }
 
 { # on_hours == 0 and == 24
 
-    my $aux = $api->_config_control('light_aux');
-
     # 24
+
+    $$init = 0;
 
     $db->update('light', 'value', 24, 'id', 'on_hours');
     $api->action_light;
@@ -84,6 +56,8 @@ my $db = App::RPi::EnvUI::DB->new(testing => 1);
 
     # 24 state on
 
+    $$init = 0;
+
     $db->update('light', 'value', 24, 'id', 'on_hours');
     $api->action_light;
     is $api->aux_state($aux), 1, "when on_hours is 24, light goes on";
@@ -96,7 +70,7 @@ my $db = App::RPi::EnvUI::DB->new(testing => 1);
     is $App::RPi::EnvUI::API::pm_sub->called, 0, "pin_mode() reset";
     is $App::RPi::EnvUI::API::wp_sub->called, 0, "write_pin() reset";
 
-    # $api->aux_state($aux, 0);
+    $$init = 0;
 
     $db->update('light', 'value', 0, 'id', 'on_hours');
     $api->action_light;
@@ -112,6 +86,8 @@ my $db = App::RPi::EnvUI::DB->new(testing => 1);
 
     $api->aux_state($aux, 0);
 
+    $$init = 0;
+
     $api->action_light;
     is $api->aux_state($aux), 0, "when on_hours is 0, light stays off";
     is $App::RPi::EnvUI::API::pm_sub->called, 0, "pin_mode() *not* called";
@@ -119,6 +95,61 @@ my $db = App::RPi::EnvUI::DB->new(testing => 1);
 
     $db->update('light', 'value', 12, 'id', 'on_hours');
     is $api->_config_light('on_hours'), 12, "on_hours reset back to default ok";
+}
+
+{ # on/off same day to see if the datetime is set correctly
+
+    $api->aux_state($aux, 0);
+    $$init = 0;
+    $api->action_light;
+
+    $$on_at = '01:00';
+    $$on_hours = 12;
+
+    $$dt_now = DateTime->now->set_time_zone('local');
+    $$dt_now->set_hour(1);
+    $$dt_now->set_minute(0);
+    $$dt_now->set_second(0);
+
+    $$dt_on = $$dt_now->clone;
+    $$dt_now->add(minutes => 3);
+
+    $$dt_off = $$dt_on->clone;
+    $$dt_off->add(hours => $$on_hours);
+
+    $api->action_light;
+
+    is $api->aux_state($aux), 1, "lamp is on";
+
+    $$dt_now->set_hour(13);
+    $$dt_now->set_minute(2);
+
+    $api->action_light;
+
+    is $api->aux_state($aux), 0, "lamp is off";
+
+    # tomorrow on
+
+    $$dt_now = DateTime->now->set_time_zone('local');
+    $$dt_now->set_hour(1);
+    $$dt_now->set_minute(0);
+    $$dt_now->set_second(0);
+    $$dt_now->add(hours => 24);
+    $$dt_now->add(minutes => 3);
+
+    $api->action_light;
+
+    is $api->aux_state($aux), 1, "lamp is on when on/off time is in the same 24 hrs";
+    # print "now: $$dt_now | on: $$dt_on | off: $$dt_off\n";
+
+    # tomorrow off
+
+    $$dt_now->set_hour(13);
+
+    $api->action_light;
+
+    is $api->aux_state($aux), 0, "lamp is off when on/off time is in the same 24 hrs";
+    # print "now: $$dt_now | on: $$dt_on | off: $$dt_off\n";
 }
 
 unconfig();

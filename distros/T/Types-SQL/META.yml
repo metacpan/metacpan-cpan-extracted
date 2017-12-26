@@ -1,10 +1,16 @@
 ---
-abstract: 'A library of SQL types'
+abstract: 'a library of SQL types'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  Test::More: '0.98'
+  File::Spec: '0'
+  JSON::PP: '2.00'
+  Module::Metadata: '0'
+  Path::Tiny: '0.004'
+  Test::More: '0'
   Test::Most: '0'
+  Time::Piece: '1.16'
+  Time::Seconds: '0'
   if: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,10 +24,10 @@ name: Types-SQL
 provides:
   Types::SQL:
     file: lib/Types/SQL.pm
-    version: v0.1.2
+    version: v0.1.3
   Types::SQL::Util:
     file: lib/Types/SQL/Util.pm
-    version: v0.1.2
+    version: v0.1.3
 recommends:
   PerlX::Maybe::XS: '0'
   Ref::Util::XS: '0'
@@ -38,5 +44,6 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Types-SQL/issues
   repository: git://github.com/robrwo/Types-SQL.git
-version: v0.1.2
+version: v0.1.3
+x_authority: cpan:RRWO
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,9 @@
 Revision history for Struct-Diff
 
+0.94    2017-12-25
+        'freezer' opt to diff() added
+        path format in list_diff() corrected according Struct::Path v0.80
+
 0.93    2017-12-09
         diff(): get rid of redundant I tokens in array's diffs
         diff(): get rid of empty subdiffs in array's diffs (noU)

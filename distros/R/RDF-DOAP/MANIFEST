@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -9,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.pod
 SIGNATURE
 dist.ini
 doap.ttl

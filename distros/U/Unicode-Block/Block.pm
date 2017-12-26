@@ -9,7 +9,7 @@ use Class::Utils qw(set_params_pub);
 use Unicode::Block::Item;
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -168,22 +168,37 @@ Constructor.
 L<Class::Utils>,
 L<Unicode::Block::Item>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<Unicode::Block::Ascii>
+
+Ascii output of unicode block.
+
+=item L<Unicode::Block::List>
+
+List of unicode blocks.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/tupinek/Unicode-Block>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2013-2017 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.06
 
 =cut

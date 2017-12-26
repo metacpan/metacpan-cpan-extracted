@@ -16,6 +16,7 @@ sub match {
     my $regex = qr{(?>
          All[ ]available[ ]IPs[ ]are[ ]at[ ]maximum[ ]connection[ ]limit    # SendGrid
         |connection[ ]rate[ ]limit[ ]exceeded
+        |domain[ ].+[ ]has[ ]exceeded[ ]the[ ]max[ ]emails[ ]per[ ]hour[ ].+[ ]allowed
         |no[ ]IPs[ ]available[ ][-][ ].+[ ]exceeds[ ]per[-]domain[ ]connection[ ]limit[ ]for
         |Throttling[ ]failure:[ ](?:
              Daily[ ]message[ ]quota[ ]exceeded
@@ -25,8 +26,11 @@ sub match {
              connections
             |connections[ ]from[ ]your[ ]host[.]    # Microsoft
             |concurrent[ ]SMTP[ ]connections        # Microsoft
+            |errors[ ]from[ ]your[ ]IP              # Free.fr
             |SMTP[ ]sessions[ ]for[ ]this[ ]host    # Sendmail(daemon.c)
             )
+        |Trop[ ]de[ ]connexions,[ ].+[A-Z]{3}.+104
+        |We[ ]have[ ]already[ ]made[ ]numerous[ ]attempts[ ]to[ ]deliver[ ]this[ ]message
         )
     }xi;
 
@@ -116,7 +120,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

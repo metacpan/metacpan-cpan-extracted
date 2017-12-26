@@ -4,7 +4,7 @@ use Carp qw(croak);
 use Benchmark qw(:all);
 
 use Plack::App::URLMux;
-my $url_tree = Plack::App::URLMux->new;
+my $url_mux = Plack::App::URLMux->new;
 
 use Plack::App::URLMap;
 my $url_map = Plack::App::URLMap->new;
@@ -21,7 +21,7 @@ while (<URLS>) {
     next if exists $urls{$menu};
     $urls{$menu} = $page;
 
-    $url_tree->map($menu => sub {return $page;}, page => $page);
+    $url_mux->map($menu => sub {return $page;}, page => $page);
     $url_map->map($menu => sub {return $page;});
 }
 close(URLS);
@@ -29,7 +29,7 @@ close(URLS);
 $url_map->prepare_app();
 
 map {
-    my $page = $url_tree->call(my $r={PATH_INFO=>$_});
+    my $page = $url_mux->call(my $r={PATH_INFO=>$_});
     croak "$page not equal for menu $_" unless $page eq $urls{$_};
     croak "no parameter in env page exists " unless exists $r->{'plack.urlmux.params.map'};
 } keys %urls;
@@ -43,15 +43,15 @@ map {
 
 #ok everiting is fine, bench it
 my $result = timethese(-10, {
-    'url_tree'  => sub {url_tree_search()},
+    'url_mux'  => sub {url_mux_search()},
     'url_map'   => sub {url_map_search()}
 });
 print "\nrecalculate real iterations to ".(keys %urls)." URLs\n\n";
 map {$_->[5] *= (keys %urls)} values %$result;
 cmpthese($result);
 
-sub url_tree_search {
-    map { $url_tree->call({PATH_INFO=>$_}) } keys %urls;
+sub url_mux_search {
+    map { $url_mux->call({PATH_INFO=>$_}) } keys %urls;
 }
 
 sub url_map_search {

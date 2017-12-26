@@ -1,4 +1,7 @@
-Revision history for WordList-ID-KBBI
+0.04    2017-12-25 (PERLANCAR)
+
+	- [Bugfix] Sort & remove 69 duplicate entries.
+
 
 0.03    2016-01-13 (PERLANCAR)
 

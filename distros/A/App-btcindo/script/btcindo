@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-12-09'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2017-12-25'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,9 +15,12 @@ our %SPEC;
 my %Canonical_Currencies = (
     # the JSON API/TAPI still uses STR instead of XLM for Stellar Lumens
     str => 'xlm',
+    # the JSON API/TAPI still uses DRK (DarkCoin) instead of DASH for Dash
+    drk => 'dash',
 );
 my %Rev_Canonical_Currencies = (
     xlm => 'str',
+    dash => 'drk',
 );
 
 my @Market_Pairs = (
@@ -994,7 +997,7 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.014 of btcindo (from Perl distribution App-btcindo), released on 2017-12-09.
+This document describes version 0.015 of btcindo (from Perl distribution App-btcindo), released on 2017-12-25.
 
 =head1 SYNOPSIS
 

@@ -43,6 +43,7 @@ my @files = (
     't/controllib/TestsFor/Control/SkipClass.pm',
     't/controllib/TestsFor/Control/SkipMethod.pm',
     't/environment.t',
+    't/executor_roles.t',
     't/include_classes.t',
     't/include_exclude.t',
     't/lib/Person.pm',
@@ -91,7 +92,9 @@ my @files = (
     't/test_control_methods.t',
     't/test_control_methods_skip.t',
     't/timing.t',
-    't/timinglib/TestFor/Timing.pm'
+    't/timinglib/TestFor/Timing.pm',
+    't/todo.t',
+    't/todolib/TestsFor/Todo.pm'
 );
 
 notabs_ok($_) foreach @files;

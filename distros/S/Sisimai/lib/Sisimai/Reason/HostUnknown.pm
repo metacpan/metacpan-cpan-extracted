@@ -16,8 +16,8 @@ sub match {
     my $regex = qr{(?>
          domain[ ](?:
              does[ ]not[ ]exist
-            |must[ ]exist
             |is[ ]not[ ]reachable
+            |must[ ]exist
             )
         |host[ ](?:
              or[ ]domain[ ]name[ ]not[ ]found
@@ -28,10 +28,12 @@ sub match {
         |name[ ]or[ ]service[ ]not[ ]known
         |no[ ]such[ ]domain
         |recipient[ ](?:
-            address[ ]rejected:[ ]unknown[ ]domain[ ]name
-            domain[ ]must[ ]exist
+             address[ ]rejected:[ ]unknown[ ]domain[ ]name
+            |domain[ ]must[ ]exist
             )
+        |The[ ]account[ ]or[ ]domain[ ]may[ ]not[ ]exist
         |unknown[ ]host
+        |Unrouteable[ ]address
         )
     }ix;
 
@@ -62,7 +64,8 @@ sub true {
     if( $tempreason eq $reasontext ) {
         # Status: 5.1.2
         # Diagnostic-Code: SMTP; 550 Host unknown
-        $v = 1;
+        require Sisimai::Reason::NetworkError;
+        $v = 1 unless Sisimai::Reason::NetworkError->match($diagnostic);
 
     } else {
         # Check the value of Diagnosic-Code: header with patterns
@@ -127,7 +130,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

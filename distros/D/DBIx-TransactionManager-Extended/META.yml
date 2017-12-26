@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   DBIx::TransactionManager::Extended:
     file: lib/DBIx/TransactionManager/Extended.pm
-    version: '0.02'
+    version: '0.03'
   DBIx::TransactionManager::Extended::Compat:
     file: lib/DBIx/TransactionManager/Extended/Compat.pm
   DBIx::TransactionManager::Extended::Txn:
@@ -35,9 +35,12 @@ provides:
 requires:
   DBIx::TransactionManager: '0'
   parent: '0'
-  perl: '5.008001'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/karupanerura/DBIx-TransactionManager-Extended/issues
   homepage: https://github.com/karupanerura/DBIx-TransactionManager-Extended
   repository: git://github.com/karupanerura/DBIx-TransactionManager-Extended.git
-version: '0.02'
+version: '0.03'
+x_contributors:
+  - 'mizuki_r <ry.mizuki@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Changes for Perl programming language extension Module-Install
 
+1.19  2017-12-19
+  - remove use of INIT phase in Module::Install::DSL, to fix issues on perl
+    5.27.7 (see cpan RT#123867 and perl RT#132577)
+
 1.18  2017-04-04
   - fix tests to no longer rely on . being in @INC (Graham Ollis, PR#58)
 

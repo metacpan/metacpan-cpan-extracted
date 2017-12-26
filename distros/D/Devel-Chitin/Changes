@@ -1,3 +1,6 @@
+0.13      2017-12-21 16:22:54-06:00 America/Chicago
+    * Support for the new given/whereso/whereis syntax in 5.27.7
+
 0.12      2017-11-13 15:19:03-06:00 America/Chicago
     * Support for the new multiconcat OP in 5.27.6
 

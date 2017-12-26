@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use List::AllUtils qw( any );
 use Types::Common::String qw( NonEmptyStr );
@@ -72,7 +72,7 @@ WebService::PayPal::PaymentsAdvanced::Response - Generic response object
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 SYNOPSIS
 

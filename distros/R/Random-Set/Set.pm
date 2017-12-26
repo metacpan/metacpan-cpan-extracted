@@ -1,15 +1,12 @@
 package Random::Set;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -112,11 +109,9 @@ Random::Set - Class for random set generation.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Random::Set;
 
  # Object.
@@ -157,17 +152,17 @@ L<https://github.com/tupinek/Random-Set>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
+ © Michal Josef Špaček 2013-2017
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

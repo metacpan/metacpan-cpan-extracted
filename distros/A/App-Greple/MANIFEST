@@ -31,6 +31,7 @@ t/00_load.t
 t/01_run.t
 t/02_search.t
 t/03_ja.t
+t/05_reverse_regions.t
 t/JA.txt
 t/SAMPLE.txt
 t/Util.pm

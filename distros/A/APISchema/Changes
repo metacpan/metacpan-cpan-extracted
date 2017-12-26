@@ -1,5 +1,8 @@
 Revision history for Perl extension APISchema
 
+1.36 2017-12-25T12:45:24Z
+  - show enum values in type column
+
 1.35 2017-12-13T14:30:28Z
   - MockServer serves default status codes in definitions
 

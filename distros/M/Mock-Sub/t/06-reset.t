@@ -26,7 +26,7 @@ BEGIN {
 
     my $ret2 = Two::test;
 
-    is ($ret2, undef, "after reset, return_value is reset");
+    is (ref $ret2, 'One', "after reset, return_value is reset");
 
     $foo->side_effect( sub {return 10;} );
 
@@ -38,7 +38,7 @@ BEGIN {
 
     my $ret4 = Two::test;
 
-    is ($ret4, undef, "after reset, side_effect does nothing");
+    is (ref $ret4, 'One', "after reset, side_effect does nothing");
 
     $foo = $mock->mock('One::foo');
     Two::test;
@@ -62,10 +62,4 @@ BEGIN {
 
     is ($foo->called, 0, "after reset, called == 0");
     is ($foo->called_count, 0, "after reset, called_count == 0");
-}
-{
-#    my $foo = Mock::Sub->mock('One::foo');
-
-    Two::test;
-
 }

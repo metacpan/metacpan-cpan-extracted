@@ -1,0 +1,61 @@
+---
+abstract: 'Edit a Perl structure addressed with a Data::DPath path'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::API: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Tools::Explain: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Edit-Struct
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Data::Edit::Struct:
+    file: lib/Data/Edit/Struct.pm
+    version: '0.06'
+  Data::Edit::Struct::Types:
+    file: lib/Data/Edit/Struct/Types.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Data::DPath: '0.56'
+  Exporter: '0'
+  List::Util: '0'
+  Params::ValidationCompiler: '0.24'
+  Ref::Util: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Type::Library: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  custom::failures: '0'
+  failures: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Edit-Struct
+  repository: git://github.com/djerius/data-edit-struct.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.70'

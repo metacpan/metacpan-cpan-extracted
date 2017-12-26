@@ -7,7 +7,7 @@ use strict;
 
 package Mail::Message::Head::Subset;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.004';
 
 use base 'Mail::Message::Head';
 

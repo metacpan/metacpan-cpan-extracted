@@ -21,8 +21,10 @@ resources:
   bugtracker: https://github.com/plicease/Shell-Guess/issues
   homepage: https://metacpan.org/pod/Shell::Guess
   repository: git://github.com/plicease/Shell-Guess.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Buddy Burden (BAREFOOT)'
+  - 'Julien Fiegehenn (SIMBABQUE)'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

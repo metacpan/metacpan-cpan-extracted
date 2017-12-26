@@ -2,10 +2,11 @@ use strict;
 use warnings;
 
 use Test::More import => ['!pass'];
+use Test::NoWarnings;
 
 my @mobile_devices = qw(iPhone iPod iPad Android BlackBerry PalmOS);
 
-plan tests => scalar(@mobile_devices) + 1;
+plan tests => @mobile_devices + 3;
 
 {
     use Dancer;
@@ -19,22 +20,31 @@ plan tests => scalar(@mobile_devices) + 1;
 use Dancer::Test;
 
 for my $md (@mobile_devices) {
-    $ENV{HTTP_USER_AGENT} = $md; # for Dancer 1.x
-    my $resp = dancer_response GET => '/', 
-        undef, 
-        { HTTP_USER_AGENT => $md };  # for Dancer 2.x
+    $ENV{HTTP_USER_AGENT} = $md;
+    my $resp = dancer_response GET => '/'; 
 
     my $content = $resp->{content};
 
     is $content => 1, "agent $md is a mobile device";
 }
 
-$ENV{HTTP_USER_AGENT} = 'Mozilla';
-    my $resp = dancer_response GET => '/', 
-        undef, 
-        { HTTP_USER_AGENT => 'Mozilla' };  # for Dancer 2.x
 
-my $content = $resp->{content};
+subtest Mozilla => sub {
 
-is $content => 0, "Mozilla is not a mobile device";
+    $ENV{HTTP_USER_AGENT} = 'Mozilla';
+    my $resp = dancer_response GET => '/'; 
 
+    my $content = $resp->{content};
+
+    is $content => 0, "Mozilla is not a mobile device";
+};
+
+subtest 'no user agent at all' => sub {
+
+    delete $ENV{HTTP_USER_AGENT};
+    my $resp = dancer_response GET => '/'; 
+
+    my $content = $resp->{content};
+
+    is $content => 0, "nothing is not a mobile device";
+};

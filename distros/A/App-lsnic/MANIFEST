@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.pod
 bin/lsnic
 dist.ini
 lib/App/lsnic.pm

@@ -1,12 +1,10 @@
+Build.PL
 Changes
+lib/List/Categorize/Multi.pm
 LICENSE
 MANIFEST
+META.json
 META.yml
-Build.PL
 README
-lib/List/Categorize/Multi.pm
-t/00-load.t
 t/categorize-multi.t
 t/categorize.t
-t/pod.t
-META.json

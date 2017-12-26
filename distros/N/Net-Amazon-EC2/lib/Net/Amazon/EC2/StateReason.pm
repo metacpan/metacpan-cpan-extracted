@@ -25,8 +25,8 @@ A message providing additional information about the state.
 
 =cut
 
-has 'code'		=> ( is => 'ro', isa => 'Int|Str' );
-has 'message' 	=> ( is => 'ro', isa => 'Str' );
+has 'code'		=> ( is => 'ro', isa => 'Maybe[Int|Str]' );
+has 'message' 	=> ( is => 'ro', isa => 'Maybe[Str]' );
 
 __PACKAGE__->meta->make_immutable();
 

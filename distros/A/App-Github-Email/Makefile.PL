@@ -2,32 +2,36 @@
 use strict;
 use warnings;
 
-use 5.008;
+
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Search and print related Github user emails.",
+  "ABSTRACT" => "Search and print particular Github user emails.",
   "AUTHOR" => "faraco <skelic3\@gmail.com>",
+  "BUILD_REQUIRES" => {
+    "Module::Build" => "0.28"
+  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "Module::Build" => "0.28"
   },
   "DISTNAME" => "App-Github-Email",
-  "EXE_FILES" => [
-    "bin/github-email"
-  ],
-  "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "LICENSE" => "gpl",
   "NAME" => "App::Github::Email",
   "PREREQ_PM" => {
-    "Email::Address" => "1.908",
-    "Getopt::Long" => "2.49.1",
-    "LWP::UserAgent" => "6.07",
-    "List::MoreUtils" => "0.416",
-    "Modern::Perl" => "1.20170117",
-    "Test::More" => "1.302075"
+    "Email::Address" => 0,
+    "LWP::Online" => 0,
+    "LWP::UserAgent" => 0,
+    "List::MoreUtils" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.0.7",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "lib" => 0
+  },
+  "VERSION" => "0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,12 +39,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Email::Address" => "1.908",
-  "Getopt::Long" => "2.49.1",
-  "LWP::UserAgent" => "6.07",
-  "List::MoreUtils" => "0.416",
-  "Modern::Perl" => "1.20170117",
-  "Test::More" => "1.302075"
+  "Email::Address" => 0,
+  "LWP::Online" => 0,
+  "LWP::UserAgent" => 0,
+  "List::MoreUtils" => 0,
+  "Module::Build" => "0.28",
+  "Test::More" => 0,
+  "lib" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

@@ -1,5 +1,8 @@
 Revision history for Games-ABC_Path-Solver
 
+0.4.1   2017-12-24
+        - Move repo to GitHub.
+
 0.4.0   2014-03-06
         - Add the --gen-v1-template flag to generate a skeleton file.
 

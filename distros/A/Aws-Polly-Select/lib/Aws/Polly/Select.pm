@@ -13,7 +13,7 @@ use Data::Table::Text qw(:all);
 use Data::Dump qw(dump);
 use utf8;
 
-our $VERSION = '20171129';
+our $VERSION = '20171217';
 
 BEGIN
  {my @fields = qw(Gender Id LanguageCode LanguageName Name Written Country);    # Field names
@@ -59,7 +59,7 @@ sub speaker(@)                                                                  
       my $r = $selection{$field};                                               # Regular expression to match
       my $v = $speaker->{$field};                                               # Value of this field for this speaker
       confess "No such field: $field" unless $v;
-      $m = $v =~ m/$r/i;                                                        # Case insensitive
+      $m = $v =~ m/$r/;                                                         # Case insensitive
      }
     push @s, $speaker if $m;                                                    # Exclude potential speaker unless they match all valid fields
    }
@@ -78,6 +78,15 @@ sub speakerDetails
     ($_->Written) = split /-/, $_->LanguageCode;                                # Add written code
    }
   $s
+ }
+
+#-------------------------------------------------------------------------------
+# Speaker ids as a hash
+#-------------------------------------------------------------------------------
+
+sub speakerIds
+ {my $s = speakerDetails;
+   +{map{$_->Id => $_} @$s}
  }
 
 #-------------------------------------------------------------------------------
@@ -537,6 +546,27 @@ from each speaker defintion returned by L<select|/select>.
 
   ok $speaker->LanguageCode eq q(es-US);
 
+=head2 speakerIds()
+
+Use speakerIds() to get a hash of speaker details by speaker id:
+
+  my $speaker = Aws::Polly::Select::speakerIds->{Vicki};
+
+  is_deeply $speaker,
+   {Gender       => "Female",
+    Id           => "Vicki",
+    LanguageCode => "de-DE",
+    LanguageName => "German",
+    Name         => "Vicki",
+    Written      => "de",
+   };
+
+Each of the fields describing a speaker may be accessed as a method, for example:
+
+  ok $speaker->Gender       eq "Female";
+  ok $speaker->LanguageName eq "German";
+  ok $speaker->Written      eq "de";
+
 =head1 Installation
 
 Standard Module::Build process for building and installing modules:
@@ -562,7 +592,7 @@ under the same terms as Perl itself.
 =cut
 
 __DATA__
-use Test::More tests=>10;
+use Test::More tests=>14;
 
 my @gender = Aws::Polly::Select::Gender;
 is_deeply [@gender], [qw(Female Male)], "Gender";
@@ -662,4 +692,20 @@ if (1)
     LanguageName=>qr(Spanish)i;
 
   ok $speaker->Id eq q(Penelope);
+ }
+
+is_deeply speakerIds->{Vicki},
+  {Gender       => "Female",
+    Id           => "Vicki",
+    LanguageCode => "de-DE",
+    LanguageName => "German",
+    Name         => "Vicki",
+    Written      => "de",
+   };
+
+if (1)
+ {my $speaker  = speakerIds->{Vicki};
+  ok $speaker->Gender       eq "Female";
+  ok $speaker->LanguageName eq "German";
+  ok $speaker->Written      eq "de";
  }

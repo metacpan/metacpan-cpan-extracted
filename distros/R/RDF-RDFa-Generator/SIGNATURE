@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,54 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 e6112986cc8521b84aa7c8657ea9264101a85ea1 COPYRIGHT
-SHA1 2f6225364f4c93e686a8bece0bae8b2a32f1be68 Changes
-SHA1 58e47fed556f626572681c48158a3ecd44ce179d HACKING
-SHA1 0ac1a8d3fa9c1050df6e720dec09f8acea8bb0ea LICENSE
-SHA1 3d4c1c7144a6f3796a094ee155b855c3074eb93e MANIFEST
-SHA1 e666a13b2e8b66884ed09ab6cf88664ab79db899 META.yml
-SHA1 e43588806edb861623f266122d112f5329ef8821 Makefile.PL
-SHA1 3bb505bd93d2cf1af2833b8d8ca2abb910ee4a18 README
+SHA1 482b4a619b1ce081d38edefdae176828e235188e COPYRIGHT
+SHA1 50ff1164ce6a80b19cf718197559e6fec454b9b1 CREDITS
+SHA1 706b22d8cffcab2cd9d8f3be660846d3e57c9809 Changes
+SHA1 4ff8b9c58bb0c75deffb5f515f261e1c89169987 INSTALL
+SHA1 1afd04fac8d7ac4c1394adc84336667e82af1717 LICENSE
+SHA1 0f9f590cb7eddcbd7c5b62b6429cfcec87b92246 MANIFEST
+SHA1 8353e5e6bcd1bc0890d891a49d2b75a7cb176259 META.json
+SHA1 081c32e2a5a2eeb65bb6a9996c07bbd0ae8366ee META.yml
+SHA1 5474817c510ff11f63fedd53e71824d65330d563 Makefile.PL
+SHA1 c00346de257677198de3383e44c9773b22ff219e README
+SHA1 08a1e3c2c2769ad601948aa5e350492e25ea2fb5 README.pod
 SHA1 7c3202fe551655d70b690f389f10a348b614294a TODO
+SHA1 08212f2a6e388e70dcc89e35c5a2862a142efd6c dist.ini
+SHA1 6ddebf028e2a85fdc401b59f028a41b641ee32de doap.ttl
 SHA1 c7aee86ed37f40b6ef6122ad21114e2cdac427f8 examples/example1-out.html
 SHA1 1e494669f72f4cd350c2aec64901989643320234 examples/example1.css
 SHA1 49e255ea736380898d62fd73b5f62037b1eb50ff examples/example1.pl
-SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
-SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
-SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
-SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
-SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
-SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
-SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
-SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
-SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
-SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
-SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
-SHA1 9de7b5129351499c048328dfa718d0eab557cf30 inc/Module/Install/TrustMetaYml.pm
-SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
-SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
-SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
-SHA1 c18deb3025b83dda8ac7c97f1e29599e1d2c7378 inc/Module/Package/Dist/RDF.pm
-SHA1 0e0eed2e69d9583081868cf4f220068d0a018568 inc/Scalar/Util.pm
-SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
-SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
-SHA1 36df501c7c9b73c282c5174ed54d8283b2f2cbf2 inc/utf8.pm
-SHA1 bcec8aa5dfa451d7e8f8434c05e793c55d2ef57a lib/RDF/RDFa/Generator.pm
-SHA1 4ac431b9f58934422a1919e6782f0bd0c62b7cb1 lib/RDF/RDFa/Generator/HTML/Head.pm
-SHA1 f240b2700544d7d4acf8d10bfecdc8bf1c42aa20 lib/RDF/RDFa/Generator/HTML/Hidden.pm
-SHA1 219e22467a5923a8c08e82fc93d2a5c9b151da10 lib/RDF/RDFa/Generator/HTML/Pretty.pm
-SHA1 478dd26f80bd5988950f7d1db5c2367d4ec141b1 lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
-SHA1 3f0dcb3ac7451841a6b2e8fd631f4cbdcac7e147 meta/changes.pret
-SHA1 314ea41ba15f09a63387e497ed372f68460d2448 meta/doap.pret
-SHA1 35a20fd4c81bf7aa5be82e2941c31f67644b4729 meta/makefile.pret
+SHA1 08a1e3c2c2769ad601948aa5e350492e25ea2fb5 lib/RDF/RDFa/Generator.pm
+SHA1 80b15057cbc8ac31cd5d7d3dbf78896b1977eda9 lib/RDF/RDFa/Generator/HTML/Head.pm
+SHA1 3701946dc46ae6f92f96f7a497b6a8c0f6e7b3a6 lib/RDF/RDFa/Generator/HTML/Hidden.pm
+SHA1 d20b3d47ef9312d6be884eccbe733b4573ae9d85 lib/RDF/RDFa/Generator/HTML/Pretty.pm
+SHA1 7d773fab4a2fb673236e043bdb8947ddaecf6824 lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
 SHA1 b01bb61e52c0bb2c07305304677e11993daf8a9e t/01basic.t
 SHA1 47372671246d38f6374fa052faeac9278b7176c0 t/02_kk_namespaces.t
+SHA1 9548cf767c4b91ed6d22ef876d00ff4d4534865a t/02_kk_trine.t
+SHA1 5e2e9fdaec34f2e9cc698333e76aa838f72ef5bb t/03_kk_attean.t
+SHA1 955084ab7ff814d0bf0b7adcae676aca5d975cd4 t/uninit_lang_warning.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
 
-iEYEARECAAYFAlDIsTsACgkQzr+BKGoqfTkW4QCguC1rcDU4GUfsToDTAoWjNL8F
-EHkAoKWJh8XKN7/bmp1jxmBn3I9bLuEx
-=bote
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlo89w0ACgkQf77o3zqe
+SqU8lQ/+KEnpmjlUGobxv6lF3NsIzps8wh2zzSAwZYhd1WOBXeCiJegZ6iVeYFta
+O/aky806axKFBr5RjTJ/lvsbWTK/SQe7d8VVNIP+UzQJChQpmWXHkKxg0QoBBps8
+zbeEW8erhFc5ZIBTEwa0q/PdU/SKpRDE9WrhpPCQgIw8Hrio8qRWdYbJYPQr+UXB
+DzoNipwRgLAcv2PDUfhzVrdxywS4xj/vpM6VY2fmVH0W8fcgVfnHvQFgbLTzVRQY
+nP2IdMdBEQBf+yMZCM7Vw1qmzc4+HKLR5qKKAGEEfWPUa9TeQmBn7h/d31AfRzeY
+HoriG+VWdH+ca/X+RDYeCeW036Ara4JYbAMPGiuqXCMJWFVT2/B4kjTPJQHJe8Gn
+Y8LBMZEoAG4PbGO+mf9aeQn4/A8quBuaHpZw/xY9Xz+nuE7Isu11UePxbVWyJqRj
+8mgTMNKrS57QKkHNTOBvOfhTplvQ++8dHd24KHLLbrjZLX8lnDx9YObSkNkupK2C
+hiVppk0HXq3dQ8lzg/7J0S7jFrEvqSONda+WJqJiHNuprrJYLpHJhWSilajjkAay
+pkH+RorL9i8EHpEXWnusU6f7TSrDFaifX2T84drIVCOyt+M0XahBBZr7jQAZqNGi
+GMdpBDAU1jWCWjfKoDMzfAs+7aPRpJC0FJdIKNd3AbYZc/Umv7I=
+=XIyX
 -----END PGP SIGNATURE-----

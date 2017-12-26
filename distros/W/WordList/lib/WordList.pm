@@ -1,14 +1,16 @@
 package WordList;
 
-our $DATE = '2016-01-12'; # DATE
-our $VERSION = '0.1.1'; # VERSION
+our $DATE = '2017-12-24'; # DATE
+our $VERSION = '0.1.2'; # VERSION
 
 use strict 'subs', 'vars';
 
 sub new {
     my $class = shift;
+    my $fh = \*{"$class\::DATA"};
+    binmode $fh, "encoding(utf8)";
     unless (defined ${"$class\::DATA_POS"}) {
-        ${"$class\::DATA_POS"} = tell *{"$class\::DATA"};
+        ${"$class\::DATA_POS"} = tell $fh;
     }
     bless [], $class;
 }
@@ -104,8 +106,6 @@ sub all_words {
 1;
 # ABSTRACT: Word lists
 
-
-
 __END__
 
 =pod
@@ -118,7 +118,7 @@ WordList - Word lists
 
 =head1 VERSION
 
-This document describes version 0.1.1 of WordList (from Perl distribution WordList), released on 2016-01-12.
+This document describes version 0.1.2 of WordList (from Perl distribution WordList), released on 2017-12-24.
 
 =head1 SYNOPSIS
 
@@ -134,8 +134,9 @@ modules.
 
 C<WordList> is an alternative interface for L<Games::Word::Wordlist> and
 C<Games::Word::Wordlist::*>. Its main difference is: C<WordList::*> modules are
-designed to have low startup overhead. This makes it more suitable for use in
-CLI scripts which often only want to pick a word from one or several lists.
+read-only/immutable and designed to have low startup overhead. This makes it
+more suitable for use in CLI scripts which often only want to pick a word from
+one or several lists.
 
 Words (or phrases) must be put in __DATA__ section, *sorted*, one per line. By
 putting it in the __DATA__ section, perl doesn't have to parse the list. To
@@ -156,7 +157,7 @@ Because obviously word lists are not only useful for games.
 
 =item * Interface is simpler
 
-The methods provided are just:
+This is partly due to the list being read-only. The methods provided are just:
 
 - C<pick> (pick one or several random entries)
 
@@ -190,14 +191,14 @@ Pick $n words matching regex $re.
 
 =head2 new()
 
-Constructor
+Constructor.
 
 =head2 $wl->each_word($code)
 
 Call C<$code> for each word in the list. The code will receive the word as its
 first argument.
 
-=head2 pick($n = 1) => list
+=head2 $wl->pick($n = 1) => list
 
 Pick C<$n> (default: 1) random words from the list. If there are less then C<$n>
 words in the list, only that many will be returned.
@@ -206,7 +207,7 @@ The algorithm used is from perlfaq ("perldoc -q "random line""), which scans the
 whole list once. The algorithm is for returning a single entry and is modified
 to support returning multiple entries.
 
-=head2 word_exists($word) => bool
+=head2 $wl->word_exists($word) => bool
 
 Check whether C<$word> is in the list.
 
@@ -215,12 +216,6 @@ Algorithm is binary search (NOTE: not yet implemented, currently linear search).
 =head2 $wl->all_words() => list
 
 Return all the words in a list.
-
-=head1 SEE ALSO
-
-L<Bencher::Scenario::GamesWordlistModules>
-
-L<Bencher::Scenario::WordListModules>
 
 =head1 HOMEPAGE
 
@@ -238,16 +233,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Bencher::Scenario::GamesWordlistModules>
+
+L<Bencher::Scenario::WordListModules>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

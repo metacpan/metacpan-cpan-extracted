@@ -9,12 +9,11 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
 configure_requires:
   Devel::CheckLib: '0.9'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +22,7 @@ name: Math-GMP
 provides:
   Math::GMP:
     file: lib/Math/GMP.pm
-    version: '2.15'
+    version: '2.16'
 requires:
   AutoLoader: '0'
   Carp: '0'
@@ -37,4 +36,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP
   repository: https://github.com/turnstep/perl-Math-GMP.git
-version: '2.15'
+version: '2.16'
+x_serialization_backend: 'YAML::Tiny version 1.70'

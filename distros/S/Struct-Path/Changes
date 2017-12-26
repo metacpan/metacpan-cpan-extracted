@@ -1,5 +1,10 @@
 Revision history for Struct-Path
 
+0.80    2017-12-22
+        hash definition format changed, exported subs renamed to avoid ambigouseness
+        path() now works with scalars as is (ref not required)
+        both changes are breaking back compatibility, sorry
+
 0.74    2017-11-20
         entire thing replacement fixed in spath()
 

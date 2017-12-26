@@ -70,7 +70,7 @@ use Net::Amazon::EC2::InstanceStatuses;
 use Net::Amazon::EC2::SystemStatus;
 use Net::Amazon::EC2::NetworkInterfaceSet;
 
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 =head1 NAME
 
@@ -1890,7 +1890,7 @@ sub describe_images {
 			my $state_reason;
 			my $block_device_mappings;
 			
-			if ( grep { defined && length } $item->{stateReason} ) {
+			if ( grep { defined && length && $_->{code} && $_->{message} } $item->{stateReason} ) {
 				$state_reason = Net::Amazon::EC2::StateReason->new(
 					code	=> $item->{stateReason}{code},
 					message	=> $item->{stateReason}{message},
@@ -2091,7 +2091,7 @@ sub describe_instances {
 					}
 				}
 
-				if ( grep { defined && length } $instance_elem->{stateReason} ) {
+				if ( grep { defined && length && $_->{code} && $_->{message} && $_->{code} && $_->{message} } $instance_elem->{stateReason} ) {
 					$state_reason = Net::Amazon::EC2::StateReason->new(
 						code	=> $instance_elem->{stateReason}{code},
 						message	=> $instance_elem->{stateReason}{message},
@@ -4578,7 +4578,7 @@ sub run_instances {
 				$instance_elem->{dnsName} = undef;
 			}
 
-			if ( grep { defined && length } $instance_elem->{stateReason} ) {
+			if ( grep { defined && length && $_->{code} && $_->{message} } $instance_elem->{stateReason} ) {
 				$state_reason = Net::Amazon::EC2::StateReason->new(
 					code	=> $instance_elem->{stateReason}{code},
 					message	=> $instance_elem->{stateReason}{message},

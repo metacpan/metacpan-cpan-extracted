@@ -2,6 +2,8 @@ package Test::Roo::DataDriven;
 
 # ABSTRACT: simple data-driven tests with Test::Roo
 
+# RECOMMEND PREREQ: App::Prove
+
 use v5.10.1;
 
 use Test::Roo::Role;
@@ -16,7 +18,7 @@ use namespace::autoclean;
 
 requires 'run_tests';
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 
 
 sub _build_data_files {
@@ -24,10 +26,20 @@ sub _build_data_files {
 
     my $match = $args->{match} // qr/\.dat$/;
 
-    my @paths = map { path($_) }
-      is_arrayref( $args->{files} ) ? @{ $args->{files} } : ( $args->{files} );
-
+    my @paths;
     my @files;
+
+    my $argv = $args->{argv} // 1;
+    if ( $argv && @ARGV ) {
+        @paths = map { path($_) } @ARGV;
+    }
+    else {
+        @paths =
+          map { path($_) }
+          is_arrayref( $args->{files} )
+          ? @{ $args->{files} }
+          : ( $args->{files} );
+    }
 
     foreach my $path (@paths) {
 
@@ -150,7 +162,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -274,6 +286,22 @@ See the L</parse_data_file> method.
 
 Added in v0.2.0.
 
+=item C<argv>
+
+If any arguments are passed on the command line, then they are assumed
+to be directories are test files. Those will be tested instead of the
+L</files> parameter.
+
+This allows you to run tests on specific data files or directories.
+
+For example,
+
+  prove -lv t/01-example.t :: t/data/002-another.dat
+
+This is enabled by default, but requires L<App::Prove>.
+
+Added in v0.2.3.
+
 =back
 
 =head2 C<parse_data_file>
@@ -362,9 +390,19 @@ unloaded.
 
 =head1 KNOWN ISSUES
 
+See also L</BUGS> below.
+
+=head2 Support for older Perl versions
+
+This module requires Perl v5.10.1 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+L</SOURCE>.
+
 =head2 Skipping test cases
 
-Skipping a test case in your test class, e.g.
+Skipping a test case in your test class as per L<Test::Roo::Cookbook>,
+e.g.
 
   sub BUILD {
     my ($self) = @_;
@@ -377,14 +415,23 @@ Skipping a test case in your test class, e.g.
 
 will stop all remaining tests from running.
 
+Instead, skip tests before the setup:
+
+    before setup => sub {
+      my ($self) = @_;
+
+      ...
+
+      plan skip_all => "Cannot test" if $some_condition;
+
+    };
+
 =head2 Prerequisite Scanners
 
 Prerequisite scanners used for build tools may not recognise modules
 used in the L</Data Files>.  To work around this, use the modules as
 well in the test class or explicitly add them to the distribution's
 metadata.
-
-See L</BUGS> below.
 
 =for readme continue
 

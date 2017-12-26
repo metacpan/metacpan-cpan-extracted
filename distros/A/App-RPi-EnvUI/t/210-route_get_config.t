@@ -28,7 +28,7 @@ my $test = Plack::Test->create(App::RPi::EnvUI->to_app);
     );
 
     my @values = qw(
-        15 3 4 -1 0 America/Edmonton
+        15 3 4 -1 0 America/Vancouver
     );
 
     is @directives, @values, "test configuration ok";
@@ -45,6 +45,7 @@ my $test = Plack::Test->create(App::RPi::EnvUI->to_app);
 
 #db_remove();
 unset_testing();
+unconfig();
 db_remove();
 done_testing();
 

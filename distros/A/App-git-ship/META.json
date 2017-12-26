@@ -3,7 +3,7 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -50,22 +50,16 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_dynamic_config" : 0,
-      "X_metaspec" : {
-         "version" : 2
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/app-git-ship/issues"
       },
-      "X_resources" : {
-         "bugtracker" : {
-            "web" : "https://github.com/jhthorsen/app-git-ship/issues"
-         },
-         "homepage" : "https://github.com/jhthorsen/app-git-ship",
-         "repository" : {
-            "type" : "git",
-            "url" : "https://github.com/jhthorsen/app-git-ship.git",
-            "web" : "https://github.com/jhthorsen/app-git-ship"
-         }
+      "homepage" : "https://github.com/jhthorsen/app-git-ship",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/app-git-ship.git",
+         "web" : "https://github.com/jhthorsen/app-git-ship"
       }
    },
-   "version" : "0.25",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

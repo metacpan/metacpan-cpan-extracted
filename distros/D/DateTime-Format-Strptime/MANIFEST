@@ -116,6 +116,9 @@ xt/author/locale-ca-ES.t
 xt/author/locale-ca-FR.t
 xt/author/locale-ca-IT.t
 xt/author/locale-ca.t
+xt/author/locale-ccp-BD.t
+xt/author/locale-ccp-IN.t
+xt/author/locale-ccp.t
 xt/author/locale-ce-RU.t
 xt/author/locale-ce.t
 xt/author/locale-cgg-UG.t
@@ -619,6 +622,8 @@ xt/author/locale-saq-KE.t
 xt/author/locale-saq.t
 xt/author/locale-sbp-TZ.t
 xt/author/locale-sbp.t
+xt/author/locale-sd-PK.t
+xt/author/locale-sd.t
 xt/author/locale-se-FI.t
 xt/author/locale-se-NO.t
 xt/author/locale-se-SE.t
@@ -683,6 +688,8 @@ xt/author/locale-te.t
 xt/author/locale-teo-KE.t
 xt/author/locale-teo-UG.t
 xt/author/locale-teo.t
+xt/author/locale-tg-TJ.t
+xt/author/locale-tg.t
 xt/author/locale-th-TH.t
 xt/author/locale-th.t
 xt/author/locale-ti-ER.t
@@ -695,6 +702,8 @@ xt/author/locale-to.t
 xt/author/locale-tr-CY.t
 xt/author/locale-tr-TR.t
 xt/author/locale-tr.t
+xt/author/locale-tt-RU.t
+xt/author/locale-tt.t
 xt/author/locale-twq-NE.t
 xt/author/locale-twq.t
 xt/author/locale-tzm-MA.t
@@ -726,6 +735,8 @@ xt/author/locale-vun-TZ.t
 xt/author/locale-vun.t
 xt/author/locale-wae-CH.t
 xt/author/locale-wae.t
+xt/author/locale-wo-SN.t
+xt/author/locale-wo.t
 xt/author/locale-xog-UG.t
 xt/author/locale-xog.t
 xt/author/locale-yav-CM.t
@@ -735,7 +746,10 @@ xt/author/locale-yi.t
 xt/author/locale-yo-BJ.t
 xt/author/locale-yo-NG.t
 xt/author/locale-yo.t
-xt/author/locale-yue-HK.t
+xt/author/locale-yue-Hans-CN.t
+xt/author/locale-yue-Hans.t
+xt/author/locale-yue-Hant-HK.t
+xt/author/locale-yue-Hant.t
 xt/author/locale-yue.t
 xt/author/locale-zgh-MA.t
 xt/author/locale-zgh.t

@@ -7,7 +7,7 @@ use Carp qw(confess);
 use Mock::Sub::Child;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 my %opts;
 
@@ -149,7 +149,9 @@ Mock::Sub - Mock package, object and standard subroutines, with unit testing in 
     eval { Package::foo(1); };
     like ($@, qr/eval catch/, "side_effect worked with params");
 
-    # extract the parameters the sub was called with
+    # extract the parameters the sub was called with (if return_value or
+    # side_effect is not used, we will return the parameters that were sent into
+    # the mocked sub (list or scalar context)
 
     my @args = $foo->called_with;
 
@@ -274,8 +276,11 @@ Instantiates and returns a new mock object on each call. 'sub' is the name of
 the subroutine to mock (requires full package name if the sub isn't in
 C<main::>).
 
-The mocked sub will return undef if a return value isn't set, or a side effect
-doesn't return anything.
+The mocked sub will return the parameters sent into the mocked sub if a return
+value isn't set, or a side effect doesn't return anything, if available. If
+in scalar context but a list was sent in, we'll return the first parameter in
+the list. In list context, we simply receive the parameters as they were sent
+in.
 
 Optional parameters:
 
@@ -372,9 +377,9 @@ the sub back to its original state.
 =head1 NOTES
 
 This module has a backwards parent-child relationship. To use, you create a
-mock object using L<PARENT MOCK OBJECT METHODS> C<new> and C<mock> methods,
-thereafter, you use the returned mocked sub object L<METHODS> to perform the
-work.
+mock object using L</MOCK OBJECT METHODS> C<new> and C<mock> methods,
+thereafter, you use the returned mocked sub object L</SUB OBJECT METHODS> to
+perform the work.
 
 The parent mock object retains certain information and statistics of the child
 mocked objects (and the subs themselves).

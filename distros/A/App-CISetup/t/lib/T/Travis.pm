@@ -9,10 +9,20 @@ use Test2::Plugin::NoWarnings;
 
 use App::CISetup::Travis::ConfigFile;
 use Cwd qw( abs_path );
+use File::Which qw( which );
 use Path::Tiny qw( tempdir );
 use YAML qw( DumpFile Load LoadFile );
 
 with 'R::Tester';
+
+sub test_setup {
+    my $self = shift;
+
+    my $method = $self->test_report->current_method->name;
+    return unless $method eq 'test_slack_notifications' && !which('travis');
+
+    $self->test_skip('Cannot test Slack support without Travis CLI tool');
+}
 
 sub test_create_and_update {
     my $self = shift;
@@ -132,11 +142,11 @@ sub test_force_threaded_perls {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.4 5.24.2 5.26.1 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
-                qr/^ +- \Q$t\E$/ms,
+                qr/^ +- '?\Q$t\E'?$/ms,
                 "created file includes Perl $t"
             );
         }
@@ -203,11 +213,11 @@ sub test_distro_has_xs {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.4 5.24.2 5.26.1 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
-                qr/^ +- \Q$t\E$/ms,
+                qr/^ +- '?\Q$t\E'?$/ms,
                 "created file includes Perl $t"
             );
         }

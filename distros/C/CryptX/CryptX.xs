@@ -74,6 +74,11 @@ typedef struct sosemanuk_struct {       /* used by Crypt::Stream::Sosemanuk */
   int id;
 } *Crypt__Stream__Sosemanuk;
 
+typedef struct rabbit_struct {          /* used by Crypt::Stream::Rabbit */
+  rabbit_state state;
+  int id;
+} *Crypt__Stream__Rabbit;
+
 typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
   rc4_state state;
   int id;
@@ -623,7 +628,7 @@ CryptX__bin_to_radix(SV *in, int radix)
         if (len == 0) XSRETURN_UNDEF;
 
         mp_init(&mpi);
-        if (mp_read_unsigned_bin(&mpi, in_data, len) == CRYPT_OK) {
+        if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
           mp_init_copy(&tmp, &mpi);
           while (mp_iszero(&tmp) == MP_NO) {
             mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
@@ -693,6 +698,7 @@ INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
 INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 INCLUDE: inc/CryptX_Stream_Sosemanuk.xs.inc
+INCLUDE: inc/CryptX_Stream_Rabbit.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc

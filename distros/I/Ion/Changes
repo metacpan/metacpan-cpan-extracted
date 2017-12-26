@@ -1,3 +1,9 @@
+0.06 2017-12-22
+-bugfix: correctly update peer host/port on newly a connected Ion::Conn
+-docs: fixed missing documentation for Ion::Conn methods host, port
+-cpanfile: add 'parent' for kwalitee
+-new feature: Connect also accepts single Coro::Handle argument
+
 0.05 2017-12-01
 -new feature: << and >> overloaded to add routines to process incoming and
  outgoing messages (along with assignment operator counterparts)

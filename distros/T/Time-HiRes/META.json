@@ -4,7 +4,7 @@
       "Jarkko Hietaniemi <jhi@iki.fi>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,15 +34,16 @@
          "requires" : {
             "Carp" : "0",
             "Config" : "0",
-            "DynaLoader" : "0",
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "0",
             "Test::More" : "0",
+            "XSLoader" : "0",
             "perl" : "5.006",
             "strict" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.9746"
+   "version" : "1.9750",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

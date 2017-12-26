@@ -3,7 +3,7 @@ package DateTime::Format::Strptime;
 use strict;
 use warnings;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use Carp qw( carp croak );
 use DateTime 1.00;
@@ -278,7 +278,7 @@ sub _build_parser {
         warn "Pattern after replacement substitution: $pattern\n";
     }
 
-    my $regex;
+    my $regex = q{};
     my @fields;
 
     while (
@@ -292,7 +292,7 @@ sub _build_parser {
             |
             ([^%]+)
                     /xg
-        ) {
+    ) {
         # Using \G in the regex match fails for some reason on Perl 5.8, so we
         # do this hack instead.
         substr( $pattern, 0, pos $pattern, q{} )
@@ -1047,7 +1047,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 =head1 VERSION
 
-version 1.74
+version 1.75
 
 =head1 SYNOPSIS
 

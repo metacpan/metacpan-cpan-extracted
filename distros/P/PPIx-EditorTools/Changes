@@ -1,5 +1,12 @@
 Revision history for PPIx-EditorTools
 
+0.21 2017-12-24
+  [ ENHANCEMENTS ]
+    - remove spurious dependencies. (GH#8, Kent Fredic)
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 110 insertions(+), 94 deletions(-)
+
 0.20 2017-10-22
   - POD fixes.
   - maintainership passes to Yanick.

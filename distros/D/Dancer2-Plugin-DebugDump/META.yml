@@ -1,8 +1,9 @@
 ---
-abstract: "Modifies debug behavior to create multi-line output that's easier for mere mortals to parse."
+abstract: "Modified debug behavior to create multi-line output that's easier for mere mortals to parse."
 author:
   - 'Steve Dondley <s@dondley.com>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -12,5 +13,14 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dancer2-Plugin-DebugDump
-version: '0.32'
+requires:
+  Dancer2: '0.200002'
+  Dancer2::Plugin: '0'
+  Data::Dumper: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/sdondley/Dancer2-Plugin-DebugDump/issues
+  repository: git://github.com/sdondley/Dancer2-Plugin-DebugDump.git
+version: '0.41'
 x_serialization_backend: 'YAML::Tiny version 1.70'

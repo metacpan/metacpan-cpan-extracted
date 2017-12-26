@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Atlassian::Confluence::RequestBuilder;
-$Footprintless::Plugin::Atlassian::Confluence::RequestBuilder::VERSION = '1.02';
+$Footprintless::Plugin::Atlassian::Confluence::RequestBuilder::VERSION = '1.03';
 # ABSTRACT: A request builder for the Atlassian Confluence REST API
 # PODNAME: Footprintless::Plugin::Atlassian::Confluence::RequestBuilder
 
@@ -112,7 +112,7 @@ Footprintless::Plugin::Atlassian::Confluence::RequestBuilder - A request builder
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

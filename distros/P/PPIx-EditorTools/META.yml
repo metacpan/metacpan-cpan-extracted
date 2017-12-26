@@ -7,22 +7,15 @@ author:
   - 'Gabor Szabo  <gabor@szabgab.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Class::Accessor: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Method::Signatures: '0'
-  Moose: '0'
-  MooseX::Declare: '0'
   Test::Differences: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Most: '0'
-  autodie: '0'
-  lib: '0'
-  version: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -35,34 +28,34 @@ name: PPIx-EditorTools
 provides:
   PPIx::EditorTools:
     file: lib/PPIx/EditorTools.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::FindUnmatchedBrace:
     file: lib/PPIx/EditorTools/FindUnmatchedBrace.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::FindVariableDeclaration:
     file: lib/PPIx/EditorTools/FindVariableDeclaration.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::IntroduceTemporaryVariable:
     file: lib/PPIx/EditorTools/IntroduceTemporaryVariable.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::Lexer:
     file: lib/PPIx/EditorTools/Lexer.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::Outline:
     file: lib/PPIx/EditorTools/Outline.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::RenamePackage:
     file: lib/PPIx/EditorTools/RenamePackage.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::RenamePackageFromPath:
     file: lib/PPIx/EditorTools/RenamePackageFromPath.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::RenameVariable:
     file: lib/PPIx/EditorTools/RenameVariable.pm
-    version: '0.20'
+    version: '0.21'
   PPIx::EditorTools::ReturnObject:
     file: lib/PPIx/EditorTools/ReturnObject.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   Carp: '0'
   Class::XSAccessor: '1.02'
@@ -79,11 +72,12 @@ resources:
   bugtracker: https://github.com/yanick/PPIx-EditorTools/issues
   homepage: https://github.com/yanick/PPIx-EditorTools
   repository: https://github.com/yanick/PPIx-EditorTools.git
-version: '0.20'
+version: '0.21'
 x_authority: cpan:YANICK
 x_contributors:
   - 'Adam Kennedy <adamk@cpan.org>'
   - 'Florian Schlichting <fschlich@zedat.fu-berlin.de>'
+  - 'Kent Fredric <kentnl@gentoo.org>'
   - 'Kevin Dawson <bowtie@cpan.org>'
   - 'Ryan Niebur <rsn@cpan.org>'
   - 'Sebastian Willing <sewi@cpan.org>'

@@ -3,33 +3,45 @@ abstract: 'make a Dancer app mobile-aware'
 author:
   - 'Dancer Core Developers'
 build_requires:
-  Dancer::Test: 0
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Module::Build: 0.3601
-  Test::More: 0
+  Dancer::Test: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dancer-Plugin-MobileDevice
 provides:
   Dancer::Plugin::MobileDevice:
     file: lib/Dancer/Plugin/MobileDevice.pm
-    version: 0.05
+    version: '0.06'
 requires:
-  Dancer: 0
-  Dancer::Plugin: 0
-  strict: 0
-  warnings: 0
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/PerlDancer/Dancer-Plugin-MobileDevice/issues
-  homepage: http://perldancer.org/
-  repository: https://github.com/PerlDancer/Dancer-Plugin-MobileDevice
-version: 0.05
+  homepage: https://github.com/PerlDancer/Dancer-Plugin-MobileDevice
+  repository: https://github.com/PerlDancer/Dancer-Plugin-MobileDevice.git
+version: '0.06'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Alberto Simoes <ambs@cpan.org>'
+  - 'Alexis Sukrieh <alexis@weborama.com>'
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+  - 'ambs <ambs@cpan.org>'
+  - 'David Precious <davidp@preshweb.co.uk>'
+  - 'franck cuny <franck@lumberjaph.net>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

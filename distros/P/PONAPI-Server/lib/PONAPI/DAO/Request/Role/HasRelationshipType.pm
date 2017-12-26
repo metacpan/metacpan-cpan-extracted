@@ -37,7 +37,7 @@ PONAPI::DAO::Request::Role::HasRelationshipType - DAO request role - `relationsh
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

@@ -31,7 +31,7 @@ use Util;
         vendor                   => 'PayPal',
     );
 
-    isa_ok( $payments, 'WebService::PayPal::PaymentsAdvanced', 'new object' );
+    isa_ok( $payments, 'WebService::PayPal::PaymentsAdvanced' );
 
     my $encoded = $payments->_pseudo_encode_args(
         { foo => 'xxx', bar => 'a space', baz => 'a +' } );

@@ -3,7 +3,7 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "1.30"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -34,6 +32,11 @@
          "requires" : {
             "Mojolicious" : "7.15"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.30"
+         }
       }
    },
    "release_status" : "stable",
@@ -43,9 +46,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/json-validator",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/json-validator.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/json-validator.git",
+         "web" : "https://github.com/jhthorsen/json-validator"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

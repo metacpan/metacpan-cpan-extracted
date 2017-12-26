@@ -143,7 +143,7 @@ EOF
     is $dates[0]->id, '* TODO normal date :tag: <2016-01-02 Sa>|2016-01-02 Sa'; # strange id formatting...
     is $dates[0]->formatted_text, 'normal date :tag: <2016-01-02 Sa>';
     is $dates[0]->date_of_date, "2016-01-02";
-    ok !length $dates[0]->time;
+    ok !defined $dates[0]->time || !length $dates[0]->time;
     ok $dates[0]->start_is_timeless;
     is $dates[0]->state, 'early';
     is $dates[0]->line, 1;
@@ -161,7 +161,7 @@ EOF
     is $dates[0]->id, '* TODO normal date :tag: <2016-01-02 Sa>|2016-01-02 Sa'; # strange id formatting...
     is $dates[0]->formatted_text, 'normal date :tag: <2016-01-02 Sa>';
     is $dates[0]->date_of_date, "2016-01-02";
-    ok !length $dates[0]->time;
+    ok !defined $dates[0]->time || !length $dates[0]->time;
     ok $dates[0]->start_is_timeless;
     is $dates[0]->state, 'wait';
     is $dates[0]->line, 1;
@@ -352,9 +352,9 @@ EOF
 	is $dates1[0]->epoch, 1451689200;
     }
     is $dates1[0]->date, '2016-01-02 Sa';
-    ok !length $dates1[0]->time;
+    ok !defined $dates1[0]->time || !length $dates1[0]->time;
     is $dates1[0]->date_end, '2016-01-03 So';
-    ok !length $dates1[0]->time_end;
+    ok !defined $dates1[0]->time_end || !length $dates1[0]->time_end;
 }
 
 { # slow emacs writes

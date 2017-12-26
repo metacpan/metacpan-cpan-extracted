@@ -14,39 +14,46 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 e3396fb4f36a19c6f2e65cc1bcbdec0afce28014 Changes
+SHA1 9fd1c98ff9aa0063ffc64a67e0da35135d3cf96d Changes
 SHA1 473ec146a5e02330aaf92b0d6595e3f41d9f7e73 INSTALL
 SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
-SHA1 28e40eea2b7528d56ce1bfb15f95a2e04802a1a9 MANIFEST
-SHA1 0960a44e8ea961a5ea71f4905ae4ed138b21bef8 META.json
-SHA1 f060af1b486109372bdac85ee3ad89e032d23e4b META.yml
-SHA1 65fe293f21d34ac710accf3bcfd4340e131f150f Makefile.PL
-SHA1 1d0e12df696e86cfbf3d90c67bdc42cde209e1eb README
-SHA1 4ccc78b0f6b6280ca8e9583579635bfbcaa8ea2f cpanfile
+SHA1 8ac3937e27a60ec0b813b017bab981f298566510 MANIFEST
+SHA1 c917d94428efd4aecd886a81a7a3fe4c66db144b META.json
+SHA1 45d0eb8311f5a700babff3584051681d3697f5c0 META.yml
+SHA1 ff63c929abead925ac25f56ca638fe21f8e4f115 Makefile.PL
+SHA1 b5efc940b5a6ee0fa8a1996c3d128bfde3bbbb9b README
+SHA1 68f33ad1076938cda35934bd9cb75711622ae37a cpanfile
 SHA1 1e728100fe12287af30217e27eff87d038e1e613 dist.ini
 SHA1 ee589cc31f37953e1cfc35c1471bd08831c830d7 examples/incr-ratelimit.pl
+SHA1 e1036069d92c3e62e149a3d0a75a551da5341f2a examples/job-benchmark.pl
+SHA1 aafe9ceb8db7692b26f92528593911ce58f09b7c examples/job-hash-submit.pl
+SHA1 afb043ca0a3b45fa4e2588b41cc7a3224bf60e84 examples/job-hash-worker.pl
 SHA1 9c82729709df420736f0b5a3a1c7e7152df00da0 examples/job-submit.pl
 SHA1 db6596b303eba1e8d48e3cab0908189d52e75030 examples/job-worker.pl
 SHA1 de7e4058cf94426b788dcc50030a2f7bdb350ee6 examples/multi.pl
-SHA1 c77b54e07d69c2f060d02819ea2a7305ea93cd02 examples/pub.pl
+SHA1 9d5736d0aadb055f9977a85f9faafef3605d0b90 examples/pub.pl
 SHA1 e27efffe5040927182d15d3ab64f808117ea76bd examples/redis-cli
 SHA1 2c96b39fc5fe341df826241141f2b63a37cb2a7a examples/sub.pl
 SHA1 10379fa8e9b3baebd823ad50859e58620c396d2a job-queue.pl
-SHA1 5def6a23f54f84fa6daa0a94b001339b45eaeccc lib/Net/Async/Redis.pm
-SHA1 5cf594a577b97b6c2a9096ed64bcfdae1b2fc5e0 lib/Net/Async/Redis.pod
-SHA1 45daa4f87bc5cd861732ffbf9694080f1e29d3d4 lib/Net/Async/Redis/Commands.pm
-SHA1 3ef8733199bf658210b900043ae9ca5b14c93058 lib/Net/Async/Redis/Multi.pm
-SHA1 5be48623593932188033975e0703ceb794351154 lib/Net/Async/Redis/Protocol.pm
-SHA1 a35f93743997a1e7209329d3323b0e3c2d17ad6b lib/Net/Async/Redis/Subscription.pm
-SHA1 6cb2d0f3b6f50012fd2298bdd048c4ce036510ec lib/Net/Async/Redis/Subscription/Message.pm
-SHA1 91a6c0e9c42bb35694b8bc91824c2b9da914547f script/generate-perl-for-commands.pl
+SHA1 6ff29702b2a2406679d2db2a52436ac083407a50 lib/Net/Async/Redis.pm
+SHA1 3b9bda4aebe6581b1c33db8c0d449afa698eb811 lib/Net/Async/Redis/Commands.pm
+SHA1 d4916a20c439b15a8c23c6bb3a22693dd769219e lib/Net/Async/Redis/Multi.pm
+SHA1 afe539498404c6be280a99d038a1b999004d91e9 lib/Net/Async/Redis/Protocol.pm
+SHA1 d1b4605590e0d053d6ec682181d73c38d2359bfe lib/Net/Async/Redis/Server.pm
+SHA1 62354a1ae5a2f7a23c2d5d5f6fada29337681882 lib/Net/Async/Redis/Server/Connection.pm
+SHA1 026f6de27893571cd813e6c8a4e03ed8539fb432 lib/Net/Async/Redis/Server/Database.pm
+SHA1 7afb8e94f047c58251055755dabb17c8256320b3 lib/Net/Async/Redis/Subscription.pm
+SHA1 e53517cacca42f7734598d1c9907b16228fd503a lib/Net/Async/Redis/Subscription/Message.pm
+SHA1 3d1a364c8abc0d17da8511686bdd23d580febb4c script/generate-perl-for-commands.pl
 SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
-SHA1 21d8040e6ac2fbe0071f566f801dbd4a0bf22b38 t/00-compile.t
-SHA1 8b3d4a9c24412e869b15a861cf0c7aeeabf2e0de t/00-report-prereqs.dd
+SHA1 e86bad54e4e31c78ee4173096de5bc2f7cc2443e t/00-compile.t
+SHA1 ec9fb26af67215f37b6d45b12443e84fb8e13fa0 t/00-report-prereqs.dd
 SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
-SHA1 a34c03a10424bffb76edab71352ce14c8e7835ad t/basic.t
-SHA1 cccdbe67d41655dde48fd2bb5423ffe8b6152ffc t/protocol.t
-SHA1 987a1b11df6f007a1f737bacf9f44a8e036f77f4 t/psubscribe.t
+SHA1 ddbac8dc25377d6d80ec73718a91bc3ed3585bf1 t/basic.t
+SHA1 4b2f526faec20c2d7edcae4287fac56ce8280612 t/multi.t
+SHA1 489ec2ec164b14489349fadae2afbe434b487c62 t/protocol.t
+SHA1 bae4c35e2f4952976eaeeb2746125fef898bc148 t/psubscribe.t
+SHA1 6c8b00401982308bd98c01676e6364277964a755 t/pubsub.t
 SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
 SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
 SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
@@ -54,17 +61,17 @@ SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJaLa/7AAoJEG2WkcbynxAl5vgQAMaIMJW0MjP+c87FjRvJTgYU
-3kFL+8y2iWjJsvcVhrmWjGsGz591Wj2FiLtZ7sB6TgC3PzUaiNbMphuLjeKHGg4a
-N/70PEX8jzI7NiKMQq81LM7NB5YMtqADSiN7Awd8yJ4NAlVGM5vFIASyKxyt1Rv6
-Q0nY3iedkQhjEbRBRAfFkL1v2td7Krn7gav4BlDCaG9V1V10JpPD1YvnefKsTj2m
-aJIKmqCNtEdJz82aw+2rM0AGAI3vBxHZJFk3EbA4OmP5JXhTNOdM35iF1GiSbExS
-nM3GRpLQ+Mt1k9KTkhSSdwYZpNUKMw0BuoFmY/nx+2ZLYFN9KjGfXVZrY81mplW8
-4Ghu79qG0Rbot9HD1ATrNFqmn3dYI5PIckLmbOoQ7PScXJlJZNykafQmr0v2j9Q3
-8zn4Q+rfZJnoYjaXL//4Kq1DXZlRktbCf/GqlE3E4TJh1P0//WIgvkUKJra7gYI7
-9y7NBLJKaE5R9wZSlq3XlzHvxsjMZxQT7fSzGjeOuj+TWyYcj+Y4x9X4Jaugfvk+
-4httejhDyUY27jeV1dhTtlqHKPJVMNpp8Zl2yYbkWBpEe/1EoNKCq0PBk4ogacOh
-o7OdOCQv2qS3D6v2g7ZCY0bXl+jK+jjH3aW73DvUSpp+qxL+vN+KIXj55mT/B7Fy
-Jxx7cDiTv+H5SKrcrz8j
-=x4UV
+iQIcBAEBAgAGBQJaQh3HAAoJEG2WkcbynxAlst0QAJzMfsNHuiLxlFMAqbCh2e+G
+ypS1HrBYqupQ+lfzrWbOwxoxr7dGHR3E26+T+wJ0liAoDsNfrXACXz7ZEREHAzN7
+QFbdUCCKkcUbOJ7fTcjQQ4knHSLfH1WUXixtH1taG0/YwO0UYF5KbZL7J9k7lwKx
+ZwVTiM1gSNrFE+jeH8N3j7uZvAL5QF7WXMb4YiVKJGCg47PJwNXduWR8bViZrxap
+q1/tKsQMCzbaYxGeJw9Qd/TqXJaHzArimEm4pFBPRUxlY9cjvbd3SsLiXOWb+QOC
+yo0PvbiAhky8itVne6ML/u4nhuJymJF4RZfZsDg2K+xfnvBTG88gKGh1Bn0BlsC4
+LLiGE3lDfevOZfn1o+7/mtwfcxQFKrp8XCUaRQZcwu6iFma6QomWpGaNGgamDyfb
+Jj+FTJmAExMi4WTK1AQx7hDIcdIg2hqibJFP7e0FnXveit2JSm/5Ub2mKWhATVbg
+9u5Mut72sAKUyf7QkRqTaUQnWC/B+qsTlGl2aiWDbIrSlaF8FiLEJFa86htnOqoF
+zu2p4LEPUd0m8aOEwFgZJwvpFVhfaPVYCH7a8nptipisEgp0WmNsULKKUn/RrcXq
+VsH5vOahZbXgAM6Pmlocoy6XZe0PqhvtxcshODRQ5jcrOaxX8N+9xmniD/TEo/fU
+NGchXsMmc+O6xyqvnwCG
+=Ew8j
 -----END PGP SIGNATURE-----

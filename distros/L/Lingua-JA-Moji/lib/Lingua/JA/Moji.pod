@@ -17,8 +17,8 @@ Convert various types of Japanese characters into one another.
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.47
-corresponding to git commit L<dd0d3ba9ecbafa4492248c27b984b07d6573565b|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/dd0d3ba9ecbafa4492248c27b984b07d6573565b> made on Wed Nov 1 13:04:35 2017 +0900.
+This document describes Lingua::JA::Moji version 0.48
+corresponding to git commit L<2b735cdf07ab42c23dda568c12efb95bcf0a78c4|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/2b735cdf07ab42c23dda568c12efb95bcf0a78c4> made on Sun Dec 24 18:06:09 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -1265,6 +1265,20 @@ exists, otherwise do nothing with it.
 
 
 
+
+
+=head1 CYRILLIZATION
+
+This is an experimental cyrillization of kana based on the information
+in a Wikipedia article,
+L<http://en.wikipedia.org/wiki/Cyrillization_of_Japanese>. The module
+author does not know anything about cyrillization of kana, so any
+assistance in correcting this is very welcome.
+
+
+
+
+
 =head2 kana2cyrillic 
 
 Convert kana to the Cyrillic (Russian) alphabet.
@@ -1522,6 +1536,11 @@ generate this data.
 
 0.46 disallowed hyphens as the first character of a romaji string and
 added L</smallize_kana> and L</cleanup_kana>.
+
+0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and changed romanisation somewhat.
+
+0.48 changed kana2romaji to be consistent with the documentation for
+long vowel options wapuro and none.
 
 
 

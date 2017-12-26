@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Test-Compile
 
+2.058     2017-12-20 01:15:23Z
+  - skip testing a script if -T is seen on the shebang line and $PERL5LIB is
+    set (which will not be visible in taint mode)
+
 2.057     2017-08-20 00:55:40Z
   - load optional modules in generated test in such a way that
     Perl::PrereqScanner doesn't think they are required dependencies

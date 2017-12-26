@@ -3,6 +3,7 @@ CHANGES
 Makefile.PL
 GMPz.pm
 GMPz.pod
+math_gmpz_include.h
 GMPz.xs
 V/V.xs
 V/V.pm
@@ -19,6 +20,7 @@ t/aliases.t
 t/alloc.t
 t/arith.t
 t/bits.t
+t/bitwise.t
 t/cmp.t
 t/cmp_q.t
 t/fac.t
@@ -33,6 +35,7 @@ t/primes.t
 t/random.t
 t/theoretic.t
 t/div2.t
+t/divby0.t
 t/cdiv.t
 t/fdiv.t
 t/io_raw.t

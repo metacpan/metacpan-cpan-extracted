@@ -3,19 +3,8 @@ NAME
     company names
 
 VERSION
-    This document describes version 0.003 of Acme::ID::CompanyName (from
-    Perl distribution Acme-ID-CompanyName), released on 2017-10-26.
-
-SYNOPSIS
-     use Acme::ID::CompanyName qw(gen_generic_id_company_names);
-     my $names = gen_generic_id_company_names(num_names => 2);
-
-    Sample output:
-
-     [
-       "Sentosa Jaya Abadi",
-       "Putra Utama Global",
-     ]
+    This document describes version 0.004 of Acme::ID::CompanyName (from
+    Perl distribution Acme-ID-CompanyName), released on 2017-12-19.
 
 DESCRIPTION
 FUNCTIONS
@@ -25,6 +14,20 @@ FUNCTIONS
      gen_generic_id_company_names(%args) -> any
 
     Generate nice-sounding, generic Indonesian company names.
+
+    Examples:
+
+    *   Example #1:
+
+         gen_generic_id_company_names( num_names => 2);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"],
+         ]
 
     This function is not exported by default, but exportable.
 

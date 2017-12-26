@@ -8,7 +8,7 @@ MYDan::Agent::KeyUpdate
 
  use MYDan::Agent::KeyUpdate;
 
- MYDan::Agent::Auth->new( auth => /path/, interval => 3600, url => 'https://xxx' )->run();
+ MYDan::Agent::KeyUpdate->new( auth => /path/, interval => 3600, url => 'https://xxx' )->run();
 
 =cut
 

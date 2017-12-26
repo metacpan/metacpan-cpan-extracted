@@ -20,7 +20,7 @@ WriteMakefile(
     },
     PREREQ_PM                  => {
         'Moo::Role'            => '2.000000',
-        'namespace::clean'     => '0.24',
+        'namespace::autoclean' => '0.28',
         'GraphViz2'            => '2.34',
         'File::Temp'           => '0.2304',
         'MIME::Base64'         => '3.14',
@@ -32,8 +32,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.28' },
-            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.28' },
+            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.30' },
+            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.30' },
         },
         resources => {
             repository => {

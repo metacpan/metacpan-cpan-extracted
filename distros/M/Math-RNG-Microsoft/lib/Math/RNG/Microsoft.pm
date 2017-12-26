@@ -1,12 +1,8 @@
 package Math::RNG::Microsoft;
-
+$Math::RNG::Microsoft::VERSION = '0.0.4';
 use 5.006;
 use strict;
 use warnings;
-
-
-our $VERSION = '0.0.3';
-
 
 
 use integer;
@@ -60,7 +56,7 @@ with Visual C.
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 
@@ -84,7 +80,7 @@ compatibility with the Windows C Run-time-library is needed.
 
 =head1 VERSION
 
-Version 0.0.3
+version 0.0.4
 
 =head1 SUBROUTINES/METHODS
 
@@ -131,8 +127,9 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft or by email to
-bug-math-rng-microsoft@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft> or by email
+to
+L<bug-math-rng-microsoft@rt.cpan.org|mailto:bug-math-rng-microsoft@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -161,7 +158,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Math-RNG-Microsoft>
+L<https://metacpan.org/release/Math-RNG-Microsoft>
 
 =item *
 
@@ -177,7 +174,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-RNG-Microsoft>
 
 =item *
 
@@ -197,25 +194,17 @@ L<http://cpanratings.perl.org/d/Math-RNG-Microsoft>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Math-RNG-Microsoft>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/Math-RNG-Microsoft>
+L<http://cpants.cpanauthors.org/dist/Math-RNG-Microsoft>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/M/Math-RNG-Microsoft>
 
@@ -240,7 +229,7 @@ L<http://deps.cpantesters.org/?module=Math::RNG::Microsoft>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-math-rng-microsoft at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-RNG-Microsoft>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Math-RNG-Microsoft>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -249,8 +238,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/abc-path>
+L<https://github.com/shlomif/abc-path>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/abc-path
+  git clone https://github.com/shlomif/abc-path
 
 =cut

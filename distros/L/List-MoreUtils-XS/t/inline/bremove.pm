@@ -39,9 +39,9 @@ is_deeply(\@in, \@expected, "bremove all even elements reversely succeeded");
 # test from shawnlaffan from GH issue #2 of List-MoreUtils-XS
 SCOPE:
 {
-    my @list = ('somestring');
+    my @list   = ('somestring');
     my $target = $list[0];
-    is ($target, (bremove {$_ cmp $target} @list), 'removed from single item list');
+    is($target, (bremove { $_ cmp $target } @list), 'removed from single item list');
 }
 
 leak_free_ok(

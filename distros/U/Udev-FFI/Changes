@@ -1,5 +1,8 @@
 Revision history for Perl extension Udev-FFI
 
+0.099005 2017-12-19T20:45:03Z
+    - fix major, minor and makedev behavior
+
 0.099004 2017-12-16T13:51:52Z
     - improve documentation
 

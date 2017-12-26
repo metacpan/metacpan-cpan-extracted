@@ -1,7 +1,6 @@
 bin/app.pl
 Changes
 config.yml
-config/envui.json
 db/envui.db
 lib/App/RPi/EnvUI.pm
 lib/App/RPi/EnvUI/API.pm
@@ -28,13 +27,13 @@ t/13-api_base.t
 t/15-api_aux.t
 t/20-api_switch.t
 t/200-route_load_front_page.t
-t/201-front_page_profiling.t
 t/205-route_light.t
 t/210-route_get_config.t
 t/210-route_get_control.t
 t/215-route_get_aux.t
 t/220-route_fetch_env.t
 t/225-route_set_aux.t
+t/226-route_set_aux_override.t
 t/25-api_env_temp_hum.t
 t/30-api_config.t
 t/300-login_route.t

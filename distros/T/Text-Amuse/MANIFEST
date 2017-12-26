@@ -23,6 +23,7 @@ t/changes.t
 t/context-parsing.t
 t/crash-on-loops.t
 t/description-lists.t
+t/directives.t
 t/elements.t
 t/false-lists.t
 t/footnotes.t
@@ -63,6 +64,9 @@ t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse
+t/testfiles/broken-inline.exp.html
+t/testfiles/broken-inline.exp.ltx
+t/testfiles/broken-inline.muse
 t/testfiles/broken-tags.exp.html
 t/testfiles/broken-tags.exp.ltx
 t/testfiles/broken-tags.muse
@@ -127,6 +131,8 @@ t/testfiles/footnotes-packing.muse
 t/testfiles/footnotes.exp.html
 t/testfiles/footnotes.exp.ltx
 t/testfiles/footnotes.muse
+t/testfiles/headers.exp.html
+t/testfiles/headers.exp.ltx
 t/testfiles/headers.muse
 t/testfiles/headings-with-fn.exp.html
 t/testfiles/headings-with-fn.exp.ltx
@@ -194,7 +200,11 @@ t/testfiles/packing.muse
 t/testfiles/pagebreaks.exp.html
 t/testfiles/pagebreaks.exp.ltx
 t/testfiles/pagebreaks.muse
+t/testfiles/prova.exp.html
+t/testfiles/prova.exp.ltx
 t/testfiles/prova.muse
+t/testfiles/recursiv.exp.html
+t/testfiles/recursiv.exp.ltx
 t/testfiles/recursiv.muse
 t/testfiles/right.exp.html
 t/testfiles/right.exp.ltx
@@ -211,6 +221,8 @@ t/testfiles/special-chars.muse
 t/testfiles/special.exp.html
 t/testfiles/special.exp.ltx
 t/testfiles/special.muse
+t/testfiles/splat.exp.html
+t/testfiles/splat.exp.ltx
 t/testfiles/splat.muse
 t/testfiles/square-brackets.exp.html
 t/testfiles/square-brackets.exp.ltx

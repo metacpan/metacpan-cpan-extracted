@@ -16,23 +16,13 @@ if (! grep { -x "$_/sqlite3" } split /:/, $ENV{PATH}) {
     die "sqlite3 must be installed to continue\n";
 }
 
-# copy initial db and conf file
-
-if (! -e 'db/envui.db'){
-    print "copying default db...\n";
-    copy 'src/envui-dist.db', 'db/envui.db' or die $!;
-}
-if (! -e 'config/envui.json'){
-    print "copying default config...\n";
-    copy 'src/envui-dist.json', 'config/envui.json' or die $1;
-}
-
 sub MY::postamble {
 return <<EOF;
 
 install:: all local
 
 local:
+
 	cp ~/envui/config/envui.json ~
 
 	rm -rf ~/envui
@@ -88,7 +78,7 @@ WriteMakefile(
     },
     PL_FILES            => {},
     PREREQ_PM => {
-        'Async::Event::Interval' => 0.04,
+        'Async::Event::Interval' => 0.05,
         'Crypt::SaltedHash' => 0,
         'Dancer2'     => 0.203001,
         'Dancer2::Plugin::Auth::Extensible' => 0,

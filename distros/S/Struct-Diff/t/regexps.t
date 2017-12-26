@@ -3,10 +3,23 @@
 use strict;
 use warnings FATAL => 'all';
 
+use Data::Dumper;
+use Struct::Diff qw(diff);
 use Test::More;
 
 use lib "t";
 use _common;
+
+# Data::Dumper as serializer (Storable fails on regexps)
+$Struct::Diff::Freezer = sub {
+    local $Data::Dumper::Deparse    = 1;
+    local $Data::Dumper::Indent     = 0;
+    local $Data::Dumper::Pair       = '';
+    local $Data::Dumper::Sortkeys   = 1;
+    local $Data::Dumper::Terse      = 1;
+
+    return Dumper @_;
+};
 
 my $re_ref = qr/foo/msix;
 my @TESTS = (
@@ -55,10 +68,32 @@ my @TESTS = (
         diff    => {N => qr/bar/msix},
         opts    => {noO => 1},
     },
+    {
+        a       => [ qr/bar/m ],
+        b       => [ qr/foo/m ],
+        name    => 'nested_different_regexps',
+        diff    => {D => [{N => qr/foo/m,O => qr/bar/m}]},
+    },
+    {
+        a       => [ qr/foo/i ],
+        b       => [ qr/foo/i ],
+        name    => 'nested_equal_regexps',
+        diff    => {U => [qr/foo/i]},
+    },
 );
 
 map { $_->{to_json} = 0 } @TESTS;
 
 run_batch_tests(@TESTS);
+
+is_deeply(
+    diff(
+        { one => qr/foo/i },
+        { one => qr/bar/i },
+        freezer => sub { Dumper $_[0] }
+    ),
+    {D => {one => {N => qr/bar/i,O => qr/foo/i}}},
+    "freezer opt test"
+);
 
 done_testing();

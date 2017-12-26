@@ -1,4 +1,4 @@
-use Test::Most tests => 1;
+use Test::Most tests => 2;
 
 use strict;
 use warnings;
@@ -22,12 +22,9 @@ sub run_plot {
 	my $data = $w->iperl_data_representations;
 }
 
-lives_ok { run_plot() } 'plotting does not die';
+my $data;
+lives_ok { $data = run_plot() } 'plotting does not die';
 
-#use DDP; p $data->{'text/html'};
-#use Path::Class;
-#file('/tmp/b.png')->spew( iomode => '>:raw', $data->{'image/png'} );
-
-#use DDP; p $w->iperl_data_representations;
+like $data->{'image/svg+xml'}, qr/<svg[^>]+>/s, 'has <svg> tag';
 
 done_testing;

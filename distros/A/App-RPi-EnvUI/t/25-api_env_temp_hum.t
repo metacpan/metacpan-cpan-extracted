@@ -79,7 +79,7 @@ is $api->{testing}, 1, "testing param to new() ok";
 
     is ref $ret, 'HASH', "env() returns a hashref with the db() mocked";
 
-    is keys %$ret, 2, "...and has proper key count";
+    is keys %$ret, 3, "...and has proper key count";
     is $ret->{temp}, -1, "if the stats table is empty, temp returned is -1";
     is $ret->{humidity}, -1, "if the stats table is empty, hum returned is -1";
 }

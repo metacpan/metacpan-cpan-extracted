@@ -61,6 +61,20 @@ my $username=getlogin || getpwuid($<);
 my $do;my $ad;my $prompt;my $public_ip='';
 my $builddir='';my @ls_tmp=();
 
+# PHP Debugging
+# error_log(__FILE__."\n".__LINE__."  ". $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+# error_log(print_r($_REQUEST,TRUE)); For Sending Array to Log
+# error_log(print_r(debug_backtrace(),TRUE));
+# error_log(wp_debug_backtrace_summary());
+
+# function cleanmsg($msg){
+#     return $msg;
+# }
+# function alert($msg,$timeout=1,$url='index.php'){
+#     $msg=cleanmsg($msg);
+#     echo "<script>(function(){alert('$msg');})();</script>";
+# }
+
 # MENU Log-In Log-Out
 # https://premium.wpmudev.org/blog/
 # how-to-add-a-loginlogout-link-to-your-wordpress-menu/
@@ -74,10 +88,18 @@ my $builddir='';my @ls_tmp=();
 # sudo firewall-cmd --zone=public --permanent --add-port=443/tcp
 # sudo firewall-cmd --zone=public --permanent --list-ports
 
+# https://chrisjean.com/change-timezone-in-centos/
+
+# https://www.cartoonify.de/
+
 my $configure_wordpress=sub {
 
    my $selection=$_[0]||'';
    my $service_and_cert_password=$_[1]||'';
+   my $stripe_publish_key=$_[2]||'';
+   my $stripe_secret_key=$_[3]||'';
+   my $recaptcha_publish_key=$_[4]||'';
+   my $recpatcha_secret_key=$_[5]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
@@ -99,12 +121,30 @@ my $configure_wordpress=sub {
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
    $builddir=$stdout;
    my $fa_ver=$Net::FullAuto::VERSION;
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}ls -1t $builddir | grep Net-FullAuto-$fa_ver");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "ls -1t $builddir | grep Net-FullAuto-$fa_ver");
    my @lstmp=split /\n/,$stdout;
    foreach my $line (@lstmp) {
       unshift @ls_tmp, $line if $line!~/\.yml$/;
    }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 /var/www/html/','__display__');
+   if ($stdout=~/wordpress/s) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cat /var/www/html/wordpress/wp-config.php');
+      my $curpass=$stdout;
+      $curpass=~s/^.*DB_PASSWORD['][,]\s+?['](.*?)['].*$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mysqldump -u wordpressuser -p'.$curpass.
+         ' --verbose --databases wordpress >'.
+         '/var/www/html/wordpress/gw_dbbackup.sql',
+         '__display__');
+      #mysql -u wordpressuser -p wordpress < gw_dbbackup.sql
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'tar zcvf /home/www-data/gw_backup.tar '.
+         '/var/www/html/wordpress','__display__');
+   }
+&Net::FullAuto::FA_Core::cleanup;
 $do=1;
 if ($do==1) {
    unless ($^O eq 'cygwin') {
@@ -448,6 +488,8 @@ print "DOING NGINX\n";
    # http://dev.soup.io/post/1622791/I-managed-to-get-nginx-running-on
    # http://search.cpan.org/dist/Catalyst-Manual-5.9002/lib/Catalyst/
    #    Manual/Deployment/nginx/FastCGI.pod
+   # https://serverfault.com/questions/171047/why-is-php-request-array-empty
+   # https://codex.wordpress.org/Nginx
    my $nginx='nginx-1.13.7';
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
    ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
@@ -823,16 +865,22 @@ END
             next;
          } 
       }
-   } 
-   ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
-      "$nginx_path/nginx/nginx.conf");
+   }
+   unless ($hostname eq 'jp-01ld.get-wisdom.com') { 
+      ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
+         "$nginx_path/nginx/nginx.conf");
+   } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/worker_processes  1;/worker_processes  8;/' ".
+         "$nginx_path/nginx/nginx.conf");
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/index  index.html/{//d;}' $nginx_path/nginx/nginx.conf");
    $ad="            root /var/www/html/wordpress;%NL%".
        '            index  index.php  index.html index.htm;%NL%'.
-       '            try_files $uri $uri/ /index.php;';
+       '            try_files $uri $uri/ /index.php?$args;';
    $ad=<<END;
 sed -i '1,/location/ {/location/a\\\
 $ad
@@ -971,7 +1019,8 @@ END
          ($stdout,$stderr)=$handle->cmd($sudo.
             'openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048',
             '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/server_name  localhost/".
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "sed -i 's/server_name  localhost/".
             "server_name get-wisdom.com www.get-wisdom.com/' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1073,7 +1122,8 @@ if ($do==1) {
             "\"max-age=63072000; includeSubDomains;\" always;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/Strict-Transport-Security/aadd_header X-Frame-Options SAMEORIGIN;' ".
+            "sed -i '/Strict-Transport-Security/aadd_header ".
+            "X-Frame-Options SAMEORIGIN;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
@@ -1184,7 +1234,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mkdir -vp /var/www/html/wordpress",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "rsync -avP ~/WordPress/wordpress/ /var/www/html/wordpress",'__display__');
+      "rsync -avP ~/WordPress/wordpress/ ".
+      "/var/www/html/wordpress",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -Rv www-data:www-data /var/www','__display__');
    ($stdout,$stderr)=$handle->cwd('/var/www/html/wordpress');
@@ -1286,7 +1337,8 @@ END
          next;
       }
    }
-   $handle->{_cmd_handle}->print('mysql -u root --password='.$service_and_cert_password);
+   $handle->{_cmd_handle}->print('mysql -u root --password='.
+      $service_and_cert_password);
    $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    my $cmd_sent=0;
    while (1) {
@@ -1543,19 +1595,83 @@ END
  Text Domain:  $the-child
 */
 
+.dashicons-cart:before {
+    color: orange;
+}
+
+.dashicons-store:before {
+    color: orange;
+}
+
+.fa-question-circle:before {
+    color: floralwhite;
+}
+
+.dashicons-admin-home:before {
+    color: orange;
+}
+
+.menu-item i._before, .rtl .menu-item i._after {
+    color: #4610e1;
+}
+
+.fa-group:before, .fa-users:before {
+    color: orange;
+}
+
+.fi-clipboard-pencil:before {
+    color: #4610e1;
+}
+
+.dashicons-welcome-edit-page:before, .dashicons-welcome-write-blog:before {
+    color: orange;
+}
+
+.meta-navigation a, .header-right .widget_nav_menu a {
+    color: pink;
+}
+
+.main-navigation a {
+    color: floralwhite;
+}
+
+#site-navigation {
+    background: peru;
+}
+
+.large-10.columns {
+    display: none;
+}
+
+.meta-navigation a {
+    color: floralwhite;
+}
+
+#site-navigation {
+    background: peru;
+}
+
+.large-10.columns {
+    display: none;
+}
+
+.meta-navigation a {
+    color: floralwhite;
+}
+
+.site-header {
+    background-image: url(https://www.get-wisdom.com/wp-content/uploads/2017/12/gw_header.png);
+}
+
 .site-branding .site-title a {
    font-family: 'Montserrat';
    font-size: x-large;
-   font-weight: bold;
-   /*color: floralwhite;*/
+   /*font-weight: bold;*/
+   color: floralwhite;
 }
 
 .site-branding .site-description {
    color: orange;
-}
-
-#buddypress .comment-reply-link, #buddypress .generic-button a, #buddypress .standard-form button, #buddypress a.button, #buddypress input[type=button], #buddypress input[type=reset], #buddypress input[type=submit], #buddypress ul.button-nav li a, a.bp-title-button {
-    background: #18BC9C;
 }
 
 END
@@ -1631,29 +1747,32 @@ END
       'wget --random-wait --progress=dot '.
       'https://www.paidmembershipspro.com/wp-content/uploads/plugins/'.
       'pmpro-nav-menus.zip','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://github.com/strangerstudios/pmpro-advanced-levels-shortcode/'.
+      'archive/master.zip','__display__');
+
    # http://www.theblogmaven.com/best-wordpress-plugins/
 
    my $listt=<<'END';
 +-------------------------------------------------+--------+--------+---------+
 | name                                            | status | update | version |
 +-------------------------------------------------+--------+--------+---------+
-| addons-for-elementor                            | active | none   | 1.4.1   |
-| all-in-one-wp-migration                         | active | none   | 6.61    |
+| addons-for-elementor                            | active | none   | 1.5     |
 | bbpress                                         | active | none   | 2.5.14  |
 | better-recent-comments                          | active | none   | 1.0.4   |
-| black-studio-tinymce-widget                     | active | none   | 2.6.0   |
-| buddypress                                      | active | none   | 2.9.2   |
+| black-studio-tinymce-widget                     | active | none   | 2.6.1   |
 | check-email                                     | active | none   | 0.5.5   |
 | commentluv                                      | active | none   | 2.94.7  |
 | comment-redirect                                | active | none   | 1.1.3   |
-| comment-reply-email-notification                | active | none   | 1.4.1   |
-| contact-form-7                                  | active | none   | 4.9.1   |
+| comment-reply-email-notification                | active | none   | 1.4.2   |
+| contact-form-7                                  | active | none   | 4.9.2   |
 | custom-dashboard-widgets                        | active | none   | 1.3.1   |
 | easy-google-fonts                               | active | none   | 1.4.3   |
-| elementor                                       | active | none   | 1.8.9   |
-| google-analytics-dashboard-for-wp               | active | none   | 5.1.2.3 |
-| jetpack                                         | active | none   | 5.6     |
-| maxbuttons                                      | active | none   | 6.24    |
+| elementor                                       | active | none   | 1.8.11  |
+| google-analytics-dashboard-for-wp               | active | none   | 5.1.2.5 |
+| jetpack                                         | active | none   | 5.6.1   |
+| maxbuttons                                      | active | none   | 6.25    |
 | meks-easy-ads-widget                            | active | none   | 2.0.3   |
 | meks-flexible-shortcodes                        | active | none   | 1.3.1   |
 | meks-simple-flickr-widget                       | active | none   | 1.1.3   |
@@ -1666,20 +1785,23 @@ END
 | multiple-post-thumbnails                        | active | none   | 1.6.6   |
 | nav-menu-roles                                  | active | none   | 1.9.1   |
 | paid-memberships-pro                            | active | none   | 1.9.4.2 |
+| pmpro-bbpress                                   | active | none   | 1.5.4   |
 | pmpro-nav-menus                                 | active | none   | .3.2    |
+| pmpro-woocommerce                               | active | none   | 1.4.5   |
 | read-more-without-refresh                       | active | none   | 2.3     |
 | simple-share-buttons-adder                      | active | none   | 7.3.10  |
 | simple-trackback-validation-with-topsy-blocker  | active | none   | 1.2.7   |
 | text-hover                                      | active | none   | 3.7.1   |
 | theme-my-login                                  | active | none   | 6.4.9   |
-| woocommerce                                     | active | none   | 3.2.5   |
+| updraftplus                                     | active | none   | 1.14.2  |
+| woocommerce                                     | active | none   | 3.2.6   |
 | woocommerce-gateway-paypal-powered-by-braintree | active | none   | 2.0.4   |
-| woocommerce-services                            | active | none   | 1.9.0   |
+| woocommerce-services                            | active | none   | 1.9.1   |
 | woocommerce-gateway-stripe                      | active | none   | 3.2.3   |
 | wpfront-notification-bar                        | active | none   | 1.7     |
-| wp-mail-smtp                                    | active | none   | 0.11.2  |
+| wp-mail-smtp                                    | active | none   | 1.2.1   |
 | wp-to-twitter                                   | active | none   | 3.3.1   |
-| wordpress-seo                                   | active | none   | 5.9.1   |
+| wordpress-seo                                   | active | none   | 6.0     |
 +-------------------------------------------------+--------+--------+---------+
 END
 
@@ -1689,6 +1811,11 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp plugin install pmpro-nav-menus.zip '.
+      '--allow-root --activate --path=/var/www/html/wordpress',
+      '__display__');
+   # https://www.paidmembershipspro.com/add-ons/pmpro-advanced-levels-shortcode/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp plugin install master.zip '.
       '--allow-root --activate --path=/var/www/html/wordpress',
       '__display__');
 
@@ -1701,7 +1828,6 @@ if ($do==1) {
          bbpress
          better-recent-comments
          black-studio-tinymce-widget
-         buddypress
          check-email
          commentluv
          comment-redirect
@@ -1709,10 +1835,10 @@ if ($do==1) {
          contact-form-7
          custom-dashboard-widgets
          easy-google-fonts
+         elasticpress
          elementor
          addons-for-elementor
          google-analytics-dashboard-for-wp
-         #hide-admin-bar-from-non-admins
          maxbuttons
          meks-easy-ads-widget
          meks-flexible-shortcodes
@@ -2001,6 +2127,8 @@ print "STDOUT=$stdout<==CUSTOM LOGO PUBLISH\n";
 
 }
 
+$do=1;
+if ($do==1) {
    my @wp_plugins=qw(
 
          multiple-post-thumbnails
@@ -2017,6 +2145,9 @@ print "STDOUT=$stdout<==CUSTOM LOGO PUBLISH\n";
          woocommerce-gateway-paypal-powered-by-braintree
          woocommerce-services
          woocommerce-gateway-stripe
+         pmpro-bbpress
+         pmpro-woocommerce
+         updraftplus
 
    );
 
@@ -2027,7 +2158,11 @@ print "STDOUT=$stdout<==CUSTOM LOGO PUBLISH\n";
          "--activate --path=/var/www/html/wordpress",
          '__display__');
    }
+}
 
+   # https://www.paidmembershipspro.com/
+   # add-a-conditional-log-in-or-log-out-link-to-your-wordpress-menu/
+   # https://www.paidmembershipspro.com/best-practices-member-log-log/
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's#check_admin_referer#//check_admin_referer#' ".
       '/var/www/html/wordpress/wp-content/plugins/'.
@@ -2239,11 +2374,13 @@ print "STDOUTACTIVATE=$stdout<==ACTIVATE\n";
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36' ".
-      "--data 'save_step=activate&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dactivate'");
-print "DONE=$stdout<==ACTIVATE-SENT\n";
+      "--data 'save_step=activate&_wpnonce=".$nonce.
+          "&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dactivate'");
+print "ACTIVATE=$stdout<==ACTIVATE-SENT\n";
 
    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings' ".
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-pagesettings' ".
       "-H 'Host: ".$urll."' ".
       "-H 'Connection: keep-alive' ".
       "-H 'Upgade-Insecure-Requests: 1' ".
@@ -2260,7 +2397,8 @@ print "DONE=$stdout<==ACTIVATE-SENT\n";
 print "NONCE=$nonce<==NONCE\n";
 
    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings".
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-pagesettings".
           "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
       "-H 'Host: ".$urll."' ".
       "-H 'Connection: keep-alive' ".
@@ -2275,7 +2413,8 @@ print "NONCE=$nonce<==NONCE\n";
       "-H 'Accept-Language: en-US,en;q=0.9'");
 
    ($stdout,$stderr)=$handle->cmd(
-      "curl -k -L -b ~/cookies.txt 'https://".$urll."/wp-admin/admin.php?page=pmpro-pagesettings' ".
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-pagesettings' ".
       "-H 'Host: ".$urll."' ".
       "-H 'Connection: keep-alive' ".
       "-H 'Upgade-Insecure-Requests: 1' ".
@@ -2288,6 +2427,526 @@ print "NONCE=$nonce<==NONCE\n";
           "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.9'");
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'");
+   $stdout=~s/^.*_wpnonce.*?value=["](.*?)["].*$/$1/s;
+   $nonce=$stdout;
+print "NONCE=$nonce<==STRIPE NONCE\n";
+
+   use Crypt::GeneratePassword qw(chars);
+   my $minlen=16;
+   my $maxlen=16;
+   my @set=("A".."Z","a".."z",0..9);
+   my $word = chars($minlen,$maxlen,\@set);
+
+   my $stripe_info=<<END;
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_enabled"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_title"
+
+Credit Card (Stripe)
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_description"
+
+Pay with your credit card via Stripe.
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_testmode"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_test_publishable_key"
+
+$stripe_publish_key
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_test_secret_key"
+
+$stripe_secret_key
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_publishable_key"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_secret_key"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_statement_descriptor"
+
+Get-Wisdom.com
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_capture"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_stripe_checkout_locale"
+
+en
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_stripe_checkout_image"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_apple_pay"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_apple_pay_button"
+
+black
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="woocommerce_stripe_apple_pay_button_lang"
+
+en
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="save"
+
+Save changes
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="_wpnonce"
+
+$nonce
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="_wp_http_referer"
+
+/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe
+END
+
+   chomp($stripe_info);
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Content-Type: multipart/form-data; boundary=----WebKitFormBoundary".
+          $word."' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe".
+          "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "--data '".$stripe_info."'";
+
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   while (1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/s;
+      print $output;
+   }
+print "GOT OUT OF STRIPE!\n";
+   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+print "DONE WITH CLEANING\n";
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wpcf7-integration&service=recaptcha&action=setup' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll."/wp-admin/admin.php?page=wpcf7-integration' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'";
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   $stdout='';
+   while (1) {
+      $stdout.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $stdout=~/$prompt/s;
+      print $stdout;
+   }
+print "OUT OF RECAPTCHA ONE\n";
+   $stdout=~s/^.*_wpnonce.*?value=["](.*?)["].*$/$1/s;
+   $nonce=$stdout;
+print "NONCE=$nonce<==reCaptcha NONCE\n";
+   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=wpcf7-integration&service=recaptcha&action=setup' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=wpcf7-integration&service=recaptcha&action=setup' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "--data '_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwpcf7-integration%26service%3Drecaptcha%26action%3Dsetup&sitekey=$recaptcha_publish_key&secret=$recpatcha_secret_key&submit=Save'";
+
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   $stdout='';
+   while (1) {
+      $stdout.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $stdout=~/$prompt/s;
+      print $stdout;
+   }
+print "STDOUT=$stdout<==RECAPTCHA PUBLISH\n";
+
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Cache-Control: max-age=0' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'");
+   $stdout=~s/^.*pmpro_paymentsettings_nonce.*?value=["](.*?)["].*$/$1/s;
+   $nonce=$stdout;
+print "NONCE=$nonce<==PAYMENTPRO NONCE\n";
+
+   $word = chars($minlen,$maxlen,\@set);
+
+   my $pp_info=<<END;
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="pmpro_paymentsettings_nonce"
+
+$nonce
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="_wp_http_referer"
+
+/wp-admin/admin.php?page=pmpro-paymentsettings
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="gateway"
+
+stripe
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="gateway_environment"
+
+sandbox
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="loginname"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="transactionkey"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="braintree_merchantid"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="braintree_publickey"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="braintree_privatekey"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="braintree_encryptionkey"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="instructions"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="cybersource_merchantid"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="cybersource_securitykey"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="payflow_partner"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="payflow_vendor"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="payflow_user"
+
+Administrator
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="payflow_pwd"
+
+lMWt%036W=LAkLK
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="gateway_email"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="apiusername"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="apipassword"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="apisignature"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="paypalexpress_skip_confirmation"
+
+0
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="stripe_publishablekey"
+
+$stripe_publish_key
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="stripe_secretkey"
+
+$stripe_secret_key
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="stripe_billingaddress"
+
+0
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="twocheckout_apiusername"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="twocheckout_apipassword"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="twocheckout_accountnumber"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="twocheckout_secretword"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="currency"
+
+USD
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="creditcards_visa"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="creditcards_mastercard"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="creditcards_amex"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="creditcards_discover"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="tax_state"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="tax_rate"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="sslseal"
+
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="savesettings"
+
+Save Settings
+------WebKitFormBoundary${word}--
+
+END
+
+   chomp($pp_info);
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Content-Type: multipart/form-data; boundary=----WebKitFormBoundary".
+          $word."' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "--data '".$pp_info."'";
+
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   while (1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/s;
+      print $output;
+   }
+print "GOT OUT OF PAYMENTPRO!\n";
+   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+print "GOING FOR NONCE!\n";
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-emailsettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9'";
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   $stdout='';
+   while (1) {
+      $stdout.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $stdout=~/$prompt/s;
+      print $stdout;
+   }
+print "OUT OF EMAIL NONCE\n";
+   $stdout=~s/^.*pmpro_emailsettings_nonce.*?value=["](.*?)["].*$/$1/s;
+   $nonce=$stdout;
+
+print "NONCE=$nonce<==PAYMENTEMAILPRO NONCE\n";
+
+   $word = chars($minlen,$maxlen,\@set);
+
+   my $em_info=<<END;
+
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="pmpro_emailsettings_nonce"
+
+$nonce
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="_wp_http_referer"
+
+/wp-admin/admin.php?page=pmpro-emailsettings
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="from_email"
+
+support\@get-wisdom.com
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="from_name"
+
+Get-Wisdom.com Support
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="email_admin_checkout"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="email_admin_changes"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="email_admin_cancels"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="email_admin_billing"
+
+1
+------WebKitFormBoundary$word
+Content-Disposition: form-data; name="savesettings"
+
+Save Settings
+------WebKitFormBoundary${word}--
+END
+
+   chomp($em_info);
+   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-emailsettings' ".
+      "-H 'Host: ".$urll."' ".
+      "-H 'Connection: keep-alive' ".
+      "-H 'Upgade-Insecure-Requests: 1' ".
+      "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
+          "AppleWebKit/537.36 (KHTML, like Gecko) ".
+          "Chrome/62.0.3202.94 Safari/537.36' ".
+      "-H 'Content-Type: multipart/form-data; boundary=----WebKitFormBoundary".
+          $word."' ".
+      "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
+          "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
+      "-H 'Referer: https://".$urll.
+          "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
+      "-H 'Accept-Encoding: gzip, deflate, br' ".
+      "-H 'Accept-Language: en-US,en;q=0.9' ".
+      "--data '".$em_info."'";
+
+   $handle->{_cmd_handle}->print($cmd);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   while (1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/s;
+      print $output;
+   }
+print "GOT OUT OF PAYMENTEMAILPRO!\n";
+
+$do=1;
+if ($do==1) {
+   # https://www.hugeserver.com/kb/install-secure-elasticsearch-kibana-centos-7/
+   # https://www.cloudways.com/blog/elasticsearch-on-wordpress/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install java-1.8.0-openjdk.x86_64','__display__');
+   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://artifacts.elastic.co/downloads/".
+      "elasticsearch/elasticsearch-5.0.0.rpm",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl enable elasticsearch','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl start elasticsearch','__display__');
+   my $ep='%NL%/** ElasticPress */%NL%'.
+          "define( 'EP_HOST', 'http://127.0.0.1:9200' );";
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/DB_COLLATE/a$ep\' /var/www/html/wordpress/wp-config.php");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+       '/var/www/html/wordpress/wp-config.php');
+}
 
    my $thanks=<<'END';
 
@@ -2325,8 +2984,13 @@ my $standup_wordpress=sub {
 
    my $catalyst="]T[{select_wordpress_setup}";
    my $password="]I[{'enter_password',1}";
+   my $stripe_pub="]I[{'stripe_keys',1}";
+   my $stripe_sec="]I[{'stripe_keys',2}";
+   my $recaptcha_pub="]I[{'recaptcha_keys',1}";
+   my $recaptcha_sec="]I[{'recaptcha_keys',2}";
    my $cnt=0;
-   $configure_wordpress->($catalyst,$password);
+   $configure_wordpress->($catalyst,$password,$stripe_pub,$stripe_sec,
+                          $recaptcha_pub,$recaptcha_sec);
    return '{choose_demo_setup}<';
 
 };
@@ -2421,6 +3085,90 @@ END
 
 };
 
+our $recaptcha_keys=sub {
+
+   package recaptcha_keys;
+   my $password_banner=<<'END';
+
+             ___           _      _           _  __
+    _ _ ___ / __|__ _ _ __| |_ __| |_  __ _  | |/ /___ _  _ ___
+   | '_/ -_) (__/ _` | '_ \  _/ _| ' \/ _` | | ' </ -_) || (_-<
+   |_| \___|\___\__,_| .__/\__\__|_||_\__,_| |_|\_\___|\_, /__/
+                     |_|                               |__/
+
+END
+   $password_banner.=<<END;
+   Paste the necessary reCaptcha Keys here:
+
+   *** BE SURE TO WRITE IT DOWN AND KEEP IT SOMEWHERE SAFE! ***
+
+   Input box with === border is highlighted (active) input box.
+   Use [TAB] key to switch focus between input boxes.
+
+
+   Publish Key
+                ]I[{1,'',46}
+
+   Secret Key
+                ]I[{2,'',46}
+END
+
+   my $recaptcha_keys={
+
+      Name => 'recaptcha_keys',
+      Input => 1,
+      Result => $standup_wordpress,
+      #Result =>
+   #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
+      Banner => $password_banner,
+
+   };
+   return $recaptcha_keys;
+
+};
+
+our $stripe_keys=sub {
+
+   package stripe_keys;
+   my $password_banner=<<'END';
+
+    ___ _       _             _  __
+   / __| |_ _ _(_)_ __  ___  | |/ /___ _  _ ___
+   \__ \  _| '_| | '_ \/ -_) | ' </ -_) || (_-<
+   |___/\__|_| |_| .__/\___| |_|\_\___|\_, /__/
+                 |_|                   |__/
+
+END
+   $password_banner.=<<END;
+   Paste the necessary Stripe Account Keys here:
+
+   *** BE SURE TO WRITE IT DOWN AND KEEP IT SOMEWHERE SAFE! ***
+
+   Input box with === border is highlighted (active) input box.
+   Use [TAB] key to switch focus between input boxes.
+
+
+   Publish Key 
+                ]I[{1,'',46}
+
+   Secret Key
+                ]I[{2,'',46}
+END
+
+   my $stripe_keys={
+
+      Name => 'stripe_keys',
+      Input => 1,
+      Result => $recaptcha_keys,
+      #Result =>
+   #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
+      Banner => $password_banner,
+
+   };
+   return $stripe_keys;
+
+};
+
 our $choose_strong_password=sub {
 
    package choose_strong_password;
@@ -2432,14 +3180,18 @@ our $choose_strong_password=sub {
    |___/\__|_| \___/_||_\__, | |_| \__,_/__/__/\_/\_/\___/_| \__,_|
                         |___/
 END
-   use Crypt::GeneratePassword qw(word);
+
+   use Crypt::GeneratePassword qw(chars);
+   my $minlen=15;
+   my $maxlen=15;
+   my @set=("A".."Z","a".."z",0..9,"#","-","_","@","%","^","=");
    my $word='';
    foreach my $count (1..50) {
       print "\n   Generating Password ...\n";
       $word=eval {
          local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
          alarm 7;
-         my $word=word(10,15,3,5,6);
+         my $word=chars($minlen,$maxlen,\@set);
          print "\n   Trying Password - $word ...\n";
          die if -1<index $word,'*';
          die if -1<index $word,'$';
@@ -2447,10 +3199,11 @@ END
          die if -1<index $word,'&';
          die if -1<index $word,'/';
          die if -1<index $word,'!';
+         die if -1<index $word,'^';
          die if $word!~/\d/;
          die if $word!~/[A-Z]/;
          die if $word!~/[a-z]/;
-         die if $word!~/[@#%^=]/;
+         die if $word!~/[@#%=]/;
          return $word;
       };
       alarm 0;
@@ -2478,7 +3231,7 @@ END
 
       Name => 'enter_password',
       Input => 1,
-      Result => $standup_wordpress,
+      Result => $stripe_keys,
       #Result =>
    #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
       Banner => $password_banner,

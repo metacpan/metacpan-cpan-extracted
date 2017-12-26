@@ -26,6 +26,7 @@ t/issue-24-booleans-in-yaml-schema.t
 t/issue-48-refs.t
 t/mixin.t
 t/path-parameters.t
+t/ref-param.t
 t/register.t
 t/renderer.t
 t/reply-spec.t

@@ -7,24 +7,24 @@ use warnings;
 
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.005';
 
 use base 'Mail::Reporter';
 
-use Mail::Message::Part;
-use Mail::Message::Head::Complete;
-use Mail::Message::Construct;
+use Mail::Message::Part ();
+use Mail::Message::Head::Complete ();
+use Mail::Message::Construct ();
 
-use Mail::Message::Body::Lines;
-use Mail::Message::Body::Multipart;
-use Mail::Message::Body::Nested;
+use Mail::Message::Body::Lines ();
+use Mail::Message::Body::Multipart ();
+use Mail::Message::Body::Nested ();
 
 use Carp;
 use Scalar::Util   'weaken';
 
 BEGIN {
     unless($ENV{HARNESS_ACTIVE}) {   # no tests during upgrade
-        # v3 splits Mail::Box is many distributions
+        # v3 splits Mail::Box in a few distributions
 		eval { require Mail::Box };
 		my $v = $Mail::Box::VERSION || 3;
 		$v >= 3 or die "You need to upgrade the Mail::Box module";
@@ -161,6 +161,7 @@ my $default_mailer;
 sub send(@)
 {   my $self = shift;
 
+	# Loosely coupled module
     require Mail::Transport::Send;
 
     my $mailer;

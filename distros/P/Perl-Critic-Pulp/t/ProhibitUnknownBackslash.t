@@ -21,7 +21,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 294;
+use Test::More tests => 299;
 
 use lib 't';
 use MyTestHelpers;
@@ -31,7 +31,7 @@ require Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 95;
+my $want_version = 96;
 is ($Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash->VERSION, $want_version, 'VERSION class method');
 {
@@ -46,6 +46,7 @@ is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash->VERSIO
 # _pos_after_interpolate_variable()
 
 foreach my $elem (## no critic (RequireInterpolationOfMetachars)
+                  ["\$#x \200\200\0", 3],
                   ['$#x blah', 3],
                   ['$#{x} blah', 5],
                   ['$x blah', 2],
@@ -146,7 +147,10 @@ diag "PPI version ",PPI->VERSION;
 
   foreach my $data
     (## no critic (RequireInterpolationOfMetachars)
-
+     
+     # with non-ASCII chars
+     [ 0, '  "$x  \200\0 $y"  ' ],
+     [ 1, '  "$x  \200\0 $y \z"  ' ],  # bad \z
 
      #-------------------
      # "$foo\::bar" etc

@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 my %configure_requires = (
+    'ExtUtils::MakeMaker' => '0',
     'Module::Build::Tiny' => '0.034',
 );
 
@@ -85,6 +86,7 @@ EOW
 
     my %module_build_args = (
       "configure_requires" => {
+        "ExtUtils::MakeMaker" => 0,
         "Module::Build::Tiny" => "0.034",
         "perl" => "5.006"
       },
@@ -94,7 +96,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-Compile",
-      "dist_version" => "2.057",
+      "dist_version" => "2.058",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::Compile",
       "recursive_test_files" => 1,

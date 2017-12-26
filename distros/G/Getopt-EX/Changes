@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.5.1 2017-12-21T14:09:25Z
+
+    - Accept multiple BASECLASSes.
+
 v1.4.2 2017-12-16T07:38:27Z
 
     Colormap.pm

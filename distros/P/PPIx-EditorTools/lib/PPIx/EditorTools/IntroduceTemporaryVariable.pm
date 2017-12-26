@@ -1,7 +1,7 @@
 package PPIx::EditorTools::IntroduceTemporaryVariable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Introduces a temporary variable using PPI
-$PPIx::EditorTools::IntroduceTemporaryVariable::VERSION = '0.20';
+$PPIx::EditorTools::IntroduceTemporaryVariable::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -112,7 +112,7 @@ PPIx::EditorTools::IntroduceTemporaryVariable - Introduces a temporary variable 
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

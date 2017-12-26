@@ -78,9 +78,9 @@ ok (! is_romaji ('ドロップ'), 'katakana does not look like romaji');
 # kana2romaji tests
 
 my $fall = kana2romaji ("フォール", {ve_type => "wapuro"});
-ok ($fall eq 'huxooru', "small o kana");
+is ($fall, 'huxo-ru', "small o kana");
 my $fell = kana2romaji ("フェール", {ve_type => "wapuro"});
-ok ($fell eq 'huxeeru', "small e kana");
+is ($fell, 'huxe-ru', "small e kana");
 my $wood = kana2romaji ("ウッド");
 ok ($wood !~ /ッ/);
 my $legend = kana2romaji ('レジェンド');
@@ -88,7 +88,7 @@ my $legend = kana2romaji ('レジェンド');
 ok ($legend =~ /zixe/, "je -> zixe");
 my $perfume = kana2romaji ('パフューム', {ve_type => 'wapuro'});
 #print "$perfume\n";
-ok ($perfume eq 'pahuxyuumu');
+ok ($perfume eq 'pahuxyu-mu');
 my $invoice = kana2romaji ('インヴォイス', {ve_type => 'wapuro', debug=>undef});
 #print "$invoice\n";
 ok ($invoice eq 'invuxoisu');

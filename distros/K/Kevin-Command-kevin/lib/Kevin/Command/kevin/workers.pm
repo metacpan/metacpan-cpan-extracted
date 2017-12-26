@@ -1,6 +1,6 @@
 
 package Kevin::Command::kevin::workers;
-$Kevin::Command::kevin::workers::VERSION = '0.4.1';
+$Kevin::Command::kevin::workers::VERSION = '0.5.5';
 # ABSTRACT: Command to list Minion workers
 use Mojo::Base 'Mojolicious::Command';
 
@@ -23,10 +23,11 @@ sub run {
     'l|limit=i'  => \(my $limit  = 100),
     'o|offset=i' => \(my $offset = 0);
 
-  my $jobs = $minion->backend->list_workers($offset, $limit, $options);
+  my $results = $minion->backend->list_workers($offset, $limit, $options);
+  my $items = $results->{workers};
 
   my $spec = $self->_table_spec;
-  render_table($jobs, $spec);
+  render_table($items, $spec);
 }
 
 *_running_since = *Kevin::Commands::Util::_running_since;
@@ -134,7 +135,7 @@ Kevin::Command::kevin::workers - Command to list Minion workers
 
 =head1 VERSION
 
-version 0.4.1
+version 0.5.5
 
 =head1 SYNOPSIS
 

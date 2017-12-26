@@ -1,10 +1,14 @@
-package Module::Manifest;
+package Module::Manifest; # git description: 39313df
 
 =pod
 
 =head1 NAME
 
 Module::Manifest - Parse and examine a Perl distribution MANIFEST file
+
+=head1 VERSION
+
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -61,7 +65,6 @@ contact the maintainer.
 
 =cut
 
-use 5.00503;
 use strict;
 use Carp             ();
 use File::Spec       ();
@@ -69,10 +72,7 @@ use File::Spec::Unix ();
 use File::Basename   ();
 use Params::Util     ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.08';
-}
+our $VERSION = '1.09';
 
 # These platforms were copied from File::Spec
 my %platforms = (

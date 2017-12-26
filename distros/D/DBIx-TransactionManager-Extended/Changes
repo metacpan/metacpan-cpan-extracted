@@ -1,8 +1,12 @@
 Revision history for Perl extension DBIx-TransactionManager-Extended
 
+0.03 2017-12-23T20:38:31Z
+
+    - fixed bug: transaction's context and hooks are broken by rollback in after commit hook #1 (thanks rymizuki)
+
 0.02 2016-04-08T13:09:49Z
 
-    - fixed bug (occur infinit recursion in rare case)
+    - fixed bug: occur infinit recursion in rare case
 
 0.01 2016-04-08T10:51:55Z
 

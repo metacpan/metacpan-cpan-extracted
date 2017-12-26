@@ -4,10 +4,11 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2017
 #-------------------------------------------------------------------------------
 # podDocumentation
+# line 1025 - handle: sub a::b
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171128';
+our $VERSION = '20171224';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -65,8 +66,8 @@ sub XXX($)                                                                      
    }
  }
 
-sub zzz($;$)                                                                    # Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
- {my ($cmd, $success) = @_;                                                     # Commands to execute - one per line with no trailing &&, optional regular expression to check the results
+sub zzz($;$$)                                                                   # Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+ {my ($cmd, $success, $returnCode) = @_;                                        # Commands to execute - one per line with no trailing &&, optional regular expression to check for acceptable results, optional regular expression to check the acceptable return codes
   $cmd or confess "No command\n";                                               # Check that there is a command to execute
   my @c;                                                                        # Commands
   for(split /\n/, $cmd)                                                         # Split commands on new lines
@@ -78,7 +79,9 @@ sub zzz($;$)                                                                    
   my $r = qx($c 2>&1);                                                          # Execute command
   my $R = $?;
   $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
-  confess "$cmd\n\n$c\n$r\n" if $R or $success && $r !~ m/$success/s;                 # Error check with return code and an error checking regular expression if one has been supplied
+  confess "$cmd\n\n$c\n$r\n" if
+    $R && (!$returnCode or $R !~ /$returnCode/) or                              # Return code failed
+    $success && $r !~ m/$success/s;                                             # Error check failed
   $r
  }
 
@@ -288,7 +291,9 @@ sub temporaryDirectory                                                          
 sub findFiles($)                                                                # Find all the files under a folder.
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @f;
-  for(split /\0/, qx(find $dir -print0))
+  my $s = qx(find $dir -print0);
+  utf8::decode($s);                                                             # Decode unicode file names
+  for(split /\0/, $s)                                                           # Split out file names on \0
    {next if -d $_;                                                              # Do not include folder names
     push @f, $_;
    }
@@ -298,7 +303,9 @@ sub findFiles($)                                                                
 sub findDirs($)                                                                 # Find all the folders under a folder.
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @d;
-  for(split /\0/, qx(find $dir -print0))
+  my $s = qx(find $dir -print0);
+  utf8::decode($s);                                                             # Decode unicode file names
+  for(split /\0/, $s)                                                           # Split out file names on \0
    {next unless -d $_;                                                          # Include only folders
     push @d, $_;
    }
@@ -388,7 +395,7 @@ sub makePath($)                                                                 
   0
  }
 
-sub writeFile($$)                                                               # Write a unicode string to a file after creating a path to the file if necessary.
+sub writeFile($$)                                                               # Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
  {my ($file, $string) = @_;                                                     # File to write to, unicode string to write
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
@@ -398,9 +405,10 @@ sub writeFile($$)                                                               
   print  {$F} $string;
   close  ($F);
   -e $file or confess "Failed to write to file:\n$file\n";
+  $file
  }
 
-sub appendFile($$)                                                              # Append a unicode string to a file after creating a path to the file if necessary.
+sub appendFile($$)                                                              # Append a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
  {my ($file, $string) = @_;                                                     # File to append to, unicode string to append
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
@@ -410,9 +418,10 @@ sub appendFile($$)                                                              
   print  {$F} $string;
   close  ($F);
   -e $file or confess "Failed to write to file:\n$file\n";
+  $file
  }
 
-sub writeBinaryFile($$)                                                         # Write a non unicode string to a file in after creating a path to the file if necessary.
+sub writeBinaryFile($$)                                                         # Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
  {my ($file, $string) = @_;                                                     # File to write to, non unicode string to write
   $file or confess "No file name supplied\n";
   $string or confess "No string for file:\n$file\n";
@@ -422,6 +431,19 @@ sub writeBinaryFile($$)                                                         
   print  {$F} $string;
   close  ($F);
   -e $file or confess "Failed to write in binary to file:\n$file\n";
+  $file
+ }
+
+sub createEmptyFile($)                                                          # Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+ {my ($file) = @_;                                                              # File to create
+  $file or confess "No file name supplied\n";
+  makePath($file);
+  open my $F, ">$file" or confess "Cannot create empty file:\n$file\n";
+  binmode($F);
+  print  {$F} '';
+  close  ($F);
+  -e $file or confess "Failed to create empty file:\n$file\n";
+  $file
  }
 
 sub binModeAllUtf8                                                              # Set STDOUT and STDERR to accept utf8 without complaint
@@ -494,12 +516,16 @@ sub decodeJson($)                                                               
 
 sub encodeBase64($)                                                             # Encode a string in base 64.
  {my ($string) = @_;                                                            # String to encode
-  encode_base64($string, '')
+  my $s = eval {encode_base64($string, '')};
+  confess $@ if $@;                                                             # So we get a trace back
+  $s
  }
 
 sub decodeBase64($)                                                             # Decode a string in base 64.
  {my ($string) = @_;                                                            # String to decode
-  decode_base64($string)
+  my $s   = eval {decode_base64($string)};
+  confess $@ if $@;                                                             # So we get a trace back
+  $s
  }
 
 sub convertUnicodeToXml($)                                                      # Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents
@@ -600,10 +626,10 @@ sub max(@)                                                                      
 sub formatTableBasic($;$)                                                       # Tabularize text
  {my ($data, $separator) = @_;                                                  # Reference to an array of arrays of data to be formatted as a table, optional line separator to use instead of new line for each row.
   my $d = $data;
-  ref($d) =~ /array/i or confess "Array reference required\n";
+  ref($d) =~ /array/i or confess "Array reference required not:\n".dump($d);
   my @D;
   for   my $e(@$d)
-   {ref($e) =~ /array/i or confess "Array reference required\n";
+   {ref($e) =~ /array/i or confess "Array reference required not:\n".dump($e);
     for my $D(0..$#$e)
      {my $a = $D[$D]           // 0;                                            # Maximum length of data so far
       my $b = length($e->[$D]) // 0;                                            # Length of current item
@@ -1278,7 +1304,7 @@ sub updatePerlModuleDocumentation($)                                            
   -e $perlModule or confess "No such file:\n$perlModule\n";
   updateDocumentation($perlModule);                                             # Update documentation
 
-  xxx("pod2html --infile=$perlModule --outfile=zzz.html && ".                   # View documentation
+  zzz("pod2html --infile=$perlModule --outfile=zzz.html && ".                   # View documentation
       " google-chrome zzz.html pods2 && ".
       " rm zzz.html pod2htmd.tmp");
  }
@@ -1312,7 +1338,8 @@ addCertificate appendFile
 binModeAllUtf8
 checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
-containingFolder convertImageToJpx convertUnicodeToXml currentDirectory currentDirectoryAbove
+containingFolder convertImageToJpx convertUnicodeToXml
+createEmptyFile currentDirectory currentDirectoryAbove
 dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64
 fileList fileModTime fileOutOfDate
@@ -1456,13 +1483,14 @@ Execute a block of shell commands line by line after removing comments
   1  Parameter  Description
   2  $cmd       Commands to execute separated by new lines
 
-=head2 zzz($$)
+=head2 zzz($$$)
 
 Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
 
-  1  Parameter  Description
-  2  $cmd       Commands to execute - one per line with no trailing &&
-  3  $success   Optional regular expression to check the results
+  1  Parameter    Description
+  2  $cmd         Commands to execute - one per line with no trailing &&
+  3  $success     Optional regular expression to check for acceptable results
+  4  $returnCode  Optional regular expression to check the acceptable return codes
 
 =head2 parseCommandLineArguments(&@)
 
@@ -1706,7 +1734,7 @@ Make the path for the specified file name or folder.
 
 =head3 writeFile($$)
 
-Write a unicode string to a file after creating a path to the file if necessary.
+Write a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
   1  Parameter  Description
   2  $file      File to write to
@@ -1714,7 +1742,7 @@ Write a unicode string to a file after creating a path to the file if necessary.
 
 =head3 appendFile($$)
 
-Append a unicode string to a file after creating a path to the file if necessary.
+Append a unicode string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
   1  Parameter  Description
   2  $file      File to append to
@@ -1722,11 +1750,18 @@ Append a unicode string to a file after creating a path to the file if necessary
 
 =head3 writeBinaryFile($$)
 
-Write a non unicode string to a file in after creating a path to the file if necessary.
+Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
 
   1  Parameter  Description
   2  $file      File to write to
   3  $string    Non unicode string to write
+
+=head3 createEmptyFile($)
+
+Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+
+  1  Parameter  Description
+  2  $file      File to create
 
 =head3 binModeAllUtf8()
 
@@ -2039,6 +2074,13 @@ Extract the package name from a perl string or file.
   1  Parameter  Description
   2  $perl      Perl file if it exists else the string of perl
 
+=head2 printQw(@)
+
+Print an array of words in qw() format
+
+  1  Parameter  Description
+  2  @words     Array of words
+
 =head1 Cloud Cover
 
 Useful for operating across the cloud
@@ -2235,155 +2277,159 @@ Extract a line of a test.
 
 15 L<convertUnicodeToXml|/convertUnicodeToXml>
 
-16 L<currentDirectory|/currentDirectory>
+16 L<createEmptyFile|/createEmptyFile>
 
-17 L<currentDirectoryAbove|/currentDirectoryAbove>
+17 L<currentDirectory|/currentDirectory>
 
-18 L<dateStamp|/dateStamp>
+18 L<currentDirectoryAbove|/currentDirectoryAbove>
 
-19 L<dateTimeStamp|/dateTimeStamp>
+19 L<dateStamp|/dateStamp>
 
-20 L<decodeBase64|/decodeBase64>
+20 L<dateTimeStamp|/dateTimeStamp>
 
-21 L<decodeJson|/decodeJson>
+21 L<decodeBase64|/decodeBase64>
 
-22 L<denormalizeFolderName|/denormalizeFolderName>
+22 L<decodeJson|/decodeJson>
 
-23 L<encodeBase64|/encodeBase64>
+23 L<denormalizeFolderName|/denormalizeFolderName>
 
-24 L<encodeJson|/encodeJson>
+24 L<encodeBase64|/encodeBase64>
 
-25 L<extractTest|/extractTest>
+25 L<encodeJson|/encodeJson>
 
-26 L<fileList|/fileList>
+26 L<extractTest|/extractTest>
 
-27 L<fileModTime|/fileModTime>
+27 L<fileList|/fileList>
 
-28 L<fileOutOfDate|/fileOutOfDate>
+28 L<fileModTime|/fileModTime>
 
-29 L<filePath|/filePath>
+29 L<fileOutOfDate|/fileOutOfDate>
 
-30 L<filePathDir|/filePathDir>
+30 L<filePath|/filePath>
 
-31 L<filePathExt|/filePathExt>
+31 L<filePathDir|/filePathDir>
 
-32 L<fileSize|/fileSize>
+32 L<filePathExt|/filePathExt>
 
-33 L<findDirs|/findDirs>
+33 L<fileSize|/fileSize>
 
-34 L<findFiles|/findFiles>
+34 L<findDirs|/findDirs>
 
-35 L<formatTable|/formatTable>
+35 L<findFiles|/findFiles>
 
-36 L<formatTableA|/formatTableA>
+36 L<formatTable|/formatTable>
 
-37 L<formatTableAA|/formatTableAA>
+37 L<formatTableA|/formatTableA>
 
-38 L<formatTableAH|/formatTableAH>
+38 L<formatTableAA|/formatTableAA>
 
-39 L<formatTableBasic|/formatTableBasic>
+39 L<formatTableAH|/formatTableAH>
 
-40 L<formatTableH|/formatTableH>
+40 L<formatTableBasic|/formatTableBasic>
 
-41 L<formatTableHA|/formatTableHA>
+41 L<formatTableH|/formatTableH>
 
-42 L<formatTableHH|/formatTableHH>
+42 L<formatTableHA|/formatTableHA>
 
-43 L<fullFileName|/fullFileName>
+43 L<formatTableHH|/formatTableHH>
 
-44 L<genLValueArrayMethods|/genLValueArrayMethods>
+44 L<fullFileName|/fullFileName>
 
-45 L<genLValueHashMethods|/genLValueHashMethods>
+45 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-46 L<genLValueScalarMethods|/genLValueScalarMethods>
+46 L<genLValueHashMethods|/genLValueHashMethods>
 
-47 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+47 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-48 L<hostName|/hostName>
+48 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-49 L<imageSize|/imageSize>
+49 L<hostName|/hostName>
 
-50 L<indentString|/indentString>
+50 L<imageSize|/imageSize>
 
-51 L<isBlank|/isBlank>
+51 L<indentString|/indentString>
 
-52 L<javaPackage|/javaPackage>
+52 L<isBlank|/isBlank>
 
-53 L<javaPackageAsFileName|/javaPackageAsFileName>
+53 L<javaPackage|/javaPackage>
 
-54 L<keyCount|/keyCount>
+54 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-55 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+55 L<keyCount|/keyCount>
 
-56 L<loadArrayFromLines|/loadArrayFromLines>
+56 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-57 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+57 L<loadArrayFromLines|/loadArrayFromLines>
 
-58 L<loadHashFromLines|/loadHashFromLines>
+58 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-59 L<makePath|/makePath>
+59 L<loadHashFromLines|/loadHashFromLines>
 
-60 L<matchPath|/matchPath>
+60 L<makePath|/makePath>
 
-61 L<max|/max>
+61 L<matchPath|/matchPath>
 
-62 L<min|/min>
+62 L<max|/max>
 
-63 L<nws|/nws>
+63 L<min|/min>
 
-64 L<pad|/pad>
+64 L<nws|/nws>
 
-65 L<parseCommandLineArguments|/parseCommandLineArguments>
+65 L<pad|/pad>
 
-66 L<parseFileName|/parseFileName>
+66 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-67 L<perlPackage|/perlPackage>
+67 L<parseFileName|/parseFileName>
 
-68 L<powerOfTwo|/powerOfTwo>
+68 L<perlPackage|/perlPackage>
 
-69 L<powerOfTwoX|/powerOfTwo>
+69 L<powerOfTwo|/powerOfTwo>
 
-70 L<printFullFileName|/printFullFileName>
+70 L<powerOfTwoX|/powerOfTwo>
 
-71 L<quoteFile|/quoteFile>
+71 L<printFullFileName|/printFullFileName>
 
-72 L<readBinaryFile|/readBinaryFile>
+72 L<printQw|/printQw>
 
-73 L<readFile|/readFile>
+73 L<quoteFile|/quoteFile>
 
-74 L<removeFilePrefix|/removeFilePrefix>
+74 L<readBinaryFile|/readBinaryFile>
 
-75 L<renormalizeFolderName|/renormalizeFolderName>
+75 L<readFile|/readFile>
 
-76 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+76 L<removeFilePrefix|/removeFilePrefix>
 
-77 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+77 L<renormalizeFolderName|/renormalizeFolderName>
 
-78 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+78 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-79 L<temporaryDirectory|/temporaryDirectory>
+79 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-80 L<temporaryFile|/temporaryFile>
+80 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-81 L<temporaryFolder|/temporaryFolder>
+81 L<temporaryDirectory|/temporaryDirectory>
 
-82 L<timeStamp|/timeStamp>
+82 L<temporaryFile|/temporaryFile>
 
-83 L<trim|/trim>
+83 L<temporaryFolder|/temporaryFolder>
 
-84 L<updateDocumentation|/updateDocumentation>
+84 L<timeStamp|/timeStamp>
 
-85 L<userId|/userId>
+85 L<trim|/trim>
 
-86 L<writeBinaryFile|/writeBinaryFile>
+86 L<updateDocumentation|/updateDocumentation>
 
-87 L<writeFile|/writeFile>
+87 L<userId|/userId>
 
-88 L<xxx|/xxx>
+88 L<writeBinaryFile|/writeBinaryFile>
 
-89 L<XXX|/XXX>
+89 L<writeFile|/writeFile>
 
-90 L<zzz|/zzz>
+90 L<xxx|/xxx>
+
+91 L<XXX|/XXX>
+
+92 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2450,7 +2496,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 121;
+use Test::More tests => 126;
 
 #Test::More->builder->output("/dev/null");
 
@@ -2509,6 +2555,10 @@ if (1)                                                                          
   my $s = readFile($f);
   ok $s eq $z;
   ok length($s) == length($z);
+
+  my @f = findFiles($T);
+  ok $f[0] eq $f, "Find unicode file name";
+
   unlink $f;
   ok !-e $f, $f;
   rmdir $t;
@@ -2777,6 +2827,7 @@ is_deeply [0, 5],    [contains('a', qw(a b c d e a b c d e))];
 is_deeply [0, 1, 5], [contains(qr(a+), qw(a baa c d e aa b c d e))];
 
 is_deeply [qw(a b)], [&removeFilePrefix(qw(a/ a/a a/b))];
+is_deeply [qw(b)],   [&removeFilePrefix("a/", "a/b")];
 
 if (0)                                                                          # fileOutOfDate
  {my @Files = qw(a b c);
@@ -2848,3 +2899,11 @@ is_deeply [qw(a b c)],
   [setUnionOfTwoArraysOfWords([qw(a b c )], [qw(a b)])];
 
 ok printQw(qw(a  b  c)) eq "qw(a b c)";
+
+if (1)
+ {my $f = createEmptyFile("zzz.data");
+  ok -e $f;
+  ok !fileSize($f);
+  unlink $f;
+  ok !-e $f;
+ }

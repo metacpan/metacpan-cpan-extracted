@@ -1,10 +1,10 @@
 {
-   "abstract" : "A clone of List-Categorize with support for multiple subcategories.",
+   "abstract" : "deprecated",
    "author" : [
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_2"
    ],
@@ -25,12 +25,17 @@
          "requires" : {
             "Module::Build" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Categorize" : "0.04"
+         }
       }
    },
    "provides" : {
       "List::Categorize::Multi" : {
          "file" : "lib/List/Categorize/Multi.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -42,5 +47,5 @@
          "url" : "https://github.com/damil/List-Categorize-Multi"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

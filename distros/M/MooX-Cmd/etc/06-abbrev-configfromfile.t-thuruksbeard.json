@@ -1,0 +1,9 @@
+{
+    "security_level": "Border",
+    "planets": "1",
+    "stations": "13",
+    "asteroids": "0",
+    "north_gate": "FamilyRhonkar",
+    "south_gate": "HatikvahsFaith",
+    "west_gate": "CompanyPride"
+}

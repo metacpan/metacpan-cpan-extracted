@@ -1,3 +1,24 @@
+0.06 2017-12-26T01:37:41+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+
+0.05 2017-12-25T16:29:54+01:00
+ - Add information about hex_length in doc.
+ - Fix running of author tests.
+ - Fix test of Brahmi block in Perl lesser than 5.14.0.
+ - Fix test comments.
+
+0.04 2017-12-19T14:12:57+01:00
+ - Add SEE ALSO section to Unicode::Block doc.
+ - Add SEE ALSO section to Unicode::Block::Item doc.
+ - Fix test 09-width.t for C locale.
+ - Rewrite tests to author tests.
+ - Rewrite unassigned unicode character to '' (blank space).
+ - Update Module::Install to 1.18 version.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2014-08-26T03:04:50+02:00
  - Add minimal version of Perl.
  - Add tests.

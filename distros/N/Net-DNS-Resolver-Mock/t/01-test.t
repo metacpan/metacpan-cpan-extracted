@@ -6,7 +6,7 @@ use Test::More;
 
 use Net::DNS::Resolver::Mock;
 
-plan tests => 13;
+plan tests => 19;
 
 {
     my $Resolver = Net::DNS::Resolver::Mock->new();
@@ -50,6 +50,18 @@ plan tests => 13;
     is( $Reply->{ 'answer' }->[0]->rdatastr(), '5.6.7.8', 'Correct IP Address returned' );;
 
     $Reply = $Resolver->query( '8.6.4.2', 'PTR' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), 'reverse.example.com.', 'Correct Address returned' );;
+
+    $Reply = $Resolver->query( '9.7.5.3', 'PTR' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::CNAME', 'New::DNS::RR::CNAME object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), '2.4.6.8.in-addr.arpa.', 'Correct CNAME returned' );;
+
+    $Reply = $Resolver->query( '2.4.6.8.in-addr.arpa.', 'PTR' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), 'reverse.example.com.', 'Correct Address returned' );;
+
+    $Reply = $Resolver->query( 'cnameptr.example.com.', 'PTR' );
     is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );
     is( $Reply->{ 'answer' }->[0]->rdatastr(), 'reverse.example.com.', 'Correct Address returned' );;
 }

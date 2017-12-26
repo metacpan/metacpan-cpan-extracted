@@ -3,8 +3,8 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.98"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -34,6 +32,11 @@
          "requires" : {
             "Mojolicious" : "6.40"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
       }
    },
    "release_status" : "stable",
@@ -43,8 +46,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/cloudinary",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/cloudinary.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/cloudinary.git",
+         "web" : "https://github.com/jhthorsen/cloudinary"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

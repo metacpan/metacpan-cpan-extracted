@@ -1,0 +1,109 @@
+==================================================
+Changes from 2016-12-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.1 at 2017-12-21 08:23:45 +0000
+------------------------------------------
+
+  Change: f74ce7c7295e0711bd4b7dc9623c6bbeadbb3c97
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 22:08:32 +0000
+
+    Minor update. 
+
+  Change: d2b11c61b2ffd2f0e10da60e6bafa873e99f19c6
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 21:31:17 +0000
+
+    Add new prototype. 
+
+  Change: 24ef56ade8ed998e07b5bfa6d1fbc5677e6385ce
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 00:04:25 +0000
+
+    Add prototype. 
+
+  Change: eefbcf38f14e894ceaf3124b802ea4ea94150c0c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-19 13:03:11 +0000
+
+    - added Modern::Perl module 
+
+  Change: 9e2e49c4685c74d31d3dea4ef59db3fd45d7b8bc
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-16 01:34:33 +0000
+
+    commited 
+
+  Change: a2a60c787424967450a949278327ea853dde9d57
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 19:17:42 +0000
+
+    v0.0.5
+
+    Updated documentation 
+
+  Change: dab20c117aa4fecfdfc8e6a68cfb86308e7668e3
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-03-11 18:43:58 +0000
+
+    0.0.4
+
+    Updated bin/github-email 
+
+  Change: 54ac05566ac0caf0f2ee42f1f035d6d14252bcd5
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-17 01:37:41 +0000
+
+    v0.0.3 
+
+  Change: 9bcef25b5d7497547cfdcf39793cbab38d874cae
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 20:56:13 +0000
+
+    v0.0.2 
+
+  Change: 0a8a5d1c124f87733a0d42b2ed2adae929526caa
+  Author: faraco <skelic2@yandex.com>
+  Date : 2017-01-16 20:49:44 +0000
+
+    Merge pull request #1 from manwar/fix-cpants-issues
+
+    Fix cpants issues 
+
+  Change: af1ad54a550cae3aab887d7a49c8f026a18ba072
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:02:46 +0000
+
+    Add MIN_PERL_VERSION using dzil plugin [MininmumPerlFast]. 
+
+  Change: c5c1f825be7357d5900abbbbfa2558459466c30b
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:01:21 +0000
+
+    Auto generate META.json using dzil plugin [MetaJSON] 
+
+  Change: 621c0b1391dc9ee7f71ee16be9ae67efe86c137c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:02:51 +0000
+
+    v0.0.1
+
+    - First release 
+
+  Change: 5835eb9831de80c239f4e91b2e3e8f6397caf0fb
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:01:43 +0000
+
+    First release 
+
+  Change: eb36527afc1aa83df297dfd6853c63622b467e18
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:01:01 +0000
+
+    v0.0.1 
+
+================
+End of releases.
+================

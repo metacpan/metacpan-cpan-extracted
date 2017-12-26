@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.90'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -29,16 +29,8 @@ requires:
   Test::Pod::Coverage: '0'
   perl: '5.014'
 resources:
-  X_dynamic_config: 0
-  X_metaspec:
-    version: 2
-  X_resources:
-    bugtracker:
-      web: https://github.com/jhthorsen/app-git-ship/issues
-    homepage: https://github.com/jhthorsen/app-git-ship
-    repository:
-      type: git
-      url: https://github.com/jhthorsen/app-git-ship.git
-      web: https://github.com/jhthorsen/app-git-ship
-version: '0.25'
+  bugtracker: https://github.com/jhthorsen/app-git-ship/issues
+  homepage: https://github.com/jhthorsen/app-git-ship
+  repository: https://github.com/jhthorsen/app-git-ship.git
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

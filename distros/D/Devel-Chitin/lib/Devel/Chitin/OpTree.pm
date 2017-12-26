@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -690,6 +690,10 @@ my %scopelike_ops = (
     pp_entergiven => 1,
     enterwhile => 1,
     pp_enterwhile => 1,
+    entergiven => 1,
+    pp_entergiven => 1,
+    enterwhereso => 1,
+    pp_enterwhereso => 1,
 );
 sub is_scopelike {
     my $self = shift;
@@ -736,7 +740,7 @@ sub is_if_statement {
     and $self->other->is_scopelike;
 }
 
-sub is_posfix_if {
+sub is_postfix_if {
     my $self = shift;
     my $name = $self->op->name;
 
@@ -936,6 +940,8 @@ sub _indent_block_text {
     my $newlines = $text =~ s/\n/\n\t/g;
     if ($newlines or $params{force_multiline}) {
         "\n\t" . $text . "\n";
+    } elsif ($params{noindent}) {
+        $text;
     } else {
         " $text ";
     }
@@ -1074,5 +1080,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

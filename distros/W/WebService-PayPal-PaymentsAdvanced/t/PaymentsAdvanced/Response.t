@@ -21,7 +21,6 @@ my %params = (
             );
         },
         'WebService::PayPal::PaymentsAdvanced::Error::Authentication',
-        'authentication exception'
     );
 
     isa_ok(
@@ -30,7 +29,6 @@ my %params = (
             params                => \%params,
         ),
         'WebService::PayPal::PaymentsAdvanced::Response',
-        'no exception when result code is marked as non-fatal'
     );
 }
 

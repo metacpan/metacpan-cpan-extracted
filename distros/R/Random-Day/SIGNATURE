@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,46 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 4871bd4db0e5c5d8253692f9407d3828b0e3573a Changes
-SHA1 726e53e3bf15f63e6de8a7bdc627559b90b5f081 Day.pm
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 fcf177833113237a32665ade8f01951cb778bb9e Changes
+SHA1 745b9fa7e189a304a37120aa2704d913fe73a8c6 Day.pm
+SHA1 bb306a003553f898c2a9c013f40281b27bd3c936 LICENSE
 SHA1 bca574011b48d5b35924344d463a3eb16e8f48a9 MANIFEST
-SHA1 77a0f57eac627245c703c124083d9e8b4be158bc META.yml
-SHA1 062eea8b53b78153009cba1506849c30a772bcc6 Makefile.PL
-SHA1 dc92e7a77a096d44d0d812a6602e7c078005c41e README
-SHA1 40b8ea563c17f9740e06e07d925dd2048c8f6002 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 02abe94f2161026ae4c3dbdf19ff5db8c7eb1f55 META.yml
+SHA1 6918a7dc305f5f4d5c92a08f44b0e0d7ae403e26 Makefile.PL
+SHA1 cac86a2853bc8843289bf495720684da6f3a3fdf README
+SHA1 ae2e124e11cce32382494933cf61bf5d6c7e09d5 examples/ex1.pl
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
 SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 4d24371113f94481cd3b9a87bbf002cc3f6555ba t/Random-Day/01-use.t
-SHA1 8c6b2d32194f4e0699c3d033738568cf494479ec t/Random-Day/02-version.t
-SHA1 6aa9c4e2dabb9edb93924524846f8a088b8f419b t/Random-Day/03-new.t
-SHA1 e5c694725fa671070e9c751a2c2f43952141e7fd t/Random-Day/04-get.t
-SHA1 a812462b678221882f833b14f6e3a9e549dd9374 t/Random-Day/05-random.t
-SHA1 620c7871e1cd27a926efcbf7e973b6d27193b891 t/Random-Day/06-random_day.t
-SHA1 cf63b2c77ba3b0eea3b814d32ca599f694c0b548 t/Random-Day/07-random_day_month.t
-SHA1 20fa689259c7d995ba146f4fdf63d8b376bedaf3 t/Random-Day/08-random_day_month_year.t
-SHA1 ab6c34232dd9a08f07dee3d9fa4c51060d31f386 t/Random-Day/09-random_month.t
-SHA1 d98854ce0743fa201855065022bc9c7e8f372e8b xt/Random-Day/01-pod_coverage.t
-SHA1 4f43dd9fe216a81cff7a4c6d379c776f0dc05a75 xt/Random-Day/02-pod.t
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 102f38134352a7c06de06cf6a3ae289ff061de32 t/Random-Day/01-use.t
+SHA1 d58b3b02c3d3added1ba59583d3a8b34e34822cc t/Random-Day/02-version.t
+SHA1 17cbde094fbe0a9826f2173f7e787ca0620a8295 t/Random-Day/03-new.t
+SHA1 71cc25e0f175ec4268bef274bb6d1d01d1d1d6c2 t/Random-Day/04-get.t
+SHA1 9f3a3fdea73a8c09d2404d0d95a96bc69ef06b93 t/Random-Day/05-random.t
+SHA1 7a4105e593bf5c87c2d3d3671061dadf563480e0 t/Random-Day/06-random_day.t
+SHA1 8603f1ebc03851eb1db1ad8cee8695f13e12715e t/Random-Day/07-random_day_month.t
+SHA1 a267618f6ff4340a6915625fe1a64ab25d9a9aea t/Random-Day/08-random_day_month_year.t
+SHA1 2915ee11a673be85262916059555d9d214720857 t/Random-Day/09-random_month.t
+SHA1 219d10245620b6c2dd0b8bcd89a860984c278b3c xt/Random-Day/01-pod_coverage.t
+SHA1 419a08dab22a629a3710c126ed5349b147ae1690 xt/Random-Day/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAWLDAAoJEJe+XXKaIuTl/awH/RF+6oPw2wLHIp6T541APJrE
-ZCCzdd+2Opkg/rWfJYIeWqb+FJ5g+agm0oPfSz/UQMOvi5jaT5I3Vw9EbOnez8Ng
-NAHt3IV8wQE+RQfHztMZAsrUZh68ECVHESISIPNoaHuKLQ7VjNr2T0IPa/ORXBsj
-ZMaoSY1wDS1PXW0Fk0FTEVJLs3/QdMcDdIZ57Bwsi+YFZdvznXJL/dVw2DWiyQ+r
-NKi4S7yn8eBo3ukiG0HgHvWx78KOOPuIHaksJwKpRZma6ApfVN/tu34BsFku4l1F
-cq0QMX/peYBCgAbRx0i1MEWgaqh0K+5z9hueRIEPkb77Z+JC0Tw1pZlLOyYd62U=
-=62Hl
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlpCITkACgkQKyiOZjWe
+rHZaaAf/aXdBcoGYCRepQMJpYrjHkCWMxVQjQrj6yl7JCD5HrTXw8wt1m0zXOHlm
+sKyVNQbttLKVjuDNNueSIsOejv7++PWbB5esDS3fz1JStu5y9R4L2GxNDfXc9CLe
+phQ6FSyFsErGxt1g2B5s630wKQYtlAQz/Hk8KVw+C6GEA0r5DyTz51Sh76TmcGm9
+/hEQ6G0UQkafKHyz3N+QQ9+/XBzQLAz8C/g8QZL873IKXDFU20/McSP1dVmOIOZ9
+TwypxLGjrrqopjSFVVGWVOgygfQqarB6X7R5XT1u/Rrp9cIy7aWLTHID7tzq2Pa6
+Vj/vaLAXck7u0WF3I5PdZoKfgYGBvw==
+=6DLL
 -----END PGP SIGNATURE-----

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Check that ppport works
 
 use strict;

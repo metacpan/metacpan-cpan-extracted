@@ -1,18 +1,112 @@
+<div class="comment" style="display:none">&lt;script&gt;&quot;hello&quot;&lt;/script&gt;</div>
 
 <!-- start comment -->
-<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
-; &lt;script&gt;&quot;hello&quot;&lt;/script&gt;
-<span class="commentmarker">END_COMMENT}}:</span>
+<div class="comment" style="display:none">
+This is &lt;script&gt;alert&lt;/script&gt; a comment \emph
 </div>
 <!-- stop comment -->
-
-<!-- start comment -->
-<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
 
 <p>
-This is &lt;script&gt;alert&lt;/script&gt; a comment \emph
+Foo
+;not a comment because the semicolon is not followed by a white space
+</p>
+<div class="comment" style="display:none">comment</div>
+<div class="comment" style="display:none">Comment</div>
+<div class="comment" style="display:none">Second line \{\}</div>
+<div class="comment" style="display:none"></div>
+
+<p>
+bar
+</p>
+<div class="comment" style="display:none"></div>
+<div class="comment" style="display:none">comment \{\}</div>
+<div class="comment" style="display:none"></div>
+
+<p>
+baz
 </p>
 
-<span class="commentmarker">END_COMMENT}}:</span>
+<p>
+This is regular
+</p>
+
+<!-- start comment -->
+<div class="comment" style="display:none">
+Hello there, this is a comment
+comment inside
 </div>
 <!-- stop comment -->
+<div class="comment" style="display:none">comment as well</div>
+<div class="comment" style="display:none"></div>
+<div class="comment" style="display:none">comment continue</div>
+
+<p>
+This is regular
+</p>
+
+<pre class="example">
+; this is some in verbatim
+&lt;comment&gt;
+Another comment
+&lt;/comment&gt;
+</pre>
+<div class="comment" style="display:none">and has a comment !@#$%^^&amp;&amp;*()\[]{}|&lt;&quot;&#x27;&gt;</div>
+<div class="verse">
+This is a verse.
+</div>
+
+<!-- start comment -->
+<div class="comment" style="display:none">
+Another comment which will screw, because of the nesting, but output
+is acceptable (throwing a warning for good measure). !@#$%^^&amp;&amp;*()\[]{}|&lt;&quot;&#x27;&gt;
+</div>
+<!-- stop comment -->
+
+<p>
+Blablabla
+</p>
+<div class="verse">
+Here the verse continue
+</div>
+
+<!-- start comment -->
+<div class="comment" style="display:none">
+Nested
+</div>
+<!-- stop comment -->
+
+<p>
+; Not a comment because of &lt;verbatim&gt;
+</p>
+
+<!-- start comment -->
+<div class="comment" style="display:none">
+Here the comment will stop. This is a kind of implementation artefact.
+</div>
+<!-- stop comment -->
+
+<pre class="example">
+verbatim
+&lt;verse&gt;
+verse
+&lt;/verse&gt;
+</pre>
+
+<pre class="example">
+{{{
+&lt;verse&gt;
+verse
+; comment
+&lt;/verse&gt;
+&lt;comment&gt;
+comment
+&lt;/comment&gt;
+}}}
+</pre>
+<div class="verse">
+
+</div>
+
+<pre class="example">
+Makes no sense
+</pre>

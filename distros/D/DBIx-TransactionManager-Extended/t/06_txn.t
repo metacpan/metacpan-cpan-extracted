@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More 0.98;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use t::Util;
 use t::Mock;
 

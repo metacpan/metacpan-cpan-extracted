@@ -1,3 +1,10 @@
+0.17        2017-12-26
+
+    * Fix the link to the GitHub repository in the metadata.
+    * Make sure to remove *~ temporary files / cruft.
+        * https://rt.cpan.org/Ticket/Display.html?id=123943
+        * Thanks to KENTNL for the report.
+
 0.16        2016-04-30
 
     * Hopefully get rid of some warnings on Solaris and other platforms with

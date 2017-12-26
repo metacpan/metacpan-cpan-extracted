@@ -24,6 +24,7 @@ no_smart_comments_in("lib/Reindeer/Role.pm");
 no_smart_comments_in("lib/Reindeer/Types.pm");
 no_smart_comments_in("lib/Reindeer/Util.pm");
 no_smart_comments_in("t/00-compile.t");
+no_smart_comments_in("t/00-report-prereqs.dd");
 no_smart_comments_in("t/00-report-prereqs.t");
 no_smart_comments_in("t/basic_load.t");
 no_smart_comments_in("t/builder/basic.t");

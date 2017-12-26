@@ -44,6 +44,7 @@ t/footnotes/verbatim-in.muse
 t/html.t
 t/manifest.t
 t/memory-cycles.t
+t/nbsp.t
 t/object.t
 t/pod-coverage.t
 t/pod.t

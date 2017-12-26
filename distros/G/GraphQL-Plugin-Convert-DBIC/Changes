@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.04	Wed Dec 20 20:05:03 GMT 2017
+ - handle mysql medium/longtext
+
 0.03	Thu Nov 16 06:00:14 GMT 2017
  - implement mutations and inputs
  - doc them plus queries

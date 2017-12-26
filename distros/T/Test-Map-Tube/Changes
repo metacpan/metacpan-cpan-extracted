@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Map::Tube.
 
+0.36  Fri Dec 22 11:15:00 2017
+      - Upgraded to use Map::Tube v3.42.
+
 0.35  Wed Nov 08 02:00:00 2017
       - Upgraded to use Map::Tube v3.37.
       - Updated sub _ok_map_functions() to respect the change to sub get_stations() in Map::Tube.

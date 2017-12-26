@@ -1,21 +1,25 @@
-Revision history for Perl extension Module-Manifest
+Revision history for Module-Manifest
 
-1.08 Tue 15 Jun 2010
+1.09      2017-12-20 01:34:15Z
+        - switch packaging to Dist::Zilla, which makes the distribution
+          installable again on perl 5.27.7  (See RT#123867)
+
+1.08      2010-06-15
 	- Updated to Module::Install::DSL 0.99
 	- Updated documentation
 	- Changed to a production version
 
-0.07 Mon 20 Apr 2009
+0.07      2009-04-20
 	- Upgrading to Module::Install::DSL 0.83
 	- Fixes for Win32
 	- Removing distribution-specific skip file (the shared on works fine)
 	- Removing custom README file (the generated one is the same)
 
-0.06 Thu 12 Mar 2009
+0.06      2009-03-12
 	- Adding a missing Test::Warn dependency
 	- Updated Module::Install to 0.79
 
-0.05 Sat 20 Dec 2008
+0.05      2008-12-20
 	- Added option for file-less parsing
 	- Clarified the docs
 		o Added a synopsis
@@ -25,16 +29,16 @@ Revision history for Perl extension Module-Manifest
 	- Added a README file made by hand from the perldoc
 	- Added a bunch of test files
 
-0.04 Thu 11 Dec 2008
+0.04      2008-12-11
 	- Upgrading Module::Install to 0.77
 	- Adding a missing use Carp (Jonathan Yu)
 
-0.03 Mon  5 May 2008
+0.03      2008-05-05
 	- Upgrading Module::Install
 	- Fixing a broken META.yml
 
-0.02 Mon 25 Sep 2006
+0.02      2006-09-25
 	- Fixing a major POD bug (got the name wrong) :(
 
-0.01 Sun 24 Sep 2006
+0.01      2006-09-24
 	- original version

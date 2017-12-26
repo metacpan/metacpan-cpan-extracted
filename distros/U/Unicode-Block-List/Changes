@@ -1,3 +1,11 @@
+0.03 2017-12-25T17:09:04+01:00
+ - Add third example to doc.
+ - Rewrite to author tests.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.18 version.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2014-08-28T01:13:45+02:00
  - Add another EXAMPLE section to doc.
  - Add minimal version of Perl.

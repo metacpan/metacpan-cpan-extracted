@@ -8,6 +8,9 @@ my $builder = Module::Build->new(
     dist_author         => q{Laurent Dami <dami@cpan.org>},
     dist_version_from   => 'lib/List/Categorize/Multi.pm',
     release_status      => 'stable',
+    requires => {
+      'List::Categorize' => 0.04,
+     },
     configure_requires => {
         'Module::Build' => 0,
     },

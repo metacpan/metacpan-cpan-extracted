@@ -1,5 +1,14 @@
 Revision history for Perl extension Digest::SHA.
 
+6.01  Mon Dec 25 00:08:08 MST 2017
+	- added "--ignore-missing" and "--strict" options to shasum
+		-- consistent with GNU coreutils
+		-- ref. rt.cpan.org #123897
+	- removed PERL_CORE preambles from test scripts
+		-- preambles no longer needed for core testing
+		-- thanks to Chris Williams for patch
+		-- ref. rt.cpan.org #123863
+
 6.00  Fri Dec  8 22:44:44 MST 2017
 	- added "tag" option (BSD-style checksums) to shasum
 		-- consistent with GNU sha1sum, sha224sum, etc.

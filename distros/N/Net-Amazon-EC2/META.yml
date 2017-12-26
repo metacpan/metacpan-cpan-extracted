@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.10'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,4 +35,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mrallen1/net-amazon-ec2
-version: 0.30_1
+version: '0.33'

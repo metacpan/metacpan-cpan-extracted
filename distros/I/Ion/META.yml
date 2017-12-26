@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  JSON::XS: '0'
   Test2::Bundle::Extended: '0'
   Test::More: '0'
   Test::Pod: '0'
@@ -26,9 +27,10 @@ requires:
   List::Util: '0'
   Scalar::Util: '0'
   common::sense: '0'
+  parent: '0'
 resources:
   bugtracker: https://github.com/sysread/Ion/issues
   homepage: https://github.com/sysread/Ion
   repository: https://github.com/sysread/Ion.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

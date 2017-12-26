@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use HTML::Latemp::GenMakeHelpers;
+use HTML::Latemp::GenMakeHelpers ();
 
 use Cwd (qw(getcwd));
 
@@ -19,7 +19,7 @@ my $generator =
 
 $generator->process_all();
 
-use IO::All;
+use IO::All qw/ io /;
 
 my $text = io("include.mak")->slurp();
 $text =~ s!^(T2_DOCS = .*)humour/fortunes/index.html!$1!m;
@@ -35,6 +35,3 @@ io("include.mak")->print($text);
 
     chdir($orig_dir);
 }
-
-1;
-

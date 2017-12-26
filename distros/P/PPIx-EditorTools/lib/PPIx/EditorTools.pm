@@ -1,7 +1,7 @@
 package PPIx::EditorTools;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Utility methods and base class for manipulating Perl via PPI
-$PPIx::EditorTools::VERSION = '0.20';
+$PPIx::EditorTools::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -329,7 +329,7 @@ PPIx::EditorTools - Utility methods and base class for manipulating Perl via PPI
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

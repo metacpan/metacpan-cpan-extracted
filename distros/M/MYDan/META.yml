@@ -34,6 +34,7 @@ requires:
   DateTime: '1.03'
   Expect: '1.21'
   File::Temp: '0'
+  Filesys::Df: '0'
   Getopt::Long: '2.38'
   IO::Poll: '0'
   IO::Pty: '1.12'
@@ -59,4 +60,4 @@ resources:
   bugtracker: https://github.com/mydan/mayi/issues
   homepage: https://github.com/mydan/mayi
   repository: https://github.com/mydan/mayi.git
-version: v0.1.22
+version: v0.1.26

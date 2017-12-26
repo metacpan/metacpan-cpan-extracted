@@ -21,9 +21,9 @@ requires:
   Capture::Tiny: '0'
   Devel::IPerl::Display::PNG: '0'
   Devel::IPerl::Display::SVG: '0'
-  File::Temp: '0'
   Moo::Role: '0'
   PDL::Graphics::Gnuplot: '0'
+  Path::Tiny: '0'
   Role::Tiny: '0'
   perl: '5.008'
   strict: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   homepage: https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot
   repository: https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot.git
-version: '0.008'
+version: '0.010'
 x_serialization_backend: 'YAML::Tiny version 1.70'

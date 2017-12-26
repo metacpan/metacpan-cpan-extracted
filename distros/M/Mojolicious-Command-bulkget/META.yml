@@ -4,7 +4,7 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Mojolicious: '7.48'
+  Mojolicious: '7.53'
   Test::More: '0.92'
 configure_requires:
   ExtUtils::MakeMaker: 6.63_03
@@ -20,12 +20,12 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '7.48'
+  Mojolicious: '7.53'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
-  bugtracker: https://github.com/graphql-perl/Mojolicious-Command-bulkget/issues
+  bugtracker: https://github.com/mohawk2/Mojolicious-Command-bulkget/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/graphql-perl/Mojolicious-Command-bulkget
-version: '0.01'
+  repository: https://github.com/mohawk2/Mojolicious-Command-bulkget
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

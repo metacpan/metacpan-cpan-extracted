@@ -1,5 +1,15 @@
 Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
 
+0.09 Fri Dec 22 11:22:48 EST 2017
+    - Implement better syntax for path to perl executable, as suggested by
+      Andreas Koenig.
+
+0.08 Wed Dec 20 21:11:24 EST 2017
+    - Add missing prerequisite Data::Dump for 'dump-parsed-cpanm-build-logs'
+
+0.07 Wed Dec 20 17:31:08 EST 2017
+    - Add helper program 'dump-parsed-cpanm-build-logs'
+
 0.06 Fri Dec 15 14:36:40 EST 2017
     - Account for possible absence of 'author' in formation of name of .json
       files.
@@ -24,5 +34,4 @@ Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
 0.01 Tue Nov 28 08:05:47 2017
     - original version; created by ExtUtils::ModuleMaker 0.56
     - [Not released to CPAN ]
-
 

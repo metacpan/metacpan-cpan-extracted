@@ -5,15 +5,15 @@ MANIFEST			This list of files
 README
 TODO
 t/00-load.t
-t/10-spath-address.t
-t/12-spath-delete.t
-t/14-spath-expand.t
-t/16-spath-assign.t
-t/20-slist.t
-t/30-spath_delta.t
-t/40-is_implicit_step.t
 t/_common.pm
+t/implicit_step.t
+t/list_paths.t
 t/manifest.t
+t/path-address.t
+t/path-assign.t
+t/path-delete.t
+t/path-expand.t
+t/path_delta.t
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

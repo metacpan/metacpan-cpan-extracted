@@ -31,11 +31,11 @@ Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.93
+Version 0.94
 
 =cut
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 =head1 SYNOPSIS
 
@@ -66,8 +66,8 @@ Nothing is exported by default.
 
 Diff is simply a HASH whose keys shows status for each item in passed
 structures. Every status type (except C<D>) may be omitted during the diff
-calculation. Disabling some or other types produces different diffs: diff for
-unchanged types only also possible (if all other types disabled).
+calculation. Disabling some or other types produce different diffs: diff with
+only unchanged items is also possible (when all other types disabled).
 
 =over 4
 
@@ -102,16 +102,16 @@ Represent unchanged items.
 
 =back
 
-Diff format: metadata alternates with data therefore diff may represent any
-structure of any data types. Simple types specified as is, arrays and hashes,
-if changed, contains subdiffs with original for represented items addresses:
-indexes for arrays and keys for hashes.
+Diff format: metadata alternates with data and, as a result, diff may represent
+any structure of any data types. Simple types specified as is, arrays and hashes
+contain subdiffs for their items with native for such types addressing: indexes
+for arrays and keys for hashes.
 
 Sample:
 
     old:  {one => [5,7]}
     new:  {one => [5],two => 2}
-    opts: unchanged items (U) omitted
+    opts: {noU => 1} # omit unchanged items
 
     diff:
     {D => {one => {D => [{I => 1,R => 7}]},two => {A => 2}}}
@@ -120,7 +120,7 @@ Sample:
     ||    | |     ||    |||    | |    |     |     |+- it says key was added
     ||    | |     ||    |||    | |    |     |     +- subdiff for it
     ||    | |     ||    |||    | |    |     +- another key from top-level hash
-    ||    | |     ||    |||    | |    +- what it was (item value - 7)
+    ||    | |     ||    |||    | |    +- what it was (item's value: 7)
     ||    | |     ||    |||    | +- shows what happened to item (removed)
     ||    | |     ||    |||    +- array item's actual index
     ||    | |     ||    ||+- prior item was omitted
@@ -147,6 +147,11 @@ changing diff: it's parts are links to original structures.
 
 =over 4
 
+=item freezer E<lt>subE<gt>
+
+Serializer callback (redefines default serializer). See
+L</CONFIGURATION VARIABLES> for details.
+
 =item noX
 
 Where X is a status (C<A>, C<N>, C<O>, C<R>, C<U>); such status will be omitted.
@@ -159,14 +164,26 @@ Drop removed item's data.
 
 =cut
 
-sub diff($$;@);
+our $Freezer = sub {
+    local $Storable::canonical = 1; # for equal snapshots for equal by data hashes
+    local $Storable::Deparse = 1;   # for coderefs
+
+    freeze \$_[0];
+};
+
 sub diff($$;@) {
     my ($x, $y, %opts) = @_;
 
-    my $d = {};
-    local $Storable::canonical = 1; # for equal snapshots for equal by data hashes
-    local $Storable::Deparse = 1;
+    $opts{freezer} = $Freezer unless (exists $opts{freezer});
 
+    _diff($x, $y, %opts);
+}
+
+sub _diff($$;@);
+sub _diff($$;@) {
+    my ($x, $y, %opts) = @_;
+
+    my $d = {};
     if (ref $x ne ref $y) {
         $d->{O} = $x unless ($opts{noO});
         $d->{N} = $y unless ($opts{noN});
@@ -174,7 +191,7 @@ sub diff($$;@) {
         return $opts{noU} ? {} : { U => [] } unless (@{$x} or @{$y});
 
         my ($i, $I) = (-1, -1);
-        for (sdiff($x, $y, sub { freeze \$_[0] })) {
+        for (sdiff($x, $y, $opts{freezer})) {
             $i++;
 
             if ($_->[0] eq 'u') {
@@ -191,7 +208,7 @@ sub diff($$;@) {
             }
 
             if ($_->[0] eq 'c') {
-                my $sd = diff($_->[1], $_->[2], %opts);
+                my $sd = _diff($_->[1], $_->[2], %opts);
                 push @{$d->{D}}, $sd if (keys %{$sd});
             } elsif ($_->[0] eq '+') {
                 push @{$d->{D}}, { A => $_->[2] } unless ($opts{noA});
@@ -209,10 +226,10 @@ sub diff($$;@) {
 
         for my $k (@keys) {
             if (exists $x->{$k} and exists $y->{$k}) {
-                if (freeze(\$x->{$k}) eq freeze(\$y->{$k})) {
+                if ($opts{freezer}($x->{$k}) eq $opts{freezer}($y->{$k})) {
                     $d->{U}->{$k} = $y->{$k} unless ($opts{noU});
                 } else {
-                    my $sd = diff($x->{$k}, $y->{$k}, %opts);
+                    my $sd = _diff($x->{$k}, $y->{$k}, %opts);
                     $d->{D}->{$k} = $sd if (keys %{$sd});
                 }
                 next;
@@ -230,14 +247,7 @@ sub diff($$;@) {
             map { $d->{D}->{$_}->{U} = $d->{U}->{$_} } keys %{$d->{U}};
             delete $d->{U};
         }
-    } elsif (ref $x eq 'Regexp' and $x != $y) {
-        if ($x eq $y) {
-            $d->{U} = $x unless ($opts{noU});
-        } else {
-            $d->{O} = $x unless ($opts{noO});
-            $d->{N} = $y unless ($opts{noN});
-        }
-    } elsif (ref $x ? $x == $y || freeze($x) eq freeze($y) : freeze(\$x) eq freeze(\$y)) {
+    } elsif (ref $x && $x == $y || $opts{freezer}($x) eq $opts{freezer}($y)) {
         $d->{U} = $x unless ($opts{noU});
     } else {
         $d->{O} = $x unless ($opts{noO});
@@ -249,7 +259,7 @@ sub diff($$;@) {
 
 =head2 list_diff
 
-List pairs (path, ref_to_subdiff) for provided diff. See
+List pairs (path_to_subdiff, ref_to_subdiff)) for provided diff. See
 L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
     @list = list_diff($diff);
@@ -296,7 +306,7 @@ sub list_diff($;@) {
             } reverse 0 .. $#{${$diff}->{D}};
         } else { # HASH
             map {
-                unshift @stack, [@{$path}, {keys => [$_]}], \${$diff}->{D}->{$_}
+                unshift @stack, [@{$path}, {K => [$_]}], \${$diff}->{D}->{$_}
             } $opts{sort}
                 ? ref $opts{sort} eq 'CODE'
                     ? reverse $opts{sort}(keys %{${$diff}->{D}})
@@ -460,13 +470,42 @@ sub valid_diff($) {
     return wantarray ? @errs : 1;
 }
 
-=head1 LIMITATIONS
+=head1 CONFIGURATION VARIABLES
 
-Struct::Diff fails on structures with loops in references. C<has_circular_ref>
-from L<Data::Structure::Util> can help to detect such structures.
+=over 4
+
+=item $Struct::Diff::Freezer
+
+Contains reference to default serialization function (C<diff()> rely on it
+to determine data equivalency). L<Storable/freeze> with enabled
+C<$Storable::canonical> and C<$Storable::Deparse> opts used by default.
+
+L<Data::Dumper> is suitable for structures containing regular experrions:
+
+    $Struct::Diff::Freezer = sub {
+        local $Data::Dumper::Deparse    = 1;
+        local $Data::Dumper::Sortkeys   = 1;
+        local $Data::Dumper::Terse      = 1;
+
+        return Dumper @_;
+    }
+
+But, comparing to C<Storable> it has two another issues: speed and unability
+to distinguish numbers from their string representations.
+
+=back
+
+=head1 LIMITATIONS
 
 Only arrays and hashes traversed. All other data types compared by reference
 addresses and content.
+
+L<Storable/freeze> (serializer used by default) failes on compiled regexp
+serialization, so, consider to use other serializer if data contains regular
+expressions. See L<CONFIGURATION VARIABLES> for details.
+
+Struct::Diff fails on structures with loops in references. C<has_circular_ref>
+from L<Data::Structure::Util> can help to detect such structures.
 
 =head1 AUTHOR
 

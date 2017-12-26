@@ -1,3 +1,7 @@
+0.68 Mon Dec 18 20:01:05 CET 2017
+ - Fix regex roundtrip (fixes issue#69) PR#70 (TINITA++)
+ - Fix loading of many regexes (fixes issue#64) PR#71 (TINITA++)
+
 0.67 Wed Nov 15 18:59:33 CET 2017
  - Support standard tags !!str, !!map and !!seq instead of dying. PR#67
    (TINITA++)

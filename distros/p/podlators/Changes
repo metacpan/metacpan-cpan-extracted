@@ -1,6 +1,29 @@
                       User-Visible podlators Changes
 
-podlators 4.09 (unreleased)
+podlators 4.10 (2017-12-25)
+
+    [Pod::Man] Change man page references and function names to bold
+    instead of italic, following the current Linux man page standard.  The
+    previous formatting was taken from Solaris, and it seems safe to say
+    that the Linux man page formatting conventions are now much more
+    widely followed than Solaris's.  Patch from Guillem Jover.
+
+    [Pod::Man] Revert the .IX handling code to the earlier version from
+    Bjarni Ingi Gislason but add the trailing backslashes that should
+    hopefully avoid blank page issues on HP-UX.  This fixes a warning
+    regression when man is run with warnings enabled.  (Debian Bug#847972)
+
+    [Pod::Man] Wrap the output file descriptor in a glob before passing it
+    to PerlIO::get_layers so that the layer check works properly.
+    Previously, this code would throw a warning if given a scalar not
+    wrapped in a glob and not detect layers properly.  Patch from Zefram.
+    (#122521)
+
+    Produce a proper diagnostic when given empty input on standard input
+    with no other arguments to pod2man or pod2text.  Reported by Guillem
+    Jover.
+
+podlators 4.09 (2016-11-05)
 
     [Pod::Text] Use Pod::Simple's logic to determine the native code
     points for NO BREAK SPACE and SOFT HYPHEN instead of hard-coding the
@@ -161,7 +184,7 @@ podlators 4.00 (2015-11-28)
     as the timestamp from which to derive the left-hand footer if the date
     option is not set, overriding the timestamp of the input file.  This
     is primarily useful to ensure reproducible builds of the same output
-    file given the same souce and Pod::Man version, even when file
+    file given the same source and Pod::Man version, even when file
     timestamps may not be consistent.  Thanks, Niko Tyni.  (Debian
     Bug#801621)
 
@@ -690,7 +713,7 @@ podlators 1.14 (2001-11-23)
     [Pod::Man] Improve and simplify the handling of indentation shifts.
 
     [Pod::Man] When intuiting the man page name for a module, also strip
-    $^O by itself as a directory component even when not preceeded or
+    $^O by itself as a directory component even when not preceded or
     followed by a dash and other text.
 
     [Pod::Text] Fix handling of =for or =begin/=end in =item paragraphs.

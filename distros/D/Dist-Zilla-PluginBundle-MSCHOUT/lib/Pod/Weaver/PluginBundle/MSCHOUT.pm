@@ -8,7 +8,7 @@
 #
 
 package Pod::Weaver::PluginBundle::MSCHOUT;
-$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.35';
+$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.36';
 # ABSTRACT: Pod::Weaver configuration the way MSCHOUT does it
 
 # Dependencies
@@ -76,7 +76,7 @@ Pod::Weaver::PluginBundle::MSCHOUT - Pod::Weaver configuration the way MSCHOUT d
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

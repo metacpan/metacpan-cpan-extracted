@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,51 +12,53 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 18008003640880cfc823f71df738b718a40e4fd2 Block.pm
-SHA1 ec00c073c8b2e80d2e5b7b52116751768101748d Block/Item.pm
-SHA1 32c1426444e1988377d4e5dc4172417c7eeecde4 Changes
-SHA1 d32d1b957eb6d99bd7b76fd8c33dac3bed505f96 LICENSE
-SHA1 ec15a949ed52a0f0e5b95e54351a5ec86d5e3331 MANIFEST
-SHA1 0639351c56f243ac0a49f28ce751bdf1e6566b9a META.yml
-SHA1 6672022b8bc9c4d9731b396a05e0d1bd40c3a450 Makefile.PL
-SHA1 2e18508f3501825424aa78037d81d54905e0a2e5 README
+SHA1 6261e6b65a03fa16808fc6558169ed394597c239 Block.pm
+SHA1 8261649a08f4dd7bdebad35a1e67af81aab3b0c8 Block/Item.pm
+SHA1 9bdf970c6843d9419a9dfcfec1824f5c0dc0074b Changes
+SHA1 bb306a003553f898c2a9c013f40281b27bd3c936 LICENSE
+SHA1 1f61f28926118d6ed16553da6643a36a78372450 MANIFEST
+SHA1 fcad5f181267cc875132516bfeaae563103dd475 META.yml
+SHA1 4aa5bfe22f97ab80b66d54dc1f5d8675a03a8f11 Makefile.PL
+SHA1 cd46ca8b6d555f2c0190fc7b600ca9f2048ffe4f README
 SHA1 1e3b017f339dfb3d568f3c4fea05675cff7073fa examples/ex1.pl
 SHA1 0eca3938f2578478eefc7b71761cff7a22daf4cd examples/ex2.pl
-SHA1 4f7982f7e554df23debce735ab343d88d7355140 inc/Module/Install.pm
-SHA1 c68c85ca62ae30d83f633975cd9af2a0789f59e0 inc/Module/Install/Base.pm
-SHA1 4797fd314e2653a427e725104704b0320993ba8c inc/Module/Install/Can.pm
-SHA1 b771d93af2bfc41273f48fa36082bf1bd6f21dbe inc/Module/Install/Fetch.pm
-SHA1 f4f3258a505a432a58cbcdc1fd030ef5e8e90985 inc/Module/Install/Makefile.pm
-SHA1 100a0dd8572f0b40373350fdd6c0a6f035d9dc39 inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 4490fed943f4e556db9fd054b7ec8765ca417f7d inc/Module/Install/Win32.pm
-SHA1 8464ddf690b9f7036a0974ff172ec0ced2f6a329 inc/Module/Install/WriteAll.pm
-SHA1 76005628918c7012269ce5c52ff964fae76fd33b t/Unicode-Block-Item/00-use.t
-SHA1 46aba8f1f1b84b7d876126cebe282b3ca6328065 t/Unicode-Block-Item/01-version.t
-SHA1 ae9f7d7bbdd3b613d5d993055a29f09ff22be4b9 t/Unicode-Block-Item/02-pod_coverage.t
-SHA1 8472870ee5d85fc95747a6fdee795e23c47d474c t/Unicode-Block-Item/03-pod.t
-SHA1 9d9d773de75f132a5e3e33f9706257a45afae972 t/Unicode-Block-Item/04-new.t
-SHA1 8192c37c647b9cc55e2610e65ed3ad65d905f3b3 t/Unicode-Block-Item/05-base.t
-SHA1 fc7509b175b98f3807dd1503b7f225ce8648d9d7 t/Unicode-Block-Item/06-char.t
-SHA1 2e1700a6ea86d5e3953b75c97d39e2ec5fa9fd10 t/Unicode-Block-Item/07-hex.t
-SHA1 50d2d491032d11ece70952db1ef39fc3b7076683 t/Unicode-Block-Item/08-last_hex.t
-SHA1 f8bb7bbcb2b2feef040b749f51898c9ad9f1efb9 t/Unicode-Block-Item/09-width.t
-SHA1 47a2397094e7ed68cd5e60e9eb414718f958a19f t/Unicode-Block/00-use.t
-SHA1 5332092b9cb4ab12464bd98821cdd389d0b3640d t/Unicode-Block/01-version.t
-SHA1 fe985a4bcb1a0715ff8ed882598e3737faeba518 t/Unicode-Block/02-pod_coverage.t
-SHA1 c75014be45dbd3bb5948255cee784cd3ddbdab09 t/Unicode-Block/03-pod.t
-SHA1 cac7960f6e445180c74d4d4042a3c15bbc95c8a1 t/Unicode-Block/04-new.t
-SHA1 c8ca118dce50fc40d7ea70b49ccdc64d91ccdc2e t/Unicode-Block/05-next.t
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 0d363f8feb1c12583ea2acf080b02a7d4adf7890 t/Unicode-Block-Item/01-use.t
+SHA1 1a592ea8013c866d387969c0a7b2df5461bdb5dd t/Unicode-Block-Item/02-version.t
+SHA1 9d9d773de75f132a5e3e33f9706257a45afae972 t/Unicode-Block-Item/03-new.t
+SHA1 8192c37c647b9cc55e2610e65ed3ad65d905f3b3 t/Unicode-Block-Item/04-base.t
+SHA1 a75160b994595e29e89ac1cc8765de2a4f2e7981 t/Unicode-Block-Item/05-char.t
+SHA1 2e1700a6ea86d5e3953b75c97d39e2ec5fa9fd10 t/Unicode-Block-Item/06-hex.t
+SHA1 50d2d491032d11ece70952db1ef39fc3b7076683 t/Unicode-Block-Item/07-last_hex.t
+SHA1 28ea5e160cc4c161b45da177f89b58000dad501c t/Unicode-Block-Item/08-width.t
+SHA1 dc6dde0b17995747467bac798b44b3cdbc20dc34 t/Unicode-Block/01-use.t
+SHA1 442b49c7ad40eb79d071c0307571309714464a8f t/Unicode-Block/02-version.t
+SHA1 cac7960f6e445180c74d4d4042a3c15bbc95c8a1 t/Unicode-Block/03-new.t
+SHA1 c8ca118dce50fc40d7ea70b49ccdc64d91ccdc2e t/Unicode-Block/04-next.t
+SHA1 16f3d4ed2d5f4631fd0a6f3e4a6b438c9e3e19ab xt/Unicode-Block-Item/01-pod_coverage.t
+SHA1 046cca4617b008e8934cc74daeec526ad275d7d6 xt/Unicode-Block-Item/02-pod.t
+SHA1 0b4f6fd52a00e19fc12fb5a12c780c515f1886e7 xt/Unicode-Block/01-pod_coverage.t
+SHA1 8d13f660a04090f3203f9009807c78331aa8c838 xt/Unicode-Block/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJT+900AAoJEAwa+cf4dLBaze8IAI+uMgm3mzFFY9AZOwXirjeU
-59bgv+gHKo6F3L7fKVNsRCTSclWHlSGxKjJ2sNev4fd4vlNlxfMmjF/HXCoQUp2H
-yl5t7Uy7cg4rdw/YR4wyYEd/0PxvuokINM3AtaobVCaK+Ryq0JijvJXAiZCd01k6
-FNhN5uFGXrBH7n3rVCf3xUrVsOunU/Hr8hy+iD4WJYkZCPrPxAj0xY0VDgYVBoR2
-7z/rwZU3hX1r8MuR0qGYm+138hOepEZHsgMY1ii1aWLp3Iru+P71rYaQj1zu/f+t
-qckv34MqstTQ+vpwDQgiMggi9PohDbpGChnmXTPrW1kDSJgYmD7lM42eg6/Bzhs=
-=1wqz
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlpBmdYACgkQKyiOZjWe
+rHa6rAf/duPeYJk/fVggbtqCBPusNq6N+3OgenaeYQEZu2CcTBAmjq5RsxcGI5Vy
+FUWTsuES5f7FBuUbY4e9cDJ/CVk+MzCgns8/rqlGvAeP0wLC7CHwH8CouMsC8iwb
+tSPPJ66WYGpJixR4xcwaLwaLAy691jz1vnO6AznCzPd0ZZ4L7KHAsEwFXx5Mmo/r
+x05OPDiBMzn1/SI9ETk5df1/ameWiadq4LxvJOOTRfLRrylWz4qP3E1kfxa/7dgm
+K4zRx0yh9suBjLrs5DzuibrADSu/Ee6gySPgUy6GPG7neh6fo7zO58dHLZB2Xkv5
+iOz9yKsmnf9S/TbUSIjy4DJgrdjoog==
+=FSUv
 -----END PGP SIGNATURE-----

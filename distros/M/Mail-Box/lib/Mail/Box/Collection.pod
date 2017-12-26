@@ -7,8 +7,8 @@ Mail::Box::Collection - a collection of subfolders
 =head1 INHERITANCE
 
  Mail::Box::Collection
-   is a User::Identity::Collection
-   is a User::Identity::Item
+   is an User::Identity::Collection
+   is an User::Identity::Item
 
  Mail::Box::Collection
    is a Mail::Reporter
@@ -36,7 +36,7 @@ Extends L<"OVERLOADED" in User::Identity::Collection|User::Identity::Collection/
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
-=item overload: B<stringification>
+=item overload: B<stringification >
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
@@ -193,7 +193,7 @@ Inherited, see L<User::Identity::Collection/"Attributes">
 The L<Mail::Box::Manager|Mail::Box::Manager> (usually a L<Mail::Box::Manage::User|Mail::Box::Manage::User> object),
 which is handling the opening of folders.
 
-=item $obj-E<gt>B<name>( [NEWNAME] )
+=item $obj-E<gt>B<name>( [$newname] )
 
 Inherited, see L<User::Identity::Item/"Attributes">
 
@@ -209,23 +209,23 @@ Extends L<"Collections" in User::Identity::Collection|User::Identity::Collection
  
 =over 4
 
-=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+=item $obj-E<gt>B<add>($collection, $role)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<collection>(NAME)
+=item $obj-E<gt>B<collection>($name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<parent>( [PARENT] )
+=item $obj-E<gt>B<parent>( [$parent] )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+=item $obj-E<gt>B<removeCollection>($object|$name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -247,15 +247,15 @@ Extends L<"Maintaining roles" in User::Identity::Collection|User::Identity::Coll
  
 =over 4
 
-=item $obj-E<gt>B<addRole>(ROLE| ([NAME],OPTIONS) | ARRAY)
+=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
-=item $obj-E<gt>B<removeRole>(ROLE|NAME)
+=item $obj-E<gt>B<removeRole>($role|$name)
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
-=item $obj-E<gt>B<renameRole>( <ROLE|OLDNAME>, NEWNAME )
+=item $obj-E<gt>B<renameRole>( <$role|$oldname>, $newname )
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
@@ -271,7 +271,7 @@ Extends L<"Searching" in User::Identity::Collection|User::Identity::Collection/"
  
 =over 4
 
-=item $obj-E<gt>B<find>(NAME|CODE|undef)
+=item $obj-E<gt>B<find>($name|CODE|undef)
 
 Inherited, see L<User::Identity::Collection/"Searching">
 
@@ -334,8 +334,8 @@ cannot add objects of a different $type.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.003,
-built on June 29, 2017.
+This module is part of Mail-Box distribution version 3.004,
+built on December 22, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

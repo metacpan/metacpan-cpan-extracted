@@ -12,7 +12,7 @@ use DBIx::TransactionManager::Extended;
     *DBIx::TransactionManager::new = \&_new;
 }
 
-sub _new { _super_new('DBIx::TransactionManager::Extended', @_[1..$#_])->_initialize() }
+sub _new { _super_new('DBIx::TransactionManager::Extended', @_[1..$#_]) }
 
 1;
 __END__

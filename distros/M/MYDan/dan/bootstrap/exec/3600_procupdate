@@ -1,0 +1,16 @@
+#!/bin/sh
+if [ ! -f $MYDanPATH/etc/env ];then
+    echo "on env file: $MYDanPATH/etc/env"
+    exit;
+fi
+
+source $MYDanPATH/etc/env
+
+if [ -z $MYDAN_PROC_UPDATE ];then
+    echo "not MYDAN_PROC_UPDATE"
+    exit
+fi
+
+echo update: $MYDAN_PROC_UPDATE
+
+exec $MYDanPATH/dan/bootstrap/bin/procupdate  --url $MYDAN_PROC_UPDATE 2>&1

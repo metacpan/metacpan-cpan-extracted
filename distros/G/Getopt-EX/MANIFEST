@@ -14,5 +14,7 @@ lib/Getopt/EX/Module.pm
 minil.toml
 t/00_compile.t
 t/01_colormap.t
+t/02_module.t
+t/home/lib/App/example/example_test.pm
 META.yml
 MANIFEST

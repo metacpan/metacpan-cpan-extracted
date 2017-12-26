@@ -1,12 +1,22 @@
+#---------------------------
 #title nbsp
+#---------------------------
 
 hello
 
  
 
-there <em>there</em> [1] [2]
+there~~there <em>there</em> [1] [2] hello~~there <verbatim>~~</verbatim>
 
-[1] footnotes
+<verse>
+Hello~~there and hello~~there
+</verse>
+
+<example>
+Hello~~there
+</example>
+
+[1] footnotes~~here
 
 
 

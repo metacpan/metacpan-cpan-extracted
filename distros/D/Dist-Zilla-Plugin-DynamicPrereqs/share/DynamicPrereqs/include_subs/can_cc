@@ -1,4 +1,10 @@
 sub can_cc {
+  if ($^O eq 'VMS') {
+    require ExtUtils::CBuilder;
+    my $builder = ExtUtils::CBuilder->new(quiet => 1);
+    return $builder->have_compiler;
+  }
+
   my @chunks = split(/ /, $Config::Config{cc});
 
   # $Config{cc} may contain args; try to find out the program part

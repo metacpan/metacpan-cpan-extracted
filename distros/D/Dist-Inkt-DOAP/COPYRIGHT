@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Dist-Inkt-DOAP
-Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org> and Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Dist-Inkt-DOAP
 
 Files: Changes
@@ -18,14 +18,14 @@ Files: Changes
  lib/Dist/Inkt/Role/WriteCREDITS.pm
  lib/Dist/Inkt/Role/WriteChanges.pm
  lib/Dist/Inkt/Role/WriteDOAP.pm
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2017 Kjetil Kjernsmo and Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
+Files: README
+ README.pod
+ lib/Dist/Inkt/DOAP.pm
+Copyright: This software is copyright (c) 2014 by Toby Inkster, 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS
@@ -33,25 +33,28 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: README
- lib/Dist/Inkt/DOAP.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  

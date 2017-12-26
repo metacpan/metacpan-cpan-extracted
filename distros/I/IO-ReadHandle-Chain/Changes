@@ -1,5 +1,11 @@
 Revision history for IO-ReadHandle-Chain
 
+1.1.0   2017-12-21
+        BUGFIX: 'read' beyond EOF now yields an empty buffer.
+
+1.0.1   2017-12-18
+        Declare that Perl v5.12 is needed.
+
 1.0     2017-11-19
         First version.
 

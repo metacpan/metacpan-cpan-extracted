@@ -1,5 +1,19 @@
 Revision history for Perl extension List-MoreUtils-XS
 
+0.428	2017-12-19
+    - release 0.427_002 without further changes
+
+0.427_002   2017-12-14
+    - Update ppport.h to 3.37 for improved blead support
+    - Fix RT#123869 - context arg to croak() reported by Zefram
+    - fix RT#123870 - one() returns true on empty list reported by Andy Lester
+    - pamper RT#123868 - $a/$b/$_ refcounting bugs reported by Zefram
+
+0.427_001   2017-12-12
+    - Fix RT#123613 - build fails on perl >=5.27.4 with -DDEBUGGING,
+      thanks for reporting and the suggested patch goes to Andreas
+      Koenig and Tony Cook
+
 0.426	2017-10-02
     - release 0.425_001 as 0.426
 

@@ -10,6 +10,10 @@ use List::MoreUtils qw(any);
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
+=head1 NAME
+
+Dist::Zilla::PluginBundle::SHLOMIF - dzil plugins for SHLOMIF (Shlomi Fish)
+
 =head1 SYNOPSIS
 
   # dist.ini
@@ -111,6 +115,7 @@ has github_name => (
 has repository => (
     is  => 'ro',
     isa => 'Str',
+    default => 'github',
 );
 
 for my $attr (qw(repository_type repository_url repository_web)) {
@@ -285,7 +290,6 @@ has _plugins => (
                 Test::CPAN::Changes
                 Test::EOL
                 Test::NoTabs
-                Test::Kwalitee::Extra
                 Test::TrailingSpace
                 TestRelease
             ),

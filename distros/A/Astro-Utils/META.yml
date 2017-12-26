@@ -20,11 +20,11 @@ no_index:
 provides:
   Astro::Utils:
     file: lib/Astro/Utils.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   DateTime: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Astro-Utils.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

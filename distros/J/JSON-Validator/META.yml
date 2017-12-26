@@ -6,7 +6,7 @@ build_requires:
   Test::More: '1.30'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/json-validator/issues
   homepage: https://github.com/jhthorsen/json-validator
   repository: https://github.com/jhthorsen/json-validator.git
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

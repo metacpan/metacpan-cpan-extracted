@@ -1,5 +1,6 @@
 $( document ).ready(function() {
   console.log('Доброго всем ALL GLORY TO GLORIA');
+  /**********************************************/
   var progress = $('.progress-file .determinate');
   $('#fileupload').fileupload({
     dataType: 'json',
@@ -55,25 +56,26 @@ $( document ).ready(function() {
       if(data.context && data.context.val) data.formData.name = data.context.val();
       
     });
-    
     return true;
   });// end fileupload
   /*****************
   File functions
   *****************/
-  var f_ToggleFileCheckbox = function(chb, rename, href) {
+  var ToggleFileCheckbox = function(chb, rename, href) {
     var tr = chb.closest('tr');
     $('input[type="text"]', tr).toggleClass('hide').focus();
     var av = $('a.file-view', tr);
     av.toggleClass('hide');
     var ad = $('a.file-download', tr);
-    ad.toggleClass('hide');
+    var ae = $('a.file-edit', tr);
+    ae.toggleClass('hide');
     var ar = $('a.file-rename', tr);
     ar.toggleClass('hide');
     if (rename !== undefined) av.text(rename);
     if (href !== undefined) {
       av.attr('href', href);
       ad.attr('href', href+'?attachment=1');
+      ae.attr('href', href+'?edit=1');
       ar.attr('_href', href);
     }
   };
@@ -86,15 +88,21 @@ $( document ).ready(function() {
     var btn = $('.files-col .btn-panel a');
     if ($('table.files input[type="checkbox"]').filter(':checked').length)  btn.removeClass('hide');
     else btn.addClass('hide');
+    
+    var ad = $('a.file-download', tr);
+    ad.toggleClass('hide');
+    var ae = $('a.file-edit', tr);
+    ae.toggleClass('hide');
 
-    if (!chb.is(':checked') && !$('input[type="text"]', tr).is(':hidden')) f_ToggleFileCheckbox(chb);
+    if (!chb.is(':checked') && !$('input[type="text"]', tr).is(':hidden')) ToggleFileCheckbox(chb);
+    
   });
   /************************************
   file buttons panel
   ************************************/
   $('.files-col .btn-panel a.renames').on('click', function(ev){
     var chb = $('table.files input[type="checkbox"]:checked');
-    chb.each(function(){ f_ToggleFileCheckbox($(this)); });
+    chb.each(function(){ ToggleFileCheckbox($(this)); });
     var tr  = chb.first().closest('tr');
     $('input[type="text"]', tr).focus();
     
@@ -121,7 +129,7 @@ $( document ).ready(function() {
   function confirm_delete(rows, items, ul, hclass){// items - files or dirs
     var m = $('#confirm-modal');
     var h = $('.modal-header .'+hclass, m).clone();
-    h.find('.chip').text(items.length);
+    h.find('sup').text(items.length);
     $('.modal-content', m).empty().append(h).append(ul);
     var a = $('a.modal-close', m);
     a.off('click.confirm-ok').on('click.confirm-ok', function(ev){
@@ -148,7 +156,7 @@ $( document ).ready(function() {
   $('.files-col .btn-panel a.del-files').on('click', function(ev){
     var rows = [],
       files = [],
-      ul = $('<ul class="collection">');
+      ul = $('<ul class="collection card">');
     $('table.files input[type="checkbox"]:checked').each(function(){
       var chb = $(this);
       var tr = chb.closest('tr');
@@ -163,7 +171,7 @@ $( document ).ready(function() {
   /*********************************************
   Dirs functions
   **********************************************/
-  function  f_ToggleDirCheckbox(chb, rename, href) {
+  function  ToggleDirCheckbox(chb, rename, href) {
     var tr = chb.closest('tr');
     $('.input-field', tr).toggleClass('hide');
     $('a.dir, a.save-dir', tr).toggleClass('hide');
@@ -187,9 +195,12 @@ $( document ).ready(function() {
     $('svg', tr).toggleClass('fill-darken-4 fill-lighten-5');
     var btn = $('.dirs-col .btn-panel a');
     if ($('table.dirs input[type="checkbox"]').filter(':checked').length)  btn.removeClass('hide');
-    else btn.addClass('hide');
+    else {
+      btn.addClass('hide');
+      $('#add-dir').removeClass('hide');
+    }
 
-    if (!chb.is(':checked') && !$('input[type="text"]', tr).is(':hidden')) f_ToggleDirCheckbox(chb);
+    if (!chb.is(':checked') && !$('input[type="text"]', tr).is(':hidden')) ToggleDirCheckbox(chb);
   });
   /************************/
   $('table.dirs a.save-dir').on('click', function(ev){//:first-child
@@ -218,10 +229,9 @@ $( document ).ready(function() {
   /**************
   dirs buttons panel
   **************/
-
   $('.dirs-col .btn-panel a.renames').on('click', function(ev){
     var chb = $('table.dirs input[type="checkbox"]:checked');
-    chb.each(function(){ f_ToggleDirCheckbox($(this)); });
+    chb.each(function(){ ToggleDirCheckbox($(this)); });
     var tr  = chb.first().closest('tr');
     $('input[type="text"]', tr).focus();
   });
@@ -229,7 +239,7 @@ $( document ).ready(function() {
   $('.dirs-col .btn-panel a.del-dirs').on('click', function(ev){
     var rows = [],
       dirs = [],
-      ul = $('<ul class="collection">');
+      ul = $('<ul class="collection card">');
     $('table.dirs input[type="checkbox"]:checked').each(function(){
       var chb = $(this);
       var tr = chb.closest('tr');
@@ -241,8 +251,55 @@ $( document ).ready(function() {
     });
     confirm_delete(rows, dirs, ul, 'del-dirs');
   });
+  /******************
+  EDIT content
+  ******************/
+  if(window.ace) {
+    var editor = ace.edit("editor");
+    //~ editor.setTheme("ace/theme/textmate");//monokai
+    editor.getSession().setUseWrapMode(true);
+    editor.setOptions({
+      autoScrollEditorIntoView: true,
+      ///maxLines: 8
+    });
+    
+    var saveBtn = $('.action a.save');
+    var success = $('.success', saveBtn.parent());
+    var fail = $('.fail', saveBtn.parent());
+    saveBtn.on('click', function(event){
+      //~ console.log("save", editor.getValue().length);
+      var $this = $(this);
+      $.post(
+        decodeURI(window.location.pathname),
+        {"edit":editor.getValue()}
+      ).done(function( data ) {//
+        //~ console.log("done save", data);
+        $this.hide();
+        success.removeClass('hide');
+        fail.addClass('hide');
+      }).fail(function(data){
+        //~ console.log("fail save", data);
+        fail.removeClass('hide');
+        success.addClass('hide');
+      });
+    });
+    
+    
+    editor.getSession().on('change', function() {
+      //~ console.log("edit changed");
+      saveBtn.show();
+      success.addClass('hide');
+      fail.addClass('hide');
+    });
+  }
+  
   /******************/
+  
+  
+});
+
+$( document ).ready(function() {
   $('input[type="checkbox"]').prop('checked', false);
   $('.modal').modal();
-  
+  $('.show-on-ready').slideDown();
 });

@@ -585,8 +585,9 @@ multiple lines, but not multiple paragraphs.
 </p>
 
 <p>
-You can also use the <code>&lt;code&gt;</code> tag to indicate code and monospace
+You can also use the <code> tag to indicate code and monospace
 text. This is handy for regions that have an “=” in them.
+</code>
 </p>
 
 <p>
@@ -1055,13 +1056,7 @@ bullet item two, and will break
 </li>
 
 </ol>
-
-<!-- start comment -->
-<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
-; a comment
-<span class="commentmarker">END_COMMENT}}:</span>
-</div>
-<!-- stop comment -->
+<div class="comment" style="display:none">a comment</div>
 
 <ol style="list-style-type:lower-alpha">
 <li>
@@ -2091,13 +2086,7 @@ See [[#anchor][the previous chapter]] for more informations.
 <pre class="example">
 ; Comment text goes here.
 </pre>
-
-<!-- start comment -->
-<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
-; this will disappear completely
-<span class="commentmarker">END_COMMENT}}:</span>
-</div>
-<!-- stop comment -->
+<div class="comment" style="display:none">this will disappear completely</div>
 
 <p>
 That is, only a semi-colon at the beginning of a line, followed by a
@@ -2119,13 +2108,8 @@ This won’t be published, but in the HTML is there, only hidden
 </pre>
 
 <!-- start comment -->
-<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
-
-<p>
+<div class="comment" style="display:none">
 This won’t be published, but in the HTML is there, only hidden
-</p>
-
-<span class="commentmarker">END_COMMENT}}:</span>
 </div>
 <!-- stop comment -->
 <h3 id="toc30">Plays and bibliographies</h3>

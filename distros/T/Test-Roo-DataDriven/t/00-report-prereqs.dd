@@ -23,6 +23,9 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'App::Prove' => '0'
+                                      },
                       'requires' => {
                                       'Class::Unload' => '0',
                                       'Path::Tiny' => '0.004',

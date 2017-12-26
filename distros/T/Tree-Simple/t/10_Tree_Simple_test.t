@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 292;
+use Test::More tests => 293;
 
 BEGIN {
 	use_ok('Tree::Simple');
@@ -977,6 +977,35 @@ $tree->traverse(sub {
 is_deeply(\@_all_node_values_post_traverse, \@all_node_values_post_traverse,
   '... our nodes match our control nodes for post traverse method');
 
+# make a control set of
+# all the nodes we have
+my @want_stop_node_values = qw(
+	1.0
+		1.1 1.1
+		1.2 1.2
+		1.3 1.3
+		1.4 1.4
+		1.5 1.5
+		1.6 1.6
+	1.0 2.0
+		2.1
+);
+
+my @have_stop_node_values;
+
+$tree->traverse(sub {
+    my $_tree = shift;
+    my $value = $_tree->getNodeValue();
+    push @have_stop_node_values, $value;
+    return 'ABORT' if $value eq '2.1';
+},
+sub {
+    my $_tree = shift;
+    push @have_stop_node_values, $_tree->getNodeValue();
+});
+
+is_deeply \@have_stop_node_values, \@want_stop_node_values, 'stopping traverse'
+    or diag explain "Have: ", \@have_stop_node_values, "Want: ", \@want_stop_node_values;
 
 ## ----------------------------------------------------------------------------
 ## test size

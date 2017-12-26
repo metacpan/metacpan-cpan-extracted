@@ -1,7 +1,7 @@
 ---
 abstract: 'A client for talking to an Open API powered server'
 author:
-  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Ed J <mohawk2@users.noreply.github.com>'
 build_requires:
   Test::More: '0.88'
 configure_requires:
@@ -19,11 +19,19 @@ no_index:
     - inc
 requires:
   JSON::Validator: '1.07'
-  Mojolicious: '7.40'
+  Mojolicious: '7.53'
   Mojolicious::Plugin::OpenAPI: '1.22'
 resources:
-  bugtracker: https://github.com/jhthorsen/openapi-client/issues
-  homepage: https://github.com/jhthorsen/openapi-client
-  repository: https://github.com/jhthorsen/openapi-client.git
-version: '0.13'
+  X_dynamic_config: 0
+  X_metaspec:
+    version: 2
+  X_resources:
+    bugtracker:
+      web: https://github.com/jhthorsen/openapi-client/issues
+    homepage: https://github.com/jhthorsen/openapi-client
+    repository:
+      type: git
+      url: https://github.com/jhthorsen/openapi-client.git
+      web: https://github.com/jhthorsen/openapi-client
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

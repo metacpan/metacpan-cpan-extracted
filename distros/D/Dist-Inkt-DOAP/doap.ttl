@@ -1,153 +1,140 @@
-@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
-@prefix dc:    <http://purl.org/dc/terms/> .
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
-@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
-@prefix doap-deps: <http://ontologi.es/doap-deps#> .
-@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-
-<http://dev.perl.org/licenses/>
-	dc:title             "the same terms as the perl 5 programming language system itself".
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/project>
-	a                    doap:Project;
-	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
-	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [
-		doap-deps:on "RDF::TrineX::Serializer::MockTurtleSoup 0"^^doap-deps:CpanId;
-	], [ doap-deps:on "Moose 2.0800"^^doap-deps:CpanId ], [ doap-deps:on "Dist::Inkt 0.017"^^doap-deps:CpanId ], [
-		doap-deps:on "Dist::Inkt::Role::Test"^^doap-deps:CpanId;
-	], [ doap-deps:on "MooX::Struct 0"^^doap-deps:CpanId ], [
-		doap-deps:on "RDF::DOAP::Project 0.007"^^doap-deps:CpanId;
-	], [ doap-deps:on "RDF::Trine 1.000"^^doap-deps:CpanId ], [
-		doap-deps:on "RDF::TrineX::Functions 0"^^doap-deps:CpanId;
-	], [
-		doap-deps:on "RDF::TrineX::Parser::Pretdsl 0.205"^^doap-deps:CpanId;
-	];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-DOAP>;
-	doap:created         "2014-05-26"^^xsd:date;
-	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:download-page   <https://metacpan.org/release/Dist-Inkt-DOAP>;
-	doap:homepage        <https://metacpan.org/release/Dist-Inkt-DOAP>;
-	doap:license         <http://dev.perl.org/licenses/>;
-	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:name            "Dist-Inkt-DOAP";
-	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-022>;
-	doap:repository      [
-		a doap:GitRepository;
-		doap:browse <https://github.com/tobyink/p5-dist-inkt-doap>;
-	];
-	doap:shortdesc       "various DOAP-related roles for Dist::Inkt".
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-016>
-	a                    doap:Version;
-	rdfs:label           "Initial release";
-	dc:identifier        "Dist-Inkt-DOAP-0.016"^^xsd:string;
-	dc:issued            "2014-05-26"^^xsd:date;
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.016.tar.gz>;
-	doap:revision        "0.016"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-017>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.017"^^xsd:string;
-	dc:issued            "2014-05-26"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix syntax error in DetermineRightsFromRdf.pm.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.017.tar.gz>;
-	doap:revision        "0.017"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-018>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.018"^^xsd:string;
-	dc:issued            "2014-06-03"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Tests;
-			rdfs:label "Test that all roles actually compile.";
-		], [
-			a doap-changeset:Packaging;
-			rdfs:label "Require Dist::Inkt 0.017.";
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Don't need to load RDF::DOAP::ChangeSets.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.018.tar.gz>;
-	doap:revision        "0.018"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-019>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.019"^^xsd:string;
-	dc:issued            "2014-08-12"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Documentation;
-			rdfs:label "Add a DESCRIPTION to Dist::Inkt::DOAP.";
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Cope better with nulls when generating CREDITS file.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.019.tar.gz>;
-	doap:revision        "0.019"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-020>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.020"^^xsd:string;
-	dc:issued            "2014-09-13"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Support x_IRC.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.020.tar.gz>;
-	doap:revision        "0.020"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-021>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.021"^^xsd:string;
-	dc:issued            "2014-09-14"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Include test to check if changelog data is up-to-date.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.021.tar.gz>;
-	doap:revision        "0.021"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-022>
-	a                    doap:Version;
-	dc:identifier        "Dist-Inkt-DOAP-0.022"^^xsd:string;
-	dc:issued            "2014-09-23"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "ETHER wants me to use a version range string in x_breaks.";
-		];
-	];
-	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.022.tar.gz>;
-	doap:revision        "0.022"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/person/tobyink>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:tobyink@cpan.org>;
-	foaf:name            "Toby Inkster";
-	foaf:nick            "TOBYINK";
-	foaf:page            <https://metacpan.org/author/TOBYINK>.
-
+_:r1513902362r0 a <http://ontologi.es/doap-changeset#Bugfix> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Fix syntax error in DetermineRightsFromRdf.pm." .
+_:r1513902362r1 a <http://ontologi.es/doap-changeset#Tests> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Test that all roles actually compile." .
+_:r1513902362r10 a <http://ontologi.es/doap-changeset#Addition> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::DOAP::Project method to find IRC channel." .
+_:r1513902362r11 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Some minor changes." .
+_:r1513902362r2 a <http://ontologi.es/doap-changeset#Packaging> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Require Dist::Inkt 0.017." .
+_:r1513902362r3 a <http://ontologi.es/doap-changeset#Bugfix> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Don't need to load RDF::DOAP::ChangeSets." .
+_:r1513902362r4 a <http://ontologi.es/doap-changeset#Documentation> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add a DESCRIPTION to Dist::Inkt::DOAP." .
+_:r1513902362r5 a <http://ontologi.es/doap-changeset#Bugfix> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Cope better with nulls when generating CREDITS file." .
+_:r1513902362r6 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Support x_IRC." .
+_:r1513902362r7 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Include test to check if changelog data is up-to-date." .
+_:r1513902362r8 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "ETHER wants me to use a version range string in x_breaks." .
+_:r1513902362r9 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Replace List::MoreUtils with List::Util." .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er0 <http://ontologi.es/doap-changeset#item> _:r1513902362r0 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er1 <http://ontologi.es/doap-changeset#item> _:r1513902362r1, _:r1513902362r2, _:r1513902362r3 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er2 <http://ontologi.es/doap-changeset#item> _:r1513902362r4, _:r1513902362r5 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er3 <http://ontologi.es/doap-changeset#item> _:r1513902362r6 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er4 <http://ontologi.es/doap-changeset#item> _:r1513902362r7 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er5 <http://ontologi.es/doap-changeset#item> _:r1513902362r8 .
+_:rb44f70547b2e34b87a1893a8cbe7d8e6er6 <http://ontologi.es/doap-changeset#item> _:r1513902362r10, _:r1513902362r11, _:r1513902362r9 .
+_:rb99a0a3cc6e7548daa9814e7319a8d4f9r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-dist-inkt-doap> ;
+	a <http://usefulinc.com/ns/doap#GitRepository> ;
+	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-dist-inkt-doap&serialization=PROV-O#> .
+_:rbb2cd873847304a6886a24fcfcb49422er0 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er1 <http://ontologi.es/doap-deps#on> "perl 5.010001"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er10 <http://ontologi.es/doap-deps#on> "RDF::TrineX::Parser::Pretdsl 0.205"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er11 <http://ontologi.es/doap-deps#on> "RDF::TrineX::Serializer::MockTurtleSoup 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er12 <http://ontologi.es/doap-deps#on> "Path::Iterator::Rule 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er13 <http://ontologi.es/doap-deps#on> "Path::Tiny 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er14 <http://ontologi.es/doap-deps#on> "Software::License 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er15 <http://ontologi.es/doap-deps#on> "Software::LicenseUtils 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er16 <http://ontologi.es/doap-deps#on> "Types::Standard 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er17 <http://ontologi.es/doap-deps#on> "URI 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er18 <http://ontologi.es/doap-deps#on> "namespace::autoclean 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er2 <http://ontologi.es/doap-deps#on> "Moose 2.0800"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er3 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.017"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er4 <http://ontologi.es/doap-deps#on> "Dist::Inkt::Role::Test"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er5 <http://ontologi.es/doap-deps#on> "MooX::Struct 0"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er6 <http://ontologi.es/doap-deps#on> "List::Util 1.45"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er7 <http://ontologi.es/doap-deps#on> "RDF::DOAP::Project 0.007"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er8 <http://ontologi.es/doap-deps#on> "RDF::Trine 1.000"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbb2cd873847304a6886a24fcfcb49422er9 <http://ontologi.es/doap-deps#on> "RDF::TrineX::Functions 0"^^<http://ontologi.es/doap-deps#CpanId> .
+<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/project> <http://ontologi.es/doap-deps#runtime-requirement> _:rbb2cd873847304a6886a24fcfcb49422er1, _:rbb2cd873847304a6886a24fcfcb49422er10, _:rbb2cd873847304a6886a24fcfcb49422er11, _:rbb2cd873847304a6886a24fcfcb49422er12, _:rbb2cd873847304a6886a24fcfcb49422er13, _:rbb2cd873847304a6886a24fcfcb49422er14, _:rbb2cd873847304a6886a24fcfcb49422er15, _:rbb2cd873847304a6886a24fcfcb49422er16, _:rbb2cd873847304a6886a24fcfcb49422er17, _:rbb2cd873847304a6886a24fcfcb49422er18, _:rbb2cd873847304a6886a24fcfcb49422er2, _:rbb2cd873847304a6886a24fcfcb49422er3, _:rbb2cd873847304a6886a24fcfcb49422er4, _:rbb2cd873847304a6886a24fcfcb49422er5, _:rbb2cd873847304a6886a24fcfcb49422er6, _:rbb2cd873847304a6886a24fcfcb49422er7, _:rbb2cd873847304a6886a24fcfcb49422er8, _:rbb2cd873847304a6886a24fcfcb49422er9 ;
+	<http://ontologi.es/doap-deps#test-requirement> _:rbb2cd873847304a6886a24fcfcb49422er0 ;
+	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/p5-dist-inkt-doap/issues> ;
+	<http://usefulinc.com/ns/doap#category> <http://dbpedia.org/resource/Category:Package_management_systems>, <http://dbpedia.org/resource/Category:Semantic_Web> ;
+	<http://usefulinc.com/ns/doap#created> "2014-05-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#developer> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/Dist-Inkt-DOAP> ;
+	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/Dist-Inkt-DOAP> ;
+	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
+	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://usefulinc.com/ns/doap#name> "Dist-Inkt-DOAP" ;
+	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
+	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-100> ;
+	<http://usefulinc.com/ns/doap#repository> _:rb99a0a3cc6e7548daa9814e7319a8d4f9r0 ;
+	<http://usefulinc.com/ns/doap#shortdesc> "various DOAP-related roles for Dist::Inkt" ;
+	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
+	a <http://usefulinc.com/ns/doap#Project> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-016> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.016"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-05-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.016.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.016"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release" .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-017> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er0 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.017"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-05-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.017.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.017"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-018> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er1 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.018"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-06-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.018.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.018"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-019> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er2 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.019"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-08-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.019.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.019"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-020> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er3 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.020"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-09-13"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.020.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.020"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-021> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er4 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.021"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-09-14"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.021.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.021"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-022> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er5 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.022"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2014-09-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-DOAP-0.022.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.022"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/v_0-100> <http://ontologi.es/doap-changeset#changeset> _:rb44f70547b2e34b87a1893a8cbe7d8e6er6 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://purl.org/dc/terms/identifier> "Dist-Inkt-DOAP-0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2017-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Dist-Inkt-DOAP-0.100.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> .
+<http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-dist-inkt-doap&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" ;
+	<http://xmlns.com/foaf/0.1/nick> "KJETILK" ;
+	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/KJETILK> .
+<http://purl.org/NET/cpan-uri/person/tobyink> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-dist-inkt-doap&serialization=PROV-O#user-Toby-Inkster> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:tobyink@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Toby Inkster" ;
+	<http://xmlns.com/foaf/0.1/nick> "TOBYINK" ;
+	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/TOBYINK> .

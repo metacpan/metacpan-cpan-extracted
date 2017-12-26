@@ -134,53 +134,58 @@ sub attachments {
 }
 
 
-=head3 get_lines
+=head3 parse_directives
 
-Returns the raw input lines as a list, reading from the filename if
-it's the first time we call it. Tabs, \r and trailing whitespace are
-cleaned up.
+Return an hashref with the directives found in the document.
 
 =cut
 
-sub get_lines {
+sub parse_directives {
     my $self = shift;
-    my $file = $self->filename;
-    $self->_debug("Reading $file");
-    open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file! $!\n";
-    my @lines;
-    while (my $l = <$fh>) {
-        # EOL
-        $l =~ s/\r\n/\n/gs;
-        $l =~ s/\r/\n/gs;
-        # TAB
-        $l =~ s/\t/    /g;
-        # trailing
-        $l =~ s/ +$//mg;
-        push @lines, $l;
-    }
-    close $fh;
-    # store the lines in the object
-    return \@lines;
+    my ($directives, $body) = $self->_parse_body_and_directives(directives_only => 1);
+    return $directives;
 }
 
 
-sub _split_body_and_directives {
-    my $self = shift;
-    my (%directives, @body);
+sub _parse_body_and_directives {
+    my ($self, %options) = @_;
+    my $file = $self->filename;
+    open (my $fh, "<:encoding(UTF-8)", $file) or die "Couldn't open $file! $!\n";
+
     my $in_meta = 1;
-    my $lastdirective;
-    my $input = $self->get_lines;
-    # scan the line
-    while (@$input) {
-        my $line = shift @$input;
+    my ($lastdirective, %directives, @body);
+
+  RAWLINE:
+    while (my $line = <$fh>) {
+        # EOL
+        $line =~ s/\r\n/\n/gs;
+        $line =~ s/\r/\n/gs;
+        # TAB
+        $line =~ s/\t/    /g;
+        # trailing
+        $line =~ s/ +$//mg;
+
         if ($in_meta) {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
                 $lastdirective = undef;
-            } elsif ($line =~ m/^\#([A-Za-z0-9]+)(\s+(.+))?$/s) {
-                my $dir = $1;
-                if ($2) {
-                    $directives{$dir} = $3;
+            } elsif ($line =~ m/^\#([A-Za-z0-9_-]+)(\s+(.+))?$/s) {
+                my ($dir, $material) = ($1, $2);
+
+                # remove underscore and dashes from directive names to
+                # keep compatibility with Emacs Muse, so e.g.
+                # #disable-tables will be parsed as directive, not as
+                # a line.
+
+                $dir =~ s/[_-]//g;
+                unless (length($dir)) {
+                    warn "Found empty directive $line, it will be removed\n";
+                }
+                if (exists $directives{$dir}) {
+                    warn "Overwriting directive '$dir' $directives{$dir} with $line\n";
+                }
+                if (defined $material) {
+                    $directives{$dir} = $material;
                 }
                 else {
                     $directives{$dir} = '';
@@ -192,17 +197,36 @@ sub _split_body_and_directives {
                 $in_meta = 0
             }
         }
-        next if $in_meta;
-        push @body, $line;
+        if ($in_meta) {
+            next RAWLINE;
+        }
+        elsif ($options{directives_only}) {
+            last RAWLINE;
+        }
+        else {
+            push @body, $line;
+        }
     }
     push @body, "\n"; # append a newline
-    # before returning, let's clean the %directives from EOLs
+    close $fh;
+
+    # before returning, let's clean the %directives from EOLs and from
+    # empty ones, e.g. #---------------------
+    delete $directives{''};
+
     foreach my $key (keys %directives) {
-        $directives{$key} =~ s/\s/ /gs;
-        $directives{$key} =~ s/\s+$//gs;
+        $directives{$key} =~ s/\s+/ /gs;
+        $directives{$key} =~ s/\s+\z//gs;
+        $directives{$key} =~ s/\A\s+//gs;
     }
-    $self->{raw_body}   = \@body;
-    $self->{raw_header} = \%directives;
+    return (\%directives, \@body);
+}
+
+sub _split_body_and_directives {
+    my $self = shift;
+    my ($directives, $body) = $self->_parse_body_and_directives;
+    $self->{raw_body}   = $body;
+    $self->{raw_header} = $directives;
 }
 
 =head3 raw_header
@@ -420,7 +444,7 @@ with a numerical argument or even with a string like [123]
 sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
-    if ($arg =~ m/(\{[0-9]+\}|\[[0-9]+\])/) {
+    if ($arg =~ m/(\{[1-9][0-9]*\}|\[[1-9][0-9]*\])/) {
         $arg = $1;
     }
     else {
@@ -532,12 +556,16 @@ sub _parse_string {
         $element{string} = $l;
         return %element;
     }
-    if ($l =~ m/^(\; (.+))$/s) {
-        $element{removed} = $l;
-        $element{type} = "comment";
+    if ($l =~ m/^(\;)(\x{20}+(.*))?$/s) {
+        $element{removed} = $1;
+        $element{string} = $3;
+        unless (defined ($element{string})) {
+            $element{string} = '';
+        }
+        $element{type} = "inlinecomment";
         return %element;
     }
-    if ($l =~ m/^((\[([0-9]+)\])\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\[([1-9][0-9]*)\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
         $element{removed} = $1;
         $element{footnote_symbol} = $2;
@@ -546,7 +574,7 @@ sub _parse_string {
         $element{string} = $4;
         return %element;
     }
-    if ($l =~ m/^((\{([0-9]+)\})\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\{([1-9][0-9]*)\})\x{20}+)(.+)$/s) {
         $element{type} = "secondary_footnote";
         $element{removed} = $1;
         $element{footnote_symbol} = $2;
@@ -714,11 +742,11 @@ sub _construct_element {
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
 
-    # catch the examples. and the verse
+    # catch the examples, comments and the verse in bloks.
     # <example> is greedy, and will stop only at another </example> or
-    # at the end of input. Same is true for verse
+    # at the end of input. Same is true for verse and comments.
 
-    foreach my $block (qw/example verse/) {
+    foreach my $block (qw/example comment verse/) {
         if ($current && $current->type eq $block) {
             if ($element->is_stop_element($current)) {
                 # print Dumper($element) . " is closing\n";
@@ -729,9 +757,13 @@ sub _construct_element {
                                                  rawline => $element->rawline);
             }
             else {
-                # maybe check if we want to stop at headings if verse?
-                # print Dumper($element) . " is appending\n";;
-                $current->append($element);
+                # remove inlined comments from verse environments
+                if ($current->type eq 'verse' and
+                    $element->type eq 'inlinecomment') {
+                }
+                else {
+                    $current->append($element);
+                }
                 return;
             }
         }

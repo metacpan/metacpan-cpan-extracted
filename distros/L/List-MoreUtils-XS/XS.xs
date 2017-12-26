@@ -274,7 +274,7 @@ in_pad (pTHX_ SV *code)
 #               endif
 
 #if PERL_VERSION_LT(5,21,7)
-		if (!SvOK(name_sv))
+                if (!SvOK(name_sv))
                     continue;
 #endif
 
@@ -389,29 +389,47 @@ in_pad (pTHX_ SV *code)
         croak("Can't use lexical $a or $b in pairwise code block"); \
     }                                                \
                                                      \
-    rc = (init);                      \
+    rc = (init);                                     \
     sv_2mortal(newRV_noinc(rc));                     \
                                                      \
     PUSH_MULTICALL(mc_cv);                           \
     SAVESPTR(GvSV(PL_defgv));                        \
                                                      \
-    if (!PL_firstgv || !PL_secondgv)                 \
-    {                                                \
-        SAVESPTR(PL_firstgv);                        \
-        SAVESPTR(PL_secondgv);                       \
-        PL_firstgv = gv_fetchpv("a", TRUE, SVt_PV);  \
-        PL_secondgv = gv_fetchpv("b", TRUE, SVt_PV); \
-    }                                                \
+    /* Following code is stolen on request of */     \
+    /* Zefram from pp_sort.c of perl core 16ada23 */ \
+    /* I have no idea why it's necessary and there */\
+    /* is no reasonable documentation regarding */   \
+    /* deal with localized $a/$b/$_ */               \
+    SAVEGENERICSV(PL_firstgv);                       \
+    SAVEGENERICSV(PL_secondgv);                      \
+    PL_firstgv = MUTABLE_GV(SvREFCNT_inc(            \
+        gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV)  \
+    ));                                              \
+    PL_secondgv = MUTABLE_GV(SvREFCNT_inc(           \
+        gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV)  \
+    ));                                              \
+    save_gp(PL_firstgv, 0); save_gp(PL_secondgv, 0); \
+    GvINTRO_off(PL_firstgv);                         \
+    GvINTRO_off(PL_secondgv);                        \
+    SAVEGENERICSV(GvSV(PL_firstgv));                 \
+    SvREFCNT_inc(GvSV(PL_firstgv));                  \
+    SAVEGENERICSV(GvSV(PL_secondgv));                \
+    SvREFCNT_inc(GvSV(PL_secondgv));                 \
                                                      \
     for (i = 1; i < items; ++i)                      \
     {                                                \
+        SV *olda, *oldb;                             \
         sv_setiv(GvSV(PL_defgv), i-1);               \
                                                      \
-        GvSV(PL_firstgv) = rc;                       \
-        GvSV(PL_secondgv) = args[i];                 \
+        olda = GvSV(PL_firstgv);                     \
+        oldb = GvSV(PL_secondgv);                    \
+        GvSV(PL_firstgv) = SvREFCNT_inc_simple_NN(rc); \
+        GvSV(PL_secondgv) = SvREFCNT_inc_simple_NN(args[i]); \
+        SvREFCNT_dec(olda);                          \
+        SvREFCNT_dec(oldb);                          \
         MULTICALL;                                   \
                                                      \
-        sv_setsv(rc, *PL_stack_sp);                  \
+        SvSetMagicSV(rc, *PL_stack_sp);              \
     }                                                \
                                                      \
     POP_MULTICALL;                                   \
@@ -445,29 +463,29 @@ in_pad (pTHX_ SV *code)
 
 #define COUNT_ARGS_MAX                                    \
     do {                                                  \
-	for (i = 0; i < items; i++) {                     \
-	    SvGETMAGIC(args[i]);                          \
-	    if(SvOK(args[i])) {                           \
-		HE *he;                                   \
-		SvSetSV_nosteal(tmp, args[i]);            \
-		he = hv_fetch_ent(hv, tmp, 0, 0);         \
-		if (NULL == he) {                         \
-		    args[count++] = args[i];              \
-		    hv_store_ent(hv, tmp, newSViv(1), 0); \
-		}                                         \
-		else {                                    \
-		    SV *v = HeVAL(he);                    \
-		    IV how_many = SvIVX(v);               \
-		    if(UNLIKELY(max < ++how_many))        \
-			max = how_many;                   \
-		    sv_setiv(v, how_many);                \
-		}                                         \
-	    }                                             \
-	    else if(0 == seen_undef++) {                  \
-		args[count++] = args[i];                  \
-	    }                                             \
-	}                                                 \
-	if(UNLIKELY(max < seen_undef)) max = seen_undef;  \
+        for (i = 0; i < items; i++) {                     \
+            SvGETMAGIC(args[i]);                          \
+            if(SvOK(args[i])) {                           \
+                HE *he;                                   \
+                SvSetSV_nosteal(tmp, args[i]);            \
+                he = hv_fetch_ent(hv, tmp, 0, 0);         \
+                if (NULL == he) {                         \
+                    args[count++] = args[i];              \
+                    hv_store_ent(hv, tmp, newSViv(1), 0); \
+                }                                         \
+                else {                                    \
+                    SV *v = HeVAL(he);                    \
+                    IV how_many = SvIVX(v);               \
+                    if(UNLIKELY(max < ++how_many))        \
+                        max = how_many;                   \
+                    sv_setiv(v, how_many);                \
+                }                                         \
+            }                                             \
+            else if(0 == seen_undef++) {                  \
+                args[count++] = args[i];                  \
+            }                                             \
+        }                                                 \
+        if(UNLIKELY(max < seen_undef)) max = seen_undef;  \
     } while(0)
 
 
@@ -951,7 +969,7 @@ CODE:
 {
     int found = 0;
 #define ON_TRUE { if (found++) { POP_MULTICALL; XSRETURN_NO; }; }
-#define ON_EMPTY XSRETURN_YES
+#define ON_EMPTY XSRETURN_NO
     TRUE_JUNCTION;
     if (found)
         XSRETURN_YES;
@@ -1621,7 +1639,9 @@ CODE:
 
     LMUav2flat(aTHX_ rc, args);
 
-    for(i = AvFILLp(rc); i >= 0; --i)
+    i = AvFILLp(rc);
+    EXTEND(SP, i+1);
+    for(; i >= 0; --i)
     {
         ST(i) = sv_2mortal(AvARRAY(rc)[i]);
         AvARRAY(rc)[i] = NULL;
@@ -1721,7 +1741,7 @@ CODE:
            croak_xs_usage(cv,  "\\@\\@;\\@...");
         av = (AV*)SvRV(ST(i));
 
-	hv_clear(distinct);
+        hv_clear(distinct);
 
         for(j = 0; j <= av_len(av); ++j)
         {
@@ -2110,7 +2130,7 @@ CODE:
 
     if(seen_undef == max)
     {
-	++count;
+        ++count;
         EXTEND(SP, count);
         ST(count-1) = &PL_sv_undef;
     }
@@ -2127,7 +2147,7 @@ CODE:
     I32 i;
 
     if( k > (items - 1) )
-        croak(aTHX_ "Cannot get %" IVdf " samples from %" IVdf " elements", (IV)k, (IV)(items-1));
+        croak("Cannot get %" IVdf " samples from %" IVdf " elements", (IV)k, (IV)(items-1));
 
     /* Initialize Drand01 unless rand() or srand() has already been called */
     if(!PL_srand_called)
@@ -2540,8 +2560,8 @@ CODE:
 
     if (AvFILLp(list) == -1)
     {
-	av_push(list, newSVsv(item));
-	RETVAL = 0;
+        av_push(list, newSVsv(item));
+        RETVAL = 0;
     }
     else if (AvFILLp(list) >= 0)
     {

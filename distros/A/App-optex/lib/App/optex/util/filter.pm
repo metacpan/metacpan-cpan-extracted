@@ -1,9 +1,5 @@
 package App::optex::util::filter;
 
-1;
-
-package util::filter;
-
 use v5.10;
 use strict;
 use warnings;
@@ -47,9 +43,20 @@ function is called instead.
 
 Set input/output function.  Tis is shortcut for B<--if> B<&>I<function>.
 
+=item B<--set-io-color> IO=I<color>
+
+Set color filter to filehandle.  You can set color filter for STDERR
+like this:
+
+    --set-io-filter STDERR=R
+
+Use comma to set multiple filehandles at once.
+
+    --set-io-filter STDIN=B,STDERR=R
+
 =item B<--io-color>
 
-Set filter to colorize STDOUT in Blue, and STDERR in Red.
+Set default color to STDOUT and STDERR.
 
 =back
 
@@ -81,21 +88,16 @@ sub io_filter (&@) {
     my $sub = shift;
     my %opt = @_;
     my $pid = do {
-	if (delete $opt{STDIN}) {
-	    open STDIN, '-|';
-	}
-	elsif (delete $opt{STDOUT}) {
-	    open STDOUT, '|-'
-	}
-	elsif (delete $opt{STDERR}) {
-	    open STDERR, '|-';
-	}
-	else {
-	    croak;
-	}
+	if    ($opt{STDIN})  { open STDIN,  '-|' }
+	elsif ($opt{STDOUT}) { open STDOUT, '|-' }
+	elsif ($opt{STDERR}) { open STDERR, '|-' }
+	else  { croak "Missing option" }
     } // die "fork: $!\n";;
     return $pid if $pid > 0;
-    $sub->(%opt);
+    if ($opt{STDERR}) {
+	open STDOUT, '>&', \*STDERR or die "dup: $!";
+    }
+    $sub->();
     exit 0;
 }
 
@@ -109,10 +111,10 @@ sub set {
 	    }
 	    use Getopt::EX::Func qw(parse_func);
 	    my $func = parse_func($filter);
-	    io_filter { $func->call($io => $opt{$io}) } %opt;
+	    io_filter { $func->call($io => $opt{$io}) } $io => 1;
 	}
 	else {
-	    io_filter { exec $filter or die "exec: $!\n" } %opt;
+	    io_filter { exec $filter or die "exec: $!\n" } $io => 1;
 	}
     }
 }

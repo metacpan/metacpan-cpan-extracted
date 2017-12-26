@@ -1,0 +1,11 @@
+use lib './lib';
+use lib './examples';
+
+use Data::Dump qw[ dump dd ];
+use Data::DPath qw[ dpath ];
+use Data::Edit::Struct 'edit';
+
+our $src;
+our $dest;
+
+do $_ for @ARGV;

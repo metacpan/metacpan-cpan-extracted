@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Tests for Module::Install::DSL
 
 use strict;

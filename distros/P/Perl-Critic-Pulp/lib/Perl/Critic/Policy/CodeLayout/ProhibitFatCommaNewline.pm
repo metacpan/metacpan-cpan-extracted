@@ -38,7 +38,7 @@ use Perl::Critic::Utils;
 use Perl::Critic::Policy 1.084;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = 95;
+our $VERSION = 96;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

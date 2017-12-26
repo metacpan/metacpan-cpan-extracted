@@ -8,12 +8,12 @@
 #
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::Compile; # git description: v2.056-4-g5817fa6
+package Dist::Zilla::Plugin::Test::Compile; # git description: v2.057-4-g2b42df1
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Common tests to check syntax of your modules, using only core modules
 # KEYWORDS: plugin test compile verify validate load modules scripts
 
-our $VERSION = '2.057';
+our $VERSION = '2.058';
 
 use Moose;
 use Path::Tiny;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Test::Compile - Common tests to check syntax of your module
 
 =head1 VERSION
 
-version 2.057
+version 2.058
 
 =head1 SYNOPSIS
 
@@ -720,6 +720,9 @@ foreach my $file (@scripts)
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
     @switches = (@switches, split(' ', $1)) if $1;
+
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 

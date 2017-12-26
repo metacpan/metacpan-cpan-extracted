@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use feature qw( say state );
 
@@ -447,7 +447,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 SYNOPSIS
 

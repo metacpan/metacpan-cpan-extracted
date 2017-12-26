@@ -1,5 +1,5 @@
 package Kevin::Command::kevin;
-$Kevin::Command::kevin::VERSION = '0.4.1';
+$Kevin::Command::kevin::VERSION = '0.5.5';
 # ABSTRACT: Alternative Minion command
 use Mojo::Base 'Mojolicious::Commands';
 
@@ -89,7 +89,7 @@ Kevin::Command::kevin - Alternative Minion command
 
 =head1 VERSION
 
-version 0.4.1
+version 0.5.5
 
 =head1 SYNOPSIS
 

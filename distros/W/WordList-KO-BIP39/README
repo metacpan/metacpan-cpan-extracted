@@ -1,0 +1,74 @@
+NAME
+    WordList::KO::BIP39 - Korean word list for BIP 39
+
+VERSION
+    This document describes version 0.001 of WordList::KO::BIP39 (from Perl
+    distribution WordList-KO-BIP39), released on 2017-12-24.
+
+SYNOPSIS
+     use WordList::KO::BIP39;
+
+     my $wl = WordList::KO::BIP39->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+STATISTICS
+     +----------------------------------+---------------+
+     | key                              | value         |
+     +----------------------------------+---------------+
+     | avg_word_len                     | 2.22998046875 |
+     | longest_word_len                 | 4             |
+     | num_words                        | 2048          |
+     | num_words_contains_nonword_chars | 0             |
+     | num_words_contains_unicode       | 2048          |
+     | num_words_contains_whitespace    | 0             |
+     | shortest_word_len                | 2             |
+     +----------------------------------+---------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-KO-BIP39>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-KO-BIP39>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-KO-BIP39>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Source:
+    <https://github.com/bitcoin/bips/blob/master/bip-0039/korean.txt>
+
+    About BIP 39:
+    <https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki>
+
+    About BIPs (Bitcoin Improvement Proposals):
+    <https://en.bitcoin.it/wiki/Bitcoin_Improvement_Proposals>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

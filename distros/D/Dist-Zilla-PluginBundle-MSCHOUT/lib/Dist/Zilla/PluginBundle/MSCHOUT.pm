@@ -8,7 +8,7 @@
 #
 
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.35';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.36';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
@@ -31,6 +31,7 @@ use Dist::Zilla::Plugin::Git::NextVersion;
 use Dist::Zilla::Plugin::Homepage;
 use Dist::Zilla::Plugin::InsertCopyright;
 use Dist::Zilla::Plugin::MetaJSON;
+use Dist::Zilla::Plugin::MetaProvides::Package;
 use Dist::Zilla::Plugin::MinimumPerl;
 use Dist::Zilla::Plugin::NextRelease;
 use Dist::Zilla::Plugin::PodWeaver;
@@ -94,6 +95,7 @@ sub configure {
             Homepage
             Signature
             Prereqs::AuthorDeps
+            MetaProvides::Package
             MetaJSON
         ),
         # update release in Changes file
@@ -208,7 +210,7 @@ Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

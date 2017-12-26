@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless::Plugin::Atlassian::Confluence
 
+1.03 2017-12-18
+
+    - Fixed bad test
+
 1.02 2017-01-03
 
     - Resolved: Fix missing prereqs reported by CPANTS. #1

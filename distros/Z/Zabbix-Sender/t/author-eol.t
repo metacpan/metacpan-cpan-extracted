@@ -23,13 +23,12 @@ my @files = (
     't/author-pod-syntax.t',
     't/boilerplate.t',
     't/bulk_buf.t',
-    't/critic.t',
     't/encode_request.t',
-    't/kwalittee.t',
-    't/manifest.t',
     't/perlcriticrc',
-    't/pod-coverage.t',
-    't/pod.t'
+    't/release-critic.t',
+    't/release-kwalittee.t',
+    't/release-manifest.t',
+    't/release-pod-coverage.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

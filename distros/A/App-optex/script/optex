@@ -36,6 +36,7 @@ use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Cwd qw(abs_path);
+use List::Util qw(uniq);
 
 our $rcloader;
 our $debug;
@@ -56,10 +57,9 @@ my $module_dir = $config_dir;
 my $bin_dir = $ENV{$env_BINDIR} || "$config_dir/bin";
 
 require Getopt::EX::Loader;
-$rcloader = Getopt::EX::Loader->new(
-    BASECLASS => "",
-    IGNORE_NO_MODULE => 1,
-    );
+$rcloader = new Getopt::EX::Loader
+    BASECLASS => [ '', 'App::optex' ],
+    IGNORE_NO_MODULE => 1;
 if (my $opt = $ENV{$env_MODULE_OPT}) {
     $mod_opt = $opt;
     $rcloader->configure(MODULE_OPT => $opt);
@@ -73,9 +73,6 @@ sub load_rc {
 
 load_rc "$config_dir/default.rc";
 
-my @system_mod_path =
-    grep { -d $_ } map { "$_/App/$abs_name" } @INC;
-
 my @private_mod_path = (
     do {
 	if (my $mod_path = $ENV{$env_MODULE_PATH}) {
@@ -87,7 +84,7 @@ my @private_mod_path = (
     $module_dir,
     );
 
-prepend_path(@private_mod_path, @system_mod_path);
+prepend_path(@private_mod_path);
 
 my $target_name = do {
     if ($cmd_name ne $abs_name) {
@@ -106,7 +103,7 @@ my $target_name = do {
 my @command_mod_path =
     grep { -d $_ } map { "$_/$target_name" } @private_mod_path;
 
-prepend_path(@command_mod_path, @private_mod_path, @system_mod_path);
+prepend_path(@command_mod_path, @private_mod_path);
 
 if ($mod_arg and @ARGV > 0 and $ARGV[0] eq $mod_opt) {
     show_modules();
@@ -149,7 +146,8 @@ exit system($target_name, @ARGV) >> 8;
 sub self_option {
     my $argv = shift;
 
-    local $rcloader = Getopt::EX::Loader->new(BASECLASS => "");
+    local $rcloader = new Getopt::EX::Loader
+	BASECLASS => [ '', 'App::optex' ];
     $rcloader->load(FILE => "$config_dir/$abs_name.rc");
     $rcloader->deal_with($argv);
 
@@ -301,7 +299,7 @@ sub usage {
 my @ORIG_INC; BEGIN { @ORIG_INC = @INC }
 my @mod_path;
 sub prepend_path {
-    @mod_path = uniq(@_);
+    @mod_path = uniq @_;
     @INC = (@mod_path, @ORIG_INC);
 }
 
@@ -321,11 +319,6 @@ sub show_modules {
 	}
 	print "\n";
     }
-}
-
-sub uniq {
-    my %seen;
-    grep { not $seen{$_}++ } @_;
 }
 
 =head1 DESCRIPTION
@@ -531,6 +524,9 @@ C<--ru> is replaced by C<-Mi18n --ru> automatically.
 
 
 =head1 STANDARD MODULES
+
+Standard modules are installed at C<App::optex>, and they can be
+addressed with and without C<App::optex> prefix.
 
 =over 4
 

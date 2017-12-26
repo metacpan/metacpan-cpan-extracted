@@ -45,6 +45,7 @@
             "Code::TidyAll" : "0",
             "Code::TidyAll::Plugin::Perl::AlignMooseAttributes" : "0",
             "Dist::Zilla::Plugin::AssertOS" : "0",
+            "Dist::Zilla::Plugin::AuthorSignatureTest" : "0",
             "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "0.173421",
             "Dist::Zilla::Plugin::ContributorsFile" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
@@ -109,7 +110,7 @@
          "web" : "https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR"
       }
    },
-   "version" : "1.173490",
+   "version" : "1.173520",
    "x_BuiltWith" : {
       "failures" : {
          "Dist::Zilla::PluginBundle::Author::IOANR" : "Module::MetaData could not parse a version from lib/Dist/Zilla/PluginBundle/Author/IOANR.pm"
@@ -120,6 +121,7 @@
          "Code::TidyAll::Plugin::Perl::AlignMooseAttributes" : "0.01",
          "Dist::Zilla" : "6.010",
          "Dist::Zilla::Plugin::AssertOS" : "0.08",
+         "Dist::Zilla::Plugin::AuthorSignatureTest" : "0.02",
          "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "0.173421",
          "Dist::Zilla::Plugin::ContributorsFile" : "0.3.0",
          "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.170880",
@@ -154,7 +156,7 @@
          "List::Util" : "1.49",
          "Module::Build::Tiny" : "0.039",
          "Moose" : "2.2009",
-         "Perl::Tidy" : "20170521",
+         "Perl::Tidy" : "20171214",
          "Pod::Elemental::Transformer::List" : "0.102000",
          "Pod::Markdown" : "3.005",
          "Pod::Weaver::Config::Assembler" : "4.015",

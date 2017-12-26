@@ -1,3 +1,18 @@
+1.026 2017-12-18
+
+  New experimental feature:
+    * By default, Shellvar backend from Config::Model 2.116 keeps
+      parameter order when writing back configuration data. This broke
+      cme test that check that data is written with canonical order
+    * add -canonical option to let data be written back according to model
+      order (i.e. the previous behavior of shellvar backend)
+    * Fix test broken by new ShellVar behavior (using -canonical option)
+    * Depends on Config::Model 2.116 (for -canonical option)
+
+  On-going deprecation of obscure multi backend feature
+    * cme: remove obsolete -backend option (since only one backend can now
+      be available, there's no need to an option to choose an alternative backend)
+
 1.025 2017-12-14
 
   Some new features for the rather new 'run' subcommand:

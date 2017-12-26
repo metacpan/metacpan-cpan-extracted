@@ -157,6 +157,14 @@ sub stringify {
         die "Missing markup for $self->fmt $type $self->tag" unless $out;
         return $out;
     }
+    elsif ($type eq 'nobreakspace') {
+        if ($self->is_latex) {
+            return '~';
+        }
+        elsif ($self->is_html) {
+            return '&nbsp;'
+        }
+    }
     elsif ($type eq 'br') {
         if ($self->is_latex) {
             return "\\forcelinebreak ";

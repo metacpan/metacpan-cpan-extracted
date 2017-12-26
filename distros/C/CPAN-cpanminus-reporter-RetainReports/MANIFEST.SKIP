@@ -34,7 +34,7 @@ svndiff/
 nytprof/
 nytprof.out
 .version_info.pl
-dump
+^dump$
 \.gitignore
 \.travis.yml
 \.appveyor.yml*

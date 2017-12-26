@@ -1,4 +1,4 @@
-package WebDriver::Tiny 0.006;
+package WebDriver::Tiny 0.100;
 
 use 5.020;
 use feature 'postderef';
@@ -90,7 +90,7 @@ sub new {
     $self->[1] .= '/' . $reply->{sessionId};
 
     # Store the capabilities.
-    $self->[3] = $reply->{value};
+    $self->[3] = $reply->{capabilities};
 
     # Numify bool objects, saves memory.
     $_ += 0 for grep ref eq 'JSON::PP::Boolean', values $self->[3]->%*;
@@ -104,9 +104,9 @@ sub new {
 
 sub capabilities { $_[0][3] }
 
-sub source { $_[0]->_req( GET => '/source' )->{value} }
-sub title  { $_[0]->_req( GET => '/title'  )->{value} }
-sub url    { $_[0]->_req( GET => '/url'    )->{value} }
+sub html  { $_[0]->_req( GET => '/source' ) }
+sub title { $_[0]->_req( GET => '/title'  ) }
+sub url   { $_[0]->_req( GET => '/url'    ) }
 
 sub back       { $_[0]->_req( POST   => '/back'    ); $_[0] }
 sub forward    { $_[0]->_req( POST   => '/forward' ); $_[0] }
@@ -116,52 +116,13 @@ sub status {
     # /status is the only path without the session prefix, so surpress it.
     local $_[0][1] = substr $_[0][1], 0, rindex $_[0][1], '/session/';
 
-    $_[0]->_req( GET => '/status' )->{value};
+    $_[0]->_req( GET => '/status' );
 }
 
-sub storage {
-    my ( $self, $key, $value ) = @_;
+sub alert_accept  { $_[0]->_req( POST => '/alert/accept'  ); $_[0] }
+sub alert_dismiss { $_[0]->_req( POST => '/alert/dismiss' ); $_[0] }
 
-    # Set a key.
-    if ( @_ == 3 ) {
-        my $ret = $self->_req(
-            POST => '/local_storage', { key => $key, value => $value } );
-
-        Carp::croak $ret->{value}{message} if $ret->{value}{message};
-
-        $self;
-    }
-    # Get a key.
-    elsif ( @_ == 2 ) {
-        $self->_req( GET => "/local_storage/key/$key" )->{value};
-    }
-    # List all keys.
-    else {
-        my @keys = $self->_req( GET => '/local_storage' )->{value}->@*;
-
-        return @keys if wantarray;
-
-        +{ map {
-            $_ => $self->_req( GET => "/local_storage/key/$_" )->{value}
-        } @keys };
-    }
-}
-
-sub accept_alert {
-    $_[0]->_req( POST => '/accept_alert' ) if $_[0][3]{handlesAlerts};
-
-    $_[0];
-}
-
-sub alert_text {
-    $_[0][3]{handlesAlerts} ? $_[0]->_req( GET => '/alert_text' )->{value} : ();
-}
-
-sub dismiss_alert {
-    $_[0]->_req( POST => '/dismiss_alert' ) if $_[0][3]{handlesAlerts};
-
-    $_[0];
-}
+sub alert_text { $_[0]->_req( GET => '/alert/text' ) }
 
 sub base_url {
     if ( @_ == 2 ) {
@@ -199,7 +160,7 @@ sub cookie_delete {
 }
 
 sub cookies {
-    my @cookies = @{ $_[0]->_req( GET => '/cookie' )->{value} // [] };
+    my @cookies = @{ $_[0]->_req( GET => '/cookie' ) // [] };
 
     # Map the incorrect key to the correct key.
     $_->{httpOnly} //= delete $_->{httponly} for @cookies;
@@ -235,19 +196,10 @@ sub find {
             { using => $method, value => "$selector" },
         );
 
-        my $type = ref $reply->{value};
-        if ($type eq 'ARRAY') {
-            @ids = map $_->{ELEMENT}, $reply->{value}->@*;
-        }
-        elsif ($type eq 'HASH') {
-            Carp::croak ref $self, qq/->find failed: $reply->{value}{message}/;
-        }
-        else {
-            Carp::croak ref $self, qq/->find failed: $reply->{value}/;
-        }
+        @ids = map values %$_, $reply->@*;
 
         @ids = grep {
-            $drv->_req( GET => "/element/$_/displayed" )->{value}
+            $drv->_req( GET => "/element/$_/displayed" )
         } @ids if $must_be_visible;
 
         last if @ids;
@@ -269,13 +221,11 @@ my $js = sub {
     $_ = { ELEMENT => $_->[1] }
         for grep ref eq 'WebDriver::Tiny::Elements', @args;
 
-    $self->_req( POST => $path, { script => $script, args => \@args } )
-        ->{value};
+    $self->_req( POST => $path, { script => $script, args => \@args } );
 };
 
-sub js         { unshift @_, '/execute';         goto $js }
-sub js_async   { unshift @_, '/execute_async';   goto $js }
-sub js_phantom { unshift @_, '/phantom/execute'; goto $js }
+sub js       { unshift @_, '/execute/sync';  goto $js }
+sub js_async { unshift @_, '/execute/async'; goto $js }
 
 sub get {
     my ( $self, $url ) = @_;
@@ -288,14 +238,13 @@ sub get {
     $self;
 }
 
-# TODO make this handle elements too? Or make a new method?
 sub screenshot {
     my ( $self, $file ) = @_;
 
     require MIME::Base64;
 
     my $data = MIME::Base64::decode_base64(
-        $self->_req( GET => '/screenshot' )->{value}
+        $self->_req( GET => '/screenshot' )
     );
 
     if ( @_ == 2 ) {
@@ -309,44 +258,27 @@ sub screenshot {
     $data;
 }
 
-sub user_agent { $js->( '/execute', $_[0], 'return window.navigator.userAgent') }
+sub user_agent { $js->( '/execute/sync', $_[0], 'return window.navigator.userAgent') }
 
-sub window  { $_[0]->_req( GET => '/window'         )->{value} }
-sub windows { $_[0]->_req( GET => '/window_handles' )->{value} }
+sub window  { $_[0]->_req( GET => '/window'         ) }
+sub windows { $_[0]->_req( GET => '/window/handles' ) }
 
 sub window_close      { $_[0]->_req( DELETE => '/window'            ); $_[0] }
 sub window_fullscreen { $_[0]->_req( POST   => '/window/fullscreen' ); $_[0] }
+sub window_maximize   { $_[0]->_req( POST   => '/window/maximize'   ); $_[0] }
+sub window_minimize   { $_[0]->_req( POST   => '/window/minimize'   ); $_[0] }
 
-sub window_maximize {
-    $_[0]->_req( POST => '/window/' . ( $_[1] // 'current' ) . '/maximize' );
-
-    $_[0];
-}
-
-sub window_position {
+sub window_rect {
     my $self = shift;
 
-    return @{
-        $self->_req( GET => '/window/' . ( $_[0] // 'current' ) . '/position' )->{value}
-    }{'x', 'y'} if @_ < 2;
+    return $self->_req( GET => '/window/rect' ) unless @_;
 
-    my ( $handle, $x, $y ) = @_ == 2 ? ( 'current', @_ ) : @_;
+    $#_ = 3;
 
-    $self->_req( POST => "/window/$handle/position", { 'x' => $x, 'y' => $y } );
+    my %args;
+    @args{ qw/width height x y/ } = map $_ // 0, @_;
 
-    $self;
-}
-
-sub window_size {
-    my $self = shift;
-
-    return @{
-        $self->_req( GET => '/window/' . ( $_[0] // 'current' ) . '/size' )->{value}
-    }{qw/width height/} if @_ < 2;
-
-    my ( $handle, $w, $h) = @_ == 2 ? ( 'current', @_ ) : @_;
-
-    $self->_req( POST => "/window/$handle/size", { width => $w, height => $h } );
+    $self->_req( POST => '/window/rect', \%args );
 
     $self;
 }
@@ -354,7 +286,7 @@ sub window_size {
 sub window_switch {
     my ( $self, $handle ) = @_;
 
-    $self->_req( POST => '/window', { name => $handle } );
+    $self->_req( POST => '/window', { handle => $handle } );
 
     $self;
 }
@@ -368,20 +300,12 @@ sub _req {
         { content => JSON::PP::encode_json( $args // {} ) },
     );
 
-    unless ( $reply->{success} ) {
-        # Try to extract an error message from the reply. Yep nested JSON :-(
-        my $error = eval {
-            # FIXME We probably just want to tell JSON::PP not to decode.
-            utf8::encode my $msg
-                = JSON::PP::decode_json($reply->{content})->{value}{message};
+    my $value = eval { JSON::PP::decode_json( $reply->{content} )->{value} };
 
-            JSON::PP::decode_json($msg)->{errorMessage};
-        };
+    Carp::croak ref $self, ' - ', $value ? $value->{message} : $reply->{content}
+        unless $reply->{success};
 
-        Carp::croak ref $self, ' - ', $error // $reply->{content};
-    }
-
-    JSON::PP::decode_json $reply->{content};
+    $value;
 }
 
 sub DESTROY { $_[0]->_req( DELETE => '' ) if $_[0][3] && $_[0][0] }

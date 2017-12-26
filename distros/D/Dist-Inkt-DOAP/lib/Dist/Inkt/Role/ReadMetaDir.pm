@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::ReadMetaDir;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.022';
+our $VERSION   = '0.100';
 
 use Moose::Role;
 use RDF::TrineX::Functions 'parse';

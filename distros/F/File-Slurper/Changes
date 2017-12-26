@@ -1,5 +1,9 @@
 Revision history for File-Slurper
 
+0.011     2017-12-18 21:23:24+01:00 Europe/Amsterdam
+          Correctly set value of $PerlIO::encoding::fallback
+          Don't skip latin-1 checking
+
 0.010     2017-09-17 22:09:05+02:00 Europe/Amsterdam
           Recognize "latin-1" as iso-8859-1
 

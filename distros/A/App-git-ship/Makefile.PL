@@ -27,17 +27,15 @@ my %WriteMakefileArgs = (
 }
 ,
   META_MERGE     => {
-    resources => {
-      'dynamic_config' => 0,
-      'meta-spec'      => {version => 2},
-      'resources'      => {
-        bugtracker => {web => 'https://github.com/jhthorsen/app-git-ship/issues'},
-        homepage   => 'https://github.com/jhthorsen/app-git-ship',
-        repository => {
-          type => 'git',
-          url  => 'https://github.com/jhthorsen/app-git-ship.git',
-          web  => 'https://github.com/jhthorsen/app-git-ship',
-        },
+    'dynamic_config' => 0,
+    'meta-spec'      => {version => 2},
+    'resources'      => {
+      bugtracker => {web => 'https://github.com/jhthorsen/app-git-ship/issues'},
+      homepage   => 'https://github.com/jhthorsen/app-git-ship',
+      repository => {
+        type => 'git',
+        url  => 'https://github.com/jhthorsen/app-git-ship.git',
+        web  => 'https://github.com/jhthorsen/app-git-ship',
       },
     },
   },

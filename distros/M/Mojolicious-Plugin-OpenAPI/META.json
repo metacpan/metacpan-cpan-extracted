@@ -3,7 +3,7 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -32,8 +30,13 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "1.06",
+            "JSON::Validator" : "1.08",
             "Mojolicious" : "6.40"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -44,9 +47,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-openapi",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/mojolicious-plugin-openapi.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojolicious-plugin-openapi.git",
+         "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

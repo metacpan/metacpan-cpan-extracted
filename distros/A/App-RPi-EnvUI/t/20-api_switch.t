@@ -22,6 +22,8 @@ my $api = App::RPi::EnvUI::API->new(
 
 my $db = App::RPi::EnvUI::DB->new(testing => 1);
 
+my $read_pin_sub = $App::RPi::EnvUI::API::rp_sub;
+
 is ref $api, 'App::RPi::EnvUI::API', "new() returns a proper object";
 is $api->{testing}, 1, "testing param to new() ok";
 
@@ -38,12 +40,14 @@ is $api->{testing}, 1, "testing param to new() ok";
     for (1..8){
         my $id = "aux$_";
         $api->aux_pin($id, 0);
+        $read_pin_sub->return_value(0);
+
         my $ret = $api->switch($id);
 
         is $api->aux_pin($id), 0, "aux $id pin set to 0";
 
-        is $App::RPi::EnvUI::API::wp_sub->called, 1, "switch(): wp called if pin isn't -1";
-        is $ret, 'ok', "switch(): if pin isn't -1, we call write_pin(), $id";
+        is $App::RPi::EnvUI::API::wp_sub->called, 0, "switch(): wp not called if pin isn't -1 and no state change";
+        is $ret, undef, "switch(): if pin isn't -1, we don't call write_pin() if no state change, $id";
 
         $api->aux_pin($id, -1);
 
@@ -71,10 +75,12 @@ is $api->{testing}, 1, "testing param to new() ok";
         is $api->aux_pin($id, 0), 0, "$id pin set to 0 for test";
         is $api->aux_state($id, 1), 1, "$id state set to 1 for test";
 
+        $read_pin_sub->return_value(1);
         $api->switch($id);
 
         is $api->aux_state($id), 1, "with state=1, switch() turns it on";
 
+        $read_pin_sub->return_value(0);
         is $api->aux_pin($id, -1), -1, "$id pin set to -1";
         is $api->aux_state($id, 0), 0, "$id state set to 0";
     }

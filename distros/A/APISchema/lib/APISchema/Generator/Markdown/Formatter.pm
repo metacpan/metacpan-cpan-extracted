@@ -41,13 +41,13 @@ sub type ($) {
         return $ref_text;
     }
 
+    return join $bar, map { code($_) } @{$def->{enum}} if $def->{enum};
+
     my $type = $def->{type};
     if ($type) {
         return sprintf '`%s`', $type unless ref $type;
         return join $bar, map { code($_) } @{$type} if ref $type eq 'ARRAY';
     }
-
-    return join $bar, map { code($_) } @{$def->{enum}} if $def->{enum};
 
     return 'undefined';
 }

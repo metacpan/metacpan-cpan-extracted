@@ -1,5 +1,3 @@
-#!perl
-
 use strict;
 BEGIN {
 	$|  = 1;

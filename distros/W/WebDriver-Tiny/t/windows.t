@@ -3,4 +3,4 @@ use t   '1';
 
 $drv->windows;
 
-reqs_are [ [ GET => '/window_handles' ] ], '->windows';
+reqs_are [ [ GET => '/window/handles' ] ], '->windows';

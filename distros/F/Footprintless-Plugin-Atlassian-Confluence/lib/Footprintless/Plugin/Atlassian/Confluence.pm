@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Atlassian::Confluence;
-$Footprintless::Plugin::Atlassian::Confluence::VERSION = '1.02';
+$Footprintless::Plugin::Atlassian::Confluence::VERSION = '1.03';
 # ABSTRACT: A Footprintless plugin for working with Atlassian Confluence
 # PODNAME: Footprintless::Plugin::Atlassian::Confluence
 
@@ -44,7 +44,7 @@ Footprintless::Plugin::Atlassian::Confluence - A Footprintless plugin for workin
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 DESCRIPTION
 

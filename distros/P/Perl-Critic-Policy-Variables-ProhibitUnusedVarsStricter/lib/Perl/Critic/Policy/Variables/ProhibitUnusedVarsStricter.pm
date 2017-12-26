@@ -15,7 +15,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 #-----------------------------------------------------------------------------
 
@@ -507,7 +507,7 @@ sub _record_symbol_use {
         or return;
 
     foreach my $decl_scope ( @{ $declaration } ) {
-        $document->element_is_in_lexical_scope_after_statement_containing(
+        _element_is_in_lexical_scope_after_statement_containing(
             $scope, $decl_scope->{declaration} )
             or next;
         $decl_scope->{used}++;
@@ -623,6 +623,161 @@ sub _get_violations {
             $a->column_number() <=> $b->column_number() }
         @in_violation );
 }
+
+#-----------------------------------------------------------------------------
+
+# THIS CODE HAS ABSOLUTELY NO BUSINESS BEING HERE. It should probably be
+# its own module; PPIx::Scope or something like that. The problem is
+# that I no longer "own" it, and am having trouble getting modifications
+# through. So I have stuck it here for the moment, but I hope it will
+# not stay here. Other than here, it appears in Perl::Critic::Document
+# (the copy I am trying to get modified) and Perl::ToPerl6::Document (a
+# cut-and-paste of an early version.)
+#
+# THIS CODE IS UNSUPPORTED. That is, the author reserves the right to
+# change it or remove it without any notice whatsoever. YOU HAVE BEEN
+# WARNED.
+#
+# This got hung on the Perl::Critic::Document, rather than living in
+# Perl::Critic::Utils::PPI, because of the possibility that caching of scope
+# objects would turn out to be desirable.
+
+# sub element_is_in_lexical_scope_after_statement_containing {...}
+sub _element_is_in_lexical_scope_after_statement_containing {
+    my ( $inner_elem, $outer_elem ) = @_;
+
+    # If the outer element defines a scope, we're true if and only if
+    # the outer element contains the inner element, and the inner
+    # element is not somewhere that is hidden from the scope.
+    if ( $outer_elem->scope() ) {
+        return _inner_element_is_in_outer_scope_really(
+            $inner_elem, $outer_elem );
+    }
+
+    # In the more general case:
+
+    # The last element of the statement containing the outer element
+    # must be before the inner element. If not, we know we're false,
+    # without walking the parse tree.
+
+    my $stmt = $outer_elem->statement()
+        or return;
+
+    my $last_elem = $stmt;
+    while ( $last_elem->isa( 'PPI::Node' ) ) {
+        $last_elem = $last_elem->last_element()
+            or return;
+    }
+
+    my $stmt_loc = $last_elem->location()
+        or return;
+
+    my $inner_loc = $inner_elem->location()
+        or return;
+
+    $stmt_loc->[0] > $inner_loc->[0]
+        and return;
+    $stmt_loc->[0] == $inner_loc->[0]
+        and $stmt_loc->[1] >= $inner_loc->[1]
+        and return;
+
+    # Since we know the inner element is after the outer element, find
+    # the element that defines the scope of the statement that contains
+    # the outer element.
+
+    my $parent = $stmt;
+    while ( ! $parent->scope() ) {
+        # Things appearing in the right-hand side of a
+        # PPI::Statement::Variable are not in-scope to its left-hand
+        # side. RESTRICTION -- this code does not handle truly
+        # pathological stuff like
+        # my ( $c, $d ) = qw{ e f };
+        # my ( $a, $b ) = my ( $c, $d ) = ( $c, $d );
+        _inner_is_defined_by_outer( $inner_elem, $parent )
+            and _location_is_in_right_hand_side_of_assignment(
+                $parent, $inner_elem )
+            and return;
+        $parent = $parent->parent()
+            or return;
+    }
+
+    # We're true if and only if the scope of the outer element contains
+    # the inner element.
+
+    return $inner_elem->descendant_of( $parent );
+
+}
+
+# Helper for element_is_in_lexical_scope_after_statement_containing().
+# Return true if and only if $outer_elem is a statement that defines
+# variables and $inner_elem is actually a variable defined in that
+# statement.
+sub _inner_is_defined_by_outer {
+    my ( $inner_elem, $outer_elem ) = @_;
+    $outer_elem->isa( 'PPI::Statement::Variable' )
+        and $inner_elem->isa( 'PPI::Token::Symbol' )
+        or return;
+    my %defines = hashify( $outer_elem->variables() );
+    return $defines{$inner_elem->symbol()};
+}
+
+# Helper for element_is_in_lexical_scope_after_statement_containing().
+# Given that the outer element defines a scope, there are still things
+# that are lexically inside it but outside the scope. We return true if
+# and only if the inner element is inside the outer element, but not
+# inside one of the excluded elements. The cases handled so far:
+#   for ----- the list is not part of the scope
+#   foreach - the list is not part of the scope
+
+sub _inner_element_is_in_outer_scope_really {
+    my ( $inner_elem, $outer_elem ) = @_;
+    $outer_elem->scope()
+        or return;
+    $inner_elem->descendant_of( $outer_elem )
+        or return;
+    if ( $outer_elem->isa( 'PPI::Statement::Compound' ) ) {
+        my $first = $outer_elem->schild( 0 )
+            or return;
+        if ( { for => 1, foreach => 1 }->{ $first->content() } ) {
+            my $next = $first;
+            while ( $next = $next->snext_sibling() ) {
+                $next->isa( 'PPI::Structure::List' )
+                    or next;
+                return ! $inner_elem->descendant_of( $next );
+            }
+        }
+    }
+    return $TRUE;
+}
+
+# Helper for element_is_in_lexical_scope_after_statement_containing().
+# Given and element that represents an assignment or assignment-ish
+# statement, and a location, return true if the location is to the right
+# of the equals sign, and false otherwise (including the case where
+# there is no equals sign). Only the leftmost equals is considered. This
+# is a restriction.
+sub _location_is_in_right_hand_side_of_assignment {
+    my ( $elem, $inner_elem ) = @_;
+    my $inner_loc = $inner_elem->location();
+    my $kid = $elem->schild( 0 );
+    while ( $kid ) {
+        $kid->isa( 'PPI::Token::Operator' )
+            and q{=} eq $kid->content()
+            or next;
+        my $l = $kid->location();
+        $l->[0] > $inner_loc->[0]
+            and return;
+        $l->[0] == $inner_loc->[0]
+            and $l->[1] >= $inner_loc->[1]
+            and return;
+        return $inner_elem->descendant_of( $elem );
+    } continue {
+        $kid = $kid->snext_sibling();
+    }
+    return;
+}
+
+# END OF CODE THAT ABSOLUTELY SHOULD NOT BE HERE
 
 #-----------------------------------------------------------------------------
 

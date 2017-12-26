@@ -1,3 +1,42 @@
+2017-12-25T17:30:32+08:00 : 发布0.1.26版本到cpan.org
+2017-12-25T17:29:20+08:00 : bootstrap 工具添加cygwin系统兼容
+2017-12-22T15:05:19+08:00 : 修改bootstrap/exec/* 让它在cygwin系统中兼容
+2017-12-22T14:33:05+08:00 : 在cygwin系统中调用Cwd::abs_path,在没有目录的情况下会报错,提前建好目录
+2017-12-22T11:56:09+08:00 : 发布0.1.25版本到cpan.org
+2017-12-22T11:55:21+08:00 : fix bootstrap
+2017-12-22T11:10:25+08:00 : 发布0.1.24版本到cpan.org
+2017-12-22T10:45:20+08:00 : bootstrap 去掉强制sudo,在install的时候已经指定了用户，允许通过别的方式启动，某些系统没有root用户
+2017-12-21T19:01:29+08:00 : update INSTALL.PL
+2017-12-19T12:42:25+08:00 : INSTALL.PL make $mydan/tmp
+2017-12-19T11:16:03+08:00 : bootstrap install的时候生成ReservedSpace文件
+2017-12-19T10:58:50+08:00 : Agent::Query 临时文件使用MYDan::Util::ReservedSpace::File
+2017-12-19T10:55:04+08:00 : add MYDan::Util::ReservedSpace::File
+2017-12-19T10:53:32+08:00 : 传递环境变量UseReservedSpace
+2017-12-18T15:32:28+08:00 : Makefile.PL 添加Filesys::Df 依赖
+2017-12-18T15:23:12+08:00 : tcpserver通过判断磁盘情况来决定使用的模式
+2017-12-18T13:19:24+08:00 : Merge branch 'release-0.0.1' of https://github.com/MYDan/mayi into release-0.0.1
+2017-12-16T22:17:36+08:00 : Merge pull request #20 from g112wdh/wdh_dev
+2017-12-16T16:44:32+08:00 : 去掉ntpsync的注释
+2017-12-16T14:08:39+08:00 : update README.md
+2017-12-16T03:27:32+08:00 : update README.md
+2017-12-16T02:25:03+08:00 : 发布0.1.23版本到cpan.org
+2017-12-16T02:22:24+08:00 : bootstrap用路径的md5前7个字符来区分多个实例的情况
+2017-12-16T01:55:12+08:00 : 更新README.md
+2017-12-16T01:34:10+08:00 : 修改procupdate,mydanupdate定时配置
+2017-12-16T01:31:52+08:00 : 更新604800*mydanupdate从etc/env拿参数
+2017-12-16T01:29:13+08:00 : 更新3600*procupdate从etc/env拿参数
+2017-12-16T01:25:40+08:00 : 更新3600*keyupdate从etc/env拿参数
+2017-12-16T01:13:40+08:00 : Merge pull request #19 from g112wdh/wdh_dev
+2017-12-16T01:04:55+08:00 : ntpserver .config
+2017-12-16T01:01:38+08:00 : add ntpsync
+2017-12-16T00:58:34+08:00 : 更新120*whitelist 更新的地址从etc/env环境变量MYDAN_WHITELIST_UPDATE中获取
+2017-12-16T00:40:32+08:00 : 把bootstrap下的temp四个定时任务放到exec中
+2017-12-16T00:31:48+08:00 : 添加agent白名单自动更新脚本
+2017-12-15T21:12:44+08:00 : 添加procupdate的配置到bootstrap/temp
+2017-12-15T21:06:27+08:00 : 添加工具用来同步bootstrap中的exec
+2017-12-15T18:15:16+08:00 : 添加mydan自动更新脚本bootstrap/temp/604800*mydanupdate
+2017-12-15T17:46:14+08:00 : 把bootstrap/exec中的3600*keyupdate放到bootstrap/temp,安装脚本中会根据环境变量来判断是否要移动回exec中，同时控制运行的频率
+2017-12-15T16:12:50+08:00 : 修改README.md
 2017-12-14T23:42:31+08:00 : 发布0.1.22版本到cpan.org
 2017-12-14T20:32:13+08:00 : agent添加scripts插件
 2017-12-14T15:19:20+08:00 : 添加fileupdate用于更新文件

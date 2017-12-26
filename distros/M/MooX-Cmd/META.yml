@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,6 +19,10 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Hash::Merge: '0.299'
+  MooX::ConfigFromFile: '0.008'
+  Text::Abbrev: '0'
 requires:
   Carp: '0'
   List::MoreUtils: '0.406'
@@ -35,5 +39,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Cmd
   homepage: https://metacpan.org/release/MooX-Cmd
   license: http://dev.perl.org/licenses/
-  repository: https://github.com:Getty/p5-moox-cmd.git
-version: '0.015'
+  repository: https://github.com/Getty/p5-moox-cmd.git
+version: '0.017'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

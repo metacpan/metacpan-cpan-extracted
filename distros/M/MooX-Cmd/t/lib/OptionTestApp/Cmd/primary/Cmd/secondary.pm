@@ -3,19 +3,21 @@ package OptionTestApp::Cmd::primary::Cmd::secondary;
 use strict;
 use warnings;
 
-BEGIN {
+BEGIN
+{
     my $moodel = $ENV{WHICH_MOODEL} || "Moo";
-    eval "use $moodel;"; $@ and die $@;
+    eval "use $moodel;";
+    $@ and die $@;
     $moodel->import;
 }
 use MooX::Cmd;
 use MooX::Options;
 
 option sure => (
-    is => "ro",
+    is          => "ro",
     negativable => 1,
-    required => 1,
-    doc => "sure?",
+    required    => 1,
+    doc         => "sure?",
 );
 
 sub execute { @_ }

@@ -42,7 +42,7 @@ cmp_ok(@received, "==", 5);
 my $received = $head->get('received');  #last
 ok(defined $received);
 is($received->name, 'received');
-my $recb = "(from majordomo\@localhost)\tby unca-don.wizards.dupont.com (8.9.3/8.9.3) id PAA29389\tfor magick-outgoing";
+my $recb = "(from majordomo\@localhost) by unca-don.wizards.dupont.com (8.9.3/8.9.3) id PAA29389 for magick-outgoing";
 
 is($received->body, $recb);
 is($received->comment, 'Wed, 9 Feb 2000 15:38:42 -0500 (EST)');

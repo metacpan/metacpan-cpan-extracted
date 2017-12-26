@@ -1,7 +1,7 @@
 use lib 't';
 use t   '6';
 
-$content = '{"value":[{}]}';
+$content = '{"value":[{"foo":"bar"}]}';
 
 $drv->find('foo');
 

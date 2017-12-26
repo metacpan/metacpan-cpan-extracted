@@ -26,7 +26,7 @@ no_index:
 provides:
   App::lsnic:
     file: lib/App/lsnic.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Env: '0'
   Getopt::Std: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/athreef/App-lsnic/issues
   homepage: https://github.com/athreef/App-lsnic
   repository: https://github.com/athreef/App-lsnic.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -214,7 +214,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.15.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -231,7 +231,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -244,11 +244,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.002
+          tag: v0.003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -262,7 +262,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.15.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -278,7 +278,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.0
+          git_version: 2.15.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -290,6 +290,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
       version: '0.016'
+    -
+      class: Dist::Zilla::Plugin::PodVersion
+      name: PodVersion
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: ReadmePodInRoot
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       name: Test::MinimumVersion

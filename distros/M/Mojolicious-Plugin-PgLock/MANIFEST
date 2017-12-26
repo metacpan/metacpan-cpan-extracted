@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/PgLock.pm
+lib/Mojolicious/Plugin/PgLock/Sentinel.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

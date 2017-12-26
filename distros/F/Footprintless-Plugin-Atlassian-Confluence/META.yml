@@ -29,16 +29,16 @@ no_index:
 provides:
   Footprintless::Plugin::Atlassian::Confluence:
     file: lib/Footprintless/Plugin/Atlassian/Confluence.pm
-    version: '1.02'
+    version: '1.03'
   Footprintless::Plugin::Atlassian::Confluence::Client:
     file: lib/Footprintless/Plugin/Atlassian/Confluence/Client.pm
-    version: '1.02'
+    version: '1.03'
   Footprintless::Plugin::Atlassian::Confluence::RequestBuilder:
     file: lib/Footprintless/Plugin/Atlassian/Confluence/RequestBuilder.pm
-    version: '1.02'
+    version: '1.03'
   Footprintless::Plugin::Atlassian::Confluence::ResponseParser:
     file: lib/Footprintless/Plugin/Atlassian/Confluence/ResponseParser.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Footprintless: '1.23'
   HTTP::Message: '6.11'
@@ -50,7 +50,7 @@ requires:
 resources:
   homepage: https://github.com/lucastheisen/footprintless-plugin-atlassian-confluence
   repository: https://github.com/lucastheisen/footprintless-plugin-atlassian-confluence.git
-version: '1.02'
+version: '1.03'
 x_Dist_Zilla:
   perl:
     version: '5.025000'
@@ -132,7 +132,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.02
+          tag: v1.03
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

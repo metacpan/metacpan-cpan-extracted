@@ -7,7 +7,7 @@
 # use, you may wish to use that instead. In fact, this code was pulled
 # from an early version of Test::DistManifest
 #
-# $Id: difference.pl 4995 2009-01-19 21:05:38Z FREQUENCY@cpan.org $
+# $Id$
 #
 # Copyright (c) 2006-2008 Adam Kennedy, et al.
 #
@@ -41,7 +41,7 @@ working directory, excluding the files in MANIFEST.SKIP.
 
 =head1 VERSION
 
-Version 1.0 ($Id: difference.pl 4995 2009-01-19 21:05:38Z FREQUENCY@cpan.org $)
+Version 1.0 ($Id$)
 
 =cut
 

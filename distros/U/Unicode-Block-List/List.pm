@@ -10,7 +10,7 @@ use Unicode::Block;
 use Unicode::UCD qw(charblock charblocks);
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -377,6 +377,69 @@ Constructor.
  #     [208] "Yijing Hexagram Symbols"
  # ]
 
+=head1 EXAMPLE3
+
+ # Pragmas.
+ use strict;
+ use warnings;
+ 
+ # Modules.
+ use Curses::UI;
+ use Encode qw(encode_utf8);
+ use Unicode::Block::Ascii;
+ use Unicode::Block::List;
+ 
+ # Get unicode block list.
+ my $list = Unicode::Block::List->new;
+ my @unicode_block_list = $list->list;
+ 
+ # Window.
+ my $cui = Curses::UI->new;
+ my $win = $cui->add('window_id', 'Window');
+ $win->set_binding(\&exit, "\cQ", "\cC");
+ 
+ # Popup menu.
+ my $popupbox = $win->add(
+         'mypopupbox', 'Popupmenu',
+         '-labels' => {
+                 map { $_, $_ } @unicode_block_list,
+         },
+         '-onchange' => sub {
+                 my $self = shift;
+                 $cui->leave_curses;
+                 my $block = $list->block($self->get);
+                 my $block_ascii = Unicode::Block::Ascii->new(%{$block});
+                 print encode_utf8($block_ascii->get)."\n";
+                 exit 0;
+         },
+         '-values' => \@unicode_block_list,
+ );
+ $popupbox->focus;
+ 
+ # Loop.
+ $cui->mainloop;
+
+ # Output after select 'Arrows' item:
+ # ┌────────────────────────────────────────┐
+ # │                 Arrows                 │
+ # ├────────┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┤
+ # │        │0│1│2│3│4│5│6│7│8│9│A│B│C│D│E│F│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+219x │←│↑│→│↓│↔│↕│↖│↗│↘│↙│↚│↛│↜│↝│↞│↟│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21ax │↠│↡│↢│↣│↤│↥│↦│↧│↨│↩│↪│↫│↬│↭│↮│↯│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21bx │↰│↱│↲│↳│↴│↵│↶│↷│↸│↹│↺│↻│↼│↽│↾│↿│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21cx │⇀│⇁│⇂│⇃│⇄│⇅│⇆│⇇│⇈│⇉│⇊│⇋│⇌│⇍│⇎│⇏│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21dx │⇐│⇑│⇒│⇓│⇔│⇕│⇖│⇗│⇘│⇙│⇚│⇛│⇜│⇝│⇞│⇟│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21ex │⇠│⇡│⇢│⇣│⇤│⇥│⇦│⇧│⇨│⇩│⇪│⇫│⇬│⇭│⇮│⇯│
+ # ├────────┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+ # │ U+21fx │⇰│⇱│⇲│⇳│⇴│⇵│⇶│⇷│⇸│⇹│⇺│⇻│⇼│⇽│⇾│⇿│
+ # └────────┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -389,16 +452,17 @@ L<https://github.com/tupinek/Unicode-Block-List>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2013-2017 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -1,7 +1,9 @@
 package Getopt::Long::Complete;
 
-our $DATE = '2016-12-03'; # DATE
-our $VERSION = '0.30'; # VERSION
+## no critic (Modules::ProhibitAutomaticExportation)
+
+our $DATE = '2017-12-20'; # DATE
+our $VERSION = '0.310'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +32,14 @@ sub GetOptionsWithCompletion {
     my $ospec;
     if (ref($_[0]) eq 'HASH') {
         $hash = shift;
-        $ospec = { map {$_=>sub{}} @_ };
+        for (my $i = 0; $i < @_; $i++) {
+            if (($i+1 < @_) && (ref $_[$i+1])) {
+                $ospec->{$_[$i]} = $_[$i+1];
+                $i++;
+            } else {
+                $ospec->{$_[$i]} = sub {};
+            }
+        }
     } else {
         $ospec = {@_};
     }
@@ -122,7 +131,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.30 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2016-12-03.
+This document describes version 0.310 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2017-12-20.
 
 =head1 SYNOPSIS
 
@@ -169,7 +178,7 @@ Example:
          my $type  = $args{type}; # 'optname', 'optval', or 'arg'
          my $opt   = $args{opt};
          if ($type eq 'optval' && $opt eq '--on-fail') {
-             return complete_array_elem(words=>[qw/die warn ignore/], word=>$word);
+             return complete_array_elem(array=>[qw/die warn ignore/], word=>$word);
          } elsif ($type eq 'optval' && ($opt eq '--user' || $opt eq '-U')) {
              return complete_user(word=>$word);
          } elsif ($type eq 'arg') {
@@ -311,7 +320,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

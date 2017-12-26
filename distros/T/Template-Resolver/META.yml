@@ -18,5 +18,5 @@ requires:
 resources:
   homepage: https://github.com/lucastheisen/template-resolver
   repository: https://github.com/lucastheisen/template-resolver.git
-version: '1.14'
+version: '1.16'
 x_serialization_backend: 'YAML::Tiny version 1.69'

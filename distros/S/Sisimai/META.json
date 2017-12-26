@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.22.2"
+         "version" : "v4.22.3"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -115,6 +115,9 @@
       },
       "Sisimai::Bite::Email::Exim" : {
          "file" : "lib/Sisimai/Bite/Email/Exim.pm"
+      },
+      "Sisimai::Bite::Email::FML" : {
+         "file" : "lib/Sisimai/Bite/Email/FML.pm"
       },
       "Sisimai::Bite::Email::Facebook" : {
          "file" : "lib/Sisimai/Bite/Email/Facebook.pm"
@@ -398,6 +401,9 @@
       "Sisimai::Rhost::ExchangeOnline" : {
          "file" : "lib/Sisimai/Rhost/ExchangeOnline.pm"
       },
+      "Sisimai::Rhost::FrancePTT" : {
+         "file" : "lib/Sisimai/Rhost/FrancePTT.pm"
+      },
       "Sisimai::Rhost::GoDaddy" : {
          "file" : "lib/Sisimai/Rhost/GoDaddy.pm"
       },
@@ -437,7 +443,7 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "4.22.2",
+   "version" : "4.22.3",
    "x_contributors" : [
       "jcbf <underspell@gmail.com>",
       "Jonathan Leroy <jonathan@inikup.com>",
@@ -446,6 +452,8 @@
       "azumakuniyuki <azumakuniyuki+github.com@gmail.com>",
       "Mutsutoshi Yoshimoto <negachov@gmail.com>",
       "Jon Jensen <jon@endpoint.com>",
+      "Adrian Yee <adrian@gt.net>",
+      "root <root@bwt-1.squaremx.com>",
       "azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>",
       "azumakuniyuki <azumakuniyuki@gmail.com>"
    ]

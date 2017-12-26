@@ -246,3 +246,7 @@ Version 0.18 December 14, 2017
 	Updated syntax scilab from version 2 to version 3
 	Updated syntax txt2tags from version 2 to version 3
 	Updated syntax xslt from version 2 to version 4
+
+Version 0.19 December 19, 2017
+	Set version requirement of Term::ANSIColor to 4.00
+

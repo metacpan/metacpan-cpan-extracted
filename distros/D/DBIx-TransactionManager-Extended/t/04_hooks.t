@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More 0.98;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use t::Util;
 
 use DBIx::TransactionManager::Extended;
@@ -162,6 +164,25 @@ subtest 'cycle calls' => sub {
             is $called, 8, "should run $type1->$type2->$type1->... hooks"
         }
     }
+};
+
+subtest "no break other transaction's context when rollback in after commit hook (#1)" => sub {
+    my $dbh = create_mock_dbh();
+    my $manager = DBIx::TransactionManager::Extended->new($dbh);
+
+    my $called = 0;
+
+    $manager->txn_begin();
+    $manager->add_hook_after_commit(sub {
+        $manager->txn_begin();
+        $manager->txn_rollback();
+    });
+    $manager->add_hook_after_commit(sub {
+        $called++;
+    });
+    $manager->txn_commit();
+
+    is $called, 1, '2nd hook should be called';
 };
 
 done_testing;

@@ -4,13 +4,17 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
+use Const::Fast qw( const );
 use List::AllUtils qw( any );
 use MooX::HandlesVia;
 use MooX::StrictConstructor;
+use Net::Works::Address ();
+use Net::Works::Network ();
 use Types::Common::String qw( NonEmptyStr );
 use Types::Standard qw( ArrayRef Bool );
+use Type::Utils qw( class_type );
 use WebService::PayPal::PaymentsAdvanced::Error::IPVerification;
 
 extends 'WebService::PayPal::PaymentsAdvanced::Response';
@@ -18,24 +22,35 @@ extends 'WebService::PayPal::PaymentsAdvanced::Response';
 sub BUILD {
     my $self = shift;
 
+    my $ip_str = $self->_has_ip_address ? $self->_ip_address->as_string : q{};
+
     return
         if !$self->_has_ip_address
         || $self->_has_ip_address && $self->_ip_address_is_verified;
 
     WebService::PayPal::PaymentsAdvanced::Error::IPVerification->throw(
-        message => $self->_ip_address . ' is not a verified PayPal address',
-        ip_address => $self->_ip_address,
+        message    => $ip_str . ' is not a verified PayPal address',
+        ip_address => $ip_str,
         params     => $self->params,
     );
 }
 
-has _ip_address => (
-    is        => 'ro',
-    isa       => NonEmptyStr,
-    init_arg  => 'ip_address',
-    required  => 0,
-    predicate => '_has_ip_address',
-);
+{
+    my $Address
+        = class_type( { class => 'Net::Works::Address' } )
+        ->plus_coercions( NonEmptyStr,
+        sub { Net::Works::Address->new_from_string( string => $_ ) },
+        );
+
+    has _ip_address => (
+        is        => 'ro',
+        isa       => $Address,
+        init_arg  => 'ip_address',
+        required  => 0,
+        coerce    => 1,
+        predicate => '_has_ip_address',
+    );
+}
 
 has _ip_address_is_verified => (
     is       => 'ro',
@@ -45,29 +60,22 @@ has _ip_address_is_verified => (
     builder  => '_build_ip_address_is_verified',
 );
 
-# Payments Advanced IPs listed at
-# https://www.paypal-techsupport.com/app/answers/detail/a_id/883/kw/payflow%20Ip
-
-has _ip_addresses => (
-    is          => 'ro',
-    isa         => ArrayRef,
-    handles_via => 'Array',
-    handles     => { _all_verified_ip_addresses => 'elements' },
-    default     => sub {
-        [ '173.0.81.1', '173.0.81.33', '66.211.170.66', '173.0.81.65' ];
-    },
-);
-
 with(
     'WebService::PayPal::PaymentsAdvanced::Role::HasTender',
     'WebService::PayPal::PaymentsAdvanced::Role::HasTokens',
     'WebService::PayPal::PaymentsAdvanced::Role::HasTransactionTime',
 );
 
+# Payments Advanced IPs listed at
+# https://www.paypal.com/us/selfhelp/article/what-are-the-ip-addresses-for-payflow-servers-ts1465/1
+const my @ALLOWED_NETWORKS =>
+    map { Net::Works::Network->new_from_string( string => $_ ) }
+    ( '66.211.170.66/32', '173.0.81.0/24' );
+
 sub _build_ip_address_is_verified {
     my $self = shift;
 
-    return any { $_ eq $self->_ip_address } $self->_all_verified_ip_addresses;
+    return any { $_->contains( $self->_ip_address ) } @ALLOWED_NETWORKS;
 }
 
 1;
@@ -82,7 +90,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST - Response object
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 DESCRIPTION
 

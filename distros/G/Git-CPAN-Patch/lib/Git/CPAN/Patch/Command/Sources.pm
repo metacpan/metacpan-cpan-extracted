@@ -1,7 +1,7 @@
 package Git::CPAN::Patch::Command::Sources;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: lists sources for the module
-$Git::CPAN::Patch::Command::Sources::VERSION = '2.3.1';
+$Git::CPAN::Patch::Command::Sources::VERSION = '2.3.2';
 use 5.10.0;
 
 use strict;
@@ -18,7 +18,7 @@ option repository => (
     isa     => 'Bool',
     default => 1,
     trigger => method {
-        return unless $self->vcs;
+        return unless $self->repository;
         $self->set_cpan(0);
         $self->set_backpan(0);
     },
@@ -31,7 +31,7 @@ option cpan => (
     default => 1,
     trigger => method {
         return unless $self->cpan;
-        $self->set_vcs(0);
+        $self->set_repository(0);
         $self->set_backpan(0);
     },
     documentation => 'show cpan information',
@@ -43,7 +43,7 @@ option backpan => (
     default => 0,
     trigger => method {
         return unless $self->backpan;
-        $self->set_vcs(0);
+        $self->set_repository(0);
         $self->set_cpan(0);
     },
     documentation => 'show backpan information',
@@ -119,7 +119,7 @@ Git::CPAN::Patch::Command::Sources - lists sources for the module
 
 =head1 VERSION
 
-version 2.3.1
+version 2.3.2
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 with(
     'WebService::PayPal::PaymentsAdvanced::Role::HasParams',
@@ -23,7 +23,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromRedirect - Response object f
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 DESCRIPTION
 

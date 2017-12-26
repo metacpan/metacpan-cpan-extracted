@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.003';
+my $VERSION = '3.004';
 
 my %prereq =
  ( Carp           => 0
@@ -19,7 +19,7 @@ my %prereq =
  , File::Copy     => 0
  , File::Remove   => 0.20
  , IO::Scalar     => 0
- , Mail::Message  => 3.0
+ , Mail::Message  => 3.005
  , Mail::Transport => 3.0
  , Object::Realize::Later => 0.19
  , POSIX          => 0

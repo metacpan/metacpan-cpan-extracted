@@ -15,6 +15,13 @@ http://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite
 THIS RELEASE
 -----------------------------------------------------------------------
 
+1.24 December 19, 2017
+    + Consistent Versioning https://github.com/redhotpenguin/soaplite/pull/24
+    ! Remove is_utf8() check from 78588
+
+1.23 December 18, 2017
+    ! RT #78588 unicode data not correct encoded
+
 1.22 August 15, 2017
     ! Noindex URI::tcp module [github/JaSei]
     ! Correct the soap namespace declaration when calling services defined in WSDL [github/waaeer]

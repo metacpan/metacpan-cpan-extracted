@@ -14,6 +14,7 @@ MANIFEST
 multicall.h
 ppport.h
 README.md
+t/.perltidyrc
 t/inline/after.pm
 t/inline/after_incl.pm
 t/inline/all.pm

@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
-require 5.10.1;
+require 5.14.0;
 
 my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
@@ -8,6 +8,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Test/Against/Dev.pm',
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Test CPAN modules against Perl dev releases',
+    MIN_PERL_VERSION => '5.14.0',
     PREREQ_PM    => {
                     # core
                     'Carp'                              => 0,

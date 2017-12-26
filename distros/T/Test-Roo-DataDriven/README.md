@@ -4,7 +4,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 # VERSION
 
-version v0.2.1
+version v0.3.0
 
 # SYNOPSIS
 
@@ -132,6 +132,24 @@ method.  It takes the following arguments:
 
     Added in v0.2.0.
 
+- `argv`
+
+    If any arguments are passed on the command line, then they are assumed
+    to be directories are test files. Those will be tested instead of the
+    ["files"](#files) parameter.
+
+    This allows you to run tests on specific data files or directories.
+
+    For example,
+
+    ```
+    prove -lv t/01-example.t :: t/data/002-another.dat
+    ```
+
+    This is enabled by default, but requires [App::Prove](https://metacpan.org/pod/App::Prove).
+
+    Added in v0.2.3.
+
 ## `parse_data_file`
 
 ```perl
@@ -224,9 +242,19 @@ unloaded.
 
 # KNOWN ISSUES
 
+See also ["BUGS"](#bugs) below.
+
+## Support for older Perl versions
+
+This module requires Perl v5.10.1 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
+
 ## Skipping test cases
 
-Skipping a test case in your test class, e.g.
+Skipping a test case in your test class as per [Test::Roo::Cookbook](https://metacpan.org/pod/Test::Roo::Cookbook),
+e.g.
 
 ```perl
 sub BUILD {
@@ -241,14 +269,25 @@ sub BUILD {
 
 will stop all remaining tests from running.
 
+Instead, skip tests before the setup:
+
+```perl
+before setup => sub {
+  my ($self) = @_;
+
+  ...
+
+  plan skip_all => "Cannot test" if $some_condition;
+
+};
+```
+
 ## Prerequisite Scanners
 
 Prerequisite scanners used for build tools may not recognise modules
 used in the ["Data Files"](#data-files).  To work around this, use the modules as
 well in the test class or explicitly add them to the distribution's
 metadata.
-
-See ["BUGS"](#bugs) below.
 
 # SEE ALSO
 

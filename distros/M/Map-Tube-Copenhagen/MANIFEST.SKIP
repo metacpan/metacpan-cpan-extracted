@@ -1,4 +1,6 @@
+^#.+#$
 ^MYMETA.json$
+^MYMETA.json.lock$
 ^MYMETA.yml$
 ^_eumm/
 ^Makefile$
@@ -7,7 +9,12 @@
 ^blibdirs
 ^Build$
 ^Build.bat$
+^cover_db/
 ^pod2htm
 ^_build/
 ^.git/
+^.gitignore
+^.travis.yml
 ^maps/
+
+

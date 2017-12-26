@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use lib 'lib';
 
@@ -25,7 +25,7 @@ mock-payflow-pro - Mock the Payflow Pro web service
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 SYNOPSIS
 

@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.45",
             "perl" : "5.016"
          }
       },
@@ -54,7 +55,7 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.4.2"
+         "version" : "v1.5.1"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm"
@@ -89,7 +90,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.4.2",
+   "version" : "v1.5.1",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <utashiro@cpan.org>"

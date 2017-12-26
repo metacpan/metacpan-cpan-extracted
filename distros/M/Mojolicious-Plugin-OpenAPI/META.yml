@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -18,11 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '1.06'
+  JSON::Validator: '1.08'
   Mojolicious: '6.40'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '1.22'
+version: '1.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

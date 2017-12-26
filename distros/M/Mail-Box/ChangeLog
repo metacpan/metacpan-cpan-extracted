@@ -1,6 +1,11 @@
 
 ===== ChangeLog of Mail::Box version 3.*
 
+version 3.004: Fri 22 Dec 09:46:28 CET 2017
+
+	Fixes:
+	- minor change in Mail::Message broken regression test [cpantesters]
+
 version 3.003: Thu 29 Jun 15:18:15 CEST 2017
 
 	Fixes:

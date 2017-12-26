@@ -14,10 +14,6 @@ WebDriver::Tiny::Elements
 
  $elems->clear;
 
-=head3 move_to
-
- $elems->move_to;
-
 =head3 send_keys
 
  $elems->send_keys('The quick brown fox jumps over the lazy dog');
@@ -33,6 +29,13 @@ WebDriver::Tiny::Elements
 =head3 css
 
 =head3 enabled
+
+=head2 html
+
+ say $elem->html;
+
+Get a serialized HTML fragment describing the element including its
+descendants.
 
 =head3 location
 
@@ -111,6 +114,9 @@ preserved.
 =head3 find
 
 =head3 screenshot
+ my $png_blob = $elem->screenshot;
+
+ $elem->screenshot('/tmp/foo.png');
 
 =head1 SEE ALSO
 

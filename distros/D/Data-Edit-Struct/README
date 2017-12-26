@@ -1,0 +1,241 @@
+Data::Edit::Struct
+
+Data::Edit::Struct provides a high-level interface for editing data
+within complex data structures. Edit and source points are specified via
+Data::DPath paths.
+
+The *destination* structure is the structure to be edited. If data are
+to be inserted into the structure, they are extracted from the *source*
+structure. See "Data Copying" for the copying policy.
+
+The following actions may be performed on the destination structure:
+
+*   "shift" - remove one or more elements from the front of an array
+
+*   "pop" - remove one or more elements from the end of an array
+
+*   "splice" - invoke "splice" on an array
+
+*   "insert" - insert elements into an array or a hash
+
+*   "delete" - delete array or hash elements
+
+*   "replace" - replace array or hash elements (and in the latter case
+    keys)
+
+  Elements *vs.* Containers
+
+Data::Edit::Struct operates on elements in the destination structure by
+following a Data::DPath path. For example, if
+
+ $src  = { dogs => 'rule' };
+ $dest = { bar => [ 2, { cats => 'rule' }, 4 ] };
+
+then a data path of
+
+ /bar/*[0]
+
+identifies the first element in the "bar" array. That element may be
+treated either as a *container* or as an *element* (this is specified by
+the "dtype" option).
+
+In the above example, "$dest->{bar}[0]" resolves to a scalar, so by
+default it is treated as an element. However "$dest->{bar[1]}" resolves
+to a hashref. When operating on it, should it be treated as an opaque
+object, or as container? For example,
+
+ edit(
+     insert => {
+         src   => $src,
+         dest  => $dest,
+         dpath => '/bar/*[1]',
+     } );
+
+Should $src be inserted *into* element 2, as in
+
+ $dest = { bar => [2, { cats => "rule", dogs => "rule" }, 4] };
+
+or should it be inserted *before* element 2 in "bar", as in?
+
+ $dest = { bar => [2, "dogs", "rule", { cats => "rule" }, 4] };
+
+The first behavior treats it as a *container*, the second as an
+*element*. By default destination paths which resolve to hash or array
+references are treated as containers, so the above code generates the
+first behavior. To explicitly indicate how a path should be treated, use
+the "dtype" option. For example,
+
+ edit(
+     insert => {
+         src   => $src,
+         dest  => $dest,
+         dpath => '/bar/*[1]',
+         dtype => 'element',
+     } );
+
+results in
+
+ $dest = { bar => [2, "dogs", "rule", { cats => "rule" }, 4] };
+
+Source structures may have the same ambiguity. In the above example,
+note that the *contents* of the hash in the source path are inserted,
+not the reference itself. This is because non-blessed references in
+sources are by default considered to be containers, and their contents
+are copied. To treat a source reference as an opaque element, use the
+"stype" option to specify it as such:
+
+ edit(
+     insert => {
+         src   => $src,
+         stype => 'element',
+         dest  => $dest,
+         dpath => '/bar/*[1]',
+         dtype => 'element',
+     } );
+
+which results in
+
+ $dest = { bar => [2, { dogs => "rule" }, { cats => "rule" }, 4] };
+
+Note that "dpath" was set to *element*, otherwise "edit" would have
+attempted to insert the source hashref (not its contents) into the
+destination hash, which would have failed, as insertion into a hash
+requires a multiple of two elements (i.e., "$key, $value").
+
+  Source Transformations
+
+Data extracted from the source structure may undergo transformations
+prior to being inserted into the destination structure. There are
+several predefined transformations and the caller may specify a callback
+to perform their own.
+
+Most of the transformations have to do with multiple values being
+returned by the source path. For example,
+
+ $src  = { foo => [1], bar => [5], baz => [5] };
+ $spath = '/*/*[value == 5]';
+
+would result in multiple extracted values:
+
+ (5, 5)
+
+By default multiple values are not allowed, but a source transformation
+(specified by the "sxfrm" option ) may be used to change that behavior.
+The provided transforms are:
+
+"array"
+    The values are assembled into an array. The "stype" parameter is
+    used to determine whether that array is treated as a container or an
+    element.
+
+"hash"
+    The items are assembled into a hash. The "stype" parameter is used
+    to determine whether that hash is treated as a container or an
+    element. Keys are derived from the data:
+
+    *   Keys for hash values will be their hash keys
+
+    *   Keys for array values will be their array indices
+
+    If there is a *single* value, a hash key may be specified via the
+    "key" option to the "sxfrm_args" option.
+
+"iterate"
+    The edit action is applied independently to each source value in
+    turn.
+
+*coderef*
+    If "sxfrm" is a code reference, it will be called to generate the
+    source values. See "Source Callbacks" for more information.
+
+  Source Callbacks
+
+If the "sxfrm" option is a code reference, it is called to generate the
+source values. It must return an array which contains *references* to
+the values (even if they are already references). For example, to return
+a hash:
+
+  my %src = ( foo => 1 );
+  return [ \\%hash ];
+
+It is called with the arguments
+
+$ctx
+    A "Data::DPath::Context" object representing the source structure.
+
+$spath
+    The source path. Unless otherwise specified, this defaults to "/",
+    *except* when the source is not a plain array or plain hash, in
+    which case the source is embedded in an array, and "spath" is set to
+    "/*[0]".
+
+    This is because "Data::DPath" requires a container to be at the root
+    of the source structure, and anything other than a plain array or
+    hash is most likely a blessed object or a scalar, both of which
+    should be treated as elements.
+
+$args
+    The value of the "sxfrm_args" option.
+
+  Data Copying
+
+By defult, copying of data from the source structure is done
+*shallowly*, e.g. references to arrays or hashes are not copied
+recursively. This may cause problems if further modifications are made
+to the destination structure which may, through references, alter the
+source structure.
+
+For example, given the following input structures:
+
+ $src  = { dogs => { say => 'bark' } };
+ $dest = { cats => { say => 'meow' } };
+
+and this edit operation:
+
+ edit(
+     insert => {
+               src  => $src,
+               dest => $dest,
+     } );
+
+We get a destination structure that looks like this:
+
+ $dest = { cats => { say => "meow" }, dogs => { say => "bark" } };
+
+But if later we change $dest,
+
+ # dogs are more excited now
+ $dest->{dogs}{say} = 'howl';
+
+the source structure is also changed:
+
+ $src = { dogs => { say => "howl" } };
+
+To avoid this possible problem, "Data::Edit::Struct" can be passed the
+"clone" option, which will instruct it how to copy data.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

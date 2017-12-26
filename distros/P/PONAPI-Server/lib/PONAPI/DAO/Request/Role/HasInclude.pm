@@ -43,7 +43,7 @@ PONAPI::DAO::Request::Role::HasInclude - DAO request role - `include`
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

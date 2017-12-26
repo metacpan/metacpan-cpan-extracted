@@ -1,3 +1,16 @@
+0.13     2017-12-23
+
+- Simplify Perl version config to always use X.YY form in Travis config
+  files. Appending the patchlevel isn't necessary and makes for a lot of churn
+  in the config as new releases are made.
+
+
+0.12     2017-12-23
+
+- The default under AppVeyor is now to run prove with the -m flag. This makes
+  it much easier to diagnose test failures.
+
+
 0.11     2017-12-10
 
 - Add support for the branches block in Travis config.

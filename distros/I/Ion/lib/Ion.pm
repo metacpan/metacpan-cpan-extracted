@@ -1,6 +1,6 @@
 package Ion;
 # ABSTRACT: A clear and concise API for writing TCP servers and clients
-$Ion::VERSION = '0.05';
+$Ion::VERSION = '0.06';
 use common::sense;
 
 use Carp;
@@ -19,7 +19,8 @@ our @EXPORT = qw(
 
 sub Connect (;$$) {
   my ($host, $port) = @_;
-  Ion::Conn->new(host => $host, port => $port);
+  return Ion::Conn->new(handle => $host) if ref $host;
+  return Ion::Conn->new(host => $host, port => $port);
 }
 
 sub Listen (;$$) {
@@ -69,7 +70,7 @@ Ion - A clear and concise API for writing TCP servers and clients
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -183,6 +184,19 @@ C<join> with it later.
 
   my $pending  = async { <$conn> };
   my $response = $pending->join;
+
+C<Connect> may also be used to build an L<Ion::Conn> out of an existing
+L<Coro::Handle>. The handle may then be used like any other Ion connection.
+This is particularly useful for serializing data across a non-blocking pipe.
+
+  use Coro::Handle 'unblock';
+  use AnyEvent::Util 'portable_pipe';
+  use JSON::XS qw(encode_json decode_json);
+  use Ion;
+
+  my ($r, $w) = portable_pipe;
+  my $in  = Connect(unblock($r)) << \&decode_json;
+  my $out = Connect(unblock($w)) >> \&encode_json;
 
 =head1 MESSAGE FORMATS
 

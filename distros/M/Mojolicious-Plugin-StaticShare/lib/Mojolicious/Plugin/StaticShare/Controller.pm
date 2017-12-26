@@ -1,22 +1,17 @@
 package Mojolicious::Plugin::StaticShare::Controller;
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::File qw(path);
 use HTTP::AcceptLanguage;
 use Mojo::Path;
-use Mojo::File qw(path);
 use Mojo::Util qw ( decode encode url_unescape xml_escape);# 
 use Time::Piece;# module replaces the standard localtime and gmtime functions with implementations that return objects
-use Mojo::Asset::File;
+#~ use Mojo::Asset::File;
 
 has plugin => sub {   shift->stash('plugin') };
 has public_uploads => sub { shift->plugin->public_uploads };
-has admin => sub {
+has is_admin => sub {
   my $c = shift;
-  return 
-    unless my $pass = $c->plugin->admin_pass;
-  my $sess = $c->session;
-  $sess->{StaticShare}{admin} = 1
-    if $c->param('admin') && $c->param('admin') eq $pass;
-  return $sess->{StaticShare} && $sess->{StaticShare}{admin};
+  $c->plugin->is_admin($c);
 };
 
 sub get {
@@ -25,9 +20,12 @@ sub get {
   $c->_stash();
   
   return $c->not_found
-    if !$c->admin && grep {/^\./} @{$c->stash('url_path')->parts};
+    if !$c->is_admin && grep {/^\./} @{$c->stash('url_path')->parts};
   
-  my $file_path = path(url_unescape($c->stash('file_path')));
+  return $c->not_found
+    if $c->plugin->access && !( ref $c->plugin->access eq 'CODE' ? $c->plugin->access->($c) : $c->plugin->access );
+  
+  my $file_path = $c->stash('file_path');
   
   return $c->dir($file_path)
     if -d $file_path;
@@ -41,29 +39,30 @@ sub post {
   my ($c) = @_;
   $c->_stash();
   
-  my $file_path = path(decode('UTF-8', url_unescape($c->stash('file_path'))));
+  my $file_path = $c->stash('file_path');
   
-  if ($c->admin && (my $dir = $c->param('dir'))) {
+  if ($c->is_admin && (my $dir = $c->param('dir'))) {
     return $c->new_dir($file_path, $dir);
-  } elsif ($c->admin && (my $rename = $c->param('rename'))) {
+  } elsif ($c->is_admin && (my $rename = $c->param('rename'))) {
     return $c->rename($file_path, $rename);
-  } elsif ($c->admin && (my $delete = $c->param('delete[]') && $c->every_param('delete[]'))) {
+  } elsif ($c->is_admin && (my $delete = $c->param('delete[]') && $c->every_param('delete[]'))) {
     return $c->delete($file_path, $delete);
-  } 
-  
+  } elsif ($c->is_admin && defined(my $edit = $c->param('edit'))) {
+    return $c->_edit($file_path, $edit);
+  }
   
   return $c->render(json=>{error=>$c->i18n('target directory not found')})
-    if !$c->admin && grep {/^\./} @{$c->stash('url_path')->parts};
+    if !$c->is_admin && grep {/^\./} @{$c->stash('url_path')->parts};
   
   return $c->render(json=>{error=>$c->i18n('you cant upload')})
-    unless $c->admin || $c->public_uploads;
+    unless $c->is_admin || $c->public_uploads;
   
   
   return $c->render(json=>{error=>$c->i18n('Cant open target directory')})
     unless -w $file_path;
   #~ $c->req->max_message_size(0);
   # Check file size
-  return $c->render(json=>{error=>$c->i18n('file is too big')}, status=>417)
+  return $c->render(json=>{error=>$c->i18n('upload is too big')}, status=>417)
     if $c->req->is_limit_exceeded;
 
   my $file = $c->req->upload('file')
@@ -96,9 +95,10 @@ sub _stash {
   $pth = $pth->trailing_slash(1)->merge('.'.$c->stash('format'))
     if $c->stash('format');
   $c->stash('pth' => $pth);
-  my $url_path = $c->plugin->root_url->clone->merge($c->stash('pth'))->trailing_slash(1);
+  my $url_path = $c->plugin->root_url->clone->merge($pth)->trailing_slash(1);
   $c->stash('url_path' => $url_path);
-  $c->stash('file_path' => $c->plugin->root_dir->clone->merge($c->stash('pth')));
+  #~ $c->stash('file_path' => $c->plugin->root_dir->clone->merge($c->stash('pth')));
+  $c->stash('file_path' => path(decode('UTF-8', url_unescape($c->plugin->root_dir->clone->merge($pth)))));
   $c->stash('title' => $c->i18n('Share')." ".$url_path->to_route);
 }
 
@@ -121,9 +121,9 @@ sub dir {
     next
       if $_ eq '.' || $_ eq '..';
     next
-      if !$c->admin && /^\./;
+      if !$c->is_admin && /^\./;
     
-    my $child = $path->child($_);
+    my $child = $path->child(decode('UTF-8', $_));
     
     push @$dirs, decode('UTF-8', $_)
       and next
@@ -152,12 +152,12 @@ sub dir {
     $c->_stash_markdown($file)
       and $c->stash(index=>$index)
       and last
-      if $index =~ $c->plugin->is_markdown;
+      if $index =~ $c->plugin->re_markdown;
     
     $c->_stash_pod($file)
       and $c->stash(index=>$index)
       and last
-      if $index =~ $c->plugin->is_pod;
+      if $index =~ $c->plugin->re_pod;
 
   }
   
@@ -243,21 +243,37 @@ sub file {
     || $c->reply->exception($ex)
     unless -r $path;
   
+  return $c->_edit($path)
+    if $c->is_admin && $c->param('edit');
+  
   my $filename = $path->basename;
   
-  $c->_markdown($path)
-    and return
-    unless ($c->plugin->render_markdown || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_markdown;
+  return $c->_markdown($path)
+    unless ($c->plugin->render_markdown || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->re_markdown;
   
-  $c->_pod($path)
-    and return
-    unless ($c->plugin->render_pod || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->is_pod;
+  return $c->_pod($path)
+    unless ($c->plugin->render_pod || '') eq 0 || $c->param('attachment') || $filename !~ $c->plugin->re_pod;
+  
+  my $asset = $c->_html($path)
+    unless $c->param('attachment') || $filename !~ $c->plugin->re_html;
   
   $c->res->headers->content_disposition($c->param('attachment') ? "attachment; filename=$filename;" : "inline");
   my $type  =$c->plugin->mime->type(  ( $path =~ /\.([0-9a-zA-Z]+)$/)[0] || 'txt' ) || $c->plugin->mime->type('txt');#'application/octet-stream';
   $c->res->headers->content_type($type);
-  $c->reply->asset(Mojo::Asset::File->new(path => $path));
+  $c->reply->asset($asset || Mojo::Asset::File->new(path => $path));
+}
+
+sub _html {# disable scripts inside html
+  my ($c, $path) = @_;
+  my $file = Mojo::Asset::File->new(path => $path);
+  my $content = $file->slurp;
+  my $dom = Mojo::DOM->new($content);
+  $dom->find('script')->each(\&_sanitize_script)->size
+    or return $file;
   
+  my $asset = Mojo::Asset::Memory->new;
+  $asset->add_chunk($dom)->mtime($file->mtime);
+  return $asset;
 }
 
 sub _markdown {# file
@@ -378,6 +394,19 @@ sub not_found {
     or $c->reply->not_found;
   
 };
+
+sub _edit {
+  my ($c, $path, $edit) = @_;
+  unless (defined $edit) {# get
+    $c->stash('edit'=> decode('UTF-8', $path->slurp));
+    $c->stash('title' => $c->i18n('Edit')." ".$c->stash('url_path')->to_route);
+    return $c->render('Mojolicious-Plugin-StaticShare/edit', format=>'html', handler=>'ep',);
+  }
+  
+  # save
+  $path->spurt(encode('UTF-8', $edit));
+  $c->render(json=>{ok=>$path->to_string});
+}
 
 1;
 

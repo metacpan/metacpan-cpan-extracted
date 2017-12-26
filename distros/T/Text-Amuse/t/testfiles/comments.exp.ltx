@@ -1,15 +1,118 @@
+% <script>"hello"</script>
 
 
 \begin{comment}
-; <script>"hello"</script>
+This is <script>alert</script> a comment \textbackslash{}emph
 \end{comment}
+
+
+Foo
+;not a comment because the semicolon is not followed by a white space
+
+% comment
+% Comment
+% Second line \textbackslash{}\{\textbackslash{}\}
+% 
+
+bar
+
+% 
+% comment \textbackslash{}\{\textbackslash{}\}
+% 
+
+baz
+
+
+This is regular
 
 
 
 \begin{comment}
-
-This is <script>alert<\Slash{}script> a comment \textbackslash{}emph
-
-
+Hello there, this is a comment
+comment inside
 \end{comment}
+
+% comment as well
+% 
+% comment continue
+
+This is regular
+
+
+\begin{alltt}
+; this is some in verbatim
+<comment>
+Another comment
+</comment>
+\end{alltt}
+
+% and has a comment !@\#\$\%\^{}\^{}\&\&*()\textbackslash{}[]\{\}\textbar{}<"'>
+
+
+\begin{verse}
+This is a verse.
+\end{verse}
+
+
+
+\begin{comment}
+Another comment which will screw, because of the nesting, but output
+is acceptable (throwing a warning for good measure). !@\#\$\%\^{}\^{}\&\&*()\textbackslash{}[]\{\}\textbar{}<"'>
+\end{comment}
+
+
+Blablabla
+
+
+
+\begin{verse}
+Here the verse continue
+\end{verse}
+
+
+
+\begin{comment}
+Nested
+\end{comment}
+
+
+; Not a comment because of <verbatim>
+
+
+
+\begin{comment}
+Here the comment will stop. This is a kind of implementation artefact.
+\end{comment}
+
+
+\begin{alltt}
+verbatim
+<verse>
+verse
+</verse>
+\end{alltt}
+
+
+\begin{alltt}
+\{\{\{
+<verse>
+verse
+; comment
+</verse>
+<comment>
+comment
+</comment>
+\}\}\}
+\end{alltt}
+
+
+
+\begin{verse}
+
+\end{verse}
+
+
+\begin{alltt}
+Makes no sense
+\end{alltt}
 

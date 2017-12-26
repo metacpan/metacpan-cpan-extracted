@@ -16,7 +16,7 @@ SCOPE:
     my @l = (1 .. 10);
     my @s = samples 10, @l;
     is(scalar @s, 10, "samples delivers 10 out of 10 when used as shuffle");
-    my @u = uniq grep {defined $_ } @s;
+    my @u = uniq grep { defined $_ } @s;
     is(scalar @u, 10, "samples doesn't add any integer twice");
 }
 

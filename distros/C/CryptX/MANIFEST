@@ -32,6 +32,7 @@ inc/CryptX_PK_ECC.xs.inc
 inc/CryptX_PK_RSA.xs.inc
 inc/CryptX_PRNG.xs.inc
 inc/CryptX_Stream_ChaCha.xs.inc
+inc/CryptX_Stream_Rabbit.xs.inc
 inc/CryptX_Stream_RC4.xs.inc
 inc/CryptX_Stream_Salsa20.xs.inc
 inc/CryptX_Stream_Sober128.xs.inc
@@ -132,6 +133,7 @@ lib/Crypt/PRNG/RC4.pm
 lib/Crypt/PRNG/Sober128.pm
 lib/Crypt/PRNG/Yarrow.pm
 lib/Crypt/Stream/ChaCha.pm
+lib/Crypt/Stream/Rabbit.pm
 lib/Crypt/Stream/RC4.pm
 lib/Crypt/Stream/Salsa20.pm
 lib/Crypt/Stream/Sober128.pm
@@ -310,6 +312,7 @@ src/ltc/misc/base64/base64_decode.c
 src/ltc/misc/base64/base64_encode.c
 src/ltc/misc/burn_stack.c
 src/ltc/misc/compare_testvector.c
+src/ltc/misc/copy_or_zeromem.c
 src/ltc/misc/crc32.c
 src/ltc/misc/crypt/crypt.c
 src/ltc/misc/crypt/crypt_argchk.c
@@ -526,6 +529,7 @@ src/ltc/stream/chacha/chacha_ivctr32.c
 src/ltc/stream/chacha/chacha_ivctr64.c
 src/ltc/stream/chacha/chacha_keystream.c
 src/ltc/stream/chacha/chacha_setup.c
+src/ltc/stream/rabbit/rabbit.c
 src/ltc/stream/rc4/rc4_stream.c
 src/ltc/stream/salsa20/salsa20_crypt.c
 src/ltc/stream/salsa20/salsa20_done.c
@@ -713,6 +717,7 @@ t/cipher_serpent.t
 t/cipher_serpent_compat.t
 t/cipher_skipjack.t
 t/cipher_stream.t
+t/cipher_stream_rabbit.t
 t/cipher_stream_salsa20.t
 t/cipher_test_vectors_ltc.t
 t/cipher_test_vectors_openssl.t

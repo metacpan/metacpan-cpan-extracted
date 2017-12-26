@@ -43,7 +43,7 @@ my $builder = Test::Run::Builder->new(
     {
         resources =>
         {
-            repository => "http://bitbucket.org/shlomif/abc-path",
+            repository => "https://github.com/shlomif/abc-path",
             homepage => "http://www.shlomifish.org/open-source/projects/japanese-puzzle-games/abc-path/",
         },
         keywords =>

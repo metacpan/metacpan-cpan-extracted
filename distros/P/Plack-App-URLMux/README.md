@@ -79,10 +79,6 @@ Compare performanse of this module with Plack::App::URLMux on over of 300 URLs
 
 Aleksey Ozhigov burnes@cpan.org
 
-# TODO
-
-Extend rules for URL map, add quantifiers for URL parameters to bind relative URLs to application. For example ':path*/bar' bind to URL contains anything between '/' and '/bar', even nothing so '/bar' and '/foo/bar' and '/foo/baz/bar' will be dispathed to one application. This type of bind is supported in original package Plack::App::URLMap.
-
 # COPYRIGHT
 
 The following copyright notice applies to all the files provided in

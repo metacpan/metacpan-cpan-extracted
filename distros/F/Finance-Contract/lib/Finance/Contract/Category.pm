@@ -1,12 +1,12 @@
 package Finance::Contract::Category;
-$Finance::Contract::Category::VERSION = '0.010';
+$Finance::Contract::Category::VERSION = '0.011';
 =head1 NAME
 
 Finance::Contract::Category
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSYS
 

@@ -46,6 +46,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Kent Fredric</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kentnl@gentoo.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Kevin Dawson</foaf:name>
       <foaf:mbox rdf:resource="mailto:bowtie@cpan.org" />
     </foaf:Person>
@@ -183,6 +189,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.19</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.20</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-22</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

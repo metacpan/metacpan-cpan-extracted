@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Modifies debug behavior to create multi-line output that's easier for mere mortals to parse.",
+  "ABSTRACT" => "Modified debug behavior to create multi-line output that's easier for mere mortals to parse.",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -15,15 +15,31 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Dancer2-Plugin-DebugDump",
   "LICENSE" => "perl",
   "NAME" => "Dancer2::Plugin::DebugDump",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.32",
+  "PREREQ_PM" => {
+    "Dancer2" => "0.200002",
+    "Dancer2::Plugin" => 0,
+    "Data::Dumper" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "TEST_REQUIRES" => {
+    "Test::More" => 0
+  },
+  "VERSION" => "0.41",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Dancer2" => "0.200002",
+  "Dancer2::Plugin" => 0,
+  "Data::Dumper" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

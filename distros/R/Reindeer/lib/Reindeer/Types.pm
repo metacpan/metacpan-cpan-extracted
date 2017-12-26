@@ -9,7 +9,7 @@
 #
 package Reindeer::Types;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Reindeer::Types::VERSION = '0.019';
+$Reindeer::Types::VERSION = '0.020';
 # ABSTRACT: Reindeer combined type library
 
 use strict;
@@ -30,7 +30,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl Alex Balhatchet
+=for :stopwords Chris Weyl Alex Balhatchet Fowler Mark
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ Reindeer::Types - Reindeer combined type library
 
 =head1 VERSION
 
-This document describes version 0.019 of Reindeer::Types - released June 09, 2017 as part of Reindeer.
+This document describes version 0.020 of Reindeer::Types - released December 20, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 

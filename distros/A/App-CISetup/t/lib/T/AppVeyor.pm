@@ -38,7 +38,7 @@ sub test_create {
                 'cpanm --installdeps . -n',
             ],
             build_script  => ['perl -e 1'],
-            test_script   => ['prove -lrv t/'],
+            test_script   => ['prove -lrvm t/'],
             skip_tags     => 'true',
             notifications => [
                 {
@@ -101,7 +101,7 @@ build_script:
   - perl -e 1
 
 test_script:
-  - prove -lrv t/
+  - prove -lrvm t/
 
 skip_tags: true
 EOF
@@ -125,7 +125,7 @@ EOF
                 'cpanm --installdeps . -n',
             ],
             build_script  => ['perl -e 1'],
-            test_script   => ['prove -lrv t/'],
+            test_script   => ['prove -lrvm t/'],
             skip_tags     => 'true',
             notifications => [
                 {

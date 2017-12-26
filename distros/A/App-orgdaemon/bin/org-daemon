@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Getopt::Long;
 use List::Util qw(max);
@@ -107,7 +107,7 @@ BEGIN {
     }
     sub start_is_timeless {
 	my $self = shift;
-	!length $self->{time};
+	!defined $self->{time} || !length $self->{time};
     }
     sub end_is_timeless {
 	my $self = shift;
@@ -149,6 +149,7 @@ my %seen_early_warning; # ($date_id -> 1)
 my %seen_due_date;      # ($date_id -> 1)
 my $with_move_button;
 my $use_anyevent;
+my $org_alert_logo;
 
 sub normal_repeater {
     $lb->repeat($recheck_interval*1000, sub { tk_do_one_iteration() });
@@ -418,6 +419,7 @@ sub check_for_alarms {
 		$t->{DateState} = $date_state;
 	    } else {
 		$t = $mw->Toplevel(%t_args);
+		$t->Icon(-image => $org_alert_logo);
 		$t->bind($_ => sub { $t->destroy })
 		    for ('<Escape>', '<Control-q>');
 		$t->{DateId} = $date_id;
@@ -733,7 +735,7 @@ sub find_dates_in_org_file {
 		    $early_warning_secs = _get_head_warning_secs($early_warning);
 		}
 		if (!defined $early_warning_secs) {
-		    $early_warning_secs = !length $time ? $default_timeless_early_warning : $default_early_warning;
+		    $early_warning_secs = !defined $time || !length $time ? $default_timeless_early_warning : $default_early_warning;
 		}
 		if ($early_warning_secs > 0) {
 		    $date_params{early_warning_epoch} = $epoch - $early_warning_secs;
@@ -881,6 +883,46 @@ D/NxXzptWLYM27Jpam9/7LH5kZfW2uz7odoYY4yn1CP9Qzzu3fB2IkFmIPDkafi/vJz+JwH8
 BUIoz9dd4ccZAAAAAElFTkSuQmCC
 EOF
 $mw->Icon(-image => $org_logo); 
+
+# Combined with the following sources:
+# * By Greg Newman - http://orgmode.org/, GPL, https://commons.wikimedia.org/w/index.php?curid=8250451
+# * Von nach den historischen Vorgaben digital umgesetzt durch Mediatus - siehe oben, DIN-Normen, Gemeinfrei, https://commons.wikimedia.org/w/index.php?curid=982688
+# Exported in inkscape as a 32x32 png. Removed alpha channel (because
+# it seems that Tk cannot handle this well). Used "base64" program to
+# generate data.
+$org_alert_logo = $mw->Photo
+    (-format => 'png',
+     -data => <<EOF);
+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
+EOF
 
 if ($overview_widget eq 'listbox') {
     $lb = $mw->Scrolled('Listbox',

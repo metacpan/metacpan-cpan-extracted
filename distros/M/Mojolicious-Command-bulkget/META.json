@@ -39,13 +39,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.48",
+            "Mojolicious" : "7.53",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Mojolicious" : "7.48",
+            "Mojolicious" : "7.53",
             "Test::More" : "0.92"
          }
       }
@@ -53,17 +53,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/graphql-perl/Mojolicious-Command-bulkget/issues"
+         "web" : "https://github.com/mohawk2/Mojolicious-Command-bulkget/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/graphql-perl/Mojolicious-Command-bulkget"
+         "web" : "https://github.com/mohawk2/Mojolicious-Command-bulkget"
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Types::Standard qw( Bool CodeRef InstanceOf );
 use WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink;
@@ -112,7 +112,7 @@ WebService::PayPal::PaymentsAdvanced::Mocker - A class which returns mocked PPA 
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 SYNOPSIS
 

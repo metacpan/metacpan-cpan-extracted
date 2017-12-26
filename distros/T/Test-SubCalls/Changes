@@ -1,37 +1,41 @@
-Changes for Perl extension Test-SubCalls
+Changes for Test-SubCalls
 
-1.09 Sun 19 Apr 2009
+1.10      2017-12-23 21:29:27Z
+        - switch packaging to Dist::Zilla, which makes the distribution
+          installable again on perl 5.27.7  (See RT#123867)
+
+1.09      2009-04-19
 	- Upgrading to Module::Install::DSL 0.83
 
-1.08 Fri 22 Aug 2008
+1.08      2008-08-22
 	- No functional changes
 	- Upgrading to Module::Install 0.77
 	- Minor tweaky refactorings
 
-1.07 Fri 16 Nov 2007
+1.07      2007-11-16
 	- No functional changes
 	- Upgrading to Module::Install 0.68
 
-1.06 Fri 12 May 2006
+1.06      2006-05-12
 	- Moving to a stable version number
 	- Upgrading to Module::Install 0.62 final
 	- Removing auto_install
 
-0.05 Mon 24 Apr 2006
+0.05      2006-04-24
 	- Apparently my tweaking of the dependencies was incorrect.
 	- Removed the Test::Simple dep, the T:B:Tester one should be enough
 	- Minor pod change
 
-0.04 Sun 23 Apr 2006
+0.04      2006-04-23
 	- Moved from SourceForge CVS to new collaborative SVN repository
 	- Upgraded Module::Install to 0.62
 
-0.03 Fri Dec 30 2004
+0.03      2005-12-30
 	- Noted version dependency is actually 5.006
 	  (This is ONLY because of Lex::HookWrap)
 
-0.02 Sat Oct  8 2005
+0.02      2005-10-08
 	- Upgraded Test::Builder::Tester dependency
 
-0.01 Thu Sep  1 2005
+0.01      2005-09-01
 	- Created the initial version of the module

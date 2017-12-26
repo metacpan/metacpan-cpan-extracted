@@ -1,0 +1,44 @@
+Revision history for Perl extension Mojolicious-Plugin-Prometheus
+
+1.0.3 2017-12-22T09:08:46Z
+    - Require at least 0.05 of Net::Prometheus
+
+1.0.2 2017-12-21T20:19:08Z
+    - Documentation fixes
+    - Make all core tests OS indepedent
+
+1.0.1 2017-12-21T16:48:54Z
+    - Cleanup docs, add custom buckets for duration
+
+1.0 2017-12-21T12:47:47Z
+    - Collect metrics about request and response sizes
+
+0.9.4 2017-12-21T07:18:55Z
+    - Just fixing tests
+
+0.9.3 2017-12-20T22:27:38Z
+    - Minor packaging errors (I'll get there soon)
+
+0.9.2 2017-12-20T21:27:40Z
+    - Minor packaging errors
+
+0.9.1 2017-12-20T21:12:12Z
+    - No changes
+
+0.9 2017-12-20T21:09:43Z
+    - First version to CPAN
+
+0.3.1 2017-12-20T20:59:12Z
+    - Adding Travis CI
+
+0.3 2017-12-20T20:32:25Z
+    - More tests
+    - Documentation
+
+0.2 2017-12-20T20:06:26Z
+    - Documentation typos
+
+0.1 2017-12-20T20:03:25Z
+
+    - original version
+

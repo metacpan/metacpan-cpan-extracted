@@ -1,5 +1,10 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.03  Mon Dec 25 00:08:10 MST 2017
+	- added "--ignore-missing" and "--strict" options to sha3sum
+		-- consistent with GNU coreutils
+		-- ref. rt.cpan.org #123897
+
 1.02  Fri Dec  8 22:44:46 MST 2017
 	- added "tag" option (BSD-style checksums) to sha3sum
 		-- consistent with GNU sha1sum, sha224sum, etc.

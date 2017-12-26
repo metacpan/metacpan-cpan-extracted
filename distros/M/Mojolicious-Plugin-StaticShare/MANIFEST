@@ -68,6 +68,8 @@ lib/Mojolicious/Plugin/StaticShare/static/static-share/js/main.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/jquery.fileupload.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/velocity.min.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/modal.js
+lib/Mojolicious/Plugin/StaticShare/static/static-share/js/dropdown.js
+lib/Mojolicious/Plugin/StaticShare/static/static-share/js/ace.js
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

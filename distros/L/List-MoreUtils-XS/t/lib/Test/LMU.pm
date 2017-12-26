@@ -31,34 +31,34 @@ sub is_true
 {
     @_ == 1 or croak "Expected 1 param";
     my $tb = $CLASS->builder();
-    $tb->ok( $_[0], "is_true ()" );
+    $tb->ok($_[0], "is_true ()");
 }
 
 sub is_false
 {
     @_ == 1 or croak "Expected 1 param";
     my $tb = $CLASS->builder();
-    $tb->ok( !$_[0], "is_false()" );
+    $tb->ok(!$_[0], "is_false()");
 }
 
 sub is_defined
 {
     @_ < 1 or croak "Expected 0..1 param";
     my $tb = $CLASS->builder();
-    $tb->ok( defined( $_[0] ), "is_defined ()" );
+    $tb->ok(defined($_[0]), "is_defined ()");
 }
 
 sub is_undef
 {
     @_ <= 1 or croak "Expected 0..1 param";
     my $tb = $CLASS->builder();
-    $tb->ok( !defined( $_[0] ), "is_undef()" );
+    $tb->ok(!defined($_[0]), "is_undef()");
 }
 
 sub is_dying
 {
     @_ == 1 or @_ == 2 or croak "is_dying(name => code)";
-    my ($name, $code );
+    my ($name, $code);
     $name = shift if @_ == 2;
     $code = shift;
     ref $code eq "CODE" or croak "is_dying(name => code)";
@@ -66,13 +66,13 @@ sub is_dying
     eval { $code->(); };
     my $except = $@;
     chomp $except;
-    $tb->ok( $except, "$name is_dying()" ) and note($except);
+    $tb->ok($except, "$name is_dying()") and note($except);
 }
 
 sub not_dying
 {
     @_ == 1 or @_ == 2 or croak "not_dying(name => code)";
-    my ($name, $code );
+    my ($name, $code);
     $name = shift if @_ == 2;
     $code = shift;
     ref $code eq "CODE" or croak "not_dying(name => code)";
@@ -80,7 +80,7 @@ sub not_dying
     eval { $code->(); };
     my $except = $@;
     chomp $except;
-    $tb->ok( !$except, "$name not_dying()" ) or diag($except);
+    $tb->ok(!$except, "$name not_dying()") or diag($except);
 }
 
 my @bigary = (1) x 500;
@@ -96,7 +96,7 @@ my $have_test_leak_trace = eval { require Test::LeakTrace; 1 };
 
 sub leak_free_ok
 {
-    while(@_)
+    while (@_)
     {
         my $name = shift;
         my $code = shift;
@@ -104,12 +104,13 @@ sub leak_free_ok
         {
             skip 'Test::LeakTrace not installed', 1 unless $have_test_leak_trace;
             local $Test::Builder::Level = $Test::Builder::Level + 1;
-            &Test::LeakTrace::no_leaks_ok( $code, "No memory leaks in $name" );
+            &Test::LeakTrace::no_leaks_ok($code, "No memory leaks in $name");
         }
     }
 }
 
 {
+
     package DieOnStringify;
     use overload '""' => \&stringify;
     sub new { bless {}, shift }

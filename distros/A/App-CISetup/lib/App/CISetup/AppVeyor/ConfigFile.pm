@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use App::CISetup::Types qw( Str );
 
@@ -46,7 +46,7 @@ sub _create_config {
                 'cpanm --installdeps . -n',
             ],
             build_script => ['perl -e 1'],
-            test_script  => ['prove -lrv t/'],
+            test_script  => ['prove -lrvm t/'],
         }
     );
 }
@@ -93,7 +93,6 @@ sub _update_notifications {
 }
 
 my @BlocksOrder = qw(
-    __app_cisetup__
     version
     skip_tags
     init

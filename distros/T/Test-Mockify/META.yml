@@ -3,19 +3,10 @@ abstract: 'minimal mocking framework for perl'
 author:
   - 'ePages GmbH'
 build_requires:
-  Devel::Cover: '1.23'
-  Devel::Cover::Report::Clover: '1.01'
-  Fatal: '0'
   FindBin: '0'
-  Minilla: v3.0.0
   Module::Build::Tiny: '0.039'
-  Perl::Critic: '1.123'
-  TAP::Harness::Archive: '0.18'
   Test::Exception: '0'
   Test::More: '0.98'
-  Version::Next: '0'
-  parent: '0'
-  strict: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -38,7 +29,7 @@ no_index:
 provides:
   Test::Mockify:
     file: lib/Test/Mockify.pm
-    version: v0.10.3
+    version: '1.0'
   Test::Mockify::CompatibilityTools:
     file: lib/Test/Mockify/CompatibilityTools.pm
   Test::Mockify::Matcher:
@@ -60,7 +51,6 @@ provides:
   Test::Mockify::Verify:
     file: lib/Test/Mockify/Verify.pm
 requires:
-  CPAN::Uploader: '0'
   Data::Compare: '0'
   Data::Dumper: '0'
   Exporter: '0'
@@ -68,13 +58,14 @@ requires:
   Scalar::Util: '0'
   Test::MockObject::Extends: '0'
   experimental: '0'
+  parent: '0'
   perl: v5.10.1
   strict: '0'
 resources:
   bugtracker: https://github.com/ePages-de/Mockify/issues
   homepage: https://github.com/ePages-de/Mockify
   repository: git://github.com/ePages-de/Mockify.git
-version: 0.10.3
+version: '1.0'
 x_authority: cpan:CHRBR
 x_contributors:
   - 'Alexander Sandau <a.sandau@epages.com>'

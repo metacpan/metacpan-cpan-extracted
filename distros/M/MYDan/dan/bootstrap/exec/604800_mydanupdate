@@ -1,0 +1,17 @@
+#!/bin/sh
+if [ ! -f $MYDanPATH/etc/env ];then
+    echo "on env file: $MYDanPATH/etc/env"
+    exit;
+fi
+
+source $MYDanPATH/etc/env
+
+if [ -z $MYDAN_UPDATE ];then
+    echo "not MYDAN_UPDATE"
+    exit
+fi
+
+echo update: $MYDAN_UPDATE
+
+
+curl -s $MYDAN_UPDATE|bash

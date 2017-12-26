@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+appveyor.yml
 bin/setup-appveyor-yml.pl
 bin/setup-travis-yml.pl
 cpanfile

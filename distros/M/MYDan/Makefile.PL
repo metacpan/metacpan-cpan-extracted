@@ -64,6 +64,7 @@ our %PREREQ_PM =
     'List::MoreUtils' => 0,
     'Module::Runtime' => 0,
     'URI::Escape' => 0,
+    'Filesys::Df' => 0,
 );
 
 our $PKG_NAME = 'MYDan';

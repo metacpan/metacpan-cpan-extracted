@@ -7,7 +7,7 @@ use warnings;
 
 package Mail::Message::Field::Full;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.005';
 
 use base 'Mail::Message::Field';
 
@@ -119,7 +119,10 @@ sub unfoldedBody($;$)
 
     $body = $self->foldedBody;
     $body =~ s/^ //;
-    $body =~ s/\n//g;
+
+	# remove FWS, also required within quoted strings.
+    $body =~ s/\r?\n\s?/ /g;
+    $body =~ s/ +$//;
     $body;
 }
 

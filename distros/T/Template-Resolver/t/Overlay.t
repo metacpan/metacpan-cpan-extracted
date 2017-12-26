@@ -8,6 +8,7 @@ use Log::Any::Adapter ( 'Stdout', log_level => 'debug' );
 use Template::Overlay;
 use Template::Resolver;
 use Test::More tests => 20;
+use Carp 'croak';
 
 BEGIN { use_ok('Template::Overlay') }
 
@@ -24,17 +25,16 @@ sub test_file {
 sub overlay {
     my ( $config, $overlays, $no_base, %options ) = @_;
 
-    my $dir = File::Temp->newdir();
+    my $dir = File::Temp->newdir();    #returns object
     Template::Overlay->new(
-        $no_base ? $dir : test_dir('base'),
+        $no_base ? $dir->dirname() : test_dir('base'),
         Template::Resolver->new($config),
         key => 'T'
-    )->overlay( $overlays, to => $dir, %options );
-
+    )->overlay( $overlays, to => $dir->dirname(), %options );
     my %results = ();
     find(
         sub {
-            if ( -f $File::Find::name && $File::Find::name =~ /^$dir\/(.*)$/ ) {
+            if ( -f $File::Find::name && $File::Find::name =~ /^\Q$dir\E\/(.*)$/ ) {
                 $results{$1} = do { local ( @ARGV, $/ ) = $_; <> };
             }
         },

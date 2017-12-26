@@ -7,7 +7,7 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20171129';
+our $VERSION = '20171222';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -34,7 +34,7 @@ genLValueScalarMethods(qw(failed));                                             
 genLValueScalarMethods(qw(fileList));                                           # Reference to an array of files produced by L<list|/list>
 genLValueScalarMethods(qw(gitFile));                                            # File name on GitHub - this name can contain '/'
 genLValueScalarMethods(qw(gitFolder));                                          # Folder name on GitHub - this name can contain '/'
-genLValueScalarMethods(qw(logFile));                                            # The name of a local file  to w hwich to write error messages if any errors occur.
+genLValueScalarMethods(qw(logFile));                                            # The name of a local file  to which to write error messages if any errors occur.
 genLValueScalarMethods(qw(message));                                            # Commit message
 genLValueScalarMethods(qw(personalAccessToken));                                # A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
 genLValueScalarMethods(qw(readData));                                           # Data produced by L<read|/read>
@@ -62,7 +62,7 @@ sub GitHub::Crud::Response::new($$)                                             
    {shift @r; $http = shift @r;
    }
 
-  if ($http =~ "HTTP/1.1" and $http =~ /200|201|404|422/)
+  if ($http =~ "HTTP/1.1" and $http =~ /200|201|404|409|422/)
    {my $ps = 0;                                                                 # Parse the response
     my @data;
     my %can;
@@ -283,8 +283,8 @@ if (0 and !caller)
   say STDERR "list:\n", join ' ', $g->list;                                     # aaa.png bbb.png
  }
 
-sub read($)                                                                     # Read data from a file on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to read.\mOptional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
- {my ($gitHub) = @_;                                                            # GitHub object
+sub read($;$)                                                                   # Read data from a file on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to read.\mOptional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
+ {my ($gitHub, $noLog) = @_;                                                    # GitHub object, whether to log errors or not
   my $user = $gitHub->userid;     $user or confess "userid required";
   my $repo = $gitHub->repository; $repo or confess "repository required";
   my $file = $gitHub->gitFile;    $file or confess "gitFile required";
@@ -297,7 +297,7 @@ sub read($)                                                                     
 
   my ($status) = split / /, $r->Status;                                         # Check response code
   $gitHub->failed = $status != 200;
-  lll($gitHub, q(read));
+  lll($gitHub, q(read)) unless $noLog;
 
   if ($gitHub->failed)                                                          # No file list supplied
    {$gitHub->readData = undef;
@@ -329,7 +329,7 @@ sub write($$)                                                                   
   my $Mess = $gitHub->message;
   my $mess = $Mess ? $Mess =~ s(") (\\\")gsr : '';                              # Commit message if any with any " escaped
 
-  $gitHub->read;                                                                # Read the file to get its sha it exists
+  $gitHub->read(1);                                                             # Read the file to get its sha if it exists - but do not write a log message if this fails
   my $r    = $gitHub->response;                                                 # Get response
   my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';             # Sha of existing file or blank string if no existing file
   if ($gitHub->utf8)                                                            # Send the data as utf8 if requested
@@ -373,7 +373,7 @@ sub delete($)                                                                   
   my $file = $gitHub->gitFile;    $file or confess "gitFile required";
   my $bran = $gitHub->refOrBranch(0);
 
-  $gitHub->read;
+  $gitHub->read(1);                                                             # Read the file to get its sha if it exists - but do not write a log message if this fails
   my $sha = sub
    {return '' if $gitHub->failed;
     ' -d \'{"message": "", "sha": "'. $gitHub->response->data->sha .'"}\'';
@@ -630,7 +630,12 @@ Folder name on GitHub - this name can contain '/'
 
 =head2 logFile :lvalue
 
-The name of a local file  to w hwich to write error messages if any errors occur.
+The name of a local file  to which to write error messages if any errors occur.
+
+
+=head2 message :lvalue
+
+Commit message
 
 
 =head2 personalAccessToken :lvalue
@@ -668,6 +673,11 @@ The title of an issue
 The url for a web hook
 
 
+=head2 utf8 :lvalue
+
+Send the data as utf8 - do not use this for binary files containing images or audio, just for files containing text
+
+
 =head2 userid :lvalue
 
 Your userid on GitHub
@@ -699,9 +709,10 @@ If the list operation fails then L<failed|/failed> is set to true and L<fileList
 
 Returns the list of file names found or empty list if no files were found.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description    
+  2  $gitHub    GitHub object  
 
-=head2 read($)
+=head2 read($$)
 
 Read data from a file on GitHub.
 
@@ -715,7 +726,9 @@ If the read operation fails then L<failed|/failed> is set to true and L<readData
 
 Returns the data read or B<undef> if no file was found.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description                   
+  2  $gitHub    GitHub object                 
+  3  $noLog     Whether to log errors or not  
 
 =head2 write($$)
 
@@ -729,8 +742,9 @@ If the write operation is successful, L<failed|/failed> is set to false otherwis
 
 Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-  1  $gitHub  GitHub object
-  2  $data    Data to be written
+  1  Parameter  Description         
+  2  $gitHub    GitHub object       
+  3  $data      Data to be written  
 
 =head2 delete($)
 
@@ -744,19 +758,21 @@ If the delete operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the delete was successful else false.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description    
+  2  $gitHub    GitHub object  
 
 =head2 listWebHooks($)
 
 List web hooks.
 
-Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. 
 
 If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns true if the list  operation was successful else false.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description    
+  2  $gitHub    GitHub object  
 
 =head2 createPushWebHook($)
 
@@ -770,7 +786,8 @@ If the create operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the web hook was created successfully else false.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description    
+  2  $gitHub    GitHub object  
 
 =head2 createIssue($)
 
@@ -782,21 +799,24 @@ If the operation is successful, L<failed|/failed> is set to false otherwise it i
 
 Returns true if the issue was created successfully else false.
 
-  1  $gitHub  GitHub object
+  1  Parameter  Description    
+  2  $gitHub    GitHub object  
 
 =head2 savePersonalAccessToken($$)
 
 Save the personal access token in a file.
 
-  1  $gitHub  GitHub object
-  2  $file    File
+  1  Parameter  Description                                                           
+  2  $gitHub    GitHub object                                                         
+  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken  
 
 =head2 loadPersonalAccessToken($$)
 
 Load a personal access token from a file.
 
-  1  $gitHub  GitHub object
-  2  $file    File
+  1  Parameter  Description                                                           
+  2  $gitHub    GitHub object                                                         
+  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken  
 
 
 =head1 Index
@@ -828,31 +848,35 @@ Load a personal access token from a file.
 
 13 L<logFile|/logFile>
 
-14 L<new|/new>
+14 L<message|/message>
 
-15 L<personalAccessToken|/personalAccessToken>
+15 L<new|/new>
 
-16 L<read|/read>
+16 L<personalAccessToken|/personalAccessToken>
 
-17 L<readData|/readData>
+17 L<read|/read>
 
-18 L<repository|/repository>
+18 L<readData|/readData>
 
-19 L<response|/response>
+19 L<repository|/repository>
 
-20 L<savePersonalAccessToken|/savePersonalAccessToken>
+20 L<response|/response>
 
-21 L<secret|/secret>
+21 L<savePersonalAccessToken|/savePersonalAccessToken>
 
-22 L<title|/title>
+22 L<secret|/secret>
 
-23 L<url|/url>
+23 L<title|/title>
 
-24 L<userid|/userid>
+24 L<url|/url>
 
-25 L<write|/write>
+25 L<userid|/userid>
 
-26 L<writeData|/writeData>
+26 L<utf8|/utf8>
+
+27 L<write|/write>
+
+28 L<writeData|/writeData>
 
 =head1 Installation
 
@@ -880,6 +904,8 @@ This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
 
 =cut
+
+
 
 # Tests and documentation
 

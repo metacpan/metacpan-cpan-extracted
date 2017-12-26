@@ -1,3 +1,17 @@
 #!/bin/sh
-ulimit -n 655350;ulimit -u 102400;ulimit -s 10240;
+os=$(uname)
+_exit () { echo $1; sleep 60; exit 1; }
+
+if [ "x$os" = "x" ];then
+     _exit "uname fail"
+fi
+
+echo "os: $os";
+
+if [ "x$os" == "xLinux" ] ;then
+    ulimit -n 655350 || _exit "ulimit -n fail";
+    ulimit -u 102400 || _exit "ulimit -u fail";
+    ulimit -s 10240  || _exit "ulimit -s fail";
+fi
+
 exec $MYDanPATH/dan/tools/tcpserver -p $($MYDanPATH/dan/tools/config agent.port) -m 10 $MYDanPATH/dan/agent/bin/agent 2>&1

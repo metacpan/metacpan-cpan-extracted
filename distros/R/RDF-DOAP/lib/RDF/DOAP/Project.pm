@@ -1,7 +1,7 @@
 package RDF::DOAP::Project;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.100';
 
 use Moose;
 extends qw(RDF::DOAP::Resource);
@@ -77,7 +77,7 @@ has $_ => (
 	coerce     => 1,
 	uri        => do { (my $x = $_) =~ s/_/-/g; $doap->$x },
 	multi      => 1,
-) for qw( homepage old_homepage license download_mirror screenshots category );
+) for qw( homepage old_homepage license download_mirror screenshots category support_forum developer_forum );
 
 has repository => (
 	traits     => [ WithURI ],

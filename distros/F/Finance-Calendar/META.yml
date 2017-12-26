@@ -1,0 +1,37 @@
+---
+abstract: 'represents the trading calendar.'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::FailWarnings: '0.008'
+  Test::MockTime: '0'
+  Test::More: '0.98'
+  Test::Most: '0.34'
+  Time::Local: '0'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Calendar
+requires:
+  Carp: '0'
+  Date::Utility: '0'
+  Finance::Exchange: '0'
+  List::Util: '0'
+  Memoize: '0'
+  Moose: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Finance-Calendar/issues
+  repository: git://github.com/binary-com/perl-Finance-Calendar.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.66'

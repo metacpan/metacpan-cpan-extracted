@@ -5,7 +5,7 @@
 
 package Mail::Box::Search;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.004';
 
 use base 'Mail::Reporter';
 

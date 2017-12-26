@@ -1,7 +1,7 @@
 package PPIx::EditorTools::Outline;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Collect use pragmata, modules, subroutiones, methods, attributes
-$PPIx::EditorTools::Outline::VERSION = '0.20';
+$PPIx::EditorTools::Outline::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -206,7 +206,7 @@ PPIx::EditorTools::Outline - Collect use pragmata, modules, subroutiones, method
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

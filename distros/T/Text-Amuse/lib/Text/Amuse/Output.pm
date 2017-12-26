@@ -4,7 +4,8 @@ use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
 use Text::Amuse::InlineElement;
-# use Data::Dumper;
+# use Data::Dumper::Concise;
+use constant DEBUG => 0;
 
 =head1 NAME
 
@@ -209,6 +210,9 @@ sub process {
         }
         elsif ($el->type eq 'verse') {
             push @pieces, $self->manage_verse($el);
+        }
+        elsif ($el->type eq 'inlinecomment') {
+            push @pieces, $self->manage_inline_comment($el);
         }
         elsif ($el->type eq 'comment') {
             push @pieces, $self->manage_comment($el);
@@ -428,16 +432,17 @@ sub inline_elements {
                             (?<link>         \[\[[^\[].*?\]\])      |
                             (?<open_verb>    \<verbatim\>)     |
                             (?<close_verb>   \<\/verbatim\>)  |
-                            (?<pri_footnote> \s*\[[0-9]+\]) |
-                            (?<sec_footnote> \s*\{[0-9]+\}) |
+                            (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
+                            (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
                                 (?<close>\/?)
                                 (?<tag_name> strong | em |  code | strike | del | sup |  sub )
                                 \>
                             ) |
+                            (?<nobreakspace>  \~\~         ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
-                            (?<br> \x{20}*\< br *\/*\>)
+                            (?<br> \x{20}*\< br \x{20}* \/?\>)
                         )}gcxms) {
         # this is a mammuth, but hey
         my %captures = %+;
@@ -485,47 +490,6 @@ sub inline_elements {
                                                 fmt => $self->fmt,
                                                 last_position => $offset + length($last_chunk),
                                                );
-    my $last = $#list;
-  PARSEINLINE:
-    for (my $i = 0; $i < @list; $i++) {
-        if ($list[$i]->type eq 'inline') {
-            my $next = $i + 1;
-            my $previous = $i - 1;
-            # check back and forward, just to mark as open or close
-            if ($i == 0) {
-                # first element, can be open if next is not a space
-                if ($next <= $last and
-                    $list[$next]->string =~ m/\A\S/) {
-                    $list[$i]->type('open_inline');
-                    next PARSEINLINE;
-                }
-            }
-            elsif ($i == $last) {
-                # last element, can only close
-                if ($list[$previous]->string =~ m/\S\z/) {
-                    $list[$i]->type('close_inline');
-                    next PARSEINLINE;
-                }
-            }
-            else {
-                # we have both next and previous
-                my $prev_string = $list[$previous]->string;
-                my $next_string = $list[$next]->string;
-                # we give preference to the closing. Logic here is weak.
-                if ($prev_string =~ m/\S\z/ and
-                       $next_string !~ m/\A\w/) {
-                    $list[$i]->type('close_inline');
-                    next PARSEINLINE;
-                }
-                elsif ($prev_string !~ m/\w\z/ and
-                    $next_string =~ m/\A\S/) {
-                    $list[$i]->type('open_inline');
-                    next PARSEINLINE;
-                }
-            }
-            $list[$i]->type('text');
-        }
-    }
     die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
     return @list;
 }
@@ -588,6 +552,119 @@ sub manage_regular {
         }
         push @processed, $piece;
     }
+
+    # now we decide what to do with the inline elements: either turn
+    # them into open/close tag via unroll, or turn them into regular
+    # text
+
+    # print Dumper(\@processed);
+    my @tracking;
+  MARKUP:
+    while (@processed) {
+        my $piece = shift @processed;
+        if ($piece->type eq 'inline') {
+            my $previous = @pieces ? $pieces[-1] : undef;
+            my $next = @processed ? $processed[0] : undef;
+
+            # first element can only open if there is a next one.
+            if (!$previous) {
+                if ($next and
+                    $next->string =~ m/\A\S/) {
+                    print "Opening initial " . $piece->string . "\n" if DEBUG;
+                    $piece->type('open_inline');
+                    push @pieces, $piece;
+                    push @tracking, $piece->tag;
+                    next MARKUP;
+                }
+            }
+            elsif (!$next) {
+                # last element, can only close
+                if (@tracking and
+                    $piece->tag eq $tracking[-1] and
+                    $previous->string =~ m/\S\z/) {
+                    print "Closing final " . $piece->string . "\n" if DEBUG;
+                    $piece->type('close_inline');
+                    push @pieces, $piece;
+                    pop @tracking;
+                    next MARKUP;
+
+                }
+            }
+            # in the middle.
+            else {
+                print $piece->string . " is in the middle\n" if DEBUG;
+                # print Dumper([ \@processed, \@pieces, \@tracking, $next, $previous ]);
+                if (@tracking and
+                    $piece->tag eq $tracking[-1] and
+                    $previous->string =~ m/\S\z/) {
+                    if ($previous->type ne 'open_inline') {
+                        $piece->type('close_inline');
+                        print "Closing " . $piece->string . "\n" if DEBUG;
+                        push @pieces, $piece;
+                        pop @tracking;
+                        next MARKUP;
+                    }
+                }
+                elsif ($next->string =~ m/\A\S/ and
+                    $previous->string =~ m/\W\z/ and
+                    scalar(grep { $_->tag eq $piece->tag } @processed)) {
+                    print "Opening " . $piece->string . "\n" if DEBUG;
+                    $piece->type('open_inline');
+                    push @pieces, $piece;
+                    push @tracking, $piece->tag;
+                    next MARKUP;
+                }
+            }
+            print "Nothing to do for " . $piece->string . "\n" if DEBUG;
+            # default to text
+            $piece->type('text');
+        }
+        push @pieces, $piece;
+    }
+
+    # we need to do another pass to assert there is a match. Sometime
+    # I regret to solve everything with s/<code>.+</code>/.../ but
+    # that has other problems.
+
+    @tracking = ();
+    # print Dumper(\@pieces);
+
+    my $warning = 'Found %s tag %s '
+                  . " in <$string> without a matching closing tag. "
+                  . "Leaving it as-is, but it's unlikely you want this. "
+                  . "To suppress this warning, wrap it around <verbatim>\n";
+
+  UNROLL:
+    while (@pieces) {
+        my $piece = shift @pieces;
+        if ($piece->type eq 'open_inline') {
+            # check if we have a matching close in the rest of the string
+            if (grep { $_->type eq 'close_inline' and $_->tag eq $piece->tag } @pieces) {
+                push @tracking, $piece->tag;
+                push @processed, $piece->unroll;
+                next UNROLL;
+            }
+            else {
+                warn sprintf($warning, $piece->type, $piece->tag);
+                $piece->type('text');
+            }
+        }
+        elsif ($piece->type eq 'close_inline') {
+            if (@tracking and $tracking[-1] eq $piece->tag) {
+                push @processed, $piece->unroll;
+                pop @tracking;
+                next UNROLL;
+            }
+            else {
+                warn sprintf($warning, $piece->type, $piece->tag);
+                $piece->type('text');
+            }
+        }
+        push @processed, $piece;
+    }
+
+    # print Dumper(\@processed);
+
     # now validate the tags: open and close
     my @tagpile;
   INLINETAG:
@@ -599,10 +676,7 @@ sub manage_regular {
                 push @tagpile, $piece->tag;
             }
             else {
-                warn "Found opening tag " . $piece->string
-                  . " in <$string> without a matching closing tag. "
-                  . "Leaving it as-is, but it's unlikely you want this. "
-                  . "To suppress this warning, wrap it around <verbatim>\n";
+                warn sprintf($warning, $piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -619,10 +693,7 @@ sub manage_regular {
                 }
             }
             else {
-                warn "Found closing element " . $piece->string
-                  . " in \"$string>\" without a matching opening tag. "
-                  . "Leaving it as-is, but it's unlikely you want this. "
-                  . "To suppress this warning, wrap it around <verbatim>\n";
+                warn sprintf($warning, $piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -640,45 +711,11 @@ sub manage_regular {
                                                       type => 'close');
     }
 
-    # finally, we have to decide if = and * are markup element or
-    # normal pieces and change the type accordingly.
-
-    while (@pieces) {
-        my $piece = shift @pieces;
-        if ($piece->type eq 'close_inline') {
-            if (@tagpile and $tagpile[-1] eq $piece->tag) {
-                # all match, can go
-                # and remove from the pile
-                pop @tagpile;
-                push @processed, $piece->unroll;
-            }
-            else {
-                # this is just a text material like this*
-                $piece->type('text');
-                push @processed, $piece;
-            }
-        }
-        elsif ($piece->type eq 'open_inline') {
-            # check if in the remaning chunks there is a matching closing
-            if (grep { $_->type eq 'close_inline' && $_->tag eq $piece->tag } @pieces) {
-                push @tagpile, $piece->tag;
-                push @processed, $piece->unroll;
-            }
-            else {
-                $piece->type('text');
-                push @processed, $piece;
-            }
-        }
-        else {
-            push @processed, $piece;
-        }
-    }
-
     # now we're hopefully set.
     my (@out, @anchors);
   CHUNK:
-    while (@processed) {
-        my $piece = shift @processed;
+    while (@pieces) {
+        my $piece = shift @pieces;
         if ($piece->type eq 'link') {
             if ($opts{nolinks}) {
                 $piece->type('text');
@@ -813,9 +850,9 @@ sub manage_header {
         }
     };
     $body_with_no_footnotes =~ s/(
-                                     \{ [0-9]+ \}
+                                     \{ [1-9][0-9]* \}
                                  |
-                                     \[ [0-9]+ \]
+                                     \[ [1-9][0-9]* \]
                                  )
                                 /$catch_fn->($1)/gxe;
     undef $catch_fn;
@@ -1014,11 +1051,30 @@ sub _format_stanza {
 
 =head3 manage_comment
 
+=head3 manage_inline_comment
+
 =cut
+
+sub manage_inline_comment {
+    my ($self, $el) = @_;
+    my $body = $self->safe($el->string);
+    $body =~ s/\n\z//;
+    $body =~ s/\s/ /g; # remove eventual newlines, even we don't expect any
+
+    if ($self->is_html) {
+        return q{<div class="comment" style="display:none">} . $body . qq{</div>\n};
+    }
+    elsif ($self->is_latex) {
+        return q{% } . $body . "\n";
+    }
+    else {
+        die "Not reached";
+    }
+}
 
 sub manage_comment {
     my ($self, $el) = @_;
-    my $body = $self->safe($el->removed);
+    my $body = $self->safe($el->string);
     chomp $body;
     return $self->blkstring(start => $el->type) .
       $body . $self->blkstring(stop => $el->type);
@@ -1464,11 +1520,11 @@ sub _build_blk_table {
                                   comment => {
                                               start => { # we could also use a more
                                                         # stable startstop hiding
-                                                        html => "\n<!-- start comment -->\n<div class=\"comment\"><span class=\"commentmarker\">{{COMMENT:</span> \n",
+                                                        html => qq{\n<!-- start comment -->\n<div class="comment" style="display:none">\n},
                                                         ltx => "\n\n\\begin{comment}\n",
                                                        },
                                               stop => {
-                                                       html => "\n<span class=\"commentmarker\">END_COMMENT}}:</span>\n</div>\n<!-- stop comment -->\n",  
+                                                       html => "\n</div>\n<!-- stop comment -->\n",
                                                        ltx => "\n\\end{comment}\n\n",
                                                       },
                                              },

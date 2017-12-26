@@ -27,9 +27,9 @@ sub usage {
 
 
 sub create_json_data {
-    my ($query, $coce, $size) = @_;
+    my ($query, $coce) = @_;
 
-    $size = "_SL" . $size . "_";
+    #$size = "_SL" . $size . "_";
     my @bibs =
         map { $_->[0] }
         @{C4::Context->dbh->selectall_arrayref($query)};
@@ -64,8 +64,9 @@ sub create_json_data {
 
     my $url = $coce . "/cover?provider=aws&id=" . join(',', keys %record_per_isbn);
     my $ua = LWP::UserAgent->new(
-        agent   => "Koha::Contrib::Tamil/1.0",
-        timeout => 300,
+        agent    => "Koha::Contrib::Tamil/1.0",
+        timeout  => 10000,
+        ssl_opts => { SSL_verify_mode => 0}
     );
     my $req = HTTP::Request->new(GET => $url);
     my $res = $ua->request($req);
@@ -80,7 +81,6 @@ sub create_json_data {
     while ( my ($isbn, $image) =  each %$image_per_isbn ) {
         my $infos = $record_per_isbn{$isbn};
         next unless $infos;
-        $image =~ s/_SL160_/$size/;
         push @$infos, $image;
         push  @ret, $infos;
     }
@@ -89,7 +89,7 @@ sub create_json_data {
 
 
 
-usage() unless @ARGV == 3;
+usage() unless @ARGV == 2;
 create_json_data(@ARGV);
 
 __END__
@@ -104,7 +104,7 @@ koha-coce-url - Generate a JSON structure of Cover url via Coce
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 DESCRIPTION
 
@@ -154,11 +154,11 @@ Size of images
 
 =head1 SYNOPSYS
 
- koha-coce-url "select biblionumber from biblio limit 100" 10 http:://coce.server 300
+ koha-coce-url "select biblionumber from biblio limit 100" http:://coce.server
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016 by Tamil, s.a.r.l.
+Copyright 2017 by Tamil, s.a.r.l.
 
 L<http://www.tamil.fr>
 

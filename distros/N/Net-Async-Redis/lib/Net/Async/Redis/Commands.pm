@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ L<https://redis.io/commands/cluster-addslots>
 
 sub cluster_addslots : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER ADDSLOTS' => @args)
+    $self->execute_command(qw(CLUSTER ADDSLOTS) => @args)
 }
 
 =head2 cluster_count_failure_reports
@@ -55,7 +55,7 @@ L<https://redis.io/commands/cluster-count-failure-reports>
 
 sub cluster_count_failure_reports : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER COUNT-FAILURE-REPORTS' => @args)
+    $self->execute_command(qw(CLUSTER COUNT-FAILURE-REPORTS) => @args)
 }
 
 =head2 cluster_countkeysinslot
@@ -74,7 +74,7 @@ L<https://redis.io/commands/cluster-countkeysinslot>
 
 sub cluster_countkeysinslot : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER COUNTKEYSINSLOT' => @args)
+    $self->execute_command(qw(CLUSTER COUNTKEYSINSLOT) => @args)
 }
 
 =head2 cluster_delslots
@@ -93,7 +93,7 @@ L<https://redis.io/commands/cluster-delslots>
 
 sub cluster_delslots : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER DELSLOTS' => @args)
+    $self->execute_command(qw(CLUSTER DELSLOTS) => @args)
 }
 
 =head2 cluster_failover
@@ -112,7 +112,7 @@ L<https://redis.io/commands/cluster-failover>
 
 sub cluster_failover : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER FAILOVER' => @args)
+    $self->execute_command(qw(CLUSTER FAILOVER) => @args)
 }
 
 =head2 cluster_forget
@@ -131,7 +131,7 @@ L<https://redis.io/commands/cluster-forget>
 
 sub cluster_forget : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER FORGET' => @args)
+    $self->execute_command(qw(CLUSTER FORGET) => @args)
 }
 
 =head2 cluster_getkeysinslot
@@ -152,7 +152,7 @@ L<https://redis.io/commands/cluster-getkeysinslot>
 
 sub cluster_getkeysinslot : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER GETKEYSINSLOT' => @args)
+    $self->execute_command(qw(CLUSTER GETKEYSINSLOT) => @args)
 }
 
 =head2 cluster_info
@@ -165,7 +165,7 @@ L<https://redis.io/commands/cluster-info>
 
 sub cluster_info : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER INFO' => @args)
+    $self->execute_command(qw(CLUSTER INFO) => @args)
 }
 
 =head2 cluster_keyslot
@@ -184,7 +184,7 @@ L<https://redis.io/commands/cluster-keyslot>
 
 sub cluster_keyslot : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER KEYSLOT' => @args)
+    $self->execute_command(qw(CLUSTER KEYSLOT) => @args)
 }
 
 =head2 cluster_meet
@@ -205,7 +205,7 @@ L<https://redis.io/commands/cluster-meet>
 
 sub cluster_meet : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER MEET' => @args)
+    $self->execute_command(qw(CLUSTER MEET) => @args)
 }
 
 =head2 cluster_nodes
@@ -218,7 +218,7 @@ L<https://redis.io/commands/cluster-nodes>
 
 sub cluster_nodes : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER NODES' => @args)
+    $self->execute_command(qw(CLUSTER NODES) => @args)
 }
 
 =head2 cluster_replicate
@@ -237,7 +237,7 @@ L<https://redis.io/commands/cluster-replicate>
 
 sub cluster_replicate : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER REPLICATE' => @args)
+    $self->execute_command(qw(CLUSTER REPLICATE) => @args)
 }
 
 =head2 cluster_reset
@@ -256,7 +256,7 @@ L<https://redis.io/commands/cluster-reset>
 
 sub cluster_reset : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER RESET' => @args)
+    $self->execute_command(qw(CLUSTER RESET) => @args)
 }
 
 =head2 cluster_saveconfig
@@ -269,7 +269,7 @@ L<https://redis.io/commands/cluster-saveconfig>
 
 sub cluster_saveconfig : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER SAVECONFIG' => @args)
+    $self->execute_command(qw(CLUSTER SAVECONFIG) => @args)
 }
 
 =head2 cluster_set_config_epoch
@@ -288,7 +288,7 @@ L<https://redis.io/commands/cluster-set-config-epoch>
 
 sub cluster_set_config_epoch : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER SET-CONFIG-EPOCH' => @args)
+    $self->execute_command(qw(CLUSTER SET-CONFIG-EPOCH) => @args)
 }
 
 =head2 cluster_setslot
@@ -311,7 +311,7 @@ L<https://redis.io/commands/cluster-setslot>
 
 sub cluster_setslot : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER SETSLOT' => @args)
+    $self->execute_command(qw(CLUSTER SETSLOT) => @args)
 }
 
 =head2 cluster_slaves
@@ -330,7 +330,7 @@ L<https://redis.io/commands/cluster-slaves>
 
 sub cluster_slaves : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER SLAVES' => @args)
+    $self->execute_command(qw(CLUSTER SLAVES) => @args)
 }
 
 =head2 cluster_slots
@@ -343,7 +343,7 @@ L<https://redis.io/commands/cluster-slots>
 
 sub cluster_slots : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLUSTER SLOTS' => @args)
+    $self->execute_command(qw(CLUSTER SLOTS) => @args)
 }
 
 =head2 readonly
@@ -356,7 +356,7 @@ L<https://redis.io/commands/readonly>
 
 sub readonly : method {
     my ($self, @args) = @_;
-    $self->execute_command('READONLY' => @args)
+    $self->execute_command(qw(READONLY) => @args)
 }
 
 =head2 readwrite
@@ -369,7 +369,7 @@ L<https://redis.io/commands/readwrite>
 
 sub readwrite : method {
     my ($self, @args) = @_;
-    $self->execute_command('READWRITE' => @args)
+    $self->execute_command(qw(READWRITE) => @args)
 }
 
 =head1 METHODS - Connection
@@ -390,7 +390,7 @@ L<https://redis.io/commands/auth>
 
 sub auth : method {
     my ($self, @args) = @_;
-    $self->execute_command('AUTH' => @args)
+    $self->execute_command(qw(AUTH) => @args)
 }
 
 =head2 echo
@@ -409,7 +409,7 @@ L<https://redis.io/commands/echo>
 
 sub echo : method {
     my ($self, @args) = @_;
-    $self->execute_command('ECHO' => @args)
+    $self->execute_command(qw(ECHO) => @args)
 }
 
 =head2 ping
@@ -428,7 +428,7 @@ L<https://redis.io/commands/ping>
 
 sub ping : method {
     my ($self, @args) = @_;
-    $self->execute_command('PING' => @args)
+    $self->execute_command(qw(PING) => @args)
 }
 
 =head2 quit
@@ -441,7 +441,7 @@ L<https://redis.io/commands/quit>
 
 sub quit : method {
     my ($self, @args) = @_;
-    $self->execute_command('QUIT' => @args)
+    $self->execute_command(qw(QUIT) => @args)
 }
 
 =head2 select
@@ -460,7 +460,7 @@ L<https://redis.io/commands/select>
 
 sub select : method {
     my ($self, @args) = @_;
-    $self->execute_command('SELECT' => @args)
+    $self->execute_command(qw(SELECT) => @args)
 }
 
 =head2 swapdb
@@ -481,7 +481,7 @@ L<https://redis.io/commands/swapdb>
 
 sub swapdb : method {
     my ($self, @args) = @_;
-    $self->execute_command('SWAPDB' => @args)
+    $self->execute_command(qw(SWAPDB) => @args)
 }
 
 =head1 METHODS - Generic
@@ -502,7 +502,7 @@ L<https://redis.io/commands/del>
 
 sub del : method {
     my ($self, @args) = @_;
-    $self->execute_command('DEL' => @args)
+    $self->execute_command(qw(DEL) => @args)
 }
 
 =head2 dump
@@ -521,7 +521,7 @@ L<https://redis.io/commands/dump>
 
 sub dump : method {
     my ($self, @args) = @_;
-    $self->execute_command('DUMP' => @args)
+    $self->execute_command(qw(DUMP) => @args)
 }
 
 =head2 exists
@@ -540,7 +540,7 @@ L<https://redis.io/commands/exists>
 
 sub exists : method {
     my ($self, @args) = @_;
-    $self->execute_command('EXISTS' => @args)
+    $self->execute_command(qw(EXISTS) => @args)
 }
 
 =head2 expire
@@ -561,7 +561,7 @@ L<https://redis.io/commands/expire>
 
 sub expire : method {
     my ($self, @args) = @_;
-    $self->execute_command('EXPIRE' => @args)
+    $self->execute_command(qw(EXPIRE) => @args)
 }
 
 =head2 expireat
@@ -582,7 +582,7 @@ L<https://redis.io/commands/expireat>
 
 sub expireat : method {
     my ($self, @args) = @_;
-    $self->execute_command('EXPIREAT' => @args)
+    $self->execute_command(qw(EXPIREAT) => @args)
 }
 
 =head2 keys
@@ -601,7 +601,7 @@ L<https://redis.io/commands/keys>
 
 sub keys : method {
     my ($self, @args) = @_;
-    $self->execute_command('KEYS' => @args)
+    $self->execute_command(qw(KEYS) => @args)
 }
 
 =head2 migrate
@@ -634,7 +634,7 @@ L<https://redis.io/commands/migrate>
 
 sub migrate : method {
     my ($self, @args) = @_;
-    $self->execute_command('MIGRATE' => @args)
+    $self->execute_command(qw(MIGRATE) => @args)
 }
 
 =head2 move
@@ -655,7 +655,7 @@ L<https://redis.io/commands/move>
 
 sub move : method {
     my ($self, @args) = @_;
-    $self->execute_command('MOVE' => @args)
+    $self->execute_command(qw(MOVE) => @args)
 }
 
 =head2 object
@@ -676,7 +676,7 @@ L<https://redis.io/commands/object>
 
 sub object : method {
     my ($self, @args) = @_;
-    $self->execute_command('OBJECT' => @args)
+    $self->execute_command(qw(OBJECT) => @args)
 }
 
 =head2 persist
@@ -695,7 +695,7 @@ L<https://redis.io/commands/persist>
 
 sub persist : method {
     my ($self, @args) = @_;
-    $self->execute_command('PERSIST' => @args)
+    $self->execute_command(qw(PERSIST) => @args)
 }
 
 =head2 pexpire
@@ -716,7 +716,7 @@ L<https://redis.io/commands/pexpire>
 
 sub pexpire : method {
     my ($self, @args) = @_;
-    $self->execute_command('PEXPIRE' => @args)
+    $self->execute_command(qw(PEXPIRE) => @args)
 }
 
 =head2 pexpireat
@@ -737,7 +737,7 @@ L<https://redis.io/commands/pexpireat>
 
 sub pexpireat : method {
     my ($self, @args) = @_;
-    $self->execute_command('PEXPIREAT' => @args)
+    $self->execute_command(qw(PEXPIREAT) => @args)
 }
 
 =head2 pttl
@@ -756,7 +756,7 @@ L<https://redis.io/commands/pttl>
 
 sub pttl : method {
     my ($self, @args) = @_;
-    $self->execute_command('PTTL' => @args)
+    $self->execute_command(qw(PTTL) => @args)
 }
 
 =head2 randomkey
@@ -769,7 +769,7 @@ L<https://redis.io/commands/randomkey>
 
 sub randomkey : method {
     my ($self, @args) = @_;
-    $self->execute_command('RANDOMKEY' => @args)
+    $self->execute_command(qw(RANDOMKEY) => @args)
 }
 
 =head2 rename
@@ -790,7 +790,7 @@ L<https://redis.io/commands/rename>
 
 sub rename : method {
     my ($self, @args) = @_;
-    $self->execute_command('RENAME' => @args)
+    $self->execute_command(qw(RENAME) => @args)
 }
 
 =head2 renamenx
@@ -811,7 +811,7 @@ L<https://redis.io/commands/renamenx>
 
 sub renamenx : method {
     my ($self, @args) = @_;
-    $self->execute_command('RENAMENX' => @args)
+    $self->execute_command(qw(RENAMENX) => @args)
 }
 
 =head2 restore
@@ -836,7 +836,7 @@ L<https://redis.io/commands/restore>
 
 sub restore : method {
     my ($self, @args) = @_;
-    $self->execute_command('RESTORE' => @args)
+    $self->execute_command(qw(RESTORE) => @args)
 }
 
 =head2 sort
@@ -867,7 +867,7 @@ L<https://redis.io/commands/sort>
 
 sub sort : method {
     my ($self, @args) = @_;
-    $self->execute_command('SORT' => @args)
+    $self->execute_command(qw(SORT) => @args)
 }
 
 =head2 touch
@@ -886,7 +886,7 @@ L<https://redis.io/commands/touch>
 
 sub touch : method {
     my ($self, @args) = @_;
-    $self->execute_command('TOUCH' => @args)
+    $self->execute_command(qw(TOUCH) => @args)
 }
 
 =head2 ttl
@@ -905,7 +905,7 @@ L<https://redis.io/commands/ttl>
 
 sub ttl : method {
     my ($self, @args) = @_;
-    $self->execute_command('TTL' => @args)
+    $self->execute_command(qw(TTL) => @args)
 }
 
 =head2 type
@@ -924,7 +924,7 @@ L<https://redis.io/commands/type>
 
 sub type : method {
     my ($self, @args) = @_;
-    $self->execute_command('TYPE' => @args)
+    $self->execute_command(qw(TYPE) => @args)
 }
 
 =head2 unlink
@@ -943,7 +943,7 @@ L<https://redis.io/commands/unlink>
 
 sub unlink : method {
     my ($self, @args) = @_;
-    $self->execute_command('UNLINK' => @args)
+    $self->execute_command(qw(UNLINK) => @args)
 }
 
 =head2 wait
@@ -964,7 +964,7 @@ L<https://redis.io/commands/wait>
 
 sub wait : method {
     my ($self, @args) = @_;
-    $self->execute_command('WAIT' => @args)
+    $self->execute_command(qw(WAIT) => @args)
 }
 
 =head2 scan
@@ -987,7 +987,7 @@ L<https://redis.io/commands/scan>
 
 sub scan : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCAN' => @args)
+    $self->execute_command(qw(SCAN) => @args)
 }
 
 =head1 METHODS - Geo
@@ -1010,7 +1010,7 @@ L<https://redis.io/commands/geoadd>
 
 sub geoadd : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEOADD' => @args)
+    $self->execute_command(qw(GEOADD) => @args)
 }
 
 =head2 geohash
@@ -1031,7 +1031,7 @@ L<https://redis.io/commands/geohash>
 
 sub geohash : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEOHASH' => @args)
+    $self->execute_command(qw(GEOHASH) => @args)
 }
 
 =head2 geopos
@@ -1052,7 +1052,7 @@ L<https://redis.io/commands/geopos>
 
 sub geopos : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEOPOS' => @args)
+    $self->execute_command(qw(GEOPOS) => @args)
 }
 
 =head2 geodist
@@ -1077,7 +1077,7 @@ L<https://redis.io/commands/geodist>
 
 sub geodist : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEODIST' => @args)
+    $self->execute_command(qw(GEODIST) => @args)
 }
 
 =head2 georadius
@@ -1118,7 +1118,7 @@ L<https://redis.io/commands/georadius>
 
 sub georadius : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEORADIUS' => @args)
+    $self->execute_command(qw(GEORADIUS) => @args)
 }
 
 =head2 georadiusbymember
@@ -1157,7 +1157,7 @@ L<https://redis.io/commands/georadiusbymember>
 
 sub georadiusbymember : method {
     my ($self, @args) = @_;
-    $self->execute_command('GEORADIUSBYMEMBER' => @args)
+    $self->execute_command(qw(GEORADIUSBYMEMBER) => @args)
 }
 
 =head1 METHODS - Hash
@@ -1180,7 +1180,7 @@ L<https://redis.io/commands/hdel>
 
 sub hdel : method {
     my ($self, @args) = @_;
-    $self->execute_command('HDEL' => @args)
+    $self->execute_command(qw(HDEL) => @args)
 }
 
 =head2 hexists
@@ -1201,7 +1201,7 @@ L<https://redis.io/commands/hexists>
 
 sub hexists : method {
     my ($self, @args) = @_;
-    $self->execute_command('HEXISTS' => @args)
+    $self->execute_command(qw(HEXISTS) => @args)
 }
 
 =head2 hget
@@ -1222,7 +1222,7 @@ L<https://redis.io/commands/hget>
 
 sub hget : method {
     my ($self, @args) = @_;
-    $self->execute_command('HGET' => @args)
+    $self->execute_command(qw(HGET) => @args)
 }
 
 =head2 hgetall
@@ -1241,7 +1241,7 @@ L<https://redis.io/commands/hgetall>
 
 sub hgetall : method {
     my ($self, @args) = @_;
-    $self->execute_command('HGETALL' => @args)
+    $self->execute_command(qw(HGETALL) => @args)
 }
 
 =head2 hincrby
@@ -1264,7 +1264,7 @@ L<https://redis.io/commands/hincrby>
 
 sub hincrby : method {
     my ($self, @args) = @_;
-    $self->execute_command('HINCRBY' => @args)
+    $self->execute_command(qw(HINCRBY) => @args)
 }
 
 =head2 hincrbyfloat
@@ -1287,7 +1287,7 @@ L<https://redis.io/commands/hincrbyfloat>
 
 sub hincrbyfloat : method {
     my ($self, @args) = @_;
-    $self->execute_command('HINCRBYFLOAT' => @args)
+    $self->execute_command(qw(HINCRBYFLOAT) => @args)
 }
 
 =head2 hkeys
@@ -1306,7 +1306,7 @@ L<https://redis.io/commands/hkeys>
 
 sub hkeys : method {
     my ($self, @args) = @_;
-    $self->execute_command('HKEYS' => @args)
+    $self->execute_command(qw(HKEYS) => @args)
 }
 
 =head2 hlen
@@ -1325,7 +1325,7 @@ L<https://redis.io/commands/hlen>
 
 sub hlen : method {
     my ($self, @args) = @_;
-    $self->execute_command('HLEN' => @args)
+    $self->execute_command(qw(HLEN) => @args)
 }
 
 =head2 hmget
@@ -1346,7 +1346,7 @@ L<https://redis.io/commands/hmget>
 
 sub hmget : method {
     my ($self, @args) = @_;
-    $self->execute_command('HMGET' => @args)
+    $self->execute_command(qw(HMGET) => @args)
 }
 
 =head2 hmset
@@ -1367,7 +1367,7 @@ L<https://redis.io/commands/hmset>
 
 sub hmset : method {
     my ($self, @args) = @_;
-    $self->execute_command('HMSET' => @args)
+    $self->execute_command(qw(HMSET) => @args)
 }
 
 =head2 hset
@@ -1390,7 +1390,7 @@ L<https://redis.io/commands/hset>
 
 sub hset : method {
     my ($self, @args) = @_;
-    $self->execute_command('HSET' => @args)
+    $self->execute_command(qw(HSET) => @args)
 }
 
 =head2 hsetnx
@@ -1413,7 +1413,7 @@ L<https://redis.io/commands/hsetnx>
 
 sub hsetnx : method {
     my ($self, @args) = @_;
-    $self->execute_command('HSETNX' => @args)
+    $self->execute_command(qw(HSETNX) => @args)
 }
 
 =head2 hstrlen
@@ -1434,7 +1434,7 @@ L<https://redis.io/commands/hstrlen>
 
 sub hstrlen : method {
     my ($self, @args) = @_;
-    $self->execute_command('HSTRLEN' => @args)
+    $self->execute_command(qw(HSTRLEN) => @args)
 }
 
 =head2 hvals
@@ -1453,7 +1453,7 @@ L<https://redis.io/commands/hvals>
 
 sub hvals : method {
     my ($self, @args) = @_;
-    $self->execute_command('HVALS' => @args)
+    $self->execute_command(qw(HVALS) => @args)
 }
 
 =head2 hscan
@@ -1478,7 +1478,7 @@ L<https://redis.io/commands/hscan>
 
 sub hscan : method {
     my ($self, @args) = @_;
-    $self->execute_command('HSCAN' => @args)
+    $self->execute_command(qw(HSCAN) => @args)
 }
 
 =head1 METHODS - Hyperloglog
@@ -1501,7 +1501,7 @@ L<https://redis.io/commands/pfadd>
 
 sub pfadd : method {
     my ($self, @args) = @_;
-    $self->execute_command('PFADD' => @args)
+    $self->execute_command(qw(PFADD) => @args)
 }
 
 =head2 pfcount
@@ -1520,7 +1520,7 @@ L<https://redis.io/commands/pfcount>
 
 sub pfcount : method {
     my ($self, @args) = @_;
-    $self->execute_command('PFCOUNT' => @args)
+    $self->execute_command(qw(PFCOUNT) => @args)
 }
 
 =head2 pfmerge
@@ -1541,7 +1541,7 @@ L<https://redis.io/commands/pfmerge>
 
 sub pfmerge : method {
     my ($self, @args) = @_;
-    $self->execute_command('PFMERGE' => @args)
+    $self->execute_command(qw(PFMERGE) => @args)
 }
 
 =head1 METHODS - List
@@ -1564,7 +1564,7 @@ L<https://redis.io/commands/blpop>
 
 sub blpop : method {
     my ($self, @args) = @_;
-    $self->execute_command('BLPOP' => @args)
+    $self->execute_command(qw(BLPOP) => @args)
 }
 
 =head2 brpop
@@ -1585,7 +1585,7 @@ L<https://redis.io/commands/brpop>
 
 sub brpop : method {
     my ($self, @args) = @_;
-    $self->execute_command('BRPOP' => @args)
+    $self->execute_command(qw(BRPOP) => @args)
 }
 
 =head2 brpoplpush
@@ -1608,7 +1608,7 @@ L<https://redis.io/commands/brpoplpush>
 
 sub brpoplpush : method {
     my ($self, @args) = @_;
-    $self->execute_command('BRPOPLPUSH' => @args)
+    $self->execute_command(qw(BRPOPLPUSH) => @args)
 }
 
 =head2 lindex
@@ -1629,7 +1629,7 @@ L<https://redis.io/commands/lindex>
 
 sub lindex : method {
     my ($self, @args) = @_;
-    $self->execute_command('LINDEX' => @args)
+    $self->execute_command(qw(LINDEX) => @args)
 }
 
 =head2 linsert
@@ -1654,7 +1654,7 @@ L<https://redis.io/commands/linsert>
 
 sub linsert : method {
     my ($self, @args) = @_;
-    $self->execute_command('LINSERT' => @args)
+    $self->execute_command(qw(LINSERT) => @args)
 }
 
 =head2 llen
@@ -1673,7 +1673,7 @@ L<https://redis.io/commands/llen>
 
 sub llen : method {
     my ($self, @args) = @_;
-    $self->execute_command('LLEN' => @args)
+    $self->execute_command(qw(LLEN) => @args)
 }
 
 =head2 lpop
@@ -1692,7 +1692,7 @@ L<https://redis.io/commands/lpop>
 
 sub lpop : method {
     my ($self, @args) = @_;
-    $self->execute_command('LPOP' => @args)
+    $self->execute_command(qw(LPOP) => @args)
 }
 
 =head2 lpush
@@ -1713,7 +1713,7 @@ L<https://redis.io/commands/lpush>
 
 sub lpush : method {
     my ($self, @args) = @_;
-    $self->execute_command('LPUSH' => @args)
+    $self->execute_command(qw(LPUSH) => @args)
 }
 
 =head2 lpushx
@@ -1734,7 +1734,7 @@ L<https://redis.io/commands/lpushx>
 
 sub lpushx : method {
     my ($self, @args) = @_;
-    $self->execute_command('LPUSHX' => @args)
+    $self->execute_command(qw(LPUSHX) => @args)
 }
 
 =head2 lrange
@@ -1757,7 +1757,7 @@ L<https://redis.io/commands/lrange>
 
 sub lrange : method {
     my ($self, @args) = @_;
-    $self->execute_command('LRANGE' => @args)
+    $self->execute_command(qw(LRANGE) => @args)
 }
 
 =head2 lrem
@@ -1780,7 +1780,7 @@ L<https://redis.io/commands/lrem>
 
 sub lrem : method {
     my ($self, @args) = @_;
-    $self->execute_command('LREM' => @args)
+    $self->execute_command(qw(LREM) => @args)
 }
 
 =head2 lset
@@ -1803,7 +1803,7 @@ L<https://redis.io/commands/lset>
 
 sub lset : method {
     my ($self, @args) = @_;
-    $self->execute_command('LSET' => @args)
+    $self->execute_command(qw(LSET) => @args)
 }
 
 =head2 ltrim
@@ -1826,7 +1826,7 @@ L<https://redis.io/commands/ltrim>
 
 sub ltrim : method {
     my ($self, @args) = @_;
-    $self->execute_command('LTRIM' => @args)
+    $self->execute_command(qw(LTRIM) => @args)
 }
 
 =head2 rpop
@@ -1845,7 +1845,7 @@ L<https://redis.io/commands/rpop>
 
 sub rpop : method {
     my ($self, @args) = @_;
-    $self->execute_command('RPOP' => @args)
+    $self->execute_command(qw(RPOP) => @args)
 }
 
 =head2 rpoplpush
@@ -1866,7 +1866,7 @@ L<https://redis.io/commands/rpoplpush>
 
 sub rpoplpush : method {
     my ($self, @args) = @_;
-    $self->execute_command('RPOPLPUSH' => @args)
+    $self->execute_command(qw(RPOPLPUSH) => @args)
 }
 
 =head2 rpush
@@ -1887,7 +1887,7 @@ L<https://redis.io/commands/rpush>
 
 sub rpush : method {
     my ($self, @args) = @_;
-    $self->execute_command('RPUSH' => @args)
+    $self->execute_command(qw(RPUSH) => @args)
 }
 
 =head2 rpushx
@@ -1908,7 +1908,7 @@ L<https://redis.io/commands/rpushx>
 
 sub rpushx : method {
     my ($self, @args) = @_;
-    $self->execute_command('RPUSHX' => @args)
+    $self->execute_command(qw(RPUSHX) => @args)
 }
 
 =head1 METHODS - Pubsub
@@ -1929,7 +1929,7 @@ L<https://redis.io/commands/psubscribe>
 
 sub psubscribe : method {
     my ($self, @args) = @_;
-    $self->execute_command('PSUBSCRIBE' => @args)
+    $self->execute_command(qw(PSUBSCRIBE) => @args)
 }
 
 =head2 pubsub
@@ -1950,7 +1950,7 @@ L<https://redis.io/commands/pubsub>
 
 sub pubsub : method {
     my ($self, @args) = @_;
-    $self->execute_command('PUBSUB' => @args)
+    $self->execute_command(qw(PUBSUB) => @args)
 }
 
 =head2 publish
@@ -1971,7 +1971,7 @@ L<https://redis.io/commands/publish>
 
 sub publish : method {
     my ($self, @args) = @_;
-    $self->execute_command('PUBLISH' => @args)
+    $self->execute_command(qw(PUBLISH) => @args)
 }
 
 =head2 punsubscribe
@@ -1990,7 +1990,7 @@ L<https://redis.io/commands/punsubscribe>
 
 sub punsubscribe : method {
     my ($self, @args) = @_;
-    $self->execute_command('PUNSUBSCRIBE' => @args)
+    $self->execute_command(qw(PUNSUBSCRIBE) => @args)
 }
 
 =head2 subscribe
@@ -2009,7 +2009,7 @@ L<https://redis.io/commands/subscribe>
 
 sub subscribe : method {
     my ($self, @args) = @_;
-    $self->execute_command('SUBSCRIBE' => @args)
+    $self->execute_command(qw(SUBSCRIBE) => @args)
 }
 
 =head2 unsubscribe
@@ -2028,7 +2028,7 @@ L<https://redis.io/commands/unsubscribe>
 
 sub unsubscribe : method {
     my ($self, @args) = @_;
-    $self->execute_command('UNSUBSCRIBE' => @args)
+    $self->execute_command(qw(UNSUBSCRIBE) => @args)
 }
 
 =head1 METHODS - Scripting
@@ -2055,7 +2055,7 @@ L<https://redis.io/commands/eval>
 
 sub eval : method {
     my ($self, @args) = @_;
-    $self->execute_command('EVAL' => @args)
+    $self->execute_command(qw(EVAL) => @args)
 }
 
 =head2 evalsha
@@ -2080,7 +2080,7 @@ L<https://redis.io/commands/evalsha>
 
 sub evalsha : method {
     my ($self, @args) = @_;
-    $self->execute_command('EVALSHA' => @args)
+    $self->execute_command(qw(EVALSHA) => @args)
 }
 
 =head2 script_debug
@@ -2099,7 +2099,7 @@ L<https://redis.io/commands/script-debug>
 
 sub script_debug : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCRIPT DEBUG' => @args)
+    $self->execute_command(qw(SCRIPT DEBUG) => @args)
 }
 
 =head2 script_exists
@@ -2118,7 +2118,7 @@ L<https://redis.io/commands/script-exists>
 
 sub script_exists : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCRIPT EXISTS' => @args)
+    $self->execute_command(qw(SCRIPT EXISTS) => @args)
 }
 
 =head2 script_flush
@@ -2131,7 +2131,7 @@ L<https://redis.io/commands/script-flush>
 
 sub script_flush : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCRIPT FLUSH' => @args)
+    $self->execute_command(qw(SCRIPT FLUSH) => @args)
 }
 
 =head2 script_kill
@@ -2144,7 +2144,7 @@ L<https://redis.io/commands/script-kill>
 
 sub script_kill : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCRIPT KILL' => @args)
+    $self->execute_command(qw(SCRIPT KILL) => @args)
 }
 
 =head2 script_load
@@ -2163,7 +2163,7 @@ L<https://redis.io/commands/script-load>
 
 sub script_load : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCRIPT LOAD' => @args)
+    $self->execute_command(qw(SCRIPT LOAD) => @args)
 }
 
 =head1 METHODS - Server
@@ -2178,7 +2178,7 @@ L<https://redis.io/commands/bgrewriteaof>
 
 sub bgrewriteaof : method {
     my ($self, @args) = @_;
-    $self->execute_command('BGREWRITEAOF' => @args)
+    $self->execute_command(qw(BGREWRITEAOF) => @args)
 }
 
 =head2 bgsave
@@ -2191,7 +2191,7 @@ L<https://redis.io/commands/bgsave>
 
 sub bgsave : method {
     my ($self, @args) = @_;
-    $self->execute_command('BGSAVE' => @args)
+    $self->execute_command(qw(BGSAVE) => @args)
 }
 
 =head2 client_kill
@@ -2218,7 +2218,7 @@ L<https://redis.io/commands/client-kill>
 
 sub client_kill : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT KILL' => @args)
+    $self->execute_command(qw(CLIENT KILL) => @args)
 }
 
 =head2 client_list
@@ -2231,7 +2231,7 @@ L<https://redis.io/commands/client-list>
 
 sub client_list : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT LIST' => @args)
+    $self->execute_command(qw(CLIENT LIST) => @args)
 }
 
 =head2 client_getname
@@ -2244,7 +2244,7 @@ L<https://redis.io/commands/client-getname>
 
 sub client_getname : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT GETNAME' => @args)
+    $self->execute_command(qw(CLIENT GETNAME) => @args)
 }
 
 =head2 client_pause
@@ -2263,7 +2263,7 @@ L<https://redis.io/commands/client-pause>
 
 sub client_pause : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT PAUSE' => @args)
+    $self->execute_command(qw(CLIENT PAUSE) => @args)
 }
 
 =head2 client_reply
@@ -2282,7 +2282,7 @@ L<https://redis.io/commands/client-reply>
 
 sub client_reply : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT REPLY' => @args)
+    $self->execute_command(qw(CLIENT REPLY) => @args)
 }
 
 =head2 client_setname
@@ -2301,7 +2301,7 @@ L<https://redis.io/commands/client-setname>
 
 sub client_setname : method {
     my ($self, @args) = @_;
-    $self->execute_command('CLIENT SETNAME' => @args)
+    $self->execute_command(qw(CLIENT SETNAME) => @args)
 }
 
 =head2 command
@@ -2314,7 +2314,7 @@ L<https://redis.io/commands/command>
 
 sub command : method {
     my ($self, @args) = @_;
-    $self->execute_command('COMMAND' => @args)
+    $self->execute_command(qw(COMMAND) => @args)
 }
 
 =head2 command_count
@@ -2327,7 +2327,7 @@ L<https://redis.io/commands/command-count>
 
 sub command_count : method {
     my ($self, @args) = @_;
-    $self->execute_command('COMMAND COUNT' => @args)
+    $self->execute_command(qw(COMMAND COUNT) => @args)
 }
 
 =head2 command_getkeys
@@ -2340,7 +2340,7 @@ L<https://redis.io/commands/command-getkeys>
 
 sub command_getkeys : method {
     my ($self, @args) = @_;
-    $self->execute_command('COMMAND GETKEYS' => @args)
+    $self->execute_command(qw(COMMAND GETKEYS) => @args)
 }
 
 =head2 command_info
@@ -2359,7 +2359,7 @@ L<https://redis.io/commands/command-info>
 
 sub command_info : method {
     my ($self, @args) = @_;
-    $self->execute_command('COMMAND INFO' => @args)
+    $self->execute_command(qw(COMMAND INFO) => @args)
 }
 
 =head2 config_get
@@ -2378,7 +2378,7 @@ L<https://redis.io/commands/config-get>
 
 sub config_get : method {
     my ($self, @args) = @_;
-    $self->execute_command('CONFIG GET' => @args)
+    $self->execute_command(qw(CONFIG GET) => @args)
 }
 
 =head2 config_rewrite
@@ -2391,7 +2391,7 @@ L<https://redis.io/commands/config-rewrite>
 
 sub config_rewrite : method {
     my ($self, @args) = @_;
-    $self->execute_command('CONFIG REWRITE' => @args)
+    $self->execute_command(qw(CONFIG REWRITE) => @args)
 }
 
 =head2 config_set
@@ -2412,7 +2412,7 @@ L<https://redis.io/commands/config-set>
 
 sub config_set : method {
     my ($self, @args) = @_;
-    $self->execute_command('CONFIG SET' => @args)
+    $self->execute_command(qw(CONFIG SET) => @args)
 }
 
 =head2 config_resetstat
@@ -2425,7 +2425,7 @@ L<https://redis.io/commands/config-resetstat>
 
 sub config_resetstat : method {
     my ($self, @args) = @_;
-    $self->execute_command('CONFIG RESETSTAT' => @args)
+    $self->execute_command(qw(CONFIG RESETSTAT) => @args)
 }
 
 =head2 dbsize
@@ -2438,7 +2438,7 @@ L<https://redis.io/commands/dbsize>
 
 sub dbsize : method {
     my ($self, @args) = @_;
-    $self->execute_command('DBSIZE' => @args)
+    $self->execute_command(qw(DBSIZE) => @args)
 }
 
 =head2 debug_object
@@ -2457,7 +2457,7 @@ L<https://redis.io/commands/debug-object>
 
 sub debug_object : method {
     my ($self, @args) = @_;
-    $self->execute_command('DEBUG OBJECT' => @args)
+    $self->execute_command(qw(DEBUG OBJECT) => @args)
 }
 
 =head2 debug_segfault
@@ -2470,7 +2470,7 @@ L<https://redis.io/commands/debug-segfault>
 
 sub debug_segfault : method {
     my ($self, @args) = @_;
-    $self->execute_command('DEBUG SEGFAULT' => @args)
+    $self->execute_command(qw(DEBUG SEGFAULT) => @args)
 }
 
 =head2 flushall
@@ -2489,7 +2489,7 @@ L<https://redis.io/commands/flushall>
 
 sub flushall : method {
     my ($self, @args) = @_;
-    $self->execute_command('FLUSHALL' => @args)
+    $self->execute_command(qw(FLUSHALL) => @args)
 }
 
 =head2 flushdb
@@ -2508,7 +2508,7 @@ L<https://redis.io/commands/flushdb>
 
 sub flushdb : method {
     my ($self, @args) = @_;
-    $self->execute_command('FLUSHDB' => @args)
+    $self->execute_command(qw(FLUSHDB) => @args)
 }
 
 =head2 info
@@ -2527,7 +2527,7 @@ L<https://redis.io/commands/info>
 
 sub info : method {
     my ($self, @args) = @_;
-    $self->execute_command('INFO' => @args)
+    $self->execute_command(qw(INFO) => @args)
 }
 
 =head2 lastsave
@@ -2540,7 +2540,7 @@ L<https://redis.io/commands/lastsave>
 
 sub lastsave : method {
     my ($self, @args) = @_;
-    $self->execute_command('LASTSAVE' => @args)
+    $self->execute_command(qw(LASTSAVE) => @args)
 }
 
 =head2 monitor
@@ -2553,7 +2553,7 @@ L<https://redis.io/commands/monitor>
 
 sub monitor : method {
     my ($self, @args) = @_;
-    $self->execute_command('MONITOR' => @args)
+    $self->execute_command(qw(MONITOR) => @args)
 }
 
 =head2 role
@@ -2566,7 +2566,7 @@ L<https://redis.io/commands/role>
 
 sub role : method {
     my ($self, @args) = @_;
-    $self->execute_command('ROLE' => @args)
+    $self->execute_command(qw(ROLE) => @args)
 }
 
 =head2 save
@@ -2579,7 +2579,7 @@ L<https://redis.io/commands/save>
 
 sub save : method {
     my ($self, @args) = @_;
-    $self->execute_command('SAVE' => @args)
+    $self->execute_command(qw(SAVE) => @args)
 }
 
 =head2 shutdown
@@ -2598,7 +2598,7 @@ L<https://redis.io/commands/shutdown>
 
 sub shutdown : method {
     my ($self, @args) = @_;
-    $self->execute_command('SHUTDOWN' => @args)
+    $self->execute_command(qw(SHUTDOWN) => @args)
 }
 
 =head2 slaveof
@@ -2619,7 +2619,7 @@ L<https://redis.io/commands/slaveof>
 
 sub slaveof : method {
     my ($self, @args) = @_;
-    $self->execute_command('SLAVEOF' => @args)
+    $self->execute_command(qw(SLAVEOF) => @args)
 }
 
 =head2 slowlog
@@ -2640,7 +2640,7 @@ L<https://redis.io/commands/slowlog>
 
 sub slowlog : method {
     my ($self, @args) = @_;
-    $self->execute_command('SLOWLOG' => @args)
+    $self->execute_command(qw(SLOWLOG) => @args)
 }
 
 =head2 sync
@@ -2653,7 +2653,7 @@ L<https://redis.io/commands/sync>
 
 sub sync : method {
     my ($self, @args) = @_;
-    $self->execute_command('SYNC' => @args)
+    $self->execute_command(qw(SYNC) => @args)
 }
 
 =head2 time
@@ -2666,7 +2666,7 @@ L<https://redis.io/commands/time>
 
 sub time : method {
     my ($self, @args) = @_;
-    $self->execute_command('TIME' => @args)
+    $self->execute_command(qw(TIME) => @args)
 }
 
 =head1 METHODS - Set
@@ -2689,7 +2689,7 @@ L<https://redis.io/commands/sadd>
 
 sub sadd : method {
     my ($self, @args) = @_;
-    $self->execute_command('SADD' => @args)
+    $self->execute_command(qw(SADD) => @args)
 }
 
 =head2 scard
@@ -2708,7 +2708,7 @@ L<https://redis.io/commands/scard>
 
 sub scard : method {
     my ($self, @args) = @_;
-    $self->execute_command('SCARD' => @args)
+    $self->execute_command(qw(SCARD) => @args)
 }
 
 =head2 sdiff
@@ -2727,7 +2727,7 @@ L<https://redis.io/commands/sdiff>
 
 sub sdiff : method {
     my ($self, @args) = @_;
-    $self->execute_command('SDIFF' => @args)
+    $self->execute_command(qw(SDIFF) => @args)
 }
 
 =head2 sdiffstore
@@ -2748,7 +2748,7 @@ L<https://redis.io/commands/sdiffstore>
 
 sub sdiffstore : method {
     my ($self, @args) = @_;
-    $self->execute_command('SDIFFSTORE' => @args)
+    $self->execute_command(qw(SDIFFSTORE) => @args)
 }
 
 =head2 sinter
@@ -2767,7 +2767,7 @@ L<https://redis.io/commands/sinter>
 
 sub sinter : method {
     my ($self, @args) = @_;
-    $self->execute_command('SINTER' => @args)
+    $self->execute_command(qw(SINTER) => @args)
 }
 
 =head2 sinterstore
@@ -2788,7 +2788,7 @@ L<https://redis.io/commands/sinterstore>
 
 sub sinterstore : method {
     my ($self, @args) = @_;
-    $self->execute_command('SINTERSTORE' => @args)
+    $self->execute_command(qw(SINTERSTORE) => @args)
 }
 
 =head2 sismember
@@ -2809,7 +2809,7 @@ L<https://redis.io/commands/sismember>
 
 sub sismember : method {
     my ($self, @args) = @_;
-    $self->execute_command('SISMEMBER' => @args)
+    $self->execute_command(qw(SISMEMBER) => @args)
 }
 
 =head2 smembers
@@ -2828,7 +2828,7 @@ L<https://redis.io/commands/smembers>
 
 sub smembers : method {
     my ($self, @args) = @_;
-    $self->execute_command('SMEMBERS' => @args)
+    $self->execute_command(qw(SMEMBERS) => @args)
 }
 
 =head2 smove
@@ -2851,7 +2851,7 @@ L<https://redis.io/commands/smove>
 
 sub smove : method {
     my ($self, @args) = @_;
-    $self->execute_command('SMOVE' => @args)
+    $self->execute_command(qw(SMOVE) => @args)
 }
 
 =head2 spop
@@ -2872,7 +2872,7 @@ L<https://redis.io/commands/spop>
 
 sub spop : method {
     my ($self, @args) = @_;
-    $self->execute_command('SPOP' => @args)
+    $self->execute_command(qw(SPOP) => @args)
 }
 
 =head2 srandmember
@@ -2893,7 +2893,7 @@ L<https://redis.io/commands/srandmember>
 
 sub srandmember : method {
     my ($self, @args) = @_;
-    $self->execute_command('SRANDMEMBER' => @args)
+    $self->execute_command(qw(SRANDMEMBER) => @args)
 }
 
 =head2 srem
@@ -2914,7 +2914,7 @@ L<https://redis.io/commands/srem>
 
 sub srem : method {
     my ($self, @args) = @_;
-    $self->execute_command('SREM' => @args)
+    $self->execute_command(qw(SREM) => @args)
 }
 
 =head2 sunion
@@ -2933,7 +2933,7 @@ L<https://redis.io/commands/sunion>
 
 sub sunion : method {
     my ($self, @args) = @_;
-    $self->execute_command('SUNION' => @args)
+    $self->execute_command(qw(SUNION) => @args)
 }
 
 =head2 sunionstore
@@ -2954,7 +2954,7 @@ L<https://redis.io/commands/sunionstore>
 
 sub sunionstore : method {
     my ($self, @args) = @_;
-    $self->execute_command('SUNIONSTORE' => @args)
+    $self->execute_command(qw(SUNIONSTORE) => @args)
 }
 
 =head2 sscan
@@ -2979,7 +2979,7 @@ L<https://redis.io/commands/sscan>
 
 sub sscan : method {
     my ($self, @args) = @_;
-    $self->execute_command('SSCAN' => @args)
+    $self->execute_command(qw(SSCAN) => @args)
 }
 
 =head1 METHODS - Sorted_set
@@ -3008,7 +3008,7 @@ L<https://redis.io/commands/zadd>
 
 sub zadd : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZADD' => @args)
+    $self->execute_command(qw(ZADD) => @args)
 }
 
 =head2 zcard
@@ -3027,7 +3027,7 @@ L<https://redis.io/commands/zcard>
 
 sub zcard : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZCARD' => @args)
+    $self->execute_command(qw(ZCARD) => @args)
 }
 
 =head2 zcount
@@ -3050,7 +3050,7 @@ L<https://redis.io/commands/zcount>
 
 sub zcount : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZCOUNT' => @args)
+    $self->execute_command(qw(ZCOUNT) => @args)
 }
 
 =head2 zincrby
@@ -3073,7 +3073,7 @@ L<https://redis.io/commands/zincrby>
 
 sub zincrby : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZINCRBY' => @args)
+    $self->execute_command(qw(ZINCRBY) => @args)
 }
 
 =head2 zinterstore
@@ -3100,7 +3100,7 @@ L<https://redis.io/commands/zinterstore>
 
 sub zinterstore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZINTERSTORE' => @args)
+    $self->execute_command(qw(ZINTERSTORE) => @args)
 }
 
 =head2 zlexcount
@@ -3123,7 +3123,7 @@ L<https://redis.io/commands/zlexcount>
 
 sub zlexcount : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZLEXCOUNT' => @args)
+    $self->execute_command(qw(ZLEXCOUNT) => @args)
 }
 
 =head2 zrange
@@ -3148,7 +3148,7 @@ L<https://redis.io/commands/zrange>
 
 sub zrange : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZRANGE' => @args)
+    $self->execute_command(qw(ZRANGE) => @args)
 }
 
 =head2 zrangebylex
@@ -3173,7 +3173,7 @@ L<https://redis.io/commands/zrangebylex>
 
 sub zrangebylex : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZRANGEBYLEX' => @args)
+    $self->execute_command(qw(ZRANGEBYLEX) => @args)
 }
 
 =head2 zrevrangebylex
@@ -3198,7 +3198,7 @@ L<https://redis.io/commands/zrevrangebylex>
 
 sub zrevrangebylex : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREVRANGEBYLEX' => @args)
+    $self->execute_command(qw(ZREVRANGEBYLEX) => @args)
 }
 
 =head2 zrangebyscore
@@ -3225,7 +3225,7 @@ L<https://redis.io/commands/zrangebyscore>
 
 sub zrangebyscore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZRANGEBYSCORE' => @args)
+    $self->execute_command(qw(ZRANGEBYSCORE) => @args)
 }
 
 =head2 zrank
@@ -3246,7 +3246,7 @@ L<https://redis.io/commands/zrank>
 
 sub zrank : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZRANK' => @args)
+    $self->execute_command(qw(ZRANK) => @args)
 }
 
 =head2 zrem
@@ -3267,7 +3267,7 @@ L<https://redis.io/commands/zrem>
 
 sub zrem : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREM' => @args)
+    $self->execute_command(qw(ZREM) => @args)
 }
 
 =head2 zremrangebylex
@@ -3290,7 +3290,7 @@ L<https://redis.io/commands/zremrangebylex>
 
 sub zremrangebylex : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREMRANGEBYLEX' => @args)
+    $self->execute_command(qw(ZREMRANGEBYLEX) => @args)
 }
 
 =head2 zremrangebyrank
@@ -3313,7 +3313,7 @@ L<https://redis.io/commands/zremrangebyrank>
 
 sub zremrangebyrank : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREMRANGEBYRANK' => @args)
+    $self->execute_command(qw(ZREMRANGEBYRANK) => @args)
 }
 
 =head2 zremrangebyscore
@@ -3336,7 +3336,7 @@ L<https://redis.io/commands/zremrangebyscore>
 
 sub zremrangebyscore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREMRANGEBYSCORE' => @args)
+    $self->execute_command(qw(ZREMRANGEBYSCORE) => @args)
 }
 
 =head2 zrevrange
@@ -3361,7 +3361,7 @@ L<https://redis.io/commands/zrevrange>
 
 sub zrevrange : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREVRANGE' => @args)
+    $self->execute_command(qw(ZREVRANGE) => @args)
 }
 
 =head2 zrevrangebyscore
@@ -3388,7 +3388,7 @@ L<https://redis.io/commands/zrevrangebyscore>
 
 sub zrevrangebyscore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREVRANGEBYSCORE' => @args)
+    $self->execute_command(qw(ZREVRANGEBYSCORE) => @args)
 }
 
 =head2 zrevrank
@@ -3409,7 +3409,7 @@ L<https://redis.io/commands/zrevrank>
 
 sub zrevrank : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZREVRANK' => @args)
+    $self->execute_command(qw(ZREVRANK) => @args)
 }
 
 =head2 zscore
@@ -3430,7 +3430,7 @@ L<https://redis.io/commands/zscore>
 
 sub zscore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZSCORE' => @args)
+    $self->execute_command(qw(ZSCORE) => @args)
 }
 
 =head2 zunionstore
@@ -3457,7 +3457,7 @@ L<https://redis.io/commands/zunionstore>
 
 sub zunionstore : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZUNIONSTORE' => @args)
+    $self->execute_command(qw(ZUNIONSTORE) => @args)
 }
 
 =head2 zscan
@@ -3482,7 +3482,7 @@ L<https://redis.io/commands/zscan>
 
 sub zscan : method {
     my ($self, @args) = @_;
-    $self->execute_command('ZSCAN' => @args)
+    $self->execute_command(qw(ZSCAN) => @args)
 }
 
 =head1 METHODS - String
@@ -3505,7 +3505,7 @@ L<https://redis.io/commands/append>
 
 sub append : method {
     my ($self, @args) = @_;
-    $self->execute_command('APPEND' => @args)
+    $self->execute_command(qw(APPEND) => @args)
 }
 
 =head2 bitcount
@@ -3526,7 +3526,7 @@ L<https://redis.io/commands/bitcount>
 
 sub bitcount : method {
     my ($self, @args) = @_;
-    $self->execute_command('BITCOUNT' => @args)
+    $self->execute_command(qw(BITCOUNT) => @args)
 }
 
 =head2 bitfield
@@ -3553,7 +3553,7 @@ L<https://redis.io/commands/bitfield>
 
 sub bitfield : method {
     my ($self, @args) = @_;
-    $self->execute_command('BITFIELD' => @args)
+    $self->execute_command(qw(BITFIELD) => @args)
 }
 
 =head2 bitop
@@ -3576,7 +3576,7 @@ L<https://redis.io/commands/bitop>
 
 sub bitop : method {
     my ($self, @args) = @_;
-    $self->execute_command('BITOP' => @args)
+    $self->execute_command(qw(BITOP) => @args)
 }
 
 =head2 bitpos
@@ -3601,7 +3601,7 @@ L<https://redis.io/commands/bitpos>
 
 sub bitpos : method {
     my ($self, @args) = @_;
-    $self->execute_command('BITPOS' => @args)
+    $self->execute_command(qw(BITPOS) => @args)
 }
 
 =head2 decr
@@ -3620,7 +3620,7 @@ L<https://redis.io/commands/decr>
 
 sub decr : method {
     my ($self, @args) = @_;
-    $self->execute_command('DECR' => @args)
+    $self->execute_command(qw(DECR) => @args)
 }
 
 =head2 decrby
@@ -3641,7 +3641,7 @@ L<https://redis.io/commands/decrby>
 
 sub decrby : method {
     my ($self, @args) = @_;
-    $self->execute_command('DECRBY' => @args)
+    $self->execute_command(qw(DECRBY) => @args)
 }
 
 =head2 get
@@ -3660,7 +3660,7 @@ L<https://redis.io/commands/get>
 
 sub get : method {
     my ($self, @args) = @_;
-    $self->execute_command('GET' => @args)
+    $self->execute_command(qw(GET) => @args)
 }
 
 =head2 getbit
@@ -3681,7 +3681,7 @@ L<https://redis.io/commands/getbit>
 
 sub getbit : method {
     my ($self, @args) = @_;
-    $self->execute_command('GETBIT' => @args)
+    $self->execute_command(qw(GETBIT) => @args)
 }
 
 =head2 getrange
@@ -3704,7 +3704,7 @@ L<https://redis.io/commands/getrange>
 
 sub getrange : method {
     my ($self, @args) = @_;
-    $self->execute_command('GETRANGE' => @args)
+    $self->execute_command(qw(GETRANGE) => @args)
 }
 
 =head2 getset
@@ -3725,7 +3725,7 @@ L<https://redis.io/commands/getset>
 
 sub getset : method {
     my ($self, @args) = @_;
-    $self->execute_command('GETSET' => @args)
+    $self->execute_command(qw(GETSET) => @args)
 }
 
 =head2 incr
@@ -3744,7 +3744,7 @@ L<https://redis.io/commands/incr>
 
 sub incr : method {
     my ($self, @args) = @_;
-    $self->execute_command('INCR' => @args)
+    $self->execute_command(qw(INCR) => @args)
 }
 
 =head2 incrby
@@ -3765,7 +3765,7 @@ L<https://redis.io/commands/incrby>
 
 sub incrby : method {
     my ($self, @args) = @_;
-    $self->execute_command('INCRBY' => @args)
+    $self->execute_command(qw(INCRBY) => @args)
 }
 
 =head2 incrbyfloat
@@ -3786,7 +3786,7 @@ L<https://redis.io/commands/incrbyfloat>
 
 sub incrbyfloat : method {
     my ($self, @args) = @_;
-    $self->execute_command('INCRBYFLOAT' => @args)
+    $self->execute_command(qw(INCRBYFLOAT) => @args)
 }
 
 =head2 mget
@@ -3805,7 +3805,7 @@ L<https://redis.io/commands/mget>
 
 sub mget : method {
     my ($self, @args) = @_;
-    $self->execute_command('MGET' => @args)
+    $self->execute_command(qw(MGET) => @args)
 }
 
 =head2 mset
@@ -3824,7 +3824,7 @@ L<https://redis.io/commands/mset>
 
 sub mset : method {
     my ($self, @args) = @_;
-    $self->execute_command('MSET' => @args)
+    $self->execute_command(qw(MSET) => @args)
 }
 
 =head2 msetnx
@@ -3843,7 +3843,7 @@ L<https://redis.io/commands/msetnx>
 
 sub msetnx : method {
     my ($self, @args) = @_;
-    $self->execute_command('MSETNX' => @args)
+    $self->execute_command(qw(MSETNX) => @args)
 }
 
 =head2 psetex
@@ -3866,7 +3866,7 @@ L<https://redis.io/commands/psetex>
 
 sub psetex : method {
     my ($self, @args) = @_;
-    $self->execute_command('PSETEX' => @args)
+    $self->execute_command(qw(PSETEX) => @args)
 }
 
 =head2 set
@@ -3893,7 +3893,7 @@ L<https://redis.io/commands/set>
 
 sub set : method {
     my ($self, @args) = @_;
-    $self->execute_command('SET' => @args)
+    $self->execute_command(qw(SET) => @args)
 }
 
 =head2 setbit
@@ -3916,7 +3916,7 @@ L<https://redis.io/commands/setbit>
 
 sub setbit : method {
     my ($self, @args) = @_;
-    $self->execute_command('SETBIT' => @args)
+    $self->execute_command(qw(SETBIT) => @args)
 }
 
 =head2 setex
@@ -3939,7 +3939,7 @@ L<https://redis.io/commands/setex>
 
 sub setex : method {
     my ($self, @args) = @_;
-    $self->execute_command('SETEX' => @args)
+    $self->execute_command(qw(SETEX) => @args)
 }
 
 =head2 setnx
@@ -3960,7 +3960,7 @@ L<https://redis.io/commands/setnx>
 
 sub setnx : method {
     my ($self, @args) = @_;
-    $self->execute_command('SETNX' => @args)
+    $self->execute_command(qw(SETNX) => @args)
 }
 
 =head2 setrange
@@ -3983,7 +3983,7 @@ L<https://redis.io/commands/setrange>
 
 sub setrange : method {
     my ($self, @args) = @_;
-    $self->execute_command('SETRANGE' => @args)
+    $self->execute_command(qw(SETRANGE) => @args)
 }
 
 =head2 strlen
@@ -4002,7 +4002,7 @@ L<https://redis.io/commands/strlen>
 
 sub strlen : method {
     my ($self, @args) = @_;
-    $self->execute_command('STRLEN' => @args)
+    $self->execute_command(qw(STRLEN) => @args)
 }
 
 =head1 METHODS - Transactions
@@ -4017,7 +4017,7 @@ L<https://redis.io/commands/discard>
 
 sub discard : method {
     my ($self, @args) = @_;
-    $self->execute_command('DISCARD' => @args)
+    $self->execute_command(qw(DISCARD) => @args)
 }
 
 =head2 exec
@@ -4030,7 +4030,7 @@ L<https://redis.io/commands/exec>
 
 sub exec : method {
     my ($self, @args) = @_;
-    $self->execute_command('EXEC' => @args)
+    $self->execute_command(qw(EXEC) => @args)
 }
 
 =head2 multi
@@ -4043,7 +4043,7 @@ L<https://redis.io/commands/multi>
 
 sub multi : method {
     my ($self, @args) = @_;
-    $self->execute_command('MULTI' => @args)
+    $self->execute_command(qw(MULTI) => @args)
 }
 
 =head2 unwatch
@@ -4056,7 +4056,7 @@ L<https://redis.io/commands/unwatch>
 
 sub unwatch : method {
     my ($self, @args) = @_;
-    $self->execute_command('UNWATCH' => @args)
+    $self->execute_command(qw(UNWATCH) => @args)
 }
 
 =head2 watch
@@ -4075,7 +4075,7 @@ L<https://redis.io/commands/watch>
 
 sub watch : method {
     my ($self, @args) = @_;
-    $self->execute_command('WATCH' => @args)
+    $self->execute_command(qw(WATCH) => @args)
 }
 
 1;

@@ -11,37 +11,34 @@ if ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation, use env var RELEASE_TESTING to enable" );
 }
 
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
 
+main();
 
-#unless ( $ENV{RELEASE_TESTING} ) {
-#    plan( skip_all => "Author tests not required for installation" );
-#}
-#
-#eval "use Test::CheckManifest 0.9";
-#plan skip_all => "Test::CheckManifest 0.9 required" if $@;
-#ok_manifest();
+sub main {
+    my $lib = "$Bin/../lib";
+    my $perl = "$^X -I$lib -w -Mstrict";   # warnings and strict on
 
-#$ENV{PATH} = "/usr/bin:/bin";
+    #1) TEST fdbls: no files in /testfolder
+    my @out = btick( "$perl bin/fdbls /testfolder/" );
+    ok( scalar(@out) == 0, "fdbls: no files in /testfolder/ (@out)" );
 
-my $perl = "$^X -w -Mstrict";   # warnings and strict on
-#1) TEST fdbls: no files in /testfolder
-my @out = btick( "$perl bin/fdbls /testfolder/" );
-ok( scalar(@out) == 0, "fdbls: no files in /testfolder/ (@out)" );
+    #2) test fdbput - put a file in /testfolder/
+    mysystem( "$perl bin/fdbput -l bin/fdbput /testfolder/fdbput" );
+    my @files = btick( "$perl bin/fdbls /testfolder/fdbput" );
+    ok( scalar(@files) == 1, "fdbput: file in /testfolder/ (@files)" );
 
-#2) test fdbput - put a file in /testfolder/
-mysystem( "$perl bin/fdbput -l bin/fdbput /testfolder/fdbput" );
-my @files = btick( "$perl bin/fdbls /testfolder/fdbput" );
-ok( scalar(@files) == 1, "fdbput: file in /testfolder/ (@files)" );
+    #3) test fdbmv - rename a file in /testfolder/
+    mysystem( "$perl bin/fdbmv /testfolder/fdbput /testfolder/fdbput-was" );
+    @files = btick( "$perl bin/fdbls /testfolder/fdbput-was" );
+    ok( scalar(@files) == 1, "fdbmv: fdbput-was in /testfolder/ (@files)" );
 
-#3) test fdbmv - rename a file in /testfolder/
-mysystem( "$perl bin/fdbmv /testfolder/fdbput /testfolder/fdbput-was" );
-@files = btick( "$perl bin/fdbls /testfolder/fdbput-was" );
-ok( scalar(@files) == 1, "fdbmv: fdbput-was in /testfolder/ (@files)" );
-
-#4) test fdbrm - remove a file in /testfolder/
-mysystem( "$perl bin/fdbrm /testfolder/fdbput-was" );
-@files = btick( "$perl bin/fdbls /testfolder/" );
-ok( scalar(@files) == 0, "fdbrm: no file /testfolder/ (@files)" );
+    #4) test fdbrm - remove a file in /testfolder/
+    mysystem( "$perl bin/fdbrm /testfolder/fdbput-was" );
+    @files = btick( "$perl bin/fdbls /testfolder/" );
+    ok( scalar(@files) == 0, "fdbrm: no file /testfolder/ (@files)" );
+}
         
 sub mysystem {
     my $ret = system( @_ );

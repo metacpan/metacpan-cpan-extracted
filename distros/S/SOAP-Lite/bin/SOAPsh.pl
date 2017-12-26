@@ -4,6 +4,9 @@
 # -- SOAP::Lite -- soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
 
 use strict;
+
+our $VERSION = '1.24'; # VERSION
+
 use SOAP::Lite;
 use Data::Dumper; $Data::Dumper::Terse = 1; $Data::Dumper::Indent = 1;
 

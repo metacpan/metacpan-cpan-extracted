@@ -1,4 +1,11 @@
-Revision history for Getopt-Long-Complete
+0.310   2017-12-20 (PERLANCAR)
+
+	- Bugfix: handle case where option spec might have handler, even
+	  though the first argument is a hashref (RT#123857, thanks
+	  Sebastian Schleussner).
+
+	- Fix example, thanks SREZIC.
+
 
 0.30    2016-12-03 (PERLANCAR)
 

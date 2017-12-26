@@ -533,7 +533,7 @@ sub record_option_coverage {
     my ( @command_line ) = @_;
 
     return unless $ENV{ACK_OPTION_COVERAGE};
-    return if $ENV{ACK_STANDALONE}; # We don't need to record the second time around.
+    return if $ENV{ACK_TEST_STANDALONE}; # We don't need to record the second time around.
 
     my $record_options = File::Spec->catfile($orig_wd, 'record-options');
 
@@ -678,12 +678,12 @@ BEGIN {
 
         *run_ack_interactive = sub {
             local $Test::Builder::Level = $Test::Builder::Level + 1;
-            Test::More::fail(<<'END_FAIL');
+            Test::More::fail(<<'HERE');
 Your system doesn't seem to have IO::Pty, and the developers
 forgot to check in this test file.  Please file a bug report
 at https://github.com/beyondgrep/ack2/issues with the name of
 the file that generated this failure.
-END_FAIL
+HERE
         };
     }
 }

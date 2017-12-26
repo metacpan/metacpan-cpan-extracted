@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter::Log4perl" => 0,
     "Moo" => 0,
     "MooX::Role::Logger" => 0,
-    "MooX::Types::Mooselike::Base" => 0,
+    "MooX::Types::Mooselike" => 0,
     "Parse::CSV" => 0,
     "Path::Tiny" => 0,
     "Test2" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "YAML::XS" => 0
   },
-  "VERSION" => "1.173490",
+  "VERSION" => "1.173530",
   "test" => {
     "TESTS" => ""
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "Log::Any::Adapter::Log4perl" => 0,
   "Moo" => 0,
   "MooX::Role::Logger" => 0,
-  "MooX::Types::Mooselike::Base" => 0,
+  "MooX::Types::Mooselike" => 0,
   "Parse::CSV" => 0,
   "Path::Tiny" => 0,
   "Test2" => 0,

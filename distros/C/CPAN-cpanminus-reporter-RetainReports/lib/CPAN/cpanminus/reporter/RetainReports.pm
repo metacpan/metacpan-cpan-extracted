@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.1;
 use parent ('App::cpanminus::reporter');
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 use Carp;
 use File::Path qw( make_path );
 use File::Spec;
@@ -100,15 +100,7 @@ blead or a branch or of a monthly dev release on such a list.
 
 =head1 METHODS
 
-Not needed in current forumulation; inherited from F<App-cpanminus-reporter>.
-
-        force               => 1,           # ignore mtime check on cpanm build.log
-        build_dir           => $cpanmdir,
-        build_logfile       => $log,
-        'ignore-versions' => 1,
-
 =head2 C<new()>
-
 
 =over 4
 
@@ -139,7 +131,7 @@ F<CPAN::cpanminus::reporter::RetainReports> object.
 
 =item * Inherited from F<App-cpanminus-reporter>.
 
-=item *
+=item * Environmental Variables
 
 At this time it is thought that these two environmental variables should be
 explicitly set if either the F<.cpanm> or the F<.cpanreporter> directory is in a
@@ -344,9 +336,10 @@ See the F<examples/> directory for sample reports.
 
 Inherited from C<App-cpanminus-reporter>.  However, whereas that library's
 method composes and transmits a report to L<CPANtesters.org>, this library's
-method generates a F<.json> report file for each distribution analyzed and retains
-that on disk for subsequent processing or analysis.  As such, this is the
-crucial difference between this library and F<App-cpanminus-reporter>.
+C<run()> method generates a F<.json> report file for each distribution
+analyzed and retains that on disk for subsequent processing or analysis.  As
+such, this is the crucial difference between this library and
+F<App-cpanminus-reporter>.
 
 =item *
 

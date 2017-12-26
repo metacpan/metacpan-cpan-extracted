@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-SHLOMIF
 
+0.000008    2017-12--20
+        - Remove some broken deps: Authority and Test::Kwalitee::Extra
+
 0.000007    2017-04-05
         - Add CPAN Prereqs to the bundle in dist.ini / Makefile.PL
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Async::Event::Interval: '0.04'
+  Async::Event::Interval: '0.05'
   Crypt::SaltedHash: '0'
   DBD::SQLite: '0'
   DBI: '0'
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/app-rpi-envui/issues
   repository: https://github.com/stevieb9/app-rpi-envui.git
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

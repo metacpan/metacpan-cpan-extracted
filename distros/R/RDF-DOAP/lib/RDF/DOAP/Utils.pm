@@ -1,14 +1,14 @@
 package RDF::DOAP::Utils;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.100';
 
 use strict;
 use warnings;
 
 use RDF::DOAP::Types -types;
 use match::simple 'match';
-use List::MoreUtils 'uniq';
+use List::Util 'uniq';
 
 use MooseX::AttributeTags (
 	WithURI   => [

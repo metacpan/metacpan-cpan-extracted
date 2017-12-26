@@ -8,7 +8,7 @@ use Data::Dumper;
 use Mock::Sub no_warnings => 1;
 use POSIX qw(tzset);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 my $db = App::RPi::EnvUI::DB->new;
 my $api = App::RPi::EnvUI::API->new(db => $db);
@@ -17,9 +17,6 @@ $ENV{TZ} = $api->_config_core('time_zone');
 tzset();
 
 my $log = $api->log->child('webapp');
-
-$api->_config_light;
-$api->set_light_times;
 
 #
 # fetch routes
@@ -40,6 +37,9 @@ get '/graph_data' => sub {
 post '/login' => sub {
         my $user = params->{username};
         my $pass = params->{password};
+
+        my $log = $log->child("/login");
+        $log->_4("proceeding to authenticate with username: $user");
 
         my ($success, $realm) = authenticate_user($user, $pass);
 
@@ -66,6 +66,7 @@ get '/time' => sub {
         my ($y, $m, $d, $h, $min) = (localtime)[5, 4, 3, 2, 1];
 
         $y += 1900;
+        $m++;
 
         for ($m, $d, $h, $min){
             $_ = "0$_" if length $_ < 2;
@@ -108,6 +109,12 @@ get '/get_aux/:aux' => sub {
         $api->switch($aux_id);
 
         return to_json $api->aux($aux_id);
+    };
+get '/get_aux_override/:aux' => sub {
+        my $aux_id = params->{aux};
+        my $log = $log->child('/get_aux_override');
+        $log->_7("fetching aux override value for $aux_id");
+        return to_json $api->aux_override($aux_id);
     };
 get '/fetch_env' => sub {
         my $log = $log->child('/fetch_env');

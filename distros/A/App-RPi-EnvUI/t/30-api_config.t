@@ -53,7 +53,7 @@ is $api->{testing}, 1, "testing param to new() ok";
         );
 
     my @values = qw(
-        15 3 4 -1 0 America/Edmonton
+        15 3 4 -1 0 America/Vancouver
         );
 
     my $i = 0;
@@ -75,7 +75,7 @@ is $api->{testing}, 1, "testing param to new() ok";
 
     is
         $api->_config_core('time_zone'),
-        'America/Edmonton',
+        'America/Vancouver',
         "...and when the db object is put back, all is well";
 
     # $want param missing
@@ -88,11 +88,11 @@ is $api->{testing}, 1, "testing param to new() ok";
 { # config_light()
 
     my @directives = qw(
-        on_at on_hours on_time off_time toggle enable
+        on_at on_hours on_time off_time enable
         );
 
     my @values = qw(
-        18:00 12 0 0 disabled 0
+        18:00 12 0 0 0
         );
 
     is @directives, @values, "config_light() test is set up equally";
@@ -100,7 +100,7 @@ is $api->{testing}, 1, "testing param to new() ok";
     my $c = $api->_config_light;
 
     is ref $c, 'HASH', "_config_light() returns a hashref w/o params";
-    is keys %$c, 6, "...and has proper count of keys";
+    is keys %$c, 5, "...and has proper count of keys";
 
     for my $k (keys %$c){
         my $ok = grep {$_ eq $k} @directives;

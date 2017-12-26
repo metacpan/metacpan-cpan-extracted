@@ -4,28 +4,30 @@ Git::CPAN::Patch - Patch CPAN modules using Git
 
 # VERSION
 
-version 2.3.1
+version 2.3.2
 
 # SYNOPSIS
 
-    # import a module:
+```perl
+# import a module:
 
-    % git-cpan clone Foo::Bar
-    % cd Foo-Bar
+% git-cpan clone Foo::Bar
+% cd Foo-Bar
 
-    # hack and submit to RT
+# hack and submit to RT
 
-    # it's probably best to work in a branch
-    % git checkout -b blah
+# it's probably best to work in a branch
+% git checkout -b blah
 
-    ... hack lib/Foo/Bar.pm ...
+... hack lib/Foo/Bar.pm ...
 
-    % git commit -am "blah"
-    % git-cpan sendpatch 
+% git commit -am "blah"
+% git-cpan sendpatch 
 
-    # update the module
-    # this automatically rebases the current branch
-    % git-cpan update
+# update the module
+# this automatically rebases the current branch
+% git-cpan update
+```
 
 # DESCRIPTION
 
@@ -97,7 +99,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

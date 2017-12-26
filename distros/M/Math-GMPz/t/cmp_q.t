@@ -18,68 +18,7 @@ no warnings 'uninitialized'; # __GNU_MP_RELEASE may be undef.
 $q = Math::GMPq->new("20/-40"); # should automatically be canonicalized to -1/2.
 }
 
-if(60099 > __GNU_MP_RELEASE) { #mpq_cmp_z is unavailable
-  print "1..8\n";
-
-  warn "\nmpq_cmp_z NOT available\n";
-
-  print "ok 1\n";
-
-  eval{my $discard = ($z < $q);};
-  if($@ =~ /^overloading "<": mpq_cmp_z/) {print "ok 2\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 2\n";
-  }
-
-  eval{my $discard = ($z > $q);};
-  if($@ =~ /^overloading ">": mpq_cmp_z/) {print "ok 3\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 3\n";
-  }
-
-  eval{my $discard = ($z <= $q);};
-  if($@ =~ /^overloading "<=": mpq_cmp_z/) {print "ok 4\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 4\n";
-  }
-
-  eval{my $discard = ($z >= $q);};
-  if($@ =~ /^overloading ">=": mpq_cmp_z/) {print "ok 5\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 5\n";
-  }
-
-  eval{my $discard = ($z == $q);};
-  if($@ =~ /^overloading "==": mpq_cmp_z/) {print "ok 6\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 6\n";
-  }
-
-  eval{my $discard = ($z != $q);};
-  if($@ =~ /^overloading "!=": mpq_cmp_z/) {print "ok 7\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 7\n";
-  }
-
-  eval{my $discard = ($z <=> $q);};
-  if($@ =~ /^overloading "<=>": mpq_cmp_z/) {print "ok 8\n"}
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 8\n";
-  }
-
-  exit 0;
-}
-
 print "1..14\n";
-
-warn "\nmpq_cmp_z is available\n";
 
 print "ok 1\n"; # test removed
 

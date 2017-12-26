@@ -3,10 +3,11 @@ package RDF::RDFa::Generator::HTML::Hidden;
 use 5.008;
 use base qw'RDF::RDFa::Generator::HTML::Head';
 use strict;
+use warnings;
 use RDF::Prefixes;
 use XML::LibXML qw':all';
 
-our $VERSION = '0.103';
+our $VERSION = '0.192';
 
 sub injection_site
 {
@@ -51,7 +52,7 @@ sub nodes
 	
 	use Data::Dumper; Dumper($prefixes);
 	
-	if ($self->{'version'} == 1.1
+	if (defined($self->{'version'}) && $self->{'version'} == 1.1
 	and $self->{'prefix_attr'})
 	{
 		$rootnode->setAttribute('prefix', $prefixes->rdfa)

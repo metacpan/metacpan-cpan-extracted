@@ -1,0 +1,10 @@
+#!/bin/sh
+
+docker-compose up --abort-on-container-exit --build --exit-code-from test -t0
+
+ret=$?
+
+docker-compose kill  &> /dev/null
+docker-compose rm -f &> /dev/null
+
+exit $ret

@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A library of SQL types",
+  "ABSTRACT" => "a library of SQL types",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -26,11 +26,17 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "0.98",
+    "File::Spec" => 0,
+    "JSON::PP" => "2.00",
+    "Module::Metadata" => 0,
+    "Path::Tiny" => "0.004",
+    "Test::More" => 0,
     "Test::Most" => 0,
+    "Time::Piece" => "1.16",
+    "Time::Seconds" => 0,
     "if" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,10 +45,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter" => 0,
+  "File::Spec" => 0,
+  "JSON::PP" => "2.00",
+  "Module::Metadata" => 0,
+  "Path::Tiny" => "0.004",
   "PerlX::Maybe" => 0,
   "Ref::Util" => 0,
-  "Test::More" => "0.98",
+  "Test::More" => 0,
   "Test::Most" => 0,
+  "Time::Piece" => "1.16",
+  "Time::Seconds" => 0,
   "Type::Library" => 0,
   "Type::Utils" => "0.44",
   "Types::Standard" => 0,

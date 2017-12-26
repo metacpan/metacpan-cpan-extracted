@@ -47,7 +47,7 @@ Test::PONAPI::Repository::MockDB::Table::Comments - mock repository - table - Co
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

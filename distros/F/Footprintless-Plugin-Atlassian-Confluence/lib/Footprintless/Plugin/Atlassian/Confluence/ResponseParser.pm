@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Atlassian::Confluence::ResponseParser;
-$Footprintless::Plugin::Atlassian::Confluence::ResponseParser::VERSION = '1.02';
+$Footprintless::Plugin::Atlassian::Confluence::ResponseParser::VERSION = '1.03';
 # ABSTRACT: A response parser for the Atlassian Confluence REST API
 # PODNAME: Footprintless::Plugin::Atlassian::Confluence::ResponseParser
 
@@ -75,7 +75,7 @@ Footprintless::Plugin::Atlassian::Confluence::ResponseParser - A response parser
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 

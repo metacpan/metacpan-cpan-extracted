@@ -1,5 +1,8 @@
 Revision history for Math-RNG-Microsoft
 
+0.0.4   2017-12-24
+    - Convert the repo to GitHub.
+
 v0.0.3  2014-10-23 ( SHLOMIF )
     - Fix the version control URL (it is in
     https://bitbucket.org/shlomif/abc-path )

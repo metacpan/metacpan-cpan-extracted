@@ -6,6 +6,7 @@ use File::Temp;
 use Text::Amuse;
 use Text::Amuse::String;
 use Text::Amuse::Output;
+use Text::Amuse::Document;
 
 require Exporter;
 
@@ -72,54 +73,16 @@ sub muse_fast_scan_header {
     my ($file, $format) = @_;
     die "No file provided!" unless defined($file) && length($file);
     die "$file is not a file!" unless -f $file;
-    open (my $fh, "<:encoding(UTF-8)", $file) or die "Can't read file $!\n";
-    my %directives;
-    my $in_meta = 1;
-    my $lastdirective;
-    while (my $line = <$fh>) {
-        # warn "Parsing $line\n";
-        if ($in_meta) {
-            # reset the directives on blank lines
-            if ($line =~ m/^\s*$/s) {
-                $lastdirective = undef;
-            }
+    my $directives = Text::Amuse::Document->new(file => $file)->parse_directives;
 
-            elsif ($line =~ m/^\#([A-Za-z0-9]+)(\s+(.+))?$/s) {
-                my $dir = $1;
-                warn "Overwriting directive $dir!" if exists $directives{$dir};
-                if ($2) {
-                    $directives{$dir} = $3;
-                }
-                else {
-                    $directives{$dir} = '';
-                }
-                $lastdirective = $dir;
-            }
-
-            elsif ($lastdirective) {
-                $directives{$lastdirective} .= $line;
-
-            }
-            else {
-                $in_meta = 0
-            }
-        }
-        last unless $in_meta;
-    }
-    close $fh;
-    foreach my $k (keys %directives) {
-        $directives{$k} =~ s/\s+/ /gs;
-        $directives{$k} =~ s/^\s+//s;
-        $directives{$k} =~ s/\s+$//s;
-    }
     if ($format) {
         die "Wrong format $format"
           unless ($format eq 'ltx' or $format eq 'html');
-        foreach my $k (keys %directives) {
-            $directives{$k} = muse_format_line($format, $directives{$k});
+        foreach my $k (keys %$directives) {
+            $directives->{$k} = muse_format_line($format, $directives->{$k});
         }
     }
-    return \%directives;
+    return $directives;
 }
 
 =head2 muse_to_html($body);

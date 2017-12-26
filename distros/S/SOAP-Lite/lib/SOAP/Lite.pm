@@ -17,7 +17,7 @@ package SOAP::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '1.22';
+our $VERSION = '1.24'; # VERSION
 
 package SOAP::XMLSchemaApacheSOAP::Deserializer;
 
@@ -806,7 +806,7 @@ sub new {
     } => $class;
     $self->typelookup({
            'base64Binary' =>
-              [10, sub {$_[0] =~ /[^\x09\x0a\x0d\x20-\x7f]/ }, 'as_base64Binary'],
+              [10, sub { $_[0] =~ /[^\x09\x0a\x0d\x20-\x7f]/ }, 'as_base64Binary'],
            'zerostring' =>
                [12, sub { $_[0] =~ /^0\d+$/ }, 'as_string'],
             # int (and actually long too) are subtle: the negative range is one greater...
@@ -2480,7 +2480,7 @@ package SOAP::Client;
 
 use SOAP::Lite::Utils;
 
-$VERSION = $SOAP::Lite::VERSION;
+our $VERSION = '1.24'; # VERSION
 sub BEGIN {
     __PACKAGE__->__mk_accessors(qw(endpoint code message
         is_success status options));

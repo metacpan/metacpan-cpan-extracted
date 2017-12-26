@@ -1,0 +1,23 @@
+% title 'Welcome to the Wishlist!';
+% layout 'default';
+
+<h2><%= title %></h2>
+
+<h3>Please log in to get started</h3>
+
+<p>
+%= form_for 'login' => begin
+  <div class="form-group">
+    <label>Username</label>
+    <input name="username" class="form-control">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input name="password" type="password" class="form-control">
+  </div>
+  <input type="submit" value="Log In" class="btn btn-primary">
+% end
+</p>
+
+<p>Or <%= link_to register => 'show_register' %> for an account.</p>
+

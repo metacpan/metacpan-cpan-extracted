@@ -6,8 +6,14 @@ Makefile.PL
 README
 lib/Statistics/SDT.pm
 t/00-load.t
+t/01-imported.t
+t/01-pvt.t
+t/02-rate.t
+t/03-bias.t
+t/03-criterion.t
+t/03-sensitivity.t
+t/03-sensitivity_mafc.t
 t/pod-coverage.t
 t/pod.t
-t/ref.t
-ex/sdt.pl
 Statistics-SDT.ppd
+META.json

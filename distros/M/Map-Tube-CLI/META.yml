@@ -21,10 +21,10 @@ no_index:
 provides:
   Map::Tube::CLI:
     file: lib/Map/Tube/CLI.pm
-    version: '0.38'
+    version: '0.39'
   Map::Tube::CLI::Option:
     file: lib/Map/Tube/CLI/Option.pm
-    version: '0.38'
+    version: '0.39'
 requires:
   Encode::Locale: '1.05'
   MIME::Base64: '3.14'
@@ -38,5 +38,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-CLI.git
-version: '0.38'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

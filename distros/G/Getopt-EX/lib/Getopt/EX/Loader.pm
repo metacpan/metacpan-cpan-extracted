@@ -152,7 +152,6 @@ sub modopt {
 sub parseopt {
     my $obj = shift;
     my($mod, $argv) = @_;
-    my $base = $obj->baseclass;
     my $call;
 
     ##
@@ -280,14 +279,20 @@ sub expand {
 
 sub modules {
     my $obj = shift;
-    my $base = $obj->baseclass // return ();
-    $base =~ s/::/\//g;
-    $base = "/$base" if $base ne "";
+    my $class = $obj->baseclass // return ();
+    my @base = ref $class eq 'ARRAY' ? @$class : ($class);
+    for (@base) {
+	s/::/\//g;
+	$_ = "/$_" if $_ ne "";
+    }
 
-    grep { /^[a-z]/ }
-    map  { /(\w+)\.pm$/ }
-    map  { glob $_ . $base . "/*.pm" }
-    @INC;
+    map {
+	my $base = $_;
+	grep { /^[a-z]/ }
+	map  { /(\w+)\.pm$/ }
+	map  { glob $_ . $base . "/*.pm" }
+	@INC;
+    } @base;
 }
 
 1;
@@ -350,7 +355,8 @@ just like a startup RC file.
 
 =item BASECLASS
 
-Define base class for user defined module.
+Define base class for user defined module.  Use array reference to
+specify multiple base classes; they are tried to be loaded in order.
 
 =item MODULE_OPT
 

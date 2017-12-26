@@ -24,10 +24,10 @@ name: DateTime-Format-Strptime
 provides:
   DateTime::Format::Strptime:
     file: lib/DateTime/Format/Strptime.pm
-    version: '1.74'
+    version: '1.75'
   DateTime::Format::Strptime::Types:
     file: lib/DateTime/Format/Strptime/Types.pm
-    version: '1.74'
+    version: '1.75'
 requires:
   Carp: '0'
   DateTime: '1.00'
@@ -53,10 +53,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Format-Strptime/issues
   homepage: http://metacpan.org/release/DateTime-Format-Strptime
   repository: git://github.com/houseabsolute/DateTime-Format-Strptime.git
-version: '1.74'
+version: '1.75'
 x_Dist_Zilla:
   perl:
-    version: '5.024001'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
@@ -84,7 +84,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -163,7 +163,7 @@ x_Dist_Zilla:
               version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -228,7 +228,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -246,7 +246,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@DROLSKY/Test::Pod::Coverage::Configurable'
@@ -277,7 +277,7 @@ x_Dist_Zilla:
             - strptime
           wordlist: Pod::Wordlist
       name: '@DROLSKY/Test::PodSpelling'
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
@@ -348,7 +348,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@DROLSKY/Test::Compile'
-      version: '2.056'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
@@ -360,18 +360,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '0.85'
+      version: '0.88'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.7.4
+          git_version: 2.15.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -491,7 +491,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '0.85'
+      version: '0.88'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -526,7 +526,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '0.85'
+      version: '0.88'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -550,10 +550,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '0.85'
+      version: '0.88'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -562,14 +562,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::DROLSKY::TidyAll
       name: '@DROLSKY/DROLSKY::TidyAll'
-      version: '0.85'
+      version: '0.88'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -587,10 +587,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -609,12 +609,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -622,16 +622,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.74
+          tag: v1.75
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -640,10 +640,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -654,7 +654,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@DROLSKY/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -669,12 +669,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -683,17 +683,25 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.15.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
       version: '6.010'
     -
-      class: inc::GenerateLocaleTests
-      name: =inc::GenerateLocaleTests
+      class: Dist::Zilla::Plugin::lib
+      config:
+        Dist::Zilla::Plugin::lib:
+          lib:
+            - inc
+      name: lib
+      version: '0.001002'
+    -
+      class: GenerateLocaleTests
+      name: =GenerateLocaleTests
       version: ~
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -758,4 +766,4 @@ x_contributors:
   - 'D. Ilmari Mannsåker <ilmari.mannsaker@net-a-porter.com>'
   - 'key-amb <yasutake.kiyoshi@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

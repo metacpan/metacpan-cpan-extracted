@@ -1,5 +1,14 @@
 Revision history for Perl extension SVG::Grid.
 
+1.11  2017-12-21T11:11:00
+	- Use File::Slurper's read_binary() for testing rather than its read_text(). This should help
+		with the test failures under MS Windows.
+
+1.10  2017-12-19T09:52:00
+	- Testing using the new SVG 2.82. All ok. So edit data/synopsis.svg to fiddle whitespace, and
+		retest. All ok. Thanx to Mohammad S Anwar for the work on SVG.
+	- Update pre-req of SVG from 2.64 to 2.82.
+
 1.09  2017-12-18T15:40:00
 	- Rework code in t/test.t which cleans up SVGs in preparation for comparing them.
 

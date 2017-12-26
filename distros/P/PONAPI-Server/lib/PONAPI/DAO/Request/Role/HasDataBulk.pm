@@ -23,7 +23,7 @@ PONAPI::DAO::Request::Role::HasDataBulk - DAO request role - `data-bulk`
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

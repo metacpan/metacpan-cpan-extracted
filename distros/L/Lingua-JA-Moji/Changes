@@ -1,5 +1,11 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.48 2017-12-24
+
+* kana2romaji now uses hyphens for chouon with ve_type => wapuro
+* kana2romaji now deletes all chouons with ve_type => none
+* normalize_romaji's options corrected
+
 0.47 2017-11-01
 
 * Add yurei_moji (non-existent kanji), bad_kanji (negative kanji)

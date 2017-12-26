@@ -252,7 +252,9 @@ dependencies/FIGlet_fonts/drpepper.flf
 #dependencies/FIGlet_fonts/dwhistled.flf
 #dependencies/FIGlet_fonts/e__fist_.flf
 dependencies/gw/angelwing75.png
+dependencies/gw/angelwing_100px.png
 dependencies/gw/gw_background.jpg
+dependencies/gw/gw_header.png
 installer/pscp.exe
 installer/putty.exe
 installer/puttygen.exe

@@ -9,7 +9,8 @@ use List::MoreUtils::XS (":all");
 use Test::More;
 use Test::LMU;
 
-SCOPE: {
+SCOPE:
+{
     my @list = ();
     is(0, (binsert { $_ cmp "Hello" } "Hello", @list), "Inserting into empty list");
     is(1, (binsert { $_ cmp "world" } "world", @list), "Inserting into one-item list");

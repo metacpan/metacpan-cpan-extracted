@@ -2,17 +2,20 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Redis.pm',
     'Net/Async/Redis/Commands.pm',
     'Net/Async/Redis/Multi.pm',
     'Net/Async/Redis/Protocol.pm',
+    'Net/Async/Redis/Server.pm',
+    'Net/Async/Redis/Server/Connection.pm',
+    'Net/Async/Redis/Server/Database.pm',
     'Net/Async/Redis/Subscription.pm',
     'Net/Async/Redis/Subscription/Message.pm'
 );
@@ -48,7 +51,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

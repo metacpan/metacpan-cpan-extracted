@@ -15,12 +15,13 @@ use MYDan::Agent::KeyUpdate;
 
 $MYDan::Util::OptConf::THIS = 'agent';
 
-$0 = 'mydan.keyupdate';
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get( qw( url=s interval=i ) )->dump();
 
 $option->assert( 'url' );
+
+$0 = 'mydan.keyupdate';
 
 MYDan::Agent::KeyUpdate->new( %o )->run();
 

@@ -2,13 +2,13 @@ use Test::More;
 
 use LWP::UserAgent;
 
-my $prefix = 'http://urlchen.de/';
+my $prefix = 'https://urlchen.de/';
 
 my $ua = LWP::UserAgent->new();
 $ua->timeout(10);
 my $r = $ua->get($prefix);
 $r->code == 200 ? plan tests => 6
-                : plan skip_all => 'http://urlchen.de/ not reachable';
+                : plan skip_all => 'https://urlchen.de/ not reachable';
 
 use_ok WWW::Shorten::URLchen;
 

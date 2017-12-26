@@ -966,15 +966,16 @@
 
     Attempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::BigInt',
-   'Math::GMPz', 'Math::GMPq' (comparison operators), or 'Math::MPFR'
-    (limited applications) will not work.
+   'Math::GMPz', 'Math::GMPq' (limited operations), or 'Math::MPFR'
+    (limited operations) will not work.
     Math::MPFR objects can be used only with '+', '-', '*', '/'
     and '**' operators, and will work only if Math::MPFR is at
     version 3.13 or later - in which case the operation will
     return a Math::MPFR object.
     Math::GMPq objects can be used only with the comparison operators
-    ( == != < <= > >= <=> ), and only if Math::GMPq has been built
-    against gmp-6.1.0 or later.
+    ( == != < <= > >= <=> ) and also, iff Math-GMPq-0.43 or later is
+    installed, with '+', '-', '/', and '*' operators (in which case
+    a Math::GMPq object is returned).
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is

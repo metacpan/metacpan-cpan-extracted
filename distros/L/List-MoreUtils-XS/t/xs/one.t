@@ -17,6 +17,7 @@ is_true(one  { 300 == $_ } @list);
 is_false(one { 0 == $_ } @list);
 is_false(one { 1 <= $_ } @list);
 is_false(one { !(127 & $_) } @list);
+is_false(one { 0 } ());
 
 leak_free_ok(
     one => sub {

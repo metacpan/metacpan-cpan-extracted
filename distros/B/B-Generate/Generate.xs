@@ -75,6 +75,14 @@ typedef AV PAD;
 #  endif
 #endif
 
+#ifndef CvISXSUB
+# ifdef CvXSUB
+#   define CvISXSUB(cv) CvXSUB(cv)
+# else
+#   error no CvISXSUB nor CvXSUB
+# endif
+#endif
+
 static const char* const svclassnames[] = {
     "B::NULL",
 #if PERL_VERSION >= 9 && PERL_VERSION < 19
@@ -447,9 +455,6 @@ cc_opclass(pTHX_ const OP *o)
 
     case OA_SVOP:
 	return OPc_SVOP;
-
-    case OA_PADOP:
-	return OPc_PADOP;
 
     case OA_PVOP_OR_SVOP:
         /*

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Categorize list items into a tree of named sublists.",
+   "author" : [
+      "Bill Odom <wnodom@cpan.org>",
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-Categorize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=List-Categorize"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/damil/List-Categorize.git"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,6 +1,6 @@
 package IO::ReadHandle::Chain;
 
-use 5.006;
+use v5.12.0;
 use strict;
 use warnings;
 
@@ -16,11 +16,11 @@ read handle
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1.0
 
 =cut
 
-our $VERSION = '1.0';
+use version; our $VERSION = version->declare('v1.1.0');
 
 =head1 SYNOPSIS
 
@@ -34,31 +34,35 @@ data source.
 Use the IO::ReadHandle::Chain object for reading as you would any
 other file handle.
 
-  use IO::ReadHandle::Chain;
+    use IO::ReadHandle::Chain;
 
-  open $ifh, '<', 'somefile.txt';
-  $text = 'This is some text.';
-  $cfh = IO::ReadHandle::Chain->new('file.txt', \$text, $ifh);
-  print while <$cfh>;
-  # prints lines from file 'file.txt', then lines from scalar $text,
-  # then lines from file handle $ifh
+    open $ifh, '<', 'somefile.txt';
+    $text = 'This is some text.';
+    $cfh = IO::ReadHandle::Chain->new('file.txt', \$text, $ifh);
+    print while <$cfh>;
+    # prints lines from file 'file.txt', then lines from scalar $text,
+    # then lines from file handle $ifh
 
-  @lines = <$cfh>;              # or get all lines at once
+    @lines = <$cfh>;              # or get all lines at once
 
-  # or read bytes instead
-  $buffer = '';
-  $bytecount = read($cfh, $buffer, 100);
-  $bytecount = sysread($cfh, $buffer, 100);
+    # or read bytes instead
+    $buffer = '';
+    $bytecount = read($cfh, $buffer, 100);
+    $bytecount = sysread($cfh, $buffer, 100);
 
-  close($cfh);
+    # or single characters
+    $c = getc($cfh);
 
-  # OO, too
-  $line = $cfh->getline;
-  @lines = $cfh->getlines;
-  $bytecount = $cfh->read($buffer, $size, $offset);
-  $bytecount = $cfh->sysread($buffer, $size, $offset);
-  $cfh->close;
-  print "end!\n" if $cfh->eof;
+    close($cfh);
+
+    # OO, too
+    $line = $cfh->getline;
+    @lines = $cfh->getlines;
+    $bytecount = $cfh->read($buffer, $size, $offset);
+    $bytecount = $cfh->sysread($buffer, $size, $offset);
+    $c = $cfh->getc;
+    $cfh->close;
+    print "end!\n" if $cfh->eof;
 
 You cannot write or seek through an IO::ReadHandle::Chain.
 
@@ -67,8 +71,8 @@ record separator is used to separate the data into lines.
 
 For any of the data sources that are file handles, when the end of the
 associated data stream is reached, or if the chain filehandle object
-is closed, then it tries to reset the file handle's position to what
-it was when the module started reading from the file handle.
+is closed, then the object tries to reset the file handle's position
+to what it was when the module started reading from the file handle.
 
 The chain filehandle object does not close any of the file handles
 that are passed to it as data sources.
@@ -183,7 +187,10 @@ sub READ {
   my $bufref = \$_[1];
   $offset //= 0;
 
-  return 0 if $self->EOF;
+  if ($self->EOF) {
+    $$bufref = '';
+    return 0;
+  }
 
   # $self->EOF has lined up the next source in $self->{ifh}
 

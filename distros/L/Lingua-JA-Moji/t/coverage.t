@@ -38,6 +38,6 @@ my $katakana = kana2katakana ('あいうえおｱｲｳｴｵ');
 ok ($katakana eq 'アイウエオアイウエオ');
 my $nr = normalize_romaji ('syuutsuju');
 my $nr2 = normalize_romaji ('しゅうつじゅ');
-ok ($nr eq $nr2);
+is ($nr, $nr2, "normalise romaji ok");
 done_testing ();
 exit;

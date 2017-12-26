@@ -13,42 +13,58 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
+    my $isnot = qr{(?:
+         5[.]1[.]0[ ]Address
+        |Recipient[ ]address
+        |Sender[ ]IP[ ]address
+        )[ ]rejected
+    }xi;
     my $regex = qr{(?>
          [<][>][ ]invalid[ ]sender
         |address[ ]rejected
+        |Administrative[ ]prohibition
         |batv[ ](?:
              failed[ ]to[ ]verify   # SoniWall
             |validation[ ]failure   # SoniWall
             )
         |backscatter[ ]protection[ ]detected[ ]an[ ]invalid[ ]or[ ]expired[ ]email[ ]address    # MDaemon
         |bogus[ ]mail[ ]from        # IMail - block empty sender
-        |closed[ ]mailing[ ]list    # Exim test mail
+        |Connections[ ]not[ ]accepted[ ]from[ ]servers[ ]without[ ]a[ ]valid[ ]sender[ ]domain
         |denied[ ]\[bouncedeny\]    # McAfee
+        |Delivery[ ]not[ ]authorized,[ ]message[ ]refused
+        |does[ ]not[ ]exist[ ]E2110
         |domain[ ]of[ ]sender[ ]address[ ].+[ ]does[ ]not[ ]exist
+        |Emetteur[ ]invalide.+[A-Z]{3}.+(?:403|405|415)
         |empty[ ]envelope[ ]senders[ ]not[ ]allowed
         |error:[ ]no[ ]third-party[ ]dsns               # SpamWall - block empty sender
+        |From:[ ]Domain[ ]is[ ]invalid[.][ ]Please[ ]provide[ ]a[ ]valid[ ]From:
         |fully[ ]qualified[ ]email[ ]address[ ]required # McAfee
         |invalid[ ]domain,[ ]see[ ][<]url:.+[>]
+        |Mail[ ]from[ ]not[ ]owned[ ]by[ ]user.+[A-Z]{3}.+421
         |Message[ ]rejected:[ ]Email[ ]address[ ]is[ ]not[ ]verified
         |mx[ ]records[ ]for[ ].+[ ]violate[ ]section[ ].+
-        |name[ ]service[ ]error[ ]for[ ]    # Malformed MX RR or host not found
         |Null[ ]Sender[ ]is[ ]not[ ]allowed
         |recipient[ ]not[ ]accepted[.][ ][(]batv:[ ]no[ ]tag
         |returned[ ]mail[ ]not[ ]accepted[ ]here
         |rfc[ ]1035[ ]violation:[ ]recursive[ ]cname[ ]records[ ]for
         |rule[ ]imposed[ ]mailbox[ ]access[ ]for        # MailMarshal
         |sender[ ](?:
-             verify[ ]failed        # Exim callout
+             email[ ]address[ ]rejected
+            |is[ ]Spammer
             |not[ ]pre[-]approved
             |rejected
             |domain[ ]is[ ]empty
+            |verify[ ]failed        # Exim callout
             )
         |syntax[ ]error:[ ]empty[ ]email[ ]address
         |the[ ]message[ ]has[ ]been[ ]rejected[ ]by[ ]batv[ ]defense
         |transaction[ ]failed[ ]unsigned[ ]dsn[ ]for
+        |Unroutable[ ]sender[ ]address
+        |you[ ]are[ ]sending[ ]to[/]from[ ]an[ ]address[ ]that[ ]has[ ]been[ ]blacklisted
         )
     }xi;
 
+    return 0 if $argv1 =~ $isnot;
     return 1 if $argv1 =~ $regex;
     return 0;
 }
@@ -64,25 +80,38 @@ sub true {
     my $argvs = shift // return undef;
 
     return undef unless ref $argvs eq 'Sisimai::Data';
+    require Sisimai::SMTP::Status;
+
     my $statuscode = $argvs->deliverystatus // '';
     my $reasontext = __PACKAGE__->text;
+    my $tempreason = Sisimai::SMTP::Status->name($statuscode) || 'undefined';
 
-    return undef unless length $statuscode;
     return 1 if $argvs->reason eq $reasontext;
 
-    require Sisimai::SMTP::Status;
     my $diagnostic = $argvs->diagnosticcode // '';
     my $v = 0;
 
-    if( Sisimai::SMTP::Status->name($statuscode) eq $reasontext ) {
-        # Delivery status code points C<rejected>.
+    if( $tempreason eq $reasontext ) {
+        # Delivery status code points "rejected".
         $v = 1;
-
     } else {
         # Check the value of Diagnosic-Code: header with patterns
         if( $argvs->smtpcommand eq 'MAIL' ) {
-            # Matched with a pattern in this class
+            # The session was rejected at 'MAIL FROM' command
             $v = 1 if __PACKAGE__->match($diagnostic);
+
+        } elsif( $argvs->smtpcommand eq 'DATA' ) {
+            # The session was rejected at 'DATA' command
+            if( $tempreason ne 'userunknown' ) {
+                # Except "userunknown"
+                $v = 1 if __PACKAGE__->match($diagnostic);
+            }
+        } else {
+            if( $tempreason =~ /\A(?:onhold|undefined|securityerror|systemerror)\z/ ) {
+                # Try to match with message patterns when the temporary reason
+                # is "onhold", "undefined", "securityerror", or "systemerror"
+                $v = 1 if __PACKAGE__->match($diagnostic);
+            }
         }
     }
 
@@ -142,7 +171,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

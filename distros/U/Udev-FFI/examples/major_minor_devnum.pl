@@ -7,7 +7,7 @@ use FindBin; # only for this example - load local Udev::FFI module
 use lib "$FindBin::Bin/../lib"; # only for this example - load local Udev::FFI module
 
 use Udev::FFI;
-use Udev::FFI::Devnum qw(:all); #import major, minor and mkdev
+use Udev::FFI::Devnum qw(:all); #import major, minor and makedev
 
 
 
@@ -34,7 +34,7 @@ if(@a) {
 
         $devnum = undef;
 
-        $devnum = mkdev($ma, $mi);
+        $devnum = makedev($ma, $mi);
         print "Devnum: $devnum\n";
     }
 }

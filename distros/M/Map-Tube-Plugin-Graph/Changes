@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.30  2017-12-25T10:20:00+01:00
+      - Improved sample code in the pod section "SYNOPSIS".
+
+0.29  2017-12-23T04:15:00+01:00
+      - Replaced "namespace::clean" with "namespace::autoclean".
+
 0.28  2017-09-20T10:40:00+01:00
       - Improved method exporting.
 

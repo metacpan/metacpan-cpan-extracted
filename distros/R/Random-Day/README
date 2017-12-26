@@ -103,11 +103,9 @@ ERRORS
                      Error: %s
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Random::Day;
 
      # Object.
@@ -134,14 +132,14 @@ REPOSITORY
     <https://github.com/tupinek/Random-Day>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
+     © Michal Josef Špaček 2013-2017
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

@@ -1,13 +1,12 @@
 package App::optex::util;
 
-1;
+use strict;
+use warnings;
 
-package util;
+use List::Util qw(pairmap);
 
 sub setenv {
-    while (($a, $b) = splice @_, 0, 2) {
-	$ENV{$a} = $b;
-    }
+    pairmap { $ENV{$a} = $b } @_;
 }
 
 1;

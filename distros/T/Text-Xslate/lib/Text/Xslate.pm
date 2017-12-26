@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v3.5.3');
+use version; our $VERSION = version->declare('v3.5.4');
 
 use Carp              ();
 use File::Spec        ();
@@ -58,7 +58,7 @@ sub input_layer { ref($_[0]) ? $_[0]->{input_layer} : ':utf8' }
 
 package Text::Xslate::Engine; # XS/PP common base class
 
-use version; our $VERSION = version->declare('v3.5.3');
+use version; our $VERSION = version->declare('v3.5.4');
 
 use Text::Xslate::Util qw(
     make_error
@@ -672,7 +672,7 @@ Text::Xslate - Scalable template engine for Perl5
 
 =head1 VERSION
 
-This document describes Text::Xslate version v3.5.3.
+This document describes Text::Xslate version v3.5.4.
 
 =head1 SYNOPSIS
 
@@ -1235,8 +1235,6 @@ A "too-safe" HTML escaping filter which escape all the symbolic characters
 
 =head1 RESOURCES
 
-WEB: L<http://xslate.org/>
-
 PROJECT HOME: L<https://github.com/xslate/>
 
 REPOSITORY: L<https://github.com/xslate/p5-Text-Xslate/>
@@ -1285,8 +1283,6 @@ L<Template::Sandbox>
 Benchmarks:
 
 L<Template::Benchmark>
-
-L<http://xslate.org/benchmark.html>
 
 Papers:
 

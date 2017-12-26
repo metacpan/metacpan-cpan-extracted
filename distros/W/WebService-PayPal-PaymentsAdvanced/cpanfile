@@ -1,3 +1,4 @@
+requires "Const::Fast" => "0";
 requires "Data::GUID" => "0";
 requires "DateTime" => "0";
 requires "DateTime::Format::MySQL" => "0";
@@ -12,9 +13,12 @@ requires "Moo" => "1.004005";
 requires "Moo::Role" => "0";
 requires "MooX::HandlesVia" => "0";
 requires "MooX::StrictConstructor" => "0";
+requires "Net::Works::Address" => "0";
+requires "Net::Works::Network" => "0";
 requires "Test::LWP::UserAgent" => "0";
 requires "Throwable::Error" => "0";
 requires "Type::Params" => "0";
+requires "Type::Utils" => "0";
 requires "Types::Common::Numeric" => "0";
 requires "Types::Common::String" => "0";
 requires "Types::Standard" => "0";

@@ -1,6 +1,6 @@
-# podlators 4.09
+# podlators 4.10
 
-Copyright 1999-2010, 2012-2016 Russ Allbery <rra@cpan.org>.  This software
+Copyright 1999-2010, 2012-2017 Russ Allbery <rra@cpan.org>.  This software
 is distributed under the same terms as Perl itself.  Please see the
 section [License](#license) below for more information.
 
@@ -47,7 +47,7 @@ smaller case for acronyms.
 As of Perl 5.6.0, my implementation was included in Perl core, and each
 release of Perl will have the at-the-time most current version of
 podlators included.  You therefore only need to install this package
-yourself if you have an old verison of Perl or need a newer version than
+yourself if you have an old version of Perl or need a newer version than
 came with Perl (to get some bug fixes, for example).
 
 ## Requirements
@@ -109,8 +109,8 @@ documentation, and pointers to any additional resources.
 For bug tracking, use the [CPAN bug
 tracker](https://rt.cpan.org/Dist/Display.html?Name=podlators).  However,
 please be aware that I tend to be extremely busy and work projects often
-take priority.  I'll save your mail and get to it as soon as I can, but it
-may take me a couple of months.
+take priority.  I'll save your report and get to it as soon as I can, but
+it may take me a couple of months.
 
 ## Source Repository
 
@@ -134,7 +134,7 @@ Perl module issues in the same place.
 The podlators package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2010, 2012-2016
+> Copyright 1999-2010, 2012-2017
 >     Russ Allbery <rra@cpan.org>
 >
 > This program is free software; you may redistribute it and/or modify it

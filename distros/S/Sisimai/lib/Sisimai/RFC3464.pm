@@ -373,7 +373,6 @@ sub scan {
             |Error-for:[ ]+
             |Failed[ ]Recipient:[ ]
             |Failed[ ]to[ ]deliver[ ]to[ ]
-            |generated[ ]from[ ]
             |Intended[ ]recipient:[ ]
             |Mailbox[ ]is[ ]full:[ ]
             |RCPT[ ]To:
@@ -415,7 +414,7 @@ sub scan {
                 $b->{'agent'} = __PACKAGE__->smtpagent.'::Fallback';
                 $recipients++;
 
-            } elsif( $e =~ m/[(]expanded[ ]from:[ ]([^@]+[@][^@]+)[)]/ ) {
+            } elsif( $e =~ m/[(](?:expanded|generated)[ ]from:?[ ]([^@]+[@][^@]+)[)]/ ) {
                 # (expanded from: neko@example.jp)
                 $b->{'alias'} = Sisimai::Address->s3s4($1);
             }
@@ -428,7 +427,7 @@ sub scan {
         for my $e ( @$rfc822list ) {
             # Check To: header in the original message
             if( $e =~ /\ATo:\s*(.+)\z/ ) {
-                my $r = Sisimai::Address->find($1, 1);
+                my $r = Sisimai::Address->find($1, 1) || [];
                 my $b = undef;
                 next unless scalar @$r;
 

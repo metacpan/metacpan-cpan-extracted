@@ -4,7 +4,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 # VERSION
 
-version 0.000023
+version 0.000024
 
 # SYNOPSIS
 

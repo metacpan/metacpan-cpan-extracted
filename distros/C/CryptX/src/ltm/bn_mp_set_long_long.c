@@ -16,9 +16,9 @@
  */
 
 /* set a platform dependent unsigned long long int */
-MP_SET_XLONG(mp_set_long_long, unsigned long long)
+MP_SET_XLONG(mp_set_long_long, uint64_t)
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

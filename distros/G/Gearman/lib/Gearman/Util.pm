@@ -1,6 +1,6 @@
 package Gearman::Util;
 use version ();
-$Gearman::Util::VERSION = version->declare("2.004.010");
+$Gearman::Util::VERSION = version->declare("2.004.011");
 
 use strict;
 use warnings;
@@ -8,9 +8,10 @@ use warnings;
 # man errno
 # Resource temporarily unavailable
 # (may be the same value as EWOULDBLOCK) (POSIX.1)
-use POSIX qw(:errno_h);
-use Time::HiRes qw();
 use IO::Select;
+use POSIX qw(:errno_h);
+use Scalar::Util qw();
+use Time::HiRes qw();
 
 =head1 NAME
 
@@ -116,8 +117,9 @@ sub read_res_packet {
     my $timeout    = shift;
     my $time_start = Time::HiRes::time();
 
-    #TODO improvement for SSL socket
-    # http://search.cpan.org/~sullr/IO-Socket-SSL/lib/IO/Socket/SSL.pod#Using_Non-Blocking_Sockets
+    Scalar::Util::blessed($sock)
+        || die "provided value is not a blessed object";
+
     my $err = sub {
         my $code = shift;
         $sock->close() if $sock->connected;
@@ -129,24 +131,28 @@ sub read_res_packet {
 
     my $is = IO::Select->new($sock);
 
-    my $readlen = 12;
-    my $offset  = 0;
-    my $buf     = '';
+    my $readlen   = 12;
+    my $offset    = 0;
+    my $buf       = '';
+    my $using_ssl = $sock->isa("IO::Socket::SSL");
 
     my ($magic, $type, $len);
 
     warn " Starting up event loop\n" if DEBUG;
-
     while (1) {
-        my $time_remaining = undef;
-        if (defined $timeout) {
-            warn "  We have a timeout of $timeout\n" if DEBUG;
-            $time_remaining = $time_start + $timeout - Time::HiRes::time();
-            return $err->("timeout") if $time_remaining < 0;
+        if ($using_ssl && $sock->pending()) {
+            warn "  We have @{[ $sock->pending() ]}  bytes...\n" if DEBUG;
         }
+        else {
+            my $time_remaining = undef;
+            if (defined $timeout) {
+                warn "  We have a timeout of $timeout\n" if DEBUG;
+                $time_remaining = $time_start + $timeout - Time::HiRes::time();
+                return $err->("timeout") if $time_remaining < 0;
+            }
 
-        $is->can_read($time_remaining) || next;
-
+            $is->can_read($time_remaining) || next;
+        } ## end else [ if ($using_ssl && $sock...)]
         warn "   Entering read loop\n" if DEBUG;
 
         my ($ok, $err_code) = _read_sock($sock, \$buf, \$readlen, \$offset);
@@ -199,7 +205,6 @@ sub _read_sock {
     my ($sock, $buf_ref, $readlen_ref, $offset_ref) = @_;
     local $!;
     my $rv = sysread($sock, $$buf_ref, $$readlen_ref, $$offset_ref);
-
     unless ($rv) {
         warn "   Read error: $!\n" if DEBUG;
         $! == EAGAIN && return;

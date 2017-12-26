@@ -7,7 +7,7 @@ Mail::Box::Identity - represents an unopened folder
 =head1 INHERITANCE
 
  Mail::Box::Identity
-   is a User::Identity::Item
+   is an User::Identity::Item
 
  Mail::Box::Identity
    is a Mail::Reporter
@@ -168,7 +168,7 @@ be set (or cleared).  The C<undef> status is an "unknown".  In the
 IMAP4 protocol, C<0> will result in a C<\Unmarked>, a C<1> results
 in a C<\Marked>, and C<undef> in nothing.
 
-=item $obj-E<gt>B<name>( [NEWNAME] )
+=item $obj-E<gt>B<name>( [$newname] )
 
 Inherited, see L<User::Identity::Item/"Attributes">
 
@@ -190,23 +190,23 @@ Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collection
  
 =over 4
 
-=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+=item $obj-E<gt>B<add>($collection, $role)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<collection>(NAME)
+=item $obj-E<gt>B<collection>($name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<parent>( [PARENT] )
+=item $obj-E<gt>B<parent>( [$parent] )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+=item $obj-E<gt>B<removeCollection>($object|$name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -228,7 +228,7 @@ Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
  
 =over 4
 
-=item $obj-E<gt>B<find>(COLLECTION, ROLE)
+=item $obj-E<gt>B<find>($collection, $role)
 
 Inherited, see L<User::Identity::Item/"Searching">
 
@@ -436,8 +436,8 @@ you have to look for a method of that object.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.003,
-built on June 29, 2017.
+This module is part of Mail-Box distribution version 3.004,
+built on December 22, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

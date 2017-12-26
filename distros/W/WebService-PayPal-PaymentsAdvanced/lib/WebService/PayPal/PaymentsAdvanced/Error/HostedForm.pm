@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 extends 'Throwable::Error';
 
@@ -26,7 +26,7 @@ WebService::PayPal::PaymentsAdvanced::Error::HostedForm - An error message which
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 SYNOPSIS
 

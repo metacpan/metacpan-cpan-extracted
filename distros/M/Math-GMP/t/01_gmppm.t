@@ -11,7 +11,9 @@ my ($f);
 
 my @data = <DATA>;
 my @tests = grep { ! /\A&/ } @data;
-plan tests => (scalar @tests + 10);
+plan tests => (2 * @tests + 10);
+
+my $WITH_FEATURE = ("$]" >= 5.022);
 
 LINES:
 foreach my $line (@data) {
@@ -189,6 +191,19 @@ foreach my $line (@data) {
 	} else {
 		is("$got", $ans, "Test worked: $try");
 	}
+    if ($WITH_FEATURE)
+    {
+        $got = eval "use feature 'bitwise'; no warnings 'experimental::bitwise'; $try";
+        if ($expect_list) {
+            is_deeply($got, $ans, "Test worked [feature bitwise]: $try");
+        } else {
+            is("$got", $ans, "Test worked [feature bitwise]: $try");
+        }
+    }
+    else
+    {
+        pass("skipped due to feature");
+    }
 }
 
 # Test of bfac as described in the pod

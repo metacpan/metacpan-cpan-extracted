@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 14;
-use Test::Deep;
+use Test::Deep qw/cmp_deeply/;
 use Test::NoWarnings;
 
 use List::Categorize qw( categorize );

@@ -1,0 +1,4 @@
+name = "Mojolicious-Plugin-PgLock"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

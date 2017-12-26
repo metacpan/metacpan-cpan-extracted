@@ -82,7 +82,7 @@ Test::PONAPI::Repository::MockDB::Table::Articles - mock repository - table - Ar
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

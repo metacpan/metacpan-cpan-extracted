@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.032-8-g54283e6
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.033-5-g41bb612
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use Moose;
 with
@@ -409,7 +409,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 
@@ -645,7 +645,8 @@ C<want_pp> - true if the user or CPAN client explicitly specified PUREPERL_ONLY 
 The implementations for some subroutines (in particular, C<can_xs>, C<can_cc>
 and C<can_run> are still works in progress, incompatible with some architectures and
 cannot yet be considered a suitable generic solution. Until we are more
-confident in their implementations, a warning will be printed upon use, and
+confident in their implementations, a warning will be printed (to the distribution author)
+upon use, and
 their use B<is not advised> without prior consultation with the author and
 other members of the Perl Toolchain Gang
 (see L<C<#toolchain> on C<irc.perl.org>|irc://irc.perl.org/#toolchain>).

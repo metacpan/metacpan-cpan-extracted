@@ -4,7 +4,7 @@ PPIx::EditorTools - Utility methods and base class for manipulating Perl via PPI
 
 # VERSION
 
-version 0.20
+version 0.21
 
 # SYNOPSIS
 

@@ -60,7 +60,7 @@
          "web" : "https://github.com/amb43790/Devel-Chitin"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0218"
 }
 

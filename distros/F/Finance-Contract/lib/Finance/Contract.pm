@@ -3,7 +3,7 @@ package Finance::Contract;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 =head1 NAME
 
@@ -639,7 +639,7 @@ sub shortcode {
 
     # TODO We expect to have a valid bet_type, but there may be codepaths which don't set this correctly yet.
     my $contract_type = $self->bet_type // $self->code;
-    my @shortcode_elements = ($contract_type, $self->underlying->symbol, $self->payout, $shortcode_date_start, $shortcode_date_expiry);
+    my @shortcode_elements = ($contract_type, $self->underlying->symbol, $self->payout + 0, $shortcode_date_start, $shortcode_date_expiry);
 
     if ($self->two_barriers) {
         push @shortcode_elements, map { $self->_barrier_for_shortcode_string($_) } ($self->supplied_high_barrier, $self->supplied_low_barrier);
@@ -709,9 +709,21 @@ sub _build_timeinyears {
 sub _build_timeindays {
     my $self = shift;
 
-    my $atid = $self->get_time_to_expiry({
-            from => $self->effective_start,
-        })->days;
+    my $time_to_expiry = $self->get_time_to_expiry({
+        from => $self->effective_start,
+    });
+
+    # Since we have fixed feed generation frequency for volatility indices, we will need to adjust the contract duration
+    # to the actual number of ticks through the contract duration to prevent under-pricing ITM contracts. But we are only adjusting
+    # for contracts less than 5 minutes.
+    if ($self->market->name eq 'volidx' and not($self->is_atm_bet or $self->for_sale) and $time_to_expiry->minutes < 5) {
+        my $date_start_adjustment  = $self->date_start->epoch % 2  ? 1 : 2;
+        my $date_expiry_adjustment = $self->date_expiry->epoch % 2 ? 1 : 0;
+        my $actual_duration =
+            $self->date_expiry->minus_time_interval($date_expiry_adjustment)->epoch -
+            $self->date_start->plus_time_interval($date_start_adjustment)->epoch;
+        $time_to_expiry = Time::Duration::Concise->new(interval => $actual_duration);
+    }
 
     my $tid = Math::Util::CalculatedValue::Validatable->new({
         name        => 'time_in_days',
@@ -719,7 +731,7 @@ sub _build_timeindays {
         set_by      => 'Finance::Contract',
         minimum     => 0.000001,
         maximum     => 730,
-        base_amount => $atid,
+        base_amount => $time_to_expiry->days,
     });
 
     return $tid;

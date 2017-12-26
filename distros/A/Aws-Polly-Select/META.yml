@@ -15,7 +15,7 @@ name: Aws-Polly-Select
 provides:
   Aws::Polly::Select:
     file: lib/Aws/Polly/Select.pm
-    version: '20171129'
+    version: '20171217'
   Aws::Polly::Select::Speaker:
     file: lib/Aws/Polly/Select.pm
 requires:
@@ -28,4 +28,4 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171129'
+version: '20171217'

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - abc
   - game
@@ -29,43 +29,43 @@ name: Games-ABC_Path-Solver
 provides:
   Games::ABC_Path::Solver:
     file: lib/Games/ABC_Path/Solver.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::App:
     file: lib/Games/ABC_Path/Solver/App.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Base:
     file: lib/Games/ABC_Path/Solver/Base.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Board:
     file: lib/Games/ABC_Path/Solver/Board.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Constants:
     file: lib/Games/ABC_Path/Solver/Constants.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Coord:
     file: lib/Games/ABC_Path/Solver/Coord.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move:
     file: lib/Games/ABC_Path/Solver/Move.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::LastRemainingCellForLetter:
     file: lib/Games/ABC_Path/Solver/Move/LastRemainingCellForLetter.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::LastRemainingLetterForCell:
     file: lib/Games/ABC_Path/Solver/Move/LastRemainingLetterForCell.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::LettersNotInVicinity:
     file: lib/Games/ABC_Path/Solver/Move/LettersNotInVicinity.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::ResultsInASuccess:
     file: lib/Games/ABC_Path/Solver/Move/ResultsInASuccess.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::ResultsInAnError:
     file: lib/Games/ABC_Path/Solver/Move/ResultsInAnError.pm
-    version: v0.4.0
+    version: v0.4.1
   Games::ABC_Path::Solver::Move::TryingLetterForCell:
     file: lib/Games/ABC_Path/Solver/Move/TryingLetterForCell.pm
-    version: v0.4.0
+    version: v0.4.1
 requires:
   Carp: '0'
   Getopt::Long: '2.36'
@@ -77,5 +77,6 @@ requires:
 resources:
   homepage: http://www.shlomifish.org/open-source/projects/japanese-puzzle-games/abc-path/
   license: http://www.opensource.org/licenses/mit-license.php
-  repository: http://bitbucket.org/shlomif/abc-path
-version: v0.4.0
+  repository: https://github.com/shlomif/abc-path
+version: v0.4.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

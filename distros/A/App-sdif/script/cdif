@@ -68,7 +68,6 @@ my $opt_b;
 my $opt_w;
 my $opt_t;
 my $opt_T;
-my $opt_W;
 
 my $rcs;
 my @rcsopt;
@@ -109,7 +108,6 @@ my @optargs = (
     "command!" => \$opt_command,
     "unknown!" => \$opt_unknown,
     "mark!" => \$opt_mark,
-    "width|W=i" => \$opt_W,
 
     "i|ignore-case" => \$opt_i,
     "b|ignore-space-change" => \$opt_b,
@@ -152,7 +150,7 @@ push(@sub_diffopts,
     );
 
 my %colormap = (
-    COMMAND => $opt_256 ? "222SE" : "SE" ,
+    COMMAND => $opt_256 ? "555/222E" : "W/KE" ,
     CMARK   => "GS" ,
     OMARK   => "CS" ,
     NMARK   => "MS" ,
@@ -180,12 +178,6 @@ warn 'colormap = ', Dumper \%colormap if $opt_d{c};
 
 sub color {
     $color_handler->color(@_);
-}
-
-my $opt_expand = $colormap{COMMAND} =~ s/E//g;
-my $expand_width;
-if ($opt_expand) {
-    $expand_width = $opt_W || terminal_width();
 }
 
 my $DIFF;
@@ -493,9 +485,6 @@ sub print_command {
     return unless $opt_command;
     my $line = shift;
     if ($opt_color) {
-	if ($opt_expand and length($line) < $expand_width) {
-	    $line =~ s/$/' ' x ($expand_width - vwidth($_))/e;
-	}
 	$line = color($colormap{COMMAND}, $line);
     }
     print $line;
@@ -840,13 +829,6 @@ sub unctrl {
     $_;
 }
 
-sub terminal_width {
-    my $default = 80;
-    my $cols = `tput cols`;
-    chomp $cols;
-    $cols > 0 ? int($cols) : $default;
-}
-
 ######################################################################
 
 =head1 NAME
@@ -874,7 +856,6 @@ Options:
 	-r<rev>, -q	rcs options
 
 	-B                  char-by-char comparison
-	-W                  specify terminal width
 	--diff=command      specify diff command
 	--stat              show statistical information
 	--colormap=s        specify color map
@@ -919,10 +900,6 @@ when B<-r>I<rev> is supplied.
 =item B<-B>, B<--char>
 
 Compare the data character-by-character context.
-
-=item B<-W> I<width>, B<--width>=I<width>
-
-Explicitly specify terminal width.
 
 =item B<--diff>=I<command>
 
@@ -1013,22 +990,19 @@ and other effects :
     U  Underline
     D  Double-struck (boldface)
     F  Flash (blink)
-    E  Expand (only for command line)
-
-When B<E> is specified for command line, the line is expanded to
-window width filling up by space characters.
+    E  Erase Line
 
 Defaults are :
 
-    COMMAND => "SE"
+    COMMAND => "555/222E"
     OMARK   => "CS"
     NMARK   => "MS"
     OTEXT   => "C"
     NTEXT   => "M"
-    OCHANGE => "BD/445"
-    NCHANGE => "BD/445"
-    DELETE  => "RD/544"
-    APPEND  => "RD/544"
+    OCHANGE => "K/445"
+    NCHANGE => "K/445"
+    DELETE  => "K/544"
+    APPEND  => "K/544"
 
     CMARK   => "GS"
     MMARK   => "YS"
@@ -1037,7 +1011,7 @@ Defaults are :
 
 This is equivalent to :
 
-    cdif --cm 'COMMAND=SE,OMARK=CS,NMARK=MS' \
+    cdif --cm 'COMMAND=555/222E,OMARK=CS,NMARK=MS' \
          --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
          --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
 

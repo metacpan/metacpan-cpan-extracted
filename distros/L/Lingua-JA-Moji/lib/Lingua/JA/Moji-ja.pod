@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.47
-corresponding to git commit L<dd0d3ba9ecbafa4492248c27b984b07d6573565b|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/dd0d3ba9ecbafa4492248c27b984b07d6573565b> made on Wed Nov 1 13:04:35 2017 +0900.
+This document describes Lingua::JA::Moji version 0.48
+corresponding to git commit L<2b735cdf07ab42c23dda568c12efb95bcf0a78c4|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/2b735cdf07ab42c23dda568c12efb95bcf0a78c4> made on Sun Dec 24 18:06:09 2017 +0900.
 
 =head1 説明
 
@@ -1122,6 +1122,16 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
+
+
+=head1 日本語のキリル文字表記
+
+実験的に仮名とキリル文字の変換をする。キリル文字に詳しい方の確認がありませんので、その結果をよく確認しますように。
+
+
+
+
+
 =head2 kana2cyrillic 
 
 仮名をキリル文字に.
@@ -1338,6 +1348,11 @@ generate this data.
 
 0.46 disallowed hyphens as the first character of a romaji string and
 added L</smallize_kana> and L</cleanup_kana>.
+
+0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and changed romanisation somewhat.
+
+0.48 changed kana2romaji to be consistent with the documentation for
+long vowel options wapuro and none.
 
 
 

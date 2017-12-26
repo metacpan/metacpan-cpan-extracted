@@ -75,7 +75,7 @@
          "web" : "https://github.com/binary-com/perl-Finance-Contract"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

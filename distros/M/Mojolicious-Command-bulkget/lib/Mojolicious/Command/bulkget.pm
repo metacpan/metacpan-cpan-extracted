@@ -5,7 +5,7 @@ use Mojo::Promise;
 use Mojo::File 'path';
 use Mojo::Util qw(getopt);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $MAXREQ = 20;
 
@@ -65,6 +65,18 @@ sub _getsuffixes {
 =head1 NAME
 
 Mojolicious::Command::bulkget - Perform bulk get requests
+
+=begin markdown
+
+# PROJECT STATUS
+
+| OS      |  Build status |
+|:-------:|--------------:|
+| Linux   | [![Build Status](https://travis-ci.org/mohawk2/Mojolicious-Command-bulkget.svg?branch=master)](https://travis-ci.org/mohawk2/Mojolicious-Command-bulkget) |
+
+[![CPAN version](https://badge.fury.io/pl/Mojolicious-Command-bulkget.svg)](https://metacpan.org/pod/Mojolicious::Command::bulkget)
+
+=end markdown
 
 =head1 SYNOPSIS
 

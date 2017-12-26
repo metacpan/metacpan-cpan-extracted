@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '3.42';
+$Map::Tube::Utils::VERSION   = '3.43';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 3.42
+Version 3.43
 
 =cut
 
@@ -35,7 +35,7 @@ sub to_perl {
     my ($file) = @_;
 
     my $json_text = do {
-        open(my $json_fh, $file) or die("ERROR: Can't open \$file\": $!\n");
+        open(my $json_fh, "<", $file) or die("ERROR: Can't open $file: $!\n");
         local $/;
         my $text = <$json_fh>;
         close($json_fh);
@@ -166,10 +166,11 @@ sub _is_number {
 sub _color_names {
 
     my $source = dist_file('Map-Tube', 'color-names.txt');
-    open (FILE, $source);
-    my @color_names = <FILE>;
+    open (my $COLOR_NAMES, "<", $source)
+        or die("ERROR: Can't open $source: $!\n");
+    my @color_names = <$COLOR_NAMES>;
     chomp @color_names;
-    close (FILE);
+    close ($COLOR_NAMES);
 
     return @color_names;
 }

@@ -521,10 +521,9 @@ fibonacci(n)
 
 
 mpz_t *
-band(m,n,swap)
+band(m,n, ...)
 	mpz_t *		m
 	mpz_t *		n
-	bool		swap
 
   CODE:
     RETVAL = malloc (sizeof(mpz_t));
@@ -534,10 +533,9 @@ band(m,n,swap)
     RETVAL
 
 mpz_t *
-bxor(m,n,swap)
+bxor(m,n, ...)
 	mpz_t *		m
 	mpz_t *		n
-	bool		swap
 
   CODE:
     RETVAL = malloc (sizeof(mpz_t));
@@ -547,10 +545,9 @@ bxor(m,n,swap)
     RETVAL
 
 mpz_t *
-bior(m,n,swap)
+bior(m,n, ...)
 	mpz_t *		m
 	mpz_t *		n
-	bool		swap
 
   CODE:
     RETVAL = malloc (sizeof(mpz_t));

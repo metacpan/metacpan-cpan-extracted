@@ -8,12 +8,14 @@ WriteMakefile(
     VERSION_FROM => 'lib/CPAN/cpanminus/reporter/RetainReports.pm', # finds \$VERSION
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Retain reports on disk rather than transmitting them',
+    EXE_FILES    => [ 'scripts/dump-parsed-cpanm-build-logs' ],
     PREREQ_PM    => {
                      'App::cpanminus::reporter'         => 0.17,
                      'Carp'                             => 0,
                      'CPAN::Testers::Common::Client'    => 0,
                      'CPAN::DistnameInfo'               => 0,
                      'Cwd'                              => 0,
+                     'Data::Dump'                       => 0,   # scripts/dump-parsed-cpanm-build-logs
                      'File::Path'                       => 2.06,
                      'File::Spec'                       => 0,
                      'JSON'                             => 0,

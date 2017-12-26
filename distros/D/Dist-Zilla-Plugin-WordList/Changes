@@ -1,4 +1,12 @@
-Revision history for Dist-Zilla-Plugin-WordList
+0.051   2017-12-25 (PERLANCAR)
+
+	- Check duplicate & sortedness.
+
+
+0.050   2017-12-24 (PERLANCAR)
+
+	- [Bugfix] Show length of words in graphemes instead of codepoints.
+
 
 0.04    2016-01-13 (PERLANCAR)
 

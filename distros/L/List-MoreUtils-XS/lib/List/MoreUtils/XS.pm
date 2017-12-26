@@ -7,26 +7,26 @@ use base ('Exporter');
 
 use vars qw{$VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION = '0.426';
+$VERSION = '0.428';
 
-@EXPORT = ();
+@EXPORT    = ();
 @EXPORT_OK = qw(any all none notall one
-          any_u all_u none_u notall_u one_u
-	  reduce_u reduce_0 reduce_1
-          true false
-          insert_after insert_after_string
-          apply indexes
-          after after_incl before before_incl
-          firstidx lastidx onlyidx
-          firstval lastval onlyval
-          firstres lastres onlyres
-          singleton duplicates frequency occurrences mode
-          each_array each_arrayref
-          pairwise natatime
-          arrayify mesh zip6 uniq listcmp
-          samples minmax minmaxstr part
-          bsearch bsearchidx binsert bremove lower_bound upper_bound equal_range
-          qsort);
+  any_u all_u none_u notall_u one_u
+  reduce_u reduce_0 reduce_1
+  true false
+  insert_after insert_after_string
+  apply indexes
+  after after_incl before before_incl
+  firstidx lastidx onlyidx
+  firstval lastval onlyval
+  firstres lastres onlyres
+  singleton duplicates frequency occurrences mode
+  each_array each_arrayref
+  pairwise natatime
+  arrayify mesh zip6 uniq listcmp
+  samples minmax minmaxstr part
+  bsearch bsearchidx binsert bremove lower_bound upper_bound equal_range
+  qsort);
 %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # Load the XS at compile-time so that redefinition warnings will be

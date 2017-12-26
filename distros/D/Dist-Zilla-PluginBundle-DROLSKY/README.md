@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 0.88
+version 0.89
 
 # SYNOPSIS
 

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.88';
+our $VERSION = '0.89';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
@@ -160,7 +160,7 @@ sub _config_to_ini {
                 sort ref $tidyall->{$section}{$key}
                 ? @{ $tidyall->{$section}{$key} }
                 : $tidyall->{$section}{$key}
-                ) {
+            ) {
 
                 $ini .= "$key = $val\n";
             }
@@ -216,7 +216,7 @@ sub _perltidyrc {$perltidyrc}
 my $perlcriticrc = <<'EOF';
 severity = 3
 verbose = 11
-theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
+theme = (core && (pbp || bugs || maintenance || cosmetic || complexity || security || tests)) || moose
 program-extensions = pl psgi t
 
 exclude = Subroutines::ProhibitCallsToUndeclaredSubs
@@ -306,7 +306,7 @@ Dist::Zilla::Plugin::DROLSKY::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =for Pod::Coverage .*
 

@@ -13,7 +13,6 @@ t/list_diff.t
 t/manifest.t
 t/mixed.t
 t/numbers.t
-t/patch.t
 t/pod-coverage.t
 t/pod.t
 t/references.t

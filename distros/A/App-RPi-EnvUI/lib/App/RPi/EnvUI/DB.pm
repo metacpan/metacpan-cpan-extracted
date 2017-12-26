@@ -9,13 +9,13 @@ BEGIN {
         require DBI;
         DBI->import;
     }
-    if (! exists $INC{'RPi/WiringPi/Constant.pm'}){
-        require RPi::WiringPi::Constant;
-        DateTime->import(qw(:all));
+    if (! exists $INC{'RPi/Const.pm'}){
+        require RPi::Const;
+        RPi::Const->import(qw(:all));
     }
 }
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub new {
     my ($class, %args) = @_;
@@ -43,7 +43,7 @@ sub new {
 
     # commonly used statement handles
 
-    $self->{graph_sth} = $self->{db}->prepare(
+    $self->{graph_sth} = $self->db->prepare(
         "select * from (
             select * from stats order by id DESC limit 5760
         ) sub
@@ -55,7 +55,7 @@ sub new {
 sub user {
     my ($self, $user) = @_;
 
-    my $sth = $self->{db}->prepare(
+    my $sth = $self->db->prepare(
         "SELECT * FROM auth WHERE user=?;"
     );
 
@@ -71,7 +71,7 @@ sub aux {
     my ($self, $aux_id) = @_;
 
     if (! $self->{aux_sth}) {
-        $self->{aux_sth} = $self->{db}->prepare(
+        $self->{aux_sth} = $self->db->prepare(
             'SELECT * from aux WHERE id=?'
         );
     }
@@ -80,9 +80,7 @@ sub aux {
     return $self->{aux_sth}->fetchrow_hashref;
 }
 sub auxs {
-    my ($self) = @_;
-
-    return $self->{db}->selectall_hashref(
+    return $_[0]->db->selectall_hashref(
         'SELECT * from aux',
         'id'
     );
@@ -91,7 +89,7 @@ sub config_control {
     my ($self, $want) = @_;
 
     if (! $self->{config_control_sth}){
-        $self->{config_control_sth} = $self->{db}->prepare(
+        $self->{config_control_sth} = $self->db->prepare(
             'SELECT value FROM control WHERE id=?'
         );
     }
@@ -103,7 +101,7 @@ sub config_core {
     my ($self, $want) = @_;
 
     if (! $self->{config_core_sth}) {
-        $self->{config_core_sth} = $self->{db}->prepare(
+        $self->{config_core_sth} = $self->db->prepare(
             'SELECT * FROM core WHERE id = ?'
         );
     }
@@ -113,7 +111,7 @@ sub config_core {
 sub config_light {
     my ($self, $want) = @_;
 
-    my $light = $self->{db}->selectall_hashref(
+    my $light = $self->db->selectall_hashref(
         'SELECT * FROM light',
         'id'
     );
@@ -131,7 +129,7 @@ sub env {
     my $id = $self->last_id;
 
     if (! $self->{env_sth}) {
-        $self->{env_sth} = $self->{db}->prepare(
+        $self->{env_sth} = $self->db->prepare(
             'SELECT * FROM stats WHERE id=?'
         );
     }
@@ -139,10 +137,13 @@ sub env {
     $sth->execute($id);
     return $sth->fetchrow_hashref;
 }
+sub db {
+    return $_[0]->{db};
+}
 sub delete {
     my ($self, $table) = @_;
 
-    my $sth = $self->{db}->prepare(
+    my $sth = $self->db->prepare(
         "DELETE FROM $table;"
     );
 
@@ -152,7 +153,7 @@ sub graph_data {
     my ($self) = @_;
 
     if (! $self->{graph_sth}){
-        $self->{graph_sth} = $self->{db}->prepare(
+        $self->{graph_sth} = $self->db->prepare(
             "select * from (
                 select * from stats order by id DESC limit 5760
             ) sub
@@ -168,7 +169,7 @@ sub insert_env {
     my ($self, $temp, $hum) = @_;
 
     if (! $self->{insert_env_sth}){
-        $self->{insert_env_sth} = $self->{db}->prepare(
+        $self->{insert_env_sth} = $self->db->prepare(
             'INSERT INTO stats VALUES (?, CURRENT_TIMESTAMP, ?, ?)'
         );
     }
@@ -176,7 +177,7 @@ sub insert_env {
 }
 sub last_id {
     my $self = shift;
-    my $id_list = $self->{db}->selectrow_arrayref(
+    my $id_list = $self->db->selectrow_arrayref(
         "select seq from sqlite_sequence where name='stats';"
     );
 
@@ -186,11 +187,11 @@ sub update {
     my ($self, $table, $col, $value, $where_col, $where_val) = @_;
 
     if (! defined $where_col) {
-        my $sth = $self->{db}->prepare("UPDATE $table SET $col=?");
+        my $sth = $self->db->prepare("UPDATE $table SET $col=?");
         $sth->execute($value);
     }
     else {
-        my $sth = $self->{db}->prepare(
+        my $sth = $self->db->prepare(
             "UPDATE $table SET $col=? WHERE $where_col=?"
         );
         $sth->execute($value, $where_val);
@@ -199,7 +200,7 @@ sub update {
 sub update_bulk {
     my ($self, $table, $col, $where_col, $data) = @_;
 
-    my $sth = $self->{db}->prepare(
+    my $sth = $self->db->prepare(
         "UPDATE $table SET $col=? WHERE $where_col=?"
     );
 
@@ -210,7 +211,7 @@ sub update_bulk {
 sub update_bulk_all {
     my ($self, $table, $col, $data) = @_;
 
-    my $sth = $self->{db}->prepare(
+    my $sth = $self->db->prepare(
         "UPDATE $table SET $col=?;"
     );
     $sth->execute(@$data);
@@ -328,6 +329,11 @@ configuration variable.
 Return: Single scalar value if C<$want> is sent in, or a hash reference of the
 entire configuration section where the keys are the variable names, and the
 values are the configuration values.
+
+=head2 db
+
+Returns the actual database instance after it has been created in C<<new()>>.
+Takes no parameters.
 
 =head2 delete($table)
 

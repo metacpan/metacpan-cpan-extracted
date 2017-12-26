@@ -14,6 +14,9 @@ $ENV{PATH} = "/bin:/usr/bin";
 is(optex('true'),  0);
 is(optex('false'), 1);
 
+is(optex('-Mhelp', 'true'),  0);
+is(optex('-MApp::optex::help', 'true'),  0);
+
 done_testing;
 
 sub optex {

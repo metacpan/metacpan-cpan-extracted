@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.42';
+$Map::Tube::VERSION   = '3.43';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.42
+Version 3.43
 
 =cut
 
@@ -492,14 +492,16 @@ or map for a particular line as base64 encoded string (png image).
 
     # Entire map image
     my $name = $tube->name;
-    open(my $MAP_IMAGE, ">$name.png");
+    open(my $MAP_IMAGE, ">", "$name.png")
+        or die "ERROR: Can't open [$name.png]: $!";
     binmode($MAP_IMAGE);
     print $MAP_IMAGE decode_base64($tube->as_image);
     close($MAP_IMAGE);
 
     # Just a particular line map image
     my $line = 'Bakerloo';
-    open(my $LINE_IMAGE, ">$line.png");
+    open(my $LINE_IMAGE, ">", "$line.png")
+        or die "ERROR: Can't open [$line.png]: $!";
     binmode($LINE_IMAGE);
     print $LINE_IMAGE decode_base64($tube->as_image($line));
     close($LINE_IMAGE);

@@ -11,12 +11,19 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-MSCHOUT
+provides:
+  Dist::Zilla::PluginBundle::MSCHOUT:
+    file: lib/Dist/Zilla/PluginBundle/MSCHOUT.pm
+    version: '0.36'
+  Pod::Weaver::PluginBundle::MSCHOUT:
+    file: lib/Pod/Weaver/PluginBundle/MSCHOUT.pm
+    version: '0.36'
 requires:
   Dist::Zilla: '4.102341'
   Dist::Zilla::Plugin::AuthorSignatureTest: '0'
@@ -29,6 +36,7 @@ requires:
   Dist::Zilla::Plugin::Homepage: '0'
   Dist::Zilla::Plugin::InsertCopyright: '0'
   Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::MinimumPerl: '0'
   Dist::Zilla::Plugin::NextRelease: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
@@ -58,5 +66,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MSCHOUT
   homepage: http://search.cpan.org/dist/Dist-Zilla-PluginBundle-MSCHOUT/
   repository: git://github.com/mschout/dist-zilla-pluginbundle-mschout.git
-version: '0.35'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.36'
+x_serialization_backend: 'YAML::Tiny version 1.70'

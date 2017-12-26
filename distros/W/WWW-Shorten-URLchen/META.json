@@ -4,13 +4,13 @@
       "Danijel Tasov <data@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-Shorten-URLchen",
    "prereqs" : {
@@ -21,7 +21,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "WWW::Shorten::URLchen" : {
          "file" : "lib/WWW/Shorten/URLchen.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,6 @@
          "url" : "http://github.com/datamuc/WWW-Shorten-URLchen"
       }
    },
-   "version" : "v0.0.3"
+   "version" : "v0.0.4",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

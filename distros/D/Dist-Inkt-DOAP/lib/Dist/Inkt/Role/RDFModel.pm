@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::RDFModel;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.022';
+our $VERSION   = '0.100';
 
 use Moose::Role;
 use Types::Standard -types;

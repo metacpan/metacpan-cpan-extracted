@@ -154,7 +154,6 @@ t/502parser-bodys.t
 t/503parser-bodyl.t
 t/504parser-bodyd.t
 t/505parser-bodymp.t
-t/folders/lockfiletest22660
 t/folders/maildir.src/cur/110000000.localhost.12:2,
 t/folders/maildir.src/cur/110000001.l.42:2,
 t/folders/maildir.src/cur/110000002.l.42:2,

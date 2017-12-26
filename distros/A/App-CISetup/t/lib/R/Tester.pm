@@ -18,7 +18,7 @@ sub _test_cisetup_flags_comment {
 
     my ($comment)
         = $file->slurp_utf8
-        =~ /### __app_cisetup__\n(.+)### __app_cisetup__/s;
+        =~ /### __app_cisetup__\r?\n(.+)### __app_cisetup__/s;
     $comment =~ s/^# //mg;
     my $got = Load($comment);
 

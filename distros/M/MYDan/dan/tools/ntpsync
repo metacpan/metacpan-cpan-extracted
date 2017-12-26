@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::Util::NTPSync;
+
+=head1 SYNOPSIS
+
+ $0 [--daemon]
+    [--interval number]
+
+=cut
+
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( try => 3, interval => 3600 )
+    ->get(qw( daemon interval=i try=i  ))->dump();
+
+$0 = 'mydan.ntpsync';
+
+MYDan::Util::NTPSync->new(%o)->run();

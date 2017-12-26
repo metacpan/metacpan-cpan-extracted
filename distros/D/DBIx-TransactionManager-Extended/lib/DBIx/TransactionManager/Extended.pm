@@ -1,26 +1,14 @@
 package DBIx::TransactionManager::Extended;
-use 5.008001;
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use parent qw/DBIx::TransactionManager/;
 
 use Carp qw/croak/;
 use DBIx::TransactionManager::Extended::Txn;
-
-# override
-sub new { shift->SUPER::new(@_)->_initialize }
-
-sub _initialize {
-    my $self = shift;
-    $self->{_in_commit_after_hook} = 0;
-    $self->{_context_data}         = {};
-    $self->{_hooks_before_commit}  = [];
-    $self->{_hooks_after_commit}   = [];
-    $self;
-}
 
 sub context_data {
     my $self = shift;
@@ -32,9 +20,21 @@ sub context_data {
 sub txn_scope { DBIx::TransactionManager::Extended::Txn->new(@_) }
 
 # override
+sub txn_begin {
+    my ($self) = @_;
+    unless ($self->in_transaction) {
+        # create new context
+        $self->{_context_data}        = {};
+        $self->{_hooks_before_commit} = [];
+        $self->{_hooks_after_commit}  = [];
+    }
+    goto &DBIx::TransactionManager::txn_begin; ## XXX: hack to adjust the caller
+}
+
+# override
 sub txn_commit {
     my $self = shift;
-    return $self->SUPER::txn_commit() if @{ $self->active_transactions } != 1;
+    return $self->SUPER::txn_commit() if @{ $self->active_transactions } != 1; # if it's a real commit
 
     my $context_data        = $self->{_context_data};
     my $hooks_before_commit = $self->{_hooks_before_commit};
@@ -58,15 +58,12 @@ sub txn_commit {
     }
 
     if (@$hooks_after_commit) {
-        local $self->{_in_commit_after_hook} = $self->{_in_commit_after_hook} + 1;
-        if ($self->{_in_commit_after_hook} == 1) {
-            eval { $_->($context_data) for @$hooks_after_commit };
-            if ($@) {
-                $self->_reset_all();
-                croak $@;
-            }
-            @$hooks_after_commit = ();
+        eval { $_->($context_data) for @$hooks_after_commit };
+        if ($@) {
+            $self->_reset_all();
+            croak $@;
         }
+        @$hooks_after_commit = ();
     }
     %$context_data = ();
 

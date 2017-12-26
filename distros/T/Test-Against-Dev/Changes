@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Against::Dev
 
+0.04 Wed Dec 20 08:23:06 EST 2017
+    - Require perl-5.14.0
+
 0.03 Sun Dec 17 21:53:17 EST 2017
     - First actual release to CPAN
 

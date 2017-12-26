@@ -9,7 +9,10 @@ my $RetryReasons = __PACKAGE__->retry;
 sub retry {
     # Reason list better to retry detecting an error reason
     # @return   [Array] Reason list
-    return ['undefined', 'onhold', 'systemerror', 'securityerror', 'networkerror'];
+    return [
+        'undefined', 'onhold', 'systemerror', 'securityerror', 'networkerror',
+        'hostunknown', 'userunknown',
+    ];
 }
 
 sub index {
@@ -65,13 +68,16 @@ sub get {
 
     if( not $reasontext || $reasontext eq 'undefined' ) {
         # Bounce reason is not detected yet.
-        $reasontext = __PACKAGE__->anotherone($argvs);
+        $reasontext   = __PACKAGE__->anotherone($argvs);
+        $reasontext   = '' if $reasontext eq 'undefined';
+        $reasontext ||= 'expired' if $argvs->action eq 'delayed';
 
-        if( $reasontext eq 'undefined' || $reasontext eq '' ) {
-            # Action: delayed => "expired"
-            $reasontext ||= 'expired' if $argvs->action eq 'delayed';
-            $reasontext ||= 'onhold'  if length $argvs->diagnosticcode;
+        unless( $reasontext ) {
+            # Try to match with message patterns in Sisimai::Reason::Vacation
+            Module::Load::load 'Sisimai::Reason::Vacation';
+            $reasontext = 'vacation' if Sisimai::Reason::Vacation->match($argvs->diagnosticcode);
         }
+        $reasontext ||= 'onhold'  if length $argvs->diagnosticcode;
         $reasontext ||= 'undefined';
     }
 
@@ -93,6 +99,7 @@ sub anotherone {
     my $statuscode = $argvs->deliverystatus // '';
     my $diagnostic = $argvs->diagnosticcode // '';
     my $commandtxt = $argvs->smtpcommand    // '';
+    my $trytomatch = undef;
     my $reasontext = '';
     my $classorder = [
         'MailboxFull', 'SpamDetected', 'PolicyViolation', 'VirusDetected',
@@ -103,8 +110,12 @@ sub anotherone {
     require Sisimai::SMTP::Status;
     $reasontext = Sisimai::SMTP::Status->name($statuscode);
 
-    if( $reasontext eq '' || $reasontext eq 'userunknown' ||
-        grep { $reasontext eq $_ } @$RetryReasons ) {
+    TRY_TO_MATCH: while(1) {
+        $trytomatch ||= 1 if $reasontext eq '';
+        $trytomatch ||= 1 if grep { $reasontext eq $_ } @$RetryReasons;
+        $trytomatch ||= 1 if $argvs->diagnostictype ne 'SMTP';
+        last unless $trytomatch;
+
         # Could not decide the reason by the value of Status:
         for my $e ( @$classorder ) {
             # Trying to match with other patterns in Sisimai::Reason::* classes
@@ -152,6 +163,7 @@ sub anotherone {
                 }
             }
         }
+        last(TRY_TO_MATCH);
     }
     return $reasontext;
 }

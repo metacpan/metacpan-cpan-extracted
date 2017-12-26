@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.4.2",
+            "Getopt::EX" : "v1.5.1",
             "List::Util" : "1.45",
             "perl" : "5.014"
          }
@@ -56,7 +56,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.6"
       },
       "App::optex::debug" : {
          "file" : "lib/App/optex/debug.pm"
@@ -75,21 +75,6 @@
       },
       "Tmpfile" : {
          "file" : "lib/App/optex/util/argv.pm"
-      },
-      "debug" : {
-         "file" : "lib/App/optex/debug.pm"
-      },
-      "help" : {
-         "file" : "lib/App/optex/help.pm"
-      },
-      "util" : {
-         "file" : "lib/App/optex/util.pm"
-      },
-      "util::argv" : {
-         "file" : "lib/App/optex/util/argv.pm"
-      },
-      "util::filter" : {
-         "file" : "lib/App/optex/util/filter.pm"
       }
    },
    "release_status" : "stable",
@@ -103,6 +88,9 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.0.4",
-   "x_authority" : "cpan:UTASHIRO"
+   "version" : "v0.0.6",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
 }

@@ -13,11 +13,13 @@ lib/Kevin/Command/kevin/jobs.pm
 lib/Kevin/Command/kevin/worker.pm
 lib/Kevin/Command/kevin/workers.pm
 lib/Kevin/Commands/Util.pm
-lib/Kevin/Plugin/kevin.pm
+lib/Minion/Worker/Role/Kevin.pm
 lib/Mojolicious/Plugin/Kevin/Commands.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/01-load.t
 t/commands.t
+t/human.t
 t/pod.t
 t/pod_coverage.t
 xt/author/pod-syntax.t

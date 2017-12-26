@@ -8,10 +8,10 @@ use parent 'Exporter';
 use Carp 'croak';
 
 our @EXPORT_OK = qw(
-    is_implicit_step
-    slist
-    spath
-    spath_delta
+    implicit_step
+    list_paths
+    path
+    path_delta
 );
 
 =head1 NAME
@@ -28,51 +28,37 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.74
+Version 0.80
 
 =cut
 
-our $VERSION = '0.74';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
-    use Struct::Path qw(slist spath spath_delta);
+    use Struct::Path qw(list_paths path);
 
     $s = [
         0,
-        1,
         {
-            '2a' => {
-                '2aa' => '2aav',
-                '2ab' => '2abv'
+            two => {
+                three => 3,
+                four => 4
             }
         },
         undef
     ];
 
-    @list = slist($s);                              # list paths and values
+    @list = list_paths($s);                         # list paths and values
     # @list == (
-    #     [[0]], \0,
-    #     [[1]], \1,
-    #     [[2],{keys => ['2a']},{keys => ['2aa']}], \'2aav',
-    #     [[2],{keys => ['2a']},{keys => ['2ab']}], \'2abv',
-    #     [[3]], \undef
+    #   [[0]], \0,
+    #   [[1],{K => ['two']},{K => ['four']}], \4,
+    #   [[1],{K => ['two']},{K => ['three']}], \3,
+    #   [[2]], \undef
     # )
 
-    @r = spath($s, [ [3,0,1] ]);                    # get refs to values
-    # @r == (\undef, \0, \1)
-
-    @r = spath($s, [ [2],{keys => ['2a']},{} ]);    # another example
-    # @r == (\'2aav', \'2abv')
-
-    @r = spath($s, [ [2],{},{regs => [qr/^2a/]} ]); # using regular expressions
-    # @r == (\'2aav', \'2abv')
-
-    ${$r[0]} =~ s/2a/blah-blah-/;                   # replace value
-    # $s->[2]{2a}{2aa} eq "blah-blah-av"
-
-    @d = spath_delta([[0],[4],[2]], [[0],[1],[3]]); # get steps delta
-    # @d == ([1],[3])
+    @r = path($s, [ [1],{K => ['two']} ]);         # get refs to values
+    # @r == (\{four => 4,three => 3})
 
 =head1 DESCRIPTION
 
@@ -81,10 +67,10 @@ structures.
 
 Why L<existed Path modules|/"SEE ALSO"> is not enough? This module has no
 conflicts for paths like '/a/0/c', where C<0> may be an array index or a key
-for hash (depends on passed structure). In some cases this is important, for
+for hash (depends on passed structure). This is vital in some cases, for
 example, when one need to define exact path in structure, but unable to
 validate it's schema or when structure itself doesn't yet exist (see
-L</spath/Options/expand> for example).
+option C<expand> for L</path> for example).
 
 =head1 EXPORT
 
@@ -94,27 +80,25 @@ Nothing is exported by default.
 
 Path is a list of 'steps', each represents nested level in structure.
 
-Arrayref as a step stands for ARRAY in the structure and must contain desired
-indexes or be empty (means "all items"). Sequence for indexes is important
-and defines result sequence.
+Arrayref as a step stands for ARRAY and must contain desired items indexes or
+be empty (means "all items"). Sequence for indexes define result sequence.
 
-Hashref represent HASH in the structure and may contain keys C<keys>, C<regs>
-or be empty. C<keys> may contain list of desired keys, C<regs> must contain
-list of regular expressions. Empty hash or empty list for C<keys> means all
-keys. Sequence in C<keys> and C<regs> lists defines result sequence. C<keys>
-have higher priority than C<regs>.
+Hashref represent HASH and may contain keys C<K>, C<R> or be empty. C<K> may
+contain list of desired keys, C<R> must contain list of regular
+expressions. Empty hash or empty list for C<K> means all keys. Sequence in C<K>
+and C<R> lists define result sequence. C<K> have higher priority than C<R>.
 
 Coderef step is a hook - subroutine which may filter and/or modify
 structure. Path as first argument and a stack (arrayref) of refs to traversed
-subsstructures as second passed to it when executed, $_ set to current
+subsstructures as second passed to it when executed, C<$_> set to current
 substructure. Some true (match) value or false (doesn't match) value expected
 as output.
 
 Sample:
 
-    $spath = [
+    $path = [
         [1,7],                      # first spep
-        {regs => [qr/foo/,qr/bar/]} # second step
+        {R => [qr/foo/,qr/bar/]}    # second step
         sub { exists $_->{bar} }    # third step
     ];
 
@@ -123,23 +107,22 @@ L<Struct::Path::PerlStyle> for human friendly path definition.
 
 =head1 SUBROUTINES
 
-=head2 is_implicit_step
+=head2 implicit_step
 
-    $implicit = is_implicit_step($step);
+    $bool = implicit_step($step);
 
 Returns true value if step contains hooks or specified 'all' items or regexp
 match.
 
 =cut
 
-sub is_implicit_step {
-
+sub implicit_step {
     if (ref $_[0] eq 'ARRAY') {
         return 1 unless (@{$_[0]});
     } elsif (ref $_[0] eq 'HASH') {
-        return 1 if (exists $_[0]->{regs} and @{$_[0]->{regs}});
-        return 1 unless (exists $_[0]->{keys});
-        return 1 unless (@{$_[0]->{keys}});
+        return 1 if (exists $_[0]->{R} and @{$_[0]->{R}});
+        return 1 unless (exists $_[0]->{K});
+        return 1 unless (@{$_[0]->{K}});
     } else { # hooks
         return 1;
     }
@@ -147,11 +130,11 @@ sub is_implicit_step {
     return undef;
 }
 
-=head2 slist
+=head2 list_paths
 
 Returns list of paths and references to their values from structure.
 
-    @list = slist($struct, %opts)
+    @list = list_paths($structure, %opts)
 
 =head3 Options
 
@@ -165,7 +148,7 @@ Don't dive into structure deeper than defined level.
 
 =cut
 
-sub slist($;@) {
+sub list_paths($;@) {
     my @stack = ([], \shift); # init: (path, ref)
     my %opts = @_;
 
@@ -176,7 +159,7 @@ sub slist($;@) {
         ($path, $ref) = splice @stack, 0, 2;
 
         if (ref ${$ref} eq 'HASH' and @{$path} != $depth and keys %{${$ref}}) {
-            map { unshift @stack, [@{$path}, {keys => [$_]}], \${$ref}->{$_} }
+            map { unshift @stack, [@{$path}, {K => [$_]}], \${$ref}->{$_} }
                 reverse sort keys %{${$ref}};
         } elsif (ref ${$ref} eq 'ARRAY' and @{$path} != $depth and @{${$ref}}) {
             map { unshift @stack, [@{$path}, [$_]], \${$ref}->[$_] }
@@ -189,11 +172,11 @@ sub slist($;@) {
     return @out;
 }
 
-=head2 spath
+=head2 path
 
 Returns list of references from structure.
 
-    @list = spath($struct, $path, %opts)
+    @found = path($structure, $path, %opts)
 
 =head3 Options
 
@@ -235,22 +218,20 @@ All options are disabled (C<undef>) by default.
 
 =cut
 
-sub spath($$;@) {
-    my (undef, $spath, %opts) = @_;
+sub path($$;@) {
+    my (undef, $path, %opts) = @_;
 
-    # alias used for struct to be able to rewrite it entirely
-    croak "Reference expected for structure" unless (ref $_[0]);
-    croak "Arrayref expected for path" unless (ref $spath eq 'ARRAY');
+    croak "Arrayref expected for path" unless (ref $path eq 'ARRAY');
     croak "Unable to remove passed thing entirely (empty path passed)"
-        if ($opts{delete} and not @{$spath});
+        if ($opts{delete} and not @{$path});
 
-    my @level = ([], [(ref $_[0] eq 'SCALAR' or ref $_[0] eq 'REF') ? $_[0] : \$_[0]]);
+    my @level = ([], [\$_[0]]); # alias - to be able to rewrite passed scalar
     my $sc = 0; # step counter
-    my ($items, @next, $path, $refs, @types);
+    my ($items, @next, $steps, $refs, @types);
 
-    for my $step (@{$spath}) {
+    for my $step (@{$path}) {
         while (@level) {
-            ($path, $refs) = splice @level, 0, 2;
+            ($steps, $refs) = splice @level, 0, 2;
 
             if (ref $step eq 'ARRAY') {
                 if (ref ${$refs->[-1]} ne 'ARRAY') {
@@ -271,10 +252,10 @@ sub spath($$;@) {
                     }
                     $_ = @{${$refs->[-1]}} if ($opts{expand} and
                         $_ > @{${$refs->[-1]}} and $opts{expand} eq 'append');
-                    push @next, [@{$path}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
+                    push @next, [@{$steps}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
                 }
 
-                if ($opts{delete} and $sc == $#{$spath}) {
+                if ($opts{delete} and $sc == $#{$path}) {
                     map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ <= $#{${$refs->[-1]}}) }
                         reverse sort @{$items};
                 }
@@ -286,16 +267,18 @@ sub spath($$;@) {
                     ${$refs->[-1]} = {};
                 }
 
-                @types = grep { exists $step->{$_} } qw(keys regs);
+                @types = grep { exists $step->{$_} } qw(K R);
                 croak "Unsupported HASH definition, step #$sc" if (@types != keys %{$step});
                 undef $items;
 
                 for my $t (@types) {
-                    croak "Unsupported HASH $t definition, step #$sc"
-                        unless (ref $step->{$t} eq 'ARRAY');
+                    unless (ref $step->{$t} eq 'ARRAY') {
+                        my $type = $t eq 'K' ? "keys" : "regs";
+                        croak "Unsupported HASH $type definition, step #$sc";
+                    }
 
-                    if ($t eq 'keys') {
-                        for (@{$step->{keys}}) {
+                    if ($t eq 'K') {
+                        for (@{$step->{K}}) {
                             unless ($opts{expand} or exists ${$refs->[-1]}->{$_}) {
                                 croak "{$_} doesn't exist, step #$sc" if $opts{strict};
                                 next;
@@ -303,19 +286,19 @@ sub spath($$;@) {
                             push @{$items}, $_;
                         }
                     } else {
-                        for my $g (@{$step->{regs}}) {
+                        for my $g (@{$step->{R}}) {
                             push @{$items}, grep { $_ =~ $g } keys %{${$refs->[-1]}};
                         }
                     }
                 }
 
                 for (@types ? @{$items} : keys %{${$refs->[-1]}}) {
-                    push @next, [@{$path}, {keys => [$_]}], [@{$refs}, \${$refs->[-1]}->{$_}];
-                    delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$spath});
+                    push @next, [@{$steps}, {K => [$_]}], [@{$refs}, \${$refs->[-1]}->{$_}];
+                    delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$path});
                 }
             } elsif (ref $step eq 'CODE') {
                 local $_ = ${$refs->[-1]};
-                $step->($path, $refs) and push @next, $path, $refs;
+                $step->($steps, $refs) and push @next, $steps, $refs;
             } else {
                 croak "Unsupported thing in the path, step #$sc";
             }
@@ -340,16 +323,16 @@ sub spath($$;@) {
     return @out;
 }
 
-=head2 spath_delta
+=head2 path_delta
 
-Returns delta for two passed paths. By delta means steps from the second path
-without beginning common steps for both.
+Returns delta for two passed paths. By delta means list of steps from the
+second path without beginning common steps for both.
 
-    @delta = spath_delta($path1, $path2)
+    @delta = path_delta($path1, $path2)
 
 =cut
 
-sub spath_delta($$) {
+sub path_delta($$) {
     my ($frst, $scnd) = @_;
 
     croak "Second path must be an arrayref" unless (ref $scnd eq 'ARRAY');
@@ -368,11 +351,11 @@ sub spath_delta($$) {
                 last MAIN unless ($frst->[$i]->[$_] == $scnd->[$i]->[$_]);
             }
         } elsif (ref $frst->[$i] eq 'HASH') {
-            last unless (@{$frst->[$i]->{keys}} == @{$scnd->[$i]->{keys}});
-            for (0 .. $#{$frst->[$i]->{keys}}) {
+            last unless (@{$frst->[$i]->{K}} == @{$scnd->[$i]->{K}});
+            for (0 .. $#{$frst->[$i]->{K}}) {
                 last MAIN unless (
-                    $frst->[$i]->{keys}->[$_] eq
-                    $scnd->[$i]->{keys}->[$_]
+                    $frst->[$i]->{K}->[$_] eq
+                    $scnd->[$i]->{K}->[$_]
                 );
             }
         } elsif (ref $frst->[$i] eq 'CODE') {

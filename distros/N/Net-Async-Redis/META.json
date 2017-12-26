@@ -26,6 +26,9 @@
       },
       "develop" : {
          "requires" : {
+            "HTML::TreeBuilder" : "0",
+            "Net::Async::HTTP" : "0",
+            "Template" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
@@ -39,6 +42,9 @@
             "List::Util" : "1.29",
             "Log::Any" : "1.050",
             "Ryu::Async" : "0.006",
+            "Syntax::Keyword::Try" : "0.08",
+            "URI" : "0",
+            "URI::redis" : "0",
             "curry" : "0",
             "namespace::clean" : "0",
             "parent" : "0"
@@ -72,7 +78,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "1.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

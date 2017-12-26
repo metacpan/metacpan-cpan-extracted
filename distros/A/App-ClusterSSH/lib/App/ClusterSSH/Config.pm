@@ -77,6 +77,8 @@ my %default_config = (
     extra_tag_file           => '',
     extra_cluster_file       => '',
     external_cluster_command => '',
+    external_command_mode    => '0600',
+    external_command_pipe    => '',
 
     unmap_on_redraw => "no",    # Debian #329440
 
@@ -108,6 +110,11 @@ my %default_config = (
 
     # don't set username here as takes precendence over ssh config
     user => '',
+    rows => -1,
+    cols => -1,
+
+    fillscreen => "no",
+
 );
 
 sub new {

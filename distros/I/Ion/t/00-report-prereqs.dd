@@ -19,7 +19,8 @@ do { my $x = {
                                       'Coro' => '6.514',
                                       'List::Util' => '0',
                                       'Scalar::Util' => '0',
-                                      'common::sense' => '0'
+                                      'common::sense' => '0',
+                                      'parent' => '0'
                                     }
                     },
        'test' => {
@@ -29,6 +30,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'JSON::XS' => '0',
                                    'Test2::Bundle::Extended' => '0',
                                    'Test::More' => '0',
                                    'Test::Pod' => '0'

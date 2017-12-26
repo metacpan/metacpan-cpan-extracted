@@ -1,5 +1,12 @@
 Revision history for perl distribution App-git-ship
 
+0.27 2017-12-24T11:59:41+0100
+ - Forgot to release git-ship with the latest git-ship #17
+
+0.26 2017-12-24T08:40:06+0100
+ - Fix invalid META.json #17
+   Contributor: Shoichi Kaji
+
 0.25 2017-12-11T19:35:14+0100
  - Set meta-spec to version 2
  - Set dynamic_config to 0

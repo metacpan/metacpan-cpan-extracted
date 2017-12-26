@@ -18,7 +18,7 @@ BEGIN {
 	# version an author currently has installed.
 	# This allows it to implement any back-compatibility features
 	# it may want or need to.
-	$VERSION = '1.18';
+	$VERSION = '1.19';
 }
 
 if ( -d './inc' ) {
@@ -65,7 +65,7 @@ inc::Module::Install::DSL - Domain Specific Language for Module::Install
   requires       Params::Util          0.35
   requires       CPAN::Version         5.5
   test_requires  Test::More            0.86
-  test_requires  Test::Script          1.03
+  test_requires  Test::Deep            1.03
   install_script adamk
   
   requires_external_bin svn

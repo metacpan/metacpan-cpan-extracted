@@ -102,7 +102,7 @@ L<https://redis.io/commands/[% command.method.lower.replace('_', '-') %]>
 
 sub [% command.method %] : method {
     my ($self, @args) = @_;
-    $self->execute_command('[% command.command %]' => @args)
+    $self->execute_command(qw([% command.command %]) => @args)
 }
 
 [%  END -%]

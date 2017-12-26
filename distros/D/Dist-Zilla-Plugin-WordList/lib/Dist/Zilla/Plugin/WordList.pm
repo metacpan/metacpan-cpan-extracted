@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::WordList;
 
-our $DATE = '2016-01-13'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-12-25'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 use 5.014;
 use strict;
@@ -18,6 +18,11 @@ with (
         default_finders => [':InstallModules'],
     },
 );
+
+sub __length_in_graphemes {
+    my $length = () = $_[0] =~ m/\X/g;
+    return $length;
+}
 
 sub munge_files {
     no strict 'refs';
@@ -48,14 +53,26 @@ sub munge_files {
                 shortest_word_len => undef,
                 longest_word_len => undef,
             );
+            my $last_word;
             $wl->each_word(
                 sub {
                     my $word = shift;
+
+                    # check that word is sorted
+                    if (defined $last_word) {
+                        if ($last_word eq $word) {
+                            die "Duplicate entry '$word'";
+                        } elsif ($last_word gt $word) {
+                            die "Wordlist is not sorted! ('$last_word' gt '$word')";
+                        }
+                    }
+                    $last_word = $word;
+
                     $stats{num_words}++;
                     $stats{num_words_contains_unicode}++ if $word =~ /[\x80-\x{10ffff}]/;
                     $stats{num_words_contains_whitespace}++ if $word =~ /\s/;
                     $stats{num_words_contains_nonword_chars}++ if $word =~ /\W/u;
-                    my $len = length($word);
+                    my $len = __length_in_graphemes($word);
                     $total_len += $len;
                     $stats{shortest_word_len} = $len
                         if !defined($stats{shortest_word_len}) ||
@@ -80,8 +97,6 @@ __PACKAGE__->meta->make_immutable;
 1;
 # ABSTRACT: Plugin to use when building WordList::* distribution
 
-
-
 __END__
 
 =pod
@@ -94,7 +109,7 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.04 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2016-01-13.
+This document describes version 0.051 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2017-12-25.
 
 =head1 SYNOPSIS
 
@@ -115,12 +130,6 @@ it does the following:
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<WordList>
-
-L<Pod::Weaver::Plugin::WordList>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-WordList>.
@@ -137,16 +146,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<WordList>
+
+L<Pod::Weaver::Plugin::WordList>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -1,0 +1,34 @@
+use strict;
+use Carp qw(croak);
+
+use Plack::App::URLMux;
+my $url_tree = Plack::App::URLMux->new;
+
+my $file = 'urls';
+croak "no 'urls' file exists, can`t becnhmark"
+    unless open(URLS, "<$file");
+
+my %urls;
+
+while (<URLS>) {
+    /^([^\,]+)\,(.*)$/o;
+    my ($menu, $page) = ($1, $2);
+    next if exists $urls{$menu};
+    $urls{$menu} = $page;
+
+    $url_tree->map($menu => sub {return $page;}, page => $page);
+}
+close(URLS);
+
+
+for (1..1000) {
+    map {
+        my $page = $url_tree->call(my $r={PATH_INFO=>$_});
+        croak "$page not equal for menu $_" unless $page eq $urls{$_};
+        croak "no parameter in env page exists " unless exists $r->{'plack.URLMux.params.map'};
+    } keys %urls;
+}
+
+
+exit;
+

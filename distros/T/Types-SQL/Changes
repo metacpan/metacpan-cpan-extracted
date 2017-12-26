@@ -1,5 +1,19 @@
 Revision history for Types-SQL
 
+v0.1.3    2017-12-20 12:53:52+00:00 Europe/London
+  [Enhancements]
+  - Types::SQL::Util translates a Bool into a boolean.
+
+  [Documentation]
+  - Updated using POD::Weaver.
+
+  - README is now in Markdown.
+
+  [Toolchain]
+  - Updated dist.ini.
+
+  - Extra tests are now part of Dist::Zilla build.
+
 v0.1.2    2017-12-11 23:04:53+00:00 Europe/London
   [Other Changes]
   - Change how Dist::Zilla manages versions

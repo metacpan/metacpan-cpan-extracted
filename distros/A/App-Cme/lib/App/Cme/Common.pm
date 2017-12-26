@@ -10,12 +10,12 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.025';
+$App::Cme::Common::VERSION = '1.026';
 use strict;
 use warnings;
 use 5.10.1;
 
-use Config::Model 2.103;
+use Config::Model 2.116;
 use Config::Model::Lister;
 use Pod::POM;
 use Pod::POM::View::Text;
@@ -38,9 +38,9 @@ sub cme_global_options {
       [ "root-dir=s"         => "Change root directory. Mostly used for test"],
       [ "file=s"             => "Specify a target file"],
       # to be deprecated
-      [ "backend=s"          => "Specify a read/write backend"],
+      [ "canonical!"         => "write back config data according to canonical order" ],
       [ "trace|stack-trace!" => "Provides a full stack trace when exiting on error"],
-      [ "verbose=s"         => "Verbosity level (1, 2, 3  or info, debug, trace)"],
+      [ "verbose=s"          => "Verbosity level (1, 2, 3  or info, debug, trace)"],
       # no bundling
       { getopt_conf => [ qw/no_bundling/ ] }
   );
@@ -162,22 +162,22 @@ sub model {
 sub instance {
     my ($self, $opt, $args) = @_;
 
-    return
-        $self->{_instance}
-        ||= $self->model->instance(
+    my %instance_args = (
             root_class_name => $opt->{_root_model},
             instance_name   => $opt->{_application},
             application     => $opt->{_application},
-            root_dir        => $opt->{root_dir},
             check           => $opt->{force_load} ? 'no' : 'yes',
             auto_create     => $opt->{create},
-            backend         => $opt->{backend},
             backend_arg     => $opt->{_backend_arg},
-            backup          => $opt->{backup},
             config_file     => $opt->{_config_file},
             config_dir      => $opt->{_config_dir},
-        );
+    );
 
+    foreach my $param (qw/root_dir canonical backup/) {
+        $instance_args{$param} = $opt->{$param} if defined $opt->{$param};
+    }
+
+    return $self->{_instance} ||= $self->model->instance(%instance_args);
 }
 
 sub init_cme {
@@ -270,7 +270,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,8 @@
 Revision history for Perl extension Convert::Base91.
 
-0.001 2017-12-16T20:12
+0.001001 2017-12-22T19:21+03:00
+ - Fix compilation on perls with -Dusemultiplicity
+ - Write README
+
+0.001 2017-12-16T20:12+03:00
  - Initial release

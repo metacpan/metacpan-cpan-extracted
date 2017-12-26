@@ -49,6 +49,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Const::Fast" : "0",
             "Data::GUID" : "0",
             "DateTime" : "0",
             "DateTime::Format::MySQL" : "0",
@@ -63,9 +64,12 @@
             "Moo::Role" : "0",
             "MooX::HandlesVia" : "0",
             "MooX::StrictConstructor" : "0",
+            "Net::Works::Address" : "0",
+            "Net::Works::Network" : "0",
             "Test::LWP::UserAgent" : "0",
             "Throwable::Error" : "0",
             "Type::Params" : "0",
+            "Type::Utils" : "0",
             "Types::Common::Numeric" : "0",
             "Types::Common::String" : "0",
             "Types::Standard" : "0",
@@ -104,163 +108,163 @@
    "provides" : {
       "WebService::PayPal::PaymentsAdvanced" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::Authentication" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/Authentication.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::Generic" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/Generic.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::HTTP" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/HTTP.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::HostedForm" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/HostedForm.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::IPVerification" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/IPVerification.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Error::Role::HasHTTPResponse" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Error/Role/HasHTTPResponse.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Mocker" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Mocker.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Mocker::Helper" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Mocker/Helper.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Mocker/PayflowLink.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Mocker/PayflowPro.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Mocker/SilentPOST.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Authorization" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Authorization.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Authorization::CreditCard" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Authorization/CreditCard.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Authorization::PayPal" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Authorization/PayPal.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Capture" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Capture.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Credit" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Credit.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::FromHTTP" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/FromHTTP.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::FromRedirect" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/FromRedirect.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/FromSilentPOST.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::CreditCard" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/FromSilentPOST/CreditCard.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::PayPal" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/FromSilentPOST/PayPal.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Inquiry" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Inquiry.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Inquiry::CreditCard" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Inquiry/CreditCard.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Inquiry::PayPal" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Inquiry/PayPal.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Sale" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Sale.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Sale::CreditCard" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Sale/CreditCard.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Sale::PayPal" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Sale/PayPal.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::SecureToken" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/SecureToken.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Response::Void" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Response/Void.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::ClassFor" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/ClassFor.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasCreditCard" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasCreditCard.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasMessage" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasMessage.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasParams" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasParams.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasPayPal" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasPayPal.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasTender" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasTender.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasTokens" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasTokens.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasTransactionTime" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasTransactionTime.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       },
       "WebService::PayPal::PaymentsAdvanced::Role::HasUA" : {
          "file" : "lib/WebService/PayPal/PaymentsAdvanced/Role/HasUA.pm",
-         "version" : "0.000023"
+         "version" : "0.000024"
       }
    },
    "release_status" : "stable",
@@ -275,10 +279,10 @@
          "web" : "https://github.com/maxmind/webservice-paypal-paymentsadvanced"
       }
    },
-   "version" : "0.000023",
+   "version" : "0.000024",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -359,7 +363,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::VersionProvider",
             "name" : "@MAXMIND/MAXMIND::VersionProvider",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -585,7 +589,7 @@
                }
             },
             "name" : "@MAXMIND/Test::PodSpelling",
-            "version" : "2.007004"
+            "version" : "2.007005"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -674,7 +678,7 @@
                }
             },
             "name" : "@MAXMIND/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -689,7 +693,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Contributors",
             "name" : "@MAXMIND/MAXMIND::Contributors",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -846,7 +850,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::WeaverConfig",
             "name" : "@MAXMIND/MAXMIND::WeaverConfig",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -891,7 +895,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::License",
             "name" : "@MAXMIND/MAXMIND::License",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -922,7 +926,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent",
             "name" : "@MAXMIND/MAXMIND::CheckChangesHasContent",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
@@ -933,7 +937,7 @@
                }
             },
             "name" : "@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
@@ -949,7 +953,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@MAXMIND/MAXMIND::TidyAll",
-            "version" : "0.83"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
@@ -1021,7 +1025,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000023",
+                  "tag" : "v0.000024",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

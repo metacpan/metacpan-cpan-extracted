@@ -774,8 +774,8 @@ my $color_re;
 my $control_re;
 BEGIN {
     $alphanum_re = qr{ [_\d\p{Latin}] }x;
-    $reset_re    = qr{ \e \[ [0;]*  m }x;
-    $color_re    = qr{ \e \[ [\d;]* m }x;
+    $reset_re    = qr{ \e \[ [0;]* m (?: \e \[ [0;]* [mK])* }x;
+    $color_re    = qr{ \e \[ [\d;]* [mK] }x;
     $control_re  = qr{ \e \] [\;\:\/0-9a-z]* \e \\ }x;
 }
 

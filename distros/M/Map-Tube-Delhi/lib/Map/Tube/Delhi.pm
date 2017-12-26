@@ -1,13 +1,13 @@
 package Map::Tube::Delhi;
 $Map::Tube::Delhi::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::VERSION = '0.62';
+$Map::Tube::Delhi::VERSION = '0.64';
 =head1 NAME
 
 Map::Tube::Delhi - Interface to the Delhi Metro Map.
 
 =head1 VERSION
 
-version 0.62
+version 0.64
 
 =cut
 
@@ -16,7 +16,7 @@ use Data::Dumper;
 use File::Share ':all';
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has json => (is => 'ro', default => sub { return dist_file('Map-Tube-Delhi', 'delhi-map.json') });
 

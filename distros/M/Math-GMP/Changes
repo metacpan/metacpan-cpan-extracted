@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::GMP.
 
+2.16  2017-12-18 Shlomif
+    - Fix behaviour under "use feature 'bitwise'"
+        - See https://rt.cpan.org/Public/Bug/Display.html?id=123907
+        - Thanks to Sisphus for the report and perlxs for some insights.
+
 2.15  2017-06-25 Shlomif
     - Bump required perl version to 5.10.x.
         - There were test failures with 5.8.x and even 5.10.x is old enough.

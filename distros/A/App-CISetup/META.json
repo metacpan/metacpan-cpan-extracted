@@ -92,35 +92,35 @@
    "provides" : {
       "App::CISetup" : {
          "file" : "lib/App/CISetup.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::AppVeyor::ConfigFile" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigFile.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::AppVeyor::ConfigUpdater" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigUpdater.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::Role::ConfigFile" : {
          "file" : "lib/App/CISetup/Role/ConfigFile.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::Role::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Role/ConfigUpdater.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::Travis::ConfigFile" : {
          "file" : "lib/App/CISetup/Travis/ConfigFile.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::Travis::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Travis/ConfigUpdater.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "App::CISetup::Types" : {
          "file" : "lib/App/CISetup/Types.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -135,7 +135,7 @@
          "web" : "https://github.com/maxmind/App-CISetup"
       }
    },
-   "version" : 0.11,
+   "version" : 0.13,
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -416,7 +416,7 @@
                }
             },
             "name" : "@MAXMIND/Test::PodSpelling",
-            "version" : "2.007004"
+            "version" : "2.007005"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -536,7 +536,7 @@
                }
             },
             "name" : "@MAXMIND/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -883,7 +883,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.11",
+                  "tag" : "v0.13",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

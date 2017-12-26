@@ -23,7 +23,7 @@ my @types2001 = qw(
 );
 
 # types * 3 + extra tests + autotype tests
-plan tests => 225;
+plan tests => 227;
 
 test_serializer('SOAP::XMLSchema1999::Serializer', @types1999);
 test_serializer('SOAP::XMLSchema2001::Serializer', @types2001);
@@ -136,6 +136,7 @@ my %type_of = (
     'P' => 'xsd:string',
     'PT' => 'xsd:string',
     'PT01S' => 'xsd:duration',
+    "t\xFCt" => 'xsd:base64Binary',
 );
 
 while (my ($value, $type) = each %type_of) {
@@ -143,3 +144,9 @@ while (my ($value, $type) = each %type_of) {
     print "# $value => $type (result: $result->[1]->{'xsi:type'})\n";
     ok ( $result->[1]->{'xsi:type'} eq $type );
 }
+use Data::Dumper;
+my $unicode_string = "t\N{U+019C}t"; #LATIN CAPITAL LETTER TURNED M
+my $result = $serializer->encode_scalar($unicode_string, 'test', undef, {});
+#die "result is " . Dumper($result->[1]);
+print "# unicode_string => xsd:base64Binary (result: $result->[1]->{'xsi:type'})\n";
+ok($result->[1]->{'xsi:type'} eq 'xsd:base64Binary');

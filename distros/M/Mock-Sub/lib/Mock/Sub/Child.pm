@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(confess);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 sub new {
     my $self = bless {}, shift;
@@ -109,11 +109,13 @@ sub _mock {
                 }
             }
 
-            return if ! $mock->{return};
+            if (defined $mock->{return}[0]){
+                return ! wantarray && @{ $mock->{return} } == 1
+                    ? $mock->{return}[0]
+                    : @{ $mock->{return} };
+            }
 
-            return ! wantarray && @{ $mock->{return} } == 1
-                ? $mock->{return}[0]
-                : @{ $mock->{return} };
+            return ! wantarray ? $_[0] : @_;
         };
     }
     $self->{state} = 1;
@@ -209,7 +211,8 @@ Returns bool whether the mocked sub has been called yet.
 
 =head2 called_count
 
-Returns an integer representing the number of times the mocked sub has been called.
+Returns an integer representing the number of times the mocked sub has been
+called.
 
 =head2 called_with
 
@@ -222,7 +225,8 @@ calling this.
 
 =head2 remock
 
-Re-mocks an unmocked sub back to the same subroutine it was originally mocked with.
+Re-mocks an unmocked sub back to the same subroutine it was originally mocked
+with.
 
 =head2 mocked_state
 
@@ -234,11 +238,13 @@ Returns the name of the sub this object is mocking.
 
 =head2 return_value
 
-Send in any values (list or scalar) that you want the mocked sub to return when called.
+Send in any values (list or scalar) that you want the mocked sub to return when
+called.
 
 =head2 side_effect
 
-Send in a code reference with any actions you want the mocked sub to perform after it's been called.
+Send in a code reference with any actions you want the mocked sub to perform
+after it's been called.
 
 =head2 reset
 
@@ -246,7 +252,8 @@ Resets all state of the object back to default (does not unmock the sub).
 
 =head2 unmock
 
-Restores original functionality of the mocked sub, and calls C<reset()> on the object.
+Restores original functionality of the mocked sub, and calls C<reset()> on the
+object.
 
 =cut
 1;

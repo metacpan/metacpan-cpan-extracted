@@ -5,13 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
-no warnings "experimental::smartmatch";
-
 require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =encoding utf8
 
@@ -21,7 +19,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -199,7 +197,8 @@ my $perl_keywords =
     ))|h(?:ift|m(?:(?:write|read|ctl|get))|utdown)|in|leep|o(?:cket(?:pair)?|rt)|p(?:li(?:(?:ce|t))|rintf)
     |qrt|rand|t(?:(?:ate?|udy))|ub(?:str)?|y(?:mlink|s(?:(?:write|call|open|read|seek|tem))))|t(?:ell(?:di
     r)?|i(?:(?:mes?|ed?))|runcate)|u(?:c(?:first)?|mask|n(?:def|l(?:(?:ess|ink))|pack|shift|ti[el])|se|tim
-    e)|v(?:(?:alues|ec))|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:(?:ile|en))|rite)|xor|BEGIN|END|INIT|CHECK))\b
+    e)|v(?:(?:alues|ec))|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:ile|e(?:n|re(?:so|is)))|rite)|xor|BEGIN|END|IN
+    IT|CHECK))\b
     /x;
 #>>>
 
@@ -221,427 +220,487 @@ sub perl_tokens(&$) {
     my $postfix_op    = 0;
     my @heredoc_eofs;
 
-    given ($code) {
-        {
-            when (($expect_format == 1) && /\G(?=\R)/) {
-                if (/.*?\R\.\h*(?=\R|\z)/cgs) {
-                    $callback->('vertical_space', $-[0],     $-[0] + 1);
-                    $callback->('format',         $-[0] + 1, $+[0]);
-                    $expect_format = 0;
-                    $canpod        = 1;
-                    $regex         = 1;
-                    $postfix_op    = 0;
-                }
-                else {
-                    if (/\G(.)/cgs) {
-                        $callback->('unknown_char', $-[0], $+[0]);
-                        redo;
-                    }
-                }
-                redo;
-            }
-            when ($#heredoc_eofs >= 0 && /\G(?=\R)/) {
-                my $token = shift @heredoc_eofs;
-                if (m{\G.*?\R\Q$token\E(?=\R|\z)}sgc) {
-                    $callback->('vertical_space', $-[0],     $-[0] + 1);
-                    $callback->('heredoc',        $-[0] + 1, $+[0]);
-                }
-                redo;
-            }
-            when (($regex == 1 || /\G(?!<<[0-9])/) && m{\G$bhdoc}gc) {
-                $callback->('heredoc_beg', $-[0], $+[0]);
-                push @heredoc_eofs, $+;
-                $regex  = 0;
-                $canpod = 0;
-                redo;
-            }
-            when ($canpod == 1 && /\G^=[a-zA-Z]/cgm) {
-                /\G.*?\R=cut\h*(?=\R|\z)/cgs || /\G.*\z/cgs;
-                $callback->('pod', $-[0] - 2, $+[0]);
-                redo;
-            }
-            when (/\G(?=\s)/) {
-                when (/\G\h+/cg) {
-                    $callback->('horizontal_space', $-[0], $+[0]);
-                    redo;
-                }
-                when (/\G\v+/cg) {
-                    $callback->('vertical_space', $-[0], $+[0]);
-                    redo;
-                }
-                when (/\G\s+/cg) {
-                    $callback->({other_space => [$-[0], $+[0]]});
-                    redo;
-                }
-            }
-            when ($variable > 0) {
-                when ((m{\G$var_name}gco || m{\G(?<=\$)\#$var_name}gco)) {
-                    $callback->('var_name', $-[0], $+[0]);
-                    $regex    = 0;
-                    $variable = 0;
-                    $canpod   = 0;
-                    $flat     = /\G(?=\s*\{)/ ? 1 : 0;
-                    redo;
-                }
-                when (
-                      (
-                       m{\G(?!\$+$var_name)}o && (   m~\G(?:\s+|#?)\{\s*(?:$var_name|$special_var_names|[#{])\s*\}~goc
-                                                  || m{\G(?:\^\w+|#(?!\{)|$special_var_names)}gco
-                                                  || /\G#/cg)
-                      )
-                  ) {
-                    $callback->('special_var_name', $-[0], $+[0]);
-                    $regex    = 0;
-                    $canpod   = 0;
-                    $variable = 0;
-                    $flat     = /\G(?<!\})(?=\s*\{)/ ? 1 : 0;
-                    redo;
-                }
-                continue;
-            }
-            when (/\G#.*/cg) {
-                $callback->('comment', $-[0], $+[0]);
-                redo;
-            }
-            when (($regex == 1 and not($postfix_op)) or /\G(?=[\@\$])/) {
-                when (/\G\$/cg) {
-                    $callback->('scalar_sigil', $-[0], $+[0]);
-                    /\G$bracket_var/o || ++$variable;
-                    $regex  = 0;
-                    $canpod = 0;
-                    $flat   = 1;
-                    redo;
-                }
-                when (/\G\@/cg) {
-                    $callback->('array_sigil', $-[0], $+[0]);
-                    /\G$bracket_var/o || ++$variable;
-                    $regex  = 0;
-                    $canpod = 0;
-                    $flat   = 1;
-                    redo;
-                }
-                when (/\G\%/cg) {
-                    $callback->('hash_sigil', $-[0], $+[0]);
-                    /\G$bracket_var/o || ++$variable;
-                    $regex  = 0;
-                    $canpod = 0;
-                    $flat   = 1;
-                    redo;
-                }
-                when (/\G\*/cg) {
-                    $callback->('glob_sigil', $-[0], $+[0]);
-                    /\G$bracket_var/o || ++$variable;
-                    $regex  = 0;
-                    $canpod = 0;
-                    $flat   = 1;
-                    redo;
-                }
-                when (/\G&/cg) {
-                    $callback->('ampersand_sigil', $-[0], $+[0]);
-                    /\G$bracket_var/o || ++$variable;
-                    $regex  = 0;
-                    $canpod = 0;
-                    $flat   = 1;
-                    redo;
-                }
-                continue;
-            }
-            when ($proto == 1 && /\G\(.*?\)/cgs) {
-                $callback->('sub_proto', $-[0], $+[0]);
-                $proto  = 0;
-                $canpod = 0;
-                $regex  = 0;
-                redo;
-            }
-            when (/\G\(/cg) {
-                $callback->('parenthesis_open', $-[0], $+[0]);
-                $regex  = 1;
-                $flat   = 0;
-                $canpod = 0;
-                redo;
-            }
-            when (/\G\)/cg) {
-                $callback->('parenthesis_close', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
-                redo;
-            }
-            when (/\G\{/cg) {
-                $callback->('curly_bracket_open', $-[0], $+[0]);
-                $regex = 1;
-                $proto = 0;
-                redo;
-            }
-            when (/\G\}/cg) {
-                $callback->('curly_bracket_close', $-[0], $+[0]);
-                $flat   = 0;
-                $canpod = 1;
-                redo;
-            }
-            when (/\G\[/cg) {
-                $callback->('right_bracket_open', $-[0], $+[0]);
-                $regex      = 1;
-                $postfix_op = 0;
-                $flat       = 0;
-                $canpod     = 0;
-                redo;
-            }
-            when (/\G\]/cg) {
-                $callback->('right_bracket_close', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
-                redo;
-            }
-            when ($proto == 0) {
-                when ($canpod == 1 && /\Gformat\b/cg) {
-                    $callback->('keyword', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    $format = 1;
-                    redo;
-                }
-                when (
-                      (
-                       $flat == 0 || ($flat == 1
-                                      && (/\G(?!\w+\h*\})/))
-                      )
-                        && m{\G(?<!->)$perl_keywords}gco
-                  ) {
-                    my $name         = $1;
-                    my @pos          = ($-[0], $+[0]);
-                    my $is_bare_word = /\G(?=\h*=>)/;
-                    $callback->(($is_bare_word ? 'bare_word' : 'keyword'), @pos);
+    $code = "$code";
 
-                    if ($name eq 'sub' and not $is_bare_word) {
-                        $proto = 1;
-                        $regex = 0;
-                    }
-                    else {
-                        $regex      = 1;
-                        $postfix_op = 0;
-                    }
-                    $canpod = 0;
+    {
+        if ($expect_format == 1 and $code =~ /\G(?=\R)/) {
+            if ($code =~ /.*?\R\.\h*(?=\R|\z)/cgs) {
+                $callback->('vertical_space', $-[0],     $-[0] + 1);
+                $callback->('format',         $-[0] + 1, $+[0]);
+                $expect_format = 0;
+                $canpod        = 1;
+                $regex         = 1;
+                $postfix_op    = 0;
+            }
+            else {
+                if ($code =~ /\G(.)/cgs) {
+                    $callback->('unknown_char', $-[0], $+[0]);
                     redo;
                 }
-                continue;
             }
-            when (/\G(?!(?>tr|[ysm]|q[rwxq]?)\h*=>)/ && /\G(?<!->)/) {
+            redo;
+        }
 
-                ($flat == 1 && /\G(?=[a-z]+\h*\})/) || /\G((?<=\{)|(?<=\{\h))(?=[a-z]+\h*\})/ ? continue : ();
+        if ($#heredoc_eofs >= 0 and $code =~ /\G(?=\R)/) {
+            my $token = shift @heredoc_eofs;
+            if ($code =~ m{\G.*?\R\Q$token\E(?=\R|\z)}sgc) {
+                $callback->('vertical_space', $-[0],     $-[0] + 1);
+                $callback->('heredoc',        $-[0] + 1, $+[0]);
+            }
+            redo;
+        }
 
-                when (m{\G $double_q{s} $substitution_flags }gcxo) {
-                    $callback->('substitution', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G (?> $double_q{tr} | $double_q{y} ) $tr_flags }gxco) {
-                    $callback->('transliteration', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when ((m{\G $single_q{m} $match_flags }gcxo || ($regex == 1 && m{\G $match_re $match_flags }gcxo))) {
-                    $callback->('match_regex', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G $single_q{qr} $compiled_regex_flags }gcxo) {
-                    $callback->('compiled_regex', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G$single_q{q}}gco) {
-                    $callback->('q_string', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G$single_q{qq}}gco) {
-                    $callback->('qq_string', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G$single_q{qw}}gco) {
-                    $callback->('qw_string', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                when (m{\G$single_q{qx}}gco) {
-                    $callback->('qx_string', $-[0], $+[0]);
-                    $regex  = 0;
-                    $canpod = 0;
-                    redo;
-                }
-                continue;
-            }
-            when (m{\G$str_dq}gco) {
-                $callback->('double_quoted_string', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
+        if (($regex == 1 or $code =~ /\G(?!<<[0-9])/) and $code =~ m{\G$bhdoc}gc) {
+            $callback->('heredoc_beg', $-[0], $+[0]);
+            push @heredoc_eofs, $+;
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($canpod == 1 and $code =~ /\G^=[a-zA-Z]/cgm) {
+            $code =~ /\G.*?\R=cut\h*(?=\R|\z)/cgs
+              or $code =~ /\G.*\z/cgs;
+            $callback->('pod', $-[0] - 2, $+[0]);
+            redo;
+        }
+
+        if ($code =~ /\G(?=\s)/) {
+            if ($code =~ /\G\h+/cg) {
+                $callback->('horizontal_space', $-[0], $+[0]);
                 redo;
             }
-            when (m{\G$str_sq}gco) {
-                $callback->('single_quoted_string', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
+
+            if ($code =~ /\G\v+/cg) {
+                $callback->('vertical_space', $-[0], $+[0]);
                 redo;
             }
-            when (m{\G$str_bq}gco) {
-                $callback->('backtick', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
+
+            if ($code =~ /\G\s+/cg) {
+                $callback->({other_space => [$-[0], $+[0]]});
                 redo;
             }
-            when (/\G;/cg) {
-                $callback->('semicolon', $-[0], $+[0]);
-                $canpod     = 1;
-                $regex      = 1;
-                $postfix_op = 0;
-                $proto      = 0;
-                $flat       = 0;
+        }
+
+        if ($variable > 0) {
+            if ($code =~ m{\G$var_name}gco or $code =~ m{\G(?<=\$)\#$var_name}gco) {
+                $callback->('var_name', $-[0], $+[0]);
+                $regex    = 0;
+                $variable = 0;
+                $canpod   = 0;
+                $flat     = ($code =~ /\G(?=\s*\{)/) ? 1 : 0;
                 redo;
             }
-            when (/\G=>/cg) {
-                $callback->('fat_comma', $-[0], $+[0]);
-                $regex      = 1;
-                $postfix_op = 0;
-                $canpod     = 0;
-                $flat       = 0;
+
+            if (
+                $code =~ m{\G(?!\$+$var_name)}o
+                and (   $code =~ m~\G(?:\s+|#?)\{\s*(?:$var_name|$special_var_names|[#{])\s*\}~goc
+                     or $code =~ m{\G(?:\^\w+|#(?!\{)|$special_var_names)}gco
+                     or $code =~ /\G#/cg)
+              ) {
+                $callback->('special_var_name', $-[0], $+[0]);
+                $regex    = 0;
+                $canpod   = 0;
+                $variable = 0;
+                $flat     = ($code =~ /\G(?<!\})(?=\s*\{)/) ? 1 : 0;
                 redo;
             }
-            when (/\G,/cg) {
-                $callback->('comma', $-[0], $+[0]);
-                $regex      = 1;
-                $postfix_op = 0;
-                $canpod     = 0;
-                $flat       = 0;
-                redo;
-            }
-            when (m{\G$vstring}gco) {
-                $callback->('v_string', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                redo;
-            }
-            when (m{\G$perl_filetests\b}gco) {
-                my @pos = ($-[0], $+[0]);
-                my $is_bare_word = /\G(?=\h*=>)/;
-                $callback->(($is_bare_word ? 'bare_word' : 'file_test'), @pos);
-                if ($is_bare_word) {
-                    $canpod = 0;
-                    $regex  = 0;
-                }
-                else {
-                    $regex      = 1;    # ambiguous, but possible
-                    $postfix_op = 0;
-                    $canpod     = 0;
-                }
-                redo;
-            }
-            when (/\G(?=__)/) {
-                when (m{\G__(?>DATA|END)__\b\h*+(?!=>).*\z}gcs) {
-                    $callback->('data', $-[0], $+[0]);
-                    redo;
-                }
-                when (m{\G__(?>SUB|FILE|PACKAGE|LINE)__\b(?!\h*+=>)}gc) {
-                    $callback->('special_keyword', $-[0], $+[0]);
-                    $canpod = 0;
-                    $regex  = 0;
-                    redo;
-                }
-                continue;
-            }
-            when ($regex == 1 && /\G(?<!(?:\+\+|--)\h)/ && m{\G$glob}gco) {
-                $callback->('glob_readline', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                redo;
-            }
-            when (m{\G$assignment_operators}gco) {
-                $callback->('assignment_operator', $-[0], $+[0]);
-                if ($format) {
-                    if (substr($_, $-[0], $+[0] - $-[0]) eq '=') {
-                        $format        = 0;
-                        $expect_format = 1;
-                    }
-                }
-                $regex  = 1;
-                $canpod = 0;
-                $flat   = 0;
-                redo;
-            }
-            when (/\G->/cg) {
-                $callback->('dereference_operator', $-[0], $+[0]);
+
+            # continue
+        }
+
+        if ($code =~ /\G#.*/cg) {
+            $callback->('comment', $-[0], $+[0]);
+            redo;
+        }
+
+        if (($regex == 1 and not($postfix_op)) or $code =~ /\G(?=[\@\$])/) {
+            if ($code =~ /\G\$/cg) {
+                $callback->('scalar_sigil', $-[0], $+[0]);
+                $code =~ /\G$bracket_var/o or ++$variable;
                 $regex  = 0;
                 $canpod = 0;
                 $flat   = 1;
                 redo;
             }
-            when (m{\G$operators}gco || /\Gx(?=[0-9\W])/cg) {
-                $callback->('operator', $-[0], $+[0]);
-                if (substr($_, $-[0], ($+[0] - $-[0])) =~ /^$postfix_operators\z/) {
-                    $postfix_op = 1;
+
+            if ($code =~ /\G\@/cg) {
+                $callback->('array_sigil', $-[0], $+[0]);
+                $code =~ /\G$bracket_var/o or ++$variable;
+                $regex  = 0;
+                $canpod = 0;
+                $flat   = 1;
+                redo;
+            }
+
+            if ($code =~ /\G\%/cg) {
+                $callback->('hash_sigil', $-[0], $+[0]);
+                $code =~ /\G$bracket_var/o or ++$variable;
+                $regex  = 0;
+                $canpod = 0;
+                $flat   = 1;
+                redo;
+            }
+
+            if ($code =~ /\G\*/cg) {
+                $callback->('glob_sigil', $-[0], $+[0]);
+                $code =~ /\G$bracket_var/o or ++$variable;
+                $regex  = 0;
+                $canpod = 0;
+                $flat   = 1;
+                redo;
+            }
+
+            if ($code =~ /\G&/cg) {
+                $callback->('ampersand_sigil', $-[0], $+[0]);
+                $code =~ /\G$bracket_var/o or ++$variable;
+                $regex  = 0;
+                $canpod = 0;
+                $flat   = 1;
+                redo;
+            }
+
+            # continue
+        }
+
+        if ($proto == 1 and $code =~ /\G\(.*?\)/cgs) {
+            $callback->('sub_proto', $-[0], $+[0]);
+            $proto  = 0;
+            $canpod = 0;
+            $regex  = 0;
+            redo;
+        }
+
+        if ($code =~ /\G\(/cg) {
+            $callback->('parenthesis_open', $-[0], $+[0]);
+            $regex  = 1;
+            $flat   = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ /\G\)/cg) {
+            $callback->('parenthesis_close', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ /\G\{/cg) {
+            $callback->('curly_bracket_open', $-[0], $+[0]);
+            $regex = 1;
+            $proto = 0;
+            redo;
+        }
+
+        if ($code =~ /\G\}/cg) {
+            $callback->('curly_bracket_close', $-[0], $+[0]);
+            $flat   = 0;
+            $canpod = 1;
+            redo;
+        }
+
+        if ($code =~ /\G\[/cg) {
+            $callback->('right_bracket_open', $-[0], $+[0]);
+            $regex      = 1;
+            $postfix_op = 0;
+            $flat       = 0;
+            $canpod     = 0;
+            redo;
+        }
+
+        if ($code =~ /\G\]/cg) {
+            $callback->('right_bracket_close', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($proto == 0) {
+            if ($canpod == 1 and $code =~ /\Gformat\b/cg) {
+                $callback->('keyword', $-[0], $+[0]);
+                $regex  = 0;
+                $canpod = 0;
+                $format = 1;
+                redo;
+            }
+
+            if (
+                (
+                 $flat == 0 or (    $flat == 1
+                                and $code =~ /\G(?!\w+\h*\})/)
+                )
+                and $code =~ m{\G(?<!->)$perl_keywords}gco
+              ) {
+                my $name         = $1;
+                my @pos          = ($-[0], $+[0]);
+                my $is_bare_word = ($code =~ /\G(?=\h*=>)/);
+                $callback->(($is_bare_word ? 'bare_word' : 'keyword'), @pos);
+
+                if ($name eq 'sub' and not $is_bare_word) {
+                    $proto = 1;
+                    $regex = 0;
                 }
                 else {
+                    $regex      = 1;
                     $postfix_op = 0;
                 }
                 $canpod = 0;
-                $regex  = 1;
-                $flat   = 0;
                 redo;
             }
-            when (m{\G$hex_num}gco) {
-                $callback->('hex_number', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                redo;
+
+            # continue
+        }
+
+        if ($code =~ /\G(?!(?>tr|[ysm]|q[rwxq]?)\h*=>)/ and $code =~ /\G(?<!->)/) {
+
+            if (($flat == 1 and $code =~ /\G(?=[a-z]+\h*\})/) or $code =~ /\G((?<=\{)|(?<=\{\h))(?=[a-z]+\h*\})/) {
+                ## ok
             }
-            when (m{\G$binary_num}gco) {
-                $callback->('binary_number', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                redo;
-            }
-            when (m{\G$number}gco) {
-                $callback->('number', $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                redo;
-            }
-            when (m{\GSTD(?>OUT|ERR|IN)\b}gc) {
-                $callback->('special_fh', $-[0], $+[0]);
-                $regex      = 1;
-                $postfix_op = 0;
-                $canpod     = 0;
-                redo;
-            }
-            when (m{\G$var_name}gco) {
-                $callback->(($proto == 1 ? 'sub_name' : 'bare_word'), $-[0], $+[0]);
-                $regex  = 0;
-                $canpod = 0;
-                $flat   = 0;
-                redo;
-            }
-            when (/\G\z/cg) {    # all done
-                break;
-            }
-            default {
-                if (/\G(.)/cgs) {
-                    $callback->('unknown_char', $-[0], $+[0]);
+            else {
+
+                if ($code =~ m{\G $double_q{s} $substitution_flags }gcxo) {
+                    $callback->('substitution', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G (?> $double_q{tr} | $double_q{y} ) $tr_flags }gxco) {
+                    $callback->('transliteration', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G $single_q{m} $match_flags }gcxo
+                    or ($regex == 1 and $code =~ m{\G $match_re $match_flags }gcxo)) {
+                    $callback->('match_regex', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G $single_q{qr} $compiled_regex_flags }gcxo) {
+                    $callback->('compiled_regex', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G$single_q{q}}gco) {
+                    $callback->('q_string', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G$single_q{qq}}gco) {
+                    $callback->('qq_string', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G$single_q{qw}}gco) {
+                    $callback->('qw_string', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
+                    redo;
+                }
+
+                if ($code =~ m{\G$single_q{qx}}gco) {
+                    $callback->('qx_string', $-[0], $+[0]);
+                    $regex  = 0;
+                    $canpod = 0;
                     redo;
                 }
             }
+
+            # continue
         }
+
+        if ($code =~ m{\G$str_dq}gco) {
+            $callback->('double_quoted_string', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$str_sq}gco) {
+            $callback->('single_quoted_string', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$str_bq}gco) {
+            $callback->('backtick', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ /\G;/cg) {
+            $callback->('semicolon', $-[0], $+[0]);
+            $canpod     = 1;
+            $regex      = 1;
+            $postfix_op = 0;
+            $proto      = 0;
+            $flat       = 0;
+            redo;
+        }
+
+        if ($code =~ /\G=>/cg) {
+            $callback->('fat_comma', $-[0], $+[0]);
+            $regex      = 1;
+            $postfix_op = 0;
+            $canpod     = 0;
+            $flat       = 0;
+            redo;
+        }
+
+        if ($code =~ /\G,/cg) {
+            $callback->('comma', $-[0], $+[0]);
+            $regex      = 1;
+            $postfix_op = 0;
+            $canpod     = 0;
+            $flat       = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$vstring}gco) {
+            $callback->('v_string', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$perl_filetests\b}gco) {
+            my @pos = ($-[0], $+[0]);
+            my $is_bare_word = ($code =~ /\G(?=\h*=>)/);
+
+            $callback->(($is_bare_word ? 'bare_word' : 'file_test'), @pos);
+
+            if ($is_bare_word) {
+                $canpod = 0;
+                $regex  = 0;
+            }
+            else {
+                $regex      = 1;    # ambiguous, but possible
+                $postfix_op = 0;
+                $canpod     = 0;
+            }
+            redo;
+        }
+
+        if ($code =~ /\G(?=__)/) {
+            if ($code =~ m{\G__(?>DATA|END)__\b\h*+(?!=>).*\z}gcs) {
+                $callback->('data', $-[0], $+[0]);
+                redo;
+            }
+
+            if ($code =~ m{\G__(?>SUB|FILE|PACKAGE|LINE)__\b(?!\h*+=>)}gc) {
+                $callback->('special_keyword', $-[0], $+[0]);
+                $canpod = 0;
+                $regex  = 0;
+                redo;
+            }
+
+            # continue
+        }
+
+        if ($regex == 1 and $code =~ /\G(?<!(?:\+\+|--)\h)/ and $code =~ m{\G$glob}gco) {
+            $callback->('glob_readline', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$assignment_operators}gco) {
+            $callback->('assignment_operator', $-[0], $+[0]);
+            if ($format) {
+                if (substr($code, $-[0], $+[0] - $-[0]) eq '=') {
+                    $format        = 0;
+                    $expect_format = 1;
+                }
+            }
+            $regex  = 1;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ /\G->/cg) {
+            $callback->('dereference_operator', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 1;
+            redo;
+        }
+
+        if ($code =~ m{\G$operators}gco or $code =~ /\Gx(?=[0-9\W])/cg) {
+            $callback->('operator', $-[0], $+[0]);
+            if (substr($code, $-[0], ($+[0] - $-[0])) =~ /^$postfix_operators\z/o) {
+                $postfix_op = 1;
+            }
+            else {
+                $postfix_op = 0;
+            }
+            $canpod = 0;
+            $regex  = 1;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$hex_num}gco) {
+            $callback->('hex_number', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$binary_num}gco) {
+            $callback->('binary_number', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$number}gco) {
+            $callback->('number', $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            redo;
+        }
+
+        if ($code =~ m{\GSTD(?>OUT|ERR|IN)\b}gc) {
+            $callback->('special_fh', $-[0], $+[0]);
+            $regex      = 1;
+            $postfix_op = 0;
+            $canpod     = 0;
+            redo;
+        }
+
+        if ($code =~ m{\G$var_name}gco) {
+            $callback->(($proto == 1 ? 'sub_name' : 'bare_word'), $-[0], $+[0]);
+            $regex  = 0;
+            $canpod = 0;
+            $flat   = 0;
+            redo;
+        }
+
+        if ($code =~ /\G(.)/cgs) {
+            $callback->('unknown_char', $-[0], $+[0]);
+            redo;
+        }
+
+        # all done
     }
 
     return pos($code);
@@ -761,7 +820,7 @@ L<https://github.com/trizen/Perl-Tokenizer>
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, E<lt>trizenx@gmail.comE<gt>
+Daniel "Trizen" Șuteu, E<lt>trizen@protonmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

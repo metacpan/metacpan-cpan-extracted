@@ -2,22 +2,22 @@
 
 use strict;
 use warnings;
-use Struct::Path::PerlStyle qw(ps_parse);
+use Struct::Path::PerlStyle qw(str2path);
 use Test::More tests => 24;
 
-eval { ps_parse('(back') };
+eval { str2path('(back') };
 like($@, qr/^Unsupported thing '\(back' in the path/, "Unclosed parenthesis");
 
-eval { ps_parse('(back}') };
+eval { str2path('(back}') };
 like($@, qr/^Unsupported thing '\(back' in the path/, "Unmatched brackets");
 
-eval { ps_parse('[0](=>)[-2]') };
+eval { str2path('[0](=>)[-2]') };
 like($@, qr/^Unsupported hook '=>', step #1 /, "Unsupported hook");
 
-eval { ps_parse('[0](back(back))[-2]') };
+eval { str2path('[0](back(back))[-2]') };
 like($@, qr/^Unsupported thing '\(back\)' as hook argument, step #1 /, "Unsupported arg type");
 
-eval { ps_parse('[0](back back)[-2]') };
+eval { str2path('[0](back back)[-2]') };
 like($@, qr/^Unsupported thing 'back' as hook argument, step #1 /, "Unsupported arg type");
 
 # args passed to callback by Struct::Path (sample)
@@ -27,7 +27,7 @@ my $args = [
 ];
 
 ok(
-    ps_parse('[0](back)')->[1]->($args->[0], $args->[1]),
+    str2path('[0](back)')->[1]->($args->[0], $args->[1]),
     "Step back must returns 1"
 );
 
@@ -42,7 +42,7 @@ $args = [
     ["a","b"],
 ];
 
-my $spath = ps_parse('[0](back 2)');
+my $spath = str2path('[0](back 2)');
 ok(
     $spath->[1]->($args->[0], $args->[1]),
     "Step back must returns 1"
@@ -71,7 +71,7 @@ $args = [
     ["a","b"],
 ];
 
-eval { ps_parse('[0](back 3)')->[1]->($args->[0], $args->[1]) };
+eval { str2path('[0](back 3)')->[1]->($args->[0], $args->[1]) };
 like(
     $@, qr/^Can't step back \(root of the structure\)/,
     "Must fail if backs steps more than current path length"
@@ -84,23 +84,23 @@ $args = [
     [\"foo",\"bar"],
 ];
 
-eval { ps_parse("[0][1](=~ 'foo' 'bar')")->[2]->($args->[0], $args->[1]) };
+eval { str2path("[0][1](=~ 'foo' 'bar')")->[2]->($args->[0], $args->[1]) };
 like($@, qr/^Only one arg accepted by '=~'/, "As is");
 
 ok(
-    ps_parse("[0][1](=~ 'ar')")->[2]->($args->[0], $args->[1]),
+    str2path("[0][1](=~ 'ar')")->[2]->($args->[0], $args->[1]),
     "eq must return true value here"
 );
 
 ok(
-    ! ps_parse("[0][1](=~ '^ar')")->[2]->($args->[0], $args->[1]),
+    ! str2path("[0][1](=~ '^ar')")->[2]->($args->[0], $args->[1]),
     "eq must return false value here"
 );
 
 $args = [ [[1]], [\undef] ];
 
 ok(
-    ps_parse("(not =~ 'b')")->[0]->($args->[0], $args->[1]),
+    str2path("(not =~ 'b')")->[0]->($args->[0], $args->[1]),
     "eq must correctly handle undefs (doesn't croak)"
 );
 
@@ -111,49 +111,49 @@ $args = [
     [\"a",\"b"],
 ];
 
-eval { ps_parse("[0][1](eq 'b' 'c')")->[2]->($args->[0], $args->[1]) };
+eval { str2path("[0][1](eq 'b' 'c')")->[2]->($args->[0], $args->[1]) };
 like($@, qr/^Only one arg accepted by 'eq'/, "As is");
 
 ok(
-    ps_parse("[0][1](eq 'b')")->[2]->($args->[0], $args->[1]),
+    str2path("[0][1](eq 'b')")->[2]->($args->[0], $args->[1]),
     "eq must return true value here"
 );
 
 ok(
-    ps_parse('[0][1](eq "b")')->[2]->($args->[0], $args->[1]),
+    str2path('[0][1](eq "b")')->[2]->($args->[0], $args->[1]),
     "eq must return true value here"
 );
 
 ok(
-    ! ps_parse("[0][1](eq 'a')")->[2]->($args->[0], $args->[1]),
+    ! str2path("[0][1](eq 'a')")->[2]->($args->[0], $args->[1]),
     "eq must return false value here"
 );
 
 $args = [ [[1]], [\undef] ];
 
 ok(
-    ps_parse("(not eq 'b')")->[0]->($args->[0], $args->[1]),
+    str2path("(not eq 'b')")->[0]->($args->[0], $args->[1]),
     "eq must correctly handle undefs"
 );
 
 ### defined
 
 ok(
-    ! ps_parse('(defined)')->[0]->($args->[0], $args->[1]),
+    ! str2path('(defined)')->[0]->($args->[0], $args->[1]),
     "'defined' must return false value"
 );
 
 ok(
-    ps_parse("(not defined)")->[0]->($args->[0], $args->[1]),
+    str2path("(not defined)")->[0]->($args->[0], $args->[1]),
     "negate defined's false value"
 );
 
 ok(
-    ps_parse("(! defined)")->[0]->($args->[0], $args->[1]),
+    str2path("(! defined)")->[0]->($args->[0], $args->[1]),
     "negate defined's false value"
 );
 
 ok(
-    ps_parse("(!defined)")->[0]->($args->[0], $args->[1]),
+    str2path("(!defined)")->[0]->($args->[0], $args->[1]),
     "negate defined's false value"
 );

@@ -1,0 +1,21 @@
+*** Revision history for Dancer2-Plugin-DebugDump ***
+
+0.41      2017-12-23 15:01:23-05:00 America/New_York
+Added requirement to dist build to required earliest version of D2 to pass CPAN tests
+
+0.40      2017-12-22 13:17:24-05:00 America/New_York
+Got rid of makrdown syntax in Perldoc
+
+0.39      2017-12-19 07:48:32-05:00 America/New_York
+
+0.38      2017-12-18 23:45:48-05:00 America/New_York
+Fixed dependency error (hopefully). Added Changes file. Made doc improvements.
+
+0.37      2017-12-18 23:43:12-05:00 America/New_York
+
+0.36      2017-12-18 23:29:08-05:00 America/New_York
+
+0.35      2017-12-18 23:21:08-05:00 America/New_York
+
+0.33      2017-12-18 22:48:34-05:00 America/New_York
+Documentation improvements

@@ -30,7 +30,7 @@ use Perl::Critic::Utils;
 # perlcritic -s RequireLinkedURLs /usr/share/perl5/AnyEvent/HTTP.pm
 # perlcritic -s RequireLinkedURLs /usr/share/perl5/SVG/Rasterize.pm
 
-our $VERSION = 95;
+our $VERSION = 96;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_LOW;

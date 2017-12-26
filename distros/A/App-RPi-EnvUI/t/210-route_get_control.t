@@ -7,6 +7,7 @@ use Test::More;
 BEGIN {
     use lib 't/';
     use TestBase;
+    config();
     set_testing();
     db_create();
 }
@@ -43,6 +44,7 @@ my $test = Plack::Test->create(App::RPi::EnvUI->to_app);
 }
 
 unset_testing();
+unconfig();
 db_remove();
 done_testing();
 

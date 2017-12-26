@@ -1,3 +1,9 @@
+2.004.011 2017-12-22 16:05:00 Europe/Berlin
+    - bug fixing client doesn't on_fail on timeout
+      https://github.com/p-alik/perl-Gearman/issues/33
+    - peculiar handling of ssl-sockets in taskset->wait to avoid freezing
+      https://github.com/p-alik/perl-Gearman/issues/32
+
 2.004.010 2017-11-19 14:46:00 Europe/Berlin
     - bug fixing worker high CPU usage in idle state
       https://github.com/p-alik/perl-Gearman/issues/28

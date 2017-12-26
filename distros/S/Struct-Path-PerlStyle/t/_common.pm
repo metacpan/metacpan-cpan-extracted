@@ -6,7 +6,7 @@ use parent 'Exporter';
 
 use Clone qw(clone);
 use Data::Dumper qw();
-use Struct::Path::PerlStyle qw(ps_parse ps_serialize);
+use Struct::Path::PerlStyle qw(str2path path2str);
 use Test::More;
 
 our @EXPORT_OK = qw(
@@ -20,8 +20,8 @@ sub roundtrip {
     my $orig_string = $string;
     my $orig_struct = clone($struct);
 
-    my $serialized = ps_serialize($struct);
-    my $parsed = ps_parse($serialized);
+    my $serialized = path2str($struct);
+    my $parsed = str2path($serialized);
 
     subtest $comment => sub {
         plan tests => 4;

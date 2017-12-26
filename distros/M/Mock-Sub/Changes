@@ -1,5 +1,9 @@
 Revision history for Mock-Sub
 
+1.08    2017-12-21
+        - the mocked subs now return the parameters that were sent in to it if
+          return_value or side_effect have not been set (closes #24)
+
 1.07    2016-10-05
         - POD fix (closes #20)
         - changed croak() to confess()

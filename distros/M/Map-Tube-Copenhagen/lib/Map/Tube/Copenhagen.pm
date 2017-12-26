@@ -1,7 +1,16 @@
 package Map::Tube::Copenhagen;
 
-$Map::Tube::Copenhagen::VERSION   = '0.01';
+$Map::Tube::Copenhagen::VERSION   = '0.03';
 $Map::Tube::Copenhagen::AUTHORITY = 'cpan:SLU';
+
+=begin html
+
+<p>
+    <a href="https://travis-ci.org/soren/Map-Tube-Copenhagen"><img
+        src="https://travis-ci.org/soren/Map-Tube-Copenhagen.svg?branch=master"/></a>
+</p>
+
+=end html
 
 =head1 NAME
 
@@ -9,7 +18,7 @@ Map::Tube::Copenhagen - Interface to the Copenhagen Metro map
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -47,7 +56,7 @@ of type L<Map::Tube::Route>. On error it throws exception of type L<Map::Tube::E
     use Map::Tube::Copenhagen;
 
     my $tube  = Map::Tube::Copenhagen->new;
-    my $route = $tube->get_shortest_route('A', 'D');
+    my $route = $tube->get_shortest_route('Flintholm', 'Kastrup');
 
     print "Route: $route\n";;
 

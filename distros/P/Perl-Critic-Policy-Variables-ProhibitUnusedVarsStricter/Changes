@@ -1,3 +1,16 @@
+0.102		2017-12-19	T. R. Wyant
+    Fix for() list and my():
+
+    The iterator variable (if any) for a for() or foreach() is not
+    in-scope as seen from the list. This is an issue for code like
+    for my $x ( @{ $x } ) {...}
+
+    The variable specified by my() is not in-scope as seen from the
+    right-hand side of an assignment (if any). This is an issue for
+    my $x = $x
+
+    Thanks to Heinz Knutzen for finding these.
+
 0.101		2017-11-20	T. R. Wyant
     Remove 'mailto' bugtracker metadata Its presence appears to tell RT
     not to allow filings.

@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.261 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2017-11-08.
+    This document describes version 0.262 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2017-12-24.
 
 SYNOPSIS
     See the included script wordlist.

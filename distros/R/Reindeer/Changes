@@ -1,5 +1,10 @@
 Revision history for Reindeer
 
+0.020     2017-12-20 17:29:08 CST-0600
+	* Use Reindeer in Reindeer documentation (@2shortplanks,
+	  pull request #11)
+	* Fix documentation of what feature bundles are enabled (issue #13)
+
 0.019     2017-06-09 22:31:28 CDT-0500
 	* Minor tweak for 5.26
 

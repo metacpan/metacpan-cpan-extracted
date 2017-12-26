@@ -218,6 +218,9 @@ Then you can use them without module option.  In this case, option
 
 # STANDARD MODULES
 
+Standard modules are installed at `App::optex`, and they can be
+addressed with and without `App::optex` prefix.
+
 - -M**help**
 
     Print available option list.  Option name is printed with substitution

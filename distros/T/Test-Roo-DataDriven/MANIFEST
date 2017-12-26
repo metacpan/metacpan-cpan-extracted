@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+cpanfile
 dist.ini
 lib/Test/Roo/DataDriven.pm
 t/00-report-prereqs.dd
@@ -14,6 +15,8 @@ t/00-report-prereqs.t
 t/01-example.t
 t/02-json.t
 t/03-parsing-errors.t
+t/04-skip_all.t
+t/05-argv.t
 t/author-clean-namespaces.t
 t/author-critic.t
 t/author-eof.t

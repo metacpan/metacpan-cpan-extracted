@@ -69,4 +69,51 @@ subtest "js socket", sub {
     ok($gc->_get_random_js_sock());
 };
 
+subtest 'Client: "on_fail" handler is triggered on timeout' => sub {
+    my ($now, $then) = (time);
+
+    my $gts         = t::Server->new();
+    my @job_servers = $gts->job_servers();
+    @job_servers || plan skip_all => $t::Server::ERROR;
+
+    my $c              = new_ok($mn, [job_servers => [@job_servers]]);
+    my $timeout        = 2;
+    my $initial_error  = '"on_fail" was NOT triggered';
+    my $expected_error = '"on_fail" was triggered';
+    my $error          = $initial_error;
+    my $res_ref        = $c->do_task(
+        task_that_does_not_exist => '',
+        {
+            timeout     => $timeout,
+            on_fail     => sub { $then = time; $error = $expected_error },
+            on_complete => sub {
+                die '"on_complete" handler was called unexpectedly';
+            },
+        }
+    );
+    lives_and { is($error, $expected_error) }
+    '"on_fail" callback was triggered on timeout';
+    ok(
+        (defined $then) && ($then - $now >= $timeout),
+        "Timeout of ${timeout}s was elapsed"
+    );
+
+    $expected_error = qq(ALRM handler fired after ${timeout}s);
+    throws_ok {
+        local $SIG{ALRM} = sub { die $expected_error };
+        alarm $timeout;
+        $res_ref = $c->do_task(
+            task_that_does_not_exist => '',
+            {
+                on_fail => sub { $then = time; $error = $expected_error },
+                on_complete => sub {
+                    die '"on_complete" handler was called unexpectedly';
+                },
+            }
+        );
+        alarm 0;
+    } ## end throws_ok
+    qr/$expected_error/, q(ALRM handler fired as expected);
+};
+
 done_testing();

@@ -10,7 +10,8 @@ use Test::Deep;
 
 foreach my $display (undef, ':0.0')
 {
-    local $ENV{DISPLAY} = $display;
+    local $ENV{DISPLAY};
+    $ENV{DISPLAY} = $display if $display;
 
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },

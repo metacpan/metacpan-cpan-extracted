@@ -9,11 +9,11 @@ Games::ABC_Path::Solver::Move - an ABC Path move.
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.4.1
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 
 =head1 SYNOPSIS
 

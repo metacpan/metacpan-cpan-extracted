@@ -68,13 +68,13 @@ sub test_lang {
                                 SUFFIX => ".muse",
                                 TMPDIR => 1);
     binmode $other, ":encoding(utf-8)";
-    print $other "#title test language  $lang\n#language    $lang\n\nHello\n";
+    print $other "#title test language      $lang\n#language    $lang\n\nHello\n";
     close $other;
     $doc = Text::Amuse->new(file => $other->filename);
     # print $fh->filename, " => $lang => $expected_lang\n";
     is($doc->language_code, $expected_code, "$lang is $expected_code");
     is($doc->language, $expected_lang, "$lang is $expected_lang");
-    is_deeply($doc->header_as_html, {title => "test language  $lang",
+    is_deeply($doc->header_as_html, {title => "test language $lang",
                                      language => $lang}, "header OK");
     is($doc->as_latex, "\nHello\n\n", "body ok");
     ok(!$doc->other_language_codes);

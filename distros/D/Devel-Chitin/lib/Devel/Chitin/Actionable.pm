@@ -3,7 +3,7 @@ package Devel::Chitin::Actionable;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Digest::MD5 qw(md5);
 use Carp;
@@ -330,5 +330,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

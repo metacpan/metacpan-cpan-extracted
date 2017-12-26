@@ -1,0 +1,176 @@
+NAME
+    Cloudinary - Talk with cloudinary.com
+
+VERSION
+    0.15
+
+DESCRIPTION
+    This module lets you interface to <http://cloudinary.com>.
+
+SYNOPSIS
+  Standalone
+      my $delay = Mojo::IOLoop->delay;
+      my $cloudinary = Cloudinary->new(cloud_name => "a", api_key => "b", api_secret => "c");
+
+      $delay->begin;
+      $cloudinary->upload({file => {file => $path_to_file}}, sub {
+        my ($cloudinary, $res) = @_;
+        # ...
+        $delay->end;
+      },
+      });
+
+      # let's you do multiple upload() in parallel
+      # just call $delay->begin once pr upload()
+      # and $delay->end in each callback given to upload()
+      $delay->wait;
+
+  With mojolicious
+    See Mojolicious::Plugin::Cloudinary.
+
+  Options
+    As from 0.04 all methods support the short and long option, meaning the
+    examples below work the same:
+
+      $self->url_for('billclinton.jpg' => { w => 50 });
+      $self->url_for('billclinton.jpg' => { width => 50 });
+
+  url_for() examples
+      $cloudinary->url_for('billclinton.jpg', { type => 'facebook' });
+      $cloudinary->url_for('billclinton.jpg', { type => 'twitter_name', h => 70, w => 100 });
+      $cloudinary->url_for('18913373.jpg', { type => 'twitter_name' });
+      $cloudinary->url_for('my-uploaded-image.jpg', { h => 50, w => 50 });
+      $cloudinary->url_for('myrawid', { resource_type => 'raw' });
+
+  Aliases
+    This module provides alias for the Cloudinary transformations:
+
+      a = angle
+      b = background
+      c = crop
+      d = default_image
+      e = effect
+      f = fetch_format
+      g = gravity
+      h = height
+      l = overlay
+      p = prefix
+      q = quality
+      r = radius
+      t = named_transformation
+      w = width
+      x = x
+      y = y
+
+ATTRIBUTES
+  cloud_name
+    Your cloud name from <https://cloudinary.com/console>
+
+  api_key
+    Your API key from <https://cloudinary.com/console>
+
+  api_secret
+    Your API secret from <https://cloudinary.com/console>
+
+  private_cdn
+    Your private CDN url from <https://cloudinary.com/console>.
+
+METHODS
+  upload
+      $self->upload(
+        {
+          file          => $binary_str | $url,    # required
+          format        => $str,                  # optional
+          public_id     => $str,                  # optional
+          resource_type => $str,                  # image or raw. defaults to "image"
+          tags          => ['foo', 'bar'],        # optional
+          timestamp     => $epoch,                # time()
+        },
+        sub { my ($cloudinary, $res) = @_ }
+      );
+
+    Will upload a file to <http://cloudinary.com> using the parameters given
+    "cloud_name", "api_key" and "api_secret". $res in the callback will be
+    the json response from cloudinary:
+
+      {
+        url        => $str,
+        secure_url => $str,
+        public_id  => $str,
+        version    => $str,
+        width      => $int,    # only for images
+        height     => $int,    # only for images
+      }
+
+    $res on error can be either "undef" if there was an issue
+    connecting/communicating with cloudinary or a an error data structure:
+
+      {error => {message: $str}}
+
+    The "file" can be:
+
+    *   A hash
+
+          { file => 'path/to/image' }
+
+    *   A Mojo::Upload object.
+
+    *   A Mojo::Asset object.
+
+    *   A URL
+
+    "res" in callbacks will be the JSON response from
+    <http://cloudinary.com> as a hash ref. It may also be "undef" if
+    something went wrong with the actual HTTP POST.
+
+    See also <https://cloudinary.com/documentation/upload_images> and
+    <http://cloudinary.com/documentation/upload_images#raw_uploads>.
+
+  destroy
+      $self->destroy(
+        {
+          public_id     => $public_id,
+          resource_type => $str,         # image or raw. defaults to "image"
+        },
+        sub { my ($cloudinary, $res) = @_; }
+      );
+
+    Will delete an image from cloudinary, identified by $public_id. The
+    callback will be called when the image got deleted or if an error occur.
+
+    On error, look for:
+
+      {error => {message: $str}}
+
+    See also
+    <https://cloudinary.com/documentation/upload_images#deleting_images>.
+
+  url_for
+      $url_obj = $self->url_for("$public_id.$format", \%args);
+
+    This method will return a public URL to the image at
+    <http://cloudinary.com>. It will use "private_cdn" or the public CDN and
+    "cloud_name" to construct the URL. The return value is a Mojo::URL
+    object.
+
+    Example %args:
+
+      {
+        h             => 150,      # height of image
+        w             => 100,      # width of image
+        resource_type => $str,     # image or raw. defaults to "image"
+        secure        => $bool,    # use private_cdn or public cdn
+        type          => $str,     # upload, facebook. defaults to "upload"
+      }
+
+    See also
+    <http://cloudinary.com/documentation/upload_images#accessing_uploaded_im
+    ages> and <http://cloudinary.com/documentation/image_transformations>.
+
+COPYRIGHT & LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Jan Henning Thorsen - jhthorsen@cpan.org
+

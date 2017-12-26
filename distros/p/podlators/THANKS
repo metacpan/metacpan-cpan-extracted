@@ -199,3 +199,11 @@ correct installation with old versions of Perl.
 Dave Mitchell, for a bug fix for warnings when determining the man page
 title of a simple module and for how best to suppress Encode warnings
 during Perl core builds.
+
+Guillem Jover, for the formatting change for man page references and
+function names to match the Linux man page standard, and reporting a
+diagnostic bug when pod2man or pod2text gets empty input on standard
+input.
+
+Zefram, for analyzing and fixing a problem with the UTF-8 layer detection
+code in Pod::Man.

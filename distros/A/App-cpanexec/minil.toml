@@ -1,0 +1,6 @@
+name = "App-cpanexec"
+# badges = ["travis"]
+authority="cpan:OKLAS"
+
+module_maker="ModuleBuildTiny"
+

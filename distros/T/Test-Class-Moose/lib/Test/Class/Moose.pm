@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.10.0;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 use Moose 2.0000;
 use Carp;
@@ -222,7 +222,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

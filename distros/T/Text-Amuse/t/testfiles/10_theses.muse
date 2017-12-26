@@ -14,6 +14,14 @@
 
 #notes Perlman Internet Archive 2006. This work has always been completely free.  *from* [[http://www.marxists.org/reference/archive/perlman-fredy/1977/thesis-egocrats.htm][Marxist.org]]
 
+#-test-me-
+continuation
+
+#__test__me__
+
+#0_test_me
+
+#hello___There
 
 *** I [1]
 

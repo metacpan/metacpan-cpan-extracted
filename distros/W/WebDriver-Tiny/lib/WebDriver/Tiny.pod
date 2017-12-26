@@ -61,10 +61,21 @@ targetting, below are some examples:
 =head2 ChromeDriver
 
  my $drv = WebDriver::Tiny->new(
-     capabilities => {
-         chromeOptions => { binary => '/usr/bin/google-chrome' },
-     },
-     port => 9515,
+     capabilities => { chromeOptions => { binary => '/usr/bin/google-chrome' } },
+     port         => 9515,
+ );
+
+=head2 geckodriver
+
+On the command line:
+
+ geckodriver
+
+In Perl code:
+
+ my $drv = WebDriver::Tiny->new(
+     capabilities => { 'moz:firefoxOptions' => { args => ['-headless'] } },
+     port         => 4444,
  );
 
 =head2 PhantomJS
@@ -277,17 +288,17 @@ Maximum number of attempts to try and find a match. Defaults to 5.
 
 =head2 Alerts
 
-=head3 accept_alert
+=head3 alert_accept
 
- $drv->accept_alert;
+ $drv->alert_accept;
+
+=head3 alert_dismiss
+
+ $drv->alert_dismiss;
 
 =head3 alert_text
 
  my $text = $drv->alert_text;
-
-=head3 dismiss_alert
-
- $drv->dismiss_alert;
 
 =head2 Cookies
 
@@ -338,28 +349,6 @@ Maximum number of attempts to try and find a match. Defaults to 5.
      callback("bar");
  JS
 
-=head3 js_phantom
-
- my $return = $drv->js_phantomjs('return "baz"');
-
-=head2 Local Storage
-
-=head3 storage
-
- # Get a hashref of all keys and values in local storage.
- my $storage = $drv->storage;
-
- # Get a list of all the keys in local storage.
- my @keys = $drv->storage;
-
- # Get the value of the "foo" key in local storage.
- my $value = $drv->storage('foo');
-
- # Set the value of the "foo" key in local storage to "bar".
- $drv->storage( foo => 'bar' );
-
-=head3 storage_delete
-
 =head2 Navigation
 
 =head3 back
@@ -384,15 +373,15 @@ Maximum number of attempts to try and find a match. Defaults to 5.
 
 Hash of the capabilities of the current session.
 
+=head3 html
+
+Get the source code of the current page.
+
 =head3 orientation
 
  my $orientation = $drv->orientation;
 
  $drv->orientation($orientation);
-
-=head3 source
-
-Get the source code of the current page.
 
 =head3 status
 

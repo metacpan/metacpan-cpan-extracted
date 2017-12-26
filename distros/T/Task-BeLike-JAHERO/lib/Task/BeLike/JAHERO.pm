@@ -1,5 +1,5 @@
 package Task::BeLike::JAHERO;
-our $VERSION = '1.173490'; # VERSION
+our $VERSION = '1.173530'; # VERSION
 # ABSTRACT: JAHERO's frequently-used or favorite modules
 
 #use App::Cmd                           ;
@@ -38,9 +38,9 @@ Task::BeLike::JAHERO - JAHERO's frequently-used or favorite modules
 
 =head1 VERSION
 
-version 1.173490
+version 1.173530
 
-=head SYNOPSIS
+=head1 SYNOPSIS
 
 This module does nothing usefull if you use it in your code. 
 It can, however, be used to install several other usefull modules.

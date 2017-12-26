@@ -21,6 +21,7 @@ sub list {
                 Bite/Email/Exim.pm
                 Bite/Email/EZweb.pm
                 Bite/Email/Facebook.pm
+                Bite/Email/FML.pm
                 Bite/Email/GMX.pm
                 Bite/Email/Google.pm
                 Bite/Email/GSuite.pm
@@ -112,6 +113,8 @@ sub list {
         Rhost.pm
             Rhost/GoogleApps.pm
             Rhost/ExchangeOnline.pm
+            Rhost/GoDaddy.pm
+            Rhost/FrancePTT.pm
         SMTP.pm
             SMTP/Error.pm
             SMTP/Reply.pm

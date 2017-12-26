@@ -1,9 +1,5 @@
 package App::optex::util::argv;
 
-1;
-
-package util::argv;
-
 use v5.10;
 use strict;
 use warnings;

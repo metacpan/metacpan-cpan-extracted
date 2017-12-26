@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
-use Test::NoWarnings;
+use Test::More tests => 4;
 
 use List::Categorize::Multi qw( categorize );
 

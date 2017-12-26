@@ -35,7 +35,7 @@
             "HTML::PullParser" : "0",
             "IO::HTML" : "1",
             "Pod::Simple::Wiki" : "0.19",
-            "Text::Amuse" : "0.76"
+            "Text::Amuse" : "0.94"
          }
       }
    },
@@ -45,5 +45,5 @@
          "url" : "https://github.com/melmothx/text-amuse-preprocessor"
       }
    },
-   "version" : "0.50"
+   "version" : "0.51"
 }

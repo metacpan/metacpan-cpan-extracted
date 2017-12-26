@@ -80,7 +80,7 @@ $conf_file->spew_utf8(@orig);
 
 subtest "minimal modification" => sub {
     # test minimal modif (re-order)
-    my @test_cmd = (qw/modify popcon -save -backup -root-dir/, $wr_dir->stringify);
+    my @test_cmd = (qw/modify popcon -save -backup -canonical -root-dir/, $wr_dir->stringify);
     my $ok = test_app( 'App::Cme' => \@test_cmd );
     is ($ok->exit_code, 0, 'all went well' ) or diag("Failed command cme @test_cmd");
     is($ok->error, undef, 'threw no exceptions');

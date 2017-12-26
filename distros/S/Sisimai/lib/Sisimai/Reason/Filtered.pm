@@ -31,6 +31,7 @@ sub match {
             )
         |we[ ]failed[ ]to[ ]deliver[ ]mail[ ]because[ ]the[ ]following[ ]address
             [ ]recipient[ ]id[ ]refuse[ ]to[ ]receive[ ]mail    # Willcom
+        |You[ ]have[ ]been[ ]blocked[ ]by[ ]the[ ]recipient
         )
     }ix;
 
@@ -147,7 +148,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

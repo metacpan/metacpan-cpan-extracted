@@ -43,6 +43,7 @@ sub read_config {
     $self->_set_server_self_link;
     $self->_set_server_relative_links;
     $self->_set_repository;
+    $self->_set_server_respond_to_updates_status;
 
     $self->{'ponapi.mediatype'} = 'application/vnd.api+json';
 
@@ -52,8 +53,13 @@ sub read_config {
 sub _set_server_respond_to_updates_status {
     my $self = shift;
 
+    my $server_update = $self->config->{server}{respond_to_updates_with_200};
+
     $self->{'ponapi.respond_to_updates_with_200'} =
-        $self->config->{server}{respond_to_updates_with_200};
+        ( grep { $server_update eq $_ } qw< yes true 1 > ) ? 1 :
+        ( grep { $server_update eq $_ } qw< no false 0 > ) ? 0 :
+        die "[PONAPI Server] server respond_to_updates_with_200 is misconfigured";
+
 }
 
 sub _set_server_sorting {
@@ -124,7 +130,7 @@ PONAPI::Server::ConfigReader - Web-Server - configuration handler
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

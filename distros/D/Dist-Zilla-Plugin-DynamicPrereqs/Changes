@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs
 
+0.034     2017-12-21 00:49:09Z
+          - can_cc implementation updated to match
+            Module::Install::Can::can_cc, by adding a code snippet for VMS
+
 0.033     2017-04-30 18:58:42Z
           - documentation added regarding the lack of ability to use dynamic
             requires-recommends, requires-suggests etc

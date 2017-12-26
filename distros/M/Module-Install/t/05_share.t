@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Check that install_share 
 
 use strict;

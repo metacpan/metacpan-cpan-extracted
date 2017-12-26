@@ -6,7 +6,7 @@ use Mojo::JSON;
 use Mojo::Util 'deprecated';
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -49,6 +49,7 @@ sub register {
     $config->{url} || $config->{spec},
     {
       allow_invalid_ref  => $config->{allow_invalid_ref},
+      schema             => $config->{schema},
       version_from_class => $config->{version_from_class} // ref $app,
     }
   );
@@ -584,6 +585,10 @@ C<route> can be specified in case you want to have a protected API. Example:
     route => $app->routes->under("/api")->to("user#auth"),
     url   => $app->home->rel_file("cool.api"),
   });
+
+=item * schema
+
+Can be used to set a different schema, than the default OpenAPI 2.0 spec.
 
 =item * spec_route_name
 

@@ -3,11 +3,13 @@ package RDF::RDFa::Generator::HTML::Head;
 use 5.008;
 use base qw'RDF::RDFa::Generator';
 use strict;
+use warnings;
 use Encode qw'encode_utf8';
 use RDF::Prefixes;
 use XML::LibXML qw':all';
+use Carp;
 
-our $VERSION = '0.103';
+our $VERSION = '0.192';
 
 sub new
 {
@@ -50,7 +52,7 @@ sub inject_document
 	$xc->registerNs('xhtml', 'http://www.w3.org/1999/xhtml');
 	my @sites = $xc->findnodes($proto->injection_site);
 	
-	die "No suitable place to inject this document." unless @sites;
+	croak "No suitable place to inject this document." unless @sites;
 	
 	$sites[0]->appendChild($_) foreach @nodes;
 	return $dom;
@@ -106,7 +108,7 @@ sub nodes
 		
 		use Data::Dumper; Dumper($prefixes);
 		
-		if ($self->{'version'} == 1.1
+		if (defined($self->{'version'}) && $self->{'version'} == 1.1
 		and $self->{'prefix_attr'})
 		{
 			$node->setAttribute('prefix', $prefixes->rdfa)
@@ -133,16 +135,27 @@ sub nodes
 sub _get_stream
 {
 	my ($self, $model) = @_;
-	
+	my $stream;
 	my $data_context = undef;
-	if (defined $self->{'data_context'})
-	{
-		$data_context = ( $self->{'data_context'} =~ /^_:(.*)$/ ) ?
-			RDF::Trine::Node::Blank->new($1) :
-			RDF::Trine::Node::Resource->new($self->{'data_context'});
+
+	if ($model->isa('RDF::Trine::Model')) {
+		if (defined $self->{'data_context'}) {
+			$data_context = ( $self->{'data_context'} =~ /^_:(.*)$/ ) ?
+			  RDF::Trine::Node::Blank->new($1) :
+					RDF::Trine::Node::Resource->new($self->{'data_context'});
+		}
+		$stream = $model->get_statements(undef, undef, undef, $data_context);
+	} elsif ($model->does('Attean::API::Model')) {
+		if (defined $self->{'data_context'}) {
+			$data_context = ( $self->{'data_context'} =~ /^_:(.*)$/ ) ?
+			  Attean::Blank->new($1) :
+					Attean::IRI->new($self->{'data_context'});
+		}
+		$stream = $model->get_quads(undef, undef, undef, $data_context);
+	} else {
+		croak "Unknown RDF model supplied";
 	}
-	
-	return $model->get_statements(undef, undef, undef, $data_context);
+	return $stream;
 }
 
 sub _process_subject
@@ -186,7 +199,7 @@ sub _process_predicate
 		$node->setAttribute($attr, ':'.$1);
 		return $self;
 	}
-	elsif ($self->{'version'} == 1.1)
+	elsif (defined($self->{'version'}) && $self->{'version'} == 1.1)
 	{
 		$node->setAttribute($attr, $st->predicate->uri);
 		return $self;

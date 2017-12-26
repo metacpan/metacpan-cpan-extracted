@@ -29,8 +29,8 @@ debug_ua($ua);
         );
 
         isa_ok(
-            $payments, 'WebService::PayPal::PaymentsAdvanced',
-            'new object'
+            $payments,
+            'WebService::PayPal::PaymentsAdvanced',
         );
 
         isa_ok(
@@ -38,7 +38,6 @@ debug_ua($ua);
                 my $res = $payments->create_secure_token( {} );
             },
             'WebService::PayPal::PaymentsAdvanced::Error::Authentication',
-            ( $production_mode ? 'production' : 'sandbox' )
         );
     }
 }

@@ -9,7 +9,20 @@ any of the following are very much welcome.
    all of the frustrations in Pod::Man with turning valid characters into
    X and would allow massive simplification of the preamble for most
    pages.  We could also move some of the remaining *roff macros to the
-   accents section and only conditionally output them.
+   accents section and only conditionally output them.  Unfortunately, it
+   looks like all non-man-db, non-groff *roff implementations still don't
+   support Unicode characters, though, and even some groff setups may not
+   support them properly.  So this is still a portability issue.
+
+ * Support an output mode that uses groff escapes for all Unicode
+   characters.  We might be able to just use \[uNNNN] for all Unicode
+   code points.  This would work portably on any system that uses groff,
+   and may make sense as the default output format on Linux.
+
+ * Escape all hyphens in the text of L<some-command> links.
+
+ * Add a =for license stanza that takes license text and embeds it as a
+   *roff comment.
 
  * Abstract the shared code between Pod::Man and Pod::Text to a new
    Pod::Simple inheritance layer that both modules can use.
@@ -18,10 +31,7 @@ any of the following are very much welcome.
    tag with mailto: added to the front.  Also strip the mailto: part if
    there is no anchor text.
 
- * Add a test suite for the pod2man and pod2text driver programs.  This
-   will probably require restructuring them so that they can be loaded
-   with require, since otherwise it's too difficult to figure out how to
-   run them with Perl.
+ * Add a test suite for the pod2man and pod2text driver programs.
 
  * There should be some way to turn off all heuristics when people are
    using POD for some purpose other than Perl or some other programming
@@ -47,6 +57,8 @@ any of the following are very much welcome.
    still have to be converted.)
 
  * Document all the standard module interfaces from Pod::Simple.
+
+ * Optionally suppress the generation of empty man pages in Pod::Man.
 
 The following items require changes to the POD specification and are
 therefore of broader scope than just this code:

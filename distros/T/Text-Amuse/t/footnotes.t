@@ -6,14 +6,14 @@ use Text::Amuse::Functions qw/muse_to_html muse_to_tex/;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 24;
+plan tests => 30;
 
 my $fn = Text::Amuse::Document->new(file => catfile(t => testfiles => 'footnotes.muse'));
 
 my @got = $fn->elements;
 
-is(scalar(grep { $_->type ne 'null'} @got), 1,
-   "Only one not null element") or diag Dumper(\@got);
+is(scalar(grep { $_->type ne 'null'} @got), 4, # added 3 lines
+   "4 not null element") or diag Dumper(\@got);
 is($fn->get_footnote('[1]')->string, "first\n");
 is($fn->get_footnote('[2]')->string, "second\nthird\n");
 is($fn->get_footnote('[3]')->string, "third\n");
@@ -83,3 +83,21 @@ MUSE
     # diag $html;
 }
 
+{
+    my $muse =<<'MUSE';
+#title test
+
+Zero [0]
+
+[0] zero
+MUSE
+
+    my $html = muse_to_html($muse);
+    my $ltx  = muse_to_tex($muse);
+    like $html, qr{0.*0}s, "Found zero in HTML";
+    unlike $html, qr{footnote}, "Not an html footnote";
+    like $ltx, qr{0.*0}s, "Found zero in TeX";
+    unlike $ltx, qr{footnote}, "Not a footnote";
+    is $html, "\n<p>\nZero [0]\n</p>\n\n<p>\n[0] zero\n</p>\n", "html is good";
+    is $ltx, "\nZero [0]\n\n\n[0] zero\n\n", "ltx is good";
+}

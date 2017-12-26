@@ -18,5 +18,5 @@ meta-spec:
 name: Plack-App-URLMux
 requires:
   Plack::Component: '0'
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.70'

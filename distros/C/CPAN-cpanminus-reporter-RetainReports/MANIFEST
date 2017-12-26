@@ -1,16 +1,18 @@
 Changes
-examples/BINGOS.Archive-Extract-0.80.log.json
-examples/BINGOS.Archive-Extract-0.80.log.txt
+examples/DAGOLDEN.Sub-Uplevel-0.2800.log.json
+examples/DAGOLDEN.Test-API-0.008.log.json
 lib/CPAN/cpanminus/reporter/RetainReports.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+scripts/dump-parsed-cpanm-build-logs
 t/001-load.t
 t/002-make_report.t
 t/003-analyze-cpan-river.t
 t/004-mixed-scheme.t
+t/005-dump-parsed-cpanm-build-logs.t
 t/data/build.cloudweights.log
 t/data/build.configure_failed.log
 t/data/build.dist_subdir.log

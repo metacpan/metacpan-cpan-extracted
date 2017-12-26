@@ -6,14 +6,14 @@ use warnings;
 
 use base qw( WWW::Shorten::generic Exporter );
 our @EXPORT = qw( makeashorterlink makealongerlink );
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use Carp;
 
 sub makeashorterlink ($) {
     my $url = shift or croak 'No URL passed to makeashorterlink';
     my $ua = __PACKAGE__->ua();
-    my $service_url = 'http://urlchen.de/';
+    my $service_url = 'https://urlchen.de/';
     my $resp = $ua->post($service_url, [
 	url => $url,
 	source => "PerlAPI-$VERSION",
@@ -23,12 +23,12 @@ sub makeashorterlink ($) {
 }
 
 sub makealongerlink ($) {
-    my $urlchen = shift 
+    my $urlchen = shift
 	or croak 'No Urlchen key / URL passed to makealongerlink';
     my $ua = __PACKAGE__->ua();
 
-    $urlchen = "http://urlchen.de/$urlchen"
-    unless $urlchen =~ m!^http://!i;
+    $urlchen = "https://urlchen.de/$urlchen"
+    unless $urlchen =~ m!^https://!i;
 
     my $resp = $ua->get($urlchen);
 

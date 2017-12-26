@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.14 2017-12-23T17:10:22+0100
+ - Add call_p() that returns a Mojo::Promise
+
 0.13 2017-12-11T19:04:35+0100
  - Add default coercion to input parameters
  - Add call() for calling "invalid" operationIds names
@@ -10,6 +13,7 @@ Revision history for perl distribution OpenAPI-Client
 
 0.11 2017-12-08T14:57:01+0100
  - Fix openapi command will not try to decode empty strings #5
+   Contributor: Ed J
 
 0.10 2017-11-27T18:01:50+0100
  - Can resolve $ref in spec

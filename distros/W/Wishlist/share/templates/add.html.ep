@@ -1,0 +1,36 @@
+% title 'Add an item';
+% layout 'default';
+
+% content_for 'head' => begin
+  <style>
+    #item-detail img {
+      max-width: 40%;
+      float: left;
+      margin: 20px;
+    }
+  </style>
+% end
+
+% content_for 'sidebar' => begin
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      Add this item to your list?
+    </div>
+    <div class="panel-body">
+      %= form_for 'do_add' => begin
+        %= hidden_field title => $link->title
+        %= hidden_field url => $link->url
+        <input type="submit" value="Yes" class="btn btn-default">
+        %= link_to 'No' => '/', (class => 'btn btn-default')
+      % end
+    </div>
+  </div>
+  %= include 'partial/log_out'
+% end
+
+<div class="panel panel-default">
+  <div id="item-detail" class="panel-body">
+    <%== $link->html %>
+  </div>
+</div>
+

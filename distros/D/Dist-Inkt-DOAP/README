@@ -27,16 +27,17 @@ DESCRIPTION
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-DOAP>.
+    <https://github.com/kjetilk/p5-dist-inkt-doap/issues>
 
 SEE ALSO
     Dist::Inkt.
 
 AUTHOR
-    Toby Inkster <tobyink@cpan.org>.
+    Toby Inkster <tobyink@cpan.org>. Kjetil Kjernsmo <kjetilk@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2014 by Toby Inkster.
+    This software is copyright (c) 2014 by Toby Inkster, 2017 by Kjetil
+    Kjernsmo
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

@@ -75,17 +75,25 @@ EXAMPLE
 DEPENDENCIES
     Class::Utils, Unicode::Block::Item.
 
+SEE ALSO
+    Unicode::Block::Ascii
+        Ascii output of unicode block.
+
+    Unicode::Block::List
+        List of unicode blocks.
+
 REPOSITORY
     <https://github.com/tupinek/Unicode-Block>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    BSD license.
+     © 2013-2017 Michal Josef Špaček
+     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.06
 

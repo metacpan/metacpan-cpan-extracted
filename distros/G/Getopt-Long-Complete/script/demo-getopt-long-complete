@@ -1,0 +1,179 @@
+#!perl
+
+our $DATE = '2017-12-20'; # DATE
+our $VERSION = '0.310'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Complete::Util qw(complete_array_elem);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+my %opts = (cols => 1, bg=>0);
+my $res = GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        my $word = $args{word};
+        my $type = $args{type};
+
+        if ($type eq 'arg') {
+            my $argpos = $args{argpos};
+            return complete_array_elem(
+                array=>["arg$argpos-a", "arg$argpos-b"], word=>$word);
+        } elsif ($type eq 'optval') {
+            my $opt = $args{opt};
+            if ($opt eq '--int-comp-array') {
+                return complete_array_elem(array=>[1..10], word=>$word);
+            } elsif ($opt eq '--str-comp-sub') {
+                return complete_array_elem(array=>[map {"$word$_"} "a".."z"],
+                                           word=>$word);
+            } elsif ($opt eq '--module' || $opt eq '-M') {
+                return {
+                    words => complete_array_elem(
+                        array=>[
+                            "Complete::Util",
+                            "Text::ANSITable",
+                            "Text::ANSI::",
+                            "Text::ANSI::Util",
+                        ],
+                        word=>$word,
+                    ),
+                    path_sep => '::',
+                };
+            }
+        }
+
+        undef;
+    },
+    'flag1|1' => sub{},
+    'flag2|f' => sub{},
+    'bool|b!' => sub{},
+    'int=i' => sub{},
+    'module|M=s' => sub{},
+    'float|F=f' => sub{},
+    'str|text|S=s' => sub{},
+    'array=s@' => sub{},
+    'int-comp-array=i' => sub{},
+    'str-comp-sub=s' => sub{},
+
+    'version|v' => sub{
+        no warnings;
+        say "test-getopt-long-complete version $main::VERSION";
+        exit 0;
+    },
+    'help|h|?' => sub {
+        print <<_;
+Usage:
+  $0 --help (or -h, -?)
+  $0 [opts]
+
+Options:
+  --flag1, -1
+  --flag2, -f
+  --(no)bool, -b
+  --int=i
+  --float=f, -F
+  --str=s, --text, -S
+  --array=s@
+  --int-comp-array=i
+  --str-comp-sub=s
+_
+        exit 0;
+    },
+);
+
+#say $res ? "Getopt failed" : "Getopt succeeded";
+# ABSTRACT: Script to demonstrate Getopt::Long::Complete
+# PODNAME: demo-getopt-long-complete
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+demo-getopt-long-complete - Script to demonstrate Getopt::Long::Complete
+
+=head1 VERSION
+
+This document describes version 0.310 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2017-12-20.
+
+=head1 SYNOPSIS
+
+Activate completion using (can be put in your bash startup file):
+
+ % complete -C demo-getopt-long-complete demo-getopt-long-complete
+
+Test completion:
+
+ % demo-getopt-long-complete <tab>
+ % demo-getopt-long-complete -<tab>
+ % demo-getopt-long-complete --int 1 -<tab>
+ # and so on
+
+=head2
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C demo-getopt-long-complete demo-getopt-long-complete
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete demo-getopt-long-complete 'p/*/`demo-getopt-long-complete`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Long-Complete>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Complete>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Complete>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

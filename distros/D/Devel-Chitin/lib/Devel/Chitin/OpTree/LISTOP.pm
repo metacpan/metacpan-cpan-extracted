@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LISTOP;
 use base Devel::Chitin::OpTree::BINOP;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Fcntl qw(:DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);
@@ -88,7 +88,9 @@ sub pp_leave {
 
     $deparsed = $self->_indent_block_text($deparsed, %params);
 
-    $block_declaration . "{$deparsed}";
+    my($open_brace, $close_brace) = $params{omit_braces} ? ('','') : ('{', '}');
+
+    join('', $block_declaration, $open_brace, $deparsed, $close_brace);
 }
 *pp_scope = \&pp_leave;
 *pp_leavetry = \&pp_leave;
@@ -683,5 +685,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

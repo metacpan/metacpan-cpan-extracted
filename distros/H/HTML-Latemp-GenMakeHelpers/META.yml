@@ -9,11 +9,10 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0'
-  blib: '1.01'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,19 +21,19 @@ name: HTML-Latemp-GenMakeHelpers
 provides:
   HTML::Latemp::GenMakeHelpers:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.0
+    version: v0.5.2
   HTML::Latemp::GenMakeHelpers::Base:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.0
+    version: v0.5.2
   HTML::Latemp::GenMakeHelpers::Error:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.0
+    version: v0.5.2
   HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.0
+    version: v0.5.2
   HTML::Latemp::GenMakeHelpers::HostEntry:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.0
+    version: v0.5.2
 requires:
   Class::XSAccessor: '0'
   File::Basename: '0'
@@ -44,5 +43,6 @@ requires:
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-GenMakeHelpers
-  repository: ssh://hg@bitbucket.org/shlomif/latemp
-version: v0.5.0
+  repository: https://github.com/thewml/latemp
+version: v0.5.2
+x_serialization_backend: 'YAML::Tiny version 1.70'

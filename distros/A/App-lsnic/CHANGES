@@ -1,9 +1,39 @@
 ==================================================
-Changes from 2016-12-07 00:00:00 +0000 to present.
+Changes from 2016-12-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2017-12-07 23:44:02 +0000
+version 0.003 at 2017-12-22 22:29:48 +0000
+------------------------------------------
+
+  Change: 2e8caf90830d5453aadc443e66c33689b6cf3e76
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-22 23:28:56 +0000
+
+    Handle disabled interfaces correctly 
+
+  Change: d0ca36d7449255dee16c2c0b1775a891e49be03d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-22 23:27:59 +0000
+
+    Revert "Use Alien::lshw to ensure lshw(1) is available"
+
+    This reverts commit 6438aaaa70808a45d8d5a1b91a9724661c672c16. 
+
+  Change: 6438aaaa70808a45d8d5a1b91a9724661c672c16
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-16 14:42:15 +0000
+
+    Use Alien::lshw to ensure lshw(1) is available 
+
+  Change: e7b665d2a8d2f6e8d4a82dbd25eed77363e71533
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-12-08 00:50:23 +0000
+
+    Generate POD from bin/* 
+
+------------------------------------------
+version 0.002 at 2017-12-07 23:43:57 +0000
 ------------------------------------------
 
   Change: 1ac9fc93c2fb290f240b55ed502cc52d890f65a4

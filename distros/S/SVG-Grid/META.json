@@ -36,7 +36,7 @@
             "Getopt::Long" : "0",
             "Moo" : "2.002004",
             "Pod::Usage" : "0",
-            "SVG" : "2.64",
+            "SVG" : "2.82",
             "Types::Standard" : "1.000005",
             "strict" : "0",
             "utf8" : "0",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/ronsavage/SVG-Grid"
       }
    },
-   "version" : "1.09",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

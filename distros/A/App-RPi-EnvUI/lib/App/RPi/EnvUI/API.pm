@@ -1,5 +1,7 @@
 package App::RPi::EnvUI::API;
 
+use strict;
+use warnings;
 use App::RPi::EnvUI::DB;
 use App::RPi::EnvUI::Event;
 use Carp qw(confess);
@@ -11,11 +13,20 @@ use Logging::Simple;
 use Mock::Sub no_warnings => 1;
 use RPi::Const qw(:all);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
+
+# configure handlers
+
+BEGIN {
+    if ($ENV{SUPPRESS_WARN}){
+        $SIG{__WARN__} = sub {};
+    }
+}
 
 # mocked sub handles for when we're in testing mode
+# readPin(), writePin() and pinMode() from wiringPi
 
-our ($temp_sub, $hum_sub, $wp_sub, $pm_sub);
+our ($temp_sub, $hum_sub, $rp_sub, $wp_sub, $pm_sub);
 
 # class variables
 
@@ -24,6 +35,12 @@ my $master_log;
 my $log;
 my $sensor;
 my $events;
+
+# class variables for the light operation
+
+our ($light_on_at, $light_on_hours);
+our ($dt_now_test, $dt_light_on, $dt_light_off);
+our $light_initialized = 0;
 
 # public environment methods
 
@@ -40,6 +57,8 @@ sub new {
 
     my $caller = (caller)[0];
     $self->_args(@_, caller => $caller);
+
+    warn "API in test mode\n" if $self->testing;
 
     $self->_init;
 
@@ -108,48 +127,64 @@ sub action_temp {
     }
 }
 sub action_light {
-    my ($self, %test_conf) = @_;
+    my ($self) = @_;
+
+    #FIXME: remove set_light_times() from here and docs
+    # - modify/remove the light times from the db and db API (and docs)
+    # - figure out better method for class vars that belong in here
 
     my $log = $log->child('action_light');
-
     my $aux      = $self->_config_control('light_aux');
     my $pin      = $self->aux_pin($aux);
     my $override = $self->aux_override($aux);
 
     return if $override;
 
-    my $on_time  = $self->_config_light('on_time');
-    my $off_time = $self->_config_light('off_time');
+    my $dt_now = defined $dt_now_test
+        ? $dt_now_test->set_time_zone('local')
+        : DateTime->now->set_time_zone('local');
 
-    my $on_hours = defined $test_conf{on_hours}
-        ? $test_conf{on_hours}
-        : $self->_config_light('on_hours');
+    if (! $light_initialized){
 
-    my $now = defined $test_conf{now} ? $test_conf{now} : time;
+        $log->_5("initializing light");
 
-    if (($on_hours == 24) || ($now > $on_time && $now < $off_time)){
+        $light_on_hours = $self->_config_light('on_hours');
+
+        $light_on_at = $self->_config_light('on_at');
+
+        $log->_6("light on: $light_on_at, light hours: $light_on_hours");
+
+        ($dt_light_on, $dt_light_off)
+          = _init_light_time($dt_now, $light_on_at, $light_on_hours);
+        
+        $light_initialized = 1;
+    }
+
+    if ($light_on_hours == 24 || $dt_now > $dt_light_on){
         if (! $self->aux_state($aux)){
+            $log->_6("turning light on");
             $self->aux_state($aux, ON);
             pin_mode($pin, OUTPUT);
             write_pin($pin, HIGH);
         }
     }
-    elsif ($self->aux_state($aux)){
-        $self->aux_state($aux, OFF);
-        pin_mode($pin, OUTPUT);
-        write_pin($pin, LOW);
-        $self->set_light_times;
+
+    if (! $light_on_hours || $dt_now > $dt_light_off){
+        if ($self->aux_state($aux)){
+            $log->_6("turning light off");
+            $self->aux_state($aux, OFF);
+            pin_mode($pin, OUTPUT);
+            write_pin($pin, LOW);
+            $dt_light_on = _set_light_on_time($dt_now, $light_on_at);
+            $dt_light_off = _set_light_off_time($dt_light_on, $light_on_hours);
+        }
     }
 }
 sub aux {
     my ($self, $aux_id) = @_;
-
     my $log = $log->child('aux');
-
     $log->_7("getting aux information for $aux_id");
-
-    my $aux = $self->db->aux($aux_id);
-    return $aux;
+    return $self->db->aux($aux_id);
 }
 sub auxs {
     my $self = shift;
@@ -175,12 +210,12 @@ sub aux_override {
 
     my $log = $log->child('aux_override');
 
-    if ($aux_id !~ /^aux/){
+    if (! defined $aux_id || $aux_id !~ /^aux/){
         confess "aux_override() requires an aux ID as its first param\n";
     }
 
     if (defined $override){
-        $log->_5("attempted override of aux: $aux_id");
+        $log->_5("attempting override of aux: $aux_id");
         my $toggle = $self->aux($aux_id)->{toggle};
 
         if ($toggle != 1){
@@ -189,14 +224,12 @@ sub aux_override {
             );
             return -1;
         }
+
+        $log->_5("override set operation called for $aux_id");
+        $self->db->update('aux', 'override', $override, 'id', $aux_id);
+        $log->_5("override set to $override for aux id: $aux_id");
     }
 
-    if (defined $override){
-        $log->_5("override set operation called for $aux_id");
-        $override = $self->aux_override($aux_id) ? 0 : 1;
-        $log->_5("override set to $override for aux id: $aux_id");
-        $self->db->update('aux', 'override', $override, 'id', $aux_id);
-    }
     return $self->aux($aux_id)->{override};
 }
 sub aux_pin {
@@ -204,7 +237,7 @@ sub aux_pin {
     # returns the auxillary's GPIO pin number
     my ($aux_id, $pin) = @_;
 
-    if ($aux_id !~ /^aux/){
+    if (! defined $aux_id || $aux_id !~ /^aux/){
         confess "aux_pin() requires an aux ID as its first param\n";
     }
 
@@ -221,7 +254,7 @@ sub aux_state {
 
     my $log = $log->child('aux_state');
 
-    if ($aux_id !~ /^aux/){
+    if (! defined $aux_id || $aux_id !~ /^aux/){
         confess "aux_state() requires an aux ID as its first param\n";
     }
 
@@ -240,7 +273,7 @@ sub aux_time {
 
     my ($aux_id, $time) = @_;
 
-    if ($aux_id !~ /^aux/){
+    if (! defined $aux_id || $aux_id !~ /^aux/){
         confess "aux_time() requires an aux ID as its first param\n";
     }
 
@@ -274,16 +307,19 @@ sub env {
 
     my $event_error = 0;
 
-    if ($self->{events}{env_to_db}->status == -1){
-        $event_error = 1;
-        print "event failure!\n";
+    if (! $self->testing){
+        if ($self->{events}{env_to_db}->status == -1){
+            $event_error = 1;
+            print "event failure, restarting!\n";
+            $self->{events}{env_to_db}->restart;
+        }
     }
 
     my $ret = $self->db->env;
 
     return {temp => -1, humidity => -1, error => $event_error} if ! defined $ret;
 
-    $ret->{error => $event_error};
+    $ret->{error} = $event_error;
 
     return $ret;
 }
@@ -352,15 +388,20 @@ sub switch {
     my $pin = $self->aux_pin($aux_id);
 
     if ($pin != -1){
-        if ($state){
-            $log->_6("set $pin state to HIGH");
-            pin_mode($pin, OUTPUT);
-            write_pin($pin, HIGH);
+        if (read_pin($pin) != $state){
+            if ($state){
+                $log->_6("set $pin state to HIGH");
+                pin_mode($pin, OUTPUT);
+                write_pin($pin, HIGH);
+            }
+            else {
+                $log->_6("set $pin state to LOW");
+                pin_mode($pin, OUTPUT);
+                write_pin($pin, LOW);
+            }
         }
         else {
-            $log->_6("set $pin state to LOW");
-            pin_mode($pin, OUTPUT);
-            write_pin($pin, LOW);
+            $log->_6("pin $pin state already set properly");
         }
     }
 }
@@ -406,7 +447,7 @@ sub events {
 sub log {
     my $self = shift;
     $master_log->file($self->log_file) if $self->log_file;
-    $master_log->level($self->log_level);
+    $master_log->level($self->debug_level);
     return $master_log;
 }
 sub passwd {
@@ -439,36 +480,13 @@ sub user {
 # public configuration getters
 
 sub env_humidity_aux {
-    my $self = shift;
-    return $self->_config_control('humidity_aux');
+    return $_[0]->_config_control('humidity_aux');
+}
+sub env_light_aux {
+    return $_[0]->_config_control('light_aux');
 }
 sub env_temp_aux {
-    my $self = shift;
-    return $self->_config_control('temp_aux');
-}
-sub set_light_times {
-    my ($self) = @_;
-
-    my $on_at = $self->_config_light('on_at');
-
-    my $time = time;
-    $time += 30 until localtime($time) =~ /$on_at:/;
-
-    my $hrs = $self->_config_light('on_hours');
-
-    my $on_time = $time;
-    my $off_time = $on_time + $hrs * 3600;
-
-    my $now = time;
-
-    if ($now > ($on_time - 86400) && $now < ($off_time - 86400)){
-        $on_time -= 24 * 3600;
-        $off_time -= 24 * 3600;
-    }
-
-    $self->db->update('light', 'value', $on_time, 'id', 'on_time');
-    $self->db->update('light', 'value', $off_time, 'id', 'off_time');
-
+    return $_[0]->_config_control('temp_aux');
 }
 
 # public instance variable methods
@@ -500,7 +518,7 @@ sub log_file {
 
     return $self->{log_file};
 }
-sub log_level {
+sub debug_level {
     my ($self, $level) = @_;
 
     if (defined $level){
@@ -508,10 +526,10 @@ sub log_level {
             warn "log level has to be between 0 and 7... disabling logging\n";
             $level = -1;
         }
-        $self->{log_level} = $level;
+        $self->{debug_level} = $level;
     }
 
-    return $self->{log_level};
+    return $self->{debug_level};
 }
 sub sensor {
     my ($self, $sensor) = @_;
@@ -524,6 +542,9 @@ sub testing {
     if (defined $bool){
         $self->{testing} = $bool;
     }
+
+    $self->{testing} = 1 if _ui_test_mode();
+
     return $self->{testing};
 }
 sub test_mock {
@@ -543,26 +564,32 @@ sub _args {
     $self->debug_sensor($args{debug_sensor});
     $self->config($args{config_file});
     $self->log_file($args{log_file});
-    $self->log_level($args{log_level});
+    $self->debug_level($args{debug_level});
     $self->testing($args{testing});
     $self->test_mock($args{test_mock});
 }
 sub _bool {
-    # translates javascript true/false to 1/0
+    # translates javascript true/false and 1/0 to 1/0
 
     my ($self, $bool) = @_;
-    confess
-      "bool() needs either 'true' or 'false' as param\n" if ! defined $bool;
-    return $bool eq 'true' ? 1 : 0;
+
+    if (! defined $bool){ 
+        confess 
+          "\$bool param must be present and must be 'true', 'false', 1 or 0";
+    }
+
+    return $bool ? 1 : 0 if $bool =~ /\d/;
+    return 1 if $bool eq 'true';
+    return 0 if $bool eq 'false';
+
+    confess "\$bool param must be either true/false or 1/0";
 }
 sub _config_control {
-    my $self = shift;
-    my $want = shift;
+    my ($self, $want) = @_;
     return $self->db->config_control($want);
 }
 sub _config_core {
-    my $self = shift;
-    my $want = shift;
+    my ($self, $want) = @_;
 
     if (! defined $self->db){
         confess "API's DB object is not defined.";
@@ -574,8 +601,7 @@ sub _config_core {
     return $self->db->config_core($want);
 }
 sub _config_light {
-    my $self = shift;
-    my $want = shift;
+    my ($self, $want) = @_;
 
     my %conf;
 
@@ -607,12 +633,13 @@ sub _init {
         )
     );
 
-    $self->log_level($self->_config_core('log_level'));
+    $self->debug_level($self->_config_core('debug_level'));
+    $self->log_file($self->_config_core('log_file'));
     $self->_log;
 
     my $log = $log->child('_init()');
 
-    if ($self->_ui_test_mode || $self->testing){
+    if ($self->testing){
         $log->_5('in test mode');
         $self->_test_mode
     }
@@ -620,6 +647,12 @@ sub _init {
         $log->_5('in prod mode');
         $self->_prod_mode;
     }
+}
+sub _init_light_time {
+    my ($dt_now, $on_at, $on_hours) = @_;
+    $dt_light_on = _set_light_on_time($dt_now, $on_at);
+    $dt_light_off = _set_light_off_time($dt_light_on, $on_hours);
+    return ($dt_light_on, $dt_light_off);
 }
 sub _test_mode {
     my ($self) = @_;
@@ -653,6 +686,10 @@ sub _test_mode {
         $pm_sub = $mock->mock(
             'App::RPi::EnvUI::API::pin_mode',
             return_value => 'ok'
+        );
+
+        $rp_sub = $mock->mock(
+            'App::RPi::EnvUI::API::read_pin',
         );
 
         $wp_sub = $mock->mock(
@@ -707,7 +744,7 @@ sub _log {
         name => 'EnvUI',
         print => 1,
         file => $self->log_file,
-        level => $self->log_level
+        level => $self->debug_level
     );
 
     $log = $master_log->child('API');
@@ -820,11 +857,34 @@ sub _reset {
 
     $self->db->delete('stats');
 }
+sub _set_light_off_time {
+    my ($dt_on, $on_time) = @_;
+    my $dt_off = $dt_on->clone;
+    $dt_off->add(hours => $on_time);
+    return $dt_off;
+}
+sub _set_light_on_time {
+    my ($dt_now, $on_at) = @_;
+    my $dt_on = $dt_now->clone;
+    $dt_on->set_second(0);
+    $dt_on->set_hour((split(/:/, $on_at))[0]);
+    $dt_on->set_minute((split(/:/, $on_at))[1]);
+
+    if ($dt_on < $dt_now){
+        # this situation happens if the light on and off times are within the
+        # same 24 hour period. We check to see if the updated on time is less
+        # than now; if it is, we need to advance to tomorrow
+
+        $dt_on->add(hours => 24);
+    }
+
+    return $dt_on;
+}
 sub _ui_test_mode {
     return -e 't/testing.lck';
 }
 
-true;
+1;
 __END__
 
 =head1 NAME
@@ -876,7 +936,7 @@ the way the system works, the API has to avoid mocking out items in test mode,
 and the mocks have to be set within the test file itself. Do not use this flag
 unless you are writing unit tests.
 
-    log_level
+    debug_level
 
 Optional, Integer. Send in a level of C<0-7> to enable logging.
 
@@ -885,7 +945,7 @@ Default: C<-1> (logging disabled)
     log_file
 
 Optional, String. Name of file to log to. We log to C<STDOUT> by default. The
-C<log_level> parameter must be changed from default for this parameter to have
+C<debug_level> parameter must be changed from default for this parameter to have
 any effect.
 
 Default: C<undef>
@@ -1139,6 +1199,11 @@ Takes no parameters.
 Returns the string name of the temperature auxillary channel (default: C<aux1>).
 Takes no parameters.
 
+=head2 env_light_aux
+
+Returns the string name of the light auxillary channel (default: C<aux3>).
+Takes no parameters.
+
 =head2 events
 
 Initializes and starts the asynchronous timed events that operate in their own
@@ -1188,9 +1253,9 @@ when instantiating a new object.
 
 Return: The string name of the currently in-use log file, if set.
 
-=head2 log_level($level)
+=head2 debug_level($level)
 
-Sets/gets the current logging level.
+Sets/gets the current debug logging level.
 
 Parameters:
 
@@ -1290,6 +1355,16 @@ Mandatory, String. The username of the user to fetch details for.
 
 Return: href, the hash reference containing user details per the 'user' database
 table.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 SUPPRESS_WARN
+
+Set this variable to a true value to suppress all warnings via a 
+C<<$SIG{__WARN__}>> handler. This is handy when running tests, when you don't
+need to know specific details about core workings.
+
+Implemented in C<<API.pm>>.
 
 =head1 AUTHOR
 

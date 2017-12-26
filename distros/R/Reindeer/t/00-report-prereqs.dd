@@ -1,0 +1,84 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.010'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'MooseX::AutoDestruct' => '0',
+                                      'MooseX::UndefTolerant::Attribute' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::ConsistentVersion' => '0',
+                                      'Test::HasVersion' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoSmartComments' => '0',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::Load' => '0',
+                                      'Import::Into' => '0',
+                                      'Moose' => '1.15',
+                                      'Moose::Autobox' => '0',
+                                      'Moose::Exporter' => '2.1400',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'MooseX::AbstractMethod' => '0.003',
+                                      'MooseX::AlwaysCoerce' => '0.16',
+                                      'MooseX::AttributeShortcuts' => '0.017',
+                                      'MooseX::ClassAttribute' => '0.26',
+                                      'MooseX::CurriedDelegation' => '0',
+                                      'MooseX::LazyRequire' => '0.07',
+                                      'MooseX::MarkAsMethods' => '0.14',
+                                      'MooseX::NewDefaults' => '0.003',
+                                      'MooseX::Params::Validate' => '0.016',
+                                      'MooseX::StrictConstructor' => '0.19',
+                                      'MooseX::Traitor' => '0.002',
+                                      'MooseX::Types::Combine' => '0',
+                                      'MooseX::Types::Common::Numeric' => '0.001004',
+                                      'MooseX::Types::Common::String' => '0.001004',
+                                      'MooseX::Types::LoadableClass' => '0.006',
+                                      'MooseX::Types::Moose' => '0.31',
+                                      'MooseX::Types::Path::Class' => '0.05',
+                                      'MooseX::Types::Tied::Hash::IxHash' => '0.003',
+                                      'Path::Class' => '0.24',
+                                      'Sub::Exporter' => '0',
+                                      'Sub::Install' => '0',
+                                      'Try::Tiny' => '0.11',
+                                      'base' => '0',
+                                      'feature' => '0',
+                                      'perl' => '5.010',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Moose::Util' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::Fatal' => '0',
+                                   'Test::Moose' => '0',
+                                   'Test::Moose::More' => '0.009',
+                                   'Test::More' => '0.94',
+                                   'Test::Requires' => '0',
+                                   'ok' => '0',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,5 +1,5 @@
 package WWW::Eksi;
-$WWW::Eksi::VERSION = '0.27';
+$WWW::Eksi::VERSION = '0.28';
 =head1 NAME
 
 WWW::Eksi - Interface for Eksisozluk.com
@@ -29,7 +29,7 @@ Provides easy access to entries and lists of entries.
 use warnings;
 use strict;
 use Carp;
-use experimental 'smartmatch';
+use List::Util qw/any/;
 
 use URI;
 use Furl;
@@ -245,7 +245,7 @@ sub _download{
   my ($self,$url) = @_;
 
   my $u = URI->new($url) if $url;
-  return 0 unless ($url && $u && $u->scheme ~~ [qw/http https/]);
+  return 0 unless ($url && $u && (any {$u->scheme eq $_} qw/http https/));
 
   my $response = Furl->new->get($u);
 
@@ -258,11 +258,11 @@ sub _lengthen{
   my ($self, $url) = @_;
 
   my $u = URI->new($url) if $url;
-  return 0 unless ( $url && $u && $u->scheme ~~ [qw/http https/] );
+  return 0 unless ($url && $u && (any {$u->scheme eq $_} qw/http https/));
 
   my $lengthener = WWW::Lenghten->new;
 
-  return ($u->host ~~ [qw/is.gd goo.gl/])
+  return (any {$u->host eq $_} qw/is.gd goo.gl/)
          ? $lengthener->try($u)
          : $u;
 }

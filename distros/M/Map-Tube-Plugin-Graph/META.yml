@@ -20,10 +20,10 @@ no_index:
 provides:
   Map::Tube::Plugin::Graph:
     file: lib/Map/Tube/Plugin/Graph.pm
-    version: '0.28'
+    version: '0.30'
   Map::Tube::Plugin::Graph::Utils:
     file: lib/Map/Tube/Plugin/Graph/Utils.pm
-    version: '0.28'
+    version: '0.30'
 requires:
   File::Temp: '0.2304'
   GraphViz2: '2.34'
@@ -31,9 +31,9 @@ requires:
   MIME::Base64: '3.14'
   Map::Tube::Exception: '3.12'
   Moo::Role: '2.000000'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-Plugin-Graph.git
-version: '0.28'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

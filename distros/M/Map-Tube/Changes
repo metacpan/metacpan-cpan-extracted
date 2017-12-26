@@ -1,5 +1,10 @@
 Revision history for Map::Tube
 
+3.43  2017-12-26T10:30:00+00:00
+      - Used 3 argument open() now.
+      - Stopped using bareword for file handle.
+      - Improved sample code in the pod.
+
 3.42  2017-11-24T10:45:00+00:00
       - Improved applying approved plugins.
 

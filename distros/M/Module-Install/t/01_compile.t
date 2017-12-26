@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Compile testing for Module::Install
 
 use strict;

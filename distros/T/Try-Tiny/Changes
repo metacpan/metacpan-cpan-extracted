@@ -1,5 +1,12 @@
 Revision history for Try-Tiny
 
+0.30      2017-12-21 07:23:03Z
+  - expand "when" test skippage to more perl versions
+
+0.29      2017-12-19 03:51:26Z
+  - skip tests of "when" and "given/when" usage for perl 5.27.7 *only* (see
+    RT#123908)
+
 0.28      2017-01-09 01:21:33Z
   - enabled some tests of finally blocks that were disabled on 5.6, now that
     that functionality works (since 0.13) (Pali, PR#4)

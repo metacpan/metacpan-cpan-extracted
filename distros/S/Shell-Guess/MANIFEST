@@ -9,7 +9,6 @@ Makefile.PL
 README
 author.yml
 corpus/print_guess.pl
-cpanfile
 dist.ini
 lib/Shell/Guess.pm
 t/00_diag.t

@@ -1,6 +1,6 @@
 package TeX::Encode::BibTeX;
 
-our $VERSION = '2.003'; # VERSION
+our $VERSION = '2.004'; # VERSION
 
 use 5.008;
 use strict;
@@ -10,8 +10,6 @@ use strict;
 use TeX::Encode;
 
 our @ISA = qw(Encode::Encoding);
-
-our $VERSION = '1.2';
 
 __PACKAGE__->Define(qw(BibTeX bibtex));
 

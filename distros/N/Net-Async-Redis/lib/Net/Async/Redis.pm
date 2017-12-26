@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =head1 NAME
 
@@ -27,6 +27,12 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
         print "Value: " . shift;
     })->get;
 
+    # ... or with Future::AsyncAwait
+    await $redis->connect;
+    my $value = await $redis->get('some_key');
+    $value ||= await $redis->set(some_key => 'some_value');
+    print "Value: $value";
+
 =head1 DESCRIPTION
 
 See L<Net::Async::Redis::Commands> for the full list of commands.
@@ -34,9 +40,12 @@ See L<Net::Async::Redis::Commands> for the full list of commands.
 =cut
 
 use mro;
+use Class::Method::Modifiers;
 use curry::weak;
 use IO::Async::Stream;
 use Ryu::Async;
+use URI;
+use URI::redis;
 
 use Log::Any qw($log);
 
@@ -48,7 +57,8 @@ use Net::Async::Redis::Subscription::Message;
 
 =head1 METHODS
 
-B<NOTE>: For a full list of Redis methods, please see L<Net::Async::Redis::Commands>.
+B<NOTE>: For a full list of the Redis methods supported by this module,
+please see L<Net::Async::Redis::Commands>.
 
 =cut
 
@@ -67,18 +77,19 @@ Subscribes to a pattern.
 =cut
 
 sub psubscribe {
-	my ($self, $pattern) = @_;
-	return $self->execute_command(
-		PSUBSCRIBE => $pattern
-	)->then(sub {
-        $self->{pubsub} = 1;
-        Future->done(
-            $self->{subscription_pattern_channel}{$pattern} //= Net::Async::Redis::Subscription->new(
-                redis => $self,
-                channel => $pattern
-            )
-        );
-	})
+    my ($self, $pattern) = @_;
+    return $self->next::method($pattern)
+        ->then(sub {
+            $self->{pubsub} //= 0;
+            $self->{pending_subscription_pattern_channel}{$pattern} //= $self->future('pattern_subscription[' . $pattern . ']');
+        })->then(sub {
+            Future->done(
+                $self->{subscription_pattern_channel}{$pattern} //= Net::Async::Redis::Subscription->new(
+                    redis   => $self,
+                    channel => $pattern
+                )
+            );
+        })
 }
 
 =head2 subscribe
@@ -105,25 +116,24 @@ Example:
 =cut
 
 sub subscribe {
-	my ($self, @channels) = @_;
+    my ($self, @channels) = @_;
     $self->next::method(@channels)
         ->then(sub {
-            $self->{pubsub} = 1;
-            my @subs = map {
-                $self->{subscription_channel}{$_} //= Net::Async::Redis::Subscription->new(
-                    redis => $self,
-                    channel => $_
-                )
-            } @channels;
-            Future->done(@subs);
+            $log->tracef('Marking as pubsub mode');
+            $self->{pubsub} //= 0;
+            Future->wait_all(
+                map {
+                    $self->{pending_subscription_channel}{$_} //= $self->future('subscription[' . $_ . ']')
+                } @channels
+            )
+        })->then(sub {
+            Future->done(
+                @{$self->{subscription_channel}}{@channels}
+            )
         })
 }
 
 =head1 METHODS - Transactions
-
-
-
-=cut
 
 =head2 multi
 
@@ -142,7 +152,7 @@ Example:
   return Future->fail("Had $failure failures, expecting everything to succeed") if $failure;
   print "$success succeeded\m";
   return Future->done;
- });
+ })->retain;
 
 =cut
 
@@ -154,140 +164,173 @@ sub multi {
     my $multi = Net::Async::Redis::Multi->new(
         redis => $self,
     );
-    $self->next::method
-        ->then(sub {
+    my $task = sub {
+        local $self->{_is_multi} = 1;
+        Net::Async::Redis::Commands::multi(
+            $self
+        )->then(sub {
             $multi->exec($code)
         })
+    };
+    my @pending = @{$self->{pending_multi}};
+
+    $log->tracef('Have %d pending MULTI transactions', 
+        0 + @pending
+    );
+    push @{$self->{pending_multi}}, $self->loop->new_future;
+    return $task->() unless @pending;
+    return Future->wait_all(
+        @pending
+    )->then($task);
 }
 
+around [qw(discard exec)] => sub {
+    my ($code, $self, @args) = @_;
+    local $self->{_is_multi} = 1;
+    $self->$code
+        ->on_ready(sub {
+             (shift @{$self->{pending_multi}})->done;
+        })
+};
+
+=head1 METHODS - Generic
+
+=head2 keys
+
+=cut
+
 sub keys : method {
-	my ($self, $match) = @_;
-	$match //= '*';
+    my ($self, $match) = @_;
+    $match //= '*';
     return $self->next::method($match);
 }
 
+=head2 watch_keyspace
+
+=cut
+
 sub watch_keyspace {
-	my ($self, $pattern, $code) = @_;
-	$pattern //= '*';
-	my $sub = '__keyspace@*__:' . $pattern;
-	(
+    my ($self, $pattern, $code) = @_;
+    $pattern //= '*';
+    my $sub = '__keyspace@*__:' . $pattern;
+    (
         $self->{have_notify} ||= $self->config_set(
             'notify-keyspace-events', 'Kg$xe'
         )
     )->then(sub {
-		$self->bus->subscribe_to_event(
-			message => sub {
-				my ($ev, $data) = @_;
-				return unless $data->{data}[1]{data} eq $sub;
-				my ($k, $op) = map $_->{data}, @{$data->{data}}[2, 3];
-				$k =~ s/^[^:]+://;
-				$code->($op => $k);
-			}
-		);
-		$self->psubscribe($sub)
-	})
+        $self->psubscribe($sub)
+    })->on_done(sub {
+        shift->events
+            ->each(sub {
+                my $data = $_;
+                return unless $data eq $sub;
+                my ($k, $op) = map $_->{data}, @{$data->{data}}[2, 3];
+                $k =~ s/^[^:]+://;
+                $code->($op => $k);
+            })
+    })->retain
 }
+
+sub endpoint { shift->{endpoint} }
+
+sub local_endpoint { shift->{local_endpoint} }
 
 =head2 connect
 
 =cut
 
-sub connect {
-	my ($self, %args) = @_;
-	my $auth = delete $args{auth};
-	$args{host} //= 'localhost';
-	$args{port} //= 6379;
-	$self->{connection} //= $self->loop->connect(
-		service => $args{port},
-		host    => $args{host},
-		socktype => 'stream',
-	)->then(sub {
-		my ($sock) = @_;
-		my $stream = IO::Async::Stream->new(
-			handle    => $sock,
-			on_closed => $self->curry::weak::notify_close,
-			on_read   => sub {
-				my ($stream, $buffref, $eof) = @_;
-				$self->protocol->parse($buffref);
-				0
-			}
-		);
-		Scalar::Util::weaken(
-			$self->{stream} = $stream
-		);
-		$self->add_child($stream);
-		if(defined $auth) {
-			return $self->auth($auth)
-		} else {
-			return Future->done
-		}
-	})
+sub connect : method {
+    my ($self, %args) = @_;
+    $self->configure(%args) if %args;
+    my $uri = $self->uri->clone;
+    for (qw(host port)) {
+        $uri->$_($self->$_) if defined $self->$_;
+    }
+    my $auth = $self->auth;
+    $auth //= ($uri->userinfo =~ s{^[^:]*:}{}r) if defined $uri->userinfo;
+    $self->{connection} //= $self->loop->connect(
+        service => $uri->port // 6379,
+        host    => $uri->host,
+        socktype => 'stream',
+    )->then(sub {
+        my ($sock) = @_;
+        $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
+        $self->{local_endpoint} = join ':', $sock->sockhost, $sock->sockport;
+        my $proto = $self->protocol;
+        my $stream = IO::Async::Stream->new(
+            handle    => $sock,
+            on_closed => $self->curry::weak::notify_close,
+            on_read   => sub {
+                $proto->parse($_[1]);
+                0
+            }
+        );
+        $self->add_child($stream);
+        Scalar::Util::weaken(
+            $self->{stream} = $stream
+        );
+        return $self->auth($auth) if defined $auth;
+        return Future->done;
+    })
 }
+
+sub connected { shift->connect }
 
 =head2 on_message
 
 Called for each incoming message.
 
+Passes off the work to L</handle_pubsub_message> or the next queue
+item, depending on whether we're dealing with subscriptions at the moment.
+
 =cut
 
 sub on_message {
-	my ($self, $data) = @_;
-	if($self->{pubsub}) {
-        my ($type, $channel, $payload) = @$data;
-        if($type =~ /message$/) {
-            if($type eq 'message') {
-                if(my $sub = $self->{subscription_channel}{$channel}) {
-                    my $msg = Net::Async::Redis::Subscription::Message->new(
-                        type => $type,
-                        channel => $channel,
-                        payload => $payload,
-                        redis   => $self,
-                        subscription => $sub
-                    );
-                    $sub->events->emit($msg);
-                } else {
-                    $log->errorf('Have message for unknown channel [%s]', $channel);
-                }
-            } elsif($type eq 'pmessage') {
-                if(my $sub = $self->{subscription_pattern_channel}{$channel}) {
-                    my $msg = Net::Async::Redis::PubSub::Message->new(
-                        type => $type,
-                        channel => $channel,
-                        payload => $payload,
-                        redis   => $self,
-                        subscription => $sub
-                    );
-                    $sub->events->emit($msg);
-                } else {
-                    $log->errorf('Have message for unknown pattern channel [%s]', $channel);
-                }
-            }
-        } elsif($type eq 'unsubscribe') {
-            if(my $sub = delete $self->{subscription_channel}{$channel}) {
-                $log->tracef('Removed subscription for [%s]', $channel);
-                delete $self->{pubsub} unless keys(%{$self->{subscription_channel}}) or keys(%{$self->{subscription_pattern_channel}});
-            } else {
-                $log->errorf('Have unsubscription for unknown channel [%s]', $channel);
-            }
-        } elsif($type eq 'punsubscribe') {
-            if(my $sub = delete $self->{subscription_pattern_channel}{$channel}) {
-                $log->tracef('Removed pattern subscription for [%s]', $channel);
-                delete $self->{pubsub} unless keys(%{$self->{subscription_channel}}) or keys(%{$self->{subscription_pattern_channel}});
-            } else {
-                $log->errorf('Have pattern unsubscription for unknown channel [%s]', $channel);
-            }
-        } elsif($type eq 'subscribe') {
-            $log->errorf('Have subscription for unknown channel [%s]', $channel) unless exists $self->{subscription_channel}{$channel};
-        } elsif($type eq 'punsubscribe') {
-            $log->errorf('Have subscription for unknown pattern channel [%s]', $channel) unless exists $self->{subscription_pattern_channel}{$channel};
+    my ($self, $data) = @_;
+    local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+    $log->tracef('Incoming message: %s', $data);
+    return $self->handle_pubsub_message(@$data) if exists $self->{pubsub};
+
+    my $next = shift @{$self->{pending}} or die "No pending handler";
+    $next->[1]->done($data);
+}
+
+sub handle_pubsub_message {
+    my ($self, $type, $channel, $payload) = @_;
+    $type = lc $type;
+    my $k = (substr $type, 0, 1) eq 'p' ? 'subscription_pattern_channel' : 'subscription_channel';
+    if($type =~ /message$/) {
+        if(my $sub = $self->{$k}{$channel}) {
+            my $msg = Net::Async::Redis::Subscription::Message->new(
+                type => $type,
+                channel => $channel,
+                payload => $payload,
+                redis   => $self,
+                subscription => $sub
+            );
+            $sub->events->emit($msg);
         } else {
-            $log->errorf('have unknown pubsub message type %s with channel %s payload %s', $type, $channel, $payload);
+            $log->warnf('Have message for unknown channel [%s]', $channel);
         }
-		$self->bus->invoke_event(message => $data) if exists $self->{bus};
-	} else {
-		my $next = shift @{$self->{pending}} or die "No pending handler";
-		$next->[1]->done($data);
-	}
+    } elsif($type =~ /unsubscribe$/) {
+        --$self->{pubsub};
+        if(my $sub = delete $self->{$k}{$channel}) {
+            $log->tracef('Removed subscription for [%s]', $channel);
+        } else {
+            $log->warnf('Have unsubscription for unknown channel [%s]', $channel);
+        }
+    } elsif($type =~ /subscribe$/) {
+        $log->tracef('Have %s subscription for [%s]', (exists $self->{$k}{$channel} ? 'existing' : 'new'), $channel);
+        ++$self->{pubsub};
+        $self->{$k}{$channel} //= Net::Async::Redis::Subscription->new(
+            redis => $self,
+            channel => $channel
+        );
+        $self->{'pending_' . $k}{$channel}->done($payload);
+    } else {
+        $log->warnf('have unknown pubsub message type %s with channel %s payload %s', $type, $channel, $payload);
+    }
+    $self->bus->invoke_event(message => [ $type, $channel, $payload ]) if exists $self->{bus};
 }
 
 =head2 stream
@@ -301,12 +344,15 @@ sub stream { shift->{stream} }
 =head2 pipeline_depth
 
 Number of requests awaiting responses before we start queuing.
+This defaults to an arbitrary value of 100 requests.
+
+Note that this does not apply when in L<transaction|METHODS - Transactions> (C<MULTI>) mode.
 
 See L<https://redis.io/topics/pipelining> for more details on this concept.
 
 =cut
 
-sub pipeline_depth { shift->{pipeline_depth} }
+sub pipeline_depth { shift->{pipeline_depth} //= 100 }
 
 =head1 METHODS - Deprecated
 
@@ -327,33 +373,63 @@ sub bus {
 =cut
 
 sub notify_close {
-	my ($self) = @_;
-	$self->configure(on_read => sub { 0 });
-	$_->[1]->fail('Server connection is no longer active', redis => 'disconnected') for @{$self->{pending}};
-	$self->maybe_invoke_event(disconnect => );
+    my ($self) = @_;
+    $self->configure(on_read => sub { 0 });
+    $_->[1]->fail('Server connection is no longer active', redis => 'disconnected') for @{$self->{pending}};
+    $self->maybe_invoke_event(disconnect => );
 }
 
 sub command_label {
-	my ($self, @cmd) = @_;
-	return join ' ', @cmd if $cmd[0] eq 'KEYS';
-	return $cmd[0];
+    my ($self, @cmd) = @_;
+    return join ' ', @cmd if $cmd[0] eq 'KEYS';
+    return $cmd[0];
 }
 
+our %ALLOWED_SUBSCRIPTION_COMMANDS = (
+    SUBSCRIBE    => 1,
+    PSUBSCRIBE   => 1,
+    UNSUBSCRIBE  => 1,
+    PUNSUBSCRIBE => 1,
+    PING         => 1,
+    QUIT         => 1,
+);
+
 sub execute_command {
-	my ($self, @cmd) = @_;
+    my ($self, @cmd) = @_;
+
+    # First, the rules: pubsub or plain
+    my $is_sub_command = exists $ALLOWED_SUBSCRIPTION_COMMANDS{$cmd[0]};
     return Future->fail(
         'Currently in pubsub mode, cannot send regular commands until unsubscribed',
         redis =>
             0 + (keys %{$self->{subscription_channel}}),
             0 + (keys %{$self->{subscription_pattern_channel}})
-    ) if keys(%{$self->{subscription_channel}}) + keys(%{$self->{subscription_pattern_channel}});
-	my $f = $self->loop->new_future->set_label($self->command_label(@cmd));
-	push @{$self->{pending}}, [ join(' ', @cmd), $f ];
-    return $self->stream->write(
-        $self->protocol->encode_from_client(@cmd)
-    )->then(sub {
-        $f
-    });
+    ) if exists $self->{pubsub} and not $is_sub_command;
+
+    my $f = $self->loop->new_future->set_label($self->command_label(@cmd));
+    $log->debugf("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
+    my $code = sub {
+        local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+        my $cmd = join ' ', @cmd;
+        $log->tracef('Outgoing [%s]', $cmd);
+        push @{$self->{pending}}, [ $cmd, $f ];
+        $log->infof("Pipeline depth now %d", 0 + @{$self->{pending}});
+        $self->stream->write(
+            $self->protocol->encode_from_client(@cmd)
+        )->then(sub {
+            $f->done if $is_sub_command;
+            $f
+        })
+    };
+    return $code->() if $self->{stream} and ($self->{is_multi} or 0 == @{$self->{pending_multi}});
+    return (
+        $self->{_is_multi}
+        ? $self->connected
+        : Future->wait_all(
+            $self->connected,
+            @{$self->{pending_multi}}
+        )
+    )->then($code);
 }
 
 sub ryu {
@@ -372,13 +448,28 @@ sub future {
 }
 
 sub protocol {
-	my ($self) = @_;
-	$self->{protocol} ||= do {
+    my ($self) = @_;
+    $self->{protocol} ||= do {
         require Net::Async::Redis::Protocol;
         Net::Async::Redis::Protocol->new(
             handler => $self->curry::weak::on_message
         )
     };
+}
+
+sub host { shift->{host} }
+sub port { shift->{port} }
+sub auth { shift->{auth} }
+sub uri { shift->{uri} //= URI->new('redis://localhost') }
+
+sub configure {
+    my ($self, %args) = @_;
+    $self->{pending_multi} //= [];
+    for (qw(host port auth uri pipeline_depth)) {
+        $self->{$_} = delete $args{$_} if exists $args{$_};
+    }
+    $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
+    $self->next::method(%args)
 }
 
 1;
@@ -393,9 +484,15 @@ Some other Redis implementations on CPAN:
 
 =item * L<Mojo::Redis2> - nonblocking, using the L<Mojolicious> framework, actively maintained
 
+=item * L<MojoX::Redis>
+
 =item * L<RedisDB>
 
 =item * L<Cache::Redis>
+
+=item * L<Redis::Fast>
+
+=item * L<Redis::Jet>
 
 =back
 

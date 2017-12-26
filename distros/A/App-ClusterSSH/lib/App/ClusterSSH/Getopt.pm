@@ -240,6 +240,22 @@ sub add_common_options {
         help =>
             $self->loc('Do not output extra text when using some options'),
     );
+    $self->add_option(
+        spec     => 'cols|x=i',
+        arg_desc => 'cols',
+        help     => $self->loc('Number of columns'),
+    );
+    $self->add_option(
+        spec     => 'rows|y=i',
+        arg_desc => 'rows',
+        help     => $self->loc('Number of rows'),
+    );
+
+    $self->add_option(
+        spec => 'fillscreen',
+        help => $self->loc(
+            'Resize terminal windows to fill the whole available screen'),
+    );
 
     return $self;
 }
@@ -380,6 +396,14 @@ sub getopts {
             = !$self->parent->config->{window_tiling} || 0;
     }
 
+    if ( $self->rows ) {
+        $self->parent->config->{rows} = $self->rows;
+    }
+    if ( $self->cols ) {
+        $self->parent->config->{cols} = $self->cols;
+    }
+    $self->parent->config->{fillscreen} = "yes"
+        if ( $self->fillscreen );
     return $self;
 }
 
@@ -398,7 +422,10 @@ sub _generate_pod {
     output $/ , "=pod";
     output '=head1 ',    $self->loc('NAME');
     output "$Script - ", $self->loc("Cluster administration tool");
-    output '=head1 ',    $self->loc('SYNOPSIS');
+    output '=head1 ',    $self->loc('VERSION');
+    output $self->loc( "This documentation is for version: [_1]",
+        $self->parent->VERSION );
+    output '=head1 ', $self->loc('SYNOPSIS');
 
     # build the synopsis
     print "$Script ";
@@ -646,6 +673,22 @@ would replace the <Alt-n> with the client's name in each window.}
     output '=item console_position = <null>';
     output $self->loc(
         q{Set the initial position of the console - if empty then let the window manager decide.  Format is '+<x>+<y>', i.e. '+0+0' is top left hand corner of the screen, '+0-70' is bottom left hand side of screen (more or less).}
+    );
+
+    output '=item external_command_mode = 0600';
+    output $self->loc(q{File mode bits for the external_command_pipe.});
+
+    output '=item external_command_pipe = <null>';
+    output $self->loc(
+        q{Define the full path to an external command pipe that can be written to for controlling some aspects of ClusterSSH, such as opening sessions to more clusters.
+
+Commands:
+
+C<< open <tag|hostname> >> - open new sessions to provided tag or hostname
+
+C<< retile >> - force window retiling
+    
+e.g.: C<< echo 'open localhost' >> /path/to/external_command_pipe >>}
     );
 
     output '=item external_cluster_command = <null>';

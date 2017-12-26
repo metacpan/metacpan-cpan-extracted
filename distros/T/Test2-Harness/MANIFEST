@@ -56,8 +56,6 @@ lib/Test2/Harness/Run/Queue.pm
 lib/Test2/Harness/Run/Runner.pm
 lib/Test2/Harness/Run/Runner/Persist.pm
 lib/Test2/Harness/Run/Runner/ProcMan.pm
-lib/Test2/Harness/Run/Runner/ProcMan/Locker.pm
-lib/Test2/Harness/Run/Runner/ProcMan/Locker/Lock.pm
 lib/Test2/Harness/Util.pm
 lib/Test2/Harness/Util/DepTracer.pm
 lib/Test2/Harness/Util/File.pm
@@ -119,8 +117,6 @@ t/Test2/Harness/Run/Queue.t
 t/Test2/Harness/Run/Runner.t
 t/Test2/Harness/Run/Runner/Persist.t
 t/Test2/Harness/Run/Runner/ProcMan.t
-t/Test2/Harness/Run/Runner/ProcMan/Locker.t
-t/Test2/Harness/Run/Runner/ProcMan/Locker/Lock.t
 t/Test2/Harness/Util.t
 t/Test2/Harness/Util/DepTracer.t
 t/Test2/Harness/Util/File.t

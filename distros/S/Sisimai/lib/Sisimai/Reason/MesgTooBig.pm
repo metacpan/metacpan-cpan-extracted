@@ -15,6 +15,7 @@ sub match {
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
          exceeded[ ]maximum[ ]inbound[ ]message[ ]size
+        |Line[ ]limit[ ]exceeded
         |max[ ]message[ ]size[ ]exceeded
         |message[ ](?:
              file[ ]too[ ]big
@@ -28,6 +29,7 @@ sub match {
             |too[ ]large[ ]for[ ]this[ ].+
             )
         |size[ ]limit
+        |Taille[ ]limite[ ]du[ ]message[ ]atteinte.+[A-Z]{3}.+514
         )
     }ix;
 
@@ -135,7 +137,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

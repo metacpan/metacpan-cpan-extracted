@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.28';
+$Map::Tube::Plugin::Graph::VERSION   = '0.30';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.28
+Version 0.30
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use Map::Tube::Plugin::Graph::Utils qw(graph_line_image graph_map_image);
 
 use Moo::Role;
-use namespace::clean;
+use namespace::autoclean;
 
 =head1 DESCRIPTION
 
@@ -35,14 +35,16 @@ Moo Role. Once installed, it gets plugged into Map::Tube::* family.
 
     # Entire map image
     my $name = $tube->name;
-    open(my $MAP_IMAGE, ">$name.png");
+    open(my $MAP_IMAGE, ">", "$name.png")
+        or die "ERROR: Can't open [$name.png]: $!";
     binmode($MAP_IMAGE);
     print $MAP_IMAGE decode_base64($tube->as_image);
     close($MAP_IMAGE);
 
     # Just a particular line map image
     my $line = 'Bakerloo';
-    open(my $LINE_IMAGE, ">$line.png");
+    open(my $LINE_IMAGE, ">", "$line.png")
+        or die "ERROR: Can't open [$line.png]: $!";
     binmode($LINE_IMAGE);
     print $LINE_IMAGE decode_base64($tube->as_image($line));
     close($LINE_IMAGE);

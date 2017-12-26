@@ -9,8 +9,8 @@
 #
 package Reindeer;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.018-20-g9af504b
-$Reindeer::VERSION = '0.019';
+# git description: 0.019-4-g42c3ce6
+$Reindeer::VERSION = '0.020';
 
 # ABSTRACT: Moose with more antlers
 
@@ -81,8 +81,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl Alex Balhatchet AutoDestruct MultiInitArg UndefTolerant
-autoclean rwp ttl metaclass Specifing
+=for :stopwords Chris Weyl Alex Balhatchet Fowler Mark AutoDestruct MultiInitArg
+UndefTolerant autoclean rwp ttl metaclass
 
 =head1 NAME
 
@@ -90,7 +90,7 @@ Reindeer - Moose with more antlers
 
 =head1 VERSION
 
-This document describes version 0.019 of Reindeer - released June 09, 2017 as part of Reindeer.
+This document describes version 0.020 of Reindeer - released December 20, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ or, if your attribute name begins with an underscore:
 
     clearer => "_clear$name"
 
-(that is, an attribute named "_foo" would get "_clear_foo")
+(that is, an attribute named C<_foo> would get C<_clear_foo>)
 
 =head2 predicate => 1
 
@@ -242,20 +242,41 @@ or, if your attribute name begins with an underscore:
 
     predicate => "_has$name"
 
-(that is, an attribute named "_foo" would get "_has_foo")
+(that is, an attribute named C<_foo> would get C<_has_foo>)
+
+=head2 init_arg => 1 / -1
+
+This is a somewhat esoteric shortcut; you probably don't want to use this (or
+even read this section).
+
+Specifying C<init_arg =E<gt> 1> will cause the following options to be set:
+
+    # attribute: "name"
+    init_arg => 'name'
+
+    # or, attribute: "_name"
+    init_arg => '_name'
+
+...while C<init_arg =E<gt> -1> will cause the following options to be set:
+
+    # attribute: "name"
+    init_arg => '_name'
+
+    # or, attribute: "_name"
+    init_arg => 'name'
 
 =head2 trigger => 1
 
 Specifying C<trigger =E<gt> 1> will cause the attribute to be created with a trigger
 that calls a named method in the class with the options passed to the trigger.
 By default, the method name the trigger calls is the name of the attribute
-prefixed with "_trigger_".
+prefixed with C<_trigger_>.
 
-e.g., for an attribute named "foo" this would be equivalent to:
+e.g., for an attribute named C<foo> this would be equivalent to:
 
     trigger => sub { shift->_trigger_foo(@_) }
 
-For an attribute named "_foo":
+For an attribute named C<_foo>:
 
     trigger => sub { shift->_trigger__foo(@_) }
 
@@ -267,12 +288,13 @@ builder naming scheme (just with a different prefix).
 Creating a delegation with a coderef will now create a new, "custom accessor"
 for the attribute.  These coderefs will be installed and called as methods on
 the associated class (just as readers, writers, and other accessors are), and
-will have the attribute metaclass available in $_.  Anything the accessor
-is called with it will have access to in @_, just as you'd expect of a method.
+will have the attribute metaclass available in C<$_>.  Anything the accessor
+is called with it will have access to in C<@_>, just as you'd expect of a
+method.
 
-e.g., the following example creates an attribute named 'bar' with a standard
-reader accessor named 'bar' and two custom accessors named 'foo' and
-'foo_too'.
+e.g., the following example creates an attribute named C<bar> with a standard
+reader accessor named C<bar> and two custom accessors named C<foo> and
+C<foo_too>.
 
     has bar => (
 
@@ -426,11 +448,9 @@ for an attribute to be populated from the %ENV hash.  So, for example if you
 have set the environment variable USERNAME to 'John' you can do:
 
     package MyApp::MyClass;
+    use Reindeer;
 
-    use Moose;
-    use MooseX::Attribute::ENV;
-
-    has 'username' => (is=>'ro', traits=>['ENV']);
+    has 'username' => (is=>'ro', traits=>[ ENV ]);
 
     package main;
 
@@ -472,10 +492,8 @@ of undef.  If you specify the value of undef to any of the attributes they
 will not be initialized (or will be set to the default, if applicable).
 Effectively behaving as if you had not provided a value at all.
 
-    package My:Class;
-    use Moose;
-
-    use MooseX::UndefTolerant::Attribute;
+    package My::Class;
+    use Reindeer;
 
     has 'bar' => (
         traits    => [ UndefTolerant ],
@@ -543,10 +561,12 @@ traits in on the fly:
 
 Non-Moose specific items made available to your class/role:
 
-=head2 Perl v5.10 features
+=head2 Perl v5.10+ features
 
 If you're running on v5.10 or greater of Perl, Reindeer will automatically
-enable v5.10 features in the consuming class.
+enable the default feature set of that level of Perl in the consuming class.
+(e.g. if you're running Perl v5.26, this is the same as C<use v5.26> or
+C<use feature ':5.26'>)
 
 =head2 L<namespace::autoclean>
 
@@ -652,11 +672,21 @@ feature.
 
 Chris Weyl <cweyl@alumni.drew.edu>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Alex Balhatchet
+=for stopwords Alex Balhatchet Mark Fowler
+
+=over 4
+
+=item *
 
 Alex Balhatchet <kaoru@slackwise.net>
+
+=item *
+
+Mark Fowler <mark@twoshortplanks.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

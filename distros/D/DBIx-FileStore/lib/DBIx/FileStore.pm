@@ -8,82 +8,73 @@ use File::Copy;
 
 use DBIx::FileStore::ConfigFile;
 
-use fields qw(  dbh dbuser dbpasswd 
-                dbhost dbname filetable blockstable  blocksize 
-                verbose 
-                confhash
-                uselocks
-                );
+our $VERSION = '0.33';  # version also mentioned in POD below.
+use Mouse;
 
-our $VERSION = '0.29';  # version also mentioned in POD below.
+has 'dbuser' =>     ( is=>'rw', isa=>'Str', default=>build_value_sub('dbuser', 'root') );
+has 'dbpasswd' =>   ( is=>'rw', isa=>'Str', default=>build_value_sub('dbpasswd', '') );
+has 'dbhost' =>     ( is=>'rw', isa=>'Str', default=>build_value_sub('dbhost', '') );
+has 'dbname' =>     ( is=>'rw', isa=>'Str', default=>build_value_sub('dbname', '') );
+has 'dbport' =>     ( is=>'rw', isa=>'Str', default=>build_value_sub('dbport', 3306) );
+has 'filetable' =>  ( is=>'rw', isa=>'Str', default=>build_value_sub('filetable', 'files') );
+has 'blockstable' => ( is=>'rw', isa=>'Str', default=>build_value_sub('blockstable', 'fileblocks') );
+has 'blocksize' =>  ( is=>'rw', isa=>'Int', default=>build_value_sub('blocksize', 500*1024) );
+has 'verbose' =>    ( is=>'rw', isa=>'Bool', default=>build_value_sub('verbose', 0) );
+has 'uselocks' =>   ( is=>'rw', isa=>'Bool', default=>0 );
+has 'config_file' => ( is=>'rw', isa=>'Maybe[Str]', default=>undef );
+has 'config_hash' => ( is=>'rw', isa=>'HashRef', lazy=>1, builder=>'build_config_hash' );
+has 'dbh' =>        ( is=>'rw', lazy=>1, builder=>'build_dbh' );
 
-sub new {
-    my ($self, %opts) = @_;
-    unless (ref $self) {
-        $self = fields::new($self);
-    }
-    if ($opts{verbose}) { $self->{verbose}=1; }
+sub build_value_sub {
+    my ($name, $default) = @_;
+    return sub {
+        my ($self) = @_;
+        #warn "$0: in build_value_sub( sub( $name, $default ));\n";
+        my $v =  exists($self->config_hash->{$name}) ? $self->config_hash->{$name} : scalar($default);
+        #warn "$0: builder for $name: returning $v\n";
+        return $v;
+    };
+};
 
+sub build_config_hash {
+    my $self = shift; 
     my $config_reader = new DBIx::FileStore::ConfigFile();
-    my $conf = $self->{confhash} = $config_reader->read_config_file();
+    my $config_file = $self->config_file();
+    my $hash =  $config_reader->read_config_file( $config_file ? ($config_file) : () );
+    return $hash;
+}
 
-    # FOR TESTING WITH 1 BYTE BLOCKS
-    #my $block_size = 1; # 1 byte blocks (!)
-    my $block_size = 500 * 1024;        # 512K blocks
-    $self->{blocksize}   = $block_size;
+sub build_dbh {
+    my ($self) = @_;
 
-    #   with 900K (or even 600K) blocks, when inserting binary .rpm files, 
-    #   we get
-    #
-    #   DBD::mysql::db do failed: Got a packet bigger than 'max_allowed_packet' bytes.
-    #
-    #   We think there's some encoding of the binary data going 
-    #   that inflates binary data during transmission. 
-    #
-    
-
-    ###############################################################################
-    # By default, WE DON'T USE LOCKS ANY MORE. Like a real filesystem, you might
-    # get interspersed or truncated information if the filesystem is
-    # being changed while you're reading!
-    ###############################################################################
-    $self->{uselocks}    = 0;
-
-    $self->{dbuser}      = $conf->{dbuser} || die "$0: no dbuser set\n";
-    $self->{dbpasswd}    = $conf->{dbpasswd} || warn "$0: no dbpasswd set\n";    # this could be ok.
-    $self->{dbname}      = $conf->{dbname} || die "$0: no dbname set\n";
-
-    # dbhost defaults to 127.0.0.1
-    $self->{dbhost}      = $conf->{dbhost} || "127.0.0.1";
-
-    $self->{filetable}   = "files";
-    $self->{blockstable} = "fileblocks";
-
-    my $dsn = "DBI:mysql:database=$self->{dbname};host=$self->{dbhost}";
+    my $dsn = "DBI:mysql:" . $self->dbname . ";host=" . $self->dbhost . ";port=" . $self->dbport;
+    #print "$0: DSN is $dsn\n";
 
     my %attr  = ( RaiseError => 1, PrintError => 1, AutoCommit => 1 );  # for mysql
 
-    $self->{dbh} = DBI->connect_cached( 
-        $dsn, $self->{dbuser}, $self->{dbpasswd}, \%attr);  
-    $self->{dbh}->{mysql_auto_reconnect} = 1;   # auto reconnect
+    #warn "$0: dbpasswd is " . $self->dbpasswd . "\n";
+    my $dbh = DBI->connect_cached( 
+        $dsn, $self->dbuser, $self->dbpasswd, \%attr
+    );  
+    $dbh->{mysql_auto_reconnect} = 1;   # auto reconnect
 
-    return $self;
+    return $dbh;
 }
-
+    
 sub get_all_filenames {
     my ($self) = @_;
-    my $files = $self->{dbh}->selectall_arrayref( # lasttime + 0 gives us an int back
-                "select name, c_len, c_md5, lasttime+0 from $self->{filetable} 
-                where b_num=0 order by name");
+    my $files = $self->dbh->selectall_arrayref( # lasttime + 0 gives us an int back
+                "select name, c_len, c_md5, lasttime+0 from " . $self->filetable .
+                " where b_num=0 order by name");
     return $files;
 }
 
 sub get_filenames_matching_prefix {
     my ($self, $name) = @_;
     my $pattern = $name . "%"; 
-    my $files = $self->{dbh}->selectall_arrayref( # lasttime + 0 gives us an int back
-        "select name, c_len, c_md5, lasttime+0 from $self->{filetable} 
-         where name like ? and b_num=0 order by name", {}, $pattern);
+    my $files = $self->dbh->selectall_arrayref( # lasttime + 0 gives us an int back
+        "select name, c_len, c_md5, lasttime+0 from " . $self->filetable  .
+        " where name like ? and b_num=0 order by name", {}, $pattern);
     return $files;
 }
 
@@ -92,17 +83,17 @@ sub rename_file {
     die "$0: name not ok: $from" unless name_ok($from);
     die "$0: name not ok: $to" unless name_ok($to);
     # renames the rows in the filetable and the blockstable
-    my $dbh = $self->{dbh};
+    my $dbh = $self->dbh;
     $self->_lock_tables();
 
-    for my $table ( ( $self->{filetable}, $self->{blockstable} ) ) {
+    for my $table ( ( $self->filetable, $self->blockstable ) ) {
         my $sql = "select name from $table where name like ?";
-        $sql .= " order by b_num" if $table eq $self->{filetable};
+        $sql .= " order by b_num" if $table eq $self->filetable;
 
         my $files = $dbh->selectall_arrayref( $sql, {}, $from . " %");
         for my $f (@$files) {
             (my $num = $f->[0]) =~ s/.* //;
-            print "$0: Moving $table:$f->[0], (num $num) to '$to $num'...\n" if $self->{verbose};
+            print "$0: Moving $table:$f->[0], (num $num) to '$to $num'...\n" if $self->verbose;
             $dbh->do("update $table set name=? where name=?", {}, "$to $num", $f->[0]);
         }
     }
@@ -115,15 +106,15 @@ sub delete_file {
     my ($self, $name) = @_;
     die "$0: name not ok: $name" unless name_ok($name);
 
-    my $dbh         = $self->{dbh};
-    my $filetable   = $self->{filetable};        # probably "files"
-    my $blockstable = $self->{blockstable};    # probably "fileblocks"
+    my $dbh         = $self->dbh;
+    my $filetable   = $self->filetable;        # probably "files"
+    my $blockstable = $self->blockstable;    # probably "fileblocks"
     for my $table ( ( $filetable, $blockstable ) ) {
         my $rv = int($dbh->do( "delete from $table where name like ?", {}, "$name %" ));
         if($rv) {
-            print "$0: $table: deleted $name ($rv blocks)\n" if $self->{verbose};
+            print "$0: $table: deleted $name ($rv blocks)\n" if $self->verbose;
         } else {
-            warn  "$0: no blocks to delete for $table:$name\n" if $self->{verbose};
+            warn  "$0: no blocks to delete for $table:$name\n" if $self->verbose;
         }
     }
     return 1;
@@ -204,16 +195,16 @@ sub write_from_filehandle_to_db {
     my ($self, $fh, $fdbname) = @_;
 
     my $ctx = Digest::MD5->new; 
-    my $dbh = $self->{dbh};
-    my $filetable = $self->{filetable};
-    my $blockstable = $self->{blockstable};
-    my $verbose = $self->{verbose};
+    my $dbh = $self->dbh;
+    my $filetable = $self->filetable;
+    my $blockstable = $self->blockstable;
+    my $verbose = $self->verbose;
     my $size = 0;
 
     $self->_lock_tables();
-    for( my ($bytes,$part,$block) = (0,0,"");           # init
-    $bytes = read($fh, $block, $self->{blocksize});    # test 
-    $part++, $block="" ) {                              # increment
+    for( my ($bytes,$part,$block) = (0,0,"");        # init our three vars
+    $bytes = read($fh, $block, $self->blocksize);    # test that we read something
+    $part++, $block="" ) {                           # increment $part and reset $block
         $ctx->add( $block );
         $size += length( $block );
         my $b_md5 = md5_base64( $block );
@@ -242,13 +233,13 @@ sub _read_blocks_from_db {
     my ($self, $callback, $fdbname) = @_;
         # callback is called on each block, like &$callback( $block )
     die "$0: name not ok: $fdbname" unless name_ok($fdbname);
-    my $dbh = $self->{dbh};
-    my $verbose = $self->{verbose};
+    my $dbh = $self->dbh;
+    my $verbose = $self->verbose;
     my $ctx = Digest::MD5->new();
     
     warn "$0: Fetching rows $fdbname" if $verbose;
     $self->_lock_tables();
-    my $cmd = "select name, b_md5, c_md5, b_num, c_len from $self->{filetable} where name like ? order by b_num";
+    my $cmd = "select name, b_md5, c_md5, b_num, c_len from " . $self->filetable . " where name like ? order by b_num";
     my @params = ( $fdbname . ' %' );
     my $sth = $dbh->prepare($cmd);
     my $rv =  $sth->execute( @params );
@@ -295,14 +286,14 @@ sub _read_blocks_from_db {
 
 sub _lock_tables {
     my $self = shift;
-    if ($self->{uselocks}) {
-        $self->{dbh}->do("lock tables $self->{filetable} write, $self->{blockstable} write");
+    if ($self->uselocks) {
+        $self->dbh->do("lock tables " . $self->filetable . " write, " . $self->blockstable . " write");
     }
 }
 sub _unlock_tables {
     my $self = shift;
-    if ($self->{uselocks}) {
-        $self->{dbh}->do("unlock tables");
+    if ($self->uselocks) {
+        $self->dbh->do("unlock tables");
     }
 }
 
@@ -337,7 +328,7 @@ DBIx::FileStore - Module to store files in a DBI backend
 
 =head1 VERSION
 
-Version 0.29
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -377,6 +368,24 @@ for details.)
 my $filestore = new DBIx::FileStore();
 
 returns a new DBIx::FileStore object
+
+=head2 build_config_hash()
+
+my $hash = $fs->build_config_hash()
+    
+reads $fs->config_file (or /etc/fdbrc.conf or ~/.fdbrc) as config file.
+
+=head2 build_dbh()
+
+returns a dbh for the $self->dbh
+
+=head2 build_value_sub( 'member_name', 'default_value' )
+
+uses $self->config_hash to return the config value for the member_name,
+or the default_value.
+
+
+
 
 =head2 get_all_filenames()
 
@@ -574,7 +583,7 @@ L<http://search.cpan.org/dist/DBIx-FileStore/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2015 Josh Rabinowitz.
+Copyright 2010-2017 Josh Rabinowitz.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

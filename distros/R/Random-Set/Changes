@@ -1,3 +1,12 @@
+0.05 2017-12-26T11:22:11+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix author dependencies.
+ - Fix minimal Perl version in Makefile.PL.
+ - Remove trivial pragmas.
+ - Update Module::Install to 1.18 version.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-09-22T16:20:18+02:00
  - Move author tests to xt/ directory.
  - Remove trailing whitespace.

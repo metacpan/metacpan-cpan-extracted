@@ -1,5 +1,8 @@
 Revision history for Perl extension SVG.
 
+2.82  2017.12.18 MANWAR
+      - Fixed subquery (txn-1762542) of the issue RT #123896.
+
 2.81  2017.12.17 MANWAR
       - Fixed issue RT #123896 (trailing space in credit comment).
 

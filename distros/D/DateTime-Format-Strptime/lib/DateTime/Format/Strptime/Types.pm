@@ -3,7 +3,7 @@ package DateTime::Format::Strptime::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use parent 'Specio::Exporter';
 
@@ -63,7 +63,7 @@ DateTime::Format::Strptime::Types - Types used for parameter checking in DateTim
 
 =head1 VERSION
 
-version 1.74
+version 1.75
 
 =head1 DESCRIPTION
 

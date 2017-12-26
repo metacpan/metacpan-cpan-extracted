@@ -14,7 +14,7 @@ use base 'Exporter';
 use strict;
 use warnings;
 
-our @EXPORT = qw(get post patch put delete trace websocket sse);
+our @EXPORT = qw(get post patch put del trace websocket sse);
 
 sub get ($) {
 	my $rule = $_[0];
@@ -36,14 +36,9 @@ sub put ($) {
 	bless \$rule, "PEF::Front::Request::Method::PUT";
 }
 
-sub delete ($) {
+sub del ($) {
 	my $rule = $_[0];
 	bless \$rule, "PEF::Front::Request::Method::DELETE";
-}
-
-sub trace($) {
-	my $rule = $_[0];
-	bless \$rule, "PEF::Front::Request::Method::TRACE";
 }
 
 sub websocket ($) {

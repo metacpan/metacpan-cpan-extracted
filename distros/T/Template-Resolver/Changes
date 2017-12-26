@@ -1,5 +1,13 @@
 Revision history for Perl module Template::Resolver
 
+1.16 2017-12-22
+    - Updated documentation (https://github.com/lucastheisen/template-resolver/pull/6)
+    - Added meta.json generation to dzil.ini 
+      (https://github.com/lucastheisen/template-resolver/pull/5)
+
+1.15 2017-12-21
+    - Fixed bug in Overlay unit test, escaping directory names
+
 1.14 2017-08-21
     - Added the ability to loop over entities in the template
 

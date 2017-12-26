@@ -13,7 +13,7 @@ PONAPI::Manual - An introduction to using PONAPI::Server
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 DESCRIPTION
 

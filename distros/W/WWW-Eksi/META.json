@@ -4,7 +4,7 @@
       "Kivanc Yazan"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,10 +27,10 @@
             "DateTime::Format::Strptime" : "0",
             "Furl" : "0",
             "IO::Socket::SSL" : "0",
+            "List::Util" : "0",
             "Mojo::DOM" : "0",
             "URI" : "0",
             "WWW::Lengthen" : "0",
-            "experimental" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -47,11 +47,11 @@
    "provides" : {
       "WWW::Eksi" : {
          "file" : "lib/WWW/Eksi.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "WWW::Eksisozluk" : {
          "file" : "lib/WWW/Eksisozluk.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -66,12 +66,12 @@
          "web" : "https://github.com/kyzn/WWW-Eksi"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [
       "Kivanc Yazan <kivancyazan@gmail.com>",
       "Kivanc Yazan <kyzn@users.noreply.github.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

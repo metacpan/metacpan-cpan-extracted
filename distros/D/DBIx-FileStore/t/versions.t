@@ -8,7 +8,7 @@ use DBIx::FileStore;
 my $version = $DBIx::FileStore::VERSION;
 (my $version_regex = $version) =~ s{\.}{\\.};
 my $date = scalar(localtime(time()));
-my $year = $ENV{RELEASE_TESTING} ? substr($date, -4) : 2015;
+my $year = $ENV{RELEASE_TESTING} ? substr($date, -4) : 2017;
 
 in_file_ok( "dist.ini",              dist_ini_version => 'version\s*=.*' . $version_regex);
 in_file_ok( "lib/DBIx/FileStore.pm", code_version     => 'VERSION\s*=.*' . $version_regex, 

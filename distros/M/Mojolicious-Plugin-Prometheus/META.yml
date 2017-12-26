@@ -1,0 +1,42 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'Vidar Tyldum'
+build_requires:
+  Devel::Cover: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Prometheus
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Prometheus:
+    file: lib/Mojolicious/Plugin/Prometheus.pm
+    version: v1.0.3
+requires:
+  Mojolicious: '0'
+  Net::Prometheus: '0.05'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/tyldum/mojolicious-plugin-prometheus/issues
+  homepage: https://github.com/tyldum/mojolicious-plugin-prometheus
+  repository: git://github.com/tyldum/mojolicious-plugin-prometheus.git
+version: 1.0.3
+x_authority: cpan:TYLDUM
+x_contributors:
+  - 'Vidar Tyldum <vidar@tyldum.com>'

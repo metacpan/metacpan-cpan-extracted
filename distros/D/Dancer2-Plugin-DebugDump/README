@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Dancer2-Plugin-DebugDump,
-version 0.32:
+version 0.41:
 
-  Modifies debug behavior to create multi-line output that's easier for mere mortals to parse.
+  Modified debug behavior to create multi-line output that's easier for mere mortals to parse.
 
 This software is copyright (c) 2017 by Steve Dondley.
 

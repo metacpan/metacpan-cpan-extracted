@@ -21,16 +21,18 @@ my %WriteMakefileArgs = (
     "Coro" => "6.514",
     "List::Util" => 0,
     "Scalar::Util" => 0,
-    "common::sense" => 0
+    "common::sense" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "JSON::XS" => 0,
     "Test2::Bundle::Extended" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,12 +45,14 @@ my %FallbackPrereqs = (
   "Coro" => "6.514",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "JSON::XS" => 0,
   "List::Util" => 0,
   "Scalar::Util" => 0,
   "Test2::Bundle::Extended" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
-  "common::sense" => 0
+  "common::sense" => 0,
+  "parent" => 0
 );
 
 

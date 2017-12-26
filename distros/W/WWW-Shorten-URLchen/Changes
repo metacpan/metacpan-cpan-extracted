@@ -1,5 +1,8 @@
 Revision history for Perl module WWW::Shorten::URLchen
 
+0.0.4 2017-12-21 DATA
+    - urlchen.de uses https now
+
 0.0.3 2014-12-20 DATA
     - Specified min perl version 5.006, in code and metadata
     - Added all prereqs to Build.PL

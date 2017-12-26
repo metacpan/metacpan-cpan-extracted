@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.39  Tue Dec 19 11:50:00 2017
+      - Added support for Copenhagen metro map.
+
 0.38  Tue Dec 12 11:50:00 2017
       - Upgraded dependency on Map::Tube v3.42
 

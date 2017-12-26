@@ -1,8 +1,10 @@
 package SecondTestApp::Cmd::ifc;
 
-BEGIN {
+BEGIN
+{
     my $moodel = $ENV{WHICH_MOODEL} || "Moo";
-    eval "use $moodel;"; $@ and die $@;
+    eval "use $moodel;";
+    $@ and die $@;
     $moodel->import;
 
     __PACKAGE__->can("with")->("MooX::Cmd::Role");

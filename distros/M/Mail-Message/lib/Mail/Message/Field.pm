@@ -7,7 +7,7 @@ use warnings;
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.005';
 
 use base 'Mail::Reporter';
 
@@ -462,8 +462,9 @@ sub fold($$;$)
 sub unfold($)
 {   my $string = $_[1];
     for($string)
-    {   s/\r?\n//gm;
+    {   s/\r?\n\s?/ /gs;  # remove FWS
         s/^ +//;
+        s/ +$//;
     }
     $string;
 }

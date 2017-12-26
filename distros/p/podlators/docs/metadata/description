@@ -31,5 +31,5 @@ smaller case for acronyms.
 As of Perl 5.6.0, my implementation was included in Perl core, and each
 release of Perl will have the at-the-time most current version of
 podlators included.  You therefore only need to install this package
-yourself if you have an old verison of Perl or need a newer version than
+yourself if you have an old version of Perl or need a newer version than
 came with Perl (to get some bug fixes, for example).

@@ -6,7 +6,7 @@ require Exporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -454,6 +454,12 @@ sub kana2romaji
 	$input =~ s/ッ([$hep_sok_list])/$hepburn_sokuon{$1}$1/g;
     }
     $input =~ s/ッ([$takes_sokuon])/$siin{$1}$1/g;
+    if ($ve_type eq 'wapuro') {
+	$input =~ s/ー/-/g;
+    }
+    if ($ve_type eq 'none') {
+	$input =~ s/ー//g;
+    }
     # 長音 (ー)
     for my $vowel (@aiueo) {
 	my $ve = $chouonhyouki{$ve_type}->{$vowel};
@@ -1085,7 +1091,7 @@ sub circled2kana
 sub normalize_romaji
 {
     my ($romaji) = @_;
-    my $kana = romaji2kana ($romaji, {ve_type => 'wapuro'});
+    my $kana = romaji2kana ($romaji, {wapuro => 1});
     $kana =~ s/[っッ]/xtu/g;
     my $romaji_out = kana2romaji ($kana, {ve_type => 'wapuro'});
 }

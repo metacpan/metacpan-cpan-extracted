@@ -1,28 +1,31 @@
 ---
-abstract: 'Search and print related Github user emails.'
+abstract: 'Search and print particular Github user emails.'
 author:
   - 'faraco <skelic3@gmail.com>'
-build_requires: {}
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-Github-Email
 requires:
-  Email::Address: '1.908'
-  Getopt::Long: v2.49.1
-  LWP::UserAgent: '6.07'
-  List::MoreUtils: '0.416'
-  Modern::Perl: '1.20170117'
-  Test::More: '1.302075'
-  perl: '5.008'
+  Email::Address: '0'
+  LWP::Online: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/faraco/App-Github-Email/issues
   homepage: https://github.com/faraco/App-Github-Email
   repository: https://github.com/faraco/App-Github-Email.git
-version: 0.0.7
+version: 0.1.1
 x_serialization_backend: 'YAML::Tiny version 1.69'

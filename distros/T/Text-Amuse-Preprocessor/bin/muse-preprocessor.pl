@@ -9,13 +9,15 @@ use File::Temp qw//;
 use File::Spec;
 use File::Copy qw/move copy/;
 
-my ($fix_links, $fix_typography, $fix_nbsp, $remove_nbsp, $fix_footnotes, $inplace, $help);
+my ($fix_links, $fix_typography, $fix_nbsp, $remove_nbsp, $show_nbsp,
+    $fix_footnotes, $inplace, $help);
 
 GetOptions (
             links => \$fix_links,
             typography => \$fix_typography,
             nbsp => \$fix_nbsp,
             'remove-nbsp' => \$remove_nbsp,
+            'show-nbsp' => \$show_nbsp,
             footnotes => \$fix_footnotes,
             inplace => \$inplace,
             help => \$help,
@@ -60,6 +62,11 @@ applicable).
 
 Unconditionally remove all the invisible non-breaking spaces
 
+=item show-nbsp
+
+Make the (usually) invisible non-breaking spaces explicit with a
+double tilde.
+
 =item footnotes
 
 Rearrange the footnotes.
@@ -95,6 +102,7 @@ my $pp = Text::Amuse::Preprocessor->new(
                                         fix_links      => $fix_links,
                                         fix_nbsp       => $fix_nbsp,
                                         remove_nbsp    => $remove_nbsp,
+                                        show_nbsp      => $show_nbsp,
                                         fix_footnotes  => $fix_footnotes,
                                         fix_typography => $fix_typography,
                                         input => $infile,

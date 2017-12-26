@@ -37,6 +37,7 @@
             "CPAN::Testers::Common::Client" : "0",
             "Carp" : "0",
             "Cwd" : "0",
+            "Data::Dump" : "0",
             "File::Path" : "2.06",
             "File::Spec" : "0",
             "JSON" : "0",
@@ -53,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

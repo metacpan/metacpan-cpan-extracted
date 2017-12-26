@@ -3,22 +3,14 @@ use strict;
 
 use List::Util qw(first);
 use File::Spec::Functions qw(catfile); # to concat dirs & filenames portably 
-use Config::File;
+use Config::Tiny;
 
 use DBIx::FileStore::UtilityFunctions qw(get_user_homedir);
 
-use fields qw( vars_hash verbose ); # you can set $obj->{verbose} for debugging
+use Mouse;
 
-######################################
-# my $conf = new DBIx::FileStore::ConfigFile() 
-sub new {
-    my DBIx::FileStore::ConfigFile $self = shift;
-    unless (ref $self) {
-        $self = fields::new($self);
-    }
-    return $self;
-}
-
+has 'vars_hash' => ( is => 'rw', isa => 'HashRef', default => sub{ return {}; } );
+has 'verbose'   => ( is => 'rw', isa => 'Bool', default => 0 );
 
 ############################################
 # my $hashref = $conf->read_config_file()
@@ -42,14 +34,17 @@ sub read_config_file {
     }
     print "$0: reading $filename\n" if $self->{verbose};
 
-    $self->{vars_hash} = Config::File::read_config_file( $filename );
+    #$self->vars_hash( Config::File::read_config_file( $filename ) );
+    my $raw = Config::Tiny->read( $filename );
+    #warn "$0: read config data: " . dump($raw->{_}) . "\n";
+    $self->vars_hash( $raw->{_} );
 
     # sanity check that there's a dbuser passed.
-    unless( $self->{vars_hash}->{dbuser} ) {
+    unless( $self->vars_hash->{dbuser} ) {
         warn "$0: Can't find a 'dbuser' setting in $filename\n";
     }
 
-    return $self->{vars_hash};
+    return $self->vars_hash;
 }
 
 1;
@@ -108,7 +103,7 @@ with an error message.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2015 Josh Rabinowitz, All Rights Reserved.
+Copyright (c) 2010-2017 Josh Rabinowitz, All Rights Reserved.
 
 =head1 AUTHORS
 

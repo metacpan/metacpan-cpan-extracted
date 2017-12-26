@@ -1,5 +1,53 @@
 Changes history for App::RPi::EnvUI
 
+0.30    2017-12-21
+        - this will be the last beta release. The next release will be 1.00,
+          will be stable, and will have proper documentation
+        - the env_to_db() Event will now restart itself if it crashes
+        - significant modifications to the API action_light() infrastructure...
+          we use DateTime objects now, per stevieb9/scripts/perl/light_timer
+        - code cleanup
+        - fix void assignment of hash in API
+        - DateTime objects are now properly set in the class scope for 
+          action_light()
+        - updated t/50 with newer tests; we now perform tests to ensure that if
+          the on/off cycle completes within the same 24 hour period, the next
+          "on" time will be pushed to the following day
+        - updated the timezone in the src config file and db to 
+          America/Vancouver
+        - fix issue where in test mode, Events aren't created and stored into
+          the API object, therefore calls to Event->status() would fail when
+          calling the API->env() method in testing (fixes #48)
+        - fixed issue where override was not operating correctly. Fixed Perl and
+          JS code (fixes #49)
+        - code/test tidying, and all tests now pass ;)
+        - fix issue in Auth, where we were calling API::user() by class, not by
+          object, broke during recent update to API code. (fixes #50)
+        - add API::env_light_aux() and DB::db() to POD
+        - added new sig handler for warn with env var SUPPRESS_WARN=1 to quiet
+          warnings. Recommended only while testing
+        - fix issue where the month in the UI date was off-by-one (fixes #46)
+        - renamed "log_level" config file variable to "debug_level"
+        - removed config/ from the distribution, and consolidated the testing()
+          and _ui_testing() configuration to use the config file in t/ instead
+        - added new config directive, "devel", if set to 1, we'll turn the
+          background of the time display in the UI red to signify this isn't
+          a production system (closes #47)
+        - fix logic bugs and other JS weirdness in core.js that was completely
+          breaking the UI's interpretation of aux override (fixes #53)
+        - rewrite logic in core.js so that if override is disabled, setting aux
+          state doesn't happen (fixes #54)
+        - disabled "toggle" in the base config file for the light aux (updated
+          tests)
+        - updated API::_bool() to allow the $bool param to be both true/false
+          and 1/0, as we do call it in both of those contexts, so we don't
+          have to translate the param in code before sending it in
+        - added new t/226 test for fully testing the set_aux_override route
+        - fix issue where when API::switch() was called, we were setting the
+          physical pin state even when the state hadn't changed (fixes #52)
+        - fix issue where the log_file directive in the config had no effect,
+          rendering an empty log file (fixes #56)
+
 0.29    2017-10-24
         - this project is still in BETA status and should not be used in a
           production growing environment without extreme monitoring

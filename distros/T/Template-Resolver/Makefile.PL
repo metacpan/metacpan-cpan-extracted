@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Log::Any" => 0
   },
-  "VERSION" => "1.14",
+  "VERSION" => "1.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

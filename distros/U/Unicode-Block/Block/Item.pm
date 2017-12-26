@@ -12,10 +12,11 @@ use Text::CharWidth qw(mbwidth);
 use Unicode::Char;
 
 # Constants.
+Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -74,7 +75,7 @@ sub char {
 
 	# Not Assigned.
 	} elsif ($char =~ m/\p{Cn}/ms) {
-		$char = $SPACE;
+		$char = $EMPTY_STR;
 	}
 
 	return $char;
@@ -168,6 +169,7 @@ Constructor.
 =item * C<hex_length>
 
  Length of hex number.
+ It's used for formatting of hex() method output.
  Default value is 4.
 
 =back
@@ -246,22 +248,33 @@ L<Readonly>,
 L<Text::CharWidth>,
 L<Unicode::Char>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<Unicode::Block>
+
+Class for unicode block manipulation.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/tupinek/Unicode-Block>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2013-2017 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.06
 
 =cut

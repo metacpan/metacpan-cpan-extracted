@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Overdue;
-$Koha::Contrib::Tamil::Overdue::VERSION = '0.051';
+$Koha::Contrib::Tamil::Overdue::VERSION = '0.052';
 use Moose;
 use Modern::Perl;
 use YAML qw/ Dump LoadFile /;
@@ -344,7 +344,7 @@ Koha::Contrib::Tamil::Overdue
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 ATTRIBUTES
 

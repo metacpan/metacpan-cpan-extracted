@@ -11,22 +11,15 @@ requires "strict" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
-  requires "Class::Accessor" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
-  requires "Method::Signatures" => "0";
-  requires "Moose" => "0";
-  requires "MooseX::Declare" => "0";
   requires "Test::Differences" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
-  requires "autodie" => "0";
-  requires "lib" => "0";
-  requires "version" => "0";
 };
 
 on 'test' => sub {

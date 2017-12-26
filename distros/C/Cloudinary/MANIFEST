@@ -1,0 +1,34 @@
+.perltidyrc
+.ship.conf
+Changes
+Cloudinary-0.16/.ship.conf
+Cloudinary-0.16/Changes
+Cloudinary-0.16/cpanfile
+Cloudinary-0.16/lib/Cloudinary.pm
+Cloudinary-0.16/lib/Mojolicious/Plugin/Cloudinary.pm
+Cloudinary-0.16/local/ch
+Cloudinary-0.16/Makefile.PL
+Cloudinary-0.16/META.json
+Cloudinary-0.16/META.yml
+Cloudinary-0.16/README
+Cloudinary-0.16/README.pod
+Cloudinary-0.16/t/00-basic.t
+Cloudinary-0.16/t/cloudinary.t
+Cloudinary-0.16/t/real.t
+Cloudinary-0.16/t/register.t
+Cloudinary-0.16/t/simple.t
+Cloudinary-0.16/t/test.jpg
+cpanfile
+lib/Cloudinary.pm
+lib/Mojolicious/Plugin/Cloudinary.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/cloudinary.t
+t/real.t
+t/register.t
+t/simple.t
+t/test.jpg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

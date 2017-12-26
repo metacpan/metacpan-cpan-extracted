@@ -119,7 +119,7 @@ or the one whose name is passed.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2015 Josh Rabinowitz, All Rights Reserved.
+Copyright (c) 2010-2017 Josh Rabinowitz, All Rights Reserved.
 
 =head1 AUTHORS
 

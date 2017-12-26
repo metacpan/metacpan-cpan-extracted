@@ -4,7 +4,7 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use feature qw( state );
 
@@ -39,7 +39,7 @@ WebService::PayPal::PaymentsAdvanced::Role::HasTransactionTime - Role which conv
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head2 transaction_time
 

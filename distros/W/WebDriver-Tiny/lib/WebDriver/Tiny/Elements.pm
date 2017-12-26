@@ -1,4 +1,4 @@
-package WebDriver::Tiny::Elements 0.006;
+package WebDriver::Tiny::Elements 0.100;
 
 use 5.020;
 use feature 'postderef';
@@ -19,106 +19,48 @@ sub uniq {
     bless [ $drv, keys %{ { map { $_ => undef } @ids } } ];
 }
 
-sub attr { $_[0]->_req( GET => "/attribute/$_[1]" )->{value} }
-sub css  { $_[0]->_req( GET =>       "/css/$_[1]" )->{value} }
+sub attr { $_[0]->_req( GET => "/attribute/$_[1]" ) }
+sub css  { $_[0]->_req( GET =>       "/css/$_[1]" ) }
+sub prop { $_[0]->_req( GET =>  "/property/$_[1]" ) }
 
 sub clear { $_[0]->_req( POST => '/clear' ); $_[0] }
 sub click { $_[0]->_req( POST => '/click' ); $_[0] }
 sub tap   { $_[0]->_req( POST => '/tap'   ); $_[0] }
 
-sub enabled  { $_[0]->_req( GET => '/enabled'   )->{value} }
-sub rect     { $_[0]->_req( GET => '/rect'      )->{value} }
-sub selected { $_[0]->_req( GET => '/selected'  )->{value} }
-sub tag      { $_[0]->_req( GET => '/name'      )->{value} }
-sub visible  { $_[0]->_req( GET => '/displayed' )->{value} }
+sub enabled  { $_[0]->_req( GET => '/enabled'   ) }
+sub rect     { $_[0]->_req( GET => '/rect'      ) }
+sub selected { $_[0]->_req( GET => '/selected'  ) }
+sub tag      { $_[0]->_req( GET => '/name'      ) }
+sub visible  { $_[0]->_req( GET => '/displayed' ) }
 
-# Slice off just 'x' & 'y' as various backends like to supply other junk too.
-sub location { +{ $_[0]->_req( GET => '/location' )->{value}->%{'x', 'y'} } }
-sub location_in_view {
-    +{ $_[0]->_req( GET => '/location_in_view' )->{value}->%{'x', 'y'} };
-}
+sub html { $_[0][0]->js( 'return arguments[0].outerHTML', $_[0] ) }
 
-*find       = \&WebDriver::Tiny::find;
-*screenshot = \&WebDriver::Tiny::screenshot;
+*find = \&WebDriver::Tiny::find;
 
-sub move_to {
-    $_[0][0]->_req( POST => '/moveto', { element => $_[0][1] } );
+sub screenshot {
+    my ($self, $file) = @_;
 
-    $_[0];
+    require MIME::Base64;
+
+    my $data = MIME::Base64::decode_base64(
+        $self->_req( GET => '/screenshot' )
+    );
+
+    if ( @_ == 2 ) {
+        open my $fh, '>', $file or die $!;
+        print $fh $data;
+        close $fh or die $!;
+
+        return $self;
+    }
+
+    $data;
 }
 
 sub send_keys {
     my ( $self, $keys ) = @_;
 
-    $self->_req( POST => '/value', { value => [ split //, $keys ] } );
-
-    $self;
-}
-
-sub submit {
-    my ( $self, %values ) = @_;
-
-    # For each key in %values, try to find an element under $self with that
-    # name, then depending on what type of element that is, work out if a
-    # click, send_keys, etc. method is needed.
-    #
-    # This logic is done in JS rather than Perl to reduce the amount of calls
-    # to the server from one plus calls per element to just one total call!
-    #
-    # This improves performance at the cost of having to read JS ;-)
-    my $drv   = $self->[0];
-    my $elems = $drv->js( <<'JS', { ELEMENT => $self->[1] }, \%values );
-        'use strict';
-
-        var form = arguments[0], values = arguments[1], click = [], keys = [];
-
-        for ( var name in values ) {
-            var elems = form.elements[name], value = values[name];
-
-            // FIXME - bodge for radio.
-            var elem = elems.length > 1 ? elems[0] : elems;
-
-            if ( elem.tagName == 'OPTION' ) {
-                var options = elems.querySelectorAll(
-                    '[value="' + (
-                        value.constructor === Array
-                            ? value.join('"],[value="') : value
-                    ) + '"]'
-                );
-
-                for ( var i = 0; i < options.length; i++ )
-                    click.push(options[i]);
-            }
-            else {
-                if ( elem.type == 'checkbox' ) {
-                    if ( !value != !elem.selected )
-                        click.push(elem);
-                }
-                else if ( elem.type == 'radio' )
-                    click.push(
-                        form.querySelector(
-                            '[name="' + name + '"][value="' + value + '"]')
-                    );
-                else
-                    keys.push([
-                        elem,
-                        // Press CTRL+A then BACKSPACE before typing
-                        ( elem.type == 'file' ? '' : '\uE009a\uE000\uE003' ) +
-                        value
-                    ]);
-            }
-        }
-
-        return [ click, keys ];
-JS
-
-    $drv->_req( POST => "/element/$_->{ELEMENT}/click" ) for $elems->[0]->@*;
-
-    $drv->_req(
-        POST => "/element/$_->[0]{ELEMENT}/value", { value => [ $_->[1] ] },
-    ) for $elems->[1]->@*;
-
-    $self->_req( POST => '/submit' );
+    $self->_req( POST => '/value', { text => "$keys" } );
 
     $self;
 }
@@ -126,7 +68,7 @@ JS
 sub text {
     my ( $drv, @ids ) = $_[0]->@*;
 
-    join ' ', map $drv->_req( GET => "/element/$_/text" )->{value}, @ids;
+    join ' ', map $drv->_req( GET => "/element/$_/text" ), @ids;
 }
 
 # Call driver's ->_req, prepend "/element/:id" to the path first.

@@ -1,5 +1,8 @@
 Revision history for Zabbix-Sender
 
+0.07    2017-12-23
+        Use Moo and Type::Tiny.
+
 0.06    2016-09-11
         Fix some failing tests.
 

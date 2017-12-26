@@ -32,8 +32,13 @@ dan/agent/code/shell
 dan/agent/code/show
 dan/agent/code/version
 dan/agent/path
+dan/agent/run/.gitkeep
 dan/bootstrap/bin/bootstrap
+dan/bootstrap/bin/procupdate
+dan/bootstrap/exec/120*whitelist
 dan/bootstrap/exec/3600*keyupdate
+dan/bootstrap/exec/3600_procupdate
+dan/bootstrap/exec/604800_mydanupdate
 dan/bootstrap/exec/agent
 dan/collector/bin/co
 dan/collector/bin/stat
@@ -103,6 +108,7 @@ dan/tools/load
 dan/tools/mcmd
 dan/tools/mrsync
 dan/tools/mssh
+dan/tools/ntpsync
 dan/tools/range
 dan/tools/rcall
 dan/tools/release
@@ -175,6 +181,7 @@ lib/MYDan/Agent/Query.pm
 lib/MYDan/API.pm
 lib/MYDan/API/Agent.pm
 lib/MYDan/Bootstrap.pm
+lib/MYDan/Bootstrap/ProcUpdate.pm
 lib/MYDan/Collector.pm
 lib/MYDan/Collector/Jobs.pm
 lib/MYDan/Collector/Parse.pm
@@ -254,12 +261,14 @@ lib/MYDan/Util/MIO/SSH.pm
 lib/MYDan/Util/MIO/TCP.pm
 lib/MYDan/Util/MIO/UDP.pm
 lib/MYDan/Util/Mrsync.pm
+lib/MYDan/Util/NTPSync.pm
 lib/MYDan/Util/OptConf.pm
 lib/MYDan/Util/Pass.pm
 lib/MYDan/Util/Percent.pm
 lib/MYDan/Util/Phasic.pm
 lib/MYDan/Util/ProcLock.pm
 lib/MYDan/Util/Proxy.pm
+lib/MYDan/Util/ReservedSpace/File.pm
 lib/MYDan/Util/Say.pm
 lib/MYDan/Util/Screen.pm
 lib/MYDan/Util/SQLiteDB.pm

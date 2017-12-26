@@ -1,7 +1,7 @@
 package PPIx::EditorTools::RenameVariable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Lexically replace a variable name in Perl code
-$PPIx::EditorTools::RenameVariable::VERSION = '0.20';
+$PPIx::EditorTools::RenameVariable::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -201,7 +201,7 @@ PPIx::EditorTools::RenameVariable - Lexically replace a variable name in Perl co
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

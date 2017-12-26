@@ -1,7 +1,7 @@
 package PPIx::EditorTools::ReturnObject;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Simple object to return values from PPIx::EditorTools
-$PPIx::EditorTools::ReturnObject::VERSION = '0.20';
+$PPIx::EditorTools::ReturnObject::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -71,7 +71,7 @@ PPIx::EditorTools::ReturnObject - Simple object to return values from PPIx::Edit
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

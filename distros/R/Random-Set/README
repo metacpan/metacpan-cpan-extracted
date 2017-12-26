@@ -34,11 +34,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Random::Set;
 
      # Object.
@@ -69,14 +67,14 @@ REPOSITORY
     <https://github.com/tupinek/Random-Set>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
+     © Michal Josef Špaček 2013-2017
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

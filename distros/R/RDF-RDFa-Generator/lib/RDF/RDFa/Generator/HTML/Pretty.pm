@@ -3,13 +3,14 @@ package RDF::RDFa::Generator::HTML::Pretty;
 use 5.008;
 use base qw'RDF::RDFa::Generator::HTML::Hidden';
 use strict;
+use warnings;
 use constant XHTML_NS => 'http://www.w3.org/1999/xhtml';
 use Encode qw'encode_utf8';
 use Icon::FamFamFam::Silk;
 use RDF::RDFa::Generator::HTML::Pretty::Note;
 use XML::LibXML qw':all';
 
-our $VERSION = '0.103';
+our $VERSION = '0.192';
 
 sub create_document
 {
@@ -71,7 +72,7 @@ sub nodes
 
 	use Data::Dumper; Dumper($prefixes);
 	
-	if ($self->{'version'} == 1.1
+	if (defined($self->{'version'}) && $self->{'version'} == 1.1
 	and $self->{'prefix_attr'})
 	{
 		$root_node->setAttribute('prefix', $prefixes->rdfa)
@@ -96,7 +97,7 @@ sub _make_id
 {
 	my ($ident, $prefix) = @_;
 	
-	if ($prefix =~ /^[A-Za-z][A-Za-z0-9\_\:\.\-]*$/)
+	if (defined($prefix) && ($prefix =~ /^[A-Za-z][A-Za-z0-9\_\:\.\-]*$/))
 	{
 		$ident =~ s/([^A-Za-z0-9\_\:\.])/sprintf('-%x-',ord($1))/ge;
 		return $prefix . $ident;
@@ -155,7 +156,7 @@ sub _resource_statements
 	
 	my @statements = sort {
 		$a->predicate->uri cmp $b->predicate->uri
-		or $a->object->as_ntriples cmp $b->object->as_ntriples
+		or $a->object->as_string cmp $b->object->as_string
 		}
 		grep {
 			$_->predicate->uri ne 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
@@ -170,7 +171,7 @@ sub _resource_statements
 	my $current_property = undef;
 	foreach my $st (@statements)
 	{
-		unless ($st->predicate->uri eq $current_property)
+		unless (defined($current_property) && ($st->predicate->uri eq $current_property))
 		{
 			my $DT = $DL->addNewChild(XHTML_NS, 'dt');
 			$DT->setAttribute('title', $st->predicate->uri);
@@ -212,7 +213,7 @@ sub _resource_statements
 		{
 			$DD->setAttribute('property',  $self->_make_curie($st->predicate->uri, $prefixes));
 			$DD->setAttribute('class', 'plain-literal');
-			$DD->setAttribute('xml:lang',  $st->object->literal_value_language);
+			$DD->setAttribute('xml:lang',  ''.$st->object->literal_value_language);
 			$DD->appendTextNode(encode_utf8($st->object->literal_value));
 		}
 		elsif ($self->{'safe_xml_literals'}

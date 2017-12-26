@@ -1,6 +1,6 @@
 # NAME
 
-sdif-tools - sdif and family tools, cdif and watchdiff
+App::sdif - sdif and family tools, cdif and watchdiff
 
 # SYNOPSIS
 

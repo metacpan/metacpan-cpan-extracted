@@ -1,3 +1,21 @@
+0.48
+ - Fix coding error in overload_not_equiv. (Affected older gmp versions only).
+   Thanks chargr.
+
+0.47
+ - Extend overloading of comparisons between mpz_t and mpq_t such that it is available for all
+   builds of Math::GMPz (ie doesn't have to be built against gmp-6.1.0 or later).
+ - Allow overloading of addition, subtraction, multiplication and division operations to
+   accept an mpq_t argument (and return an mpq_t object).
+ - Move the defines at the beginning of GMPz.xs out of that file and into (the newly
+   created) math_gmpz_include.h
+ - Croak on divby0 (instead of crashing).
+ - In overload_xor_eq, overload_ior_eq, overload_and_eq, overload_pow_eq, overload_rshift_eq,
+   overload_lshift_eq, overload_mod_eq, overload_div_eq, overload_sub_eq, overload_add_eq and
+   overload_mul_eq, SvREFCNT_dec(a) before every occurrence of croak().
+ - modify overloaded bitwise functions to work when feature 'bitwise' is enabled - and add
+   a test file (bitwise.t) to test this.
+
 0.46
  - Rewrite tests in t/index_bug.t to avoid crashes owing to memory constraints
 

@@ -1,5 +1,15 @@
 Revision history for Perl module MooX::Cmd
 
+0.017	2017-12-19
+    - bump author requirement for proper Perl::Tidy to 20171214
+    - ensure only MooX::Options 4.100 is tested to avoid false
+      regressions
+
+0.016_001	2017-12-12
+    - improve repository infrastructure (steal from MooX::Options)
+    - fix cmd plugin loader to ensure unambiguous commands
+    - introduce optional role allowing abbreviated commands on CLI
+
 0.015 2015-05-29
     - fix breaking tests on Win32 due stacked Capture::Tiny::_capture_tee
       (thanks Alexandr Ciornii for reporting)

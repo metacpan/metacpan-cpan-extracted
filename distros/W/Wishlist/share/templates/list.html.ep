@@ -1,0 +1,49 @@
+% my $user = user;
+% title $user->{name} . "'s List";
+% layout 'default';
+
+% content_for 'sidebar' => begin
+  %= include 'partial/user_list'
+  %= include 'partial/add_url'
+  %= include 'partial/log_out'
+% end
+
+<h2><%= title %></h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <td>Title</td>
+      <td>Link</td>
+      <td>Action</td>
+    </td>
+  </thead>
+  <tbody>
+    % for my $item (@{ $user->{items} }) {
+    <tr>
+      %= t td => $item->{title}
+      %= t td => link_to $item->{url} => $item->{url}
+      % if (session->{username} eq $user->{username}) {
+        %= t td => form_for 'remove' => begin
+          %= hidden_field id => $item->{id}
+          <input type="submit" value="Remove" class="btn btn-default">
+        % end
+      % } else {
+        %= t td => form_for 'update' => begin
+          %= hidden_field next_url => $c->req->url
+          %= hidden_field id => $item->{id}
+          % if ($item->{purchased}) {
+            %= hidden_field purchased => 0
+            <input type="submit" value="Mark Not Purchased" class="btn btn-default">
+          % } else {
+            %= hidden_field purchased => 1
+            <input type="submit" value="Mark Purchased" class="btn btn-default">
+          % }
+        % end
+      % }
+    </tr>
+  % }
+  </tbody>
+</table>
+
+

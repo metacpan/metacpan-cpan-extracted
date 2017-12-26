@@ -1,7 +1,7 @@
 package Acme::ID::CompanyName;
 
-our $DATE = '2017-10-26'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-12-19'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,28 +17,47 @@ alam
 alami
 abad
 abadi
+agung
 aman
 ampuh
 amanah
 amanat
 
-eka
-eterna
-
+bagus
 bangsa
 berjaya
 berdikari
 berdiri
+berlian
 bersama
 bersatu
 bersaudara
+besar
 
+cahaya
+cahya
+cakra
+catur
+cendrawasih
+central
+chandra
+cipta
+citra
+class
+control
+cosmos
+creative
+
+diamond
 dika
 delta
 dunia
 
-eterna
+eka
 elegan
+era
+eterna
+etos
 
 fajar
 forsa
@@ -46,7 +65,25 @@ fortuna
 
 global
 graha
+guna
 
+hutama
+hulu
+harapan
+harmoni
+harta
+hasil
+hasrat
+hasta
+haluan
+halal
+hati
+hurip
+humana
+human
+humania
+
+indah
 inti
 internasional
 indonesia
@@ -59,6 +96,12 @@ karya
 kurnia
 
 lestari
+lumbung
+laksana
+lautan
+lotus
+lucky
+luas
 
 mulia
 mandala
@@ -70,6 +113,8 @@ multi
 mitra
 
 nusantara
+normal
+nirwana
 
 oasis
 optima
@@ -78,12 +123,32 @@ optimus
 obor
 orisinal
 optimis
+oscar
 
+pelangi
 perusahaan
 pertama
 pratama
 prima
 putra
+pusaka
+pusat
+
+quick
+quadra
+quadrant
+quality
+quantum
+quanta
+
+rekayasa
+rajawali
+raja
+radiant
+rintis
+royal
+roda
+ruang
 
 sarana
 sejahtera
@@ -102,6 +167,60 @@ tren
 umum
 utara
 utama
+
+victory
+viktori
+victoria
+varia
+variasi
+versa
+vektor
+vista
+visi
+vision
+venus
+venture
+ventura
+vita
+vito
+vidia
+
+widya
+widia
+wira
+wiratama
+warna
+wahana
+wahyu
+waringin
+wacana
+wadah
+waguna
+wiguna
+
+xsis
+xcel
+xtra
+xtras
+xmas
+xpro
+xpres
+xpress
+xtreme
+
+yellow
+yasa
+yes
+young
+
+zeus
+zeta
+zoom
+zona
+zone
+zaman
+zaitun
+
 );
 
 my %Per_Letter_Words;
@@ -122,6 +241,7 @@ tri
 tetra
 panca
 );
+# ever
 
 our @Suffixes = qw(
 indo
@@ -136,9 +256,34 @@ tama
 # media
 
 ## some more specific prefixes/suffixes
+# valas
+# herbal
+# higienis
+# home
+# cyber
+# net
+# organik
+# online
+# ritel
+# data
+# digital
+# energi
+# energy
+# equinox
+# exa
+# pustaka
+# huruf
+# equity
+# eco-
+# electronic
 # tekno-
 # oto-
 # media-
+
+# christianish
+# yobel
+# hosana
+# yahya
 
 $SPEC{gen_generic_id_company_names} = {
     v => 1.1,
@@ -174,6 +319,13 @@ $SPEC{gen_generic_id_company_names} = {
         },
     },
     result_naked => 1,
+    examples => [
+        {
+            argv => [qw/-n 2/],
+            result => [200, "OK", ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"]],
+            test => 0,
+        },
+    ],
 };
 sub gen_generic_id_company_names {
     my %args = @_;
@@ -281,19 +433,7 @@ Acme::ID::CompanyName - Generate nice-sounding, generic Indonesian company names
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2017-10-26.
-
-=head1 SYNOPSIS
-
- use Acme::ID::CompanyName qw(gen_generic_id_company_names);
- my $names = gen_generic_id_company_names(num_names => 2);
-
-Sample output:
-
- [
-   "Sentosa Jaya Abadi",
-   "Putra Utama Global",
- ]
+This document describes version 0.004 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2017-12-19.
 
 =head1 DESCRIPTION
 
@@ -307,6 +447,24 @@ Usage:
  gen_generic_id_company_names(%args) -> any
 
 Generate nice-sounding, generic Indonesian company names.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ gen_generic_id_company_names( num_names => 2);
+
+Result:
+
+ [
+   200,
+   "OK",
+   ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"],
+ ]
+
+=back
 
 This function is not exported by default, but exportable.
 

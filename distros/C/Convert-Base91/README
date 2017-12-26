@@ -1,16 +1,13 @@
-Convert-Base91 version 0.001
-============================
+Convert-Base91 version 0.001001
+===============================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Base91 is a method for encoding binary data as printable ASCII
+characters. Every two base91 characters (16 bits) encode 13 or 14 bits
+of actual data, thus the overhead is between 14% and 23%, an
+improvement over base64's overhead of 33%.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+This module provides a procedural interface for encoding/decoding
+whole strings and an OO interface for encoding/decoding in chunks.
 
 INSTALLATION
 
@@ -23,13 +20,10 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
-
-  blah blah blah
+This module requires no non-core modules and libraries.
+A C compiler is needed.
 
 COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
 
 Copyright (C) 2017 by Marius Gavrilescu
 

@@ -27,6 +27,9 @@ requires:
   List::Util: '1.29'
   Log::Any: '1.050'
   Ryu::Async: '0.006'
+  Syntax::Keyword::Try: '0.08'
+  URI: '0'
+  URI::redis: '0'
   curry: '0'
   namespace::clean: '0'
   parent: '0'
@@ -34,5 +37,5 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: http://search.cpan.org/perldoc?Net-Async-Redis
   repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '1.002'
+version: '1.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

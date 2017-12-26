@@ -1,5 +1,8 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.173520 2017-12-18T22:33:59Z
+ - Add missing dep
+
 1.173490 2017-12-15T18:36:52Z
  - Make sure DZP::Prereqs::AuthorDeps is added to prereqs
  - Add a git mailmap, mapping to committers' pause addresses

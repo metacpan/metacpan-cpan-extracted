@@ -4,11 +4,16 @@ use Cwd;
 
 use Module::Build;
 
+# touch README
+open( my $fh, '>>', 'README' );
+close($fh);
+
 my %project_info = (
     tracker    => 'https://github.com/duncs/clusterssh/issues',
     repository => 'http://github.com/duncs/clusterssh',
     homepage   => 'http://github.com/duncs/clusterssh/wiki',
     ci         => 'https://travis-ci.org/duncs/clusterssh',
+    coverage   => 'https://coveralls.io/github/duncs/clusterssh',
 );
 
 my $class = Module::Build->subclass(
@@ -19,6 +24,7 @@ my $class = Module::Build->subclass(
             homepage => '$project_info{homepage}',
             repository => '$project_info{repository}',
             ci => '$project_info{ci}',
+            coverage => '$project_info{coverage}',
         );
     } . q{
     # don't check for errors; 'build_requires' should get this sorted
@@ -58,11 +64,22 @@ Home page: $project_info{homepage},
 Bug Reports and Issues: $project_info{tracker}
 Project Repository: $project_info{repository}
 Automated Testing: $project_info{ci}
+Automated test coverage: $project_info{coverage}
 CPAN release: http://search.cpan.org/~duncs/App-ClusterSSH-$v
 SF release: http://sourceforge.net/projects/clusterssh/files/2.%20ClusterSSH%20Series%204/App-ClusterSSH-${v}.tar.gz/download
 ==========
 EOF
             return $self;
+        }
+
+        sub ACTION_dist {
+            my ($self, @args) = @_;
+
+            print "Creating README", $/;
+
+            qx{ $^X bin_PL/cssh --generate-pod | pod2text > README };
+
+            $self->SUPER::ACTION_dist;
         }
     },
 );
@@ -76,6 +93,7 @@ my $build = $class->new(
             ],
             bugtracker => $project_info{tracker},
             homepage   => $project_info{homepage},
+            coverage   => $project_info{coverage},
         },
     },
     module_name       => 'App::ClusterSSH',
@@ -83,7 +101,7 @@ my $build = $class->new(
     dist_author       => q{Duncan Ferguson <duncan_j_ferguson@yahoo.co.uk>},
     dist_version_from => 'lib/App/ClusterSSH.pm',
     requires          => {
-        'version'           => '0',
+        'version'           => '0.77',
         'Tk'                => '800.022',
         'X11::Protocol'     => '0.56',
         'X11::Protocol::WM' => '0',
@@ -106,6 +124,7 @@ my $build = $class->new(
         'CPAN::Changes'       => 0.27,
         'File::Slurp'         => 0,
         'Test::PerlTidy'      => 0,
+        'Perl::Tidy'          => 20171214,
     },
     recommends         => { 'Sort::Naturally' => 0, },
     configure_requires => { 'Module::Build'   => 0, },

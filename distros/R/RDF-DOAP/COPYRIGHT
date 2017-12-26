@@ -1,11 +1,12 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: RDF-DOAP
-Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org> and Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/RDF-DOAP
 
 Files: Changes
  META.json
  META.yml
+ dist.ini
  doap.ttl
  lib/RDF/DOAP/Change.pm
  lib/RDF/DOAP/Change/Addition.pm
@@ -28,11 +29,10 @@ Files: Changes
  lib/RDF/DOAP/Types.pm
  lib/RDF/DOAP/Utils.pm
  lib/RDF/DOAP/Version.pm
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2017 Kjetil Kjernsmo and Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
  examples/changelog.pl
  examples/credits.pl
@@ -42,33 +42,36 @@ Files: CONTRIBUTING
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/RDF/DOAP.pm
- t/01basic.t
- t/02changelog.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
 
+Files: README
+ README.pod
+ lib/RDF/DOAP.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster, 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02changelog.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Makefile.PL
- dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  

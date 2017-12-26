@@ -1,0 +1,79 @@
+{
+   "abstract" : "postgres advisory locks for Mojolicious application",
+   "author" : [
+      "Copyright (C) Alexander Onokhov <onokhov@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.14",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-PgLock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::Crc32" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::PgLock" : {
+         "file" : "lib/Mojolicious/Plugin/PgLock.pm",
+         "version" : "0.01"
+      },
+      "Mojolicious::Plugin::PgLock::Sentinel" : {
+         "file" : "lib/Mojolicious/Plugin/PgLock/Sentinel.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/onokhov/Mojolicious-Plugin-PgLock/issues"
+      },
+      "homepage" : "https://github.com/onokhov/Mojolicious-Plugin-PgLock",
+      "repository" : {
+         "url" : "git://github.com/onokhov/Mojolicious-Plugin-PgLock.git",
+         "web" : "https://github.com/onokhov/Mojolicious-Plugin-PgLock"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "ccn <ccnweb@gmail.com>"
+   ]
+}

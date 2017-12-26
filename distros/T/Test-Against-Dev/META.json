@@ -44,7 +44,8 @@
             "JSON" : "0",
             "Path::Tiny" : "0",
             "Perl::Download::FTP" : "0.03",
-            "Text::CSV_XS" : "0"
+            "Text::CSV_XS" : "0",
+            "perl" : "5.014000"
          }
       },
       "test" : {
@@ -56,6 +57,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

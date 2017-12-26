@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::PADOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;
@@ -37,5 +37,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

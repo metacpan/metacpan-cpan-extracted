@@ -8,7 +8,7 @@ use warnings;
 use XSLoader;
 use Exporter;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our @ISA = qw(Exporter);
 
 # symbols to export on request

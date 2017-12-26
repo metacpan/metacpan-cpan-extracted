@@ -12,7 +12,7 @@ for my $plack ( 1, 0 ) {
             = WebService::PayPal::PaymentsAdvanced::Mocker->new(
             plack => $plack );
         if ($plack) {
-            isa_ok( $mocker->mocked_ua, 'Test::LWP::UserAgent', 'ua' );
+            isa_ok( $mocker->mocked_ua, 'Test::LWP::UserAgent' );
         }
         my $suffix = $plack ? 'Plack enabled' : 'Plack not enabled';
         ok( $mocker->payflow_link, "payflow_link $suffix" );

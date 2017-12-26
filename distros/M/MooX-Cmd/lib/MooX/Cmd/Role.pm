@@ -3,7 +3,7 @@ package MooX::Cmd::Role;
 use strict;
 use warnings;
 
-our $VERSION = "0.015";
+our $VERSION = "0.017";
 
 use Moo::Role;
 
@@ -88,7 +88,7 @@ ARRAY-REF of args on command line
 
 =cut
 
-has 'command_args' => ( is => "ro" );
+has 'command_args' => (is => "ro");
 
 =head2 command_chain
 
@@ -96,7 +96,7 @@ ARRAY-REF of commands lead to this instance
 
 =cut
 
-has 'command_chain' => ( is => "ro" );
+has 'command_chain' => (is => "ro");
 
 =head2 command_chain_end
 
@@ -104,7 +104,7 @@ COMMAND accesses the finally detected command in chain
 
 =cut
 
-has 'command_chain_end' => ( is => "lazy" );
+has 'command_chain_end' => (is => "lazy");
 
 sub _build_command_chain_end { $_[0]->command_chain->[-1] }
 
@@ -114,7 +114,7 @@ ARRAY-REF the name of the command lead to this command
 
 =cut
 
-has 'command_name' => ( is => "ro" );
+has 'command_name' => (is => "ro");
 
 =head2 command_commands
 
@@ -122,30 +122,26 @@ HASH-REF names of other commands
 
 =cut
 
-has 'command_commands' => ( is => "lazy" );
+has 'command_commands' => (is => "lazy");
 
 sub _build_command_commands
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
     defined $params->{command_base} or $params->{command_base} = $class->_build_command_base($params);
     my $base = $params->{command_base};
 
-    # i have no clue why 'only' and 'except' seems to not fulfill what i need or are bugged in M::P - Getty
+    # I have no clue why 'only' and 'except' seems to not fulfill what I need or are bugged in M::P - Getty
     my @cmd_plugins = grep {
-        my $plug_class = $_;
-        $plug_class =~ s/${base}:://;
-        $plug_class !~ /:/;
-      } Module::Pluggable::Object->new(
+        my $plug_class = _mkcommand($_, $base);
+        index($plug_class, ":") == -1;
+    } Module::Pluggable::Object->new(
         search_path => $base,
         require     => 0,
-      )->plugins;
+    )->plugins;
 
-    my %cmds;
-
-    for my $cmd_plugin (@cmd_plugins)
-    {
-        $cmds{ _mkcommand( $cmd_plugin, $base ) } = $cmd_plugin;
-    }
+    my %cmds = map { _mkcommand($_, $base) => $_ } @cmd_plugins;
+    scalar keys %cmds == scalar @cmd_plugins
+      or croak "Can't compute unambiguous list of commands from '" . join("', '", @cmd_plugins) . "'";
 
     \%cmds;
 }
@@ -156,7 +152,7 @@ STRING base of command plugins
 
 =cut
 
-has command_base => ( is => "lazy" );
+has command_base => (is => "lazy");
 
 sub _build_command_base { $_[0] . '::Cmd'; }
 
@@ -166,7 +162,7 @@ STRING name of the method to invoke to execute a command, default "execute"
 
 =cut
 
-has command_execute_method_name => ( is => "lazy" );
+has command_execute_method_name => (is => "lazy");
 
 sub _build_command_execute_method_name { "execute" }
 
@@ -176,7 +172,7 @@ STRING I have no clue what that is good for ...
 
 =cut
 
-has command_execute_return_method_name => ( is => "lazy" );
+has command_execute_return_method_name => (is => "lazy");
 
 sub _build_command_execute_return_method_name { "execute_return" }
 
@@ -186,7 +182,7 @@ STRING name of constructor
 
 =cut
 
-has command_creation_method_name => ( is => "lazy" );
+has command_creation_method_name => (is => "lazy");
 
 sub _build_command_creation_method_name { "new_with_cmd" }
 
@@ -196,9 +192,9 @@ ARRAY-REF names of methods to chain for creating object (from L</command_creatio
 
 =cut
 
-has command_creation_chain_methods => ( is => "lazy" );
+has command_creation_chain_methods => (is => "lazy");
 
-sub _build_command_creation_chain_methods { [ 'new_with_options', 'new' ] }
+sub _build_command_creation_chain_methods { ['new_with_options', 'new'] }
 
 =head2 command_execute_from_new
 
@@ -206,7 +202,7 @@ BOOL true when constructor shall invoke L</command_execute_method_name>, false o
 
 =cut
 
-has command_execute_from_new => ( is => "lazy" );
+has command_execute_from_new => (is => "lazy");
 
 sub _build_command_execute_from_new { 0 }
 
@@ -222,8 +218,10 @@ sub new_with_cmd { goto &_initialize_from_cmd; }
 
 sub _mkcommand
 {
-    my ( $package, $base ) = @_;
-    $package =~ s/^${base}:://g;
+    my ($package, $base) = @_;
+    my $bwc     = "${base}::";
+    my $len_bwc = length($bwc);
+    index($package, $bwc) == 0 and substr($package, 0, $len_bwc, "");
     lc($package);
 }
 
@@ -231,53 +229,55 @@ my @private_init_params =
   qw(command_base command_execute_method_name command_execute_return_method_name command_creation_chain_methods command_execute_method_name);
 
 my $required_method = sub {
-    my ( $tgt, $method ) = @_;
-    $tgt->can($method) or croak( "You need an '$method' in " . ( blessed $tgt || $tgt ) );
+    my ($tgt, $method) = @_;
+    $tgt->can($method) or croak("You need an '$method' in " . (blessed $tgt || $tgt));
 };
 
 my $call_required_method = sub {
-    my ( $tgt, $method, @args ) = @_;
-    my $m = $required_method->( $tgt, $method );
-    return $m->( $tgt, @args );
+    my ($tgt, $method, @args) = @_;
+    my $m = $required_method->($tgt, $method);
+    return $m->($tgt, @args);
 };
 
 my $call_optional_method = sub {
-    my ( $tgt, $method, @args ) = @_;
+    my ($tgt, $method, @args) = @_;
     my $m = $tgt->can($method) or return;
-    return $m->( $tgt, @args );
+    return $m->($tgt, @args);
 };
 
 my $call_indirect_method = sub {
-    my ( $tgt, $name_getter, @args ) = @_;
-    my $g = $call_required_method->( $tgt, $name_getter );
-    my $m = $required_method->( $tgt, $g );
-    return $m->( $tgt, @args );
+    my ($tgt, $name_getter, @args) = @_;
+    my $g = $call_required_method->($tgt, $name_getter);
+    my $m = $required_method->($tgt, $g);
+    return $m->($tgt, @args);
 };
 
+## no critic qw(ProhibitExcessComplexity)
 sub _initialize_from_cmd
 {
-    my ( $class, %params ) = @_;
+    my ($class, %params) = @_;
 
-    my @args = shellwords( join ' ', map { quotemeta } @ARGV );
+    my @args = shellwords(join ' ', map { quotemeta } @ARGV);
 
-    my ( @used_args, $cmd, $cmd_name, $cmd_name_index );
+    my (@used_args, $cmd, $cmd_name, $cmd_name_index);
 
     my %cmd_create_params = %params;
-    delete @cmd_create_params{ qw(command_commands), @private_init_params };
+    delete @cmd_create_params{qw(command_commands), @private_init_params};
 
-    defined $params{command_commands} or $params{command_commands} = $class->_build_command_commands( \%params );
-    if ( ( $cmd_name_index = first_index { $cmd = $params{command_commands}->{$_} } @args ) >= 0 )
+    defined $params{command_commands} or $params{command_commands} = $class->_build_command_commands(\%params);
+    if (($cmd_name_index = first_index { $cmd = $params{command_commands}->{$_} } @args) >= 0)
     {
         @used_args = splice @args, 0, $cmd_name_index;
-        $cmd_name = shift @args;    # be careful about relics
+        shift @args;    # be careful about relics
+        $cmd_name = _mkcommand($cmd, $params{command_base});
 
         use_module($cmd);
         defined $cmd_create_params{command_execute_method_name}
           or $cmd_create_params{command_execute_method_name} =
-          $call_optional_method->( $cmd, "_build_command_execute_method_name", \%cmd_create_params );
+          $call_optional_method->($cmd, "_build_command_execute_method_name", \%cmd_create_params);
         defined $cmd_create_params{command_execute_method_name}
           or $cmd_create_params{command_execute_method_name} = "execute";
-        $required_method->( $cmd, $cmd_create_params{command_execute_method_name} );
+        $required_method->($cmd, $cmd_create_params{command_execute_method_name});
     }
     else
     {
@@ -286,54 +286,55 @@ sub _initialize_from_cmd
     }
 
     defined $params{command_creation_chain_methods}
-      or $params{command_creation_chain_methods} = $class->_build_command_creation_chain_methods( \%params );
+      or $params{command_creation_chain_methods} = $class->_build_command_creation_chain_methods(\%params);
     my @creation_chain =
-      _ARRAY( $params{command_creation_chain_methods} )
-      ? @{ $params{command_creation_chain_methods} }
-      : ( $params{command_creation_chain_methods} );
-    ( my $creation_method = first_result { defined $_ and $class->can($_) } @creation_chain )
+      _ARRAY($params{command_creation_chain_methods})
+      ? @{$params{command_creation_chain_methods}}
+      : ($params{command_creation_chain_methods});
+    (my $creation_method = first_result { defined $_ and $class->can($_) } @creation_chain)
       or croak "Can't find a creation method on $class";
 
+    ## no critic qw(RequireLocalizedPunctuationVars)
     @ARGV                 = @used_args;
     $params{command_args} = [@args];
     $params{command_name} = $cmd_name;
     defined $params{command_chain} or $params{command_chain} = [];
-    my $self = $creation_method->( $class, %params );
-    push @{ $self->command_chain }, $self;
+    my $self = $creation_method->($class, %params);
+    push @{$self->command_chain}, $self;
 
     if ($cmd)
     {
         @ARGV = @args;
-        my ( $creation_method, $creation_method_name, $cmd_plugin );
+        my ($creation_method, $creation_method_name, $cmd_plugin);
         $cmd->can("_build_command_creation_method_name")
-          and $creation_method_name = $cmd->_build_command_creation_method_name( \%params );
+          and $creation_method_name = $cmd->_build_command_creation_method_name(\%params);
         $creation_method_name and $creation_method = $cmd->can($creation_method_name);
         if ($creation_method)
         {
             @cmd_create_params{qw(command_chain)} = @$self{qw(command_chain)};
-            $cmd_plugin = $creation_method->( $cmd, %cmd_create_params );
-            $self->{ $self->command_execute_return_method_name } =
-              [ @{ $call_indirect_method->( $cmd_plugin, "command_execute_return_method_name" ) } ];
+            $cmd_plugin = $creation_method->($cmd, %cmd_create_params);
+            $self->{$self->command_execute_return_method_name} =
+              [@{$call_indirect_method->($cmd_plugin, "command_execute_return_method_name")}];
         }
         else
         {
-            ( $creation_method = first_result { defined $_ and $cmd->can($_) } @creation_chain )
+            ($creation_method = first_result { defined $_ and $cmd->can($_) } @creation_chain)
               or croak "Can't find a creation method on " . $cmd;
             $cmd_plugin = $creation_method->($cmd);
-            push @{ $self->command_chain }, $cmd_plugin;
+            push @{$self->command_chain}, $cmd_plugin;
 
             my $cemn = $cmd_plugin->can("command_execute_method_name");
             my $exec_fun = $cemn ? $cemn->() : $self->command_execute_method_name();
             $self->command_execute_from_new
-              and $self->{ $self->command_execute_return_method_name } =
-              [ $call_required_method->( $cmd_plugin, $exec_fun, \@ARGV, $self->command_chain ) ];
+              and $self->{$self->command_execute_return_method_name} =
+              [$call_required_method->($cmd_plugin, $exec_fun, \@ARGV, $self->command_chain)];
         }
     }
     else
     {
         $self->command_execute_from_new
-          and $self->{ $self->command_execute_return_method_name } =
-          [ $call_indirect_method->( $self, "command_execute_method_name", \@ARGV, $self->command_chain ) ];
+          and $self->{$self->command_execute_return_method_name} =
+          [$call_indirect_method->($self, "command_execute_method_name", \@ARGV, $self->command_chain)];
     }
 
     return $self;
@@ -350,7 +351,7 @@ sub execute_return { $_[0]->{execute_return} }
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2013 Torsten Raudssus, Copyright 2013-2015 Jens Rehsack.
+Copyright 2012-2013 Torsten Raudssus, Copyright 2013-2017 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

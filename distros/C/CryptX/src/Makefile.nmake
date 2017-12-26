@@ -43,11 +43,11 @@ ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_done.obj ltc/mac/xc
 ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj ltc/mac/xcbc/xcbc_memory_multi.obj \
 ltc/mac/xcbc/xcbc_process.obj ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/radix_to_bin.obj \
 ltc/math/rand_bn.obj ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj \
-ltc/misc/adler32.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc/misc/crc32.obj \
-ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj ltc/misc/pk_get_oid.obj ltc/misc/zeromem.obj \
-ltc/misc/base32/base32_decode.obj ltc/misc/base32/base32_encode.obj ltc/misc/base64/base64_decode.obj \
-ltc/misc/base64/base64_encode.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj \
-ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
+ltc/misc/adler32.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc/misc/copy_or_zeromem.obj \
+ltc/misc/crc32.obj ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj ltc/misc/pk_get_oid.obj \
+ltc/misc/zeromem.obj ltc/misc/base32/base32_decode.obj ltc/misc/base32/base32_encode.obj \
+ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/crypt/crypt.obj \
+ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
 ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
 ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
 ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
@@ -124,25 +124,25 @@ ltc/pk/rsa/rsa_verify_hash.obj ltc/prngs/chacha20.obj ltc/prngs/fortuna.obj ltc/
 ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj \
 ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_done.obj \
 ltc/stream/chacha/chacha_ivctr32.obj ltc/stream/chacha/chacha_ivctr64.obj ltc/stream/chacha/chacha_keystream.obj \
-ltc/stream/chacha/chacha_setup.obj ltc/stream/rc4/rc4_stream.obj ltc/stream/salsa20/salsa20_crypt.obj \
-ltc/stream/salsa20/salsa20_done.obj ltc/stream/salsa20/salsa20_ivctr64.obj ltc/stream/salsa20/salsa20_keystream.obj \
-ltc/stream/salsa20/salsa20_setup.obj ltc/stream/sober128/sober128_stream.obj ltc/stream/sosemanuk/sosemanuk.obj \
-ltm/bncore.obj ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj \
-ltm/bn_fast_s_mp_mul_digs.obj ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj \
-ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj ltm/bn_mp_add.obj ltm/bn_mp_addmod.obj ltm/bn_mp_add_d.obj \
-ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj ltm/bn_mp_clear.obj ltm/bn_mp_clear_multi.obj \
-ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj ltm/bn_mp_cmp_mag.obj ltm/bn_mp_cnt_lsb.obj \
-ltm/bn_mp_copy.obj ltm/bn_mp_count_bits.obj ltm/bn_mp_div.obj ltm/bn_mp_div_2.obj \
-ltm/bn_mp_div_2d.obj ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj ltm/bn_mp_dr_is_modulus.obj \
-ltm/bn_mp_dr_reduce.obj ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj ltm/bn_mp_export.obj \
-ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_expt_d.obj ltm/bn_mp_expt_d_ex.obj \
-ltm/bn_mp_exteuclid.obj ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj ltm/bn_mp_gcd.obj \
-ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj ltm/bn_mp_get_long_long.obj ltm/bn_mp_grow.obj \
-ltm/bn_mp_import.obj ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj ltm/bn_mp_init_multi.obj \
-ltm/bn_mp_init_set.obj ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj ltm/bn_mp_invmod.obj \
-ltm/bn_mp_invmod_slow.obj ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj ltm/bn_mp_karatsuba_mul.obj \
-ltm/bn_mp_karatsuba_sqr.obj ltm/bn_mp_lcm.obj ltm/bn_mp_lshd.obj ltm/bn_mp_mod.obj \
-ltm/bn_mp_mod_2d.obj ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj \
+ltc/stream/chacha/chacha_setup.obj ltc/stream/rabbit/rabbit.obj ltc/stream/rc4/rc4_stream.obj \
+ltc/stream/salsa20/salsa20_crypt.obj ltc/stream/salsa20/salsa20_done.obj ltc/stream/salsa20/salsa20_ivctr64.obj \
+ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_setup.obj ltc/stream/sober128/sober128_stream.obj \
+ltc/stream/sosemanuk/sosemanuk.obj ltm/bncore.obj ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj \
+ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj ltm/bn_fast_s_mp_mul_high_digs.obj \
+ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj ltm/bn_mp_add.obj \
+ltm/bn_mp_addmod.obj ltm/bn_mp_add_d.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj ltm/bn_mp_clear.obj \
+ltm/bn_mp_clear_multi.obj ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj ltm/bn_mp_cmp_mag.obj \
+ltm/bn_mp_cnt_lsb.obj ltm/bn_mp_copy.obj ltm/bn_mp_count_bits.obj ltm/bn_mp_div.obj \
+ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj \
+ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_dr_reduce.obj ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj \
+ltm/bn_mp_export.obj ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_expt_d.obj \
+ltm/bn_mp_expt_d_ex.obj ltm/bn_mp_exteuclid.obj ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj \
+ltm/bn_mp_gcd.obj ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj ltm/bn_mp_get_long_long.obj \
+ltm/bn_mp_grow.obj ltm/bn_mp_import.obj ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj \
+ltm/bn_mp_init_multi.obj ltm/bn_mp_init_set.obj ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj \
+ltm/bn_mp_invmod.obj ltm/bn_mp_invmod_slow.obj ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj \
+ltm/bn_mp_karatsuba_mul.obj ltm/bn_mp_karatsuba_sqr.obj ltm/bn_mp_lcm.obj ltm/bn_mp_lshd.obj \
+ltm/bn_mp_mod.obj ltm/bn_mp_mod_2d.obj ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj \
 ltm/bn_mp_montgomery_reduce.obj ltm/bn_mp_montgomery_setup.obj ltm/bn_mp_mul.obj \
 ltm/bn_mp_mulmod.obj ltm/bn_mp_mul_2.obj ltm/bn_mp_mul_2d.obj ltm/bn_mp_mul_d.obj \
 ltm/bn_mp_neg.obj ltm/bn_mp_n_root.obj ltm/bn_mp_n_root_ex.obj ltm/bn_mp_or.obj ltm/bn_mp_prime_fermat.obj \

@@ -1,7 +1,10 @@
 package RDF::DOAP::Types;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.100';
+
+use strict;
+use warnings;
 
 use Type::Utils -all;
 use Type::Library -base;

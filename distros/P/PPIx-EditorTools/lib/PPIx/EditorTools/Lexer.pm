@@ -1,7 +1,7 @@
 package PPIx::EditorTools::Lexer;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Simple Lexer used for syntax highlighting
-$PPIx::EditorTools::Lexer::VERSION = '0.20';
+$PPIx::EditorTools::Lexer::VERSION = '0.21';
 use 5.008;
 use strict;
 use warnings;
@@ -103,7 +103,7 @@ PPIx::EditorTools::Lexer - Simple Lexer used for syntax highlighting
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

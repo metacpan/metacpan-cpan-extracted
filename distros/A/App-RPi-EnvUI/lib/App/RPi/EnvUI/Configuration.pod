@@ -64,18 +64,28 @@ information.
 
 Default: C<0>
 
-=head3 log_level
-
-Value: Integer, C<-1> through C<7>. Sets the logging level.
-
-Default: C<-1> (off)
-
 =head3 log_file
 
 Value: String, a filename to use to log to. By default, if logging is enabled,
 we log to C<STDOUT>.
 
 Default: C<""> (empty string, ie. no file)
+
+=head3 debug_level
+
+Value: Integer, C<-1> through C<7>. Sets the debug logging level.
+
+Default: C<-1> (off)
+
+=head3 devel
+
+Value: Bool. True to signify that this is not a production system, False to
+signify it is.
+
+When enabled, the UI's time/date bar's background colour will change to red for
+easy identification of a development system.
+
+Default: C<0> (off)
 
 =head2 CONTROL CONFIGURATION SECTION
 

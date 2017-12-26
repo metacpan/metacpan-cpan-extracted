@@ -5,7 +5,6 @@ use Getopt::Long;
 
 use DBIx::FileStore;
 use DBIx::FileStore::UtilityFunctions qw( convert_bytes_to_human_size );
-#use Data::Dumper;
 
 my $long = 0;
 my $human = 0;	# like du's -h
@@ -33,7 +32,7 @@ sub main {
         "debug!" =>  \$debug,
     ) || die Usage();
 
-    my $filestore = new DBIx::FileStore();
+    my $filestore = new DBIx::FileStore( {verbose=>$debug} );
 
     @ARGV = ( "" ) unless @ARGV;
 
@@ -54,7 +53,6 @@ sub main {
             $files = $filestore->get_filenames_matching_prefix( $name );
         }
 
-        #print Dumper($files);
         print( "fdbls: got " . scalar(@$files) . " rows back for '$name'\n") if $debug;
 
         for my $f (@$files) {

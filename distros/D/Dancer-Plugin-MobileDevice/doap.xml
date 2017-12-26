@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dancer-Plugin-MobileDevice</name>
+  <shortdesc>make a Dancer app mobile-aware</shortdesc>
+  <developer>
+    <foaf:Person rdfs:label="Dancer Core Developers" />
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Alberto Simoes</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ambs@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Alexis Sukrieh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:alexis@weborama.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Alexis Sukrieh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sukria@sukria.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>ambs</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ambs@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>David Precious</foaf:name>
+      <foaf:mbox rdf:resource="mailto:davidp@preshweb.co.uk" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>franck cuny</foaf:name>
+      <foaf:mbox rdf:resource="mailto:franck@lumberjaph.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Philippe Bruhat</foaf:name>
+      <foaf:nick>BooK</foaf:nick>
+      <foaf:mbox rdf:resource="mailto:book@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-MobileDevice" />
+  <bug-database rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-MobileDevice/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-MobileDevice" />
+      <location rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-MobileDevice.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.01</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-12-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-12-13</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-04-10</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-11-25</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.05</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-09-28</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

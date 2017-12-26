@@ -1,7 +1,7 @@
 package App::wordlist;
 
-our $DATE = '2017-11-08'; # DATE
-our $VERSION = '0.261'; # VERSION
+our $DATE = '2017-12-24'; # DATE
+our $VERSION = '0.262'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,6 +29,11 @@ our %arg_wordlists = (
         },
     },
 );
+
+sub _length_in_graphemes {
+    my $length = () = $_[0] =~ m/\X/g;
+    return $length;
+}
 
 sub _list_installed {
     require Module::List;
@@ -326,11 +331,11 @@ sub wordlist {
 
                     return if !$random && $num > 0 && $n >= $num;
                     return if defined($args{len}) &&
-                        length($word) != $args{len};
+                        _length_in_graphemes($word) != $args{len};
                     return if defined($args{min_len}) &&
-                        length($word) < $args{min_len};
+                        _length_in_graphemes($word) < $args{min_len};
                     return if defined($args{max_len}) &&
-                        length($word) > $args{max_len};
+                        _length_in_graphemes($word) > $args{max_len};
 
                     my $cmpword = $ci ? lc($word) : $word;
                     for (@$arg) {
@@ -438,7 +443,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.261 of App::wordlist (from Perl distribution App-wordlist), released on 2017-11-08.
+This document describes version 0.262 of App::wordlist (from Perl distribution App-wordlist), released on 2017-12-24.
 
 =head1 SYNOPSIS
 

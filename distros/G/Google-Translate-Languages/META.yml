@@ -15,7 +15,7 @@ name: Google-Translate-Languages
 provides:
   Google::Translate::Languages:
     file: lib/Google/Translate/Languages.pm
-    version: '20171206'
+    version: '20171222'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -26,4 +26,4 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171206'
+version: '20171222'

@@ -74,7 +74,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     print Dumper(@a), "\n";
 
     if(@a) { # get major and minor
-        use Udev::FFI::Devnum qw(:all); # import major, minor and mkdev
+        use Udev::FFI::Devnum qw(:all); # import major, minor and makedev
 
         my $device = $udev->new_device_from_syspath($a[0]);
         if(defined $device) {
@@ -88,7 +88,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
             $devnum = undef;
 
-            $devnum = mkdev($ma, $mi);
+            $devnum = makedev($ma, $mi);
             print "Devnum: $devnum\n";
 
 
@@ -149,8 +149,8 @@ Udev::FFI exposes OO interface to libudev.
 
     Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
 
-        use Udev::FFI::Devnum qw(mkdev);
-        my $device = $udev->new_device_from_devnum('b', mkdev(8, 1));
+        use Udev::FFI::Devnum qw(makedev);
+        my $device = $udev->new_device_from_devnum('b', makedev(8, 1));
 
 - new\_device\_from\_subsystem\_sysname ( SUBSYSTEM, SYSNAME )
 

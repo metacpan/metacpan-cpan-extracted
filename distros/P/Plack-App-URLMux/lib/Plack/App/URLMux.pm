@@ -1,13 +1,14 @@
 package Plack::App::URLMux;
 
 use strict;
-use 5.008_001;
-our $VERSION = '0.05';
+use v5.22;
+use experimental qw(signatures postderef);
+our $VERSION = '0.08';
 
 use parent qw(Plack::Component);
 use Carp qw(croak);
 
-use constant MAX_FINE        => 65535; # if URL will contain url-path segments more than this number - increment it :)
+use constant MAX_FINE        => 65535; # if URL will contains url-path segments more than this number - increment it :)
 
 # map[] structure constants
 use constant _keys           => 0; # hash of url-path segments => map[]
@@ -41,12 +42,7 @@ use constant _matching_fine  => 1;
 
 sub mount { shift->map(@_) }
 
-sub map {
-    my $self     = shift;
-    my $location = shift;
-    my $app      = shift;
-    my $input_params = \@_;
-
+sub map($self, $location, $app, @input_params) {
 
     if ($location eq '') {
         croak "location 'not found' has already mount app"
@@ -67,7 +63,7 @@ sub map {
 
     my @paths = split('/', $location);
 
-    my ($index, $params, $quants, $quant) = (0, [], [], undef);
+    my ($index, $params, $quants) = (0, [], []);
     my $map = $self->{_mapping}->{$host} ||= [{}, $index, [1, 0]];  # Zero mapping for URL '/'
     $index++;
     foreach my $path (@paths) {
@@ -132,24 +128,17 @@ sub map {
     croak "/$location has already mount app"
         if defined $map->[_app];
 
-    @$map[_app,_params,_names,_quants] = ($app, $input_params, @$params ? $params : undef, $quants);
+    @$map[_app,_params,_names,_quants] = ($app, \@input_params, @$params ? $params : undef, $quants);
 
 }
 
-sub _parse_quant {
+sub prepapre_app  ($self) {}
 
-}
-
-sub prepapre_app {
-    my $self = shift;
-}
-
-sub call {
-    my ($self, $env) = @_;
+sub call ($self, $env) {
     my ($matches, $params);
 
-    my($http_host, $server_name, $script_name, $path_info)
-        = @{$env}{qw( HTTP_HOST SERVER_NAME SCRIPT_NAME PATH_INFO )};
+    my ($http_host, $server_name, $script_name, $path_info)
+        = $env->@{qw( HTTP_HOST SERVER_NAME SCRIPT_NAME PATH_INFO )};
 
     #FIXME possible BUG
     # is there cases when port is not the same in HTTP_HOST and SERVER_PORT?
@@ -181,7 +170,7 @@ sub call {
 
     #now we have first matched rule and match path, we need fill params if they exists
 
-    my ($match, $matching) = @{$matched}[_match_map,_match_matching];
+    my ($match, $matching) = $matched->@[_match_map,_match_matching];
 
     if (defined $match->[_names]) {
         my ($i, $j);
@@ -214,15 +203,14 @@ sub call {
         );
 
     return $self->response_cb($match->[_app]->($env), sub {
-        @{$env}{qw( PATH_INFO SCRIPT_NAME )} = ($path_info, $script_name);
+        $env->@{qw( PATH_INFO SCRIPT_NAME )} = ($path_info, $script_name);
     });
 }
 
-sub search {
-    my ($self, $map, $index, $parts, $l, $matching) = @_;
+sub search ($self, $map, $index, $parts, $l, $matching) {
 
     my $path = $parts->[$index];
-    my ($_app, $_keys, $_named) = @$map[_app,_keys,_named];
+    my ($_app, $_keys, $_named) = $map->@[_app,_keys,_named];
 
     my $matches = [];
 
@@ -241,7 +229,7 @@ sub search {
 
     if (defined $_named) {
         foreach my $quant (values %{$_named}) {
-            my ($n, $m) = @{$quant->[_quant]}[_quant_n,_quant_m];
+            my ($n, $m) = $quant->[_quant]->@[_quant_n,_quant_m];
             my ($ln, $lm) = ($index + $n, ($m==-1 ? MAX_FINE : $index + $m));
             my $matches_ = [];
             for ($ln .. ($lm > $l ? $l : $lm)) {
@@ -271,8 +259,7 @@ sub search {
 
 }
 
-sub _matched {
-    my ($matches) = @_;
+sub _matched ($matches) {
 
     return unless @$matches;
     return $matches->[0] if @$matches == 1;
@@ -299,8 +286,7 @@ sub _matched {
     return $match;
 }
 
-sub _matched_greedy {
-    my ($matches, $index) = @_;
+sub _matched_greedy ($matches, $index) {
 
     return unless @$matches;
     return $matches->[0] if @$matches == 1;
@@ -343,7 +329,7 @@ __END__
 
 =head1 NAME
 
-Plack::App::URLMux - Map multiple applications in defferent url path.
+Plack::App::URLMux - Map multiple applications by different url path.
 
 =head1 SYNOPSYS
 

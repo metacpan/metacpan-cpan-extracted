@@ -9,6 +9,9 @@
 package SOAP::Lite::Packager;
 
 use strict;
+
+our $VERSION = '1.24'; # VERSION
+
 use vars;
 
 use vars qw($SUPPORTED_TYPES);

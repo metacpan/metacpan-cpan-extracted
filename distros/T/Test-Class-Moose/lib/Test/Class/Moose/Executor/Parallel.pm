@@ -4,7 +4,7 @@ package Test::Class::Moose::Executor::Parallel;
 
 use 5.10.0;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 use Moose 2.0000;
 use Carp;
@@ -117,7 +117,7 @@ sub _run_test_classes_in_parallel {
         $subtest->attach($id);
         $subtest->run(
             sub {
-                $class_report = $self->_run_test_class($test_class);
+                $class_report = $self->run_test_class($test_class);
             }
         );
         $subtest->detach;
@@ -159,7 +159,7 @@ sub _build_fork_manager {
     return $pfm;
 }
 
-around _run_test_method => sub {
+around run_test_method => sub {
     my $orig = shift;
     my $self = shift;
 
@@ -208,7 +208,7 @@ Test::Class::Moose::Executor::Parallel - Execute tests in parallel (parallelized
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =for Pod::Coverage Tags Tests runtests
 

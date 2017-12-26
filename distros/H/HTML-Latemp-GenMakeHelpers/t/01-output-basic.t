@@ -85,7 +85,6 @@ $(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% : unchanged
 $(SRC_DEST): unchanged
 	mkdir -p $@
 	touch $@
-
 EOFGALOG
 
 # TEST
@@ -186,7 +185,6 @@ $(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% : unchanged
 $(SRC_DEST): unchanged
 	mkdir -p $@
 	touch $@
-
 EOFGALOG
 
 # TEST

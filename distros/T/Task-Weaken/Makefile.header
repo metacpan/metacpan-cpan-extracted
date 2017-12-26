@@ -1,0 +1,41 @@
+# Dear Distribution Packagers
+#
+# Hi there!
+#
+# Before we begin, I'm really really sorry for what you are about to
+# encounter a bit lower down in this file.
+#
+# Trust me, I didn't want to WRITE it just as much as you are probably
+# not going to want to READ it and try to work out how the hell it
+# applies to your Linux/etc distribution.
+#
+# So lets try to shortcut the whole confusion thing and save us both
+# some time.
+#
+# Some distributions have this problem where the Scalar::Util version
+# in the Perl core gets built WITHOUT a C compiler available. When this happens,
+# most of the functions in Scalar::Util that need the compiler are replaced
+# with a Pure-Perl version that works identically...
+#
+# ...except for two function relating to "weak references", a reference
+# that is intentionally not counted for the purposes of garbage collection.
+#
+# It's used to implement certain specific data structures, like circular
+# references and parent links in tree structures, in a way that can safely
+# be garbage collected and won't leak.
+#
+# So what you really should check FIRST, is that the Perl build in your
+# distribution has the Scalar::Util::weaken function defined.
+#
+# If not, then your Perl build is probably broken, and your solution
+# ultimately needs to be applied to Perl itself. Then the whole problem
+# goes away.
+#
+# If Scalar::Util::weaken is defined in your core Perl distribution, then
+# none of the edge cases described below apply, and everything will be
+# just rosy.
+#
+# Best Regards
+#
+# Adam K
+

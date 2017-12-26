@@ -65,14 +65,23 @@ set up:
      DBIx::FileStore for technical details.)
   
   3) Copy the file fdb.conf-sample to either /etc/fdb.conf or ~/.fdbrc, 
-     and edit it to specify your dbname, dbuser and dbpasswd.
+     and edit it to specify your dbname, dbuser and dbpasswd (and dbhost if needed).
   
   4) Create the the needed tables in mysql, in the database you 
      specified above, via a command like:
          % mysql dbname < table-definitions.sql
   
   5) You now have the DBIx-FileStore system installed.  
-     It's that simple!
+
+     Use the commands fdbls, fdbcat, fdbget, fdbput, fdbmv, and fdbrm
+     to list, output, fetch, insert, rename, and delete files in the FileStore.
+     
+     fdbslurp is the reverse of fdbcat and will insert files into the FileStore
+     from stdin.
+
+     Each of these programs has documentation in the output of '$program -h'.
+
+     QUICKSTART - Technically the QUICKSTART section is over. Read on for more.
   
   6) As a basic test, let's use the filestore scripts to put 
      a file into the filestore. 

@@ -40,7 +40,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20171128"
+         "version" : "20171224"
       }
    },
    "release_status" : "stable",
@@ -49,5 +49,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171128"
+   "version" : "20171224"
 }

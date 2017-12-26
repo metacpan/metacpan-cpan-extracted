@@ -549,6 +549,35 @@ say "\@$x";
 
 #-----------------------------------------------------------------------------
 
+## name for() arguments (Knutzen)
+## failures 0
+# ## TODO Correct scope code, which is currently in Perl::Critic
+## cut
+
+my $x = [ qw{ Larry Moe Shemp } ];
+for my $x ( @{ $x } ) {
+    say $x;
+}
+
+my $y = [ qw{ Athos Porthos Aramis D'Artagnan } ];
+foreach my $y ( @{ $y } ) {
+    say $y;
+}
+
+#-----------------------------------------------------------------------------
+
+## name if() conditions (Knutzen)
+## failures 0
+# ## TODO Correct scope code, which is currently in Perl::Critic
+## cut
+
+my $x = [ qw{ Conan Solomon Bran Kull } ];
+if ( my ( undef, $x ) = @{ $x } ) {
+    say $x;
+}
+
+#-----------------------------------------------------------------------------
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

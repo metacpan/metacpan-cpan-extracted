@@ -15,6 +15,7 @@ use AnyEvent::Impl::Perl;
 use AnyEvent::Socket;
 use AnyEvent::Handle;
 use Fcntl qw(:flock SEEK_END);
+use Filesys::Df;
 
 use MYDan;
 
@@ -133,7 +134,17 @@ sub run
        }
 
        my $tmp_handle;
-       unless( open $tmp_handle, '>', "$tmp/$index" )
+
+       if( $this->dfok() )
+       {
+           unless( open $tmp_handle, '>', "$tmp/$index" )
+           {
+	       print "open '$tmp/$index' fail:$!\n";
+               close $fh;
+               return;
+           }
+       }
+       else
        {
            my $rs = $this->space();
            unless( $rs ) { close $fh; return; }
@@ -169,6 +180,7 @@ sub run
                    open STDIN, '<', "$tmp/$index" or die "Can't open '$tmp/$index': $!";
                    my $m = -f "$tmp/$index.out" ? '+<' : '>';
                    open STDOUT, $m, "$tmp/$index.out" or die "Can't open '$tmp/$index.out': $!";
+                   $ENV{UseReservedSpace} = 1 if $m eq '+<';
                    exec $exec;
                }
            },
@@ -254,6 +266,22 @@ sub rsok
 {
     my $file = shift;
     return ( $file && -f $file && ( stat $file )[3] == 1 ) ? 1 : 0;
+}
+
+sub dfok
+{
+    my $F;
+    unless ( open( $F, shift->{tmp} ) )
+    {
+        print "df open tmp fail\n";
+        return undef;
+    }
+
+    my $df = df($F);
+    close $F;
+
+    return undef unless $df && ref $df eq 'HASH' && defined $df->{bfree} && defined $df->{ffree};
+    return ( $df->{bfree} > 102400 && $df->{ffree} > 4000 ) ? 1 : 0;
 }
 
 1;

@@ -1,20 +1,51 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::*
+    distribution
 
+VERSION
+    This document describes version 0.051 of Dist::Zilla::Plugin::WordList
+    (from Perl distribution Dist-Zilla-Plugin-WordList), released on
+    2017-12-25.
+
+SYNOPSIS
     In dist.ini:
 
      [Bencher::Scenario]
 
 DESCRIPTION
-
-    This plugin is to be used when building WordList::* distribution.
+    This plugin is to be used when building "WordList::*" distribution.
     Currently it does the following:
 
-      * Replace # STATS placeholder (which must exist) with word list
-      statistics
+    *   Replace "# STATS" placeholder (which must exist) with word list
+        statistics
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-WordList>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-WordList>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Wor
+    dList>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     WordList
 
     Pod::Weaver::Plugin::WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

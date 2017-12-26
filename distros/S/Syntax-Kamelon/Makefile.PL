@@ -19,9 +19,9 @@ WriteMakefile(
    PREREQ_PM         => {
       'Data::Dumper' => 0,
       'Module::Load::Conditional' => 0,
-      'Template' => 0,
-      'Term::ANSIColor' => 0,
-      'Test::More' => 0,
+      'Template' => 2.27,
+      'Term::ANSIColor' => 4.00,
+      'Test::More' => 1,
       'XML::TokeParser' => 0.05,
       'Time::HiRes' => 0,
    },

@@ -1,16 +1,16 @@
 {
    "abstract" : "Interface to the Copenhagen Metro map",
    "author" : [
-      "Søren Lund <soren@lund.org>"
+      "SÃ¸ren Lund <soren@lund.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Map-Tube-Copenhagen",
    "no_index" : {
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

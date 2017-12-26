@@ -1,10 +1,10 @@
 package Gearman::ResponseParser;
 use version ();
-$Gearman::ResponseParser::VERSION = version->declare("2.004.010");
-
+$Gearman::ResponseParser::VERSION = version->declare("2.004.011");
 
 use strict;
 use warnings;
+use Gearman::Util ();
 
 =head1 NAME
 
@@ -170,22 +170,19 @@ C<$sock> is readable, we should sysread it and feed it to L<parse_data($data)>
 
 sub parse_sock {
     my ($self, $sock) = @_;
-    my $data;
-    my $rv = sysread($sock, $data, 128 * 1024);
-
-    if (!defined $rv) {
-        $self->on_error("read_error: $!");
+    my $res = Gearman::Util::read_res_packet($sock, \my $err);
+    if ($err) {
+        $self->on_error("read_error: ${$err}");
         return;
     }
 
-    # FIXME:  EAGAIN , EWOULDBLOCK
-
-    if (!$rv) {
-        $self->eof;
-        return;
-    }
-
-    $self->parse_data(\$data);
+    $self->{pkt} = $res;
+    if (defined($self->{pkt})
+        && length(${ $self->{pkt}{blobref} }) == $self->{pkt}{len})
+    {
+        $self->on_packet($self->{pkt}, $self);
+        $self->reset;
+    } ## end if (defined($self->{pkt...}))
 } ## end sub parse_sock
 
 1;

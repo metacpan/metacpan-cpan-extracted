@@ -1,0 +1,50 @@
+{
+   "abstract" : "Signal detection theory (SDT) measures of sensitivity and bias in frequency data",
+   "author" : [
+      "Roderick Garton <rgarton@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Statistics-SDT",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4210"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : "0.09",
+            "Math::Cephes" : "0.5304",
+            "String::Numeric" : "0.9",
+            "String::Util" : "1.21"
+         }
+      }
+   },
+   "provides" : {
+      "Statistics::SDT" : {
+         "file" : "lib/Statistics/SDT.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

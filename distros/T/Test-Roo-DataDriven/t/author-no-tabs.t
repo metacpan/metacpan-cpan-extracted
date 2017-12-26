@@ -21,6 +21,8 @@ my @files = (
     't/01-example.t',
     't/02-json.t',
     't/03-parsing-errors.t',
+    't/04-skip_all.t',
+    't/05-argv.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',

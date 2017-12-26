@@ -1,0 +1,44 @@
+#title Inline broken
+
+
+And. *this is
+*broken* and will not compile.
+
+This (=should be code=).
+
+This (=/this/the/same=).
+
+Same **(*ć is paired so it works č*)**
+
+Same (**ć is paired so it works č**)
+
+Same (***ć is paired so it works č***)**
+
+=hello=
+
+=== there =*=
+
+-*- hello -*- ** *=*
+
+=*= =|=
+
+<code>4 + 4 = 2; 2 * 2 = 3</code>
+
+<verbatim>=*= =|=</verbatim>
+
+This is nothing <b>
+
+**
+
+==
+
+(=«»=, =“”= or others), use of em dash (=—=)
+
+
+<em>This should</em> <em> <em>compile</em>
+
+You can also use the <code><verbatim><code></verbatim></code> tag to indicate code and monospace
+text. This is handy for regions that have an “=” in them.
+
+If the “*” confuse you or the preview is screwed up, you can use
+inline tag <code><verbatim><em></verbatim></code> and <code><verbatim><strong></verbatim></code>, which are guaranteed to work in any case.

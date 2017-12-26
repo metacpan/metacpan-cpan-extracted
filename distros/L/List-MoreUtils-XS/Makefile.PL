@@ -43,10 +43,9 @@ if (-d "Sandbox")
     Sandbox::Tumble->tumble(qw(t));
 }
 
-
 # Should we build the XS version?
 my %RUN_DEPS = (
-    'XSLoader'        => "0.22",
+    'XSLoader' => "0.22",
 );
 my %BUNDLE_CONFIGURE_DEPS = (
     'inc::latest'      => '0.500',
@@ -112,17 +111,17 @@ WriteMakefile1(
         prereqs => {
             develop => {
                 requires => {
-                    'Test::CPAN::Changes'                 => 0,
-                    'Test::CheckManifest'                 => 0,
-                    'Module::CPANTS::Analyse'             => '0.96',
-                    'Test::Kwalitee'                      => 0,
-                    'Test::Pod'                           => 0,
-                    'Test::Pod::Coverage'                 => 0,
-                    'Test::Pod::Spelling::CommonMistakes' => 0,
-                    'Test::Spelling'                      => 0,
-                    'Test::WriteVariants'                 => '0.013',
-                    %BUNDLE_CONFIGURE_DEPS,
-                },
+                    "Test::CPAN::Changes"                 => 0,
+                    "Test::CheckManifest"                 => 0,
+                    "Module::CPANTS::Analyse"             => "0.96",
+                    "Test::Kwalitee"                      => 0,
+                    "Test::Perl::Critic"                  => 0,
+                    "Test::PerlTidy"                      => 0,
+                    "Test::Pod"                           => 0,
+                    "Test::Pod::Coverage"                 => 0,
+                    "Test::Pod::Spelling::CommonMistakes" => 0,
+                    "Test::Spelling"                      => 0,
+                }
             },
             configure => {
                 requires   => {%CONFIGURE_DEPS},
@@ -164,7 +163,7 @@ WriteMakefile1(
 sub CheckConflicts
 {
     my %params    = @_;
-    my %conflicts = %{ $params{CONFLICTS} };
+    my %conflicts = %{$params{CONFLICTS}};
     my $found     = 0;
 
     while (my ($module, $version) = each(%conflicts))

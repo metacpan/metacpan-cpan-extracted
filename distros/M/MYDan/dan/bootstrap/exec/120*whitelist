@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ ! -f $MYDanPATH/etc/env ];then 
+    echo "on env file: $MYDanPATH/etc/env"
+    exit;
+fi
+
+source $MYDanPATH/etc/env
+
+if [ -z $MYDAN_WHITELIST_UPDATE ];then
+    echo "not MYDAN_WHITELIST_UPDATE"
+    exit;
+fi
+
+exec $MYDanPATH/dan/tools/fileupdate  --output $MYDanPATH/etc/agent/whitelist --url $MYDAN_WHITELIST_UPDATE 2>&1

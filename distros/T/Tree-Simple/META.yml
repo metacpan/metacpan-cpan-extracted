@@ -28,5 +28,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Simple
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/Tree-Simple.git
-version: '1.31'
+version: '1.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,104 @@
+NAME
+
+    Wishlist - A multi-user web application for tracking wanted items.
+
+SYNOPSIS
+
+      $ wishlist daemon
+      $ wishlist prefork
+      $ hypnotoad `which wishlist`
+
+DESCRIPTION
+
+    Wishlist is a Mojolicious application for storing and sharing wishlists
+    derived from external urls. Users paste urls and the app fetches data
+    from those sites. Users can then add the item to their wishlist. Other
+    users can then mark the item as purchased.
+
+    The application is very raw, lots of feature improvement is possible.
+    It was developed as examples from several of the posts
+    <https://mojolicious.io/blog/tag/wishlist/> during the 2017 Mojolicious
+    Advent Calendar <https://mojolicious.io/blog/tag/advent/>. I hope that
+    it will continue to improve, with community collaboration, into a fully
+    fledge competitor to cloud solutions that track and mine your data.
+
+DEPLOYING
+
+    As Wishlist is just a Mojolicious application, all of the "DEPLOYMENT"
+    in Mojolicious::Guides::Cookbook options are available for deployment.
+
+ APPLICATION HOME
+
+    The application home is where Wishlist stores data and looks for
+    configuration. It can be set by setting WISHLIST_HOME in your
+    environment, otherwise your current working directory is used.
+
+ CONFIGURATION
+
+      {
+        site_name => 'Family Wishlist',
+        secrets => ['a very secret string'],
+        database => '/path/to/database/file.db',
+      }
+
+    A configuration file is highly recommended. Its contents should
+    evaluate to a Perl data structure. The easiest usage is to create a
+    configuration file in the "APPLICATION HOME". The file should be called
+    wishlist.conf or wishlist.$mode.conf if per-mode configuration is
+    desired. Alternatively, an absolute path to the configuration file can
+    be given via WISHLIST_CONFIG.
+
+    The allowed configuration options are
+
+    site_name
+
+      A string specifying the name of the site. Used in the link to the
+      application root. Defaults to Mojo Wishlist.
+
+    secrets
+
+      An array reference of strings used to sign storage cookies. While
+      this value is optional, it is highly recommended. Learn about how
+      these work at
+      https://mojolicious.io/blog/2017/12/16/day-16-the-secret-life-of-sessions.
+
+    database
+
+      Path to the file used to store data via Mojo::SQLite. If not
+      specified the default value will be wishlist.db. Any relative values
+      will be relative to the "APPLICATION HOME".
+
+    hypnotoad
+
+      Hypnotoad uses the application's configuration for deployment
+      parameters. If you deploy using it, you probably should read
+      "Hypnotoad" in Mojolicious::Guides::Cookbook.
+
+SEE ALSO
+
+    Blog entries tagged 'wishlist'
+    <https://mojolicious.io/blog/tag/wishlist/>
+
+    Mojolicious
+
+    LinkEmbedder
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Wishlist
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+    [None yet]
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 by "AUTHOR" and "CONTRIBUTORS".
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

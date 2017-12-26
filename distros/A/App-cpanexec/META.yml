@@ -1,0 +1,38 @@
+---
+abstract: 'Execute application within local environment.'
+author:
+  - 'Serguei Okladnikov <oklaspec@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpanexec
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::cpanexec:
+    file: lib/App/cpanexec.pm
+    version: '0.03'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/oklas/cpanexec/issues
+  homepage: https://github.com/oklas/cpanexec
+  repository: git://github.com/oklas/cpanexec.git
+version: '0.03'
+x_authority: cpan:OKLAS
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

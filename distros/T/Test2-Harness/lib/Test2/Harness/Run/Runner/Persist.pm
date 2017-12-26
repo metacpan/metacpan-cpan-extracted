@@ -7,10 +7,11 @@ use Fcntl qw/LOCK_EX LOCK_UN SEEK_SET/;
 use Time::HiRes qw/sleep time/;
 use Test2::Util qw/pkg_to_file/;
 use Test2::Harness::Util qw/read_file write_file open_file/;
+use File::Spec;
 
 use Test2::Harness::Util::DepTracer();
 
-our $VERSION = '0.001041';
+our $VERSION = '0.001043';
 
 use parent 'Test2::Harness::Run::Runner';
 use Test2::Harness::Util::HashBase qw{
@@ -64,7 +65,10 @@ sub init {
 sub procman {
     my $self = shift;
     return $self->{+_PROCMAN} if $self->{+_PROCMAN};
-    return $self->SUPER::procman(end_loop_cb => sub { $self->check_watched });
+    return $self->SUPER::procman(
+        end_loop_cb => sub { $self->check_watched },
+        lock_file => File::Spec->catfile($self->{+DIR}, 'lock'),
+    );
 }
 
 sub respawn {

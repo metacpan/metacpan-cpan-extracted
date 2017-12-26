@@ -12,6 +12,8 @@ sub _type : Tests {
         [{type => ['object', 'number']} =>  '`"object"`&#124;`"number"`'],
         [{'$ref' => '#/resource/foo'} =>  '[`foo`](#resource-foo)'],
         [{oneOf => [{ type =>'object'}, {type =>'number'}]} =>  '`object`&#124;`number`'],
+        [{type => 'string', enum => ['a', 'b', 'c']} =>  '`"a"`&#124;`"b"`&#124;`"c"`'],
+        [{type => 'number', enum => [1, 2, 3]} =>  '`1`&#124;`2`&#124;`3`'],
     ) {
        is APISchema::Generator::Markdown::Formatter::type($case->[0]), $case->[1], $case->[2] || $case->[1];
     }

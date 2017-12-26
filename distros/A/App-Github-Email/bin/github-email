@@ -1,75 +1,37 @@
 #!perl
 
-use Modern::Perl '2009';
-use LWP::UserAgent;
-use Getopt::Long qw(GetOptions);
-use Email::Address;
-use List::MoreUtils qw(uniq);
-#PODNAME: github-email
-#VERSION
+use strict;
+use warnings;
+use App::Github::Email;
+use Getopt::Long 'GetOptions';
 
-my $name;
+# ABSTRACT: A command line tool to get a list of email addresses from particular Github account.
+our $VERSION = '0.1.1';    # VERSION
 
-GetOptions( "name=s" => \$name ) or die("Error");
+my $username;
 
-if (not defined $name)
+GetOptions("name=s" => \$username) or die "Error.";
+
+if (not defined $username)
 {
-	die "Error. Username is not defined. Please try again with: 'github-email -n username'.\n";
+    die
+        "Error. Username is not defined. Please try again with: 'github-email -n username'.\n";
 }
 
-my $ua = LWP::UserAgent->new;
-my $json_get = $ua->get("https://api.github.com/users/$name/events/public");
+my @addresses = App::Github::Email::get_user($username);
 
-if ( $json_get->is_success )
+for my $address (@addresses)
 {
-    my $raw_json    = $json_get->decoded_content;
-    my @addresses   = Email::Address->parse($raw_json);
-    my @unique_addr = uniq @addresses;
-
-    for my $address (@unique_addr)
-	{
-        if ( $address ne 'git@github.com')
-		{
-            say $address;
-        }
-    }
+    print $address . "\n";
 }
-
-else
-{
-    die "User is not exist\n";
-}
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-github-email
-
-=head1 VERSION
-
-version 0.0.7
 
 =head1 SYNOPSIS
 
-	github-email --name <Github username>
+    github-email --name <github username>
 
-	github-email --name faraco
-	github-email --n faraco 
+    # Examples
 
-=head1 AUTHOR
-
-faraco <skelic3@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by faraco.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
+    github-email --name faraco
+    github-email -n faraco
 =cut
+

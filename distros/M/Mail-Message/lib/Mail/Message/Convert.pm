@@ -8,7 +8,7 @@ use warnings;
 
 package Mail::Message::Convert;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.005';
 
 use base 'Mail::Reporter';
 

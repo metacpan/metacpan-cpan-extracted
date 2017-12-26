@@ -1,14 +1,12 @@
 package HTML::Latemp::GenMakeHelpers;
-
+$HTML::Latemp::GenMakeHelpers::VERSION = 'v0.5.2';
 use strict;
 use warnings;
 
 use 5.008;
 
-our $VERSION = 'v0.5.0';
-
 package HTML::Latemp::GenMakeHelpers::Base;
-
+$HTML::Latemp::GenMakeHelpers::Base::VERSION = 'v0.5.2';
 sub new
 {
     my $class = shift;
@@ -19,7 +17,7 @@ sub new
 }
 
 package HTML::Latemp::GenMakeHelpers::HostEntry;
-
+$HTML::Latemp::GenMakeHelpers::HostEntry::VERSION = 'v0.5.2';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 use Class::XSAccessor accessors => {'dest_dir' => 'dest_dir', 'id' => 'id', 'source_dir' => 'source_dir',};
@@ -35,11 +33,11 @@ sub initialize
 }
 
 package HTML::Latemp::GenMakeHelpers::Error;
-
+$HTML::Latemp::GenMakeHelpers::Error::VERSION = 'v0.5.2';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 package HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile;
-
+$HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile::VERSION = 'v0.5.2';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Error));
 
 use Class::XSAccessor accessors => {'file' => 'file', 'host' => 'host',};
@@ -126,7 +124,7 @@ sub _make_path
     my $host = shift;
     my $path = shift;
 
-    return $host->source_dir(). "/".$path;
+    return $host->source_dir() . "/" . $path;
 }
 
 
@@ -142,8 +140,8 @@ sub get_initial_buckets
             'filter' =>
             sub
             {
-                my $file = shift;
-                return ($file !~ /\.(?:tt|w)ml$/) && (-f $self->_make_path($host, $file))
+                my $fn = shift;
+                return ($fn !~ /\.(?:tt|w)ml\z/) && (-f $self->_make_path($host, $fn))
             },
         },
         {
@@ -151,8 +149,7 @@ sub get_initial_buckets
             'filter' =>
             sub
             {
-                my $file = shift;
-                return (-d $self->_make_path($host, $file))
+                return (-d $self->_make_path($host, shift))
             },
             filter_out_common => 1,
         },
@@ -161,20 +158,26 @@ sub get_initial_buckets
             'filter' =>
             sub
             {
-                my $file = shift;
-                return $file =~ /\.x?html\.wml$/;
+                return shift =~ /\.x?html\.wml\z/;
             },
-            'map' => sub { my $a = shift; $a =~ s{\.wml$}{}; return $a;},
+            'map' => sub {
+                my $fn = shift;
+                $fn =~ s{\.wml\z}{};
+                return $fn;
+            },
         },
         {
             'name' => "TTMLS",
             'filter' =>
             sub
             {
-                my $file = shift;
-                return $file =~ /\.ttml$/;
+                return shift =~ /\.ttml\z/;
             },
-            'map' => sub { my $a = shift; $a =~ s{\.ttml$}{}; return $a;},
+            'map' => sub {
+                my $fn = shift;
+                $fn =~ s{\.ttml\z}{};
+                return $fn;
+            },
         },
     ];
 }
@@ -218,13 +221,13 @@ sub _filter_out_special_files
 
     my @files = @$files_ref;
 
-    @files = (grep { ! m{(^|/)\.svn(/|$)} } @files);
-    @files = (grep { ! /~$/ } @files);
+    @files = (grep { ! m{(\A|/)\.svn(/|\z)} } @files);
+    @files = (grep { ! /~\z/ } @files);
     @files =
         (grep
         {
-            my $b = basename($_);
-            !(($b =~ /^\./) && ($b =~ /\.swp$/))
+            my $bn = basename($_);
+            not (($bn =~ /\A\./) && ($bn =~ /\.swp\z/))
         }
         @files
         );
@@ -264,25 +267,25 @@ sub place_files_into_buckets
     FILE_LOOP:
     foreach my $f (@$files)
     {
-        foreach my $b (@$buckets)
+        foreach my $bucket (@$buckets)
         {
-            if ($b->{'filter'}->($f))
+            if ($bucket->{'filter'}->($f))
             {
                 if ($host->{'id'} eq "common")
                 {
-                    $self->_common_buckets->{$b->{name}}->{$f} = 1;
+                    $self->_common_buckets->{$bucket->{name}}->{$f} = 1;
                 }
 
                 if (   ($host->{'id'} eq "common")
                     ||
                     (!(
-                        $b->{'filter_out_common'}
+                        $bucket->{'filter_out_common'}
                             &&
-                        exists($self->_common_buckets->{$b->{name}}->{$f})
+                        exists($self->_common_buckets->{$bucket->{name}}->{$f})
                     ))
                 )
                 {
-                    push @{$b->{'results'}}, $b->{'map'}->($f);
+                    push @{$bucket->{'results'}}, $bucket->{'map'}->($f);
                 }
 
                 next FILE_LOOP;
@@ -364,7 +367,6 @@ X8X_COMMON_DOCS_DEST = \$(patsubst %,\$(X8X_DEST)/%,\$(COMMON_DOCS))
 \$(X8X_DEST): unchanged
 	mkdir -p \$@
 	touch \$@
-
 EOF
 }
 
@@ -389,10 +391,10 @@ sub process_host
 
     my $id = $host->id();
     my $host_uc = uc($id);
-    foreach my $b (@$buckets)
+    foreach my $bucket (@$buckets)
     {
-        my $name = $b->{name};
-        $file_lists_text .= $host_uc . "_" . $name . " =" . join("", map { " $_" } @{$self->_filename_lists_post_filter->({filenames => $b->{'results'}, bucket => $name, host => $id,})}) . "\n";
+        my $name = $bucket->{name};
+        $file_lists_text .= $host_uc . "_" . $name . " =" . join("", map { " $_" } @{$self->_filename_lists_post_filter->({filenames => $bucket->{'results'}, bucket => $name, host => $id,})}) . "\n";
     }
 
     if ($id ne "common")
@@ -425,7 +427,7 @@ HTML::Latemp::GenMakeHelpers - A Latemp Utility Module.
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.2
 
 =head1 SYNOPSIS
 
@@ -548,8 +550,9 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-GenMakeHelpers or by
-email to bug-html-latemp-genmakehelpers@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-GenMakeHelpers> or
+by email to
+L<bug-html-latemp-genmakehelpers@rt.cpan.org|mailto:bug-html-latemp-genmakehelpers@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -578,7 +581,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Latemp-GenMakeHelpers>
+L<https://metacpan.org/release/HTML-Latemp-GenMakeHelpers>
 
 =item *
 
@@ -614,14 +617,6 @@ L<http://cpanratings.perl.org/d/HTML-Latemp-GenMakeHelpers>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Latemp-GenMakeHelpers>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -632,7 +627,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Latemp-GenMakeHelpers>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Latemp-GenMakeHelpers>
 
@@ -666,8 +661,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/latemp>
+L<https://github.com/thewml/latemp>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/latemp
+  git clone https://github.com/thewml/latemp
 
 =cut

@@ -2,6 +2,8 @@
 
 This is a line [1] with [2] some [3] footnotes [4]
 
+This is a <br> another <br /> and this is not <br //> and neither this is <br / >
+
 #internal
 Link here
 

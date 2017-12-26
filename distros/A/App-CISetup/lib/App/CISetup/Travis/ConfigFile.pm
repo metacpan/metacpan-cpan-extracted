@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
@@ -115,7 +115,7 @@ sub _fixup_helpers_usage {
             && ( grep { !/cpan-install/ } @{ $travis->{install} }
                 || @{ $travis->{install} } > 2 )
         )
-        ) {
+    ) {
 
         my $i = (
             first_index {/travis-perl|haarg/}
@@ -157,16 +157,16 @@ sub _rewrite_perl_block {
     my @perls = qw(
         blead
         dev
-        5.26.1
-        5.24.2
-        5.22.4
-        5.20.3
-        5.18.3
-        5.16.3
-        5.14.4
-        5.12.5
-        5.10.1
-        5.8.8
+        5.26
+        5.24
+        5.22
+        5.20
+        5.18
+        5.16
+        5.14
+        5.12
+        5.10
+        5.8
     );
 
     for my $perl (qw( 5.8 5.10 5.12 )) {
@@ -182,10 +182,7 @@ sub _rewrite_perl_block {
         $travis->{perl} = [ map { ( $_, $_ . '-thr' ) } @perls ];
     }
     else {
-        # If we don't need threads we can just ask for 5.x and the
-        # travis-helpers will find the latest patch version that it has
-        # pre-built and give that to us.
-        $travis->{perl} = [ map { $_ =~ s/\.\d+$//r } @perls ];
+        $travis->{perl} = \@perls;
     }
 
     return;
@@ -329,7 +326,6 @@ sub _run3 {
 }
 
 my @BlocksOrder = qw(
-    __app_cisetup__
     sudo
     addons
     language

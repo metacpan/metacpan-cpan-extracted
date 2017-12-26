@@ -4,7 +4,7 @@ package Test::Class::Moose::Report;
 
 use 5.10.0;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 use Carp;
 use Moose;
@@ -12,12 +12,6 @@ use namespace::autoclean;
 with 'Test::Class::Moose::Role::HasTimeReport';
 
 use List::Util qw( first sum0 );
-
-has 'is_parallel' => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
-);
 
 has test_classes => (
     is      => 'ro',
@@ -144,7 +138,7 @@ Test::Class::Moose::Report - Test information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

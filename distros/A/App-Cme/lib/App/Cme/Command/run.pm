@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.025';
+$App::Cme::Command::run::VERSION = '1.026';
 use strict;
 use warnings;
 use 5.10.1;
@@ -228,7 +228,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.025';
+$App::Cme::Run::Var::VERSION = '1.026';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -255,7 +255,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 

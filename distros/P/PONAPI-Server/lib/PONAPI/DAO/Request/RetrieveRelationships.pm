@@ -45,7 +45,7 @@ PONAPI::DAO::Request::RetrieveRelationships - DAO request - retrieve relationshi
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 AUTHORS
 

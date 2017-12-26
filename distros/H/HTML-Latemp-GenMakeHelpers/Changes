@@ -1,5 +1,11 @@
 Revision history for HTML-Latemp-GenMakeHelpers
 
+0.5.2   2017-12-25
+    - Try to fix the $VERSION.
+
+0.5.1   2017-12-25
+    - Remove trailing blank lines.
+
 0.5.0   2017-02-07
     - Add the filename_lists_post_filter argument to the constructor.
 
@@ -65,4 +71,3 @@ Revision history for HTML-Latemp-GenMakeHelpers
 
 0.1.2   2005-04-19
     - First version
-

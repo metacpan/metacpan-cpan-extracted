@@ -3,7 +3,7 @@ package Net::Async::Redis::Multi;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 =head1 NAME
 
@@ -27,14 +27,15 @@ sub new {
 
 sub exec {
     my ($self, $code) = @_;
-    $code->($self);
+    $self->$code;
     $self->redis->exec->then(sub {
         my @reply = @{$_[0]};
         my $success = 0;
         my $failure = 0;
-        for my $queued (splice @{$self->{queued_requests}}) {
+        while(my $queued = shift @{$self->{queued_requests}}) {
             try {
-                $queued->done(shift @reply) unless $queued->is_ready;
+                my $reply = shift @reply;
+                $queued->done($reply) unless $queued->is_ready;
                 ++$success
             } catch {
                 $log->warnf("Failure during transaction: %s", $@);
@@ -54,7 +55,7 @@ sub exec {
             }
         }
         Future->fail($err, $category, @details);
-    })
+    })->retain
 }
 
 =head2 redis
@@ -66,15 +67,20 @@ Accessor for the L<Net::Async::Redis> instance.
 sub redis { shift->{redis} }
 
 sub AUTOLOAD {
-    my ($self, @args) = @_;
     my ($method) = our $AUTOLOAD =~ m{::([^:]+)$};
     die "Unknown method $method" unless Net::Async::Redis::Commands->can($method);
-    push @{$self->{queued_requests}}, my $f = $self->redis->$method(@args)->then(sub {
-        my ($resp) = @_;
-        return $self->redis->future->set_label($method) if $resp eq 'QUEUED';
-        Future->fail(@_)
-    });
-    $f
+    my $code = sub {
+        my ($self, @args) = @_;
+        local $self->redis->{_is_multi} = 1;
+        push @{$self->{queued_requests}}, my $f = $self->redis->$method(@args)->then(sub {
+            my ($resp) = @_;
+            return $self->redis->future->set_label($method) if $resp eq 'QUEUED';
+            Future->fail(@_)
+        });
+        $f
+    };
+    { no strict 'refs'; *$method = $code }
+    $code->(@_);
 }
 
 sub DESTROY {

@@ -3,7 +3,7 @@ package App::ClusterSSH;
 use 5.008.004;
 use warnings;
 use strict;
-use version; our $VERSION = version->new('4.09');
+use version; our $VERSION = version->new('4.12');
 
 use Carp qw/cluck :DEFAULT/;
 
@@ -170,6 +170,22 @@ sub terminate_host($) {
 sub exit_prog() {
     my ($self) = @_;
     $self->debug( 3, "Exiting via normal routine" );
+
+    if ( $self->config->{external_command_pipe}
+        && -e $self->config->{external_command_pipe} )
+    {
+        close( $self->{external_command_pipe_fh} )
+            or warn(
+            "Could not close pipe "
+                . $self->config->{external_command_pipe} . ": ",
+            $!
+            );
+        $self->debug( 2, "Removing external command pipe" );
+        unlink( $self->config->{external_command_pipe} )
+            || warn "Could not unlink "
+            . $self->config->{external_command_pipe}
+            . ": ", $!;
+    }
 
     # for each of the client windows, send a kill.
     # to make sure we catch all children, even when they haven't
@@ -950,30 +966,50 @@ sub retile_hosts {
     $self->config->{internal_screen_width}  = $xdisplay->{width_in_pixels};
 
     # Now, work out how many columns of terminals we can fit on screen
-    $self->config->{internal_columns} = int(
-        (         $self->config->{internal_screen_width}
-                - $self->config->{screen_reserve_left}
-                - $self->config->{screen_reserve_right}
-        ) / (
-            $self->config->{internal_terminal_width}
-                + $self->config->{terminal_reserve_left}
-                + $self->config->{terminal_reserve_right}
-        )
-    );
+    if ( $self->config->{rows} != -1 || $self->config->{cols} != -1 ) {
+        if ( $self->config->{rows} != -1 ) {
+            $self->config->{internal_rows}    = $self->config->{rows};
+            $self->config->{internal_columns} = int(
+                (         $self->config->{internal_total}
+                        / $self->config->{internal_rows}
+                ) + 0.999
+            );
+        }
+        else {
+            $self->config->{internal_columns} = $self->config->{cols};
+            $self->config->{internal_rows}    = int(
+                (         $self->config->{internal_total}
+                        / $self->config->{internal_columns}
+                ) + 0.999
+            );
+        }
+    }
+    else {
+        $self->config->{internal_columns} = int(
+            (         $self->config->{internal_screen_width}
+                    - $self->config->{screen_reserve_left}
+                    - $self->config->{screen_reserve_right}
+            ) / (
+                $self->config->{internal_terminal_width}
+                    + $self->config->{terminal_reserve_left}
+                    + $self->config->{terminal_reserve_right}
+            )
+        );
 
-    # Work out the number of rows we need to use to fit everything on screen
-    $self->config->{internal_rows} = int(
-        (         $self->config->{internal_total}
-                / $self->config->{internal_columns}
-        ) + 0.999
-    );
-
+      # Work out the number of rows we need to use to fit everything on screen
+        $self->config->{internal_rows} = int(
+            (         $self->config->{internal_total}
+                    / $self->config->{internal_columns}
+            ) + 0.999
+        );
+    }
     $self->debug( 2, "Screen Columns: ", $self->config->{internal_columns} );
     $self->debug( 2, "Screen Rows: ",    $self->config->{internal_rows} );
+    $self->debug( 2, "Fill scree: ",     $self->config->{fillscreen} );
 
     # Now adjust the height of the terminal to either the max given,
     # or to get everything on screen
-    {
+    if ( $self->config->{fillscreen} ne 'yes' ) {
         my $height = int(
             (   (         $self->config->{internal_screen_height}
                         - $self->config->{screen_reserve_top}
@@ -986,15 +1022,41 @@ sub retile_hosts {
                 )
             ) / $self->config->{internal_rows}
         );
-
-        $self->debug( 2, "Terminal height=$height" );
-
         $self->config->{internal_terminal_height} = (
               $height > $self->config->{internal_terminal_height}
             ? $self->config->{internal_terminal_height}
             : $height
         );
     }
+    else {
+        $self->config->{internal_terminal_height} = int(
+            (   (         $self->config->{internal_screen_height}
+                        - $self->config->{screen_reserve_top}
+                        - $self->config->{screen_reserve_bottom}
+                ) - (
+                    $self->config->{internal_rows} * (
+                              $self->config->{terminal_reserve_top}
+                            + $self->config->{terminal_reserve_bottom}
+                    )
+                )
+            ) / $self->config->{internal_rows}
+        );
+        $self->config->{internal_terminal_width} = int(
+            (   (         $self->config->{internal_screen_width}
+                        - $self->config->{screen_reserve_left}
+                        - $self->config->{screen_reserve_right}
+                ) - (
+                    $self->config->{internal_columns} * (
+                              $self->config->{terminal_reserve_left}
+                            + $self->config->{terminal_reserve_right}
+                    )
+                )
+            ) / $self->config->{internal_columns}
+        );
+    }
+    $self->debug( 2, "Terminal h: ",
+        $self->config->{internal_terminal_height},
+        ", w: ", $self->config->{internal_terminal_width} );
 
     $self->config->dump("noexit") if ( $self->options->debug_level > 1 );
 
@@ -1389,6 +1451,35 @@ sub setup_repeat() {
                 $self->config->{internal_count}
             );
 
+            # See if there are any commands in the external command pipe
+            if( defined $self->{external_command_pipe_fh} ) {
+                my $ext_cmd;
+                sysread( $self->{external_command_pipe_fh}, $ext_cmd, 400 );
+                if ($ext_cmd) {
+                    my @external_commands = split( /\n/, $ext_cmd );
+                    for my $cmd_line (@external_commands) {
+                        chomp($cmd_line);
+                        my ( $cmd, @tags ) = split /\s+/, $cmd_line;
+                        $self->debug( 2,
+                            "Got external command: $cmd -> @tags" );
+
+                        for ($cmd) {
+                            if (m/^open$/) {
+                                my @new_hosts = $self->resolve_names(@tags);
+                                $self->open_client_windows(@new_hosts);
+                                $self->build_hosts_menu();
+                                last;
+                            }
+                            if (m/^retile$/) {
+                                $self->retile_hosts();
+                                last;
+                            }
+                            warn "Unknown external command: $cmd_line", $/;
+                        }
+                    }
+                }
+            }
+
 #$self->debug( 3, "Number of servers in hash is: ", scalar( keys(%servers) ) );
 
             foreach my $svr ( keys(%servers) ) {
@@ -1463,10 +1554,10 @@ sub create_windows() {
         -insertborderwidth => 4,
         -width             => 25,
         -class             => 'cssh',
-        )->pack(
+    )->pack(
         -fill   => "x",
         -expand => 1,
-        );
+    );
 
     $windows{history} = $windows{main_window}->Scrolled(
         "ROText",
@@ -2187,6 +2278,44 @@ sub run {
     $windows{main_window}->positionfrom('user')
         ;    # user puts it somewhere, leave it there
 
+    # set up external command pipe
+    if ( $self->config->{external_command_pipe} ) {
+
+        if ( -e $self->config->{external_command_pipe} ) {
+            $self->debug( 1, "Removing pre-existing external command pipe" );
+            unlink( $self->config->{external_command_pipe} )
+                or die(
+                "Could not remove "
+                    . $self->config->{external_command_pipe}
+                    . " prior to creation: "
+                    . $!,
+                $/
+                );
+        }
+
+        $self->debug( 2, "Creating external command pipe" );
+
+        mkfifo(
+            $self->config->{external_command_pipe},
+            oct( $self->config->{external_command_mode} )
+            )
+            or die(
+            "Could not create "
+                . $self->config->{external_command_pipe} . ": ",
+            $!
+            );
+
+        sysopen(
+            $self->{external_command_pipe_fh},
+            $self->config->{external_command_pipe},
+            O_NONBLOCK | O_RDONLY
+            )
+            or die(
+            "Could not open " . $self->config->{external_command_pipe} . ": ",
+            $!
+            );
+    }
+
     $self->debug( 2, "Setting up repeat" );
     $self->setup_repeat();
 
@@ -2337,9 +2466,7 @@ slash_slash_equal($a, 0) is equivalent to $a //= 0
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-clusterssh at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-ClusterSSH>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests via L<https://github.com/duncs/clusterssh/issues>. 
 
 =head1 SUPPORT
 
@@ -2351,9 +2478,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item * Github issue tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-ClusterSSH>
+L<https://github.com/duncs/clusterssh/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -2379,7 +2506,7 @@ Duncan Ferguson, C<< <duncan_j_ferguson at yahoo.co.uk> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 1999-2016 Duncan Ferguson, all rights reserved.
+Copyright 1999-2017 Duncan Ferguson, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -2390,3 +2517,4 @@ See http://dev.perl.org/licenses/ for more information.
 =cut
 
 1;
+

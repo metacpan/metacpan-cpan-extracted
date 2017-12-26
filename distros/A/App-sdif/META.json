@@ -42,8 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.4.2",
-            "List::Util" : "1.33",
+            "Getopt::EX" : "v1.5.1",
+            "List::Util" : "1.45",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
             "perl" : "5.014"
@@ -64,7 +64,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v3.3.2"
+         "version" : "v3.4.1"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -87,6 +87,9 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "3.3.2",
-   "x_authority" : "cpan:UTASHIRO"
+   "version" : "3.4.1",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
 }

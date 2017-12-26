@@ -28,12 +28,9 @@ use Perl::Critic::Utils;
 use Perl::Critic::Pulp;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
-our $VERSION = 95;
-
-use constant DEBUG => 0;
-
+our $VERSION = 96;
 
 use constant supported_parameters =>
   ({ name           => 'single',
@@ -202,8 +199,10 @@ sub violates {
       # $ or @
       unless ($single) {  # no variables in single-quote
         ### interpolation at: pos($str)
-        pos($str) = _pos_after_interpolate_variable ($str,
-                                                     pos($str) - length($1));
+        my $new_pos = _pos_after_interpolate_variable
+          ($str, pos($str) - length($1))
+          || last;
+        pos($str) = $new_pos;
         ### ends at: pos($str)
         if (substr($str,pos($str)-1,1) =~ /(\w)|[]}]/) {
           $interpolate_var_colon = $1;
@@ -307,28 +306,46 @@ sub violates {
   return @violations;
 }
 
-# $pos is a position within $str of a "$" or "@" interpolation
-# return the position within $str after that variable or expression
+# $pos is a position within $str of a "$" or "@" interpolation.
+# Return the position within $str after that variable or expression.
+#
+# FIXME: Would like PPI to do this.  Its PPI::Token::Quote::Double version
+# 1.236 interpolations() has a comment that returning the expressions would
+# be good.
 #
 sub _pos_after_interpolate_variable {
   my ($str, $pos) = @_;
   $str = substr ($str, $pos);
-  ### _pos_after_interpolate_variable
+  ### _pos_after_interpolate_variable() ...
   ### $str
+
+  # PPI circa 1.236 doesn't like to parse non-ascii as program code
+  # identifiers etc, try changing to spaces for measuring.
+  #
+  # Might be happy for it to parse the interpolate expression and ignore
+  # anything bad after, but PPI::Tokenizer crunches a whole line at a time
+  # or something like that.
+  #
+  $str =~ s/[^[:print:]\t\r\n]/ /g;
 
   require PPI::Document;
   my $doc = PPI::Document->new(\$str);
-  my $elem = $doc->child(0)->child(0);
-  if (DEBUG) {
-    print "  elem @{[ref $elem]} '$elem' len @{[length $elem->content]}\n";
+  my $elem = $doc && $doc->child(0);
+  $elem = $elem && $elem->child(0);
+  if (! $elem) {
+    warn "ProhibitUnknownBackslash: oops, cannot parse interpolation, skipping string";
+    return undef;
   }
+  ### elem: ref $elem
+  ### length: length($elem->content)
   $pos += length($elem->content);
 
   if ($elem->isa('PPI::Token::Cast')) {
     # get the PPI::Structure::Block following "$" or "@", can have
     # whitespace before it too
     while ($elem = $elem->next_sibling) {
-      if (DEBUG) { print "  and '$elem' @{[length $elem->content]}\n"; }
+      ### and: "$elem"
+      ### length: length($elem->content)
       $pos += length($elem->content);
       last if $elem->isa('PPI::Structure::Block');
     }
@@ -339,7 +356,8 @@ sub _pos_after_interpolate_variable {
     for (;;) {
       $elem = $elem->next_sibling || last;
       $elem->isa('PPI::Structure::Subscript') || last;
-      if (DEBUG) { print "  and '$elem' @{[length $elem->content]}\n"; }
+      ### and: "$elem"
+      ### length: length($elem->content)
       $pos += length($elem->content);
     }
   }
@@ -554,13 +572,13 @@ version then it's presumed a high octal is intentional and is allowed.
 =head2 Named Chars
 
 Named chars C<\N{SOME THING}> are added by L<charnames>, new in Perl 5.6,
-and it is automatically loaded in Perl 5.16 up.  C<\N> is treated as known
+and it is autoloaded in Perl 5.16 up when used.  C<\N> is treated as known
 if C<use 5.016> or higher,
 
     use 5.016;
     print "\N{EQUALS SIGN}";   # ok with 5.16 automatic charnames
 
-Or C<use charnames> in the lexical scope,
+Or if C<use charnames> in the lexical scope,
 
     {
       use charnames ':full';
@@ -646,6 +664,15 @@ command backticks are double-quote but as C<qx''> is single-quote.  They are
 treated per the corresponding C<single> or C<double> option.
 
 =back
+
+=head1 BUGS
+
+Interpolations in double-quote strings are found by some code here in
+C<ProhibitUnknownBackslash> (re-parse the string content as Perl code
+starting from the C<$> or C<@>).  If this fails for some reason then a
+warning is given and the rest of the string is unchecked.  In the future
+would like PPI to parse interpolations, for the benefit of string chopping
+like here or checking of code in an interpolation.
 
 =head1 SEE ALSO
 

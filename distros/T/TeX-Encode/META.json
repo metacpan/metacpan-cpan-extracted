@@ -80,15 +80,15 @@
    "provides" : {
       "TeX::Encode" : {
          "file" : "lib/TeX/Encode.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "TeX::Encode::BibTeX" : {
          "file" : "lib/TeX/Encode/BibTeX.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "TeX::Encode::charmap" : {
          "file" : "lib/TeX/Encode/charmap.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       }
    },
    "release_status" : "stable",
@@ -103,10 +103,10 @@
          "web" : "https://github.com/athreef/TeX-Encode"
       }
    },
-   "version" : "2.003",
+   "version" : "2.004",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -338,7 +338,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
@@ -361,7 +361,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -378,12 +378,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.003",
+                  "tag" : "v2.004",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -403,7 +403,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },
@@ -424,7 +424,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1",
                   "repo_root" : "."
                }
             },

@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001041';
+our $VERSION = '0.001043';
 
 use Carp qw/croak confess/;
 use POSIX ":sys_wait_h";
@@ -369,9 +369,9 @@ sub task_loop {
     my $pman = $self->procman;
 
     while (1) {
-        my ($task, $lock) = $pman->next($stage) or return undef;
+        my $task = $pman->next($stage) or return undef;
 
-        my $runfile = $self->run_job($task, $lock);
+        my $runfile = $self->run_job($task);
         return $runfile if $runfile;
     }
 
@@ -442,7 +442,7 @@ sub stage_stop {
 
 sub run_job {
     my $self = shift;
-    my ($task, $lock) = @_;
+    my ($task) = @_;
 
     my $job_id = $task->{job_id};
     my $file = $task->{file};
@@ -529,7 +529,7 @@ sub run_job {
     return $runfile if $runfile;
 
     # In parent
-    $self->procman->job_started(task => $task, job => $job, pid => $pid, dir => $dir, lock => $lock);
+    $self->procman->job_started(task => $task, job => $job, pid => $pid, dir => $dir);
 
     return undef;
 }

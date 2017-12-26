@@ -10,7 +10,6 @@ README
 README.mkdn
 SIGNATURE
 cpanfile
-dist.ini
 doap.xml
 lib/PPIx/EditorTools.pm
 lib/PPIx/EditorTools/FindUnmatchedBrace.pm

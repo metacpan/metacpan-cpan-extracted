@@ -14,19 +14,23 @@ sub match {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
-         account[ ]is[ ](?:
+         Account[ ]disabled[ ]temporarly[ ]for[ ]exceeding[ ]receiving[ ]limits
+        |account[ ]is[ ](?:
              exceeding[ ]their[ ]quota
             |over[ ]quota
             |temporarily[ ]over[ ]quota
             )
+        |Boite[ ]du[ ]destinataire[ ]pleine.+[A-Z]{3}.+417
         |delivery[ ]failed:[ ]over[ ]quota
         |disc[ ]quota[ ]exceeded
         |does[ ]not[ ]have[ ]enough[ ]space
         |exceeded[ ]storage[ ]allocation
         |exceeding[ ]its[ ]mailbox[ ]quota
         |full[ ]mailbox
-        |is[ ]over[ ]quota[ ]temporarily
-        |is[ ]over[ ]disk[ ]quota
+        |is[ ]over[ ](?:
+             disk[ ]quota
+            |quota[ ]temporarily
+            )
         |mail[ ](?:
              file[ ]size[ ]exceeds[ ]the[ ]maximum[ ]size[ ]allowed[ ]for[ ]mail[ ]delivery
             |quota[ ]exceeded
@@ -47,22 +51,26 @@ sub match {
         |mailfolder[ ]is[ ]full
         |not[ ]enough[ ]storage[ ]space[ ]in
         |over[ ]the[ ]allowed[ ]quota
-        |quota[ ]exceeded
-        |quota[ ]violation[ ]for
+        |quota[ ](?:
+             exceeded
+            |violation[ ]for
+            )
         |recipient[ ](?:
              reached[ ]disk[ ]quota
             |rejected:[ ]mailbox[ ]would[ ]exceed[ ]maximum[ ]allowed[ ]storage
             )
-        |The[ ]recipient[ ]mailbox[ ]has[ ]exceeded[ ]its[ ]disk[ ]space[ ]limit
-        |The[ ]user[']s[ ]space[ ]has[ ]been[ ]used[ ]up
+        |The[ ](?:
+             recipient[ ]mailbox[ ]has[ ]exceeded[ ]its[ ]disk[ ]space[ ]limit
+            |user[']s[ ]space[ ]has[ ]been[ ]used[ ]up
+            |user[ ]you[ ]are[ ]trying[ ]to[ ]reach[ ]is[ ]over[ ]quota
+            )
         |too[ ]much[ ]mail[ ]data   # @docomo.ne.jp
         |user[ ](?:
              has[ ](?:
                  exceeded[ ]quota,[ ]bouncing[ ]mail
                 |too[ ]many[ ]messages[ ]on[ ]the[ ]server
                 )
-            |is[ ]over[ ]quota
-            |is[ ]over[ ]the[ ]quota
+            |is[ ]over[ ](?:the[ ])?quota
             |over[ ]quota
             |over[ ]quota[.][ ][(][#]5[.]1[.]1[)]   # qmail-toaster
             )
@@ -162,7 +170,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

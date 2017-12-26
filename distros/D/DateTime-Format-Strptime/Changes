@@ -1,3 +1,8 @@
+1.75     2017-12-24
+
+- Fixed tests to pass with blead Perl. Reported by James Keenan. GH #19.
+
+
 1.74     2017-08-03
 
 - Fix text to not rely on a very specific exception message from Specio. This

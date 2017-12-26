@@ -60,7 +60,6 @@ sub _test_error {
     isa_ok(
         $ex,
         'WebService::PayPal::PaymentsAdvanced::Error::HTTP',
-        'HTTP error thrown'
     ) or return;
 
     is( $ex->message, $expected_message, qq{message of "$expected_message"} );

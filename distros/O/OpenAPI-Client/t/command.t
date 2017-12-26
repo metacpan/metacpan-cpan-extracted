@@ -32,8 +32,9 @@ like "@said", qr{Could not find}, 'no information about operation';
 @said = ();
 my ($fh, $filename) = tempfile;
 close $fh;
-# this is because under Docker, STDIN is !-t, readable immediately,
-#  gives EOF. This simulates that
+
+# This is because under Docker, STDIN is !-t, readable immediately,
+# gives EOF. This simulates that
 open STDIN, '<', $filename;
 eval { $cmd->run(path('t', 'spec.json'), 'listPets') };
 is $@, '';

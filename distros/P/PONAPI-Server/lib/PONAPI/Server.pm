@@ -4,7 +4,7 @@ package PONAPI::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 
 use Plack::Request;
 use Plack::Response;
@@ -398,7 +398,7 @@ PONAPI::Server - PONAPI - Perl implementation of {JSON:API} (http://jsonapi.org/
 
 =head1 VERSION
 
-version 0.003001
+version 0.003002
 
 =head1 SYNOPSIS
 

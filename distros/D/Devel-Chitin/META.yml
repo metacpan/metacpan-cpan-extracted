@@ -39,5 +39,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/amb43790/Devel-Chitin.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'YAML::Tiny version 1.69'

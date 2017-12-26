@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Struct::Path::PerlStyle qw(ps_parse);
+use Struct::Path::PerlStyle qw(str2path);
 use Test::More tests => 6;
 
 my $aliases = {
@@ -12,30 +12,30 @@ my $aliases = {
     A04 => '$A03[4]',
 };
 
-eval { ps_parse('$UNEXISTED_ALIAS') };
+eval { str2path('$UNEXISTED_ALIAS') };
 like($@, qr/^Unknown alias 'UNEXISTED_ALIAS'/);
 
-eval { ps_parse('@UNSUPPORTED_SIGIL') };
+eval { str2path('@UNSUPPORTED_SIGIL') };
 like($@, qr/^Unsupported thing '\@UNSUPPORTED_SIGIL' in the path, step #0 /);
 
-eval { ps_parse('$A01.$A02', {aliases => $aliases}) };
+eval { str2path('$A01.$A02', {aliases => $aliases}) };
 like($@, qr/^Unsupported thing '.' in the path/, "no operators suported for aliases");
 
 is_deeply(
-    ps_parse('$A01', {aliases => $aliases}),
-    [{keys => ["first"]}],
+    str2path('$A01', {aliases => $aliases}),
+    [{K => ["first"]}],
     "single alias"
 );
 
 is_deeply(
-    ps_parse('$A01$A04', {aliases => $aliases}),
-    [{keys => ["first"]},[2],{keys => ["third"]},[4]],
+    str2path('$A01$A04', {aliases => $aliases}),
+    [{K => ["first"]},[2],{K => ["third"]},[4]],
     "recirsive aliases"
 );
 
 is_deeply(
-    ps_parse('{first}$A03[4]', {aliases => $aliases}),
-    [{keys => ["first"]},[2],{keys => ["third"]},[4]],
+    str2path('{first}$A03[4]', {aliases => $aliases}),
+    [{K => ["first"]},[2],{K => ["third"]},[4]],
     "aliases combined with usual steps"
 );
 

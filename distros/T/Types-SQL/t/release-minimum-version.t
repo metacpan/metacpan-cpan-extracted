@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
@@ -10,5 +10,7 @@ BEGIN {
 
 use Test::More;
 
-use Test::MinimumVersion;
-all_minimum_version_ok('v5.8.8');
+eval "use Test::MinimumVersion";
+plan skip_all => "Test::MinimumVersion required for testing minimum versions"
+  if $@;
+all_minimum_version_from_metayml_ok();

@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 use Moose::Role;
 use Benchmark qw(timediff timestr :hireswallclock);
@@ -81,7 +81,7 @@ Test::Class::Moose::Role::HasTimeReport - Report timing role
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 

@@ -17,7 +17,7 @@ use Test::More;
 
 my $api = App::RPi::EnvUI::API->new(
     testing => 1,
-    test_mock => 0,
+    test_mock => 1,
     config_file => 't/envui.json'
 );
 my $evt = App::RPi::EnvUI::Event->new(testing => 1);
@@ -82,6 +82,7 @@ is $hpin, 0, "set humidity aux to pin for testing ok";
     $hum_sub->return_value(99);
 
     my $event = $evt->env_to_db;
+    $api->{events}{env_to_db} = $event;
 
     $event->start;
     sleep 1;
@@ -99,6 +100,7 @@ is $hpin, 0, "set humidity aux to pin for testing ok";
     $hum_sub->return_value(20);
 
     my $event = $evt->env_to_db( $api );
+    $api->{events}{env_to_db} = $event;
 
     $event->start;
     sleep 1;
@@ -116,6 +118,7 @@ is $hpin, 0, "set humidity aux to pin for testing ok";
     $hum_sub->return_value(20);
 
     my $event = $evt->env_to_db($api);
+    $api->{events}{env_to_db} = $event;
 
     $event->start;
     sleep 1;
@@ -123,7 +126,7 @@ is $hpin, 0, "set humidity aux to pin for testing ok";
 
     my $env = $api->env;
 
-    is keys %$env, 4, "the correct number of keys in the return ok";
+    is keys %$env, 5, "the correct number of keys in the return ok";
 
     is $env->{temp}, 80, "temp val ok in env_to_db() event after update";
     is $env->{humidity}, 20, "hum val ok in env_to_db() event after update";

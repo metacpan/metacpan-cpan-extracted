@@ -442,7 +442,7 @@ ATTR
 	}
 	if ($session_required && @validator_checks) {
 		my $session_load = <<SESSION;
-		$def {session} = PEF::Front::Session->new(\$_[0]);
+		$def {session} ||= PEF::Front::Session->new($def {request});
 SESSION
 		splice @validator_checks, 1, 0, $session_load;
 	}

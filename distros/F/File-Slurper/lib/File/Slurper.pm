@@ -1,12 +1,12 @@
 package File::Slurper;
-$File::Slurper::VERSION = '0.010';
+$File::Slurper::VERSION = '0.011';
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Exporter 5.57 'import';
 
-use Encode qw(:fallbacks);
+use Encode qw/FB_CROAK STOP_AT_PARTIAL/;
 use PerlIO::encoding;
 
 our @EXPORT_OK = qw/read_binary read_text read_lines write_binary write_text read_dir/;
@@ -40,10 +40,7 @@ sub _text_layers {
 	my ($encoding, $crlf) = @_;
 	$crlf = CRLF_DEFAULT if $crlf && $crlf eq 'auto';
 
-	if ($encoding =~ /^(latin-?|iso-8859-)1$/i) {
-		return $crlf ? ':unix:crlf' : ':raw';
-	}
-	elsif (HAS_UTF8_STRICT && $encoding =~ /^utf-?8\b/i) {
+	if (HAS_UTF8_STRICT && $encoding =~ /^utf-?8\b/i) {
 		return $crlf ? ':unix:utf8_strict:crlf' : ':unix:utf8_strict';
 	}
 	else {
@@ -56,9 +53,8 @@ sub read_text {
 	my ($filename, $encoding, $crlf) = @_;
 	$encoding ||= 'utf-8';
 	my $layer = _text_layers($encoding, $crlf);
-	return read_binary($filename) if $layer eq ':raw';
 
-	local $PerlIO::encoding::fallback = FB_CROAK;
+	local $PerlIO::encoding::fallback = STOP_AT_PARTIAL | FB_CROAK;
 	open my $fh, "<$layer", $filename or croak "Couldn't open $filename: $!";
 	return do { local $/; <$fh> };
 }
@@ -68,7 +64,7 @@ sub write_text {
 	$encoding ||= 'utf-8';
 	my $layer = _text_layers($encoding, $crlf);
 
-	local $PerlIO::encoding::fallback = FB_CROAK;
+	local $PerlIO::encoding::fallback = STOP_AT_PARTIAL | FB_CROAK;
 	open my $fh, ">$layer", $filename or croak "Couldn't open $filename: $!";
 	print $fh $_[1] or croak "Couldn't write to $filename: $!";
 	close $fh or croak "Couldn't write to $filename: $!";
@@ -76,7 +72,11 @@ sub write_text {
 }
 
 sub write_binary {
-	return write_text(@_[0,1], 'latin-1');
+	my $filename = $_[0];
+	open my $fh, ">:raw", $filename or croak "Couldn't open $filename: $!";
+	print $fh $_[1] or croak "Couldn't write to $filename: $!";
+	close $fh or croak "Couldn't write to $filename: $!";
+	return;
 }
 
 sub read_lines {
@@ -84,7 +84,7 @@ sub read_lines {
 	$encoding ||= 'utf-8';
 	my $layer = _text_layers($encoding, $crlf);
 
-	local $PerlIO::encoding::fallback = FB_CROAK;
+	local $PerlIO::encoding::fallback = STOP_AT_PARTIAL | FB_CROAK;
 	open my $fh, "<$layer", $filename or croak "Couldn't open $filename: $!";
 	return <$fh> if $skip_chomp;
 	my @buf = <$fh>;
@@ -115,7 +115,7 @@ File::Slurper - A simple, sane and efficient module to slurp a file
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

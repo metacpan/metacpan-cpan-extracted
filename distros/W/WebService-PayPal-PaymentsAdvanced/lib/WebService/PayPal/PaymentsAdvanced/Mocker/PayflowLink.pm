@@ -2,7 +2,7 @@ package WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink;
 
 use Mojolicious::Lite;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 # A GET request will be a request for the hosted form.
 
@@ -29,7 +29,7 @@ WebService::PayPal::PaymentsAdvanced::Mocker::PayflowLink - A simple app to enab
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 DESCRIPTION
 

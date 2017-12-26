@@ -52,14 +52,28 @@ sub configure {
     }
     elsif (my $module = delete $opt{MODULE}) {
 	my $pkg = $opt{PACKAGE} || 'main';
-	$module = join '::', $obj->{Base}, $module if $obj->{Base};
-	$obj->module($module);
-	eval "package $pkg; use $module";
-	croak "$module: $@" if $@;
-	$obj->define('__PACKAGE__' => $module);
-	local *data = "${module}::DATA";
-	if (not eof *data) {
-	    $obj->readrc(*data);
+	my @base = do {
+	    if (ref $obj->{Base} eq 'ARRAY') {
+		@{$obj->{Base}};
+	    } else { 
+		($obj->{Base} // '');
+	    }
+	};
+	while (@base) {
+	    my $base = shift @base;
+	    my $mod = $base ? "${base}::${module}" : $module;
+	    eval "package $pkg; use $mod;";
+	    if ($@) {
+		next if @base;
+		croak "$mod: $@";
+	    }
+	    $obj->module($mod);
+	    $obj->define('__PACKAGE__' => $mod);
+	    local *data = "${mod}::DATA";
+	    if (not eof *data) {
+		$obj->readrc(*data);
+	    }
+	    last;
 	}
     }
 
@@ -86,6 +100,7 @@ sub readrc {
 	s/\\\n//g;
     }
     $obj->parsetext($text);
+    $obj;
 }
 
 ############################################################

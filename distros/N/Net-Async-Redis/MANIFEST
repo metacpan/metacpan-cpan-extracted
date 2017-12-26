@@ -11,6 +11,9 @@ SIGNATURE
 cpanfile
 dist.ini
 examples/incr-ratelimit.pl
+examples/job-benchmark.pl
+examples/job-hash-submit.pl
+examples/job-hash-worker.pl
 examples/job-submit.pl
 examples/job-worker.pl
 examples/multi.pl
@@ -19,10 +22,12 @@ examples/redis-cli
 examples/sub.pl
 job-queue.pl
 lib/Net/Async/Redis.pm
-lib/Net/Async/Redis.pod
 lib/Net/Async/Redis/Commands.pm
 lib/Net/Async/Redis/Multi.pm
 lib/Net/Async/Redis/Protocol.pm
+lib/Net/Async/Redis/Server.pm
+lib/Net/Async/Redis/Server/Connection.pm
+lib/Net/Async/Redis/Server/Database.pm
 lib/Net/Async/Redis/Subscription.pm
 lib/Net/Async/Redis/Subscription/Message.pm
 script/generate-perl-for-commands.pl
@@ -31,8 +36,10 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t
+t/multi.t
 t/protocol.t
 t/psubscribe.t
+t/pubsub.t
 xt/author/mojibake.t
 xt/author/pod-syntax.t
 xt/author/test-version.t

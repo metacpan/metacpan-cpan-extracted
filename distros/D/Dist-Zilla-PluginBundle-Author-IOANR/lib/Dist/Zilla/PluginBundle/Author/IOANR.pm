@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::IOANR 1.173490;
+package Dist::Zilla::PluginBundle::Author::IOANR 1.173520;
 
 # ABSTRACT: Build dists the way IOANR likes
 
@@ -6,6 +6,7 @@ use v5.24;
 use Moose;
 use List::Util 1.33 'any';
 use Dist::Zilla::Plugin::AssertOS;
+use Dist::Zilla::Plugin::AuthorSignatureTest;
 use Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes 0.173421;
 use Dist::Zilla::Plugin::ContributorsFile;
 use Dist::Zilla::Plugin::CopyFilesFromBuild;
@@ -226,7 +227,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.173490
+version 1.173520
 
 =head1 OPTIONS
 

@@ -34,9 +34,12 @@ my $test_dir = dirname( File::Spec->rel2abs($0) );
 sub with_footprintless {
     my ( $httpd_handler, $callback, %options ) = @_;
 
-    my $httpd = HTTP::Daemon->new() || die('unable to create daemon');
-    my $pid = fork();
+    my $port = int( rand(10000) ) + 49152;
+    my $pid  = fork();
     if ( $pid == 0 ) {
+        print STDERR "Starting server...\n";
+        my $httpd = HTTP::Daemon->new( LocalPort => $port )
+            || die( 'unable to create daemon: ' . $! );
         while ( my $connection = $httpd->accept() ) {
             while ( my $request = $connection->get_request() ) {
                 if (   $request->method() eq 'GET'
@@ -44,7 +47,9 @@ sub with_footprintless {
                 {
                     $connection->send_status_line();
                 }
-                &$httpd_handler( $connection, $request );
+                else {
+                    &$httpd_handler( $connection, $request );
+                }
             }
             $connection->close();
             undef($connection);
@@ -53,7 +58,7 @@ sub with_footprintless {
     }
     else {
         eval {
-            my $url = $httpd->url();
+            my $url = "http://localhost:$port/";
             my $uri = URI->new($url);
 
             my $count = 0;
@@ -62,6 +67,7 @@ sub with_footprintless {
                 && !$agent->get( $url . 'running' )->is_success() )
             {
                 $logger->tracef( "not running: ", $count++, "\n" );
+                sleep(1);
             }
             die('httpd never started') unless ( $count < 5 );
 

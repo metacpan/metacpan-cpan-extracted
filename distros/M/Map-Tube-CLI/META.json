@@ -49,11 +49,11 @@
    "provides" : {
       "Map::Tube::CLI" : {
          "file" : "lib/Map/Tube/CLI.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       },
       "Map::Tube::CLI::Option" : {
          "file" : "lib/Map/Tube/CLI/Option.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "web" : "https://github.com/manwar/Map-Tube-CLI"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

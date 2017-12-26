@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "3.3.2";
+our $VERSION = "3.4.1";
 
 1;
 
@@ -11,7 +11,7 @@ our $VERSION = "3.3.2";
 
 =head1 NAME
 
-sdif-tools - sdif and family tools, cdif and watchdiff
+App::sdif - sdif and family tools, cdif and watchdiff
 
 =head1 SYNOPSIS
 

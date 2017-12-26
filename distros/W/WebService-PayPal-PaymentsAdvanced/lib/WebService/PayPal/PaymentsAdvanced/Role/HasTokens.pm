@@ -4,7 +4,7 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Types::Common::String qw( NonEmptyStr );
 
@@ -42,7 +42,7 @@ WebService::PayPal::PaymentsAdvanced::Role::HasTokens - Provides roles for deali
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head2 secure_token
 

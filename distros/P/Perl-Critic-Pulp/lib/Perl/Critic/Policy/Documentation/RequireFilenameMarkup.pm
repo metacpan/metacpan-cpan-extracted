@@ -33,7 +33,7 @@ use Pod::Escapes;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 95;
+our $VERSION = 96;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_LOW;

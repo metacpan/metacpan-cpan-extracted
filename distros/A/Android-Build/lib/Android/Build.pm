@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171125';
+our $VERSION = '20171224';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -184,7 +184,6 @@ sub buildArea($)                                                                
 sub getBinFolder($)     {my ($a) = @_; $a->buildArea.'bin/'}                    # Bin folder name
 sub getGenFolder($)     {my ($a) = @_; $a->buildArea.'gen/'}                    # Gen folder name
 sub getResFolder($)     {my ($a) = @_; $a->buildArea.'res/'}                    # Res folder name
-sub getIcon($)          {my ($a) = @_; $a->buildArea.'icon.png'}                # Icon file name
 sub getManifestFile($)  {my ($a) = @_; $a->buildArea.'AndroidManifest.xml'}     # Name of manifest file
 
 sub logMessage($@)                                                              # Log a message
@@ -192,7 +191,7 @@ sub logMessage($@)                                                              
   my $s = join '', grep {$_} @message;
   chomp($s) if $s =~ /\n\Z/;
   push @{$android->log}, $s;
-# say STDERR $s;
+  say STDERR $s if -t STDERR;
  }
 
 #-------------------------------------------------------------------------------
@@ -201,41 +200,47 @@ sub logMessage($@)                                                              
 
 sub pushIcon                                                                    # Create and transfer each icon  using Imagemagick
  {my ($android, $icon, $size, $dir) = @_;
-  my $getIcon = $android->getIcon;
   my $res     = $android->getResFolder;
   my $man     = $android->getManifestFile;
+
   for my $i(qw(ic_launcher))
    {for my $d(qw(drawable))
-     {makePath($getIcon);
-      my $s = $size;
-
-      my $c = "convert -strip \"$icon\" -resize ${s}x${s}! \"$getIcon\"";       # Convert icon to required size and make it square
-      my $r = xxx $c, qr(convert);
-      !$r or confess "Unable to create icon:\n$r\n";
+     {my $s = $size;
       my $T = $res.$d.'-'.$dir.'dpi/'.$i.'.png';
       makePath($T);
       unlink $T;
-      copy($getIcon, $T);
-      -e $T or confess "Unable to create icon:\n$T\n";
+      my $c = "convert -strip \"$icon\" -resize ${s}x${s}! \"$T\"";             # Convert icon to required size and make it square
+
+      my $r = zzz($c);
+#     say STDERR dump([$c, $icon, $T, -e $T, fileSize($T), $r ]);
+      confess "Unable to create icon:\n$T\n$r\n"                                # Check icon was created
+        if $r or !-e $T or fileSize($T) < 10;
      }
    }
  }
 
-sub pushIcons                                                                   # Create icons in parallel
+sub pushIcons                                                                   # Create icons possibly in parallel
  {my ($android) = @_;
   my $icon      = $android->iconX;
   -e $icon or confess "Cannot find icon file:\n$icon\n";
   my @pid;
-  for([48, "m"], [72, "h"], [96, "xh"], [144, "xxh"])
-   {if (my $pid = fork())                                                       # Speed up - but does produce a lot of error messages
-     {push @pid, $pid
+  my @i = ([48, "m"], [72, "h"], [96, "xh"], [144, "xxh"]);                     # Icon specifications
+
+  if ($android->fastIcons)                                                      # Speed up - but it does produce a lot of error messages
+   {for(@i)
+     {if (my $pid = fork())
+       {push @pid, $pid
+       }
+      else
+       {eval {$android->pushIcon($icon, @$_)};
+        exit;
+       }
      }
-    else
-     {$android->pushIcon($icon, @$_);
-      exit;
-     }
+    waitpid($_, 0) for @pid;
    }
-  waitpid($_, 0) for @pid;
+  else
+   {$android->pushIcon($icon, @$_) for @i;
+   }
  }
 
 #-------------------------------------------------------------------------------
@@ -312,16 +317,38 @@ sub resources()
   my $parameters = $android->parameters // '';
   my $package    = $android->getPackage;
   my $res        = $android->getResFolder;
+  my $strings    = sub
+   {return qq(<string name="parameters">$parameters</string>)
+      unless ref $parameters;
+    my $s = '';
+    for my $key(sort keys %$parameters)
+     {my $val = $parameters->{$key};
+      $s .= qq(<string name="$key">$val</string>\n);
+     }
+    $s
+   }->();
   my $t = << "END";
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="packageName">$package</string>
     <string name="app_name">$title</string>
     <string name="versionName">$version</string>
-    <string name="parameters">$parameters</string>
+    $strings
 </resources>
 END
   writeFile($res."values/strings.xml", $t);
+
+  if (my $titles = $android->titles)                                            # Create additional titles from a hash of: {ISO::639 2 digit language code=>title in that language}
+   {for my $l(sort keys %$titles)
+     {my $t = $title->{$l};
+      writeFile($res."values-$t/strings.xml", <<END);
+      <?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">$t</string>
+</resources>
+END
+     }
+   }
  }
 
 #-------------------------------------------------------------------------------
@@ -330,10 +357,6 @@ END
 
 sub create
  {my ($android) = @_;
-  my $buildArea = $android->buildArea;
-  my $name      = $android->getAppName;
-  my $activity  = $android->activityX;
-  my $package   = $android->getPackage;
   $android->pushIcons;
   $android->manifest;
   $android->resources;
@@ -381,29 +404,29 @@ sub make
   my $apk          = $bin."$getAppName.apk";
 
   if (1)                                                                        # Confirm aapt
-   {my $a = xxx("$aapt version", qr(Android Asset Packaging Tool));
+   {my $a = zzz("$aapt version", qr(Android Asset Packaging Tool));
     $a =~ /Android Asset Packaging Tool/ or
       confess "aapt not found at:\n$aapt\n";
    }
 
   if (1)                                                                        # Confirm javac
-   {my $a = xxx("javac -version", qr(javac));
+   {my $a = zzz("javac -version", qr(javac));
     $a =~ /javac/ or confess "javac not found\n";
    }
 
   if (1)                                                                        # Confirm dx
-   {my $a = xxx("$dx --version", qr(dx version));
+   {my $a = zzz("$dx --version", qr(dx version));
     $a =~ /dx version/ or confess "dx not found at:\n$dx\n";
    }
 
   if (1)                                                                        # Confirm zipalign
-   {my $a = xxx("$zipAlign", qr(zipalign));
+   {my $a = zzz("$zipAlign", undef, 2);
     $a =~ /Zip alignment utility/ or
       confess "zipalign not found at:\n$zipAlign\n";
    }
 
   if (1)                                                                        # Confirm adb
-   {my $a = xxx("$adb version", qr(Android Debug Bridge));
+   {my $a = zzz("$adb version", qr(Android Debug Bridge));
     $a =~ /Android Debug Bridge/ or confess "adb not found at:\n$adb\n";
    }
 
@@ -431,10 +454,9 @@ sub make
 
   if (1)                                                                        # Generate R.java
    {makePath($gen);
-    my $r = xxx
-    ("$aapt package -f -m -0 apk -M $manifest -S $res -I $androidJar",
-     "-J $gen --generate-dependencies");
-    $android->logMessage($r);
+    my $c = "$aapt package -f -m -0 apk -M $manifest -S $res -I $androidJar".
+            " -J $gen --generate-dependencies";
+    zzz($c);
    }
 
   if (1)                                                                        # Java
@@ -444,42 +466,41 @@ sub make
 
     my $J = join ':', $androidJar, @libs;                                       # Jar files for javac
 
-    my $r = xxx("javac -g -Xlint:-options -source $javaTarget ".                # Compile java source files
-                " -target $javaTarget -cp $J          -d $classes $j");
-    $android->logMessage($r) if $r;
-    $r !~ /error/ or confess "Java errors\n$r\n";
+    my $c = "javac -g -Xlint:-options -source $javaTarget ".                    # Compile java source files
+            " -target $javaTarget -cp $J -d $classes $j";
+    zzz($c);
    }
 
   if (1)                                                                        # Dx
    {my $j = join ' ', @libs;                                                    # Jar files to include in dex
-    my $r = xxx("$dx --incremental --dex --force-jumbo --output $classes.dex $classes $j");
-    $android->logMessage($r);
+    zzz("$dx --incremental --dex --force-jumbo ".
+        " --output $classes.dex $classes $j");
    }
 
   if (1)                                                                        # Crunch
    {makePath($binRes);
-    my $r = xxx("$aapt crunch -S $res -C $binRes");
-    $android->logMessage($r);
+    zzz("$aapt crunch -S $res -C $binRes");
    }
 
   if (1)                                                                        # Package
-   {my $r = xxx
-     ("$aapt package --no-crunch -f  -0 apk -M $manifest",
-      "-S $binRes  -S $res -I $androidJar",
-      "-F $api",
-      "--generate-dependencies");
-    $android->logMessage($r);
+   {zzz
+     ("$aapt package --no-crunch -f  -0 apk -M $manifest".
+      " -S $binRes  -S $res -I $androidJar".
+      " -F $api".
+      " --generate-dependencies");
    }
 
   if (1)                                                                        # Create apk and sign
-   {xxx("cp $api $apj");                                                        # Create apk
-    xxx("cd $bin && zip -qv $apj classes.dex");                                 # Add dexed classes
+   {zzz("cp $api $apj");                                                        # Create apk
+    zzz("cd $bin && zip -qv $apj classes.dex");                                 # Add dexed classes
 
     if (1)                                                                      # Sign
      {my $alg = $android->debug ? '' : "-sigalg SHA1withRSA -digestalg SHA1";
 
-      my $s = xxx("echo $keyStorePwd |",
-       "jarsigner $alg -keystore $keyStoreFile $apj $keyAlias");
+      my $c =
+        "echo $keyStorePwd |".
+        "jarsigner $alg -keystore $keyStoreFile $apj $keyAlias";
+      my $s = zzz($c);
 
       $s =~ /reference a valid KeyStore key entry containing a private key/s and
         confess "Invalid keystore password: $keyStorePwd ".
@@ -487,19 +508,14 @@ sub make
                 "Specify the correct password via the keyStorePwd() method\n";
 
       $s =~ /jar signed/s or confess "Unable to sign $apj\n";
-      $android->logMessage($s);
      }
 
     if ($android->verifyApk)                                                    # Optional verify
-     {my $v = xxx("jarsigner -verify $apj");
-      $v =~ /jar verified/s  or confess "Unable to verify $apk\n";
-      $android->logMessage($v);
+     {my $v = zzz("jarsigner -verify $apj");
+      $v =~ /jar verified/s or confess "Unable to verify $apk\n";
      }
 
-    if (1)                                                                      # Zip align as required by Google Play
-     {my $z = xxx("$zipAlign -f 4 $apj $apk");
-      $android->logMessage($z);
-     }
+    zzz("$zipAlign -f 4 $apj $apk");                                            # Zip align
    }
  }
 
@@ -524,6 +540,7 @@ if (1) {                                                                        
   genLValueScalarMethods(qw(classes));                                          # A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against
   genLValueScalarMethods(qw(debug));                                            # Make the app debuggable if this option is true
   genLValueScalarMethods(qw(device));                                           # Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per qx(man adb)
+  genLValueScalarMethods(qw(fastIcons));                                        # Create icons in parallel - the default is to create them serially.
   genLValueScalarMethods(qw(icon));                                             # Jpg file containing a picture that will be converted and scaled by L<ImageMagick|http://imagemagick.org/script/index.php> to make an icon for the app, default is B<icon.jpg>
   genLValueScalarMethods(qw(keyAlias));                                         # Alias used in the java keytool to name the key to be used to sign this app. See L<Signing key|/Signing key> for how to generate a key.
   genLValueScalarMethods(qw(keyStoreFile));                                     # Name of key store file.  See L<Signing key|/Signing key> for how to generate a key.
@@ -532,37 +549,54 @@ if (1) {                                                                        
   genLValueScalarMethods(qw(lintFile));                                         # A file to be linted with the L<lint|/lint> action using the android L<platform|/platform> and the L<classes|/classes> specified.
   genLValueArrayMethods (qw(log));                                              # Output: a reference to an array of messages showing all the non fatal errors produced by this running this build. To catch fatal error enclose L<build|/build>with 𝗲𝘃𝗮𝗹 {}
   genLValueScalarMethods(qw(package));                                          # The package name to be used in the manifest and to start the app - the file containing the L<activity|/activity> for the app should be in this package
-  genLValueScalarMethods(qw(parameters));                                       # Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app.
+  genLValueScalarMethods(qw(parameters));                                       # Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app. Alternatively, if this is a reference to a hash, strings are created for each hash key=value
   genLValueArrayMethods (qw(permissions));                                      # A reference to an array of permissions, a standard useful set is applied by default if none are specified.
   genLValueScalarMethods(qw(platform));                                         # Folder containing B<android.jar>. For example B<~/Android/sdk/platforms/25.0.2>
   genLValueScalarMethods(qw(platformTools));                                    # Folder containing L<adb|https://developer.android.com/studio/command-line/adb.html>
   genLValueArrayMethods (qw(sdkLevels));                                        # [minSdkVersion, targetSdkVersion], default is [15, 25]
   genLValueArrayMethods (qw(src));                                              # A reference to an array of java source files to be compiled to create this app
   genLValueScalarMethods(qw(title));                                            # Title of app, the default is name of app
+  genLValueScalarMethods(qw(titles));                                           # Create additional titles for different languages from a hash of: {ISO::639 2 digit language code=>title in that language}
   genLValueScalarMethods(qw(verifyApk));                                        # Verify the signed apk
   genLValueScalarMethods(qw(version));                                          # Version of app, default is today's date
  }
 
-sub compile($)                                                                  # Compile the app
+sub compile2($)                                                                 # Compile the app
  {my ($android)  = @_;                                                          # Android build
   $android->create;
   $android->make;                                                               # Compile the app
  }
 
-sub lint($)                                                                     # Lint all the source code java files for the app
+sub compile($)                                                                  # Compile the app
+ {my ($android)  = @_;                                                          # Android build
+  eval {&compile2(@_)};
+  if ($@)
+   {$android->logMessage($@);
+    return $@;
+   }
+  undef                                                                         # No errors encountered
+ }
+
+sub lint2($)                                                                    # Lint all the source code java files for the app
  {my ($android)  = @_;                                                          # Android build
   my $src        = $android->getLintFile;
   my $androidJar = $android->getAndroidJar;
   my $area       = $android->classes // 'Classes';
   makePath($area);
-  my $cmd = qq(javac *.java -d $area -cp $androidJar:$area);                    # Android, plus locally created classes
-  $android->logMessage($cmd);
-  if (my $r = qx($cmd))                                                         # Perform compile
-   {say STDERR "$r\n";
-   }
+  zzz("javac *.java -d $area -cp $androidJar:$area");                           # Android, plus locally created classes
  }
 
-sub install($)                                                                  # Install an already L<compiled|/compile> app on the selected L<device|/device>:
+sub lint($)                                                                     # Lint all the source code java files for the app
+ {my ($android)  = @_;                                                          # Android build
+  eval {&lint2(@_)};
+  if ($@)
+   {$android->logMessage($@);
+    return $@;
+   }
+  undef                                                                         # No errors encountered
+ }
+
+sub install2($)                                                                 # Install an already L<compiled|/compile> app on the selected L<device|/device>:
  {my ($android)  = @_;                                                          # Android build
   my $apk        = $android->apk;
   my $device     = $android->getDevice;
@@ -570,25 +604,28 @@ sub install($)                                                                  
   my $activity   = $android->activityX;
   my $adb        = $android->getAdb." $device ";
 
-  if (1)
-   {my $c = "$adb install -r $apk";
-    my $r = xxx($c);
-    $r =~ /Success/ or confess "Install failed\n$r\n";
-    $android->logMessage($r);
+  zzz("$adb install -r $apk");
+  zzz("$adb shell am start $package/.Activity");
+ }
+
+sub install($)                                                                  # Install an already L<compiled|/compile> app on the selected L<device|/device>:
+ {my ($android)  = @_;                                                          # Android build
+  eval {&install2(@_)};
+  if ($@)
+   {$android->logMessage($@);
+    return $@;
    }
-  if (1)
-   {my $c = "$adb shell am start $package/.Activity";
-    my $r = xxx($c);
-    $r =~ /Starting/ or confess "Start failed\n$r\n";
-    $android->logMessage($r);
-   }
+  undef                                                                         # No errors encountered
  }
 
 sub run($)                                                                      # L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
  {my ($android)  = @_;                                                          # Android build
-  $android->compile;
-  $android->install;                                                            # Perform compile
- }                                                                              # Install and run
+  for(qw(compile install))                                                      # Compile, install and run
+   {my $r = $android->$_;
+    return $r if $r;
+   }
+  undef                                                                         # No errors encountered
+ }
 
 # podDocumentation
 
@@ -791,6 +828,16 @@ A reference to an array of java source files to be compiled to create this app
 Title of app, the default is name of app
 
 
+=head2 titles :lvalue
+
+Create additional titles for different languages from a hash of: {ISO::639 2 digit language code=>title in that language}
+
+
+=head2 verifyApk :lvalue
+
+Verify the signed apk
+
+
 =head2 version :lvalue
 
 Version of app, default is today's date
@@ -800,25 +847,29 @@ Version of app, default is today's date
 
 Compile the app
 
-  1  $android  Android build
+  1  Parameter  Description
+  2  $android   Android build
 
 =head2 lint($)
 
 Lint all the source code java files for the app
 
-  1  $android  Android build
+  1  Parameter  Description
+  2  $android   Android build
 
 =head2 install($)
 
 Install an already L<compiled|/compile> app on the selected L<device|/device>:
 
-  1  $android  Android build
+  1  Parameter  Description
+  2  $android   Android build
 
 =head2 run($)
 
 L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
 
-  1  $android  Android build
+  1  Parameter  Description
+  2  $android   Android build
 
 
 =head1 Index
@@ -876,7 +927,11 @@ L<Compile|/compile> the app, L<install|/install> and then run it on the selected
 
 26 L<title|/title>
 
-27 L<version|/version>
+27 L<titles|/titles>
+
+28 L<verifyApk|/verifyApk>
+
+29 L<version|/version>
 
 =head1 Installation
 

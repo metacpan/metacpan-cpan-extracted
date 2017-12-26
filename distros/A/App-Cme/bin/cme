@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.025
+version 1.026
 
 =head1 SYNOPSIS
 
@@ -208,6 +208,12 @@ the same effect:
 
 Load file even if error are found in data. Bad data are discarded
 
+=item -canonical
+
+Write config data back using model order. By default, write items back
+using the order found in the configuration file. This feature is
+experimental and not supported by all backends.
+
 =item -backup
 
 Create a backup of configuration files before saving. By default, C<old> will
@@ -255,11 +261,6 @@ directory.
 =item -stack-trace
 
 Provides a full stack trace when exiting on error.
-
-=item -backend
-
-Specify a read/write backend. The actual backend name depends on the model
-passed to C<-model> option. See L<Config::Model::BackendMgr> for details.
 
 =item -try-app-as-model
 

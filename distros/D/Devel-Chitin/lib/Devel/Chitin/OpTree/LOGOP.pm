@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LOGOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;
@@ -91,7 +91,7 @@ sub pp_and {
         $right = _format_if_block($right);
         "if ($left) $right";
 
-    } elsif ($self->is_posfix_if) {
+    } elsif ($self->is_postfix_if) {
         "$right if $left";
 
     } else {
@@ -116,7 +116,7 @@ sub pp_or {
         my $code = _format_if_block($self->other->deparse);
         "unless ($condition) $code";
 
-    } elsif ($self->is_posfix_if) {
+    } elsif ($self->is_postfix_if) {
         $self->other->deparse . ' unless ' . $self->first->deparse;
 
     } else {
@@ -212,5 +212,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2016, Anthony Brummett.  This module is free software. It may
+Copyright 2017, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

@@ -8,7 +8,7 @@
       "Fred Moyer"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -89,7 +89,7 @@
          "web" : "https://github.com/redhotpenguin/soaplite"
       }
    },
-   "version" : "1.22",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "1.24",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

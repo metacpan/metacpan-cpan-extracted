@@ -1,5 +1,8 @@
 Revision history for PONAPI-Server
 
+0.003002     2017-Dec-18
+             * Corrected congif value handling (Adam Taylor)
+
 0.003001     2017-Feb-7
              * JSON::XS --> JSON::MaybeXS.
 

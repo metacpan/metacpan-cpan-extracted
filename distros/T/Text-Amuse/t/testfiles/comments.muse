@@ -5,3 +5,89 @@
 <comment>
 This is <script>alert</script> a comment \emph
 </comment>
+
+Foo
+;not a comment because the semicolon is not followed by a white space
+; comment
+; Comment
+; Second line \{\}
+;
+bar
+;
+; comment \{\}
+;
+baz
+
+This is regular
+<comment>
+Hello there, this is a comment
+; comment inside
+</comment>
+; comment as well
+;
+; comment continue
+This is regular
+
+{{{
+; this is some in verbatim
+<comment>
+Another comment
+</comment>
+}}}
+
+; and has a comment !@#$%^^&&*()\[]{}|<"'>
+
+<verse>
+This is a verse.
+; and has a comment !@#$%^^&&*()\[]{}|<"'>
+<comment>
+
+Another comment which will screw, because of the nesting, but output
+is acceptable (throwing a warning for good measure). !@#$%^^&&*()\[]{}|<"'>
+
+</comment>
+
+Blablabla
+</verse>
+
+<verse>
+; with a comment
+Here the verse continue
+</verse>
+
+<comment>
+<comment>
+Nested
+</comment>
+</comment>
+
+<verbatim>;</verbatim> Not a comment because of <verbatim><verbatim></verbatim>
+
+<comment>
+Here the comment will stop. This is a kind of implementation artefact.
+
+<example>
+verbatim
+<verse>
+verse
+</verse>
+</example>
+</comment>
+
+<example>
+{{{
+<verse>
+verse
+; comment
+</verse>
+<comment>
+comment
+</comment>
+}}}
+</example>
+
+<verse>
+<example>
+Makes no sense
+</example>
+</verse>

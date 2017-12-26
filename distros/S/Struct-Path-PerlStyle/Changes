@@ -1,5 +1,11 @@
 Revision history for Struct-Path-PerlStyle
 
+0.80    2017-12-22
+        path structs format changed, exported subs renamed to avoid ambigouseness
+        deprecated hook '<<' support removed
+        don't serialize two indexes as range
+        redundant code removed, SYNOPSIS rewritten
+
 0.73    2017-11-05
         tests for scientific notation or a floating-point numbers fixed
 

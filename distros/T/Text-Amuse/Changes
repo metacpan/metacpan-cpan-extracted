@@ -1,5 +1,18 @@
 Revision history for perl module Text::Amuse
 
+0.94 2017-12-25
+
+ - Fix regressions in inline parsing
+
+0.93 2017-12-23
+
+ - Permit empty comments and prettify comment output
+ - Extended character set for directives
+ - Support ~~ as non-breaking space
+
+Special thanks to Alexander @labdsf for patches, comments and bringing
+up these issues.
+
 0.92 2017-12-10
 
  - Fixed recursion bug in secondary footnotes handling

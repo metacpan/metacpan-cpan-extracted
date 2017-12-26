@@ -303,6 +303,7 @@ sub can_merge_next {
         $self->type eq 'null'       or
         $self->type eq 'table'      or
         $self->type eq 'newpage'    or
+        $self->type eq 'inlinecomment' or
         $self->type eq 'comment') {
         return 0;
     } else {

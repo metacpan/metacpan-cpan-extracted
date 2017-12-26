@@ -567,17 +567,15 @@ my %WriteMakefileArgs = (
   TEST_REQUIRES  => <%= $_[1]->{TEST_REQUIRES} %>,
   PREREQ_PM      => <%= $_[1]->{PREREQ_PM} %>,
   META_MERGE     => {
-    resources => {
-      'dynamic_config' => 0,
-      'meta-spec'      => {version => 2},
-      'resources'      => {
-        bugtracker => {web => '<%= $_[0]->config->{bugtracker} %>'},
-        homepage   => '<%= $_[0]->config->{homepage} %>',
-        repository => {
-          type => 'git',
-          url  => '<%= $_[0]->repository %>',
-          web  => '<%= $_[0]->config->{homepage} %>',
-        },
+    'dynamic_config' => 0,
+    'meta-spec'      => {version => 2},
+    'resources'      => {
+      bugtracker => {web => '<%= $_[0]->config->{bugtracker} %>'},
+      homepage   => '<%= $_[0]->config->{homepage} %>',
+      repository => {
+        type => 'git',
+        url  => '<%= $_[0]->repository %>',
+        web  => '<%= $_[0]->config->{homepage} %>',
       },
     },
   },

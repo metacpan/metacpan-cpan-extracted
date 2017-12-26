@@ -3,7 +3,7 @@ package MooX::Cmd::Tester;
 use strict;
 use warnings;
 
-our $VERSION = "0.015";
+our $VERSION = "0.017";
 
 require Exporter;
 use Test::More import => ['!pass'];
@@ -22,7 +22,7 @@ BEGIN
 {
     *CORE::GLOBAL::exit = sub {
         return CORE::exit(@_) unless $TEST_IN_PROGRESS;
-        MooX::Cmd::Tester::Exited->throw( $_[0] );
+        MooX::Cmd::Tester::Exited->throw($_[0]);
     };
 }
 
@@ -30,14 +30,14 @@ sub result_class { 'MooX::Cmd::Tester::Result' }
 
 sub test_cmd
 {
-    my ( $app, $argv ) = @_;
+    my ($app, $argv) = @_;
 
-    my $result = _run_with_capture( $app, $argv );
-    my $exit_code = defined $result->{error} ? ( ( 0 + $! ) || -1 ) : 0;
+    my $result = _run_with_capture($app, $argv);
+    my $exit_code = defined $result->{error} ? ((0 + $!) || -1) : 0;
 
     $result->{error}
       and eval { $result->{error}->isa('MooX::Cmd::Tester::Exited') }
-      and $exit_code = ${ $result->{error} };
+      and $exit_code = ${$result->{error}};
 
     result_class->new(
         {
@@ -51,44 +51,45 @@ sub test_cmd_ok
 {
     my $rv = test_cmd(@_);
 
-    my $test_ident = $rv->app . " => [ " . join( " ", @{ $_[1] } ) . " ]";
-    ok( !$rv->error, "Everythink ok running cmd $test_ident" ) or diag( $rv->error );
+    my $test_ident = $rv->app . " => [ " . join(" ", @{$_[1]}) . " ]";
+    ok(!$rv->error, "Everythink ok running cmd $test_ident") or diag($rv->error);
     # no error and cmd means, we're reasonable successful so far
     $rv
-      and !$rv->error
+      and not $rv->error
       and $rv->cmd
       and $rv->cmd->command_name
-      and ok( $rv->cmd->command_commands->{ $rv->cmd->command_name }, "found command at $test_ident" );
+      and ok($rv->cmd->command_commands->{$rv->cmd->command_name}, "found command at $test_ident");
 
     $rv;
 }
 
+## no critic qw(ProhibitSubroutinePrototypes)
 sub _capture_merged(&)
 {
     my $code = shift;
-    my ( $stdout, $stderr, $merged, $ok );
-    if ( $^O eq 'MSWin32' )
+    my ($stdout, $stderr, $merged, $ok);
+    if ($^O eq 'MSWin32')
     {
-        ( $stdout, $stderr, $ok ) = tee { $code->(); };
+        ($stdout, $stderr, $ok) = tee { $code->(); };
         $merged = $stdout . $stderr;
     }
     else
     {
         ($merged) = tee_merged
         {
-            ( $stdout, $stderr, $ok ) = tee { $code->() };
+            ($stdout, $stderr, $ok) = tee { $code->() };
         };
     }
-    ( $stdout, $stderr, $merged, $ok );
+    ($stdout, $stderr, $merged, $ok);
 }
 
 sub _run_with_capture
 {
-    my ( $app, $argv ) = @_;
+    my ($app, $argv) = @_;
 
-    my ( $execute_rv, $cmd, $cmd_name );
+    my ($execute_rv, $cmd, $cmd_name, $error);
 
-    my ( $stdout, $stderr, $merged, $ok ) = _capture_merged
+    my ($stdout, $stderr, $merged, $ok) = _capture_merged
     {
         eval {
             local $TEST_IN_PROGRESS = 1;
@@ -98,30 +99,29 @@ sub _run_with_capture
 
             $cmd = ref $app ? $app : $app->new_with_cmd;
             ref $app and $app = ref $app;
-            my $test_ident = "$app => [ " . join( " ", @$argv ) . " ]";
-            ok( $cmd->isa($app), "got a '$app' from new_with_cmd" );
+            my $test_ident = "$app => [ " . join(" ", @$argv) . " ]";
+            ok($cmd->isa($app), "got a '$app' from new_with_cmd");
             @$argv
-              and defined( $cmd_name = $cmd->command_name )
-              and ok( ( grep { $_ =~ m/$cmd_name/ } @$argv ), "proper cmd name from $test_ident" );
-            ok( scalar @{ $cmd->command_chain } <= 1 + scalar @$argv, "\$#argv vs. command chain length testing $test_ident" );
-            @$argv and ok( $cmd->command_chain_end == $cmd->command_chain->[-1], "command_chain_end ok" );
+              and defined($cmd_name = $cmd->command_name)
+              and ok((grep { index($cmd_name, $_) != -1 } @$argv), "proper cmd name from $test_ident");
+            ok(scalar @{$cmd->command_chain} <= 1 + scalar @$argv, "\$#argv vs. command chain length testing $test_ident");
+            @$argv and ok($cmd->command_chain_end == $cmd->command_chain->[-1], "command_chain_end ok");
 
-            unless ( $execute_rv = $cmd->execute_return )
+            unless ($execute_rv = $cmd->execute_return)
             {
-                my ( $command_execute_from_new, $command_execute_method_name );
+                my ($command_execute_from_new, $command_execute_method_name);
                 my $cce = $cmd->can("command_chain_end");
                 $cce                      and $cce                      = $cce->($cmd);
                 $cce                      and $command_execute_from_new = $cce->can("command_execute_from_new");
                 $command_execute_from_new and $command_execute_from_new = $command_execute_from_new->($cce);
                 $command_execute_from_new or $command_execute_method_name = $cce->can('command_execute_method_name');
                 $command_execute_method_name
-                  and $execute_rv = [ $cce->can( $command_execute_method_name->($cce) )->($cce) ];
+                  and $execute_rv = [$cce->can($command_execute_method_name->($cce))->($cce)];
             }
             1;
-        };
+        } or $error = 1;
+        $@ and $error = $@;
     };
-
-    my $error = $ok ? undef : $@;
 
     return {
         app        => $app,
@@ -135,12 +135,13 @@ sub _run_with_capture
 }
 
 {
+    ## no critic qw(ProhibitMultiplePackages)
     package    # no-index
       MooX::Cmd::Tester::Result;
 
     sub new
     {
-        my ( $class, $arg ) = @_;
+        my ($class, $arg) = @_;
         bless $arg => $class;
     }
 }
@@ -148,18 +149,20 @@ sub _run_with_capture
 my $res = Package::Stash->new("MooX::Cmd::Tester::Result");
 for my $attr (qw(app cmd stdout stderr output error execute_rv exit_code))
 {
-    $res->add_symbol( '&' . $attr, sub { $_[0]->{$attr} } );
+    $res->add_symbol('&' . $attr, sub { $_[0]->{$attr} });
 }
 
 {
+    ## no critic qw(ProhibitMultiplePackages)
     package    # no-index
       MooX::Cmd::Tester::Exited;
 
     sub throw
     {
-        my ( $class, $code ) = @_;
+        my ($class, $code) = @_;
         defined $code or $code = 0;
-        my $self = ( bless \$code => $class );
+        my $self = (bless \$code => $class);
+        ## no critic qw(RequireCarping)
         die $self;
     }
 }
@@ -261,7 +264,7 @@ MooX::Cmd.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2015 Jens Rehsack.
+Copyright 2013-2017 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

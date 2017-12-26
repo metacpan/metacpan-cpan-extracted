@@ -15,7 +15,7 @@ name: ISO-639
 provides:
   ISO::639:
     file: lib/ISO/639.pm
-    version: '20171207'
+    version: '20171214'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -25,4 +25,4 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171207'
+version: '20171214'

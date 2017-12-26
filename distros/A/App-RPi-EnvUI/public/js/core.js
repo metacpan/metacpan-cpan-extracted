@@ -65,12 +65,18 @@ $(document).on('pageshow', '#home', function(){
 
     // button event
 
-    $('div.ui-page-active .button').on('change', flip_change);
+    $('div.ui-page-active .button').on('change', aux_action);
 
     // main menu
 
     $('div.ui-page-active .myMenu ul li').hover(function() {
         $(this).children('ul').stop(true, false, true).slideToggle(300);
+    });
+
+    $.get('/get_config/devel', function(devel){
+        if (parseInt(devel) == '1'){
+            $('#time').css({'background-color': 'red'});
+        }
     });
 
     // draggable widgets
@@ -80,7 +86,7 @@ $(document).on('pageshow', '#home', function(){
 
     $.each(positions, function (id, pos){
         $('div.ui-page-active #'+ id).css(pos);
-    })
+    });
 
     $('div.ui-page-active .drag').draggable({
         handle: 'p.widget_handle',
@@ -159,11 +165,11 @@ function aux_update(){
 
     for(var i = 1; i < 9; i++){
         var aux = 'aux'+ i;
-        aux_state(aux);
+        aux_setup(aux);
     }
 }
 
-function aux_state(aux){
+function aux_setup(aux){
 
     $.ajax({
         async: true,
@@ -194,41 +200,54 @@ function aux_state(aux){
 
             $('div.ui-page-active #'+ aux).off('change');
 
-            $('div.ui-page-active #'+ aux).flipswitch("option", "onText",  onText);
-            $('div.ui-page-active #'+ aux).flipswitch("option", "offText", offText);
+            $('div.ui-page-active #'+ aux).flipswitch(
+                "option",
+                "onText",
+                onText
+            );
+            $('div.ui-page-active #'+ aux).flipswitch(
+                "option",
+                "offText",
+                offText
+            );
 
             $('div.ui-page-active #'+ aux).flipswitch('refresh');
-
-            $('div.ui-page-active #'+ aux).on('change', flip_change);
-
+            $('div.ui-page-active #'+ aux).on('change', aux_action);
         }
     });
 }
 
-function flip_change(e){
+function aux_action(e){
     var checked = $(this).prop('checked');
     var aux = $(this).attr('id');
 
-    $.get('/set_aux_override/'+ aux +'/'+ 'true', function(data){
-        var json = $.parseJSON(data);
+    $.get('/get_aux_override/'+ aux, function(get_override_data){
+        var start_override_status = parseInt(get_override_data);
 
-        if (json.error){
-            console.log(json.error);
-        }
+        $.get('/set_aux_override/'+ aux +'/'+ ! start_override_status,
+        function(set_override_data){
+            var set_override_json = $.parseJSON(set_override_data);
 
-        var override_status = parseInt(json.override);
+            if (set_override_json.override == -1){
+                console.log("aux id " + aux + " toggling is disabled");
+                alert(
+                    "aux id " + aux + " toggling is disabled in the config file"
+                );
+                return;
+            }
+            else {
+                // change state only after we know the override operation
+                // succeeded
 
-        if (override_status != -1){
-            $.get('/set_aux_state/'+ aux +'/'+ checked, function(data){
-                var json = $.parseJSON(data);
-                if (json.error){
-                    console.log(json.error);
-                }
-            });
-        }
-        else {
-            alert("aux id " + aux + " toggling is disabled in the config file");
-        }
+                $.get('/set_aux_state/'+ aux +'/'+ checked, function(set_state){
+                    var set_state_json = $.parseJSON(set_state);
+
+                    if (set_state_json.error){
+                        console.log(set_state_json.error);
+                    }
+                });
+            }
+        });
     });
 }
 

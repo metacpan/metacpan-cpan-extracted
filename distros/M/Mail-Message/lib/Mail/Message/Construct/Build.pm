@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.005';
 
 
 use strict;

@@ -1,0 +1,9 @@
+{
+    "security_level": "Core",
+    "planets": "3",
+    "stations": "11",
+    "asteroids": "1",
+    "north_gate": "FamilyZein",
+    "south_gate": "RhonkarsFire",
+    "east_gate": "CompanyPride"
+}

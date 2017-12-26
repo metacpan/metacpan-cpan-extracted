@@ -30,6 +30,8 @@ use FindBin qw( $RealBin );
 use MYDan::Agent::Auth;
 use MYDan::Util::OptConf;
 use MYDan::Util::ProcLock;
+use MYDan;
+use MYDan::Util::ReservedSpace::File;
 
 our $CA = 86400;
 
@@ -150,10 +152,10 @@ sub run
     %ENV = ( %ENV, %$env ) if $env && ref $env eq 'HASH';
     map{ $ENV{"MYDan_$_"} = $query->{$_} }qw( user sudo );
 
-    my $tmpfile = "/tmp/tmp.agent.$$";
-    YAML::XS::DumpFile $tmpfile, $query;
-    open STDIN, '<', "$tmpfile" or idie( "Can't open '$tmpfile': $!" );
-    unlink $tmpfile;
+    my $tmpfile = "tmp.agent.$$";    
+    MYDan::Util::ReservedSpace::File::dump( $tmpfile, $query );
+    open STDIN, '<', "$MYDan::PATH/tmp/$tmpfile" or idie( "Can't open '$tmpfile': $!" );
+    MYDan::Util::ReservedSpace::File::unlink( $tmpfile );
 
     exec "$path{code}/$code";
 }

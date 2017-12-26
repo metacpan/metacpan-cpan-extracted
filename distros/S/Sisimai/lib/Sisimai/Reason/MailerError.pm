@@ -14,19 +14,17 @@ sub match {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
-         command[ ](?:
+         \Aprocmail:[ ]    # procmail
+        |bin/(?:procmail|maildrop)
+        |command[ ](?:
              failed:[ ]
             |died[ ]with[ ]status[ ]\d+
             |output:
-        )
-        |\Aprocmail:[ ]    # procmail
-        |bin/(?:
-             procmail
-            |maildrop
             )
-        |mailer[ ]error
-        |X[-]UNIX[;][ ]\d+  # X-UNIX; 127
         |exit[ ]\d+
+        |mailer[ ]error
+        |pipe[ ]to[ ][|][/].+
+        |X[-]UNIX[;][ ]\d+  # X-UNIX; 127
         )
     }ix;
 
@@ -93,7 +91,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

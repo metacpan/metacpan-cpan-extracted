@@ -12,8 +12,8 @@ use Scalar::Util 'looks_like_number';
 use re qw(is_regexp regexp_pattern);
 
 our @EXPORT_OK = qw(
-    ps_parse
-    ps_serialize
+    path2str
+    str2path
 );
 
 =encoding utf8
@@ -32,18 +32,37 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.73
+Version 0.80
 
 =cut
 
-our $VERSION = '0.73';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
-    use Struct::Path::PerlStyle qw(ps_parse ps_serialize);
+    use Struct::Path qw(spath);
+    use Struct::Path::PerlStyle qw(path2str str2path);
 
-    $struct = ps_parse('{a}{b}[1]');    # string to Struct::Path path
-    $string = ps_serialize($struct);    # Struct::Path path to string
+    my $nested = {
+        a => {
+            b => ["B0", "B1", "B2"],
+            c => ["C0", "C1"],
+            d => {},
+        },
+    };
+
+    my @found = path($nested, str2path('{a}{}[0,2]'), deref => 1, paths => 1);
+
+    while (@found) {
+        my $path = shift @found;
+        my $data = shift @found;
+
+        print "path '" . path2str($path) . "' refer to '$data'\n";
+    }
+
+    # path '{a}{b}[0]' refer to 'B0'
+    # path '{a}{b}[2]' refer to 'B2'
+    # path '{a}{c}[0]' refer to 'C0'
 
 =head1 EXPORT
 
@@ -59,7 +78,7 @@ Examples:
     '{a}{"space inside"}' # key must be quoted unless it is a simple word (single quotes supported as well)
     '{a}{"multi\nline"}'  # same for special characters (if double quoted)
     '{a}{"π"}'            # keys containing non ASCII characters also must be quoted*
-    '{a}{/regexp/}'       # regexp keys match
+    '{a}{/pattern/mods}'  # regexp keys match (fully supported, except code expressions)
     '{a}{b}[0,1,2,5]'     # 0, 1, 2 and 5 array's items
     '{a}{b}[0..2,5]'      # same, but using ranges
     '{a}{b}[9..0]'        # descending ranges allowed (perl doesn't)
@@ -68,12 +87,6 @@ Examples:
     * at least until https://github.com/adamkennedy/PPI/issues/168
 
 =head1 SUBROUTINES
-
-=head2 ps_parse
-
-Parse perl-style string to L<Struct::Path|Struct::Path> path
-
-    $struct_path = ps_parse($string);
 
 =cut
 
@@ -112,8 +125,6 @@ our $HOOKS = {
     },
 };
 
-$HOOKS->{'<<'} = $HOOKS->{back}; # backward compatibility ('<<' is deprecated)
-
 my %ESCP = (
     '\\' => '\\\\', # single => double
     '"'  => '\"',
@@ -140,8 +151,16 @@ $RSAFE->permit_only(
     'padany',
 );
 
-sub ps_parse($;$);
-sub ps_parse($;$) {
+=head2 str2path
+
+Convert perl-style string to L<Struct::Path|Struct::Path> path structure
+
+    $struct = str2path($string);
+
+=cut
+
+sub str2path($;$);
+sub str2path($;$) {
     my ($path, $opts) = @_;
 
     croak "Undefined path passed" unless (defined $path);
@@ -155,21 +174,20 @@ sub ps_parse($;$) {
         if ($step->isa('PPI::Structure') and $step->start eq '{' and $step->finish) {
             push @out, {};
             for my $t (map { $_->elements } $step->children) {
-                my $tmp;
                 if ($t->isa('PPI::Token::Word') or $t->isa('PPI::Token::Number')) {
-                    $tmp->{keys} = $t->content;
+                    push @{$out[-1]->{K}}, $t->content;
                 } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
-                    next;
+                    ;
                 } elsif ($t->isa('PPI::Token::Quote::Single')) {
-                    $tmp->{keys} = $t->literal;
+                    push @{$out[-1]->{K}}, $t->literal;
                 } elsif ($t->isa('PPI::Token::Quote::Double')) {
-                    $tmp->{keys} = $t->string;
-                    $tmp->{keys} =~ s/($INTP)/$INTP{$1}/gs; # interpolate
+                    push @{$out[-1]->{K}}, $t->string;
+                    $out[-1]->{K}->[-1] =~ s/($INTP)/$INTP{$1}/gs; # interpolate
                 } elsif (
                     $t->isa('PPI::Token::Regexp::Match') or
                     $t->isa('PPI::Token::QuoteLike::Regexp')
                 ) {
-                    $tmp->{regs} = $RSAFE->reval(
+                    push @{$out[-1]->{R}}, $RSAFE->reval(
                         'qr/' . $t->get_match_string . '/' .
                         join('', keys %{$t->get_modifiers}), 1
                     );
@@ -180,7 +198,6 @@ sub ps_parse($;$) {
                 } else {
                     croak "Unsupported thing '$t' for hash key, step #$#out";
                 }
-                map { push @{$out[-1]->{$_}}, delete $tmp->{$_} } keys %{$tmp};
             }
         } elsif ($step->isa('PPI::Structure') and $step->start eq '[' and $step->finish) {
             push @out, [];
@@ -189,20 +206,19 @@ sub ps_parse($;$) {
                 if ($t->isa('PPI::Token::Number')) {
                     croak "Incorrect array index '$t', step #$#out"
                         unless ($t->content == int($t));
-                    if ($range) {
-                        my $start = pop(@{$out[-1]});
-                        croak "Range start absent, step #$#out"
-                            unless (defined $start);
+                    if (defined $range) {
                         push @{$out[-1]},
-                            ($start < $t->content ? $start .. $t : reverse $t .. $start);
+                            ($range < $t->content ? $range .. $t : reverse $t .. $range);
                         $range = undef;
                     } else {
                         push @{$out[-1]}, int($t);
                     }
                 } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
-                    $range = undef;
+                    ;
                 } elsif ($t->isa('PPI::Token::Operator') and $t eq '..') {
-                    $range = $t;
+                    $range = pop(@{$out[-1]});
+                    croak "Range start absent, step #$#out"
+                        unless (defined $range);
                 } else {
                     croak "Unsupported thing '$t' for array index, step #$#out";
                 }
@@ -233,7 +249,7 @@ sub ps_parse($;$) {
         } elsif ($step->isa('PPI::Token::Symbol') and $step->raw_type eq '$') {
             my $name = substr($step, 1); # cut off sigil
             croak "Unknown alias '$name'" unless (exists $opts->{aliases}->{$name});
-            push @out, @{ps_parse($opts->{aliases}->{$name}, $opts)};
+            push @out, @{str2path($opts->{aliases}->{$name}, $opts)};
         } else {
             croak "Unsupported thing '$step' in the path, step #" . @out;
         }
@@ -242,15 +258,15 @@ sub ps_parse($;$) {
     return \@out;
 }
 
-=head2 ps_serialize
+=head2 path2str
 
-Serialize L<Struct::Path|Struct::Path> path to perl-style string
+Convert L<Struct::Path|Struct::Path> path structure to perl-style string
 
-    $string = ps_serialize($struct_path);
+    $string = path2str($struct);
 
 =cut
 
-sub ps_serialize($) {
+sub path2str($) {
     my $path = shift;
 
     croak "Arrayref expected for path" unless (ref $path eq 'ARRAY');
@@ -273,9 +289,16 @@ sub ps_serialize($) {
                     push @items, [$i]; # new range
                 }
             }
-            $out .= "[" . join(",", map { $_->[0] == $_->[-1] ? $_->[0] : "$_->[0]..$_->[-1]" } @{items}) . "]";
+
+            for (@{items}) {
+                $_ = abs($_->[0] - $_->[-1]) < 2
+                    ? join(',', @{$_})
+                    : "$_->[0]..$_->[-1]"
+            }
+
+            $out .= "[" . join(",", @{items}) . "]";
         } elsif (ref $step eq 'HASH') {
-            my $types = [ grep { exists $step->{$_} } qw(keys regs) ];
+            my $types = [ grep { exists $step->{$_} } qw(K R) ];
             if (keys %{$step} != @{$types}) {
                 $types = { map { $_, 1 } @{$types} };
                 my @errs = grep { !exists $types->{$_} } sort keys %{$step};
@@ -283,11 +306,11 @@ sub ps_serialize($) {
                     join(',', @errs) . "), step #$sc"
             }
 
-            if (exists $step->{keys}) {
+            if (exists $step->{K}) {
                 croak "Unsupported hash keys definition, step #$sc"
-                    unless (ref $step->{keys} eq 'ARRAY');
+                    unless (ref $step->{K} eq 'ARRAY');
 
-                for my $k (@{$step->{keys}}) {
+                for my $k (@{$step->{K}}) {
                     croak "Unsupported hash key type 'undef', step #$sc"
                         unless (defined $k);
                     croak "Unsupported hash key type '@{[ref $k]}', step #$sc"
@@ -304,12 +327,12 @@ sub ps_serialize($) {
                 }
             }
 
-            if (exists $step->{regs}) {
-                croak "Unsupported hash regs definition, step #$sc"
-                    unless (ref $step->{regs} eq 'ARRAY');
+            if (exists $step->{R}) {
+                croak "Unsupported hash regexps definition, step #$sc"
+                    unless (ref $step->{R} eq 'ARRAY');
 
-                for my $r (@{$step->{regs}}) {
-                    croak "Regexp expected for regs item, step #$sc"
+                for my $r (@{$step->{R}}) {
+                    croak "Regexp expected for regexps item, step #$sc"
                         unless (is_regexp($r));
 
                     my ($patt, $mods) = regexp_pattern($r);

@@ -4,15 +4,16 @@ require 5.003000;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use vars qw($VERSION @ISA @EXPORT_OK $errmsg);
 use Fcntl qw(O_RDONLY);
 use integer;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
+	$errmsg
 	shake128	shake128_base64		shake128_hex
 	shake256	shake256_base64		shake256_hex
 	sha3_224	sha3_224_base64		sha3_224_hex
@@ -72,6 +73,7 @@ sub add_bits {
 sub _bail {
 	my $msg = shift;
 
+	$errmsg = $!;
 	$msg .= ": $!";
         require Carp;
         Carp::croak($msg);

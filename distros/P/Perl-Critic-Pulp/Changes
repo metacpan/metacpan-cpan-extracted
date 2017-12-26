@@ -17,6 +17,10 @@ with Perl-Critic-Pulp.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 96, December 2017
+    - ProhibitUnknownBackslash allow for non-ascii in strings, as
+      reported by Mark Fowler RT#123922
+
 Version 95, October 2017
     - RequireFinalSemicolon also sort{} blocks are an expression
 

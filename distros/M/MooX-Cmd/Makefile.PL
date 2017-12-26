@@ -6,16 +6,16 @@ use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %RUN_DEPS = (
-    "Carp" => 0,
-    "List::MoreUtils" => 0.406,
-    "Moo" => "0.009013",
+    "Carp"              => 0,
+    "List::MoreUtils"   => 0.406,
+    "Moo"               => "0.009013",
     "Module::Pluggable" => "4.8",
-    "Module::Runtime" => 0,
-    "Package::Stash" => "0.33",
-    "Params::Util" => "0.37",
-    "Regexp::Common" => "2011121001",
-    "Scalar::Util" => 0,
-    "Text::ParseWords" => 0,
+    "Module::Runtime"   => 0,
+    "Package::Stash"    => "0.33",
+    "Params::Util"      => "0.37",
+    "Regexp::Common"    => "2011121001",
+    "Scalar::Util"      => 0,
+    "Text::ParseWords"  => 0,
 );
 
 my %CONFIGURE_DEPS = (
@@ -32,11 +32,11 @@ my %TEST_DEPS = (
 WriteMakefile1(
     MIN_PERL_VERSION => '5.008001',
     META_ADD         => {
-        'meta-spec' => { version => 2 },
+        'meta-spec' => {version => 2},
         resources   => {
             homepage   => 'https://metacpan.org/release/MooX-Cmd',
             repository => {
-                url  => 'https://github.com:Getty/p5-moox-cmd.git',
+                url  => 'https://github.com/Getty/p5-moox-cmd.git',
                 web  => 'https://github.com/Getty/p5-moox-cmd',
                 type => 'git',
             },
@@ -49,25 +49,36 @@ WriteMakefile1(
         prereqs => {
             develop => {
                 requires => {
-                    'Test::CPAN::Changes'                 => 0,
-                    'Test::CheckManifest'                 => 0,
-                    'Module::CPANTS::Analyse'             => '0.96',
-                    'Test::Kwalitee'                      => 0,
-                    'Test::Pod'                           => 0,
-                    'Test::Pod::Coverage'                 => 0,
-                    'Test::Pod::Spelling::CommonMistakes' => 0,
-                    'Test::Spelling'                      => 0,
+                    "Test::CPAN::Changes"                 => 0,
+                    "Test::CheckManifest"                 => 0,
+                    "Module::CPANTS::Analyse"             => "0.96",
+                    "Test::Kwalitee"                      => 0,
+                    "Test::Perl::Critic"                  => 0,
+                    "Perl::Tidy"                          => "20171214",
+                    "Test::PerlTidy"                      => 0,
+                    "Test::Pod"                           => 0,
+                    "Test::Pod::Coverage"                 => 0,
+                    "Test::Pod::Spelling::CommonMistakes" => 0,
+                    "Test::Spelling"                      => 0,
+                },
+                recommends => {
+                    "MooX::Options" => "4.103",
                 },
             },
             configure => {
                 requires => {%CONFIGURE_DEPS},
             },
-            build   => { requires => {%BUILD_DEPS} },
-            test    => { requires => {%TEST_DEPS} },
+            build   => {requires => {%BUILD_DEPS}},
+            test    => {requires => {%TEST_DEPS}},
             runtime => {
                 requires => {
                     %RUN_DEPS,
-                    perl => '5.8.1',
+                    perl => "5.8.1",
+                },
+                recommends => {
+                    "Hash::Merge"          => "0.299",
+                    "MooX::ConfigFromFile" => "0.008",
+                    "Text::Abbrev"         => 0,
                 },
             },
         },
@@ -76,12 +87,12 @@ WriteMakefile1(
     VERSION_FROM       => 'lib/MooX/Cmd.pm',
     ABSTRACT_FROM      => 'lib/MooX/Cmd.pm',
     LICENSE            => 'perl',
-    AUTHOR             => [ q{Jens Rehsack <rehsack@cpan.org>}, q{Torsten Raudssus <torsten@raudss.us>} ],
+    AUTHOR             => [q{Jens Rehsack <rehsack@cpan.org>}, q{Torsten Raudssus <torsten@raudss.us>}],
     PREREQ_PM          => \%RUN_DEPS,
     CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    test               => { TESTS => 't/*.t xt/*.t' },
+    test               => {TESTS => 't/*.t xt/*.t'},
 );
 
 sub WriteMakefile1
@@ -89,37 +100,37 @@ sub WriteMakefile1
     my %params       = @_;
     my $eumm_version = $ExtUtils::MakeMaker::VERSION;
     $eumm_version = eval $eumm_version;
-    die "EXTRA_META is deprecated" if ( exists( $params{EXTRA_META} ) );
-    die "License not specified"    if ( !exists( $params{LICENSE} ) );
+    die "EXTRA_META is deprecated" if (exists($params{EXTRA_META}));
+    die "License not specified"    if (!exists($params{LICENSE}));
     $params{TEST_REQUIRES}
       and $eumm_version < 6.6303
-      and $params{BUILD_REQUIRES} = { %{ $params{BUILD_REQUIRES} || {} }, %{ delete $params{TEST_REQUIRES} } };
+      and $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES} || {}}, %{delete $params{TEST_REQUIRES}}};
     #EUMM 6.5502 has problems with BUILD_REQUIRES
     $params{BUILD_REQUIRES}
       and $eumm_version < 6.5503
-      and $params{PREREQ_PM} = { %{ $params{PREREQ_PM} || {} }, %{ delete $params{BUILD_REQUIRES} } };
+      and $params{PREREQ_PM} = {%{$params{PREREQ_PM} || {}}, %{delete $params{BUILD_REQUIRES}}};
     ref $params{AUTHOR}
       and "ARRAY" eq ref $params{AUTHOR}
       and $eumm_version < 6.5702
-      and $params{AUTHOR} = join( ", ", @{ $params{AUTHOR} } );
-    delete $params{CONFIGURE_REQUIRES}    if ( $eumm_version < 6.52 );
-    delete $params{MIN_PERL_VERSION}      if ( $eumm_version < 6.48 );
-    delete $params{META_MERGE}            if ( $eumm_version < 6.46 );
-    delete $params{META_ADD}{prereqs}     if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}{'meta-spec'} if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}              if ( $eumm_version < 6.46 );
-    delete $params{LICENSE}               if ( $eumm_version < 6.31 );
-    delete $params{AUTHOR}                if ( $] < 5.005 );
-    delete $params{ABSTRACT_FROM}         if ( $] < 5.005 );
-    delete $params{BINARY_LOCATION}       if ( $] < 5.005 );
+      and $params{AUTHOR} = join(", ", @{$params{AUTHOR}});
+    delete $params{CONFIGURE_REQUIRES}    if ($eumm_version < 6.52);
+    delete $params{MIN_PERL_VERSION}      if ($eumm_version < 6.48);
+    delete $params{META_MERGE}            if ($eumm_version < 6.46);
+    delete $params{META_ADD}{prereqs}     if ($eumm_version < 6.58);
+    delete $params{META_ADD}{'meta-spec'} if ($eumm_version < 6.58);
+    delete $params{META_ADD}              if ($eumm_version < 6.46);
+    delete $params{LICENSE}               if ($eumm_version < 6.31);
+    delete $params{AUTHOR}                if ($] < 5.005);
+    delete $params{ABSTRACT_FROM}         if ($] < 5.005);
+    delete $params{BINARY_LOCATION}       if ($] < 5.005);
 
     # more or less taken from Moose' Makefile.PL
-    if ( $params{CONFLICTS} )
+    if ($params{CONFLICTS})
     {
         my $ok = CheckConflicts(%params);
-        exit(0) if ( $params{PREREQ_FATAL} and not $ok );
+        exit(0) if ($params{PREREQ_FATAL} and not $ok);
         my $cpan_smoker = grep { $_ =~ m/(?:CR_SMOKER|CPAN_REPORTER|AUTOMATED_TESTING)/ } keys %ENV;
-        unless ( $cpan_smoker || $ENV{PERL_MM_USE_DEFAULT} )
+        unless ($cpan_smoker || $ENV{PERL_MM_USE_DEFAULT})
         {
             sleep 4 unless ($ok);
         }

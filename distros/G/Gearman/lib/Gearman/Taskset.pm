@@ -1,6 +1,6 @@
 package Gearman::Taskset;
 use version ();
-$Gearman::Taskset::VERSION = version->declare("2.004.010");
+$Gearman::Taskset::VERSION = version->declare("2.004.011");
 
 use strict;
 use warnings;
@@ -225,32 +225,62 @@ sub wait {
     # fd -> Gearman::ResponseParser object
     my %parser;
 
+    my $cb = sub {
+        my ($fd) = shift;
+
+        my $parser = $parser{$fd} ||= Gearman::ResponseParser::Taskset->new(
+            source  => $fd,
+            taskset => $self
+        );
+        eval {
+            $parser->parse_sock($fd);
+            1;
+        } or do {
+
+            # TODO this should remove the fd from the list, and reassign any tasks to other jobserver, or bail.
+            # We're not in an accessible place here, so if all job servers fail we must die to prevent hanging.
+            Carp::croak("Job server failure: $@");
+            } ## end do
+    };
+
     my $io = IO::Select->new($self->{default_sock},
         values %{ $self->{loaned_sock} });
+
+    my $pending_sock;
+    foreach ($io->handles) {
+        (ref($_) eq "IO::Socket::SSL" && $_->pending()) || next;
+
+        $pending_sock = $_;
+        last;
+    }
+
+    if ($pending_sock) {
+        return $cb->($pending_sock);
+    }
 
     while (!$self->{cancelled} && keys %{ $self->{waiting} }) {
         my $time_left = $timeout ? $timeout - Time::HiRes::time() : 0.5;
         my $nfound = select($io->bits(), undef, undef, $time_left);
         if ($timeout && $time_left <= 0) {
+            ## Attempt to fix
+            #  https://github.com/p-alik/perl-Gearman/issues/33
+            #  Mark all tasks of that taskset failed.
+            #  Get all waiting tasks and call their "fail" method one by one
+            #  with the failure reason.
+            for (values %{ $self->{waiting} }) {
+                for (@$_) {
+                    my $func = $_->func;
+                    $_->fail("Task $func elapsed timeout [${timeout}s]");
+                }
+            } ## end for (values %{ $self->{...}})
             $self->cancel;
             return;
-        }
+        } ## end if ($timeout && $time_left...)
+
         next if !$nfound;
         foreach my $fd ($io->can_read()) {
-            my $parser = $parser{$fd}
-                ||= Gearman::ResponseParser::Taskset->new(
-                source  => $fd,
-                taskset => $self
-                );
-            eval { $parser->parse_sock($fd); };
-
-            if ($@) {
-
-                # TODO this should remove the fd from the list, and reassign any tasks to other jobserver, or bail.
-                # We're not in an accessible place here, so if all job servers fail we must die to prevent hanging.
-                Carp::croak("Job server failure: $@");
-            } ## end if ($@)
-        } ## end foreach my $fd ($io->can_read...)
+            $cb->($fd);
+        }
     } ## end while (!$self->{cancelled...})
 } ## end sub wait
 

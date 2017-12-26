@@ -8,7 +8,7 @@ build_requires:
   Net::DNS::Packet: 0
   Net::DNS::Question: 0
   Net::DNS::Resolver: 0
-  Net::DNS::Resolver::Mock: 0
+  Net::DNS::Resolver::Mock: '1.20171219'
   Net::DNS::ZoneFile: 0
   Test::CheckManifest: 0
   Test::File::Contents: 0
@@ -63,4 +63,4 @@ resources:
   bugtracker: https://github.com/fastmail/authentication_milter/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/fastmail/authentication_milter/
-version: '1.001005'
+version: '1.001007'

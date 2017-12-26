@@ -10,7 +10,7 @@ package SOAP::Transport::POP3;
 
 use strict;
 
-our $VERSION = 1.17;
+our $VERSION = '1.24'; # VERSION
 
 use Net::POP3;
 use URI;

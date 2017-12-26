@@ -32,7 +32,7 @@ is $api->{testing}, 1, "testing param to new() ok";
         my $aux = $api->aux($name);
 
         is ref $aux, 'HASH', "aux() returns $name as an href";
-        is keys %$aux, 6, "$name has proper key count";
+        is keys %$aux, 7, "$name has proper key count";
 
         for (qw(id desc pin state override on_time)){
             is exists $aux->{$_}, 1, "$name has directive $_";
@@ -139,11 +139,21 @@ is $api->{testing}, 1, "testing param to new() ok";
 
         $o = $api->aux_override($aux_id, 1);
 
-        is $o, 1, "aux_override() correctly sets override for $aux_id";
+        if ($aux_id eq 'aux3'){
+            is $o, -1, "aux_override() refuses to be set if toggle disabled ($aux_id)"; 
+        }
+        else { 
+            is $o, 1, "aux_override() correctly sets override for $aux_id";
+        }
 
         $o = $api->aux_override($aux_id, 0);
 
-        is $o, 0, "aux_override() can re-set override for $aux_id";
+        if ($aux_id eq 'aux3'){
+            is $o, -1, "aux_override() can't re-set override for $aux_id (toggle disabled)";
+        }
+        else {
+            is $o, 0, "aux_override() can re-set override for $aux_id";
+        }
     }
 
     my $ok = eval { $api->aux_override; 1; };

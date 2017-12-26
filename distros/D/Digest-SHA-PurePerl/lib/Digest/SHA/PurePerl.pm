@@ -4,16 +4,16 @@ require 5.003000;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use vars qw($VERSION @ISA @EXPORT_OK $errmsg);
 use Fcntl qw(O_RDONLY);
 use integer;
 use Carp qw(croak);
 
-$VERSION = '6.00';
+$VERSION = '6.01';
 
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT_OK = ();		# see "SHA and HMAC-SHA functions" below
+@EXPORT_OK = ('$errmsg');	# see "SHA and HMAC-SHA functions" below
 
 # Inherit from Digest::base if possible
 
@@ -896,6 +896,7 @@ sub add_bits {
 sub _bail {
 	my $msg = shift;
 
+	$errmsg = $!;
 	$msg .= ": $!";
 	croak $msg;
 }

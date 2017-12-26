@@ -33,7 +33,7 @@
    "provides" : {
       "ISO::639" : {
          "file" : "lib/ISO/639.pm",
-         "version" : "20171207"
+         "version" : "20171214"
       }
    },
    "release_status" : "stable",
@@ -42,5 +42,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171207"
+   "version" : "20171214"
 }

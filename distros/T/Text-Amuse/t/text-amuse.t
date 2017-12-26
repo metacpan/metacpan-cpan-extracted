@@ -5,7 +5,7 @@ use Text::Amuse::Document;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 93;
+plan tests => 92;
 
 diag "Constructor";
 
@@ -20,10 +20,6 @@ my @expected = (
                 "This    is a test\n",
                 "This    is a test\n",
                );
-
-my $got = $muse->get_lines;
-is_deeply($got, \@expected, "input ok");
-
 
 is_deeply [$muse->raw_body],
   ["This    is a test\n", "This    is a test\n", "\n" ],
@@ -182,7 +178,7 @@ is($parsed[25]->type, "stopblock");
 is($parsed[26]->block, "ul");
 is($parsed[26]->type, "stopblock");
 
-is($parsed[27]->block, "comment");
+is($parsed[27]->block, "inlinecomment");
 is($parsed[28]->type, "regular");
 is scalar(@parsed), 29;
 

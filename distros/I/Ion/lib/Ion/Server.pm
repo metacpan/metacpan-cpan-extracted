@@ -1,6 +1,6 @@
 package Ion::Server;
 # ABSTRACT: An Ion TCP service
-$Ion::Server::VERSION = '0.05';
+$Ion::Server::VERSION = '0.06';
 use common::sense;
 
 use Carp;
@@ -125,7 +125,7 @@ Ion::Server - An Ion TCP service
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 METHODS
 

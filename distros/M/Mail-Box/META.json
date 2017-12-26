@@ -44,7 +44,7 @@
             "File::Remove" : "0.2",
             "File::Spec" : "0.7",
             "IO::Scalar" : "0",
-            "Mail::Message" : "3",
+            "Mail::Message" : "3.005",
             "Mail::Transport" : "3",
             "Object::Realize::Later" : "0.19",
             "POSIX" : "0",
@@ -55,5 +55,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.003"
+   "version" : "3.004"
 }

@@ -3,7 +3,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 29;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 use Data::Dumper;
@@ -37,6 +37,7 @@ my @strings = (
                "<em>à\n<br>\nđ</em>",
                "0",
                "\n0",
+               "=== there =*=",
               );
 
 foreach my $str (@strings) {
@@ -46,9 +47,23 @@ foreach my $str (@strings) {
         {
             my @out = $out->inline_elements($str);
             ok scalar(@out);
-            diag Dumper(\@out);
+            # diag Dumper(\@out);
             diag $out->manage_regular($str);
         }
     }
 }
 
+{
+    my $parser = Text::Amuse::Output->new(document => $doc,
+                                          format => 'ltx');
+    is $parser->manage_regular('=== there =*='), '\texttt{=} there \texttt{*}';
+    is $parser->manage_regular('This (=should be code=).'), 'This (\texttt{should be code}).';
+    is $parser->manage_regular('***Hello there ***'), '***Hello there ***';
+    is $parser->manage_regular('This <code> should work'), 'This <code> should work';
+    is $parser->manage_regular('This <code><code></code> should work'), 'This \texttt{ should work}';
+    is $parser->manage_regular('Same **(*a is paired so it works a*)**'),
+      'Same \textbf{(\emph{a is paired so it works a})}';
+    is $parser->manage_regular('Same =here **(*a is paired so it works a*)** here='),
+      'Same \texttt{here \textbf{(\emph{a is paired so it works a})} here}';
+
+}

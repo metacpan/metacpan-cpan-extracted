@@ -14,33 +14,32 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 65f6fc587cecdc088018c41a62548c304d97524f CONTRIBUTORS
-SHA1 5fe62d30de1905fdbb52412e716bcfe080abc565 Changes
+SHA1 4699f561d8ea1911589f4cb5fbc0ea193238e3d4 CONTRIBUTORS
+SHA1 51fde09553ac9e886c05c964075b0fa525c08267 Changes
 SHA1 dc71f2f76914f43563f8c9b5c94dedffb786e22c INSTALL
 SHA1 c07cb3e4ee204b03d740b5685e1369722e8201ea LICENSE
-SHA1 95b3cf0e9da138573393386ba58071dc5c65741d MANIFEST
-SHA1 a9e38bb676cfe99075ec120276094c2f52f7bbd8 META.json
-SHA1 62b81a0e8197bd34d705be56fd6e0ed64ddc800a META.yml
-SHA1 bd548ac3f80b6b6489cf84e0c398d07740451591 Makefile.PL
+SHA1 ede61e8ad665984ba8dc73cd317671de1e402cd3 MANIFEST
+SHA1 c61568409a2c5ea6c456495eed392accc86f1ffa META.json
+SHA1 e596ee56a771a826919d343c268c4f48874da87d META.yml
+SHA1 942a6d201789512014955fdf643d856c22c583aa Makefile.PL
 SHA1 950f8db4957e1482191f1e28ec5c8a4bea9c9dc1 README
-SHA1 b7b88530ea58b7630278791109a872931e4ced48 README.mkdn
-SHA1 9f11da2cc27952fbfcad13c0e9057cd4af3ee3ae cpanfile
-SHA1 0e5a786fb074087cff2ff0817732fe9cf1d45a0b dist.ini
-SHA1 ba8ba2ba62e465fc7b931158e8e1473fc8ae8ee0 doap.xml
-SHA1 d6f381e87da8578aba3c946e99e804653e2d2f5c lib/PPIx/EditorTools.pm
-SHA1 c58909c66908c566b1a9c00df7b1966aba2462a8 lib/PPIx/EditorTools/FindUnmatchedBrace.pm
-SHA1 6dc22a55cba6d85d36726fbd8bab6cb48f3d8409 lib/PPIx/EditorTools/FindVariableDeclaration.pm
-SHA1 547ff8dfe965feaf21b29e43ba1e05c95be1c196 lib/PPIx/EditorTools/IntroduceTemporaryVariable.pm
-SHA1 3ffae93b4ba004e89046663a108a7de6905447a4 lib/PPIx/EditorTools/Lexer.pm
-SHA1 ce7714a678e87f14abef365f8f81dc1e524d2259 lib/PPIx/EditorTools/Outline.pm
-SHA1 cbfcebe307d0fcd61e520f16c74680271119b306 lib/PPIx/EditorTools/RenamePackage.pm
-SHA1 3a0c79c9ba519003fd941a560b4dc6d57321cbc5 lib/PPIx/EditorTools/RenamePackageFromPath.pm
-SHA1 3f397f3f831e44d6bf39be043e6c2e8357cbba86 lib/PPIx/EditorTools/RenameVariable.pm
-SHA1 501573d1294ec986f47daec724ca3073a9d2503e lib/PPIx/EditorTools/ReturnObject.pm
+SHA1 0d8265a050121b80f17ce18bd3c3d4ca108073a2 README.mkdn
+SHA1 6f4b6d6896959fa219d32bdf4bb5fb4e59cbc36b cpanfile
+SHA1 6444f2e532e5c5b9bf430da9bedf0d513dd83914 doap.xml
+SHA1 5de8f0695a50ab69ffe27eb0f2e598293a47a92f lib/PPIx/EditorTools.pm
+SHA1 0c427c7ae75f359cbfe46ab234aef21508c220ed lib/PPIx/EditorTools/FindUnmatchedBrace.pm
+SHA1 657c530d91d725e3da9ccd599b44e9b83bdc511d lib/PPIx/EditorTools/FindVariableDeclaration.pm
+SHA1 caa83d45b4f3d811a7ed5398bf85318b463d2e9b lib/PPIx/EditorTools/IntroduceTemporaryVariable.pm
+SHA1 837c0aac1f111f58e0d24b2e0bec0a12d0819667 lib/PPIx/EditorTools/Lexer.pm
+SHA1 71b1a51a172ae202e940a46e23d10dee37d8d6d0 lib/PPIx/EditorTools/Outline.pm
+SHA1 319ffea27efc0b09f3bab604d4146397652bac9f lib/PPIx/EditorTools/RenamePackage.pm
+SHA1 0904725e3044dfc472b95d608435789a840a62d9 lib/PPIx/EditorTools/RenamePackageFromPath.pm
+SHA1 dde6a4e6c1f7e91ee0ca22dfa312b864533a520f lib/PPIx/EditorTools/RenameVariable.pm
+SHA1 49bd4a45dd18a06a9409a3e9b9c8bc3bcd2e4707 lib/PPIx/EditorTools/ReturnObject.pm
 SHA1 e7e0e8952cb48e7cd27a950807a2f2dcfb227b38 script/ppix_editortools
 SHA1 20e771be9893e894e065e7674f9df2fcb03033f7 t/00-compile.t
 SHA1 4eb6e5b345bd77b0f12d71f4e5259696362189f7 t/00-ppix-editortools.t
-SHA1 8adac03b6b0aa2bae145c66763ea9e5e96806d32 t/00-report-prereqs.dd
+SHA1 d61ebf2fff63bc8b58bbbea0d5439e14d4c757d8 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 8ede358b2f277a091c497906169f5091ebeda334 t/01-findunmatchedbrace.t
 SHA1 f5e4bf0840ea8c792e08df27c43d34b684688ef9 t/02-findvariabledeclaration.t
@@ -66,7 +65,7 @@ SHA1 9cf8236dd9b2fd02c9e1ad97f14f554a32d51832 t/rename_variable/1.out
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlns4jUACgkQ34Hwf+GwC4zxOgCggQ29x2lQ6wGjgcDEQDqt2KR3
-jwQAn3JMqcBqADk1cMijKNp1rI15GHnC
-=6Oz3
+iEYEARECAAYFAlpAHW8ACgkQ34Hwf+GwC4xcGQCgjcla4AsrHe6d25ZGk5IE968k
+oO8AoOOUI25L7B0hpCrYTSMnvtYNpKIv
+=Xtit
 -----END PGP SIGNATURE-----

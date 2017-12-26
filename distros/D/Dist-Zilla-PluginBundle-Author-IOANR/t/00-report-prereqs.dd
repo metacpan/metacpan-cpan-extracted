@@ -30,6 +30,7 @@ do { my $x = {
                                       'Code::TidyAll' => '0',
                                       'Code::TidyAll::Plugin::Perl::AlignMooseAttributes' => '0',
                                       'Dist::Zilla::Plugin::AssertOS' => '0',
+                                      'Dist::Zilla::Plugin::AuthorSignatureTest' => '0',
                                       'Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes' => '0.173421',
                                       'Dist::Zilla::Plugin::ContributorsFile' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',

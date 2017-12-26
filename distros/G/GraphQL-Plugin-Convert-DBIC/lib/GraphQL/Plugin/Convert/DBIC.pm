@@ -5,7 +5,7 @@ use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -69,8 +69,11 @@ my %TYPEMAP = (
   interval_minute_to_second => 'Int',
   # not DBI SQL_* types
   int => 'Int',
+  # mysql
   text => 'String',
   tinytext => 'String',
+  mediumtext => 'String',
+  longtext => 'String',
 );
 my %TYPE2SCALAR = map { ($_ => 1) } qw(ID String Int Float Boolean);
 

@@ -1,0 +1,13 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    Users' Lists
+  </div>
+  <div class="panel-body">
+    <ul class="nav nav-pills nav-stacked">
+      % for my $user (@{ users() }) {
+      %= t li => link_to $user->{name} => list => {username => $user->{username}}
+      % }
+    </ul>
+  </div>
+</div>
+

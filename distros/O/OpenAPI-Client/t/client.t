@@ -69,6 +69,15 @@ is_deeply $tx->res->json, [{page => 2}], 'call(list pets)';
 eval { $tx = $client->call('nope') };
 like $@, qr{No such operationId.*client\.t}, 'call(nope)';
 
+# this approach from https://metacpan.org/source/SRI/Mojolicious-7.59/t/mojo/promise.t and user_agent.t
+note 'call_p()';
+my $promise = $client->call_p('list pets', {page => 2});
+my (@results, @errors);
+$promise->then(sub { @results = @_ }, sub { @errors = @_ });
+$promise->wait;
+is_deeply $results[0]->res->json, [{page => 2}], 'call_p(list pets)';
+is_deeply \@errors, [], 'promise not rejected';
+
 done_testing;
 
 __DATA__

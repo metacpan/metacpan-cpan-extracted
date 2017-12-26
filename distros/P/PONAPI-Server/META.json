@@ -83,23 +83,23 @@
    "provides" : {
       "PONAPI::Constants" : {
          "file" : "lib/PONAPI/Constants.pm",
-         "version" : "0.003001"
+         "version" : "0.003002"
       },
       "PONAPI::DAO" : {
          "file" : "lib/PONAPI/DAO.pm",
-         "version" : "0.003001"
+         "version" : "0.003002"
       },
       "PONAPI::Exception" : {
          "file" : "lib/PONAPI/Exception.pm",
-         "version" : "0.003001"
+         "version" : "0.003002"
       },
       "PONAPI::Repository" : {
          "file" : "lib/PONAPI/Repository.pm",
-         "version" : "0.003001"
+         "version" : "0.003002"
       },
       "PONAPI::Server" : {
          "file" : "lib/PONAPI/Server.pm",
-         "version" : "0.003001"
+         "version" : "0.003002"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "url" : "https://github.com/mickeyn/PONAPI/tree/master/Server"
       }
    },
-   "version" : "0.003001",
+   "version" : "0.003002",
    "x_contributors" : [
       "Paolo Mazzoncini",
       "Andrei Vereha"

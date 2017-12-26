@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-use File::Slurper 'read_text';
+use File::Slurper 'read_binary';
 use File::Spec;
 use File::Temp;
 
@@ -110,12 +110,13 @@ $svg -> write(output_file_name => $output_file_name);
 # For this test we have to zap the SVG modules' version #s
 # which are embedded in the 2 files.
 
-my($got)				= read_text($output_file_name);
+my($got)				= read_binary($output_file_name);
 $got					= "$1$2" if ($got =~ /(.+)<!--.+-->(.+)/ms);
 my($input_file_name)	= File::Spec -> catfile('data', 'synopsis.svg');
-my($expected)			= read_text($input_file_name);
+my($expected)			= read_binary($input_file_name);
 $expected				= "$1$2" if ($expected =~ /(.+)<!--.+-->(.+)/ms);
+my($result)			 	= $got eq $expected;
 
-ok($got eq $expected, "$output_file_name matches $input_file_name");
+ok($result, "$output_file_name matches $input_file_name");
 
 done_testing;

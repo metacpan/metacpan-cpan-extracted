@@ -12,7 +12,7 @@ typedef struct base91 {
 	SV* output;
 }* Convert__Base91;
 
-Convert__Base91 new(SV* class) {
+Convert__Base91 new(pTHX_ SV* class) {
 	Convert__Base91 self;
 	Newxc(self, 1, struct base91, struct base91);
 	basE91_init(&self->b91);
@@ -20,7 +20,7 @@ Convert__Base91 new(SV* class) {
 	return self;
 }
 
-void encode(Convert__Base91 self, SV* input) {
+void encode(pTHX_ Convert__Base91 self, SV* input) {
 	void *o;
 	char* i;
 	size_t len, max_out_len, ret;
@@ -34,7 +34,7 @@ void encode(Convert__Base91 self, SV* input) {
 	Safefree(o);
 }
 
-SV* encode_end(Convert__Base91 self) {
+SV* encode_end(pTHX_ Convert__Base91 self) {
 	char o[2];
 	size_t ret;
 	SV* out;
@@ -46,7 +46,7 @@ SV* encode_end(Convert__Base91 self) {
 	return out;
 }
 
-void decode(Convert__Base91 self, SV* input) {
+void decode(pTHX_ Convert__Base91 self, SV* input) {
 	void *o;
 	char* i;
 	size_t len, max_out_len, ret;
@@ -59,7 +59,7 @@ void decode(Convert__Base91 self, SV* input) {
 	Safefree(o);
 }
 
-SV* decode_end(Convert__Base91 self) {
+SV* decode_end(pTHX_ Convert__Base91 self) {
 	char o;
 	size_t ret;
 	SV* out;
@@ -71,7 +71,7 @@ SV* decode_end(Convert__Base91 self) {
 	return out;
 }
 
-void DESTROY(Convert__Base91 self) {
+void DESTROY(pTHX_ Convert__Base91 self) {
 	sv_2mortal(self->output);
 	Safefree(self);
 }
@@ -80,13 +80,19 @@ MODULE = Convert::Base91		PACKAGE = Convert::Base91
 PROTOTYPES: ENABLE
 
 Convert::Base91 new(SV* class)
+C_ARGS: aTHX_ class
 
 void encode(Convert::Base91 self, SV* input)
+C_ARGS: aTHX_ self, input
 
 SV* encode_end(Convert::Base91 self)
+C_ARGS: aTHX_ self
 
 void decode(Convert::Base91 self, SV* input)
+C_ARGS: aTHX_ self, input
 
 SV* decode_end(Convert::Base91 self)
+C_ARGS: aTHX_ self
 
 void DESTROY(Convert::Base91 self)
+C_ARGS: aTHX_ self

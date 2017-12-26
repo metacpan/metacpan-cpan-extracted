@@ -83,7 +83,6 @@ foreach my $method (
                 );
             },
             'WebService::PayPal::PaymentsAdvanced::Error::IPVerification',
-            'Bad IP exception'
         );
 
     }

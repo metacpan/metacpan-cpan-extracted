@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 
@@ -591,8 +591,8 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP or by email to
-bug-math-gmp@rt.cpan.org.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP> or by email
+to L<bug-math-gmp@rt.cpan.org|mailto:bug-math-gmp@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -621,7 +621,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Math-GMP>
+L<https://metacpan.org/release/Math-GMP>
 
 =item *
 
@@ -657,14 +657,6 @@ L<http://cpanratings.perl.org/d/Math-GMP>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Math-GMP>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -675,7 +667,7 @@ L<http://cpants.cpanauthors.org/dist/Math-GMP>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/M/Math-GMP>
 

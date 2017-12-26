@@ -1,127 +1,38 @@
 package Kevin::Command::kevin::worker;
-$Kevin::Command::kevin::worker::VERSION = '0.4.1';
+$Kevin::Command::kevin::worker::VERSION = '0.5.5';
 # ABSTRACT: Alternative Minion worker command
 use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util qw(getopt steady_time);
+use Minion::Worker;
+use Mojo::Util 'getopt';
 
 has description => 'Start alternative Minion worker';
 has usage => sub { shift->extract_usage };
 
-use constant TRACE => $ENV{KEVIN_WORKER_TRACE} || 0;
+sub _worker {
+  my $minion = shift;
+  return $minion->kevin_worker(@_) if $minion->can('kevin_worker');
+  my $worker = Minion::Worker->with_roles('+Kevin')->new(minion => $minion, @_);
+  $minion->emit(worker => $worker);
+  return $worker;
+}
 
 sub run {
   my ($self, @args) = @_;
 
-  my $app    = $self->app;
-  my $worker = $self->{worker} = $app->minion->worker;
-  my $status = $worker->status;
-  $status->{performed} //= 0;
-
+  my $defaults = {};
   getopt \@args,
-    'C|command-interval=i'   => \($status->{command_interval}   //= 10),
-    'f|fast-start'           => \my $fast,
-    'I|heartbeat-interval=i' => \($status->{heartbeat_interval} //= 300),
-    'j|jobs=i'               => \($status->{jobs}               //= 4),
-    'q|queue=s'              => ($status->{queues}              //= []),
-    'R|repair-interval=i'    => \($status->{repair_interval}    //= 21600);
-  @{$status->{queues}} = ('default') unless @{$status->{queues}};
+    'C|command-interval=i'   => \$defaults->{command_interval},
+    'f|fast-start'           => \$defaults->{fast_start},
+    'I|heartbeat-interval=i' => \$defaults->{heartbeat_interval},
+    'j|jobs=i'               => \$defaults->{jobs},
+    'q|queue=s@'             => \$defaults->{queues},
+    'R|repair-interval=i'    => \$defaults->{repair_interval};
+  for (keys %$defaults) { delete $defaults->{$_} unless defined $defaults->{$_} }
 
-  my $now = steady_time;
-  $self->{next_heartbeat} = $now if $status->{heartbeat_interval};
-  $self->{next_command}   = $now if $status->{command_interval};
-  if ($status->{repair_interval}) {
-
-    # Randomize to avoid congestion
-    $status->{repair_interval} -= int rand $status->{repair_interval} / 2;
-
-    $self->{next_repair} = $now;
-    $self->{next_repair} += $status->{repair_interval} if $fast;
-  }
-
-  $self->{pid} = $$;
-  local $SIG{CHLD} = sub { };
-  local $SIG{INT} = local $SIG{TERM} = sub { $self->_term(1) };
-  local $SIG{QUIT} = sub { $self->_term };
-
-  # Remote control commands need to validate arguments carefully
-  $worker->add_command(
-    jobs => sub { $status->{jobs} = $_[1] if ($_[1] // '') =~ /^\d+$/ });
-  $worker->add_command(
-    stop => sub { $self->{jobs}{$_[1]}->stop if $self->{jobs}{$_[1] // ''} });
-
-  # Log fatal errors
-  my $log = $app->log;
-  $log->info("Worker $$ started");
-  eval { $self->_work until $self->{finished}; 1 }
-    or $log->fatal("Worker error: $@");
-  $worker->unregister;
-  $log->info("Worker $$ stopped");
-}
-
-sub _term {
-  my ($self, $graceful) = @_;
-  return unless $self->{pid} == $$;
-  $self->{stopping}++;
-  $self->{graceful} = $graceful or kill 'KILL', keys %{$self->{jobs}};
-}
-
-sub _work {
-  my $self = shift;
-
-  my $app    = $self->app;
-  my $log    = $app->log;
-  my $worker = $self->{worker};
-  my $status = $worker->status;
-
-  if ($self->{stopping} && !$self->{quit}++) {
-    $log->info("Stopping worker $$ "
-        . ($self->{graceful} ? 'gracefully' : 'immediately'));
-
-    # Skip hearbeats, remote command and repairs
-    delete @{$status}{qw(heartbeat_interval command_interval )}
-      unless $self->{graceful};
-    delete $status->{repair_interval};
-  }
-
-  # Send heartbeats in regular intervals
-  if ($status->{heartbeat_interval} && $self->{next_heartbeat} < steady_time) {
-    $log->debug('Sending heartbeat') if TRACE;
-    $worker->register;
-    $self->{next_heartbeat} = steady_time + $status->{heartbeat_interval};
-  }
-
-  # Process worker remote control commands in regular intervals
-  if ($status->{command_interval} && $self->{next_command} < steady_time) {
-    $log->debug('Checking remote control') if TRACE;
-    $worker->process_commands;
-    $self->{next_command} = steady_time + $status->{command_interval};
-  }
-
-  # Repair in regular intervals
-  if ($status->{repair_interval} && $self->{next_repair} < steady_time) {
-    $log->debug('Checking worker registry and job queue');
-    $app->minion->repair;
-    $self->{next_repair} = steady_time + $status->{repair_interval};
-  }
-
-  # Check if jobs are finished
-  my $jobs = $self->{jobs} ||= {};
-  $jobs->{$_}->is_finished and ++$status->{performed} and delete $jobs->{$_}
-    for keys %$jobs;
-
-  # Return if worker is finished
-  ++$self->{finished} and return if $self->{stopping} && !keys %{$self->{jobs}};
-
-  # Wait if job limit has been reached or worker is stopping
-  if (($status->{jobs} <= keys %$jobs) || $self->{stopping}) { sleep 1 }
-
-  # Try to get more jobs
-  elsif (my $job = $worker->dequeue(5 => {queues => $status->{queues}})) {
-    $jobs->{my $id = $job->id} = $job->start;
-    my ($pid, $task) = ($job->pid, $job->task);
-    $log->debug(qq{Process $pid is performing job "$id" with task "$task"});
-  }
+  my $app = $self->app;
+  my $worker = _worker($app->minion, defaults => $defaults, log => $app->log);
+  $worker->run;
 }
 
 1;
@@ -165,7 +76,7 @@ sub _work {
 #pod L<Kevin::Command::kevin::worker> starts a L<Minion> worker. You can have as
 #pod many workers as you like.
 #pod
-#pod This is a clone of L<Minion::Command::minion::worker>. The differences are:
+#pod This is a fork of L<Minion::Command::minion::worker>. The differences are:
 #pod
 #pod =over 4
 #pod
@@ -282,7 +193,7 @@ Kevin::Command::kevin::worker - Alternative Minion worker command
 
 =head1 VERSION
 
-version 0.4.1
+version 0.5.5
 
 =head1 SYNOPSIS
 
@@ -321,7 +232,7 @@ version 0.4.1
 L<Kevin::Command::kevin::worker> starts a L<Minion> worker. You can have as
 many workers as you like.
 
-This is a clone of L<Minion::Command::minion::worker>. The differences are:
+This is a fork of L<Minion::Command::minion::worker>. The differences are:
 
 =over 4
 

@@ -2,7 +2,7 @@ package Crypt::PK::ECC;
 
 use strict;
 use warnings;
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
@@ -1094,7 +1094,7 @@ If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc76
 
 =head2 export_key_raw
 
-Export raw public/private key. Public key is exported in ANS X9.63 format (compressed or uncompressed),
+Export raw public/private key. Public key is exported in ASN X9.62 format (compressed or uncompressed),
 private key is exported as raw bytes (padded with leading zeros to have the same size as the ECC curve).
 
  my $pubkey_octets  = $pk->export_key_raw('public');

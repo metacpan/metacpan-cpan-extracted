@@ -9,7 +9,7 @@
 #
 package Reindeer::Role;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Reindeer::Role::VERSION = '0.019';
+$Reindeer::Role::VERSION = '0.020';
 # ABSTRACT: Reindeer in role form
 
 use strict;
@@ -60,7 +60,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl Alex Balhatchet
+=for :stopwords Chris Weyl Alex Balhatchet Fowler Mark
 
 =head1 NAME
 
@@ -68,7 +68,7 @@ Reindeer::Role - Reindeer in role form
 
 =head1 VERSION
 
-This document describes version 0.019 of Reindeer::Role - released June 09, 2017 as part of Reindeer.
+This document describes version 0.020 of Reindeer::Role - released December 20, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,7 @@ my @files = (
     'lib/Reindeer/Util.pm',
     't/00-check-deps.t',
     't/00-compile.t',
+    't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/basic_load.t',
     't/builder/basic.t',

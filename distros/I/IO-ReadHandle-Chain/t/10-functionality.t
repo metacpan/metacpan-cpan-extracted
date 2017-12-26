@@ -1,4 +1,4 @@
-#*!perl -T
+#!perl -T
 use 5.006;
 use strict;
 use warnings;
@@ -155,6 +155,10 @@ $n = $cfh->read($buffer, 10, $pos);
 is($n, 1, 'read next byte');
 is($buffer, "ext3\ntext4", 'next bytes');
 
+$n = $cfh->read($buffer, 100);
+is($n, 0, 'end of data');
+is($buffer, '', 'means empty buffer');
+
 $cfh->close;
 
 $cfh = IO::ReadHandle::Chain->new(\$source2, "$tmp");
@@ -228,4 +232,4 @@ if (open my $ofh, '>', $fname) {
   ++$skipped;
 }
 
-done_testing(25 - $skipped);
+done_testing(27 - $skipped);

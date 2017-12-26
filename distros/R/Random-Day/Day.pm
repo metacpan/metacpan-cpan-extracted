@@ -1,10 +1,8 @@
 package Random::Day;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use DateTime;
 use DateTime::Event::Random;
@@ -12,8 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -358,11 +355,9 @@ Random::Day - Class for random day generation.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Random::Day;
 
  # Object.
@@ -402,17 +397,17 @@ L<https://github.com/tupinek/Random-Day>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
+ © Michal Josef Špaček 2013-2017
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

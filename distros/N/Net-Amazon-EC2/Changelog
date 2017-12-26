@@ -1,3 +1,6 @@
+0.33   2017-12-18
+       Maik Hentsche    Fix stateReason for empty hash (GH#54)
+
 0.32   2017-03-06
        Stephen Day      DRY code. Fix whitespace. (GH#47)
        Brett Estrade    Fix POD for run_instance parameters (GH#48)

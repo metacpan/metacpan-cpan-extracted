@@ -1,3 +1,22 @@
 #!/bin/sh
-ulimit -n 655350;ulimit -u 102400;ulimit -s 10240;
-exec $MYDanPATH/dan/agent/bin/keyupdate  --url https://raw.githubusercontent.com/MYDan/key/master/keyupdate 2>&1
+if [ ! -f $MYDanPATH/etc/env ];then
+    echo "on env file: $MYDanPATH/etc/env"
+    exit;
+fi
+
+source $MYDanPATH/etc/env
+
+if [ -z $MYDAN_KEY_UPDATE ];then
+    echo "not MYDAN_KEY_UPDATE"
+
+    if [ -z $ORGANIZATION ];then
+	echo  "not ORGANIZATION"
+        exit;
+    fi
+
+    MYDAN_KEY_UPDATE=https://raw.githubusercontent.com/$ORGANIZATION/key/master/keyupdate
+fi
+
+echo update: $MYDAN_KEY_UPDATE
+
+exec $MYDanPATH/dan/agent/bin/keyupdate  --url $MYDAN_KEY_UPDATE 2>&1

@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use App::CISetup::Travis::ConfigFile;
 use App::CISetup::Types qw( Bool CodeRef Dir Str );
@@ -115,7 +115,7 @@ sub _stored_params_from_file {
     return
         unless my ($yaml)
         = $file->slurp_utf8
-        =~ /### __app_cisetup__\n(.+)### __app_cisetup__/s;
+        =~ /### __app_cisetup__\r?\n(.+)### __app_cisetup__/s;
 
     $yaml =~ s/^# //mg;
 

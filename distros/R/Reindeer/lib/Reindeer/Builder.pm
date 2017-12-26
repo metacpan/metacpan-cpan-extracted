@@ -9,7 +9,7 @@
 #
 package Reindeer::Builder;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Reindeer::Builder::VERSION = '0.019';
+$Reindeer::Builder::VERSION = '0.020';
 # ABSTRACT: Easily build a new 'Reindeer' style class
 
 use strict;
@@ -79,7 +79,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl Alex Balhatchet metaclass
+=for :stopwords Chris Weyl Alex Balhatchet Fowler Mark metaclass
 
 =head1 NAME
 
@@ -87,7 +87,7 @@ Reindeer::Builder - Easily build a new 'Reindeer' style class
 
 =head1 VERSION
 
-This document describes version 0.019 of Reindeer::Builder - released June 09, 2017 as part of Reindeer.
+This document describes version 0.020 of Reindeer::Builder - released December 20, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 

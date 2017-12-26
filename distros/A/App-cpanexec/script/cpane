@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+#
+# https://github.com/oklas/cpanexec
+
+use strict;
+use local::lib;
+
+die "Script or execuble may be with args required\n"
+  unless scalar @ARGV;
+
+die "There is no folder 'local' in current dir\n"
+  unless -d "./local";
+
+local::lib->setup_env_hash_for("./local");
+
+system @ARGV;

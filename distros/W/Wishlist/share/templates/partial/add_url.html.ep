@@ -1,0 +1,11 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    Add Item by URL
+  </div>
+  <div class="panel-body">
+    %= form_for 'show_add' => begin
+      <input name="url" class="form-control">
+    % end
+  </div>
+</div>
+

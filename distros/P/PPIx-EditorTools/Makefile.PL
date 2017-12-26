@@ -29,24 +29,17 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Class::Accessor" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Method::Signatures" => 0,
-    "Moose" => 0,
-    "MooseX::Declare" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
-    "autodie" => 0,
-    "lib" => 0,
-    "version" => 0
+    "Test::Most" => 0
   },
-  "VERSION" => "0.20",
+  "VERSION" => "0.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +48,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Class::Accessor" => 0,
   "Class::XSAccessor" => "1.02",
   "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
@@ -63,9 +55,6 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Method::Signatures" => 0,
-  "Moose" => 0,
-  "MooseX::Declare" => 0,
   "PPI" => "1.203",
   "PPI::Find" => 0,
   "Test::Differences" => 0,
@@ -73,11 +62,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Most" => 0,
   "Try::Tiny" => 0,
-  "autodie" => 0,
   "base" => 0,
-  "lib" => 0,
   "strict" => 0,
-  "version" => 0,
   "warnings" => 0
 );
 

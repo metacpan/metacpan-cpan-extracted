@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =cut
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 
 =head1 SYNOPSIS
@@ -147,6 +147,11 @@ first the non-break spaces are removed, then reinserted.
 
 Add non-break spaces where appropriate (whatever this means).
 
+=head3 show_nbsp
+
+Make the non-break spaces visible and explicit as ~~ (available on
+Text::Amuse since version 0.94).
+
 =head3 fix_footnotes
 
 Rearrange the footnotes if needed. Default to false.
@@ -171,6 +176,7 @@ sub new {
                 fix_typography  => 0,
                 fix_footnotes   => 0,
                 remove_nbsp     => 0,
+                show_nbsp       => 0,
                 fix_nbsp        => 0,
                 debug  => 0,
                 input  => undef,
@@ -214,6 +220,10 @@ sub fix_typography {
 
 sub remove_nbsp {
     return shift->{remove_nbsp};
+}
+
+sub show_nbsp {
+    return shift->{show_nbsp};
 }
 
 sub fix_nbsp {
@@ -281,6 +291,7 @@ sub process {
     my $fixlinks = $self->fix_links;
     my $fixtypo = $self->fix_typography;
     my $remove_nbsp = $self->remove_nbsp;
+    my $show_nbsp = $self->show_nbsp;
     my $lang = $self->_get_lang;
 
     if ($lang && $fixtypo) {
@@ -324,6 +335,9 @@ sub process {
         $line =~ s/\x{ad}\s*//g;
         if ($remove_nbsp) {
             $line =~ s/\x{a0}/ /g;
+        }
+        elsif ($show_nbsp) {
+            $line =~ s/\x{a0}/~~/g;
         }
         if ($fixtypo) {
             $line =~ s/(?<=\.) (?=\.)//g; # collapse the dots

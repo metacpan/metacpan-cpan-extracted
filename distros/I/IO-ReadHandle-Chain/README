@@ -1,6 +1,6 @@
 IO-ReadHandle-Chain
 
-The current version is 1.0.
+The current version is 1.1.0.
 
 This module chains any number of data sources (scalar, file, IO
 handle) together for reading through a single file read handle.
@@ -28,6 +28,9 @@ other file handle.
     $bytecount = read($cfh, $buffer, 100);
     $bytecount = sysread($cfh, $buffer, 100);
 
+    # or single characters
+    $c = getc($cfh);
+
     close($cfh);
 
     # OO, too
@@ -35,6 +38,7 @@ other file handle.
     @lines = $cfh->getlines;
     $bytecount = $cfh->read($buffer, $size, $offset);
     $bytecount = $cfh->sysread($buffer, $size, $offset);
+    $c = $cfh->getc;
     $cfh->close;
     print "end!\n" if $cfh->eof;
 

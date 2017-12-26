@@ -1,9 +1,7 @@
 package Dancer::Plugin::MobileDevice;
-{
-  $Dancer::Plugin::MobileDevice::VERSION = '0.05';
-}
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: make a Dancer app mobile-aware
-
+$Dancer::Plugin::MobileDevice::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -11,30 +9,25 @@ use Dancer ':syntax';
 use Dancer::Plugin;
 
 register 'is_mobile_device' => sub {
-    return request->user_agent =~
-        /(?:iP(?:ad|od|hone)|Android|BlackBerry|Mobile|Palm)/
-      ? 1 : 0;
+    no warnings 'uninitialized';
+    return request->user_agent 
+        =~ /(?:iP(?:ad|od|hone)|Android|BlackBerry|Mobile|Palm)/ || 0 ;
 };
 
 hook before => sub {
     # If we don't have a mobile layout declared, do nothing.
-    my $settings = plugin_setting || {};
+    my $mobile_layout = plugin_setting->{mobile_layout}
+        and is_mobile_device()
+        or return;
 
-    if (my $mobile_layout = $settings->{mobile_layout}) {
-        # OK, remember the original layout setting (so we can restore it
-        # after the request), and override it with the specified mobile layout.
-        if (is_mobile_device()) {
-            var orig_layout => setting('layout');
-            setting layout => $mobile_layout;
-        }
-    }
+    var orig_layout => setting('layout');
+    setting layout => $mobile_layout;
 };
 
 hook after => sub {
-    my $settings = plugin_setting || {};
-    if ( $settings->{mobile_layout} && is_mobile_device() ) {
-        setting layout => delete vars->{orig_layout};
-    }
+    setting layout => delete vars->{orig_layout}
+        if plugin_setting->{mobile_layout}
+        and is_mobile_device();
 };
 
 hook before_template => sub {
@@ -42,7 +35,7 @@ hook before_template => sub {
     $tokens->{'is_mobile_device'} = is_mobile_device();
 };
 
-register_plugin for_versions => [ 1, 2 ];
+register_plugin;
 
 1;
 
@@ -50,13 +43,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dancer::Plugin::MobileDevice - make a Dancer app mobile-aware
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -143,7 +138,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Alexis Sukrieh.
+This software is copyright (c) 2017, 2013, 2012, 2010 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

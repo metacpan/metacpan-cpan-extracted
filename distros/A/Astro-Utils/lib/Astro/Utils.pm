@@ -1,6 +1,6 @@
 package Astro::Utils;
 
-$Astro::Utils::VERSION   = '0.05';
+$Astro::Utils::VERSION   = '0.06';
 $Astro::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Astro::Utils - Utility package for Astronomical Calculations.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

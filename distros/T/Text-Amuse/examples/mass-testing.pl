@@ -8,6 +8,8 @@ use Path::Tiny;
 use Data::Dumper::Concise;
 use lib "$FindBin::Bin/../lib";
 use Text::Amuse;
+binmode STDOUT, ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)";
 
 my ($in, $out) = @ARGV;
 die "Missing arguments input and output directory" unless $in && $out;

@@ -49,7 +49,7 @@ my $api = App::RPi::EnvUI::API->new(
         my $name = "aux$_";
         my $aux = $db->aux($name);
         is ref $aux, 'HASH', "aux() returns an href for $name";
-        is keys %$aux, 6, "aux() $name has proper count keys";
+        is keys %$aux, 7, "aux() $name has proper count keys";
     }
 }
 
@@ -83,7 +83,7 @@ my $api = App::RPi::EnvUI::API->new(
     );
 
     my @values = qw(
-        15 3 4 -1 0 America/Edmonton
+        15 3 4 -1 0 America/Vancouver
     );
 
     my $i = 0;
@@ -98,11 +98,11 @@ my $api = App::RPi::EnvUI::API->new(
 { # config_light()
 
     my @directives = qw(
-        on_at on_hours on_time off_time toggle enable
+        on_at on_hours on_time off_time enable
     );
 
     my @values = qw(
-        18:00 12 0 0 disabled 0
+        18:00 12 0 0 0
     );
 
     is @directives, @values, "config_light() test is set up equally";

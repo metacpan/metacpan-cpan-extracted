@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use MooX::HandlesVia;
 use MooX::StrictConstructor;
@@ -69,7 +69,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromHTTP - Response object for W
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 DESCRIPTION
 

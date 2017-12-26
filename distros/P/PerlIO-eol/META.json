@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
-            "Test::Kwalitee::Extra" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.96",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
@@ -45,15 +45,14 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "blib" : "1.01"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "PerlIO::eol" : {
          "file" : "lib/PerlIO/eol.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -64,10 +63,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shlomif/perl-PerlIO-eol.git",
-         "web" : "https://github.com/shlomif/perl-PerlIO-eol"
+         "url" : "https://github.com/shlomif/PerlIO-eol.git",
+         "web" : "https://github.com/shlomif/PerlIO-eol"
       }
    },
-   "version" : "0.16"
+   "version" : "0.17",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

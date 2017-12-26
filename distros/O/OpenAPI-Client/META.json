@@ -1,7 +1,7 @@
 {
    "abstract" : "A client for talking to an Open API powered server",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Ed J <mohawk2@users.noreply.github.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -33,21 +31,34 @@
       "runtime" : {
          "requires" : {
             "JSON::Validator" : "1.07",
-            "Mojolicious" : "7.40",
+            "Mojolicious" : "7.53",
             "Mojolicious::Plugin::OpenAPI" : "1.22"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/jhthorsen/openapi-client/issues"
+      "X_dynamic_config" : 0,
+      "X_metaspec" : {
+         "version" : 2
       },
-      "homepage" : "https://github.com/jhthorsen/openapi-client",
-      "repository" : {
-         "url" : "https://github.com/jhthorsen/openapi-client.git"
+      "X_resources" : {
+         "bugtracker" : {
+            "web" : "https://github.com/jhthorsen/openapi-client/issues"
+         },
+         "homepage" : "https://github.com/jhthorsen/openapi-client",
+         "repository" : {
+            "type" : "git",
+            "url" : "https://github.com/jhthorsen/openapi-client.git",
+            "web" : "https://github.com/jhthorsen/openapi-client"
+         }
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

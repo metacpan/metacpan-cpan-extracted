@@ -1,7 +1,7 @@
 package Git::CPAN::Patch::Command::SendEmail;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: use C<git-send-email> to submit patches to CPAN RT
-$Git::CPAN::Patch::Command::SendEmail::VERSION = '2.3.1';
+$Git::CPAN::Patch::Command::SendEmail::VERSION = '2.3.2';
 use 5.10.0;
 
 use strict;
@@ -40,7 +40,7 @@ Git::CPAN::Patch::Command::SendEmail - use C<git-send-email> to submit patches t
 
 =head1 VERSION
 
-version 2.3.1
+version 2.3.2
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

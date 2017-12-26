@@ -38,7 +38,7 @@
             "MIME::Base64" : "3.14",
             "Map::Tube::Exception" : "3.12",
             "Moo::Role" : "2.000000",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -46,11 +46,11 @@
    "provides" : {
       "Map::Tube::Plugin::Graph" : {
          "file" : "lib/Map/Tube/Plugin/Graph.pm",
-         "version" : "0.28"
+         "version" : "0.30"
       },
       "Map::Tube::Plugin::Graph::Utils" : {
          "file" : "lib/Map/Tube/Plugin/Graph/Utils.pm",
-         "version" : "0.28"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Plugin-Graph"
       }
    },
-   "version" : "0.28",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

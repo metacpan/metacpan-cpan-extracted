@@ -4,7 +4,7 @@ use Test::More;
 use Text::Amuse::Element;
 use Text::Amuse::Document;
 
-plan tests => 257;
+plan tests => 259;
 
 sub test_line {
     my $string = shift;
@@ -105,7 +105,7 @@ test_line("     c. ciao", {
                            indentation => 7,
                       });
 
-foreach my $bl (qw/biblio play comment
+foreach my $bl (qw/biblio play
                    center right quote/) {
     test_line("<$bl> \n", {
                           type => "startblock",
@@ -119,7 +119,7 @@ foreach my $bl (qw/biblio play comment
                          });
 };
 
-foreach my $bl (qw/verse example/) {
+foreach my $bl (qw/verse example comment/) {
     test_line("<$bl> \n", {
                              type => $bl,
                              block => $bl,
@@ -205,10 +205,10 @@ test_line("[1450]  hello", {
                        });
 
 test_line("; comment", {
-                        type => 'comment',
-                        block => 'comment',
-                        removed => '; comment',
-                        string => "",
+                        type => 'inlinecomment',
+                        block => 'inlinecomment',
+                        removed => ';',
+                        string => "comment",
                        });
 
 test_line(" table | table", {

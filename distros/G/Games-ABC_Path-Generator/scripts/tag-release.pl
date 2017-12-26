@@ -19,7 +19,7 @@ if (!defined ($version))
 my $mini_repos_base = 'https://svn.berlios.de/svnroot/repos/fc-solve/abc-path';
 
 my @cmd = (
-    "hg", "tag", "-m",
+    "git", "tag", "-m",
     "Tagging the Games-ABC_Path-Generator release as $version",
     "Games-ABC_Path-Generator-$version"
 );

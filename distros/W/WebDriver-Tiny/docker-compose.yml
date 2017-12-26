@@ -1,0 +1,20 @@
+version: '2'
+services:
+    geckodriver:
+        image: quay.io/cvlibrary/geckodriver
+        logging:
+            driver: none
+    httpd:
+        image: trinitronx/python-simplehttpserver
+        logging:
+            driver: none
+        volumes:
+            - ./xt/www:/var/www
+    test:
+        build: .
+        depends_on:
+            - geckodriver
+            - httpd
+        volumes:
+            - .:/root
+

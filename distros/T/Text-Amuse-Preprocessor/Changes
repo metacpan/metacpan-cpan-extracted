@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.51 2017-12-26
+
+ - Add support to make non-break spaces explicit --show-nbsp
+
 0.50 2017-12-10
 
  - Add support for secondary footnote rewrite/renumbering

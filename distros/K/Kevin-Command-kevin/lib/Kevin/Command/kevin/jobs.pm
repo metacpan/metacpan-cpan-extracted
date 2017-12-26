@@ -1,6 +1,6 @@
 
 package Kevin::Command::kevin::jobs;
-$Kevin::Command::kevin::jobs::VERSION = '0.4.1';
+$Kevin::Command::kevin::jobs::VERSION = '0.5.5';
 # ABSTRACT: Command to list Minion jobs
 use Mojo::Base 'Mojolicious::Command';
 
@@ -26,10 +26,11 @@ sub run {
     'S|state=s'  => \$options->{state},
     't|task=s'   => \$options->{task};
 
-  my $jobs = $minion->backend->list_jobs($offset, $limit, $options);
+  my $results = $minion->backend->list_jobs($offset, $limit, $options);
+  my $items = $results->{jobs};
 
   my $spec = $self->_table_spec;
-  render_table($jobs, $spec);
+  render_table($items, $spec);
 }
 
 *_created_since = *Kevin::Commands::Util::_created_since;
@@ -131,7 +132,7 @@ Kevin::Command::kevin::jobs - Command to list Minion jobs
 
 =head1 VERSION
 
-version 0.4.1
+version 0.5.5
 
 =head1 SYNOPSIS
 

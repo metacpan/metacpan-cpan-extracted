@@ -1,5 +1,26 @@
 Revision history for Test::Roo::DataDriven
 
+v0.3.0    2017-12-21 17:27:27+00:00 Europe/London
+  [Enhancements]
+  - Allow @ARGV to override files, #2.
+
+  [Documentation]
+  - Change example of skipped test for consistency.
+
+  - Added note about minimum Perl version.
+
+  [Toolchain]
+  - Include cpanfile in the distribution.
+
+v0.2.2    2017-12-20 13:57:22+00:00 Europe/London
+  [Documentation]
+  - Document how to skip all tests, #1.
+
+  [Tests]
+  - Remove language-specific error check, #6.
+
+  - Add test for skip_all, #1.
+
 v0.2.1    2017-12-18 01:18:37+00:00 Europe/London
   [Tests]
   - Skip error tests if the locale language is not English,

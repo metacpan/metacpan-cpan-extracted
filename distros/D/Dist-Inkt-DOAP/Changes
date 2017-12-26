@@ -3,8 +3,15 @@ Dist-Inkt-DOAP
 
 Created:      2014-05-26
 Home page:    <https://metacpan.org/release/Dist-Inkt-DOAP>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-DOAP>
+Bug tracker:  <https://github.com/kjetilk/p5-dist-inkt-doap/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.100	2017-12-22
+
+ - Added: Use RDF::DOAP::Project method to find IRC channel.
+ - Replace List::MoreUtils with List::Util.
+ - Some minor changes.
 
 0.022	2014-09-23
 

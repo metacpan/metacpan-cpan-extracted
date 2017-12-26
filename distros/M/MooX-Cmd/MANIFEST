@@ -2,8 +2,12 @@ Changes
 etc/04-moox-configfromfile.t-check-it.json
 etc/04-moox-configfromfile.t-check.json
 etc/04-moox-configfromfile.t.json
+etc/06-abbrev-configfromfile.t-thuruksbeard.json
+etc/06-abbrev-configfromfile.t-thurukspride.json
+etc/06-abbrev-configfromfile.t.json
 lib/MooX/Cmd.pm
 lib/MooX/Cmd/Role.pm
+lib/MooX/Cmd/Role/AbbrevCmds.pm
 lib/MooX/Cmd/Role/ConfigFromFile.pm
 lib/MooX/Cmd/Tester.pm
 Makefile.PL
@@ -15,6 +19,14 @@ t/01-simple.t
 t/02-moox-options.t
 t/03-params.t
 t/04-moox-configfromfile.t
+t/05-text-abbrev.t
+t/06-abbrev-configfromfile.t
+t/lib/AbbrevApp.pm
+t/lib/AbbrevApp/Cmd/ThuruksBeard.pm
+t/lib/AbbrevApp/Cmd/ThuruksPride.pm
+t/lib/ConfigAbbrevApp.pm
+t/lib/ConfigAbbrevApp/Cmd/ThuruksBeard.pm
+t/lib/ConfigAbbrevApp/Cmd/ThuruksPride.pm
 t/lib/ConfigApp.pm
 t/lib/ConfigApp/Cmd/Check.pm
 t/lib/ConfigApp/Cmd/Check/Cmd/It.pm

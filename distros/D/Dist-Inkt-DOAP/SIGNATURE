@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
-SHA1 c5d1e698b8399e1f86533cd5fd978c03fc1b4cab COPYRIGHT
-SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 ae47a78174d1d80c2a640feee4d73056256068eb Changes
+SHA1 901a18b58f00afe43bc4e586a1a11cf418da7a7e COPYRIGHT
+SHA1 bb0bfc2ab454eef85345e9edf18f4d09be22dc64 CREDITS
+SHA1 7d94840f91adcc390f9b7deaad4ed642aae9174a Changes
 SHA1 a1002b6c3b308181b7373ebe585f490d7ad36148 INSTALL
-SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
-SHA1 b16185159db6940d7608332f757071b0648687f7 MANIFEST
-SHA1 8056a2b28695805c8f3dd71f5a562e0dfa6901ae META.json
-SHA1 b9ab99eb12ffb50430024815aa04180737d0e79a META.yml
-SHA1 2b71801682becc7559a7a550cb1ee860fb333b64 Makefile.PL
-SHA1 00ffa075013d6740e2aa9b4f2eed6fd00f509757 README
+SHA1 1afd04fac8d7ac4c1394adc84336667e82af1717 LICENSE
+SHA1 82d9b9e8af014b4af1200915bc76953899007fa0 MANIFEST
+SHA1 7f68d248bb82bed701733176b4b80789f6e3d340 META.json
+SHA1 e4d1b098b915f8cb51937d6127f377e28d6b9066 META.yml
+SHA1 80f8705b5daa97243c63fde94c36459018e77d2a Makefile.PL
+SHA1 dfae56f1594bed53e3558513ac3dfee0eaae94e8 README
+SHA1 3724b5c326a491f455b40aac9e73251946bba911 README.pod
 SHA1 202ca9127a417b5bfde070b3c48126613484081f dist.ini
-SHA1 b3a152b6712aa016a129cec1269aa7914f9443e4 doap.ttl
-SHA1 e8ba923bddfcea419220246f66fbce6a376a4cd5 lib/Dist/Inkt/DOAP.pm
-SHA1 b587568175379efbf0023490f545d13223eb0a75 lib/Dist/Inkt/Role/DetermineRightsFromRdf.pm
-SHA1 b65e7c2bbdaea666799efe59e9ac08a8989ce267 lib/Dist/Inkt/Role/ProcessDOAP.pm
-SHA1 e1a6a4bf2a5d5e688fd1bfbcd6220919d53cd5a1 lib/Dist/Inkt/Role/ProcessDOAPDeps.pm
-SHA1 fab44e8201888820173f30da325098fd56617a52 lib/Dist/Inkt/Role/RDFModel.pm
-SHA1 63bf9adde2d7cd592970920c38cd0464625edad1 lib/Dist/Inkt/Role/ReadMetaDir.pm
-SHA1 4a99341ecbd81e9134fcfd6b61c4f5090b21a8cd lib/Dist/Inkt/Role/Test/Changes.pm
-SHA1 2f6e2b27767be566279682779a7535531ecb3650 lib/Dist/Inkt/Role/WriteCOPYRIGHT.pm
-SHA1 06a47ba07bbc6e06b66eaca0712b0c11d3065418 lib/Dist/Inkt/Role/WriteCREDITS.pm
-SHA1 cd6d087310232db03c746f380c83b0d88118929e lib/Dist/Inkt/Role/WriteChanges.pm
-SHA1 f08a4f7b8b515234ffc29ae5ec842919c2fbd089 lib/Dist/Inkt/Role/WriteDOAP.pm
+SHA1 170b2cdd0426f3f15d5d0b79f234377207b6be77 doap.ttl
+SHA1 3724b5c326a491f455b40aac9e73251946bba911 lib/Dist/Inkt/DOAP.pm
+SHA1 fa8efdcb3ff0af4bb6d1d91e06acbd3bceb119ab lib/Dist/Inkt/Role/DetermineRightsFromRdf.pm
+SHA1 d7e07954ac3733a5eaab76cfe8a15655e1f13e88 lib/Dist/Inkt/Role/ProcessDOAP.pm
+SHA1 96d23200db75110a3f385675bf7d352314399362 lib/Dist/Inkt/Role/ProcessDOAPDeps.pm
+SHA1 d27e74e63c97642eeabec1055884d3ce9cd766b5 lib/Dist/Inkt/Role/RDFModel.pm
+SHA1 de2863dcaa9f55bb745e5be2206e80b96b731f9a lib/Dist/Inkt/Role/ReadMetaDir.pm
+SHA1 8bc049a2a9c087513167d71fd3d23856b93ef696 lib/Dist/Inkt/Role/Test/Changes.pm
+SHA1 1c84501cf8ae482f99f965e147317cd8aa0cab82 lib/Dist/Inkt/Role/WriteCOPYRIGHT.pm
+SHA1 e84de8b013a763d53a4d5e20a07273b6c2dcc7a0 lib/Dist/Inkt/Role/WriteCREDITS.pm
+SHA1 b7d70d5185d50a3ad41aead30eef314de19a22d9 lib/Dist/Inkt/Role/WriteChanges.pm
+SHA1 f05db47697504580c56f0e4bddd3ba4e84a6da64 lib/Dist/Inkt/Role/WriteDOAP.pm
 SHA1 6b2c9e34c9b04ef8173d43990dcf6ccafaf34704 t/01basic.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlQhvY8ACgkQzr+BKGoqfTkvfQCgjUnZ4+KyXdii9468P/I5jQ7D
-U9MAnR3kq0oGsxp+fP/41JhDnB2QvlMe
-=RXY0
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlo8URwACgkQf77o3zqe
+SqWEtw/+L825PaNj8yn2TckC+l6r3Lw5WKuqv7wn7ZLr1yrEyeXgfOs+ZktsSf7t
+F07K9spPjErNxNtXygAjoLWS5XjsAcoVhFO6jjG6rEsH0gLgXjZfBaPTM0ZdBf3h
+c23d1XYaFJ5edAAXwRNNVuyV7kfJZfj/0JuWKSVzdYf4FpswLGCrIcJJb4QzW/Qg
+sELDrSjVmHcOj5V1mG4TNG/A/8yIUKnLjSha43pYtNOkTObcyCFG9VvhW9dwUiG6
+YZAgSqXeYjOs8lYDUPjxe7bjo/EMMpLYN0PB6Rx4MXvbI2QKVAcNjZqOJGAy/+sb
+cdNq/wcBpO4n2M2oMXobAHLr75mKq/+TpOoTb4rdnUfeW3fcYVHdmVyvNYhKQDOd
+08So/DsjXkqGui2xGvhAMD/lwg4agnMUKqvgowQHJwm9PTtN970Hw8KJ1hSrxF/W
+rThl6RQNGMPYYjZZZqd46QDpl9qi6Z5izIxjRmB5bF0gAKTOt+2Tn6mUeFf7pFZK
+5omVHewtA7V2nJcxSvLbAE3CvRJ6QXET6vztyyMKb36j870z7m78FT32PsualGo5
+QXIsi+K131CRh8SE9yzhtnG0tFbSxCMcHbrJqBfUUJ3j/ZiX9nGRvF0JSu0/lX3R
+xa66QKIJ6f1+Au4w9M/JGqqwCKLJfz6Gcj4N3Pw4RvVqK90LHSc=
+=c0pX
 -----END PGP SIGNATURE-----

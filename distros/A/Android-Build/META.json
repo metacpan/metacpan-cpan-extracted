@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20171004",
+            "Data::Table::Text" : "20171223",
             "File::Copy" : "0",
             "POSIX" : "0",
             "Test2::API" : "0",
@@ -34,7 +34,7 @@
    "provides" : {
       "Android::Build" : {
          "file" : "lib/Android/Build.pm",
-         "version" : "20171125"
+         "version" : "20171224"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171125"
+   "version" : "20171224"
 }

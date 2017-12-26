@@ -8,7 +8,7 @@ Mail::Message::Field::Address - One e-mail address
 
  Mail::Message::Field::Address
    is a Mail::Identity
-   is a User::Identity::Item
+   is an User::Identity::Item
 
 =head1 SYNOPSIS
 
@@ -261,8 +261,8 @@ The collection with $name does not exist and can not be created.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.003,
-built on November 08, 2017.
+This module is part of Mail-Message distribution version 3.005,
+built on December 22, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

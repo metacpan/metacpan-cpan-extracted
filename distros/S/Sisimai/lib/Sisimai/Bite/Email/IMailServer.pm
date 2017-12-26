@@ -121,7 +121,7 @@ sub scan {
             # Original message follows.
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A(.+)[ ](.+)[:][ \t]*([^ ]+[@][^ ]+)/ ) {
+            if( $e =~ m/\A([^ ]+)[ ]([^ ]+)[:][ \t]*([^ ]+[@][^ ]+)/ ) {
                 # Unknown user: kijitora@example.com
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -144,7 +144,8 @@ sub scan {
 
             } else {
                 # Other error message text
-                $v->{'alterrors'} .= ' '.$e if length $v->{'alterrors'};
+                $v->{'alterrors'} //= '';
+                $v->{'alterrors'}  .= ' '.$e if length $v->{'alterrors'};
                 if( $e =~ $Re1->{'error'} ) {
                     # Body of message generated response:
                     $v->{'alterrors'} = $e;

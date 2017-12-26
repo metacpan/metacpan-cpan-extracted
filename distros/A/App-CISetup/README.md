@@ -4,7 +4,7 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 # VERSION
 
-version 0.11
+version 0.13
 
 # DESCRIPTION
 

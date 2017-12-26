@@ -1,12 +1,25 @@
 Revision history for DBIx-FileStore
 
+0.33    2017/12/22
+        Update dependencies in dist.ini.
+
+0.32    2017/12/20
+        Update example table sql.
+
+0.31    2017/12/20
+        Update pod and README.
+
+0.30    2017/12/20
+        Use Mouse instead of fields.
+        Update copyrights.
+
 0.29    2015/02/11
         Small logic and doc changes.
 
 0.28    2015/01/03
-        Fix date test to pass in 2015
-        Update docs a little
-        Update copyrights to 2015
+        Fix date test to pass in 2015.
+        Update docs a little.
+        Update copyrights to 2015.
 
 0.27    2014/12/22
         Test release

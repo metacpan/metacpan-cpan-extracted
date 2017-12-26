@@ -113,7 +113,7 @@ WriteMakefile
       },
      }
     ) : ()),
-    #SIGN => 1
+    SIGN => 1
   );
 
 

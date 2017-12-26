@@ -3,7 +3,7 @@ package Tree::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 use Scalar::Util qw(blessed);
 
@@ -469,8 +469,14 @@ sub traverse {
     (ref($post) eq "CODE") || die "Incorrect Object Type : post traversal function is not a function"
         if defined($post);
     foreach my $child ($self->getAllChildren()) {
-        $func->($child);
-        $child->traverse($func, $post);
+        my $ret = $func->($child);
+
+        # Propagate up the stack.
+        return $ret if 'ABORT' eq $ret;
+
+        $ret = $child->traverse($func, $post);
+        return $ret if 'ABORT' eq $ret;
+
         defined($post) && $post->($child);
     }
 }
@@ -965,16 +971,18 @@ This method accepts two arguments a mandatory C<$func> and an optional
 C<$postfunc>. If the argument C<$func> is not defined then an exception
 is thrown. If C<$func> or C<$postfunc> are not in fact CODE references
 then an exception is thrown. The function C<$func> is then applied
-recursively to all the children of the invocant. If given, the function
-C<$postfunc> will be applied to each child after the children of the child
-have been traversed.
+recursively to all the children of the invocant, or until C<$func>
+returns C<'ABORT'>. If given, the function C<$postfunc> will be applied
+to each child after the children of the child have been traversed.
 
 Here is an example of a traversal function that will print out the
 hierarchy as a tabbed in list.
 
   $tree->traverse(sub {
       my ($_tree) = @_;
-      print (("\t" x $_tree->getDepth()), $_tree->getNodeValue(), "\n");
+      my $tag = $_tree->getNodeValue();
+      print (("\t" x $_tree->getDepth()), $tag, "\n");
+      return 'ABORT' if 'foo' eq $tag;
   });
 
 Here is an example of a traversal function that will print out the
@@ -990,6 +998,10 @@ hierarchy in an XML-style format.
       print ((' ' x $_tree->getDepth()),
               '</', $_tree->getNodeValue(),'>',"\n");
   });
+
+Note that aborting traverse is not recommended when using C<$postfunc>
+because post-function will not be called for any nodes after aborting
+which might lead to less than predictable results.
 
 =item B<size>
 

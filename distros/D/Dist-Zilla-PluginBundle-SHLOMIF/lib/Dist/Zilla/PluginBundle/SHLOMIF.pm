@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::SHLOMIF;
-$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000007';
+$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000008';
 use 5.014;
 
 use Moose;
@@ -39,6 +39,7 @@ has github_name => (
 has repository => (
     is  => 'ro',
     isa => 'Str',
+    default => 'github',
 );
 
 for my $attr (qw(repository_type repository_url repository_web)) {
@@ -196,7 +197,6 @@ has _plugins => (
             ),
             ($self->awesome ? $self->awesome : 'MakeMaker'),
             qw(
-                Authority
                 CheckChangesHasContent
                 ConfirmRelease
                 Manifest
@@ -213,7 +213,6 @@ has _plugins => (
                 Test::CPAN::Changes
                 Test::EOL
                 Test::NoTabs
-                Test::Kwalitee::Extra
                 Test::TrailingSpace
                 TestRelease
             ),
@@ -299,7 +298,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - Dist::Zilla plugins for me
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 SYNOPSIS
 
@@ -378,7 +377,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - dzil plugins for SHLOMIF (Shlomi Fish)
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 SEE ALSO
 

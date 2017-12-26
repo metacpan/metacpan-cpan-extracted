@@ -1,4 +1,4 @@
-package inc::GenerateLocaleTests;
+package GenerateLocaleTests;
 
 use strict;
 use warnings;

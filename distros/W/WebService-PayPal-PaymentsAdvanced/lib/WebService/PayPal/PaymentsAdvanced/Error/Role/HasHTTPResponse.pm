@@ -4,7 +4,7 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Types::Standard qw( InstanceOf Int );
 use Types::URI qw( Uri );
@@ -40,7 +40,7 @@ WebService::PayPal::PaymentsAdvanced::Error::Role::HasHTTPResponse - Role which 
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 METHODS
 

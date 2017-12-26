@@ -1,0 +1,115 @@
+sub requires;	# forward declaration
+
+sub check_scalar_util {
+	# Try to load Scalar::Util
+	eval {
+		require Scalar::Util;
+	};
+	if ( $@ ) {
+		# Scalar::Util not installed (really old Perl?)
+		requires 'Scalar::Util' => '1.14';
+		return;
+	}
+
+	# Is installed
+	my $module_version = $Scalar::Util::VERSION;
+	my $module_weaken  = !! defined &Scalar::Util::weaken;
+	if ( $module_weaken ) {
+		# Already have weaken support.
+		# Make sure it is a new enough version
+		requires 'Scalar::Util' => '1.14';
+		return;
+	}
+
+	# Does NOT have weaken, so either a very old
+	# Scalar::Util, or a broken one.
+	if ( $module_version <= 1.01 ) {
+		# Very old Scalar::Util, upgrade it
+		requires 'Scalar::Util' => '1.14';
+		return;
+	}
+
+	my $latest_scalar_util = 1.21; #does not support 5.5, but weak references were introduced in 5.6
+	$latest_scalar_util = 1.19 if $] < 5.006;
+	# will not work of course - CPAN automatically installs only latest version
+        
+	# Broken Scalar::Util
+	# That is, it does NOT contain the weaken function
+	# which means it was built without a compiler.
+	unless ( can_cc() ) {
+		# The user does not have a compiler
+		# There is currently no way to resolve
+		# this situation, but we should probably
+		# try to upgrade Scalar::Util anyway, just
+		# in case the author is able to come up
+		# with a solution at some point in the
+		# future.
+		message1();
+		requires 'List::Util::XS' => $latest_scalar_util;
+		return;
+	}
+
+	# User should be capable of installing an
+	# upgraded version.
+	# Can we be certain they WILL do the upgrade?
+	if ( $module_version < $latest_scalar_util ) {
+		# We should be able to do a straight
+		# forward upgrade of the module
+		requires 'List::Util::XS' => $latest_scalar_util;
+		return;
+	}
+
+	# They ALREADY have the newest version... and it is broken.
+	# Very little we can do in this case, other than issue a
+	# message to the user, and then add a high dependency in the
+	# vague hope it does something.
+	message2();
+	requires 'List::Util::XS' => $latest_scalar_util;
+	return;
+}
+sub message1 {
+	print "\n\n\n";
+	print "    ERROR:\n\n";
+	print "    A CPAN module critically requires a function\n";
+	print "    (Scalar::Util::weaken) that can only be provided by\n";
+	print "    upgrading your Scalar::Util module to a new version,\n";
+	print "    which will need a C compiler in order to install.\n\n";
+	print "    Unfortunately, I can't seem to locate a C compiler on this\n";
+	print "    computer.\n\n";
+	print "    I'm going to try to continue anyway, but the most likely result\n";
+	print "    is going to be an extremely noisy series of testing errors.\n\n";
+	print "    If this happens, you will need to install a C compiler\n";
+	print "    (such as gcc) and then try to install whatever it is you are\n";
+	print "    installing again.\n\n";
+	print "    During the second attempt, I should be able to find the C\n";
+	print "    compiler and be able to build the needed function without\n";
+	print "    having to bother you again.\n\n";
+	print "    I'm going to wait for about a minute now in the hope you read\n";
+	print "    this\n\n\n";
+	sleep( 50 );
+}
+
+sub message2 {
+	print "\n\n\n";
+	print "    ERROR:\n\n";
+	print "    A CPAN module critically requires a function\n";
+	print "    (Scalar::Util::weaken) that should exist in your\n";
+	print "    Scalar::Util module but doesn't.\n\n";
+	print "    This probably happened because you are using a Perl\n";
+	print "    provided by a binary package from a vendor, and this\n";
+	print "    vendor has packaged Perl incorrectly.\n\n";
+	print "    I have checked for a couple of potential workarounds\n";
+	print "    but none of them appear to be usable in your\n";
+	print "    situation.\n\n";
+	print "    I will try a last-ditch option anyway, but the most\n";
+	print "    likely result is a number of noisily failing tests\n\n";
+	print "    If this happens, you will need to contact technical\n";
+	print "    support for your vendor and report the broken Perl,\n";
+	print "    so that they can repair it.\n\n";
+	print "    Please refer them to the documentation for the\n";
+	print "    'Task::Weaken' CPAN module, which explains the problem\n";
+	print "    and how they can fix it.\n\n";
+	print "    I'm going to wait for about a minute now so you have time\n";
+	print "    to read this message\n\n\n";
+	sleep( 50 );
+}

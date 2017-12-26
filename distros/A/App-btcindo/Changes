@@ -1,3 +1,9 @@
+0.015   2017-12-25 (PERLANCAR)
+
+	- Handle DASH <-> DRK symbol confusion (we use DASH at the CLI
+	  level, but the JSON API & TAPI still use DRK).
+
+
 0.014   2017-12-09 (PERLANCAR)
 
 	- balance: Show percentage of value (in IDR) of each currency, add

@@ -92,9 +92,7 @@ sub _render {
     foreach my $el (@$list) {
         if (ref($el)) {
             my $body = join('', @{$el->{body}});
-            if ($body =~ m/\\begin\{comment\}\s*
-                           \n;\s+no\s*slides?\s*
-                           \\end\{comment\}/xsi) {
+            if ($body =~ m/^%\s+no\s*slides?\s*$/im) {
                 # and remove the previous element with the chapter
                 pop @out if @out;
                 next ELEMENT;
