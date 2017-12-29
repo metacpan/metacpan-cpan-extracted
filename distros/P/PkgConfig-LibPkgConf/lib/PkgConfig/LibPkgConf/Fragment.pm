@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use overload '""' => sub { shift->to_string };
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 

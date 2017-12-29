@@ -77,3 +77,7 @@ Revision history for Perl extension B::Keywords.
   - Fixed $OUTPUT_AUTOFLUSH, RT #108572 (Defragmented Reality)
   - Made $* $MULTILINE_MATCHING version specific, deprecated with 5.8.1,
     removed with 5.10
+1.16 Thu Dec 28 2017 rurban
+  - Added 5.27.7 changes, RT #123948
+  - Added cperl class keywords
+  - Added keywords per version back to 5.004

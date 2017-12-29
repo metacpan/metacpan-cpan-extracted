@@ -4,6 +4,14 @@ Revision history for Perl extension Math::Polygon
    paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
 20121024 Request by Rick Rutgers: widening polygon contour
 
+version 1.07: Wed 27 Dec 11:14:00 CET 2017
+
+	Fixes:
+	- float rounding issue in Perl >= 5.27 breaks tests [cpan_testers]
+
+	Improvements:
+	- new ::Calc::polygon_format()
+
 version 1.06: Sun 16 Jul 13:04:43 CEST 2017
 
 	Fixes:

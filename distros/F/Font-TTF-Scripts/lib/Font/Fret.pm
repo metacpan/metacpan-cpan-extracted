@@ -175,6 +175,8 @@ sub process_font
 #    $font->tables_do(sub { $_[0]->read; });
     @rev = $font->{'cmap'}->read->reverse;
 
+    my $mytime = $opt{'d'} ?  sub { return gmtime($_[0]); } : sub { return localtime($_[0]); };
+
     $numg = $font->{'maxp'}->read->{'numGlyphs'};
     $upem = $font->{'head'}->read->{'unitsPerEm'};
     $font->{'loca'}->read->glyphs_do(sub {
@@ -227,10 +229,10 @@ sub process_font
 no strict;        
     $ftrleft = "BT 1 0 0 1 36 27 Tm 80 Tz /FR 7 Tf (FRET v$VERSION "
         . "Package $package " . ${"${package}::VERSION"} . ") Tj ET\n";
-use strict;
-    @time = split(/\s+/, localtime($opt{d} || time()));
+    @time = split(/\s+/, &{$mytime}($opt{d} || time()));
     $tr = "Printed at $time[3] on $time[0] $time[2] $time[1] $time[4]   Page ";
-    @time = split(/\s+/, localtime($font->{'head'}->getdate));
+    @time = split(/\s+/, &{$mytime}($font->{'head'}->getdate));
+use strict;
     $hdrrw = "Modified at $time[3] on $time[0] $time[2] $time[1] $time[4]";
     $rpos = $maxx - 36 - $pdf_helv->width($hdrrw) * 5.6;
     $hdrlft .= "BT 1 0 0 1 $rpos ". ($maxy - 58) . " Tm 80 Tz /FR 7 Tf "
@@ -555,6 +557,8 @@ sub get_points
     my ($onoff, $ends, $corners);
     my ($comp, $g);
 
+    if (!defined $glyph)
+    { return ([], [], [], undef); }
     $glyph->read_dat;
     if ($glyph->{'numberOfContours'} < 0)
     {
@@ -1056,7 +1060,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This module is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

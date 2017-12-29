@@ -5799,34 +5799,10 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
     }
   }
 
-  /* Filter by type. If at least one terminal matched, skip everything that is not a terminal */
-  if (haveTerminalMatchedb) {
-    for (alternativei = 0; alternativei < alternativeStackSymboli; alternativei++) {
-
-      alternativep = (marpaESLIF_alternative_t *) GENERICSTACK_GET_PTR(alternativeStackSymbolp, alternativei);
-
-      symbolp = alternativep->symbolp;
-      if (symbolp->type != MARPAESLIF_SYMBOL_TYPE_TERMINAL) {
-        MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp,
-                                    funcs,
-                                    "Alternative %s is out-prioritized (not a terminal)",
-                                    symbolp->descp->asciis);
-        /* No need to set it to NULL, we use the alternativep->usedb flag */
-        alternativep->usedb = 0;
-      }
-    }
-  }
-
-  /* From now on it is possible that some alternatives have usedb == 0 */
-
   /* Filter by priority */
   {
     for (alternativei = 0; alternativei < alternativeStackSymboli; alternativei++) {
       alternativep = (marpaESLIF_alternative_t *) GENERICSTACK_GET_PTR(alternativeStackSymbolp, alternativei);
-      if (! alternativep->usedb) {
-        continue;
-      }
-
       symbolp = alternativep->symbolp;
       if ((! maxPriorityInitializedb) || (symbolp->priorityi > maxPriorityi)) {
         maxPriorityi = symbolp->priorityi;
@@ -5835,10 +5811,6 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
 
     for (alternativei = 0; alternativei < alternativeStackSymboli; alternativei++) {
       alternativep = (marpaESLIF_alternative_t *) GENERICSTACK_GET_PTR(alternativeStackSymbolp, alternativei);
-      if (! alternativep->usedb) {
-        continue;
-      }
-
       symbolp = alternativep->symbolp;
       if (symbolp->priorityi < maxPriorityi) {
         MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp,
@@ -5849,19 +5821,41 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
                                     maxPriorityi);
         /* No need to set it to NULL, we use the alternativep->usedb flag */
         alternativep->usedb = 0;
+        /* This will trigger maxMatchedl recomputation */
+        maxMatchedl = 0;
       }
     }
   }
 
-  /* Filter by length (LATM) - this test is "useless" in the sense that latmb is forced to be true, i.e. maxMatchedl is always meaningful */
+  if (maxMatchedl <= 0) {
+    for (alternativei = 0; alternativei < alternativeStackSymboli; alternativei++) {
+      alternativep = (marpaESLIF_alternative_t *) GENERICSTACK_GET_PTR(alternativeStackSymbolp, alternativei);
+      if (! alternativep->usedb) {
+        /* Out-prioritized */
+        continue;
+      }
+
+      sizel = alternativep->valuel;
+      if (sizel > maxMatchedl) {
+        maxMatchedl = sizel;
+      }
+    }
+    MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp,
+                                funcs,
+                                "maxMatchedl revisited to %ld",
+                                (unsigned long) maxMatchedl);
+  }
+
+  /* Filter by length (LATM) - the test on latmb is "useless" in the sense that latmb is forced to be true, i.e. maxMatchedl is always meaningful */
   if (latmb) {
     for (alternativei = 0; alternativei < alternativeStackSymboli; alternativei++) {
       alternativep = (marpaESLIF_alternative_t *) GENERICSTACK_GET_PTR(alternativeStackSymbolp, alternativei);
       if (! alternativep->usedb) {
+        /* Out-prioritized */
         continue;
       }
 
-      sizel   = alternativep->valuel;
+      sizel = alternativep->valuel;
       if (sizel < maxMatchedl) {
         MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp,
                                     funcs,

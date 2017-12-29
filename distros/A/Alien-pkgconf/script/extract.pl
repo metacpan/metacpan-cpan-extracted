@@ -56,6 +56,17 @@ if(-d "pkgconf-1.2.1" && $^O eq 'cygwin')
   chdir '..';
 }
 
+if(-d "pkgconf-1.3.9" && $^O eq 'solaris')
+{
+  chdir 'pkgconf-1.3.9';
+  require Alien::patch;
+  local $ENV{PATH} = $ENV{PATH};
+  unshift @PATH, Alien::patch->bin_dir;
+  system("@{[ Alien::patch->exe ]} -T -p1 < ../../../patch/pkgconf-solaris-1.3.9.diff");
+  die "unable to patch" if $?;
+  chdir '..';
+}
+
 chdir(File::Spec->catdir(File::Spec->updir, File::Spec->updir));
 
 my $filename = do {

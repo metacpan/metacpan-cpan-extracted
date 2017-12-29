@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 require 5.006;
 
 # increased per release
-my $relversion = '1.07';
+my $relversion = '1.08';
 
 my $libversion = '4.4.9';
 
@@ -53,7 +53,6 @@ WriteMakefile
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for DIST, see PODTAIL.txt as well
-LICENSE		= artistic
 RAWDIR          = ../public_html/geoproj4/raw
 DISTDIR         = ../public_html/geoproj4/source
 __POSTAMBLE

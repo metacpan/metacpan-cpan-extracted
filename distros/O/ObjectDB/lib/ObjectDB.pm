@@ -15,7 +15,7 @@ use ObjectDB::Table;
 use ObjectDB::With;
 use ObjectDB::Util qw(execute filter_columns);
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 
 $Carp::Internal{ (__PACKAGE__) }++;
 $Carp::Internal{"ObjectDB::$_"}++ for qw/
@@ -37,7 +37,6 @@ $Carp::Internal{"ObjectDB::$_"}++ for qw/
   DBHPool
   Meta
   RelationshipFactory
-  Exception
   /;
 
 sub new {
@@ -344,7 +343,7 @@ sub create {
         values => [ map { $_ => $self->{columns}->{$_} } $self->columns ]
     );
 
-    my $rv = execute($dbh, $sql, context => $self);
+    my $rv = execute($dbh, $sql);
 
     if (my $auto_increment = $self->meta->auto_increment) {
         $self->set_column(
@@ -423,7 +422,7 @@ sub load {
         for_update => $params{for_update},
     );
 
-    my ($rv, $sth) = execute($self->init_db, $select, context => $self);
+    my ($rv, $sth) = execute($self->init_db, $select);
 
     my $rows = $sth->fetchall_arrayref;
     return unless $rows && @$rows;
@@ -496,7 +495,7 @@ sub update {
         where  => [%where]
     );
 
-    my $rv = execute($self->init_db, $sql, context => $self);
+    my $rv = execute($self->init_db, $sql);
 
     Carp::croak('No rows were affected') if $rv eq '0E0';
 
@@ -532,7 +531,7 @@ sub delete : method {
         where  => [%where]
     );
 
-    my $rv = execute($self->init_db, $sql, context => $self);
+    my $rv = execute($self->init_db, $sql);
 
     Carp::croak('No rows were affected') if $rv eq '0E0';
 

@@ -7,7 +7,7 @@ use warnings;
 
 package Math::Polygon::Calc;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Exporter';
 
@@ -27,6 +27,7 @@ our @EXPORT = qw/
  polygon_same
  polygon_start_minxy
  polygon_string
+ polygon_format
 /;
 
 use List::Util    qw/min max/;
@@ -381,3 +382,14 @@ sub polygon_distance($%)
     $minDist;
 }
 
+
+
+sub polygon_format($@)
+{   my $format = shift;
+	my $call   = ref $format eq 'CODE' ? $format
+      : sub { sprintf $format, $_[0] };
+
+    map [ $call->($_->[0]), $call->($_->[1]) ], @_;
+}
+
+1;

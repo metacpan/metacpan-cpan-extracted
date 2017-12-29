@@ -14,7 +14,7 @@ use base 'Exporter';
 use strict;
 use warnings;
 
-our @EXPORT = qw(get post patch put del trace websocket sse);
+our @EXPORT = qw(get post patch put del websocket sse);
 
 sub get ($) {
 	my $rule = $_[0];
@@ -520,7 +520,7 @@ Using B<CODE> => B<undef> you can implement any URL mapping that you wish.
 During routing process you can change request parameters and put some notes to
 it. See C<note($key [, $value])> in L<PEF::Front::Request>.
 
-This module exports these functions: C<get post patch put delete trace websocket sse>
+This module exports these functions: C<get post patch put delete websocket sse>
 to help with HTTP method filtering.
 
   PEF::Front::Route::add_route(

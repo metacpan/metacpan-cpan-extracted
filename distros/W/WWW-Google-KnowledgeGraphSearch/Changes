@@ -1,5 +1,8 @@
 Revision history for WWW::Google::KnowledgeGraphSearch
 
+0.04  Wed Dec 27 11:20:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
 0.03  Wed Dec 06 14:50:00 2017
       - Updated sample code in the pod section SYNOPSIS.
 

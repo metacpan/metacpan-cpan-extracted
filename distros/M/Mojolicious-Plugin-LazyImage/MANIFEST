@@ -1,0 +1,12 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojolicious/Plugin/LazyImage.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-basic.t
+t/lazy-image.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

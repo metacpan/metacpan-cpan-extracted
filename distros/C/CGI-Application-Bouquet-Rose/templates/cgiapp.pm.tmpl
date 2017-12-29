@@ -113,7 +113,7 @@ sub build_search_form
 		my($key);
 
 		for $key (keys %{$$field{'html_attrs'} })
-		{			
+		{
 			if ( ($key eq 'type') && ($$field{'html_attrs'}{$key} eq 'hidden') )
 			{
 				$$field{'html_attrs'}{'maxlength'} = 20;

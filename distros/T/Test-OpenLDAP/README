@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.07
+    Version 0.71
 
 SYNOPSIS
 
@@ -43,7 +43,11 @@ SUBROUTINES/METHODS
 
       * debug - the debug level of the slapd instance. To see valid values
       for debug, execute the command "slapd -d '?'". slapd will list all
-      the valid debug levels
+      the valid debug levels. It defaults to '0' or no logging.
+
+      * syslog - the debug level of the slapd instance for syslog. This
+      parameter accepts the same values as the debug level. It defaults to
+      '0' or no logging to syslog
 
  skip
 
@@ -83,6 +87,20 @@ SUBROUTINES/METHODS
  debug_handle
 
     This method gives a handle to the slapd debug log.
+
+ set_cookie
+
+    This method sets the value for the "-c" argument to slapd. This can be
+    used to force a reload for a replication consumer.
+
+ get_cookie
+
+    This method gets the value for the "-c" argument to slapd.
+
+ clear_cookie
+
+    This method clears the value for the "-c" argument to slapd. This can
+    be used to reset the cookie in between stopping and starting slapd
 
  new_db_directory
 

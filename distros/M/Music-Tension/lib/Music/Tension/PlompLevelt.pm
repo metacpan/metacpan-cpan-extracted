@@ -1,8 +1,6 @@
 # -*- Perl -*-
 #
 # "Plomp-Levelt consonance curve" implementation
-#
-# Beta interface! May change without notice!
 
 package Music::Tension::PlompLevelt;
 
@@ -16,17 +14,17 @@ use Music::Tension ();
 use Scalar::Util qw/looks_like_number/;
 
 our @ISA     = qw(Music::Tension);
-our $VERSION = '0.70';
+our $VERSION = '1.01';
 
 # pianowire* are from [Helmholtz 1877 p.79] relative intensity of first
 # six harmonics of piano wire, struck at 1/7th its length, for various
 # hammer types. Via http://jjensen.org/DissonanceCurve.html
 my %AMPLITUDES = (
-  'ones' => [ (1) x 6 ],
-  'pianowire-plucked' => [ 1, 0.8, 0.6, 0.3, 0.1, 0.03 ],
-  'pianowire-soft'    => [ 1, 1.9, 1.1, 0.2, 0,   0.05 ],
-  'pianowire-medium'  => [ 1, 2.9, 3.6, 2.6, 1.1, 0.2 ],
-  'pianowire-hard'    => [ 1, 3.2, 5,   5,   3.2, 1 ],
+    'ones' => [ (1) x 6 ],
+    'pianowire-plucked' => [ 1, 0.8, 0.6, 0.3, 0.1, 0.03 ],
+    'pianowire-soft'    => [ 1, 1.9, 1.1, 0.2, 0,   0.05 ],
+    'pianowire-medium'  => [ 1, 2.9, 3.6, 2.6, 1.1, 0.2 ],
+    'pianowire-hard'    => [ 1, 3.2, 5,   5,   3.2, 1 ],
 );
 
 ########################################################################
@@ -34,40 +32,40 @@ my %AMPLITUDES = (
 # SUBROUTINES
 
 sub new {
-  my ( $class, %param ) = @_;
-  my $self = $class->SUPER::new(%param);
+    my ( $class, %param ) = @_;
+    my $self = $class->SUPER::new(%param);
 
-  $self->{_amplitudes} = {%AMPLITUDES};
+    $self->{_amplitudes} = {%AMPLITUDES};
 
-  if ( exists $param{amplitudes} ) {
-    for my $name ( keys %{ $param{amplitudes} } ) {
-      croak "amplitude profile '$name' must be array reference"
-        unless ref $param{amplitudes}->{$name} eq 'ARRAY';
-      $self->{_amplitudes}->{$name} = $param{amplitudes}->{$name};
+    if ( exists $param{amplitudes} ) {
+        for my $name ( keys %{ $param{amplitudes} } ) {
+            croak "amplitude profile '$name' must be array reference"
+              unless ref $param{amplitudes}->{$name} eq 'ARRAY';
+            $self->{_amplitudes}->{$name} = $param{amplitudes}->{$name};
+        }
     }
-  }
 
-  if ( exists $param{default_amp_profile} ) {
-    croak "no such profile '$param{default_amp_profile}'"
-      unless exists $self->{_amplitudes}->{ $param{default_amp_profile} };
-    $self->{_amp_profile} = $param{default_amp_profile};
-  } else {
-    $self->{_amp_profile} = 'pianowire-medium';
-  }
-
-  # NOTE will also need normalize if add setter method to update _amplitudes
-  $self->{_normalize_amps} = exists $param{normalize_amps} ? 1 : 0;
-  if ( $self->{_normalize_amps} ) {
-    for my $amps ( values %{ $self->{_amplitudes} } ) {
-      my $sum = sum @$amps;
-      for my $amp (@$amps) {
-        $amp /= $sum;
-      }
+    if ( exists $param{default_amp_profile} ) {
+        croak "no such profile '$param{default_amp_profile}'"
+          unless exists $self->{_amplitudes}->{ $param{default_amp_profile} };
+        $self->{_amp_profile} = $param{default_amp_profile};
+    } else {
+        $self->{_amp_profile} = 'pianowire-medium';
     }
-  }
 
-  bless $self, $class;
-  return $self;
+    # NOTE will also need normalize if add setter method to update _amplitudes
+    $self->{_normalize_amps} = exists $param{normalize_amps} ? 1 : 0;
+    if ( $self->{_normalize_amps} ) {
+        for my $amps ( values %{ $self->{_amplitudes} } ) {
+            my $sum = sum @$amps;
+            for my $amp (@$amps) {
+                $amp /= $sum;
+            }
+        }
+    }
+
+    bless $self, $class;
+    return $self;
 }
 
 # Not sure if I've followed the papers correctly; they all operate on a
@@ -82,85 +80,83 @@ sub new {
 # that the most dissonant interval of the scale, e.g. minor 2nd in equal
 # temperament has the value of one?)
 sub frequencies {
-  my ( $self, $f1, $f2 ) = @_;
-  my @harmonics;
+    my ( $self, $f1, $f2 ) = @_;
+    my @harmonics;
 
-  if ( looks_like_number $f1) {
-    for my $i ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
-      push @{ $harmonics[0] },
-        {
-        amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$i] || 0,
-        freq => $f1 * ( $i + 1 ),
-        };
+    if ( looks_like_number $f1) {
+        for my $i ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
+            push @{ $harmonics[0] },
+              { amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$i] || 0,
+                freq => $f1 * ( $i + 1 ),
+              };
+        }
+    } elsif ( ref $f1 eq 'ARRAY' and @$f1 and ref $f1->[0] eq 'HASH' ) {
+        $harmonics[0] = $f1;
+    } else {
+        croak "unknown input for frequency1";
     }
-  } elsif ( ref $f1 eq 'ARRAY' and @$f1 and ref $f1->[0] eq 'HASH' ) {
-    $harmonics[0] = $f1;
-  } else {
-    croak "unknown input for frequency1";
-  }
-  if ( looks_like_number $f2) {
-    for my $j ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
-      push @{ $harmonics[1] },
-        {
-        amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$j] || 0,
-        freq => $f2 * ( $j + 1 ),
-        };
+    if ( looks_like_number $f2) {
+        for my $j ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
+            push @{ $harmonics[1] },
+              { amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$j] || 0,
+                freq => $f2 * ( $j + 1 ),
+              };
+        }
+    } elsif ( ref $f2 eq 'ARRAY' and @$f2 and ref $f2->[0] eq 'HASH' ) {
+        $harmonics[1] = $f2;
+    } else {
+        croak "unknown input for frequency2";
     }
-  } elsif ( ref $f2 eq 'ARRAY' and @$f2 and ref $f2->[0] eq 'HASH' ) {
-    $harmonics[1] = $f2;
-  } else {
-    croak "unknown input for frequency2";
-  }
 
-  # code ported from equation at http://jjensen.org/DissonanceCurve.html
-  my $tension;
-  for my $i ( 0 .. $#{ $harmonics[0] } ) {
-    for my $j ( 0 .. $#{ $harmonics[1] } ) {
-      my @freqs = sort { $a <=> $b } $harmonics[0]->[$i]{freq},
-        $harmonics[1]->[$j]{freq};
-      my $q = ( $freqs[1] - $freqs[0] ) / ( 0.021 * $freqs[0] + 19 );
-      $tension +=
-        $harmonics[0]->[$i]{amp} *
-        $harmonics[1]->[$j]{amp} *
-        ( exp( -0.84 * $q ) - exp( -1.38 * $q ) );
+    # code ported from equation at http://jjensen.org/DissonanceCurve.html
+    my $tension;
+    for my $i ( 0 .. $#{ $harmonics[0] } ) {
+        for my $j ( 0 .. $#{ $harmonics[1] } ) {
+            my @freqs = sort { $a <=> $b } $harmonics[0]->[$i]{freq},
+              $harmonics[1]->[$j]{freq};
+            my $q = ( $freqs[1] - $freqs[0] ) / ( 0.021 * $freqs[0] + 19 );
+            $tension +=
+              $harmonics[0]->[$i]{amp} *
+              $harmonics[1]->[$j]{amp} *
+              ( exp( -0.84 * $q ) - exp( -1.38 * $q ) );
+        }
     }
-  }
 
-  return $tension;
+    return $tension;
 }
 
 sub pitches {
-  my ( $self, $p1, $p2, $freq_harmonics ) = @_;
-  croak "two pitches required" if !defined $p1 or !defined $p2;
-  croak "pitches must be positive integers"
-    if $p1 !~ m/^\d+$/
+    my ( $self, $p1, $p2, $freq_harmonics ) = @_;
+    croak "two pitches required" if !defined $p1 or !defined $p2;
+    croak "pitches must be positive integers"
+      if $p1 !~ m/^\d+$/
       or $p2 !~ m/^\d+$/;
 
-  return $self->frequencies( map( $self->pitch2freq($_), $p1, $p2 ),
-    $freq_harmonics );
+    return $self->frequencies( map( $self->pitch2freq($_), $p1, $p2 ),
+        $freq_harmonics );
 }
 
 sub vertical {
-  my ( $self, $pset ) = @_;
-  croak "pitch set must be array ref" unless ref $pset eq 'ARRAY';
-  croak "pitch set must contain multiple elements" if @$pset < 2;
+    my ( $self, $pset ) = @_;
+    croak "pitch set must be array ref" unless ref $pset eq 'ARRAY';
+    croak "pitch set must contain multiple elements" if @$pset < 2;
 
-  my @freqs = map $self->pitch2freq($_), @$pset;
+    my @freqs = map $self->pitch2freq($_), @$pset;
 
-  my $min = ~0;
-  my $max = 0;
-  my ( @tensions, $sum );
-  for my $i ( 1 .. $#freqs ) {
-    my $t = $self->frequencies( $freqs[0], $freqs[$i] );
-    $sum += $t;
-    $min = $t
-      if $t < $min;
-    $max = $t
-      if $t > $max;
-    push @tensions, $t;
-  }
+    my $min = ~0;
+    my $max = 0;
+    my ( @tensions, $sum );
+    for my $i ( 1 .. $#freqs ) {
+        my $t = $self->frequencies( $freqs[0], $freqs[$i] );
+        $sum += $t;
+        $min = $t
+          if $t < $min;
+        $max = $t
+          if $t > $max;
+        push @tensions, $t;
+    }
 
-  return wantarray ? ( $sum, $min, $max, \@tensions ) : $sum;
+    return wantarray ? ( $sum, $min, $max, \@tensions ) : $sum;
 }
 
 1;
@@ -172,12 +168,10 @@ Music::Tension::PlompLevelt - Plomp-Levelt consonance curve calculations
 
 =head1 SYNOPSIS
 
-Beta interface! Will likely change without notice!
-
   use Music::Tension::PlompLevelt;
   my $tension = Music::Tension::PlompLevelt->new;
 
-  $tension->frequences(440, 880);
+  $tension->frequencies(440, 880);
 
   $tension->pitches(69, 81);
 
@@ -193,7 +187,7 @@ Parsing music into a form suitable for use by this module and practical
 uses of the results are left as an exercise to the reader. Consult the
 C<eg/> directory of this module's distribution for example programs.
 
-=head2 TERMINIOLOGY
+=head2 TERMINOLOGY
 
       Fundamental        Overtones
   Harmonic      1        2       3       4       5       6       7
@@ -403,10 +397,10 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2013 by Jeremy Mates
+Copyright (C) 2012-2013,2017 by Jeremy Mates
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.16 or, at
+your option, any later version of Perl 5 you may have available.
 
 =cut

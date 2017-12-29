@@ -1,15 +1,16 @@
 bin/cgi.app.gen.pl
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 lib/CGI/Application/Bouquet/Rose.pm
 lib/CGI/Application/Bouquet/Rose/.htcgi.bouquet.conf
 lib/CGI/Application/Bouquet/Rose/Config.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
+MANIFEST.SKIP
 README
-t/pod.t
+t/00.versions.t
+t/00.versions.tx
 t/test.t
 templates/cgiapp.pm.tmpl
 templates/content.tmpl
@@ -21,3 +22,6 @@ templates/run.mode.pm.tmpl
 templates/search.fcgi.tmpl
 templates/search.form.tmpl
 templates/web.page.tmpl
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

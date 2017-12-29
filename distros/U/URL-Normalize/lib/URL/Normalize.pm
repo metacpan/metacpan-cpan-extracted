@@ -11,11 +11,11 @@ URL::Normalize - Normalize/optimize URLs.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
@@ -79,8 +79,7 @@ You can also send in just the path:
     my $normalizer = URL::Normalize->new( '/some/path' );
 
 The latter is NOT recommended, though, and hasn't been tested properly. You
-should always give URL::Normalize an absolute URL by using L<URI>'s C<new_abs>
-(or is similar solutions).
+should always give URL::Normalize an absolute URL by using L<URI>'s C<new_abs>.
 
 =cut
 
@@ -145,27 +144,13 @@ has 'social_query_params' => (
         [
             'ncid',
             'utm_campaign',
+            'utm_content',
             'utm_medium',
             'utm_source',
             'utm_term',
-            'utm_content',
         ],
     },
 );
-
-=head2 get_url
-
-DEPRECATED! Use C<url> instead.
-
-=cut
-
-sub get_url {
-    my $self = shift;
-
-    Carp::carp( "The 'get_url' method is deprecated; start using the 'url' method instead." );
-
-    return $self->url;
-}
 
 =head2 URI
 
@@ -314,6 +299,10 @@ The default regular expressions for matching a directory index are:
 =over 4
 
 =item * C</default\.aspx?>
+
+=item * C</default\.s?html?>
+
+=item * C</home\.s?html?>
 
 =item * C</index\.cgi>
 
@@ -662,9 +651,13 @@ Default social query parameters are:
 
 =item * C<utm_campaign>
 
+=item * C<utm_content>
+
 =item * C<utm_medium>
 
 =item * C<utm_source>
+
+=item * C<utm_term>
 
 =back
 
@@ -690,9 +683,38 @@ has been created:
 sub remove_social_query_parameters {
     my $self = shift;
 
+    return $self->remove_query_parameters( $self->social_query_params );
+}
+
+=head2 remove_query_parameter
+
+Convenience method for removing a parameter from the URL. If the parameter is
+mentioned multiple times (?a=1&a=2), all occurences will be removed.
+
+=cut
+
+sub remove_query_parameter {
+    my $self  = shift;
+    my $param = shift;
+
+    return $self->remove_query_parameters( [$param] );
+}
+
+=head2 remove_query_parameters
+
+Convenience method for removing multiple parameters from the URL. If the
+parameters are mentioned multiple times (?a=1&a=2), all occurences will be
+removed.
+
+=cut
+
+sub remove_query_parameters {
+    my $self   = shift;
+    my $params = shift || [];
+
     if ( my $URI = $self->URI ) {
-        foreach ( @{$self->social_query_params} ) {
-            $URI->query_param_delete( $_ );
+        foreach my $param ( @{$params} ) {
+            $URI->query_param_delete( $param );
         }
 
         $self->_set_url( $URI->as_string );
@@ -702,6 +724,8 @@ sub remove_social_query_parameters {
 =head1 SEE ALSO
 
 =over 4
+
+=item * L<URI::Normalize>
 
 =item * L<URI>
 
@@ -751,7 +775,7 @@ L<http://search.cpan.org/dist/URL-Normalize/>
 
 The MIT License (MIT)
 
-Copyright (c) 2012-2016 Tore Aursand
+Copyright (c) 2012-2018 Tore Aursand
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

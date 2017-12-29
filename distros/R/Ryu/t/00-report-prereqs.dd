@@ -25,7 +25,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Encode' => '1.98',
-                                      'Future' => '0.35',
+                                      'Future' => '0.37',
                                       'List::UtilsBy' => '0.10',
                                       'Log::Any' => '1.045',
                                       'Log::Any::Adapter' => '1.045',

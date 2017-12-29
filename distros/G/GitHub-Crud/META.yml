@@ -15,7 +15,7 @@ name: GitHub-Crud
 provides:
   GitHub::Crud:
     file: lib/GitHub/Crud.pm
-    version: '20171222'
+    version: '20171227'
   GitHub::Crud::Response:
     file: lib/GitHub/Crud.pm
   GitHub::Crud::Response::Data:
@@ -30,4 +30,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171222'
+version: '20171227'

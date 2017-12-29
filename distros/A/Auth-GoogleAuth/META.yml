@@ -9,12 +9,12 @@ build_requires:
   Test::More: '0'
   Test::Most: '0'
   constant: '0'
-  perl: '5.006'
+  perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,11 +28,12 @@ requires:
   Math::Random::MT: '0'
   URI::Escape: '0'
   base: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Auth-GoogleAuth/issues
   homepage: https://github.com/gryphonshafer/Auth-GoogleAuth
   repository: https://github.com/gryphonshafer/Auth-GoogleAuth.git
-version: '1.01'
+version: '1.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

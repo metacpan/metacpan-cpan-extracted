@@ -88,6 +88,6 @@
          "web" : "https://github.com/jef-sure/pef-front-psgi-dist"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

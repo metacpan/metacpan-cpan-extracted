@@ -7,7 +7,7 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20171222';
+our $VERSION = '20171227';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -254,7 +254,6 @@ sub list($)                                                                     
   my $pat  = $gitHub->patKey(0);
 
   my $s = filePath("curl -si $pat $url",$user,$repo, qq(contents), $path.$bran);
-
   my $r = GitHub::Crud::Response::new($gitHub, $s);                             # Get response
 
   my ($status) = split / /, $r->Status;                                         # Check response code
@@ -270,7 +269,6 @@ sub list($)                                                                     
      }
     $gitHub->fileList = [map{$_->name} @{$r->data}];                            # List of files
    }
-
   @{$gitHub->fileList}
  }
 
@@ -332,6 +330,10 @@ sub write($$)                                                                   
   $gitHub->read(1);                                                             # Read the file to get its sha if it exists - but do not write a log message if this fails
   my $r    = $gitHub->response;                                                 # Get response
   my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';             # Sha of existing file or blank string if no existing file
+  if (my $s = $r->data->sha)                                                    # Check the sha of one was returned
+   {my $S   = getSha($data);                                                    # Our Sha
+    return undef if $s eq $S;                                                   # Duplicate if the shas match
+   }
   if ($gitHub->utf8)                                                            # Send the data as utf8 if requested
    {use Encode 'encode';
     $data  = encode('UTF-8', $data);
@@ -350,19 +352,20 @@ sub write($$)                                                                   
   my $success = $status == 200 ? 'updated' : $status == 201 ? 'created' : undef;# Updated, created
   $gitHub->failed = $success ? undef : 1;
   lll($gitHub, q(write));
+
   $success                                                                      # Return true on success
  }
 
-if (0 and !caller)
+if (1 and !caller)
  {my $g = GitHub::Crud::new();
   $g->userid     = $testUserid;
   $g->repository = $testRepository;
-  $g->gitFile    = "test4.html";
   $g->personalAccessToken = $pat;
-  my $d = (dateTimeStamp."\n") x 10;
+  $g->gitFile    = "zzz.data";
+  my $d = "a" x 10;
   my $w = $g->write($d);
   my $r = $g->read;
-  say STDERR $r;                                                                # 10 dateTimeStamps
+  say STDERR "$r\n", $d eq $r ? "SUCCESS!" : "FAIL " x 10;
  }
 
 sub delete($)                                                                   # Delete a file already present on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile>, L<patKey|/patKey>.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the delete was successful else false.
@@ -709,8 +712,8 @@ If the list operation fails then L<failed|/failed> is set to true and L<fileList
 
 Returns the list of file names found or empty list if no files were found.
 
-  1  Parameter  Description    
-  2  $gitHub    GitHub object  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
 
 =head2 read($$)
 
@@ -726,9 +729,9 @@ If the read operation fails then L<failed|/failed> is set to true and L<readData
 
 Returns the data read or B<undef> if no file was found.
 
-  1  Parameter  Description                   
-  2  $gitHub    GitHub object                 
-  3  $noLog     Whether to log errors or not  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
+  3  $noLog     Whether to log errors or not
 
 =head2 write($$)
 
@@ -742,9 +745,9 @@ If the write operation is successful, L<failed|/failed> is set to false otherwis
 
 Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-  1  Parameter  Description         
-  2  $gitHub    GitHub object       
-  3  $data      Data to be written  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
+  3  $data      Data to be written
 
 =head2 delete($)
 
@@ -758,21 +761,21 @@ If the delete operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the delete was successful else false.
 
-  1  Parameter  Description    
-  2  $gitHub    GitHub object  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
 
 =head2 listWebHooks($)
 
 List web hooks.
 
-Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. 
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
 
 If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns true if the list  operation was successful else false.
 
-  1  Parameter  Description    
-  2  $gitHub    GitHub object  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
 
 =head2 createPushWebHook($)
 
@@ -786,8 +789,8 @@ If the create operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the web hook was created successfully else false.
 
-  1  Parameter  Description    
-  2  $gitHub    GitHub object  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
 
 =head2 createIssue($)
 
@@ -799,24 +802,24 @@ If the operation is successful, L<failed|/failed> is set to false otherwise it i
 
 Returns true if the issue was created successfully else false.
 
-  1  Parameter  Description    
-  2  $gitHub    GitHub object  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
 
 =head2 savePersonalAccessToken($$)
 
 Save the personal access token in a file.
 
-  1  Parameter  Description                                                           
-  2  $gitHub    GitHub object                                                         
-  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
+  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken
 
 =head2 loadPersonalAccessToken($$)
 
 Load a personal access token from a file.
 
-  1  Parameter  Description                                                           
-  2  $gitHub    GitHub object                                                         
-  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken  
+  1  Parameter  Description
+  2  $gitHub    GitHub object
+  3  $file      Optional access file - default is /etc/GitHubCrudPersonalAccessToken
 
 
 =head1 Index

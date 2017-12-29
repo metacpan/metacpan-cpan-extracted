@@ -1138,7 +1138,7 @@ sub parse_volt
                 $res->{'lookups'}[-1]{'lookup'} = ['sub', [@content]];
 
                 unless ($str =~ m/\GEND_SUBSTITUTION\s+/ogc)
-                { die "Expected END_SUBSTITUION in LOOKUP $name, found: " . substr($str, pos($str), 20); }
+                { die "Expected END_SUBSTITUTION in LOOKUP $name, found: " . substr($str, pos($str), 20); }
             }
             else        # presume pos
             {
@@ -1812,7 +1812,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This module is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

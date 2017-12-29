@@ -5,12 +5,11 @@ use warnings;
 
 use base 'Exporter';
 
-our $VERSION   = '3.24';
+our $VERSION   = '3.25';
 our @EXPORT_OK = qw(load_class execute to_array merge_rows filter_columns);
 
 require Carp;
 require Storable;
-use ObjectDB::Exception;
 
 sub load_class {
     my ($class) = @_;
@@ -53,22 +52,13 @@ sub load_class {
 }
 
 sub execute {
-    my ($dbh, $stmt, %context) = @_;
+    my ($dbh, $stmt) = @_;
 
     my $sql  = $stmt->to_sql;
     my @bind = $stmt->to_bind;
 
-    my ($rv, $sth);
-    eval {
-        $sth = $dbh->prepare($sql);
-        $rv  = $sth->execute(@bind);
-
-        1;
-    } or do {
-        my $e = $@;
-
-        ObjectDB::Exception->throw($e, %context, sql => $stmt);
-    };
+    my $sth = $dbh->prepare($sql);
+    my $rv  = $sth->execute(@bind);
 
     return wantarray ? ($rv, $sth) : $rv;
 }

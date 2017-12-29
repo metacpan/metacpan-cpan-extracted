@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171224';
+our $VERSION = '20171227';
 
 #-------------------------------------------------------------------------------
 # Constants

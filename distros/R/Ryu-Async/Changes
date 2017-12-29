@@ -1,50 +1,57 @@
 Revision history for Ryu-Async
 
-0.007     2017-10-28 23:26:00+08:00 Asia/Kuala_Lumpur
+0.009     2017-12-28 01:15:18+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - Initial support for async process handling
+
+0.008     2017-10-28 23:26:00+08:00 Asia/Kuala_Lumpur
     Bugs fixed:
 
-    * added IO::Socket::IP to dependency list
+    - added IO::Socket::IP to dependency list
 
 
 0.007     2017-09-01 21:03:27+08:00 Asia/Kuala_Lumpur
     New features:
 
-    * Basic timeout support
-    * UDP client/server helpers
+    - Basic timeout support
+    - UDP client/server helpers
 
 0.006     2017-06-17 01:43:13+08:00 Asia/Kuala_Lumpur
     No new features.
 
     Bugs fixed:
 
-    * requires newer Ryu::Source to get examples/cat.pl working.
+    - requires newer Ryu::Source to get examples/cat.pl working.
 
 0.005     2017-06-17 01:30:50+08:00 Asia/Kuala_Lumpur
     New features:
 
-    * ->stdin helper
-    * ->from_stream now available as a method, might be more readable this way
+    - ->stdin helper
+    - ->from_stream now available as a method, might be more readable this way
 
 0.004     2017-03-26 11:51:12+08:00 Asia/Kuala_Lumpur
     No new features.
 
     Distribution metadata:
-    * Update dist.ini
-    * Minimum Ryu version updated
+
+    - Update dist.ini
+    - Minimum Ryu version updated
 
 0.003     2017-03-19 23:45:36+08:00 Asia/Kuala_Lumpur
-    Features:
-    * Perl 5.14 support
+    New features:
+
+    - Perl 5.14 support
 
 0.002     2017-01-12 21:51:25+08:00 Asia/Kuala_Lumpur
     No new features.
 
     Distribution metadata:
 
-    * perl version is now listed in `requires`, rather than just
+    - perl version is now listed in `requires`, rather than just
     `build_requires` - thanks to Mohammad S Anwar for the idea
-    * `provides` metadata added
-    * test dependencies updated in `cpanfile`
+    - `provides` metadata added
+    - test dependencies updated in `cpanfile`
 
 0.001     2017-01-11 02:02:36+08:00 Asia/Kuala_Lumpur
     Initial CPAN release

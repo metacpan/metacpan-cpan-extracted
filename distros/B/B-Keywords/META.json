@@ -4,13 +4,13 @@
       "Joshua ben Jore <jjore@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 8.3004, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "B-Keywords",
    "no_index" : {
@@ -45,6 +45,6 @@
          "url" : "http://github.com/rurban/b-keywords"
       }
    },
-   "version" : "1.15",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.16",
+   "x_serialization_backend" : "JSON::PP version 2.94_01"
 }

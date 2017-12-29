@@ -191,18 +191,18 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 our @EXPORT = qw{
-    one_row
-    all_rows
-    for_rows
-    new_row
+  one_row
+  all_rows
+  for_rows
+  new_row
 };
 
 our @EXPORT_OK = qw{
-    connector
-    hash_ref_slice
+  connector
+  hash_ref_slice
 };
 
 sub ccmap ($) {
@@ -221,6 +221,7 @@ our $connector_pool;
 our $connector_pool_method = 'get_connector';
 our $connector_args        = [];
 our $connector_driver;
+our $user_schema_namespace;
 our $table_classes_namespace = 'DBC';
 our $query_classes_namespace = 'DBQ';
 our $error_message_class     = 'DBIx::Struct::Error::String';
@@ -294,8 +295,8 @@ sub hash_ref_slice($@) {
     error_message {
         message => "first parameter is not hash reference",
         result  => 'INTERR',
-        }
-        if 'HASH' ne ref $hashref;
+      }
+      if 'HASH' ne ref $hashref;
     map {$_ => $hashref->{$_}} @slice;
 }
 
@@ -319,6 +320,10 @@ sub set_connector_pool {
             *{"$aep\::connector"} = \&connector;
         }
     }
+}
+
+sub set_user_schema_namespace {
+    $user_schema_namespace = $_[0];
 }
 
 sub set_connector_pool_method {
@@ -365,6 +370,9 @@ sub import {
             --$i;
         } elsif ($args[$i] eq 'camel_case_map' && 'CODE' eq ref $args[$i]) {
             (undef, $camel_case_map) = splice @args, $i, 2;
+            --$i;
+        } elsif ($args[$i] eq 'user_schema_namespace') {
+            (undef, $user_schema_namespace) = splice @args, $i, 2;
             --$i;
         } elsif ($args[$i] eq 'table_classes_namespace') {
             (undef, $table_classes_namespace) = splice @args, $i, 2;
@@ -446,10 +454,10 @@ sub _not_yet_connected {
             @$connector_args = ($dsn, $user, $password, $connect_attrs);
         }
         $conn = $connector_module->$connector_constructor(@$connector_args)
-            or error_message {
+          or error_message {
             message => "DB connect error",
             result  => 'SQLERR',
-            };
+          };
         $conn->mode('fixup');
     }
     '' =~ /()/;
@@ -581,12 +589,12 @@ sub _parse_find_by {
     my $obj   = $type eq 'One' ? 'DBIx::Struct::one_row'  : 'DBIx::Struct::all_rows';
     my $flags = $column        ? ", -column => '$column'" : '';
     $flags = $distinct ? $flags ? ", -distinct => '$column'" : ", '-distinct'" : $flags;
-    $order
-        = $order
-        ? $asc eq 'Asc'
-            ? ", -order_by => '" . $camel_case_map->($order) . "'"
-            : ", -order_by => {-desc => '" . $camel_case_map->($order) . "'}"
-        : '';
+    $order =
+        $order
+      ? $asc eq 'Asc'
+          ? ", -order_by => '" . $camel_case_map->($order) . "'"
+          : ", -order_by => {-desc => '" . $camel_case_map->($order) . "'}"
+      : '';
     $where = $conds ? ", -where => [$conds]" : '';
     $limit = $limit && $limit > 1 && $type ne 'One' ? ", -limit => $limit" : '';
     my $tspec = "'$table'" . $flags;
@@ -1055,8 +1063,8 @@ sub _parse_interface ($) {
             error_message {
                 result  => 'SQLERR',
                 message => "Unknown base interface table $i",
-                }
-                unless _exists_row $dbc_name;
+              }
+              unless _exists_row $dbc_name;
             no strict 'refs';
             my $href = \%{"${dbc_name}::fkfuncs"};
             if ($href && %$href) {
@@ -1070,8 +1078,8 @@ sub _parse_interface ($) {
             error_message {
                 result  => 'SQLERR',
                 message => "Unknown base interface table $i",
-                }
-                unless _exists_row $dbc_name;
+              }
+              unless _exists_row $dbc_name;
             no strict 'refs';
             my $href = \%{"${dbc_name}::fkfuncs"};
             next if not $href or not %$href;
@@ -1100,17 +1108,17 @@ sub _parse_interface ($) {
 
 sub make_object_to_json {
     my ($table, $field_types, $fields) = @_;
-    my @to_types = map {
-        [   $_,
+    my @to_types = map {[
+            $_,
             qq|!defined(\$self->[@{[_row_data]}][$fields->{$_}])? undef: |
-                . (
+              . (
                   $field_types->{$_} eq 'number'  ? "0+\$self->[@{[_row_data]}][$fields->{$_}]"
                 : $field_types->{$_} eq 'boolean' ? "\$self->[@{[_row_data]}][$fields->{$_}]? \\1: \\0"
                 : $field_types->{$_} eq 'json'
                 ? "CORE::ref(\$self->[@{[_row_data]}]->[$fields->{$_}])? \$self->[@{[_row_data]}][$fields->{$_}]->data"
-                    . ": JSON::from_json(\$self->[@{[_row_data]}][$fields->{$_}])"
+                  . ": JSON::from_json(\$self->[@{[_row_data]}][$fields->{$_}])"
                 : "\"\$self->[@{[_row_data]}][$fields->{$_}]\""
-                )
+              )
         ]
     } keys %$field_types;
     my $field_to_types = join ",\n\t\t\t\t ", map {qq|"$_->[0]" => $_->[1]|} @to_types;
@@ -1179,13 +1187,29 @@ sub _field_type_from_name {
     }
 }
 
+sub _schema_name {
+    my $ncn = $_[0];
+    if ($user_schema_namespace) {
+        (my $uncn = $ncn) =~ s/^.*:://;
+        no strict 'refs';
+        eval {
+            if (${"${user_schema_namespace}::${uncn}::"}{ISA}
+                && "${user_schema_namespace}::${uncn}"->isa($ncn))
+            {
+                $ncn = "${user_schema_namespace}::${uncn}";
+            }
+        };
+    }
+    $ncn;
+}
+
 sub setup_row {
     my ($table, $ncn, $interface) = @_;
     error_message {
         result  => 'SQLERR',
         message => "Unsupported driver $connector_driver",
-        }
-        unless exists $driver_pk_insert{$connector_driver};
+      }
+      unless exists $driver_pk_insert{$connector_driver};
     $ncn ||= make_name($table);
     return $ncn if _exists_row $ncn ;
     my %fields;
@@ -1207,8 +1231,8 @@ sub setup_row {
                 error_message {
                     result  => 'SQLERR',
                     message => "Unknown table $table",
-                    }
-                    if not $cih;
+                  }
+                  if not $cih;
                 my $i = 0;
                 while (my $chr = $cih->fetchrow_hashref) {
                     $chr->{COLUMN_NAME} =~ s/"//g;
@@ -1243,16 +1267,17 @@ sub setup_row {
                     delete $pkeys{$_} for @d;
                     if (%pkeys) {
                         my @spk = sort {scalar(keys %{$pkeys{$a}{fields}}) <=> scalar(keys %{$pkeys{$b}{fields}})}
-                            keys %pkeys;
+                          keys %pkeys;
                         @pkeys = keys %{$pkeys{$spk[0]}{fields}};
                     }
                 }
                 my $sth = $_->foreign_key_info(undef, undef, undef, undef, undef, $table);
                 if ($sth) {
-                    @fkeys = grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
-                        map {
+                    @fkeys =
+                      grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
+                      map {
                         $_->{FK_COLUMN_NAME} = $_->{FKCOLUMN_NAME}
-                            if $_->{FKCOLUMN_NAME};
+                          if $_->{FKCOLUMN_NAME};
                         $_->{FK_TABLE_NAME}  = $_->{FKTABLE_NAME} if $_->{FKTABLE_NAME};
                         $_->{FK_TABLE_NAME}  = lc $_->{FK_TABLE_NAME};
                         $_->{FK_COLUMN_NAME} = lc $_->{FK_COLUMN_NAME};
@@ -1261,21 +1286,22 @@ sub setup_row {
                         $_->{PKTABLE_NAME}  = lc $_->{PKTABLE_NAME}  if $_->{PKTABLE_NAME};
                         $_->{PKCOLUMN_NAME} = lc $_->{PKCOLUMN_NAME} if $_->{PKCOLUMN_NAME};
                         $_
-                        } @{$sth->fetchall_arrayref({})};
+                      } @{$sth->fetchall_arrayref({})};
                 }
                 $sth = $_->foreign_key_info(undef, undef, $table, undef, undef, undef);
                 if ($sth) {
-                    @refkeys = grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
-                        map {
+                    @refkeys =
+                      grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
+                      map {
                         $_->{FK_COLUMN_NAME} = $_->{FKCOLUMN_NAME}
-                            if $_->{FKCOLUMN_NAME};
+                          if $_->{FKCOLUMN_NAME};
                         $_->{FK_TABLE_NAME}  = $_->{FKTABLE_NAME} if $_->{FKTABLE_NAME};
                         $_->{FK_TABLE_NAME}  = lc $_->{FK_TABLE_NAME};
                         $_->{FK_COLUMN_NAME} = lc $_->{FK_COLUMN_NAME};
                         $_->{PKTABLE_NAME}   = lc($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME});
                         $_->{PKCOLUMN_NAME}  = lc($_->{PKCOLUMN_NAME} || $_->{UK_COLUMN_NAME});
                         $_
-                        } @{$sth->fetchall_arrayref({})};
+                      } @{$sth->fetchall_arrayref({})};
                 }
             }
         );
@@ -1296,9 +1322,9 @@ sub setup_row {
                     $field =~ s/[^\w ].*$//;
                     $field_types{$field} = _field_type_from_name($ti->{TYPE_NAME});
                     push @timestamp_fields, $field
-                        if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^time/;
+                      if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^time/;
                     $json_fields{$field} = undef
-                        if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^json/;
+                      if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^json/;
                 }
             }
         );
@@ -1548,8 +1574,8 @@ DESTROY
         $destroy = '';
     }
     my $eval_code = join "", $package_header, $select_keys, $new,
-        $set,    $data,   $fetch,   $autoload,  $to_json,        $filter_timestamp,
-        $update, $delete, $destroy, $accessors, $foreign_tables, $references_tables;
+      $set,    $data,   $fetch,   $autoload,  $to_json,        $filter_timestamp,
+      $update, $delete, $destroy, $accessors, $foreign_tables, $references_tables;
 
     #    print $eval_code;
     eval $eval_code;
@@ -1629,8 +1655,8 @@ sub _build_complex_query {
             error_message {
                 result  => 'SQLERR',
                 message => "Unknown table $tn"
-                }
-                unless _exists_row(make_name($tn));
+              }
+              unless _exists_row(make_name($tn));
             push @from, [$tn, $ta];
         } else {
             my $cmd = substr($le, 1);
@@ -1658,7 +1684,12 @@ sub _build_complex_query {
                 $limit = 0 + $linked_list[++$i];
             } elsif ($cmd eq 'offset') {
                 $offset = 0 + $linked_list[++$i];
-            } elsif ($cmd eq 'columns' || $cmd eq 'column' || $cmd eq 'distinct' || $cmd eq 'count' || $cmd eq 'all') {
+            } elsif ($cmd eq 'columns'
+                || $cmd eq 'column'
+                || $cmd eq 'distinct'
+                || $cmd eq 'count'
+                || $cmd eq 'all')
+            {
                 if ($cmd eq 'all') {
                     $all = 1;
                 }
@@ -1807,7 +1838,8 @@ sub _parse_groupby {
     my $sql_grp;
     if (defined $groupby) {
         $sql_grp = "GROUP BY ";
-        my @groupby = map {/^\d+$/ ? $_ : /^[a-z][\w ]*$/i ? "\"$_\"" : "$_"} (ref($groupby) ? @$groupby : ($groupby));
+        my @groupby =
+          map {/^\d+$/ ? $_ : /^[a-z][\w ]*$/i ? "\"$_\"" : "$_"} (ref($groupby) ? @$groupby : ($groupby));
         $sql_grp .= join(", ", @groupby);
     }
     $sql_grp;
@@ -1889,14 +1921,15 @@ sub execute {
 
     if ($simple_table) {
         $ncn = make_name($table);
-        setup_row($table);
+        $ncn = _schema_name($ncn);
+        setup_row($table, $ncn);
         if ($have_conditions and not ref $conditions) {
             my $id = ($ncn->selectKeys())[0]
-                or error_message {
+              or error_message {
                 result  => 'SQLERR',
                 message => "unknown primary key",
                 query   => "select * from $table",
-                };
+              };
             if (defined $conditions) {
                 $where      = "where $id = ?";
                 @where_bind = ($conditions);
@@ -1955,20 +1988,20 @@ sub execute {
     return DBIx::Struct::connect->run(
         sub {
             $sth = $_->prepare($query)
-                or error_message {
+              or error_message {
                 result  => 'SQLERR',
                 message => $_->errstr,
                 query   => $query,
-                };
+              };
             $sth->execute(@query_bind, @where_bind)
-                or error_message {
+              or error_message {
                 result     => 'SQLERR',
                 message    => $_->errstr,
                 query      => $query,
                 where_bind => Dumper(\@where_bind),
                 query_bind => Dumper(\@query_bind),
                 conditions => Dumper($conditions),
-                };
+              };
             setup_row($sth, $ncn, $up_interface);
             return $code->($sth, $ncn, $one_column);
         }
@@ -2054,8 +2087,8 @@ sub for_rows {
         where_bind => "(not parsed)",
         query_bind => "(not parsed)",
         conditions => "(not parsed)",
-        }
-        if not $itemfunc;
+      }
+      if not $itemfunc;
     return execute(
         sub {
             my ($sth, $ncn) = @_;
@@ -2081,9 +2114,11 @@ sub new_row {
     error_message {
         result  => 'SQLERR',
         message => "insert row can't work for queries"
-        }
-        unless $simple_table;
-    my $ncn = setup_row($table);
+      }
+      unless $simple_table;
+    my $ncn = make_name($table);
+    $ncn = _schema_name($ncn);
+    $ncn = setup_row($table, $ncn);
     return $ncn->new(@data);
 }
 

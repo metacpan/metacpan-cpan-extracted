@@ -30,6 +30,7 @@ Examples/ttfgetname.pl
 Examples/ttfmetrics.pl
 Examples/ttfname-old.pl
 Examples/ttfprintot.pl
+Examples/ttfpstest.pl
 Examples/ttfpuaspare.pl
 Examples/ttfreplacetable.pl
 Examples/ttfsortcover.pl
@@ -37,6 +38,7 @@ Examples/ttfstripgraphite.pl
 Examples/ttfstriphints.pl
 Examples/ttfunadopter.pl
 Examples/ttfwidth.pl
+Examples/volt2fea.pl
 Examples/volt2ps.pl
 Examples/volt2volt.pl
 Examples/voltExportAnchors.pl
@@ -112,6 +114,7 @@ t/base/tt_font_tt_1_metrics.ttf.GPOS.dat
 t/base/tt_font_tt_1_metrics.ttf.GSUB.dat
 t/base/tt_font_tt_1_metrics.ttf.name.dat
 t/base/ttfnamed.ttf
+t/changes.t
 t/fret.t
 t/lamalefliga.vtp
 t/OFL.txt

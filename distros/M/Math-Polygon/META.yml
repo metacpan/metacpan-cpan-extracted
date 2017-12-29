@@ -21,4 +21,4 @@ requires:
   Math::Trig: 0
   Scalar::Util: 1.13
   Test::More: 0.47
-version: 1.06
+version: 1.07

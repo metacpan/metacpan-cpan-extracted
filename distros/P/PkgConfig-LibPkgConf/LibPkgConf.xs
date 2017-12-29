@@ -408,11 +408,11 @@ _get_string(self, client, type)
     if(eflag != PKGCONF_PKG_ERRF_OK)
       XSRETURN_EMPTY;
     pkgconf_fragment_filter(&client->client, &filtered_list, &unfiltered_list, directory_filter, NULL);
-    len = pkgconf_fragment_render_len(&filtered_list, escape);
+    len = pkgconf_fragment_render_len(&filtered_list, escape, NULL);
     RETVAL = newSV(len == 1 ? len : len-1);
     SvPOK_on(RETVAL);
     SvCUR_set(RETVAL, len-1);
-    pkgconf_fragment_render_buf(&filtered_list, SvPVX(RETVAL), len, escape);
+    pkgconf_fragment_render_buf(&filtered_list, SvPVX(RETVAL), len, escape, NULL);
     pkgconf_fragment_free(&filtered_list);
     pkgconf_fragment_free(&unfiltered_list);
   OUTPUT:

@@ -10,7 +10,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.17
+Version 0.18
 
 # SYNOPSIS
 
@@ -44,7 +44,7 @@ and OpenStreetMap for other places:
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
     if($location = $geocoderlist->geocode('10 Downing St, London, UK')) {
-        print 'The prime minister lives at co-ordinates ', 
+        print 'The prime minister lives at co-ordinates ',
             $location->{geometry}{location}{lat}, ',',
             $location->{geometry}{location}{lng}, "\n";
     }

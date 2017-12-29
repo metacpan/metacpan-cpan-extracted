@@ -1,25 +1,42 @@
 use warnings;
 use strict;
-
 use Test::More;
-use Test::RequiresInternet ('www.eksisozluk.com' => 80);
 use WWW::Eksi;
+
+# Redefine _download for offline testing with minimal working example.
+sub WWW::Eksi::_download{
+  my $html = <<END;
+<html><body>
+<h1 id="title" data-title="test-topic"><a href="/test-link"></a></h1>
+<ul id="entry-list">
+<li data-author="test-author" data-id="1111" data-author-id="2222" data-favorite-count="3333">
+<div class="content">lorem ipsum dolor sit amet, consectetur adipiscing elit</div>
+</li>
+</ul>
+<section id="hidden-channels">channel-1,channel-2</section>
+<a class="entry-date permalink">01.01.2018</a>
+<a class="entry-author" href="/biri/test-author">test-author</a>
+</body></html>
+END
+  return $html;
+}
 
 my $e = WWW::Eksi->new;
 isa_ok($e, 'WWW::Eksi');
 
-my $entry    = $e->download_entry(1);
+my $entry    = $e->download_entry(1111);
 my $expected = {
-  author_id      => 8097,
-  author_name    => 'ssg',
-  author_url     => 'https://eksisozluk.com/biri/ssg',
-  body_processed => 'gitar calmak icin kullanilan minik plastik garip nesne.',
-  body_raw       => 'gitar calmak icin kullanilan minik plastik garip nesne.',
-  body_text      => 'gitar calmak icin kullanilan minik plastik garip nesne.',
-  entry_url      => 'https://eksisozluk.com/entry/1',
-  time_as_seen   => '15.02.1999',
-  topic_title    => 'pena',
-  topic_url      => 'https://eksisozluk.com/pena--31782',
+  author_id      => 2222,
+  fav_count      => 3333,
+  author_name    => 'test-author',
+  author_url     => 'https://eksisozluk.com/biri/test-author',
+  body_processed => 'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+  body_raw       => 'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+  body_text      => 'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+  entry_url      => 'https://eksisozluk.com/entry/1111',
+  time_as_seen   => '01.01.2018',
+  topic_title    => 'test-topic',
+  topic_url      => 'https://eksisozluk.com/test-link',
 };
 
 foreach my $key (keys %$expected){
@@ -28,8 +45,7 @@ foreach my $key (keys %$expected){
        : is ($entry->{$key}, $expected->{$key}, "correct $key");
 }
 
-ok($entry->{fav_count} > 0, "correct fav_count");
-ok(scalar($entry->{topic_channels})>0, "correct topic_channels");
-is($entry->{create_time}->ymd,'1999-02-15', "correct create_time");
+is($entry->{create_time}->ymd,'2018-01-01', "correct create_time");
+is_deeply($entry->{topic_channels}, [qw/channel-1 channel-2/], "correct topic_channels");
 
 done_testing;

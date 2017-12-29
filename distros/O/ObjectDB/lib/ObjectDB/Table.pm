@@ -3,7 +3,7 @@ package ObjectDB::Table;
 use strict;
 use warnings;
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 
 use constant DEFAULT_PAGE_SIZE => 10;
 
@@ -16,7 +16,6 @@ use ObjectDB::Iterator;
 use ObjectDB::Quoter;
 use ObjectDB::With;
 use ObjectDB::Meta;
-use ObjectDB::Exception;
 use ObjectDB::Util qw(execute to_array filter_columns);
 
 sub new {
@@ -108,7 +107,7 @@ sub find {
         for_update => $params{for_update},
     );
 
-    my ($rv, $sth) = execute($self->dbh, $select, context => $self);
+    my ($rv, $sth) = execute($self->dbh, $select);
 
     return $self->_finalize_results($select, $sth, %params, meta => $self->meta, wantarray => wantarray);
 }
@@ -152,7 +151,7 @@ sub find_by_compose {
         for_update => $params{for_update},
     );
 
-    my ($rv, $sth) = execute($self->dbh, $select, context => $self);
+    my ($rv, $sth) = execute($self->dbh, $select);
 
     my $meta;
     if (!$params{rows_as_hashes}) {
@@ -181,7 +180,7 @@ sub find_by_sql {
 
     my $stmt = ObjectDB::Stmt->new(sql => $sql, bind => \@bind);
 
-    my ($rv, $sth) = execute($self->dbh, $stmt, context => $self);
+    my ($rv, $sth) = execute($self->dbh, $stmt);
 
     my @column_names = @{ $sth->{NAME_lc} };
 
@@ -331,7 +330,7 @@ sub update {
         where  => $params{where},
     );
 
-    my $rv = execute($self->dbh, $sql, context => $self);
+    my $rv = execute($self->dbh, $sql);
     return $rv;
 }
 
@@ -346,7 +345,7 @@ sub delete : method {
         where  => $params{where},
     );
 
-    my $rv = execute($self->dbh, $sql, context => $self);
+    my $rv = execute($self->dbh, $sql);
     return $rv;
 }
 
@@ -383,7 +382,7 @@ sub count {
         group_by => $params{group_by},
     );
 
-    my ($rv, $sth) = execute($self->dbh, $select, context => $self);
+    my ($rv, $sth) = execute($self->dbh, $select);
 
     my $results    = $sth->fetchall_arrayref;
     my $row_object = $select->from_rows($results);

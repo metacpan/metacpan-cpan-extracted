@@ -1,8 +1,11 @@
 package Text::Password::SHA;
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use Moose;
 extends 'Text::Password::MD5';
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
 
 use Carp;
 use Digest::SHA qw(sha1_hex);
@@ -60,11 +63,11 @@ returns true if the verification succeeds.
 
 =cut
 
-override 'verify' => sub {
+sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input !~ /[!-~]/ or $input =~ /\s/;
+    if length $input and $input !~ /[!-~]/ or $input =~ /\s/;
 
     if ( $data =~ /^\$6\$([!-~]{1,8})\$[!-~]{86}$/ ) {
         my $salt = $1;
@@ -77,7 +80,7 @@ override 'verify' => sub {
         return $data eq sha1_hex($input);
     }
     return 0;
-};
+}
 
 =head3 nonce($length)
 
@@ -93,7 +96,7 @@ salt will be made automatically.
  
 =cut
 
-override 'encrypt' => sub {
+sub encrypt {
     my $self = shift;
     my $input = shift;
     my $min = $self->minimum();
@@ -101,11 +104,12 @@ override 'encrypt' => sub {
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
     if $input =~ /[^!-~]/ or $input =~ /\s/;
 
-    my $hash;
-     do{ $hash = Crypt::Passwd::XS::unix_sha512_crypt( $input, $self->nonce(8) ) }
-    until( $hash =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/ );
-    return $hash;
-};
+    return Crypt::Passwd::XS::unix_sha512_crypt( $input, $self->_salt() );
+}
+
+1;
+
+__END__
 
 =head3 generate($length)
 
@@ -116,15 +120,6 @@ unless $self->readability is 0.
 
 the length defaults to 8($self->default).
  
-=cut
-
-__PACKAGE__->meta->make_immutable;
-no Moose;
-
-1;
-
-__END__
-
 =head1 LICENSE
 
 Copyright (C) Yuki Yoshida(worthmine).

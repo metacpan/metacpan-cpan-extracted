@@ -3,7 +3,7 @@ package Ryu::Observable;
 use strict;
 use warnings;
 
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 =encoding utf8
 
@@ -18,8 +18,6 @@ so that you can be notified when said things are in some way not the same as
 the things they used to be, but are indeed now possessed of some detectable
 difference which may be of relevance to the thing that makes use of this thing
 which notifies as per the aforementioned conditions.
-
-
 
 =cut
 

@@ -16,7 +16,7 @@ my ( $raw, $hash, $flag );
 ( $raw, $hash ) = $pwd_CC->generate();
 note('generated hash strings with CORE::Crypt is ' . $hash );
 
-subtest 'verify CORE::Crypt 100 times' => sub {                         # 3
+subtest 'verify with CORE::Crypt 100 times' => sub {                    # 3
     plan tests => 100;
     foreach ( 1 .. 100 ){
         $flag = $pwd->verify( $raw, $hash );
@@ -28,7 +28,7 @@ subtest 'verify CORE::Crypt 100 times' => sub {                         # 3
 ( $raw, $hash ) = $pwd_MD5->generate();
 note('generated hash strings with MD5 is ' . $hash );
 
-subtest 'verify MD5 100 times' => sub {                                 # 4
+subtest 'verify with MD5 100 times' => sub {                            # 4
     plan tests => 100;
     foreach ( 1 .. 100 ){
         $flag = $pwd->verify( $raw, $hash );
@@ -40,7 +40,7 @@ subtest 'verify MD5 100 times' => sub {                                 # 4
 ( $raw, $hash ) = $pwd->generate();
 note('generated hash strings with SHA512 is ' . $hash );
 
-subtest 'verify SHA512 100 times' => sub {                              # 5
+subtest 'verify with SHA512 100 times' => sub {                         # 5
     plan tests => 100;
     foreach ( 1 .. 100 ){
         $flag = $pwd->verify( $raw, $hash );

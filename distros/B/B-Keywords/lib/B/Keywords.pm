@@ -14,7 +14,8 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.15';
+$VERSION = '1.16';
+my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
 @Scalars = (
@@ -122,14 +123,23 @@ use vars '@Filehandles';
 );
 
 use vars '@Functions';
-@Functions = qw(
+@Functions = (
+  ($] >= 5.015006 ? qw(
     __SUB__
+  ) : ()), qw(
     AUTOLOAD
     BEGIN
     DESTROY
-    END
-    INIT
-    CHECK
+    END ),
+    # STOP was between 5.5.64 - v5.6.0
+  ($] >= 5.005064 && $] < 5.006
+    ? qw(STOP) : qw(CHECK)),
+    # INIT was called RESTART before 5.004_50
+  ($] >= 5.006
+    ? qw(INIT) : qw(RESTART)),
+  ($] < 5.007003 ? qw(
+    EQ GE GT LE LT NE
+  ) : ()), qw(
     UNITCHECK
     abs
     accept
@@ -137,8 +147,10 @@ use vars '@Functions';
     atan2
     bind
     binmode
-    bless
+    bless ),
+  ($] >= 5.009003 && ($] < 5.027007 || $CPERL) ? qw(
     break
+  ) : ()), qw(
     caller
     chdir
     chmod
@@ -153,7 +165,10 @@ use vars '@Functions';
     cos
     crypt
     dbmclose
-    dbmopen
+    dbmopen ),
+  ($] >= 5.009003 && ($] < 5.027007 || $CPERL) ? qw(
+    default
+  ) : ()), qw(
     defined
     delete
     die
@@ -166,13 +181,17 @@ use vars '@Functions';
     endpwent
     endservent
     eof
-    eval
+    eval ),
+  ($] >= 5.015005 ? qw(
     evalbytes
+  ) : ()), qw(
     exec
     exists
     exit
-    exp
+    exp ),
+  ($] >= 5.015008 ? qw(
     fc
+  ) : ()), qw(
     fcntl
     fileno
     flock
@@ -204,7 +223,10 @@ use vars '@Functions';
     getservbyport
     getservent
     getsockname
-    getsockopt
+    getsockopt ),
+  ($] >= 5.009003 ? qw(
+    given
+  ) : ()), qw(
     glob
     gmtime
     goto
@@ -224,7 +246,10 @@ use vars '@Functions';
     link
     listen
     local
-    localtime
+    localtime ),
+  ($] >= 5.004 ? qw(
+    lock
+  ) : ()), qw(
     log
     lstat
     map
@@ -266,8 +291,10 @@ use vars '@Functions';
     reverse
     rewinddir
     rindex
-    rmdir
+    rmdir ),
+  ($] >= 5.009003 ? qw(
     say
+  ) : ()), qw(
     scalar
     seek
     seekdir
@@ -335,7 +362,13 @@ use vars '@Functions';
     wait
     waitpid
     wantarray
-    warn
+    warn ),
+  ($] >= 5.009003 && ($] < 5.027007 || $CPERL) ? qw(
+    when
+  ) : qw(
+    whereis
+    whereso
+  )), qw(
     write
 
     -r -w -x -o
@@ -344,10 +377,11 @@ use vars '@Functions';
     -u -g -k
     -T -B
     -M -A -C
-);
+));
 
 use vars '@Barewords';
-@Barewords = qw(
+@Barewords = (
+  qw(
     __FILE__
     __LINE__
     __PACKAGE__
@@ -361,14 +395,20 @@ use vars '@Barewords';
     LT
     NE
     NULL
-    and
+    and ),
+  ($CPERL && $] >= 5.027001 ? qw(
+    class method role multi has
+  ) : ()), qw(
     cmp
     continue
     default
     do
     else
     elsif
-    eq
+    eq ),
+  ($] >= 5.008001 && $] < 5.010 ? qw(
+    err
+  ) : ()), qw(
     for
     foreach
     ge
@@ -384,8 +424,13 @@ use vars '@Barewords';
     or
     package
     q
-    qq
+    qq ),
+  ($] >= 5.004072 ? qw(
     qr
+  ) : ()),
+  ($] == 5.007003 ? qw(
+    qu
+  ) : ()), qw(
     qw
     qx
     s
@@ -398,7 +443,7 @@ use vars '@Barewords';
     x
     xor
     y
-);
+));
 
 use vars '@TieIOMethods';
 @TieIOMethods = qw(
@@ -564,7 +609,7 @@ for patches and releases.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2009 Joshua ben Jore, All rights reserved.
-Copyright 2013, 2015 Reini Urban, All rights reserved.
+Copyright 2013, 2015, 2017 Reini Urban, All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:

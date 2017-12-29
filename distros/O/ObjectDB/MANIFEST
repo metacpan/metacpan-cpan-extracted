@@ -11,7 +11,6 @@ cpanfile
 lib/ObjectDB.pm
 lib/ObjectDB/DBHPool.pm
 lib/ObjectDB/DBHPool/Connection.pm
-lib/ObjectDB/Exception.pm
 lib/ObjectDB/Factory.pm
 lib/ObjectDB/Iterator.pm
 lib/ObjectDB/Meta.pm
@@ -35,7 +34,6 @@ lib/ObjectDB/With.pm
 minil.toml
 t/columns.t
 t/connection.t
-t/exception.t
 t/inheritance.t
 t/lib/Author.pm
 t/lib/Book.pm

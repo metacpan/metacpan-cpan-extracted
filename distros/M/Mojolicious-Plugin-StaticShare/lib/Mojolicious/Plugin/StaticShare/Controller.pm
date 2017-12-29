@@ -22,9 +22,22 @@ sub get {
   return $c->not_found
     if !$c->is_admin && grep {/^\./} @{$c->stash('url_path')->parts};
   
-  return $c->not_found
-    if $c->plugin->access && !( ref $c->plugin->access eq 'CODE' ? $c->plugin->access->($c) : $c->plugin->access );
+  if ($c->plugin->access) {
+    my $access = ref $c->plugin->access eq 'CODE' ? $c->plugin->access->($c) : $c->plugin->access;
+    
+    return $c->not_found
+      unless $access;
+    
+    return $c->render(%$access)
+      if ref $access eq 'HASH';
+  }
   
+  if ($c->is_admin && $c->param('admin')) {
+    # Temporary Redirect
+    $c->res->code(307);
+    return $c->redirect_to($c->req->url->to_abs->path);
+  }
+
   my $file_path = $c->stash('file_path');
   
   return $c->dir($file_path)
@@ -38,6 +51,12 @@ sub get {
 sub post {
   my ($c) = @_;
   $c->_stash();
+  
+  #~ if ($c->is_admin && $c->param('admin')) {
+    # Temporary Redirect
+    #~ $c->res->code(307);
+    #~ return $c->redirect_to($c->req->url->to_abs->path);
+  #~ }
   
   my $file_path = $c->stash('file_path');
   

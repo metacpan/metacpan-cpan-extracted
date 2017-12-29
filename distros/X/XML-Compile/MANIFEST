@@ -108,8 +108,8 @@ t/77form.t
 t/81-2000.t
 t/90nons.t
 t/91noqual.t
-t/92json.t
 t/TestTools.pm
+xt/92json.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

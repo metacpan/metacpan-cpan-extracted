@@ -30,10 +30,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0,
-    "Test::RequiresInternet" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +48,6 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Mojo::DOM" => 0,
   "Test::More" => 0,
-  "Test::RequiresInternet" => 0,
   "URI" => 0,
   "WWW::Lengthen" => 0,
   "strict" => 0,

@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 36)
+MYPACKAGESTART (tconv 1 0 40)
 
 ###########
 # Library #
@@ -213,6 +213,15 @@ MYPACKAGECHECK(tconvExe -t UTF-16 -o tconv.tconv-UTF-16.c "${PROJECT_SOURCE_DIR}
 ###########
 # Install #
 ###########
-INSTALL (TARGETS tconv tconvExe ARCHIVE DESTINATION lib LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
 MYPACKAGEMAN("include/README.pod"       "TCONV"     "3" "${TCONV_VERSION}")
 MYPACKAGEMAN("include/tconv/README.pod" "TCONV_EXT" "3" "${TCONV_VERSION}")
+
+#############
+# Packaging #
+#############
+MYPACKAGEPACK ("" "Portable Iconv-like interface")
+
+#########
+# Setup #
+#########
+MYPACKAGEPRINTSETUP()

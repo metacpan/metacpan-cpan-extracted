@@ -7,7 +7,7 @@ use warnings;
 
 package Math::Polygon::Transform;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Exporter';
 

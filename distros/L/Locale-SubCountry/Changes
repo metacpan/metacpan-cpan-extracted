@@ -1,5 +1,8 @@
 Revision history for Perl CPAN module Locale::SubCountry
 
+2.03 27 Dec 2017    
+    Updated to alioth.debian.org codes 3.77 (Dec 2017)
+
 2.02 7 Mar 2017
     Fixed RT bug #120002, name space pollution
     Updated to alioth.debian.org codes 3.74 (Jan 2017)

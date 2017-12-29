@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-App-btcindo"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

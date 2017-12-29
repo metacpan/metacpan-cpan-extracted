@@ -4,27 +4,32 @@ use Font::TTF::Scripts::Fea;
 use IO::File;
 use Getopt::Long;
 use Pod::Usage;
+use File::Basename;
 
 our(%opts);
 GetOptions(\%opts, 
     'ap|a=s', 
     # 'b',              # used in make_volt
-    'classfile|c=s', 
+    'classfile|c=s',
     'classprops',
-    # 'autodefines|d',  # used in make_gdl
-    # 'define|D=s%',    # used in make_gdl
-    'empty|e=s', 
+    'classwarn',
+    # 'autodefines',    # used in make_gdl
+    # 'define|d=s%',    # used in make_gdl
+    'empty|e=s',
     # 'forceadd|f=i',   # used in make_volt
-    'help|h', 
-    'include|i=s@', 
-    'ligatures|l=s', 
-    'mark|m=s', 
+    'help|h',
+    'include|i=s@',
+    'ligatures|l=s',
+    'mark|m=s',
+    'markattach=s%',
     # 'normalize|n=i',  # used in make_gdl, make_volt
-    'omitaps|o=s', 
+    'omitaps|o=s',
+    'package=s',
     # 'positions|p=i',  # used in make_gdl
+    'preinclude=s',
+    'renameaps|r',
     # 'substitutions|s=i',  # used in make_gdl
     # 'outVOLT|t',      # used in make_volt
-    'renameaps|r', 
     'z=i');
 
 unless ($ARGV[1] || $opts{'help'})
@@ -57,16 +62,25 @@ if ($opts{'empty'})
     $options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
 }
 
+# Process -o if supplied
 $options{'-omittedAPs'} = $opts{'omitaps'} if $opts{'omitaps'};
 
-my $f = Font::TTF::Scripts::Fea->read_font($ARGV[0], $opts{'ap'}, %opts) || die "Can't read font information";
-
-if (exists $f->{'WARNINGS'})
+# Open font, using custom module if --package suppplied
+my $f;
+if ($opts{'package'})
 {
-    warn $f->{'WARNINGS'};
+    my $pkg = $opts{'package'};
+    require $pkg;
+    # Assume the package name is the basename of the filename:
+    ($pkg, undef, undef) = fileparse($opts{'package'}, qr/\.[^.]*/);
+    $f = $pkg->read_font($ARGV[0], $opts{'ap'}, %options);
 }
-
-
+else
+{
+    $f = Font::TTF::Scripts::Fea->read_font($ARGV[0], $opts{'ap'}, %options);
+}
+die "Can't read font information" unless $f;
+ 
 my $outfh = IO::File->new("> $ARGV[1]") || die "Can't open $ARGV[1] for writing";
 
 my $comp = $1 if ($opts{'ligatures'} =~ s/(comp)$//oi);
@@ -90,13 +104,31 @@ if ($opts{'renameaps'})
     }
 }
 
+my %markattaches = ();
+if ($opts{'markattach'} and %{$opts{'markattach'}})
+{
+    while (my ($k, $v) = each %{$opts{'markattach'}})
+    {
+        foreach my $a (split(/[,;.\/ ]+/, $k))
+        {
+            $markattaches{$a} = $v;
+        }
+    }
+}
+
 $f->{'vecs'} = {};
 
-$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}, -w => $opts{'classwarn'}) if ($opts{'classfile'});
 $f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -ignoredAPs => $options{'omitaps'}, -notmark => $opts{'mark'});
 $f->out_classes($outfh);
-$f->out_pos_lookups($outfh);
+$f->start_afdko($outfh, %opts);
+$f->out_pos_lookups($outfh, -m => \%markattaches);
 $f->end_out($outfh, $opts{'include'}, %opts);
+
+if (exists $f->{'WARNINGS'})
+{
+    warn $f->{'WARNINGS'};
+}
 
 $outfh->close();
 
@@ -104,7 +136,7 @@ __END__
 
 =head1 NAME
 
-make_fea - Create GDL from a TrueType Font
+make_fea - Create FEA from a TrueType Font
 
 =head1 SYNOPSIS
 
@@ -117,9 +149,10 @@ Creates font specific AFDKO fea source file from a font and optional attachment 
 
   -a file       Attachment point database
   -c classfile  xml file of class and property information to merge in
-  --classproperties
-                specifies whether classes are made for property values in
+  --classprops  specifies whether classes are made for property values in
                 the classfile
+  --classwarn   issue warnings if classfile contains references to glyphs
+                that are not in the font.
   -e file       A file containing names (1 per line) of glyphs that are 
                 known to have no outline (thus shouldn't generate warnings). 
   -h            print manpage
@@ -131,6 +164,12 @@ Creates font specific AFDKO fea source file from a font and optional attachment 
                     lastcomp - treat extensions as part of elements, as last
   -m "list"     List of APs to ignore when deciding whether a glyph is a mark
   -o "list"     List of AP names to omit
+  --package file
+                Use the named file instead of Font::TTF::Scripts::GDL.pm to
+                open the font. Assumes the internal package name is the
+                same as the basename of file (sans any extension).
+  --preinclude file
+                add #include statement at begining of file
   -r            Rename point names such that final M gets initial _ and final S
                 is removed. Typically for Fontographer fonts.
   -z bitfield   Bitfield of various controls:
@@ -150,7 +189,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This script is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

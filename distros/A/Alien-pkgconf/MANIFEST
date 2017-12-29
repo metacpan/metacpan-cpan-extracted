@@ -8,6 +8,7 @@ maint/travis
 Makefile.PL
 MANIFEST			This list of files
 patch/pkgconf-cygwin-1.2.1.diff
+patch/pkgconf-solaris-1.3.9.diff
 README
 script/build.pl
 script/clean.pl

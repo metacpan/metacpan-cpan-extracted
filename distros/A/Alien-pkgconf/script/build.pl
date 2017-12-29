@@ -103,8 +103,29 @@ if(-e 'Makefile')
   run 'make', 'distclean';
 }
 
+if($^O eq 'solaris')
+{
+  outer:
+  foreach my $dir (@PATH, '/usr/gnu/bin')
+  {
+    foreach my $try (map { File::Spec->catfile($dir, $_) } qw( gnm nm ))
+    {
+      if(-x $try)
+      {
+        my($line) = `$try --version`;
+        if($? == 0 && $line =~ /GNU nm/)
+        {
+          print "+setenv+ NM = $try\n";
+          $ENV{NM} = $try;
+          last outer;
+        }
+      }
+    }
+  }
+}
+
 run 'sh', 'configure', @configure_flags;
-run 'make';
+run 'make', 'V=1';
 run 'make', 'install';
 
 my @cleanup = (

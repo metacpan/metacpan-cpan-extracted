@@ -60,6 +60,7 @@ t/file.t
 t/glob.t
 t/io-handle.t
 t/leak.t
+t/load-blessed.t
 t/load.t
 t/load_standard_tags.t
 t/loadfile-empty.t

@@ -13,11 +13,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our %locations;
 
 =head1 SYNOPSIS
@@ -65,7 +65,7 @@ and OpenStreetMap for other places:
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
     if($location = $geocoderlist->geocode('10 Downing St, London, UK')) {
-        print 'The prime minister lives at co-ordinates ', 
+        print 'The prime minister lives at co-ordinates ',
             $location->{geometry}{location}{lat}, ',',
             $location->{geometry}{location}{lng}, "\n";
     }
@@ -96,7 +96,7 @@ return value, if the value was retrieved from the cache the value will be undefi
 sub geocode {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(@_ % 2 == 0) {
@@ -110,7 +110,12 @@ sub geocode {
 	return unless(defined($location));
 	return unless(length($location) > 0);
 
+	$location =~ s/\s\s+/ /g;
+
 	if((!wantarray) && (my $rc = $locations{$location})) {
+		if(ref($rc) eq 'ARRAY') {
+			$rc = @{$rc}[0];
+		}
 		if(ref($rc) eq 'HASH') {
 			delete $rc->{'geocoder'};
 			my $log = {
@@ -139,7 +144,7 @@ sub geocode {
 
 	my $error;
 
-	foreach my $g(@{$self->{geocoders}}) {
+	ENCODER: foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
 		if(ref($geocoder) eq 'HASH') {
 			my $regex = $g->{'regex'};
@@ -180,6 +185,7 @@ sub geocode {
 				};
 				CORE::push @{$self->{'log'}}, $log;
 				@rc = ();
+				next ENCODER;
 			} else {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
 				if(!defined($l->{geometry}{location}{lat})) {
@@ -241,7 +247,7 @@ sub geocode {
 				$locations{$location} = \@rc;
 				return @rc;
 			}
-			if(length($rc[0])) {
+			if(scalar($rc[0])) {	# check it's not an empty hash
 				$locations{$location} = $rc[0];
 				return $rc[0];
 			}

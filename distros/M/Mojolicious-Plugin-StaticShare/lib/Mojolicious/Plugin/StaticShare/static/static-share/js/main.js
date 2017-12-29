@@ -23,6 +23,7 @@ $( document ).ready(function() {
         $('td.size', ntr).text(file.size);
         $('td.mtime', ntr).text((file.lastModified && new Date(file.lastModified).toLocaleString()) || (file.lastModifiedDate && file.lastModifiedDate.toLocaleString()) || '');
         ntr.prependTo(tbody);
+        namefield.focus();
       });
     },// end add file
     progressall: function (e, data) {

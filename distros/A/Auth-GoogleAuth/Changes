@@ -1,5 +1,8 @@
 Revision history for Auth::GoogleAuth
 
+1.02      2017-12-26 13:50:58-08:00 America/Los_Angeles
+        - Adding Perl versions to test; annual general update for 2018
+
 1.01      2015-08-03 18:04:30-07:00 America/Los_Angeles
         - Minor POD clean-up
 

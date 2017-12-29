@@ -39,7 +39,6 @@
       "test" : {
          "requires" : {
             "Test::More" : "0",
-            "Test::RequiresInternet" : "0",
             "perl" : "5.010"
          }
       }
@@ -47,11 +46,11 @@
    "provides" : {
       "WWW::Eksi" : {
          "file" : "lib/WWW/Eksi.pm",
-         "version" : "0.28"
+         "version" : "0.30"
       },
       "WWW::Eksisozluk" : {
          "file" : "lib/WWW/Eksisozluk.pm",
-         "version" : "0.28"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
@@ -66,7 +65,7 @@
          "web" : "https://github.com/kyzn/WWW-Eksi"
       }
    },
-   "version" : "0.28",
+   "version" : "0.30",
    "x_contributors" : [
       "Kivanc Yazan <kivancyazan@gmail.com>",
       "Kivanc Yazan <kyzn@users.noreply.github.com>",

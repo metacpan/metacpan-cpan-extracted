@@ -30,6 +30,10 @@ WriteMakefile(
     clean => { FILES => 'WWW-Google-KnowledgeGraphSearch-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'WWW::Google::KnowledgeGraphSearch'         => { file => 'lib/WWW/Google/KnowledgeGraphSearch.pm'       , version => '0.04' },
+            'WWW::Google::KnowledgeGraphSearch::Result' => { file => 'lib/WWW/Google/KnowledgeGraphSearch/Result.pm', version => '0.04' },
+        },
         resources => {
             repository => {
                 type => 'git',

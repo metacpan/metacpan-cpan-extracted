@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       },
       "develop" : {
@@ -29,6 +29,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0"
          }
       },
@@ -41,7 +42,7 @@
             "Math::Random::MT" : "0",
             "URI::Escape" : "0",
             "base" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -54,7 +55,7 @@
             "Test::More" : "0",
             "Test::Most" : "0",
             "constant" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       }
    },
@@ -70,6 +71,7 @@
          "web" : "https://github.com/gryphonshafer/Auth-GoogleAuth"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

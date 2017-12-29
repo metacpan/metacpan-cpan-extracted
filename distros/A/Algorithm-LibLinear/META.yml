@@ -21,7 +21,7 @@ name: Algorithm-LibLinear
 provides:
   Algorithm::LibLinear:
     file: lib/Algorithm/LibLinear.pm
-    version: '0.17'
+    version: '0.18'
   Algorithm::LibLinear::DataSet:
     file: lib/Algorithm/LibLinear/DataSet.pm
   Algorithm::LibLinear::FeatureScaling:
@@ -36,5 +36,5 @@ requires:
   perl: v5.14.0
 resources:
   license: http://opensource.org/licenses/mit-license.php
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

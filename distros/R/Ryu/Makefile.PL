@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Ryu",
   "PREREQ_PM" => {
     "Encode" => "1.98",
-    "Future" => "0.35",
+    "Future" => "0.37",
     "List::UtilsBy" => "0.10",
     "Log::Any" => "1.045",
     "Log::Any::Adapter" => "1.045",
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "Encode" => "1.98",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Future" => "0.35",
+  "Future" => "0.37",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::UtilsBy" => "0.10",

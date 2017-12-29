@@ -19,13 +19,13 @@ l<https://pkg-isocodes.alioth.debian.org/>
 #------------------------------------------------------------------------------
 use utf8;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 package Locale::SubCountry::Codes;
 
 $Locale::SubCountry::Codes::JSON =
 q{
 {
-"3166-1": [
+  "3166-1": [
     {
       "alpha_2": "AW",
       "alpha_3": "ABW",
@@ -413,8 +413,9 @@ q{
     {
       "alpha_2": "CZ",
       "alpha_3": "CZE",
-      "name": "Czech Republic",
-      "numeric": "203"
+      "name": "Czechia",
+      "numeric": "203",
+      "official_name": "Czech Republic"
     },
     {
       "alpha_2": "DE",
@@ -1645,6 +1646,7 @@ q{
     {
       "alpha_2": "VN",
       "alpha_3": "VNM",
+      "common_name": "Vietnam",
       "name": "Viet Nam",
       "numeric": "704",
       "official_name": "Socialist Republic of Viet Nam"
@@ -1698,7 +1700,6 @@ q{
       "official_name": "Republic of Zimbabwe"
     }
   ],
-  
   "3166-2": [
     {
       "code": "AD-02",
@@ -8266,587 +8267,587 @@ q{
     {
       "code": "FR-01",
       "name": "Ain",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-02",
       "name": "Aisne",
-      "parent": "S",
+      "parent": "HDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-03",
       "name": "Allier",
-      "parent": "C",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-04",
       "name": "Alpes-de-Haute-Provence",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-05",
       "name": "Hautes-Alpes",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-06",
       "name": "Alpes-Maritimes",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-07",
       "name": "Ardèche",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-08",
       "name": "Ardennes",
-      "parent": "G",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-09",
       "name": "Ariège",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-10",
       "name": "Aube",
-      "parent": "G",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-11",
       "name": "Aude",
-      "parent": "K",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-12",
       "name": "Aveyron",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-13",
       "name": "Bouches-du-Rhône",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-14",
       "name": "Calvados",
-      "parent": "P",
+      "parent": "NOR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-15",
       "name": "Cantal",
-      "parent": "C",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-16",
       "name": "Charente",
-      "parent": "T",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-17",
       "name": "Charente-Maritime",
-      "parent": "T",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-18",
       "name": "Cher",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-19",
       "name": "Corrèze",
-      "parent": "L",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-21",
       "name": "Côte-d'Or",
-      "parent": "D",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-22",
       "name": "Côtes-d'Armor",
-      "parent": "E",
+      "parent": "BRE",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-23",
       "name": "Creuse",
-      "parent": "L",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-24",
       "name": "Dordogne",
-      "parent": "B",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-25",
       "name": "Doubs",
-      "parent": "I",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-26",
       "name": "Drôme",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-27",
       "name": "Eure",
-      "parent": "Q",
+      "parent": "NOR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-28",
       "name": "Eure-et-Loir",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-29",
       "name": "Finistère",
-      "parent": "E",
+      "parent": "BRE",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-2A",
       "name": "Corse-du-Sud",
-      "parent": "H",
+      "parent": "COR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-2B",
       "name": "Haute-Corse",
-      "parent": "H",
+      "parent": "COR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-30",
       "name": "Gard",
-      "parent": "K",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-31",
       "name": "Haute-Garonne",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-32",
       "name": "Gers",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-33",
       "name": "Gironde",
-      "parent": "B",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-34",
       "name": "Hérault",
-      "parent": "K",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-35",
       "name": "Ille-et-Vilaine",
-      "parent": "E",
+      "parent": "BRE",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-36",
       "name": "Indre",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-37",
       "name": "Indre-et-Loire",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-38",
       "name": "Isère",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-39",
       "name": "Jura",
-      "parent": "I",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-40",
       "name": "Landes",
-      "parent": "B",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-41",
       "name": "Loir-et-Cher",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-42",
       "name": "Loire",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-43",
       "name": "Haute-Loire",
-      "parent": "C",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-44",
       "name": "Loire-Atlantique",
-      "parent": "R",
+      "parent": "PDL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-45",
       "name": "Loiret",
-      "parent": "F",
+      "parent": "CVL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-46",
       "name": "Lot",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-47",
       "name": "Lot-et-Garonne",
-      "parent": "B",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-48",
       "name": "Lozère",
-      "parent": "K",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-49",
       "name": "Maine-et-Loire",
-      "parent": "R",
+      "parent": "PDL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-50",
       "name": "Manche",
-      "parent": "P",
+      "parent": "NOR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-51",
       "name": "Marne",
-      "parent": "G",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-52",
       "name": "Haute-Marne",
-      "parent": "G",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-53",
       "name": "Mayenne",
-      "parent": "R",
+      "parent": "PDL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-54",
       "name": "Meurthe-et-Moselle",
-      "parent": "M",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-55",
       "name": "Meuse",
-      "parent": "M",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-56",
       "name": "Morbihan",
-      "parent": "E",
+      "parent": "BRE",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-57",
       "name": "Moselle",
-      "parent": "M",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-58",
       "name": "Nièvre",
-      "parent": "D",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-59",
       "name": "Nord",
-      "parent": "O",
+      "parent": "HDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-60",
       "name": "Oise",
-      "parent": "S",
+      "parent": "HDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-61",
       "name": "Orne",
-      "parent": "P",
+      "parent": "NOR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-62",
       "name": "Pas-de-Calais",
-      "parent": "O",
+      "parent": "HDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-63",
       "name": "Puy-de-Dôme",
-      "parent": "C",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-64",
       "name": "Pyrénées-Atlantiques",
-      "parent": "B",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-65",
       "name": "Hautes-Pyrénées",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-66",
       "name": "Pyrénées-Orientales",
-      "parent": "K",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-67",
       "name": "Bas-Rhin",
-      "parent": "A",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-68",
       "name": "Haut-Rhin",
-      "parent": "A",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-69",
       "name": "Rhône",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-70",
       "name": "Haute-Saône",
-      "parent": "I",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-71",
       "name": "Saône-et-Loire",
-      "parent": "D",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-72",
       "name": "Sarthe",
-      "parent": "R",
+      "parent": "PDL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-73",
       "name": "Savoie",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-74",
       "name": "Haute-Savoie",
-      "parent": "V",
+      "parent": "ARA",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-75",
       "name": "Paris",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-76",
       "name": "Seine-Maritime",
-      "parent": "Q",
+      "parent": "NOR",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-77",
       "name": "Seine-et-Marne",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-78",
       "name": "Yvelines",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-79",
       "name": "Deux-Sèvres",
-      "parent": "T",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-80",
       "name": "Somme",
-      "parent": "S",
+      "parent": "HDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-81",
       "name": "Tarn",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-82",
       "name": "Tarn-et-Garonne",
-      "parent": "N",
+      "parent": "OCC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-83",
       "name": "Var",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-84",
       "name": "Vaucluse",
-      "parent": "U",
+      "parent": "PAC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-85",
       "name": "Vendée",
-      "parent": "R",
+      "parent": "PDL",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-86",
       "name": "Vienne",
-      "parent": "T",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-87",
       "name": "Haute-Vienne",
-      "parent": "L",
+      "parent": "NAQ",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-88",
       "name": "Vosges",
-      "parent": "M",
+      "parent": "GES",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-89",
       "name": "Yonne",
-      "parent": "D",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-90",
       "name": "Territoire de Belfort",
-      "parent": "I",
+      "parent": "BFC",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-91",
       "name": "Essonne",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-92",
       "name": "Hauts-de-Seine",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-93",
       "name": "Seine-Saint-Denis",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-94",
       "name": "Val-de-Marne",
-      "parent": "J",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
       "code": "FR-95",
-      "name": "Val d'Oise",
-      "parent": "J",
+      "name": "Val-d'Oise",
+      "parent": "IDF",
       "type": "Metropolitan department"
     },
     {
-      "code": "FR-A",
-      "name": "Alsace",
+      "code": "FR-ARA",
+      "name": "Auvergne-Rhône-Alpes",
       "type": "Metropolitan region"
     },
     {
-      "code": "FR-B",
-      "name": "Aquitaine",
+      "code": "FR-BFC",
+      "name": "Bourgogne-Franche-Comté",
       "type": "Metropolitan region"
     },
     {
@@ -8855,8 +8856,13 @@ q{
       "type": "Overseas territorial collectivity"
     },
     {
-      "code": "FR-C",
-      "name": "Auvergne",
+      "code": "FR-BRE",
+      "name": "Bretagne",
+      "type": "Metropolitan region"
+    },
+    {
+      "code": "FR-COR",
+      "name": "Corse",
       "type": "Metropolitan region"
     },
     {
@@ -8865,64 +8871,50 @@ q{
       "type": "Dependency"
     },
     {
-      "code": "FR-D",
-      "name": "Bourgogne",
+      "code": "FR-CVL",
+      "name": "Centre-Val de Loire",
       "type": "Metropolitan region"
     },
     {
-      "code": "FR-E",
-      "name": "Bretagne",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-F",
-      "name": "Centre",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-G",
-      "name": "Champagne-Ardenne",
+      "code": "FR-GES",
+      "name": "Grand-Est",
       "type": "Metropolitan region"
     },
     {
       "code": "FR-GF",
-      "name": "Guyane",
-      "type": "Overseas region/department"
+      "name": "Guyane (française)",
+      "type": "Overseas territorial collectivity"
     },
     {
       "code": "FR-GP",
       "name": "Guadeloupe",
-      "type": "Overseas region/department"
+      "parent": "GUA",
+      "type": "Overseas department"
     },
     {
-      "code": "FR-H",
-      "name": "Corse",
+      "code": "FR-GUA",
+      "name": "Guadeloupe",
+      "type": "Overseas region"
+    },
+    {
+      "code": "FR-HDF",
+      "name": "Hauts-de-France",
       "type": "Metropolitan region"
     },
     {
-      "code": "FR-I",
-      "name": "Franche-Comté",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-J",
+      "code": "FR-IDF",
       "name": "Île-de-France",
       "type": "Metropolitan region"
     },
     {
-      "code": "FR-K",
-      "name": "Languedoc-Roussillon",
-      "type": "Metropolitan region"
+      "code": "FR-LRE",
+      "name": "La Réunion",
+      "type": "Overseas region"
     },
     {
-      "code": "FR-L",
-      "name": "Limousin",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-M",
-      "name": "Lorraine",
-      "type": "Metropolitan region"
+      "code": "FR-MAY",
+      "name": "Mayotte",
+      "type": "Overseas region"
     },
     {
       "code": "FR-MF",
@@ -8932,11 +8924,11 @@ q{
     {
       "code": "FR-MQ",
       "name": "Martinique",
-      "type": "Overseas region/department"
+      "type": "Overseas territorial collectivity"
     },
     {
-      "code": "FR-N",
-      "name": "Midi-Pyrénées",
+      "code": "FR-NAQ",
+      "name": "Nouvelle-Aquitaine",
       "type": "Metropolitan region"
     },
     {
@@ -8945,13 +8937,23 @@ q{
       "type": "Overseas territorial collectivity"
     },
     {
-      "code": "FR-O",
-      "name": "Nord - Pas-de-Calais",
+      "code": "FR-NOR",
+      "name": "Normandie",
       "type": "Metropolitan region"
     },
     {
-      "code": "FR-P",
-      "name": "Basse-Normandie",
+      "code": "FR-OCC",
+      "name": "Occitanie",
+      "type": "Metropolitan region"
+    },
+    {
+      "code": "FR-PAC",
+      "name": "Provence-Alpes-Côte-d’Azur",
+      "type": "Metropolitan region"
+    },
+    {
+      "code": "FR-PDL",
+      "name": "Pays-de-la-Loire",
       "type": "Metropolitan region"
     },
     {
@@ -8965,44 +8967,15 @@ q{
       "type": "Overseas territorial collectivity"
     },
     {
-      "code": "FR-Q",
-      "name": "Haute-Normandie",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-R",
-      "name": "Pays de la Loire",
-      "type": "Metropolitan region"
-    },
-    {
       "code": "FR-RE",
-      "name": "Réunion",
-      "type": "Overseas region/department"
-    },
-    {
-      "code": "FR-S",
-      "name": "Picardie",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-T",
-      "name": "Poitou-Charentes",
-      "type": "Metropolitan region"
+      "name": "La Réunion",
+      "parent": "LRE",
+      "type": "Overseas department"
     },
     {
       "code": "FR-TF",
       "name": "Terres australes françaises",
       "type": "Overseas territorial collectivity"
-    },
-    {
-      "code": "FR-U",
-      "name": "Provence-Alpes-Côte d'Azur",
-      "type": "Metropolitan region"
-    },
-    {
-      "code": "FR-V",
-      "name": "Rhône-Alpes",
-      "type": "Metropolitan region"
     },
     {
       "code": "FR-WF",
@@ -9012,7 +8985,8 @@ q{
     {
       "code": "FR-YT",
       "name": "Mayotte",
-      "type": "Overseas region/department"
+      "parent": "MAY",
+      "type": "Overseas department"
     },
     {
       "code": "GA-1",
@@ -27205,7 +27179,7 @@ q{
       "name": "Mashonaland West",
       "type": "Province"
     }
-  ]
+  ]  
 }
 
 };

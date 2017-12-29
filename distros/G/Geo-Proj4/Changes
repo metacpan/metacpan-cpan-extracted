@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::Proj4.
 
+version 1.08: Thu 28 Dec 11:38:06 CET 2017
+
+	Fixes:
+	- revert change of 1.07, because it breaks people's code, and make
+	  it harder to use transform() rt.cpan.org#123950 [Salven Rezic]
+
 version 1.07: Wed  8 Nov 10:57:23 CET 2017
 
 	Fixes:

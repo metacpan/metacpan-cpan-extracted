@@ -1,0 +1,112 @@
+{
+   "abstract" : "FIDO/U2F Authentication Test Client",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Authen-U2F-Tester",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::X509" : "0",
+            "Crypt::PK::ECC" : "0",
+            "Digest::SHA" : "0",
+            "Exporter" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::AttributeShortcuts" : "0",
+            "MooseX::SingleArg" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Authen::U2F" : "0",
+            "Crypt::Misc" : "0",
+            "File::Slurp" : "0",
+            "Path::Tiny" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::U2F::Tester" : {
+         "file" : "lib/Authen/U2F/Tester.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::Const" : {
+         "file" : "lib/Authen/U2F/Tester/Const.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::Error" : {
+         "file" : "lib/Authen/U2F/Tester/Error.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::Keypair" : {
+         "file" : "lib/Authen/U2F/Tester/Keypair.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::RegisterResponse" : {
+         "file" : "lib/Authen/U2F/Tester/RegisterResponse.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::Role::Response" : {
+         "file" : "lib/Authen/U2F/Tester/Role/Response.pm",
+         "version" : "0.01"
+      },
+      "Authen::U2F::Tester::SignResponse" : {
+         "file" : "lib/Authen/U2F/Tester/SignResponse.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-authen-u2f-tester at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester"
+      },
+      "homepage" : "http://search.cpan.org/dist/Authen-U2F-Tester/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/perl-authen-u2f-tester.git",
+         "web" : "https://github.com/mschout/perl-authen-u2f-tester"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

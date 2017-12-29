@@ -1,0 +1,38 @@
+Revision history for Perl extension CGI::Application::Bouquet::Rose.
+
+1.06  2017-12-27T16:10:00
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Fix typos in Makefile.PL.
+	- Remove Build.PL.
+	- Change licence from Artistic to Perl.
+	- Put module on github at https://github.com/ronsavage/CGI-Application-Bouquet-Rose.
+	- Use Moo.
+	- Option to new, docroot, changed to doc_root, to match the docs.
+	- Rename CHANGES to Changes.
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.05  2010-02-21T12:54:20
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.04  2010-02-10T13:52:31
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.03  2009-11-13T13:20:00
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.02  2008-07-22T14:41:00
+	- Rename CHANGES to Changes.txt to match my other modules
+
+1.01  2008-06-29T09:46:00
+	- Add Config::IniFiles to Build.PL and Makefile.PL, since it is used by
+		CGI::Application::Bouquet::Rose::Config
+	- Ship Changelog.ini. See Module:Metadata::Changes
+
+1.00  2008-05-22T13:13:13
+	- Original version

@@ -1,0 +1,6 @@
+Revision history for perl distribution Mojolicious-Plugin-LazyImage
+
+0.01 2017-12-28T11:38:57+0100
+ - Add lazy_image helper
+ - Add javascript() method to retrieve the JavaScript
+ - Add /js/lazy-image.js asset

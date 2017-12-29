@@ -1,8 +1,6 @@
 # -*- Perl -*-
 #
 # "Copian" tension analysis for 12-pitch material in equal temperament.
-#
-# Beta interface! May change without notice!
 
 package Music::Tension::Cope;
 
@@ -15,7 +13,7 @@ use Music::Tension ();
 use Scalar::Util qw/looks_like_number/;
 
 our @ISA     = qw(Music::Tension);
-our $VERSION = '0.70';
+our $VERSION = '1.01';
 
 my $DEG_IN_SCALE = 12;
 
@@ -24,169 +22,169 @@ my $DEG_IN_SCALE = 12;
 # SUBROUTINES
 
 sub new {
-  my ( $class, %param ) = @_;
-  my $self = $class->SUPER::new(%param);
+    my ( $class, %param ) = @_;
+    my $self = $class->SUPER::new(%param);
 
-  if ( exists $param{duration_weight} ) {
-    croak "duration_weight must be a number"
-      if !looks_like_number $param{duration_weight};
-    $self->{_duration_weight} = $param{duration_weight};
-  } else {
-    $self->{_duration_weight} = 0.1;
-  }
-
-  if ( exists $param{metric_weight} ) {
-    croak "metric_weight must be a number"
-      if !looks_like_number $param{metric_weight};
-    $self->{_metric_weight} = $param{metric_weight};
-  } else {
-    $self->{_metric_weight} = 0.1;
-  }
-
-  if ( exists $param{octave_adjust} ) {
-    croak "octave_adjust must be a number"
-      if !looks_like_number $param{octave_adjust};
-    $self->{_octave_adjust} = $param{octave_adjust};
-  } else {
-    $self->{_octave_adjust} = -0.02;
-  }
-
-  if ( exists $param{tensions} ) {
-    croak "tensions must be hash reference" if ref $param{tensions} ne 'HASH';
-    for my $i ( 0 .. 11 ) {
-      croak "tensions must include all intervals from 0 through 11"
-        if !exists $param{tensions}->{$i};
+    if ( exists $param{duration_weight} ) {
+        croak "duration_weight must be a number"
+          if !looks_like_number $param{duration_weight};
+        $self->{_duration_weight} = $param{duration_weight};
+    } else {
+        $self->{_duration_weight} = 0.1;
     }
-    $self->{_tensions} = $param{tensions};
-  } else {
-    # Default interval tentions taken from "Computer Models of Musical
-    # Creativity", Cope, p.229-230, from least tension (0.0) to greatest
-    # (1.0), less if greater than an octave.
-    $self->{_tensions} = {
-      0  => 0.0,
-      1  => 1.0,
-      2  => 0.8,
-      3  => 0.225,
-      4  => 0.2,
-      5  => 0.55,
-      6  => 0.65,
-      7  => 0.1,
-      8  => 0.275,
-      9  => 0.25,
-      10 => 0.7,
-      11 => 0.9,
-    };
-  }
 
-  bless $self, $class;
-  return $self;
+    if ( exists $param{metric_weight} ) {
+        croak "metric_weight must be a number"
+          if !looks_like_number $param{metric_weight};
+        $self->{_metric_weight} = $param{metric_weight};
+    } else {
+        $self->{_metric_weight} = 0.1;
+    }
+
+    if ( exists $param{octave_adjust} ) {
+        croak "octave_adjust must be a number"
+          if !looks_like_number $param{octave_adjust};
+        $self->{_octave_adjust} = $param{octave_adjust};
+    } else {
+        $self->{_octave_adjust} = -0.02;
+    }
+
+    if ( exists $param{tensions} ) {
+        croak "tensions must be hash reference" if ref $param{tensions} ne 'HASH';
+        for my $i ( 0 .. 11 ) {
+            croak "tensions must include all intervals from 0 through 11"
+              if !exists $param{tensions}->{$i};
+        }
+        $self->{_tensions} = $param{tensions};
+    } else {
+        # Default interval tentions taken from "Computer Models of Musical
+        # Creativity", Cope, p.229-230, from least tension (0.0) to greatest
+        # (1.0), less if greater than an octave.
+        $self->{_tensions} = {
+            0  => 0.0,
+            1  => 1.0,
+            2  => 0.8,
+            3  => 0.225,
+            4  => 0.2,
+            5  => 0.55,
+            6  => 0.65,
+            7  => 0.1,
+            8  => 0.275,
+            9  => 0.25,
+            10 => 0.7,
+            11 => 0.9,
+        };
+    }
+
+    bless $self, $class;
+    return $self;
 }
 
 # Approach tension - horizontal tension, I'm assuming harmonic function,
 # therefore limit to intervals in same register.
 sub approach {
-  my ( $self, $p1 ) = @_;
-  croak "pitch is required" if !defined $p1;
-  croak "pitch must be integer" if $p1 !~ m/^-?\d+$/;
+    my ( $self, $p1 ) = @_;
+    croak "pitch is required" if !defined $p1;
+    croak "pitch must be integer" if $p1 !~ m/^-?\d+$/;
 
-  $self->pitches( 0, abs($p1) % $DEG_IN_SCALE );
+    $self->pitches( 0, abs($p1) % $DEG_IN_SCALE );
 }
 
 # Tension over durations
 sub duration {
-  my ( $self, $input, $duration ) = @_;
+    my ( $self, $input, $duration ) = @_;
 
-  croak "duration must be a positive value"
-    if !looks_like_number($duration)
+    croak "duration must be a positive value"
+      if !looks_like_number($duration)
       or $duration <= 0;
 
-  my $tension;
-  if ( ref $input eq 'ARRAY' ) {
-    $tension = $self->vertical($input);
-  } elsif ( looks_like_number($input) ) {
-    $tension = $input;
-  } else {
-    croak "unknown pitch set or prior tension value '$input'";
-  }
+    my $tension;
+    if ( ref $input eq 'ARRAY' ) {
+        $tension = $self->vertical($input);
+    } elsif ( looks_like_number($input) ) {
+        $tension = $input;
+    } else {
+        croak "unknown pitch set or prior tension value '$input'";
+    }
 
-  # p.232-233 [Cope 2005] - this result "is then added to any grouping's
-  #   accumulated tension weighting"
-  return $self->{_duration_weight} * $duration +
-    $self->{_duration_weight} * $tension;
+    # p.232-233 [Cope 2005] - this result "is then added to any grouping's
+    #   accumulated tension weighting"
+    return $self->{_duration_weight} * $duration +
+      $self->{_duration_weight} * $tension;
 }
 
 # KLUGE things into whatever is closest equal temperament for now
 sub frequencies {
-  my ( $self, $f1, $f2 ) = @_;
-  croak "two frequencies required" if !defined $f1 or !defined $f2;
-  croak "frequencies must be positive numbers"
-    if !looks_like_number $f1
+    my ( $self, $f1, $f2 ) = @_;
+    croak "two frequencies required" if !defined $f1 or !defined $f2;
+    croak "frequencies must be positive numbers"
+      if !looks_like_number $f1
       or !looks_like_number $f2
       or $f1 < 0
       or $f2 < 0;
 
-  $self->pitches( map $self->freq2pitch($_), $f1, $f2 );
+    $self->pitches( map $self->freq2pitch($_), $f1, $f2 );
 }
 
 # Tension based on where note is within measure p.232 [Cope 2005]
 sub metric {
-  my ( $self, $b, $v ) = @_;
-  croak "input must be positive numeric"
-    if !looks_like_number($b)
+    my ( $self, $b, $v ) = @_;
+    croak "input must be positive numeric"
+      if !looks_like_number($b)
       or $b <= 0
       or !looks_like_number($v)
       or $v <= 0;
 
-  return ( $b * $self->{_metric_weight} ) / $v;
+    return ( $b * $self->{_metric_weight} ) / $v;
 }
 
 # Tension for two pitches
 sub pitches {
-  my ( $self, $p1, $p2 ) = @_;
-  croak "two pitches required" if !defined $p1 or !defined $p2;
-  croak "pitches must be integers"
-    if $p1 !~ m/^-?\d+$/
+    my ( $self, $p1, $p2 ) = @_;
+    croak "two pitches required" if !defined $p1 or !defined $p2;
+    croak "pitches must be integers"
+      if $p1 !~ m/^-?\d+$/
       or $p2 !~ m/^-?\d+$/;
 
-  my $interval = abs( $p2 - $p1 );
-  my $octave   = int( $interval / $DEG_IN_SCALE );
-  my $tension =
-    $self->{_tensions}->{ $interval % $DEG_IN_SCALE } +
-    ( $octave > 0 ? $self->{_octave_adjust} : 0 );
-  $tension = 0 if $tension < 0;
+    my $interval = abs( $p2 - $p1 );
+    my $octave   = int( $interval / $DEG_IN_SCALE );
+    my $tension =
+      $self->{_tensions}->{ $interval % $DEG_IN_SCALE } +
+      ( $octave > 0 ? $self->{_octave_adjust} : 0 );
+    $tension = 0 if $tension < 0;
 
-  return $tension;
+    return $tension;
 }
 
 # Tension from first note to all others above it in a passed pitch set.
 # Returns sum, min, max, and array ref of tensions, unless just the sum
 # is desired by context.
 sub vertical {
-  my ( $self, $pset ) = @_;
-  croak "pitch set must be array ref" unless ref $pset eq 'ARRAY';
-  croak "pitch set must contain multiple elements" if @$pset < 2;
-  my @pcs = @$pset;
+    my ( $self, $pset ) = @_;
+    croak "pitch set must be array ref" unless ref $pset eq 'ARRAY';
+    croak "pitch set must contain multiple elements" if @$pset < 2;
+    my @pcs = @$pset;
 
-  # Reposition pitches upwards if subsequent lower than the initial pitch
-  for my $i ( 1 .. $#pcs ) {
-    if ( $pcs[$i] < $pcs[0] ) {
-      $pcs[$i] += $DEG_IN_SCALE +
-        ( int( ( $pcs[0] - $pcs[$i] - 1 ) / $DEG_IN_SCALE ) ) * $DEG_IN_SCALE;
+    # Reposition pitches upwards if subsequent lower than the initial pitch
+    for my $i ( 1 .. $#pcs ) {
+        if ( $pcs[$i] < $pcs[0] ) {
+            $pcs[$i] += $DEG_IN_SCALE +
+              ( int( ( $pcs[0] - $pcs[$i] - 1 ) / $DEG_IN_SCALE ) ) * $DEG_IN_SCALE;
+        }
     }
-  }
 
-  my $min = ~0;
-  my $max = 0;
-  my ( @tensions, $sum );
-  for my $j ( 1 .. $#pcs ) {
-    my $t = $self->pitches( $pcs[0], $pcs[$j] );
-    $sum += $t;
-    $min = $t if $t < $min;
-    $max = $t if $t > $max;
-    push @tensions, $t;
-  }
+    my $min = ~0;
+    my $max = 0;
+    my ( @tensions, $sum );
+    for my $j ( 1 .. $#pcs ) {
+        my $t = $self->pitches( $pcs[0], $pcs[$j] );
+        $sum += $t;
+        $min = $t if $t < $min;
+        $max = $t if $t > $max;
+        push @tensions, $t;
+    }
 
-  return wantarray ? ( $sum, $min, $max, \@tensions ) : $sum;
+    return wantarray ? ( $sum, $min, $max, \@tensions ) : $sum;
 }
 
 1;
@@ -197,8 +195,6 @@ __END__
 Music::Tension::Cope - tension analysis for equal temperament music
 
 =head1 SYNOPSIS
-
-Beta interface! Has and will change without notice!
 
   use Music::Tension::Cope;
   my $tension = Music::Tension::Cope->new;
@@ -439,10 +435,10 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Jeremy Mates
+Copyright (C) 2012,2017 by Jeremy Mates
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.16 or, at
+your option, any later version of Perl 5 you may have available.
 
 =cut

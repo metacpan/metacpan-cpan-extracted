@@ -1,0 +1,10 @@
+Revision history for Perl module FIAS::SQL.
+
+0.03  Dec 26 2017 Daniil Popov
+    - fix test
+
+0.02  Dec 26 2017 Daniil Popov
+    - fix test
+
+0.01  Dec 26 2017 Daniil Popov
+    - initial release

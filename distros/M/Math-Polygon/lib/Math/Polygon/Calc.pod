@@ -104,6 +104,15 @@ a closed polygon.
 Compare two polygons, on the level of points. When the polygons are
 the same but rotated, this will return false. See L<polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
 
+=item B<polygon_format>($format, @points)
+
+[1.07] Map the $format over all @points, both the X and Y coordinate.  This
+is especially useful to reduce the number of digits in the stringification.
+For instance, when you want reproducible results in regression scripts.
+
+The format is anything supported by printf(), for instance "%5.2f".  Or,
+you can pass a code reference which accepts a single value.
+
 =item B<polygon_is_clockwise>(LIST-of-$points)
 
 =item B<polygon_is_closed>($points)
@@ -135,8 +144,8 @@ corner of the bounding box is made first.
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.06,
-built on July 16, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.07,
+built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
 
 =head1 LICENSE
 

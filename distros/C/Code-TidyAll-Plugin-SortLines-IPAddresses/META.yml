@@ -1,0 +1,41 @@
+---
+abstract: 'Sort lines of a file containing IP addresses'
+author:
+  - 'Kevin Phair <phair.kevin@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Code::TidyAll: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-SortLines-IPAddresses
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Code::TidyAll::Plugin: '0'
+  Moo: '0'
+  Net::Works::Address: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/klp2/Code-TidyAll-Plugin-SortLines-IPAddresses/issues
+  homepage: https://github.com/klp2/Code-Tidyall-Plugin-Sortlines-IPAddresses
+  repository: https://github.com/klp2/Code-Tidyall-Plugin-Sortlines-IPAddresses.git
+version: 0.0.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

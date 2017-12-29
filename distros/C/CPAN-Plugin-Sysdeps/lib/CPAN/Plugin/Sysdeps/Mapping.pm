@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 # shortcuts
 #  os and distros
@@ -12,6 +12,7 @@ use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
 use constant like_debian => (linuxdistro => '~debian');
 use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial)]);
+use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
 use constant like_fedora => (linuxdistro => '~fedora');
 #  package shortcuts
 use constant freebsd_jpeg => 'jpeg | jpeg-turbo';
@@ -314,7 +315,7 @@ sub mapping {
        [package => 'taglib']],
      ],
 
-     [cpanmod => 'Authen::Krb5Password',
+     [cpanmod => ['Authen::Krb5Password', 'GSSAPI'],
       [os_freebsd,
        [package => 'heimdal | krb5']],
       [like_debian,
@@ -323,6 +324,8 @@ sub mapping {
        [package => 'libkrb5-dev']],
       [like_fedora,
        [package => 'krb5-devel']],
+      [os_darwin,
+       [package => 'krb5']],
      ],
 
      [cpanmod => 'Authen::SASL::Cyrus',
@@ -747,7 +750,7 @@ sub mapping {
      [cpanmod => 'Devel::IPerl',
       [like_debian,
        [linuxdistrocodename => [qw(stretch)],
-	[package => [qw(libzmq3-dev ipython libmagic-dev)]], # ipython-notebook not anymore available, see https://github.com/EntropyOrg/p5-Devel-IPerl/issues/70
+	[package => [qw(libzmq3-dev ipython jupyter-console jupyter-notebook libmagic-dev)]],
        [package => [qw(libzmq3-dev ipython ipython-notebook libmagic-dev)]], # as specified in https://metacpan.org/source/ZMUGHAL/Devel-IPerl-0.006/README.md
        ]]
      ],
@@ -1974,6 +1977,18 @@ sub mapping {
        [package => 'libidn-devel']],
       [os_darwin,
        [package => 'libidn']],
+     ],
+
+     [cpanmod => 'Net::LibIDN2',
+      [os_freebsd,
+       [package => 'libidn2']],
+      [like_debian,
+       [before_debian_buster,
+	[package => []]], # libidn2-0-dev exists, but is too old
+       [package => 'libidn2-dev']],
+      [like_fedora,
+       [package => 'libidn2-devel']],
+      # currently no libidn2 in homebrew
      ],
 
      [cpanmod => 'Net::LibLO',

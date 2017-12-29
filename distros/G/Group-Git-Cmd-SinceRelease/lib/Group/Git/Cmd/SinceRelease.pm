@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.0.10');
+our $VERSION = version->new('0.0.11');
 
 my $opt = Getopt::Alt->new(
     {
@@ -30,6 +30,7 @@ my $opt = Getopt::Alt->new(
         'min|min-commits|m=i',
         'name|n',
         'no_release|no-release',
+        'latest|latest-tag',
         'released|r',
         'verbose|v+',
         'quiet|q!',
@@ -38,8 +39,22 @@ my $opt = Getopt::Alt->new(
 
 sub _num_sort {
     my $A = $a;
-    $A =~ s/((0+)\d+)/sprintf "%03d", $2 eq '00' ? $1 : $2 eq '0' ? $1 * 10 : $1 * 100/egxms;
+    $A =~ s/^v(\d)/$1/;
     my $B = $b;
+    $B =~ s/^v(\d)/$1/;
+
+    if ( $A =~ /^\d+[.]\d+[.]\d+$/ && $B =~ /^\d+[.]\d+[.]\d+$/ ) {
+        my @A = split /[.]/, $A;
+        my @B = split /[.]/, $B;
+        my $max = @A > @B ? @A : @B;
+
+        for my $i ( 0 .. $max - 1 ) {
+            return $A[$i] <=> $B[$i] if $A[$i] <=> $B[$i];
+        }
+        return 0;
+    }
+
+    $A =~ s/((0+)\d+)/sprintf "%03d", $2 eq '00' ? $1 : $2 eq '0' ? $1 * 10 : $1 * 100/egxms;
     $B =~ s/((0+)\d+)/sprintf "%03d", $2 eq '00' ? $1 : $2 eq '0' ? $1 * 10 : $1 * 100/egxms;
     $A cmp $B;
 }
@@ -57,7 +72,7 @@ sub since_release {
     local $CWD = $name;
 
     # find the newest tag and count newer commits
-    my @tags = sort _num_sort map {/(.*)$/; $1} `git tag | sort -n`;
+    my @tags = sort _num_sort grep {/^v?\d+(?:[.]\d+)*$/} map {/(.*)$/; $1} `git tag | sort -n`;
     if ($opt->opt->no_release) {
         return "Never released" if !@tags;
         return;
@@ -66,7 +81,17 @@ sub since_release {
         return;
     }
 
-    my ($sha, $time) = split /\s+/, `git log -n 1 --format=format:'%H %at' $tags[-1]`;
+    if ( $opt->opt->latest ) {
+        return $tags[-1];
+    }
+
+    my ($sha, $time, @rest) = split /\s+/, `git log -n 1 --format=format:'%H %at' $tags[-1]`;
+
+    if (!$sha) {
+        warn "$name\ngit log -n 1 --format=format:'%H %at' $tags[-1]\n\n";
+        warn join ' ', $sha, $time, @rest;
+        return;
+    }
 
     my $format = @ARGV ? join(' ', @ARGV) : '--format=format:"  %s"';
     my @logged = `git log -n 100 $format $sha..HEAD`;
@@ -93,7 +118,7 @@ Group::Git::Cmd::SinceRelease - Gets the number of commits each repository is ah
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::SinceRelease version 0.0.10
+This documentation refers to Group::Git::Cmd::SinceRelease version 0.0.11
 
 =head1 SYNOPSIS
 

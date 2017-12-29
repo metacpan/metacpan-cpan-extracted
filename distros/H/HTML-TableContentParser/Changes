@@ -1,26 +1,28 @@
-Revision history for Perl extension HTML::TableParser.
+0.200		2017-12-27	T. R. Wyant
+    Fix RT 32010: Test fails under Perl 5.10.0.
 
-0.13 Sun Jul 14 11:59:32 EDT 2002
-	- Added note about nested tables.
+    Modernize structure, metadata.
 
-0.12 Sat Jul 13 09:31:30 EDT 2002
-	- Reversed order of ChangeLog items
-	- Fixed problem where tags inside <td></td> were being ignored.
-	- Added support & tests for caption element.
-	- Removed check for invalid HTML when adding text, since the check for
-	  out-of-order ness should be made when parsing the elements. Removed the
-	  tests for this condition in t/1.t
+0.13		2002-07-14	S. Drabble
+    - Added note about nested tables.
 
-
-0.11 Tue Jun 11 12:03:49 2002
-	- Fixed case sensitivity problem.
-	- Changed contact address.
-
-0.10 Wed May 7 09:49:23 2002
-  - First version released.
-
-0.01  Wed May  1 20:39:44 2002
-	- original version; created by h2xs 1.21 with options
-		-X HTML::TableParser
+0.12		2002-07-13	S. Drabble
+    - Reversed order of ChangeLog items
+    - Fixed problem where tags inside <td></td> were being ignored.
+    - Added support & tests for caption element.
+    - Removed check for invalid HTML when adding text, since the check for
+      out-of-order ness should be made when parsing the elements. Removed the
+      tests for this condition in t/1.t
 
 
+0.11		2002-06-11	S. Drabble
+    - Fixed case sensitivity problem.
+    - Changed contact address.
+
+0.10		2002-05-07	S. Drabble
+    - First version released.
+
+0.01 		2002-05-01	S. Drabble
+    - original version; created by h2xs 1.21 with options -X HTML::TableParser
+
+# ex: set textwidth=72 autoindent :

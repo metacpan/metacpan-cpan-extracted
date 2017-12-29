@@ -261,7 +261,7 @@ Locale::SubCountry was written by Kim Ryan <kimryan at cpan dot org>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is Copyright (c) 2016 by Kim Ryan.
+This software is Copyright (c) 2018 by Kim Ryan.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
@@ -278,7 +278,7 @@ this module.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -298,7 +298,7 @@ use Locale::SubCountry::Codes;
 #-------------------------------------------------------------------------------
 
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 # Define all the methods for the 'world' class here. Note that because the
 # name space inherits from the Locale::SubCountry name space, the
@@ -354,7 +354,7 @@ sub all_codes
 #-------------------------------------------------------------------------------
 
 package Locale::SubCountry;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 #-------------------------------------------------------------------------------
 # Initialization code which will be run first to create global data structure.

@@ -1,0 +1,19 @@
+---
+abstract: 'Модуль для минимальной работы с данными из базы ФИАC https://fias.nalog.ru/FiasInfo.aspx'
+author:
+  - 'Daniil Popov <popov.daniil@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FIAS-SQL
+requires:
+  Readonly: '0'
+  XBase: '0'
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

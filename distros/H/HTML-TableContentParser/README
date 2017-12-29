@@ -1,20 +1,20 @@
-HTML/TableContentParser version 0.1
-===================================
+HTML::TableContentParser
+========================
 
 
 
 This module can be used to parse the content of tables in HTML text. The
-parser returns an arrayref consisting of data for each table found within the
-passed-in text.
+parser returns an arrayref consisting of data for each table found
+within the passed-in text.
 
 The module looks for HTML table elements described at
 
   http://www.w3.org/TR/1999/REC-html401-19991224/struct/tables.html
 
 
-Each table is a hashref consisting of an array of headers, and an array of
-rows. Each row consists of an array of cells, which each contain data.
-
+Each table is a hashref consisting of an array of headers, and an array
+of rows. Each row consists of an array of cells, which each contain
+data.
 
 Currently, this module does not support nested tables.
 
@@ -39,6 +39,12 @@ COPYRIGHT AND LICENCE
 
 Copyright (C) 2002  Simon Drabble   <sdrabble@cpan.org>
 
-This software is released under the same terms as perl. It may be freely
-copied provided this file remains intact.
+Copyright (C) 2017  Thomas R. Wyant, III <wyant at cpan dot org>
 
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

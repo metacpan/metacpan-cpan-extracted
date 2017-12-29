@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (genericHash 1 0 39)
+MYPACKAGESTART (genericHash 1 0 47)
 
 ###############
 # Executables #
@@ -19,3 +19,13 @@ MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/
 # Tests #
 #########
 MYPACKAGECHECK(genericHashTester)
+
+#############
+# Packaging #
+#############
+MYPACKAGEPACK("" "Generic Logger")
+
+#########
+# Setup #
+#########
+MYPACKAGEPRINTSETUP()

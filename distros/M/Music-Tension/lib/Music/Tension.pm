@@ -11,46 +11,46 @@ use warnings;
 use Carp qw/croak/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.70';
+our $VERSION = '1.01';
 
 ########################################################################
 #
 # SUBROUTINES
 
 sub new {
-  my ( $class, %param ) = @_;
-  my $self = {};
+    my ( $class, %param ) = @_;
+    my $self = {};
 
-  # just MIDI support here, see Music::Scala for scala scale file support
-  if ( exists $param{reference_frequency} ) {
-    croak "reference_frequency must be a number"
-      if !looks_like_number $param{reference_frequency};
-    $self->{_reference_frequency} = $param{reference_frequency};
-  } else {
-    $self->{_reference_frequency} = 440;
-  }
+    # just MIDI support here, see Music::Scala for scala scale file support
+    if ( exists $param{reference_frequency} ) {
+        croak "reference_frequency must be a number"
+          if !looks_like_number $param{reference_frequency};
+        $self->{_reference_frequency} = $param{reference_frequency};
+    } else {
+        $self->{_reference_frequency} = 440;
+    }
 
-  bless $self, $class;
-  return $self;
+    bless $self, $class;
+    return $self;
 }
 
 sub freq2pitch {
-  my ( $self, $freq ) = @_;
-  croak "frequency must be a positive number"
-    if !looks_like_number $freq
-    or $freq < 0;
+    my ( $self, $freq ) = @_;
+    croak "frequency must be a positive number"
+      if !looks_like_number $freq
+      or $freq < 0;
 
-  return sprintf "%.0f",
-    69 + 12 * ( log( $freq / $self->{_reference_frequency} ) / log(2) );
+    return sprintf "%.0f",
+      69 + 12 * ( log( $freq / $self->{_reference_frequency} ) / log(2) );
 }
 
 sub pitch2freq {
-  my ( $self, $pitch ) = @_;
-  croak "pitch must be MIDI number"
-    if !looks_like_number $pitch
-    or $pitch < 0;
+    my ( $self, $pitch ) = @_;
+    croak "pitch must be MIDI number"
+      if !looks_like_number $pitch
+      or $pitch < 0;
 
-  return $self->{_reference_frequency} * ( 2**( ( $pitch - 69 ) / 12 ) );
+    return $self->{_reference_frequency} * ( 2**( ( $pitch - 69 ) / 12 ) );
 }
 
 1;
@@ -61,8 +61,6 @@ __END__
 Music::Tension - music tension analysis
 
 =head1 SYNOPSIS
-
-Beta interface! May change without notice!
 
   my $t = Music::Tension ();
   $t->pitch2freq(60);
@@ -127,7 +125,7 @@ frequency use by the frequency/pitch conversion calls (440 by default).
 =item B<freq2pitch> I<frequency>
 
 Given a frequency (Hz), returns the integer pitch number (which might
-also be a MIDI number, unless that range is execeeded somehow).
+also be a MIDI number, unless that range is exceeded somehow).
 Fractional pitch results are rounded to the nearest pitch number. (I'm
 not sure if the standard practice is to round or truncate the
 conversion, so I guessed to round.)
@@ -160,7 +158,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2013 by Jeremy Mates
+Copyright (C) 2012-2013,2017 by Jeremy Mates
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16 or,

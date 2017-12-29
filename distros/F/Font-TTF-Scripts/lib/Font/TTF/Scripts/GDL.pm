@@ -55,7 +55,7 @@ sub out_gdl
 
                 if ($opts{'-split_ligs'})
                 {
-                    if (defined $glyph->{'compunds'}{$pl})
+                    if (defined $glyph->{'compounds'}{$pl})
                     { $glyph->{'compounds'}{$pl}[3] = $pt->{'x'}; }
                     else
                     { $glyph->{'compounds'}{$pl} = [0, 0, $pt->{'x'}, $ytop]; }
@@ -142,7 +142,6 @@ sub out_classes
         else
         { $name =~ s/^_//o; }
 
-        $fh->print("#define HAS_c${name}Dia 1\n") if ($opts{'-defines'} && $name !~ m/^Takes/o);
         $fh->print("c${name}Dia = (");
         $count = 0; $sep = '';
         foreach $cl (@{$lists->{$l}})
@@ -177,6 +176,16 @@ sub out_classes
             { $sep = ", "; }
         }
         $fh->print(");\n\n");
+    }
+    if ($opts{'-defines'})
+    {
+        foreach $l (sort keys %{$lists})
+        {
+            next if ($l =~ m/^_/o);
+            next if (!scalar @{$lists->{$l}} || !scalar @{$lists->{"_$l"}});
+            next if (!$self->{'hasnclass'}{$l} || !$self->{'hasnclass'}{"_$l"});
+            $fh->print("#define HAS_c${l}Dia 1\n");
+        }
     }
 
 
@@ -420,7 +429,9 @@ EOT
     foreach $p (keys %{$lists})
     {
         next if ($p =~ m/^_/o);
-        $fh->print("cTakes${p}Dia c${p}Dia {attach {to = \@1; at = ${p}S; with = ${p}M}; user1 = 1} / ^ _ " . ($self->{'hasnclass'}{$p} ? "opt4(cnTakes${p}Dia) " : "") . "_ {user1 == 0};\n");
+        next if (!scalar @{$lists->{$p}} || ref($lists->{"_$p"}) ne 'ARRAY' || !scalar @{$lists->{"_$p"}});
+        # $fh->print("cTakes${p}Dia c${p}Dia {attach {to = \@1; at = ${p}S; with = ${p}M}; user1 = 1} / ^ _ " . ($self->{'hasnclass'}{$p} ? "opt4(cnTakes${p}Dia) " : "") . "_ {user1 == 0};\n");
+        $fh->print("c${p}Dia {attach {to = \@1; at = ${p}S; with = ${p}M}} / cTakes${p}Dia " . ($self->{'hasnclass'}{$p} ? "opt4(cnTakes${p}Dia) " : "") . "_;\n");
     }
     $fh->print("endpass;\nendtable;\n");
 }
@@ -435,13 +446,18 @@ sub has
 
 1;
 
+=head1 NAME
+
+Font::TTF::Scripts::GDL - create GDL (Graphite Description Language) from a
+                          TrueType font
+
 =head1 AUTHOR
 
 Martin Hosken L<http://scripts.sil.org/FontUtils>. 
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This module is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

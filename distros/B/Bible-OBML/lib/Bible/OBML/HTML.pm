@@ -1,18 +1,182 @@
 package Bible::OBML::HTML;
 # ABSTRACT: Render OBML as HTML
 
-use strict;
-use warnings;
+use 5.012;
 
 use Moose;
 use Template;
 use Bible::OBML;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 with 'Throwable';
 
 has obml => ( is => 'ro', isa => 'Bible::OBML', default => sub { Bible::OBML->new } );
+
+has settings => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { +{
+        FILTERS => {
+            verse_collapse => sub {
+                my ($text) = @_;
+
+                $text =~ s/\s{2,}/ /msg;
+                $text =~ s/^\s+|\s+$//msg;
+                $text =~ s/\s+(?=<sup\b)|//msg;
+                $text =~ s/(?<=i>)\s+(?=[^\sa-zA-Z0-9])//msg;
+
+                return $text;
+            },
+            fn_tidy => sub {
+                my ($text) = @_;
+                $text =~ s/<[^>]*?>//g;
+                return $text;
+            }
+        },
+    } },
+);
+
+has template => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => q{
+        [%
+            crossreferences = [];
+            footnotes       = [];
+            inside_element  = '';
+        %]
+        [% BLOCK render %]
+            [% FOREACH bit IN bits %]
+                [% IF bit.length %]
+                    [% bit %]
+                [% ELSE %]
+                    [% type = bit.shift %]
+
+                    [% IF type == 'italic' %]
+                        <i>[% PROCESS render bits = bit | trim %]</i>
+                    [% ELSIF type == 'red text' %]
+                        <span class="obml_red_text">[% PROCESS render bits = bit | trim %]</span>
+                    [% ELSIF type == 'crossreference' %]
+                        [%
+                            rv = bit.shift;
+                            crossreferences.push(rv);
+                        %]
+                        <sup class="obml_crossreference"><a
+                            href="#cr[% crossreferences.size %]"
+                            title="[% crossreferences.size %]: [% rv.join('; ') %]"
+                        >{[% crossreferences.size %]}</a></sup>
+                    [% ELSIF type == 'footnote' %]
+                        [%
+                            rv = BLOCK;
+                                PROCESS render bits = bit;
+                            END;
+                            footnotes.push(rv);
+                        %]
+                        <sup class="obml_footnote"><a
+                            href="#fn[% footnotes.size %]"
+                            title="[% footnotes.size %]: [% rv | fn_tidy | trim %]"
+                        >[[% footnotes.size %]]</a></sup>
+                    [% ELSIF type == 'paragraph' %]
+                        [% IF inside_element != '' %]
+                            </span>
+                            [% inside_element = '' %]
+                        [% END %]
+                        </p><p>
+                    [% ELSIF type == 'break' %]
+                        [% IF inside_element %]
+                            </span>
+                            [% inside_element = '' %]
+                        [% END %]
+                        <br />
+                    [% ELSIF type == 'blockquote' %]
+                        [% IF inside_element != 'blockquote' %]
+                            <span class="obml_blockquote">
+                            [% inside_element = 'blockquote' %]
+                        [% END %]
+                        [% PROCESS render bits = bit | trim %]
+                    [% ELSIF type == 'blockquote_indent' %]
+                        [% IF inside_element != 'blockquote_indent' %]
+                            <span class="obml_blockquote_indent">
+                            [% inside_element = 'blockquote_indent' %]
+                        [% END %]
+                        [% PROCESS render bits = bit | trim %]
+                    [% ELSE %]
+                        <sub><b>[ ERROR: [% type %] | [% bit.join(' | ') %] ]</b></sub>
+                    [% END %]
+                [% END %]
+            [% END %]
+        [% END %]
+
+        <div class="obml">
+            <div class="obml_title">[% content.0.reference.book %] [% content.0.reference.chapter %]</div>
+            <div class="obml_content">
+                [% IF content %]
+                    <div class="obml_scripture">
+                        [% USE wrap %]
+                        [% FILTER wrap( 110, '', '' ) %]
+                            [% FOREACH verse IN content %]
+                                [% FILTER collapse %]
+                                    [% IF verse.header %]
+                                        [% UNLESS loop.first %]</p>[% END %]
+                                        <div class="obml_header">[%
+                                            PROCESS render bits = verse.header | verse_collapse %]</div>
+                                        [% UNLESS loop.first %]<p>[% END %]
+                                    [% END %]
+                                    [% IF loop.first %]<p>[% END %]
+                                    <sup class="obml_reference"><b>[% verse.reference.verse %]</b></sup>
+                                    [%- PROCESS render bits = verse.content | verse_collapse %]
+                                    [% IF loop.last %]</p>[% END %]
+                                [% END %]
+                            [% END %]
+                        [% END %]
+                    </div>
+                [% ELSE %]
+                    <p>A content parsing error occured.</p>
+                [% END %]
+
+                [% IF footnotes.size OR crossreferences.size %]
+                    </div>
+                    <div class="obml_notes_title">Notes</div>
+                    <div class="obml_notes">
+                        <p>
+                            There are
+                            [% IF footnotes.size %]footnotes[% END %]
+                            [% IF footnotes.size AND crossreferences.size %]and[% END %]
+                            [% IF crossreferences.size %]crossreferences[% END %]
+                            for this chapter.
+                        </p>
+
+                        [% IF footnotes.size %]
+                            <div class="obml_footnote">
+                                <div class="obml_footnote_title">[Footnotes]</div>
+                                <ol>
+                                    [% count = 0 %]
+                                    [% FOREACH item IN footnotes %]
+                                        [% count = count + 1 %]
+                                        <li><a name="fn[% count %]">[% item %]</a></li>
+                                    [% END %]
+                                </ol>
+                            </div>
+                        [% END %]
+
+                        [% IF crossreferences.size %]
+                            <div class="obml_crossreference">
+                                <div class="obml_crossreference_title">{Crossreferences}</div>
+                                <ol>
+                                    [% count = 0 %]
+                                    [% FOREACH item IN crossreferences %]
+                                        [% count = count + 1 %]
+                                        <li><a name="cr[% count %]">[% item.join('; ') %]</a></li>
+                                    [% END %]
+                                </ol>
+                            </div>
+                        [% END %]
+                [% END %]
+            </div>
+        </div>
+    },
+);
 
 sub from_file {
     my ( $self, $file, $skip_smartify ) = @_;
@@ -45,162 +209,8 @@ sub _html {
     my ( $self, $content ) = @_;
     my $output = '';
 
-    Template->new({
-        FILTERS => {
-            verse_collapse => sub {
-                my ($text) = @_;
-
-                $text =~ s/\s{2,}/ /msg;
-                $text =~ s/^\s+|\s+$//msg;
-                $text =~ s/\s+(?=<sup\b)|//msg;
-                $text =~ s/(?<=i>)\s+(?=[^\sa-zA-Z0-9])//msg;
-
-                return $text;
-            },
-            fn_tidy => sub {
-                my ($text) = @_;
-                $text =~ s/<[^>]*?>//g;
-                return $text;
-            }
-        },
-    })->process(
-        \q{
-            [%
-                crossreferences = [];
-                footnotes       = [];
-                inside_element  = '';
-            %]
-
-            [% BLOCK render %]
-                [% FOREACH bit IN bits %]
-                    [% IF bit.length %]
-                        [% bit %]
-                    [% ELSE %]
-                        [% type = bit.shift %]
-
-                        [% IF type == 'italic' %]
-                            <i>[% PROCESS render bits = bit | trim %]</i>
-                        [% ELSIF type == 'red text' %]
-                            <span class="obml_red_text">[% PROCESS render bits = bit | trim %]</span>
-                        [% ELSIF type == 'crossreference' %]
-                            [%
-                                rv = bit.shift;
-                                crossreferences.push(rv);
-                            %]
-                            <sup class="obml_crossreference"><a
-                                href="#cr[% crossreferences.size %]"
-                                title="[% crossreferences.size %]: [% rv.join('; ') %]"
-                            >{[% crossreferences.size %]}</a></sup>
-                        [% ELSIF type == 'footnote' %]
-                            [%
-                                rv = BLOCK;
-                                    PROCESS render bits = bit;
-                                END;
-                                footnotes.push(rv);
-                            %]
-                            <sup class="obml_footnote"><a
-                                href="#fn[% footnotes.size %]"
-                                title="[% footnotes.size %]: [% rv | fn_tidy | trim %]"
-                            >[[% footnotes.size %]]</a></sup>
-                        [% ELSIF type == 'paragraph' %]
-                            [% IF inside_element != '' %]
-                                </span>
-                                [% inside_element = '' %]
-                            [% END %]
-                            </p><p>
-                        [% ELSIF type == 'break' %]
-                            [% IF inside_element %]
-                                </span>
-                                [% inside_element = '' %]
-                            [% END %]
-                            <br />
-                        [% ELSIF type == 'blockquote' %]
-                            [% IF inside_element != 'blockquote' %]
-                                <span class="obml_blockquote">
-                                [% inside_element = 'blockquote' %]
-                            [% END %]
-                            [% PROCESS render bits = bit | trim %]
-                        [% ELSIF type == 'blockquote_indent' %]
-                            [% IF inside_element != 'blockquote_indent' %]
-                                <span class="obml_blockquote_indent">
-                                [% inside_element = 'blockquote_indent' %]
-                            [% END %]
-                            [% PROCESS render bits = bit | trim %]
-                        [% ELSE %]
-                            <sub><b>[ ERROR: [% type %] | [% bit.join(' | ') %] ]</b></sub>
-                        [% END %]
-                    [% END %]
-                [% END %]
-            [% END %]
-
-            <div class="obml">
-                <div class="obml_title">[% content.0.reference.book %] [% content.0.reference.chapter %]</div>
-                <div class="obml_content">
-                    [% IF content %]
-                        <div class="obml_scripture">
-                            [% USE wrap %]
-                            [% FILTER wrap( 110, '', '' ) %]
-                                [% FOREACH verse IN content %]
-                                    [% FILTER collapse %]
-                                        [% IF verse.header %]
-                                            [% UNLESS loop.first %]</p>[% END %]
-                                            <div class="obml_header">[%
-                                                PROCESS render bits = verse.header | verse_collapse %]</div>
-                                            [% UNLESS loop.first %]<p>[% END %]
-                                        [% END %]
-                                        [% IF loop.first %]<p>[% END %]
-                                        <sup class="obml_reference"><b>[% verse.reference.verse %]</b></sup>
-                                        [%- PROCESS render bits = verse.content | verse_collapse %]
-                                        [% IF loop.last %]</p>[% END %]
-                                    [% END %]
-                                [% END %]
-                            [% END %]
-                        </div>
-                    [% ELSE %]
-                        <p>A content parsing error occured.</p>
-                    [% END %]
-
-                    [% IF footnotes.size OR crossreferences.size %]
-                        </div>
-                        <div class="obml_notes_title">Notes</div>
-                        <div class="obml_notes">
-                            <p>
-                                There are
-                                [% IF footnotes.size %]footnotes[% END %]
-                                [% IF footnotes.size AND crossreferences.size %]and[% END %]
-                                [% IF crossreferences.size %]crossreferences[% END %]
-                                for this chapter.
-                            </p>
-
-                            [% IF footnotes.size %]
-                                <div class="obml_footnote">
-                                    <div class="obml_footnote_title">[Footnotes]</div>
-                                    <ol>
-                                        [% count = 0 %]
-                                        [% FOREACH item IN footnotes %]
-                                            [% count = count + 1 %]
-                                            <li><a name="fn[% count %]">[% item %]</a></li>
-                                        [% END %]
-                                    </ol>
-                                </div>
-                            [% END %]
-
-                            [% IF crossreferences.size %]
-                                <div class="obml_crossreference">
-                                    <div class="obml_crossreference_title">{Crossreferences}</div>
-                                    <ol>
-                                        [% count = 0 %]
-                                        [% FOREACH item IN crossreferences %]
-                                            [% count = count + 1 %]
-                                            <li><a name="cr[% count %]">[% item.join('; ') %]</a></li>
-                                        [% END %]
-                                    </ol>
-                                </div>
-                            [% END %]
-                    [% END %]
-                </div>
-            </div>
-        },
+    Template->new( $self->settings )->process(
+        \$self->template,
         { content => $content },
         \$output,
     );
@@ -225,7 +235,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 
@@ -241,6 +251,9 @@ version 1.07
     $self->from_obml( $obml,     $skip_smartify );
     $self->from_file( $filename, $skip_smartify );
     $self->from_data( $data,     $skip_smartify );
+
+    $self->settings; # get or set Template Toolkit new() hashref
+    $self->template; # get or set Template Toolkit template text
 
 =head1 DESCRIPTION
 
@@ -297,9 +310,19 @@ to skip running the "smartify" method on the content.
 This module has an attribute of "obml" which contains a reference to an
 instance of L<Bible::OBML>.
 
+=head2 settings
+
+Internally, this module uses L<Template::Toolkit> to render HTML from OBML. The
+module ships with Toolkit settings and a template. You can replace the "settings"
+hashref that's passed to Toolkit's C<new()>) with this C<settings()> accessor.
+
+=head2 template
+
+You can get or set the Template Toolkit template text with this accessor.
+
 =head1 SEE ALSO
 
-L<Bible::OBML>, L<Bible::OBML::Reference>.
+L<Bible::OBML>, L<Bible::Reference>.
 
 You can also look for additional information at:
 
@@ -345,7 +368,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -222,9 +222,9 @@ the readers and writers get compiled.
 
 See L<blockNamespace()|XML::Compile::Schema/"Accessors">
 
-=item hook => HOOK|ARRAY
+=item hook => $hook|ARRAY
 
-See L<addHook()|XML::Compile::Schema/"Accessors">.  Adds one HOOK (HASH) or more at once.
+See L<addHook()|XML::Compile::Schema/"Accessors">.  Adds one $hook (HASH) or more at once.
 
 =item hooks => ARRAY
 
@@ -249,7 +249,7 @@ See L</Key rewrite>.
 
 =item parser_options => HASH|ARRAY
 
-=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+=item schema_dirs => $directory|ARRAY-OF-directories
 
 =item typemap => HASH
 
@@ -531,15 +531,15 @@ Change in [1.44]: C<TOP> before enforced a name-space on the top-level.
 There should always be a name-space on the top element.  It got changed
 into that C<TOP> checks that the globals have a targetNamespace.
 
-=item hook => HOOK|ARRAY-OF-HOOKS
+=item hook => $hook|ARRAY-OF-hooks
 
-Define one or more processing hooks.  See L</Schema hooks> below.
+Define one or more processing $hooks.  See L</Schema hooks> below.
 These hooks are only active for this compiled entity, where L<addHook()|XML::Compile::Schema/"Accessors">
 and L<addHooks()|XML::Compile::Schema/"Accessors"> can be used to define hooks which are used for all
 results of L<compile()|XML::Compile::Schema/"Compilers">.  The hooks specified with the C<hook> or C<hooks>
 option are run before the global definitions.
 
-=item hooks => HOOK|ARRAY-OF-HOOKS
+=item hooks => $hook|ARRAY-OF-hooks
 
 Alternative for option C<hook>.
 
@@ -2139,8 +2139,8 @@ then still only one prefix is added.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.58,
-built on June 27, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.59,
+built on December 28, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
 
 Please post questions or ideas to the mailinglist at
 F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
@@ -2152,6 +2152,6 @@ on C<irc.perl.org>.
 Copyrights 2006-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

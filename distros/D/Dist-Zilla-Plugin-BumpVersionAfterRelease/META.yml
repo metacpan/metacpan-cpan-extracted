@@ -34,10 +34,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::BumpVersionAfterRelease:
     file: lib/Dist/Zilla/Plugin/BumpVersionAfterRelease.pm
-    version: '0.016'
+    version: '0.017'
   Dist::Zilla::Plugin::RewriteVersion:
     file: lib/Dist/Zilla/Plugin/RewriteVersion.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   Dist::Zilla: '5.040'
   Dist::Zilla::Role::AfterRelease: '5'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease/issues
   homepage: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease
   repository: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease.git
-version: '0.016'
+version: '0.017'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Dave Rolsky <autarch@urth.org>'

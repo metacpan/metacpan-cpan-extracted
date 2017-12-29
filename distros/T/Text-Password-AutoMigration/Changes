@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.13 2017-12-27T08:41:56Z
+  - be more strict at the tests
+  - forbade '$' charactor in salt
+
+
 0.12 2017-11-16T06:00:58Z
   - fix the tests and codes for denying sometimes fail the test at random
 

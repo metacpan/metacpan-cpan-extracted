@@ -56,6 +56,22 @@ ADD_CUSTOM_TARGET (marpaESLIFPerlRelease ${CMAKE_COMMAND} -E echo "${PERL_EXECUT
   DEPENDS marpaESLIFPerlCopy
   )
 
+# -------
+# Test
+# -------
+ADD_CUSTOM_TARGET (marpaESLIFPerlTest ${CMAKE_COMMAND} -E echo "${PERL_EXECUTABLE} -MDist::Zilla::App -e ${DIST_ZILLA_APP_RUN} -- test"
+  COMMAND ${PERL_EXECUTABLE} -MDist::Zilla::App -e "${DIST_ZILLA_APP_RUN}" -- test
+  DEPENDS marpaESLIFPerlCopy
+  )
+
+# -------
+# Xtest
+# -------
+ADD_CUSTOM_TARGET (marpaESLIFPerlXtest ${CMAKE_COMMAND} -E echo "${PERL_EXECUTABLE} -MDist::Zilla::App -e ${DIST_ZILLA_APP_RUN} -- xtest"
+  COMMAND ${PERL_EXECUTABLE} -MDist::Zilla::App -e "${DIST_ZILLA_APP_RUN}" -- xtest
+  DEPENDS marpaESLIFPerlCopy
+  )
+
 # -----
 # Check
 # -----

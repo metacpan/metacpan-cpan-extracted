@@ -1,5 +1,5 @@
 package WWW::Eksi;
-$WWW::Eksi::VERSION = '0.28';
+$WWW::Eksi::VERSION = '0.30';
 =head1 NAME
 
 WWW::Eksi - Interface for Eksisozluk.com

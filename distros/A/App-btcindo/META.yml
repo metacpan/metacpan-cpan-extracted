@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-btcindo
   homepage: https://metacpan.org/release/App-btcindo
   repository: git://github.com/perlancar/perl-App-btcindo.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

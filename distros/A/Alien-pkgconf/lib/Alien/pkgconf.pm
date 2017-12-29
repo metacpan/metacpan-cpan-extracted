@@ -6,7 +6,7 @@ use JSON::PP ();
 use File::Spec;
 use File::ShareDir ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -173,6 +173,13 @@ sub alien_helper {
 =item L<PkgConfig::LibPkgConf>
 
 =back
+
+=head1 PLATFORM NOTES
+
+=head2 Solaris
+
+You may need to have the GNU version of nm installed, which comes
+with GNU binutils.
 
 =head1 ACKNOWLEDGMENTS
 

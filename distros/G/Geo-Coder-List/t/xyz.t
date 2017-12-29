@@ -13,7 +13,8 @@ BEGIN {
 
 XYZ: {
 	SKIP: {
-		skip 'Test requires Internet access', 18 unless(-e 't/online.enabled');
+		skip 'XYZ is often throttled for all users', 18;
+		# skip 'Test requires Internet access', 18 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::XYZ;

@@ -63,8 +63,8 @@ example:
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.06,
-built on July 16, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.07,
+built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
 
 =head1 LICENSE
 

@@ -56,6 +56,11 @@ HELPERS
 SEE ALSO
     PkgConfig::LibPkgConf
 
+PLATFORM NOTES
+  Solaris
+    You may need to have the GNU version of nm installed, which comes with
+    GNU binutils.
+
 ACKNOWLEDGMENTS
     Thanks to the "pkgconf" developers for their efforts:
 

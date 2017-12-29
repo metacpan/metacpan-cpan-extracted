@@ -56,7 +56,7 @@ my %args = (
   
 );
 
-if($^O eq 'cygwin')
+if($^O eq 'cygwin' || $^O eq 'solaris')
 {
   $args{BUILD_REQUIRES}->{'Alien::patch'} = '0.09';
 }
@@ -78,7 +78,7 @@ eval {
   die "ALIEN_INSTALL_TYPE" if defined $ENV{ALIEN_INSTALL_TYPE} 
                            && $ENV{ALIEN_INSTALL_TYPE} eq 'share';
 
-  system 'pkgconf', '--atleast-version=1.3.0', 'libpkgconf';
+  system 'pkgconf', '--atleast-version=1.3.90', 'libpkgconf';
   die "no pkgconf" if $?;
   my $cflags = `pkgconf --cflags libpkgconf`;
   die "getting cflags" if $?;

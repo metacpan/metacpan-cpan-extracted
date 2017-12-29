@@ -11,12 +11,13 @@ GetOptions(\%opts,
 	'b', 
 	'classfile|c=s',
 	'classprops',
+    'classwarn',
 	# 'autodefines|d',	# used in make_gdl
 	# 'define|D=s%', 	# used in make_gdl
 	'empty|e=s', 
 	'forceadd|f=i', 
 	'help|h', 
-	'include|i=s@', 
+	'include|i=s', 
 	'ligatures|l=s', 
 	'mark|m=s', 
 	'normalize|n=i', 
@@ -24,7 +25,7 @@ GetOptions(\%opts,
 	# 'positions|p=i', 	# used in make_gdl
 	# 'renameaps|r', 	# used in make_gdl
 	# 'substitutions|s=i',	# used in make_gdl
-	'outVOLT|t', 
+	'outvolt|t', 
 	'z=i');
 
 
@@ -62,15 +63,9 @@ $options{'-omittedAPs'} = $opts{'omitaps'} if $opts{'omitaps'};
 
 my $f = Font::TTF::Scripts::Volt->read_font($ARGV[0], $opts{'ap'}, %options) || die "Can't read font information";
 
-if (exists $f->{'WARNINGS'})
-{
-	warn $f->{'WARNINGS'};
-}
-
-
 my $comp = $1 if ($opts{'ligatures'} =~ s/(comp)$//o);
 
-$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}, -w => $opts{'classwarn'}) if ($opts{'classfile'});
 $f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -notmark => $opts{'mark'});
 if ($opts{'include'})
 {
@@ -114,6 +109,11 @@ else
     $f->{'font'}->out($ARGV[1]);
 }
 
+if (exists $f->{'WARNINGS'})
+{
+    warn $f->{'WARNINGS'};
+}
+
 exit($f->{'error'});
 
 __END__
@@ -134,9 +134,10 @@ Creates a copy of the infile font file adding a VOLT table to it.
   -a file       Attachment Point database .xml file
   -b            Set un-typed glyphs to type "BASE"
   -c classfile  xml file of class and property information to merge in
-  --classproperties
-                specifies whether classes are made for property values in
+  --classprops  specifies whether classes are made for property values in
                 the classfile
+  --classwarn   issue warnings if classfile contains references to glyphs
+                that are not in the font.
   -e file       A file containing names (1 per line) of glyphs that are 
                 known to have no outline (thus shouldn't generate warning). 
   -f level      Force value for adding OpenType lookups:
@@ -215,7 +216,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This script is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

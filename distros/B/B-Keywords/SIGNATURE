@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,14 +14,14 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 dfa8493c71ba9f080fe464c78c23965b38d7ddae Changes
+SHA1 b0d5034c2d55bd27392ef0300ef691050bf9d11c Changes
 SHA1 0e987cce2b4e94a4d6920e7353f8674a4462528a LICENSE
 SHA1 46ec9231f2152e6fcf554de076272a1fc03e0a72 MANIFEST
-SHA1 80f5993ec9d75329ed85a4925be7a8ee6bd95709 META.json
-SHA1 0a4a5072af71fc57177e670368de1ef0ae6ee088 META.yml
+SHA1 b881bd7a707ac1f8b11660a4ff8bdf158675bd59 META.json
+SHA1 c04ef8f5523aacc4ed61d0192c166ee4a2526442 META.yml
 SHA1 30135cfc198eb4d8eec4d5c35a1a1f23f19ebc00 Makefile.PL
 SHA1 a53710b3f8ae9645adcdf4bae864206b330c15af README
-SHA1 90a5f7870f866084f409696aececcc657938dde8 lib/B/Keywords.pm
+SHA1 4349192c3a2844117eadfacda2c90218799e7cd2 lib/B/Keywords.pm
 SHA1 26eebf3bf6177dc6fc7f91890c68c05b7a61fbe1 t/10basic.t
 SHA1 d977811d4f33d71a1b515fc6eb96d1bb4184bbd5 t/11keywords.t
 SHA1 e6872ebfbccb57ef102945ddd11d131453024ea3 t/export.t
@@ -31,9 +31,8 @@ SHA1 ade48e2b6098a0a329312543e1451e7e7fb7bc5f t/z_perl_minimum_version.t
 SHA1 db4c7c6e1b7cf2bd96d86fa303fd2225b8bf8613 t/z_pod-coverage.t
 SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlZDT/oACgkQmm2SYo/9yUJPiwCfV1RujLF7ssQs2YL4oSMbpjix
-280AnjTfInhuJsPPn3OWRsHdbu2MfWiX
-=zA44
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWkTdTAAKCRCabZJij/3J
+QqN8AJ9sZ/ef76oWLXPbTKJgtIyqKDYbfwCghVuE8BCrIKYovxLcia8ARMz6xOc=
+=43Tt
 -----END PGP SIGNATURE-----

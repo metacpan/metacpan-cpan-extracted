@@ -3,7 +3,7 @@ package App::ClusterSSH;
 use 5.008.004;
 use warnings;
 use strict;
-use version; our $VERSION = version->new('4.12');
+use version; our $VERSION = version->new('4.13');
 
 use Carp qw/cluck :DEFAULT/;
 
@@ -878,7 +878,8 @@ sub show_console() {
     $windows{main_window}->update();
 
     select( undef, undef, undef, 0.2 );    #sleep for a mo
-    $windows{main_window}->withdraw;
+    $windows{main_window}->withdraw
+        if $windows{main_window}->state ne "withdrawn";
 
     # Sleep for a moment to give WM time to bring console back
     select( undef, undef, undef, 0.5 );
@@ -1452,7 +1453,7 @@ sub setup_repeat() {
             );
 
             # See if there are any commands in the external command pipe
-            if( defined $self->{external_command_pipe_fh} ) {
+            if ( defined $self->{external_command_pipe_fh} ) {
                 my $ext_cmd;
                 sysread( $self->{external_command_pipe_fh}, $ext_cmd, 400 );
                 if ($ext_cmd) {
@@ -2140,7 +2141,7 @@ sub run {
     # options is not the default value otherwise the default options
     # value is used instead of the config file
     if ( $self->config->{comms} eq 'ssh' ) {
-        if ( $self->config->{ssh_args} ) {
+        if ( defined $self->config->{ssh_args} ) {
             if (   $self->options->options
                 && $self->options->options ne
                 $self->options->options_default )

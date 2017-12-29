@@ -1,6 +1,7 @@
 lib/Mojolicious/Plugin/PubSubHubbub.pm
 t/PubSubHubbub.t
 t/PubSubHubbub-Discovery.t
+t/PubSubHubbub-Config.t
 examples/pubsubapp
 Changes
 MANIFEST

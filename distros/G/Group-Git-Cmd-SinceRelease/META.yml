@@ -3,12 +3,12 @@ abstract: 'Gets the number of commits each repository is ahead of the last relea
 author:
   - 'Ivan Wills <ivan.wills@gmail.com>'
 build_requires:
-  Test::More: '0'
-  Test::Warnings: '0'
+  Test::More: '0.88'
+  Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Group-Git-Cmd-SinceRelease
 provides:
   Group::Git::Cmd::SinceRelease:
     file: lib/Group/Git/Cmd/SinceRelease.pm
-    version: v0.0.10
+    version: v0.0.11
 requires:
   File::chdir: '0'
   Getopt::Alt: v0.3.1
@@ -28,5 +28,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group::Git::Cmd::SinceRelease
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/Group-Git-Cmd-SinceRelease.git
-version: v0.0.10
+version: v0.0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

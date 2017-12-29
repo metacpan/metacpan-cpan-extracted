@@ -7,17 +7,40 @@ DESCRIPTION
 
     Idea is simple:
 
-    *   you create a new context when a new web request comes or whan a new
-        message comes from a queue or command line script starts
+    *   you create a "new" context for an entry point
 
-    *   use "cb_w_context" to create callbacks
+        It can be a new web request, a new message from a queue to process
+        or command line script command
+
+    *   use "cb_w_context" to create all callbacks in your application
 
     *   correct context restored when your callbacks are called
 
-    *   use "context" to access it
+    *   use "context" to access data
 
-    You can live without it in simple applications It's not something you
-    can deal
+METHODS and FUNCTIONS
+  new
+    Creates a new context and makes it the current one. Takes named pairs
+    and stores them in the context.
+
+        Async::ContextSwitcher->new( request => $psgi_env );
+
+  context
+    Returns the current context. Function is exported. Always returns
+    context.
+
+        my $ct = context->{request}{HTTP_CONTENT_TYPE};
+        context->{user} = $user;
+
+  cb_w_context
+    Wrapper for callbacks. Function is exported. Wraps a callback with code
+    that stores and restores context to make sure correct context travels
+    with your code.
+
+        async_call( callback => cb_w_context { context->{good} = shift } );
+
+    Make sure that all callbacks in your code are created with this function
+    or you can loose track of your context.
 
 AUTHOR
     Ruslan Zakirov <Ruslan.Zakirov@gmail.com>

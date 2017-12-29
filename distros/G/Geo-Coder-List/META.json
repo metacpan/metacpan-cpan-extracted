@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Geo-Coder-List",
    "no_index" : {
@@ -57,6 +57,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

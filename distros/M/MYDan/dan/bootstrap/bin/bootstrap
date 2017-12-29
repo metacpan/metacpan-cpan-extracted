@@ -54,7 +54,7 @@ elsif( $o{install} )
         die "user undef" unless $user;
         my $path = "/var/cron/tabs/$user";
         system "sed -i '/mydan_bootstrap_cron_$uuid/d' $path";
-        system "echo '* * * * * root $MYDan::PATH/dan/bootstrap/bin/bootstrap --run > /tmp/mydan_bootstrap_cron_$uuid.log 2>&1' >> $path"
+        system "echo '* * * * * $MYDan::PATH/dan/bootstrap/bin/bootstrap --run > /tmp/mydan_bootstrap_cron_$uuid.log 2>&1' >> $path"
     }
     else
     {

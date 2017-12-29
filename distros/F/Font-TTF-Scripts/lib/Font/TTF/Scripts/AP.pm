@@ -208,7 +208,7 @@ $VERSION = "0.09";  # MH  Add classes property support
 Reads the TrueType font file C<$ttf_file> and the attachment point database (APDB) file
 C<$ap_file>, and builds a structure to represent the APDB.
 
-Options that may be supplied throught the C<%opts> hash include:
+Options that may be supplied through the C<%opts> hash include:
 
 =over 4
 
@@ -323,9 +323,9 @@ sub read_font
             if (defined $attrs{'GID'})
             {
                 $ig = $attrs{'GID'};
-                $self->APerror($xml, $cur_glyph, undef, "Specified glyph id $attrs{'GID'} different to glyph of Unicode ID: $attrs{'UID'}")
+                $self->APerror($xml, $cur_glyph, undef, "Specified glyph id $attrs{'GID'} different to glyph ($ug) of Unicode ID: $attrs{'UID'}")
                         if (defined $ug && $ug != $ig);
-                $self->APerror($xml, $cur_glyph, undef, "Specified glyph id $attrs{'GID'} different to glyph of postscript name $attrs{'PSName'}")
+                $self->APerror($xml, $cur_glyph, undef, "Specified glyph id $attrs{'GID'} different to glyph ($pg) of postscript name $attrs{'PSName'}")
                         if (defined $pg && $pg != $ig);
                 $self->APerror($xml, $cur_glyph, undef, "Specified glyph id $attrs{'GID'} is >= number of glyphs in font ($numg)")
                         if ($ig < 0 || ($f && $ig >= $numg));
@@ -519,7 +519,11 @@ sub add_classfile
                 foreach my $e (('', split(' ', $currclass->[1])))
                 {
                     my ($c) = canon("$g$e");
-                    next unless (defined $cglyphs{$c});
+                    unless (defined $cglyphs{$c})
+                    {
+                        $self->error("Class $currclass->[0] references non-existant glyph $c\n") if ($opts{'-w'});
+                        next;
+                    }
 
                     if ($tag eq 'class')
                     { $cglyphs{$c}{'props'}{'classes'} .= " $currclass->[$0]"; }
@@ -607,7 +611,7 @@ sub make_classes
 {
     my ($self, %opts) = @_;
     my ($numg) = $self->{'numg'};
-    my (%classes, %namemap);
+    my (%classes, %namemap, %fixedclasses);
     my ($g, $gname, $i, $j, $glyph, %used, $p, $name);
 
     for ($i = 0; $i < $numg; $i++)
@@ -623,6 +627,7 @@ sub make_classes
         $glyph->{'name'} = $gname;
         $self->{'glyph_names'}{$gname} = $i;
 
+        my ($maybebase) = 0;
         foreach $p (keys %{$glyph->{'points'}})
         {
             my ($pname) = $self->make_point($p, $glyph, \%opts);
@@ -635,8 +640,13 @@ sub make_classes
             push (@{$self->{'lists'}{$pname}}, $i);
             vec($self->{'vecs'}{$pname}, $i, 1) = 1 if ($self->{'vecs'});
             next if (defined $opts{'-notmark'} and $opts{'-notmark'} =~ m/\b$pname\b/);
-            vec($self->{'ismarks'}, $i, 1) = 1 if ($pname =~ m/^_/o);
+            if ($pname =~ m/^_/o)
+            { vec($self->{'ismarks'}, $i, 1) = 1; }
+            else
+            { $maybebase = 1; } 
         }
+        vec($self->{'bases'}, $i, 1) = 1 if ($maybebase);
+
         foreach (split('/', $glyph->{'post'}))
         { $namemap{$_} = $i; }
         if (defined $glyph->{'props'}{'classes'})
@@ -645,7 +655,29 @@ sub make_classes
             foreach $c (split(' ', $glyph->{'props'}{'classes'}))
             {
                 $c =~ s/^c//o;
-                push (@{$classes{$c}}, $glyph->{'gnum'});
+                if ($c =~ s/\[(\d+)\]$//o)
+                {
+                    if ($fixedclasses{$c}[$1])
+                        { $self->error("Duplicate fixed class position $1 in class $c between $fixedclasses{$c}[$1] and $glyph->{'gnum'}"); }
+                    $fixedclasses{$c}[$1] = $glyph->{'gnum'};
+                }
+                else
+                { push (@{$classes{$c}}, $glyph->{'gnum'}); }
+            }
+        }
+    }
+    while (my ($k, $v) = each %fixedclasses)
+    {
+        if (!defined $classes{$k})
+        { $classes{$k} = $v; }
+        else
+        {
+            my ($c) = 0;
+            foreach (my ($a) = @{$v})
+            {
+                if (defined $a)
+                { splice(@{$classes{$k}}, $c, 0, $a); }
+                $c++;
             }
         }
     }
@@ -738,12 +770,14 @@ sub make_name
     $gname;
 }
 
-=head2 $ap->make_point ($pname, $glyph)
+=head2 $ap->make_point ($pname, $glyph, \%opts)
 
 Given an an attachment point name and a reference to its C<glyph> structure, returns
 a replacement name, e.g., one that might be an acceptable identifier in
 a programming language, or undef to indicate the attachment point should be omitted.
 By default this returns $pname, but the function could be overridden when subclassing.
+
+$opts->{'-ignoredAPs'} can be set to a list of AP names that should be ignored.
 
 =cut
 
@@ -975,7 +1009,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This module is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

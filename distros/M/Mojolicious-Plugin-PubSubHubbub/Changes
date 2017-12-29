@@ -1,3 +1,7 @@
+0.18 2017-12-27
+        - Improved test coverage.
+        - Fixed tests for recent Mojolicious versions.
+
 0.17 2017-01-10
         - Updated to Mojolicious 7.13.
         - Removed deprecated methods pubsub_publish, pubsub_subscribe,

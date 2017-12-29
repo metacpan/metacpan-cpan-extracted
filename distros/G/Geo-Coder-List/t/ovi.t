@@ -13,7 +13,8 @@ BEGIN {
 
 OVI: {
 	SKIP: {
-		skip 'Test requires Internet access', 23 unless(-e 't/online.enabled');
+		# skip 'Test requires Internet access', 23 unless(-e 't/online.enabled');
+		skip 'Geo::Coder::Ovi has stopped working', 23;
 
 		eval {
 			require Geo::Coder::Ovi;

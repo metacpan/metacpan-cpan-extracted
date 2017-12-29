@@ -1,5 +1,5 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use Moose;
 extends 'Text::Password::SHA';
@@ -88,7 +88,7 @@ So you can replace hashes in your DB very easily like below:
  my $input = $req->body_parameters->{passwd};
  my $hash = $pwd->verify( $input, $db{passwd} ); # returns hash with SHA-512, and it's true
 
- if ($hash) { # you don't have to excute this every time
+ if ($hash) { # you don't have to execute this every time
     $succeed = 1;
     my $sth = $dbh->prepare('UPDATE DB SET passwd=? WHERE uid =?') or die $dbh->errstr;
     $sth->excute( $hash, $req->body_parameters->{uid} ) or die $sth->errstr;
@@ -106,18 +106,12 @@ override 'verify' => sub {
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
     if $input =~ /[^!-~]/ or $input =~ /\s/;
 
-    my $new;
-    if (   $data =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/
-        or $data =~ /^\$5\$[!-~]{1,8}\$[!-~]{43}$/
-        or $data =~ /^[0-9a-f]{40}$/i
-    ) {
-        return super() unless $self->migrate();
-        do{ $new = $self->encrypt($input) } until( $new =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/ );
-        return $new;
+    if ( super() ){
+        return $self->encrypt($input) if $self->migrate();
+        return 1;
     }elsif( $self->Text::Password::MD5::verify(@_) ){
-        return 1 unless $self->migrate();
-        do{ $new = $self->encrypt($input) } until( $new =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/ );
-        return $new;
+        return $self->encrypt($input) if $self->migrate();
+        return 1;
     }
     return undef;
 };

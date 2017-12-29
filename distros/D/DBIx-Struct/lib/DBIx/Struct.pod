@@ -530,7 +530,7 @@ This literal SQL expressions can be used for insert values also.
 
 =head4 B<JSON> output support
 
-Every row-object hash C<TO_JSON()> function that can be automatically used
+Every row-object has C<TO_JSON()> function that can be automatically used
 by C<JSON> C<encode> function. This C<TO_JSON()> has some flexibility what
 to output. 
 

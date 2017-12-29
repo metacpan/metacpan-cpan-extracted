@@ -5,7 +5,7 @@ use warnings;
 
 use base 'ObjectDB::Related';
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 
 use Storable qw(dclone);
 use ObjectDB::Util qw(to_array);

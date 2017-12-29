@@ -3,54 +3,39 @@ package CGI::Application::Bouquet::Rose::Config;
 use strict;
 use warnings;
 
-require Exporter;
-
 use Carp;
+
 use Config::IniFiles;
 
-our @ISA = qw(Exporter);
+use Moo;
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
+use Types::Standard qw/Int Str/;
 
-# This allows declaration	use CGI::Application::Bouquet::Rose::Config ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-
+has config =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
 );
-our $VERSION = '1.05';
 
-# -----------------------------------------------
+has section =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
 
-# Encapsulated class data.
+has verbose =>
+(
+	default		=> sub {return 0},
+	is			=> 'rw',
+	isa			=> Int,
+	required	=> 0,
+);
 
-{
-	my(%_attr_data) =
-	(
-		_verbose => 0,
-	);
-
-	sub _default_for
-	{
-		my($self, $attr_name) = @_;
-
-		$_attr_data{$attr_name};
-	}
-
-	sub _standard_keys
-	{
-		sort keys %_attr_data;
-	}
-
-}	# End of Encapsulated class data.
+our $VERSION = '1.06';
 
 # -----------------------------------------------
 
@@ -104,26 +89,10 @@ sub get_verbose
 
 # -----------------------------------------------
 
-sub new
+sub BUILD
 {
-	my($class, %arg) = @_;
-	my($self)        = bless({}, $class);
-
-	for my $attr_name ($self -> _standard_keys() )
-	{
-		my($arg_name) = $attr_name =~ /^_(.*)/;
-
-		if (exists($arg{$arg_name}) )
-		{
-			$$self{$attr_name} = $arg{$arg_name};
-		}
-		else
-		{
-			$$self{$attr_name} = $self -> _default_for($attr_name);
-		}
-	}
-
-	my($name) = '.htcgi.bouquet.conf';
+	my($self)	= @_;
+	my($name)	= '.htcgi.bouquet.conf';
 
 	my($path);
 
@@ -134,17 +103,15 @@ sub new
 		($path = $INC{$_}) =~ s/Config.pm/$name/;
 	}
 
-	$$self{'config'}  = Config::IniFiles -> new(-file => $path);
-	$$self{'section'} = 'CGI::Application::Bouquet::Rose';
+	$self -> config(Config::IniFiles -> new(-file => $path) );
+	$self -> section('CGI::Application::Bouquet::Rose');
 
-	if (! $$self{'config'} -> SectionExists($$self{'section'}) )
+	if (! $self -> config -> SectionExists($self -> section) )
 	{
-		Carp::croak "Config file '$path' does not contain the section [$$self{'section'}]";
+		Carp::croak "Config file '$path' does not contain the section [" . $self -> section . ']';
 	}
 
-	return $self;
-
-}	# End of new.
+}	# End of BUILD.
 
 # --------------------------------------------------
 

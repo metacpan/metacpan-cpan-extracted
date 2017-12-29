@@ -18,7 +18,7 @@ my ( $raw, $hash ) = $pwd->generate();
 "succeed to encrypt from raw password";
 
 subtest "generate with CORE::crypt" => sub {                            # 6
-    plan tests => 4;
+    plan tests => 6;
     my ( $raw, $hash ) = $pwd->generate();
     like $raw, qr/^[!-~]{8}$/, "succeed to generate raw passwd";        # 6.1
     like $raw, qr/^[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{8}$/, # 6.2
@@ -26,6 +26,10 @@ subtest "generate with CORE::crypt" => sub {                            # 6
      like $hash, qr/^[!-~]{13}$/,                                       # 6.3
     "succeed to generate hash with CORE::crypt";
     is $pwd->verify( $raw, $hash ), 1, "succeed to verify";             # 6.4
+     is $pwd->verify( $pwd->nonce(), $hash ), '',                       # 6.5
+    "fail to verify with random strings";
+     is $pwd->verify( '', $hash ), '',                                  # 6.6
+    "fail to verify with empty string";
 };
 
 subtest "generate unreadable strings" => sub {                          # 7

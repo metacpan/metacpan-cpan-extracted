@@ -5,7 +5,7 @@ use Mojo::DOM;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare hmac_sha1_sum/;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # Todo:
 # - Prevent log injection
@@ -14,7 +14,7 @@ our $VERSION = '0.17';
 # - Test ->discover
 
 # Default lease seconds before automatic subscription refreshing
-has 'lease_seconds' => ( 9 * 24 * 60 * 60 );
+has lease_seconds => ( 9 * 24 * 60 * 60 );
 has hub => 'http://pubsubhubbub.appspot.com/';
 
 my $FEED_TYPE_RE   = qr{^(?i:application/(atom|r(?:ss|df))\+xml)};
@@ -98,6 +98,12 @@ sub register {
           # Hook on callback
           return $plugin->callback($c);
         });
+    });
+
+  # Return plugin object
+  $mojo->helper(
+    'pubsub._plugin' => sub {
+      $plugin;
     });
 
   $mojo->helper(
@@ -763,7 +769,6 @@ sub _find_topics {
 sub _add_topics {
   state $atom_ns = 'http://www.w3.org/2005/Atom';
 
-
   my ($type, $dom, $self_href) = @_;
 
   my $link = qq{<link rel="self" href="$self_href" />};
@@ -943,7 +948,7 @@ Mojolicious::Plugin::PubSubHubbub - Publish and Subscribe with PubSubHubbub
   any('/:user/callback_url')->pubsub;
 
   # In Controllers:
-  # Publish feeds
+  # Publish feeds to subscribers
   $c->pubsub->publish(
     'https://sojolicio.us/blog.atom',
     'https://sojolicio.us/activity.atom'

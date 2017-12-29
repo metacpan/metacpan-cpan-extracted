@@ -365,8 +365,8 @@ proj(1), cs2cs(1), pj_init(3).
 
 =head1 COPYRIGHTS
 
-Developed and maintained by Mark Overmeer E<lt>geo@overmeer.netE<gt>.
-Copyright (c) 2004-2007 by the authors. All rights reserved.
+Developed and maintained by Mark Overmeer E<lt>markov@cpan.orgE<gt>.
+Copyright (c) 2004-2017 by the authors. All rights reserved.
 
 Originally Written by Schuyler Erle E<lt>schuyler@nocat.netE<gt> and
 Rich Gibson E<lt>rich@nocat.netE<gt>.  Their site: Mapping Hacks home

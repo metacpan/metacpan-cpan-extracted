@@ -30,11 +30,11 @@ BEGIN {
 {
     # Check for default social query parameters.
     my $normalizer = URL::Normalize->new( 'http://www.example.com/' );
-    is_deeply( $normalizer->social_query_params, [ 'ncid', 'utm_campaign', 'utm_medium', 'utm_source', 'utm_term', 'utm_content' ] );
+    is_deeply( $normalizer->social_query_params, [ 'ncid', 'utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term' ] );
 
     # Try to add another.
     $normalizer->add_social_query_param( 'foobar' );
-    is_deeply( $normalizer->social_query_params, [ 'ncid', 'utm_campaign', 'utm_medium', 'utm_source', 'utm_term', 'utm_content', 'foobar' ] );
+    is_deeply( $normalizer->social_query_params, [ 'ncid', 'utm_campaign', 'utm_content', 'utm_medium', 'utm_source', 'utm_term', 'foobar' ] );
 }
 
 done_testing;

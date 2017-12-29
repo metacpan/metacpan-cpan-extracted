@@ -1,78 +1,135 @@
 package CGI::Application::Bouquet::Rose;
 
-# Author:
-#	Ron Savage <ron@savage.net.au>
-#
-# Note:
-#	\t = 4 spaces || die.
-
 use strict;
 use warnings;
 
-require 5.005_62;
-
-require Exporter;
-
 use Carp;
+
 use CGI::Application::Bouquet::Rose::Config;
+
 use File::Copy;
 use File::Path; # For mkpath and rmtree.
 use File::Spec; # For copy.
+
 use HTML::Template;
 
-our @ISA = qw(Exporter);
+use Moo;
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
+use Types::Standard qw/Int Str/;
 
-# This allows declaration	use CGI::Application::Bouquet::Rose ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-
+has db_module =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
 );
 
-our $VERSION = '1.05';
+has dir_name =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has doc_root =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has exclude =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has module =>
+(
+	default		=> sub {return 'Local::Wines'},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has output_dir =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has prefix =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has remove =>
+(
+	default		=> sub {return 0},
+	is			=> 'rw',
+	isa			=> Int,
+	required	=> 0,
+);
+
+has tmpl_path =>
+(
+	default		=> sub {return ''},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+has verbose =>
+(
+	default		=> sub {return 0},
+	is			=> 'rw',
+	isa			=> Int,
+	required	=> 0,
+);
+
+our $VERSION = '1.06';
 
 # -----------------------------------------------
 
-# Preloaded methods go here.
-
-# -----------------------------------------------
-
-# Encapsulated class data.
-
+sub BUILD
 {
-	my(%_attr_data) =
-	(
-	 _docroot    => undef,
-	 _exclude    => undef,
-	 _module     => 'Local::Wine',
-	 _output_dir => undef,
-	 _remove     => 0,
-	 _tmpl_path  => undef,
-	 _verbose    => undef,
-	);
+	my($self) = @_;
 
-	sub _default_for
-	{
-		my($self, $attr_name) = @_;
+	$self -> prefix($self -> module . '\::CGI');
+	$self -> dir_name($self -> output_dir . '\::' . $self -> prefix);
+	$self -> dir_name(File::Spec -> catdir(split(/::/, $self -> dir_name) ) );
+	$self -> db_module($self -> module . '\::Base\::DB');
 
-		$_attr_data{$attr_name};
-	}
+	my($file)	= $self -> db_module;
+	$file		= File::Spec -> catdir(split(/::/, $file) );
 
-	sub _standard_keys
-	{
-		keys %_attr_data;
-	}
-}
+	$self -> log('doc_root:        ' . $self -> doc_root);
+	$self -> log('exclude:         ' . $self -> exclude);
+	$self -> log('module:          ' . $self -> module);
+	$self -> log('output_dir:      ' . $self -> output_dir);
+	$self -> log('prefix:          ' . $self -> prefix);
+	$self -> log('remove:          ' . $self -> remove);
+	$self -> log('tmpl_path:       ' . $self -> tmpl_path);
+	$self -> log('verbose:         ' . $self -> verbose);
+	$self -> log('Working dir:     ' . $self -> dir_name);
+	$self -> log('Rose::DB module: ' . $self -> db_module);
+
+	# Ensure we can load the user's Rose::DB-based module.
+
+	eval "require '$file.pm'";
+	croak $@ if $@;
+
+}	# End of BUILD.
 
 # -----------------------------------------------
 
@@ -80,7 +137,7 @@ sub log
 {
 	my($self, $message) = @_;
 
-	if ($$self{'_verbose'})
+	if ($self -> verbose)
 	{
 		print STDERR "$message\n";
 	}
@@ -89,80 +146,22 @@ sub log
 
 # -----------------------------------------------
 
-sub new
-{
-	my($class, $arg) = @_;
-	my($self)        = bless({}, $class);
-	my($config)      = CGI::Application::Bouquet::Rose::Config -> new();
-
-	for my $attr_name ($self -> _standard_keys() )
-	{
-		my($arg_name) = $attr_name =~ /^_(.*)/;
-
-		if (exists($$arg{$arg_name}) )
-		{
-			$$self{$attr_name} = $$arg{$arg_name};
-		}
-		else
-		{
-			$$self{$attr_name} = $self -> _default_for($attr_name);
-		}
-
-		if (! defined $$self{$attr_name})
-		{
-			# The '' is for when the user chops the option out of the config file,
-			# and also refuses to specify a value on the command line.
-
-			my($method)        = "get_$arg_name";
-			$$self{$attr_name} = $config -> $method() || '';
-		}
-	}
-
-	$$self{'_prefix'}    = "$$self{'_module'}\::CGI";
-	$$self{'_dir_name'}  = "$$self{'_output_dir'}\::$$self{'_prefix'}";
-	$$self{'_dir_name'}  = File::Spec -> catdir(split(/::/, $$self{'_dir_name'}) );
-	$$self{'_db_module'} = "$$self{'_module'}\::Base\::DB";;
-	my($file)            = $$self{'_db_module'};
-	$file                =  File::Spec -> catdir(split(/::/, $file) );
-
-	$self -> log("docroot:         $$self{'_docroot'}");
-	$self -> log("exclude:         $$self{'_exclude'}");
-	$self -> log("module:          $$self{'_module'}");
-	$self -> log("output_dir:      $$self{'_output_dir'}");
-	$self -> log("prefix:          $$self{'_prefix'}");
-	$self -> log("remove:          $$self{'_remove'}");
-	$self -> log("tmpl_path:       $$self{'_tmpl_path'}");
-	$self -> log("verbose:         $$self{'_verbose'}");
-	$self -> log("Working dir:     $$self{'_dir_name'}");
-	$self -> log("Rose::DB module: $$self{'_db_module'}");
-
-	# Ensure we can load the user's Rose::DB-based module.
-
-	eval "require '$file.pm'";
-	croak $@ if $@;
-
-	return $self;
-
-}	# End of new.
-
-# -----------------------------------------------
-
 sub run
 {
 	my($self) = @_;
 
-	if ($$self{'_remove'})
+	if ($self -> remove)
 	{
-		$self -> log("Removing:        $$self{'_dir_name'}");
+		$self -> log('Removing:        ' . $self -> dir_name);
 		$self -> log('Success');
 
-		rmtree([$$self{'_dir_name'}]);
+		rmtree([$self -> dir_name]);
 
 		return 0;
 	}
 
-	my($rose_db) = $$self{'_db_module'} -> new();
-	my(@table)   = $rose_db -> list_tables();
+	my($rose_db)	= $self -> db_module -> new();
+	my(@table)		= $rose_db -> list_tables();
 
 	my($data);
 	my($module, @module);
@@ -179,8 +178,8 @@ sub run
 
 		push @module,
 		{
-			module_name => $module,
-			table_name  => $table,
+			module_name	=> $module,
+			table_name	=> $table,
 		}
 	}
 
@@ -188,11 +187,11 @@ sub run
 
 	$self -> log('Processing templates:');
 
-	my(@component)      = split(/::/, lc $$self{'_module'});
-	my($fcgi_name)      = $component[- 1];
-	my(@real_tmpl_path) = split(/::/, lc $$self{'_module'});
-	my($real_tmpl_path) = File::Spec -> catdir('assets', 'templates');
-	$real_tmpl_path     = File::Spec -> catdir($$self{'_docroot'}, $real_tmpl_path, @real_tmpl_path);
+	my(@component)		= split(/::/, lc $self -> module);
+	my($fcgi_name)		= $component[- 1];
+	my(@real_tmpl_path)	= split(/::/, lc $self -> module);
+	my($real_tmpl_path)	= File::Spec -> catdir('assets', 'templates');
+	$real_tmpl_path		= File::Spec -> catdir($self -> doc_root, $real_tmpl_path, @real_tmpl_path);
 
 	$self -> log("Path to run-time templates: $real_tmpl_path");
 
@@ -212,7 +211,7 @@ sub run
 
 		$self -> log("Copying $output_file_name");
 
-		copy("$$self{'_tmpl_path'}/$_", $output_file_name);
+		copy($self -> tmpl_path . "/$_", $output_file_name);
 	}
 
 	# Process: search.fcgi.tmpl.
@@ -223,10 +222,10 @@ sub run
 
 	mkpath([$output_dir_name], 0, 0744);
 
-	$output_file_name = File::Spec -> catfile($output_dir_name, "$fcgi_name.fcgi");
-	my($template)     = HTML::Template -> new(filename => File::Spec -> catfile($$self{'_tmpl_path'}, 'search.fcgi.tmpl') );
+	$output_file_name	= File::Spec -> catfile($output_dir_name, "$fcgi_name.fcgi");
+	my($template)		= HTML::Template -> new(filename => File::Spec -> catfile($self -> tmpl_path, 'search.fcgi.tmpl') );
 
-	$template -> param(prefix => $$self{'_prefix'});
+	$template -> param(prefix => $self -> prefix);
 
 	$self -> log("Creating $output_file_name");
 
@@ -236,15 +235,16 @@ sub run
 
 	# Process: CGI/CGIApp.pm.
 
-	$self -> log("Creating $$self{'_dir_name'}");
+	$self -> log('Creating ' . $self -> dir_name);
 
-	mkpath([$$self{'_dir_name'}], 0, 0744);
+	mkpath([$self -> dir_name], 0, 0744);
 
-	$output_file_name   = File::Spec -> catfile($$self{'_dir_name'}, 'CGIApp.pm');
-	$template           = HTML::Template -> new(filename => File::Spec -> catfile($$self{'_tmpl_path'}, 'cgiapp.pm.tmpl') );
-	$template -> param(module    => $$self{'_module'});
-	$template -> param(prefix    => $$self{'_prefix'});
-	$template -> param(tmpl_path => $real_tmpl_path);
+	$output_file_name	= File::Spec -> catfile($self -> dir_name, 'CGIApp.pm');
+	$template			= HTML::Template -> new(filename => File::Spec -> catfile($self -> tmpl_path, 'cgiapp.pm.tmpl') );
+
+	$template -> param(module		=> $self -> module);
+	$template -> param(prefix		=> $self -> prefix);
+	$template -> param(tmpl_path	=> $real_tmpl_path);
 
 	$self -> log("Creating $output_file_name");
 
@@ -254,10 +254,10 @@ sub run
 
 	# Process: CGI/Dispatcher.pm.
 
-	$output_file_name = File::Spec -> catfile($$self{'_dir_name'}, 'Dispatcher.pm');
-	$template         = HTML::Template -> new(filename => File::Spec -> catfile($$self{'_tmpl_path'}, 'dispatcher.pm.tmpl') );
+	$output_file_name	= File::Spec -> catfile($self -> dir_name, 'Dispatcher.pm');
+	$template			= HTML::Template -> new(filename => File::Spec -> catfile($self -> tmpl_path, 'dispatcher.pm.tmpl') );
 
-	$template -> param(prefix => $$self{'_prefix'});
+	$template -> param(prefix => $self -> prefix);
 
 	$self -> log("Creating $output_file_name");
 
@@ -267,10 +267,10 @@ sub run
 
 	# Process: CGI/MainMenu.pm.
 
-	$output_file_name = File::Spec -> catfile($$self{'_dir_name'}, 'MainMenu.pm');
-	$template         = HTML::Template -> new(filename => File::Spec -> catfile($$self{'_tmpl_path'}, 'main.menu.pm.tmpl') );
+	$output_file_name	= File::Spec -> catfile($self -> dir_name, 'MainMenu.pm');
+	$template			= HTML::Template -> new(filename => File::Spec -> catfile($self -> tmpl_path, 'main.menu.pm.tmpl') );
 
-	$template -> param(prefix => $$self{'_prefix'});
+	$template -> param(prefix => $self -> prefix);
 
 	$self -> log("Creating $output_file_name");
 
@@ -280,19 +280,19 @@ sub run
 
 	# Process: CGI/CGIApp/*.pm (1 per table).
 
-	$output_dir_name = File::Spec -> catdir($$self{'_dir_name'}, 'CGIApp');
+	$output_dir_name = File::Spec -> catdir($self -> dir_name, 'CGIApp');
 
 	$self -> log("Creating $output_dir_name");
 
 	mkpath([$output_dir_name], 0, 0744);
 
-	$template = HTML::Template -> new(filename => File::Spec -> catfile($$self{'_tmpl_path'}, 'generator.pl.tmpl') );
+	$template = HTML::Template -> new(filename => File::Spec -> catfile($self -> tmpl_path, 'generator.pl.tmpl') );
 
-	$template -> param(dir_name    => $output_dir_name);
-	$template -> param(module_loop => \@module);
-	$template -> param(module      => $$self{'_module'});
-	$template -> param(tmpl_path   => $$self{'_tmpl_path'});
-	$template -> param(verbose     => $$self{'_verbose'} || 0);
+	$template -> param(dir_name		=> $output_dir_name);
+	$template -> param(module_loop	=> \@module);
+	$template -> param(module		=> $self -> module);
+	$template -> param(tmpl_path	=> $self -> tmpl_path);
+	$template -> param(verbose		=> $self -> verbose || 0);
 
 	print $template -> output();
 
@@ -308,7 +308,7 @@ sub run
 
 =head1 NAME
 
-C<CGI::Application::Bouquet::Rose> - Generate a set of CGI::Application-based classes
+CGI::Application::Bouquet::Rose - Generate a set of CGI::Application-based classes
 
 =head1 Synopsis
 
@@ -320,7 +320,7 @@ must restrict usage of the generated code to trusted persons.
 =head2 Sample Code
 
 	Step 1: Run the steps from the synopsis for Rose::DBx::Bouquet.
-	Remember, the current dir /must/ still be Local-Wine-1.06/.
+	Remember, the current dir /must/ still be Local-Wines-1.29/.
 
 	Step 2: Edit:
 	o lib/Rose/DBx/Bouquet/.htcgi.bouquet.conf
@@ -330,16 +330,16 @@ must restrict usage of the generated code to trusted persons.
 	shell> scripts/run.cgi.app.gen.pl > scripts/run.cgi.pl
 
 	Step 4: This is the log from run.cgi.app.gen.pl:
-	docroot:         /var/www
+	doc_root:         /var/www
 	exclude:         ^(?:information_schema|pg_|sql_)
-	module:          Local::Wine
+	module:          Local::Wines
 	output_dir:      ./lib
-	prefix:          Local::Wine::CGI
+	prefix:          Local::Wines::CGI
 	remove:          0
 	tmpl_path:       ../CGI-Application-Bouquet-Rose/templates
 	verbose:         1
 	Working dir:     lib/Local/Wine/CGI
-	Rose::DB module: Local::Wine::Base::DB
+	Rose::DB module: Local::Wines::Base::DB
 	Processing tables:
 	Table: grape. Module: Grape
 	Table: vineyard. Module: Vineyard
@@ -376,7 +376,7 @@ must restrict usage of the generated code to trusted persons.
 	Step 7: Install the templates:
 	shell> scripts/install.templates.pl
 
-	Step 8: Install Local::Wine
+	Step 8: Install Local::Wines
 	shell> perl Build.PL
 	shell> perl Build
 	shell> sudo perl Build install
@@ -417,8 +417,8 @@ may include SQL tokens such as '%' and '_'.
 The N rows returned by the search are displayed as a HTML table, and you can page back and forth around this
 data set.
 
-This documentation uses Local::Wine as the basis for all discussions. See the FAQ for the availability
-of the Local::Wine distro.
+This documentation uses Local::Wines as the basis for all discussions. See the FAQ for the availability
+of the Local::Wines distro.
 
 =head1 Distributions
 
@@ -433,7 +433,7 @@ help on unpacking and installing.
 
 new(...) returns an object of type C<CGI::Application::Bouquet::Rose>.
 
-This is the class's contructor.
+This is the class contructor.
 
 Usage: C<< CGI::Application::Bouquet::Rose -> new() >>.
 
@@ -447,7 +447,7 @@ Available options:
 
 =item doc_root
 
-This takes a directory name, which is the name of your web server's document root.
+This takes a directory name, which is the name of your web server document root.
 
 If not specified, the value defaults to the value in lib/Rose/DBx/Bouquet/.htcgi.bouquet.conf.
 
@@ -473,7 +473,7 @@ The default value is ./lib.
 
 =item tmpl_path
 
-This is the path to C<CGI::Application::Bouquet::Rose's> template directory.
+This is the path to the C<CGI::Application::Bouquet::Rose> template directory.
 
 These templates are input to the code generation process.
 
@@ -481,7 +481,7 @@ If not specified, the value defaults to the value in lib/CGI/Application/Bouquet
 
 The default value is ../CGI-Application-Bouquet-Rose/templates.
 
-Note: The point of the '../' is because I assume you have done 'cd Local-Wine-1.06'
+Note: The point of the '../' is because I assume you have done 'cd Local-Wines-1.29'
 or the equivalent for whatever module you are working with.
 
 =item verbose
@@ -498,14 +498,14 @@ The default value is 0.
 
 =over 4
 
-=item Availability of Local::Wine
+=item Availability of Local::Wines
 
-Download Local::Wine from http://savage.net.au/Perl-modules/Local-Wine-1.06.tgz
+Download Local::Wines from http://savage.net.au/Perl-modules/Local-Wines-1.29.tgz
 
 The schema is at: http://savage.net.au/Perl-modules/wine.png
 
 C<CGI::Application::Bouquet::Rose> ships with C<cgi.app.gen.pl> in the bin/ directory, whereas
-C<Local::Wine> ships with various programs in the scripts/ directory.
+C<Local::Wines> ships with various programs in the scripts/ directory.
 
 Files in the /bin directory get installed via 'make install'. Files in the scripts/ directory
 are not intended to be installed; they are only used during the code-generation process.
@@ -513,33 +513,33 @@ are not intended to be installed; they are only used during the code-generation 
 Note also that 'make install' installs lib/CGI/Application/Bouquet/Rose/.htcgi.bouquet.conf, and
 - depending on your OS - you may need to change its permissions in order to edit it.
 
-=item Minimum modules required when replacing Local::Wine with your own code
+=item Minimum modules required when replacing Local::Wines with your own code
 
 Short answer:
 
 =over 4
 
-=item Local::Wine
+=item Local::Wines
 
-=item Local::Wine::Config
+=item Local::Wines::Config
 
 You can implement this module any way you want. It just has to provide the same methods.
 
-=item Local::Wine::Base::Create
+=item Local::Wines::Base::Create
 
-=item Local::Wine::DB
+=item Local::Wines::DB
 
 This module will use the default type and domain, where 'type' and 'domain' are Rose concepts.
 
-=item Local::Wine::Object
+=item Local::Wines::Object
 
 =back
 
 Long answer:
 
-See the docs for Local::Wine.
+See the docs for Local::Wines.
 
-=item Why isn't Local::Wine on CPAN?
+=item Why is Local::Wines not on CPAN?
 
 To avoid the problem of people assuming it can be downloaded and used just like any other module.
 
@@ -549,7 +549,7 @@ See the FAQ for <Rose::DBx::Bouquet>.
 
 =item What is the syntax used for search terms at run-time?
 
-SQL. So, to find the name of a grape starting with S, you'd type S%.
+SQL. So, to find the name of a grape starting with S, you type S%.
 
 And yes, I know there is the potential for sabotage with such a system. This means you absolutely
 must restrict usage of the generated code to trusted persons.
@@ -581,7 +581,7 @@ Output from the database is encoded using HTML::Entities::Interpolate.
 
 =item A note on option management
 
-You'll see a list of option names and default values near the top of this file, in the hash %_attr_data.
+You will see a list of option names and default values near the top of this file, in the hash %_attr_data.
 
 Some default values are undef, and some are scalars.
 
@@ -604,7 +604,7 @@ Then that scalar is the default, and cannot be over-ridden by a value from a con
 Because I believe it makes sense for the end user (you, dear reader), to have the power to change
 configuration values without patching the source code. Hence the conf file.
 
-However, for some values, I don't think it makes sense to do that. So, for those options, the default
+However, for some values, I do not think it makes sense to do that. So, for those options, the default
 value is a scalar in the source code of this module.
 
 =item Is this option arrangement permanent?
@@ -632,11 +632,29 @@ Do everything.
 
 See C<bin/cgi.app.gen.pl> for an example of how to call C<run()>.
 
+=head1 Machine-Readable Change Log
+
+The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes>.
+
+=head1 Version Numbers
+
+Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
+
+=head1 Repository
+
+L<https://github.com/ronsavage/CGI-Application-Bouquet-Rose>
+
+=head1 Support
+
+Email the author, or log a bug on RT:
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=CGI::Application::Bouquet::Rose>.
+
 =head1 Author
 
 C<CGI::Application::Bouquet::Rose> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2008.
 
-Home page: http://savage.net.au/index.html
+L<Homepage|https://savage.net.au/>.
 
 =head1 Copyright
 
@@ -644,7 +662,7 @@ Australian copyright (c) 2008, Ron Savage.
 
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of
-	The Artistic License, a copy of which is available at:
-	http://www.opensource.org/licenses/index.html
+	The Perl License, a copy of which is available at:
+	http://dev.perl.org/licenses/
 
 =cut

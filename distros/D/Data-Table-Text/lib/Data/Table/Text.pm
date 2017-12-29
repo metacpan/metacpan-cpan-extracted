@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171224';
+our $VERSION = '20171227';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -31,6 +31,10 @@ sub dateTimeStamp                                                               
 
 sub dateStamp                                                                   # Year-monthName-day
  {strftime('%Y-%b-%d', localtime)
+ }
+
+sub versionCode                                                                 # YYYmmdd-HHMMSS
+ {strftime('%Y%m%d-%H%M%S', localtime)
  }
 
 sub timeStamp                                                                   # hours:minute:seconds
@@ -79,7 +83,7 @@ sub zzz($;$$)                                                                   
   my $r = qx($c 2>&1);                                                          # Execute command
   my $R = $?;
   $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
-  confess "$cmd\n\n$c\n$r\n" if
+  confess "$cmd\nReturn code: $R\n$c\n$r\n" if
     $R && (!$returnCode or $R !~ /$returnCode/) or                              # Return code failed
     $success && $r !~ m/$success/s;                                             # Error check failed
   $r
@@ -1362,6 +1366,7 @@ saveToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords
 temporaryDirectory temporaryFile temporaryFolder timeStamp trim
 updateDocumentation updatePerlModuleDocumentation userId
+versionCode
 writeBinaryFile writeFile
 xxx XXX
 zzz);

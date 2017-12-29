@@ -73,7 +73,7 @@ So you can replace hashes in your DB very easily like below:
     my $input = $req->body_parameters->{passwd};
     my $hash = $pwd->verify( $input, $db{passwd} ); # returns hash with SHA-512, and it's true
 
-    if ($hash) { # you don't have to excute this every time
+    if ($hash) { # you don't have to execute this every time
        $succeed = 1;
        my $sth = $dbh->prepare('UPDATE DB SET passwd=? WHERE uid =?') or die $dbh->errstr;
        $sth->excute( $hash, $req->body_parameters->{uid} ) or die $sth->errstr;

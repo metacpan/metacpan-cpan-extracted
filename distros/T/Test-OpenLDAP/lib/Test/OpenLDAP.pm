@@ -12,7 +12,7 @@ use URI::Escape();
 use Net::LDAP();
 use English qw( -no_match_vars );
 
-our $VERSION = '0.7';
+our $VERSION = '0.71';
 
 our @CARP_NOT = ('Test::OpenLDAP');
 sub OPENLDAP_SLAPD_BINARY_NAME         { return 'slapd' }
@@ -1248,9 +1248,9 @@ sub _create_schema_core_ldif {
       );
     $handle->print(
         <<"__SCHEMA_CORE_LDIF__") or Carp::croak("Failed to write to '$self->{cn_schema_core_ldif_path}':$OS_ERROR");
-dn: cn={1}core
+dn: cn={0}core
 objectClass: olcSchemaConfig
-cn: {1}core
+cn: {0}core
 olcAttributeTypes: {0}( 2.5.4.2 NAME 'knowledgeInformation' DESC 'RFC2256: kno
  wledge information' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.
  1.15{32768} )
@@ -1769,7 +1769,7 @@ Test::OpenLDAP - Creates a temporary instance of OpenLDAP's slapd daemon to run 
 
 =head1 VERSION
 
-Version 0.07
+Version 0.71
 
 =head1 SYNOPSIS
 

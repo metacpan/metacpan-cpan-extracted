@@ -4,7 +4,7 @@ Pod::Markdown::Github - Convert POD to Github's specific markdown
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # SYNOPSIS
 
@@ -40,9 +40,13 @@ sub syntax {
 Github uses [Liguist](https://github.com/github/linguist) to perform language
 detection and syntax highlighting, so the above may not be needed after all.
 
-# AUTHOR
+# AUTHORS
 
-Stefan G. `minimal @ cpan . org`
+Stefan G. (minimal)
+
+Ben Kaufman (whosgonna)
+
+Nikolay Mishin (mishin)
 
 # LICENCE
 

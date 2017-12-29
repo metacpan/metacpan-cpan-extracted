@@ -21,16 +21,22 @@ BEGIN {
         'HTTP://www.Example.com/' => 'http://www.example.com/',
         'http://www.example.com'  => 'http://www.example.com/',
         'http://www.example.com/' => 'http://www.example.com/',
+
+        # From URI::Normalize
+        'HTTPS://www.example.com:443/../test/../foo/index.html' => 'https://www.example.com/foo/index.html',
+        'https://WWW.EXAMPLE.COM/./foo/index.html'              => 'https://www.example.com/foo/index.html',
+        'https://www.example.com/%66%6f%6f/index.html'          => 'https://www.example.com/foo/index.html',
     );
 
     foreach ( keys %urls ) {
-        my $Normalizer = URL::Normalize->new(
+        my $normalizer = URL::Normalize->new(
             url => $_,
         );
 
-        $Normalizer->make_canonical;
+        $normalizer->make_canonical;
+        $normalizer->remove_dot_segments;
 
-        ok( $Normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $Normalizer->url );
+        ok( $normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $normalizer->url );
     }
 }
 
@@ -46,13 +52,13 @@ BEGIN {
     );
 
     foreach ( keys %urls ) {
-        my $Normalizer = URL::Normalize->new(
+        my $normalizer = URL::Normalize->new(
             url => $_,
         );
 
-        $Normalizer->make_canonical;
+        $normalizer->make_canonical;
 
-        ok( $Normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $Normalizer->url );
+        ok( $normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $normalizer->url );
     }
 }
 
@@ -72,13 +78,13 @@ BEGIN {
     );
 
     foreach ( keys %urls ) {
-        my $Normalizer = URL::Normalize->new(
+        my $normalizer = URL::Normalize->new(
             url => $_,
         );
 
-        $Normalizer->make_canonical;
+        $normalizer->make_canonical;
 
-        ok( $Normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $Normalizer->url );
+        ok( $normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $normalizer->url );
     }
 }
 
@@ -96,13 +102,13 @@ BEGIN {
     );
 
     foreach ( keys %urls ) {
-        my $Normalizer = URL::Normalize->new(
+        my $normalizer = URL::Normalize->new(
             url => $_,
         );
 
-        $Normalizer->make_canonical;
+        $normalizer->make_canonical;
 
-        ok( $Normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $Normalizer->url );
+        ok( $normalizer->url eq $urls{$_}, "$_ eq $urls{$_} - got " . $normalizer->url );
     }
 }
 

@@ -1,5 +1,12 @@
 Revision history for Group-Git-Cmd-SinceRelease
 
+0.0.11   2017-12-28
+        Updating for release of version 0.0.11
+        Adding better errors when no SHA found (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Better editing (Ivan Wills)
+        Better sorting (Ivan Wills)
+
 0.0.10   2017-03-19
         Updating for release of version 0.0.10
         Improved version comparisons (Ivan Wills)

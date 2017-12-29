@@ -1,5 +1,12 @@
 Revision history for URL::Normalize
 
+0.36    2017-12-27
+        - Added 'remove_query_parameter' and 'remove_empty_query_parameters'.
+        - Deprecated 'get_url'; 'url' should be used instead.
+        - Upped dependencies' version requirements.
+        - Improved tests.
+        - Improved documentation.
+
 0.35    2016-07-07
         - Corrected the version number in the documentation.
 

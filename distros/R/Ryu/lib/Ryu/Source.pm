@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 =head1 NAME
 
@@ -164,19 +164,17 @@ sub from {
     my $src = (ref $class) ? $class : $class->new;
     if(my $from_class = blessed($_[0])) {
         if($from_class->isa('Future')) {
-            retain_future(
-                $_[0]->on_ready(sub {
-                    my ($f) = @_;
-                    if($f->failure) {
-                        $src->fail($f->from_future);
-                    } elsif(!$f->is_cancelled) {
-                        $src->finish;
-                    } else {
-                        $src->emit($f->get);
-                        $src->finish;
-                    }
-                })
-            );
+            $_[0]->on_ready(sub {
+                my ($f) = @_;
+                if($f->failure) {
+                    $src->fail($f->from_future);
+                } elsif(!$f->is_cancelled) {
+                    $src->finish;
+                } else {
+                    $src->emit($f->get);
+                    $src->finish;
+                }
+            })->retain;
             return $src;
         } else {
             die 'Unknown class ' . $from_class . ', cannot turn it into a source';
@@ -244,19 +242,9 @@ like C<< from->combine_latest->count >>.
 =cut
 
 # It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
-our $future_state = sub {
-      $_[0]->is_done
-    ? 'done'
-    : $_[0]->is_failed
-    ? 'failed'
-    : $_[0]->is_cancelled
-    ? 'cancelled'
-    : 'pending'
-};
-
 sub describe {
     my ($self) = @_;
-    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $future_state->($self->completed) . ')';
+    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $self->completed->state . ')';
 }
 
 =head2 encode
@@ -433,11 +421,11 @@ Often useful in conjunction with a C<< do >> block to provide a closure.
 Examples:
 
  $src->map(do {
-           my $idx = 0;
-           sub {
-            [ @$_, ++$idx ]
-           }
-       })
+   my $idx = 0;
+   sub {
+    [ @$_, ++$idx ]
+   }
+ })
 
 =cut
 
@@ -736,8 +724,7 @@ item.
 
 sub combine_latest : method {
     use Scalar::Util qw(blessed);
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(blessed retain_future);
+    use namespace::clean qw(blessed);
     my ($self, @sources) = @_;
     push @sources, sub { @_ } if blessed $sources[-1];
     my $code = pop @sources;
@@ -754,15 +741,13 @@ sub combine_latest : method {
             $combined->emit([ $code->(@value) ]) if @sources == keys %seen;
         }, $combined);
     }
-    retain_future(
-        Future->needs_any(
-            map $_->completed, @sources
-        )->on_ready(sub {
-            @value = ();
-            return if $combined->completed->is_ready;
-            shift->on_ready($combined->completed)
-        })
-    );
+    Future->needs_any(
+        map $_->completed, @sources
+    )->on_ready(sub {
+        @value = ();
+        return if $combined->completed->is_ready;
+        shift->on_ready($combined->completed)
+    })->retain;
     $combined
 }
 
@@ -830,8 +815,6 @@ Example:
 =cut
 
 sub merge : method {
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(retain_future);
     my ($self, @sources) = @_;
 
     my $combined = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -842,11 +825,10 @@ sub merge : method {
             $combined->emit($_)
         });
     }
-    retain_future(
-        Future->needs_all(
-            map $_->completed, @sources
-        )->on_ready($combined->completed)
-    );
+    Future->needs_all(
+        map $_->completed, @sources
+    )->on_ready($combined->completed)
+     ->retain;
     $combined
 }
 
@@ -860,8 +842,6 @@ results.
 =cut
 
 sub apply : method {
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(retain_future);
     my ($self, @code) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -869,11 +849,10 @@ sub apply : method {
     for my $code (@code) {
         push @pending, map $code->($_), $self;
     }
-    retain_future(
-        Future->needs_all(
-            map $_->completed, @pending
-        )->on_ready($src->completed)
-    );
+    Future->needs_all(
+        map $_->completed, @pending
+    )->on_ready($src->completed)
+     ->retain;
     # Pass through the original events
     $self->each_while_source(sub {
         $src->emit($_)
@@ -944,15 +923,28 @@ This is a terrible name for a method, expect it to change.
 =cut
 
 sub ordered_futures {
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(retain_future);
     my ($self) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     $self->each_while_source(sub {
-        retain_future(
-            $_->on_done($src->curry::weak::emit)
-              ->on_fail($src->curry::weak::fail)
-        )
+        $_->on_done($src->curry::weak::emit)
+          ->on_fail($src->curry::weak::fail)
+          ->retain
+    }, $src);
+}
+
+*resolve = *ordered_futures;
+
+=head2 concurrent
+
+=cut
+
+sub concurrent {
+    my ($self) = @_;
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->each_while_source(sub {
+        $_->on_done($src->curry::weak::emit)
+          ->on_fail($src->curry::weak::fail)
+          ->retain
     }, $src);
 }
 
@@ -1758,7 +1750,7 @@ sub chained {
         );
         weaken($src->{parent});
         push @{$self->{children}}, $src;
-        $log->tracef("Constructing chained source for %s from %s (%s)", $src->label, $self->label, $future_state->($self->completed));
+        $log->tracef("Constructing chained source for %s from %s (%s)", $src->label, $self->label, $self->completed->state);
         return $src;
     } else {
         my $src = $self->new(@_);

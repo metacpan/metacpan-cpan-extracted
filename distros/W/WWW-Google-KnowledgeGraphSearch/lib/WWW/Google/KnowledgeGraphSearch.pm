@@ -1,6 +1,6 @@
 package WWW::Google::KnowledgeGraphSearch;
 
-$WWW::Google::KnowledgeGraphSearch::VERSION   = '0.03';
+$WWW::Google::KnowledgeGraphSearch::VERSION   = '0.04';
 $WWW::Google::KnowledgeGraphSearch::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::KnowledgeGraphSearch - Interface to Google Knowledge Graph Search A
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -6,6 +6,12 @@ Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
 
+version 1.59: Thu 28 Dec 11:29:27 CET 2017
+
+	Improvements:
+	- remove json regression tests from t/ into xt/, because those
+	  modules keep on breaking... [cpantesters]
+
 version 1.58: Tue 27 Jun 16:50:29 CEST 2017
 
 	Fixes:
@@ -35,7 +41,7 @@ version 1.55: Wed  8 Mar 08:28:02 CET 2017
 
 	Improvements:
 	- spell fix Debian rt.cpan.org#118569 [Lucas Kanashiro, Debian]
-	- add json_friendly, patch by Slaven Rezic.
+	- add json_friendly, patch by rt.cpan.org#120066 [Slaven Rezic]
 	- added bin/xml2json
 
 version 1.54: Mon Sep 19 22:26:02 CEST 2016

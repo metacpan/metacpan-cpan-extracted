@@ -1,10 +1,10 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.010;
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile'
- , VERSION	=> '1.58'
+ , VERSION	=> '1.59'
 
  , PREREQ_PM    =>
    { XML::LibXML               => 2.0107
@@ -40,7 +40,6 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/xml-compile/raw
 DISTDIR         = ../public_html/xml-compile/source
-LICENSE         = artistic
 SKIP_LINKS      = XML::LibXML
 
 # for POD

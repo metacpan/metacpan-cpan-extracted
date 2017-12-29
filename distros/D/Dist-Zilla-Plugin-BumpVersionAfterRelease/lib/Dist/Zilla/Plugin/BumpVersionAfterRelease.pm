@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::BumpVersionAfterRelease;
 # ABSTRACT: Bump module versions after distribution release
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Moose;
 use namespace::autoclean;
@@ -118,7 +118,8 @@ sub munge_file {
         $self->log_debug( [ 'bumped $VERSION in %s', $file->_original_name ] );
     }
     else {
-        $self->log( [ q[Skipping: no "our $VERSION = '...'" found in "%s"], $file->name ] );
+        my $version = $self->all_matching ? $self->zilla->version : '...';
+        $self->log( [ q[Skipping: no "our $VERSION = '%s'" found in "%s"], $version, $file->name ] );
     }
     return;
 }
@@ -235,7 +236,7 @@ Dist::Zilla::Plugin::BumpVersionAfterRelease - Bump module versions after distri
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

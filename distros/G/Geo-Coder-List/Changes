@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-List
 
+0.18	Tue Dec 26 08:18:54 EST 2017
+	Improved return value checking
+	Squash spaces
+
 0.17	Fri Oct 27 14:14:57 EDT 2017
 	Support Geo::Coder::Ovi, Geo::Coder::US::Census,
 		Geo::Coder::GeocodeFarm and Geo::Coder::RandMcnally

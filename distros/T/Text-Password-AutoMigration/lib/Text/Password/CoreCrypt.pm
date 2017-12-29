@@ -1,5 +1,5 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use 5.8.8;
 use Moose;
@@ -84,7 +84,7 @@ sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input !~ /[!-~]/ or $input =~ /\s/;
+    if length $input and $input !~ /[!-~]/ or $input =~ /\s/;
     croak "CORE::crypt makes 13bytes hash strings. Your data must be wrong."
     if $data !~ /^[!-~]{13}$/;
 
@@ -130,12 +130,7 @@ sub encrypt {
     if $input =~ /[^!-~]/ or $input =~ /\s/;
     carp __PACKAGE__ . " ignores the password with over 8bytes" unless $input =~ /^[!-~]{8}$/;
 
-    my $encrypt;
-    my @seeds = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9, '.', '/' );
-    my $salt = '';
-    $salt .= $seeds[ rand @seeds ] until length $salt == 2;
-
-    return $encrypt = CORE::crypt( $input, $salt );
+    return CORE::crypt( $input, $self->_salt() );
 }
 
 =head3 generate($length)
@@ -165,6 +160,15 @@ sub generate {
     }while( $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/i );
 
     return $raw, $self->encrypt($raw);
+}
+
+sub _salt {
+    my $self = shift;
+
+    my @seeds = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9, '.', '/' );
+    my $salt = '';
+    $salt .= $seeds[ rand @seeds ] until length $salt == 2;
+    return $salt;
 }
 
 1;

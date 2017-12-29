@@ -91,6 +91,7 @@ public:
 	void Hv(double *s, double *Hs);
 
 	int get_nr_variable(void);
+	void get_diagH(double *M);
 
 private:
 	void Xv(double *v, double *Xv);
@@ -191,6 +192,27 @@ void l2r_lr_fun::Hv(double *s, double *Hs)
 		Hs[i] = s[i] + Hs[i];
 }
 
+void l2r_lr_fun::get_diagH(double *M)
+{
+	int i;
+	int l = prob->l;
+	int w_size=get_nr_variable();
+	feature_node **x = prob->x;
+
+	for (i=0; i<w_size; i++)
+		M[i] = 1;
+
+	for (i=0; i<l; i++)
+	{
+		feature_node *s = x[i];
+		while (s->index!=-1)
+		{
+			M[s->index-1] += s->value*s->value*C[i]*D[i];
+			s++;
+		}
+	}
+}
+
 void l2r_lr_fun::Xv(double *v, double *Xv)
 {
 	int i;
@@ -225,6 +247,7 @@ public:
 	void Hv(double *s, double *Hs);
 
 	int get_nr_variable(void);
+	void get_diagH(double *M);
 
 protected:
 	void Xv(double *v, double *Xv);
@@ -302,6 +325,27 @@ void l2r_l2_svc_fun::grad(double *w, double *g)
 int l2r_l2_svc_fun::get_nr_variable(void)
 {
 	return prob->n;
+}
+
+void l2r_l2_svc_fun::get_diagH(double *M)
+{
+	int i;
+	int w_size=get_nr_variable();
+	feature_node **x = prob->x;
+
+	for (i=0; i<w_size; i++)
+		M[i] = 1;
+
+	for (i=0; i<sizeI; i++)
+	{
+		int idx = I[i];
+		feature_node *s = x[idx];
+		while (s->index!=-1)
+		{
+			M[s->index-1] += s->value*s->value*C[idx]*2;
+			s++;
+		}
+	}
 }
 
 void l2r_l2_svc_fun::Hv(double *s, double *Hs)
@@ -2802,6 +2846,11 @@ struct model *load_model(const char *model_file_name)
 	double bias;
 	model *model_ = Malloc(model,1);
 	parameter& param = model_->param;
+	// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+	param.nr_weight = 0;
+	param.weight_label = NULL;
+	param.weight = NULL;	
+	param.init_sol = NULL;
 
 	model_->label = NULL;
 

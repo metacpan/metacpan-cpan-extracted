@@ -1,7 +1,9 @@
 package Ryu::Async::Client;
-$Ryu::Async::Client::VERSION = '0.008';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.009'; # VERSION
 
 sub new { bless { @_[1..$#_] }, $_[0] }
 

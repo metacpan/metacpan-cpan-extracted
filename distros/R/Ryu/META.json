@@ -40,7 +40,7 @@
          },
          "requires" : {
             "Encode" : "1.98",
-            "Future" : "0.35",
+            "Future" : "0.37",
             "List::UtilsBy" : "0.10",
             "Log::Any" : "1.045",
             "Log::Any::Adapter" : "1.045",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "0.025",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.026",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -14,9 +14,9 @@ examples/cat.pl
 examples/synopsis.pl
 examples/timer.pl
 lib/Ryu/Async.pm
-lib/Ryu/Async.pod
 lib/Ryu/Async/Client.pm
 lib/Ryu/Async/Packet.pm
+lib/Ryu/Async/Process.pm
 lib/Ryu/Async/Server.pm
 t/00-check-deps.t
 t/00-compile.t

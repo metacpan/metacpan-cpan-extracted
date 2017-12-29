@@ -18,10 +18,18 @@ sub verify {
 
     my $environment = 'Production';
     my $receipt = $args{receipt};
+    my $password = $args{password};
+    my $exclude_old_transactions = $args{exclude_old_transactions};
 
     my $hash = {
         'receipt-data' => $receipt,
     };
+    if ($password) {
+        $hash->{password} = $password;
+    }
+    if ($exclude_old_transactions) {
+        $hash->{'exclude-old-transactions'} = \1;
+    }
 
     # try production environment first. cf.
     #   https://developer.apple.com/library/ios/technotes/tn2259/_index.html FAQ16

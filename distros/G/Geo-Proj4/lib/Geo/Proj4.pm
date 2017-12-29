@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package Geo::Proj4;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 
 use strict;

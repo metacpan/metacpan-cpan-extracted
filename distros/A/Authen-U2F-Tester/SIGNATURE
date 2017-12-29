@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 282c622ea900623014de1d8907f6924a556311e7 Changes
+SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
+SHA1 7def27a6691fa1cefe3c06fbb45aeb8bb964da67 MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 16f4946a0f2ba91c4fe768e26dcafeae239f3878 META.json
+SHA1 99340491229f6eee5debd8afa34d4409475f754a META.yml
+SHA1 4d546060760718ec321bca6c7c6fd3b20c50f1f8 Makefile.PL
+SHA1 fb043a3ce8bd3cedb41d78eb1eb5503df33cb704 README
+SHA1 59cbe9534acea07381d65b3be555acfa423c8d52 README.md
+SHA1 8892e8baef6479417697d66c8bd3bbb55376b39d lib/Authen/U2F/Tester.pm
+SHA1 9fd670d70a189ca21b1950e9886cb0e30a4d8061 lib/Authen/U2F/Tester/Const.pm
+SHA1 8f13089be8874f0efbd0f6bf3527f6693c7a91fb lib/Authen/U2F/Tester/Error.pm
+SHA1 7d681a67ebe11b49e84bf2a3bda44315cc197fa3 lib/Authen/U2F/Tester/Keypair.pm
+SHA1 3a8fe46b5b8ad5726375b0c0905d8b463af82cb9 lib/Authen/U2F/Tester/RegisterResponse.pm
+SHA1 30dde1ec70dc35648b2d2a712b5b9995840119d3 lib/Authen/U2F/Tester/Role/Response.pm
+SHA1 a7479326a25ebc88c64fe698159c1dc91758116c lib/Authen/U2F/Tester/SignResponse.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 c25bd69c09fa71323f1201d8cad2e973e74963f7 t/smoke.t
+SHA1 d47eec3a73827e0840255794214630e37aebcc11 t/ssl/cert.pem
+SHA1 161e39a64d86f1afd6762619bc892689b588f235 t/ssl/key.pem
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWkSAeKQl27WkM10aAQhv7A/9F9rms1i6uga0uGDO1BMAy+znq39VdG6a
+4YraMpTOrGkWMfQsnd1buhAe3FxvVFsXMMthgTsgxn3j2O3PJhd0kJS87arKuoCW
+E21kyvqpNhon+ahF36JYgWxs0WtcEb/TkGvgI+jtQOlN7lWBkJ0N4LXR0h7KfiLj
+a0Dg0icYdqQ1fjmocg9cAxG3qHwN4CNxx9rZhleQCxJ/xwItW5tnzfm6uV/0Pv7B
+zUQoZyhs3Pe5g0SKQxtsK+pYdYdhV4EL6PoSEQv3KDgIX+z8dkyADzDkhmSEdaYR
+7wTi5V8u9CszLueLZFv2sItnZl7JZbAl40ugv1RBu+4AD3/PRfi7FcqSxPIIOT7P
++8WmfgCKGrZbp3OgSolzhmiG+iRp4Ym79XeYZouVrqBH6ELkb62vsuU+OqDQqE8M
+HvVvMNCzUlTj9Ccsu+soDQ4d5LdkiQWh4JpSqbUYa1BqYELNCM5c+5/8mGzrB8FX
+2TsxIgKSSiK3NLf+dwpQndZqZyW4B3EssTzm9pE74qYRHTHey37xR60/yzFC6Cy9
+Ev9/UHpTIGD/4ePod4yfKdCwjC9jGkComOFL2rE7Syy4GqUjjraWE/jgq5KTnSVx
+RKMtBBsotwvTuCKEJpuQH/oxLO6MAbKBdItQj9asFuzmf0d+1x/DegxIWWCTGYSu
+/NuH+iTHW6Y=
+=wZ9g
+-----END PGP SIGNATURE-----

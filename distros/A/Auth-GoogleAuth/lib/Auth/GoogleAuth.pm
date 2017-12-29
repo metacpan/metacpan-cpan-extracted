@@ -1,6 +1,7 @@
 package Auth::GoogleAuth;
 # ABSTRACT: Google Authenticator TBOT Abstraction
 
+use 5.008;
 use strict;
 use warnings;
 
@@ -12,7 +13,7 @@ use URI::Escape 'uri_escape';
 use Convert::Base32 qw( encode_base32 decode_base32 );
 use Carp 'croak';
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 my @accessors = qw( secret secret32 issuer key_id otpauth );
 __PACKAGE__->mk_accessors(@accessors);
@@ -135,7 +136,7 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Auth-GoogleAuth.svg)](https://travis-ci.org/gryphonshafer/Auth-GoogleAuth)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Auth-GoogleAuth/badge.png)](https://coveralls.io/r/gryphonshafer/Auth-GoogleAuth)
@@ -403,7 +404,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

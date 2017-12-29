@@ -6,7 +6,7 @@ ENDIF ()
 # Usually the version here correspong to the NEXT version - it is git tagged
 # when we do make marpaESLIFPerlRelease
 #
-MYPACKAGESTART (marpaESLIF 2 0 23)
+MYPACKAGESTART (marpaESLIF 2 0 30)
 
 ###########
 # Library #
@@ -109,7 +109,7 @@ IF (JNI_FOUND AND JAVA_FOUND)
   MESSAGE(STATUS "----------")
   MESSAGE(STATUS "Path to jni.h    : " ${JAVA_INCLUDE_PATH})
   MESSAGE(STATUS "Path to jni_md.h : " ${JAVA_INCLUDE_PATH2})
-  ADD_SUBDIRECTORY(src/bindings/java)
+  ADD_SUBDIRECTORY(src/bindings/java EXCLUDE_FROM_ALL)
 ENDIF ()
 
 INCLUDE(FindPerl)
@@ -132,7 +132,7 @@ IF (PERL_FOUND)
     MESSAGE(STATUS "PERL Executable located at ${PERL_EXECUTABLE}")
     MESSAGE(STATUS "PERL Packaging will be done with Dist::Zilla::App package")
     MESSAGE(STATUS "Asking for Dist::Zilla version said: ${PERL_OUTPUT_VARIABLE}")
-    ADD_SUBDIRECTORY(src/bindings/perl)
+    ADD_SUBDIRECTORY(src/bindings/perl EXCLUDE_FROM_ALL)
   ELSE ()
     MESSAGE(STATUS "")
     MESSAGE(STATUS "PERL Executable located at ${PERL_EXECUTABLE}")
@@ -143,3 +143,13 @@ ELSE ()
   MESSAGE(STATUS "")
   MESSAGE(STATUS "PERL Packaging cannot be done without perl -;")
 ENDIF ()
+
+#############
+# Packaging #
+#############
+MYPACKAGEPACK ("" "Marpa Extended Scanless Interface")
+
+#########
+# Setup #
+#########
+MYPACKAGEPRINTSETUP()

@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::BumpVersionAfterRelease::_Util;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Moose::Role;
 

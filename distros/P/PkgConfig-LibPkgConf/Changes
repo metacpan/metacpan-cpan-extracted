@@ -1,5 +1,9 @@
 Revision history for PkgConfig-LibPkgConf
 
+0.08 2017-12-27 09:38:07 -0500
+  - Compatability with pkgconf 1.3.90
+  - Require pkgconf 1.3.90
+
 0.07 2017-03-15 10:45:03 -0400
   - Use correct CCFLAGS for Perl ABI (ppisar++ gh#5)
 

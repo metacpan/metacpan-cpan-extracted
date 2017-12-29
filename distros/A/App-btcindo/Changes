@@ -1,3 +1,9 @@
+0.016   2017-12-27 (PERLANCAR)
+
+	- Handle NEM <-> XEM symbol confusion (we use XEM at the CLI level,
+	  but the JSON API & TAPI still use NEM).
+
+
 0.015   2017-12-25 (PERLANCAR)
 
 	- Handle DASH <-> DRK symbol confusion (we use DASH at the CLI

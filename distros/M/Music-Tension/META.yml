@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,10 @@ requires:
   List::Util: '0'
   Scalar::Util: '0'
   strict: '0'
-version: '0.70'
+version: '1.01'
 x_homepageresources:
   repository:
     type: git
     url: git://github.com/thrig/Music-Tension.git
     web: https://github.com/thrig/Music-Tension
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

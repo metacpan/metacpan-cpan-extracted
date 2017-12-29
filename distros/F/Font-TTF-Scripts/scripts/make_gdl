@@ -4,28 +4,33 @@ use Font::TTF::Scripts::GDL;
 use IO::File;
 use Getopt::Long;
 use Pod::Usage;
+use File::Basename;
 
 our(%opts);
 GetOptions(\%opts, 
-	'ap|a=s', 
-	# 'b',				# used in make_volt
-	'classfile|c=s', 
-	'classprops',
-	'autodefines|d', 
-	'define|D=s%', 
-	'empty|e=s', 
-	# 'forceadd|f=i', 	# used in make_volt
-	'help|h', 
-	'include|i=s@', 
-	'ligatures|l=s',
-	'mark|m=s', 
-	'normalize|n=i', 
-	'omitaps|o=s', 
-	'positions|p=i', 
-	'renameaps|r', 
-	'substitutions|s=i',
-	# 'outVOLT|t',		# used in make_volt
-	'z=i');
+    'ap|a=s', 
+    # 'b',              # used in make_volt
+    'classfile|c=s',
+    'classprops',
+    'classwarn',
+    'autodefines',
+    'define|d=s%',
+    'empty|e=s',
+    # 'forceadd|f=i',   # used in make_volt
+    'help|h',
+    'include|i=s@',
+    'ligatures|l=s',
+    'mark|m=s',
+    # 'markattach=s%',  # used in make_fea
+    'normalize|n=i',
+    'omitaps|o=s',
+    'package=s',
+    'positions|p=i',
+    # 'preinclude=s',   # used in make_fea
+    'renameaps|r',
+    'substitutions|s=i',
+    # 'outVOLT|t',      # used in make_volt
+    'z=i');
 
 unless ($ARGV[1] || $opts{'help'})
 {
@@ -45,25 +50,36 @@ my %options;
 if ($opts{'empty'}) 
 {
     my @glist;
-	open (IN, "<$opts{'empty'}") or die "Couldn't open '$opts{'empty'}' for reading.";
-	while (<IN>)
-	{
-		s/[\r\n]*$//o;      # platform-safe chomp
-		s/;.*$//o;          # Strip comments
-		s/ //go;            # Strip whitespace
-		push (@glist, $_) unless $_ eq '';
-	}
+    open (IN, "<$opts{'empty'}") or die "Couldn't open '$opts{'empty'}' for reading.";
+    while (<IN>)
+    {
+        s/[\r\n]*$//o;      # platform-safe chomp
+        s/;.*$//o;          # Strip comments
+        s/ //go;            # Strip whitespace
+        push (@glist, $_) unless $_ eq '';
+    }
     close IN;
-	$options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
+    $options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
 }
 
-my $f = Font::TTF::Scripts::GDL->read_font($ARGV[0], $opts{'ap'}, %options) || die "Can't read font information";
+# Process -o if supplied
+$options{'-omittedAPs'} = $opts{'omitaps'} if $opts{'omitaps'};
 
-if (exists $f->{'WARNINGS'})
+# Open font, using custom module if --package suppplied
+my $f;
+if ($opts{'package'})
 {
-	warn $f->{'WARNINGS'};
+    my $pkg = $opts{'package'};
+    require $pkg;
+    # Assume the package name is the basename of the filename:
+    ($pkg, undef, undef) = fileparse($opts{'package'}, qr/\.[^.]*/);
+    $f = $pkg->read_font($ARGV[0], $opts{'ap'}, %options);
 }
-
+else
+{
+    $f = Font::TTF::Scripts::GDL->read_font($ARGV[0], $opts{'ap'}, %options);
+}
+die "Can't read font information" unless $f;
 
 my $outfh = IO::File->new("> $ARGV[1]") || die "Can't open $ARGV[1] for writing";
 
@@ -90,7 +106,7 @@ if ($opts{'renameaps'})
 
 $f->{'vecs'} = {};
 
-$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}, -w => $opts{'classwarn'}) if ($opts{'classfile'});
 $f->start_gdl($outfh);
 $f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -ignoredAPs => $options{'omitaps'}, -notmark => $opts{'mark'});
 $f->out_gdl($outfh, -split_ligs => ($opts{'z'} & 1), -psnames => ($opts{'z'} & 4));
@@ -100,6 +116,11 @@ $f->normal_rules($outfh, $opts{'normalize'}, ($opts{'z'} & 2)) if ($opts{'normal
 $f->lig_rules($outfh, $opts{'substitutions'}, $opts{'ligatures'}) if ($opts{'ligatures'});
 $f->pos_rules($outfh, $opts{'positions'}) if ($opts{'positions'});
 $f->end_gdl($outfh, $opts{'include'}, $opts{'define'});
+
+if (exists $f->{'WARNINGS'})
+{
+    warn $f->{'WARNINGS'};
+}
 
 $outfh->close();
 
@@ -120,11 +141,12 @@ Creates font specific GDL from a font and optional attachment point database
 
   -a file       Attachment point database
   -c classfile  xml file of class and property information to merge in
-  --classproperties
-                specifies whether classes are made for property values in
+  --classprops  specifies whether classes are made for property values in
                 the classfile
-  -d            Output per class #defines for key classes
-  -D name=val   Add #defines to output gdl
+  --classwarn   issue warnings if classfile contains references to glyphs
+                that are not in the font.
+  --autodefines Output per class #defines for key classes
+  -d name=val   Add #defines to output gdl
   -e file       A file containing names (1 per line) of glyphs that are 
                 known to have no outline (thus shouldn't generate warnings). 
   -h            print manpage
@@ -137,6 +159,10 @@ Creates font specific GDL from a font and optional attachment point database
   -m "list"     List of APs to ignore when deciding whether a glyph is a mark
   -n num        Add a normalization substitution with the given pass number
   -o "list"     List of AP names to omit
+  --package file
+                Use the named file instead of Font::TTF::Scripts::GDL.pm to
+                open the font. Assumes the internal package name is the
+                same as the basename of file (sans any extension).
   -p num        Add auto positioning attachment rules with the given pass number
   -r            Rename point names such that final M gets initial _ and final S
                 is removed. Typically for Fontographer fonts.
@@ -273,7 +299,7 @@ Martin Hosken L<http://scripts.sil.org/FontUtils>.
 
 =head1 LICENSING
 
-Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+Copyright (c) 1998-2016, SIL International (http://www.sil.org)
 
 This script is released under the terms of the Artistic License 2.0.
 For details, see the full text of the license in the file LICENSE.

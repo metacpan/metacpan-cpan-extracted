@@ -1,11 +1,14 @@
+0.39 Wed Dec 28 23:48:00 CEST 2017
+         - first step to user defined entities
+
 0.38 Tue Oct 24 00:08:00 CEST 2017
-         -  TO_JSON improvements
+         - TO_JSON improvements
 
 0.37 Tue Oct 24 00:08:00 CEST 2017
-         -  json mysql fixes
+         - json mysql fixes
          
 0.33 Sun Oct 15 23:00:00 CEST 2017
-         -  for_rows mysql fixes
+         - for_rows mysql fixes
          
 0.32 Sat Oct 14 17:00:00 CEST 2017
          - speed complex query creation up 

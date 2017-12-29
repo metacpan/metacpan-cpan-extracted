@@ -19,12 +19,5 @@ Run perldoc(1) on Music::Tension for more documentation.
 
 DEPENDENCIES
 
-Some knowledge of music theory may well benefit the user. See the Makefile.PL
-for module dependencies.
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2012,2013,2015 Jeremy Mates
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+Some knowledge of music theory may well benefit the user. See the
+Makefile.PL for module dependencies.

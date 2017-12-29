@@ -92,11 +92,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
          "file" : "lib/Dist/Zilla/Plugin/BumpVersionAfterRelease.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Dist::Zilla::Plugin::RewriteVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/RewriteVersion.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -111,7 +111,7 @@
          "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Dave Rolsky <autarch@urth.org>",
