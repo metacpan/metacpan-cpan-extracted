@@ -1,3 +1,15 @@
+20180103 - Wed Jan  3 13:25:19 PST 2018
+    Bug Fixes
+    * Protect against non-glob refs in the symbol table.
+      5.27 started introducing them.
+
+
+20171231 - Sun Dec 31 09:03:04 PST 2017
+    Dist Fixes
+    * Forgot a META.json file, despite it being in the MANIFEST.
+      [github #1]
+
+
 20130412 - Fri Apr 12 17:32:43 BST 2013
     Bug Fixes
     * Now compatible with Test::Builder 1.5.0

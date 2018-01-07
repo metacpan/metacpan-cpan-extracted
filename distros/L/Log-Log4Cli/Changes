@@ -1,5 +1,11 @@
 Revision history for Log-Log4Cli
 
+0.20    2017-12-30
+        save exit code in global $STATUS when die_* used in eval block
+        die_fatal used for CORE::GLOBAL::die
+        notice level removed
+        tests improved, refactoring
+
 0.19    2017-10-09
         use croak instead of die (file:line in $@ fixed)
 

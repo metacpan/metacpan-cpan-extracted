@@ -63,7 +63,7 @@ BEGIN {
     my $foo = $mock->mock('One::foo');
     my $ret = Two::test;
 
-    is (ref $ret, 'One', "no side effect set yet");
+    is ($ret, undef, "no side effect set yet");
 
     $foo->side_effect(sub {50});
 

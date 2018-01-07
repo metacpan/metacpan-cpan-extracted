@@ -1,5 +1,5 @@
 package HackaMol::Roles::BondsAnglesDihedralsRole;
-$HackaMol::Roles::BondsAnglesDihedralsRole::VERSION = '0.046';
+$HackaMol::Roles::BondsAnglesDihedralsRole::VERSION = '0.047';
 # ABSTRACT: Array traits for containers of HackaMol Bonds, Angles, Dihedrals.
 use Moose::Role;
 
@@ -35,7 +35,7 @@ HackaMol::Roles::BondsAnglesDihedralsRole - Array traits for containers of Hacka
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 DESCRIPTION
 

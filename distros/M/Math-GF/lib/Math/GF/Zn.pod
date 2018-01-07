@@ -1,0 +1,208 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Math::GF::Zn - Elements for arithmetics over Zn
+
+=head1 SYNOPSIS
+
+   use Math::GF;
+   my $field = Math::GF->new(order => 7);
+
+   # one is-a Math::GF::Zn because 7 is a prime
+   my $one = $field->multiplicative_neutral;
+
+
+=head1 DESCRIPTION
+
+This module implements elements and operations over a Galois Field based
+on primes. You are not supposed to generate instances of this class
+directly, but only through L<Math::GF> (see L</SYNOPSIS> above for an
+example).
+
+=head1 OPERATORS
+
+This module overrides some arithmetic and comparison operators, namely:
+
+   + - * / **
+   == != eq
+
+Additionally, the stringification operator C<""> is overloaded too.
+
+=head1 METHODS
+
+In the following, C<$e> is supposed to be a C<Math::GF::Zn> object.
+
+=begin HIDE
+
+=head2 B<< BUILD_multiplicative_inverse >>
+
+Builder for L</i>.
+
+=head2 B<< BUILD_additive_inverse >>
+
+Builder for L</o>.
+
+=end HIDE
+
+=head2 B<< assert_compatibility >>
+
+   my $n = $e->assert_compatibility($other_element);
+
+Assert the compatibility of this object C<$e> with C<$other_element>. It
+is defined as follows:
+
+=over
+
+=item *
+
+C<$other_element> is-a C<Math::GF::Zn>
+
+=item *
+
+C<$other_element> is based on the same field, i.e. it has the same L</n>
+as C<$e>.
+
+=back
+
+Throws an error if the conditions are not met.
+
+Returns L</n> (sparing you to call it if you need it). As this is a prime
+integer, it will always evaluate as true in Perl.
+
+=head2 B<< divided_by >>
+
+   my $d = $e->divided_by($other_element);
+
+Evaluate C<$e> divided by C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C</>
+overloaded operator.
+
+=head2 B<< equal_to >>
+
+   my $bool = $e->equal_to($other_element);
+
+Asses equality of C<$e> and C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C<==> and
+C<eq> overloaded operators.
+
+=head2 B<< field >>
+
+   my $field = $e->field;
+
+Accessor for the field where this element belongs.
+
+=head2 B<< i >>
+
+   my $i = $e->i;
+
+The I<reference value> for the multiplicative inverse of this object.
+
+=head2 B<< inv >>
+
+   my $inv = $e->inv;
+
+A C<Math::GF::Zn> element belonging to the same L</field> that is the
+multiplicative inverse of this object.
+
+=head2 B<< minus >>
+
+   my $difference = $e->minus($other_element);
+
+Evaluate difference of C<$e> and C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C<->
+overloaded operator.
+
+=head2 B<< n >>
+
+   my $n = $e->n;
+
+Prime integer at the base of Zn. Same as C<< $e->field->order >>.
+
+=head2 B<< not_equal_to >>
+
+   my $bool = $e->not_equal_to($other_element);
+
+Asses disequality of C<$e> and C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C<!=>
+overloaded operator.
+
+=head2 B<< o >>
+
+   my $i = $e->o;
+
+The I<reference value> for the additive inverse (opposite) of this object.
+
+=head2 B<< opp >>
+
+   my $opp = $e->opp;
+
+A C<Math::GF::Zn> element belonging to the same L</field> that is the
+additive inverse of this object.
+
+=head2 B<< plus >>
+
+   my $sum = $e->plus($other_element);
+
+Evaluate sum of C<$e> and C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C<+>
+overloaded operator.
+
+=head2 B<< stringify >>
+
+   my $string = $e->stringify;
+
+Get a string representation of the object. It does just return L</v>. Used
+in the implementation of the C<""> overloaded operator.
+
+=head2 B<< times >>
+
+   my $prod = $e->times($other_element);
+
+Evaluate product of C<$e> and C<$other_element>. Calls
+L</assert_compatibility>. Used in the implementation of the C<*>
+overloaded operator.
+
+=head2 B<< to_power >>
+
+   my $pow = $e->to_power($exp);
+
+Evaluate the power of C<$e> to C<$exp>. Used in the implementation of the
+C<**> overloaded operator.
+
+=head2 B<< v >>
+
+   my $v = $e->v;
+
+A I<reference value> for this object. In case of element of Zn, it is
+actually a meaningful integer value that can be used for operations modulo
+L</n>.
+
+
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs through GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Math::GF>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017, 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

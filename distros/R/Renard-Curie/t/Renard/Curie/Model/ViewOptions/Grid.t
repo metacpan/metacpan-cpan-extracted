@@ -36,7 +36,7 @@ subtest "Grid option construction" => sub {
 					Renard::Curie::Model::ViewOptions::Grid->new(
 						$option->{options}
 					);
-				} 'Renard::Incunabula::Common::Error::ViewOptions::InvalidGridOptions',
+				} 'Renard::Curie::Error::ViewOptions::InvalidGridOptions',
 					"Invalid options: @{[ $option->{reason} ]}";;
 			}
 		};

@@ -4,7 +4,7 @@ use Mojo::Base '-role';
 use Mojo::Cookie::Response;
 use Mojo::File;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has file    => 'cookies.txt';
 has session => 1;
@@ -50,7 +50,7 @@ sub save {
     ];
   }
 
-  Mojo::File->($self->file)->spurt(join "\n",
+  Mojo::File->new($self->file)->spurt(join "\n",
     '# Netscape HTTP Cookie File',
     '',
     map { join "\t", @{$_} } @cookies
@@ -58,3 +58,5 @@ sub save {
 
   return $self;
 }
+
+1;

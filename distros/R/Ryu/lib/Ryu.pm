@@ -3,7 +3,7 @@ package Ryu;
 use strict;
 use warnings;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 =encoding utf8
 
@@ -218,5 +218,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
 

@@ -1,17 +1,21 @@
 use lib 't';
-use t   '16';
+use t   '17';
 
-is $drv->$_('foo'), $drv, "drv->$_('foo') should return \$self" for qw/
+is $drv->$_, $drv, "drv->$_ should return \$self" for qw/
     alert_accept
     alert_dismiss
     back
-    base_url
     cookie_delete
     forward
-    get
     refresh
     window_close
     window_maximize
+/;
+
+is $drv->$_('foo'), $drv, "drv->$_('foo') should return \$self" for qw/
+    base_url
+    cookie_delete
+    get
     window_switch
 /;
 

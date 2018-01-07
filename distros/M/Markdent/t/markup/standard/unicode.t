@@ -2,17 +2,11 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More 0.88;
+use Test2::V0;
 
 use lib 't/lib';
 
 use Test::Markdent;
-
-## no critic (InputOutput::RequireCheckedSyscalls)
-binmode $_, ':encoding(UTF-8)'
-    for map { Test::Builder->new->$_ }
-    qw( output failure_output todo_output );
-## use critic
 
 {
     my $text = <<"EOF";

@@ -1,5 +1,8 @@
 Revision history for Perl extension EveOnline-SSO
 
+0.03 2017-12-28T13:59:36Z
+    - "Whitespace in base64 encoding #1" fixed issue
+
 0.02 2017-03-21T20:59:51Z
     - Add EveOnline::SSO::Client for ESI API
 

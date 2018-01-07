@@ -1,5 +1,9 @@
 Revision history for Device-Cdio
 
+2.0.0  Dec 31, 2017
+
+Revise for libcdio 2.0.0 API
+
 0.4.0  Nov 1, 2017
 
 - ISO filesystem stat now returns all of the time.h fields,

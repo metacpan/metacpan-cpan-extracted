@@ -1,0 +1,112 @@
+{
+   "abstract" : "coincheck Perl libraries L<http://coincheck.jp/>",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Coincheck",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Class::Load" : "0",
+            "Digest::SHA" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "String::CamelCase" : "0",
+            "Time::HiRes" : "0",
+            "URI::Query" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::AllModules" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Coincheck" : {
+         "file" : "lib/WebService/Coincheck.pm",
+         "version" : "0.02"
+      },
+      "WebService::Coincheck::Account" : {
+         "file" : "lib/WebService/Coincheck/Account.pm"
+      },
+      "WebService::Coincheck::BankAccount" : {
+         "file" : "lib/WebService/Coincheck/BankAccount.pm"
+      },
+      "WebService::Coincheck::Borrow" : {
+         "file" : "lib/WebService/Coincheck/Borrow.pm"
+      },
+      "WebService::Coincheck::Deposit" : {
+         "file" : "lib/WebService/Coincheck/Deposit.pm"
+      },
+      "WebService::Coincheck::Leverage" : {
+         "file" : "lib/WebService/Coincheck/Leverage.pm"
+      },
+      "WebService::Coincheck::Order" : {
+         "file" : "lib/WebService/Coincheck/Order.pm"
+      },
+      "WebService::Coincheck::OrderBook" : {
+         "file" : "lib/WebService/Coincheck/OrderBook.pm"
+      },
+      "WebService::Coincheck::Send" : {
+         "file" : "lib/WebService/Coincheck/Send.pm"
+      },
+      "WebService::Coincheck::Ticker" : {
+         "file" : "lib/WebService/Coincheck/Ticker.pm"
+      },
+      "WebService::Coincheck::Trade" : {
+         "file" : "lib/WebService/Coincheck/Trade.pm"
+      },
+      "WebService::Coincheck::Transfer" : {
+         "file" : "lib/WebService/Coincheck/Transfer.pm"
+      },
+      "WebService::Coincheck::Withdraw" : {
+         "file" : "lib/WebService/Coincheck/Withdraw.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/WebService-Coincheck/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/WebService-Coincheck"
+      },
+      "x_IRC" : {
+         "url" : "irc://chat.freenode.org/#bayadev",
+         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

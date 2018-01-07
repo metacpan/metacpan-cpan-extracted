@@ -6,6 +6,7 @@ LICENSE
 lib/Locale/Maketext/Lexicon/Getcontext.pm
 t/00-load.t
 t/10-parse.t
+t/11-parse-no-maketext-conv.t
 t/po/off-common/en.po
 t/po/off-common/fr.po
 t/po/off-common/he.po

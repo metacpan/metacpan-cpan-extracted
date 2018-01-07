@@ -1,0 +1,24 @@
+Revision history for App-Jiffy
+
+0.05  2017-12-29 13:10:23 CST
+        - Use local timezone in `search()`
+
+0.04  2017-12-29 11:45:04 CST
+        - Added rounding to durations
+        - Added JSON export
+
+0.03  2016-02-22 14:45:04 CST
+        - Added search and timesheet subcommands
+        - Fixed add_entry timezone bug
+        - Moved duration calculation into TimeEntry
+        - Added entry's title to current subcommand output
+        - Added tests
+
+0.02  2015-04-06 14:48:30 CDT
+        - Added minimalist HTTP server ( AKA `jiffyd` )
+        - Added docs
+        - Added `current` subcommand to `App::Jiffy`
+
+0.01  2015-04-03 01:14:57 CDT
+        - Initial release
+        - Insert and Update TimeEntries

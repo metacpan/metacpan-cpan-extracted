@@ -5,5 +5,8 @@ use warnings;
 
 __DATA__
 
+option default --deprecated --default
+option --deprecated $<move(0,0)>
+
 define what poison
 option --drink-me what

@@ -528,6 +528,9 @@ Or with parameters:
  
 This literal SQL expressions can be used for insert values also.
 
+Special form C<_$column> allows to set internal column value without marking
+it for actual update in table.
+
 =head4 B<JSON> output support
 
 Every row-object has C<TO_JSON()> function that can be automatically used

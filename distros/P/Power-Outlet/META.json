@@ -37,6 +37,7 @@
             "Net::SNMP" : "0",
             "Net::UPnP" : "0",
             "Package::New" : "0",
+            "Path::Class" : "0",
             "Test::Simple" : "0.44",
             "URI" : "0",
             "XML::LibXML::LazyBuilder" : "0"
@@ -44,5 +45,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.16"
+   "version" : "0.19"
 }

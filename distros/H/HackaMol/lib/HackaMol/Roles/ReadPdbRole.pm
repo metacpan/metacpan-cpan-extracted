@@ -1,33 +1,82 @@
 package HackaMol::Roles::ReadPdbRole;
-$HackaMol::Roles::ReadPdbRole::VERSION = '0.046';
+$HackaMol::Roles::ReadPdbRole::VERSION = '0.047';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
 use Math::Vector::Real;
 use Carp;
 
+requires 'readline_func';
+
+sub read_pdb_parts{
+    my $self = shift;
+    my $fh   = shift;
+
+    my $header             = $self->read_pdb_header( $fh );
+    my ($atoms,$model_ids) = $self->read_pdb_atoms( $fh );
+
+    return ($header,$atoms,$model_ids);
+
+}
+
+sub read_pdb_header{
+    my $self = shift;
+    my $fh   = shift;
+    my $header;
+    my $line;
+    while($line = <$fh>){
+        if ($line =~ m/^(?:MODEL|ATOM|HETATM)\s/){
+            seek($fh, -length($line),1); # rewind back and end
+            last;
+        }
+        else{
+            $header .= $line;
+        }
+    }
+    return ($header);
+}
+
 sub read_pdb_atoms {
 
     #read pdb file and generate list of Atom objects
     my $self = shift;
+
     my $fh   = shift;
     #my $file = shift;
     #my $fh   = FileHandle->new("<$file") or croak "unable to open $file";
 
     my @atoms;
+    my @model_ids;
     my ( $n, $t ) = ( 0, 0 );
     my $q_tbad          = 0;
     my $something_dirty = 0;
+    my $t0_atom_count = 0;
+    my $t_atom_count = 0;
+    my $pdb_model_id;
 
     while (<$fh>) {
-
+        if($self->has_readline_func){
+            next if $self->readline_func->($_) eq 'PDB_SKIP';
+        }
         if (/^(?:MODEL\s+(\d+))/) {
 
-            #$t = $1 - 1; # I don't like this!!  set increment t instead.. below
             $n      = 0;
             $q_tbad = 0;    # flag a bad model and never read again!
+            $t_atom_count = 0 ;
+            $pdb_model_id = $1;
+            $model_ids[$t] = $pdb_model_id;
         }
         elsif (/^(?:ENDMDL)/) {
+            # delete coords if the number of atoms on t is != to that at start
+            if ($t){
+                if ($t_atom_count != $t0_atom_count){
+                    my $carp_message =
+                        "BAD t->$t PDB atom list length changed from $t0_atom_count to $t_atom_count: ignoring model $t";
+                    carp $carp_message;
+                    $_->delete_coords($t) foreach @atoms;
+                    $t--;
+                }
+            }
             $t++;
         }
         elsif (/^(?:HETATM|ATOM)/) {
@@ -78,9 +127,11 @@ sub read_pdb_atoms {
                     altloc      => $altloc,
                 );
                 $atoms[$n]->is_dirty($qdirt) unless $atoms[$n]->is_dirty;
+                $t0_atom_count++;
             }
             else {
-                #croak condition if atom changes between models
+                # croak condition if atom changes between models
+                # does not catch case were number of atoms shrinks!
                 if ( $n > $#atoms or  $name ne $atoms[$n]->name
                     or $element ne $atoms[$n]->symbol )
                 {
@@ -90,12 +141,13 @@ sub read_pdb_atoms {
                       . "has changed";
                     carp $carp_message;
                     $q_tbad = $t;    # this is a bad model!
-                                     #wipe out all the coords prior
+                                     # wipe out all the coords prior
                     $atoms[$_]->delete_coords($t) foreach 0 .. $n - 1;
                     $t--;
                     next;
                 }
                 $atoms[$n]->set_coords( $t, $xyz );
+                $t_atom_count++;
             }
             $n++;
         }
@@ -115,7 +167,7 @@ sub read_pdb_atoms {
             carp $message;
         }
     }
-    return (@atoms);
+    return (\@atoms,\@model_ids);
 }
 
 no Moose::Role;
@@ -132,7 +184,7 @@ HackaMol::Roles::ReadPdbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ This package contains polygon transformation algorithms.
 
 =over 4
 
-=item B<polygon_grid>(%options, LIST-of-$points)
+=item B<polygon_grid>(%options, @points)
 
 Snap the polygon points to grid points, where artifacts are removed.
 
@@ -40,7 +40,7 @@ no transformation will take place.
 
 =back
 
-=item B<polygon_mirror>(%options, LIST-of-$points)
+=item B<polygon_mirror>(%options, @points)
 
 Mirror the polygon in a line.  Only one of the options can be provided.
 Some programs call this "flip" or "flop".
@@ -80,7 +80,7 @@ Mirror in the line C<y=value>, which means that C<x> stays unchanged.
 
 =back
 
-=item B<polygon_move>(%options, LIST-of-$points)
+=item B<polygon_move>(%options, @points)
 
 Returns a list of points which are moved over the indicated distance
 
@@ -100,7 +100,7 @@ Displacement in the vertical direction.
 
 =back
 
-=item B<polygon_resize>(%options, LIST-of-$points)
+=item B<polygon_resize>(%options, @points)
 
  -Option--Default
   center  [0,0]
@@ -128,7 +128,7 @@ Specific scaling factor in the vertical direction.
 
 =back
 
-=item B<polygon_rotate>(%options, LIST-of-$points)
+=item B<polygon_rotate>(%options, @points)
 
  -Option --Default
   center   [0,0]
@@ -149,7 +149,7 @@ specify rotation angle in rads (between -pi and 2*pi)
 
 =back
 
-=item B<polygon_simplify>(%options, LIST-of-$points)
+=item B<polygon_simplify>(%options, @points)
 
  -Option    --Default
   max_points  undef
@@ -193,12 +193,12 @@ Removing points will change the area of the polygon.
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.07,
-built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.10,
+built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

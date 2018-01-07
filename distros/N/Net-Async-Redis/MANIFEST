@@ -22,11 +22,14 @@ examples/redis-cli
 examples/sub.pl
 job-queue.pl
 lib/Net/Async/Redis.pm
+lib/Net/Async/Redis.pod
 lib/Net/Async/Redis/Commands.pm
 lib/Net/Async/Redis/Multi.pm
 lib/Net/Async/Redis/Protocol.pm
 lib/Net/Async/Redis/Server.pm
+lib/Net/Async/Redis/Server.pod
 lib/Net/Async/Redis/Server/Connection.pm
+lib/Net/Async/Redis/Server/Connection.pod
 lib/Net/Async/Redis/Server/Database.pm
 lib/Net/Async/Redis/Subscription.pm
 lib/Net/Async/Redis/Subscription/Message.pm

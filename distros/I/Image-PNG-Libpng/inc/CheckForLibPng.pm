@@ -1,3 +1,21 @@
+#   ____ _               _       __              _ _ _                       
+#  / ___| |__   ___  ___| | __  / _| ___  _ __  | (_) |__  _ __  _ __   __ _ 
+# | |   | '_ \ / _ \/ __| |/ / | |_ / _ \| '__| | | | '_ \| '_ \| '_ \ / _` |
+# | |___| | | |  __/ (__|   <  |  _| (_) | |    | | | |_) | |_) | | | | (_| |
+#  \____|_| |_|\___|\___|_|\_\ |_|  \___/|_|    |_|_|_.__/| .__/|_| |_|\__, |
+#                                                         |_|          |___/ 
+#
+# 0.02 2017-07-01
+#
+# - Remove "Template" stuff
+# - Change file to edit
+# - Debugging messages all go through "msg".
+#
+# 0.01 2017-06-28
+#
+# Old method of checking for libpng recovered from Image::PNG::Libpng
+# git commit 50c6032e3f61624736159930026f2b2a306fcd35.
+
 package CheckForLibPng;
 use parent Exporter;
 our @EXPORT = qw/check_for_libpng/;
@@ -7,6 +25,8 @@ use utf8;
 use FindBin '$Bin';
 use Carp;
 
+our $VERSION = '0.02';
+
 # This uses $Config{ldflags} and $Config{ccflags} when it tries to
 # compile a small program which links against libpng.
 
@@ -14,59 +34,53 @@ use Config qw/%Config/;
 
 # If the test compilation doesn't work, edit the following two lines
 # to point to your libpng library's location and the location of the
-# file "png.h".
+# directory containing the file "png.h".
 
 my $png_lib_dir;
 my $png_include_dir;
 
+# The following variable switches on printing of non-error messages
+
+my $verbose;
+
+sub msg
+{
+    my ($msg) = @_;
+    if ($verbose) {
+	print __PACKAGE__ . ": " . $msg . ".\n";
+    }
+}
+
 sub find_program
 {
-    my ($program, $verbose) = @_;
-    if ($verbose) {
-        print "I am going to look for $program in the list of directories in your PATH.\n";
-    }
+    my ($program) = @_;
+    msg ("looking for $program in \$PATH");
     my $found;
     if ($ENV{PATH}) {
         my @path = split /:/, $ENV{PATH};
         for my $dir (@path) {
-            if ($verbose) {
-                print "Looking in '$dir' for '$program': ";
-            }
+	    msg ("Looking in '$dir' for '$program'");
             my $dprogram = "$dir/$program";
             if (-f $dprogram && -x $dprogram) {
-                if ($verbose) {
-                    print "Found.\n";
-                }
+		msg ("Found");
                 $found = $dprogram;
                 last;
             }
-            if ($verbose) {
-                print "Not found.\n";
-            }
+	    msg ("Not found");
         }
     }
     else {
-        if ($verbose) {
-            print "There is no PATH environment variable.\n";
-        }
+	msg ("There is no PATH environment variable");
     }
     return $found;
 }
 
-
-
 sub check_for_libpng
 {
+    ($verbose) = @_;
 
-    # The following variable switches on printing of non-error messages
+    msg ("Debugging messages in check_for_libpng are switched on");
 
-    my ($verbose) = @_;
-
-    if ($verbose) {
-	print <<EOF;
-Debugging messages in check_for_libpng are switched on.
-EOF
-    }
     # $inc is a flag for the C compiler to tell it where to find header
     # files.
 
@@ -84,28 +98,17 @@ EOF
     }
     my $has_pkg_config = find_program ('pkg-config', $verbose);
     if ($has_pkg_config) {
-	if ($verbose) {
-	    print <<EOF;
-
-I found "pkg-config" in your PATH so I am going to use that to help
-with the compilation of the C part of this module.
-
-EOF
-	}
+	msg ('I found "pkg-config" in your PATH so I am going to use that to help with the compilation of the C part of this module.');
 	my $pkg_config_cflags = `pkg-config --cflags libpng`;
 	$pkg_config_cflags =~ s/\s+$//;
 	my $pkg_config_ldflags = `pkg-config --libs libpng`;
 	$pkg_config_ldflags =~ s/\s+$//;
 	if ($pkg_config_cflags) {
-	    if ($verbose) {
-		print "Adding '$pkg_config_cflags' to C compiler flags from pkg-config.\n";
-	    }
+	    msg ("Adding '$pkg_config_cflags' to C compiler flags from pkg-config");
 	    $inc = "$inc $pkg_config_cflags";
 	}
 	if ($pkg_config_ldflags) {
-	    if ($verbose) {
-		print "Adding '$pkg_config_ldflags' to linker flags from pkg-config.\n";
-	    }
+	    msg ("Adding '$pkg_config_ldflags' to linker flags from pkg-config");
 	    $libs = "$pkg_config_ldflags $libs";
 	}
     }
@@ -159,27 +162,21 @@ EOF
     my $run_ok;
 
     if (! -f $c_file_name && ! -f $exe_file_name) {
-	if ($verbose) {
-	    print "\nI am going to compile and run a test program called '$c_file_name'.\n";
-	}
+	msg ("compiling and running a test program called '$c_file_name'");
 	# Get $ldflags and $ccflags from Config.pm.
 	my $ldflags = $Config{ldflags};
 	#    my $ccflags;
 	my $ccflags = $Config{ccflags};
 	open my $output, ">", $c_file_name
-        or die "Error opening file '$c_file_name' for writing: $!";
+            or die "Error opening file '$c_file_name' for writing: $!";
 	print $output $test_c;
 	close $output
-        or die "Error closing file '$c_file_name': $!";
+            or die "Error closing file '$c_file_name': $!";
 	my $compile = "cc $ccflags $inc -o $exe_file_name $c_file_name $ldflags $libs";
-	if ($verbose) {
-	    print "The compile command is '$compile'.\n";
-	}
-	$compile_ok =
-        (system ($compile) == 0);
+	msg ("The compile command is '$compile'");
+	$compile_ok = (system ($compile) == 0);
 	if ($compile_ok) {
-	    $run_ok = 
-            (system ("./$exe_file_name") == 0);
+	    $run_ok = (system ("./$exe_file_name") == 0);
 	}
 	for my $file ($exe_file_name, $c_file_name) {
 	    if (-f $file) {
@@ -227,8 +224,7 @@ EOF
 I tried to compile and run a small test program in C to see if I could
 #include the libpng header file "png.h" and link to the library
 "libpng". Somehow or other this didn't work out. If you don't have
-libpng on your system, sorry but you need to install it to use
-[% config.base %]. 
+libpng on your system, sorry but you need to install this module. 
 
 If you are on Ubuntu Linux, you probably need to do something like
 
@@ -237,8 +233,8 @@ If you are on Ubuntu Linux, you probably need to do something like
 to install the header file "png.h" for libpng into your system.
 
 If you think you have libpng on your system, please edit the file
-"Makefile.PL" and run "perl Makefile.PL" again. The relevant lines are
-right at the top of the file,
+"inc/CheckForLibPng.pm" and run "perl Makefile.PL" again. The relevant
+lines are right at the top of the file,
 
 my $png_lib_dir;
 my $png_include_dir;
@@ -249,20 +245,13 @@ respectively are to be found, for example
 my $png_lib_dir = '/some/strange/directory';
 my $png_include_dir = '/somewhere/nobody/knows';
 
-Then run "perl Makefile.PL" again. If you don't see this message, you
-are alright.
+Then run "perl Makefile.PL" again. If you don't see this message, the
+process has succeeded.
 EOF
 	return undef;
     }
     else {
-	if ($verbose) {
-	    print <<EOF;
-The program compiled and ran successfully, so it looks like you have
-libpng installed in a place where I can find it. I am now going to
-write out the file "Makefile" using these parameters.
-
-EOF
-	}
+	msg ("The program compiled and ran successfully, so it looks like you have libpng installed in a place where I can find it");
     }
 
     my %vals;

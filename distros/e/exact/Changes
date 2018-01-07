@@ -1,5 +1,9 @@
 Revision history for exact
 
+1.03      2018-01-04 18:58:07-08:00 America/Los_Angeles
+        - Add Perl versions to test; annual general update for 2018
+        - Remove testing switch statements (given/when) because v27 drops support
+
 1.02      2017-07-10 13:32:41-04:00 America/New_York
         - Alter dependencies to enable old versions of Perl back to v5.10
 

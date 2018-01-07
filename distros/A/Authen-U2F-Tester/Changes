@@ -1,4 +1,13 @@
 Revision history for Authen-U2F-Tester
 
+0.02  2018-01-06
+    - Rename tester keypair() accessor to key(). This is a bit less confusing as
+      its not a ::Tester::Keypair object, but a Crypt::PK::ECC object.
+    - Move key store management into its own class
+      (Authen::U2F::Keystore::Wrapped) and allow for possibility to implement
+      different keystore schemes by passing in an object that does the
+      Authen::U2F::Tester::Role::Keystore role to the tester constructor.
+    - Fix documentation typo
+
 0.01  2017-12-27
     - Initial release

@@ -206,7 +206,7 @@ Usage:
 use strict;
 use warnings;
 
-our $VERSION     = '0.014';
+our $VERSION     = '0.015';
 
 use Exporter 5.57 'import';
 

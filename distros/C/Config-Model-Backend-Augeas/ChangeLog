@@ -1,3 +1,9 @@
+2017-12-30  Dominique Dumont  <domi.dumont@free.fr> v0.123
+
+    * Build.PL: require Config::Model::Itself 2.116 for tests
+    * Fix broken tests following deprecation of multi-backends
+      in Config::Model
+
 2017-10-03  Dominique Dumont  <domi.dumont@free.fr> v0.122
 
     * Build.PL: require Config::Model::Itself 2.012 for tests

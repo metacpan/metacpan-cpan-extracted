@@ -678,3 +678,50 @@ CODE:
 	png_read_update_info (Png->png, Png->info);
 OUTPUT:
 	RETVAL
+
+#if 0
+
+void
+perl_png_set_compression_level (Png, level)
+	Image::PNG::Libpng Png;
+	int level
+CODE:
+	png_set_compression_level (Png->png, level);
+
+void
+perl_png_set_compression_mem_level (Png, mem_level);
+	Image::PNG::Libpng Png;
+	int mem_level;
+CODE:
+	png_set_compression_level (Png->png, mem_level);
+
+void
+perl_png_set_compression_method (Png, method);
+	Image::PNG::Libpng Png;
+	int method;
+CODE:
+	png_set_compression_method (Png->png, method);
+
+void
+perl_png_set_compression_strategy (Png, strategy);
+	Image::PNG::Libpng Png;
+	int strategy;
+CODE:
+	png_set_compression_strategy (Png->png, strategy);
+
+void
+perl_png_set_compression_window_bits  (Png,   window_bits);
+	Image::PNG::Libpng Png;
+	int window_bits;
+CODE:
+	png_set_compression_window_bits (Png->png, window_bits);
+
+void
+perl_png_set_crc_action  (Png, crit_action, ancil_action);
+	Image::PNG::Libpng Png;
+	int crit_action;
+	int ancil_action;
+CODE:
+	png_set_crc_action (Png->png, crit_action, ancil_action);
+
+#endif /* 0 */

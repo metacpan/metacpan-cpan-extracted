@@ -1,5 +1,18 @@
 Revision history for Group-Git-Cmd-Todo
 
+0.0.3   2018-01-01
+        Updating for release of version 0.0.3
+        De-supporting old perl (Ivan Wills)
+        Setting default files to open (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+
+0.0.2   2015-08-27
+        Updating for release of version 0.0.2
+        Removed creation of makefile (Ivan Wills)
+        Cleaned up wording (Ivan Wills)
+
 0.0.1   2015-05-29
         First version, released on an unsuspecting world.
 

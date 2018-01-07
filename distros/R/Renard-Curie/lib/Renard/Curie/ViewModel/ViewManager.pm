@@ -1,9 +1,10 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::ViewModel::ViewManager;
 # ABSTRACT: Manages the currently open views
-$Renard::Curie::ViewModel::ViewManager::VERSION = '0.003';
+$Renard::Curie::ViewModel::ViewManager::VERSION = '0.004';
 use Moo;
-use Renard::Incunabula::Common::Types qw(InstanceOf DocumentModel Path FileUri PositiveInt ZoomLevel);
+use Renard::Incunabula::Common::Types qw(InstanceOf Path FileUri PositiveInt);
+use Renard::Incunabula::Document::Types qw(DocumentModel ZoomLevel);
 use Renard::Incunabula::Format::PDF::Document;
 
 use Renard::Curie::Model::ViewOptions;
@@ -147,7 +148,7 @@ Renard::Curie::ViewModel::ViewManager - Manages the currently open views
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

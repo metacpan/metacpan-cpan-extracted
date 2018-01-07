@@ -37,3 +37,4 @@ ok($t->{track} == 1, 'get_first_track');
 ok($t->get_format() eq 'audio', 'get_track_format');
 ok($t->get_msf() eq "00:02:00", "get_msf");
 $device->close();
+done_testing();

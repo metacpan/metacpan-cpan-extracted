@@ -1,47 +1,45 @@
-#========================================================================
-#
-# Changes 
-#
-# DESCRIPTION
-#   Revision history for the Class::Base module.
-#
-# AUTHOR
-#   Andy Wardley   <abw@kfs.org>
-#
-#========================================================================
+ Revision history for the Class::Base module
 
+0.09 2018-01-04
+  [ DOCUMENTATION ]
+    - Fix pod typo. (GH#4, knowledgejunkie)
 
-0.08 2016.08.25
-    Fix release (hopefully)
+  [ ENHANCEMENTS ]
+    - clone method now deep clone. 
+    - a few minor refactorings.
 
-0.07 2016.08.25
-    BUILD_REQUIRES vs TEST_REQUIRES  (Kent Fredric)
+  [ STATISTICS ]
+    - code churn: 9 files changed, 139 insertions(+), 137 deletions(-)
 
-0.06 2014.08.26
-    Add license to META files
-    Updating the Changes file
+0.08 2016 .08.25
+  - Fix release (hopefully)
 
-0.05 2012.05.16
-    Silencing a warning by chromatic RT 75286
-    Linking to source repository
+0.07 2016 .08.25
+  - BUILD_REQUIRES vs TEST_REQUIRES  (Kent Fredric)
 
+0.06 2014 .08.26
+  - Add license to META files
+  - Updating the Changes file
 
-0.04 2012.02.06
-    Test script is using Test::More instead the home-made ok() and is().
-    Recommend using Badger::Base instead.
-    Gabor Szabo co-maintainer.
+0.05 2012 .05.16
+  - Silencing a warning by chromatic RT 75286
+  - Linking to source repository
 
-0.03 2002.05.13
-    Added the params() method which is typically called from the init()
-      method to copy value from a configuration hash into $self.  
-    
-    Minor changes to debug() method to only use object value _DEBUG if
-      defined, otherwise fall back on $DEBUG package variable.
+0.04 2012 .02.06
+  - Test script is using Test::More instead the home-made ok() and is().
+  - Recommend using Badger::Base instead.
+  - Gabor Szabo co-maintainer.
 
-0.02  2002.02.20
-    Added the clone() method as suggested by Brian Moseley
-    Added the id(), debug() and debugging() methods to provide a fairly
-      simple mechanism for generating debugging information.
+0.03 2002 .05.13
+  - Added the params() method which is typically called from the init()
+    method to copy value from a configuration hash into $self.	
+  - Minor changes to debug() method to only use object value _DEBUG if
+    defined, otherwise fall back on $DEBUG package variable.
 
-0.01  2002.01.11
-    initial version
+0.02 2002 .02.20
+  - Added the clone() method as suggested by Brian Moseley
+  - Added the id(), debug() and debugging() methods to provide a fairly
+    simple mechanism for generating debugging information.
+
+0.01 2002 .01.11
+  - initial version

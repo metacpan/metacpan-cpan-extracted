@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,47 +26,47 @@ no_index:
 provides:
   Finance::Robinhood:
     file: lib/Finance/Robinhood.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Account:
     file: lib/Finance/Robinhood/Account.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Fundamentals:
     file: lib/Finance/Robinhood/Fundamentals.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Instrument:
     file: lib/Finance/Robinhood/Instrument.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Instrument::Split:
     file: lib/Finance/Robinhood/Instrument/Split.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Market:
     file: lib/Finance/Robinhood/Market.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Market::Hours:
     file: lib/Finance/Robinhood/Market/Hours.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Order:
     file: lib/Finance/Robinhood/Order.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Portfolio:
     file: lib/Finance/Robinhood/Portfolio.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Position:
     file: lib/Finance/Robinhood/Position.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Quote:
     file: lib/Finance/Robinhood/Quote.pm
-    version: '0.19'
+    version: '0.21'
   Finance::Robinhood::Watchlist:
     file: lib/Finance/Robinhood/Watchlist.pm
-    version: '0.19'
+    version: '0.21'
 requires:
   Carp: '1.36'
   DateTime: '1.26'
   HTTP::Tiny: '0.056'
   IO::Socket::SSL: '2.020'
   JSON::Tiny: '0.54'
-  Moo: '2.000002'
+  Moo: '2.003004'
   Try::Tiny: '0.24'
   namespace::clean: '0.26'
   perl: '5.012'
@@ -75,5 +75,5 @@ resources:
   bugtracker: https://github.com/sanko/Finance-Robinhood/issues
   homepage: https://github.com/sanko/Finance-Robinhood
   repository: git://github.com/sanko/Finance-Robinhood.git
-version: '0.19'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

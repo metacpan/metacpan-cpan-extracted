@@ -122,7 +122,7 @@ IVSIZE_BITS              : Defined only if MATH_MPFR_NEED_LONG_LONG_INT is
 _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
                            (as expressed by $]) is less than 5.022.
                            These earlier perl versions generally stringified
-                           NaNs as (-)1.#IND and (-)1.#INF.
+                           NaNs as (-)1.#IND and Infs as (-)1.#INF.
 
 *************************************************/
 
@@ -172,10 +172,15 @@ typedef __float128 float128;
 #define CHECK_ROUNDING_VALUE \
  if((mp_rnd_t)SvUV(round) > 3) \
   croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+
+#elif MPFR_VERSION_MAJOR < 4
+#define CHECK_ROUNDING_VALUE \
+ if((mp_rnd_t)SvUV(round) > 4) \
+  croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+
 #else
 #define CHECK_ROUNDING_VALUE
 #endif
-
 
 #define NOK_POK_DUALVAR_CHECK \
         if(SvNOK(b)) { \

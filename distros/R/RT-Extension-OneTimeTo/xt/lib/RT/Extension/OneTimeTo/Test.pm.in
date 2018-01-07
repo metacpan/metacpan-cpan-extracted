@@ -1,0 +1,21 @@
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+
+package RT::Extension::OneTimeTo::Test;
+
+use base 'RT::Test';
+
+sub import {
+    my $class = shift;
+    my %args  = @_;
+
+    $class->SUPER::import( testing => 'RT::Extension::OneTimeTo', %args );
+    $class->export_to_level(1);
+
+    require RT::Extension::OneTimeTo;
+}
+
+1;

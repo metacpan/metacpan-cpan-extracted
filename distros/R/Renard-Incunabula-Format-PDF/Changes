@@ -1,3 +1,20 @@
+0.004 2018-01-06 00:52:40-0600
+
+  Features
+   - Retrieve document information dictionary.
+
+     Connects with <https://github.com/project-renard/curie/issues/13>.
+
+     See <https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF/pull/5>.
+
+  Refactoring
+   - Update to use the split Renard-Incunabula distributions.
+
+     See
+
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF/pull/7>.
+
 0.003 2017-07-11 23:17:34-0500
   - Split off from Renard-Curie-0.002.
 

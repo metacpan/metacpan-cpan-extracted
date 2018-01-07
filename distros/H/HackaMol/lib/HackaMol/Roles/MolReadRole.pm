@@ -1,5 +1,5 @@
 package HackaMol::Roles::MolReadRole;
-$HackaMol::Roles::MolReadRole::VERSION = '0.046';
+$HackaMol::Roles::MolReadRole::VERSION = '0.047';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use Carp;
@@ -24,6 +24,7 @@ has 'hush_read' => (
     default => 0,
 );
 
+
 sub read_string_atoms {
     my $self   = shift;
     my $string = shift;  
@@ -31,30 +32,39 @@ sub read_string_atoms {
 
     open (my $fh, '<', \$string) or croak "unable to open string";
 
-    my @atoms;
+    my $atoms;
 
     if ( $type eq 'pdb' ) {
-        @atoms = $self->read_pdb_atoms($fh);
+        ($atoms) = $self->read_pdb_atoms($fh);
     }
     elsif ( $type eq 'pdbqt') {
-        @atoms = $self->read_pdbqt_atoms($fh);
+        $atoms = $self->read_pdbqt_atoms($fh);
     }
     elsif ( $type eq 'xyz') {
-        @atoms = $self->read_xyz_atoms($fh);
+        $atoms = $self->read_xyz_atoms($fh);
     }
     elsif ( $type eq 'zmat') {
-        @atoms = $self->read_zmat_atoms($fh);
+        $atoms = $self->read_zmat_atoms($fh);
     }
     elsif ( $type eq 'yaml') {
         $fh->close;
         $fh = Loadtype($type); 
-        @atoms = $self->read_yaml_atoms($fh);
+        $atoms = $self->read_yaml_atoms($fh);
     }
     else {
         croak "$type format not supported";
     }
-    return (@atoms);
+    return (@{$atoms});
 }
+
+sub read_file_pdb_parts{
+    my $self = shift;
+    my $file = shift;
+
+    my $fh   = FileHandle->new("<$file") or croak "unable to open $file";
+    return $self->read_pdb_parts($fh);    
+}
+
 
 sub read_file_atoms {
     my $self = shift;
@@ -62,30 +72,29 @@ sub read_file_atoms {
  
     my $fh   = FileHandle->new("<$file") or croak "unable to open $file";
 
-    my @atoms;
-
+    my $atoms;
 
     if ( $file =~ m/\.pdb$/ ) {
-        @atoms = $self->read_pdb_atoms($fh);
+        ($atoms) = $self->read_pdb_atoms($fh);
     }
     elsif ( $file =~ m/\.pdbqt$/ ) {
-        @atoms = $self->read_pdbqt_atoms($fh);
+        $atoms = $self->read_pdbqt_atoms($fh);
     }
     elsif ( $file =~ m/\.xyz$/ ) {
-        @atoms = $self->read_xyz_atoms($fh);
+        $atoms = $self->read_xyz_atoms($fh);
     }
     elsif ( $file =~ m/\.zmat$/ ) {
-        @atoms = $self->read_zmat_atoms($fh);
+        $atoms = $self->read_zmat_atoms($fh);
     }
     elsif ( $file =~ m/\.yaml$/) {
         $fh->close;
         $fh = LoadFile($file); 
-        @atoms = $self->read_yaml_atoms($fh);
+        $atoms = $self->read_yaml_atoms($fh);
     }
     else {
         croak "$file format not supported";
     }
-    return (@atoms);
+    return (@{$atoms});
 }
 
 no Moose::Role;
@@ -102,7 +111,7 @@ HackaMol::Roles::MolReadRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

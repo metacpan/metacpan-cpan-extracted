@@ -41,6 +41,7 @@ my $data = {
 	two => [qw/1 2 3/],
 	three => 10,
 	four => Test::Obj->new(),
+	five => 0,
 };
 
 is(lnpath($data, '/three'), 10, 'three');
@@ -59,6 +60,7 @@ is_deeply(lnpath($data, 'four/magic({a=>"b"})'), { a => 'b' }, 'hash');
 is_deeply(lnpath($data, 'four/magic([ "a", "b" ])'), [ "a", "b" ], 'array');
 is_deeply(lnpath($data, 'four/magic(["a","b"])'), [ "a", "b" ], 'array');
 is_deeply(lnpath($data, 'four/magic([crazy_world,&thing])'), [ 100, 100 ], 'array');
+is(lnpath($data, '/five'), 0, 'five');
 
 sub thing {
 	return $_[0] || 100;

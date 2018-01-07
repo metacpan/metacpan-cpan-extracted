@@ -1,5 +1,5 @@
 This is CORBA::IDLtree, a module that builds abstract syntax trees
-from CORBA IDL.
+from OMG IDL.
 
 The main export is sub Parse_File which takes an IDL input file name
 as the parameter, and returns a reference to an array of references
@@ -16,6 +16,9 @@ Parse_File uses two auxiliary data structures:
 A further export is the sub Dump_Symbols which takes the return value
 of Parse_File as the parameter, and prints the trees constructed to
 stdout in IDL syntax.
+For more information on the further subroutines, consult
+   `man CORBA::IDLtree`       (after installation)
+or `perldoc CORBA/IDLtree.pm` (possible without installing).
 
 -----------------------------------------------------------------------------
 
@@ -35,12 +38,13 @@ programming interface is now considered stable.
 A "thing" in the symbol tree can be either a reference to a node, or a
 reference to an array of references to nodes.
 
-A node is a five-element array with the elements
+A node is a six element array with the elements
   [0] => TYPE (MODULE|INTERFACE|STRUCT|UNION|ENUM|TYPEDEF...)
   [1] => NAME
   [2] => SUBORDINATES
-  [3] => COMMENT  (introduced in IDLtree version 1.2)
-  [4] => SCOPEREF
+  [3] => ANNOTATIONS (introduced in IDLtree version 1.6)
+  [4] => COMMENT  (introduced in IDLtree version 1.2)
+  [5] => SCOPEREF
 
 Some IDL types are representable as a simple numeric constant;
 they do not require nodes.  We'll call these types "elementary".
@@ -92,34 +96,30 @@ Contents of SUBORDINATES:
                   member node.
                   For DEFAULT, both the NAME and the SUBORDINATE are unused.
 
-  ENUM            Reference to the array of enum value literals.
-                  If the global variable $enable_enum_comments is set then
-                  the elements in the array may be shaped differently:
-                  - If the enum literal is not followed by a comment then
-                    the element in the array is the enum literal as usual.
-                  - If the enum literal is followed by a comment then the
-                    element in the array is a reference to a tuple. In this
-                    tuple, the first element is the enum literal, and the
-                    second element is a reference to the comment list.
-                    Thus, when generating code for the literals, it is
-                    recommended to use the `ref' predicate to find out
-                    which of the two alternatives is in effect for each
-                    array element.
+  ENUM            Reference to an array describing the enum value literals.
+                  Each element in the aray is a reference to a triplet
+                  (three element array): The first element in the triplet is
+                  the enum literal value.  The second element is a reference
+                  to an array of annotations as described in the ANNOTATIONS
+                  documentation (see below).  The third element is a
+                  reference to the trailing comment list.
 
   TYPEDEF         Reference to a two-element array: element 0 contains a
                   reference to the type descriptor of the original type;
                   element 1 contains a reference to an array of dimension
-                  numbers, or the null value if no dimensions are given.
+                  expressions, or the null value if no dimensions are given.
+                  When given, the dimension expressions are plain strings.
 
   SEQUENCE        As a special case, the NAME element of a SEQUENCE node
                   does not contain a name (as sequences are anonymous
                   types), but instead is used to hold the bound number.
-                  If the bound number is 0, then it is an unbounded
+                  If the bound number is 0 then it is an unbounded
                   sequence. The SUBORDINATES element contains the type
                   descriptor of the base type of the sequence. This
                   descriptor could itself be a reference to a SEQUENCE
                   defining node (that is, a nested sequence definition.)
-                  Bounded strings are treated as a special case of sequence.
+
+  BOUNDED_STRING  Bounded strings are treated as a special case of sequence.
                   They are represented as references to a node that has
                   BOUNDED_STRING or BOUNDED_WSTRING as the type ID, the bound
                   number in the NAME, and the SUBORDINATES element is unused.
@@ -142,22 +142,24 @@ Contents of SUBORDINATES:
                          to tuples (two-element lists) of the form:
                          [0] => 0|PRIVATE|PUBLIC
                                 A zero for this value means the element [1]
-                                contains a reference to a METHOD or ATTRIBUTE.
+                                contains a reference to a declaration, such
+                                as a METHOD or ATTRIBUTE.
                                 In case of METHOD, the first element in the
                                 method node subordinates (i.e., the return
                                 type) may be FACTORY.
+                                However, unlike interface methods, the last
+                                element is _not_ a reference to the 'raises'
+                                list.  Support for 'raises' of valuetype
+                                methods may be added in a future version.
                          [1] => reference to the defining node.
                                 In case of PRIVATE or PUBLIC state member,
-                                the defining node is the same as for STRUCT
-                                subordinates, namely a quadruplet containing:
-                                 [0] => member type id
-                                 [1] => member name
-                                 [2] => dimref (reference to dimensions list)
-                                 [3] => COMMENT element
+                                the SUBORDINATES of the defining node
+                                contains a dimref (reference to dimensions
+                                list, see STRUCT.)
 
   VALUETYPE_BOX   Reference to the defining type node.
 
-  VALUETYPE_FWD   Subordinates unused.
+  VALUETYPE_FWD   Reference to the node of the full valuetype declaration.
 
   NATIVE          Subordinates unused.
 
@@ -190,41 +192,37 @@ Contents of SUBORDINATES:
   PRAGMA          This is for the general case of pragmas that are none
                   of the above, i.e. pragmas unknown to IDLtree.
                   The NAME holds the pragma name, and SUBORDINATES
-                  holds a reference to all further text appearing after
-                  the pragma name, if any.
+                  holds all further text appearing after the pragma name.
 
-  REMARK          The SUBORDINATES of the node is unused.
-                  The NAME component contains a reference to a list of
-                  comment lines. In the case of a single-line comment, the
-                  list will contain only one element; in case of multi-
-                  line comments, each line is represented by a list entry.
-                  The lines in this list are not newline terminated; empty
-                  entries represent empty comment lines.
-  REMARK          The SUBORDINATES of the node is unused.
-                  The NAME component contains a reference to a list of
-                  comment info array references.  In the case of a single-
-                  line comment, the list will contain only one element; in
-                  case of multi-line comments, each line is represented by a
-                  list entry.  A comment info array element is a triplet
-                  (three element list) with [0] = filename, [1] = line
-                  number, [2] = comment text.
-                  The comment text (index 2) is not newline terminated; empty
-                  entries represent empty comment lines.
-                  The COMMENT element (described below) uses the same
-                  definition of a "comment line".
+  REMARK          The NAME of the node contains the starting line number
+                  of the comment text.
+                  The SUBORDINATES component contains a reference to a list
+                  of comment lines. The comment lines are not newline
+                  terminated.
+                  The source line number of each comment line can be
+                  computed by adding the starting line number and the
+                  array index of the comment line.
+                  By default, REMARK nodes will not be generated;
+                  generation of REMARK nodes can be enabled by setting the
+                  $enable_comments global variable to non zero.
 
+The ANNOTATIONS element holds the reference to an array of annotation nodes
+if IDL4 style annotations are present (if no annotations are present then
+the ANNOTATIONS element holds 0).
+Each entry in this array is an array reference.  The first element in the
+array referenced is a reference to an entry in @annoDefs (see comments at
+declaration of @annoDefs).  The following elements contain the concrete
+values for the parameters, in the order as defined by the entry in
+@annoDefs.  If the user omitted the value of the parameter then the
+default as specified by the entry in @annoDefs is filled in.
 
 The COMMENT element holds the comment text that follows the IDL declaration
 on the same line. Usually this is just a single line. However, if a multi-
 line comment is started on the same line after a declaration, the multi-line
 comment may extend to further lines - therefore we use a list of lines.
-The lines in this list are not newline terminated. The COMMENT field is a
-reference to this list, or contains the value 0 if no comment is present
-at the IDL item.
-
-Comment lines are not simple strings, a reference to an array is used that
-contains the name of the file, the line number and the comment text in that
-order.
+The lines in this list are not newline terminated.  The COMMENT field is a
+reference to a tuple of starting line number and reference to the line list,
+or contains 0 if no trailing comment is present at the IDL item.
 
 The SCOPEREF element is a reference back to the node of the module or
 interface enclosing the current node. If the current node is already
@@ -236,7 +234,79 @@ points to the enclosing scope.
 All nodes have this element except for the parameter nodes of methods and
 the component nodes of structs/unions/exceptions.
 
+-----------------------------------------------------------------------------
 
--- Last updated: 2017/07/23
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CORBA::IDLtree
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CORBA-IDLtree
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CORBA-IDLtree
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CORBA-IDLtree
+
+    Search CPAN
+        http://search.cpan.org/dist/CORBA-IDLtree/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 Oliver M. Kellogg
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-- Last updated: 2018/01/05
 -- okellogg@users.sourceforge.net
 

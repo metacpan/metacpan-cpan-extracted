@@ -1,0 +1,26 @@
+Revision history for Math-GComplex
+
+0.05    2018-01-06
+
+        - Fixed the `floor()` and `ceil()` functions for integer arguments.
+        - Make sure `Math::AnyNum >= 0.20` is installed. Otherwise skip the `t/anynum.t` test. (thanks to Slaven Rezić for reporting this issue)
+
+0.04    2018-01-05
+
+        - Fixed the result of the `atan2(x, y)` function, when `x` and `y` are non-positive numbers.
+
+0.03    2018-01-03
+
+        - Added more examples.
+        - Added subroutine prototypes.
+        - Division by zero is now handled for native Perl numbers as components of complex numbers.
+        - Binary numbers are no longer overloaded (such as: `0b101`, `0xff` or `012`).
+        - Documented the syntax for disabling the `:overload` behavior.
+
+0.02    2018-01-01
+
+        - Removed some non-portable tests.
+
+0.01    2018-01-01
+
+        - First release.

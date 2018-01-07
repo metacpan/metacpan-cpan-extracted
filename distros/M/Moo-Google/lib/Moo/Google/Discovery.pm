@@ -1,5 +1,5 @@
 package Moo::Google::Discovery;
-$Moo::Google::Discovery::VERSION = '0.02';
+$Moo::Google::Discovery::VERSION = '0.03';
 
 # ABSTRACT: Methods for working with Google API discovery service
 
@@ -211,7 +211,7 @@ Moo::Google::Discovery - Methods for working with Google API discovery service
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 METHODS
 

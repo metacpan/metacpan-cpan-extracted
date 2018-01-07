@@ -24,7 +24,8 @@ t/14-core_subs.t
 t/15-remock.t
 t/16-non_exist_warn.t
 t/17-no_warnings.t
-t/18-return_params.t
+t/18-bug_25-retval_override.t
+t/19-return_params.t
 t/data/One.pm
 t/data/Two.pm
 t/manifest.t

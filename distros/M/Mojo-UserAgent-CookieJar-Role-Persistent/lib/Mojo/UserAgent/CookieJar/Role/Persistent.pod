@@ -5,13 +5,11 @@ Netscape file
 
 =head1 SYNOPSIS
 
-  # Create a UserAgent with persistable cookies and load existing cookies
-  my $cj = Mojo::UserAgent::CookieJar->with_roles('+Persistent')->new;
-  $cj->load;
-  my $ua = Mojo::UserAgent->new(cookie_jar => $cj);
+  # Add role to existing CookieJar in UserAgent, then load cookies
+  $ua->cookie_jar->with_roles('+Persistent')->load;
   
-  # After cookie adding response e.g. logging into a website
-  $cj->save;
+  # After a response which adds cookies e.g. logging into a website
+  $ua->cookie_jar->save;
 
 =head1 DESCRIPTION
 
@@ -69,6 +67,10 @@ Adds cookies from file into the CookieJar.
 =item Grinnz
 
 Reviewed a draft implementation.
+
+=item sri
+
+Advised on examples in documentation.
 
 =back
 

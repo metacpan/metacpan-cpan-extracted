@@ -3,11 +3,11 @@ use warnings;
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
+use Test::Deep '!none';
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
-use List::Util 'first';
+use List::Util 1.33 'first', 'none';
 
 use lib 't/lib';
 use Helper;
@@ -76,9 +76,13 @@ cmp_deeply(
         methods([ isa => 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' ] => bool(1)),
         methods([ isa => 'Dist::Zilla::Plugin::NextRelease' ] => bool(1)),
         methods([ isa => 'Dist::Zilla::Plugin::Git::Commit' ] => bool(1)),
-        methods([ isa => 'Dist::Zilla::Plugin::Prereqs' ] => bool(1)),
     ),
     'all expected plugins make it into the build',
+);
+
+ok(
+    (none { $_->isa('Dist::Zilla::Plugin::Prereqs') } @{ $tzil->plugins }),
+    '[Prereqs] is not in the plugins list',
 );
 
 my $rewrite_version_plugin = first { $_->isa('Dist::Zilla::Plugin::RewriteVersion::Transitional') } @{ $tzil->plugins };

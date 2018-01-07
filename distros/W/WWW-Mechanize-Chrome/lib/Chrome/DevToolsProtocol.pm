@@ -11,9 +11,10 @@ use JSON;
 use Data::Dumper;
 use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
+use Try::Tiny;
 
-use vars qw<$VERSION>;
-$VERSION = '0.07';
+our $VERSION = '0.09';
+our @CARP_NOT;
 
 sub _build_log( $self ) {
     require Log::Log4perl;
@@ -24,10 +25,10 @@ sub new($class, %args) {
     my $self = bless \%args => $class;
 
     # Set up defaults
-    $args{ host } ||= 'localhost';
+    $args{ host } ||= '127.0.0.1';
     $args{ port } ||= 9222;
     $args{ json } ||= JSON->new;
-    $args{ ua } ||= Future::HTTP->new;
+    $args{ ua } ||= Future::HTTP->new();
     $args{ sequence_number } ||= 0;
     $args{ tab } ||= undef;
     $args{ log } ||= $self->_build_log;
@@ -141,8 +142,10 @@ sub connect( $self, %args ) {
 
                 if( ! $tab ) {
                     croak "Couldn't find a tab matching /$args{ tab }/";
+                } elsif( ! $tab->{webSocketDebuggerUrl} ) {
+                    local @CARP_NOT = ('Future',@CARP_NOT);
+                    croak "Found the tab but it didn't have a webSocketDebuggerUrl";
                 };
-
                 $self->{tab} = $tab;
                 $self->log('debug', "Attached to tab $args{tab}", $tab );
                 return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
@@ -192,7 +195,9 @@ sub connect( $self, %args ) {
         croak @args;
     });
 
-    my $transport = delete $args{ transport } || 'Chrome::DevToolsProtocol::Transport';
+    my $transport = delete $args{ transport }
+                    || $self->transport
+                    || 'Chrome::DevToolsProtocol::Transport';
     if( ! ref $transport ) { # it's a classname
         (my $transport_module = $transport) =~ s!::!/!g;
         $transport_module .= '.pm';
@@ -209,7 +214,7 @@ sub connect( $self, %args ) {
 
 sub close( $self ) {
     if( my $t = $self->transport) {
-        $t->close();
+        $t->close() if ref $t;
     };
 };
 
@@ -352,13 +357,14 @@ sub _send_packet( $self, $response, $method, %params ) {
     };
 
     $self->log( 'trace', "Sent message", $payload );
-    my $result = eval {
-        $self->transport->send( $payload );
+    my $result;
+    try {
+        $result = $self->transport->send( $payload );
+    } catch {
+        $self->log('error', $_ );
+        $result = Future->fail( $_ );
     };
-    if( my $err = $@ ) {
-        $self->log('error', $@ );
-    };
-    $result
+    return $result
 }
 
 =head2 C<< $chrome->send_packet >>
@@ -390,7 +396,12 @@ has sent a response to this query.
 
 sub send_message( $self, $method, %params ) {
     my $response = $self->future;
-    $self->_send_packet( $response, $method, %params );
+    # We add our response listener before we've even sent our request to
+    # Chrome. This ensures that no amount of buffering etc. will make us
+    # miss a reply from Chrome to a request
+    my $f;
+    $f = $self->_send_packet( $response, $method, %params );
+    $f->on_ready( sub { undef $f });
     $response
 }
 
@@ -531,5 +542,32 @@ sub DESTROY {
 =head1 SEE ALSO
 
 Chrome DevTools at L<https://chromedevtools.github.io/devtools-protocol/1-2>
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/www-mechanize-chrome>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
+or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
 
 =cut

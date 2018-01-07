@@ -1,0 +1,52 @@
+Source: analizo
+Section: devel
+Priority: optional
+Maintainer: Joenio Costa <joenio@joenio.me>
+Build-Depends: debhelper (>= 10)
+Build-Depends-Indep: libfile-sharedir-perl,
+ liblist-moreutils-perl,
+ libterm-ui-perl,
+ libgit-wrapper-perl,
+ libfile-share-perl,
+ libtest-mockmodule-perl,
+ libtest-mockobject-perl,
+ libmethod-signatures-perl,
+ libtest-bdd-cucumber-perl,
+ libfile-libmagic-perl,
+ libtest-exception-perl,
+ libarchive-extract-perl,
+ libtest-class-perl
+Standards-Version: 4.1.2
+Homepage: http://analizo.org
+
+Package: analizo
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libapp-cmd-perl,
+ libchi-perl,
+ libdbd-sqlite3-perl,
+ libmojolicious-perl,
+ libfile-homedir-perl,
+ libstatistics-descriptive-perl,
+ libfindbin-libs-perl,
+ libyaml-perl,
+ libzmq-ffi-perl,
+ libterm-progressbar-perl,
+ libfile-copy-recursive-perl,
+ libgraph-writer-dsm-perl,
+ libclass-accessor-perl,
+ liblist-compare-perl,
+ libyaml-tiny-perl,
+ libjson-perl,
+ libdbi-perl,
+ libgraph-perl,
+ doxyparse,
+ sloccount,
+ sqlite3,
+ man
+Recommends: graphviz
+Description: multi-language source code analysis toolkit
+ Analizo parses source code in multiple languages and report useful information
+ about it, such as module dependency, source code metrics and more.
+ .
+ Analizo uses doxyparse to parse the source code, and is currently tested and
+ expected to work well with C, C++ and Java source code.

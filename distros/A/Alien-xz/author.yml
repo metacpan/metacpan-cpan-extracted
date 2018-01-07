@@ -6,6 +6,9 @@ pod_spelling_system:
   stopwords:
     - xz
     - liblzma
+    - DHARDISON
+    - Hardison
+    - dylanwh
 
 pod_coverage:
   skip: 0

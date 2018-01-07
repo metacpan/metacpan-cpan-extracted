@@ -66,7 +66,6 @@ for my $opt ( sort keys %$one_or_greater ) {
 my $zero_or_greater = {
     default     => '[ 0-9 ]+',
     pad         => '[ 0-9 ]+',
-    pad_one_row => '[ 0-9 ]+',
 };
 my @val_zero_or_greater = ( 0, 1, 2, 100, 999999, undef );
 
@@ -118,10 +117,10 @@ for my $opt ( sort keys %$no_spacebar ) {
 ok( ! defined( exception {  $d = choose( $choices, {
     beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, justify => 0, layout => 0, mouse => 0,
     order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9, fill_up => 0,
-    pad => 3, pad_one_row => 2, empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ] } ) } ) );
+    pad => 3, empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ] } ) } ) );
 
 ok( ! defined( exception {  $d = choose( [ 'aaa' .. 'zzz' ], {
-    no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad_one_row => 2, pad => 3,
+    no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,
     default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1, fill_up => 1,
     mouse => 0, layout => 3, justify => 0, index => 0, hide_cursor => 1,  clear_screen => undef, beep  => 0 } ) } ) );
 

@@ -16,7 +16,7 @@ use File::chdir;
 use Path::Tiny;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.0.1');
+our $VERSION = version->new('0.0.3');
 
 my $opt = Getopt::Alt->new(
     {
@@ -68,7 +68,7 @@ Group::Git::Cmd::Todo - Group-Git tools to show combined markdown TODOs
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Todo version 0.0.1
+This documentation refers to Group::Git::Cmd::Todo version 0.0.3
 
 =head1 SYNOPSIS
 

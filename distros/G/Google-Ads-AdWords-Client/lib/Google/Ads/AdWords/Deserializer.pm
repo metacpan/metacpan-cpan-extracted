@@ -39,8 +39,8 @@ sub deserialize {
   my $client         = $self->get_client();
   utf8::is_utf8 $response_xml and utf8::encode $response_xml;
 
-  my $request_message = sprintf("Outgoing request:\n%s",
-    $client->get_last_soap_request());
+  my $request_message =
+    sprintf("Outgoing request:\n%s", $client->get_last_soap_request());
   my $response_message = sprintf("Incoming response:\n%s", $response_xml);
   $client->set_last_soap_response($response_xml);
 
@@ -112,10 +112,11 @@ sub deserialize {
 sub _deserialize {
   my ($self, $content) = @_;
 
-  my $parser = Google::Ads::SOAP::Deserializer::MessageParser->new(
-    {strict => $self->get_strict()});
+  my $parser = Google::Ads::SOAP::Deserializer::MessageParser->new({
+    strict      => $self->get_strict()
+  });
   $parser->class_resolver($self->get_class_resolver());
-  eval { $parser->parse_string($content) };
+  eval { $parser->parse_string($content, $self->get_client()) };
   if ($@) {
     return $self->generate_fault({
       code    => 'SOAP-ENV:Server',

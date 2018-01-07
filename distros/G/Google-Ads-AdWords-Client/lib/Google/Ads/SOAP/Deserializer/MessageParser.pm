@@ -21,6 +21,7 @@ use strict;
 use warnings;
 use base qw(SOAP::WSDL::Expat::MessageParser);
 
+use Google::Ads::Common::LibXmlParser;
 use Google::Ads::Common::XPathSAXParser;
 
 use Carp;
@@ -31,17 +32,25 @@ use SOAP::WSDL::XSD::Typelib::ComplexType;
 
 # PATCH Overriding the SAX Parser initialization to use ours.
 sub parse_string {
-  my $xml    = $_[1];
-  my $parser = $_[0]->_initialize(Google::Ads::Common::XPathSAXParser->new());
-  eval { $parser->parse($xml); };
-  croak($@) if $@;
-  delete $_[0]->{parser};
-  return $_[0]->{data};
+  my ($self, $xml, $client) = @_;
+  # The variable 'soap_legacy' in the client is a boolean value indicating if
+  # the legacy SOAP library should be used.
+  my $soap_parser =
+    ($client->get_soap_legacy())
+    ? Google::Ads::Common::XPathSAXParser->new()
+    : Google::Ads::Common::LibXmlParser->new();
+  my $parser = $self->_initialize($soap_parser, $client);
+  $parser->parse($xml);
+  if ($@) {
+    $client->get_die_on_faults() ? die($@) : warn($@);
+  }
+  delete $self->{parser};
+  return $self->{data};
 }
 # END PATCH
 
 sub _initialize {
-  my ($self, $parser) = @_;
+  my ($self, $parser, $client) = @_;
 
   # Removing potential old results.
   delete $self->{data};
@@ -101,7 +110,7 @@ sub _initialize {
   };
   $parser->set_handlers({
       Start => sub {
-        # PATCH Added more input coming from the SAX parser
+        # PATCH Added more input coming from the parser
         my ($parser, $element, $attrs, $node) = @_;
         # END PATCH
 
@@ -161,7 +170,10 @@ sub _initialize {
 
         # PATCH Creating a double link between the SOAP Object and the parser
         # node, so it can be later use for XPath searches.
-        Google::Ads::Common::XPathSAXParser::link_object_to_node($current,
+        ($client->get_soap_legacy())
+          ? Google::Ads::Common::XPathSAXParser::link_object_to_node($current,
+          $node)
+          : Google::Ads::Common::LibXmlParser::link_object_to_node($current,
           $node);
         # END PATCH
 
@@ -223,7 +235,7 @@ sub _initialize {
         #Stepping up in the current object hierarchy.
         $current = pop @$list;
         return;
-        }
+      }
     });
   return $parser;
 }

@@ -31,7 +31,9 @@ use Google::Ads::AdWords::v201710::OfflineCallConversionFeedOperation;
 use Google::Ads::AdWords::v201710::OfflineData;
 use Google::Ads::AdWords::v201710::OfflineDataUploadOperation;
 use Google::Ads::AdWords::v201710::StoreSalesTransaction;
+use Google::Ads::AdWords::v201710::ThirdPartyUploadMetadata;
 use Google::Ads::AdWords::v201710::UploadConversion;
+use Google::Ads::AdWords::v201710::UploadMetadata;
 use Google::Ads::AdWords::v201710::UserIdentifier;
 
 use Cwd qw(abs_path);
@@ -46,10 +48,20 @@ my $external_upload_id = 'INSERT_EXTERNAL_UPLOAD_ID';
 my $conversion_name = 'INSERT_CONVERSION_NAME';
 # Insert email addresses below for creating user identifiers.
 my @email_addresses = ['EMAIL_ADDRESS_1', 'EMAIL_ADDRESS_2'];
+# For times, use the format yyyyMMdd HHmmss tz. For more details on formats,
+# see:
+# https://developers.google.com/adwords/api/docs/appendix/codes-formats#date-and-time-formats
+# For time zones, see:
+# https://developers.google.com/adwords/api/docs/appendix/codes-formats#timezone-ids
+my $advertiser_upload_time = "INSERT_ADVERTISER_UPLOAD_TIME";
+my $bridge_map_version_id  = "INSERT_BRIDGE_MAP_VERSION_ID";
+my $partner_id             = "INSERT_PARTNER_ID";
 
 # Example main subroutine.
 sub upload_offline_data {
-  my ($client, $external_upload_id, $conversion_name, $email_addresses) = @_;
+  my ($client, $external_upload_id, $conversion_name, $email_addresses,
+    $advertiser_upload_time, $bridge_map_version_id, $partner_id)
+    = @_;
 
   # Create the first offline data for upload.
   # This transaction occurred 7 days ago with amount of 200 USD.
@@ -100,8 +112,21 @@ sub upload_offline_data {
     Google::Ads::AdWords::v201710::OfflineDataUpload->new({
       externalUploadId => $external_upload_id,
       offlineDataList  => [$offline_data_1, $offline_data_2],
-      # Optional: You can set the type of this upload.
-      uploadType => 'STORE_SALES_UPLOAD_FIRST_PARTY'
+      # Set the type and metadata of this upload.
+      uploadType     => 'STORE_SALES_UPLOAD_THIRD_PARTY',
+      uploadMetadata => Google::Ads::AdWords::v201710::UploadMetadata->new({
+          storeSalesUploadCommonMetadata =>
+            Google::Ads::AdWords::v201710::ThirdPartyUploadMetadata->new({
+              loyaltyRate           => "1.0",
+              transactionUploadRate => "1.0",
+              advertiserUploadTime  => $advertiser_upload_time,
+              validTransactionRate  => "1.0",
+              partnerMatchRate      => "1.0",
+              partnerUploadRate     => "1.0",
+              bridgeMapVersionId    => $bridge_map_version_id,
+              partnerId             => $partner_id
+            })
+      })
     });
 
   # Create an offline data upload operation.
@@ -204,4 +229,5 @@ $client->set_die_on_faults(1);
 
 # Call the example
 upload_offline_data($client, $external_upload_id, $conversion_name,
-  \@email_addresses);
+  \@email_addresses, $advertiser_upload_time, $bridge_map_version_id,
+  $partner_id);

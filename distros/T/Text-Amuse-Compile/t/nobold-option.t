@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 6;
+use Test::More tests => 12;
 use Text::Amuse::Compile;
 
 use Text::Amuse::Compile::Utils qw/read_file write_file/;
@@ -98,5 +98,29 @@ foreach my $nobold (0..1) {
     else {
         unlike $texbody, $re, "$re not found";
     }
-    
+}
+
+foreach my $start_with_empty_page (0..1) {
+    my $basename = "empty-start-$start_with_empty_page";
+    my $target = File::Spec->catfile($tmpdir, $basename . '.muse');
+    my $tex = File::Spec->catfile($tmpdir, $basename . '.tex');
+    my $pdf = File::Spec->catfile($tmpdir, $basename . '.pdf');
+    write_file($target, $muse);
+    my $c = Text::Amuse::Compile->new(tex => 1,
+                                      pdf => !!$ENV{TEST_WITH_LATEX},
+                                      extra => { start_with_empty_page => $start_with_empty_page });
+    $c->compile($target);
+    ok (-f $tex);
+  SKIP: {
+        skip "pdf $pdf not required", 1 unless $ENV{TEST_WITH_LATEX};
+        ok(-f $pdf, "$pdf created");
+    }
+    my $texbody = read_file($tex);
+    my $re = qr{^% start with an empty page}m;
+    if ($start_with_empty_page) {
+        like $texbody, $re, "$re found";
+    }
+    else {
+        unlike $texbody, $re, "$re not found";
+    }
 }

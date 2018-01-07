@@ -8,8 +8,6 @@ use parent qw(Math::Bacovia);
 
 our $VERSION = $Math::Bacovia::VERSION;
 
-my %cache;
-
 sub new {
     my ($class, $minuend, $subtrahend) = @_;
 
@@ -27,13 +25,13 @@ sub new {
         $subtrahend = $Math::Bacovia::ZERO;
     }
 
-    $cache{join(';', $minuend->stringify, $subtrahend->stringify)} //= bless {
-                                                                              minuend    => $minuend,
-                                                                              subtrahend => $subtrahend,
-                                                                             }, $class;
+    bless {
+           minuend    => $minuend,
+           subtrahend => $subtrahend,
+          }, $class;
 }
 
-sub inside {
+sub get {
     my ($x) = @_;
     ($x->{minuend}, $x->{subtrahend});
 }
@@ -146,7 +144,7 @@ Class::Multimethods::multimethod eq => (__PACKAGE__, '*') => sub {
 
 sub numeric {
     my ($x) = @_;
-    $x->{_num} //= $x->{minuend}->numeric - $x->{subtrahend}->numeric;
+    $x->{minuend}->numeric - $x->{subtrahend}->numeric;
 }
 
 sub pretty {

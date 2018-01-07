@@ -1,5 +1,8 @@
 Revision history for Barcode-Code93
 
+0.05    Tue Jan  2 15:33:09 CST 2018
+        - Switched to Dist::Zilla, Thanks to Shlomi Fish: https://github.com/mstratman/Barcode-Code93/pull/3
+
 0.04    Tue Feb 10 11:08:31 CST 2015
         - Fixed makefile to require Moo
 

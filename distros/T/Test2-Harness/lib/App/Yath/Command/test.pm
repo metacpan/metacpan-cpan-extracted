@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001043';
+our $VERSION = '0.001045';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -241,7 +241,7 @@ sub options {
         },
 
         {
-            spec => 'qvf',
+            spec => 'qvf!',
             field => 'formatter',
             used_by => {display => 1},
             section   => 'Display Options',
@@ -249,10 +249,14 @@ sub options {
             summary   => ['Quiet, but verbose on failure'],
             long_desc => 'Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.',
             action   => sub {
-                my ($self, $settings, $field) = @_;
-                $settings->{formatter} = '+Test2::Formatter::QVF';
+                my ($self, $settings, $field, $arg) = @_;
+                if ($arg) {
+                    $settings->{formatter} = '+Test2::Formatter::QVF';
+                }
+                elsif ($settings->{formatter} eq '+Test2::Formatter::QVF') {
+                    delete $settings->{formatter};
+                }
             },
-
         },
     );
 }
@@ -369,6 +373,10 @@ sub run_command {
 
     # Possible failure causes
     my $fail = $lost || $exit || !defined($exit) || !$ok || !$stat;
+
+    for my $plugin (@{$self->{+PLUGINS}}) {
+        $plugin->post_run(command => $self, settings => $settings, stat => $stat);
+    }
 
     if (@$bad) {
         $self->paint("\nThe following test jobs failed:\n");
@@ -620,6 +628,18 @@ Exit after showing what yath thinks your options mean
 =item --help
 
 Exit after showing this help message
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=item -V
+
+=item --version
+
+Show version information
 
 =back
 

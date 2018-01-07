@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::DescribeKeyPairsResponse;
+$Net::Amazon::EC2::DescribeKeyPairsResponse::VERSION = '0.35';
 use strict;
 use Moose;
 

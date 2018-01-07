@@ -4,19 +4,14 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 use Carp ();
 use DateTime;
 use DateTime::Helpers;
 use DateTime::Types;
-use Params::ValidationCompiler qw( validation_for );
+use Params::ValidationCompiler 0.26 qw( validation_for );
 use Scalar::Util qw( blessed );
-
-BEGIN {
-    my $has = eval { require Sub::Util; 1 };
-    sub HAS_SUB_UTIL () {$has}
-}
 
 use overload (
     fallback => 1,
@@ -53,8 +48,9 @@ my @all_units = qw( months days minutes seconds nanoseconds );
     );
 
     my $check = validation_for(
-        ( HAS_SUB_UTIL ? ( name => '_check_new_params' ) : () ),
-        params => {
+        name             => '_check_new_params',
+        name_is_optional => 1,
+        params           => {
             %units,
             end_of_month => {
                 type     => t('EndOfMonthMode'),
@@ -356,7 +352,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 
@@ -458,8 +454,8 @@ of the month the new date will also be. For instance, adding one
 month to Feb 29, 2000 will result in Mar 31, 2000.
 
 For positive durations, the "end_of_month" parameter defaults to wrap.
-For negative durations, the default is "limit". This should match how
-most people "intuitively" expect datetime math to work.
+For negative durations, the default is "preserve". This should match
+how most people "intuitively" expect datetime math to work.
 
 =head2 $dur->clone()
 

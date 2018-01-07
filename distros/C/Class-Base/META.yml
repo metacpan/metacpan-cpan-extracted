@@ -1,25 +1,44 @@
 ---
-abstract: 'useful base class for other modules'
+abstract: 'useful base class for deriving other modules '
 author:
-  - 'Andy Wardley <abw@kfs.org>'
+  - 'Andy Wardley    <abw@kfs.org>'
+  - 'Gabor Szabo  <gabor@szabgab.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0.47'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  base: '0'
+  perl: '5.006'
+  vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Class-Base
-no_index:
-  directory:
-    - t
-    - inc
-requires: {}
+provides:
+  Class::Base:
+    file: lib/Class/Base.pm
+    version: '0.09'
+requires:
+  Clone: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  repository: https://github.com/szabgab/Class-Base
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://github.com/yanick/Class-Base/issues
+  homepage: https://github.com/yanick/Class-Base
+  repository: https://github.com/yanick/Class-Base.git
+version: '0.09'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Gabor Szabo <szabgab@gmail.com>'
+  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Nick Morrott <knowledgejunkie@gmail.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

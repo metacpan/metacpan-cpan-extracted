@@ -1,5 +1,7 @@
 # AdWords API Perl Client Library
 
+[![CPAN version](https://badge.fury.io/pl/Google-Ads-AdWords-Client.svg)](https://badge.fury.io/pl/Google-Ads-AdWords-Client)
+
 Google's [AdWords API](https://developers.google.com/adwords/api/) service lets developers design computer programs that
 interact directly with the [AdWords
 platform](https://adwords.google.com/select/Login). With these applications,

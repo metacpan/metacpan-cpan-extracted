@@ -8,9 +8,11 @@ use Types::Standard -all;
 use GraphQL::Type::Library -all;
 use Return::Type;
 use Function::Parameters;
+use GraphQL::Debug qw(_debug);
 
 our $VERSION = '0.02';
 
+use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 my %NONENUM = map { ($_ => 1) } qw(original_error);
 
 =head1 NAME
@@ -77,9 +79,13 @@ it will be preserved as C<original_error>.
 
 =cut
 
-method coerce(Any $item) :ReturnType(InstanceOf[__PACKAGE__]) {
-  return $item if $self->is($item);
-  is_InstanceOf($item)
+method coerce(
+  Any $item
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  DEBUG and _debug('Error.coerce', $item);
+  return $item if __PACKAGE__->is($item);
+  $item ||= 'Unknown error';
+  !is_Str($item)
     ? $self->new(message => $item.'', original_error => $item)
     : $self->new(message => $item);
 }

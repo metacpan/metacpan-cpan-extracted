@@ -42,11 +42,13 @@
       },
       "runtime" : {
          "requires" : {
+            "local::lib" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -54,7 +56,7 @@
    "provides" : {
       "App::cpanexec" : {
          "file" : "lib/App/cpanexec.pm",
-         "version" : "0.03"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -68,7 +70,7 @@
          "web" : "https://github.com/oklas/cpanexec"
       }
    },
-   "version" : "0.03",
+   "version" : "0.08",
    "x_authority" : "cpan:OKLAS",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

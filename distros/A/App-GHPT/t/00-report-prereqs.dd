@@ -28,8 +28,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {
@@ -58,7 +57,7 @@ do { my $x = {
                                       'Path::Class' => '0',
                                       'Term::CallEditor' => '0',
                                       'Term::Choose' => '0',
-                                      'WebService::PivotalTracker' => '0.04',
+                                      'WebService::PivotalTracker' => '0.10',
                                       'autodie' => '2.25',
                                       'experimental' => '0',
                                       'feature' => '0',

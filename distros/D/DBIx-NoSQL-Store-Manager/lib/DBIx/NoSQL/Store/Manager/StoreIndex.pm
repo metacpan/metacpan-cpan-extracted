@@ -1,12 +1,7 @@
 package DBIx::NoSQL::Store::Manager::StoreIndex;
-BEGIN {
-  $DBIx::NoSQL::Store::Manager::StoreIndex::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $DBIx::NoSQL::Store::Manager::StoreIndex::VERSION = '0.2.2';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Marks attributes to be indexed in the store
-
+$DBIx::NoSQL::Store::Manager::StoreIndex::VERSION = '1.0.0';
 
 use Moose::Role;
 Moose::Util::meta_attribute_alias('StoreIndex');
@@ -23,13 +18,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::NoSQL::Store::Manager::StoreIndex - Marks attributes to be indexed in the store
 
 =head1 VERSION
 
-version 0.2.2
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -48,11 +45,11 @@ L<DBIx::NoSQL::Store::Manager> store.
 
 =head1 AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

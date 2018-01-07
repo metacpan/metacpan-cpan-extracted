@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.173500';
+$Bio::MUST::Core::SeqId::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -214,6 +214,7 @@ const my @GENERA  => qw(
     ANMV-1
     Anopheline-associated
     antibiotic-resistant
+    Apple-associated
     Araraquara-like
     Argemone-Cactus
     Arrabida-like
@@ -337,6 +338,7 @@ const my @GENERA  => qw(
     Cre-expression
     Cre-lox
     Crimean-Congo
+    CRISPR-cas9
     CRISPR-mediated
     Cryphonectria-Endothia
     Cryptaulaxoides-like
@@ -369,7 +371,6 @@ const my @GENERA  => qw(
     Duck-dominant
     Dyella-like
     early-diverging
-    EBHSV-GD
     EDTA-degrading
     Ehrlichia-like
     EIAV-based
@@ -428,6 +429,7 @@ const my @GENERA  => qw(
     HERV-H/env59
     HERV-H/env60
     HERV-H/env62
+    Hibiscus-infecting
     Himar1-delivery
     his-3
     HIV-1
@@ -468,6 +470,7 @@ const my @GENERA  => qw(
     Legionella-like
     Leptotrichia-like
     LMWdDNA-degrading
+    Long-fingered
     long-tailed
     LPP-group
     Luna-1
@@ -572,6 +575,7 @@ const my @GENERA  => qw(
     P-element
     P1-specific
     PAH-contaminated
+    PAH-degrading
     Paracoccus-like
     Parecho-like
     Parechovirus-like
@@ -586,7 +590,6 @@ const my @GENERA  => qw(
     Perkinsela-like
     Perkinsiella-like
     Pfiesteria-like
-    PG1-like
     pharmaceutical-degrading
     phenanthrene-degrading
     phenanthrene-metabolizing
@@ -600,6 +603,7 @@ const my @GENERA  => qw(
     Pike-perch
     Piscirickettsia-like
     pkBIG-alpha
+    pLEV-TeLS
     pnpB-pnpA
     Po-Circo-like
     Poaceae-associated
@@ -714,8 +718,8 @@ const my @GENERA  => qw(
     Stripa-derived
     Stx1-converting
     Stx2-converting
-    Sulfate-reducing
     sulfate-reducing
+    Sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     Sulfur-oxidizing
@@ -736,8 +740,9 @@ const my @GENERA  => qw(
     thiosulfate-reducing
     Thrips-associated
     Ti-curing
-    Tick-borne
+    Tick-associated
     tick-borne
+    Tick-borne
     toluene-degrading
     Tri-shuttle
     trichloroacetic-acid-degrading
@@ -793,8 +798,6 @@ const my @GENERA  => qw(
 const my @SPECIES => qw(
     04_1_1
     070605-23_N11_16
-    1.064.O._10N.261.52.E2
-    1.072.O._10N.286.48.A12
     100_oclvp78
     101_oclvp44
     102_oclvp93
@@ -1545,16 +1548,30 @@ const my @SPECIES => qw(
     CCSD_DF2030_TE37_isolate_1
     CCSD_DF2030_TE37_isolate_2
     Ced_B08
+    CG06_land_8_20_14_3_00_33_50
+    CG06_land_8_20_14_3_00_37_11
+    CG07_land_8_20_14_0_80_38_8
     CG09_39_24
     CG10_37_50
     CG10_46_32
     CG10_49_38
+    CG10_big_fil_rev_8_21_14_0_10_33_18
+    CG10_big_fil_rev_8_21_14_0_10_43_11
+    CG17_big_fil_post_rev_8_21_14_2_50_64_8
     CG1_02_42_9
     CG2_30_31_98
     CG2_30_33_46
     CG2_30_37_16
     CG2_30_40_12
     CG2_30_54_10
+    CG_4_10_14_0_2_um_filter_33_32
+    CG_4_10_14_0_2_um_filter_48_144
+    CG_4_10_14_0_2_um_filter_Archaea_38_6
+    CG_4_10_14_0_8_um_filter_33_57
+    CG_4_8_14_3_um_filter_33_28
+    CG_4_8_14_3_um_filter_38_5
+    CG_4_9_14_3_um_filter_33_26
+    CG_4_9_14_3_um_filter_65_15
     CH30_LM136
     CH311c_11T
     CH336b_11D
@@ -1649,6 +1666,10 @@ const my @SPECIES => qw(
     DmelCS_103
     dog/GVI.1/HKU_Ca026F/2007/HKG
     dog/GVI.1/HKU_Ca035F/2007/HKG
+    DOLJORAL78_63_78
+    DOLJORAL78_65_58
+    DOLZORAL124_38_8
+    DOLZORAL124_64_63
     DSFBPG_3R2A
     DSFBPG_3R2B
     DSFBPG_4R3A
@@ -2572,12 +2593,63 @@ const my @SPECIES => qw(
     Hu/GII/GP2_Feb08_1351/ZAF
     Hu/GII/GP2_Mar11_2963/ZAF
     Hu/GII/GP2_Nov08_1706/ZAF
+    Hu/GII/JP/2004/GII.P12_GII.2/Tochigi-92
+    Hu/GII/JP/2004/GII.P2_GII.2/Hokkaido-13
+    Hu/GII/JP/2004/GII.P2_GII.2/Tochigi-85
+    Hu/GII/JP/2004/GII.P2_GII.2/Tochigi-86
+    Hu/GII/JP/2004/GII.P2_GII.2/Tochigi-87
+    Hu/GII/JP/2006/GII.P2_GII.2/Hokkaido-14
+    Hu/GII/JP/2008/GII.P2_GII.2/Hokkaido-15
+    Hu/GII/JP/2009/GII.P16_GII.2/Kanagawa-49
+    Hu/GII/JP/2010/GII.P16_GII.2/Ehime-43
+    Hu/GII/JP/2010/GII.P16_GII.2/Ehime-44
+    Hu/GII/JP/2010/GII.P16_GII.2/Kanagawa-50
+    Hu/GII/JP/2010/GII.P16_GII.2/Kanagawa-51
+    Hu/GII/JP/2010/GII.P16_GII.2/Osaka-019
+    Hu/GII/JP/2010/GII.P2_GII.2/Hiroshima-17
+    Hu/GII/JP/2010/GII.P2_GII.2/Hiroshima-18
+    Hu/GII/JP/2010/GII.P2_GII.2/Hiroshima-19
+    Hu/GII/JP/2010/GII.P2_GII.2/Hokkaido-16
+    Hu/GII/JP/2011/GII.P16_GII.2/Ehime-45
+    Hu/GII/JP/2011/GII.P16_GII.2/Hiroshima-26
+    Hu/GII/JP/2011/GII.P16_GII.2/Hokkaido-17
+    Hu/GII/JP/2011/GII.P16_GII.2/Osaka-023
+    Hu/GII/JP/2011/GII.P16_GII.2/Osaka-038
+    Hu/GII/JP/2011/GII.P16_GII.2/Osaka-18
+    Hu/GII/JP/2011/GII.P16_GII.2/Osaka-26
+    Hu/GII/JP/2011/GII.P16_GII.2/Osaka-9
+    Hu/GII/JP/2011/GII.P16_GII.2/Saitama-51
+    Hu/GII/JP/2011/GII.P16_GII.2/Yamaguchi-4
+    Hu/GII/JP/2012/GII.P16_GII.2/Ehime-46
+    Hu/GII/JP/2012/GII.P16_GII.2/Hokkaido-18
+    Hu/GII/JP/2012/GII.P16_GII.2/Saitama-121
+    Hu/GII/JP/2012/GII.P16_GII.2/Saitama-122
+    Hu/GII/JP/2012/GII.P16_GII.2/Tochigi-26
+    Hu/GII/JP/2012/GII.P16_GII.2/Tochigi-30
+    Hu/GII/JP/2013/GII.P16_GII.2/Ehime-6
+    Hu/GII/JP/2013/GII.P16_GII.2/Ehime-8
+    Hu/GII/JP/2013/GII.P16_GII.2/Ehime-9
+    Hu/GII/JP/2013/GII.P16_GII.2/Miyagi-7
+    Hu/GII/JP/2013/GII.P16_GII.2/Miyagi-8
+    Hu/GII/JP/2013/GII.P16_GII.2/Saitama-123
+    Hu/GII/JP/2013/GII.P16_GII.2/Saitama-124
+    Hu/GII/JP/2013/GII.P16_GII.2/Saitama-125
+    Hu/GII/JP/2013/GII.P16_GII.2/Tochigi-46
     Hu/GII/JP/2013/GII.P17_GII.17/Saitama5203
     Hu/GII/JP/2013/GII.P17_GII.17/Saitama5309
+    Hu/GII/JP/2014/GII.P16_GII.2/Hiroshima-30
+    Hu/GII/JP/2014/GII.P16_GII.2/Kanagawa-52
+    Hu/GII/JP/2014/GII.P16_GII.2/Osaka-225
+    Hu/GII/JP/2014/GII.P16_GII.2/Saitama-126
+    Hu/GII/JP/2014/GII.P16_GII.2/Tochigi-17
     Hu/GII/JP/2014/GII.P17_GII.17/Kawasaki323
     Hu/GII/JP/2014/GII.P17_GII.17/Nagano7-1
     Hu/GII/JP/2014/GII.P17_GII.17/Nagano8-1
+    Hu/GII/JP/2014/GII.P2_GII.2/Yamaguchi-014
+    Hu/GII/JP/2014/GII.Pe_GII.2/Saitama-127
     Hu/GII/JP/2015/GII.P17_GII.17/Kawasaki308
+    Hu/GII/JP/2015/GII.P2_GII.2/Miyagi-63
+    Hu/GII/JP/2015/GII.P2_GII.2/Saitama-169
     Hu/GII/JP/2015/GII.Pe_GII.4/Osaka/OSF78
     Hu/GII/JP/2016/GII.P16_GII.4_Sydney2012/Kawasaki194
     Hu/GII/JP/2017/GII.P17_GII.17/Tokyo330021
@@ -5413,6 +5485,7 @@ const my @SPECIES => qw(
     UBP8_UBA817
     UBP8_UBA827
     UBP9_UBA1085
+    UBP9_UBA11836
     UBP9_UBA1432
     UBP9_UBA4627
     UBP9_UBA4705
@@ -5989,7 +6062,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

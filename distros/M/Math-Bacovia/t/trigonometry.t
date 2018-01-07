@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 146;
+plan tests => 163;
 
 use Math::AnyNum;
 use Math::Bacovia qw(:all);
@@ -143,6 +143,19 @@ is($k->asin->sin->numeric->round(-20), -0.5);
 is($k->sec->asec->numeric->round(-20), 0.5);
 is($k->asec->sec->numeric->round(-20), -0.5);
 
+like(atan2($y, $k)->numeric->round(-50), qr/^-1\.58242370975128049024936229387106682\d*\z/);
+like(atan2($k, $y)->numeric->round(-50), qr/^-3\.12996527063340936744460278104818750\d*\z/);
+
+like(atan2($k, $y)->simple->numeric->round(-50), qr/^-3\.12996527063340936744460278104818750\d*\z/);
+like(atan2($k, $y)->simple(full => 1)->numeric->round(-50), qr/^-3\.12996527063340936744460278104818750\d*\z/);
+
+like(atan2(Symbol('x', -3 - 4 * i), Symbol('y', -7 - 5 * i))->numeric,
+     qr/^-2\.625506575223870174339219\d*\+0\.134463574038477498677542285560005\d*i/);
+like(atan2(Symbol('x', -3 - 4 * i), Symbol('y', -7 - 5 * i))->simple(full => 1)->numeric,
+     qr/^-2\.625506575223870174339219\d*\+0\.134463574038477498677542285560005\d*i/);
+like(atan2(Symbol('x', -3 - 4 * i), Symbol('y', -7 - 5 * i))->expand(full => 1)->numeric,
+     qr/^-2\.625506575223870174339219\d*\+0\.134463574038477498677542285560005\d*i/);
+
 foreach my $method (
                     qw(
                     sin sinh asin asinh
@@ -165,4 +178,17 @@ foreach my $method (
     is(Math::Bacovia::Number->new($n)->$method->simple->numeric->round(-50)->abs,            $n->$method->round(-50)->abs, "$method($n)");
     is(Math::Bacovia::Number->new($n)->$method->simple(full => 1)->numeric->round(-50)->abs, $n->$method->round(-50)->abs, "$method($n)");
 #>>>
+}
+
+{
+    my $x      = Symbol('x');
+    my @values = qw(0 3/4 4/3 15/8 12/5);
+
+    foreach my $n (1 .. 5) {
+
+        $x->set($n);    # change the numerical value of $x
+
+        is($x->stringify,                  qq{Symbol("x", $n)});
+        is($x->log->sinh->simple->numeric, shift(@values));
+    }
 }

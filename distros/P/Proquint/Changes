@@ -1,0 +1,19 @@
+0.003 (2018-01-03)
+
+    Packaging:
+        - Add missing Test2::V0 dependency
+
+0.002 (2018-01-03)
+
+    API / Behaviour Changes:
+        - Function names expanded to include full "proquint"
+
+    Enhancements:
+        - Minor code clarity improvements
+
+    Bug Fixes:
+        - Fix up link to original Proquint paper
+
+0.001 (2018-01-02)
+
+    Initial release

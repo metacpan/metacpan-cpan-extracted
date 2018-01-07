@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build xz
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 
@@ -34,7 +34,7 @@ Alien::xz - Find or build xz
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ In your script or module:
  use Alien::xz;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::xz->bin_dir;
+ unshift @PATH, Alien::xz->bin_dir;
 
 =head1 DESCRIPTION
 
@@ -97,7 +97,11 @@ L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Dylan William Hardison (dylanwh, DHARDISON)
 
 =head1 COPYRIGHT AND LICENSE
 

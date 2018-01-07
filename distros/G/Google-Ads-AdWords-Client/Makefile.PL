@@ -39,6 +39,7 @@ WriteMakefile
                    'Test::MockObject::Extends' => 0,
                    'Test::More' => 0,
                    'URI::Escape' => 0,
+                   'XML::LibXML' => 0,
                    'XML::Simple' => 0,
                    'XML::XPath' => 0
                  },

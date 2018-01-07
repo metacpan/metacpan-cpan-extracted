@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::PlacementResponse;
+$Net::Amazon::EC2::PlacementResponse::VERSION = '0.35';
 use strict;
 use Moose;
 

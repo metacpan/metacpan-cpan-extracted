@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -46,7 +46,7 @@ SYNOPSIS
      use Alien::xz;
      use Env qw( @PATH );
      
-     unshift @ENV, Alien::xz->bin_dir;
+     unshift @PATH, Alien::xz->bin_dir;
 
 DESCRIPTION
 
@@ -67,7 +67,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Dylan William Hardison (dylanwh, DHARDISON)
 
 COPYRIGHT AND LICENSE
 

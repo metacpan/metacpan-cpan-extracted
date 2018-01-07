@@ -34,7 +34,7 @@ See [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) for usage.
 
 ## register
 
-    $plugin->register($app, \&config);
+    $plugin->register($app, \%config);
 
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application.
 
@@ -70,12 +70,12 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
     Override buckets for request duration histogram.
 
-    Default: `(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)`
+    Default: `(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)` (actually see [Net::Prometheus](https://metacpan.org/source/PEVANS/Net-Prometheus-0.05/lib/Net/Prometheus/Histogram.pm#L19))
 
 # METRICS
 
-In addition to exporting the default process metrics that [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) already export
-this plugin will also export
+In addition to exposing the default process metrics that [Net::Prometheus](https://metacpan.org/pod/Net::Prometheus) already expose
+this plugin will also expose
 
 - `http_requests_total`, request counter partitioned over HTTP method and HTTP response code
 - `http_request_duration_seconds`, request duration histogram partitoned over HTTP method

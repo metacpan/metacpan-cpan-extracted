@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.173500';
+$Bio::MUST::Core::Ali::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -13,7 +13,8 @@ use feature qw(say);
 
 use Carp;
 use File::Temp;
-use List::AllUtils qw(max uniq indexes sum0);
+use List::AllUtils qw(uniq indexes sum0);
+use Path::Class qw(file);
 use POSIX qw(ceil floor);
 use Statistics::Descriptive;
 use Tie::IxHash;
@@ -21,11 +22,11 @@ use Tie::IxHash;
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:gaps :files);
 use aliased 'Bio::MUST::Core::Seq';
-use aliased 'Bio::MUST::Core::IdMapper';
-use aliased 'Bio::MUST::Core::IdList';          # alias currently not used
 use aliased 'Bio::MUST::Core::SeqMask';
 with 'Bio::MUST::Core::Roles::Commentable',
      'Bio::MUST::Core::Roles::Listable';
+
+# ATTRIBUTES
 
 
 has 'seqs' => (
@@ -40,10 +41,21 @@ has 'seqs' => (
           set_seq  => 'set',
        delete_seq  => 'delete',
        insert_seq  => 'insert',
-        first_seq  => 'first',
         count_seqs => 'count',
           all_seqs => 'elements',
+        first_seq  => 'first',
        filter_seqs => 'grep',
+    },
+);
+
+
+has 'file' => (
+    is       => 'ro',
+    isa      => 'Bio::MUST::Core::Types::File',
+    default  => 'untitled.ali',
+    coerce   => 1,
+    handles  => {
+        filename => 'stringify',
     },
 );
 
@@ -60,21 +72,20 @@ has 'guessing' => (
 );
 
 
-has 'file' => (
-    is       => 'ro',
-    isa      => 'Bio::MUST::Core::Types::File',
-    default  => 'untitled.ali',
-    coerce   => 1,
-    handles  => {
-        filename => 'stringify',
-    },
-);
-
-# TODO: document filename?
-
-
 # CONSTRUCTORS
 
+
+
+sub clone {
+    my $self = shift;
+
+    return $self->new(
+        comments => [ $self->all_comments ],
+        seqs     => [ map { $_->clone } $self->all_seqs ],
+        file     => file( $self->filename ),
+        guessing => $self->guessing,
+    );
+}
 
 # ACCESSORS
 
@@ -83,7 +94,7 @@ sub get_seq_with_id {
     my $self = shift;
     my $id   = shift;
 
-    my ($seq) = $self->filter_seqs( sub { $_->full_id eq $id } );
+    my $seq = $self->first_seq( sub { $_->full_id eq $id } );
     carp "Warning: cannot find seq with id: $id; returning undef!"
         unless $seq;
 
@@ -95,7 +106,6 @@ sub all_seq_ids {
     my $self = shift;
     return map { $_->seq_id } $self->all_seqs;
 }
-
 
 # PROPERTIES
 
@@ -126,17 +136,15 @@ sub is_aligned {
 
 sub width {
     my $self = shift;
-    $self->uniformize if $self->is_aligned;     # pad seqs for robustness...
+    $self->uniformize if $self->is_aligned;     # pad seqs for robustness
     return $self->_max_seq_len;
 }
-
 
 sub _max_seq_len {
     my $self = shift;
     my @lengths = map { $_->seq_len } $self->all_seqs;
-    return (max @lengths) // 0;                 # to avoid warnings...
+    return (List::AllUtils::max @lengths) // 0;     # to avoid warnings
 }
-
 
 
 sub seq_len_stats {
@@ -155,20 +163,11 @@ sub perc_miss {
     my $self = shift;
 
     my $n = sum0 map { $_->nomiss_seq_len } $self->all_seqs;
-    ### $n
     return 0.0 unless $n;
 
     my $total = $self->width * $self->count_seqs;
-    ### $total
-
     return 100.0 * ($total - $n) / $total;
 }
-
-
-sub gapmiss_regex {
-    return shift->is_protein ? $GAPPROTMISS : $GAPDNAMISS;
-}
-
 
 # MUTATORS
 
@@ -251,17 +250,16 @@ sub restore_ids {                           ## no critic (RequireArgUnpacking)
     return shift->_change_ids_(0, @_);
 }
 
-
 sub _change_ids_ {
     my $self   = shift;
     my $abbr   = shift;
     my $mapper = shift;
 
     for my $seq ($self->all_seqs) {
-        my $new_id = $abbr ? $mapper->abbr_id_for($seq->full_id)
-                           : $mapper->long_id_for($seq->full_id);
-        $seq->set_seq_id($new_id) if $new_id;       # auto-coercion
-    }                             # Note: leave id alone if not found
+        my $new_id = $abbr ? $mapper->abbr_id_for( $seq->full_id )
+                           : $mapper->long_id_for( $seq->full_id );
+        $seq->set_seq_id($new_id) if $new_id;
+    }                       # Note: leave id alone if not found
 
     return $self;
 }
@@ -317,7 +315,7 @@ sub apply_mask {
 
     # select sites for each seq using a precomputed array slice
     my @indexes = indexes { $_ } $mask->all_states;
-    $_->_set_seq( join q{}, ($_->all_states)[@indexes] )
+    $_->_set_seq( join q{}, ( $_->all_states )[@indexes] )
         for $self->all_seqs;
 
     return $self;
@@ -327,6 +325,13 @@ sub apply_mask {
 sub idealize {                              ## no critic (RequireArgUnpacking)
     my $self = shift;
     return $self->apply_mask( SeqMask->ideal_mask($self, @_) );
+}
+
+# MISC METHODS
+
+
+sub gapmiss_regex {
+    return shift->is_protein ? $GAPPROTMISS : $GAPDNAMISS;
 }
 
 
@@ -350,6 +355,12 @@ sub map_coords {
     return \@coords_out;
 }
 
+# ALIASES
+
+
+sub height {
+    return shift->count_seqs
+}
 
 # I/O METHODS
 
@@ -551,7 +562,7 @@ sub load_phylip {
     }
 
     my $width = $ali->width;
-    croak "Error: unexpected number of sites in PHYLIP file: $width; aborting!"
+    croak "Error: unexpected site number in PHYLIP file: $width; aborting!"
         if $width != $site_n;
 
     return $ali;
@@ -720,18 +731,63 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 
-    # TODO
+    #!/usr/bin/env perl
+
+    use Modern::Perl '2011';
+    # same as:
+    # use strict;
+    # use warnings;
+    # use feature qw(say);
+
+    use Bio::MUST::Core;
+    use aliased 'Bio::MUST::Core::Ali';
+
+    # read Ali form disk
+    my $ali = Ali->load('example.ali');
+
+    # get some properties
+    say 'height:  ' . $ali->height;         # number of seqs
+    say 'width:   ' . $ali->width;          # number of sites
+    say '% miss:  ' . $ali->perc_miss;      # fraction of missing chars (%)
+    say 'seqs are ' . $ali->is_protein ? 'proteins' : 'nucleotides';
+
+    # turn seqs to uppercase
+    $ali->uc_seqs;
+
+    # filter out seqs with no species associated
+    my @seqs = $ali->filter_seqs( sub { not $_->is_genus_only } );
+    use aliased 'Bio::MUST::Core::IdList';
+    my $list = IdList->new( ids => \@seqs );
+    $ali->apply_list($list);
+
+    # alternatively:
+    # $ali = Ali->new( seqs => \@seqs );
+
+    # filter out gap-rich sites
+    $ali->idealize(0.2);                    # min 20% non-gaps per site
+
+    # filter out non-informative sites
+    use aliased 'Bio::MUST::Core::SeqMask';
+    my $mask = SeqMask->parsimony_mask($ali);
+    $ali->apply_mask($mask);
+
+    # write down reduced Ali to disk
+    $ali->store('example-uc-genus-sp-20.ali');
+    $ali->store_fasta('example-uc-genus-sp-20.fasta');
+
+    # see below for additional methods
+    # ...
 
 =head1 DESCRIPTION
 
 This module defines a multiple sequence alignment (MSA) object and its
 methods. An Ali is modeled as an array of L<Bio::MUST::Core::Seq> objects.
 Consequently, sequence ids do not absolutely need to be unique for it to
-work (though id uniqueness helps a lot for sequence filtering).
+work (though id uniqueness helps a lot for sequence access and filtering).
 
 An Ali knows whether it contains nucleotide or protein sequences, whether
 those are aligned or not, as well as its Seq count and exact width. All
@@ -767,17 +823,6 @@ to this public attribute using L<Moose::Meta::Attribute::Native/Moose native
 delegation>. Their documentation thus heavily borrows from the corresponding
 help pages.
 
-=head2 guessing
-
-Boolean
-
-By default, an Ali object tries to guess whether it is aligned or not by
-looking for gap-like characters in any of its Seq objects (see
-L<Bio::MUST::Core::Seq> for the exact test performed on each sequence).
-
-When this smart behavior causes issues, one can disable it by unsetting this
-boolean attribute (see dont_guess and guess accessor methods).
-
 =head2 file
 
 Path::Class::File
@@ -787,17 +832,22 @@ from disk. It is meant to improve the introspection capabilities of the Ali.
 For now, this attribute is not used by the C<store> methods, though it might
 provide them with a default value in the future.
 
+=head2 guessing
+
+Boolean
+
+By default, an Ali object tries to guess whether it is aligned or not by
+looking for gap-like characters in any of its Seq objects (see
+L<Bio::MUST::Core::Seq> for the exact test performed on each sequence).
+
+When this smart behavior causes issues, one can disable it by unsetting this
+boolean attribute (see C<dont_guess> and C<guess> accessor methods).
+
 =head2 comments
 
 An Ali object is commentable, which means that it supports all the methods
 pertaining to comment lines described in
 L<Bio::MUST::Core::Roles::Commentable> (such as C<header>).
-
-=head1 METHODS
-
-=head2
-
-TODO: set method type and doc
 
 =head1 CONSTRUCTORS
 
@@ -810,7 +860,19 @@ Default constructor (class method) returning a new Ali.
     my @seqs = $ali->all_seqs;
     my $ali2 = Ali->new( seqs => \@seqs );
 
-This method accepts an optional argument.
+This method accepts four optional arguments (see ATTRIBUTES above): C<seqs>,
+C<file>, C<guessing> and C<comments>.
+
+=head2 clone
+
+Creates a deep copy (a clone) of the Ali. Returns the copy.
+
+    use aliased 'Bio::MUST::Core::Ali';
+    my $ali = Ali->load('input.ali');
+    my $ali_copy = $ali->clone;
+    # you can now mess with $ali_copy without affecting $ali
+
+This method does not accept any arguments.
 
 =head1 ACCESSORS
 
@@ -880,18 +942,6 @@ the new sequence at C<$index>.
 
 This method requires two arguments.
 
-=head2 first_seq
-
-Returns the first sequence of the Ali matching a given criterion, just like
-L<List::Util>'s C<first> function. This method requires a subroutine
-implementing the matching logic.
-
-    # get a given sequence based on its id (pseudo-hash access)
-    my $id2find = 'seq13';
-    my $seq = $ali->first_seq( sub { $_->full_id eq $id2find } );
-
-This method requires a single argument.
-
 =head2 all_seqs
 
 Returns all the sequences of the Ali (not an array reference).
@@ -899,6 +949,18 @@ Returns all the sequences of the Ali (not an array reference).
     my @seqs = $ali->all_seqs;
 
 This method does not accept any arguments.
+
+=head2 first_seq
+
+Returns the first sequence of the Ali matching a given criterion, just like
+L<List::Util>'s C<first> function. This method requires a subroutine
+implementing the matching logic.
+
+    # emulate get_seq_with_id method
+    my $id2find = 'seq13';
+    my $seq = $ali->first_seq( sub { $_->full_id eq $id2find } );
+
+This method requires a single argument.
 
 =head2 filter_seqs
 
@@ -924,16 +986,23 @@ Returns all the sequence ids (L<Bio::MUST::Core::SeqId> objects) of the Ali
 
 This method does not accept any arguments.
 
+=head2 filename
+
+Returns the stringified filename of the Ali.
+
+This method does not accept any arguments.
+
 =head2 guess
 
-Turn on the smart detection of gaps (see guessing attribute above).
+Turn on the smart detection of gaps (see C<guessing> attribute above).
 
 This method does not accept any arguments.
 
 =head2 dont_guess
 
-Turn off the smart detection of gaps (see guessing attribute above).
+Turn off the smart detection of gaps (see C<guessing> attribute above).
 
+    use aliased 'Bio::MUST::Core::Ali';
     my $ali = Ali->load('ensembl.fasta');
     $ali->dont_guess;
 
@@ -954,7 +1023,7 @@ This method does not accept any arguments.
 Returns true if any sequence of the Ali looks like a protein. See
 L<Bio::MUST::Core::Seq> for the exact test performed on each sequence.
 
-    say 'Your file has nucleotide sequences' unless $ali->is_protein;
+    say 'Your file includes nucleotide sequences' unless $ali->is_protein;
 
 This method does not accept any arguments.
 
@@ -971,7 +1040,8 @@ This method does not accept any arguments.
 
 =head2 count_seqs
 
-Returns the number of sequences of the Ali.
+Returns the number of sequences of the Ali. The alias method C<height> is
+provided for convenience.
 
     my $height = $ali->count_seqs;
 
@@ -997,8 +1067,8 @@ This method does not accept any arguments.
 
 =head2 seq_len_stats
 
-Returns a list of 5 values summarizing the Ali seq lengths (ignoring gaps). The
-values are the following: Q0 (min), Q1, Q2 (median), Q3, and Q4 (max).
+Returns a list of 5 values summarizing the Ali seq lengths (ignoring gaps).
+The values are the following: Q0 (min), Q1, Q2 (median), Q3, and Q4 (max).
 
 This method does not accept any arguments.
 
@@ -1012,28 +1082,31 @@ As this method internally calls C<Ali::width>, the remarks above also apply.
 
 This method does not accept any arguments.
 
-=head2 gapmiss_regex
-
-Returns a regular expression matching gaps and ambiguous or missing states.
-The exact regex returned depends on the type of sequences in the Ali (nucl. or
-proteins).
-
-    my $regex = $ali->gapmiss_regex;
-    my $first_seq = $ali->get_seq(0)->seq;
-    my $gapmiss_n = $first_seq =~ m/($regex)/xmsg;
-    say "The first sequence has $gapmiss_n gaps or ambiguous/missing sites";
-
-This method does not accept any arguments.
-
 =head1 MUTATORS
 
 =head2 uc_seqs
 
-TODO: doc
+Turn all the sequences of the Ali to uppercase and returns it.
+
+This method does not accept any arguments.
 
 =head2 recode_seqs
 
-TODO: doc
+Recode all the sequences of the Ali and returns it.
+
+    use aliased 'Bio::MUST::Core::Ali';
+    my $ali = Ali->load('biased.ali');
+
+    # set up RY recoding for suppressing codon bias
+    my %base_for = (
+        A => 'A',   G => 'A',       # purines
+        C => 'C',   T => 'C',       # pyrimidines
+    );
+
+    my $ali_rec = $ali->recode_seqs( \%base_for );
+    $ali_rec->store('biased_ry.ali');
+
+This method requires one argument.
 
 =head2 degap_seqs
 
@@ -1051,7 +1124,7 @@ This method does not accept any arguments.
 
 =head2 gapify_seqs
 
-Gapify all the sequences of the Ali and returns it. See the corresponding
+Gapifies all the sequences of the Ali and returns it. See the corresponding
 method in L<Bio::MUST::Core::Seq> for the exact effect of this gap-cleaning
 operation.
 
@@ -1098,6 +1171,7 @@ specified by the passed L<Bio::MUST::Core::IdMapper> and returns the Ali.
 
 Note that this method will work only if the sequence ids have not been
 already shortened or modified in any way since the creation of the IdMapper.
+Long ids without abbreviated forms in the IdMapper are left untouched.
 
     use aliased 'Bio::MUST::Core::Ali';
     use aliased 'Bio::MUST::Core::IdMapper';
@@ -1107,6 +1181,8 @@ already shortened or modified in any way since the creation of the IdMapper.
     $ali->store_fasta('input.4blast.ali');
     # makeblastdb
 
+    # Note: the temp_fasta method does exactly that
+
 This method requires one argument.
 
 =head2 restore_ids
@@ -1114,9 +1190,9 @@ This method requires one argument.
 Replaces all the sequence ids of the Ali by their long forms as specified by
 the passed L<Bio::MUST::Core::IdMapper> and returns the Ali.
 
-Note that this method will work only if the sequence ids have been
-previously abbreviated (see above) and have not been modified in any way
-since then.
+Note that this method will work only if the sequence ids have been previously
+abbreviated (see above) and have not been modified in any way since then.
+Again, abbreviated ids without long forms in the IdMapper are left untouched.
 
     use aliased 'Bio::MUST::Core::IdMapper';
     my $mapper = IdMapper->gi_mapper($ali);
@@ -1170,6 +1246,37 @@ L<Bio::MUST::Core::SeqMask>.
 
 This method accepts an optional argument.
 
+=head1 MISC METHODS
+
+=head2 gapmiss_regex
+
+Returns a regular expression matching gaps and ambiguous or missing states.
+The exact regex returned depends on the type of sequences in the Ali (nucl. or
+proteins).
+
+    my $regex = $ali->gapmiss_regex;
+    my $first_seq = $ali->get_seq(0)->seq;
+    my $gapmiss_n = $first_seq =~ m/($regex)/xmsg;
+    say "The first sequence has $gapmiss_n gaps or ambiguous/missing sites";
+
+This method does not accept any arguments.
+
+=head2 map_coords
+
+Converts a set of site positions from Ali coordinates to coordinates of the
+specified sequence (thereby ignoring positions due to gaps). Returns the
+converted sites in sequence coordinates as an array refrence.
+
+    use aliased 'Bio::MUST::Core::Ali';
+    my $ali = Ali->load('input.ali');
+    my $id = 'GIV-Norovirus Hum.GIV.1.POL_1338688@508124125';
+    my $ali_coords = [ 4, 25, 73, 89, 104, 116 ];
+    my $seq_coords = $ali->map_coords($id, $ali_coords);
+    # $seq_coords is [ 3, 23, 59, 71,  71,  74 ]
+
+This method requires two arguments: the id of a sequence and an array
+reference of input sites in Ali coordinates.
+
 =head1 I/O METHODS
 
 =head2 load
@@ -1192,7 +1299,14 @@ This method requires one argument.
 
 Writes the Ali to disk in the MUST pseudo-FASTA format (ALI files).
 
+Note that the ALI format is only used when the suffix of the outfile name is
+'.ali'. In all other cases (including lack of suffix), this method
+automatically forwards the call to C<store_fasta>.
+
     $ali->store('output.ali');
+    # output.ali is written in ALI format
+    $ali->store('output.fasta');
+    # output.fasta is written in FASTA format
 
 This method requires one argument.
 
@@ -1227,7 +1341,7 @@ In list context, returns the IdMapper object along with temporary filename.
     my $output = `script.sh $infile`;
     ...
 
-This method accepts the same optional argument as C<store_fasta>.
+This method accepts the same optional argument hash as C<store_fasta>.
 
 =head2 load_phylip
 
@@ -1236,13 +1350,13 @@ PHYLIP format. Both sequential and interleaved formats are supported.
 
 The only constraint is that sequence ids MUST NOT contain whitespace and be
 followed by at least one whitespace character. This means that some old-school
-PHYLIP files that do not follow this convention will not be processed correctly.
+PHYLIP files not following this convention will not be processed correctly.
 
 When using the interleaved format, sequence ids may or may not be repeated in
 each block.
 
     use aliased 'Bio::MUST::Core::Ali';
-    my $ali = Ali->load_phylip('test/phylip.phy');
+    my $ali = Ali->load_phylip('phylip.phy');
     say $ali->count_seqs;
     say $ali->width;
 
@@ -1288,7 +1402,7 @@ STOCKHOLM format. =GF comments are retained (see above) but not the other
 comment classes (=GS, =GR and =GC).
 
     use aliased 'Bio::MUST::Core::Ali';
-    my $ali = Ali->load('test/upsk.stockholm');
+    my $ali = Ali->load('upsk.stockholm');
     say $ali->header;
 
     # outputs:
@@ -1304,6 +1418,12 @@ comment classes (=GS, =GR and =GC).
     # RL    J Virol 1997;71:5990-5996.
 
 This method requires one argument.
+
+=head1 ALIASES
+
+=head2 height
+
+Alias for C<count_seqs> method. For API consistency.
 
 =head1 AUTHOR
 

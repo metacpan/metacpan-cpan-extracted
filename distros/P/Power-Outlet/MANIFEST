@@ -15,6 +15,7 @@ lib/Power/Outlet/Hue.pm
 lib/Power/Outlet/iBoot.pm
 lib/Power/Outlet/iBootBar.pm
 lib/Power/Outlet/WeMo.pm
+lib/Power/Outlet/Virtual.pm
 t/001_load.t
 t/002_http.t
 t/002_ip.t
@@ -22,6 +23,7 @@ t/002_iBoot_live.t
 t/003_iBootBar_live.t
 t/003_Hue_live.t
 t/003_WeMo_live.t
+t/003_Virtual_live.t
 t/004_iBoot_defaults.t
 t/005_iBootBar_defaults.t
 perl-Power-Outlet.spec

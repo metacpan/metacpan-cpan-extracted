@@ -1,55 +1,70 @@
 NAME
+
     Digest::PBKDF2 A minimalist Digest module using the PBKDF2 algorithm.
 
 NOTICE
-    You can only use one salt, a pre-salt, with this module. It is not smart
-    enough to do post-salts.
+
+    You can only use one salt, a pre-salt, with this module. It is not
+    smart enough to do post-salts.
 
 SYNOPSIS
+
         my $digest = Digest::PBKDF2->new;   # Or...
         my $digest = Digest::PBKDF2->new(encoding => 'ldap');
         $digest->add('mysalt');             # salt = 'mysalt'
         $digest->add('k3wLP@$$w0rd');       # password = 'k3wLP@$$w0rd'
-
+    
         $digest->add('eX+ens10n');          # password = 'k3wLP@$$w0rdeX+ens10n'
-
+    
         my $result = $digest->digest;       # $PBKDF2$HMACSHA1:1000:bXlzYWx0$4P9pwp
                                             # LoF+eq5jwUbMw05qRQyZs=
 
     That's about it.
 
 METHODS
-    new Create a new Digest::PBKDF2 object. This defaults to using the
-        "ldap" encoding available in Crypt::PBKDF2--please see Crypt::PBKDF2
-        for details.
+
+    new
+
+      Create a new Digest::PBKDF2 object. This defaults to using the "ldap"
+      encoding available in Crypt::PBKDF2--please see Crypt::PBKDF2 for
+      details.
 
     clone
-        Copies the data and state from the original Digest::PBKDF2 object,
-        and returns a new object.
 
-    add Pass this method your salt and data chunks. They are stored up until
-        you call digest.
+      Copies the data and state from the original Digest::PBKDF2 object,
+      and returns a new object.
+
+    add
+
+      Pass this method your salt and data chunks. They are stored up until
+      you call digest.
 
     digest
-        This encrypts your data and returns the encrypted string.
+
+      This encrypts your data and returns the encrypted string.
 
     reset
-        After calling digest, the module calls reset on its self, clearing
-        data and the record of how many additions were made to the data to
-        be digested.
+
+      After calling digest, the module calls reset on its self, clearing
+      data and the record of how many additions were made to the data to be
+      digested.
 
 SEE ALSO
+
     Crypt::PBKDF2 Digest
 
 AUTHOR
+
     Amiri Barksdale, <abarksdale@campusexplorer.com>
 
 COPYRIGHT
-    Copyright (c) 2014 by Campus Explorer, Inc.
 
-    <http://www.campusexplorer.com>
+    Copyright (c) 2017 by Campus Explorer, Inc.
+
+    http://www.campusexplorer.com
 
 LICENSE
+
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 

@@ -19,7 +19,7 @@ my $author_ok = eval {
 
 if (! $author_ok){
     _invalid_author();
-    _help() if ! $author_ok;
+    _help();
 }
 
 my %opts;

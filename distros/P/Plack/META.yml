@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/plack/Plack/issues
   homepage: https://github.com/plack/Plack
   repository: https://github.com/plack/Plack.git
-version: '1.0044'
+version: '1.0045'
 x_authority: cpan:MIYAGAWA
 x_contributors:
   - 'Aaron Trevena <aaron.trevena@gmail.com>'
@@ -91,6 +91,7 @@ x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'franck cuny <franck@lumberjaph.net>'
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Grant McLean <grant@catalyst.net.nz>'
   - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
@@ -148,11 +149,13 @@ x_contributors:
   - 'Ray Miller <rm7@sanger.ac.uk>'
   - 'Richard Simões <rsimoes@gmail.com>'
   - 'Ricky Morse <remorse@partners.org>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Rob Hoelz <rob@hoelz.ro>'
   - 'Ryo Miyake <ryo.studiom@gmail.com>'
   - 'Sawyer X <xsawyerx@cpan.org>'
   - 'Scott S. McCoy <smccoy@saymedia.com>'
   - 'Shawn M Moore <sartak@gmail.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
   - 'smcmurray <smcmurray@localhost.localdomain>'
   - 'Stephen Clouse <stephenclouse@gmail.com>'
   - 'Stevan Little <stevan.little@iinteractive.com>'

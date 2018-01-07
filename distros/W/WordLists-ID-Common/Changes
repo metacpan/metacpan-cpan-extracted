@@ -1,0 +1,20 @@
+0.004   2018-01-01 (PERLANCAR)
+
+	- Remove proper noun 'Islam'.
+
+
+0.003   2018-01-01 (PERLANCAR)
+
+	- [Bugfix] Remove some English words that were included.
+
+
+0.002   2017-12-31 (PERLANCAR) (unreleased)
+
+        - No functional changes.
+
+        - Fix summaries and descriptions of modules (copy-paste mistake).
+
+
+0.001   2017-12-31 (PERLANCAR) (unreleased)
+
+        - First release.

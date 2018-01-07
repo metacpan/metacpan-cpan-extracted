@@ -22,4 +22,3 @@ t/no_tests_no_seed.t
 t/note_seed_on_pass.t
 t/rand.t
 t/rand_check.plx
-SIGNATURE    Added here by Module::Build

@@ -1,5 +1,8 @@
 use ExtUtils::MakeMaker;
 require 5.008;
+if ($^O =~ /^MSWin32$/i ) {
+    die ('OS unsupported');
+}
 
 my $mm_ver = ExtUtils::MakeMaker->VERSION;
 

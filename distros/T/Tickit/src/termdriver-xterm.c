@@ -6,6 +6,10 @@
 
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
+#define CSI_MORE_SUBPARAM 0x80000000
+#define CSI_NEXT_SUB(x)   ((x) & CSI_MORE_SUBPARAM)
+#define CSI_PARAM(x)      ((x) & ~CSI_MORE_SUBPARAM)
+
 struct XTermDriver {
   TickitTermDriver driver;
 
@@ -24,6 +28,8 @@ struct XTermDriver {
   struct {
     unsigned int cursorshape:1;
     unsigned int slrm:1;
+    unsigned int csi_sub_colon:1;
+    unsigned int rgb8:1;
   } cap;
 
   struct {
@@ -210,10 +216,12 @@ static struct SgrOnOff { int on, off; } sgr_onoff[] = {
 
 static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
 {
-  /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
+  /* There can be at most 16 SGR parameters; 5 from each of 2 colours, and
    * 6 single attributes
    */
-  int params[12];
+  int params[16];
   int pindex = 0;
 
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
@@ -230,13 +238,21 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       val = tickit_pen_get_colour_attr(delta, attr);
       if(val < 0)
         params[pindex++] = onoff->off;
+      else if(xd->cap.rgb8 && tickit_pen_has_colour_attr_rgb8(delta, attr)) {
+        TickitPenRGB8 rgb = tickit_pen_get_colour_attr_rgb8(delta, attr);
+        params[pindex++] = (onoff->on+8) | CSI_MORE_SUBPARAM;
+        params[pindex++] = 2             | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.r         | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.g         | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.b;
+      }
       else if(val < 8)
         params[pindex++] = onoff->on + val;
       else if(val < 16)
         params[pindex++] = onoff->on+60 + val-8;
       else {
-        params[pindex++] = (onoff->on+8) | 0x80000000;
-        params[pindex++] = 5 | 0x80000000;
+        params[pindex++] = (onoff->on+8) | CSI_MORE_SUBPARAM;
+        params[pindex++] = 5 | CSI_MORE_SUBPARAM;
         params[pindex++] = val;
       }
       break;
@@ -275,7 +291,7 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
 
   size_t len = 3; /* ESC [ ... m */
   for(int i = 0; i < pindex; i++)
-    len += snprintf(NULL, 0, "%d", params[i]&0x7fffffff) + 1;
+    len += snprintf(NULL, 0, "%d", CSI_PARAM(params[i])) + 1;
   if(pindex > 0)
     len--; /* Last one has no final separator */
 
@@ -284,10 +300,10 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
 
   s += sprintf(s, "\e[");
   for(int i = 0; i < pindex-1; i++)
-    /* TODO: Work out what terminals support :s */
-    s += sprintf(s, "%d%c", params[i]&0x7fffffff, ';');
+    s += sprintf(s, "%d%c", CSI_PARAM(params[i]),
+        CSI_NEXT_SUB(params[i]) && xd->cap.csi_sub_colon ? ':' : ';');
   if(pindex > 0)
-    s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
+    s += sprintf(s, "%d", CSI_PARAM(params[pindex-1]));
   sprintf(s, "m");
 
   tickit_termdrv_write_str(ttd, buffer, len);
@@ -442,6 +458,10 @@ static void start(TickitTermDriver *ttd)
   // Also query the current cursor visibility, blink status, and shape
   tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
 
+  // Try to work out whether the terminal supports 24bit cololurs (RGB8) and
+  // whether it understands : to separate sub-params
+  tickit_termdrv_write_strf(ttd, "\e[38;5;255m\e[38:2:0:1:2m\eP$qm\e\\\e[m");
+
   /* Some terminals (e.g. xfce4-terminal) don't understand DECRQM and print
    * the raw bytes directly as output, while still claiming to be TERM=xterm
    * It doens't hurt at this point to clear the current line just in case.
@@ -493,6 +513,22 @@ static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t argl
     }
     xd->initialised.cursorshape = 1;
   }
+  else if(strneq(args + arglen - 1, "m", 1)) { // SGR
+    // skip the initial number, find the first separator
+    while(arglen && args[0] >= '0' && args[0] <= '9')
+      args++, arglen--;
+    if(!arglen)
+      return;
+
+    if(args[0] == ':')
+      xd->cap.csi_sub_colon = 1;
+    args++, arglen--;
+
+    // If the palette index is 2 then the terminal understands rgb8
+    int value;
+    if(sscanf(args, "%d", &value) && value == 2)
+      xd->cap.rgb8 = 1;
+  }
 }
 
 static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
@@ -522,21 +558,35 @@ static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
   return 0;
 }
 
-static void stop(TickitTermDriver *ttd)
+static void teardown(TickitTermDriver *ttd)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   if(xd->mode.mouse)
-    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_OFF);
+    tickit_termdrv_write_strf(ttd, "\e[?%dl\e[?1006l", mode_for_mouse(xd->mode.mouse));
   if(!xd->mode.cursorvis)
-    setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
+    tickit_termdrv_write_str(ttd, "\e[?25h", 0);
   if(xd->mode.altscreen)
-    setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
+    tickit_termdrv_write_str(ttd, "\e[?1049l", 0);
   if(xd->mode.keypad)
-    setctl_int(ttd, TICKIT_TERMCTL_KEYPAD_APP, 0);
+    tickit_termdrv_write_strf(ttd, "\e>");
 
   // Reset pen
   tickit_termdrv_write_str(ttd, "\e[m", 3);
+}
+
+static void resume(TickitTermDriver *ttd)
+{
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
+  if(xd->mode.keypad)
+    tickit_termdrv_write_strf(ttd, "\e=");
+  if(xd->mode.altscreen)
+    tickit_termdrv_write_str(ttd, "\e[?1049h", 0);
+  if(!xd->mode.cursorvis)
+    tickit_termdrv_write_str(ttd, "\e[?25l", 0);
+  if(xd->mode.mouse)
+    tickit_termdrv_write_strf(ttd, "\e[?%dh\e[?1006h", mode_for_mouse(xd->mode.mouse));
 }
 
 static void destroy(TickitTermDriver *ttd)
@@ -550,7 +600,9 @@ static TickitTermDriverVTable xterm_vtable = {
   .destroy    = destroy,
   .start      = start,
   .started    = started,
-  .stop       = stop,
+  .stop       = teardown,
+  .pause      = teardown,
+  .resume     = resume,
   .print      = print,
   .goto_abs   = goto_abs,
   .move_rel   = move_rel,

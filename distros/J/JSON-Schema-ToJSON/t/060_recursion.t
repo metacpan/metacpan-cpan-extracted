@@ -4,12 +4,11 @@ use strict;
 use warnings;
 
 use JSON::Schema::ToJSON;
-use JSON::Validator;
 use Cpanel::JSON::XS;
 use Test::Most;
 
 my $ToJSON = JSON::Schema::ToJSON->new(
-	max_depth => 10,
+	max_depth => 1,
 );
 
 isa_ok( $ToJSON,'JSON::Schema::ToJSON' );
@@ -39,20 +38,13 @@ my $schema = {
 $SIG{ALRM} = sub { die 'Recursion!' };
 alarm 5;
 
-my $json = $ToJSON->json_schema_to_json(
-	schema => $schema,
-);
+eval {
+	my $json = $ToJSON->json_schema_to_json(
+		schema => $schema,
+	);
+};
 
-alarm 0;
-
-pass( 'did not deeply recurse' );
-
-my $validator = JSON::Validator->new;
- 
-$validator->schema( $schema );
-my @errors = $validator->validate( $json );
-
-ok( ! @errors,'round trip' );
+like( $@,qr/Seems like you have a circular reference/,'die on recursion' );
 
 done_testing();
 

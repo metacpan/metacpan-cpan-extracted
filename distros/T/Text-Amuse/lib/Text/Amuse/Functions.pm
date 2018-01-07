@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use File::Temp;
+use File::Copy qw/move/;
 use Text::Amuse;
 use Text::Amuse::String;
 use Text::Amuse::Output;
@@ -17,6 +18,7 @@ our @EXPORT_OK = qw/muse_format_line
                     muse_to_html
                     muse_to_tex
                     muse_to_object
+                    muse_rewrite_header
                    /;
 
 
@@ -146,6 +148,45 @@ sub _format_on_the_fly {
     else {
         die "Wrong usage, format can be only ltx or html!";
     }
+}
+
+=head2 muse_rewrite_header($file, { header1 => value, header2 => value2 })
+
+Rewrite the headers of the given file, adding/replacing the header
+where appropriate.
+
+=cut
+
+sub muse_rewrite_header {
+    my ($file, $pairs) = @_;
+    my $doc = Text::Amuse::Document->new(file => $file);
+    # do a deep copy
+    my @directives = map { [ @{$_} ] } $doc->directives_array;
+
+  REWRITE:
+    foreach my $key (keys %$pairs) {
+        my $value = defined $pairs->{$key} ? $pairs->{$key} . "\n" : "\n";
+      SEARCH:
+        foreach my $dir (@directives) {
+            if ($dir->[0] eq $key) {
+                $dir->[1] = $value;
+                next REWRITE;
+            }
+        }
+        push @directives, [ $key, $value ];
+    }
+    my @out;
+    foreach my $dir (@directives) {
+        push @out, '#' . $dir->[0] . " " . $dir->[1];
+    }
+    my $now = time();
+    my $rewritten = $file . '~rw' . $now;
+    my $backup = $file . '~bk' . $now;
+    open (my $fh, ">:encoding(UTF-8)", $rewritten);
+    print $fh @out, "\n", $doc->raw_body;
+    close $fh;
+    move($file, $backup) or die "Cannot move $file into $backup $!";
+    move($rewritten, $file) or die "Cannot move $rewritten into $backup $!";
 }
 
 

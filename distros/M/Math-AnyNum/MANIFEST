@@ -16,6 +16,7 @@ examples/inverse_of_factorial.pl
 examples/is_power.pl
 examples/krzysztof_reformulated_zeta_function.pl
 examples/lambert_W.pl
+examples/mandelbrot_set.pl
 examples/miller_rabin_primality_test.pl
 examples/newton_s_method.pl
 examples/pi_machin.pl

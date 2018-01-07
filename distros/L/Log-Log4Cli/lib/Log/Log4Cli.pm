@@ -8,20 +8,26 @@ use parent qw(Exporter);
 use Carp qw(croak);
 use Term::ANSIColor qw(colored);
 
-our $VERSION = '0.19'; # Don't forget to change in pod below
+BEGIN {
+    *CORE::GLOBAL::die = sub {
+        my $msg = join(' ', grep { defined } @_) || "Died";
+        $msg .= " at " . join(' line ', (caller)[1,2]);
+        &die_fatal($msg, 255);
+    };
+}
+
+our $VERSION = '0.20'; # Don't forget to change in pod below
 
 our @EXPORT = qw(
     die_fatal
     die_info
     die_alert
-    die_notice
 
     log_fd
 
     log_fatal
     log_error
     log_alert
-    log_notice
     log_warn
     log_info
     log_debug
@@ -37,19 +43,21 @@ our $COLORS = {
     DEBUG  => 'blue',
     TRACE  => 'magenta'
 };
-$COLORS->{NOTICE} = $COLORS->{ALERT}; # Deprecated
 
 our $LEVEL = 0;
 our $POSITIONS = undef;
-my $FD = \*STDERR;       # descriptor
-our $COLOR = -t $FD;     # color on/off switcher
+our $COLOR;              # color on/off switcher; defined below
+our $STATUS = undef;     # exit code
 
-sub _die($$$$) {
+my $FD;                  # descriptor to write messages; defined below
+
+sub _die($$$) {
     if ($^S) {
         # inside eval block
-        croak defined $_[3] ? "$_[3]" : "Died";
+        $STATUS = $_[0];
+        croak defined $_[2] ? "$_[2]" : "Died";
     } else {
-        print $FD $_[2] . (defined $_[3] ? "$_[3]. " : "") .
+        print $FD $_[1] . (defined $_[2] ? "$_[2]. " : "") .
             "Exit $_[0], ET " . (time - $^T) . "s\n" if ($_[1]);
         exit $_[0];
     }
@@ -63,15 +71,13 @@ sub _pfx($) {
         (($POSITIONS or $LEVEL > 4) ? join(":", (caller(1))[1,2]) . " " : "");
 }
 
-sub die_fatal(;$;$) { _die $_[1] || 127, $LEVEL > -2, _pfx('FATAL'), $_[0] }
-sub die_alert(;$;$) { _die $_[1] || 0,   $LEVEL > -1, _pfx('ALERT'), $_[0] }
-*die_notice = \&die_alert; # Deprecated
-sub die_info(;$;$)  { _die $_[1] || 0,   $LEVEL >  1, _pfx('INFO'),  $_[0] }
+sub die_fatal(;$;$) { _die $_[1] || 127, $LEVEL > -2 && _pfx('FATAL'), $_[0] }
+sub die_alert(;$;$) { _die $_[1] || 0,   $LEVEL > -1 && _pfx('ALERT'), $_[0] }
+sub die_info(;$;$)  { _die $_[1] || 0,   $LEVEL >  1 && _pfx('INFO'),  $_[0] }
 
 sub log_fatal(&) { print $FD _pfx('FATAL') . $_[0]->($_) . "\n" if $LEVEL > -2 }
 sub log_error(&) { print $FD _pfx('ERROR') . $_[0]->($_) . "\n" if $LEVEL > -1 }
 sub log_alert(&) { print $FD _pfx('ALERT') . $_[0]->($_) . "\n" if $LEVEL > -1 }
-*log_notice = \&log_alert; # Deprecated
 sub log_warn(&)  { print $FD _pfx('WARN')  . $_[0]->($_) . "\n" if $LEVEL >  0 }
 sub log_info(&)  { print $FD _pfx('INFO')  . $_[0]->($_) . "\n" if $LEVEL >  1 }
 sub log_debug(&) { print $FD _pfx('DEBUG') . $_[0]->($_) . "\n" if $LEVEL >  2 }
@@ -84,6 +90,8 @@ sub log_fd(;$) {
     }
     return $FD;
 }
+
+log_fd(\*STDERR);
 
 1;
 
@@ -103,7 +111,7 @@ Log::Log4Cli -- Lightweight logger for command line tools
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =head1 SYNOPSIS
 
@@ -138,21 +146,21 @@ All subroutines described below are exported by default.
 
 =head1 SUBROUTINES
 
-=head2 die_fatal, die_alert, die_notice, die_info
+=head2 die_fatal, die_alert, die_info
 
     die_fatal "Something terrible happened", 8;
 
-Log message and exit with provided code. All arguments are optional. If second arg
-(exit code) omitted die_fatal, die_alert and die_info will exit with 127, 0 and 0
-respectively. C<die_notice> is deprecated and will be removed in future releases.
+Log message and exit with provided code. In eval blocks C<Carp::croak> used
+instead of exit and exit code stored in C<$Log::Log4Cli::STATUS>. All
+arguments are optional. If second arg (exit code) omitted die_fatal, die_alert
+and die_info will exit with 127, 0 and 0 respectively.
 
-=head2 log_fatal, log_error, log_alert, log_notice, log_warn, log_info, log_debug, log_trace
+=head2 log_fatal, log_error, log_alert, log_warn, log_info, log_debug, log_trace
 
     log_error { "Something went wrong!" };
 
 Execute passed code block and write it's return value if loglevel permit so. Set
-C<$Log::Log4Cli::COLOR> to false value to disable colors. C<log_notice> is
-deprecated and will be removed in future releases.
+C<$Log::Log4Cli::COLOR> to false value to disable colors.
 
 =head2 log_fd
 

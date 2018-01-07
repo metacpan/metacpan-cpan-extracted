@@ -31,7 +31,7 @@ sub new {
     bless {values => \@flat}, $class;
 }
 
-sub inside {
+sub get {
     my ($x) = @_;
     (@{$x->{values}});
 }
@@ -61,8 +61,8 @@ Class::Multimethods::multimethod div => (__PACKAGE__, 'Math::Bacovia') => sub {
 };
 
 #~ Class::Multimethods::multimethod pow => (__PACKAGE__, 'Math::Bacovia') => sub {
-    #~ my ($x, $y) = @_;
-    #~ __PACKAGE__->new(map { $_**$y } @{$x->{values}});
+#~ my ($x, $y) = @_;
+#~ __PACKAGE__->new(map { $_**$y } @{$x->{values}});
 #~ };
 
 sub inv {
@@ -76,13 +76,14 @@ sub inv {
 
 sub numeric {
     my ($x) = @_;
-    $x->{_num} //= do {
-        my $prod = $Math::Bacovia::ONE->{value};
-        foreach my $value (@{$x->{values}}) {
-            $prod *= $value->numeric;
-        }
-        $prod;
-    };
+
+    my $prod = $Math::Bacovia::ONE->{value};
+
+    foreach my $value (@{$x->{values}}) {
+        $prod *= $value->numeric;
+    }
+
+    $prod;
 }
 
 sub pretty {

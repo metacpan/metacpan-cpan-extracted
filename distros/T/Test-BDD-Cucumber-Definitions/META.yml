@@ -1,0 +1,34 @@
+---
+abstract: 'The great new Test::BDD::Cucumber::Definitions!'
+author:
+  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-BDD-Cucumber-Definitions
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DDP: '0'
+  HTTP::Tiny: '0'
+  JSON::XS: '0'
+  Moose::Util::TypeConstraints: '0'
+  Params::ValidationCompiler: '0'
+  Test::BDD::Cucumber: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/ivanych/Test-BDD-Cucumber-Definitions/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ivanych/Test-BDD-Cucumber-Definitions.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

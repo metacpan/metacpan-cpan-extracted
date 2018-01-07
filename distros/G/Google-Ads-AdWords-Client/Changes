@@ -1,3 +1,12 @@
+5.0.0
+- Replaced XML::XPath with XML::LibXML, which resulted in a significant
+  improvement in memory usage and performance.
+  See https://github.com/googleads/googleads-perl-lib/wiki/SOAP-Dependencies
+  for details.
+- Fixed https://github.com/googleads/googleads-perl-lib/issues/20.
+- Update examples with the latest features including add_ad_groups.pl,
+  update_ad_group.pl, and upload_offline_data.pl.
+
 4.18.0
 - Added support and examples for v201710.
 - Added a new upload_offline_data.pl example for whitelisted API users

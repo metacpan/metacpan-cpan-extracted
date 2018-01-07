@@ -6,7 +6,7 @@ File::Path::Tiny - recursive versions of mkdir() and rmdir() without as much ove
 
 =head1 VERSION
 
-This document describes File::Path::Tiny version 0.8
+This document describes File::Path::Tiny version 0.9
 
 =head1 SYNOPSIS
 
@@ -38,11 +38,15 @@ Backwards compatibility brings in a lot of code and logic that we don't need fro
 
 =item * chdir()s
 
-It does a ton of chdir()s which could leave you somewhere you're not planning on being and requires much more overhead to do.
+It forces a ton of chdir()s which could leave you somewhere you're not planning on being and requires much more overhead to do.
+
+This module provides a way to disable that if you know it is safe to do so in your circumstance.
 
 =item * can croak not allowing you to detect and handle failure
 
 Just let me handle errors how I want. Don't make my entire app die or have to wrap it in an eval
+
+The exception here is the security checks can croak, which is what you want. See L<DIAGNOSTICS> for more info.
 
 =item * A well intentioned output system
 
@@ -76,27 +80,49 @@ It is recursive in the sense that given “foo/bar/baz” as the path to create 
 
 Takes a single path (like L<rmdir>()) to recursively empty and remove.
 
-Returns false if it could not be emptied or removed, true otherwise. (returns ‘2’ if it is !-d already)
+Returns false if it could not be emptied or removed, true otherwise (returns ‘2’ if it is !-d already). Also see L<DIAGNOSTICS>.
 
 It is recursive in the sense that given “/foo/bar/baz” as the path to remove it will recursively empty ‘baz’ and then remove it from /foo/bar.
 
 Its parents, /, /foo, and /foo/bar are *not* touched.
 
+By default it does chdir() for security reasons. If you are sure it is safe to do without that for the sake of a bit of speed you can pass a second true argument to skip that.
+
 =head2 File::Path::Tiny::empty_dir()
 
-Takes a single path to recursively empty  but not remove.
+Takes a single path to recursively empty but not remove.
 
-Returns false when there is a problem.
+Returns false when there is a problem. Also see L<DIAGNOSTICS>.
+
+By default it does chdir() for security reasons. If you are sure it is safe to do without that for the sake of a bit of speed you can pass a second true argument to skip that.
 
 =head2 File::Path::Tiny::mk_parent()
 
 Like mk() but recursively creates the parent. e.g. given “foo/bar/baz.txt” creates foo/bar.
 
+=head2 From Cwd
+
+It uses these internally so, for convenience, these are exposed in case you want to use them also.
+
+=head3 File::Path::Tiny::cwd()
+
+Comes directly from L<Cwd’s cwd()|Cwd/cwd>.
+
+=head3 File::Path::Tiny::chdir()
+
+Comes directly from L<Cwd’s chdir()|Cwd/$ENV{PWD}>.
+
 =head1 DIAGNOSTICS
 
-Throws no warnings or errors of its own
-
 If the functions ever return false, $! will have been set either explicitly or by the L<mkdir>(), L<rmdir>(), L<unlink>(), or L<opendir>() that ultimately returned false.
+
+=over 4
+
+=item C<< directory %s changed: expected dev=%d ino=$d, actual dev=%d ino=%d, aborting >>
+
+empty_dir() and rm() throw this if any of the directories being operated on change during the operation.
+
+=back
 
 =head1 MISC
 
@@ -174,6 +200,10 @@ Even after that it might not be "safe" so you'll need to discern what your parti
 =head1 DEPENDENCIES
 
 L<File::Spec> of course but its only loaded if needed
+
+=head1 SEE ALSO
+
+We already talked about L<File::Path> in the L</DESCRIPTION>. L<Path::Tiny> also offers a mkpath interface but it too has/does things that this module attempts to do without per the L</DESCRIPTION>. Plus its ::Tiny name is a misnomer, see L<Acme::Tiny> for details.
 
 =head1 INCOMPATIBILITIES
 

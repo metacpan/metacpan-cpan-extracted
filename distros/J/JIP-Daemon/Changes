@@ -1,5 +1,17 @@
 Revision history for JIP-Daemon
 
+0.041   2018-01-07
+        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+
+0.04    2018-01-07
+        Added devnull method.
+        Added stdout method.
+        Added stderr method.
+        Added program_name attribute.
+        Added change_program_name method.
+        Increased JIP::ClassField version requirement to 0.05.
+        Improved documentation.
+
 0.03    2015-06-24
         Added on_fork_callback attribute.
         Sub::Util::set_subname() for all callback functions.

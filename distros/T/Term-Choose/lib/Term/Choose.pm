@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.507';
+our $VERSION = '1.509';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -14,9 +14,6 @@ use Term::Choose::Constants qw( :choose );
 use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
 
 no warnings 'utf8';
-#use Log::Log4perl qw( get_logger );
-# #Log::Log4perl::init() called in main::
-#my $log = get_logger( __PACKAGE__ );
 
 my $Plugin_Package;
 
@@ -75,7 +72,6 @@ sub __defaults {
         #no_spacebar => undef,
         order        => 1,
         pad          => 2,
-        #pad_one_row => pad,
         page         => 1,
         undef        => '<undef>',
     };
@@ -88,7 +84,6 @@ sub __undef_to_defaults {
     for my $option ( keys %$defaults ) {
         $self->{$option} = $defaults->{$option} if ! defined $self->{$option};
     }
-    $self->{pad_one_row}  = $self->{pad} if ! defined $self->{pad_one_row};
 }
 
 
@@ -109,7 +104,7 @@ sub __valid_options {
         max_width       => '[ 1-9 ][ 0-9 ]*',
         default         => '[ 0-9 ]+',
         pad             => '[ 0-9 ]+',
-        pad_one_row     => '[ 0-9 ]+',
+        pad_one_row     => '[ 0-9 ]+', # removed ###
         lf              => 'ARRAY',
         mark            => 'ARRAY',
         no_spacebar     => 'ARRAY',
@@ -228,6 +223,16 @@ sub __choose {
     if ( ! @$orig_list_ref ) {
         return;
     }
+
+    # ###
+    if ( defined $self->{pad_one_row} ) {
+        print 'Please remove the invalid option "pad_one_row" (see "Changes"/1.509).' . "\n";
+        print 'Continue with ENTER ';
+        my $p = <STDIN>;
+        print "\n";
+    }
+    # ###
+
     $self->{orig_list} = $orig_list_ref;
     local $\ = undef;
     local $, = undef;
@@ -759,11 +764,11 @@ sub __size_and_layout {
     else {
         $self->{avail_col_width} = $self->{length_longest};
     }
-    my $all_in_first_row;
+    my $all_in_first_row = '';
     if ( $self->{layout} == 0 || $self->{layout} == 1 ) {
         for my $idx ( 0 .. $#{$self->{list}} ) {
             $all_in_first_row .= $self->{list}[$idx];
-            $all_in_first_row .= ' ' x $self->{pad_one_row} if $idx < $#{$self->{list}};
+            $all_in_first_row .= ' ' x $self->{pad} if $idx < $#{$self->{list}};
             if ( $self->__print_columns( $all_in_first_row ) > $self->{avail_width} ) {
                 $all_in_first_row = '';
                 last;
@@ -919,7 +924,7 @@ sub __wr_cell {
             for my $cl ( 0 .. $col - 1 ) {
                 my $i = $self->{rc2idx}[$row][$cl];
                 $lngth += $self->__print_columns( $self->{list}[$i] );
-                $lngth += $self->{pad_one_row};
+                $lngth += $self->{pad};
             }
         }
         $self->__goto( $row - $self->{p_begin}, $lngth );
@@ -1002,7 +1007,6 @@ sub __mouse_info_to_key {
     if ( $mouse_row > $#{$self->{rc2idx}} ) {
         return NEXT_get_key;
     }
-    my $pad = $#{$self->{rc2idx}} == 0 ? $self->{pad_one_row} : $self->{pad};
     my $matched_col;
     my $end_last_col = 0;
     my $row = $mouse_row + $self->{p_begin};
@@ -1011,13 +1015,13 @@ sub __mouse_info_to_key {
         my $end_this_col;
         if ( $#{$self->{rc2idx}} == 0 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $end_this_col = $end_last_col + $self->__print_columns( $self->{list}[$idx] ) + $pad;
+            $end_this_col = $end_last_col + $self->__print_columns( $self->{list}[$idx] ) + $self->{pad};
         }
         else { #
             $end_this_col = $end_last_col + $self->{col_width};
         }
         if ( $col == 0 ) {
-            $end_this_col -= int( $pad / 2 );
+            $end_this_col -= int( $self->{pad} / 2 );
         }
         if ( $col == $#{$self->{rc2idx}[$row]} && $end_this_col > $self->{avail_width} ) {
             $end_this_col = $self->{avail_width};
@@ -1067,7 +1071,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.507
+Version 1.509
 
 =cut
 
@@ -1437,7 +1441,7 @@ From broad to narrow: 0 > 1 > 2 > 3
 
 =head2 lf
 
-If I<prompt> lines are folded the option I<lf> allows to insert spaces at beginning of the folded lines.
+If I<prompt> lines are folded the option I<lf> allows one to insert spaces at beginning of the folded lines.
 
 The option I<lf> expects a reference to an array with one or two elements:
 
@@ -1562,12 +1566,6 @@ Sets the number of whitespaces between columns. (default: 2)
 
 Allowed values: 0 or greater
 
-=head2 pad_one_row
-
-Sets the number of whitespaces between elements if we have only one row. (default: value of the option I<pad>)
-
-Allowed values: 0 or greater
-
 =head2 page
 
 0 - off
@@ -1674,7 +1672,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2017 Matthäus Kiem.
+Copyright (C) 2012-2018 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

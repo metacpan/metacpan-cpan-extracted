@@ -433,7 +433,7 @@ AddressParse was written by Kim Ryan <kimryan at cpan d o t org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2015 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -452,7 +452,7 @@ use Lingua::EN::AddressParse::Grammar;
 use Lingua::EN::NameParse;
 use Parse::RecDescent;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 #------------------------------------------------------------------------------
 # Create a new instance of an address parsing object. This step is time
@@ -464,13 +464,11 @@ sub new
     my %args = @_;
 
 
-    unless (defined $args{country} and $args{country} =~
-            /^(AU|Australia|GB|United Kingdom|US|United States|CA|Canada)$/ )
+    unless (defined $args{country} and $args{country} =~ /^(AU|Australia|GB|United Kingdom|US|United States|CA|Canada)$/ )
     {
-        croak "Cannot start parser. You must specify a value for the country in the options hash.\nValid options are AUS,GB,US or CA.\n";
+        croak "Cannot start parser. You must specify a value for the country in the options hash.\nValid options are AU,GB,US or CA.\n";
     }
-
-
+    
     my $address = {};
     bless($address,$class);
 
@@ -559,12 +557,21 @@ sub components
     my (%cased_components);
     foreach my $curr_key ( keys %orig_components )
     {
-        my $cased_value;
-        my $curr_value = $orig_components{$curr_key};
+        my ($cased_value, $curr_value);
+        
+        if ( $orig_components{$curr_key})
+        {
+            $curr_value = $orig_components{$curr_key};
+        }
+        else
+        {
+            $curr_value = '';
+        }
+                
         
         if ($uc_all)
         {
-             $cased_components{$curr_key} = uc($curr_value);
+            $cased_components{$curr_key} = uc($curr_value);
             next;            
         }
         
@@ -853,19 +860,8 @@ sub _assemble
     {
         $address->{components}{property_identifier} = $parsed_address->{property_identifier};
     }
-
-    $address->{components}{base_street_name} = '';
-    $address->{components}{street_direction_prefix} = '';
-    my ($street_direction,$base_street_name) = _get_street_direction($parsed_address->{street_name});
-    if ($street_direction )
-    {
-        $address->{components}{street_direction_prefix} =  $street_direction;
-        $address->{components}{base_street_name} = $base_street_name;
-    }
-    else
-    {
-        $address->{components}{base_street_name} = $parsed_address->{street_name};
-    }
+    
+    ($address->{components}{street_direction_prefix},$address->{components}{base_street_name}) = _get_street_direction($parsed_address->{street_name});
 
     $address->{components}{street_name} = '';
     $address->{components}{street_type} = '';
@@ -882,7 +878,6 @@ sub _assemble
             $address->{components}{street_type} = $parsed_address->{street_type};
         }
     }
-
 
     $address->{components}{street_direction_suffix} = '';
     if ( $parsed_address->{street_direction_suffix} )
@@ -972,6 +967,16 @@ sub _get_street_direction
             shift(@words);
             $base_street_name = join(' ',@words);
         }
+        else
+        {
+            $street_direction = '';
+            $base_street_name = $street_name;
+            
+        }
+    }
+    else
+    {
+        $base_street_name = $street_name;
     }
     return($street_direction,$base_street_name);
 
@@ -1125,7 +1130,6 @@ sub _clean
         # remove redundant '#'
         $input =~ s/ (APT|SUITE|UNIT) #/ $1 /;
         # still to test
-       
     }
     else
     {
@@ -1183,7 +1187,8 @@ sub _extract_level
     if    
     (
         # Level info could be at start of string so first space is optional
-        $input =~ / ?((FIRST|SECONND|THIRD|FOURTH|FIFTH|SIXTH) (FLOOR|FLR|FL) )/ or      
+        # TO DO, add lower?, mezz, BASEMENT etc?
+        $input =~ / ?((GROUND|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH) (FLOOR|FLR|FL) )/ or      
         $input =~ / ?(\d{1,2}(ST|ND|RD|TH) (FLOOR|FLR|FL) )/ or       
         $input =~ / ?(LEVEL (\d{1,2}|[GM])[\/ -])/ or
         $input =~ / ?((FLOOR|FLR|FL) \d{1,2}[\/ -])/
@@ -1208,12 +1213,12 @@ sub _extract_building
     my ($input) = @_;
     my ($building);
     
-    my $bld = qr{BLOCK|BLDG?|BUILDING|TOWER};
+    my $building_label = qr{BLOCK|BLDG?|BUILDING|TOWER};
     my $id = qr{[A-Z]|A[A-Z]|\d+|\d{1,3}[A-Z]|[A-Z]\d{1,3}}; #  AA or 12  or 32C or C12
     
     if    
     (
-        $input =~ / ($bld $id) / or  $input =~ /^($bld $id) /
+        $input =~ /^($building_label $id) / or $input =~ / ($building_label $id) /
      )
     {
         $building = $1;
@@ -1221,7 +1226,19 @@ sub _extract_building
         $building =~ s|-||;
         $input =~ s/$building//;
     }
-    # TO DO, North, East etc Building?
+    # TO DO, North, East etc Building? 
+    
+    
+    my $name = qr{[A-Z]+}; #
+    my $house;
+    
+    # Allow for x house at start of text only. Not for example: 12 Gate House Road, suburb
+    if ( $input =~  /^(($name )?$name HOUSE) /   )
+    {
+        $house = $1;       
+        $input =~ s/$house//;
+        $building .= $house;
+    }
  
     return($building,$input);
 }
@@ -1269,8 +1286,7 @@ sub _trim_trailing_space
 
 sub _fmt_report_line
 {
-    my ($report_ref,$label,$value) = @_;
-    # To DO $$ ??
+    my ($report_ref,$label,$value) = @_;    
     $$report_ref .= sprintf("%-23.23s '%s'\n",$label,$value);
 }
 #------------------------------------------------------------------------------

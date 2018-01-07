@@ -20,6 +20,10 @@ use Test::More;
         return 42;
     }
 
+    # Simulate a non-glob reference in the symbol table.
+    # 5.27 started doing this.
+    $Phone::{sim_foo} = \42;
+
     export_sims();
 }
 

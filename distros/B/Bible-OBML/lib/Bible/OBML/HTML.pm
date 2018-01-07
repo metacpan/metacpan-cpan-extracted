@@ -7,7 +7,7 @@ use Moose;
 use Template;
 use Bible::OBML;
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 with 'Throwable';
 
@@ -235,7 +235,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.08
+version 1.10
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 

@@ -1,12 +1,12 @@
 package HTML::Latemp::GenMakeHelpers;
-$HTML::Latemp::GenMakeHelpers::VERSION = 'v0.5.2';
+$HTML::Latemp::GenMakeHelpers::VERSION = 'v0.5.3';
 use strict;
 use warnings;
 
 use 5.008;
 
 package HTML::Latemp::GenMakeHelpers::Base;
-$HTML::Latemp::GenMakeHelpers::Base::VERSION = 'v0.5.2';
+$HTML::Latemp::GenMakeHelpers::Base::VERSION = 'v0.5.3';
 sub new
 {
     my $class = shift;
@@ -17,7 +17,7 @@ sub new
 }
 
 package HTML::Latemp::GenMakeHelpers::HostEntry;
-$HTML::Latemp::GenMakeHelpers::HostEntry::VERSION = 'v0.5.2';
+$HTML::Latemp::GenMakeHelpers::HostEntry::VERSION = 'v0.5.3';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 use Class::XSAccessor accessors => {'dest_dir' => 'dest_dir', 'id' => 'id', 'source_dir' => 'source_dir',};
@@ -33,11 +33,11 @@ sub initialize
 }
 
 package HTML::Latemp::GenMakeHelpers::Error;
-$HTML::Latemp::GenMakeHelpers::Error::VERSION = 'v0.5.2';
+$HTML::Latemp::GenMakeHelpers::Error::VERSION = 'v0.5.3';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 package HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile;
-$HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile::VERSION = 'v0.5.2';
+$HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile::VERSION = 'v0.5.3';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Error));
 
 use Class::XSAccessor accessors => {'file' => 'file', 'host' => 'host',};
@@ -344,7 +344,7 @@ X8X_COMMON_DOCS_DEST = \$(patsubst %,\$(X8X_DEST)/%,\$(COMMON_DOCS))
 \$(X8X_TTMLS_DEST) : $h_dest_star : \$(X8X_SRC_DIR)/%.ttml \$(TTMLS_COMMON_DEPS)
 	ttml -o \$@ \$(X8X_TTML_FLAGS) -DLATEMP_FILENAME=\$(patsubst $h_dest_star,%,\$(patsubst %.ttml,%,\$@)) \$<
 
-\$(X8X_DIRS_DEST) : $h_dest_star : unchanged
+\$(X8X_DIRS_DEST) : $h_dest_star :
 	mkdir -p \$@
 	touch \$@
 
@@ -360,11 +360,11 @@ X8X_COMMON_DOCS_DEST = \$(patsubst %,\$(X8X_DEST)/%,\$(COMMON_DOCS))
 \$(X8X_COMMON_DOCS_DEST) : $h_dest_star : \$(COMMON_SRC_DIR)/%.wml \$(DOCS_COMMON_DEPS)
 	$wml_path ; ( cd \$(COMMON_SRC_DIR) && wml -o "\$\${WML_LATEMP_PATH}" \$(X8X_WML_FLAGS) -DLATEMP_FILENAME=\$(patsubst $h_dest_star,%,\$(patsubst %.wml,%,\$@)) \$(patsubst \$(COMMON_SRC_DIR)/%,%,\$<) )
 
-\$(X8X_COMMON_DIRS_DEST)  : $h_dest_star : unchanged
+\$(X8X_COMMON_DIRS_DEST)  : $h_dest_star :
 	mkdir -p \$@
 	touch \$@
 
-\$(X8X_DEST): unchanged
+\$(X8X_DEST):
 	mkdir -p \$@
 	touch \$@
 EOF
@@ -427,7 +427,7 @@ HTML::Latemp::GenMakeHelpers - A Latemp Utility Module.
 
 =head1 VERSION
 
-version v0.5.2
+version v0.5.3
 
 =head1 SYNOPSIS
 

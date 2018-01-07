@@ -3,6 +3,7 @@ package Test::UA;
 use strict;
 use warnings;
 
+use Digest::MD5 qw( md5_hex );
 use HTTP::Response;
 use Path::Tiny qw( path );
 use Test2::Bundle::Extended;
@@ -23,17 +24,21 @@ sub ua {
 
             my $path = $req->uri->path_query;
 
-            my $file = path( 't/fixtures', uri_unescape($path) . '.json' );
+            my $unescaped = uri_unescape($path);
+            for my $file ( map { path( 't/fixtures', $_ . '.json' ) }
+                $unescaped, md5_hex($unescaped) ) {
 
-            return HTTP::Response->new(404)
-                unless $file->exists;
+                next unless $file->exists;
 
-            return HTTP::Response->new(
-                200,
-                undef,
-                [ 'Content-Type' => 'application/json' ],
-                scalar $file->slurp,
-            );
+                return HTTP::Response->new(
+                    200,
+                    undef,
+                    [ 'Content-Type' => 'application/json' ],
+                    scalar $file->slurp,
+                );
+            }
+
+            return HTTP::Response->new(404);
         }
     );
     return $ua;

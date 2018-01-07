@@ -38,6 +38,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Term/Choose.pm',
     EXE_FILES        => [],
     BUILD_REQUIRES   => {
+        'lib'                   => 0,
         'File::Spec::Functions' => 0,
         'FindBin'               => 0,
         'Test::More'            => 0,

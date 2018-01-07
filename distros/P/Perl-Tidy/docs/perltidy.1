@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PERLTIDY 1"
-.TH PERLTIDY 1 "2017-12-14" "perl v5.22.1" "User Contributed Perl Documentation"
+.TH PERLTIDY 1 "2017-12-29" "perl v5.22.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -596,6 +596,9 @@ unstable editing).
 .RE
 .IP "\fB\-syn\fR,   \fB\-\-check\-syntax\fR" 4
 .IX Item "-syn, --check-syntax"
+This flag is now ignored for safety, but the following documentation
+has been retained for reference.
+.Sp
 This flag causes perltidy to run \f(CW\*(C`perl \-c \-T\*(C'\fR to check syntax of input
 and output.  (To change the flags passed to perl, see the next
 item, \fB\-pscf\fR).  The results are written to the \fI.LOG\fR file, which
@@ -1851,7 +1854,104 @@ separately if desired:
 \&  \-ohbr or \-\-opening\-hash\-brace\-right
 \&  \-osbr or \-\-opening\-square\-bracket\-right
 .Ve
-.IP "Vertical tightness of non-block curly braces, parentheses, and square brackets." 4
+.IP "\fB\-wn\fR,  \fB\-\-weld\-nested\-containers\fR" 4
+.IX Item "-wn, --weld-nested-containers"
+The \fB\-wn\fR flag causes closely nested pairs of opening and closing container
+symbols (curly braces, brackets, or parens) to be \*(L"welded\*(R" together, meaning
+that they are treated as if combined into a single unit, with the indentation
+of the innermost code reduced to be as if there were just a single container
+symbol.
+.Sp
+For example:
+.Sp
+.Vb 6
+\&        # default formatting
+\&        do {
+\&            {
+\&                next if $x == $y;    
+\&            }
+\&        } until $x++ > $z;
+\&
+\&        # perltidy \-wn
+\&        do { {
+\&            next if $x == $y;
+\&        } } until $x++ > $z;
+.Ve
+.Sp
+When this flag is set perltidy makes a preliminary pass through the file and
+identifies all nested pairs of containers.  To qualify as a nested pair, the
+closing container symbols must be immediately adjacent. The opening symbols
+must either be adjacent, or, if the outer opening symbol is an opening
+paren, they may be separated by any single non-container symbol or something
+that looks like a function evaluation.
+.Sp
+Any container symbol may serve as both the inner container of one pair and as
+the outer container of an adjacent pair. Consequently, any number of adjacent
+opening or closing symbols may join together in weld.  For example, here are
+three levels of wrapped function calls:
+.Sp
+.Vb 9
+\&        # default formatting
+\&        my (@date_time) = Localtime(
+\&            Date_to_Time(
+\&                Add_Delta_DHMS(
+\&                    $year, $month,  $day, $hour, $minute, $second,
+\&                    \*(Aq0\*(Aq,   $offset, \*(Aq0\*(Aq,  \*(Aq0\*(Aq
+\&                )
+\&            )
+\&        );
+\&
+\&        # perltidy \-wn
+\&        my (@date_time) = Localtime( Date_to_Time( Add_Delta_DHMS(
+\&            $year, $month,  $day, $hour, $minute, $second,
+\&            \*(Aq0\*(Aq,   $offset, \*(Aq0\*(Aq,  \*(Aq0\*(Aq
+\&        ) ) );
+.Ve
+.Sp
+Notice how the indentation of the inner lines are reduced by two levels in this
+case.  This example also shows the typical result of this formatting, namely it
+is a sandwich consisting of an initial opening layer, a central section of any
+complexity forming the \*(L"meat\*(R" of the sandwich, and a final closing layer.  This
+predictable structure helps keep the compacted structure readable.
+.Sp
+Here is an example illustrating a welded container within a welded containers:
+.Sp
+.Vb 11
+\&        # default formatting
+\&        $x\->badd(
+\&            bmul(
+\&                $class\->new(
+\&                    abs(
+\&                        $sx * int( $xr\->numify() ) & $sy * int( $yr\->numify() )
+\&                    )
+\&                ),
+\&                $m
+\&            )
+\&        );
+\&
+\&        # perltidy \-wn
+\&        $x\->badd( bmul(
+\&            $class\->new( abs(
+\&                $sx * int( $xr\->numify() ) & $sy * int( $yr\->numify() )
+\&            ) ),
+\&            $m
+\&        ) );
+.Ve
+.Sp
+Some math and logical expressions can benefit from this option.
+.Sp
+This format option is quite general but there are some limitations.
+.Sp
+One limitiation is that any line length limit still applies and can cause long
+welded sections to be broken into multiple lines.
+.Sp
+Another limitation is that an opening symbol which delimits quoted text cannot
+be included in a welded pair.  This is because quote delimiters are treated
+specially in perltidy.
+.Sp
+Finally, the stacking of containers defined by this flag have priority over
+any other container stacking flags.  This is because any welding is done first.
+.IP "\fBVertical tightness\fR of non-block curly braces, parentheses, and square brackets." 4
 .IX Item "Vertical tightness of non-block curly braces, parentheses, and square brackets."
 These parameters control what shall be called vertical tightness.  Here are the
 main points:
@@ -3312,7 +3412,7 @@ purpose of this rule is to prevent generating confusing filenames such as
 \&\fIperlstyle\fR\|(1), \fIPerl::Tidy\fR\|(3)
 .SH "VERSION"
 .IX Header "VERSION"
-This man page documents perltidy version 20171214.
+This man page documents perltidy version 20180101.
 .SH "BUG REPORTS"
 .IX Header "BUG REPORTS"
 A list of current bugs and issues can be found at the \s-1CPAN\s0 site

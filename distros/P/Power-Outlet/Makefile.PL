@@ -13,6 +13,7 @@ WriteMakefile(
                      'URI'                      => 0, #for Hue
                      'HTTP::Tiny'               => 0, #for Hue
                      'JSON'                     => 0, #for Hue
+                     'Path::Class'              => 0, #for Virtual
                     },
     EXE_FILES    => [
                     qw{

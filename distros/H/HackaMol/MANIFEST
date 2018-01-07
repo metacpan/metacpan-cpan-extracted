@@ -116,6 +116,7 @@ t/lib/bad2.xyz
 t/lib/bad3.xyz
 t/lib/byZ.xyz
 t/lib/byZSym.xyz
+t/lib/head_model_atom.pdb
 t/lib/test.pdbqt
 t/lib/valine.yaml
 t/lib/valine.zmat

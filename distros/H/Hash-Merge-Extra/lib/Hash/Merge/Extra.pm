@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use Hash::Merge qw(_merge_hashes);
 
-our $VERSION = '0.05'; # Don't forget to change in pod below
+our $VERSION = '0.06'; # Don't forget to change in pod below
 
 use constant L_ADDITIVE => {
     'SCALAR' => {
@@ -40,60 +40,6 @@ use constant R_ADDITIVE => {
         'SCALAR' => sub { defined $_[1] ? $_[1] : $_[0] },
         'ARRAY'  => sub { $_[1] },
         'HASH'   => sub { _merge_hashes(@_) },
-    },
-};
-
-use constant L_MERGE_PATCH => {
-    'SCALAR' => {
-        'SCALAR' => sub { $_[0] },
-        'ARRAY'  => sub { $_[0] },
-        'HASH'   => sub { $_[0] },
-    },
-    'ARRAY' => {
-        'SCALAR' => sub { $_[0] },
-        'ARRAY'  => sub { $_[0] },
-        'HASH'   => sub { $_[0] },
-    },
-    'HASH' => {
-        'SCALAR' => sub { $_[0] },
-        'ARRAY'  => sub { $_[0] },
-        'HASH'   => sub {
-            map {
-                unless (defined $_[0]->{$_}) {
-                    delete $_[1]->{$_};
-                    delete $_[0]->{$_}; # also remove (or will be merged)
-                }
-            } keys %{$_[0]};
-
-            _merge_hashes(@_)
-        },
-    },
-};
-
-use constant R_MERGE_PATCH => {
-    'SCALAR' => {
-        'SCALAR' => sub { $_[1] },
-        'ARRAY'  => sub { $_[1] },
-        'HASH'   => sub { $_[1] },
-    },
-    'ARRAY' => {
-        'SCALAR' => sub { $_[1] },
-        'ARRAY'  => sub { $_[1] },
-        'HASH'   => sub { $_[1] },
-    },
-    'HASH' => {
-        'SCALAR' => sub { $_[1] },
-        'ARRAY'  => sub { $_[1] },
-        'HASH'   => sub {
-            map {
-                unless (defined $_[1]->{$_}) {
-                    delete $_[0]->{$_};
-                    delete $_[1]->{$_}; # also remove (or will be merged)
-                }
-            } keys %{$_[1]};
-
-            _merge_hashes(@_)
-        },
     },
 };
 
@@ -170,15 +116,13 @@ use constant R_REPLACE => {
 };
 
 my %INDEX = (
-    L_ADDITIVE              => L_ADDITIVE,
-    L_MERGE_PATCH           => L_MERGE_PATCH,
-    L_OVERRIDE              => L_OVERRIDE,
-    L_REPLACE               => L_REPLACE,
+    L_ADDITIVE      => L_ADDITIVE,
+    L_OVERRIDE      => L_OVERRIDE,
+    L_REPLACE       => L_REPLACE,
 
-    R_ADDITIVE              => R_ADDITIVE,
-    R_MERGE_PATCH           => R_MERGE_PATCH,
-    R_OVERRIDE              => R_OVERRIDE,
-    R_REPLACE               => R_REPLACE,
+    R_ADDITIVE      => R_ADDITIVE,
+    R_OVERRIDE      => R_OVERRIDE,
+    R_REPLACE       => R_REPLACE,
 );
 
 sub import {
@@ -211,7 +155,7 @@ Hash::Merge::Extra - Collection of extra behaviors for L<Hash::Merge>
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -247,13 +191,6 @@ Only specified behaviors registered if list defined:
 Hashes merged, arrays joined, undefined scalars overrided. Left and right
 precedence.
 
-=item B<L_MERGE_PATCH>, B<R_MERGE_PATCH>
-
-JSON Merge Patch (L<rfc7386|https://tools.ietf.org/html/rfc7386>) patch
-behavior for perl structures. Almost the same as C<L_OVERRIDE> and
-C<R_OVERRIDE>, but hash keys with C<undef> values in the patch cause removal of
-existing keys in the main structure. Left and right precedence.
-
 =item B<L_OVERRIDE>, B<R_OVERRIDE>
 
 Hashes merged, arrays and scalars overrided. Left and right precedence.
@@ -280,7 +217,7 @@ L<Hash::Merge>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Michael Samoglyadov.
+Copyright 2017,2018 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

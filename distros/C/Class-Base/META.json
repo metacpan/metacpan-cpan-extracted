@@ -1,10 +1,12 @@
 {
-   "abstract" : "useful base class for other modules",
+   "abstract" : "useful base class for deriving other modules ",
    "author" : [
-      "Andy Wardley <abw@kfs.org>"
+      "Andy Wardley    <abw@kfs.org>",
+      "Gabor Szabo  <gabor@szabgab.com>",
+      "Yanick Champoux <yanick@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -13,40 +15,67 @@
       "version" : "2"
    },
    "name" : "Class-Base",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Clone" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "0.47"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "vars" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Class::Base" : {
+         "file" : "lib/Class/Base.pm",
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Class-Base/issues"
+      },
+      "homepage" : "https://github.com/yanick/Class-Base",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/szabgab/Class-Base",
-         "web" : "https://github.com/szabgab/Class-Base"
+         "url" : "https://github.com/yanick/Class-Base.git",
+         "web" : "https://github.com/yanick/Class-Base"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.09",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Gabor Szabo <szabgab@gmail.com>",
+      "Kent Fredric <kentfredric@gmail.com>",
+      "Nick Morrott <knowledgejunkie@gmail.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
+

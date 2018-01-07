@@ -1,0 +1,52 @@
+NAME
+    App::BIP39Utils - Collection of CLI utilities related to BIP39
+
+VERSION
+    This document describes version 0.002 of App::BIP39Utils (from Perl
+    distribution App-BIP39Utils), released on 2018-01-01.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities related
+    to BIP39:
+
+    *   bip39-mnemonic-to-entropy
+
+    *   entropy-to-bip39-mnemonic
+
+    *   gen-bip39-mnemonic
+
+    Keywords: bitcoin, cryptocurrency, BIP, bitcoin improvement proposal,
+    mnemonic phrase.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BIP39Utils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BIP39Utils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BIP39Utils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://en.bitcoin.it/wiki/Mnemonic_phrase>
+
+    <https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki>
+
+    WordList::EN::BIP39 and BIP39 for the other languages in
+    "WordList::*::BIP39".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

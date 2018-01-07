@@ -1,0 +1,21 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+    pkg_name => 'libasyncns',
+);
+
+share {
+    # http://0pointer.de/lennart/projects/libasyncns/libasyncns-0.8.tar.gz
+    start_url 'http://0pointer.de/lennart/projects/libasyncns';
+    plugin 'Download' => (
+        filter  => qr/^libasyncns-[0-9\.]+\.tar\.gz$/,
+        version => qr/^libasyncns-([0-9\.]+)\.tar\.gz$/,
+    );
+    plugin 'Extract' => 'tar.gz';
+    plugin 'Build::Autoconf';
+    build [
+        '%{configure}',
+        '%{make}',
+        '%{make} install',
+  ];
+};

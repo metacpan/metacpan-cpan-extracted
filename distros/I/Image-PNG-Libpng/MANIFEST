@@ -9,7 +9,6 @@ examples/set-unknown-chunk.pl
 examples/supports.pl
 examples/synopsis.pl
 inc/CheckForLibPng.pm
-inc/Devel/CheckLib.pm
 lib/Image/PNG/Const.pm
 lib/Image/PNG/Libpng.pm
 lib/Image/PNG/Libpng.pod

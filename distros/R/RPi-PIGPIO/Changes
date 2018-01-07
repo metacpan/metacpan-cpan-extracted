@@ -1,5 +1,7 @@
 Revision history for WWW-Session
 
+0.015  2018-01-02
+      Improved error handling for MH-Z14 sensor and prevent infinite loop if the sensor does not send back data
 0.014  2017-04-03
       Improved calculations for DSM501 dust sensor
       POD improvements

@@ -22,7 +22,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Future' => '0.30',
+                                      'Class::Method::Modifiers' => '0',
+                                      'Future' => '0.37',
                                       'IO::Async' => '0',
                                       'List::Util' => '1.29',
                                       'Log::Any' => '1.050',

@@ -2,7 +2,6 @@ Build.PL
 Changes
 lib/Group/Git/Cmd/Todo.pm
 LICENSE
-Makefile.PL
 MANIFEST
 META.json
 META.yml

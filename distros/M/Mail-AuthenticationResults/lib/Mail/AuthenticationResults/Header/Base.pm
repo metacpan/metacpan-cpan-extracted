@@ -1,7 +1,8 @@
 package Mail::AuthenticationResults::Header::Base;
+require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171226'; # VERSION
+our $VERSION = '1.20171230'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use Carp;
 
@@ -10,6 +11,7 @@ use Mail::AuthenticationResults::Header::Group;
 sub HAS_KEY{ return 0; }
 sub HAS_VALUE{ return 0; }
 sub HAS_CHILDREN{ return 0; }
+sub ALLOWED_CHILDREN{ return 0; } # uncoverable statement
 
 sub new {
     my ( $class ) = @_;
@@ -21,9 +23,9 @@ sub new {
 sub set_key {
     my ( $self, $key ) = @_;
     croak 'Does not have key' if ! $self->HAS_KEY();
-    die 'Key cannot be undefined' if ! defined $key;
-    die 'Key cannot be empty' if $key eq q{};
-    die 'Invalid characters in key' if $key =~ /[^a-zA-Z0-9\.\-_]/;
+    croak 'Key cannot be undefined' if ! defined $key;
+    croak 'Key cannot be empty' if $key eq q{};
+    croak 'Invalid characters in key' if $key =~ /"/;
     $self->{ 'key' } = $key;
     return $self;
 }
@@ -37,16 +39,28 @@ sub key {
 sub set_value {
     my ( $self, $value ) = @_;
     croak 'Does not have value' if ! $self->HAS_VALUE();
-    die 'Value cannot be undefined' if ! defined $value;
-    #die 'Value cannot be empty' if $value eq q{};
-    die 'Invalid characters in value' if $value =~ /[\s\t \(\);]/;
+    croak 'Value cannot be undefined' if ! defined $value;
+    #croak 'Value cannot be empty' if $value eq q{};
+    croak 'Invalid characters in value' if $value =~ /"/;
     $self->{ 'value' } = $value;
     return $self;
 }
+
 sub value {
     my ( $self ) = @_;
     croak 'Does not have value' if ! $self->HAS_VALUE();
     return $self->{ 'value' } // q{};
+}
+
+sub stringify {
+    my ( $self, $value ) = @_;
+    my $string = $value // q{};
+
+    if ( $string =~ /[\s\t \(\);]/ ) {
+        $string = '"' . $string . '"';
+    }
+
+    return $string;
 }
 
 sub children {
@@ -58,35 +72,42 @@ sub children {
 sub add_parent {
     my ( $self, $parent ) = @_;
     return if ( ref $parent eq 'Mail::AuthenticationResults::Header::Group' );
-    die 'Child already has a parent' if exists $self->{ 'parent' };
+    croak 'Child already has a parent' if exists $self->{ 'parent' };
+    croak 'Cannot add parent' if ! $parent->ALLOWED_CHILDREN( $self );
     $self->{ 'parent' } = $parent;
     weaken $self->{ 'parent' };
     return;
 }
 
+sub parent {
+    my ( $self ) = @_;
+    return $self->{ 'parent' };
+}
+
 sub add_child {
     my ( $self, $child ) = @_;
     croak 'Does not have children' if ! $self->HAS_CHILDREN();
-
-    my $parent_ref = ref $self;
-    my $child_ref  = ref $child;
-
-    die 'Not a Header object' if ! $child_ref =~ /^Mail::AuthenticationResults::Header/;
-
-    die 'Cannot add a class as its own parent' if refaddr $self == refaddr $child;
-
-    die 'Cannot use base class directly' if $parent_ref eq 'Mail::AuthenticationResults::Header::Base';
-    die 'Cannot use base class directly' if $child_ref  eq 'Mail::AuthenticationResults::Header::Base';
+    croak 'Cannot add child' if ! $self->ALLOWED_CHILDREN( $child );
+    croak 'Cannot add a class as its own parent' if refaddr $self == refaddr $child;
 
     $child->add_parent( $self );
-
     push @{ $self->{ 'children' } }, $child;
+
     return $child;
 }
 
 sub as_string {
     my ( $self ) = @_;
-    my $string = $self->key() . '=' . $self->value();
+    my $string = $self->stringify( $self->key() );
+    if ( $self->value() ) {
+        $string .= '=' . $self->stringify( $self->value() );
+    }
+    else {
+        # We special case none here
+        if ( $self->key() ne 'none' ) {
+             $string .= '=';
+        }
+    }
     if ( $self->HAS_CHILDREN() ) {
         foreach my $child ( @{$self->children()} ) {
             $string .= ' ' . $child->as_string();
@@ -104,7 +125,10 @@ sub search {
 
     if ( exists( $search->{ 'key' } ) ) {
         if ( $self->HAS_KEY() ) {
-            if ( lc $search->{ 'key' } eq lc $self->key() ) {
+            if ( ref $search->{ 'key' } eq 'Regexp' && $self->key() =~ m/$search->{'key'}/ ) {
+                $match = $match && 1;
+            }
+            elsif ( lc $search->{ 'key' } eq lc $self->key() ) {
                 $match = $match && 1;
             }
             else {
@@ -118,7 +142,10 @@ sub search {
 
     if ( exists( $search->{ 'value' } ) ) {
         if ( $self->HAS_VALUE() ) {
-            if ( lc $search->{ 'value' } eq lc $self->value() ) {
+            if ( ref $search->{ 'value' } eq 'Regexp' && $self->value() =~ m/$search->{'value'}/ ) {
+                $match = $match && 1;
+            }
+            elsif ( lc $search->{ 'value' } eq lc $self->value() ) {
                 $match = $match && 1;
             }
             else {
@@ -126,34 +153,16 @@ sub search {
             }
         }
         else {
-            $match = 0;
+            $match = 0; # uncoverable statement
         }
     }
 
     if ( exists( $search->{ 'isa' } ) ) {
-        if ( lc $search->{ 'isa' } eq 'entry' ) {
-            if ( ref $self eq 'Mail::AuthenticationResults::Header::Entry' ) {
-                $match = $match && 1;
-            }
-            else {
-                $match = 0;
-            }
+        if ( lc ref $self eq 'mail::authenticationresults::header::' . lc $search->{ 'isa' } ) {
+            $match = $match && 1;
         }
-        if ( lc $search->{ 'isa' } eq 'subentry' ) {
-            if ( ref $self eq 'Mail::AuthenticationResults::Header::SubEntry' ) {
-                $match = $match && 1;
-            }
-            else {
-                $match = 0;
-            }
-        }
-        if ( lc $search->{ 'isa' } eq 'comment' ) {
-            if ( ref $self eq 'Mail::AuthenticationResults::Header::Comment' ) {
-                $match = $match && 1;
-            }
-            else {
-                $match = 0;
-            }
+        else {
+            $match = 0;
         }
     }
 

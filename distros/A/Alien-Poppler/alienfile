@@ -36,12 +36,27 @@ share {
 		$splash_bitmap->edit_lines(sub {
 			s{\Qpoppler/GfxState.h\E}{GfxState.h}g;
 		});
+
+		# Bug in Poppler v0.61: uses `@CMAKE_INSTALL_LIBDIR@` instead
+		# of either `@CMAKE_INSTALL_FULL_LIBDIR@` or
+		# `${prefix}/@CMAKE_INSTALL_LIBDIR@`.
+		my @pc_cmake_paths = Path::Tiny->new('.')->children(qr/\Q.pc.cmake\E$/);
+		for my $pc_cmake_file (@pc_cmake_paths) {
+			$pc_cmake_file->edit_lines(sub {
+				s[libdir=\@CMAKE_INSTALL_LIBDIR@][libdir=\${prefix}/\@CMAKE_INSTALL_LIBDIR@]g;
+				s[includedir=\@CMAKE_INSTALL_INCLUDEDIR@][includedir=\${prefix}/\@CMAKE_INSTALL_INCLUDEDIR@]g;
+			});
+		}
+
 	};
 
-	plugin 'Build::Autoconf' => ();
 	build [
-		[ '%{configure} --enable-xpdf-headers' ],
-		[ '%{gmake}' ], # , 'V=1'
+		[ 'cmake', qw(-G), 'Unix Makefiles',
+			'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+			'-DENABLE_XPDF_HEADERS=ON',
+			( '-DENABLE_GLIB=OFF' )x!!( $^O eq 'darwin' ),
+			'.' ],
+		[ '%{gmake}' ],
 		[ '%{gmake}', 'install' ],
 	];
 

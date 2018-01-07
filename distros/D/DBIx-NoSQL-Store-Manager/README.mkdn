@@ -4,29 +4,31 @@ DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store
 
 # VERSION
 
-version 0.2.2
+version 1.0.0
 
 # SYNOPSIS
 
-    package MyStore;
+```perl
+package MyStore;
 
-    use Moose;
+use Moose;
 
-    extends 'DBIx::NoSQL::Store::Manager';
+extends 'DBIx::NoSQL::Store::Manager';
 
-    __PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
+```
 
 # DESCRIPTION
 
-Just like [DBIx::NoSQL](http://search.cpan.org/perldoc?DBIx::NoSQL) is a layer providing the
-flexibility of a NoSQL store on top of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class), _DBIx::NoSQL::Store::Manager_
-provides a mechanism to drop and retrieve [Moose](http://search.cpan.org/perldoc?Moose) objects from that store.
+Just like [DBIx::NoSQL](https://metacpan.org/pod/DBIx::NoSQL) is a layer providing the
+flexibility of a NoSQL store on top of [DBIx::Class](https://metacpan.org/pod/DBIx::Class), _DBIx::NoSQL::Store::Manager_
+provides a mechanism to drop and retrieve [Moose](https://metacpan.org/pod/Moose) objects from that store.
 
-As can be seen in the ["SYNOPSIS"](#SYNOPSIS), the store class itself is typically fairly
-bare; most of the work is done by [DBIx::NoSQL::Store::Manager::Model](http://search.cpan.org/perldoc?DBIx::NoSQL::Store::Manager::Model), the
+As can be seen in the ["SYNOPSIS"](#synopsis), the store class itself is typically fairly
+bare; most of the work is done by [DBIx::NoSQL::Store::Manager::Model](https://metacpan.org/pod/DBIx::NoSQL::Store::Manager::Model), the
 role the models (i.e., the classes to be stored in the database) must consume.
 
-_DBIx::NoSQL::Store::Manager_ extends [DBIx::NoSQL](http://search.cpan.org/perldoc?DBIx::NoSQL) and inherits all its
+_DBIx::NoSQL::Store::Manager_ extends [DBIx::NoSQL](https://metacpan.org/pod/DBIx::NoSQL) and inherits all its
 methods.
 
 # METHODS
@@ -40,25 +42,25 @@ Creates a new store manager.
 - models => \\@classes
 - models => $class
 
-Classes to be imported as models for the store. Namespaces can also be given
-with a trailing `::`, in which case all modules found under that namespace
-will be imported.  If only one class is to be used, it can be passed as a
-single string.
+    Classes to be imported as models for the store. Namespaces can also be given
+    with a trailing `::`, in which case all modules found under that namespace
+    will be imported.  If only one class is to be used, it can be passed as a
+    single string.
 
-If not given, defaults
-to the `Model` sub-namespace under the store's (e.g., for store
-class `MyStore`, that would be `MyStore::Model::`). 
+    If not given, defaults
+    to the `Model` sub-namespace under the store's (e.g., for store
+    class `MyStore`, that would be `MyStore::Model::`). 
 
+    ```perl
     my $store = MyStore->new; 
         # will import MyStore::Model::*
-    
 
     my $store = MyStore->new( models => [ 'Foo::Bar', 'Something::Else' ] );
         # imports specific classes
         
-
     my $store = MyStore->new( models => [ 'Foo::Bar', 'MyStore::Model::' ] );
         # imports Foo::Bar and all classes under MyStore::Model::*
+    ```
 
 ## model\_names()
 
@@ -72,14 +74,24 @@ Returns the full class name of all models known to the store.
 
 Returns the full class name of the given model.
 
-## create( $model\_name, @args )
-
 ## new\_model\_object( $model\_name, @args )
 
 Shortcut constructor for a model class of the store. Equivalent to
 
-    my $class = $store->model_class( $model_name );
-    my $thingy = $class->new( store_db => $store, @args );
+```perl
+my $class = $store->model_class( $model_name );
+my $thingy = $class->new( store_db => $store, @args );
+```
+
+## create( $model, @args )
+
+Create a new model object and save it. Morally equivalent to
+
+```
+$store->new_model_object( $model, @args )->save;
+```
+
+Returns the new object.
 
 # SEE ALSO
 
@@ -87,17 +99,17 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 ## Similar Modules
 
-\* [KiokuDB](http://search.cpan.org/perldoc?KiokuDB)
+\* [KiokuDB](https://metacpan.org/pod/KiokuDB)
 
-\* [Elastic::Model](http://search.cpan.org/perldoc?Elastic::Model)
+\* [Elastic::Model](https://metacpan.org/pod/Elastic::Model)
 
 # AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

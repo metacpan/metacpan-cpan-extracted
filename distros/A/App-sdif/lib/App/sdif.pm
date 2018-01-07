@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "3.4.1";
+our $VERSION = "4.2.0";
 
 1;
 
@@ -38,19 +38,27 @@ with visual effect to emphasize modified part.
 
 See individual manual of each command for detail.
 
+=head1 INSTALL
+
+=head2 CPANM
+
+    $ cpanm App::sdif
+
 =head1 SEE ALSO
 
 L<sdif>, L<cdif>, L<watchdiff>
 
 =head1 LICENSE
 
-Copyright (C) Kaz Utashiro.
+Copyright (C) Kazumasa Utashiro.
 
 These commands and libraries are free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Kaz Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro
 
 =cut
+
+#  LocalWords:  sdif cdif watchdiff diff CPANM cpanm Kaz Utashiro

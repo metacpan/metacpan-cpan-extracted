@@ -1,3 +1,26 @@
+0.004 2018-01-06 00:45:10-0600
+
+  Features
+
+   - Retrieves and parses PDF objects from mutool output
+
+     Connects with <https://github.com/project-renard/curie/issues/13>.
+
+     See <https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool/pull/3>.
+
+   - Update stext parsing for the MuPDF v1.12.0 output.
+
+     See <https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool/pull/6>.
+
+  Refactoring
+   - Update to use the split Renard-Incunabula distributions.
+
+     See
+
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool/pull/6>.
+
+
 0.003 2017-07-11 23:17:21-0500
   - Split off from Renard-Curie-0.002.
 

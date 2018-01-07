@@ -16,55 +16,56 @@ Hash: SHA1
 
 SHA1 73eb912df1015125f3dab924fe1a08dac9c19b42 AUTHOR_PLEDGE
 SHA1 838bd7e3fd5e3090a692d40756cd45bca03026f1 CONTRIBUTORS
-SHA1 02a5763290a2e92e59d052ea0625ff4646ec5044 Changes
+SHA1 df90837cfa55c9ba3b390d1b5c0414561cb4f7ea Changes
 SHA1 0bfe79bd93599e55e7f8376f63d1def302273e68 INSTALL
 SHA1 96d23fd0d5fce92a90b5c6cce7a1d10dc7f7afe8 LICENSE
-SHA1 60426b50c7aac71949503d949b70064de71a2e64 MANIFEST
-SHA1 8e8072ee6b4f96d28afe4229603401144a73563b META.json
-SHA1 4058f3557158389f4b723db535de5c48cd8e592d META.yml
-SHA1 c9c24da51433fd781132723c005fc05bf3a8426f Makefile.PL
-SHA1 d54ca2a5a689ff78ee6080d93c915340214d5968 README.mkdn
+SHA1 e301fdd51d8b8e41996fe24777679f565ca31919 MANIFEST
+SHA1 518359c8943f4385bc1dfa91294a90d193a39ed6 META.json
+SHA1 838c7b5c6d364d50ec6d764bc790d93f90bd5a20 META.yml
+SHA1 1b0ed4d21f7251b56cdaa21731511a9fe3dc9ea4 Makefile.PL
+SHA1 8bf2de9ed727d4e39578c3669662421048af5cfa README.mkdn
 SHA1 01860079805cfc5b3ae577543c9ad90e7f7a542a TODO
-SHA1 115d512ba352501944af521edddd1036f3560d56 bin/task-kusarigama
-SHA1 7ec65d24655b55fc4fa07edd39caf04fd8c1014a cpanfile
-SHA1 0b0311b6435fe7576ee47d67e790484380e5ed9e doap.xml
-SHA1 8fcbbf4457fc166db79c2a8660b17ed6634489ac lib/Taskwarrior/Kusarigama.pm
-SHA1 87fd1fe65d85e55f018f155bcda3bb711bb05680 lib/Taskwarrior/Kusarigama/App.pm
-SHA1 b77845ec4f146584456cb77bbdad252bfced05d7 lib/Taskwarrior/Kusarigama/App/Add.pm
-SHA1 d561f59308cbea200c3289c69e11fc0bd4b728a7 lib/Taskwarrior/Kusarigama/App/Decimate.pm
-SHA1 2862615e6f1414e32c27dde23157e69810e0b89b lib/Taskwarrior/Kusarigama/App/Install.pm
-SHA1 81179d369b54196828ffa2869c29e770cb63847c lib/Taskwarrior/Kusarigama/App/Review.pm
-SHA1 f9bd9050bd69d4cb59171b111bbac3bfed9b7551 lib/Taskwarrior/Kusarigama/Core.pm
-SHA1 a3cf77427bf1d7dec1023ca81ba100a449db9f1b lib/Taskwarrior/Kusarigama/Hook.pm
-SHA1 908d831e15701be2b69fbea7a6e5e2cf8f164fd3 lib/Taskwarrior/Kusarigama/Hook/OnAdd.pm
-SHA1 fdee6ed374ccb3ed7d6332781cff8b8978b89560 lib/Taskwarrior/Kusarigama/Hook/OnCommand.pm
-SHA1 b34cd5c302de9bc83bb66c000d1cd7bc390d5ddf lib/Taskwarrior/Kusarigama/Hook/OnExit.pm
-SHA1 ea32d34f367e427d845d039e7f30450f98b25eb2 lib/Taskwarrior/Kusarigama/Hook/OnLaunch.pm
-SHA1 9d511306c1fb3503231cdeb29efa31221a2d6a25 lib/Taskwarrior/Kusarigama/Hook/OnModify.pm
-SHA1 40d41d6b925d6758b68a747aa19b03e6c18136e7 lib/Taskwarrior/Kusarigama/Plugin.pm
-SHA1 afba4a12b568b0801fc3443e239f292087288e8d lib/Taskwarrior/Kusarigama/Plugin/Command/AndAfter.pm
-SHA1 6792892c02bd461b5373673bd85ea2ffa3f7c7f3 lib/Taskwarrior/Kusarigama/Plugin/Command/ButBefore.pm
-SHA1 4a94eaa3d57ad132607a2742f93380334237ce44 lib/Taskwarrior/Kusarigama/Plugin/Command/Morning.pm
-SHA1 682290887e8b1071a6d64b7d3bca83b13b6c45de lib/Taskwarrior/Kusarigama/Plugin/Command/Progress.pm
-SHA1 7b2306d8bab81b5c83be26df259a20a49ac9eddd lib/Taskwarrior/Kusarigama/Plugin/Command/Wait.pm
-SHA1 d00c72274a30339a4b65dda793651cfdb5722000 lib/Taskwarrior/Kusarigama/Plugin/GitCommit.pm
-SHA1 91d4d4f0d6043892122aedb1d909bf92b44cb3b3 lib/Taskwarrior/Kusarigama/Plugin/ProjectAlias.pm
-SHA1 894c9abe30091d02df6b4f215bb2cd472d26d98c lib/Taskwarrior/Kusarigama/Plugin/Renew.pm
-SHA1 4b1837da242305c99f211917e1ef70e17b2c3e57 lib/Taskwarrior/Kusarigama/Plugin/SingleActive.pm
-SHA1 baacef12cd436c40c85bc6bf9513e8412e52d795 lib/Taskwarrior/Kusarigama/Task.pm
-SHA1 80b674f0b0da82edaa85a69f7de176dfd7d5afee lib/Taskwarrior/Kusarigama/Wrapper.pm
-SHA1 be20c0628a9545b7a4d311cc13fc44ef0513cd66 lib/Taskwarrior/Kusarigama/Wrapper/Exception.pm
+SHA1 7d99a1987664267624ee81c494c6274fc342c7d7 bin/task-kusarigama
+SHA1 8e0185932db1433c7df44f40353738cb00ecb73c cpanfile
+SHA1 28aa5c1fc3d5aea678e55b6d6dd693ace3859ba9 doap.xml
+SHA1 99f7f1cdee7b3beaf70941f2d8c90c4e2dbb7497 lib/Taskwarrior/Kusarigama.pm
+SHA1 862fbc9c1d1096644075262411cb65fe928ac39d lib/Taskwarrior/Kusarigama/App.pm
+SHA1 b1e50681bf35f06555a4a25f99069a201ec9cef9 lib/Taskwarrior/Kusarigama/App/Add.pm
+SHA1 bea5837fd2f50637d4cd0bed7b216207ac87f057 lib/Taskwarrior/Kusarigama/App/Decimate.pm
+SHA1 53ad51dc59ef2c1f9d137e95f3e077c94b04a33e lib/Taskwarrior/Kusarigama/App/Install.pm
+SHA1 245b31f4e2147be60dbddd927062e5886cb01019 lib/Taskwarrior/Kusarigama/App/Review.pm
+SHA1 4d721a47ae697faf1df6191c37ffcf9e73367668 lib/Taskwarrior/Kusarigama/Core.pm
+SHA1 fa9e6d351e239f29004ae7ada71a7f7bf7869e75 lib/Taskwarrior/Kusarigama/Hook.pm
+SHA1 91527c37dec1939ab75ebee15af1ea63fc68aa81 lib/Taskwarrior/Kusarigama/Hook/OnAdd.pm
+SHA1 01fbd4c099ffd46a0033969ba6e1f7fa4b34d389 lib/Taskwarrior/Kusarigama/Hook/OnCommand.pm
+SHA1 6a42296d9a5bdff36b878a81818bc61be278fbcf lib/Taskwarrior/Kusarigama/Hook/OnExit.pm
+SHA1 3f541137d5cf8b89148c375fdb50466e1cf79ee2 lib/Taskwarrior/Kusarigama/Hook/OnLaunch.pm
+SHA1 66d741f8fd59755951bf4d2521af72f5b2b4c47d lib/Taskwarrior/Kusarigama/Hook/OnModify.pm
+SHA1 af8a4b540773230592ace7bedbbe783e60e18800 lib/Taskwarrior/Kusarigama/Plugin.pm
+SHA1 57376a97f7277bc41f65565e820d5dc82d90a185 lib/Taskwarrior/Kusarigama/Plugin/Command/AndAfter.pm
+SHA1 ea656012b665f6278dbb950a98d54a3cc2b2b8dc lib/Taskwarrior/Kusarigama/Plugin/Command/ButBefore.pm
+SHA1 eae043e11742b014274305fe8e59b43a6860df58 lib/Taskwarrior/Kusarigama/Plugin/Command/Morning.pm
+SHA1 f1eeadf41b8a73c680258660286a9cf53d0bb0a3 lib/Taskwarrior/Kusarigama/Plugin/Command/Open.pm
+SHA1 c33614d02aa861bc8260beb84f6ab14ef57d67f9 lib/Taskwarrior/Kusarigama/Plugin/Command/Progress.pm
+SHA1 ee3f81cab19601968e4a98353a437c457af2af65 lib/Taskwarrior/Kusarigama/Plugin/Command/Wait.pm
+SHA1 3b027870ce26d04d515154fcff6d450366d2fb45 lib/Taskwarrior/Kusarigama/Plugin/GitCommit.pm
+SHA1 65b857cbf3fc05feb38f1935869c9c1d982935ba lib/Taskwarrior/Kusarigama/Plugin/ProjectAlias.pm
+SHA1 b005f97edf3de23408d07059377d3f5172696df5 lib/Taskwarrior/Kusarigama/Plugin/Renew.pm
+SHA1 7af268959b9d80b09e4d05bd91190f2359ebdc0d lib/Taskwarrior/Kusarigama/Plugin/SingleActive.pm
+SHA1 a11605133d31f56794bec91a66f19b6de5dbfd91 lib/Taskwarrior/Kusarigama/Task.pm
+SHA1 9c553ca04b87aa8ea5325e0faedb6e61b1fe362b lib/Taskwarrior/Kusarigama/Wrapper.pm
+SHA1 178c2ba2785c2619f526ac1c17e831fc3313c73e lib/Taskwarrior/Kusarigama/Wrapper/Exception.pm
 SHA1 8508688b8192c9cbacc13db661e256b213e378fe misc/autocomplete.fish
 SHA1 f87d5211e96f2c14b913ba75c3806c469a01a4a1 misc/graph.pl
-SHA1 4527ee0a69376a828095758e5eb2f3e0e29c9998 t/00-compile.t
-SHA1 d14d293ced92507aa47fa346c7307affa9722028 t/00-report-prereqs.dd
+SHA1 88aaf391a86efd081a81214532baaeec0da11a0d t/00-compile.t
+SHA1 fbf1019beb69a9b4dc1b20dc530974ce228d2d40 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 4789b949a43248a363532c46845092d5bdf38f28 t/task.t
 SHA1 11b1e92a440fefac70a6d5922e74dd762a81f2e1 t/wrapper.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAloYYT8ACgkQ34Hwf+GwC4w7lgCfROuntp8tpjss39WpCZTryQ7k
-5FwAn1yf4sDBIFoLSYmxfrJWdi3P6rTQ
-=ShKp
+iEYEARECAAYFAlpJbbAACgkQ34Hwf+GwC4xRLwCg8b+BKd7ys6rWmgT1GO6E/kDI
+n9IAnjuIr3Qso9irgqqGyOH61sJ1UohK
+=ZvZU
 -----END PGP SIGNATURE-----

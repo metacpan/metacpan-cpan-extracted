@@ -154,7 +154,7 @@ sub _parse_body_and_directives {
 
     my $in_meta = 1;
     my ($lastdirective, %directives, @body);
-
+    my @directives_array;
   RAWLINE:
     while (my $line = <$fh>) {
         # EOL
@@ -170,7 +170,7 @@ sub _parse_body_and_directives {
             if ($line =~ m/^\s*$/s) {
                 $lastdirective = undef;
             } elsif ($line =~ m/^\#([A-Za-z0-9_-]+)(\s+(.+))?$/s) {
-                my ($dir, $material) = ($1, $2);
+                my ($dir, $material) = ($1, $3);
 
                 # remove underscore and dashes from directive names to
                 # keep compatibility with Emacs Muse, so e.g.
@@ -179,10 +179,10 @@ sub _parse_body_and_directives {
 
                 $dir =~ s/[_-]//g;
                 unless (length($dir)) {
-                    warn "Found empty directive $line, it will be removed\n";
+                    warn "$file: Found empty directive $line, it will be removed\n";
                 }
                 if (exists $directives{$dir}) {
-                    warn "Overwriting directive '$dir' $directives{$dir} with $line\n";
+                    warn "$file: Overwriting directive '$dir' $directives{$dir} with $line\n";
                 }
                 if (defined $material) {
                     $directives{$dir} = $material;
@@ -190,9 +190,12 @@ sub _parse_body_and_directives {
                 else {
                     $directives{$dir} = '';
                 }
+                push @directives_array, [ $dir, $directives{$dir} ];
+
                 $lastdirective = $dir;
             } elsif ($lastdirective) {
                 $directives{$lastdirective} .= $line;
+                $directives_array[-1][1] .= $line;
             } else {
                 $in_meta = 0
             }
@@ -219,14 +222,15 @@ sub _parse_body_and_directives {
         $directives{$key} =~ s/\s+\z//gs;
         $directives{$key} =~ s/\A\s+//gs;
     }
-    return (\%directives, \@body);
+    return (\%directives, \@body, \@directives_array);
 }
 
 sub _split_body_and_directives {
     my $self = shift;
-    my ($directives, $body) = $self->_parse_body_and_directives;
+    my ($directives, $body, $dir_array) = $self->_parse_body_and_directives;
     $self->{raw_body}   = $body;
     $self->{raw_header} = $directives;
+    $self->{directives_array} = $dir_array;
 }
 
 =head3 raw_header
@@ -249,6 +253,11 @@ sub raw_header {
 Accessor to the raw body of the muse file. The body is returned as a
 list of lines.
 
+=head3 directives_array
+
+This is very similar to raw_header, but store them in an array, so the
+header can be rewritten.
+
 =cut
 
 sub raw_body {
@@ -257,6 +266,14 @@ sub raw_body {
         $self->_split_body_and_directives;
     }
     return @{$self->{raw_body}}
+}
+
+sub directives_array {
+    my $self = shift;
+    unless (defined $self->{directives_array}) {
+        $self->_split_body_and_directives;
+    }
+    return @{$self->{directives_array}}
 }
 
 sub _parse_body {

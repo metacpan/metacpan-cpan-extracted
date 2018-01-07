@@ -1,0 +1,72 @@
+{
+   "abstract" : "Galois Fields arithmetics",
+   "author" : [
+      "Flavio Poletti <polettix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-GF",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Path::Tiny" : "0.096",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Polynomial" : "1.014",
+            "Moo" : "2.003002",
+            "Ouch" : "0.0410",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.096",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/Math-GF/issues"
+      },
+      "homepage" : "https://github.com/polettix/Math-GF",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/polettix/Math-GF.git",
+         "web" : "https://github.com/polettix/Math-GF"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ]
+}
+

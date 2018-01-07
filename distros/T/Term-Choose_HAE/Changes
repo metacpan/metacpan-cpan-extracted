@@ -1,6 +1,10 @@
 Revision history for Term::Choose_HAE
 
 
+0.052   2018-01-04
+        - Fixed wrong key name: row_on_top -> p_begin.
+        - Removed option "pad_one_row".
+
 0.051   2016-08-14
         - "Term::Choose": minimum version "1.505".
 

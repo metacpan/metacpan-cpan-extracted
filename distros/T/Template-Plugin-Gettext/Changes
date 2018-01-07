@@ -1,2 +1,10 @@
+0.3  2018-01-02
+        - New option '--plug-in' allows overriding the plug-in name,
+          see (https://github.com/gflohr/Template-Plugin-Gettext/issues/1)
+
+0.2  2017-12-31
+        - Extract nested method invocations.
+        - Remember all files using a certain textdomain.
+
 0.1 2017-09-10
         - Initial version.

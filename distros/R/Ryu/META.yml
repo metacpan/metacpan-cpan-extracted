@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu/issues
   repository: git://github.com/team-at-cpan/Ryu.git
-version: '0.026'
+version: '0.027'
 x_serialization_backend: 'YAML::Tiny version 1.70'

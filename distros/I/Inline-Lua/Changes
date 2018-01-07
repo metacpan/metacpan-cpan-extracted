@@ -1,5 +1,11 @@
 Revision history for Perl extension Inline::Lua.
 
+0.14 January 01 2018
+        - Add missing dependencies
+
+0.13 December 28 2017
+        - Allow additional PERL_MM_OPT customizations (thanks, Andy Beverley!)
+
 0.12 June 23 2016
         - Remove references to table.foreach from documentation
         - Allow PERL_MM_OPT to work with Makefile.PL

@@ -1,0 +1,7 @@
+alienfile
+lib/Alien/SLOCCount.pm
+Makefile.PL
+MANIFEST			This list of files
+t/alien_sloccount.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

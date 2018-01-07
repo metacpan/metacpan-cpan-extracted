@@ -6,7 +6,7 @@
                                                           
 
 
-This is the README for HTML::Valid version 0.06.
+This is the README for HTML::Valid version 0.07.
 
 HTML::Valid is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -62,11 +62,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm HTML::Valid
 
-To install the module from the source file, HTML-Valid-0.06.tar.gz, follow
+To install the module from the source file, HTML-Valid-0.07.tar.gz, follow
 this sequence of commands:
 
-    tar xfz HTML-Valid-0.06.tar.gz
-    cd HTML-Valid-0.06
+    tar xfz HTML-Valid-0.07.tar.gz
+    cd HTML-Valid-0.07
     perl Makefile.PL
     make
     make install
@@ -91,6 +91,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Mar  2 14:23:54 2017.
+This README was written on Sat Dec 30 13:43:37 2017.
 
 -----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 package App::CreateAcmeCPANListsImportModules;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2018-01-01'; # DATE
+our $VERSION = '0.080'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,6 +61,14 @@ be fairly recent.
 
 _
         },
+        typos => {
+            summary => 'Module names that should be replaced by their fixed spellings',
+            schema => 'hash*',
+        },
+        ignore_empty => {
+            summary => 'If set to true, will not create if there are no extracte module names found',
+            schema => 'bool',
+        },
     },
 };
 sub create_acme_cpanlists_import_modules {
@@ -86,6 +94,7 @@ sub create_acme_cpanlists_import_modules {
     my $now = time();
 
     my %names;
+  AC_MOD:
     for my $ac_mod (@$ac_modules) {
         log_info("Processing %s ...", $ac_mod->{name});
 
@@ -124,6 +133,10 @@ sub create_acme_cpanlists_import_modules {
 
             log_debug("Extracted module names: %s", $mods0);
             for my $m (@$mods0) {
+                if ($args{typos} && $args{typos}{$m}) {
+                    log_info("Replacing typo %s with fixed spelling %s", $m, $args{typos}{$m});
+                    $m = $args{typos}{$m};
+                }
                 push @$mods, $m unless grep { $m eq $_ } @$mods;
             }
         } # for each extract url
@@ -154,7 +167,14 @@ sub create_acme_cpanlists_import_modules {
 
         push @$mods, @{$ac_mod->{add_modules}} if $ac_mod->{add_modules};
 
-        return [412, "No module names found for $ac_mod->{name}"] unless @$mods;
+        unless (@$mods) {
+            if ($args{ignore_empty}) {
+                log_info("No module names found for $ac_mod->{name}, skipped");
+                next AC_MOD;
+            } else {
+                return [412, "No module names found for $ac_mod->{name}"];
+            }
+        }
 
         (my $ac_module_path = "$dist_dir/lib/$namespace_pm/$ac_mod->{name}.pm") =~ s!::!/!g;
 
@@ -206,7 +226,7 @@ App::CreateAcmeCPANListsImportModules - Create Acme::CPANLists::Import::* module
 
 =head1 VERSION
 
-This document describes version 0.07 of App::CreateAcmeCPANListsImportModules (from Perl distribution App-CreateAcmeCPANListsImportModules), released on 2017-07-08.
+This document describes version 0.080 of App::CreateAcmeCPANListsImportModules (from Perl distribution App-CreateAcmeCPANListsImportModules), released on 2018-01-01.
 
 =head1 FUNCTIONS
 
@@ -241,9 +261,17 @@ Consult local CPAN index and exclude module entries that are not indexed on CPAN
 This requires C<App::lcpan> to be installed and a local CPAN index to exist and
 be fairly recent.
 
+=item * B<ignore_empty> => I<bool>
+
+If set to true, will not create if there are no extracte module names found.
+
 =item * B<modules>* => I<array[hash]>
 
 =item * B<namespace>* => I<str>
+
+=item * B<typos> => I<hash>
+
+Module names that should be replaced by their fixed spellings.
 
 =item * B<user_agent> => I<str>
 
@@ -300,7 +328,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

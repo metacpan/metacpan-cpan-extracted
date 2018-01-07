@@ -1,5 +1,8 @@
 Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
 
+0.10 Fri Dec 29 21:30:37 EST 2017
+    - Die in Makefile.PL if on Windows.
+
 0.09 Fri Dec 22 11:22:48 EST 2017
     - Implement better syntax for path to perl executable, as suggested by
       Andreas Koenig.

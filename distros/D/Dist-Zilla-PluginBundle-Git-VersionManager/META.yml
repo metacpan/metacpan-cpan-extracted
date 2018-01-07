@@ -3,6 +3,8 @@ abstract: 'A plugin bundle that manages your version in git'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
+  CPAN::Meta::Check: '0.011'
+  CPAN::Meta::Requirements: '0'
   Exporter: '0'
   File::Spec: '0'
   JSON::MaybeXS: '0'
@@ -42,10 +44,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MetaProvides::Update:
     file: lib/Dist/Zilla/Plugin/MetaProvides/Update.pm
-    version: '0.003'
+    version: '0.004'
   Dist::Zilla::PluginBundle::Git::VersionManager:
     file: lib/Dist/Zilla/PluginBundle/Git/VersionManager.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   CPAN::Meta::Requirements: '0'
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.016'
@@ -77,7 +79,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Git-VersionManager
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.027006'
@@ -188,7 +190,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::ETHER/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -258,7 +260,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::Test::Pod::No404s
       name: '@Author::ETHER/Test::Pod::No404s'
@@ -699,7 +701,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.002'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -739,7 +741,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
+          tag: v0.004
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -773,7 +775,9 @@ x_Dist_Zilla:
           commit_msg: 'increment $VERSION after %v release'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - Build.PL
             - Changes
+            - Makefile.PL
           allow_dirty_match:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
@@ -784,14 +788,6 @@ x_Dist_Zilla:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
       version: '2.043'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: suggests
-      name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
-      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -866,6 +862,10 @@ x_Dist_Zilla:
       name: MetaResources
       version: '6.010'
     -
+      class: Dist::Zilla::Plugin::Breaks
+      name: Breaks
+      version: '0.004'
+    -
       class: Dist::Zilla::Plugin::Test::CheckBreaks
       config:
         Dist::Zilla::Plugin::Test::CheckBreaks:
@@ -928,6 +928,8 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.010'
 x_authority: cpan:ETHER
+x_breaks:
+  Dist::Zilla::PluginBundle::Author::ETHER: '<= 0.132'
 x_serialization_backend: 'YAML::Tiny version 1.72'
 x_static_install: 1
 x_use_unsafe_inc: 0

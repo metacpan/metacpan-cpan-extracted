@@ -45,11 +45,11 @@
    "provides" : {
       "WWW::Google::KnowledgeGraphSearch" : {
          "file" : "lib/WWW/Google/KnowledgeGraphSearch.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "WWW::Google::KnowledgeGraphSearch::Result" : {
          "file" : "lib/WWW/Google/KnowledgeGraphSearch/Result.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/manwar/WWW-Google-KnowledgeGraphSearch"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

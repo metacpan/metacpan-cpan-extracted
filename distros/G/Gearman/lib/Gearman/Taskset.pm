@@ -1,6 +1,6 @@
 package Gearman::Taskset;
 use version ();
-$Gearman::Taskset::VERSION = version->declare("2.004.011");
+$Gearman::Taskset::VERSION = version->declare("2.004.012");
 
 use strict;
 use warnings;
@@ -211,10 +211,16 @@ everything has finished running or failing.
 
 sub wait {
     my ($self, %opts) = @_;
-    my $timeout;
+    my ($timeout, $given_timeout_s);
     if (exists $opts{timeout}) {
         $timeout = delete $opts{timeout};
-        $timeout += Time::HiRes::time() if defined $timeout;
+        if (defined $timeout) {
+            ## keep the given timeout value for the failure reason
+            #  Handles issue #35
+            #  https://github.com/p-alik/perl-Gearman/issues/35
+            $given_timeout_s = $timeout;
+            $timeout += Time::HiRes::time();
+        }
     }
 
     Carp::carp "Unknown options: "
@@ -270,7 +276,10 @@ sub wait {
             for (values %{ $self->{waiting} }) {
                 for (@$_) {
                     my $func = $_->func;
-                    $_->fail("Task $func elapsed timeout [${timeout}s]");
+                    ## use the given timeout here
+                    #  Handles issue #35
+                    #  https://github.com/p-alik/perl-Gearman/issues/35
+                    $_->fail("Task $func elapsed timeout [${given_timeout_s}s]");
                 }
             } ## end for (values %{ $self->{...}})
             $self->cancel;

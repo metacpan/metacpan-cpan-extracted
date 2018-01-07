@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::ExceptionHandler;
 # ABSTRACT: A role for handling exceptions
-$Renard::Curie::Component::MainWindow::Role::ExceptionHandler::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::Role::ExceptionHandler::VERSION = '0.004';
 use Moo::Role;
 use Gtk3;
 use Glib 'TRUE', 'FALSE';
@@ -14,7 +14,7 @@ has _exception_handler => (
 
 method _build__exception_handler() {
 	Glib->install_exception_handler( fun( $exception ) {
-		if ( $exception->isa('Renard::Incunabula::Common::Error::User::InvalidPageNumber') ) {
+		if ( $exception->isa('Renard::Curie::Error::User::InvalidPageNumber') ) {
 			$self->_show_exception_dialog_box(
 				'Page number entered is invalid: entered "%s", should be between %s and %s.',
 				[
@@ -84,7 +84,7 @@ Renard::Curie::Component::MainWindow::Role::ExceptionHandler - A role for handli
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

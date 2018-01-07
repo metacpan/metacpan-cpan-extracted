@@ -14,8 +14,14 @@ my $Parsed = Mail::AuthenticationResults::Parser->new()->parse( 'test.example.co
 my $Key = $Parsed->search({ 'key' => 'three' });
 is( $Key->as_string(), 'three=four (comment)', 'Found key' );
 
+my $RxKey = $Parsed->search({ 'key' => qr/^three$/ });
+is( $RxKey->as_string(), 'three=four (comment)', 'Found Regex key' );
+
 my $Value = $Parsed->search({ 'value' => 'six' });
 is ( $Value->as_string, 'five=six', 'Found value' );
+
+my $RxValue = $Parsed->search({ 'value' => qr/^six$/ });
+is ( $RxValue->as_string, 'five=six', 'Found Regex value' );
 
 my $NoKey = $Parsed->search({ 'key' => 'four' });
 is( $NoKey->as_string(), '', 'Not found key' );
@@ -39,6 +45,10 @@ is ( scalar @{$Comment->children()}, 1, 'One found' );
 
 is( scalar @{ $Comment->search({ 'isa' => 'entry' })->children() }, 0, 'Entry not found under Comment' );
 is( scalar @{ $Comment->search({ 'isa' => 'subentry' })->children() }, 0, 'SubEntry not found under Comment' );
+
+is( scalar @{ $Entry->search({ 'key' => 'notfound' })->children() }, 0, 'Search key fail under Entry' );
+is( scalar @{ $Entry->search({ 'value' => 'notfound' })->children() }, 0, 'Search value fail under Entry' );
+
 
 done_testing();
 

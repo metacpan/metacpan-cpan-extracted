@@ -5,14 +5,14 @@ Comment: This file documents the copyright statements and licenses for
  .
  For any copyright year range specified as YYYY-ZZZZ in this file, the
  range specifies every single year in that closed interval.
-Copyright: 2013-2016 Russ Allbery <rra@cpan.org>
+Copyright: 2013-2017 Russ Allbery <rra@cpan.org>
 License: Expat
 
 Files: *
 Copyright: 1993-1994, 1996-1998, 2000, 2003-2014
     The Board of Trustees of the Leland Stanford Junior University
   2000-2001, 2004, 2006-2016 Russ Allbery <eagle@eyrie.org>
-  2013-2016 Russ Allbery <rra@cpan.org>
+  2013-2017 Russ Allbery <rra@cpan.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the
@@ -32,15 +32,3 @@ License: Expat
  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
  OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Files: t/data/ansicolor/output/readme t/data/ansicolor/output/thread
-Copyright: 1996 Zenin
-  1996-1998, 2000-2002, 2005-2006, 2008-2016 Russ Allbery <rra@cpan.org>
-  2012 Kurt Starsinic <kstarsinic@gmail.com>
-License: Perl
- This program is free software; you may redistribute it and/or modify it
- under the same terms as Perl itself.  This means that you may choose
- between the two licenses that Perl is released under:  the GNU GPL and the
- Artistic License.  Please see your Perl distribution for the details and
- copies of the licenses.
-

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 {
     # Includes RT-Send-To in the list of headers used to grab

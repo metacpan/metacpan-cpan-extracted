@@ -1,0 +1,139 @@
+NAME
+    Bitcoin::BIP39 - A BIP39 implementation in Perl
+
+VERSION
+    This document describes version 0.002 of Bitcoin::BIP39 (from Perl
+    distribution Bitcoin-BIP39), released on 2018-01-06.
+
+DESCRIPTION
+    This module is an implementation of BIP39 (mnemonic phrase). Features:
+
+    *   Ability to choose non-English wordlist
+
+        As long as the appropriate "WordList::<LANG_CODE>::BIP39" module
+        exists.
+
+    Keywords: bitcoin, mnemonic code, mnemonic phrase, deterministic keys
+
+  TODO
+    *   Allow mispellings after the 4th character
+
+    *   Language detection
+
+FUNCTIONS
+  bip39_mnemonic_to_entropy
+    Usage:
+
+     bip39_mnemonic_to_entropy(%args) -> any
+
+    Convert BIP39 mnemonic phrase to entropy.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   encoding => *str* (default: "hex")
+
+    *   language => *str* (default: "en")
+
+        Pick which language wordlist to use.
+
+        Will retrieve wordlist from "WordList::<LANG_CODE>::BIP39" Perl
+        module.
+
+        For Chinese (simplified), use "zh-simplified". For Chinese
+        (traditional), use "zh-traditional".
+
+    *   mnemonic* => *str*
+
+        Mnemonic phrase.
+
+    Return value: (any)
+
+  entropy_to_bip39_mnemonic
+    Usage:
+
+     entropy_to_bip39_mnemonic(%args) -> any
+
+    Convert entropy to BIP39 mnemonic phrase.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   entropy => *buf*
+
+        Entropy (binary data).
+
+    *   entropy_hex => *hexbuf*
+
+        Entropy (hex-encoded).
+
+    *   language => *str* (default: "en")
+
+        Pick which language wordlist to use.
+
+        Will retrieve wordlist from "WordList::<LANG_CODE>::BIP39" Perl
+        module.
+
+        For Chinese (simplified), use "zh-simplified". For Chinese
+        (traditional), use "zh-traditional".
+
+    Return value: (any)
+
+  gen_bip39_mnemonic
+    Usage:
+
+     gen_bip39_mnemonic(%args) -> any
+
+    Generate BIP39 mnemonic phrase.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bits => *posint* (default: 128)
+
+        Size of entropy in bits.
+
+    *   language => *str* (default: "en")
+
+        Pick which language wordlist to use.
+
+        Will retrieve wordlist from "WordList::<LANG_CODE>::BIP39" Perl
+        module.
+
+        For Chinese (simplified), use "zh-simplified". For Chinese
+        (traditional), use "zh-traditional".
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bitcoin-BIP39>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bitcoin-BIP39>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bitcoin-BIP39>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://en.bitcoin.it/wiki/Mnemonic_phrase>
+
+    <https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

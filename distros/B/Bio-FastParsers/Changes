@@ -1,6 +1,10 @@
+0.173640  2017-12-30 22:53:09+01:00 Europe/Brussels
+    - Fixes
+      - Hmmer::Standard tests should pass on more platforms
+
 0.173510  2017-12-17 10:18:23+01:00 Europe/Brussels
-	- Additions
-	  new parser for CD-HIT output
+    - Additions
+      - new parser for CD-HIT output
 
 0.173450  2017-12-11 09:45:25+01:00 Europe/Brussels
-	- first release
+    - first release

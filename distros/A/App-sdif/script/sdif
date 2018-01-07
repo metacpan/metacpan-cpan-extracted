@@ -23,7 +23,7 @@ diff ... | sdif
     --number, -n	print line number
     --digit=#		set the line number digits (default 4)
     --truncate, -t	truncate long line
-    --onword		fold line on word boundaries
+    --[no]onword	fold line on word boundaries
     --context, -c, -C#	context diff
     --unified, -u, -U#	unified diff
 
@@ -76,21 +76,18 @@ my $opt_l;
 my $opt_s;
 my $opt_q;
 my $opt_d;
-my $opt_c;
-my $opt_u;
-my $opt_C;
-my $opt_U;
-my $opt_truncate;
-my $opt_onword;
-my $opt_cdif = 0;
-my @opt_cdifopts = qw(--nocc --nomc --notc);
+my $opt_truncate = 0;
+my $opt_onword = 1;
+my $opt_cdif = 1;
+my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc);
+my @opt_cdifopts;
 my $opt_env = 1;
 my @opt_colormap;
 my @opt_diffopts;
 my $opt_diff = 'diff';
 my $opt_digit = 4;
 my $opt_view;
-my $opt_ambiguous = 'detect';
+my $opt_ambiguous = 'narrow';
 my $screen_width;
 my $column_width;
 my @column_width;
@@ -119,7 +116,7 @@ my @optargs = (
     "n|number!" => \$opt_n,
     "digit=i" => \$opt_digit,
     "truncate|t!" => \$opt_truncate,
-    "onword|W!" => \$opt_onword,
+    "onword!" => \$opt_onword,
     "mark=s" => \$opt_mark,
     "l" => \$opt_l,
     "s" => \$opt_s,
@@ -137,10 +134,13 @@ my @optargs = (
     "color!" => \$opt_color,
     "colormap|cm=s" => \@opt_colormap,
     "256!" => \$opt_256,
-    "c|context" => \$opt_c,
-    "u|unified" => \$opt_u,
-    "C=i" => \$opt_C,
-    "U=i" => \$opt_U,
+    "b|ignore-space-change" => sub { push @opt_diffopts, '-b' },
+    "w|ignore-all-space"    => sub { push @opt_diffopts, '-w' },
+    "B|ignore-blank-lines"  => sub { push @opt_diffopts, '-B' },
+    "c|context"             => sub { push @opt_diffopts, '-c' },
+    "u|unified"             => sub { push @opt_diffopts, '-u' },
+    "C=i"                   => sub { push @opt_diffopts, '-C' . $_[1] },
+    "U=i"                   => sub { push @opt_diffopts, '-U' . $_[1] },
     "cdif!" => \$opt_cdif,
     "cdifopts=s" => \@opt_cdifopts,
     "colortable" => \$opt_colortable,
@@ -151,7 +151,7 @@ my @optargs = (
 my @SAVEDARGV = @ARGV;
 use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
-GetOptions(@optargs) || usage();
+GetOptions(@optargs) || usage({status => 1});
 
 warn "\@ARGV = (@SAVEDARGV)\n" if $opt_d;
 
@@ -207,7 +207,7 @@ my %colormap =
     );
 
 use Getopt::EX::Colormap;
-use constant SGD_RESET => "\e[m";
+use constant SGR_RESET => "\e[m";
 my $color_handler = new Getopt::EX::Colormap
     HASH => \%colormap;
 $color_handler->load_params(@opt_colormap);
@@ -226,17 +226,10 @@ $colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
 $colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
 
 ##
-## setup diffopts
-##
-push @opt_diffopts, "-c" if $opt_c;
-push @opt_diffopts, "-u" if $opt_u;
-push @opt_diffopts, "-C$opt_C" if defined $opt_C;
-push @opt_diffopts, "-U$opt_U" if defined $opt_U;
-
-##
 ## setup cdifopts
 ##
 push @opt_cdifopts, '--no256' if not $opt_256;
+push @opt_cdifopts, @default_opt_cdifopts;
 
 my($OLD, $NEW, $DIFF);
 if (@ARGV == 2) {
@@ -246,17 +239,18 @@ if (@ARGV == 2) {
     $DIFF = shift || '-';
     $opt_s++;
 } else {
-    usage("Unexpected arguments.\n\n");
+    usage({status => 1}, "Unexpected arguments.\n\n");
 }
 my $readfile =
-     ($OLD and $NEW)
-     && !($opt_s || $opt_c || $opt_u || (defined $opt_C || defined $opt_U));
+    ($OLD and $NEW) && !$opt_s && !(grep { /^-[cuCU]/ } @opt_diffopts);
 
 sub usage {
+    my $opt = ref($_[0]) eq 'HASH' ? shift : {};
     select STDERR;
     print @_;
     pod2usage(-verbose => 0, -exitval => "NOEXIT");
-    exit;
+    print "Version: $version\n";
+    exit($opt->{status} // 0);
 }
 
 use constant {
@@ -881,7 +875,7 @@ sub fold {
     }
 
     if (@color_stack) {
-	$folded .= SGD_RESET;
+	$folded .= SGR_RESET;
 	$_ = join '', @color_stack, $_ if $_ ne '';
     }
 
@@ -1022,9 +1016,9 @@ __END__
 B<sdif> is inspired by System V L<sdiff(1)> command.  The basic
 feature of sdif is making a side-by-side listing of two different
 files.  All contents of two files are listed on left and right sides.
-Center column is used to indicate how different those lines.  No mark
-means no difference.  Added, deleted and modified lines are marked
-with `-' and `+' character.
+Center column is used to indicate how different those lines are.  No
+mark means no difference.  Added, deleted and modified lines are
+marked with `-' and `+' character.
 
     1 deleted  -
     2 same          1 same
@@ -1037,17 +1031,69 @@ standard input.  Besides normal diff output, context diff I<-c> and
 unified diff I<-u> output will be handled properly.  Combined diff
 format is also supported, but currently limited up to three files.
 
-Each lines can be displayed in different colors.  Read B<--colormap>
-section in this manual for detail.
+=head2 STARTUP and MODULE
+
+B<cdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.sdifrc>
+file if available when starting up.  You can define original and
+default option there.  To show the line number always, define like
+this:
+
+    option default -n
+
+Modules under B<App::sdif> can be loaded by B<-M> option without
+prefix.  Next command load B<App::sdif::colors> module.
+
+    $ sdif -Mcolors
+
+You can also define options in module file, and activate by B<-M>
+option.
+
+Read `perldoc Getopt::EX::Module` for detail.
+
+=head2 COLOR
+
+Each lines are displayed in different colors by default.  Use
+B<no-color> option to disable it.  Each text segment has own labels,
+and color for them can be specified by B<--colormap> option.  Read
+`perldoc Getopt::EX::Colormap` for detail.
+
+Standard module B<-Mcolors> is loaded by default, and define several
+colormaps for light and dark screen.  If you want to use CMY colors in
+dark screen, place following line in your F<~/.sdifrc>.
+
+    option default --dark-cmy
+
+Option B<--autocolor> is defined to load B<-Mautocolor> module.  It
+sets B<--light> or B<--dark> option according to the brightness of the
+terminal screen.  You can set preferred color in your F<~/.sdifrc>
+like:
+
+    option --light --cmy
+    option --dark  --dark-cmy
+
+If the B<BRIGHTNESS> environment variable is set in a range of 0 to
+100 digit, it is used as a screen brightness.
+
+Currently automatic setting by B<-Mautocolor> module works only on
+macOS Terminal.app.  If you are using other terminal application, set
+the B<BRIGHTNESS> or write a module.
+
+Option B<--autocolor> is set by default, so override it to do nothing
+to disable.
+
+    option --autocolor --nop
+
+=head2 CDIF
 
 While B<sdif> doesn't care about the contents of each modified lines,
 it can read the output from B<cdif> command which show the word
 context differences of each lines.  Option B<--cdif> set the
-appropriate options for B<cdif>.  Set I<--nocc>, I<--nomc> options at
-least when invoking B<cdif> manually.  Option I<--notc> is preferable
-because text color can be handled by B<sdif>.
+appropriate options for B<cdif>.  Set I<--no-cc>, I<--no-mc> options
+at least when invoking B<cdif> manually.  Option I<--no-tc> is
+preferable because text color can be handled by B<sdif>.
 
-Environment valuable B<SDIFOPTS> is used to set default options.
+From version 4.1.0, option B<--cdif> is set by default, so use
+B<--no-cdif> option to disable it.
 
 
 =head1 OPTIONS
@@ -1060,14 +1106,21 @@ Use width as a width of output listing.  Default width is 80.  If the
 standard error is assigned to a terminal, the width is taken from it
 if possible.
 
-=item B<--number>, B<-n>
+=item B<-->[B<no>]B<number>, B<-n>
 
 Print line number on each lines.
+Default false.
 
 =item B<--digit>=I<n>
 
 Line number is displayed in 4 digits by default.  Use this option to
 change it.
+
+=item B<-b>, B<--ignore-space-change>
+
+=item B<-w>, B<--ignore-all-space>
+
+=item B<-B>, B<--ignore-blank-lines>
 
 =item B<-c>, B<-C>I<n>, B<-u>, B<-U>I<n>
 
@@ -1075,17 +1128,20 @@ Passed through to the back-end diff command.  Sdif can interpret the
 output from normal, context (I<diff -c>) and unified diff (I<diff
 -u>).
 
-=item B<--truncate>, B<-t>
+=item B<-->[B<no>]B<truncate>, B<-t>
 
 Truncate lines if they are longer than printing width.
+Default false.
 
-=item B<--onword>
+=item B<-->[B<no>]B<onword>
 
 Fold long line at word boundaries.
+Default true.
 
 =item B<-->[B<no>]B<cdif>
 
 Use B<cdif> command instead of normal diff command.
+Default true.
 
 =item B<--cdifopts>=I<option>
 
@@ -1128,14 +1184,14 @@ Viewer mode.  Display two files side-by-side in straightforward order.
 
 =item B<--ambiguous>=I<width_spec>
 
-This is experimental option to specify how to treat Unicode ambiguous
-width characters.  Default value is 'detect'.
+This is an experimental option to specify how to treat Unicode
+ambiguous width characters.  Default value is 'narrow'.
 
 =over 4
 
 =item B<detect> or B<auto>
 
-Detect from user's locate.  Set 'wide' when used in CJK enviroment.
+Detect from user's locate.  Set 'wide' when used in CJK environment.
 
 =item B<wide> or B<full>
 
@@ -1259,6 +1315,34 @@ This is equivalent to :
 =back
 
 
+=head1 MODULE OPTIONS
+
+=head2 default
+
+  default      --autocolor
+  --autocolor  -Mautocolor
+  --nop        do nothing
+
+=head2 -Mcolors
+
+Following options are available by default.
+
+  --light
+  --green
+  --cmy
+  --mono
+
+  --dark
+  --dark-green
+  --dark-cmy
+  --dark-mono
+
+
+=head1 ENVIRONMENT
+
+Environment variable B<SDIFOPTS> is used to set default options.
+
+
 =head1 AUTHOR
 
 =over
@@ -1276,4 +1360,14 @@ L<cdif(1)>, L<watchdiff(1)>
 
 L<Getopt::EX::Colormap>
 
+L<App::sdif::colors>,
+L<App::sdif::autocolor>,
+L<App::sdif::autocolor::Apple_Terminal>
+
 =cut
+
+#  LocalWords:  perldoc colormap autocolor onword cdifopts mecab CJK
+#  LocalWords:  diffopts colortable Unicode OCOMMAND NCOMMAND OFILE
+#  LocalWords:  MCOMMAND NFILE MFILE OMARK NMARK MMARK UMARK OLINE
+#  LocalWords:  NLINE MLINE ULINE OTEXT NTEXT MTEXT UTEXT Cyan RGB
+#  LocalWords:  SDIFOPTS Kazumasa Utashiro watchdiff

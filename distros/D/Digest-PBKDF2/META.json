@@ -4,24 +4,24 @@
       "Amiri Barksdale <abarksdale@campusexplorer.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Digest-PBKDF2",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Crypt::PBKDF2" : "0.112020",
+            "Crypt::PBKDF2" : "0.161520",
             "Digest::base" : "0",
             "parent" : "0",
             "strict" : "0",
@@ -30,9 +30,9 @@
       },
       "test" : {
          "requires" : {
-            "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0",
+            "Scalar::Util" : "1.49",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302120",
             "lib" : "0"
          }
       }
@@ -45,6 +45,7 @@
          "web" : "http://github.com/amiri/Digest-PBKDF2"
       }
    },
-   "version" : "0.010"
+   "version" : "0.013",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

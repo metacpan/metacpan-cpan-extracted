@@ -4,17 +4,18 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use File::Spec;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 use Mock::Quick qw(qtakeover qobj qmeth);
 use Capture::Tiny qw(capture capture_stderr);
 
-plan tests => 14;
+plan tests => 16;
 
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::Daemon', '0.03';
+    use_ok 'JIP::Daemon', '0.041';
     require_ok 'JIP::Daemon';
 
     diag(
@@ -26,7 +27,7 @@ subtest 'Require some module' => sub {
 };
 
 subtest 'new(). exceptions' => sub {
-    plan tests => 14;
+    plan tests => 20;
 
     eval { JIP::Daemon->new(uid => undef) } or do {
         like $EVAL_ERROR, qr{^Bad \s argument \s "uid"}x;
@@ -76,10 +77,31 @@ subtest 'new(). exceptions' => sub {
     eval { JIP::Daemon->new(on_fork_callback => q{}) } or do {
         like $EVAL_ERROR, qr{^Bad \s argument \s "on_fork_callback"}x;
     };
+
+    eval { JIP::Daemon->new(stdout => undef) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "stdout"}x;
+    };
+    eval { JIP::Daemon->new(stdout => q{}) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "stdout"}x;
+    };
+
+    eval { JIP::Daemon->new(stderr => undef) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "stderr"}x;
+    };
+    eval { JIP::Daemon->new(stderr => q{}) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "stderr"}x;
+    };
+
+    eval { JIP::Daemon->new(program_name => undef) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "program_name"}x;
+    };
+    eval { JIP::Daemon->new(program_name => q{}) } or do {
+        like $EVAL_ERROR, qr{^Bad \s argument \s "program_name"}x;
+    };
 };
 
 subtest 'new()' => sub {
-    plan tests => 13;
+    plan tests => 17;
 
     my $obj = JIP::Daemon->new;
     ok $obj, 'got instance if JIP::Daemon';
@@ -103,6 +125,10 @@ subtest 'new()' => sub {
         is_detached
         log_callback
         on_fork_callback
+        devnull
+        stdout
+        stderr
+        program_name
     );
 
     is $obj->pid,              $PROCESS_ID;
@@ -114,6 +140,10 @@ subtest 'new()' => sub {
     is $obj->umask,            undef;
     is $obj->logger,           undef;
     is $obj->on_fork_callback, undef;
+    is $obj->devnull,          File::Spec->devnull;
+    is $obj->stdout,           undef;
+    is $obj->stderr,           undef;
+    is $obj->program_name,     $PROGRAM_NAME;
 
     is ref $obj->log_callback, 'CODE';
 };
@@ -277,25 +307,82 @@ subtest 'exceptions in drop_privileges()' => sub {
 };
 
 subtest 'reopen_std()' => sub {
-    plan tests => 2;
+    plan tests => 4;
 
-    my $obj;
+    my $obj = JIP::Daemon->new;
+    is ref($obj), 'JIP::Daemon';
 
-    my ($std_out, $std_err) = capture {
-        print {*STDOUT} q{first std_out msg}
+    my ($stdout, $stderr) = capture {
+        print {*STDOUT} q{first stdout msg}
             or croak(sprintf q{Can't print to STDOUT: %s}, $OS_ERROR);
-        print {*STDERR} q{first std_err msg}
+        print {*STDERR} q{first stderr msg}
             or croak(sprintf q{Can't print to STDERR: %s}, $OS_ERROR);
 
-        $obj = JIP::Daemon->new->reopen_std;
-        print {*STDOUT} q{second std_out msg}
+        is ref($obj->reopen_std), 'JIP::Daemon';
+
+        print {*STDOUT} q{second stdout msg}
             or croak(sprintf q{Can't print to STDOUT: %s}, $OS_ERROR);
-        print {*STDERR} q{second std_err msg}
+        print {*STDERR} q{second stderr msg}
             or croak(sprintf q{Can't print to STDERR: %s}, $OS_ERROR);
     };
 
-    is ref($obj), 'JIP::Daemon';
-    is_deeply[$std_out, $std_err], [q{first std_out msg}, q{first std_err msg}];
+    is $stdout, q{first stdout msg};
+    is $stderr, q{first stderr msg};
+};
+
+subtest 'change_program_name. nothing to do' => sub {
+    plan tests => 2;
+
+    my $logs = [];
+
+    my $control_daemon = qtakeover 'JIP::Daemon' => (
+        logger => qobj(info => qmeth {
+            my ($self, $msg) = @ARG;
+            push @{ $logs }, $msg;
+        }),
+    );
+
+    my $old_program_name = $PROGRAM_NAME;
+
+    my $obj = JIP::Daemon->new->change_program_name;
+
+    my $new_program_name = $PROGRAM_NAME;
+
+    is $old_program_name, $new_program_name;
+    is_deeply $logs, [];
+};
+
+subtest 'change_program_name' => sub {
+    plan tests => 4;
+
+    my $logs = [];
+
+    my $control_daemon = qtakeover 'JIP::Daemon' => (
+        logger => qobj(info => qmeth {
+            my ($self, $msg) = @ARG;
+            push @{ $logs }, $msg;
+        }),
+    );
+
+    my $old_program_name = $PROGRAM_NAME;
+    my $new_program_name = 'tratata';
+
+    my $obj = JIP::Daemon->new(program_name => $new_program_name);
+    $obj = $obj->change_program_name;
+
+    is $PROGRAM_NAME, $new_program_name;
+    is_deeply $logs, [
+        'The program name changed from t/00-jip-daemon.t to tratata',
+    ];
+
+    $obj = JIP::Daemon->new(program_name => $old_program_name);
+    $obj = $obj->change_program_name;
+
+    is $PROGRAM_NAME, $old_program_name;
+    is_deeply $logs, [
+        'The program name changed from t/00-jip-daemon.t to tratata',
+        'The program name changed from tratata to t/00-jip-daemon.t',
+    ];
 };
 
 subtest 'daemonize. dry_run' => sub {
@@ -358,7 +445,7 @@ subtest 'daemonize. parent' => sub {
 };
 
 subtest 'daemonize. child' => sub {
-    plan tests => 8;
+    plan tests => 9;
 
     my $pid  = '500';
     my $logs = [];
@@ -390,6 +477,11 @@ subtest 'daemonize. child' => sub {
         drop_privileges => sub {
             my $self = shift;
             pass 'drop_privileges() method is invoked';
+            return $self;
+        },
+        change_program_name => sub {
+            my $self = shift;
+            pass 'change_program_name() method is invoked';
             return $self;
         },
     );

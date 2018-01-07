@@ -1,18 +1,42 @@
+0.004 2018-01-06 00:31:17-0600
+
+  Features
+
+   - Add Types::URI to list of common types.
+
+     See <https://github.com/project-renard/p5-Renard-Incunabula/pull/3>.
+
+  Refactoring
+   - Removes all document-specific code and splits them off to the
+     Renard-Incunabula-Document and Renard-Incunabula-Format-Cairo
+     distributions.
+
+     See
+
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>, 
+       - <https://github.com/project-renard/p5-Renard-Incunabula/pull/6>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Document/pull/1>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Format-Cairo/pull/1>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool/pull/6>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF/pull/7>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3/pull/5>,
+       - <https://github.com/project-renard/curie/pull/223>.
+
 0.003 2017-07-11 23:16:58-0500
   - Split off from Renard-Curie-0.002.
 
     project-renard/p5-Renard-Incunabula
-      s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup
-      s/Renard::Curie::Types/Renard::Incunabula::Common::Types
+      s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup/
+      s/Renard::Curie::Types/Renard::Incunabula::Common::Types/
       s/Renard::Curie::Error/Renard::Incunabula::Common::Error/
       s/Renard::Curie::Model::Document/Renard::Incunabula::Document/
       s/Renard::Curie::Model::Outline/Renard::Incunabula::Outline/
-      s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile
-      s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable
-      s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable
-      s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable
-      s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable
-      s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable
+      s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile/
+      s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable/
+      s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable/
+      s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable/
+      s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable/
+      s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable/
       s/Renard::Curie::Model::Page::Role::CairoRenderableFromPNG/Renard::Incunabula::Page::Role::CairoRenderableFromPNG/
       s/Renard::Curie::Model::Page::Role::Bounds/Renard::Incunabula::Page::Role::Bounds/
       s/Renard::Curie::Model::Page::Role::BoundsFromCairoImageSurface/Renard::Incunabula::Page::Role::BoundsFromCairoImageSurface/

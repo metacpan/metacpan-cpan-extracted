@@ -69,7 +69,7 @@
    "provides" : {
       "Text::Xslate" : {
          "file" : "lib/Text/Xslate.pm",
-         "version" : "v3.5.4"
+         "version" : "v3.5.5"
       },
       "Text::Xslate::Bridge" : {
          "file" : "lib/Text/Xslate/Bridge.pm"
@@ -82,24 +82,21 @@
       },
       "Text::Xslate::Engine" : {
          "file" : "lib/Text/Xslate.pm",
-         "version" : "v3.5.4"
+         "version" : "v3.5.5"
       },
       "Text::Xslate::HashWithDefault" : {
          "file" : "lib/Text/Xslate/HashWithDefault.pm"
       },
       "Text::Xslate::PP" : {
          "file" : "lib/Text/Xslate/PP.pm",
-         "version" : "v3.5.4"
-      },
-      "Text::Xslate::PP::Const" : {
-         "file" : "lib/Text/Xslate/PP/Const.pm"
+         "version" : "v3.5.5"
       },
       "Text::Xslate::PP::Method" : {
          "file" : "lib/Text/Xslate/PP/Method.pm"
       },
       "Text::Xslate::PP::Opcode" : {
          "file" : "lib/Text/Xslate/PP/Opcode.pm",
-         "version" : "v3.5.4"
+         "version" : "v3.5.5"
       },
       "Text::Xslate::PP::State" : {
          "file" : "lib/Text/Xslate/PP/State.pm"
@@ -149,7 +146,7 @@
          "web" : "https://github.com/xslate/p5-Text-Xslate"
       }
    },
-   "version" : "v3.5.4",
+   "version" : "v3.5.5",
    "x_contributors" : [
       "André Walker <andre@andrewalker.net>",
       "Anirvan Chatterjee <anirvan@users.noreply.github.com>",
@@ -193,5 +190,5 @@
       "moznion <moznion@gmail.com>",
       "punytan <punytan@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

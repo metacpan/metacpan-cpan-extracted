@@ -1,3 +1,10 @@
+0.017   2018-01-05 (PERLANCAR)
+
+	- Add market: ignis_idr.
+
+	- Add subcommand: trade-history-total (name?).
+
+
 0.016   2017-12-27 (PERLANCAR)
 
 	- Handle NEM <-> XEM symbol confusion (we use XEM at the CLI level,

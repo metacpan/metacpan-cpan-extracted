@@ -4,7 +4,7 @@
       "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,6 +30,9 @@
             "IO::Async" : "0.61",
             "Module::Runtime" : "0",
             "Moo" : "1",
+            "Net::Frame::Layer::ICMPv6" : "1.1",
+            "Net::Frame::Layer::IPv6" : "1.08",
+            "Net::Frame::Simple" : "1.09",
             "Time::HiRes" : "0",
             "namespace::clean" : "0.23",
             "perl" : "5.010"
@@ -54,7 +57,7 @@
          "web" : "https://github.com/frioux/Net-Async-Ping"
       }
    },
-   "version" : "0.002000",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.003000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

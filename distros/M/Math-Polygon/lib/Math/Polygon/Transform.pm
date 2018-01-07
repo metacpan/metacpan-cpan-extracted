@@ -1,15 +1,19 @@
-# Copyrights 2004-2017 by [Mark Overmeer].
+# Copyrights 2004-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use strict;
-use warnings;
+# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Math::Polygon::Transform;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 use base 'Exporter';
+
+use strict;
+use warnings;
 
 use Math::Trig   qw/deg2rad pi rad2deg/;
 use POSIX        qw/floor/;
@@ -254,7 +258,8 @@ sub polygon_simplify(@)
         @_ = @new;
     }
 
-    return @_ unless exists $opts{max_points};
+	exists $opts{max_points}
+        or return @_;
 
     #
     # Reduce the number of points to $max
@@ -287,7 +292,7 @@ sub polygon_simplify(@)
     }
 
     # Return left-over points
-    @_ = grep {defined} @_;
+    @_ = grep defined, @_;
     push @_, $_[0] if $is_ring;
     @_;
 }

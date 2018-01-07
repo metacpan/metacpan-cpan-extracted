@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::BlockDeviceMapping;
+$Net::Amazon::EC2::BlockDeviceMapping::VERSION = '0.35';
 use strict;
 use Moose;
 

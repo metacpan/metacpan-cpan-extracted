@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-wordlist"
       }
    },
-   "version" : "0.262",
+   "version" : "0.263",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

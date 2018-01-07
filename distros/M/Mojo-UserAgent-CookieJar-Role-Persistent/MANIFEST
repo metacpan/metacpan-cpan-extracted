@@ -1,6 +1,7 @@
-MANIFEST
-Makefile.PL
-lib/Mojo/UserAgent/CookieJar/Role/Persistent.pod
+Changes
 lib/Mojo/UserAgent/CookieJar/Role/Persistent.pm
+lib/Mojo/UserAgent/CookieJar/Role/Persistent.pod
+Makefile.PL
+MANIFEST
 META.json
 META.yml

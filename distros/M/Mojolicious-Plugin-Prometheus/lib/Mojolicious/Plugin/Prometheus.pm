@@ -3,103 +3,107 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 has prometheus => sub { state $prom = Net::Prometheus->new };
 has route => sub {undef};
 has http_request_duration_seconds => sub {
-    undef;
+  undef;
 };
 has http_request_size_bytes => sub {
-    undef;
+  undef;
 };
 has http_response_size_bytes => sub {
-    undef;
+  undef;
 };
 has http_requests_total => sub {
-    undef;
+  undef;
 };
 
 sub register {
-    my ( $self, $app, $config ) = @_;
+  my ($self, $app, $config) = @_;
 
-    $self->http_request_duration_seconds(
-        $self->prometheus->new_histogram(
-            namespace => $config->{namespace} // undef,
-            subsystem => $config->{subsystem} // undef,
-            name      => "http_request_duration_seconds",
-            help      => "Histogram with request processing time",
-            labels    => [qw/method/],
-            buckets   => $config->{duration_buckets} // undef,
-        )
-    );
+  $self->http_request_duration_seconds(
+    $self->prometheus->new_histogram(
+      namespace => $config->{namespace}        // undef,
+      subsystem => $config->{subsystem}        // undef,
+      name      => "http_request_duration_seconds",
+      help      => "Histogram with request processing time",
+      labels    => [qw/method/],
+      buckets   => $config->{duration_buckets} // undef,
+    )
+  );
 
-    $self->http_request_size_bytes(
-        $self->prometheus->new_histogram(
-            namespace => $config->{namespace} // undef,
-            subsystem => $config->{subsystem} // undef,
-            name      => "http_request_size_bytes",
-            help      => "Histogram containing request sizes",
-            labels    => [qw/method/],
-            buckets   => $config->{request_buckets} // [(1, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
-        )
-    );
+  $self->http_request_size_bytes(
+    $self->prometheus->new_histogram(
+      namespace => $config->{namespace} // undef,
+      subsystem => $config->{subsystem} // undef,
+      name      => "http_request_size_bytes",
+      help      => "Histogram containing request sizes",
+      labels    => [qw/method/],
+      buckets   => $config->{request_buckets}
+        // [(1, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
+    )
+  );
 
-    $self->http_response_size_bytes(
-        $self->prometheus->new_histogram(
-            namespace => $config->{namespace} // undef,
-            subsystem => $config->{subsystem} // undef,
-            name      => "http_response_size_bytes",
-            help      => "Histogram containing response sizes",
-            labels    => [qw/method code/],
-            buckets   => $config->{response_buckets} // [(5, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
-        )
-    );
+  $self->http_response_size_bytes(
+    $self->prometheus->new_histogram(
+      namespace => $config->{namespace} // undef,
+      subsystem => $config->{subsystem} // undef,
+      name      => "http_response_size_bytes",
+      help      => "Histogram containing response sizes",
+      labels    => [qw/method code/],
+      buckets   => $config->{response_buckets}
+        // [(5, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
+    )
+  );
 
-    $self->http_requests_total(
-        $self->prometheus->new_counter(
-            namespace => $config->{namespace} // undef,
-            subsystem => $config->{subsystem} // undef,
-            name      => "http_requests_total",
-            help =>
-                "How many HTTP requests processed, partitioned by status code and HTTP method.",
-            labels => [qw/method code/],
-        )
-    );
+  $self->http_requests_total(
+    $self->prometheus->new_counter(
+      namespace => $config->{namespace} // undef,
+      subsystem => $config->{subsystem} // undef,
+      name      => "http_requests_total",
+      help =>
+        "How many HTTP requests processed, partitioned by status code and HTTP method.",
+      labels => [qw/method code/],
+    )
+  );
 
-    $self->route( $app->routes->get( $config->{path} // '/metrics' ) );
-    $self->route->to(
-        cb => sub {
-            my ($c) = @_;
-            $c->render( text => $c->prometheus->render, format => 'txt' );
-        }
-    );
+  $self->route($app->routes->get($config->{path} // '/metrics'));
+  $self->route->to(
+    cb => sub {
+      my ($c) = @_;
+      $c->render(text => $c->prometheus->render, format => 'txt');
+    }
+  );
 
-    $app->hook(
-        before_dispatch => sub {
-            my ($c) = @_;
-            $c->stash( 'prometheus.start_time' => [gettimeofday] );
-            $self->http_request_size_bytes->observe( $c->req->method, $c->req->content->asset->size );
-        }
-    );
+  $app->hook(
+    before_dispatch => sub {
+      my ($c) = @_;
+      $c->stash('prometheus.start_time' => [gettimeofday]);
+      $self->http_request_size_bytes->observe($c->req->method,
+        $c->req->content->asset->size);
+    }
+  );
 
-    $app->hook(
-        after_render => sub {
-            my ($c) = @_;
-            $self->http_request_duration_seconds->observe( $c->req->method,
-                tv_interval( $c->stash('prometheus.start_time') ) );
-        }
-    );
+  $app->hook(
+    after_render => sub {
+      my ($c) = @_;
+      $self->http_request_duration_seconds->observe($c->req->method,
+        tv_interval($c->stash('prometheus.start_time')));
+    }
+  );
 
-    $app->hook(
-        after_dispatch => sub {
-            my ($c) = @_;
-            $self->http_requests_total->inc( $c->req->method, $c->res->code );
-            $self->http_response_size_bytes->observe( $c->req->method, $c->res->code, $c->res->content->asset->size );
-        }
-    );
+  $app->hook(
+    after_dispatch => sub {
+      my ($c) = @_;
+      $self->http_requests_total->inc($c->req->method, $c->res->code);
+      $self->http_response_size_bytes->observe($c->req->method, $c->res->code,
+        $c->res->content->asset->size);
+    }
+  );
 
-    $app->helper( prometheus => sub { $self->prometheus } );
+  $app->helper(prometheus => sub { $self->prometheus });
 
 }
 
@@ -143,7 +147,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 register
 
-  $plugin->register($app, \&config);
+  $plugin->register($app, \%config);
 
 Register plugin in L<Mojolicious> application.
 
@@ -181,14 +185,14 @@ Default: C<(5, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)>
 
 Override buckets for request duration histogram.
 
-Default: C<(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)>
+Default: C<(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10)> (actually see L<Net::Prometheus|https://metacpan.org/source/PEVANS/Net-Prometheus-0.05/lib/Net/Prometheus/Histogram.pm#L19>)
 
 =back
 
 =head1 METRICS
 
-In addition to exporting the default process metrics that L<Net::Prometheus> already export
-this plugin will also export
+In addition to exposing the default process metrics that L<Net::Prometheus> already expose
+this plugin will also expose
 
 =over 2
 

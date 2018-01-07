@@ -186,7 +186,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2017 Kazumasa Utashiro
+Copyright 2015-2018 Kazumasa Utashiro
 
 # LICENSE
 

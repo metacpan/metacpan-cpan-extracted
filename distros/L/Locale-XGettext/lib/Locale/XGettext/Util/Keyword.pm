@@ -19,7 +19,7 @@
 # USA.
 
 package Locale::XGettext::Util::Keyword;
-
+$Locale::XGettext::Util::Keyword::VERSION = '0.3';
 use strict;
 
 use Locale::TextDomain qw(Locale-XGettext);

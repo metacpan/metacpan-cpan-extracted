@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2017 by Dominique Dumont.
+# This software is Copyright (c) 2015-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -128,9 +128,7 @@ parsed. This is useful to alter or add configuration settings for a unit, withou
 modify unit files. Each drop-in file must have appropriate section headers. Note that for
 instantiated units, this logic will first look for the instance C<.d/>
 subdirectory and read its C<.conf> files, followed by the template
-C<.d/> subdirectory and the C<.conf> files there. Also note that
-settings from the C<[Install]> section are not honored in drop-in unit files,
-and have no effect.
+C<.d/> subdirectory and the C<.conf> files there.
 
 In addition to /etc/systemd/system, the drop-in C<.d>
 directories for system services can be placed in /usr/lib/systemd/system or
@@ -145,23 +143,6 @@ between units it is recommended to use this functionality only
 sparingly and instead rely on techniques such as bus-based or
 socket-based activation which make dependencies implicit,
 resulting in a both simpler and more flexible system.
-
-Some unit names reflect paths existing in the file system
-namespace. Example: a device unit
-dev-sda.device refers to a device with the
-device node /dev/sda in the
-file system namespace. If this applies, a special way to escape
-the path name is used, so that the result is usable as part of a
-filename. Basically, given a path, \"/\" is replaced by \"-\", and all
-other characters which are not ASCII alphanumerics are replaced by
-C-style \"\\x2d\" escapes (except that \"_\" is never replaced and \".\"
-is only replaced when it would be the first character in the
-escaped path). The root directory \"/\" is encoded as single dash,
-while otherwise the initial and ending \"/\" are removed from all
-paths during transformation. This escaping is reversible. Properly
-escaped paths can be generated using the
-L<systemd-escape(1)>
-command.
 
 Optionally, units may be instantiated from a
 template file at runtime. This allows creation of
@@ -255,8 +236,9 @@ effect.',
         },
         'description' => "Configures requirement dependencies on other units. If this unit gets activated, the units
 listed here will be activated as well. If one of the other units fails to activate, and an ordering dependency
-C<After> on the failing unit is set, this
-unit will not be started. This option may be specified more than once or multiple space-separated units may be
+C<After> on the failing unit is set, this unit will not be started. Besides, with or without
+specifying C<After>, this unit will be deactivated if one of the other units get deactivated.
+This option may be specified more than once or multiple space-separated units may be
 specified in one option in which case requirement dependencies for all listed names will be created. Note that
 requirement dependencies do not influence the order in which services are started or stopped.  This has to be
 configured independently with the C<After> or C<Before> options. If a unit
@@ -290,7 +272,13 @@ above.",
         'description' => 'Similar to C<Requires>.
 However, if the units listed here are not started already,
 they will not be started and the transaction will fail
-immediately. ',
+immediately.
+
+When C<Requisite=b.service> is used on
+a.service, this dependency will show as
+C<RequisiteOf=a.service> in property listing of
+b.service. C<RequisiteOf>
+dependency cannot be specified directly.',
         'type' => 'list'
       },
       'Wants',
@@ -334,7 +322,13 @@ state for this unit to also be in active state. This not only means a unit bound
 enters inactive state, but also one that is bound to another unit that gets skipped due to a failed condition
 check (such as C<ConditionPathExists>, C<ConditionPathIsSymbolicLink>, \x{2026} \x{2014}
 see below) will be stopped, should it be running. Hence, in many cases it is best to combine
-C<BindsTo> with C<After>.",
+C<BindsTo> with C<After>.
+
+When C<BindsTo=b.service> is used on
+a.service, this dependency will show as
+C<BoundBy=a.service> in property listing of
+b.service. C<BoundBy>
+dependency cannot be specified directly.",
         'type' => 'list'
       },
       'PartOf',
@@ -348,7 +342,13 @@ C<Requires>, but limited to stopping and
 restarting of units. When systemd stops or restarts the units
 listed here, the action is propagated to this unit. Note that
 this is a one-way dependency\x{a0}\x{2014} changes to this unit do not
-affect the listed units. ",
+affect the listed units.
+
+When C<PartOf=b.service> is used on
+a.service, this dependency will show as
+C<ConsistsOf=a.service> in property listing of
+b.service. C<ConsistsOf>
+dependency cannot be specified directly.",
         'type' => 'list'
       },
       'Conflicts',
@@ -636,6 +636,26 @@ ones.',
           'yes'
         ]
       },
+      'CollectMode',
+      {
+        'choice' => [
+          'inactive',
+          'inactive-or-failed'
+        ],
+        'description' => "Tweaks the \"garbage collection\" algorithm for this unit. Takes one of C<inactive>
+or C<inactive-or-failed>. If set to C<inactive> the unit will be unloaded if it is
+in the C<inactive> state and is not referenced by clients, jobs or other units \x{2014} however it
+is not unloaded if it is in the C<failed> state. In C<failed> mode, failed
+units are not unloaded until the user invoked systemctl reset-failed on them to reset the
+C<failed> state, or an equivalent command. This behaviour is altered if this option is set to
+C<inactive-or-failed>: in this case the unit is unloaded even if the unit is in a
+C<failed> state, and thus an explicitly resetting of the C<failed> state is
+not necessary. Note that if this mode is used unit results (such as exit codes, exit signals, consumed
+resources, \x{2026}) are flushed out immediately after the unit completed, except for what is stored in the logging
+subsystem. Defaults to C<inactive>.",
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
       'JobTimeoutSec',
       {
         'description' => 'When a job for this unit is queued, a time-out C<JobTimeoutSec> may be
@@ -722,49 +742,57 @@ system call.',
       },
       'StartLimitIntervalSec',
       {
-        'description' => 'Configure unit start rate limiting. By default, units which are started more than 5 times
-within 10 seconds are not permitted to start any more times until the 10 second interval ends. With these two
-options, this rate limiting may be modified. Use C<StartLimitIntervalSec> to configure the
-checking interval (defaults to C<DefaultStartLimitIntervalSec> in manager configuration file,
-set to 0 to disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many
-starts per interval are allowed (defaults to C<DefaultStartLimitBurst> in manager
-configuration file). These configuration options are particularly useful in conjunction with the service
-setting C<Restart> (see
+        'description' => 'Configure unit start rate limiting. Units which are started more than
+burst times within an interval time interval are not
+permitted to start any more. Use C<StartLimitIntervalSec> to configure the checking interval
+(defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, set it to 0 to
+disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many starts per
+interval are allowed (defaults to C<DefaultStartLimitBurst> in manager configuration
+file). These configuration options are particularly useful in conjunction with the service setting
+C<Restart> (see
 L<systemd.service(5)>); however,
 they apply to all kinds of starts (including manual), not just those triggered by the
 C<Restart> logic. Note that units which are configured for C<Restart> and
 which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted
-manually at a later point, from which point on, the restart logic is again activated. Note that
-systemctl reset-failed will cause the restart rate counter for a service to be flushed,
-which is useful if the administrator wants to manually start a unit and the start limit interferes with
-that. Note that this rate-limiting is enforced after any unit condition checks are executed, and hence unit
-activations with failing conditions are not counted by this rate limiting. Slice, target, device and scope
-units do not enforce this setting, as they are unit types whose activation may either never fail, or may
-succeed only a single time.',
+manually at a later point, after the interval has passed.  From this point on, the
+restart logic is activated again. Note that systemctl reset-failed will cause the restart
+rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit
+and the start limit interferes with that. Note that this rate-limiting is enforced after any unit condition
+checks are executed, and hence unit activations with failing conditions do not count towards this rate
+limit. This setting does not apply to slice, target, device, and scope units, since they are unit types whose
+activation may either never fail, or may succeed only a single time.
+
+When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+has no effect.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'StartLimitBurst',
       {
-        'description' => 'Configure unit start rate limiting. By default, units which are started more than 5 times
-within 10 seconds are not permitted to start any more times until the 10 second interval ends. With these two
-options, this rate limiting may be modified. Use C<StartLimitIntervalSec> to configure the
-checking interval (defaults to C<DefaultStartLimitIntervalSec> in manager configuration file,
-set to 0 to disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many
-starts per interval are allowed (defaults to C<DefaultStartLimitBurst> in manager
-configuration file). These configuration options are particularly useful in conjunction with the service
-setting C<Restart> (see
+        'description' => 'Configure unit start rate limiting. Units which are started more than
+burst times within an interval time interval are not
+permitted to start any more. Use C<StartLimitIntervalSec> to configure the checking interval
+(defaults to C<DefaultStartLimitIntervalSec> in manager configuration file, set it to 0 to
+disable any kind of rate limiting). Use C<StartLimitBurst> to configure how many starts per
+interval are allowed (defaults to C<DefaultStartLimitBurst> in manager configuration
+file). These configuration options are particularly useful in conjunction with the service setting
+C<Restart> (see
 L<systemd.service(5)>); however,
 they apply to all kinds of starts (including manual), not just those triggered by the
 C<Restart> logic. Note that units which are configured for C<Restart> and
 which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted
-manually at a later point, from which point on, the restart logic is again activated. Note that
-systemctl reset-failed will cause the restart rate counter for a service to be flushed,
-which is useful if the administrator wants to manually start a unit and the start limit interferes with
-that. Note that this rate-limiting is enforced after any unit condition checks are executed, and hence unit
-activations with failing conditions are not counted by this rate limiting. Slice, target, device and scope
-units do not enforce this setting, as they are unit types whose activation may either never fail, or may
-succeed only a single time.',
+manually at a later point, after the interval has passed.  From this point on, the
+restart logic is activated again. Note that systemctl reset-failed will cause the restart
+rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit
+and the start limit interferes with that. Note that this rate-limiting is enforced after any unit condition
+checks are executed, and hence unit activations with failing conditions do not count towards this rate
+limit. This setting does not apply to slice, target, device, and scope units, since they are unit types whose
+activation may either never fail, or may succeed only a single time.
+
+When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+has no effect.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -796,11 +824,31 @@ semantics. Defaults to C<none>.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
+      'FailureAction',
+      {
+        'description' => 'Configure the action to take when the unit stops and enters a failed state or inactive
+state. Takes the same values as the setting C<StartLimitAction> setting and executes the same
+actions (see
+L<systemd.unit(5)>). Both options
+default to C<none>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SuccessAction',
+      {
+        'description' => 'Configure the action to take when the unit stops and enters a failed state or inactive
+state. Takes the same values as the setting C<StartLimitAction> setting and executes the same
+actions (see
+L<systemd.unit(5)>). Both options
+default to C<none>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'RebootArgument',
       {
         'description' => 'Configure the optional argument for the
 L<reboot(2)> system call if
-C<StartLimitAction> or a service\'s C<FailureAction> is a reboot action. This
+C<StartLimitAction> or C<FailureAction> is a reboot action. This
 works just like the optional argument to systemctl reboot command.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -1079,6 +1127,7 @@ check whether the given security module is enabled on the
 system. Currently, the recognized values are
 C<selinux>,
 C<apparmor>,
+C<tomoyo>,
 C<ima>,
 C<smack> and
 C<audit>. The test may be negated by

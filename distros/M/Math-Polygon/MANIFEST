@@ -3,6 +3,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 lib/Math/Polygon.pm
 lib/Math/Polygon.pod
 lib/Math/Polygon/Calc.pm

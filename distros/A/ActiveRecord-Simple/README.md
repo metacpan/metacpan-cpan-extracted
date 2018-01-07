@@ -12,7 +12,7 @@ The basic setup of your package should be:
     use base 'ActiveRecord::Simple';
 
     __PACKAGE__->table_name('foo');
-    __PACKAGE__->columns(['id', 'bar', 'baz']);
+    __PACKAGE__->columns('id', 'bar', 'baz');
     __PACKAGE__->primary_key('id');
 
     1;
@@ -26,16 +26,12 @@ And then, you can use your package in a program:
 
     # or
     my $foo = Foo->get(1);
-    say $foo->bar;
+    print $foo->bar;
 
     # or
     $foo->bar('new value')->save();
 
-    say $foo->bar;
-
-That's it. ActiveRecord::Simple provides a variety of techniques to make your work with
-data little easier. It contains only a basic set of operations, such as
-search, create, update and delete data.
+    print $foo->bar;
 
 See pod documentation of the module for more information about using
 ActiveRecord::Simple.
@@ -51,8 +47,8 @@ Flexible search
     Person->find({ city => City->find({name => 'Paris'})->fetch }); # parameters as an objects
     Person->find('name = ? OR lastname = ?', 'Foo', 'Bar'); # by condition
 
-    Person->last;
-    Person->first;
+    Person->last;  # last object in the database
+    Person->first; # first object  
 
 Easy fetch
 
@@ -67,7 +63,7 @@ Easy fetch
 
     # Even more:
     while (my $person = Person->find->fetch) {
-        say $person->name;
+        print $person->name, "\n";
     }
 
 Simple ordering:
@@ -85,23 +81,23 @@ Limit, Offset:
 Left joins:
 
     my $person = Person->find->with('misc_info')->fetch;
-    say $person->name;
-    say $person->misc_info->zip;
+    print $person->name;
+    print $person->misc_info->zip;
 
 And, of course, all of this together:
 
     my $new_customer =
         Person->find
               ->only('name')
-              ->oreder_by('date_register')
+              ->order_by('date_register')
               ->desc
               ->limit(1)
               ->with('misc_info', 'payment_info')
               ->fetch;
 
-    say $new_customer->name;
-    say $new_customer->misc_info->zip;
-    say $new_customer->payment_info->last_payment;
+    print $new_customer->name;
+    print $new_customer->misc_info->zip;
+    print $new_customer->payment_info->last_payment;
 
 Also one-to-one, one-to-many, many-to-one and many-to-many relations, smart_saving and even more.
 
@@ -124,7 +120,7 @@ To install this module, run the following commands:
 
 or:
 
-        $ sudo cpan ActiveRecord::Simple
+    $ sudo cpan ActiveRecord::Simple
 
 SUPPORT AND DOCUMENTATION
 =========================
@@ -143,7 +139,7 @@ http://shootnix.github.io/activerecord-simple/
 LICENSE AND COPYRIGHT
 =====================
 
-Copyright (C) 2013-2017 shootnix
+Copyright (C) 2013-2018 shootnix
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -162,3 +158,4 @@ CREDITS
 @dsteinbrunner
 @reindeer
 @grinya007
+@manwar

@@ -12,7 +12,7 @@ if($@) {
   exit 0;
 }
 
-print "1..8\n";
+print "1..10\n";
 
 my $nan   = Math::MPFR->new();
 my $ninf  = Math::MPFR->new(-1) / Math::MPFR->new(0);
@@ -110,4 +110,31 @@ else {
   print "not ok 8\n";
 }
 
+eval {require Math::GMPz; Math::GMPz->import(':mpz');};
 
+if($@) {
+  warn "\nSkipping (canonicalization) tests 9 & 10 - Couldn't load Math::GMPz\n";
+  print "ok 9\n";
+  print "ok 10\n";
+}
+
+else {
+  my $num = Math::GMPz->new();
+  my $rop = Math::GMPq->new();
+  Rmpfr_get_q($rop, Math::MPFR->new(1.5));
+  Rmpq_numref($num, $rop);
+
+  if($num == 3) {print "ok 9\n"}
+  else {
+    warn "\nExpected 3, got $num\n";
+    print "not ok 9\n";
+  }
+
+  Rmpq_denref($num, $rop);
+
+  if($num == 2) {print "ok 10\n"}
+  else {
+    warn "\nExpected 2, got $num\n";
+    print "not ok 10\n";
+  }
+}

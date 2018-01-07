@@ -32,7 +32,9 @@ name: Alien-Poppler
 requires:
   Alien::Base: '0.038'
   Alien::Role::Dino: '0'
+  ExtUtils::PkgConfig: '0'
   File::Spec: '0'
+  File::Which: '0'
   Role::Tiny::With: '0'
   base: '0'
   perl: '5.010'
@@ -41,5 +43,27 @@ requires:
 resources:
   homepage: https://github.com/project-renard/p5-Alien-Poppler
   repository: https://github.com/project-renard/p5-Alien-Poppler.git
-version: '0.001'
+version: '0.002'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::Dino: '0'
+      Alien::OpenJPEG: '0'
+      Alien::gmake: '0.11'
+      Env::ShellWords: '0.01'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Net::SSLeay: '1.49'
+      Path::Tiny: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system:
+      Alien::Build::Plugin::Gather::Dino: '0'
+      Alien::OpenJPEG: '0'
+      Alien::gmake: '0'
+      Env::ShellWords: '0.01'
+      Path::Tiny: '0'
 x_serialization_backend: 'YAML::Tiny version 1.70'

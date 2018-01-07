@@ -36,6 +36,168 @@ $Device::Cdio::Device::VERSION   = $Device::Cdio::VERSION;
 @Device::Cdio::Device::EXPORT    = qw( new );
 @Device::Cdio::Device::EXPORT_OK = qw( close open );
 
+%Device::Cdio::CDTEXT_FIELD = (
+    'TITLE'      => $perlcdio::CDTEXT_FIELD_TITLE,
+    'PERFORMER'  => $perlcdio::CDTEXT_FIELD_PERFORMER,
+    'SONGWRITER' => $perlcdio::CDTEXT_FIELD_SONGWRITER,
+    'COMPOSER'   => $perlcdio::CDTEXT_FIELD_COMPOSER,
+    'MESSAGE'    => $perlcdio::CDTEXT_FIELD_MESSAGE,
+    'ARRANGER'   => $perlcdio::CDTEXT_FIELD_ARRANGER,
+    'ISRC'       => $perlcdio::CDTEXT_FIELD_ISRC,
+    'UPC_EAN'    => $perlcdio::CDTEXT_FIELD_UPC_EAN,
+    'GENRE'      => $perlcdio::CDTEXT_FIELD_GENRE,
+    'DISCID'     => $perlcdio::CDTEXT_FIELD_DISCID,
+    'INVALID'    => $perlcdio::CDTEXT_FIELD_INVALID,
+    );
+
+$Device::Cdio::CDTEXT_MIN_CDTEXT_FIELD  = $perlcdio::MIN_CDTEXT_FIELD;
+$Device::Cdio::CDTEXT_MAX_CDTEXT_FIELDS = $perlcdio::MAX_CDTEXT_FIELDS;
+
+%Device::Cdio::CDTEXT_FIELD_by_id = reverse %Device::Cdio::CDTEXT_FIELD;
+
+
+%Device::Cdio::CDTEXT_GENRE = (
+    'UNUSED'         => $perlcdio::CDTEXT_GENRE_UNUSED,
+    'UNDEFINED'      => $perlcdio::CDTEXT_GENRE_UNDEFINED,
+    'ADULT_CONTEMP'  => $perlcdio::CDTEXT_GENRE_ADULT_CONTEMP,
+    'ALT_ROCK'       => $perlcdio::CDTEXT_GENRE_ALT_ROCK,
+    'CHILDRENS'      => $perlcdio::CDTEXT_GENRE_CHILDRENS,
+    'CLASSIC'        => $perlcdio::CDTEXT_GENRE_CLASSIC,
+    'CHRIST_CONTEMP' => $perlcdio::CDTEXT_GENRE_CHRIST_CONTEMP,
+    'COUNTRY'        => $perlcdio::CDTEXT_GENRE_COUNTRY,
+    'DANCE'          => $perlcdio::CDTEXT_GENRE_DANCE,
+    'EASY_LISTENING' => $perlcdio::CDTEXT_GENRE_EASY_LISTENING,
+    'EROTIC'         => $perlcdio::CDTEXT_GENRE_EROTIC,
+    'FOLK'           => $perlcdio::CDTEXT_GENRE_FOLK,
+    'GOSPEL'         => $perlcdio::CDTEXT_GENRE_GOSPEL,
+    'HIPHOP'         => $perlcdio::CDTEXT_GENRE_HIPHOP,
+    'JAZZ'           => $perlcdio::CDTEXT_GENRE_JAZZ,
+    'LATIN'          => $perlcdio::CDTEXT_GENRE_LATIN,
+    'MUSICAL'        => $perlcdio::CDTEXT_GENRE_MUSICAL,
+    'NEWAGE'         => $perlcdio::CDTEXT_GENRE_NEWAGE,
+    'OPERA'          => $perlcdio::CDTEXT_GENRE_OPERA,
+    'OPERETTA'       => $perlcdio::CDTEXT_GENRE_OPERETTA,
+    'POP'            => $perlcdio::CDTEXT_GENRE_POP,
+    'RAP'            => $perlcdio::CDTEXT_GENRE_RAP,
+    'REGGAE'         => $perlcdio::CDTEXT_GENRE_REGGAE,
+    'ROCK'           => $perlcdio::CDTEXT_GENRE_ROCK,
+    'RYTHMANDBLUES'  => $perlcdio::CDTEXT_GENRE_RYTHMANDBLUES,
+    'SOUNDEFFECTS'   => $perlcdio::CDTEXT_GENRE_SOUNDEFFECTS,
+    'SOUNDTRACK'     => $perlcdio::CDTEXT_GENRE_SOUNDTRACK,
+    'SPOKEN_WORD'    => $perlcdio::CDTEXT_GENRE_SPOKEN_WORD,
+    'WORLD_MUSIC'    => $perlcdio::CDTEXT_GENRE_WORLD_MUSIC,
+    );
+
+
+%Device::Cdio::CDTEXT_GENRE_by_id = reverse %Device::Cdio::CDTEXT_GENRE;
+
+%Device::Cdio::CDTEXT_LANGUAGE = (
+    'UNKNOWN'       => $perlcdio::CDTEXT_LANGUAGE_UNKNOWN,
+    'ALBANIAN'      => $perlcdio::CDTEXT_LANGUAGE_ALBANIAN,
+    'BRETON'        => $perlcdio::CDTEXT_LANGUAGE_BRETON,
+    'CATALAN'       => $perlcdio::CDTEXT_LANGUAGE_CATALAN,
+    'CROATIAN'      => $perlcdio::CDTEXT_LANGUAGE_CROATIAN,
+    'WELSH'         => $perlcdio::CDTEXT_LANGUAGE_WELSH,
+    'CZECH'         => $perlcdio::CDTEXT_LANGUAGE_CZECH,
+    'DANISH'        => $perlcdio::CDTEXT_LANGUAGE_DANISH,
+    'GERMAN'        => $perlcdio::CDTEXT_LANGUAGE_GERMAN,
+    'ENGLISH'       => $perlcdio::CDTEXT_LANGUAGE_ENGLISH,
+    'SPANISH'       => $perlcdio::CDTEXT_LANGUAGE_SPANISH,
+    'ESPERANTO'     => $perlcdio::CDTEXT_LANGUAGE_ESPERANTO,
+    'ESTONIAN'      => $perlcdio::CDTEXT_LANGUAGE_ESTONIAN,
+    'BASQUE'        => $perlcdio::CDTEXT_LANGUAGE_BASQUE,
+    'FAROESE'       => $perlcdio::CDTEXT_LANGUAGE_FAROESE,
+    'FRENCH'        => $perlcdio::CDTEXT_LANGUAGE_FRENCH,
+    'FRISIAN'       => $perlcdio::CDTEXT_LANGUAGE_FRISIAN,
+    'IRISH'         => $perlcdio::CDTEXT_LANGUAGE_IRISH,
+    'GAELIC'        => $perlcdio::CDTEXT_LANGUAGE_GAELIC,
+    'GALICIAN'      => $perlcdio::CDTEXT_LANGUAGE_GALICIAN,
+    'ICELANDIC'     => $perlcdio::CDTEXT_LANGUAGE_ICELANDIC,
+    'ITALIAN'       => $perlcdio::CDTEXT_LANGUAGE_ITALIAN,
+    'LAPPISH'       => $perlcdio::CDTEXT_LANGUAGE_LAPPISH,
+    'LATIN'         => $perlcdio::CDTEXT_LANGUAGE_LATIN,
+    'LATVIAN'       => $perlcdio::CDTEXT_LANGUAGE_LATVIAN,
+    'LUXEMBOURGIAN' => $perlcdio::CDTEXT_LANGUAGE_LITHUANIAN,
+    'HUNGARIAN'     => $perlcdio::CDTEXT_LANGUAGE_HUNGARIAN,
+    'MALTESE'       => $perlcdio::CDTEXT_LANGUAGE_MALTESE,
+    'DUTCH'         => $perlcdio::CDTEXT_LANGUAGE_DUTCH,
+    'NORWEGIAN'     => $perlcdio::CDTEXT_LANGUAGE_NORWEGIAN,
+    'OCCITAN'       => $perlcdio::CDTEXT_LANGUAGE_OCCITAN,
+    'POLISH'        => $perlcdio::CDTEXT_LANGUAGE_POLISH,
+    'PORTUGUESE'    => $perlcdio::CDTEXT_LANGUAGE_PORTUGUESE,
+    'ROMANIAN'      => $perlcdio::CDTEXT_LANGUAGE_ROMANIAN,
+    'ROMANSH'       => $perlcdio::CDTEXT_LANGUAGE_ROMANSH,
+    'SERBIAN'       => $perlcdio::CDTEXT_LANGUAGE_SERBIAN,
+    'SLOVAK'        => $perlcdio::CDTEXT_LANGUAGE_SLOVAK,
+    'SLOVENIAN'     => $perlcdio::CDTEXT_LANGUAGE_SLOVENIAN,
+    'FINNISH'       => $perlcdio::CDTEXT_LANGUAGE_FINNISH,
+    'SWEDISH'       => $perlcdio::CDTEXT_LANGUAGE_SWEDISH,
+    'TURKISH'       => $perlcdio::CDTEXT_LANGUAGE_TURKISH,
+    'FLEMISH'       => $perlcdio::CDTEXT_LANGUAGE_FLEMISH,
+    'WALLON'        => $perlcdio::CDTEXT_LANGUAGE_WALLON,
+    'ZULU'          => $perlcdio::CDTEXT_LANGUAGE_ZULU,
+    'VIETNAMESE'    => $perlcdio::CDTEXT_LANGUAGE_VIETNAMESE,
+    'UZBEK'         => $perlcdio::CDTEXT_LANGUAGE_UZBEK,
+    'URDU'          => $perlcdio::CDTEXT_LANGUAGE_URDU,
+    'UKRAINIAN'     => $perlcdio::CDTEXT_LANGUAGE_UKRAINIAN,
+    'THAI'          => $perlcdio::CDTEXT_LANGUAGE_THAI,
+    'TELUGU'        => $perlcdio::CDTEXT_LANGUAGE_TELUGU,
+    'TATAR'         => $perlcdio::CDTEXT_LANGUAGE_TATAR,
+    'TAMIL'         => $perlcdio::CDTEXT_LANGUAGE_TAMIL,
+    'TADZHIK'       => $perlcdio::CDTEXT_LANGUAGE_TADZHIK,
+    'SWAHILI'       => $perlcdio::CDTEXT_LANGUAGE_SWAHILI,
+    'SRANANTONGO'   => $perlcdio::CDTEXT_LANGUAGE_SRANANTONGO,
+    'SOMALI'        => $perlcdio::CDTEXT_LANGUAGE_SOMALI,
+    'SINHALESE'     => $perlcdio::CDTEXT_LANGUAGE_SINHALESE,
+    'SHONA'         => $perlcdio::CDTEXT_LANGUAGE_SHONA,
+    'SERBO_CROAT'   => $perlcdio::CDTEXT_LANGUAGE_SERBO_CROAT,
+    'RUTHENIAN'     => $perlcdio::CDTEXT_LANGUAGE_RUTHENIAN,
+    'RUSSIAN'       => $perlcdio::CDTEXT_LANGUAGE_RUSSIAN,
+    'QUECHUA'       => $perlcdio::CDTEXT_LANGUAGE_QUECHUA,
+    'PUSHTU'        => $perlcdio::CDTEXT_LANGUAGE_PUSHTU,
+    'PUNJABI'       => $perlcdio::CDTEXT_LANGUAGE_PUNJABI,
+    'PERSIAN'       => $perlcdio::CDTEXT_LANGUAGE_PERSIAN,
+    'PAPAMIENTO'    => $perlcdio::CDTEXT_LANGUAGE_PAPAMIENTO,
+    'ORIYA'         => $perlcdio::CDTEXT_LANGUAGE_ORIYA,
+    'NEPALI'        => $perlcdio::CDTEXT_LANGUAGE_NEPALI,
+    'NDEBELE'       => $perlcdio::CDTEXT_LANGUAGE_NDEBELE,
+    'MARATHI'       => $perlcdio::CDTEXT_LANGUAGE_MARATHI,
+    'MOLDAVIAN'     => $perlcdio::CDTEXT_LANGUAGE_MOLDAVIAN,
+    'MALAYSIAN'     => $perlcdio::CDTEXT_LANGUAGE_MALAYSIAN,
+    'MALAGASAY'     => $perlcdio::CDTEXT_LANGUAGE_MALAGASAY,
+    'MACEDONIAN'    => $perlcdio::CDTEXT_LANGUAGE_MACEDONIAN,
+    'LAOTIAN'       => $perlcdio::CDTEXT_LANGUAGE_LAOTIAN,
+    'KOREAN'        => $perlcdio::CDTEXT_LANGUAGE_KOREAN,
+    'KHMER'         => $perlcdio::CDTEXT_LANGUAGE_KHMER,
+    'KAZAKH'        => $perlcdio::CDTEXT_LANGUAGE_KAZAKH,
+    'KANNADA'       => $perlcdio::CDTEXT_LANGUAGE_KANNADA,
+    'JAPANESE'      => $perlcdio::CDTEXT_LANGUAGE_JAPANESE,
+    'INDONESIAN'    => $perlcdio::CDTEXT_LANGUAGE_INDONESIAN,
+    'HINDI'         => $perlcdio::CDTEXT_LANGUAGE_HINDI,
+    'HEBREW'        => $perlcdio::CDTEXT_LANGUAGE_HEBREW,
+    'HAUSA'         => $perlcdio::CDTEXT_LANGUAGE_HAUSA,
+    'GURANI'        => $perlcdio::CDTEXT_LANGUAGE_GURANI,
+    'GUJURATI'      => $perlcdio::CDTEXT_LANGUAGE_GUJURATI,
+    'GREEK'         => $perlcdio::CDTEXT_LANGUAGE_GREEK,
+    'GEORGIAN'      => $perlcdio::CDTEXT_LANGUAGE_GEORGIAN,
+    'FULANI'        => $perlcdio::CDTEXT_LANGUAGE_FULANI,
+    'DARI'          => $perlcdio::CDTEXT_LANGUAGE_DARI,
+    'CHURASH'       => $perlcdio::CDTEXT_LANGUAGE_CHURASH,
+    'CHINESE'       => $perlcdio::CDTEXT_LANGUAGE_CHINESE,
+    'BURMESE'       => $perlcdio::CDTEXT_LANGUAGE_BURMESE,
+    'BULGARIAN'     => $perlcdio::CDTEXT_LANGUAGE_BULGARIAN,
+    'BENGALI'       => $perlcdio::CDTEXT_LANGUAGE_BENGALI,
+    'BIELORUSSIAN'  => $perlcdio::CDTEXT_LANGUAGE_BAMBORA,
+    'AZERBAIJANI'   => $perlcdio::CDTEXT_LANGUAGE_AZERBAIJANI,
+    'ASSAMESE'      => $perlcdio::CDTEXT_LANGUAGE_ASSAMESE,
+    'ARMENIAN'      => $perlcdio::CDTEXT_LANGUAGE_ARMENIAN,
+    'ARABIC'        => $perlcdio::CDTEXT_LANGUAGE_ARABIC,
+    'AMHARIC'       => $perlcdio::CDTEXT_LANGUAGE_AMHARIC,
+    );
+
+%Device::Cdio::CDTEXT_LANGUAGE_by_id = reverse %Device::Cdio::CDTEXT_LANGUAGE;
+
+
 =pod
 
 =head1 METHODS
@@ -458,22 +620,103 @@ sub audio_set_volume {
 =head2 get_disk_cdtext, get_track_cdtext
 
     $hash = $dev->get_disk_cdtext;
-    $hash = $dev->get_track_cdtext(track);
+    $hash = $dev->get_cdtext_for_track(track, field);
+    $hash = $dev->get_cdtext_field_for_track(track, field);
+    $hash = $dev->get_cdtext_field_for_track(track, field);
 
 Returns a hash reference hash->{cdtext_field}="text"
 if found any cdtext on disk;
 
 =cut
 
-sub get_disk_cdtext {
+sub cdtext_init {
     my($self,@p) = @_;
-    return perlcdio::get_cdtext($self->{cd},0);
+    $self->{cdtext} =  perlcdio::cdio_get_cdtext($self->{cd});
+    return $self->{cdtext};
+}
+
+sub cdtext_data_init {
+    my($cdt, $cdt_data, $cdt_size, @p) = @_;
+    return perlcdio::cdtext_data_init($cdt, $cdt_data, $cdt_size);
+}
+
+=head2 get_disk_cdtext_field_for_track
+
+    $str = $dev->get_cdtext_field_for_track($field, $track=0, $cdtext=$self->{cdtext});
+
+Returns the text associated with field $field of track $track of $cdtext if there
+is any.
+
+=cut
+sub cdtext_field_for_track {
+    my($self,$f, $t, @p) = @_;
+    $t = 0 if !defined $t;
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    return perlcdio::cdtext_get_const($cdtext, $f, $t);
+}
+
+sub cdtext_field_for_disc {
+    my($self,$f, @p) = @_;
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    return perlcdio::cdtext_get_const($cdtext, $f, 0);
+}
+
+sub cdtext_list_languages {
+    my($self, @p) = @_;
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    if (!$cdtext) {
+	$cdtext = $self->cdtext_init();
+    }
+    return perlcdio::cdtext_list_languages($cdtext);
+}
+
+sub cdtext_select_language {
+    my($self, $lang, @p) = @_;
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    return if !exists $Device::Cdio::CDTEXT_LANGUAGE{$lang};
+    my $l = $Device::Cdio::CDTEXT_LANGUAGE{$lang};
+    if (!$cdtext) {
+	$cdtext = $self->cdtext_init();
+    }
+    return perlcdio::cdtext_select_language($cdtext, $l);
 }
 
 sub get_track_cdtext {
-    my($self,$t, @p) = @_;
-    $t = 1 if !defined $t;
-    return perlcdio::get_cdtext($self->{cd},$t);
+    my($self, $t, @p) = @_;
+    $t = 0 if !defined $t;
+    my $cdtext_fields = {};
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    for (my $field=$perlcdio::MIN_CDTEXT_FIELD;
+	 $field <= $perlcdio::MAX_CDTEXT_FIELDS; $field++) {
+	$cdtext_fields->{$field} = perlcdio::cdtext_get_const($cdtext, $field, $t);
+    }
+    return $cdtext_fields;
+}
+
+sub get_disc_cdtext {
+    my($self, @p) = @_;
+    return get_track_cdtext($self, 0, @p);
+}
+
+
+=head2 cdtext_destroy
+
+$dev->cdtext_destroy()
+
+Removes CD-TEXT memor resources associated a disc and sets
+$dev->{cdtext} to undef.
+
+Use this when you are done accessing with CD-TEXT information.
+
+Note: $def->close() runs this as part of its operation.
+
+=cut
+
+sub cdtext_destroy {
+    my($self, @p) = @_;
+    my $cdtext = defined $p[0] ? $p[0] : $self->{cdtext};
+    perlcdio::cdtext_destory($cdtext);
+    $self->{cdtext} = undef;
 }
 
 =pod
@@ -505,7 +748,7 @@ Returns a hash reference with the audio-subchannel-mmc status values:
     track : track number
     index : index in track
     msf time values as ints minutes, seconds,frames :
-        abs_m,abs_s,abs_f  : total disk time played
+        abs_m,abs_s,abs_f  : total disc time played
         rel_m,rel_s,el_f   : track time played
     disk_s  : seconds disk played
     track_s : seconds track played
@@ -774,6 +1017,7 @@ sub open {
 
     $self->close() if defined($self->{cd});
     $self->{cd} = perlcdio::open_cd($source, $driver_id, $access_mode);
+    $self->{cdtext} = undef;
 }
 
 =pod

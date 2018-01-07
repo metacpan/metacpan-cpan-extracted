@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Math::GF;
+use 5.010;
+use Data::Dumper;
+
+my $plane = PG2(shift // 2); # Fano plane by default
+print_aoa($plane);
+say 'errors in check: ', check($plane);
+
+sub PG2 {
+   my $order = shift;
+   my $field = Math::GF->new(order => $order);
+   my @elements = $field->all;
+
+   say 'elements in field: ' . scalar(@elements);
+
+   my $zero = $field->additive_neutral;
+
+   my @points;
+   for my $i (@elements[0, 1]) {
+      for my $j ($i == $zero ? @elements[0, 1] : @elements) {
+         for my $k ((($i == $zero) && ($j == $zero)) ? $elements[1] : @elements) {
+            push @points, [$i, $j, $k];
+         }
+      }
+   }
+
+   my @lines = map { [] } 1 .. scalar(@points);
+   for my $li (0 .. $#points) {
+      my $L = $points[$li];
+      for my $pi ($li .. $#points) {
+         last if scalar(@{$lines[$li]}) == $order + 1;
+         my $sum = $zero;
+         $sum = $sum + $L->[$_] * $points[$pi][$_] for 0 .. 2;
+         next if $sum != $zero;
+         push @{$lines[$li]}, $pi;
+         push @{$lines[$pi]}, $li if $pi != $li;
+      }
+   }
+
+   return \@lines;
+}
+
+sub print_aoa {
+   my $aoa = shift;
+   printf {*STDOUT} "%3d. (%s)\n", $_, join ', ', @{$aoa->[$_]}
+     for 0 .. $#$aoa;
+}
+
+sub check {
+   my $plane = shift;
+   my %adjacents;
+   my $errors = 0;
+   my %collisions_for;
+   for my $line (@$plane) {
+      for my $i (0 .. $#$line) {
+         my $I = $line->[$i];
+         for my $j ($i .. $#$line) {
+            my $J = $line->[$j];
+            if (($I != $J) && $adjacents{$I}{$J}) {
+               say {*STDERR} "ERROR: <$I> and <$J> is duplicated";
+               push @{$collisions_for{$I}}, $J;
+               push @{$collisions_for{$J}}, $I;
+               $errors++;
+            } ## end if (($I != $J) && $adjacents...)
+            $adjacents{$I}{$J} = $adjacents{$J}{$I} = 1;
+         } ## end for my $j ($i .. $#$line)
+      } ## end for my $i (0 .. $#$line)
+   } ## end for my $line (@$plane)
+   my @keys = sort { $a <=> $b } keys %adjacents;
+   for my $I (@keys) {
+      for my $J (@keys) {
+         if (!exists $adjacents{$I}{$J}) {
+            say {*STDERR} "ERROR: <$I> and <$J> does not exist";
+            $errors++;
+         }
+      } ## end for my $J (@keys)
+   } ## end for my $I (@keys)
+   say Dumper(\%collisions_for) if $errors;
+
+   return $errors;
+} ## end sub check

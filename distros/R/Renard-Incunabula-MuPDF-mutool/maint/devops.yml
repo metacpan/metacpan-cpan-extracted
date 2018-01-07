@@ -1,0 +1,9 @@
+---
+native:
+  debian:
+    packages:
+      - pkg-config
+  macos-homebrew:
+    packages: ~
+  msys2-mingw64:
+    packages: ~

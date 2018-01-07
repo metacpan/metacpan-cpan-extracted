@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.017
+This document describes Attean::API::Model version 0.018
 
 =head1 DESCRIPTION
 
@@ -115,14 +115,14 @@ subjects and objects present in the specified C<< $graph >>.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.017 {
-	use Moo::Role;
+package Attean::API::Model 0.018 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(uniq);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	# get_quads($s, $p, $o, $g)
 	# or:
@@ -236,13 +236,13 @@ package Attean::API::Model 0.017 {
 }
 
 
-package Attean::API::MutableModel 0.017 {
-	use Moo::Role;
+package Attean::API::MutableModel 0.018 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
 	use Scalar::Util qw(blessed);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	requires 'add_quad';
 	requires 'remove_quad';
@@ -328,21 +328,21 @@ package Attean::API::MutableModel 0.017 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.017 {
+package Attean::API::ETagCacheableModel 0.018 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.017 {
+package Attean::API::TimeCacheableModel 0.018 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.017 {
+package Attean::API::BulkUpdatableModel 0.018 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';
@@ -387,7 +387,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

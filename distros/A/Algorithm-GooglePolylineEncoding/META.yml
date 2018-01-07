@@ -21,4 +21,4 @@ no_index:
 requires: {}
 resources:
   repository: git://github.com/eserte/algorithm-googlepolylineencoding.git
-version: 0.05
+version: 0.06

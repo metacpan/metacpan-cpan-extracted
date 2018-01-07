@@ -10,18 +10,21 @@ Makefile.PL
 README.md
 THANKS
 configure
-data/cdda.bin
-data/cdda.cue
-data/cdda.toc
-data/copying.iso
-data/isofs-m1.bin
-data/isofs-m1.cue
+data/cdda.bin                 # A CDDA bin/
+data/cdda.cue                 # cue image
+data/cdda.toc                 # Sample CDRDAO image
+data/cdtext-test.toc          # CDRDAO image used in testing
+data/cdtext.cdt               # Raw CDText data
+data/copying.iso              # An ISO 9660 images
+data/isofs-m1.bin             # An ISO9660 bin/
+data/isofs-m1.cue             # cue image
 examples/.gitignore
 examples/README
 examples/audio.pl
 examples/cd-read.pl
 examples/cdchange.pl
 examples/cdtext.pl
+examples/cdtext-raw.pl
 examples/checkcd.pl
 examples/device.pl
 examples/drives.pl
@@ -55,7 +58,6 @@ swig/perlmmc.swg
 swig/read.swg
 swig/track.swg
 swig/types.swg
-t/.gdb_history
 t/00.load.t
 t/01.pod-coverage.t
 t/01.pod.t
@@ -72,5 +74,4 @@ t/10.cdda.t
 t/10.cdtext.t
 t/10.read.t
 t/11.dev.t
-t/cdtext.toc
 SIGNATURE    Added here by Module::Build

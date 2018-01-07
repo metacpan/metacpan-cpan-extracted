@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::Command::db;
-$Footprintless::Plugin::Database::Command::db::VERSION = '1.01';
+$Footprintless::Plugin::Database::Command::db::VERSION = '1.03';
 # ABSTRACT: Provides support for databases
 # PODNAME: Footprintless::Plugin::Database::Command::db
 
@@ -37,7 +37,7 @@ Footprintless::Plugin::Database::Command::db - Provides support for databases
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head1 SYNOPSIS
 

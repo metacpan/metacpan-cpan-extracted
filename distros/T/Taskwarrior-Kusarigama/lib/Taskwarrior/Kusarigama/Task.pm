@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Task;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: per-task Taskwarrior::Kusarigama::Wrapper
-$Taskwarrior::Kusarigama::Task::VERSION = '0.4.0';
+$Taskwarrior::Kusarigama::Task::VERSION = '0.5.0';
 use strict;
 
 use experimental 'postderef';
@@ -54,7 +54,7 @@ Taskwarrior::Kusarigama::Task - per-task Taskwarrior::Kusarigama::Wrapper
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 SYNOPSIS
 

@@ -471,6 +471,9 @@ unstable editing).
 
 =item B<-syn>,   B<--check-syntax>      
 
+This flag is now ignored for safety, but the following documentation
+has been retained for reference.
+
 This flag causes perltidy to run C<perl -c -T> to check syntax of input
 and output.  (To change the flags passed to perl, see the next
 item, B<-pscf>).  The results are written to the F<.LOG> file, which
@@ -1732,7 +1735,100 @@ separately if desired:
   -ohbr or --opening-hash-brace-right
   -osbr or --opening-square-bracket-right
 
-=item Vertical tightness of non-block curly braces, parentheses, and square brackets.
+=item B<-wn>,  B<--weld-nested-containers> 
+
+The B<-wn> flag causes closely nested pairs of opening and closing container
+symbols (curly braces, brackets, or parens) to be "welded" together, meaning
+that they are treated as if combined into a single unit, with the indentation
+of the innermost code reduced to be as if there were just a single container
+symbol.
+
+For example:
+
+	# default formatting
+        do {
+            {
+                next if $x == $y;    
+            }
+        } until $x++ > $z;
+
+	# perltidy -wn
+        do { {
+            next if $x == $y;
+        } } until $x++ > $z;
+
+When this flag is set perltidy makes a preliminary pass through the file and
+identifies all nested pairs of containers.  To qualify as a nested pair, the
+closing container symbols must be immediately adjacent. The opening symbols
+must either be adjacent, or, if the outer opening symbol is an opening
+paren, they may be separated by any single non-container symbol or something
+that looks like a function evaluation.  
+
+Any container symbol may serve as both the inner container of one pair and as
+the outer container of an adjacent pair. Consequently, any number of adjacent
+opening or closing symbols may join together in weld.  For example, here are
+three levels of wrapped function calls:
+
+	# default formatting
+        my (@date_time) = Localtime(
+            Date_to_Time(
+                Add_Delta_DHMS(
+                    $year, $month,  $day, $hour, $minute, $second,
+                    '0',   $offset, '0',  '0'
+                )
+            )
+        );
+
+        # perltidy -wn
+        my (@date_time) = Localtime( Date_to_Time( Add_Delta_DHMS(
+            $year, $month,  $day, $hour, $minute, $second,
+            '0',   $offset, '0',  '0'
+        ) ) );
+
+Notice how the indentation of the inner lines are reduced by two levels in this
+case.  This example also shows the typical result of this formatting, namely it
+is a sandwich consisting of an initial opening layer, a central section of any
+complexity forming the "meat" of the sandwich, and a final closing layer.  This
+predictable structure helps keep the compacted structure readable.
+
+Here is an example illustrating a welded container within a welded containers:
+
+	# default formatting
+        $x->badd(
+            bmul(
+                $class->new(
+                    abs(
+                        $sx * int( $xr->numify() ) & $sy * int( $yr->numify() )
+                    )
+                ),
+                $m
+            )
+        );
+
+	# perltidy -wn
+        $x->badd( bmul(
+            $class->new( abs(
+                $sx * int( $xr->numify() ) & $sy * int( $yr->numify() )
+            ) ),
+            $m
+        ) );
+
+Some math and logical expressions can benefit from this option.
+
+This format option is quite general but there are some limitations.  
+
+One limitiation is that any line length limit still applies and can cause long
+welded sections to be broken into multiple lines.  
+
+Another limitation is that an opening symbol which delimits quoted text cannot
+be included in a welded pair.  This is because quote delimiters are treated
+specially in perltidy.  
+
+Finally, the stacking of containers defined by this flag have priority over
+any other container stacking flags.  This is because any welding is done first.
+
+
+=item B<Vertical tightness> of non-block curly braces, parentheses, and square brackets.
 
 These parameters control what shall be called vertical tightness.  Here are the
 main points:
@@ -3214,7 +3310,7 @@ perlstyle(1), Perl::Tidy(3)
 
 =head1 VERSION
 
-This man page documents perltidy version 20171214.
+This man page documents perltidy version 20180101.
 
 =head1 BUG REPORTS
 

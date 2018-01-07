@@ -7,7 +7,7 @@ our @EXPORT = qw/gzip gunzip gzip_file gunzip_file gzip_to_file/;
 our @EXPORT_OK = qw/deflate inflate deflate_raw inflate_raw/;
 our %EXPORT_TAGS = ('all' => [@EXPORT, @EXPORT_OK]);
 use Carp;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 require XSLoader;
 XSLoader::load ('Gzip::Faster', $VERSION);
 

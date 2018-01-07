@@ -42,7 +42,7 @@ sub _pp
 	my $tmpDir = tempdir('testontap_ppscript_XXXX', TMPDIR => 1, CLEANUP => 1);
 	$_[0]->{_pp_script} = "$tmpDir/testontap_pp.pl";
 	my $scriptFile = __internal_pp_script(@_);
-	system("perl $SHELL_ARG_DELIM$scriptFile$SHELL_ARG_DELIM");
+	system("$^X $SHELL_ARG_DELIM$scriptFile$SHELL_ARG_DELIM");
 }
 
 sub _pp_info
@@ -52,7 +52,7 @@ sub _pp_info
 	die("Sorry, you're not running a binary/packed instance\n") unless $IS_PACKED;
 
 	print "$0\n";
-	foreach my $sec (qw(CMD CONFIG MODULES))
+	foreach my $sec (qw(USERNAME HOSTNAME CONFIG ENV MODULES CMD))
 	{
 		print "### $sec BEGIN\n";
 		print PAR::read_file("TESTONTAP_${sec}_FILE");
@@ -105,6 +105,7 @@ sub __internal_pp_script
 	chomp($x_liblocs);
 	
 	my $script = <<SCRIPT;
+#! $^X
 use strict;
 use warnings;
 
@@ -115,11 +116,14 @@ use File::Slurp qw(write_file);
 use File::Spec;
 use File::Temp qw(tempfile);
 use Getopt::Long;
+use Net::Domain qw(hostfqdn);
 
 \$| = 1;
 
 eval "require PAR::Packer";
 die("Sorry, PAR:Packer is not installed/working!\\n") if \$@;
+
+my \$IS_WINDOWS = \$^O eq 'MSWin32';
 
 my \$_argsPodInput = slashify(File::Spec->rel2abs('$x__argsPodInput'));
 my \$argsPodInput = slashify(File::Spec->rel2abs('$x_argsPodInput'));
@@ -128,20 +132,53 @@ my \$manualPodInput = slashify(File::Spec->rel2abs('$x_manualPodInput'));
 my \$outfile = slashify(File::Spec->rel2abs('$x_output'));
 my \$verbose = $x_verbose;
 my \$debug = 0;
-GetOptions('outfile=s' => \\\$outfile, 'verbose!' => \\\$verbose, 'debug' => \\\$debug) || usage();
+my \$info = 1;
+GetOptions('outfile=s' => \\\$outfile, 'verbose!' => \\\$verbose, 'info!' => \\\$info, 'debug' => \\\$debug) || usage();
 \$verbose = 1 if \$debug; 
 
 my \$outdir = dirname(\$outfile);
 die("The output directory doesn't exist: '\$outdir'\\n") unless -d \$outdir;
 die("The outfile exists: '\$outfile'\\n") if -e \$outfile;
 
+print "Getting username...\\n" if \$verbose;
+my (undef, \$usernameFile) = tempfile('testontap_username_XXXX', TMPDIR => 1, UNLINK => 1);
+if (\$info)
+{
+	my \$username = \$IS_WINDOWS ? getlogin() : scalar(getpwuid(\$<));
+	write_file(\$usernameFile, "\$username\\n") || die("Failed to write '\$usernameFile': $!\\n");
+}
+
+print "Getting hostname...\\n" if \$verbose;
+my (undef, \$hostnameFile) = tempfile('testontap_hostname_XXXX', TMPDIR => 1, UNLINK => 1);
+if (\$info)
+{
+	my \$hostname = hostfqdn();
+	write_file(\$hostnameFile, "\$hostname\\n") || die("Failed to write '\$hostnameFile': $!\\n");
+}
+
+print "Getting environment...\\n" if \$verbose;
+my (undef, \$envFile) = tempfile('testontap_env_XXXX', TMPDIR => 1, UNLINK => 1);
+if (\$info)
+{
+	my \$env = getEnv();
+	write_file(\$envFile, \$env) || die("Failed to write '\$envFile': $!\\n");
+}
+
 print "Getting config...\\n" if \$verbose;
 my (undef, \$configFile) = tempfile('testontap_config_XXXX', TMPDIR => 1, UNLINK => 1);
-write_file(\$configFile, myconfig()) || die("Failed to write '\$configFile': \$!\\n");
+if (\$info)
+{
+	my \$config = myconfig();
+	write_file(\$configFile, \$config) || die("Failed to write '\$configFile': \$!\\n");
+}
  
 print "Getting modules...\\n" if \$verbose;
 my (undef, \$modulesFile) = tempfile('testontap_modules_XXXX', TMPDIR => 1, UNLINK => 1);
-write_file(\$modulesFile, find_modules()) || die("Failed to write '\$modulesFile': $!\\n");
+if (\$info)
+{
+	my \$modules = find_modules();
+	write_file(\$modulesFile, \$modules) || die("Failed to write '\$modulesFile': $!\\n");
+}
 
 print "Getting cmd...\\n" if \$verbose;
 my (undef, \$cmdFile) = tempfile('testontap_cmd_XXXX', TMPDIR => 1, UNLINK => 1);
@@ -160,6 +197,9 @@ my \@cmd =
 		'-a', "\$cmdFile;TESTONTAP_CMD_FILE",
 		'-a', "\$configFile;TESTONTAP_CONFIG_FILE",
 		'-a', "\$modulesFile;TESTONTAP_MODULES_FILE",
+		'-a', "\$usernameFile;TESTONTAP_USERNAME_FILE",
+		'-a', "\$hostnameFile;TESTONTAP_HOSTNAME_FILE",
+		'-a', "\$envFile;TESTONTAP_ENV_FILE",
 		'-M', 'Encode::*',
 		'-o', \$outfile,
 		slashify(File::Spec->rel2abs('$x_input'))
@@ -167,7 +207,10 @@ my \@cmd =
 
 my \@cmdCopy = \@cmd;
 \$_ .= "\\n" foreach (\@cmdCopy);
-write_file(\$cmdFile, { binmode => ':raw' }, \@cmdCopy) || die("Failed to write '\$cmdFile': \$!\\n");
+if (\$info)
+{
+	write_file(\$cmdFile, { binmode => ':raw' }, \@cmdCopy) || die("Failed to write '\$cmdFile': \$!\\n");
+}
 
 if (\$verbose)
 {
@@ -181,9 +224,12 @@ else
 
 if (\$debug)
 {
-	print "cmd file     : \$cmdFile\\n";
-	print "config file  : \$configFile\\n";
-	print "modules file : \$modulesFile\\n";
+	print "username file     : \$usernameFile\\n";
+	print "hostname file     : \$hostnameFile\\n";
+	print "config file       : \$configFile\\n";
+	print "env file          : \$envFile\\n";
+	print "modules file      : \$modulesFile\\n";
+	print "cmd file          : \$cmdFile\\n";
 	print "Continue? (no) : ";
 	my \$ans = <STDIN>;
 	exit(1) unless \$ans =~ /^\\s*yes\\s*\$/i;
@@ -196,6 +242,14 @@ print "done\\n";
 exit(0);
 
 ###
+
+sub getEnv
+{
+	my \$env = '';
+	\$env .= "\$_ => '\$ENV{\$_}'\\n" foreach (sort(keys(\%ENV)));
+	
+	return \$env;
+}
 
 sub find_modules
 {
@@ -228,12 +282,16 @@ sub usage
 Usage: \$0
           [--output <file>]
           [--verbose || --no-verbose];
+          [--info || --no-info]
 
 Creates a testontap binary with a default name of '$x_output'.
 Use '--output' to change.
 
 Use '--verbose' or '--no-verbose' to turn on/off verboseness.
-Defaults to verboseness when script was created (currently '$x_verbose'). 
+Defaults to verboseness when script was created (currently '$x_verbose').
+
+By default a number of information parts is embedded in the packed file (to be printed
+with '--_pp_info'). Use '--no-info' to embed blank data only. 
 USAGE
 	exit(42);
 }
@@ -241,6 +299,13 @@ SCRIPT
 
 	write_file($scriptFile, $script) || die("Failed to write '$scriptFile': $!\n");
 	
+	if (!$IS_WINDOWS)
+	{
+		my $mode = (stat($scriptFile))[2];
+		$mode |= 0100;
+		chmod($mode, $scriptFile);
+	}
+	 
 	return $scriptFile;
 }
 

@@ -2,17 +2,15 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 3;
 use Geo::WeatherNWS;
 
-if ( ! $ENV{TEST_NETWORK} ) {
-    plan skip_all => "ENV{TEST_NETWORK} is not set";
-}
-else {
-    plan tests => 4;
+
+SKIP: {
+    skip "network dependent test", 3 unless $ENV{TEST_NETWORK};
 
     my $report_a = Geo::WeatherNWS::new();
-    # Test connecting to bad server via FTP
+    # Test connecting to bad server
     my $bogus_site = "bogus-site.example.com";    # doesn't exist
     $report_a->setservername($bogus_site);
     $report_a->settimeout(1);    # no point waiting for the impossible
@@ -24,14 +22,8 @@ else {
         'error text set for conditions'
     );
 
-    # Get data via FTP 
     my $report_b = Geo::WeatherNWS::new();
     $report_b->getreport('kstl');
     is($report_b->{code}, 'KSTL', 'icao code from ftp report');
-
-    # Get data via HTTP
-    my $report_c = Geo::WeatherNWS::new();
-    $report_c->getreporthttp('kord');
-    is($report_c->{code}, 'KORD', 'icao code from http report');
 }
 

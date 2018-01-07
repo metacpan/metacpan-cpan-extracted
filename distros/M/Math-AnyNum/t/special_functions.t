@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 231;
+plan tests => 233;
 
 use Math::AnyNum qw(:special rat float complex);
 
@@ -46,7 +46,11 @@ like(beta(complex(0.5), complex(0.5)), qr/^3\.1415926535897932384626433\d*\z/);
     $f1 = complex($f1);
     $f2 = complex($f2);
 
-    like(atan2($f1, $f2), qr/^0\.3217505543966421934014046143586613\d*\z/);
+    like(atan2($f1, $f2)->round(-50), qr/^0\.3217505543966421934014046143586613\d*\z/);
+    like(atan2(Math::AnyNum->new_c(3, 4), Math::AnyNum->new_c(-7, -5)),
+         qr/^2\.6255065752238701743392190680509115\d*-0\.1344635740384774986775422855600050869\d*i\z/);
+    like(atan2(Math::AnyNum->new_c(-3, -4), Math::AnyNum->new_c(-7, -5)),
+         qr/^-2\.6255065752238701743392190680509115\d*\+0\.1344635740384774986775422855600050869\d*i\z/);
 
     is($f1, '0.5');
     is($f2, '1.5');

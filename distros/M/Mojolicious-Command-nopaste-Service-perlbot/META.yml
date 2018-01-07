@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Path::Tiny: '0'
   Test::More: '0'
   strict: '0'
   warnings: '0'
@@ -28,16 +29,16 @@ no_index:
 provides:
   Mojolicious::Command::nopaste::Service::perlbot:
     file: lib/Mojolicious/Command/nopaste/Service/perlbot.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   Getopt::Long: '0'
   Mojo::Base: '0'
   Mojo::JSON: '0'
-  Mojolicious::Command::nopaste: '0'
+  Mojolicious::Command::nopaste: '0.10'
 resources:
   bugtracker: https://github.com/perlbot/Mojolicious-Command-nopaste-Service-perlbot/issues
   repository: git://github.com/perlbot/Mojolicious-Command-nopaste-Service-perlbot.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -177,11 +178,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.006
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -199,10 +200,21 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
       name: Git::Push
       version: '2.042'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.15.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: Git::Contributors
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::Readme::Brief
       name: Readme::Brief
@@ -299,4 +311,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.009'
+x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,16 @@
 Revision history for Math-Bacovia
 
+0.03    2018-01-05
+
+        - Fixed the result of the `atan2(x, y)` function, when `x` and `y` are non-positive numbers.
+        - Less aggressive caching.
+
+0.02    2018-01-02
+
+        - Renamed the method `inside()` to `get()`.
+        - Uncached the `numeric()` method.
+        - Added the `set()` method in `Math::Bacovia::Symbol`, which allows changing the numerical value of the self-object.
+
 0.01    2017-12-14
 
         - First release.

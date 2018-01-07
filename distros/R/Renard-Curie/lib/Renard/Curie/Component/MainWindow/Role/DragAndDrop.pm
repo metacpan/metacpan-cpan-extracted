@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::DragAndDrop;
 # ABSTRACT: Role for drag-and-drop
-$Renard::Curie::Component::MainWindow::Role::DragAndDrop::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::Role::DragAndDrop::VERSION = '0.004';
 use Moo::Role;
 use MooX::Lsub;
 
@@ -64,7 +64,7 @@ Renard::Curie::Component::MainWindow::Role::DragAndDrop - Role for drag-and-drop
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 

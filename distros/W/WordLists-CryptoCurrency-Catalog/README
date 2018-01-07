@@ -1,0 +1,50 @@
+NAME
+    WordLists::CryptoCurrency::Catalog - Wordlists from cryptocurrency
+    catalog
+
+VERSION
+    This document describes version 20180106 of
+    WordLists::CryptoCurrency::Catalog (from Perl distribution
+    WordLists-CryptoCurrency-Catalog), released on 2018-01-07.
+
+DESCRIPTION
+    This distribution contains the following modules:
+
+    *   WordList::CryptoCurrency::Catalog::Symbol
+
+    *   WordList::CryptoCurrency::Catalog::Name
+
+    *   WordList::CryptoCurrency::Catalog::NameSymbol
+
+    *   WordList::CryptoCurrency::Catalog::Safename
+
+    They are sourced from CryptoCurrency::Catalog.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordLists-CryptoCurrency-Catalog>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordLists-CryptoCurrency-Catalog>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordLists-CryptoCurre
+    ncy-Catalog>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CryptoCurrency::Catalog
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(check_deps);
 
 use MetaCPAN::Client;
 
-my $mc = MetaCPAN::Client->new;
+my $mc = MetaCPAN::Client->new(debug => 1);
 
 sub check_deps {
     my ($author, %args) = @_;
@@ -165,7 +165,7 @@ Module::CheckDep::Version - Compare v
 
     # return the data within a hash reference instead of printing
 
-    check_deps('STEVEB', return => 1);
+    my $info = check_deps('STEVEB', return => 1);
 
     # send in your own custom function to manage the data
 

@@ -98,6 +98,7 @@ html_valid_run (html_valid_t * htv, SV * html,
     /* These are not our mallocs, they are Perl's mallocs, so we don't
        increase htv->n_mallocs for these. After we return them, we no
        longer take care of these. */
+
     * output_ptr = output;
     * errors_ptr = errors;
     return html_valid_ok;

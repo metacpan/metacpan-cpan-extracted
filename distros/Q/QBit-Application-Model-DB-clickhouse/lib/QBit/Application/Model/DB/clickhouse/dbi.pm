@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse::dbi;
-$QBit::Application::Model::DB::clickhouse::dbi::VERSION = '0.005';
+$QBit::Application::Model::DB::clickhouse::dbi::VERSION = '0.006';
 use qbit;
 
 use base qw(QBit::Class);
@@ -15,6 +15,8 @@ __PACKAGE__->mk_accessors(qw(err errstr));
 
 sub init {
     my ($self) = @_;
+    
+    weaken($self->db);
 
     $self->{'__REQUEST__'} =
       HTTP::Request->new(

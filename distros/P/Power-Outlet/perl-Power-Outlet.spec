@@ -1,7 +1,7 @@
 %define lowername  power-outlet
 
 Name:           perl-Power-Outlet
-Version:        0.16
+Version:        0.19
 Release:        1%{?dist}
 Summary:        Control and query network attached power outlets
 License:        GPL+ or Artistic
@@ -16,6 +16,7 @@ BuildRequires:  perl(Package::New)
 BuildRequires:  perl(HTTP::Tiny)
 BuildRequires:  perl(JSON)
 BuildRequires:  perl(URI)
+BuildRequires:  perl(Path::Class)
 Requires:       perl(Net::SNMP)
 Requires:       perl(Net::UPnP)
 Requires:       perl(XML::LibXML::LazyBuilder)
@@ -23,6 +24,7 @@ Requires:       perl(Package::New)
 Requires:       perl(HTTP::Tiny)
 Requires:       perl(JSON)
 Requires:       perl(URI)
+Requires:       perl(Path::Class)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
@@ -87,12 +89,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files application-cgi
 %defattr(-,root,root,-)
-%{_sysconfdir}/httpd/conf.d/%{lowername}.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{lowername}.conf
 %dir %{_datadir}/%{lowername}
 %dir %{_datadir}/%{lowername}/conf/
 %dir %{_datadir}/%{lowername}/cgi-bin/
 %dir %{_datadir}/%{lowername}/images/
-%config %{_datadir}/%{lowername}/conf/%{lowername}.ini
+%config(noreplace) %{_datadir}/%{lowername}/conf/%{lowername}.ini
 %attr(0755,root,root) %{_datadir}/%{lowername}/cgi-bin/%{lowername}.cgi
 %attr(0755,root,root) %{_datadir}/%{lowername}/cgi-bin/%{lowername}-json.cgi
 %{_datadir}/%{lowername}/images/btn-on.png

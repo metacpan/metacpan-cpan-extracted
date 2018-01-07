@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.002-6-g3439e40
+package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.003-8-gc11004c
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle that manages your version in git
 # KEYWORDS: bundle distribution git version Changes increment
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moose;
 with
@@ -50,14 +50,28 @@ around commit_files_after_release => sub {
 
 sub mvp_multivalue_args { qw(commit_files_after_release) }
 
-has _develop_suggests => (
+has _plugin_requirements => (
     isa => class_type('CPAN::Meta::Requirements'),
     lazy => 1,
     default => sub { CPAN::Meta::Requirements->new },
     handles => {
-        _add_minimum_develop_suggests => 'add_minimum',
-        _develop_suggests_as_string_hash => 'as_string_hash',
+        _add_minimum_plugin_requirement => 'add_minimum',
+        _plugin_requirements_as_string_hash => 'as_string_hash',
     },
+);
+
+has plugin_prereq_phase => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { $_[0]->payload->{plugin_prereq_phase} // '' },
+);
+
+has plugin_prereq_relationship => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { $_[0]->payload->{plugin_prereq_relationship} // '' },
 );
 
 sub configure
@@ -126,17 +140,18 @@ sub configure
             } ],
     );
 
-    # ensure that additional optional plugins are declared in prereqs
+    # add used plugins to desired prereq section
     $self->add_plugins(
         [ 'Prereqs' => 'prereqs for @Git::VersionManager' => {
-                '-phase' => 'develop',
-                '-relationship' => 'suggests',
-              %{ $self->_develop_suggests_as_string_hash },
+                '-phase' => $self->plugin_prereq_phase,
+                '-relationship' => $self->plugin_prereq_relationship,
+              %{ $self->_plugin_requirements_as_string_hash },
           } ],
-    );
+    ) if $self->plugin_prereq_phase and $self->plugin_prereq_relationship;
 }
 
-# determine develop prereqs
+# capture minimum requirements for used plugins
+# TODO: this can be pulled off into a separately-distributed role
 around add_plugins => sub
 {
     my ($orig, $self, @plugins) = @_;
@@ -150,10 +165,10 @@ around add_plugins => sub
         # this plugin is provided in the local distribution
         next if $plugin_spec->[0] eq 'MetaProvides::Update';
 
-        # record develop-suggests prereq
+        # save requirement for (possible) later prereq population
         my $payload = ref $plugin_spec->[-1] ? $plugin_spec->[-1] : {};
         my $plugin = Dist::Zilla::Util->expand_config_package_name($plugin_spec->[0]);
-        $self->_add_minimum_develop_suggests($plugin => $payload->{':version'} // 0);
+        $self->_add_minimum_plugin_requirement($plugin => $payload->{':version'} // 0);
     }
 
     return $self->$orig(@plugins);
@@ -174,7 +189,7 @@ Dist::Zilla::PluginBundle::Git::VersionManager - A plugin bundle that manages yo
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -235,8 +250,8 @@ When no custom options are passed, is equivalent to the following configuration 
     commit_msg = increment $VERSION after %v release
 
     [Prereqs / prereqs for @Git::VersionManager]
-    -phase = develop
-    -relationship = suggests
+    -phase = .. if plugin_prereq_phase specified ..
+    -relationship = .. if plugin_prereq_relationship specified ..
     ...all the plugins this bundle uses...
 
 =for Pod::Coverage configure
@@ -289,6 +304,14 @@ allocated in F<Changes> entries to the version string. Defaults to 10.
 Unused if C<NextRelease.format = anything> is passed into the configuration.
 
 =for stopwords customizations
+
+=head2 plugin_prereq_phase, plugin_prereq_relationship
+
+If these are set, then plugins used by the bundle (with minimum version requirements) are injected into the
+distribution's prerequisites at the specified phase and relationship. By default these options are disabled. If
+set, the recommended values are C<develop> and C<suggests>.
+
+First available in version 0.004.
 
 =head2 other customizations
 

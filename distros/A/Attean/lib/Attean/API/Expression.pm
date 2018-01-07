@@ -7,7 +7,7 @@ Attean::API::Expression - SPARQL expressions
 
 =head1 VERSION
 
-This document describes Attean::API::Expression version 0.017
+This document describes Attean::API::Expression version 0.018
 
 =head1 DESCRIPTION
 
@@ -65,10 +65,10 @@ Returns a string serialization of the expression object.
 
 =cut
 
-package Attean::API::Expression 0.017 {
-	use Moo::Role;
+package Attean::API::Expression 0.018 {
 	use Types::Standard qw(Str);
-	use namespace::clean;
+
+	use Moo::Role;
 
 	with 'Attean::API::DirectedAcyclicGraph', 'Attean::API::UnionScopeVariables';
 	
@@ -100,11 +100,11 @@ package Attean::API::Expression 0.017 {
 	}
 }
 
-package Attean::API::UnaryExpression 0.017 {
-	use Moo::Role;
+package Attean::API::UnaryExpression 0.018 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	with 'Attean::API::Expression', 'Attean::API::UnaryQueryTree';
 	with 'Attean::API::SPARQLSerializable';
@@ -140,11 +140,11 @@ package Attean::API::UnaryExpression 0.017 {
 	}
 }
 
-package Attean::API::BinaryExpression 0.017 {
-	use Moo::Role;
+package Attean::API::BinaryExpression 0.018 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	with 'Attean::API::Expression', 'Attean::API::BinaryQueryTree';
 	with 'Attean::API::SPARQLSerializable';
@@ -189,7 +189,7 @@ package Attean::API::BinaryExpression 0.017 {
 	}
 }
 
-package Attean::API::NaryExpression 0.017 {
+package Attean::API::NaryExpression 0.018 {
 	use Moo::Role;
 	with 'Attean::API::Expression', 'Attean::API::QueryTree';
 	sub as_string {
@@ -209,7 +209,7 @@ package Attean::API::NaryExpression 0.017 {
 	}
 }
 
-package Attean::API::AggregateExpression 0.017 {
+package Attean::API::AggregateExpression 0.018 {
 	use Moo::Role;
 	requires 'operator';
 	requires 'scalar_vars';
@@ -250,7 +250,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

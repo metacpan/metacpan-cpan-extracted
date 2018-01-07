@@ -6,6 +6,8 @@ use Test::Exception 0.43;
 
 use lib 't/lib';
 use CurieTestHelper;
+use Renard::Incunabula::Devel::TestHelper;
+use Renard::Incunabula::Format::Cairo::Devel::TestHelper;
 
 use Renard::Incunabula::Common::Setup;
 use Renard::Curie::Container::App;
@@ -19,7 +21,7 @@ use version 0.77 ();
 subtest "Process arguments" => sub {
 	subtest "Process arguments for PDF file" => sub {
 		my $pdf_ref_path = try {
-			CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+			Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 		} catch {
 			plan skip_all => "$_";
 		};
@@ -106,8 +108,8 @@ subtest "Run app and destroy" => sub {
 subtest "Open document twice" => sub {
 	my $c = CurieTestHelper->get_app_container;
 	my $app = $c->app;
-	my $cairo_doc_a = CurieTestHelper->create_cairo_document;
-	my $cairo_doc_b = CurieTestHelper->create_cairo_document;
+	my $cairo_doc_a = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document;
+	my $cairo_doc_b = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document;
 
 	$c->view_manager->current_document($cairo_doc_a);
 	cmp_deeply $c->_test_current_view->document, $cairo_doc_a, 'First document loaded';
@@ -120,7 +122,7 @@ subtest "Open document twice" => sub {
 
 subtest "Drag and drop of file" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -179,7 +181,7 @@ subtest "Drag and drop of file" => sub {
 
 subtest "Opening document adds to recent manager" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};

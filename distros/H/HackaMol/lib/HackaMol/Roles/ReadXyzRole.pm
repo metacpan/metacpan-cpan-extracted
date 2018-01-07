@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadXyzRole;
-$HackaMol::Roles::ReadXyzRole::VERSION = '0.046';
+$HackaMol::Roles::ReadXyzRole::VERSION = '0.047';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use Carp;
@@ -67,7 +67,7 @@ sub read_xyz_atoms {
 
     # set iatom to track the array.  diff from serial which refers to pdb
     $atoms[$_]->iatom($_) foreach ( 0 .. $#atoms );
-    return (@atoms);
+    return (\@atoms);
 }
 
 no Moose::Role;
@@ -84,7 +84,7 @@ HackaMol::Roles::ReadXyzRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

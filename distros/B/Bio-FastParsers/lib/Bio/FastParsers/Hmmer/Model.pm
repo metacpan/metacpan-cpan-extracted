@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Model;
 # ABSTRACT: internal class for HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Model::VERSION = '0.173510';
+$Bio::FastParsers::Hmmer::Model::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -68,7 +68,7 @@ Bio::FastParsers::Hmmer::Model - internal class for HMMER parser
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 AUTHOR
 

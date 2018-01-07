@@ -24,29 +24,29 @@ Cut-off all parts of the polygon which are outside the box
 
 =over 4
 
-=item B<polygon_fill_clip1>(ARRAY-$box, LIST-of-$points)
+=item B<polygon_fill_clip1>(\@box, @points)
 
 Clipping a polygon into rectangles can be done in various ways.
 With this algorithm (which I designed myself, but may not be new), the
-parts of the polygon which are outside the $box are mapped on the borders.
+parts of the polygon which are outside the @box are mapped on the borders.
 The polygon stays in one piece.
 
 Returned is one list of points, which is cleaned from double points,
 spikes and superfluous intermediate points.
 
-=item B<polygon_fill_clip2>(ARRAY-$box, LIST-of-$points)
+=item B<polygon_fill_clip2>(\@box, @points)
 
 B<To be implemented>.  The polygon falls apart in fragments, which are not
 connected: paths which are followed in two directions are removed.
 This is required by some applications, like polygons used in geographical
 context (country contours and such).
 
-=item B<polygon_fill_clip3>( ARRAY-$box, $out-$poly, [$in-$polys] )
+=item B<polygon_fill_clip3>( \@box, $out-$poly, [$in-$polys] )
 
 B<To be implemented>.  A surrounding polygon, with possible
 inclussions.
 
-=item B<polygon_line_clip>(ARRAY-$box, LIST-of-$points)
+=item B<polygon_line_clip>(\@box, @points)
 
 Returned is a list of ARRAYS (possibly 0 long) containing line pieces
 from the input polygon (or line).
@@ -63,12 +63,12 @@ example:
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.07,
-built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.10,
+built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

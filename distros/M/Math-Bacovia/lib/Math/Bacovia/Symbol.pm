@@ -21,7 +21,14 @@ sub new {
           }, $class;
 }
 
-sub inside {
+sub set {
+    my ($x, $value) = @_;
+    Math::Bacovia::_check_type(\$value);
+    $x->{value} = $value;
+    $x;
+}
+
+sub get {
     my ($x) = @_;
     defined($x->{value})
       ? ($x->{name}, $x->{value})
@@ -58,11 +65,9 @@ sub pretty {
 sub stringify {
     my ($x) = @_;
 
-    $x->{_str} //= do {
-        defined($x->{value})
-          ? ("Symbol(\"\Q$x->{name}\E\", " . $x->{value}->stringify() . ")")
-          : ("Symbol(\"\Q$x->{name}\E\")");
-    };
+    defined($x->{value})
+      ? ("Symbol(\"\Q$x->{name}\E\", " . $x->{value}->stringify() . ")")
+      : ("Symbol(\"\Q$x->{name}\E\")");
 }
 
 1;

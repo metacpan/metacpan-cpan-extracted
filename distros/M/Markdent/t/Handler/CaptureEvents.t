@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
-use Test::Deep;
+use Test2::V0;
 
 use File::Slurp qw( read_file );
 
@@ -28,7 +27,7 @@ for my $handler ( $ch, $th1 ) {
 my $th2 = Markdent::Handler::MinimalTree->new();
 $ch->captured_events()->replay_events($th2);
 
-cmp_deeply(
+is(
     tree_from_handler($th1),
     tree_from_handler($th2),
     'compare parse direct to tree versus replaying captured events into a tree'

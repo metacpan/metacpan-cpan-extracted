@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Target;
 # ABSTRACT: internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.173510';
+$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -47,7 +47,7 @@ around BUILDARGS => sub {
     ( $outargs{target_name} = $raw[0] ) =~ s/[\>\s+]//xmsg;
 
     # split Domain blocks
-    my @domain_indexes = indexes { $_ =~ m/^\s+==/xms } @raw;
+    my @domain_indexes = indexes { m/^\s+==/xms } @raw;
 
     # set as empty ArrayRef as --domE option can report Target without domain
     $outargs{domains} = [];
@@ -62,7 +62,7 @@ around BUILDARGS => sub {
                         : splice @raw, $domain_indexes[$i]
             ;
             push @{ $outargs{domains} },
-                Domain->new( { 'raw' => \@block, 'summary' => $summary[$i] } );
+                Domain->new( { raw => \@block, summary => $summary[$i] } );
         }
     }
 
@@ -83,7 +83,7 @@ Bio::FastParsers::Hmmer::Standard::Target - internal class for standard HMMER pa
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

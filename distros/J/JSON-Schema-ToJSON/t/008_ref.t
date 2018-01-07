@@ -64,7 +64,7 @@ eval {
 
 like(
 	$@,
-	qr!Could not load document!,
+	qr!Unable to load schema!,
 	'die on bad file $ref'
 );
 

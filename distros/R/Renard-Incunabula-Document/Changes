@@ -1,0 +1,8 @@
+0.004 2018-01-06 00:34:38-0600
+
+  Refactoring
+   - Split off from Renard-Incunabula-0.003.
+
+     See
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Document/pull/1>.

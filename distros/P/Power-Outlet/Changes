@@ -4,6 +4,19 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.19 2018-10-05
+  - Fixed two type-Os in Home Assistant YAML
+
+0.18 2018-01-03
+  - Added lib/Power/Outlet/Virtual.pm
+
+0.17 2018-01-01
+  - Updated lib/Power/Outlet/Hue.pm
+    - Dropped disused List::Util package
+    - Added resource property
+    - Added _path method
+    - Tested against HueEmulator-v0.7.jar
+
 0.16 2015-11-07
   - Updated MANIFEST - rt108167 <chorny at cpan.org>
 

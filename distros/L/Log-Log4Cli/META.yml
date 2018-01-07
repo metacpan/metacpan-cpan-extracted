@@ -4,7 +4,6 @@ author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
   Capture::Tiny: 0
-  Term::ANSIColor: 0
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
@@ -20,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  Carp: 0
   Term::ANSIColor: 0
   parent: 0
   perl: 5.008
@@ -27,4 +27,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Log-Log4Cli.pm
-version: 0.19
+version: 0.20

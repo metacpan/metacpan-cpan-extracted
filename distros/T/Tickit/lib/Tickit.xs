@@ -170,8 +170,45 @@ static SV *newSVpen(TickitPen *pen, char *package)
   return newSVpen_noinc(tickit_pen_ref(pen), package);
 }
 
-static SV *pen_get_attr(TickitPen *pen, TickitPenAttr attr)
+enum {
+  TICKIT_PEN_FG_RGB8 = 0x100 | TICKIT_PEN_FG,
+  TICKIT_PEN_BG_RGB8 = 0x100 | TICKIT_PEN_BG,
+};
+
+static int pen_parse_attrname(const char *name)
 {
+  const char *end = strchr(name, ':');
+  TickitPenAttr ret;
+
+  if(!end)
+    return tickit_pen_lookup_attr(name);
+
+  if(!strEQ(end+1, "rgb8"))
+    return -1;
+
+  name = strndup(name, end - name);
+  ret = tickit_pen_lookup_attr(name);
+  free((void *)name);
+
+  switch(ret) {
+    case TICKIT_PEN_FG: return TICKIT_PEN_FG_RGB8;
+    case TICKIT_PEN_BG: return TICKIT_PEN_BG_RGB8;
+    default: return -1;
+  }
+}
+
+static SV *pen_get_attr(TickitPen *pen, int attr)
+{
+  switch(attr) {
+    case TICKIT_PEN_FG_RGB8:
+    case TICKIT_PEN_BG_RGB8:
+    {
+      TickitPenRGB8 val;
+      val = tickit_pen_get_colour_attr_rgb8(pen, attr & 0xFF);
+      return newSVpvf("#%02X%02X%02X", val.r, val.g, val.b);
+    }
+  }
+
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
     return tickit_pen_get_bool_attr(pen, attr) ? &PL_sv_yes : &PL_sv_no;
@@ -182,8 +219,20 @@ static SV *pen_get_attr(TickitPen *pen, TickitPenAttr attr)
   }
 }
 
-static void pen_set_attr(TickitPen *pen, TickitPenAttr attr, SV *val)
+static void pen_set_attr(TickitPen *pen, int attr, SV *val)
 {
+  switch(attr) {
+    case TICKIT_PEN_FG_RGB8:
+    case TICKIT_PEN_BG_RGB8:
+    {
+      TickitPenRGB8 v;
+      if(sscanf(SvPV_nolen(val), "#%02hhx%02hhx%02hhx", &v.r, &v.g, &v.b) < 3)
+        return;
+      tickit_pen_set_colour_attr_rgb8(pen, attr & 0xFF, v);
+      return;
+    }
+  }
+
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_INT:
     tickit_pen_set_int_attr(pen, attr, SvOK(val) ? SvIV(val) : -1);
@@ -222,9 +271,11 @@ static TickitPen *pen_from_args(SV **args, int argcount)
 static void pen_set_attrs(TickitPen *pen, HV *attrs)
 {
   TickitPenAttr a;
+  SV *val;
+
   for(a = 0; a < TICKIT_N_PEN_ATTRS; a++) {
     const char *name = tickit_pen_attrname(a);
-    SV *val = hv_delete(attrs, name, strlen(name), 0);
+    val = hv_delete(attrs, name, strlen(name), 0);
     if(!val)
       continue;
 
@@ -232,6 +283,21 @@ static void pen_set_attrs(TickitPen *pen, HV *attrs)
       tickit_pen_clear_attr(pen, a);
     else
       pen_set_attr(pen, a, val);
+  }
+
+  if((val = hv_delete(attrs, "fg:rgb8", 7, 0))) {
+    if(SvOK(val)) {
+      pen_set_attr(pen, TICKIT_PEN_FG_RGB8, val);
+    }
+    else
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG));
+  }
+  if((val = hv_delete(attrs, "bg:rgb8", 7, 0))) {
+    if(SvOK(val)) {
+      pen_set_attr(pen, TICKIT_PEN_BG_RGB8, val);
+    }
+    else
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, tickit_pen_get_colour_attr(pen, TICKIT_PEN_BG));
   }
 }
 
@@ -281,35 +347,6 @@ static SV *newSVrb(TickitRenderBuffer *rb)
  ****************/
 
 typedef TickitTerm *Tickit__Term;
-
-static TickitTermCtl term_name2ctl(const char *name)
-{
-  switch(name[0]) {
-    case 'a':
-      return streq(name+1, "ltscreen") ? TICKIT_TERMCTL_ALTSCREEN
-                                       : -1;
-    case 'c':
-      return streq(name+1, "olors")      ? TICKIT_TERMCTL_COLORS
-           : streq(name+1, "ursorblink") ? TICKIT_TERMCTL_CURSORBLINK
-           : streq(name+1, "ursorshape") ? TICKIT_TERMCTL_CURSORSHAPE
-           : streq(name+1, "ursorvis")   ? TICKIT_TERMCTL_CURSORVIS
-                                         : -1;
-    case 'i':
-      return streq(name+1, "con_text")      ? TICKIT_TERMCTL_ICON_TEXT
-           : streq(name+1, "contitle_text") ? TICKIT_TERMCTL_ICONTITLE_TEXT
-                                            : -1;
-    case 'k':
-      return streq(name+1, "eypad_app") ? TICKIT_TERMCTL_KEYPAD_APP
-                                        : -1;
-    case 'm':
-      return streq(name+1, "ouse") ? TICKIT_TERMCTL_MOUSE
-                                       : -1;
-    case 't':
-      return streq(name+1, "itle_text") ? TICKIT_TERMCTL_TITLE_TEXT
-                                        : -1;
-  }
-  return -1;
-}
 
 static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info, void *user)
 {
@@ -943,11 +980,17 @@ hasattr(self,attr)
   Tickit::Pen  self
   char        *attr
   INIT:
-    TickitPenAttr a;
+    int a;
   CODE:
-    if((a = tickit_pen_lookup_attr(attr)) == -1)
+    if((a = pen_parse_attrname(attr)) == -1)
       XSRETURN_UNDEF;
-    RETVAL = tickit_pen_has_attr(self, a);
+    switch(a) {
+      case TICKIT_PEN_FG_RGB8:
+      case TICKIT_PEN_BG_RGB8:
+        RETVAL = tickit_pen_has_colour_attr_rgb8(self, a & 0xff); break;
+      default:
+        RETVAL = tickit_pen_has_attr(self, a); break;
+    }
   OUTPUT:
     RETVAL
 
@@ -956,12 +999,21 @@ getattr(self,attr)
   Tickit::Pen  self
   char        *attr
   INIT:
-    TickitPenAttr a;
+    int a;
   CODE:
-    if((a = tickit_pen_lookup_attr(attr)) == -1)
+    if((a = pen_parse_attrname(attr)) == -1)
       XSRETURN_UNDEF;
-    if(!tickit_pen_has_attr(self, a))
-      XSRETURN_UNDEF;
+    switch(a) {
+      case TICKIT_PEN_FG_RGB8:
+      case TICKIT_PEN_BG_RGB8:
+        if(!tickit_pen_has_colour_attr_rgb8(self, a & 0xff))
+          XSRETURN_UNDEF;
+        break;
+      default:
+        if(!tickit_pen_has_attr(self, a))
+          XSRETURN_UNDEF;
+        break;
+    }
     RETVAL = pen_get_attr(self, a);
   OUTPUT:
     RETVAL
@@ -982,6 +1034,16 @@ getattrs(self)
       /* Because mPUSHp(str,0) creates a 0-length string */
       mPUSHs(newSVpv(tickit_pen_attrname(a), 0));
       mPUSHs(pen_get_attr(self, a));
+    }
+    if(tickit_pen_has_colour_attr_rgb8(self, TICKIT_PEN_FG)) {
+      EXTEND(SP, 2); count += 2;
+      mPUSHs(newSVpv("fg:rgb8", 7));
+      mPUSHs(pen_get_attr(self, TICKIT_PEN_FG_RGB8));
+    }
+    if(tickit_pen_has_colour_attr_rgb8(self, TICKIT_PEN_BG)) {
+      EXTEND(SP, 2); count += 2;
+      mPUSHs(newSVpv("bg:rgb8", 7));
+      mPUSHs(pen_get_attr(self, TICKIT_PEN_BG_RGB8));
     }
     XSRETURN(count);
 
@@ -1016,12 +1078,19 @@ chattr(self,attr,value)
   char        *attr
   SV          *value
   INIT:
-    TickitPenAttr a;
+    int a;
   CODE:
-    if((a = tickit_pen_lookup_attr(attr)) == -1)
+    if((a = pen_parse_attrname(attr)) == -1)
       XSRETURN_UNDEF;
     if(!SvOK(value)) {
-      tickit_pen_clear_attr(self, a);
+      switch(a) {
+        case TICKIT_PEN_FG_RGB8:
+        case TICKIT_PEN_BG_RGB8:
+          tickit_pen_set_colour_attr(self, a & 0xFF, tickit_pen_get_colour_attr(self, a & 0xFF));
+          break;
+        default:
+          tickit_pen_clear_attr(self, a);
+      }
       XSRETURN_UNDEF;
     }
     pen_set_attr(self, a, value);
@@ -1236,7 +1305,6 @@ rects(self)
   Tickit::RectSet self
   INIT:
     int n;
-    TickitRect *rects;
     int i;
   PPCODE:
     n = tickit_rectset_rects(self);
@@ -1246,15 +1314,12 @@ rects(self)
       XSRETURN(1);
     }
 
-    Newx(rects, n, TickitRect);
-    tickit_rectset_get_rects(self, rects, n);
-
     EXTEND(SP, n);
     for(i = 0; i < n; i++) {
-      mPUSHrect(rects + i);
+      TickitRect rect;
+      tickit_rectset_get_rect(self, i, &rect);
+      mPUSHrect(&rect);
     }
-
-    Safefree(rects);
 
     XSRETURN(n);
 
@@ -1506,6 +1571,13 @@ skip_to(self,col)
 
     tickit_renderbuffer_skip_to(self, col);
 
+void
+skiprect(self,rect)
+  Tickit::RenderBuffer self
+  Tickit::Rect rect
+  CODE:
+    tickit_renderbuffer_skiprect(self, rect);
+
 int
 text_at(self,line,col,text,pen=NULL)
   Tickit::RenderBuffer self
@@ -1688,6 +1760,20 @@ flush_to_term(self,term)
   CODE:
     tickit_renderbuffer_flush_to_term(self, term);
 
+void
+copyrect(self,dest,src)
+  Tickit::RenderBuffer self
+  Tickit::Rect dest
+  Tickit::Rect src
+  ALIAS:
+    copyrect = 0
+    moverect = 1
+  CODE:
+    switch(ix) {
+      case 0: tickit_renderbuffer_copyrect(self, dest, src); break;
+      case 1: tickit_renderbuffer_moverect(self, dest, src); break;
+    }
+
 MODULE = Tickit             PACKAGE = Tickit::StringPos
 
 SV *
@@ -1857,6 +1943,18 @@ await_started(self,timeout)
   double        timeout
   CODE:
     tickit_term_await_started_msec(self, timeout * 1000);
+
+void
+pause(self)
+  Tickit::Term  self
+  CODE:
+    tickit_term_pause(self);
+
+void
+resume(self)
+  Tickit::Term  self
+  CODE:
+    tickit_term_resume(self);
 
 void
 flush(self)
@@ -2112,7 +2210,7 @@ getctl_int(self,ctl)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = term_name2ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -2135,7 +2233,7 @@ setctl_int(self,ctl,value)
     TickitTermCtl ctl_e;
   PPCODE:
     if(SvPOK(ctl)) {
-      ctl_e = term_name2ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }
@@ -2158,7 +2256,7 @@ setctl_str(self,ctl,value)
     TickitTermCtl ctl_e;
   CODE:
     if(SvPOK(ctl)) {
-      ctl_e = term_name2ctl(SvPV_nolen(ctl));
+      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
       if(ctl_e == -1)
         croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
     }

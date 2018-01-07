@@ -1,0 +1,40 @@
+NAME
+    App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
+
+VERSION
+    This document describes version 0.001 of App::CryptoCurrencyUtils (from
+    Perl distribution App-CryptoCurrencyUtils), released on 2018-01-07.
+
+DESCRIPTION
+    This distribution contains the following CLI utilities:
+
+    *   grepcrypto
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CryptoCurrencyUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CryptoCurrencyUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CryptoCurrencyUti
+    ls>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::CoinMarketCapUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

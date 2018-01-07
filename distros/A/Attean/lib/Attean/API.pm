@@ -7,7 +7,7 @@ Attean::API - Utility package for loading all Attean role packages.
 
 =head1 VERSION
 
-This document describes Attean::API version 0.017
+This document describes Attean::API version 0.018
 
 =head1 SYNOPSIS
 
@@ -25,20 +25,20 @@ in the Attean::API namespace.
 
 =cut
 
-package Attean::API::ResultOrTerm 0.017 {
+package Attean::API::ResultOrTerm 0.018 {
 	use Moo::Role;
 }
 
-package Attean::API::BlankOrIRI 0.017 {
+package Attean::API::BlankOrIRI 0.018 {
 	use Moo::Role;
 }
 
-package Attean::API::TermOrVariable 0.017 {
-	use Moo::Role;
+package Attean::API::TermOrVariable 0.018 {
 	use Scalar::Util qw(blessed);
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
-	use namespace::clean;
+
+	use Moo::Role;
 
 	with 'Attean::API::SPARQLSerializable';
 
@@ -83,16 +83,16 @@ package Attean::API::TermOrVariable 0.017 {
 	}
 }
 
-package Attean::Mapper 0.017 {
+package Attean::Mapper 0.018 {
 	use Moo::Role;
 	requires 'map'; # my $that = $object->map($this)
 }
 
-package Attean::API::Variable 0.017 {
+package Attean::API::Variable 0.018 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
+
 	use Moo::Role;
-	use namespace::clean;
 
 	with 'Attean::API::TermOrVariable';
 
@@ -115,9 +115,10 @@ Returns a string representation of the variable.'
 	
 }
 
-package Attean::API::CanonicalizingBindingSet 0.017 {
-	use Moo::Role;
+package Attean::API::CanonicalizingBindingSet 0.018 {
 	use Attean::RDF;
+
+	use Moo::Role;
 	use namespace::clean;
 
 	with 'MooX::Log::Any';
@@ -211,7 +212,7 @@ package Attean::API::CanonicalizingBindingSet 0.017 {
 	}
 }
 
-package Attean::API 0.017 {
+package Attean::API 0.018 {
 	use Attean::API::Term;
 	use Attean::API::Store;
 	use Attean::API::Model;
@@ -249,7 +250,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

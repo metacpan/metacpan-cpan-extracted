@@ -58,7 +58,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.099005"
+         "version" : "0.099006"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -87,7 +87,7 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.099005",
+   "version" : "0.099006",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

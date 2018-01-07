@@ -1,0 +1,42 @@
+---
+abstract: 'time over HTTP middleware'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  JSON::PP: '2.00'
+  Module::Metadata: '0'
+  Path::Tiny: '0.004'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Time::Piece: '1.16'
+  Time::Seconds: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-TimeOverHTTP
+provides:
+  Plack::Middleware::TimeOverHTTP:
+    file: lib/Plack/Middleware/TimeOverHTTP.pm
+    version: v0.1.0
+requires:
+  HTTP::Status: '0'
+  Plack::Middleware: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/Plack-Middleware-TimeOverHTTP/issues
+  repository: git://github.com/robrwo/Plack-Middleware-TimeOverHTTP.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -129,7 +129,10 @@ sub _refresh_access_token {
   my $res = $self->get___user_agent()->request($request);
 
   if (!$res->is_success()) {
-    warn($res->decoded_content());
+    my $err_msg = $res->decoded_content();
+    $self->get_api_client()->get_die_on_faults()
+      ? die($err_msg)
+      : warn($err_msg);
     return 0;
   }
 

@@ -1,4 +1,4 @@
-simpleXMLParse version 3.0 
+simpleXMLParse version 3.1 
 ===========================
 
 simpleXMLParse - Perl extension for pure perl XML parsing 
@@ -18,7 +18,25 @@ DESCRIPTION
   style is "1" or "2".
 
   style "1" will create attribute key-value pairs with an "_attr" suffix convention
+      This style is useful if one is traversing the data structure and needs to know an attribute value before descending
+      into the node.
   style "2" will create attribute key-value pairs in same format as nodes while handling collisions
+      This is the same style as XML::Simple, with the exception that on the collision of an attribute name and node name,
+      XML::Simple will push the attribute to the top of the array, whereas simpleXMLParse will rename the attribute <name>1.
+
+  NOTES ABOUT version 3.1
+  =======================
+
+  Testing: used Data::Compare to compare parses of about 10000 XML files with the results of XML::Simple. The files found
+  on my Linux box successfully compared 90%. On Windows it was more like 60%. Most of the differences were debatable.
+  For example, some XML files have an <href> tag in the middle of some free-form text. XML::Simple pulls the tag data out
+  and makes a key/value node out of it, with the text chopped into separate nodes. simpleXMLParse leaves the <href> embedded
+  in the text. Also, for some tags that have only whitespace, such as newlines, XML::Simple will ignore the whitespace and
+  make the node a {}. simpleXMLParse, in the spirit of typsetting tools, will make the node equal to ' ', for example.
+
+  BACKWARD COMPATIBILITY to 3.0 and earlier was not maintained in the following, in order to conform to the XML::Simple standard:
+  the keyword "VALUE" was replaced by "content"
+  empty nodes will now be {} instead of '' 
 
 EXPORT
 
@@ -28,11 +46,11 @@ SEE ALSO
 
 AUTHOR
 
-Daniel Graham, E<lt>dgraham@firstteamsoft.com<gt>
+Daniel Graham, E<lt>daniel@firstteamsoft.com<gt>
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2015 by Daniel Edward Graham
+Copyright (C) 2008-2018 by Daniel Edward Graham
 
 LGPL 3.0
 
@@ -59,7 +77,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2008-2015 by Dan Graham
+Copyright (C) 2008-2018 by Dan Graham
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16.3 or,

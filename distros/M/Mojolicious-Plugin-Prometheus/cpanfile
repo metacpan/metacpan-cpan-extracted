@@ -7,3 +7,7 @@ on 'test' => sub {
     requires 'Devel::Cover';
 };
 
+on 'develop' => sub {
+    requires 'Minilla';
+    requires 'Software::License::Artistic_2_0';
+};

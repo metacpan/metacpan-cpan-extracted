@@ -3,14 +3,11 @@ abstract: 'Perl extension for embedding Lua scripts into Perl code'
 author:
   - 'Rob Hoelz <rob@hoelz.ro>'
 build_requires:
-  File::Spec: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +15,11 @@ meta-spec:
 name: Inline-Lua
 requires:
   Inline: '0'
+  Test::Exception: '0'
   perl: v5.8.8
 resources:
   bugtracker: https://github.com/hoelzro/inline-lua/issues
   homepage: https://github.com/hoelzro/inline-lua
   repository: https://github.com/hoelzro/inline-lua.git
-version: '0.12'
+version: '0.14'
+x_serialization_backend: 'YAML::Tiny version 1.70'

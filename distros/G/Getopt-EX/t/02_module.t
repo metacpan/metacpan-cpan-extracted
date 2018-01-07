@@ -20,9 +20,10 @@ unshift @INC, $app_lib;
 {
     my $rcloader = new Getopt::EX::Loader
 	BASECLASS => "App::example";
-    my @argv = qw(-Mexample_test --drink-me);
+    my @argv = qw(-Mexample_test --drink-me arg1);
     $rcloader->deal_with(\@argv);
-    is($argv[0], "poison", "deal_with");
+    is($argv[0], "--default", "deal_with");
+    is($argv[1], "poison", "deal_with");
 }
 
 ##

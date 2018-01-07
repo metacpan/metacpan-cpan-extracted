@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::Command::db::copy_to;
-$Footprintless::Plugin::Database::Command::db::copy_to::VERSION = '1.01';
+$Footprintless::Plugin::Database::Command::db::copy_to::VERSION = '1.03';
 # ABSTRACT: copy's the database to the specified destination
 # PODNAME: Footprintless::Plugin::Database::Command::db::copy_to
 
@@ -95,7 +95,7 @@ Footprintless::Plugin::Database::Command::db::copy_to - copy's the database to t
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head1 AUTHOR
 

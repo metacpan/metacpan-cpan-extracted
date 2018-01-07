@@ -16,8 +16,9 @@ Example::Class->run_data_tests(
     files   => [qw{ t/data }],
     recurse => 1,
     filter  => sub {
-        my ($case, $file) = @_;
+        my ($case, $file, $index) = @_;
         $case->{data_file} //= $file;
+        $case->{index}       = $index;
         $case;
     },
 );

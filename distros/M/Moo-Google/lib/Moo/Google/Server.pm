@@ -1,6 +1,6 @@
 #!perl
 package Moo::Google::Server;
-$Moo::Google::Server::VERSION = '0.02';
+$Moo::Google::Server::VERSION = '0.03';
 
 # ABSTRACT: Mojolicious::Lite web server for getting Google Mojo tokens via Oauth 2.0
 
@@ -135,7 +135,7 @@ Moo::Google::Server - Mojolicious::Lite web server for getting Google Mojo token
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 METHODS
 

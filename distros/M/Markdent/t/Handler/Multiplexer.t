@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
-use Test::Deep;
+use Test2::V0;
 
 use File::Slurp qw( read_file );
 
@@ -26,7 +25,7 @@ my $multi = Markdent::Handler::Multiplexer->new( handlers => [ $th1, $th2 ] );
 my $parser = Markdent::Parser->new( handler => $multi );
 $parser->parse( markdown => $markdown );
 
-cmp_deeply(
+is(
     tree_from_handler($th1),
     tree_from_handler($th2),
     'compare parsing from trees generated from multiplexer'

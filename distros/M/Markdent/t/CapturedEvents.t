@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
-use Test::Deep;
+use Test2::V0;
 
 use lib 't/lib';
 
@@ -22,7 +21,7 @@ my @events = (
 
 my $captured = Markdent::CapturedEvents->new( events => \@events );
 
-cmp_deeply(
+is(
     [ $captured->events() ],
     \@events,
     '->events() returns expected objects'
@@ -32,7 +31,7 @@ my $handler = Markdent::Handler::MinimalTree->new();
 
 $captured->replay_events($handler);
 
-cmp_deeply(
+is(
     tree_from_handler($handler),
     [
         {

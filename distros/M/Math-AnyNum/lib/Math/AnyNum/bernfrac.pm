@@ -76,19 +76,11 @@ sub __bernfrac__ {
     }
 
     state $N = Math::MPFR::Rmpfr_init2_nobless(64);
+
     Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);         # K = K*d
-
-    state $_V = Math::MPFR::MPFR_VERSION_MAJOR();
-
-    if ($_V >= 4) {
-        state $R = Math::MPFR::Rmpfr_init2_nobless(64);
-        Math::MPFR::Rmpfr_set_ui($R, $n - 1, $round);        # R = 1
-        Math::MPFR::Rmpfr_ui_div($R, 1, $R, $round);         # R = 1/R
-        Math::MPFR::Rmpfr_pow($N, $K, $R, $round);           # N = K^R
-    }
-    else {
-        Math::MPFR::Rmpfr_root($N, $K, $n - 1, $round);      # N = K^(1/(n-1))     (deprecated since mpfr-4.0.0)
-    }
+    Math::MPFR::Rmpfr_set_ui($N, $n - 1, $round);        # N = n-1
+    Math::MPFR::Rmpfr_ui_div($N, 1, $N, $round);         # R = 1/R
+    Math::MPFR::Rmpfr_pow($N, $K, $N, $round);           # N = K^R
 
     Math::MPFR::Rmpfr_ceil($N, $N);                      # N = ceil(N)
 

@@ -11,7 +11,7 @@ package DBI;
 require 5.008_001;
 
 BEGIN {
-our $XS_VERSION = our $VERSION = "1.637"; # ==> ALSO update the version in the pod text below!
+our $XS_VERSION = our $VERSION = "1.639"; # ==> ALSO update the version in the pod text below!
 $VERSION = eval $VERSION;
 }
 
@@ -143,7 +143,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.637
+This is the DBI specification that corresponds to DBI version 1.639
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -338,6 +338,7 @@ my $dbd_prefix_registry = {
   ing_         => { class => 'DBD::Ingres',         },
   ix_          => { class => 'DBD::Informix',       },
   jdbc_        => { class => 'DBD::JDBC',           },
+  mem_         => { class => 'DBD::Mem',            },
   mo_          => { class => 'DBD::MO',             },
   monetdb_     => { class => 'DBD::monetdb',        },
   msql_        => { class => 'DBD::mSQL',           },
@@ -7266,7 +7267,7 @@ an exception.  For example, using L<Try::Tiny>:
       # but do it in an eval{} as it may also fail
       eval { $dbh->rollback };
       # add other application on-error-clean-up code here
-  }
+  };
 
 If the C<RaiseError> attribute is not set, then DBI calls would need to be
 manually checked for errors, typically like this:

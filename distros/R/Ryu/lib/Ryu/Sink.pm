@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 =head1 NAME
 
@@ -83,5 +83,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
 

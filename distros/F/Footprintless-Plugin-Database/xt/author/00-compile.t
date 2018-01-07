@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13;
+plan tests => 15;
 
 my @module_files = (
     'Footprintless/Plugin/Database.pm',
@@ -19,7 +19,9 @@ my @module_files = (
     'Footprintless/Plugin/Database/CsvProvider.pm',
     'Footprintless/Plugin/Database/DefaultCommandHelper.pm',
     'Footprintless/Plugin/Database/MySqlProvider.pm',
+    'Footprintless/Plugin/Database/OracleProvider.pm',
     'Footprintless/Plugin/Database/PostgreSqlProvider.pm',
+    'Footprintless/Plugin/Database/PreparedStatementTemplate.pm',
     'Footprintless/Plugin/Database/SqlShellAdapter.pm'
 );
 

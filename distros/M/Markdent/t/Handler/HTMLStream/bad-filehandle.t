@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Fatal;
-use Test::More 0.88;
+use Test2::V0;
 
 use File::Temp qw( tempfile );
 use IO::File;
@@ -18,7 +17,7 @@ use Markdent::Parser;
     close $fh or die "Cannot close temp filehandle: $!";
 
     like(
-        exception { _parse_to_handler($handler) },
+        dies { _parse_to_handler($handler) },
         qr/\QCannot write to handle/,
         'Got an exception when the HTMLStream handler tries to write to a closed filehandle',
     );
@@ -33,7 +32,7 @@ use Markdent::Parser;
     close $fh or die "Cannot close temp filehandle: $!";
 
     like(
-        exception { _parse_to_handler($handler) },
+        dies { _parse_to_handler($handler) },
         qr/\QCannot write to handle/,
         'Got an exception when the HTMLStream handler tries to write to a closed filehandle',
     );

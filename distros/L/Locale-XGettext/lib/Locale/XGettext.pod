@@ -513,6 +513,10 @@ Get all command-line options as a hash reference.
 
 Get the value for command line option B<OPTION>.
 
+=item B<setOption OPTION, VALUE>
+
+Set the value for command line option B<OPTION> to B<VALUE>.
+
 =item B<languageSpecificOptions>
 
 The default representation returns nothing.
@@ -591,6 +595,11 @@ does not support the option "--flag".
 Returns true by default.  Return a false value if your extractor
 does not support input from files.  In this case you should
 implement readFromNonFiles().
+
+=item B<programName>
+
+Return the name of the program for usage and help information.  Defaults
+to just C<$0> but you can return another value here.
 
 =item B<run>
 
@@ -685,10 +694,6 @@ Prints the help for language-specific options.  Override it,
 if you are not happy with the formatting.
 
 =back
-
-=head1 BUGS
-
-Flags are not yet supported.
 
 =head1 COPYRIGHT
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.173500';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.173620';
 use Moose::Role;
 
 use autodie;
@@ -9,13 +9,11 @@ use feature qw(say);
 use Carp;
 use Const::Fast;
 use Date::Format;
-use List::AllUtils qw(max);
+use List::AllUtils;
 use POSIX qw(ceil floor);
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:seqids);
-use aliased 'Bio::MUST::Core::IdList';
-use aliased 'Bio::MUST::Core::IdMapper';
 
 requires 'all_seq_ids';
 
@@ -44,7 +42,7 @@ sub _list_from_seq_ids {
 
     my @ids = map { $_->full_id } $self->all_seq_ids;
     @ids = sort @ids if $sort;          # optionally sort list
-    return IdList->new( ids => \@ids );
+    return Bio::MUST::Core::IdList->new( ids => \@ids );
 }
 
 around qw(complete_seq_list len_mapper) => sub {
@@ -67,7 +65,7 @@ sub complete_seq_list {
 
     # get (non-missing char) lengths of all seqs and record max_len
     my @lengths = map { $_->nomiss_seq_len } $self->all_seqs;
-    my $max_len = max @lengths;
+    my $max_len = List::AllUtils::max @lengths;
 
     # convert fractional min_res to conservative integer (if needed)
     $min_res = ceil($min_res * $max_len)
@@ -77,7 +75,7 @@ sub complete_seq_list {
     my @ids = map { $_->full_id } $self->all_seq_ids;
     my @indices = grep { $lengths[$_] >= $min_res } 0..$#ids;
 
-    return IdList->new( ids => [ @ids[@indices] ] );
+    return Bio::MUST::Core::IdList->new( ids => [ @ids[@indices] ] );
 }
 
 
@@ -89,7 +87,7 @@ sub std_mapper {
     my $prefix = shift // 'seq';
 
     my @seq_ids = $self->all_seq_ids;
-    return IdMapper->new(
+    return Bio::MUST::Core::IdMapper->new(
         long_ids => [ map { $_->full_id  }    @seq_ids ],   #   list context
         abbr_ids => [ map { $prefix . $_ } 1..@seq_ids ],   # scalar context
     );
@@ -102,7 +100,7 @@ sub acc_mapper {
 
     # Note: this mapper could fail with non-GenBank Seqs
     my @seq_ids = $self->all_seq_ids;
-    return IdMapper->new(
+    return Bio::MUST::Core::IdMapper->new(
         long_ids => [ map {           $_->full_id   } @seq_ids ],
         abbr_ids => [ map { $prefix . $_->accession } @seq_ids ],
     );
@@ -114,7 +112,7 @@ sub len_mapper {
 
     my @seq_ids = $self->all_seq_ids;
     my @lengths = map { $_->nomiss_seq_len } $self->all_seqs;
-    return IdMapper->new(
+    return Bio::MUST::Core::IdMapper->new(
         long_ids => [ map { $_->full_id . '@' . shift @lengths } @seq_ids ],
         abbr_ids => [ map { $_->full_id                        } @seq_ids ],
     );
@@ -141,7 +139,10 @@ sub regex_mapper {
         push @abbr_ids, $prefix . $id;
     }
 
-    return IdMapper->new( long_ids => \@long_ids, abbr_ids => \@abbr_ids );
+    return Bio::MUST::Core::IdMapper->new(
+        long_ids => \@long_ids,
+        abbr_ids => \@abbr_ids
+    );
 }
 
 
@@ -161,7 +162,10 @@ sub org_mapper_from_long_ids {
                 . '|' . $seq_id->accession;
     }
 
-    return IdMapper->new( long_ids => \@long_ids, abbr_ids => \@abbr_ids );
+    return Bio::MUST::Core::IdMapper->new(
+        long_ids => \@long_ids,
+        abbr_ids => \@abbr_ids
+    );
 }
 
 
@@ -182,7 +186,10 @@ sub org_mapper_from_abbr_ids {
         push @abbr_ids, $abbr_id;
     }
 
-    return IdMapper->new( long_ids => \@long_ids, abbr_ids => \@abbr_ids );
+    return Bio::MUST::Core::IdMapper->new(
+        long_ids => \@long_ids,
+        abbr_ids => \@abbr_ids
+    );
 }
 
 
@@ -234,7 +241,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

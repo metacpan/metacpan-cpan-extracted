@@ -1,9 +1,9 @@
-package WebDriver::Tiny 0.100;
+package WebDriver::Tiny 0.101;
 
 use 5.020;
-use feature 'postderef';
+use feature qw/postderef signatures/;
 use warnings;
-no  warnings 'experimental::postderef';
+no  warnings 'experimental';
 
 # Allow "cute" $drv->('selector') syntax.
 #
@@ -68,9 +68,7 @@ sub import {
 #   3: The capabilities of the WebDriver daemon,
 #   4: Cached closure of $self for ->() syntax,
 # ]
-sub new {
-    my ( $class, %args ) = @_;
-
+sub new($class, %args) {
     Carp::croak qq/$class - Missing required parameter "port"/
         unless exists $args{port};
 
@@ -102,15 +100,15 @@ sub new {
     $self;
 }
 
-sub capabilities { $_[0][3] }
+sub capabilities($self) { $self->[3] }
 
-sub html  { $_[0]->_req( GET => '/source' ) }
-sub title { $_[0]->_req( GET => '/title'  ) }
-sub url   { $_[0]->_req( GET => '/url'    ) }
+sub  html($self) { $self->_req( GET => '/source' ) }
+sub title($self) { $self->_req( GET => '/title'  ) }
+sub   url($self) { $self->_req( GET => '/url'    ) }
 
-sub back       { $_[0]->_req( POST   => '/back'    ); $_[0] }
-sub forward    { $_[0]->_req( POST   => '/forward' ); $_[0] }
-sub refresh    { $_[0]->_req( POST   => '/refresh' ); $_[0] }
+sub    back($self) { $self->_req( POST   => '/back'    ); $self }
+sub forward($self) { $self->_req( POST   => '/forward' ); $self }
+sub refresh($self) { $self->_req( POST   => '/refresh' ); $self }
 
 sub status {
     # /status is the only path without the session prefix, so surpress it.
@@ -119,10 +117,10 @@ sub status {
     $_[0]->_req( GET => '/status' );
 }
 
-sub alert_accept  { $_[0]->_req( POST => '/alert/accept'  ); $_[0] }
-sub alert_dismiss { $_[0]->_req( POST => '/alert/dismiss' ); $_[0] }
+sub  alert_accept($self) { $self->_req( POST => '/alert/accept'  ); $self }
+sub alert_dismiss($self) { $self->_req( POST => '/alert/dismiss' ); $self }
 
-sub alert_text { $_[0]->_req( GET => '/alert/text' ) }
+sub alert_text($self) { $self->_req( GET => '/alert/text' ) }
 
 sub base_url {
     if ( @_ == 2 ) {
@@ -146,11 +144,9 @@ sub cookie {
     $self;
 }
 
-sub cookie_delete {
-    my $self = shift;
-
-    if (@_) {
-        $self->_req( DELETE => "/cookie/$_" ) for @_;
+sub cookie_delete($self, @cookies) {
+    if (@cookies) {
+        $self->_req( DELETE => "/cookie/$_" ) for @cookies;
     }
     else {
         $self->_req( DELETE => '/cookie' );
@@ -169,9 +165,7 @@ sub cookies {
 }
 
 # NOTE This method can be called from a driver or a collection of elements.
-sub find {
-    my ( $self, $selector, %args ) = @_;
-
+sub find($self, $selector, %args) {
     state $methods = {
         css               => 'css selector',
         ecmascript        => 'ecmascript',
@@ -181,9 +175,6 @@ sub find {
     };
 
     my $method = $methods->{ $args{method} // '' } // 'css selector';
-
-    my $must_be_visible
-        = $method eq 'css selector' && $selector =~ s/:visible$//;
 
     # FIXME
     my $drv = ref $self eq 'WebDriver::Tiny::Elements' ? $self->[0] : $self;
@@ -200,7 +191,7 @@ sub find {
 
         @ids = grep {
             $drv->_req( GET => "/element/$_/displayed" )
-        } @ids if $must_be_visible;
+        } @ids if $args{visible};
 
         last if @ids;
 
@@ -214,8 +205,7 @@ sub find {
               : bless [ $drv, @ids ], 'WebDriver::Tiny::Elements';
 }
 
-my $js = sub {
-    my ( $path, $self, $script, @args ) = @_;
+my $js = sub($path, $self, $script, @args) {
 
     # Currently only takes the first ID in the collection, this should change.
     $_ = { ELEMENT => $_->[1] }
@@ -227,9 +217,7 @@ my $js = sub {
 sub js       { unshift @_, '/execute/sync';  goto $js }
 sub js_async { unshift @_, '/execute/async'; goto $js }
 
-sub get {
-    my ( $self, $url ) = @_;
-
+sub get($self, $url) {
     $self->_req(
         POST => '/url',
         { url => $url =~ m(^https?://) ? $url : $self->[2] . $url },
@@ -260,13 +248,13 @@ sub screenshot {
 
 sub user_agent { $js->( '/execute/sync', $_[0], 'return window.navigator.userAgent') }
 
-sub window  { $_[0]->_req( GET => '/window'         ) }
-sub windows { $_[0]->_req( GET => '/window/handles' ) }
+sub  window($self) { $self->_req( GET => '/window'         ) }
+sub windows($self) { $self->_req( GET => '/window/handles' ) }
 
-sub window_close      { $_[0]->_req( DELETE => '/window'            ); $_[0] }
-sub window_fullscreen { $_[0]->_req( POST   => '/window/fullscreen' ); $_[0] }
-sub window_maximize   { $_[0]->_req( POST   => '/window/maximize'   ); $_[0] }
-sub window_minimize   { $_[0]->_req( POST   => '/window/minimize'   ); $_[0] }
+sub      window_close($self) { $self->_req( DELETE => '/window'            ); $self }
+sub window_fullscreen($self) { $self->_req( POST   => '/window/fullscreen' ); $self }
+sub   window_maximize($self) { $self->_req( POST   => '/window/maximize'   ); $self }
+sub   window_minimize($self) { $self->_req( POST   => '/window/minimize'   ); $self }
 
 sub window_rect {
     my $self = shift;
@@ -283,9 +271,7 @@ sub window_rect {
     $self;
 }
 
-sub window_switch {
-    my ( $self, $handle ) = @_;
-
+sub window_switch( $self, $handle) {
     $self->_req( POST => '/window', { handle => $handle } );
 
     $self;
@@ -302,8 +288,13 @@ sub _req {
 
     my $value = eval { JSON::PP::decode_json( $reply->{content} )->{value} };
 
-    Carp::croak ref $self, ' - ', $value ? $value->{message} : $reply->{content}
-        unless $reply->{success};
+    unless ( $reply->{success} ) {
+        my $error = $value
+            ? $value->{message} || $value->{error} || $reply->{content}
+            : $reply->{content};
+
+        Carp::croak ref $self, ' - ', $error;
+    }
 
     $value;
 }

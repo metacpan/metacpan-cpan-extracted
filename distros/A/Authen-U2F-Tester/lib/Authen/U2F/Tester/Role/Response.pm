@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::Role::Response;
-$Authen::U2F::Tester::Role::Response::VERSION = '0.01';
+$Authen::U2F::Tester::Role::Response::VERSION = '0.02';
 # ABSTRACT: U2F Successful Response Role
 
 use Moose::Role;
@@ -43,7 +43,7 @@ Authen::U2F::Tester::Role::Response - U2F Successful Response Role
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -45,6 +45,6 @@
          "url" : "https://github.com/maddingue/Locale-Maketext-Lexicon-Getcontext"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

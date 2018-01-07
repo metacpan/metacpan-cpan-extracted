@@ -39,3 +39,6 @@ Revision history for Perl extension simpleXMLParse.
 
 3.0  Mon Apr 06 14:28:00 2015
         - strip out !ATTLIST and debug statement removal 
+
+3.1  Mon Jan 01 22:00:00 2018
+        - fixes several problems with the algorithm that were discovered by using Data::Compare and XML::Simple. Also, added UTF-16 and UTF-8 with BOM support, to supplement existing ASCII and UTF-8 without BOM support. Added hexidecimal entity support. 

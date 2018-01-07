@@ -1,5 +1,5 @@
 {
-   "abstract" : "Edit data in xml format",
+   "abstract" : "Edit data held in the XML format.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -33,7 +33,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20170901"
+         "version" : "20180101"
       }
    },
    "release_status" : "stable",
@@ -42,5 +42,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170901"
+   "version" : "20180101"
 }

@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,9 +27,13 @@ requires:
   Moo::Role: '0'
   Renard::Incunabula::Common::Setup: '0'
   Renard::Incunabula::Common::Types: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
   perl: '5.006'
 resources:
   homepage: https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3
   repository: https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.70'

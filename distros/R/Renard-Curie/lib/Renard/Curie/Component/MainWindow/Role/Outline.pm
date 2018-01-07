@@ -1,10 +1,11 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::Outline;
 # ABSTRACT: Role for outline
-$Renard::Curie::Component::MainWindow::Role::Outline::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::Role::Outline::VERSION = '0.004';
 use Moo::Role;
 use Renard::Curie::Component::Outline;
-use Renard::Incunabula::Common::Types qw(InstanceOf DocumentModel);
+use Renard::Incunabula::Common::Types qw(InstanceOf);
+use Renard::Incunabula::Document::Types qw(DocumentModel);
 
 use Glib 'TRUE', 'FALSE';
 
@@ -38,7 +39,7 @@ Renard::Curie::Component::MainWindow::Role::Outline - Role for outline
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 

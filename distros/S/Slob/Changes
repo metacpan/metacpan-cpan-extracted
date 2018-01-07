@@ -1,5 +1,8 @@
 Revision history for Perl extension Slob.
 
+0.002 2018-01-06T20:09+02:00
+ - Add bzip2 and zlib compression support
+
 0.001 2017-12-09T20:39+02:00
  - First stable release
  - Add lzma2 compression support

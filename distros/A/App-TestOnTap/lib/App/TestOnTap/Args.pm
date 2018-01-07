@@ -62,6 +62,7 @@ sub __parseArgv
 			archive => 0,				# don't save results as archive
 			v => 0,						# don't let through output from tests
 			harness => 1,				# use the normal test harness
+			merge => undef,				# ask the harness to merge stdout/stderr of tests
 			
 			# hidden
 			#
@@ -87,9 +88,10 @@ sub __parseArgv
 			'timer!',
 			'workdirectory=s',
 			'savedirectory=s',
-			'archive!',
+			'archive',
 			'v|verbose+',
 			'harness!',
+			'merge!',
 			
 			# hidden
 			#
@@ -267,6 +269,15 @@ sub __parseArgv
 		warn("WARNING: No 'parallelizable' rule found ('--jobs $self->{jobs}' has no effect); all tests will run serially!\n");
 	}
 
+	# unless merge is explicitly set:
+	# * default to merge if the results are saved in any way (to force stderr to the tap files)
+	# * otherwise default to no merge
+	#
+	$self->{merge} =
+		defined($rawOpts{merge})
+			? $rawOpts{merge}
+			: ($rawOpts{workdirectory} || $rawOpts{savedirectory} || $rawOpts{archive}) ? 1 : 0;
+
 	# run preprocessing
 	#
 	$self->{preprocess} = App::TestOnTap::Preprocess->new($self->{config}->getPreprocessCmd(), $self, { %ENV }, \@argv);
@@ -340,6 +351,13 @@ sub getVerbose
 	my $self = shift;
 	
 	return $self->{v};
+}
+
+sub getMerge
+{
+	my $self = shift;
+	
+	return $self->{merge};
 }
 
 sub getSuiteRoot

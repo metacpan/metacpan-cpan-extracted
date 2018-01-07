@@ -10,8 +10,9 @@ use Text::Balanced qw( extract_delimited extract_bracketed );
 use Text::Wrap 'wrap';
 use Bible::OBML::HTML;
 use Bible::Reference 1.02;
+use Clone 'clone';
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 with 'Throwable';
 
@@ -48,18 +49,15 @@ private_method _update_ref => sub {
     $self->_reference->acronyms( $self->acronyms );
 };
 
-binmode( STDOUT, ':encoding(utf8)' );
-binmode( STDERR, ':encoding(utf8)' );
-
 sub read_file {
     my ( $self, $filename ) = @_;
-    open( my $file, '<:encoding(utf8)', $filename ) or $self->throw($!);
+    open( my $file, '<:encoding(utf8)', $filename ) or $self->throw("Unable to read file $filename; $!");
     return join( '', <$file> );
 }
 
 sub write_file {
     my ( $self, $filename, $content ) = @_;
-    open( my $file, '>:encoding(utf8)', $filename ) or $self->throw($!);
+    open( my $file, '>:encoding(utf8)', $filename ) or $self->throw("Unable to write file $filename; $!");
     print $file $content;
     return;
 }
@@ -71,48 +69,44 @@ sub parse {
     $content =~ s/^\s*#.*?(?>\r?\n)//msg;
 
     # "unwrap" wrapped lines
-    my $last_space = 0;
-    my @buffer;
-    $content = join( "\n", reverse grep { defined } map {
-        my $line = $_;
-        my ( $rv, $space );
-
-        if ( $line !~ /^\s*$/ ) {
-            $space = ( $line =~ s/^([ ]+)// ) ? length $1 : 0;
-
-            if ( defined $last_space and $space != $last_space ) {
-                $rv = ( ' ' x $last_space ) . join( ' ', reverse @buffer ) . "\n";
-                @buffer = ();
-            }
-
-            push( @buffer, $line );
+    $content =~ s/\n[ \t]+\n/\n\n/mg;
+    $content =~ s/\n[ ]{6,}(?=\S)/ "\n" . ( ' ' x 6 ) /mge;
+    $content =~ s/\n[ ]{3,5}(?=\S)/ "\n" . ( ' ' x 4 ) /mge;
+    $content =~ s/\n[ ]{1,2}(?=\S)/\n/mg;
+    $content =~ s/(?<=\N)[ ]*\n(?=\S)/ /mg;
+    my @content;
+    for my $line ( split( /\n/, $content ) ) {
+        unless (
+            @content and $content[-1] and
+            (
+                ( $content[-1] =~ /^[ ]{4}\S/ and $line =~ /^[ ]{4}\S/ ) or
+                ( $content[-1] =~ /^[ ]{6}\S/ and $line =~ /^[ ]{6}\S/ )
+            )
+        ) {
+            push( @content, $line );
         }
         else {
-            $rv = ( ' ' x $last_space ) . join( ' ', reverse @buffer ) . "\n";
-            @buffer = ();
-            $rv .= $line;
+            $line =~ s/^[ ]+//;
+            $content[-1] .= ' ' . $line;
         }
-
-        $last_space = $space || 0;
-        $rv;
-    } reverse split( /\n/, "\n" . $content ) );
-    $content = join( ' ', reverse @buffer ) . "\n" . $content;
-    $content =~ s/\n//;
+    }
+    $content = join( "\n", @content );
 
     # pull out the reference base
-    ( my $reference_base = ( $content =~ s/~([^~]+)~//ms ) ? $1 : undef ) =~ s/^\s+|\s+$//g;
+    ( my $reference_base = ( $content =~ s/~([^~]+)~//ms ) ? $1 : '' ) =~ s/^\s+|\s+$//g;
 
     # warn on any obvious errors
     $self->throw('Missing reference base marker') unless ($reference_base);
     $self->throw('Multiple reference base markers') if ( $content =~ /~[^~]+~/ms );
 
+    # split out book and chapter; check book name for validity
     my $book = $reference_base;
     my $chapter = 1;
     $chapter = $1 if ( $book =~ s/\s*(\d+)\s*$// );
-
     $self->throw(qq{Book "$book" unknown; must use canonical book name})
         unless ( grep { $_ eq $book } $self->_reference->books );
 
+    # code to recursively for a given block or sub-block
     my $parse_block;
     $parse_block = sub {
         my ($block_content) = @_;
@@ -133,13 +127,8 @@ sub parse {
                     ref( $parsed_parts[$i] ) and
                     ref( $parsed_parts[ $i + 1 ] ) and
                     (
-                        (
-                            $parsed_parts[$i][0] eq 'blockquote' and
-                            $parsed_parts[ $i + 1 ][0] eq 'blockquote_indent'
-                        ) or (
-                            $parsed_parts[$i][0] eq 'blockquote_indent' and
-                            $parsed_parts[ $i + 1 ][0] eq 'blockquote'
-                        )
+                        $parsed_parts[$i][0] =~ /^blockquote/ and
+                        $parsed_parts[ $i + 1 ][0] =~ /^blockquote/
                     )
                 );
             }
@@ -187,54 +176,45 @@ sub parse {
         return $block_content;
     };
 
-    my $parse_wrap = sub {
-        my ($block_content) = @_;
-        my @results = $parse_block->($block_content);
-
-        my $i = 0;
-        while ( $i <= @results ) {
-            if (
-                ref( $results[$i] ) and ref( $results[ $i + 1 ] ) and
-                $results[$i][0] eq $results[ $i + 1 ][0]
-            ) {
-                my $node = splice( @results, $i + 1, 1 );
-
-                if ( not ref( $results[$i][-1] ) and not ref( $node->[1] ) ) {
-                    $results[$i][-1] .= ' ' . $node->[1];
-                }
-                else {
-                    push( @{ $results[$i] }, $node->[1] );
-                }
-            }
-            else {
-                $i++;
-            }
-        }
-
-        return [@results];
-    };
-
     my ( @verses, $header_text );
+    my $space_cache = '';
 
-    for my $block ( grep { /\w/ } map { split(/(?=\=[^=]+\=)/) } split( /(?=\|\d+\|)/, $content ) ) {
+    # split up the content into verse-sized blocks
+    for my $block ( map { split(/(?=\=[^=]+\=)/) } split( /(?=[ ]*\|\d+\|)/, $content ) ) {
+        # record block end-of-line type
+        my $eol = ( $block =~ /\n{2,}$/ ) ? 'paragraph' : ( $block =~ /\n$/ ) ? 'break' : '';
+
+        # preserve leading spaces for a given block/verse line
+        next if ( not @verses and not $block =~ /\w/ );
+        unless ( $block =~ /\w/ ) {
+            $space_cache .= $block;
+            next;
+        }
+        $block = $space_cache . $block;
+        $space_cache = '';
+
+        # check for a header and store for later if exists
         if ( $block =~ /\=\s*([^=]+?)\s*\=/ ) {
             $self->throw('Multiple back-to-back headers found') if ($header_text);
-            $header_text = $parse_wrap->($1);
+            $header_text = [ $parse_block->($1) ];
             next;
         }
 
+        # find the verse number
         my $verse_number = $1 if ( $block =~ s/\|\s*(\d+)\s*\|\s*// );
         $self->throw('Failed to find verse number') unless ($verse_number);
 
+        # parse the block into a verse data structure
         my $verse = {
             reference => {
                 book    => $book,
                 chapter => $chapter,
                 verse   => $verse_number,
             },
-            content => $parse_wrap->($block),
+            content => [ $parse_block->($block) ],
         };
 
+        # set the header in the verse data stucture if a header was found
         if ($header_text) {
             $verse->{header} = $header_text;
             undef $header_text;
@@ -251,26 +231,23 @@ sub parse {
         ) {
             $verse->{content}[0] = [ $verses[-1]{content}[-1][0], $verse->{content}[0] ];
 
-            if ( ref( $verse->{content}[1] ) and $verse->{content}[0][0] eq $verse->{content}[1][0] ) {
-                my $node = splice( @{ $verse->{content} }, 1, 1 );
-                $verse->{content}[0][1] .= ' ' . $node->[1];
-            }
-
             splice( @{ $verse->{content} }, 1, 0, ['break'] ) if (
                 $verse->{content}[0] and $verse->{content}[1] and
                 ref( $verse->{content}[0] ) and ref( $verse->{content}[1] ) and
                 (
-                    (
-                        $verse->{content}[0][0] eq 'blockquote' and
-                        $verse->{content}[1][0] eq 'blockquote_indent'
-                    ) or
-                    (
-                        $verse->{content}[0][0] eq 'blockquote_indent' and
-                        $verse->{content}[1][0] eq 'blockquote'
-                    )
+                    $verse->{content}[0][0] =~ /^blockquote/ and
+                    $verse->{content}[1][0] =~ /^blockquote/
                 )
             );
         }
+
+        push( @{ $verse->{content} }, [$eol] ) if (
+            $eol and
+            (
+                not ( ref $verse->{content}[-1] eq 'ARRAY' and @{ $verse->{content}[-1] } )
+                or $verse->{content}[-1][0] ne $eol
+            )
+        );
 
         push( @verses, $verse );
     }
@@ -281,6 +258,7 @@ sub parse {
 sub render {
     my ( $self, $data, $skip_wrapping ) = @_;
     my $content = '';
+    $data = clone($data);
 
     my $render_block;
     $render_block = sub {
@@ -329,7 +307,6 @@ sub render {
     };
 
     my %chapters;
-    my $verses_seen = 0;
     for my $verse (@$data) {
         unless ($content) {
             my $chapter = $verse->{reference}{book} . ' ' . $verse->{reference}{chapter};
@@ -342,10 +319,12 @@ sub render {
         $content .= ' ' if ( substr( $content, length($content) - 1, 1 ) ne "\n" );
 
         my $verse_content = $render_block->( $verse->{content} );
-        my $leader = ( $verse_content =~ s/^(\s*)// and not $verses_seen ) ? $1 : '';
+        my $leader = (
+            $verse_content =~ s/^(\s*)// and
+            substr( $content, length($content) - 1, 1 ) eq "\n"
+        ) ? $1 : '';
 
         $content .= $leader . '|' . $verse->{reference}{verse} . '| ' . $verse_content;
-        $verses_seen++;
     }
 
     $content =~ s/\{\s+/\{/g;
@@ -516,7 +495,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.08
+version 1.10
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML)

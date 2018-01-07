@@ -1,17 +1,22 @@
 Revision history for Hash-Merge-Extra
 
+0.06    2018-01-02
+        - {L,R}_MERGE_PATCH removed (impossible to remove hash items
+          using Hash::Merge)
+        - dist corrected
+
 0.05    2017-12-15
-        {L,R}_JSON_MERGE_PATCH behaviors renamed to {L,R}_MERGE_PATCH
+        - {L,R}_JSON_MERGE_PATCH behaviors renamed to {L,R}_MERGE_PATCH
 
 0.04    2017-11-25
-        L_JSON_MERGE_PATCH and R_JSON_MERGE_PATCH behaviors added (rfc7386)
+        - L_JSON_MERGE_PATCH and R_JSON_MERGE_PATCH behaviors added (rfc7386)
 
 0.03    2017-08-14
-        docs improved
+        - docs improved
 
 0.02    2017-08-04
-        L_ADDITIVE and R_ADDITIVE behaviors added
+        - L_ADDITIVE and R_ADDITIVE behaviors added
 
 0.01    2017-07-22
-        Initial release.
+        - Initial release.
 

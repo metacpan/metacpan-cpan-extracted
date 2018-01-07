@@ -1,5 +1,11 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.07	Sat Dec 30 12:40:31 GMT 2017
+ - update resolver docs
+ - deal with type "object" as key/value
+ - handle empty-string enum values
+ - test/implement using local OpenAPI, using promises
+
 0.06	Tue 12 Dec 03:48:59 GMT 2017
  - resolver die if not is_success
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::PostPred::Composition;
 # ABSTRACT: Posterior predictive test for compositional bias
-$Bio::MUST::Core::PostPred::Composition::VERSION = '0.173500';
+$Bio::MUST::Core::PostPred::Composition::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -9,7 +9,7 @@ use feature qw(say);
 
 # use Smart::Comments;
 
-use List::AllUtils qw(max sum);
+use List::AllUtils qw(sum);
 use Tie::IxHash;
 
 use Bio::MUST::Core::Types;
@@ -95,7 +95,7 @@ sub _build_stat_for {
     }
 
     # compute global biases
-    $bias_for{'GLOBALMAX'}  = max( values %bias_for );
+    $bias_for{'GLOBALMAX'}  = List::AllUtils::max( values %bias_for );
     $bias_for{'GLOBALMEAN'} = sum( values %bias_for ) / keys %bias_for;
 
     return \%bias_for;
@@ -116,7 +116,7 @@ Bio::MUST::Core::PostPred::Composition - Posterior predictive test for compositi
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

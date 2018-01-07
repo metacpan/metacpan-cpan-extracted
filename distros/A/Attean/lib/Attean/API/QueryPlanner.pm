@@ -7,7 +7,7 @@ Attean::API::IDPJoinPlanner - Iterative dynamic programming query planning role
 
 =head1 VERSION
 
-This document describes Attean::API::IDPJoinPlanner version 0.017
+This document describes Attean::API::IDPJoinPlanner version 0.018
 
 =head1 SYNOPSIS
 
@@ -32,18 +32,19 @@ methods that consume the L<Attean::API::CostPlanner> role.
 
 =cut
 
-package Attean::API::QueryPlanner 0.017 {
-	use Moo::Role;
+package Attean::API::QueryPlanner 0.018 {
 	use Types::Standard qw(CodeRef);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	requires 'plan_for_algebra'; # plan_for_algebra($algebra, $model, \@default_graphs)
 }
 
-package Attean::API::CostPlanner 0.017 {
-	use Moo::Role;
+package Attean::API::CostPlanner 0.018 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(CodeRef);
+
+	use Moo::Role;
 	use namespace::clean;
 	with 'Attean::API::QueryPlanner';
 	
@@ -74,16 +75,15 @@ package Attean::API::CostPlanner 0.017 {
 	}
 }
 
-package Attean::API::JoinPlanner 0.017 {
+package Attean::API::JoinPlanner 0.018 {
 	use Moo::Role;
-	use namespace::clean;
 	requires 'joins_for_plan_alternatives';
 }
 
-package Attean::API::NaiveJoinPlanner 0.017 {
-	use Moo::Role;
+package Attean::API::NaiveJoinPlanner 0.018 {
 	use Math::Cartesian::Product;
-	use namespace::clean;
+
+	use Moo::Role;
 
 	with 'Attean::API::JoinPlanner';
 	with 'Attean::API::QueryPlanner';
@@ -108,11 +108,12 @@ package Attean::API::NaiveJoinPlanner 0.017 {
 	}
 }
 
-package Attean::API::SimpleCostPlanner 0.017 {
-	use Moo::Role;
-	use namespace::clean;
+package Attean::API::SimpleCostPlanner 0.018 {
 	use Types::Standard qw(Int);
 	use Scalar::Util qw(blessed);
+
+	use Moo::Role;
+
 	with 'Attean::API::CostPlanner';
 	with 'MooX::Log::Any';
 
@@ -182,6 +183,7 @@ package Attean::API::SimpleCostPlanner 0.017 {
 				my $lcost		= $self->cost_for_plan($children[0], $model);
 				my $rcost		= $self->cost_for_plan($children[1], $model);
 				$cost	= ($lcost + $rcost);
+				$cost += ($lcost < $rcost); # To let the plan with cheaper rhs win
 				$cost	*= 100 unless ($plan->children_are_variable_connected);
 			} elsif ($plan->isa('Attean::Plan::Service')) {
 				my $scost	= 10;
@@ -211,8 +213,7 @@ package Attean::API::SimpleCostPlanner 0.017 {
 	}
 }
 
-package Attean::API::IDPJoinPlanner 0.017 {
-	use Moo::Role;
+package Attean::API::IDPJoinPlanner 0.018 {
 	use Encode qw(encode);
 	use Attean::RDF;
 	use LWP::UserAgent;
@@ -224,7 +225,8 @@ package Attean::API::IDPJoinPlanner 0.017 {
 	use Algorithm::Combinatorics qw(subsets);
 	use List::Util qw(min);
 	use Math::Cartesian::Product;
-	use namespace::clean;
+
+	use Moo::Role;
 
 	with 'Attean::API::JoinPlanner';
 	with 'Attean::API::SimpleCostPlanner';
@@ -395,6 +397,7 @@ package Attean::API::IDPJoinPlanner 0.017 {
 					my $mult = $self->_penalize_joins($plan);
 # 					warn "$mult * ($lcost + $rcost)";
 					$cost	= $mult * ($lcost + $rcost);
+					$cost += ($lcost < $rcost); # To let the plan with cheaper rhs win
 				}
 			} elsif ($plan->isa('Attean::Plan::Service')) {
 				my $scost	= 10;
@@ -559,7 +562,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

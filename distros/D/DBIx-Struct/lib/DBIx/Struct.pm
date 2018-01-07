@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.39';
+our $VERSION = '0.45';
 
 our @EXPORT = qw{
   one_row
@@ -497,10 +497,32 @@ sub populate {
             my $sth = $_->table_info('', '', '%', "TABLE");
             return if not $sth;
             my $tables = $sth->fetchall_arrayref;
-            @tables = map {$_->[2]} grep {$_->[3] eq 'TABLE' and $_->[2] !~ /^sql_/} @$tables;
+            @tables = map {
+                (my $t = $_->[2]) =~ s/"//g;
+                $t;
+              } grep {
+                $_->[3] eq 'TABLE' and $_->[2] !~ /^sql_/
+              } @$tables;
         }
     );
-    setup_row($_) for @tables;
+    for (@tables) {
+        my $ncn = setup_row($_);
+        if ($user_schema_namespace) {
+            (my $uncn = $ncn) =~ s/^.*:://;
+            eval "use ${user_schema_namespace}::${uncn}";
+            no strict 'refs';
+            eval {
+                if (
+                    keys %{"${user_schema_namespace}::${uncn}::"}
+                    and (  not ${"${user_schema_namespace}::${uncn}::"}{ISA}
+                        or not "${user_schema_namespace}::${uncn}"->isa($ncn))
+                  )
+                {
+                    unshift @{"${user_schema_namespace}::${uncn}::ISA"}, $ncn;
+                }
+            };
+        }
+    }
 }
 
 #<<<
@@ -990,8 +1012,8 @@ sub make_object_autoload_find {
 				*{\$ncn."::".\$method} = eval \$func;
 				DBIx::Struct::error_message {
 					result  => 'SQLERR',
-					message => "Error creating method \$method for $table: \$!"
-				} if \$!;
+					message => "Error creating method \$method for $table: \$\@"
+				} if \$\@;
 			}
 			goto &{\$ncn."::".\$method};
 		}
@@ -1386,14 +1408,20 @@ SK
     my %foreign_tables;
     my %fkfuncs;
     for my $fk (@fkeys) {
-        $fk->{FK_COLUMN_NAME} =~ s/"//g;
-        my $fn = $fk->{FK_COLUMN_NAME};
+        (my $pt = $fk->{PKTABLE_NAME}  || $fk->{UK_TABLE_NAME}) =~ s/"//g;
+        (my $pk = $fk->{PKCOLUMN_NAME} || $fk->{UK_COLUMN_NAME}) =~ s/"//g;
+        my $fn = $pt;
         $fn =~ tr/_/-/;
         $fn =~ s/\b(\w)/\u$1/g;
         $fn =~ tr/-//d;
-        (my $pt = $fk->{PKTABLE_NAME}  || $fk->{UK_TABLE_NAME}) =~ s/"//g;
-        (my $pk = $fk->{PKCOLUMN_NAME} || $fk->{UK_COLUMN_NAME}) =~ s/"//g;
-        $fn =~ s/^${pk}_*//i or $fn =~ s/_$pk(?=[^a-z]|$)//i or $fn =~ s/$pk(?=[^a-z]|$)//i;
+        $fk->{FK_COLUMN_NAME} =~ s/"//g;
+        my $fn_suffix = $fk->{FK_COLUMN_NAME};
+        $fn_suffix =~ s/^${pk}_*//i or $fn_suffix =~ s/_$pk(?=[^a-z]|$)//i or $fn_suffix =~ s/$pk(?=[^a-z]|$)//i;
+        $fn_suffix =~ tr/_/-/;
+        $fn_suffix =~ s/\b(\w)/\u$1/g;
+        $fn_suffix =~ tr/-//d;
+        $fn_suffix =~ s/$fn//;
+        $fn .= $fn_suffix;
         $fkfuncs{$fn} = undef;
         $foreign_tables .= <<FKT;
 		sub $fn { 
@@ -1473,6 +1501,12 @@ ACC
         if (!exists $json_fields{$k}) {
             if (!exists($pk_fields{$k}) && (not ref $table)) {
                 $accessors .= <<ACC;
+		sub _$k {
+			if(\@_ > 1) {
+				\$_[0]->[@{[_row_data]}]->[$fields{$k}] = \$_[1];
+			}
+			\$_[0]->[@{[_row_data]}]->[$fields{$k}];
+		}
 		sub $k {
 			if(\@_ > 1) {
 				\$_[0]->[@{[_row_data]}]->[$fields{$k}] = \$_[1];
@@ -1491,6 +1525,21 @@ ACC
         } else {
             if (!exists($pk_fields{$k}) && (not ref $table)) {
                 $accessors .= <<ACC;
+		sub _$k {
+			if(\@_ > 1) {
+				if(not CORE::ref \$_[1]) {
+					\$_[0]->[@{[_row_data]}]->[$fields{$k}] = \$_[1];
+				} else {
+					\$_[0]->[@{[_row_data]}]->[$fields{$k}] = JSON::to_json(\$_[1]);
+				}
+			}
+			if(not CORE::ref \$_[0]->[@{[_row_data]}]->[$fields{$k}]) {
+				\$_[0]->[@{[_row_updates]}] = {} if not \$_[0]->[@{[_row_updates]}];
+				\$_[0]->[@{[_row_data]}]->[$fields{$k}] = 
+					DBIx::Struct::JSON->factory(\\\$_[0]->[@{[_row_data]}]->[$fields{$k}], \$_[0]->[@{[_row_updates]}], "$k");
+			}
+			\$_[0]->[@{[_row_data]}]->[$fields{$k}]->accessor;
+		}
 		sub $k {
 			if(\@_ > 1) {
 				if(not CORE::ref \$_[1]) {

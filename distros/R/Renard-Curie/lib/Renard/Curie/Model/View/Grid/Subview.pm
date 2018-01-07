@@ -1,9 +1,10 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Grid::Subview;
 # ABSTRACT: A subview for a grid-layout
-$Renard::Curie::Model::View::Grid::Subview::VERSION = '0.003';
+$Renard::Curie::Model::View::Grid::Subview::VERSION = '0.004';
 use Moo;
-use Renard::Incunabula::Common::Types qw(InstanceOf ArrayRef SizeRequest);
+use Renard::Incunabula::Common::Types qw(InstanceOf ArrayRef);
+use Renard::Incunabula::Frontend::Gtk3::Types qw(SizeRequest);
 use List::AllUtils qw(part sum max);
 
 has _grid_view => (
@@ -107,7 +108,7 @@ Renard::Curie::Model::View::Grid::Subview - A subview for a grid-layout
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

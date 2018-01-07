@@ -11,8 +11,8 @@ use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
-use vars qw<$VERSION $magic @CARP_NOT>;
-$VERSION = '0.07';
+our $VERSION = '0.09';
+our @CARP_NOT = ();
 
 =head1 SYNOPSIS
 
@@ -46,12 +46,13 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
     $got_endpoint->then( sub( $endpoint ) {
         die "Got an undefined endpoint" unless defined $endpoint;
 
-        my $res = as_future_cb( sub( $done_cb, $fail_cb ) {
-            $logger->('debug',"Connecting to $endpoint");
-            $client = AnyEvent::WebSocket::Client->new(
-                max_payload_size => 0, # allow unlimited size for messages
-            );
-            $client->connect( $endpoint )->cb( $done_cb );
+        my $res = $self->future;
+        $logger->('debug',"Connecting to $endpoint");
+        $client = AnyEvent::WebSocket::Client->new(
+            max_payload_size => 0, # allow unlimited size for messages
+        );
+        $client->connect( $endpoint )->cb( sub {
+            $res->done( @_ )
         });
         $res
 
@@ -63,7 +64,8 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
         undef $self;
 
         # Kick off the continous polling
-        $connection->on( each_message => sub( $connection,$message) {
+        $connection->on( each_message => sub( $connection,$message, @rest) {
+            # I haven't investigated what @rest contains...
             $handler->on_response( $connection, $message->body )
         });
         $connection->on( parse_error => sub( $connection, $error) {
@@ -77,7 +79,8 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
 }
 
 sub send( $self, $message ) {
-    $self->connection->send( $message )
+    $self->connection->send( $message );
+    $self->future->done(1);
 }
 
 sub close( $self ) {
@@ -99,14 +102,36 @@ Returns a Future that will be resolved in the number of seconds given.
 =cut
 
 sub sleep( $self, $seconds ) {
-
-    my $timer;
-    as_future_cb( sub( $done_cb, $fail_cb ) {
-        $timer = AnyEvent->timer( after => $seconds, cb => sub {
-            undef $timer;
-            goto &$done_cb
-        })
-    });
+    AnyEvent::Future->new_delay( after => $seconds );
 }
 
 1;
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/www-mechanize-chrome>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
+or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut

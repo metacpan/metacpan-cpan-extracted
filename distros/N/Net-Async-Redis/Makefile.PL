@@ -17,7 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Net::Async::Redis",
   "PREREQ_PM" => {
-    "Future" => "0.30",
+    "Class::Method::Modifiers" => 0,
+    "Future" => "0.37",
     "IO::Async" => 0,
     "List::Util" => "1.29",
     "Log::Any" => "1.050",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::HexString" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,9 +48,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::Method::Modifiers" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Future" => "0.30",
+  "Future" => "0.37",
   "IO::Async" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

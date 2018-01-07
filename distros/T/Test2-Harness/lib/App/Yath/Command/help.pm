@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001043';
+our $VERSION = '0.001045';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
@@ -126,6 +126,18 @@ Exit after showing what yath thinks your options mean
 =item --help
 
 Exit after showing this help message
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=item -V
+
+=item --version
+
+Show version information
 
 =back
 

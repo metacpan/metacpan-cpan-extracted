@@ -10,7 +10,7 @@ WriteMakefile(
 	LICENSE           => 'perl',
 	SIGN              => 1,
 	PREREQ_PM         => {},
-	INC               => '-I. -Ibase91-0.6.0',
+	INC               => '-I.',
 	META_ADD         => {
 		dynamic_config => 1,
 		resources      => {

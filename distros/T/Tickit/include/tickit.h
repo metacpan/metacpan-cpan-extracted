@@ -242,6 +242,15 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 int  tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int value);
+
+typedef struct {
+  uint8_t r, g, b;
+} TickitPenRGB8;
+
+bool tickit_pen_has_colour_attr_rgb8(const TickitPen *pen, TickitPenAttr attr);
+TickitPenRGB8 tickit_pen_get_colour_attr_rgb8(const TickitPen *pen, TickitPenAttr attr);
+void tickit_pen_set_colour_attr_rgb8(TickitPen *pen, TickitPenAttr attr, TickitPenRGB8 value);
+
 bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *value);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
@@ -339,6 +348,9 @@ void tickit_term_set_output_buffer(TickitTerm *tt, size_t len);
 void tickit_term_await_started_msec(TickitTerm *tt, long msec);
 void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout);
 void tickit_term_flush(TickitTerm *tt);
+
+void tickit_term_pause(TickitTerm *tt);
+void tickit_term_resume(TickitTerm *tt);
 
 /* fd is allowed to be unset (-1); works abstractly */
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
@@ -511,8 +523,8 @@ void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol
 void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int endline, int col,
     TickitLineStyle style, TickitLineCaps caps);
 
-void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src);
-void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src);
+void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src);
+void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src);
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 

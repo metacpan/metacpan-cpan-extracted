@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::AbstractProvider;
-$Footprintless::Plugin::Database::AbstractProvider::VERSION = '1.01';
+$Footprintless::Plugin::Database::AbstractProvider::VERSION = '1.03';
 # ABSTRACT: A base class for database providers
 # PODNAME: Footprintless::Plugin::Database::AbstractProvider
 
@@ -63,6 +63,40 @@ sub client {
     }
 
     croak($error) if ($error);
+}
+
+sub _column_info {
+    my ( $self, $statement_handle ) = @_;
+    my $column_info = [];
+    if ( defined( $statement_handle->{NUM_OF_FIELDS} ) ) {
+        $column_info = [
+            map {
+                my $element = {};
+                $element->{name} = $statement_handle->{NAME}->[$_]
+                    if defined( $statement_handle->{NAME} );
+                $element->{type} = $statement_handle->{TYPE}->[$_]
+                    if defined( $statement_handle->{TYPE} );
+                if ( my $type_info =
+                    $self->{connection}->type_info( $statement_handle->{TYPE}->[$_] ) )
+                {
+                    $element->{type_name} = $type_info->{TYPE_NAME}
+                        if defined( $type_info->{TYPE_NAME} );
+                    $element->{type_info} = $type_info if defined( $type_info->{NAME} );
+                }
+                $element->{column_size} = $statement_handle->{PRECISION}->[$_]
+                    if defined( $statement_handle->{PRECISION} );
+                $element->{scale} = $statement_handle->{SCALE}->[$_]
+                    if defined( $statement_handle->{SCALE} );
+                if ( defined( $statement_handle->{NULLABLE} )
+                    && ( my $nullable = $statement_handle->{NULLABLE}->[$_] ) != 2 )
+                {
+                    $element->{nullable} = $nullable ? 1 : 0;
+                }
+                $element;
+            } 0 .. $statement_handle->{NUM_OF_FIELDS} - 1
+        ];
+    }
+    return $column_info;
 }
 
 sub commit_transaction {
@@ -222,15 +256,22 @@ sub _process_sql {
 }
 
 sub query {
-    my ( $self, $query, $result_handler ) = @_;
+    my ( $self, $query, $result_handler, %options ) = @_;
+    my $hash = $options{hash};
+    my $column_info = $options{column_info} || ( $hash && [] );
 
     $self->_process_sql(
         $query,
         sub {
             my ( $statement_handle, $execute_result ) = @_;
-
-            while ( my @row = $statement_handle->fetchrow_array() ) {
-                &{$result_handler}(@row);
+            @$column_info = @{ $self->_column_info($statement_handle) } if $column_info;
+            if ( !$options{no_fetch} ) {
+                while ( my @row = $statement_handle->fetchrow_array() ) {
+                    @row =
+                        map { $column_info->[$_]->{name} => $row[$_] } 0 .. ( scalar(@row) - 1 )
+                        if $hash;
+                    &{$result_handler}(@row);
+                }
             }
         }
     );
@@ -238,9 +279,11 @@ sub query {
 }
 
 sub query_for_list {
-    my ( $self, $query, $row_mapper ) = @_;
+    my ( $self, $query, $row_mapper, %options ) =
+        ( shift, shift, ( scalar(@_) % 2 ) ? shift : undef, @_ );
 
     my @results = ();
+    my $hash    = $options{hash};
     $self->query(
         $query,
         sub {
@@ -248,17 +291,20 @@ sub query_for_list {
                 push( @results, &{$row_mapper}(@_) );
             }
             else {
-                push( @results, \@_ );
+                push( @results, $hash ? {@_} : \@_ );
             }
-        }
+        },
+        %options
     );
     return wantarray() ? @results : \@results;
 }
 
 sub query_for_map {
-    my ( $self, $query, $row_mapper ) = @_;
+    my ( $self, $query, $row_mapper, %options ) =
+        ( shift, shift, ( scalar(@_) % 2 ) ? shift : undef, @_ );
 
     my %results = ();
+    my $hash    = $options{hash};
     $self->query(
         $query,
         sub {
@@ -267,9 +313,10 @@ sub query_for_map {
                 $results{ $key_value_pair->[0] } = $key_value_pair->[1];
             }
             else {
-                $results{ $_[0] } = \@_;
+                $results{ $_[ $hash ? 1 : 0 ] } = $hash ? {@_} : \@_;
             }
-        }
+        },
+        %options
     );
     return wantarray() ? %results : \%results;
 }
@@ -325,7 +372,7 @@ Footprintless::Plugin::Database::AbstractProvider - A base class for database pr
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -454,27 +501,102 @@ Executes C<$query> and returns the number of rows effected.
 
 Returns the configured schema name.
 
-=head2 query($query, $row_handler)
+=head2 query($query, $row_handler, %options)
 
 Executes C<$query> and calls C<$row_handler> once for each row.  Does not return
-anything.
+anything. If you do not set the C<hash> option, the C<$row_handler> gets the 
+field data in the C<@_> array (see C<hash> option below).
 
-=head2 query_for_list($query, [$row_mapper])
+The following options may be set:
+
+=over 4
+
+=item C<column_info>
+
+To get column information, set this option to an array ref - when the query is
+executed, before the C<$row_handler> is called for the first time, the array
+will be populated with the column information, the indexed by result column.
+This array may be empty if the underlying driver does not support column
+information.
+
+Each item in the array will be a hash containing the following properties if
+the driver does not support a field it will be missing:
+
+=over 4
+
+=item C<name>
+
+The column name
+
+=item C<type>
+
+The SQL type identified by number - these are supposedly cataloged as part of
+the ISO/IEC 9075 type registry - but I would not know because this particular
+spec seems to be a particularly well guarded secret (I could not get it for
+free on the internet). I suggest looking directly at the C<type_name> and 
+C<type_info> properties instead of worrying about this.
+
+=item C<type_name>
+
+The SQL type identified by name.
+
+=item C<type_info> 
+
+A single C<type_info> hash describing the type for the column as
+described at http://search.cpan.org/~timb/DBI-1.637/DBI.pm#type_info
+
+=item C<column_size>
+
+The precision of the column. For numeric types, this is the number of digits
+(does not include sign, decimal point, or even exponent digits). For character
+based types, this is the number of bytes which may or may not correspond to
+the number of characters.
+
+=item C<scale>
+
+An integer indicating "scale" or C<undef> for types where scale is not used.
+
+=item C<nullable>
+
+Indicates whether or not we can assign this column to null - C<undef> if the
+nullability is unknown. Otherwise this may be evaluated a boolean.
+
+=back
+
+=item C<hash>
+
+Set this to a true value to get the parameters to the C<$row_handler> to be set up
+suitable for a hash assignment. The actual parameters are an array, but will
+now come as: column-name-1 => field-1, column-name-2 => field-2...
+
+=item C<no_fetch>
+
+Set this to a true value to skip the fetching of data from a result set - this is
+useful for "queries" that have no result set and would throw an exception when
+we attempt to fetch a row (i.e. C<ALTER SESSION> queries). 
+
+=back
+
+=head2 query_for_list($query, [$row_mapper,] %options)
 
 Executes C<$query> and calls C<$row_mapper> once for each row.  C<$row_mapper> is
 expected to return a scalar representing the row.  All of the returned scalars will
 be collected into a list and returned.  When called in list context, a list is
 returned.  In scalar context, an arrayref is returned.  If C<$row_mapper> is not
-supplied, each rows values will be returned as an arrayref.
+supplied, each rows values will be returned as an arrayref (or as hashref if the
+C<hash> option is selected). For information about the C<options>, see the 
+C<query()> method - being that they are the same options.
 
-=head2 query_for_map($query, $row_mapper)
+=head2 query_for_map($query, [$row_mapper,] %options)
 
 Executes C<$query> and calls C<$row_mapper> once for each row.  C<$row_mapper> is
 expected to return a hashref with a single key/value pair.  All of the returned 
 hashrefs will be collected into a single hash and returned.  When called in list 
 context, a hash is returned.  In scalar context, a hashref is returned.  If 
 C<$row_mapper> is not supplied, each rows values will be returned as a hashref 
-using the first value as the key, and the whole rows arrayref as the value.
+using the first value as the key, and the whole rows arrayref as the value (or
+as hashref if the C<hash> option is selected). For information about the
+C<options>, see the C<query()> method - being that they are the same options..
 
 =head2 query_for_scalar($query, $row_mapper)
 

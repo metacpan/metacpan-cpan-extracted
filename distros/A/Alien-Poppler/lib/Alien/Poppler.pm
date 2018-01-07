@@ -1,6 +1,6 @@
 package Alien::Poppler;
 # ABSTRACT: Alien package for the Poppler PDF rendering library
-$Alien::Poppler::VERSION = '0.001';
+$Alien::Poppler::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -10,15 +10,25 @@ use Role::Tiny::With qw( with );
 with 'Alien::Role::Dino';
 
 use File::Spec;
+use File::Which;
+use ExtUtils::PkgConfig;
 
 sub pdftotext_path {
-	my ($self) = @_;
-	File::Spec->catfile( File::Spec->rel2abs($self->dist_dir) , qw(bin pdftotext) );
+	my ($class) = @_;
+	if( $class->install_type eq 'share' ) {
+		return File::Spec->catfile( File::Spec->rel2abs($class->dist_dir) , qw(bin pdftotext) );
+	} else {
+		return which('pdftotext');
+	}
 }
 
 sub pkg_config_path {
 	my ($class) = @_;
-	File::Spec->catfile( File::Spec->rel2abs($class->dist_dir), qw(lib pkgconfig) );
+	if( $class->install_type eq 'share' ) {
+		return File::Spec->catfile( File::Spec->rel2abs($class->dist_dir), qw(lib pkgconfig) );
+	} else {
+		return ExtUtils::PkgConfig->variable('poppler', 'pcfiledir');
+	}
 }
 
 1;
@@ -35,7 +45,7 @@ Alien::Poppler - Alien package for the Poppler PDF rendering library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 

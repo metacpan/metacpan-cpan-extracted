@@ -1,0 +1,28 @@
+NAME
+
+    Test::Module::CheckDep::Version - Unusable distribution to test
+    Module::CheckDep::Version
+
+DESCRIPTION
+
+    This distribution does absolutely nothing but provide a reliable test
+    case for Module::CheckDep::Version. It has no code whatsoever.
+
+    It is required due to the said distribution relying on
+    MetaCPAN::Client, and fetching a distribution known to have a
+    <PREREQ_PM> which has a lower version than the most up-do-date release.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

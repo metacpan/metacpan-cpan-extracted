@@ -173,11 +173,23 @@ is($benz->count_atoms, 12, '12 atoms read in using a string!' );
 my $mol1 = $hack->read_file_mol("t/lib/1L2Y_mod123.pdb");
 is( $mol1->tmax, 2, "index of last coords for each atom" );
 
+my $mol_lys = HackaMol->new(readline_func => sub{ return "PDB_SKIP" unless /LYS/})->read_file_mol("t/lib/1L2Y_mod123.pdb");
+ok ($mol_lys->count_atoms, "readline_func for LYS read still has atoms");
+is ($mol_lys->select_group("resname LYS")->count_atoms, $mol_lys->count_atoms, "only lysines are parsed");
+
 #{
 #  my $mol = $hack->read_file_mol("t/lib/shit.zmat");
 #  $mol->print_xyz;
 #  exit;
 #}
+
+# t/lib/head_model_atom.pdb 
+{
+    my $mol = $hack->read_pdbfile_mol("t/lib/head_model_atom.pdb");
+    is($mol->info ,"SOME HEADER information\nSOME MORE HEADER information\n", "header extracted");
+    is($mol->get_model_id(0),2, 'first model id is 2');
+    is($mol->get_model_id(1),4, 'second model id is 2');
+}
 
 #read_file push_coords tests
 {
@@ -290,6 +302,10 @@ dies_ok { $hack->build_angles( @bb[ 0, 1 ] ) } "build_angles croak";
 
     $bc += $_->bond_count foreach @ss_atoms;
     is( $bc, 18, "18 bonds for 9  disulfides (1/atom) in molecule" );
+
+
+    my @ss_2 = $hack->mol_disulfide_bonds($mol,0.15);
+    is_deeply([@ss],[@ss_2],'mol_disulfide gives same as find_disulfide');
 
     # checks out by viz xyz and pdb overlay
     # $mol2->print_xyz;

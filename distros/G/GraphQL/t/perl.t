@@ -1,30 +1,11 @@
-use 5.014;
-use strict;
-use warnings;
-use Test::More;
-use Test::Exception;
-use Test::Deep;
-use JSON::MaybeXS;
-use Data::Dumper;
+use lib 't/lib';
+use GQLTest;
 
 my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
 
 BEGIN {
   use_ok( 'GraphQL::Schema' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
-}
-
-sub run_test {
-  my ($args, $expected) = @_;
-  my $got = execute(@$args);
-  is_deeply $got, $expected or diag nice_dump($got);
-}
-
-sub nice_dump {
-  my ($got) = @_;
-  local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
-  $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
-  Dumper $got;
 }
 
 subtest 'DateTime->now as resolve' => sub {
@@ -130,6 +111,33 @@ EOF
   ],
     { data => { hello => 'Hello, available' } },
   );
+};
+
+subtest 'arbitrary object as exception' => sub {
+  {
+    package MyException;
+    use overload '""' => sub { join ' ', @{ $_[0] } };
+    sub new { my $class = shift; bless [ @_ ], $class; }
+  }
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+type Query {
+  hello(arg: String): String
+}
+EOF
+  run_test([
+    $schema, '{hello(arg: "Hi")}', {
+      hello => sub { die MyException->new(qw(oh no)) }
+    }
+  ], {
+    'data' => { 'hello' => undef },
+    'errors' => [
+      {
+        'locations' => [ { 'column' => 18, 'line' => 1 } ],
+        'message' => 'oh no',
+        'path' => [ 'hello' ],
+      },
+    ],
+  });
 };
 
 done_testing;

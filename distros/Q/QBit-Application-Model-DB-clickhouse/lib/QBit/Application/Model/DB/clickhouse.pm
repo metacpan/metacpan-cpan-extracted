@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse;
-$QBit::Application::Model::DB::clickhouse::VERSION = '0.005';
+$QBit::Application::Model::DB::clickhouse::VERSION = '0.006';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -148,7 +148,7 @@ B<Example:>
                   {name => 'date', type => 'Date',},
                   {name => 'hits', type => 'UInt32',},
               ],
-              engine => {MergeTree => ['date', [',' => ['date', 'hits']], \8192]}
+              engine => {MergeTree => ['date', {'' => ['date', 'hits']}, \8192]}
           },
       },
   );

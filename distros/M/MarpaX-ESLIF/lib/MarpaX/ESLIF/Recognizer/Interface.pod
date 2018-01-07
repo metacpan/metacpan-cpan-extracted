@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer::Interface - MarpaX::ESLIF's recognizer interface
 
 =head1 VERSION
 
-version 2.0.30
+version 2.0.31
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,12 @@ Returns a boolean indicating if absolute position tracking is on.
 Absolute position tracking must be on if you plan to use one of the lastCompletedOffset(), lastCompletedLength() or lastCompletedLocation() recognizer methods. The information returned by these methods is not fully reliable, because ESLIF will not check if there is a turnaround with associated internal variables.
 
 =back
+
+=head2 NOTES
+
+The C<isWithDisableThreshold()>, C<isWithExhaustion()>, C<isWithNewline()> and C<isWithTrack()> methods are always called once at the very beginning of a recognizer processing.
+
+The C<read()>, C<encoding()>, C<isEof()> and C<isCharacterStream()> methods are always called whenever the parser needs more data, and in this order.
 
 =head1 AUTHOR
 

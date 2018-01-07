@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2017 by Dominique Dumont.
+# This software is Copyright (c) 2015-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Systemd;
-$Config::Model::Systemd::VERSION = '0.235.1';
+$Config::Model::Systemd::VERSION = '0.236.1';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Config::Model::Systemd - Editor and validator for systemd configuration files
 
 =head1 VERSION
 
-version 0.235.1
+version 0.236.1
 
 =head1 SYNOPSIS
 
@@ -204,7 +204,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2017 by Dominique Dumont.
+This software is Copyright (c) 2015-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 
@@ -257,7 +257,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model-Systemd>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model-Systemd>
 

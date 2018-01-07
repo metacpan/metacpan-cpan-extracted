@@ -14,7 +14,7 @@
 	if $ENV{COVER};
     my $flags = join ' ', @flags;
     $SLAYMAKE = "$^X $flags -I ../../blib/lib ../../blib/script/slaymake";
-    $SANITIZE = "$^X -pe 's/(slaymake line) \\d+/\\1 314159/; s/(slaymake) \\d+(\\.\\d+)+/\\1 3.141.59/'";
+    $SANITIZE = "$^X -pe 's/(slaymake line) \\d+\.?/\\1 314159/; s/(slaymake) \\d+(\\.[\\d_]+)+/\\1 3.141.59/'";
 }
 
 test:	{ @OKS }

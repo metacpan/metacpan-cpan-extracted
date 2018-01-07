@@ -175,9 +175,11 @@ sub __set_gzip_header {
   # Setting HTTP user-agent and gzip compression.
   $user_agent->default_header("Accept-Encoding" => scalar $can_accept);
 
+  my $user_agent_description = $self->get_client()->_get_header()->{userAgent};
   # Set the header for gzip support.
-  $user_agent->agent(
-    $self->get_client()->get_user_agent() . ($gzip_support ? " gzip" : ""));
+  $user_agent_description = sprintf("%s%s", $user_agent_description,
+    ($gzip_support ? " gzip" : ""));
+  $user_agent->agent($user_agent_description);
   return $gzip_support;
 }
 

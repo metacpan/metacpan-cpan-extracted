@@ -3,7 +3,7 @@ package Test::Sims;
 use strict;
 use warnings;
 
-our $VERSION = "20130412";
+our $VERSION = "20180103";
 
 =head1 NAME
 
@@ -211,8 +211,16 @@ sub export_sims {
         \%{ $caller . '::' };
     };
 
-    my @sim_funcs = grep { *{ $symbols->{$_} }{CODE} }
-      grep /^sim_/, keys %$symbols;
+    my @sim_funcs = grep {
+        *{ $symbols->{$_} }{CODE}
+      }
+      grep {
+          # Protect against non-glob refs in the symbol table.
+          my $ref = ref $symbols->{$_};
+          $ref eq 'GLOB' || $ref eq ''
+      }
+      grep /^sim_/,
+      keys %$symbols;
     for my $func (@sim_funcs) {
         _add_to_export( $caller, $func );
         _add_to_export_tags( $caller, $func, 'sims' );

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Markdent::Types;
 
@@ -31,7 +31,7 @@ Markdent::Event::EndTableBody - An event for the end of a table body
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 DESCRIPTION
 

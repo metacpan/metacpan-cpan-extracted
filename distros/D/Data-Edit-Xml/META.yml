@@ -1,5 +1,5 @@
 ---
-abstract: 'Edit data in xml format'
+abstract: 'Edit data held in the XML format.'
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
@@ -15,7 +15,7 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20170901'
+    version: '20180101'
 requires:
   Carp: '0'
   Data::Table::Text: '20170901'
@@ -25,4 +25,4 @@ requires:
   XML::Parser: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170901'
+version: '20180101'

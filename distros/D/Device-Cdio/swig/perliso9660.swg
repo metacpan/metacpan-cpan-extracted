@@ -112,7 +112,7 @@ typedef iso9660_stat_t IsoStat_t;
 
 %typemap(out) IsoStatList_t *{
     // $1 is of type IsoStatList_t
-    CdioList_t *p_entlist   = result;
+    CdioISO9660FileList_t *p_entlist   = result;
     CdioListNode_t *p_entnode;
     unsigned int num = 0;
 
@@ -141,7 +141,7 @@ typedef iso9660_stat_t IsoStat_t;
       XPUSHs(sv_2mortal(newSViv(p_statbuf->tm.tm_isdst)));
       num += 14;
     }
-    _cdio_list_free (p_entlist, true);
+    iso9660_filelist_free(p_entlist);
     argvi += num + 2;
  out: ;
 }
@@ -573,8 +573,7 @@ IsoStat_t *iso9660_fs_stat (CdIo_t *p_cdio, const char psz_path[]);
  */
 %rename iso9660_fs_stat_translate fs_stat_translate;
 IsoStat_t *iso9660_fs_stat_translate (CdIo_t *p_cdio,
-				      const char psz_path[],
-				      bool b_mode2=false);
+				      const char psz_path[]);
 
 /*!
   Return file status for pathname. NULL is returned on error.
@@ -601,7 +600,7 @@ IsoStatList_t *fs_readdir (CdIo_t *p_cdio, const char psz_path[]);
 %inline %{
 IsoStatList_t *fs_readdir (CdIo_t *p_cdio, const char psz_path[])
 {
-  CdioList_t *p_statlist = iso9660_fs_readdir (p_cdio, psz_path, false);
+  CdioList_t *p_statlist = iso9660_fs_readdir (p_cdio, psz_path);
   return p_statlist;
 }
 %}

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "HTML-Latemp-GenMakeHelpers",
-  "dist_version" => "v0.5.2",
+  "dist_version" => "v0.5.3",
   "license" => "mit",
   "module_name" => "HTML::Latemp::GenMakeHelpers",
   "recursive_test_files" => 1,

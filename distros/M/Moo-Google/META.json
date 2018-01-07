@@ -4,13 +4,13 @@
       "Pavel Serikov <pavelsr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Moo-Google",
    "prereqs" : {
@@ -70,7 +70,7 @@
          "web" : "https://github.com/pavelsr/moo-google"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

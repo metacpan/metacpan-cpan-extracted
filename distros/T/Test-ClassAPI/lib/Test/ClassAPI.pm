@@ -1,4 +1,5 @@
-package Test::ClassAPI;
+package Test::ClassAPI; # git description: 7ff3c00
+# ABSTRACT: Provides basic first-pass API testing for large class trees
 
 # Allows us to test class APIs in a simplified manner.
 # Implemented as a wrapper around Test::More, Class::Inspector and Config::Tiny.
@@ -11,10 +12,10 @@ use Config::Tiny     2.00 ();
 use Class::Inspector 1.12 ();
 use Params::Util     1.00 '_INSTANCE';
 
-use vars qw{$VERSION $CONFIG $SCHEDULE $EXECUTED %IGNORE *DATA};
-BEGIN {
-	$VERSION = '1.06';
+our $VERSION = '1.07';
 
+use vars qw{$CONFIG $SCHEDULE $EXECUTED %IGNORE *DATA};
+BEGIN {
 	# Config starts empty
 	$CONFIG   = undef;
 	$SCHEDULE = undef;
@@ -218,9 +219,17 @@ sub execute {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Test::ClassAPI - Provides basic first-pass API testing for large class trees
+
+=head1 VERSION
+
+version 1.07
 
 =head1 DESCRIPTION
 
@@ -328,24 +337,34 @@ API description, and that nothing has been "missed".
 
 =head1 SUPPORT
 
-Bugs should be submitted via the CPAN bug tracker, located at
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-ClassAPI>
-
-For other issues, or commercial enhancement or support, contact the author.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-ClassAPI>
+(or L<bug-Test-ClassAPI@rt.cpan.org|mailto:bug-Test-ClassAPI@rt.cpan.org>).
 
 =head1 AUTHOR
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+Adam Kennedy <adamk@cpan.org>
 
-=head1 COPYRIGHT
+=head1 CONTRIBUTORS
 
-Copyright 2002 - 2009 Adam Kennedy.
+=for stopwords Adam Kennedy Karen Etheridge
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=over 4
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+=item *
+
+Adam Kennedy <adam@ali.as>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

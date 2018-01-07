@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package # hide from PAUSE
     Helper;
 
@@ -16,38 +19,36 @@ use JSON::MaybeXS;
 use Moose::Util 'find_meta';
 use namespace::clean;
 
+my $bundle_plugin_requirements; # hashref via CPAN::Meta::Requirements
+{
+    use Dist::Zilla::PluginBundle::Git::VersionManager;
+    package Dist::Zilla::PluginBundle::Git::VersionManager;
+    use Moose;
+    __PACKAGE__->meta->make_mutable;
+    # grab a copy of _plugin_prereqs attribute so we can test that these
+    # prereqs are also reflected in the bundle's runtime-requires
+    after configure => sub {
+        my $self = shift;
+        $bundle_plugin_requirements = $self->_plugin_requirements_as_string_hash;
+    };
+    __PACKAGE__->meta->make_immutable;
+}
+
 # checks that all plugins in use are in the plugin bundle dist's runtime
 # requires list
-# - some plugins can be marked 'additional' - must be in recommended prereqs
-#   AND the built dist's develop suggests list
-# - some plugins can be explicitly exempted (added manually to faciliate
-#   testing)
+# - some plugins can be explicitly exempted (added manually to faciliate testing)
 # TODO: move into its own distribution
 sub all_plugins_in_prereqs
 { SKIP: {
     my ($tzil, %options) = @_;
 
     my $bundle_name = $options{bundle_name} // '@Git::VersionManager';    # TODO: default to dist we are in
-    my %additional = map { $_ => undef } @{ $options{additional} // [] };
     my %exempt = map { $_ => undef } @{ $options{exempt} // [] };
 
     my $pluginbundle_meta = -f 'META.json' ? decode_json(path('META.json')->slurp_raw) : undef;
     my $dist_meta = $tzil->distmeta;
 
-    # these are develop-suggests prereqs
-    my $plugin_name = "$bundle_name/prereqs for $bundle_name";
-    my $bundle_plugin_prereqs = $tzil->plugin_named($plugin_name);
-    cmp_deeply(
-        $bundle_plugin_prereqs,
-        methods(
-            prereq_phase => 'develop',
-            prereq_type => 'suggests',
-        ),
-        "found '$plugin_name' develop-suggests prereqs",
-    );
-    $bundle_plugin_prereqs = $bundle_plugin_prereqs->_prereq;
-
-    subtest 'all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or develop-suggests prerequisites by the distribution' => sub {
+    subtest 'all plugins in use are specified as *required* runtime prerequisites by the plugin bundle' => sub {
         foreach my $plugin (uniq map { find_meta($_)->name }
             grep { $_->plugin_name =~ /^$bundle_name\/[^@]/ } @{$tzil->plugins})
         {
@@ -55,41 +56,22 @@ sub all_plugins_in_prereqs
                 if exists $exempt{$plugin};
 
             # cannot be a (non-develop) prereq if the module lives in this distribution
-            next if (
+            note("$plugin is found in local directory or in 'provides' metadata; skipping"), next
+            if (
                 $pluginbundle_meta ? exists $pluginbundle_meta->{provides}{$plugin}
                : do {
                    (my $file = $plugin) =~ s{::}{/}g; $file .= '.pm';
                    path('lib', $file)->exists;
                });
 
-            # plugins with a specific :version requirement are added to
-            # prereqs via an extra injected [Prereqs] plugin
-            my $required_version = $bundle_plugin_prereqs->{find_meta($plugin)->name} // 0;
+            my $required_version = $bundle_plugin_requirements->{find_meta($plugin)->name} // 0;
 
-            if (exists $additional{$plugin})
-            {
-                # plugin was added in via an extra option, therefore the
-                # plugin should have been added to develop prereqs, and not be a runtime prereq
-                ok(
-                    exists $dist_meta->{prereqs}{develop}{suggests}{$plugin},
-                    $plugin . ' is a develop prereq of the distribution',
-                );
-
-                cmp_deeply(
-                    $pluginbundle_meta->{prereqs}{runtime}{recommends},
-                    superhashof({ $plugin => $required_version }),
-                    $plugin . ' is a runtime recommendation of the plugin bundle',
-                ) if $pluginbundle_meta;
-            }
-            else
-            {
-                # plugin is a core requirement of the bundle
-                cmp_deeply(
-                    $pluginbundle_meta->{prereqs}{runtime}{requires},
-                    superhashof({ $plugin => $required_version }),
-                    $plugin . ' is a runtime prereq of the plugin bundle',
-                ) if $pluginbundle_meta;
-            }
+            # plugin is a core requirement of the bundle
+            cmp_deeply(
+                $pluginbundle_meta->{prereqs}{runtime}{requires},
+                superhashof({ $plugin => $required_version }),
+                $plugin . ' is a runtime prereq of the plugin bundle',
+            ) if $pluginbundle_meta;
         }
 
         pass 'this is a token test to keep things humming' if not $pluginbundle_meta;
@@ -134,7 +116,7 @@ sub git_in_path
         $dir = $dir->parent;
     }
     continue {
-        die "too many iterations when traversing $tempdir!"
+        die "too many iterations when traversing $dir!"
             if $count++ > 100;
     }
     return $in_git;

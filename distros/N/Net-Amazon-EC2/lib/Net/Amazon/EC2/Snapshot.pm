@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::Snapshot;
+$Net::Amazon::EC2::Snapshot::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

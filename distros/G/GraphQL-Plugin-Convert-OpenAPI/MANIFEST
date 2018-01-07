@@ -13,6 +13,7 @@ t/03-schema.t
 t/04-corpus.json
 t/04-execute.t
 t/04-schema.t
+t/local.t
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

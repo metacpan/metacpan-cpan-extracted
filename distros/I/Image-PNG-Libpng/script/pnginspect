@@ -1,43 +1,12 @@
 #!/home/ben/software/install/bin/perl
 
-=pod
-
-=head1 NAME
-
-pnginspect - print contents of PNG files
-
-=head1 SYNOPSIS
-
-    pnginspect a.png b.png c.png
-
-=head1 DESCRIPTION
-
-This is a primitive "dumper" for PNG image data. If you have
-L<Data::Validate::URI> and L<LWP::Simple> installed, you can also use
-it to examine PNG files on the web, like this:
-
-    pnginspect http://libpng.org/pub/png/img_png/libpng-88x31.png
-
-These modules are not installed by default.
-
-=head1 SEE ALSO
-
-=over
-
-=item L<Image::PNG::Libpng>
-
-=back
-
-=head1 AUTHOR
-
-Ben Bullock <bkb@cpan.org>
-
-=cut
-
 use warnings;
 use strict;
 use Image::PNG::Libpng ':all';
 use Data::Dumper;
+
+# Ok to connect to web?
+
 my $webok;
 
 eval {
@@ -122,6 +91,50 @@ for my $file (@ARGV) {
 	}
     }
 }
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pnginspect - print contents of PNG files
+
+=head1 SYNOPSIS
+
+    pnginspect a.png b.png c.png
+
+=head1 DESCRIPTION
+
+Print a text representation of the data within a PNG image file to
+standard output. It reads the PNG file, prints out its header
+information and its valid chunks, and then attempts to read all the
+chunks. Most of the chunks are printed using
+L<Data::Dumper>. Modification time and text segments are printed
+specially.
+
+The image data is not currently printed out.
+
+If you have L<Data::Validate::URI> and L<LWP::Simple> installed, you
+can also use it to examine PNG files on the web, like this:
+
+    pnginspect http://libpng.org/pub/png/img_png/libpng-88x31.png
+
+These modules are not installed by default.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+=back
+
+=head1 AUTHOR
+
+Ben Bullock <bkb@cpan.org>
+
+=cut
 
 # Local variables:
 # mode: perl

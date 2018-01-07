@@ -2732,6 +2732,7 @@ perl_png_set_user_limits (perl_libpng_t * png,
 }
 
 
+
 static SV *
 perl_png_get_user_width_max (perl_libpng_t * png)
 {

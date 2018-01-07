@@ -9,10 +9,7 @@ use Mojolicious::Lite;
 use GraphQL::Schema;
 
 my $schema = GraphQL::Schema->from_doc(<<'EOF');
-schema {
-  query: QueryRoot
-}
-type QueryRoot {
+type Query {
   helloWorld: String
 }
 EOF
@@ -35,6 +32,15 @@ plugin GraphQL => {endpoint => '/graphql2', handler => sub {
 }};
 plugin GraphQL => {endpoint => '/graphql-live-and-let-die', handler => sub {
   die "I died!\n" }};
+plugin GraphQL => {
+  endpoint => '/graphql-promise',
+  schema => $schema,
+  root_value => { helloWorld => sub {
+    my $promise = Mojo::Promise->new;
+    Mojo::IOLoop->timer(0.5 => sub { $promise->resolve('Yo') });
+    $promise->then(sub { "$_[0]!" });
+  } },
+};
 
 use Test::Mojo;
 my $t = Test::Mojo->new;
@@ -70,6 +76,15 @@ subtest 'GraphQL with die' => sub {
     '{"query":"{helloWorld}"}',
   )->json_is(
     { errors => [ { message => "I died!\n" } ] },
+  );
+};
+
+subtest 'GraphQL with promise' => sub {
+  my $tm = $t->post_ok('/graphql-promise',
+    { Content_Type => 'application/json' },
+    '{"query":"{helloWorld}"}',
+  )->json_is(
+    { 'data' => { 'helloWorld' => 'Yo!' } },
   );
 };
 

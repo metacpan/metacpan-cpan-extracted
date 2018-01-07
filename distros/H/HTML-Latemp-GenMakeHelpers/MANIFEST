@@ -8,7 +8,6 @@ META.yml
 README
 dist.ini
 examples/shlomifish.org-gen-helpers.pl
-inc/Test/Run/Builder.pm
 lib/HTML/Latemp/GenMakeHelpers.pm
 t/00-compile.t
 t/00-load.t

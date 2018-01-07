@@ -1,6 +1,6 @@
 ## no critic (RequireUseStrict)
 package Inline::Lua;
-$Inline::Lua::VERSION = '0.12';
+$Inline::Lua::VERSION = '0.14';
 ## use critic (RequireUseStrict)
 use 5.006;
 use strict;
@@ -225,7 +225,7 @@ Inline::Lua - Perl extension for embedding Lua scripts into Perl code
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -756,7 +756,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/hoelzro/inline-lua/issues
+L<https://github.com/hoelzro/inline-lua/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

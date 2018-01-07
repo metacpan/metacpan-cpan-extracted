@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Hook::Output::Tiny" : "0.05",
             "Test::More" : "0"
          }
       },
@@ -32,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "MetaCPAN::Client" : "2.0107",
+            "MetaCPAN::Client" : "2.010700",
             "perl" : "5.006"
          }
       }
@@ -48,6 +49,6 @@
          "web" : "https://github.com/stevieb9/module-checkdep-version"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

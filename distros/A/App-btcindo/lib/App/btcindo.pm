@@ -1,7 +1,7 @@
 package App::btcindo;
 
-our $DATE = '2017-12-27'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2018-01-05'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 1;
 # ABSTRACT: CLI for bitcoin.co.id (VIP)
@@ -18,7 +18,7 @@ App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.016 of App::btcindo (from Perl distribution App-btcindo), released on 2017-12-27.
+This document describes version 0.017 of App::btcindo (from Perl distribution App-btcindo), released on 2018-01-05.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

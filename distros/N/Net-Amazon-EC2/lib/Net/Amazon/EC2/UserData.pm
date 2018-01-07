@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::UserData;
+$Net::Amazon::EC2::UserData::VERSION = '0.35';
 use strict;
 use Moose;
 

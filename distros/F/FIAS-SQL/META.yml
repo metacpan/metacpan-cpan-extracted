@@ -15,5 +15,5 @@ name: FIAS-SQL
 requires:
   Readonly: '0'
   XBase: '0'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

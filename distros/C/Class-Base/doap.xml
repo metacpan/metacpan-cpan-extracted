@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Class-Base</name>
+  <shortdesc>useful base class for deriving other modules </shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Andy Wardley   </foaf:name>
+      <foaf:mbox rdf:resource="mailto:abw@kfs.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Gabor Szabo </foaf:name>
+      <foaf:mbox rdf:resource="mailto:gabor@szabgab.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Gabor Szabo</foaf:name>
+      <foaf:mbox rdf:resource="mailto:szabgab@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Kent Fredric</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kentfredric@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Nick Morrott</foaf:name>
+      <foaf:mbox rdf:resource="mailto:knowledgejunkie@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/yanick/Class-Base" />
+  <bug-database rdf:resource="https://github.com/yanick/Class-Base/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/Class-Base" />
+      <location rdf:resource="https://github.com/yanick/Class-Base.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.01</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.05</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.06</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.07</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.08</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

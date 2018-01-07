@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use Cpanel::JSON::XS qw( decode_json encode_json );
 use HTTP::Request;
@@ -100,3 +100,43 @@ sub _make_request {
 }
 
 1;
+
+# ABSTRACT: The API client
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::PivotalTracker::Client - The API client
+
+=head1 VERSION
+
+version 0.10
+
+=head1 DESCRIPTION
+
+This class has no user-facing parts.
+
+=for Pod::Coverage *EVERYTHING*
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-PivotalTracker/issues>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by MaxMind, Inc.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

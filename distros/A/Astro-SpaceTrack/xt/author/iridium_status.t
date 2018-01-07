@@ -26,28 +26,36 @@ my %known_inconsistent = (
 				# Decayed: 24-Nov-2017
 				# Sladen removed 24-Nov-2017
     24793 => { sladen => 1 },	# Sladen: failed 02-nov-2017
-    24794 => { sladen => 1 },	# Sladen: Spare 23-Nov-2017
+#   24794 => { sladen => 1 },	# Sladen: failed 23-Nov-2017
+				# Kelso: failed 19-Dec-2017
 #   24795 => { sladen => 1 },	# Kelso: Failed 16-Nov-2017
 				# Sladen Failed 17-Nov-2017
     24796 => { sladen => 1 },	# Kelso: failed 20-Oct-2012;
 				# Sladen: still operational.
     24869 => { sladen => 1 },	# Sladen: failed 14-May-2017
     24872 => { sladen => 1 },	# Sladen: failed 19-May-2017
+    24907 => { sladen => 1 },	# Kelso: failed 19-Dec-2017
 #   24949 => { sladen => 1 },	# Sladen: failed 23-Oct-2017
 				# Kelso: gone 16-Nov-2017
 				# decayed 28-Sep-2017
     24950 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed
+#   24965 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
+				# Kelso: failed 19-Dec-2017
+    24968 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
+    24969 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
     25042 => { sladen => 1 },	# 19-Aug-2016: Sladen - Failed on station?
 #   25262 => { sladen => 1 },	# Kelso: spare; others: operational.
     				# 12-Nov-2017: Sladen - failed.
 				# Kelso: Failed 16-Nov-2017
     25263 => { sladen => 1 },	# Sladen: operational; others: spare.
+				# Sladen: failed 09-Dec-2017 (Kelso: operational)
     25272 => { sladen => 1 },	# 14-Aug-2017: Sladen tumbling.
     25274 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed.
     25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
     27374 => { sladen => 1 },	# 16-Nov-2012 Sladen: operational;
 				# 18-Feb-2014 McCants: operational;
 				#             others: spare
+    27376 => { sladen => 1 },	# Sladen: failed 22-Dec-2017
 );
 
 =begin comment
@@ -108,7 +116,7 @@ foreach (
 	["T. S. Kelso's Iridium list",
 	kelso => <<'KELSO'],
  24793   Iridium 7      [+]      
- 24794   Iridium 6      [+]      
+ 24794   Iridium 6      [-]      Tumbling
  24795   Iridium 5      [-]      Tumbling
  24796   Iridium 4      [-]      Tumbling
  24836   Iridium 914    [-]      Tumbling
@@ -126,7 +134,7 @@ foreach (
  24904   Iridium 25     [+]      
  24905   Iridium 46     [+]      
  24906   Iridium 23     [+]      
- 24907   Iridium 22     [+]      
+ 24907   Iridium 22     [-]      Tumbling
  24925   Dummy mass 1   [-]      Tumbling
  24926   Dummy mass 2   [-]      Tumbling
  24944   Iridium 29     [-]      Tumbling
@@ -134,11 +142,11 @@ foreach (
  24946   Iridium 33     [-]      Tumbling
  24948   Iridium 28     [-]      Tumbling
  24950   Iridium 31     [+]      
- 24965   Iridium 19     [+]      
+ 24965   Iridium 19     [-]      Tumbling
  24966   Iridium 35     [+]      
  24967   Iridium 36     [-]      Tumbling
  24968   Iridium 37     [+]      
- 24969   Iridium 34     [+]      
+ 24969   Iridium 34     [-]      Tumbling
  25039   Iridium 43     [-]      Tumbling
  25040   Iridium 41     [+]      
  25041   Iridium 40     [-]      Tumbling
@@ -192,14 +200,13 @@ foreach (
  27373   Iridium 90     [B]      
  27374   Iridium 94     [+]      
  27375   Iridium 95     [+]      
- 27376   Iridium 96     [+]      
+ 27376   Iridium 96     [P]      
  27450   Iridium 97     [+]      
  27451   Iridium 98     [+]      
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	sladen => <<'SLADEN'],
  24793   Iridium 7      [-]      Plane 4 - Failed on station?
- 24794   Iridium 6      [-]      Plane 4
  24795   Iridium 5      [-]      Plane 4 - Failed on station?
  24796   Iridium 4      [-]      Plane 4 - Failed on station?
  24836   Iridium 914    [-]      Plane 5
@@ -225,11 +232,11 @@ KELSO
  24946   Iridium 33     [-]      Plane 3
  24948   Iridium 28     [-]      Plane 3 - Failed on station?
  24950   Iridium 31     [-]      Plane 3
- 24965   Iridium 19     [+]      Plane 4
+ 24965   Iridium 19     [-]      Plane 4 - Failed on station?
  24966   Iridium 35     [+]      Plane 4
  24967   Iridium 36     [-]      Plane 4
- 24968   Iridium 37     [+]      Plane 4
- 24969   Iridium 34     [+]      Plane 4
+ 24968   Iridium 37     [-]      Plane 4
+ 24969   Iridium 34     [-]      Plane 4 - Failed on station?
  25039   Iridium 43     [-]      Plane 6 - Failed on station?
  25040   Iridium 41     [+]      Plane 6
  25041   Iridium 40     [-]      Plane 6 - Failed on station?
@@ -247,7 +254,7 @@ KELSO
  25172   Iridium 50     [+]      Plane 5
  25173   Iridium 53     [+]      Plane 5
  25262   Iridium 51     [-]      Plane 4 - Failed on station?
- 25263   Iridium 61     [+]      Plane 4
+ 25263   Iridium 61     [-]      Plane 4
  25272   Iridium 55     [-]      Plane 3
  25273   Iridium 57     [-]      Plane 3 - Failed on station?
  25274   Iridium 58     [-]      Plane 3
@@ -283,7 +290,7 @@ KELSO
  27373   Iridium 90     [S]      Plane 5
  27374   Iridium 94     [+]      Plane 2
  27375   Iridium 95     [+]      Plane 3
- 27376   Iridium 96     [+]      Plane 4
+ 27376   Iridium 96     [-]      Plane 4 - Failed on station?
  27450   Iridium 97     [+]      Plane 4
  27451   Iridium 98     [+]      Plane 6
 SLADEN
@@ -292,7 +299,7 @@ SLADEN
 	spacetrack => <<'SPACETRACK'],
  24792   Iridium 8      [D]      Decayed 2017-11-24
  24793   Iridium 7      [?]      SpaceTrack
- 24794   Iridium 6      [?]      SpaceTrack
+ 24794   Iridium 6      [D]      Decayed 2017-12-23
  24795   Iridium 5      [?]      SpaceTrack
  24796   Iridium 4      [?]      SpaceTrack
  24836   Iridium 914    [?]      SpaceTrack

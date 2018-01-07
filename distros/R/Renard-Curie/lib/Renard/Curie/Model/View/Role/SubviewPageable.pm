@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Role::SubviewPageable;
 # ABSTRACT: Role for view models that are paged
-$Renard::Curie::Model::View::Role::SubviewPageable::VERSION = '0.003';
+$Renard::Curie::Model::View::Role::SubviewPageable::VERSION = '0.004';
 use Moo::Role;
 use MooX::HandlesVia;
 use Renard::Incunabula::Common::Types qw(Bool PositiveOrZeroInt ArrayRef);
@@ -68,7 +68,7 @@ Renard::Curie::Model::View::Role::SubviewPageable - Role for view models that ar
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 

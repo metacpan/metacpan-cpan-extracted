@@ -1,0 +1,38 @@
+---
+abstract: 'A document format for Cairo surfaces'
+author:
+  - 'Project Renard'
+build_requires:
+  Renard::Incunabula::Devel::TestHelper: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Renard-Incunabula-Format-Cairo
+requires:
+  CHI: '0'
+  Cairo: '0'
+  Function::Parameters: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Renard::Incunabula::Common::Setup: '0'
+  Renard::Incunabula::Common::Types: '0'
+  Renard::Incunabula::Document: '0'
+  Renard::Incunabula::Document::Types: '0'
+  Renard::Incunabula::Page::Role::Bounds: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/project-renard/p5-Renard-Incunabula-Format-Cairo
+  repository: https://github.com/project-renard/p5-Renard-Incunabula-Format-Cairo.git
+version: '0.004'
+x_serialization_backend: 'YAML::Tiny version 1.70'

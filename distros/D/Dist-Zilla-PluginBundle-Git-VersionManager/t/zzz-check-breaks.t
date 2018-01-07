@@ -21,4 +21,24 @@ SKIP: {
     pass 'conflicts checked via Moose::Conflicts';
 }
 
-pass 'no x_breaks data to check';
+# this data duplicates x_breaks in META.json
+my $breaks = {
+  "Dist::Zilla::PluginBundle::Author::ETHER" => "<= 0.132"
+};
+
+use CPAN::Meta::Requirements;
+use CPAN::Meta::Check 0.011;
+
+my $reqs = CPAN::Meta::Requirements->new;
+$reqs->add_string_requirement($_, $breaks->{$_}) foreach keys %$breaks;
+
+our $result = CPAN::Meta::Check::check_requirements($reqs, 'conflicts');
+
+if (my @breaks = grep { defined $result->{$_} } keys %$result)
+{
+    diag 'Breakages found with Dist-Zilla-PluginBundle-Git-VersionManager:';
+    diag "$result->{$_}" for sort @breaks;
+    diag "\n", 'You should now update these modules!';
+}
+
+pass 'checked x_breaks data';

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::Region;
+$Net::Amazon::EC2::Region::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

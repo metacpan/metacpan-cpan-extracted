@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -71,6 +71,7 @@ PNG_INFO_iCCP
 PNG_INFO_sPLT
 PNG_INFO_sCAL
 PNG_INFO_IDAT
+PNG_INFO_eXIf
 PNG_INFO_acTL
 PNG_INFO_fcTL
 PNG_TRANSFORM_IDENTITY
@@ -150,6 +151,7 @@ PNG_FREE_UNKN
 PNG_FREE_PLTE
 PNG_FREE_TRNS
 PNG_FREE_TEXT
+PNG_FREE_EXIF
 PNG_FREE_ALL
 PNG_FREE_MUL
 PNG_HANDLE_CHUNK_AS_DEFAULT
@@ -175,6 +177,7 @@ PNG_FORMAT_FLAG_LINEAR
 PNG_FORMAT_FLAG_COLORMAP
 PNG_FORMAT_FLAG_BGR
 PNG_FORMAT_FLAG_AFIRST
+PNG_FORMAT_FLAG_ASSOCIATED_ALPHA
 PNG_FORMAT_GRAY
 PNG_FORMAT_GA
 PNG_FORMAT_AG
@@ -287,8 +290,9 @@ use constant {
     PNG_INFO_sPLT => 0x2000,
     PNG_INFO_sCAL => 0x4000,
     PNG_INFO_IDAT => 0x8000,
-    PNG_INFO_acTL => 0x10000,
-    PNG_INFO_fcTL => 0x20000,
+    PNG_INFO_eXIf => 0x10000,
+    PNG_INFO_acTL => 0x20000,
+    PNG_INFO_fcTL => 0x40000,
     PNG_TRANSFORM_IDENTITY => 0x0000,
     PNG_TRANSFORM_STRIP_16 => 0x0001,
     PNG_TRANSFORM_STRIP_ALPHA => 0x0002,
@@ -366,7 +370,8 @@ use constant {
     PNG_FREE_PLTE => 0x1000,
     PNG_FREE_TRNS => 0x2000,
     PNG_FREE_TEXT => 0x4000,
-    PNG_FREE_ALL => 0x7fff,
+    PNG_FREE_EXIF => 0x8000,
+    PNG_FREE_ALL => 0xffff,
     PNG_FREE_MUL => 0x4220,
     PNG_HANDLE_CHUNK_AS_DEFAULT => 0,
     PNG_HANDLE_CHUNK_NEVER => 1,
@@ -391,6 +396,7 @@ use constant {
     PNG_FORMAT_FLAG_COLORMAP => 0x08,
     PNG_FORMAT_FLAG_BGR => 0x10,
     PNG_FORMAT_FLAG_AFIRST => 0x20,
+    PNG_FORMAT_FLAG_ASSOCIATED_ALPHA => 0x40,
     PNG_FORMAT_GRAY => 0,
     PNG_FORMAT_GA => 0x01,
     PNG_FORMAT_AG => (0x01|0x20),
@@ -715,13 +721,17 @@ PNG_INFO_sCAL has value 0x4000.
 
 PNG_INFO_IDAT has value 0x8000.
 
+=item PNG_INFO_eXIf
+
+PNG_INFO_eXIf has value 0x10000.
+
 =item PNG_INFO_acTL
 
-PNG_INFO_acTL has value 0x10000.
+PNG_INFO_acTL has value 0x20000.
 
 =item PNG_INFO_fcTL
 
-PNG_INFO_fcTL has value 0x20000.
+PNG_INFO_fcTL has value 0x40000.
 
 =item PNG_TRANSFORM_IDENTITY
 
@@ -1031,9 +1041,13 @@ PNG_FREE_TRNS has value 0x2000.
 
 PNG_FREE_TEXT has value 0x4000.
 
+=item PNG_FREE_EXIF
+
+PNG_FREE_EXIF has value 0x8000.
+
 =item PNG_FREE_ALL
 
-PNG_FREE_ALL has value 0x7fff.
+PNG_FREE_ALL has value 0xffff.
 
 =item PNG_FREE_MUL
 
@@ -1130,6 +1144,10 @@ PNG_FORMAT_FLAG_BGR has value 0x10.
 =item PNG_FORMAT_FLAG_AFIRST
 
 PNG_FORMAT_FLAG_AFIRST has value 0x20.
+
+=item PNG_FORMAT_FLAG_ASSOCIATED_ALPHA
+
+PNG_FORMAT_FLAG_ASSOCIATED_ALPHA has value 0x40.
 
 =item PNG_FORMAT_GRAY
 
@@ -1274,6 +1292,7 @@ all the symbols in this module:
 This Perl module was generated from C<png.h>.
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -1281,7 +1300,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
--2017
+-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

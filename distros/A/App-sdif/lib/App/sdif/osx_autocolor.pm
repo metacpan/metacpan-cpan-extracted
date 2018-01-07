@@ -6,6 +6,12 @@ App::sdif::osx_autocolor
 
 sdif -Mosx_autocolor
 
+=head1 CAUTION
+
+This module is moved to L<App::sdif::autocolor::Apple_Terminal> and
+called from L<App::sdif::autocolor> interface module.  Will be removed
+in the future.
+
 =head1 DESCRIPTION
 
 This is a module for L<sdif(1)> command to set default option
@@ -16,10 +22,9 @@ equation.
     Y = 0.30 * R + 0.59 * G + 0.11 * B
 
 When the result is greater than 0.5, set B<--LIGHT_SCREEN> option,
-otherwise set B<--DARK_SCREEN> option.
-
-Because these options are not defined in this module, user have to
-define them somewhere.
+otherwise set B<--DARK_SCREEN> option.  Those are defined as
+B<--green> and B<dark-green> respectively by default.  You can
+override them in your F<~/.sdifrc>.
 
 If the environment variable C<BRIGHTNESS> is defined, its value is
 used as a brightness rather than caliculated from terminal color.  The
@@ -55,3 +60,6 @@ sub initialize {
 1;
 
 __DATA__
+
+option --LIGHT_SCREEN --green
+option --DARK_SCREEN  --dark-green

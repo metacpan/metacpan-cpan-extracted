@@ -5,7 +5,7 @@
 
 use strict;
 
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use SOAP::Lite;
 use Data::Dumper; $Data::Dumper::Terse = 1; $Data::Dumper::Indent = 1;

@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor::Lite" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "Exception::Tiny" : "0",
             "Furl" : "0",
@@ -50,6 +51,7 @@
             "MIME::Base64" : "0",
             "Mouse" : "0",
             "Try::Tiny" : "0",
+            "parent" : "0",
             "perl" : "5.010000"
          }
       },
@@ -63,7 +65,7 @@
    "provides" : {
       "Web::MarketReceipt" : {
          "file" : "lib/Web/MarketReceipt.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Web::MarketReceipt::Order" : {
          "file" : "lib/Web/MarketReceipt/Order.pm"
@@ -92,9 +94,11 @@
          "web" : "https://github.com/kayac/p5-Web-MarketReceipt"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
-      "hitode909 <hitode909@gmail.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "hitode909 <hitode909@gmail.com>",
+      "root <root@3330ac66f871.(none)>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

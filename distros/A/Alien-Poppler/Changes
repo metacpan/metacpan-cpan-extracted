@@ -1,3 +1,32 @@
+0.002 2018-01-05 23:57:53-0600
+
+  Features
+
+   - Add support for using `pdftotext_path`, `pkg_config_path` when
+     `ALIEN_INSTALL_TYPE=system`. See
+     <https://github.com/project-renard/p5-Alien-Poppler/pull/6>.
+
+  Bug fixes
+   - Patch Poppler v0.61 to use the full path for the pkg-config .pc files.
+     See <https://github.com/project-renard/p5-Alien-Poppler/issues/9>,
+     <https://github.com/project-renard/p5-Alien-Poppler/pull/10>.
+
+  Build changes
+   - Switch build commands to CMake. This is needed since poppler-0.60.0 which
+     removed the autotools build system.
+
+     See <https://github.com/project-renard/p5-Alien-Poppler/issues/4>,
+     <https://github.com/project-renard/p5-Alien-Poppler/pull/5>.
+
+   - Explicitly disable poppler-glib on macOS. This may be temporary until a
+     fix for finding `-lintl` is found.
+
+   - Enable Xpdf headers for CMake build so that they are available for other
+     code that uses them.
+
+     See <https://github.com/project-renard/p5-Alien-Poppler/issues/7>,
+     <https://github.com/project-renard/p5-Alien-Poppler/pull/8>.
+
 0.001 2017-08-27 15:23:52-0400
 
   Features

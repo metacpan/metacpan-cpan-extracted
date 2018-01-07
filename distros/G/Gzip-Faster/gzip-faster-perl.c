@@ -21,7 +21,7 @@ typedef struct
 {
     /* Input. */
     SV * in;
-    char * in_char;
+    const char * in_char;
     STRLEN in_length;
     /* Compression structure. */
     z_stream strm;
@@ -154,6 +154,24 @@ gf_get_mod_time (gzip_faster_t * gf)
     return & PL_sv_undef;
 }
 
+static void
+check_avail_in (gzip_faster_t * gf)
+{
+    if (gf->strm.avail_in != 0) {
+	croak ("Zlib did not finish processing the string: %d bytes left",
+	       gf->strm.avail_in);
+    }
+}
+
+static void
+check_zlib_status (int zlib_status)
+{
+    if (zlib_status != Z_STREAM_END) {
+	croak ("Zlib did not come to the end of the string: zlib_status = %d",
+	       zlib_status);
+    }
+}
+
 static SV *
 gzip_faster (gzip_faster_t * gf)
 {
@@ -168,6 +186,7 @@ gzip_faster (gzip_faster_t * gf)
     }
     gf_set_up (gf);
     if (gf->in_length == 0) {
+	warn ("Attempt to compress empty string");
 	return & PL_sv_undef;
     }
 
@@ -261,12 +280,8 @@ gzip_faster (gzip_faster_t * gf)
 	}
     }
     while (gf->strm.avail_out == 0);
-    if (gf->strm.avail_in != 0) {
-	croak ("Zlib did not finish processing the string");
-    }
-    if (zlib_status != Z_STREAM_END) {
-	croak ("Zlib did not come to the end of the string");
-    }
+    check_avail_in (gf);
+    check_zlib_status (zlib_status);
     deflateEnd (& gf->strm);
     if (gf->user_object) {
 	if (gf->file_name) {
@@ -281,13 +296,15 @@ gzip_faster (gzip_faster_t * gf)
 static SV *
 gunzip_faster (gzip_faster_t * gf)
 {
+    /* The return value. */
     SV * plain;
-
     /* The message from zlib. */
     int zlib_status;
-
+    /* The gzip library header. */
     gz_header header;
+    /* The name of the file, if it exists. */
     unsigned char name[GF_FILE_NAME_MAX];
+    /* Extra bytes in the header, if they exist. */
     unsigned char extra[EXTRA_LENGTH];
 
     if (! SvOK (gf->in)) {
@@ -295,6 +312,10 @@ gunzip_faster (gzip_faster_t * gf)
 	return & PL_sv_undef;
     }
     gf_set_up (gf);
+    if (gf->in_length == 0) {
+	warn ("Attempt to uncompress empty string");
+	return & PL_sv_undef;
+    }
 
     if (gf->is_gzip) {
 	if (gf->is_raw) {
@@ -329,6 +350,8 @@ gunzip_faster (gzip_faster_t * gf)
 	    inflateGetHeader (& gf->strm, & header);
 	}
     }
+
+    /* Mark the return value as uninitialised. */
     plain = 0;
 
     do {
@@ -362,19 +385,20 @@ gunzip_faster (gzip_faster_t * gf)
 	}
 	have = CHUNK - gf->strm.avail_out;
 	if (! plain) {
+	    /* If the return value is uninitialised, set up a new
+	       one. */
 	    plain = newSVpv ((const char *) gf->out_buffer, have);
 	}
 	else {
+	    /* If the return value was initialised, append the
+	       contents of "gf->out_buffer" to it using
+	       "sv_catpvn". */
 	    sv_catpvn (plain, (const char *) gf->out_buffer, have);
 	}
     }
     while (gf->strm.avail_out == 0);
-    if (gf->strm.avail_in != 0) {
-	croak ("Zlib did not finish processing the string");
-    }
-    if (zlib_status != Z_STREAM_END) {
-	croak ("Zlib did not come to the end of the string");
-    }
+    check_avail_in (gf);
+    check_zlib_status (zlib_status);
     inflateEnd (& gf->strm);
     if (gf->user_object && gf->is_gzip && header.done == 1) {
 	if (gf->copy_perl_flags) {

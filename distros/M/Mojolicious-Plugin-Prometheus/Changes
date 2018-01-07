@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojolicious-Plugin-Prometheus
 
+1.0.4 2018-01-04T12:28:52Z
+    - Reformat code with Mojo perltidy settings
+    - Minor documentation updates
+
 1.0.3 2017-12-22T09:08:46Z
     - Require at least 0.05 of Net::Prometheus
 

@@ -21,19 +21,19 @@ name: HTML-Latemp-GenMakeHelpers
 provides:
   HTML::Latemp::GenMakeHelpers:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.2
+    version: v0.5.3
   HTML::Latemp::GenMakeHelpers::Base:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.2
+    version: v0.5.3
   HTML::Latemp::GenMakeHelpers::Error:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.2
+    version: v0.5.3
   HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.2
+    version: v0.5.3
   HTML::Latemp::GenMakeHelpers::HostEntry:
     file: lib/HTML/Latemp/GenMakeHelpers.pm
-    version: v0.5.2
+    version: v0.5.3
 requires:
   Class::XSAccessor: '0'
   File::Basename: '0'
@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-GenMakeHelpers
   repository: https://github.com/thewml/latemp
-version: v0.5.2
+version: v0.5.3
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::EbsBlockDevice;
+$Net::Amazon::EC2::EbsBlockDevice::VERSION = '0.35';
 use strict;
 use Moose;
 

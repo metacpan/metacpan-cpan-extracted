@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.056   2018-01-04
+        - Print the column names if the table is empty.
+
 0.055   2017-10-11
         - Bugfix: no empty row below header if is `grid` disabled.
 

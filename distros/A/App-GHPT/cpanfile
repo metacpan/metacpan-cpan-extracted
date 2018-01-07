@@ -22,7 +22,7 @@ requires "MooseX::Types::Moose" => "0";
 requires "Path::Class" => "0";
 requires "Term::CallEditor" => "0";
 requires "Term::Choose" => "0";
-requires "WebService::PivotalTracker" => "0.04";
+requires "WebService::PivotalTracker" => "0.10";
 requires "autodie" => "2.25";
 requires "experimental" => "0";
 requires "feature" => "0";
@@ -85,5 +85,4 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
 };

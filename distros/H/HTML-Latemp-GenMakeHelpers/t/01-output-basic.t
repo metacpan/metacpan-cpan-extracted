@@ -62,7 +62,7 @@ $(SRC_DOCS_DEST) : $(SRC_DEST)/% : $(SRC_SRC_DIR)/%.wml $(DOCS_COMMON_DEPS)
 $(SRC_TTMLS_DEST) : $(SRC_DEST)/% : $(SRC_SRC_DIR)/%.ttml $(TTMLS_COMMON_DEPS)
 	ttml -o $@ $(SRC_TTML_FLAGS) -DLATEMP_FILENAME=$(patsubst $(SRC_DEST)/%,%,$(patsubst %.ttml,%,$@)) $<
 
-$(SRC_DIRS_DEST) : $(SRC_DEST)/% : unchanged
+$(SRC_DIRS_DEST) : $(SRC_DEST)/% :
 	mkdir -p $@
 	touch $@
 
@@ -78,11 +78,11 @@ $(SRC_COMMON_TTMLS_DEST) : $(SRC_DEST)/% : $(COMMON_SRC_DIR)/%.ttml $(TTMLS_COMM
 $(SRC_COMMON_DOCS_DEST) : $(SRC_DEST)/% : $(COMMON_SRC_DIR)/%.wml $(DOCS_COMMON_DEPS)
 	WML_LATEMP_PATH="$$(perl -MFile::Spec -e 'print File::Spec->rel2abs(shift)' '$@')" ; ( cd $(COMMON_SRC_DIR) && wml -o "$${WML_LATEMP_PATH}" $(SRC_WML_FLAGS) -DLATEMP_FILENAME=$(patsubst $(SRC_DEST)/%,%,$(patsubst %.wml,%,$@)) $(patsubst $(COMMON_SRC_DIR)/%,%,$<) )
 
-$(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% : unchanged
+$(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% :
 	mkdir -p $@
 	touch $@
 
-$(SRC_DEST): unchanged
+$(SRC_DEST):
 	mkdir -p $@
 	touch $@
 EOFGALOG
@@ -162,7 +162,7 @@ $(SRC_DOCS_DEST) : $(SRC_DEST)/% : $(SRC_SRC_DIR)/%.wml $(DOCS_COMMON_DEPS)
 $(SRC_TTMLS_DEST) : $(SRC_DEST)/% : $(SRC_SRC_DIR)/%.ttml $(TTMLS_COMMON_DEPS)
 	ttml -o $@ $(SRC_TTML_FLAGS) -DLATEMP_FILENAME=$(patsubst $(SRC_DEST)/%,%,$(patsubst %.ttml,%,$@)) $<
 
-$(SRC_DIRS_DEST) : $(SRC_DEST)/% : unchanged
+$(SRC_DIRS_DEST) : $(SRC_DEST)/% :
 	mkdir -p $@
 	touch $@
 
@@ -178,11 +178,11 @@ $(SRC_COMMON_TTMLS_DEST) : $(SRC_DEST)/% : $(COMMON_SRC_DIR)/%.ttml $(TTMLS_COMM
 $(SRC_COMMON_DOCS_DEST) : $(SRC_DEST)/% : $(COMMON_SRC_DIR)/%.wml $(DOCS_COMMON_DEPS)
 	WML_LATEMP_PATH="$$(perl -MFile::Spec -e 'print File::Spec->rel2abs(shift)' '$@')" ; ( cd $(COMMON_SRC_DIR) && wml -o "$${WML_LATEMP_PATH}" $(SRC_WML_FLAGS) -DLATEMP_FILENAME=$(patsubst $(SRC_DEST)/%,%,$(patsubst %.wml,%,$@)) $(patsubst $(COMMON_SRC_DIR)/%,%,$<) )
 
-$(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% : unchanged
+$(SRC_COMMON_DIRS_DEST)  : $(SRC_DEST)/% :
 	mkdir -p $@
 	touch $@
 
-$(SRC_DEST): unchanged
+$(SRC_DEST):
 	mkdir -p $@
 	touch $@
 EOFGALOG

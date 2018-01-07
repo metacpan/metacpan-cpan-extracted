@@ -15,7 +15,7 @@ use Time::Strptime::TimeZone;
 
 use constant DEBUG => exists $ENV{PERL_TIME_STRPTIME_DEBUG} && $ENV{PERL_TIME_STRPTIME_DEBUG};
 
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 our %DEFAULT_HANDLER = (
     A   => [SKIP          => sub {
@@ -90,7 +90,7 @@ our %DEFAULT_HANDLER = (
     Y   => [year        => q{[0-9]{4}}],
     y   => ['UNSUPPORTED'],
     Z   => [timezone    => ['[-A-Z0-9]+', '[A-Z][a-z]+(?:/[A-Z][a-z]+)+']],
-    z   => [offset      => q{[-+][0-9]{4}}],
+    z   => [offset      => ['[-+][0-9]{4}', 'Z']],
 );
 
 our %FIXED_OFFSET = (
@@ -165,7 +165,7 @@ sub _compile_format {
 my ($vars);
 \$offset = 0;
 sub {
-    ($captures) = \$_[0] =~ m{^$format\$}
+    ($captures) = \$_[0] =~ m{\\A$format\\z}mo
         or Carp::croak 'cannot parse datetime. text: "'.\$_[0].'", format: '.\%s;
 \%s
     (\$epoch, \$offset);
@@ -291,7 +291,7 @@ EOD
     }
     elsif ($types_table->{offset}) {
         $src .= <<'EOD';
-    $offset = (abs($offset) == $offset ? 1 : -1) * (60 * 60 * substr($offset, 1, 2) + 60 * substr($offset, 3, 2));
+    $offset = $offset eq 'Z' ? 0 : (abs($offset) == $offset ? 1 : -1) * (60 * 60 * substr($offset, 1, 2) + 60 * substr($offset, 3, 2));
 EOD
     }
     else {

@@ -13,7 +13,6 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";
-  requires "blib" => "1.01";
 };
 
 on 'configure' => sub {

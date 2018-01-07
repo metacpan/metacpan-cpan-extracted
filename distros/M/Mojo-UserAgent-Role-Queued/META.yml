@@ -1,0 +1,40 @@
+---
+abstract: 'A role to process non-blocking requests in a rate-limiting queue.'
+author:
+  - 'Dotan Dimet <dotan@corky.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-UserAgent-Role-Queued
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::UserAgent::Role::Queued:
+    file: lib/Mojo/UserAgent/Role/Queued.pm
+    version: '0.04'
+requires:
+  Class::Method::Modifiers: '2.12'
+  Mojolicious: '7.52'
+  Role::Tiny: '2.000001'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued/issues
+  homepage: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued
+  repository: git://github.com/dotandimet/Mojo-UserAgent-Role-Queued.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ Math::Bacovia - Symbolic math library with support for alternative representatio
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -100,14 +100,6 @@ Importing a name from B<Math::Bacovia> can be done using the following syntax:
 
     use Math::Bacovia qw(Fraction);     # imports the Fraction() function
 
-By specifying the B<:all> special keyword, B<Math::Bacovia> will export all the provided functions and constants.
-
-    use Math::Bacovia qw(:all);
-
-Nothing is exported by default.
-
-=head1 CONSTANTS
-
 =head2 i / e / pi / tau
 
 B<Math::Bacovia> also provides a small list of useful constants which can be imported:
@@ -121,9 +113,15 @@ For importing a constant, the same syntax can be used as in importing a function
 
     use Math::Bacovia qw(i tau);
 
+By specifying the B<:all> special keyword, B<Math::Bacovia> will export all the provided functions and constants.
+
+    use Math::Bacovia qw(:all);
+
+Nothing is exported by default.
+
 =head1 METHODS
 
-This section description of the special methods provided by Math::Bacovia.
+This section describes the special methods provided by Math::Bacovia.
 
 =head2 inv
 
@@ -190,6 +188,7 @@ C<x> to the power C<y>, defined as:
 
 =head2 sqrt
 
+    sqrt($x)
     $x->sqrt
 
 Square root of C<x>, defined as:
@@ -198,6 +197,7 @@ Square root of C<x>, defined as:
 
 =head2 log
 
+    log($x)
     $x->log
 
 Natural logarithm of C<x>, defined as:
@@ -206,6 +206,7 @@ Natural logarithm of C<x>, defined as:
 
 =head2 exp
 
+    exp($x)
     $x->exp
 
 Natural exponentiation of C<x>, defined as:
@@ -217,7 +218,7 @@ Natural exponentiation of C<x>, defined as:
     int($x)
     $x->int
 
-Evaluates C<x> numerically and truncates the result to an integer, returing a C<Math::AnyNum> object.
+Evaluates C<x> numerically and truncates the result to an integer, returing a L<Math::AnyNum> object.
 
 It may return C<NaN> when this conversion is not possible.
 
@@ -328,7 +329,7 @@ Output:
 
 B<WARNING:> The number of alternative representations grows exponentially! For non-trivial expressions,
 this process may take a very long time and use lots of memory. In combination with the B<full> option
-(set to a true value), the returned list may contain hundreds of even thousands of alternative representations.
+(set to a true value), the returned list may contain hundreds or even thousands of alternative representations.
 
 =head2 simple
 
@@ -349,7 +350,7 @@ This approach works pretty well even on relatively complex expressions, such as:
 
     say Log(Symbol('x'))->cosh->simple->pretty;     #=> ((1 + x^2)/(2 * x))
 
-However, the returned simplified expression is not guaranteed to be "optimal". In some cases, calling the C<simple()>
+However, the returned simplified expression is not guaranteed to always be "optimal". In some cases, calling the C<simple()>
 method on an already simplified expression, the simplified expression may get simplified even further:
 
     $x->simple(full => 1)->simple(full => 1);
@@ -461,7 +462,7 @@ L<https://github.com/trizen/Math-Bacovia>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Daniel Șuteu.
+Copyright 2017-2018 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

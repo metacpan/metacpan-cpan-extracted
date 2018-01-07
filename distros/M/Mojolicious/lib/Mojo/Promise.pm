@@ -3,13 +3,19 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Scalar::Util qw(blessed weaken);
+use Mojo::Util 'deprecated';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub all {
-  my ($class, @promises) = (ref $_[0] ? (undef, @_) : @_);
+  my ($class, @promises) = @_;
 
-  my $all = $promises[0]->_clone;
+  # DEPRECATED!
+  unshift(@promises, $class)
+    and deprecated 'Use of Mojo::Promise::all as instance method is DEPRECATED'
+    if ref $class;
+
+  my $all = $class->new;
 
   my $results   = [];
   my $remaining = scalar @promises;
@@ -41,10 +47,17 @@ sub finally {
 }
 
 sub race {
-  my ($class, @promises) = (ref $_[0] ? (undef, @_) : @_);
-  my $race = $promises[0]->_clone;
-  $_->then(sub { $race->resolve(@_) }, sub { $race->reject(@_) }) for @promises;
-  return $race;
+  my ($class, @promises) = @_;
+
+  # DEPRECATED!
+  unshift(@promises, $class)
+    and deprecated 'Use of Mojo::Promise::race as instance method is DEPRECATED'
+    if ref $class;
+
+  my $new = $class->new;
+  $_->then(sub { $new->resolve(@_) }, sub { $new->reject(@_) }) for @promises;
+
+  return $new;
 }
 
 sub reject  { shift->_settle('reject',  @_) }
@@ -202,14 +215,12 @@ the following new ones.
 =head2 all
 
   my $new = Mojo::Promise->all(@promises);
-  my $new = $promise->all(@promises);
 
 Returns a new L<Mojo::Promise> object that either fulfills when all of the
-passed L<Mojo::Promise> objects (including the invocant) have fulfilled or
-rejects as soon as one of them rejects. If the returned promise fulfills, it is
-fulfilled with the values from the fulfilled promises in the same order as the
-passed promises. This method can be useful for aggregating results of multiple
-promises.
+passed L<Mojo::Promise> objects have fulfilled or rejects as soon as one of them
+rejects. If the returned promise fulfills, it is fulfilled with the values from
+the fulfilled promises in the same order as the passed promises. This method can
+be useful for aggregating results of multiple promises.
 
 =head2 catch
 
@@ -253,11 +264,10 @@ reason.
 =head2 race
 
   my $new = Mojo::Promise->race(@promises);
-  my $new = $promise->race(@promises);
 
 Returns a new L<Mojo::Promise> object that fulfills or rejects as soon as one of
-the passed L<Mojo::Promise> objects (including the invocant) fulfills or
-rejects, with the value or reason from that promise.
+the passed L<Mojo::Promise> objects fulfills or rejects, with the value or
+reason from that promise.
 
 =head2 reject
 
@@ -265,11 +275,17 @@ rejects, with the value or reason from that promise.
 
 Reject the promise with one or more rejection reasons.
 
+  # Generate rejected promise
+  my $promise = Mojo::Promise->new->reject('Something went wrong: Oops');
+
 =head2 resolve
 
   $promise = $promise->resolve(@value);
 
 Resolve the promise with one or more fulfillment values.
+
+  # Generate fulfilled promise
+  my $promise = Mojo::Promise->new->resolve('The result is: 24');
 
 =head2 then
 

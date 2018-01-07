@@ -335,13 +335,37 @@ actually worked.
 
 =back
 
+=head1 CLASS METHODS
+
+=over 4
+
+=item B<textdomains>
+
+Returns a hash where the keys are the textdomains found in templates that
+invoked the plug-in, and the values are the corresponding template file names.
+
+The purpose of this method is to allow harvesting files that should be
+processed by L<xgettext-tt2>.
+
+If the template is either "input text" or "input file handle", the template
+variable C<gettext_filename> - if existing - is assumed as the template
+name.  Rationale: "input text" and "input file handle" are used by the
+Template Toolkit as aliases, when reading from a scalar or a file handle.
+
+=item B<resetTextdomains>
+
+Resets the hash described above for B<textdomain()> to its initial, empty
+state.
+
+=back
+
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2017 Guido Flohr (http://www.guido-flohr.net/).
+Copyright (C) 2016-2018 Guido Flohr (http://www.guido-flohr.net/).
 License LGPLv3+: L<GNU General Public License version 3 or later|http://gnu.org/licenses/lgpl.html>.
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+Copyright (C) 2016-2018 Guido Flohr <guido.flohr@cantanea.com>,
 all rights reserved.
 
 =head1 SEE ALSO

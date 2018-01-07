@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::ViewOptions;
 # ABSTRACT: A high-level set of options for generating a view
-$Renard::Curie::Model::ViewOptions::VERSION = '0.003';
+$Renard::Curie::Model::ViewOptions::VERSION = '0.004';
 use Moo;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 use Renard::Curie::Model::ViewOptions::Grid;
@@ -43,7 +43,7 @@ Renard::Curie::Model::ViewOptions - A high-level set of options for generating a
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: guido.flohr@cantanea.com\n"
-"POT-Creation-Date: 2017-08-23 18:12+0200\n"
+"POT-Creation-Date: 2017-12-31 09:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/Locale/XGettext/Text.pm:34 ../lib/Locale/XGettext.pm:741
+#: ../lib/Locale/XGettext/Text.pm:34 ../lib/Locale/XGettext.pm:770
 #, perl-brace-format
 msgid "Error reading '{filename}': {error}!\n"
 msgstr ""
@@ -40,39 +40,29 @@ msgid ""
 "a separately translatable unit.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext/Util/Keyword.pm:30
-#, perl-brace-format
-msgid "Invalid function name '{function}'!\n"
-msgstr ""
-
-#: ../lib/Locale/XGettext/Util/Keyword.pm:49
+#: ../lib/Locale/XGettext/Util/Keyword.pm:46
 #, perl-brace-format
 msgid "Multiple meanings for argument #{num} for function '{function}'!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext/Util/Keyword.pm:53
+#: ../lib/Locale/XGettext/Util/Keyword.pm:50
 #, perl-brace-format
 msgid "Multiple context arguments for function '{function}'!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext/Util/Keyword.pm:58
+#: ../lib/Locale/XGettext/Util/Keyword.pm:55
 #, perl-brace-format
 msgid "Too many forms for '{function}'!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext/Util/Keyword.pm:66
+#: ../lib/Locale/XGettext/Util/Keyword.pm:63
 #, perl-brace-format
 msgid "Multiple automatic comments for function '{function}'!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext/Util/Keyword.pm:71
+#: ../lib/Locale/XGettext/Util/Keyword.pm:68
 #, perl-brace-format
 msgid "Invalid argument specification '{spec}' for function '{function}'!\n"
-msgstr ""
-
-#: ../lib/Locale/XGettext/Util/Keyword.pm:88
-#, perl-brace-format
-msgid "Invalid function name in keyword specification '{spec}'!\n"
 msgstr ""
 
 #: ../lib/Locale/XGettext/Util/POEntries.pm:105
@@ -91,204 +81,204 @@ msgid ""
 "{old_ref}: {msg}\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:63
+#: ../lib/Locale/XGettext.pm:65
 #, perl-brace-format
 msgid ""
 "{package} is an abstract base class and must not be instantiated directly"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:77
+#: ../lib/Locale/XGettext.pm:79
 msgid "The argument to '--add-location' must be 'full', 'file', or 'never'.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:84
+#: ../lib/Locale/XGettext.pm:86
 msgid "Option 'add_comments' must be an array reference.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:99
+#: ../lib/Locale/XGettext.pm:101
 #, perl-brace-format
 msgid ""
 "warning: '{from_code}' is not a valid encoding name.  Using ASCII as "
 "fallback."
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:110
+#: ../lib/Locale/XGettext.pm:112
 msgid "no input file given"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:163
+#: ../lib/Locale/XGettext.pm:165
 msgid "Attempt to re-run extractor"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:171
+#: ../lib/Locale/XGettext.pm:173
 msgid "--join-existing cannot be used when output is written to stdout"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:179
+#: ../lib/Locale/XGettext.pm:181
 #, perl-brace-format
 msgid "Error resolving file name '{filename}': {error}!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:223 ../lib/Locale/XGettext.pm:582
+#: ../lib/Locale/XGettext.pm:229 ../lib/Locale/XGettext.pm:611
 #, perl-brace-format
 msgid "error reading '{filename}': {error}!\n"
 msgstr ""
 
 #. TRANSLATORS: run() is a method that should be invoked first. 
-#: ../lib/Locale/XGettext.pm:243
+#: ../lib/Locale/XGettext.pm:249
 msgid "Attempt to add entries before run"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:367
+#: ../lib/Locale/XGettext.pm:388
 #, perl-brace-format
 msgid ""
 "Non-ASCII string at '{reference}'.\n"
 "    Please specify the source encoding through '--from-code'.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:378
+#: ../lib/Locale/XGettext.pm:399
 #, perl-brace-format
 msgid "{reference}: invalid multibyte sequence\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:444
+#: ../lib/Locale/XGettext.pm:473
 msgid "Attempt to output from extractor before run"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:449
+#: ../lib/Locale/XGettext.pm:478
 msgid "No PO data"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:458 ../lib/Locale/XGettext.pm:463
-#: ../lib/Locale/XGettext.pm:467
+#: ../lib/Locale/XGettext.pm:487 ../lib/Locale/XGettext.pm:492
+#: ../lib/Locale/XGettext.pm:496
 #, perl-brace-format
 msgid "Error writing '{file}': {error}.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:554
+#: ../lib/Locale/XGettext.pm:583
 #, perl-brace-format
 msgid ""
 "{program} ({package}) {version}\n"
 "Please see the source for copyright information!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:637
+#: ../lib/Locale/XGettext.pm:666
 #, perl-brace-format
 msgid ""
 "error calling method '{method}' with value '{value}' on Locale::PO instance: "
 "{error}.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:652
+#: ../lib/Locale/XGettext.pm:681
 #, perl-brace-format
 msgid "{reference}: {conversion_error}\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:790
+#: ../lib/Locale/XGettext.pm:819
 #, perl-brace-format
 msgid "Error opening '{file}': {error}!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:925
+#: ../lib/Locale/XGettext.pm:947
 #, perl-brace-format
 msgid ""
 "A --flag argument doesn't have the <keyword>:<argnum>:[pass-]<flag> syntax: "
 "{flag}"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:946
+#: ../lib/Locale/XGettext.pm:970
 #, perl-brace-format
 msgid "Usage: {program} [OPTION] [INPUTFILE]...\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:950
+#: ../lib/Locale/XGettext.pm:975
 msgid "Extract translatable strings from given input files.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:953
+#: ../lib/Locale/XGettext.pm:978
 #, perl-brace-format
 msgid "Usage: {program} [OPTION]\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:957
+#: ../lib/Locale/XGettext.pm:982
 msgid "Extract translatable strings.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:971
+#: ../lib/Locale/XGettext.pm:996
 msgid ""
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "Similarly for optional arguments.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:978
+#: ../lib/Locale/XGettext.pm:1003
 msgid "Input file location:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:982
+#: ../lib/Locale/XGettext.pm:1007
 msgid "  INPUTFILE ...               input files\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:986
+#: ../lib/Locale/XGettext.pm:1011
 msgid "  -f, --files-from=FILE       get list of input files from FILE\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:990
+#: ../lib/Locale/XGettext.pm:1015
 msgid ""
 "  -D, --directory=DIRECTORY   add DIRECTORY to list for input files search\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:994
+#: ../lib/Locale/XGettext.pm:1019
 msgid "If input file is -, standard input is read.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1000
+#: ../lib/Locale/XGettext.pm:1025
 msgid "Output file location:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1004
+#: ../lib/Locale/XGettext.pm:1029
 msgid ""
 "  -d, --default-domain=NAME   use NAME.po for output (instead of messages."
 "po)\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1008
+#: ../lib/Locale/XGettext.pm:1033
 msgid "  -o, --output=FILE           write output to specified file\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1012
+#: ../lib/Locale/XGettext.pm:1037
 msgid ""
 "  -p, --output-dir=DIR        output files will be placed in directory DIR\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1016
+#: ../lib/Locale/XGettext.pm:1041
 msgid "If output file is -, output is written to standard output.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1022
+#: ../lib/Locale/XGettext.pm:1047
 msgid "Input file interpretation:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1026
+#: ../lib/Locale/XGettext.pm:1051
 msgid "      --from-code=NAME        encoding of input files\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1029
+#: ../lib/Locale/XGettext.pm:1054
 msgid "By default the input files are assumed to be in ASCII.\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1035
+#: ../lib/Locale/XGettext.pm:1060
 msgid "Operation mode:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1039
+#: ../lib/Locale/XGettext.pm:1064
 msgid "  -j, --join-existing         join messages with existing file\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1043
+#: ../lib/Locale/XGettext.pm:1068
 msgid "  -x, --exclude-file=FILE.po  entries from FILE.po are not extracted\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1047
+#: ../lib/Locale/XGettext.pm:1072
 msgid ""
 "  -cTAG, --add-comments=TAG   place comment blocks starting with TAG and\n"
 "                                preceding keyword lines in output file\n"
@@ -297,15 +287,15 @@ msgid ""
 "                                in output file\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1056
+#: ../lib/Locale/XGettext.pm:1081
 msgid "Language specific options:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1061
+#: ../lib/Locale/XGettext.pm:1086
 msgid "  -a, --extract-all           extract all strings\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1067
+#: ../lib/Locale/XGettext.pm:1092
 msgid ""
 "  -kWORD, --keyword=WORD      look for WORD as an additional keyword\n"
 "  -k, --keyword               do not to use default keywords\"));\n"
@@ -314,81 +304,81 @@ msgid ""
 "                              number ARG of keyword WORD\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1079
+#: ../lib/Locale/XGettext.pm:1104
 msgid "Output details:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1083
+#: ../lib/Locale/XGettext.pm:1108
 msgid "      --force-po              write PO file even if empty\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1087
+#: ../lib/Locale/XGettext.pm:1112
 msgid "      --no-location           do not write '#: filename:line' lines\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1091
+#: ../lib/Locale/XGettext.pm:1116
 msgid ""
 "  -n, --add-location          generate '#: filename:line' lines (default)\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1095
+#: ../lib/Locale/XGettext.pm:1120
 msgid "  -s, --sort-output           generate sorted output\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1099
+#: ../lib/Locale/XGettext.pm:1124
 msgid "  -F, --sort-by-file          sort output by file location\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1103
+#: ../lib/Locale/XGettext.pm:1128
 msgid ""
 "      --omit-header           don't write header with 'msgid \"\"' entry\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1107
+#: ../lib/Locale/XGettext.pm:1132
 msgid "      --copyright-holder=STRING  set copyright holder in output\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1111
+#: ../lib/Locale/XGettext.pm:1136
 msgid ""
 "      --foreign-user          omit FSF copyright in output for foreign user\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1115
+#: ../lib/Locale/XGettext.pm:1140
 msgid "      --package-name=PACKAGE  set package name in output\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1119
+#: ../lib/Locale/XGettext.pm:1144
 msgid "      --package-version=VERSION  set package version in output\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1123
+#: ../lib/Locale/XGettext.pm:1148
 msgid ""
 "      --msgid-bugs-address=EMAIL@ADDRESS  set report address for msgid bugs\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1127
+#: ../lib/Locale/XGettext.pm:1152
 msgid ""
 "  -m[STRING], --msgstr-prefix[=STRING]  use STRING or \"\" as prefix for "
 "msgstr\n"
 "                                values\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1132
+#: ../lib/Locale/XGettext.pm:1157
 msgid ""
 "  -M[STRING], --msgstr-suffix[=STRING]  use STRING or \"\" as suffix for "
 "msgstr\n"
 "                                values\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1139
+#: ../lib/Locale/XGettext.pm:1164
 msgid "Informative output:\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1143
+#: ../lib/Locale/XGettext.pm:1168
 msgid "  -h, --help                  display this help and exit\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1147
+#: ../lib/Locale/XGettext.pm:1172
 msgid "  -V, --version               output version information and exit\n"
 msgstr ""
 
@@ -396,17 +386,17 @@ msgstr ""
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: ../lib/Locale/XGettext.pm:1159
+#: ../lib/Locale/XGettext.pm:1184
 #, perl-brace-format
 msgid "Report bugs at <{URL}>!\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1170
+#: ../lib/Locale/XGettext.pm:1195
 #, perl-brace-format
 msgid "{program_name}: {error}\n"
 msgstr ""
 
-#: ../lib/Locale/XGettext.pm:1176
+#: ../lib/Locale/XGettext.pm:1201
 #, perl-brace-format
 msgid "Try '{program_name} --help' for more information!\n"
 msgstr ""

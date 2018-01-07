@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use DateTime::Format::RFC3339;
 use Params::ValidationCompiler qw( validation_for );
@@ -46,6 +46,15 @@ has _client => (
     builder => '_build_client',
 );
 
+# This is gross. Is there a better way to manage this? This is the only way to
+# get the Person who is the requester. There is no person endpoint from which
+# to retrieve this information later!
+my $StoryFields = do {
+    ## no critic (Subroutines::ProtectPrivateSubs)
+    my %props = WebService::PivotalTracker::Story->_properties;
+    join ',', sort ( keys %props, 'requested_by' );
+};
+
 sub projects {
     my $self = shift;
 
@@ -77,8 +86,11 @@ sub projects {
         my %args = $check->(@_);
 
         my $uri = $self->_client->build_uri(
-            "/projects/$args{project_id}/stories",
-            \%args,
+            "/projects/$args{project_id}/stories?",
+            {
+                %args,
+                fields => $StoryFields,
+            },
         );
 
         return [
@@ -103,11 +115,15 @@ sub projects {
         my $self = shift;
         my %args = $check->(@_);
 
-        WebService::PivotalTracker::Story->new(
-            raw_content => $self->_client->get(
-                $self->_client->build_uri("/stories/$args{story_id}"),
+        my $content = $self->_client->get(
+            $self->_client->build_uri(
+                "/stories/$args{story_id}",
+                { fields => $StoryFields }
             ),
-            pt_api => $self,
+        );
+        WebService::PivotalTracker::Story->new(
+            raw_content => $content,
+            pt_api      => $self,
         );
     }
 }
@@ -260,7 +276,7 @@ WebService::PivotalTracker - Perl library for the Pivotal Tracker REST API
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -270,16 +286,123 @@ version 0.07
     my $story = $pt->story( story_id => 1234 );
     my $me = $pt->me;
 
-    for my $label ( $story->labels ) { ... }
+    for my $label ( $story->labels ) { }
 
-    for my $comment ( $story->comments ) { ... }
+    for my $comment ( $story->comments ) { }
 
 =head1 DESCRIPTION
 
-B<This is very alpha (and as of yet mostly undocumented) software>.
+B<This is fairly alpha software. The API is likely to change in breaking ways
+in the future.>
 
-This module provides a Perl interface to the L<Pivotal
-Tracker|https://www.pivotaltracker.com/> REST API.
+This module provides a Perl interface to the L<REST API
+V5|https://www.pivotaltracker.com/help/api/rest/v5> for L<Pivotal
+Tracker|https://www.pivotaltracker.com/>. You will need to refer to the L<REST
+API docs|https://www.pivotaltracker.com/help/api/rest/v5> for some details, as
+this documentation does not reproduce the details of every attribute available
+for a resource.
+
+This class, C<WebService::PivotalTracker>, provides the main entry point for
+all API calls.
+
+=for Pod::Coverage project_iterations
+
+=head1 METHODS
+
+All web requests which return anything other than a success status result in a
+call to C<die> with a simple string error message. This will probably change
+to something more useful in the future.
+
+This class provides the following methods:
+
+=head2 WebService::PivotalTracker->new(...)
+
+This creates a new object of this class. It accepts the following arguments:
+
+=over 4
+
+=item * token
+
+An MD5 access token for Pivotal Tracker.
+
+This is required.
+
+=item * base_uri
+
+The base URI against which all requests will be made. This defaults to
+C<https://www.pivotaltracker.com/services/v5>.
+
+=back
+
+=head2 $pt->projects
+
+This method returns an array reference of
+L<WebService::PivotalTracker::Project> objects, one for each project to which
+the token provides access.
+
+=head2 $pt->project_stories_where(...)
+
+This method accepts the following arguments:
+
+=over 4
+
+=item * story_id
+
+The id of the project you are querying.
+
+This is required.
+
+=item * filter
+
+A search filter. This is the same syntax as you would use in the PT
+application for searching. See
+L<https://www.pivotaltracker.com/help/articles/advanced_search/> for details.
+
+=back
+
+=head2 $pt->story(...)
+
+This method returns a single L<WebService::PivotalTracker::Story> object, if
+one exists for the given id.
+
+This method accepts the following arguments:
+
+=over 4
+
+=item * story_id
+
+The id of the story you are querying.
+
+This is required.
+
+=back
+
+=head2 $pt->create_story(...)
+
+This creates a new story. This method accepts every attribute of a
+L<WebService::PivotalTracker::Story> object. The C<project_id> and C<name>
+parameters are required.
+
+It also accepts two additional optional parameters:
+
+=over 4
+
+=item * before_id
+
+A story ID before which this story should be added.
+
+=item * after_id
+
+A story ID after which this story should be added.
+
+=back
+
+By default the story will be added as the last story in the icebox.
+
+=head2 $pt->me
+
+This returns a L<WebService::PivotalTracker::Me> object for the user to which
+the token belongs.
 
 =head1 SUPPORT
 
@@ -311,7 +434,7 @@ Greg Oschwald <goschwald@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MaxMind, Inc.
+This software is Copyright (c) 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

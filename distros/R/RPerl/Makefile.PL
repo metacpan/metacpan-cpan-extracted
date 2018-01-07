@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.026_000;
+our $VERSION = 0.032_000;
 use 5.010;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.8 and earlier?
 
 use ExtUtils::MakeMaker;
@@ -93,6 +93,12 @@ WriteMakefile(
     EXE_FILES        => ['script/rperl'],
     MIN_PERL_VERSION => '5.10.0',  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.8 and earlier?
 #    MAKE             => 'gmake',   # CORRELATION #rp200, Windows + EU::MM + GNU makef
+    CONFIGURE_REQUIRES => {
+        # DEV NOTE, CORRELATION #rp061: prioritize installation of all dists which are (or may be) prerequisites for other dists or components
+        'IO::Socket::SSL'     => '2.043',     # (infamously problematic) pre-prerequisite for Alien::astyle
+        'Alien::GMP'          => '1.07',      # prerequisite for Math::BigInt::GMP
+        'Alien::GSL'          => '1.01',      # prerequisite for Math::GSL
+    },
     PREREQ_PM        => {
         # RPERL USER DEPENDENCIES
         'ExtUtils::MakeMaker' => '7.04',      # for compatibility with Inline::C >= v0.75
@@ -114,10 +120,11 @@ WriteMakefile(
         'List::MoreUtils'     => '0.33',
         'Math::BigInt::GMP'   => '1.46',
         'Math::GSL'           => '0.39',
-        'IO::Socket::SSL'     => '2.043',     # pre-prerequisite for Alien::astyle
         'Alien::astyle'       => '0.009',
         'Alien::PCRE2'        => '0.015',     # for regex support
         'Alien::JPCRE2'       => '0.012',     # for regex support
+#        'Alien::Pluto'        => '0.003',
+        'MongoDB'             => "v1.8.0",    # NEED FIX: EU::MM does not seem to handle v-strings properly???
 
         # RPERL SYSTEM (NON-USER) DEPENDENCIES
         'Parse::Eyapp'        => '1.21',      # RPerl Grammar; used by grammar_recompile.sh

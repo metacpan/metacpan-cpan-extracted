@@ -16,20 +16,26 @@ sub browser_instances {
     $filter ||= qr/^/;
     my @instances;
     # default Chrome instance
-    my ($default)=
-        map { my $exe= File::Spec->catfile($_,"chrome$Config{_exe}");
-              -x $exe ? $exe : ()
-            } File::Spec->path();
-    push @instances, $default
-        if $default;
 
-    push @instances, $ENV{ CHROME_BIN }
-        if $ENV{ CHROME_BIN } and -x $ENV{ CHROME_BIN };
+    if( $ENV{TEST_WWW_MECHANIZE_CHROME_VERSIONS} ) {
+        # add author tests with local versions
+        my $spec = $ENV{TEST_WWW_MECHANIZE_CHROME_VERSIONS};
+        push @instances, grep { -x } bsd_glob $spec;
 
-    # add author tests with local versions
-    my $spec = $ENV{TEST_WWW_MECHANIZE_CHROMES_VERSIONS}
-             || 'chrome-versions/*/{*/,}chrome*'; # sorry, likely a bad default
-    push @instances, grep { -x } bsd_glob $spec;
+    } elsif( $ENV{CHROME_BIN}) {
+        push @instances, $ENV{ CHROME_BIN }
+            if $ENV{ CHROME_BIN } and -x $ENV{ CHROME_BIN };
+
+    } else {
+        my ($default)=
+            map { my $exe= File::Spec->catfile($_,"chrome$Config{_exe}");
+                  -x $exe ? $exe : ()
+                } File::Spec->path();
+        push @instances, $default
+            if $default;
+        my $spec = 'chrome-versions/*/{*/,}chrome*'; # sorry, likely a bad default
+        push @instances, grep { -x } bsd_glob $spec;
+    };
 
     # Consider filtering for unsupported Chrome versions here
     @instances = map { s!\\!/!g; $_ } # for Windows
@@ -78,18 +84,18 @@ sub runtests {
                     launch_exe => $browser_instance
                 });
             };
-            diag sprintf "Chrome version '%s'", $version;
+            diag sprintf "Failed on Chrome version '%s'", $version;
             return
         };
 
-        diag sprintf "Chrome version '%s'",
+        diag sprintf "Using Chrome version '%s'",
             $mech->chrome_version;
 
         # Run the user-supplied tests, making sure we don't keep a
         # reference to $mech around
         @_ = ($browser_instance, $mech);
     };
-    
+
     goto &$code;
 }
 END {

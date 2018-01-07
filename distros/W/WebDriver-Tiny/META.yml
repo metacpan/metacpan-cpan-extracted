@@ -16,14 +16,14 @@ name: WebDriver-Tiny
 provides:
   WebDriver::Tiny:
     file: lib/WebDriver/Tiny.pm
-    version: '0.100'
+    version: '0.101'
   WebDriver::Tiny::Elements:
     file: lib/WebDriver/Tiny/Elements.pm
-    version: '0.100'
+    version: '0.101'
 requires:
   perl: '5.020'
 resources:
   bugtracker: https://github.com/cv-library/WebDriver-Tiny/issues
   repository: git://github.com/cv-library/WebDriver-Tiny.git
-version: '0.100'
+version: '0.101'
 x_serialization_backend: 'YAML::Tiny version 1.70'

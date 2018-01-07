@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnLaunch;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the task launch stage
-$Taskwarrior::Kusarigama::Hook::OnLaunch::VERSION = '0.4.0';
+$Taskwarrior::Kusarigama::Hook::OnLaunch::VERSION = '0.5.0';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Taskwarrior::Kusarigama::Hook::OnLaunch - Role for plugins running during the ta
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 SYNOPSIS
 

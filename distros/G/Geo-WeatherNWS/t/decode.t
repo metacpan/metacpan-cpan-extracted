@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 103;
+use Test::More tests => 99;
 use Geo::WeatherNWS;
 
 sub num_close {
@@ -165,28 +165,3 @@ for (my $obs4_case=0; $obs4_case<=$#obs4_middle; $obs4_case++) {
     is($decode4->{conditions1}, 'Freezing', "conditions1 for $abbr4");
     is($decode4->{conditions2}, 'Fog', "conditions2 for $abbr4");
 }
-
-#------------------------------------------------------------
-# Make sure undefined dew point is handled correctly
-#------------------------------------------------------------
-my $report5 = Geo::WeatherNWS::new();
-
-my $obs5 =
-'2012/12/20 16:53 PAFA 201653Z 00000KT 1 1/4SM R02L/5000VP6000FT BR BKN003 M42/ A3062 RMK AO2 SLP395 T1417';
-my $decode5 = $report5->decodeobs($obs5);
-
-is( $decode5->{dewpoint_c}, undef, 'decoded undef dewpoint Celius' );
-is( $decode5->{dewpoint_f}, undef, 'decoded undef dewpoint Fahrenheit' );
-is( $decode5->{relative_humidity}, undef, 'decoded undef rh');
-
-#------------------------------------------------------------
-# Check handling of FEW
-#------------------------------------------------------------
-my $report6 = Geo::WeatherNWS::new();
-
-my $obs6 =
-'2011/08/27 15:53 KHOU 271553Z 30007KT 10SM FEW1     10 A2993 RMK AO2 SLPNO $';
-my $decode6 = $report6->decodeobs($obs6);
-
-is( $decode6->{cloudcover}, 'Fair', 'FEW cloudcover' );
-

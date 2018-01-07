@@ -198,31 +198,6 @@ my $list = {
     short   => [ 0 .. 99 ],
     long_test_index  => [ map { s/^\d/chr( $& + 97 )/e; $_ } 0 .. 1999 ],
     short_test_index => [ map { s/^\d/chr( $& + 97 )/e; $_ } 0 .. 99 ],
-    ll      => [ (
-            "In"            . '.' x 7,
-            "scalar"        . '.' x 3,
-            "context"       . '.' x 4,
-            "returns"       . '.' x 2,
-            "the"           . '.' x 6,
-            "number"        . '.' x 3,
-            "of"            . '.' x 7,
-            "elements"      . '.' x 1,
-            "so"            . '.' x 7,
-            "generated"              ,
-            "hello"         . '.' x 4,
-            "world"         . '.' x 4,
-            "12345678"      . '.' x 1,
-            "The"           . '.' x 6,
-            "black"         . '.' x 4,
-            "cat"           . '.' x 6,
-            "jumped"        . '.' x 3,
-            "from"          . '.' x 5,
-            "the"           . '.' x 6,
-            "green"         . '.' x 4,
-            "tree"          . '.' x 5,
-            "abcdefghi"              ,
-
-        ) x 2 ],
 };
 
 
@@ -249,7 +224,7 @@ my $options = [
       justify => 2, keep => 8, clear_screen => 1 },                                                                         # 9
 
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ' x 100, page => 0, pad => 3, order => 1,
-      justify => 2, keep => 8, clear_screen => 1, pad_one_row => 4 },                                                       # 10
+      justify => 2, keep => 8, clear_screen => 1 },                                                                         # 10
 
     { prompt => 'abc 12345678 def' x 50, default => 10, empty =>' ', undef => '--', beep => 1,
       no_spacebar => [ 11 .. 2000 ], lf => [ 0, 4 ], keep => 16 },                                                          # 11
@@ -435,29 +410,7 @@ my $short = [
     },
 ];
 
-my $option_ll = [
-    {
-        list      => $list->{ll},
-        used_keys => [ ( 'DOWN' ) x 3, 'SPACE', ( 'RIGHT' ) x 3, 'SPACE', 'HOME', 'ENTER'  ],
-        expected  => "<In....... returns.. so.......>",
-        options   => { ll => 9, layout => 1 }
-    },
-    {
-        list      => $list->{ll},
-        used_keys => [  'END', 'SPACE', 'PAGE_UP', 'SPACE', ( 'UP' ) x 12, 'LEFT', 'ENTER'  ],
-        expected  => "<generated abcdefghi abcdefghi>",
-        options   => { ll => 9, layout => 3 }
-    },
-];
 
-my $pad_one_row = [
-    {
-        list      => [ qw( 1 The black cat this_is_a_long_word climbed the green tree ) ],
-        used_keys => [ qw( END LEFT SPACE LEFT LEFT LEFT ENTER ) ],
-        expected  => "<this_is_a_long_word green>",
-        options   => { prompt => 'one_row', default => 3, pad_one_row => 3 }
-    },
-];
 
 sub return_test_data {
     my $type = shift;
@@ -466,9 +419,6 @@ sub return_test_data {
     elsif ( $type eq 'seq_test'    ) { return $seq_test; }
     elsif ( $type eq 'long'        ) { return $long; }
     elsif ( $type eq 'short'       ) { return $short; }
-    elsif ( $type eq 'option_ll'   ) { return $option_ll; }
-    elsif ( $type eq 'pad_one_row' ) { return $pad_one_row; }
-
 }
 
 

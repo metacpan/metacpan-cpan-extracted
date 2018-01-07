@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::ReservedInstance;
+$Net::Amazon::EC2::ReservedInstance::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

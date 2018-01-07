@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.053';
+our $VERSION = '1.054';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse SQLite/MySQL/PostgreSQL databases and their tables intera
 
 =head1 VERSION
 
-Version 1.053
+Version 1.054
 
 =cut
 
@@ -61,7 +61,7 @@ If C<db-browser> is called with arguments, the arguments are used as the availab
 
     db-browser [-s|--search]
 
-C<db-browser> called with C<-s|--search> causes a new search of SQLite databases instead of using the cached data.
+C<db-browser> called with C<-s|--search> causes a new search for SQLite databases instead of using the cached data.
 
 =head1 DESCRIPTION
 
@@ -91,8 +91,6 @@ Non mappable characters will break the output.
 
 The best way to find out how C<db-browser> works is calling C<db-browser>.
 
-To be able to use all the features of the C<db-browser> some basic SQL knowledge is required.
-
 =head3 Keys to move around
 
 =over
@@ -118,8 +116,7 @@ To confirm a chosen menu item use the C<Return> key.
 
 In some sub-menus it is possible to select more then one item before C<Return> is pressed; in such sub-menus the list of
 items marked with the C<SpaceBar> key including the highlighted item are added to the chosen items when C<Return>
-is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the C<SpaceBar>. C<Ctrl-SpaceBar>
-(or C<Ctrl-@>) inverts the made choices - marked items are unmarked and unmarked items are marked.
+is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the C<SpaceBar>.
 
 To move backwards in the menu hierarchy one can press the C<q> key. When prompted for a string, try C<Ctrl-D> instead
 of C<q>.
@@ -201,7 +198,7 @@ Choose the required database plugins.
 
 =head4 DB Settings
 
-I<DB Settings> are used as default database settings.
+I<DB Settings> are used as the default database settings.
 
 There is also in each database sub-menu the menu entry "Database settings". If these database specific parameter are not
 set, the global (to the database plugin) I<DB Settings> are use instead.
@@ -221,8 +218,8 @@ Which environment variables should be used.
 
 =item Login Data
 
-The entered data for a field is saved with the field in a configuration file. If the configuration file contains a field
-with a defined value, the value is used for that field to connect instead to ask the user for the value.
+The entered login data is saved in a configuration file and used to connect to the database (the password can not be
+saved).
 
 =item DB Options
 
@@ -519,14 +516,12 @@ The default data type of the columns.
 
 =head2 CONFIGURATION FILES
 
-The syntax of the configuration file names is C<"conf_${db_plugin_name}.json">. To find out the location of the
-configuration files call C<db-browser -h> and choose I<Path>.
+To find out the location of the configuration files call C<db-browser -h> and choose I<Path>. The data is saved in JSON
+format.
 
-The data is saved in JSON format.
-
-The global database settings are placed in the member called C<"*$db_plugin">. Database specific settings have its own
-member named like the database itself.
-With the C<SQLite> driver "database name" means the absolute path to the database file.
+The Database configuration file: the member of the global database settings is called C<"*$db_plugin"> whereas members
+of database specific settings are named like the database itself (for C<SQLite>: "database name" means the absolute path
+to the database file).
 
 Sub-members (keys):
 
@@ -537,55 +532,14 @@ Sub-members (keys):
         directories_sqlite¹                         mysql_enable_utf8  (0,1)          pg_enable_utf8  (0,1,-1)
                                                     binary_filter      (0,1)          binary_filter   (0,1)
 
-¹ only with the C<SQLite> driver: expects an array-reference as its value. C<db-browser> searches for SQLite databases in the
-directories passed with this array-reference.
-
-Examples
-
-    conf_SQLite.json:                                           conf_mysql.json:
-
-    {                                                           {
-        "*SQLite" : {                                               "*mysql" : {
-            "binary_filter" : 0,                                        "binary_filter" : 0,
-            "directories_sqlite" : [                                    "host" : "localhost",
-                "/home/my/Documents",                                   "mysql_enable_utf8" : 1,
-                "/home/my/databases"                                    "port" : null,
-            ],                                                          "user" : "name"
-            "sqlite_see_if_its_a_number" : 1,                       },
-            "sqlite_unicode" : 1                                    "database1" : {
-        },                                                              "mysql_enable_utf8" : 0,
-        "/home/my/databases/db1.sqlite" : {                             "host" : "my_host",
-            "binary_filter" : 1,                                        "user" : "user_5"
-            "sqlite_unicode" : 0                                    },
-        }                                                           "database2" : {
-    }                                                                   "binary_filter" : 1
-                                                                    }
-                                                                }
+¹ directories passed as an array-reference
 
 =head1 REQUIREMENTS
 
-See L<Term::TablePrint/REQUIREMENTS>.
+The same requirements as C<Term::TablePrint> (L<Term::TablePrint/REQUIREMENTS>).
 
-=head2 Perl version
-
-Requires Perl version 5.8.3 or greater.
-
-=head2 Decoded strings
-
-C<db-browser> expects decoded strings.
-
-=head2 Terminal
-
-It is required a terminal that uses a monospaced font which supports the printed characters.
-
-Also the terminal has to understand ANSI escape sequences. If the OS is MSWin32 C<App::DBBrowser> uses
+The terminal has to understand ANSI escape sequences. If the OS is MSWin32 C<App::DBBrowser> uses
 L<Win32::Console::ANSI> which emulates an ANSI console for the C<db-browser>.
-
-The terminal should have a width of at least 40 print columns.
-
-=head1 SEE ALSO
-
-L<DBI>, L<DBD::SQLite>, L<DBD::mysql>, L<DBD::Pg>.
 
 =head1 CREDITS
 
@@ -598,7 +552,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Matthäus Kiem.
+Copyright 2012-2018 Matthäus Kiem.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

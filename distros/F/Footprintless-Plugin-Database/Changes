@@ -1,5 +1,13 @@
 Revision history for Perl module Footprintless::Plugin::Database
 
+1.03 2018-01-04
+
+    - Added a prepared statement template
+
+1.02 2018-01-02
+
+    - Added an OracleProvider and a bunch of options to the query query_for_list and query_for_map
+
 1.01 2016-11-18
 
     - fixed bug in timeout setting for mysql dump command

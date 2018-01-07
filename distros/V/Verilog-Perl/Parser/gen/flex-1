@@ -2018,7 +2018,7 @@ char *VParseLextext;
  *
  **************************************************************************
  *
- * Copyright 2000-2017 by Wilson Snyder.  This program is free software;
+ * Copyright 2000-2018 by Wilson Snyder.  This program is free software;
  * you can redistribute it and/or modify it under the terms of either the
  * GNU Lesser General Public License Version 3 or the Perl Artistic License
  * Version 2.0.
@@ -4405,7 +4405,7 @@ YY_RULE_SETUP
 case 361:
 YY_RULE_SETUP
 #line 591 "VParseLex.l"
-{ VALTEXT; CALLBACK(commentCb); yy_pop_state(); } // No FL; it's at comment begin
+{ VALTEXT; CALLBACK(commentCb); yy_pop_state(); } /* No FL; it's at comment begin */
 	YY_BREAK
 case 362:
 YY_RULE_SETUP
@@ -4491,7 +4491,7 @@ case 373:
 /* rule 373 can match eol */
 YY_RULE_SETUP
 #line 620 "VParseLex.l"
-{ yymore(); yy_push_state(ATTRMODE); }	// Doesn't match (*), but (* attr_spec
+{ yymore(); yy_push_state(ATTRMODE); }	/* Doesn't match (*), but (* attr_spec */
 	YY_BREAK
 
 /************************************************************************/
@@ -4723,7 +4723,7 @@ YY_RULE_SETUP
 case 417:
 YY_RULE_SETUP
 #line 679 "VParseLex.l"
-{ FL; yy_push_state(CMTMODE); yymore(); }  // FL; marks start for COMMENT callback
+{ FL; yy_push_state(CMTMODE); yymore(); }  /* FL; marks start for COMMENT callback */
 	YY_BREAK
 case 418:
 YY_RULE_SETUP

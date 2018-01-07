@@ -10,7 +10,11 @@ WriteMakefile(
     PL_FILES      => {},
     LICENSE       => 'perl',
     PREREQ_PM     => {
-        'Test::More' => 0,
+        'Test::More'      => 0,    # for unit tests
+        'File::Temp'      => 0,    # for unit tests
+        'Test::Exception' => 0,    # for unit tests
+        'Cwd'             => 0,
+        'Carp'            => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'File-Path-Tiny-*' },

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Roles::Targetable;
 # ABSTRACT: Target attrs common to Standard::Target and Table::Hit
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Roles::Targetable::VERSION = '0.173510';
+$Bio::FastParsers::Hmmer::Roles::Targetable::VERSION = '0.173640';
 use Moose::Role;
 
 use autodie;
@@ -56,7 +56,7 @@ Bio::FastParsers::Hmmer::Roles::Targetable - Target attrs common to Standard::Ta
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

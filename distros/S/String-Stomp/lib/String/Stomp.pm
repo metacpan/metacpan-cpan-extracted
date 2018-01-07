@@ -3,8 +3,9 @@ use strict;
 use warnings;
 package String::Stomp;
 
-our $VERSION = '0.0102'; # VERSION
+our $VERSION = '0.0103';
 # ABSTRACT: Removes empty leading and trailing lines
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
 
 use Exporter 'import';
 our @EXPORT = qw/stomp/;
@@ -32,22 +33,21 @@ String::Stomp - Removes empty leading and trailing lines
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-String-Stomp"><img src="https://api.travis-ci.org/Csson/p5-String-Stomp.svg?branch=master" alt="Travis status" /></a></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
+<a href="https://travis-ci.org/Csson/p5-String-Stomp"><img src="https://api.travis-ci.org/Csson/p5-String-Stomp.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/String-Stomp-0.0103"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/String-Stomp/0.0103" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=String-Stomp%200.0103"><img src="http://badgedepot.code301.com/badge/cpantesters/String-Stomp/0.0103" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-100.0%-brightgreen.svg" alt="coverage 100.0%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-String-Stomp.svg?branch=master)](https://travis-ci.org/Csson/p5-String-Stomp)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.0102, released 2016-01-09.
+Version 0.0103, released 2017-12-31.
 
 =head1 SYNOPSIS
 
@@ -62,8 +62,8 @@ Version 0.0102, released 2016-01-09.
 
     # is exactly the same as
     sub out {
-        print q{        A long
-            text.};
+        print q{        A short
+            text};
     }
 
 =head1 DESCRIPTION
@@ -119,7 +119,7 @@ L<Syntax::Feature::Qs> adds C<qs> and C<qqs> that removes all leading whitespace
 
                 string.
                 END
-            
+
             $text =~ s{\v\z}{};
             print $text;
         }
@@ -161,7 +161,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson.
+This software is copyright (c) 2016 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

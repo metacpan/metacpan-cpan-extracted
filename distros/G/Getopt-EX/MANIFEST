@@ -15,6 +15,9 @@ minil.toml
 t/00_compile.t
 t/01_colormap.t
 t/02_module.t
+t/03_mode.t
 t/home/lib/App/example/example_test.pm
+t/home/lib/App/example/mode_function.pm
+t/home/lib/App/example/mode_wildcard.pm
 META.yml
 MANIFEST

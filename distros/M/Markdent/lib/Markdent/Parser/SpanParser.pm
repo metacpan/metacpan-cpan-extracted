@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -985,7 +985,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 DESCRIPTION
 

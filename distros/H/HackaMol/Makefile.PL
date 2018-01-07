@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Capture::Tiny" => "0.28",
     "Cwd" => "0.0",
-    "File::Slurp" => "0.00",
     "HTTP::Tiny" => "0.070",
     "JSON::XS" => "3.01",
     "List::MoreUtils" => "0.410",
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "0.0",
     "YAML::XS" => "0.41"
   },
-  "VERSION" => "0.046",
+  "VERSION" => "0.047",
   "test" => {
     "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t"
   }
@@ -51,7 +50,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => "0.28",
   "Cwd" => "0.0",
-  "File::Slurp" => "0.00",
   "HTTP::Tiny" => "0.070",
   "JSON::XS" => "3.01",
   "List::MoreUtils" => "0.410",

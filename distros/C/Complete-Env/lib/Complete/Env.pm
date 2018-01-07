@@ -1,7 +1,7 @@
 package Complete::Env;
 
-our $DATE = '2016-10-18'; # DATE
-our $VERSION = '0.39'; # VERSION
+our $DATE = '2017-12-31'; # DATE
+our $VERSION = '0.400'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,7 +34,7 @@ use case-insensitive option (`ci`) to match against original casing.
 
 _
     args => {
-        word     => { schema=>[str=>{default=>''}], pos=>0, req=>1 },
+        %arg_word,
     },
     result_naked => 1,
     result => {
@@ -67,7 +67,7 @@ separated elements. This routine complete from the elements of such variable.
 
 _
     args => {
-        word     => { schema=>[str=>{default=>''}], pos=>0, req=>1 },
+        %arg_word,
         env      => {
             summary => 'Name of environment variable to use',
             schema  => 'str*',
@@ -107,7 +107,7 @@ elements. This routine complete from those elements.
 
 _
     args => {
-        word     => { schema=>[str=>{default=>''}], pos=>0, req=>1 },
+        %arg_word,
     },
     result_naked => 1,
     result => {
@@ -134,14 +134,18 @@ Complete::Env - Completion routines related to environment variables
 
 =head1 VERSION
 
-This document describes version 0.39 of Complete::Env (from Perl distribution Complete-Env), released on 2016-10-18.
+This document describes version 0.400 of Complete::Env (from Perl distribution Complete-Env), released on 2017-12-31.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 complete_env(%args) -> array
+=head2 complete_env
+
+Usage:
+
+ complete_env(%args) -> array
 
 Complete from environment variables.
 
@@ -156,12 +160,18 @@ Arguments ('*' denotes required arguments):
 
 =item * B<word>* => I<str> (default: "")
 
+Word to complete.
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_env_elem(%args) -> array
+=head2 complete_env_elem
+
+Usage:
+
+ complete_env_elem(%args) -> array
 
 Complete from elements of an environment variable.
 
@@ -180,12 +190,18 @@ Name of environment variable to use.
 
 =item * B<word>* => I<str> (default: "")
 
+Word to complete.
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_path_env_elem(%args) -> array
+=head2 complete_path_env_elem
+
+Usage:
+
+ complete_path_env_elem(%args) -> array
 
 Complete from elements of PATH environment variable.
 
@@ -199,6 +215,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<word>* => I<str> (default: "")
+
+Word to complete.
 
 =back
 
@@ -232,7 +250,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,17 +1,19 @@
 package Nodejs::Util;
 
-our $DATE = '2016-07-03'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-01-07'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
                        get_nodejs_path
+                       nodejs_path
                        nodejs_available
                        system_nodejs
+                       nodejs_module_path
                );
 
 our %SPEC;
@@ -28,7 +30,7 @@ _
     },
 );
 
-$SPEC{get_nodejs_path} = {
+$SPEC{nodejs_path} = {
     v => 1.1,
     summary => 'Check the availability of Node.js executable in PATH',
     description => <<'_',
@@ -42,7 +44,7 @@ _
     },
     result_naked => 1,
 };
-sub get_nodejs_path {
+sub nodejs_path {
     require File::Which;
     require IPC::System::Options;
 
@@ -67,15 +69,16 @@ sub get_nodejs_path {
     \@paths;
 }
 
+*get_nodejs_path = \&nodejs_path;
+
 $SPEC{nodejs_available} = {
     v => 1.1,
     summary => 'Check the availability of Node.js',
     description => <<'_',
 
-This is a more advanced alternative to `get_nodejs_path()`. Will check for
-`node` or `nodejs` in the PATH, like `get_nodejs_path()`. But you can also
-specify minimum version (and other options in the future). And it will return
-more details.
+This is a more advanced alternative to `nodejs_path()`. Will check for `node` or
+`nodejs` in the PATH, like `nodejs_path()`. But you can also specify minimum
+version (and other options in the future). And it will return more details.
 
 Will return status 200 if everything is okay. Actual result will return the path
 to executable, and result metadata will contain extra result like detected
@@ -104,7 +107,7 @@ sub nodejs_available {
 
     my $paths = do {
         local $ENV{PATH} = $args{path} if defined $args{path};
-        get_nodejs_path(all => 1);
+        nodejs_path(all => 1);
     };
     defined $paths or return [412, "node.js not detected in PATH"];
 
@@ -184,6 +187,87 @@ sub system_nodejs {
     );
 }
 
+sub nodejs_module_path {
+    my $opts = ref $_[0] eq 'HASH' ? shift : {};
+    my $module = shift;
+
+    my ($dir, $name, $ext) = $module =~ m!\A(?:(.*)/)?(.+?)(\.\w+)?\z!;
+    #use DD; dd {dir=>$dir, name=>$name, ext=>$ext};
+
+    my  @dirs;
+    if (defined $dir) {
+        @dirs = ($dir);
+    } else {
+        my $cwd = do {
+            if (defined $opts->{cwd}) {
+                $opts->{cwd};
+            } else {
+                require Cwd;
+                Cwd::getcwd();
+            }
+        };
+        $cwd =~ s!/node_modules\z!!;
+        while (1) {
+            push @dirs, "$cwd/node_modules";
+            $cwd =~ s!(.*)/.+!$1!
+                or last;
+        }
+    }
+
+    if (defined $ENV{NODE_PATH}) {
+        my $sep = $^O =~ /win32/i ? qr/;/ : qr/:/;
+        push @dirs, split($sep, $ENV{NODE_PATH});
+    }
+
+    if (defined $ENV{HOME}) {
+        push @dirs, "$ENV{HOME}/.node_modules";
+        push @dirs, "$ENV{HOME}/.node_libraries";
+    }
+
+    if (defined $ENV{PREFIX}) {
+        push @dirs, "$ENV{PREFIX}/lib/node";
+    }
+
+    #use DD; dd \@dirs;
+
+    my @res;
+    for my $d (@dirs) {
+        next unless -d $d;
+        if (defined $ext) {
+            my $p = "$d/$name$ext";
+            if (-f $p) {
+                push @res, $p;
+                last unless $opts->{all};
+            }
+        } else {
+            my $p;
+            for my $e (".js", ".json", ".node") {
+                $p = "$d/$name$e";
+                if (-f $p) {
+                    push @res, $p;
+                    last unless $opts->{all};
+                }
+            }
+            $p = "$d/$name";
+            if (-d $p) {
+                if (-f "$p/index.js") {
+                    push @res, "$p/index.js";
+                    last unless $opts->{all};
+                } elsif (-f "$p/package.json") {
+                    push @res, "$p/package.json";
+                    last unless $opts->{all};
+                }
+            }
+        }
+    }
+
+    if ($opts->{all}) {
+        return \@res;
+    } else {
+        return $res[0];
+    }
+}
+
 1;
 # ABSTRACT: Utilities related to Node.js
 
@@ -199,43 +283,24 @@ Nodejs::Util - Utilities related to Node.js
 
 =head1 VERSION
 
-This document describes version 0.006 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2016-07-03.
+This document describes version 0.009 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2018-01-07.
+
+=for Pod::Coverage ^(get_nodejs_path)$
 
 =head1 FUNCTIONS
 
 
-=head2 get_nodejs_path(%args) -> any
+=head2 nodejs_available
 
-Check the availability of Node.js executable in PATH.
+Usage:
 
-Return the path to executable or undef if none is available. Node.js is usually
-installed as 'node' or 'nodejs'.
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<all> => I<bool>
-
-Find all node.js instead of the first found.
-
-If this option is set to true, will return an array of paths intead of path.
-
-=back
-
-Return value:  (any)
-
-
-=head2 nodejs_available(%args) -> [status, msg, result, meta]
+ nodejs_available(%args) -> [status, msg, result, meta]
 
 Check the availability of Node.js.
 
-This is a more advanced alternative to C<get_nodejs_path()>. Will check for
-C<node> or C<nodejs> in the PATH, like C<get_nodejs_path()>. But you can also
-specify minimum version (and other options in the future). And it will return
-more details.
+This is a more advanced alternative to C<nodejs_path()>. Will check for C<node> or
+C<nodejs> in the PATH, like C<nodejs_path()>. But you can also specify minimum
+version (and other options in the future). And it will return more details.
 
 Will return status 200 if everything is okay. Actual result will return the path
 to executable, and result metadata will contain extra result like detected
@@ -275,7 +340,39 @@ that contains extra information.
 
 Return value:  (any)
 
-=head2 system_nodejs([ \%opts ], @argv)
+
+=head2 nodejs_path
+
+Usage:
+
+ nodejs_path(%args) -> any
+
+Check the availability of Node.js executable in PATH.
+
+Return the path to executable or undef if none is available. Node.js is usually
+installed as 'node' or 'nodejs'.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<all> => I<bool>
+
+Find all node.js instead of the first found.
+
+If this option is set to true, will return an array of paths intead of path.
+
+=back
+
+Return value:  (any)
+
+=head2 system_nodejs
+
+Usage:
+
+ system_nodejs([ \%opts ], @argv)
 
 Will call L<IPC::System::Options>'s system(), but with node.js binary as the
 first argument. Known options:
@@ -296,6 +393,37 @@ Will be passed to C<nodejs_available()>.
 =back
 
 Other options will be passed to C<IPC::System::Options>'s C<system()>.
+
+=head2 nodejs_module_path
+
+Usage:
+
+ nodejs_module_path([ \%opts, ] $module)
+
+Search module in filesystem according to Node.js rule described in
+L<https://nodejs.org/api/modules.html>. C<$module> can be either a
+relative/absolute path (e.g. C<./bip39.js>, C<../bip39.js>, or
+C</home/foo/bip39.js>), a filename (e.g. C<bip39.js>), or a filename with the
+C<.js> removed (e.g. C<bip39>).
+
+Known options:
+
+=over
+
+=item * parse_package_json => bool (default: 0)
+
+Not yet implemented.
+
+=item * cwd => str
+
+Use this directory instead of using C<Cwd::get_cwd()>.
+
+=item * all => bool
+
+If set to true, will return an array of all found paths instead of the first
+found path.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -319,7 +447,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

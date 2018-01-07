@@ -1,12 +1,14 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::MenuBar;
 # ABSTRACT: Role for menu bar
-$Renard::Curie::Component::MainWindow::Role::MenuBar::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::Role::MenuBar::VERSION = '0.004';
 use Moo::Role;
 
 use Renard::Curie::Component::MenuBar;
 use Renard::Curie::Component::FileChooser;
-use Renard::Incunabula::Common::Types qw(InstanceOf DocumentModel);
+use Renard::Incunabula::Common::Types qw(InstanceOf);
+use Renard::Incunabula::Document::Types qw(DocumentModel);
+use Renard::Curie::Component::DocumentPropertiesWindow;
 
 use Glib 'TRUE', 'FALSE';
 
@@ -43,6 +45,12 @@ callback on_open_file_dialog_cb( $event, $self ) {
 	}
 }
 
+callback on_document_properties_dialog_cb( $event, $self ) {
+	Renard::Curie::Component::DocumentPropertiesWindow->new(
+		document => $self->view_manager->current_document
+	)->show_all;
+}
+
 
 1;
 
@@ -58,7 +66,7 @@ Renard::Curie::Component::MainWindow::Role::MenuBar - Role for menu bar
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 
@@ -73,6 +81,13 @@ A L<Renard::Curie::Component::MenuBar> for the application's menu-bar.
   callback on_open_file_dialog_cb( $event, $self )
 
 Callback that opens a L<Renard::Curie::Component::FileChooser> component.
+
+=head2 on_document_properties_dialog_cb
+
+  callback on_document_properties_dialog_cb( $event, $self )
+
+Callback that opens a L<Renard::Curie::Component::DocumentPropertiesWindow>
+component for the current document.
 
 =head1 AUTHOR
 

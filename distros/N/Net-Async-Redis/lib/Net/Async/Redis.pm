@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 =head1 NAME
 
@@ -187,10 +187,9 @@ sub multi {
 around [qw(discard exec)] => sub {
     my ($code, $self, @args) = @_;
     local $self->{_is_multi} = 1;
-    $self->$code
-        ->on_ready(sub {
-             (shift @{$self->{pending_multi}})->done;
-        })
+    my $f = $self->$code(@args);
+    (shift @{$self->{pending_multi}})->done;
+    $f
 };
 
 =head1 METHODS - Generic

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::CreateVolumePermission;
+$Net::Amazon::EC2::CreateVolumePermission::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

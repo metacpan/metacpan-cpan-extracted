@@ -5,14 +5,18 @@ use warnings;
 
 use Mojo::Base -base;
 use Cpanel::JSON::XS;
-use JSON::Validator;
 use String::Random;
 use DateTime;
 use Hash::Merge qw/ merge /;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
-has _validator  => sub { JSON::Validator->new };
+has _validator  => sub {
+	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
+	require JSON::Validator;
+	JSON::Validator->new
+};
+
 has _str_rand   => sub { String::Random->new };
 has _depth      => sub { 0 };
 
@@ -34,8 +38,10 @@ sub json_schema_to_json {
 
 	$self->example_key( $args{example_key} ) if $args{example_key};
 
-	$self->_validator->schema( $schema );
-	$schema = $self->_validator->schema->data;
+	$schema = $self->_validator->bundle({
+		replace => 1,
+		schema  => $schema,
+	});
 
 	$self->_depth( $self->_depth + 1 );
 	my ( $method,$sub_schema ) = $self->_guess_method( $schema );
@@ -183,7 +189,7 @@ sub _random_array {
 			|| ( $schema->{minItems} ? $schema->{minItems} + 1 : 5 )
 	});
 
-	if ( $self->_depth >= $self->max_depth ) {
+	if ( $self->max_depth && $self->_depth >= $self->max_depth ) {
 		warn __PACKAGE__
 			. " hit max depth (@{[ $self->max_depth ]}) in _random_array";
 		return [ 1 .. $length ];
@@ -200,7 +206,7 @@ sub _random_array {
 		if ( ref( $items ) eq 'ARRAY' ) {
 
 			ADD_ITEM: foreach my $item ( @{ $items } ) {
-				last ADD_ITEM if ( $self->_depth >= $self->max_depth );
+				last ADD_ITEM if ( $self->max_depth && $self->_depth >= $self->max_depth );
 				$self->_add_next_array_item( \@return_items,$item,$unique )
 					|| redo ADD_ITEM; # possible halting problem
 			}
@@ -208,7 +214,7 @@ sub _random_array {
 		} else {
 
 			ADD_ITEM: foreach my $i ( 1 .. $length ) {
-				last ADD_ITEM if ( $self->_depth >= $self->max_depth );
+				last ADD_ITEM if ( $self->max_depth && $self->_depth >= $self->max_depth );
 				$self->_add_next_array_item( \@return_items,$items,$unique )
 					|| redo ADD_ITEM; # possible halting problem
 			}
@@ -226,7 +232,7 @@ sub _random_array {
 sub _add_next_array_item {
 	my ( $self,$array,$schema,$unique ) = @_;
 
-	if ( $self->_depth >= $self->max_depth ) {
+	if ( $self->max_depth && $self->_depth >= $self->max_depth ) {
 		warn __PACKAGE__
 			. " hit max depth (@{[ $self->max_depth ]}) in _add_next_array_item";
 		push( @{ $array },undef );
@@ -310,7 +316,7 @@ sub _random_object {
 		}
 	}
 
-	if ( $self->_depth >= $self->max_depth ) {
+	if ( $self->max_depth && $self->_depth >= $self->max_depth ) {
 		warn __PACKAGE__
 			. " hit max depth (@{[ $self->max_depth ]}) in _random_object";
 		return {};
@@ -322,7 +328,7 @@ sub _random_object {
 
 		$self->_depth( $self->_depth + 1 );
 
-		last PROPERTY if ( $self->_depth >= $self->max_depth );
+		last PROPERTY if ( $self->max_depth && $self->_depth >= $self->max_depth );
 
 		my ( $method,$sub_schema )
 			= $self->_guess_method( $schema->{properties}{$property} );
@@ -405,8 +411,12 @@ sub _guess_method {
 		warn __PACKAGE__ . " encountered not, see CAVEATS perldoc section";
 	}
 
-	# danger danger! accessing private method from elsewhere
-	my $schema_type = JSON::Validator::_guess_schema_type( $schema );
+	# danger danger! accessing private method from elsewhere. note enum was
+	# removed from _guess_data_type in JSON::Validator
+	# f290618f621a36db8f5010f8b99a42170dac820a so need to check for it here
+	my $schema_type = $schema->{enum}
+		? 'enum'
+		: JSON::Validator::_guess_schema_type( $schema );
 
 	$schema_type //= 'null';
 
@@ -427,7 +437,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.11
+0.13
 
 =head1 SYNOPSIS
 

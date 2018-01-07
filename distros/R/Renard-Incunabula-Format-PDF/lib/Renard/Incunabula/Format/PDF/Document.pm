@@ -1,12 +1,12 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Format::PDF::Document;
 # ABSTRACT: document that represents a PDF file
-$Renard::Incunabula::Format::PDF::Document::VERSION = '0.003';
+$Renard::Incunabula::Format::PDF::Document::VERSION = '0.004';
 use Moo;
 use Renard::Incunabula::MuPDF::mutool;
 use Renard::Incunabula::Format::PDF::Page;
 use Renard::Incunabula::Outline;
-use Renard::Incunabula::Common::Types qw(PageNumber ZoomLevel);
+use Renard::Incunabula::Document::Types qw(PageNumber ZoomLevel);
 
 use Math::Trig;
 use Math::Polygon;
@@ -117,7 +117,7 @@ Renard::Incunabula::Format::PDF::Document - document that represents a PDF file
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

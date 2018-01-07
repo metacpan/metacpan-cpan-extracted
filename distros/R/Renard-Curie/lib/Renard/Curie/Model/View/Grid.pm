@@ -1,10 +1,11 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Grid;
 # ABSTRACT: A view model for grid-based views
-$Renard::Curie::Model::View::Grid::VERSION = '0.003';
+$Renard::Curie::Model::View::Grid::VERSION = '0.004';
 use Moo;
 
-use Renard::Incunabula::Common::Types qw(InstanceOf ArrayRef SizeRequest);
+use Renard::Incunabula::Common::Types qw(InstanceOf ArrayRef);
+use Renard::Incunabula::Frontend::Gtk3::Types qw(SizeRequest);
 use POSIX qw(ceil);
 use List::AllUtils qw(part first);
 use Glib qw(TRUE FALSE);
@@ -268,7 +269,7 @@ Renard::Curie::Model::View::Grid - A view model for grid-based views
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

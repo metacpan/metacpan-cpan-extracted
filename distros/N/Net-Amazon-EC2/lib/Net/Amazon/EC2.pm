@@ -1,8 +1,8 @@
 package Net::Amazon::EC2;
+$Net::Amazon::EC2::VERSION = '0.35';
 use Moose;
 
 use strict;
-use vars qw($VERSION);
 
 use XML::Simple;
 use LWP::UserAgent;
@@ -70,16 +70,12 @@ use Net::Amazon::EC2::InstanceStatuses;
 use Net::Amazon::EC2::SystemStatus;
 use Net::Amazon::EC2::NetworkInterfaceSet;
 
-$VERSION = '0.33';
-
 =head1 NAME
 
 Net::Amazon::EC2 - Perl interface to the Amazon Elastic Compute Cloud (EC2)
 environment.
 
 =head1 VERSION
-
-This is Net::Amazon::EC2 version 0.32
 
 EC2 Query API version: '2014-06-15'
 
@@ -198,9 +194,8 @@ has 'SecretAccessKey' => (
 );
 has 'SecurityToken' => ( 
 	is => 'ro',
-	isa => 'Str',
+	isa => 'Maybe[Str]',
 	required => 0,
-	lazy => 1,
 	predicate => 'has_SecurityToken',
 	default => sub {
 		if (defined($_[0]->temp_creds)) {
@@ -227,7 +222,6 @@ has 'base_url'          => (
 );
 has 'temp_creds' => (
 	is      => 'ro',
-	lazy    => 1,
 	default => sub {
 		my $ret;
 		$ret = $_[0]->_fetch_iam_security_credentials();
@@ -345,13 +339,24 @@ sub _sign_v4 {
 	my @now              = gmtime();
 	my $amz_date         = strftime("%Y%m%dT%H%M%SZ", @now);
 	my $datestamp        = strftime("%Y%m%d", @now);
-	my $credential_scope = $datestamp . "/" . $self->region . "/" . $service . "/aws4_request"; 
+	my $credential_scope = $datestamp . "/" . $self->region . "/" . $service . "/aws4_request";
 	my $content_type     = "application/x-www-form-urlencoded";
 	my $signed_headers   = "content-type;host;x-amz-date";
-	# Assemble the content
+
+	# Step 1: create canonical request string
+	my $uri = URI->new($self->base_url);
+	my $canonical_headers = "content-type:" . $content_type . "\n" .
+				"host:" . lc($uri->host) . "\n" .
+				"x-amz-date:" . $amz_date . "\n";
 	$args{Version}       = $self->version;
-	if ($self->has_temp_creds || $self->has_SecurityToken) {
+	if ($self->SecurityToken) {
+		# If we have a security token from an IAM role, passed
+		# as instance metadata, it needs to be included in
+		# the list of canonical headers and passed with the
+		# request
 		$args{'X-Amz-Security-Token'} = $self->SecurityToken;
+		$canonical_headers .= "x-amz-security-token:". $self->SecurityToken . "\n";
+		$signed_headers .= ";x-amz-security-token";
 	}
 	my @content_elements;
 	foreach my $key (sort keys %args) {
@@ -361,11 +366,6 @@ sub _sign_v4 {
 
 	$self->_debug("CONTENT: $content");
 
-	# Step 1: create canonical request string
-	my $uri = URI->new($self->base_url);
-	my $canonical_headers = "content-type:" . $content_type . "\n" .
-				"host:" . lc($uri->host) . "\n" .
-				"x-amz-date:" . $amz_date . "\n";
 
 	my $canonical_request = "POST\n";			# method
 	$canonical_request .= "/\n";				# uri
@@ -398,12 +398,13 @@ sub _sign_v4 {
 				', Signature=' . $signature;
 
 
-	my $req = HTTP::Request->new('POST', $uri,
-			[ "Authorization" => $auth_header,
-			"Content-Type"  => $content_type,
-			"X-Amz-Date"    => $amz_date ] , 
-			$content
-	);
+	my $hdrs = [ "Authorization" => $auth_header,
+		     "Content-Type"  => $content_type,
+		     "X-Amz-Date" => $amz_date ];
+
+	push @{ $hdrs }, "X-Amz-Security-Token" => $self->SecurityToken if $self->SecurityToken;
+
+	my $req = HTTP::Request->new('POST', $uri, $hdrs, $content);
 	$self->_debug("HTTP REQUEST: " . $req->as_string() . "\n");
 
 	my $ua = LWP::UserAgent->new();
@@ -4329,7 +4330,7 @@ Up to 2 EC2 Compute Units (for short periodic bursts), 32-bit or 64-bit, 613MB R
 
 =item c1.medium: High-CPU Medium Instance
 
-5 EC2 Compute Units (2 virutal cores with 2.5 EC2 Compute Units each). 32-bit or 64-bit, 1.7GB RAM, 350GB disk
+5 EC2 Compute Units (2 virtual cores with 2.5 EC2 Compute Units each). 32-bit or 64-bit, 1.7GB RAM, 350GB disk
 
 =item c1.xlarge: High-CPU Extra Large Instance
 

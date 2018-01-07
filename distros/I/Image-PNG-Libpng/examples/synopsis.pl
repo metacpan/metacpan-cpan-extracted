@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Image::PNG::Libpng ':all';
 my $png = create_read_struct ();
-open my $file, '<:raw', 'nice.png';
+open my $file, '<:raw', 'nice.png' or die $!;
 $png->init_io ($file);
 $png->read_png ();
 close $file;

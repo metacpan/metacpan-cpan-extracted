@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 8;
+use Test::Most tests => 9;
 
 use lib 't/lib';
 use CurieTestHelper;
+use Renard::Incunabula::Devel::TestHelper;
 
 use Renard::Incunabula::Common::Setup;
 use Renard::Incunabula::Frontend::Gtk3::Helper;
@@ -34,7 +35,7 @@ subtest 'Check that the menu item File -> Open exists' => sub {
 
 subtest "Menu: File -> Open" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -70,6 +71,33 @@ subtest "Menu: File -> Open" => sub {
 	};
 };
 
+subtest "Menu: File -> Properties" => sub {
+	my $pdf_ref_path = try {
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+	} catch {
+		plan skip_all => "$_";
+	};
+
+	my $fc = Test::MockModule->new('Renard::Curie::Component::DocumentPropertiesWindow', no_auto => 1);
+	my $window_show = 0;
+	my $path;
+	$fc->mock( show_all => sub {
+		my ($self) = @_;
+		$window_show = 1;
+		$path = $self->_pdf_information_dictionary->filename;
+
+	} );
+
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
+	$c->view_manager->open_pdf_document( $pdf_ref_path );
+
+	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
+		'on_menu_file_properties_activate_cb', undef );
+	ok( $window_show, "Callback opened the document properties window");
+	is( $path, $pdf_ref_path, "Opened properties of the same file");
+};
+
 subtest "Menu: File -> Quit" => sub {
 	plan tests => 2;
 	my $c = CurieTestHelper->get_app_container;
@@ -89,7 +117,7 @@ subtest "Menu: File -> Quit" => sub {
 
 subtest "Menu: File -> Recent files" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -115,7 +143,7 @@ subtest "Menu: File -> Recent files" => sub {
 
 subtest "Menu: View -> Continuous" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -152,7 +180,7 @@ subtest "Menu: View -> Continuous" => sub {
 
 subtest "Menu: View -> Zoom" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};

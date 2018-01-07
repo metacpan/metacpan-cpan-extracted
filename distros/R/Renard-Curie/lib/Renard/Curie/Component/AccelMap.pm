@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::AccelMap;
 # ABSTRACT: Set up the accelerator map (global keybindings)
-$Renard::Curie::Component::AccelMap::VERSION = '0.003';
+$Renard::Curie::Component::AccelMap::VERSION = '0.004';
 use Moo;
 use Renard::Incunabula::Frontend::Gtk3::Helper;
 
@@ -39,7 +39,7 @@ Renard::Curie::Component::AccelMap - Set up the accelerator map (global keybindi
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

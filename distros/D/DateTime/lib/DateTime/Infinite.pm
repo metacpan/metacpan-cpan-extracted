@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 use DateTime;
 use DateTime::TimeZone;
@@ -67,6 +67,8 @@ sub _infinity_string {
         ? DateTime::INFINITY . q{}
         : DateTime::NEG_INFINITY . q{};
 }
+
+sub _week_values { [ $_[0]->{utc_rd_days}, $_[0]->{utc_rd_days} ] }
 
 sub STORABLE_freeze {return}
 sub STORABLE_thaw   {return}
@@ -212,7 +214,7 @@ DateTime::Infinite - Infinite past and future DateTime objects
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 

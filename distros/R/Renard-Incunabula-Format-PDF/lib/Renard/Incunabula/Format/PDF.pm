@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Format::PDF;
 # ABSTRACT: Provides a Document and Page for PDF files.
-$Renard::Incunabula::Format::PDF::VERSION = '0.003';
+$Renard::Incunabula::Format::PDF::VERSION = '0.004';
 1;
 
 __END__
@@ -16,7 +16,7 @@ Renard::Incunabula::Format::PDF - Provides a Document and Page for PDF files.
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SEE ALSO
 

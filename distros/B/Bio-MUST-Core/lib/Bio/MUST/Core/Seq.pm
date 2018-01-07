@@ -2,7 +2,7 @@ package Bio::MUST::Core::Seq;
 # ABSTRACT: Nucleotide or protein sequence
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Seq::VERSION = '0.173500';
+$Bio::MUST::Core::Seq::VERSION = '0.173620';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -16,7 +16,6 @@ use Carp;
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:seqtypes :gaps);
-use aliased 'Bio::MUST::Core::Seq';         # TODO: fix this weird stuff
 
 has 'seq_id' => (
     is       => 'rw',
@@ -49,7 +48,7 @@ has 'seq' => (
 sub clone {
     my $self = shift;
 
-    return Seq->new(
+    return $self->new(
         seq_id => $self->full_id, seq => $self->seq
     );
 }
@@ -85,7 +84,8 @@ sub is_subseq_of {
     my $seq2 = shift;                       # can be a mere string
 
     $self = $self->raw_seq;
-    $seq2 = $seq2->isa(Seq) ? $seq2->raw_seq : _strip_gaps($seq2);
+    $seq2 = $seq2->isa('Bio::MUST::Core::Seq')
+        ? $seq2->raw_seq : _strip_gaps($seq2);
     return 1 if $seq2 =~ m/$self/xmsi;      # case-insensitive comparison
     return 0;                               # only here because expensive!
 }
@@ -96,7 +96,8 @@ sub is_superseq_of {
     my $seq2 = shift;                       # can be a mere string
 
     $self = $self->raw_seq;
-    $seq2 = $seq2->isa(Seq) ? $seq2->raw_seq : _strip_gaps($seq2);
+    $seq2 = $seq2->isa('Bio::MUST::Core::Seq')
+        ? $seq2->raw_seq : _strip_gaps($seq2);
     return 1 if $self =~ m/$seq2/xmsi;      # case-insensitive comparison
     return 0;                               # only here because expensive!
 }
@@ -268,7 +269,7 @@ sub reverse_complemented_seq {
     $new_seq =~ tr/ATUGCYRSWKMBDHVN/TAACGRYSWMKVHDBN/;
     $new_seq =~ tr/atugcyrswkmbdhvn/taacgryswmkvhdbn/;
 
-    return Seq->new( seq_id => $self->full_id, seq => $new_seq );
+    return $self->new( seq_id => $self->full_id, seq => $new_seq );
 }
 
 
@@ -283,7 +284,7 @@ sub spliced_seq {
         $new_seq .= substr $seq, $start - 1, $end - $start + 1;
     }
 
-    return Seq->new( seq_id => $self->full_id, seq => $new_seq );
+    return $self->new( seq_id => $self->full_id, seq => $new_seq );
 }
 
 
@@ -347,7 +348,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

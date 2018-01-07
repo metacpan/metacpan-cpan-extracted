@@ -14,9 +14,7 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   Alien::Build::Plugin::Build::Autoconf
-  Config
   ExtUtils::MakeMaker
-  IPC::Cmd
   Test2::V0
   Test::Alien
   Test::More

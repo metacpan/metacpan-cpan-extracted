@@ -1,39 +1,67 @@
 Revision history for DBIx-NoSQL-Store-Manager
 
-0.2.2 2013-01-30
- [BUG FIXES]
- - Bump DBIx::NoSQL requirement to 0.0020.
+1.0.0 2018-01-05
+  [ API CHANGES ]
+    - 'create()' now saves the new object in the store	      upon
+      creation.
 
- [STATISTICS]
- - code churn: 3 files changed, 12 insertions(+), 4 deletions(-)
+  [ BUG FIXES ]
+    - multi-field keys are now always joined in the same order.
+
+  [ IMPROVEMENTS ]
+    - added StoreModel trait, to have attributes that are themselves store
+      objects.
+    - $store->set($object) figures out which model to use based on the
+      object's class.
+
+  [ MISC ]
+    - Remove dependency to Method::Signatures; use core signatures instead.
+      (GH#6)
+    - documentation fixes.
+
+  [ STATISTICS ]
+    - code churn: 16 files changed, 703 insertions(+), 46 deletions(-)
+
+0.2.2 2013-01-30
+  [ API CHANGES ]
+
+  [ BUG FIXES ]
+    - Bump DBIx::NoSQL requirement to 0.0020.
+
+  [ DOCUMENTATION ]
+
+  [ ENHANCEMENTS ]
+
+  [ NEW FEATURES ]
+
+  [ STATISTICS ]
 
 0.2.1 2013-01-24
- [BUG FIXES]
- - ensure class names are db-friendly (replace '::' by '_')
- - fix calls to next()
- - Make the building of the store a bit more sane.
+  [ BUG FIXES ]
+    - ensure class names are db-friendly (replace '::' by '_')
+    - fix calls to next()
+    - Make the building of the store a bit more sane.
 
- [STATISTICS]
- - code churn: 6 files changed, 74 insertions(+), 32 deletions(-)
+  [ STATISTICS ]
+    - code churn: 6 files changed, 74 insertions(+), 32 deletions(-)
 
 0.2.0 2012-11-23
- [ENHANCEMENTS]
- - method 'create' as a shorter alias to 'new_model_object'
- - search() functionality now work
+  [ ENHANCEMENTS ]
+    - method 'create' as a shorter alias to 'new_model_object'
+    - search() functionality now work
 
- [STATISTICS]
- - code churn: 8 files changed, 39 insertions(+), 17 deletions(-)
+  [ STATISTICS ]
+    - code churn: 8 files changed, 39 insertions(+), 17 deletions(-)
 
 0.1.1 2012-09-30
- [BUG FIXES]
- - Explicitly require perl 5.10.0
+  [ BUG FIXES ]
+    - Explicitly require perl 5.10.0
 
- [STATISTICS]
- - code churn: 2 files changed, 16 insertions(+)
+  [ STATISTICS ]
+    - code churn: 2 files changed, 16 insertions(+)
 
 0.1.0 2012-09-21
- - First version, unleashed on an unsuspecting world.
+  - First version, unleashed on an unsuspecting world.
 
- [STATISTICS]
- - code churn: 3 files changed, 6 insertions(+), 3 deletions(-)
-
+  [ STATISTICS ]
+    - code churn: 3 files changed, 6 insertions(+), 3 deletions(-)

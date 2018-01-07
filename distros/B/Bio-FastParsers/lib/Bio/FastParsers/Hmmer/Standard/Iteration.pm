@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Iteration;
 # ABSTRACT: front-end class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Iteration::VERSION = '0.173510';
+$Bio::FastParsers::Hmmer::Standard::Iteration::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -92,7 +92,7 @@ around BUILDARGS => sub {
             @fields[0..7] = map { 0 + $_      } @fields[0..7];
 
             # fixing description
-            $fields[9] = join ' ', @fields[9..$#fields];
+            $fields[9] = join q{ }, @fields[9..$#fields];
             # set missing/empty field values to undef
             @fields[8..9] = map { $_ || undef } @fields[8..9];
 
@@ -105,7 +105,7 @@ around BUILDARGS => sub {
     }
 
     # split Targets (Hits)
-    my @target_indexes = indexes { $_ =~ m/^\>\>/xms } @lines;
+    my @target_indexes = indexes { m/^\>\>/xms } @lines;
     my @targets;
     for (my $i = 0; $i < @target_indexes; $i++) {
         my @block = defined $target_indexes[$i+1]
@@ -152,7 +152,7 @@ Bio::FastParsers::Hmmer::Standard::Iteration - front-end class for standard HMME
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

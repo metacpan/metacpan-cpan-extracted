@@ -1,11 +1,5 @@
-use 5.014;
-use strict;
-use warnings;
-use Test::More;
-use Test::Exception;
-use Test::Deep;
-use JSON::MaybeXS;
-use Data::Dumper;
+use lib 't/lib';
+use GQLTest;
 
 my $JSON = JSON::MaybeXS->new->allow_nonref;
 
@@ -17,19 +11,6 @@ BEGIN {
   use_ok( 'GraphQL::Type::Enum' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Introspection', '$QUERY' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
-}
-
-sub run_test {
-  my ($args, $expected) = @_;
-  my $got = execute(@$args);
-  is_deeply $got, $expected or diag nice_dump($got);
-}
-
-sub nice_dump {
-  my ($got) = @_;
-  local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
-  $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
-  Dumper $got;
 }
 
 subtest 'executes an introspection query', sub {
@@ -106,9 +87,7 @@ fragment TypeRef on __Type {
   }
 }
 EOQ
-
-  my $got = execute($schema, $request);
-  cmp_deeply $got, {
+  run_test([$schema, $request], {
     data => {
       __schema => {
         types => supersetof(
@@ -152,7 +131,7 @@ EOQ
         )
       }
     }
-  } or diag nice_dump($got);
+  });
 };
 
 subtest 'supports the __type root field'=> sub {
@@ -415,15 +394,13 @@ subtest 'fails as expected on the __type root field without an arg'=> sub {
   }
 }
 EOQ
-
-  my $got = execute($schema, $request);
-  cmp_deeply $got, {
+  run_test([$schema, $request], {
     data => { __type => undef },
     errors => [noclass(superhashof({
       message => 'Argument \'name\' of type \'String!\' not given.',
       locations => [{ line => 5, column => 1 }],
     }))]
-  } or diag nice_dump($got);
+  });
 };
 
 subtest 'exposes descriptions on types and fields'=> sub {
@@ -448,8 +425,7 @@ subtest 'exposes descriptions on types and fields'=> sub {
 }
 EOQ
 
-  my $got = execute($schema, $request);
-  cmp_deeply $got, {
+  run_test([$schema, $request], {
     data => {
       schemaType => {
         name => '__Schema',
@@ -478,7 +454,7 @@ EOQ
         )
       }
     }
-  } or diag nice_dump($got);
+  });
 };
 
 subtest 'exposes descriptions on enums'=> sub {
@@ -503,8 +479,7 @@ subtest 'exposes descriptions on enums'=> sub {
 }
 EOQ
 
-  my $got = execute($schema, $request);
-  cmp_deeply $got, {
+  run_test([$schema, $request], {
     data => {
       typeKindType => {
         name => '__TypeKind',
@@ -545,7 +520,7 @@ EOQ
         )
       }
     }
-  } or diag nice_dump($got);
+  });
 };
 
 done_testing;

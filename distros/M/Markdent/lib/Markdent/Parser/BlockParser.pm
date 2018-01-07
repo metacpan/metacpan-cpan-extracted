@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Digest::SHA1 qw( sha1_hex );
 use Encode qw( encode );
@@ -434,7 +434,7 @@ sub _match_blockquote {
         $self->_split_chunks_on_regex(
             $bq, qr/^>(?: \p{SpaceSeparator} | \t )*\S/xm
         )
-        ) {
+    ) {
 
         $self->_parse_text( \$chunk );
     }
@@ -809,7 +809,7 @@ Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 DESCRIPTION
 

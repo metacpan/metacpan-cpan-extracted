@@ -113,7 +113,10 @@ sub _refresh_access_token {
   my $res        = $user_agent->request($request);
 
   if (!$res->is_success()) {
-    warn($res->decoded_content());
+    my $err_msg = $res->decoded_content();
+    $self->get_api_client()->get_die_on_faults()
+      ? die($err_msg)
+      : warn($err_msg);
     return 0;
   }
 
@@ -173,12 +176,6 @@ sub _scope {
 sub _formatted_scopes {
   my $self = shift;
   die "Need to be implemented by subclass";
-}
-
-sub _throw_error {
-  my ($self, $err_msg) = @_;
-
-  $self->get_api_client()->get_die_on_faults() ? die($err_msg) : warn($err_msg);
 }
 
 1;

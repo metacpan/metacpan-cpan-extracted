@@ -33,7 +33,7 @@ is( ref $Parser, 'Mail::AuthenticationResults::Parser', 'Returns Parser Object' 
 my $Header;
 lives_ok( sub{ $Header = $Parser->parsed() }, 'Parser returns data' );
 is( ref $Header, 'Mail::AuthenticationResults::Header', 'Returns Header Object' );
-is( $Header->value(), 'test.example.com', 'Authserve Id correct' );
+is( $Header->value()->value(), 'test.example.com', 'Authserve Id correct' );
 is( $Header->as_string(), join( ";\n", 'test.example.com', @$Input ), 'As String data matches input data' );
 
 my $Search;

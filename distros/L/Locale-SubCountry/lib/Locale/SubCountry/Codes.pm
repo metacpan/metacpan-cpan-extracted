@@ -18,8 +18,10 @@ l<https://pkg-isocodes.alioth.debian.org/>
 =cut
 #------------------------------------------------------------------------------
 use utf8;
+use strict;
+use warnings;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 package Locale::SubCountry::Codes;
 
 $Locale::SubCountry::Codes::JSON =

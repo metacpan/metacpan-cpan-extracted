@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
-# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.ulg.ac.be>
+# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
 use Moose;
 use namespace::autoclean;

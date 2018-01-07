@@ -2,8 +2,10 @@ package File::Path::Tiny;
 
 use strict;
 use warnings;
+use Cwd qw(cwd chdir);
+use Carp ();
 
-$File::Path::Tiny::VERSION = 0.8;
+$File::Path::Tiny::VERSION = 0.9;
 
 sub mk {
     my ( $path, $mask ) = @_;
@@ -30,30 +32,56 @@ sub mk {
 }
 
 sub rm {
-    my ($path) = @_;
-    if ( -e $path && !-d $path ) { $! = 20; return; }
-    return 2 if !-d $path;
-    empty_dir($path) or return;
+    my ( $path, $fast ) = @_;
+    my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
+    if ( -e _ && !-d _ ) { $! = 20; return; }
+    return 2 if !-d _;
+
+    empty_dir( $path, $fast ) or return;
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
     rmdir($path) or !-e $path or return;
     return 1;
 }
 
 sub empty_dir {
-    my ($path) = @_;
-    if ( -e $path && !-d $path ) { $! = 20; return; }
+    my ( $path, $fast ) = @_;
+    my ( $orig_dev, $orig_ino ) = ( lstat $path )[ 0, 1 ];
+    if ( -e _ && !-d _ ) { $! = 20; return; }
+
+    my ( $starting_point, $starting_dev, $starting_ino );
+    if ( !$fast ) {
+        $starting_point = cwd();
+        ( $starting_dev, $starting_ino ) = ( lstat $starting_point )[ 0, 1 ];
+        chdir($path) or Carp::croak("Failed to change directory to “$path”: $!");
+        $path = '.';
+        _bail_if_changed( $path, $orig_dev, $orig_ino );
+    }
+
     opendir( DIR, $path ) or return;
     my @contents = grep { $_ ne '.' && $_ ne '..' } readdir(DIR);
     closedir DIR;
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
+
     require File::Spec if @contents;
     for my $thing (@contents) {
         my $long = File::Spec->catdir( $path, $thing );
-        if ( !-l $long && -d $long ) {
+        if ( !-l $long && -d _ ) {
+            _bail_if_changed( $path, $orig_dev, $orig_ino );
             rm($long) or !-e $long or return;
         }
         else {
+            _bail_if_changed( $path, $orig_dev, $orig_ino );
             unlink $long or !-e $long or return;
         }
     }
+
+    _bail_if_changed( $path, $orig_dev, $orig_ino );
+
+    if ( !$fast ) {
+        chdir($starting_point) or Carp::croak("Failed to change directory to “$starting_point”: $!");
+        _bail_if_changed( ".", $starting_dev, $starting_ino );
+    }
+
     return 1;
 }
 
@@ -71,6 +99,25 @@ sub mk_parent {
 
     my $parent = File::Spec->catpath( $v, $d, $f );
     return mk( $parent, $mode );
+}
+
+sub _bail_if_changed {
+    my ( $path, $orig_dev, $orig_ino ) = @_;
+
+    my ( $cur_dev, $cur_ino ) = ( lstat $path )[ 0, 1 ];
+
+    if ( !defined $cur_dev || !defined $cur_ino ) {
+        $cur_dev ||= "undef(path went away?)";
+        $cur_ino ||= "undef(path went away?)";
+    }
+    else {
+        $path = Cwd::abs_path($path);
+    }
+
+    if ( $orig_dev ne $cur_dev || $orig_ino ne $cur_ino ) {
+        local $Carp::CarpLevel += 1;
+        Carp::croak("directory $path changed: expected dev=$orig_dev ino=$orig_ino, actual dev=$cur_dev ino=$cur_ino, aborting");
+    }
 }
 
 1;

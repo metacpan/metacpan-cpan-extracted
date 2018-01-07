@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::RegisterResponse;
-$Authen::U2F::Tester::RegisterResponse::VERSION = '0.01';
+$Authen::U2F::Tester::RegisterResponse::VERSION = '0.02';
 # ABSTRACT: U2F Tester Registration Response
 
 use Moose;
@@ -34,7 +34,7 @@ Authen::U2F::Tester::RegisterResponse - U2F Tester Registration Response
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 /* -*- c -*-
   Copyright (C) 2009, Thomas Vander Stichele <thomas at apestaart dot org>
-  Copyright (C) 2012, Rocky Bernstein  rocky@cpan.org
+  Copyright (C) 2012, 2017 Rocky Bernstein  rocky@cpan.org
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -176,14 +176,43 @@ typedef int cdtext_genre_t;
 const char *cdtext_field2str (cdtext_field_t i);
 const char *cdtext_lang2str (cdtext_lang_t i);
 const char *cdtext_genre2str (cdtext_genre_t i);
+
+%inline %{
+typedef uint8_t cdtext_data_bytes_t[9220];
+%}
+
+%typemap(in) cdtext_data_bytes_t {
+  /* SVpv to uint8_t * */
+  cdtext_data_bytes_t wdata = {0,};
+  STRLEN len;
+  char *ptr;
+  ptr = SvPV($input, len);
+  memcpy(wdata, ptr, len);
+  $1=wdata;
+}
+
+
+%rename cdio_cdtext_init cdtext_init;
 cdtext_t *cdtext_init (void);
+
+int cdtext_data_init(cdtext_t *p_cdtext, cdtext_data_bytes_t wdata, size_t i_data);
+
 void cdtext_destroy (cdtext_t *p_cdtext);
 char *cdtext_get (const cdtext_t *p_cdtext, cdtext_field_t key, track_t track);
-const char *cdtext_get_const (const cdtext_t *p_cdtext, cdtext_field_t key, track_t track);
 cdtext_lang_t cdtext_get_language (const cdtext_t *p_cdtext);
+
+%rename cdio_cdtext_select_language cdtext_select_language;
 bool cdtext_select_language(cdtext_t *p_cdtext, cdtext_lang_t lang);
+
 cdtext_lang_t *cdtext_list_languages (const cdtext_t *p_cdtext);
 void cdtext_set (cdtext_t *p_cdtext, cdtext_field_t key, const uint8_t *value, track_t track, const char *charset);
 
-%rename cdio_get_cdtext get_cdtext;
 cdtext_t *cdio_get_cdtext (CdIo_t *p_cdio);
+
+%rename cdio_cdtext_get cdtext_get;
+char *cdio_cdtext_get (const cdtext_t *p_cdtext, cdtext_field_t key,
+			track_t track);
+
+%rename get_track_cdtext cdtext_get_const;
+const char *cdtext_get_const (const cdtext_t *p_cdtext, cdtext_field_t key,
+			     track_t track);

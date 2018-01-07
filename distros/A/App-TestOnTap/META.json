@@ -4,13 +4,13 @@
       "Kenneth Olwing <knth@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-TestOnTap",
    "no_index" : {
@@ -82,6 +82,6 @@
          "web" : "https://github.com/kenneth-olwing/App-TestOnTap"
       }
    },
-   "version" : "0.049",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.050",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,0 +1,69 @@
+---
+abstract: 'coincheck Perl libraries L<http://coincheck.jp/>'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::AllModules: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Coincheck
+provides:
+  WebService::Coincheck:
+    file: lib/WebService/Coincheck.pm
+    version: '0.02'
+  WebService::Coincheck::Account:
+    file: lib/WebService/Coincheck/Account.pm
+  WebService::Coincheck::BankAccount:
+    file: lib/WebService/Coincheck/BankAccount.pm
+  WebService::Coincheck::Borrow:
+    file: lib/WebService/Coincheck/Borrow.pm
+  WebService::Coincheck::Deposit:
+    file: lib/WebService/Coincheck/Deposit.pm
+  WebService::Coincheck::Leverage:
+    file: lib/WebService/Coincheck/Leverage.pm
+  WebService::Coincheck::Order:
+    file: lib/WebService/Coincheck/Order.pm
+  WebService::Coincheck::OrderBook:
+    file: lib/WebService/Coincheck/OrderBook.pm
+  WebService::Coincheck::Send:
+    file: lib/WebService/Coincheck/Send.pm
+  WebService::Coincheck::Ticker:
+    file: lib/WebService/Coincheck/Ticker.pm
+  WebService::Coincheck::Trade:
+    file: lib/WebService/Coincheck/Trade.pm
+  WebService::Coincheck::Transfer:
+    file: lib/WebService/Coincheck/Transfer.pm
+  WebService::Coincheck::Withdraw:
+    file: lib/WebService/Coincheck/Withdraw.pm
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Class::Load: '0'
+  Digest::SHA: '0'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  String::CamelCase: '0'
+  Time::HiRes: '0'
+  URI::Query: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC:
+    url: irc://chat.freenode.org/#bayadev
+    web: http://webchat.freenode.net/?channels=%23bayadev
+  bugtracker: http://github.com/bayashi/WebService-Coincheck/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/WebService-Coincheck
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

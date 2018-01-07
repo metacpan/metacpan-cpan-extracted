@@ -4,7 +4,7 @@ use Mojo::JSON qw/decode_json/;
 
 use Getopt::Long;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 # ABSTRACT: Pastes stuff to https://perl.bot/
 
@@ -36,7 +36,7 @@ sub display_channels {
   my $self = shift;
   my $tx = $self->ua->get( 'https://perl.bot/api/v1/channels');
  
-  unless ($tx->res->is_status_class(200)) {
+  unless ($tx->res->is_success) {
     say "Failed to get channels, try again later.";
     exit 1;
   }
@@ -55,7 +55,7 @@ sub display_languages {
   my $self = shift;
   my $tx = $self->ua->get( 'https://perl.bot/api/v1/languages');
  
-  unless ($tx->res->is_status_class(200)) {
+  unless ($tx->res->is_success) {
     say "Failed to get languages, try again later.";
   }
 
@@ -80,7 +80,7 @@ sub paste {
     description => $self->desc || '',
   });
  
-  unless ($tx->res->is_status_class(200)) {
+  unless ($tx->res->is_success) {
     say "Paste failed, try again later.";
     exit 1;
   }
@@ -98,5 +98,9 @@ Mojolicious::Command::nopaste::Service::perlbot - A Mojo-nopaste service for htt
 
 =head1 AUTHOR
 Ryan Voots L<simcop@cpan.org|mailto:SIMCOP@cpan.org>
+
+=head1 CONTRIBUTORS
+
+Dan Book 
 
 =cut

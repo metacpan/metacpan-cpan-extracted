@@ -1,51 +1,63 @@
 ---
 abstract: 'DBIx::NoSQL as a Moose object store '
 author:
-  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
-  Module::Build: 0.3601
-  Test::More: 0.88
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-NoSQL-Store-Manager
 provides:
   DBIx::NoSQL::Store::Manager:
     file: lib/DBIx/NoSQL/Store/Manager.pm
-    version: v0.2.2
+    version: v1.0.0
   DBIx::NoSQL::Store::Manager::Model:
     file: lib/DBIx/NoSQL/Store/Manager/Model.pm
-    version: v0.2.2
+    version: v1.0.0
   DBIx::NoSQL::Store::Manager::StoreIndex:
     file: lib/DBIx/NoSQL/Store/Manager/StoreIndex.pm
-    version: v0.2.2
+    version: v1.0.0
   DBIx::NoSQL::Store::Manager::StoreKey:
     file: lib/DBIx/NoSQL/Store/Manager/StoreKey.pm
-    version: v0.2.2
+    version: v1.0.0
+  DBIx::NoSQL::Store::Manager::StoreModel:
+    file: lib/DBIx/NoSQL/Store/Manager/StoreModel.pm
+    version: v1.0.0
 requires:
-  DBIx::NoSQL: 0.0020
-  Method::Signatures: 0
-  Module::Pluggable: 0
-  Moose: 0
-  Moose::Role: 0
-  Moose::Util::TypeConstraints: 0
-  MooseX::ClassAttribute: 0
-  MooseX::Storage: 0.31
-  perl: v5.10.0
-  strict: 0
-  warnings: 0
+  DBIx::NoSQL: '0.0020'
+  Log::Any: '0'
+  Module::Pluggable: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::SetOnce: '0'
+  MooseX::Storage: '0.31'
+  Scalar::Util: '0'
+  Types::Standard: '0'
+  experimental: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-NoSQL-Store-Manager
-  homepage: http://search.cpan.org/dist/DBIx-NoSQL-Store-Manager/
+  bugtracker: https://github.com/yanick/DBIx-NoSQL-Store-Manager/issues
+  homepage: https://github.com/yanick/DBIx-NoSQL-Store-Manager
   repository: https://github.com/yanick/DBIx-NoSQL-Store-Manager.git
-version: 0.2.2
+version: 1.0.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_serialization_backend: 'YAML::Tiny version 1.67'

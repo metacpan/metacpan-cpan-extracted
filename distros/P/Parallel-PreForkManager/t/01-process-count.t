@@ -22,7 +22,7 @@ my $Worker = Parallel::PreForkManager->new({
     'ChildCount'     => 10,
 });
 
-for ( my $i=0;$i<200;$i++ ) {
+for ( my $i=0;$i<40;$i++ ) {
     $Worker->AddJob({ 'Value' => $i });
 }
 
@@ -42,6 +42,9 @@ sub WorkHandler {
         my ( $Self, $Thing ) = @_;
         my $Val = $Thing->{'Value'};
         $Self->ProgressCallback( 'Log', "WorkHandler:ProgressCallback:$PID" );
+        # sleep such that this process is busy resulting in more even
+        # spread across the available children during the test.
+        sleep 1;
         return "WorkHandler:Return:$PID";
 }
 

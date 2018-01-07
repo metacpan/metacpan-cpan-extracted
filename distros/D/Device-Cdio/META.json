@@ -4,7 +4,7 @@
       "Rocky Bernstein <rocky@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4214",
    "license" : [
       "gpl_1"
    ],
@@ -36,7 +36,7 @@
    "provides" : {
       "Device::Cdio" : {
          "file" : "lib/Device/Cdio.pm",
-         "version" : "v0.4.0"
+         "version" : "v2.0.0"
       },
       "Device::Cdio::Device" : {
          "file" : "lib/Device/Cdio/Device.pm"
@@ -90,12 +90,12 @@
          "web" : "https://github.com/rocky/Perl-Device-Cdio/issues"
       },
       "license" : [
-         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+         "http://opensource.org/licenses/gpl-license.php"
       ],
       "repository" : {
          "url" : "http://github.com/rocky/Perl-Device-Cdio"
       }
    },
-   "version" : "v0.4.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v2.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

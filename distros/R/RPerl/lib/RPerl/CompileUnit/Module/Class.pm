@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Module::Class;
 use strict;
 use warnings;
 use RPerl::Config;    # get @ARG, Dumper, Carp, English without 'use RPerl;'
-our $VERSION = 0.048_000;
+our $VERSION = 0.049_000;
 
 # [[[ OO INHERITANCE ]]]
 # BASE CLASS HAS NO INHERITANCE
@@ -229,8 +229,7 @@ sub create_symtab_entries_and_accessors_mutators {
 #    RPerl::diag(q{in Class.pm INIT block, have $TYPES_SUPPORTED = } . Dumper($TYPES_SUPPORTED) . "\n");
 
     foreach my $module_filename_short ( sort keys %{$INC_ref} ) {
-
-#        RPerl::diag("in Class.pm INIT block, have \$module_filename_short = '$module_filename_short'\n");
+#        RPerl::diag('in Class.pm INIT block, have $module_filename_short = ', q{'}, $module_filename_short, q{'}, "\n");
 
         # skip special entry created by Filter::Util::Call
         if ( $module_filename_short eq '-e' ) {
@@ -246,7 +245,7 @@ sub create_symtab_entries_and_accessors_mutators {
         if (defined $module_filename_long) {
             # skip already-processed modules, triggered by imaginary $module_filename_short created by Perl in %INC when one .pm file contains multiple packages 
             if (exists $module_filename_long_processed->{$module_filename_long}) {
-                RPerl::diag( 'in Class.pm INIT block, skipping due to already-processed PM file, have $module_filename_long = ', q{'}, $module_filename_long, q{'}, ', $module_filename_short = ', q{'}, $module_filename_short, q{'}, "\n" );
+#                RPerl::diag( 'in Class.pm INIT block, skipping due to already-processed PM file, have $module_filename_long = ', q{'}, $module_filename_long, q{'}, ', $module_filename_short = ', q{'}, $module_filename_short, q{'}, "\n" );
                 next;
             }
             $module_filename_long_processed->{$module_filename_long} = 1;
@@ -930,7 +929,7 @@ sub save_object_properties_types {
         while ( ( defined $object_property_key ) and ( defined $object_property_type ) and ( defined $object_property_inner_type_name ) ) {
             if ( $object_property_key ne $object_property_inner_type_name ) {
                 # DEV NOTE, CORRELATION #rp030: matches numbering of ECOGEASCP20 in RPerl/CompileUnit/Module/Class/Generator.pm
-                die 'ERROR ECOGEPPRP20, CODE GENERATOR, PURE PERL TO RPERL: redundant name mismatch, inner type name ' . q{'}
+                die 'ERROR ECOGEPPRP20, CODE GENERATOR, PURE PERL TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                     . $object_property_inner_type_name . q{'}
                     . ' does not equal OO properties key ' . q{'}
                     . $object_property_key . q{'}

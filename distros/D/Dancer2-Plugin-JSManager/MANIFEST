@@ -7,3 +7,6 @@ META.yml
 Makefile.PL
 README
 lib/Dancer2/Plugin/JSManager.pm
+xt/JSManager.t
+xt/environments/testing.yml
+xt/views/index.tt

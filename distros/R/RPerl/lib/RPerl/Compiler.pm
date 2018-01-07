@@ -7,7 +7,7 @@ package RPerl::Compiler;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.030_000;
+our $VERSION = 0.032_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);
@@ -263,6 +263,7 @@ sub find_dependencies {
                 # DEV NOTE, CORRELATION #rp042: do not recursively load the same .pm file from within itself
                 next;
             }
+            # use rperlsse;
             elsif ( $file_line =~ /use\s+rperlsse\s*;/ ) {
 
 #               RPerl::diag('in Compiler::find_dependencies(), found rperlsse line, have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n");
@@ -280,6 +281,7 @@ sub find_dependencies {
 #                RPerl::diag('in Compiler::find_dependencies(), after finding rperlsse line, have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n");
                 next;
             }
+            # use rperlgmp;
             elsif ( $file_line =~ /use\s+rperlgmp\s*;/ ) {
 #                RPerl::diag('in Compiler::find_dependencies(), found rperlgmp line, have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n");
                 if ( ( not exists $modes->{_enable_gmp} ) or ( not defined $modes->{_enable_gmp} ) ) {
@@ -290,6 +292,7 @@ sub find_dependencies {
 #                RPerl::diag('in Compiler::find_dependencies(), after finding rperlgmp line, have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n");
                 next;
             }
+            # use rperlgsl;
             elsif ( $file_line =~ /use\s+rperlgsl\s*;/ ) {
 #                RPerl::diag('in Compiler::find_dependencies(), found rperlgsl line, have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n");
                 if ( ( not exists $modes->{_enable_gsl} ) or ( not defined $modes->{_enable_gsl} ) ) {
@@ -298,6 +301,17 @@ sub find_dependencies {
                 $modes->{_enable_gsl}->{$file_name} = 1;
 
 #                RPerl::diag('in Compiler::find_dependencies(), after finding rperlgsl line, have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n");
+                next;
+            }
+            # use RPerl::Support::MongoDB;
+            elsif ( $file_line =~ /use\s+RPerl::Support::MongoDB\s*;/ ) {
+#                RPerl::diag('in Compiler::find_dependencies(), found RPerl::Support::MongoDB line, have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n");
+                if ( ( not exists $modes->{_enable_mongodb} ) or ( not defined $modes->{_enable_mongodb} ) ) {
+                    $modes->{_enable_mongodb} = {};
+                }
+                $modes->{_enable_mongodb}->{$file_name} = 1;
+
+#                RPerl::diag('in Compiler::find_dependencies(), after finding RPerl::Support::MongoDB line, have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n");
                 next;
             }
             elsif ( $file_line =~ /use\s+lib/ ) {
@@ -1367,8 +1381,12 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional SSE support here >>>' . "\n" ) ) {
+#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n" );
+#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+                    $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
+                    $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
+#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
 
-                   #                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n" );
                     if (    ( exists $modes->{_enable_sse} )
                         and ( defined $modes->{_enable_sse} )
                         and ( exists $modes->{_enable_sse}->{$pm_file_path} )
@@ -1383,16 +1401,20 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional GMP support here >>>' . "\n" ) ) {
-
 #                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n" );
 #                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+                    $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
+                    $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
+#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+
                     if (    ( exists $modes->{_enable_gmp} )
                         and ( defined $modes->{_enable_gmp} )
                         and ( exists $modes->{_enable_gmp}->{$pm_file_path} )
                         and ( defined $modes->{_enable_gmp}->{$pm_file_path} )
                         and $modes->{_enable_gmp}->{$pm_file_path} )
                     {
-                        $file_line = q(        $RPerl::Inline::ARGS{libs}  = '-lgmpxx -lgmp';  # enable GMP support) . "\n";
+                        $file_line = q(        $RPerl::Inline::ARGS{libs}  = '-L' . $RPerl::Inline::gmp_lib_dir . ' -lgmpxx -lgmp';  # enable GMP support) . "\n";
+                        $file_line .= q(        $RPerl::Inline::ARGS{inc}  .= ' -I' . $RPerl::Inline::gmp_include_dir;  # enable GMP support) . "\n";
                         $file_line
                             .= q(        $RPerl::Inline::ARGS{auto_include} = [ @{ $RPerl::Inline::ARGS{auto_include} }, '#include <gmpxx.h>', '#include <gmp.h>' ];    # enable GMP support)
                             . "\n";
@@ -1413,7 +1435,7 @@ sub post_processor_cpp__pmc_generate {
                         and $modes->{_enable_gsl}->{$pm_file_path} )
                     {
                         # DEV NOTE: linking instructions    https://www.gnu.org/software/gsl/doc/html/usage.html#linking-programs-with-the-library
-                        $file_line = q(        $RPerl::Inline::ARGS{libs}  = '-lgsl -lgslcblas -lm';  # enable GSL support) . "\n";
+                        $file_line = q(        $RPerl::Inline::ARGS{libs}  = '-L' . $RPerl::Inline::gsl_lib_dir . ' -lgsl -lgslcblas -lm';  # enable GSL support) . "\n";
                         $file_line .= q(        $RPerl::Inline::ARGS{inc}  .= ' -I' . $RPerl::Inline::gsl_include_dir;  # enable GSL support) . "\n";
                         $file_line
                             .= q(        $RPerl::Inline::ARGS{auto_include} = [ @{ $RPerl::Inline::ARGS{auto_include} }, '#include <gsl_matrix.h>', '#include <gsl_blas.h>' ];    # enable GSL support)
@@ -1422,8 +1444,41 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
 
+
+
+
+                elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional MongoDB support here >>>' . "\n" ) ) {
+#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n" );
+#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+                    $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
+                    $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
+#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+                    
+                    if (    ( exists $modes->{_enable_mongodb} )
+                        and ( defined $modes->{_enable_mongodb} )
+                        and ( exists $modes->{_enable_mongodb}->{$pm_file_path} )
+                        and ( defined $modes->{_enable_mongodb}->{$pm_file_path} )
+                        and $modes->{_enable_mongodb}->{$pm_file_path} )
+                    {
+                        # DEV NOTE: linking instructions    http://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/tutorial/ 
+                        # g++ --std=c++11 ... $(pkg-config --cflags --libs libmongocxx) -Wl,-rpath,/usr/local/lib
+                        $file_line = q(        $RPerl::Inline::ARGS{libs}  = '$(pkg-config --libs libmongocxx) -Wl,-rpath,' . $RPerl::Inline::mongodb_lib_dir;  # enable MongoDB support) . "\n";
+                        $file_line .= q(        $RPerl::Inline::ARGS{inc}  .= ' $(pkg-config --cflags libmongocxx)';  # enable MongoDB support) . "\n";
+                        # fix conflict between RPerl's use of "exp" exponent function from math.h (in rperloperations.h) & MongoDB BSON "exp" expected value (in bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/optional.hpp);
+                        # error: expected ‘,’ or ‘...’    AND    note: in expansion of macro ‘exp’
+                        $file_line .= q(        $RPerl::Inline::ARGS{auto_include} = [ @{ $RPerl::Inline::ARGS{auto_include} }, ) .
+                                      q('#undef exp', '#include <mongocxx/client.hpp>', '#include <mongocxx/stdx.hpp>', '#include <mongocxx/uri.hpp>', ) .
+                                      q('#include <mongocxx/instance.hpp>', '#include <<bsoncxx/json.hpp>' ];    # enable MongoDB support) . "\n";
+                    }
+                    else { $file_line = undef; }
+                }
+
                 if ( defined $file_line ) { $source_group->{PMC} .= $file_line; }
             }
+
+
+
+
 
             close $FILE_HANDLE
                 or die 'ERROR ECOCOFI04, COMPILER, SAVE OUTPUT FILES, MODULE TEMPLATE COPY: Cannot close file '
@@ -1586,6 +1641,7 @@ sub cpp_to_xsbinary__subcompile {
         }
 
         my string $subcompile_command = $modes->{CXX};
+        my string $subcompile_command_append = q{};
 
         if (   ( $modes->{subcompile} eq 'ASSEMBLE' )
             or ( $modes->{subcompile} eq 'ARCHIVE' ) )
@@ -1616,7 +1672,47 @@ sub cpp_to_xsbinary__subcompile {
         $subcompile_command .= q{ } . '-I"' . $RPerl::BASE_PATH . '"';
         $subcompile_command .= q{ } . '-I"' . $RPerl::INCLUDE_PATH . '"'; # different than original Inline::CPP subcompile command, double-quotes added to encapsulate user-name directories
         $subcompile_command .= q{ } . '-Ilib';
-        $subcompile_command .= q{ } . '-I"' . $RPerl::Inline::pcre2_include_dir . '"';  # for regex support
+
+        # DEV NOTE: must have $pl_file_path for support checking below; GMP, GSL, MongoDB 
+#        RPerl::diag( 'in Compiler::cpp_to_xsbinary__subcompile(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n" );
+        my string $pl_file_path = $modes->{_input_file_name};
+#        RPerl::diag( 'in Compiler::cpp_to_xsbinary__subcompile(), have $pl_file_path = ' . $pl_file_path . "\n" );
+        $pl_file_path = post_processor__absolute_path_delete($pl_file_path);
+        $pl_file_path = post_processor__current_directory_path_delete($pl_file_path);
+#        RPerl::diag( 'in Compiler::cpp_to_xsbinary__subcompile(), have possibly-trimmed $pl_file_path = ' . $pl_file_path . "\n" );
+
+        # GMP support
+        if (    ( exists $modes->{_enable_gmp} )
+            and ( defined $modes->{_enable_gmp} )
+            and ( exists $modes->{_enable_gmp}->{$pl_file_path} )
+            and ( defined $modes->{_enable_gmp}->{$pl_file_path} )
+            and $modes->{_enable_gmp}->{$pl_file_path} )
+        {
+            $subcompile_command .= q{ } . '-I"' . $RPerl::Inline::gmp_include_dir . '"';
+        }
+
+        # GSL support
+        if (    ( exists $modes->{_enable_gsl} )
+            and ( defined $modes->{_enable_gsl} )
+            and ( exists $modes->{_enable_gsl}->{$pl_file_path} )
+            and ( defined $modes->{_enable_gsl}->{$pl_file_path} )
+            and $modes->{_enable_gsl}->{$pl_file_path} )
+        {
+            $subcompile_command .= q{ } . '-I"' . $RPerl::Inline::gsl_include_dir . '"';
+        }
+
+        # MongoDB support
+        if (    ( exists $modes->{_enable_mongodb} )
+            and ( defined $modes->{_enable_mongodb} )
+            and ( exists $modes->{_enable_mongodb}->{$pl_file_path} )
+            and ( defined $modes->{_enable_mongodb}->{$pl_file_path} )
+            and $modes->{_enable_mongodb}->{$pl_file_path} )
+        {
+            $subcompile_command .= q{ } . '$(pkg-config --cflags libmongocxx)';
+            $subcompile_command_append .= q{ } . '$(pkg-config --libs libmongocxx) -Wl,-rpath,' . $RPerl::Inline::mongodb_lib_dir;
+        }
+
+        $subcompile_command .= q{ } . '-I"' . $RPerl::Inline::pcre2_include_dir . '"';   # for regex support
         $subcompile_command .= q{ } . '-I"' . $RPerl::Inline::jpcre2_include_dir . '"';  # for regex support
 
         $subcompile_command .= q{ } . $RPerl::Inline::CCFLAGSEX;
@@ -1670,7 +1766,10 @@ sub cpp_to_xsbinary__subcompile {
                 $subcompile_command .= q{ } . $cpp_output_file_name_group->{OPENMP_EXE};
             }
         }
-        
+
+        # some subcompile arguments must be at the end of the command (presumably after the filenames?)
+        $subcompile_command .= $subcompile_command_append;
+
         if ( $modes->{subcompile} eq 'SHARED' ) {
             $subcompile_command .= q{ } . '-shared';
         }
@@ -1726,8 +1825,8 @@ sub cpp_to_xsbinary__subcompile {
         my string $subcompile_command_stdout = q{};
         my string $subcompile_command_stderr = q{};
 
-	#my $pid = open3( 0, \*SUBCOMPILE_STDOUT, \*SUBCOMPILE_STDERR, $subcompile_command );    # disable STDIN w/ 0
-	run3( $subcompile_command, \undef, \$subcompile_command_stdout, \$subcompile_command_stderr );
+    	#my $pid = open3( 0, \*SUBCOMPILE_STDOUT, \*SUBCOMPILE_STDERR, $subcompile_command );    # disable STDIN w/ 0
+    	run3( $subcompile_command, \undef, \$subcompile_command_stdout, \$subcompile_command_stderr );
 
         my $test_exit_status = $CHILD_ERROR >> 8;
 

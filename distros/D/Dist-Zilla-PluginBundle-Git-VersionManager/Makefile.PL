@@ -108,6 +108,8 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "CPAN::Meta::Check" => "0.011",
+    "CPAN::Meta::Requirements" => 0,
     "Exporter" => 0,
     "File::Spec" => 0,
     "JSON::MaybeXS" => 0,
@@ -122,13 +124,14 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "CPAN::Meta::Check" => "0.011",
   "CPAN::Meta::Requirements" => 0,
   "Dist::Zilla::Plugin::BumpVersionAfterRelease" => "0.016",
   "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004",

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print"1..3\n";
+print"1..6\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -41,3 +41,40 @@ else {
   warn "\n\$\@: $@\n";
   print "not ok 3\n";
 }
+
+if(4 <= MPFR_VERSION_MAJOR) {
+  warn "\nCalling all cache freeing functions\n";
+  Rmpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);
+  Rmpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);
+  Rmpfr_free_cache();
+  Rmpfr_free_pool();
+  warn "Skipping tests 4, 5 and 6 - not relevant to this build\n";
+  for(4 .. 6) {print "ok $_\n"}
+}
+else {
+  warn "\nCalling Rmpfr_free_cache()\n";
+  Rmpfr_free_cache();
+
+  eval {Rmpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);};
+  if($@ =~ /^Rmpfr_free_cache2 not implmented/) {print "ok 4\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 4\n";
+  }
+
+  eval {Rmpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);};
+  if($@ =~ /^Rmpfr_free_cache2 not implmented/) {print "ok 5\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 5\n";
+  }
+
+  eval {Rmpfr_free_pool();};
+  if($@ =~ /^Rmpfr_free_pool not implmented/) {print "ok 6\n"}
+  else {
+    warn "\$\@: $@\n";
+    print "not ok 6\n";
+  }
+
+}
+

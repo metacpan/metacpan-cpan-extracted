@@ -23,10 +23,14 @@ test:	{ @OKS }
 	    my $errs = eval { $sm->parse($deps->[0]) };
 	    open T, ">$target";
 	    if ($errs) {
-		s/(SlayMakefile\.main line )\d+/${1}314159/ foreach @$errs;
+		s/(SlayMakefile\.main line )\d+\.?/${1}314159/ foreach @$errs;
 		print T @$errs;
 	    }
-	    print T $@ if $@;
+	    if ($@) {
+		my $err = $@;
+		$err =~ s/(SlayMakefile\.main line \d+)\.?/$1/;
+		print T $err;
+	    }
 	    close T;
 	}
 
@@ -42,7 +46,7 @@ no_targets.log:  no_targets.smak
 	    push @errs, $@ if $@;
 	    open T, ">$target";
 	    if (@errs) {
-		s/(SlayMakefile\.main line )\d+/${1}314159/ foreach @errs;
+		s/(SlayMakefile\.main line )\d+\.?/${1}314159/ foreach @errs;
 		print T @errs;
 	    }
 	    close T;

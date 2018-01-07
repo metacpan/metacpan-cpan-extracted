@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::SecurityGroup;
+$Net::Amazon::EC2::SecurityGroup::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

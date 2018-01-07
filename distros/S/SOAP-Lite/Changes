@@ -15,6 +15,12 @@ http://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite
 THIS RELEASE
 -----------------------------------------------------------------------
 
+1.26 December 30, 2017
+    ! typo fix https://anonscm.debian.org/cgit/pkg-perl/packages/libsoap-lite-perl.git/tree/debian/patches/spelling-error.patch
+
+1.25 December 29, 2017
+    ! Bad usage of UNIVERSAL::isa (See RT#62667)
+
 1.24 December 19, 2017
     + Consistent Versioning https://github.com/redhotpenguin/soaplite/pull/24
     ! Remove is_utf8() check from 78588

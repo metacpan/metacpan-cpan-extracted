@@ -919,6 +919,24 @@ bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value
   return (*tt->driver->vtable->setctl_str)(tt->driver, ctl, value);
 }
 
+void tickit_term_pause(TickitTerm *tt)
+{
+  if(tt->driver->vtable->pause)
+    (*tt->driver->vtable->pause)(tt->driver);
+
+  if(tt->termkey)
+    termkey_stop(tt->termkey);
+}
+
+void tickit_term_resume(TickitTerm *tt)
+{
+  if(tt->termkey)
+    termkey_start(tt->termkey);
+
+  if(tt->driver->vtable->resume)
+    (*tt->driver->vtable->resume)(tt->driver);
+}
+
 const char *tickit_term_ctlname(TickitTermCtl ctl)
 {
   switch(ctl) {

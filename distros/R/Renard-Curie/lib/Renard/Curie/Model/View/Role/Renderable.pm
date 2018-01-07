@@ -1,9 +1,10 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Role::Renderable;
 # ABSTRACT: Role for rendering a view model
-$Renard::Curie::Model::View::Role::Renderable::VERSION = '0.003';
+$Renard::Curie::Model::View::Role::Renderable::VERSION = '0.004';
 use Moo::Role;
-use Renard::Incunabula::Common::Types qw(InstanceOf SizeRequest);
+use Renard::Incunabula::Common::Types qw(InstanceOf);
+use Renard::Incunabula::Frontend::Gtk3::Types qw(SizeRequest);
 
 method draw_page(
 	(InstanceOf['Gtk3::DrawingArea']) $widget,
@@ -32,7 +33,7 @@ Renard::Curie::Model::View::Role::Renderable - Role for rendering a view model
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 

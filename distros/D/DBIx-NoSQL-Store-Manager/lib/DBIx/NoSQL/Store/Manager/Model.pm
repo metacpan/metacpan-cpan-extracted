@@ -1,41 +1,51 @@
 package DBIx::NoSQL::Store::Manager::Model;
-BEGIN {
-  $DBIx::NoSQL::Store::Manager::Model::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $DBIx::NoSQL::Store::Manager::Model::VERSION = '0.2.2';
-}
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for classes to be handled by DBIx::NoSQL::Store::Manager
-
-use 5.10.0;
+$DBIx::NoSQL::Store::Manager::Model::VERSION = '1.0.0';
+use 5.20.0;
 
 use strict;
 use warnings;
 
 use Moose::Role;
 
-use Method::Signatures;
 use MooseX::ClassAttribute;
 use MooseX::Storage 0.31;
+use MooseX::SetOnce;
+
+use Scalar::Util qw/ refaddr /;
 
 with Storage;
-with 'DBIx::NoSQL::Store::Manager::StoreKey',
-     'DBIx::NoSQL::Store::Manager::StoreIndex';
 
+use DBIx::NoSQL::Store::Manager::StoreKey;
+use DBIx::NoSQL::Store::Manager::StoreIndex;
+use DBIx::NoSQL::Store::Manager::StoreModel;
+
+use experimental 'signatures';
+
+# TODO: ad-hoc model registration
 
 
 
 has store_db => (
-    traits => [ 'DoNotSerialize' ],
-    is       => 'ro',
-    required => 1,
+    traits => [ 'DoNotSerialize', 'SetOnce' ],
+    is       => 'rw',
+    predicate =>  'has_store_db',
 );
+
+around store_db => sub ( $orig, $self, @rest ) {
+    if ( @rest and $self->has_store_db ) {
+        shift @rest if refaddr $self->store_db == refaddr $rest[0];
+    }
+
+    return $orig->($self,@rest);
+};
 
 
 class_has store_model => (
     isa => 'Str',
     is => 'rw',
-    default => method {
+    default => sub ($self) {
         # TODO probably over-complicated
        my( $class ) = $self->class_precedence_list;
 
@@ -50,10 +60,10 @@ has store_key => (
     traits => [ 'DoNotSerialize' ],
     is => 'ro',
     lazy => 1,
-    default => method {
-       return join( '-', map {
-        my $m = $_->get_read_method;
-        $self->$m;
+    default => sub($self) {
+        no warnings 'uninitialized';
+       return join( '-', map { $self->$_ } sort map {
+        $_->get_read_method
        } grep { $_->does('DBIx::NoSQL::Store::Manager::StoreKey') }
          $self->meta->get_all_attributes )
          // die "no store key set for $self";
@@ -61,26 +71,37 @@ has store_key => (
 );
 
 
-method store {
-    $self->store_db->set( 
-        $self->store_model =>
-            $self->store_key => $self,
-    );
+sub store($self) {
+    # TODO put deprecation notice
+    $self->save;
 }
 
 
-method delete {
+sub delete($self) {
     $self->store_db->delete( $self->store_model => $self->store_key );
 }
 
-method _entity {
+sub _entity($self) {
    return $self->pack; 
 }
 
-method indexes {
+around pack => sub($orig,$self) {
+    local $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING = $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING;
+
+    return $DBIx::NoSQL::Store::Manager::Model::INNER_PACKING++ ? $self->store_key : $orig->($self);
+};
+
+sub indexes($self) {
     return map  { [ $_->name, ( isa => $_->store_isa ) x $_->has_store_isa ] }
            grep { $_->does('DBIx::NoSQL::Store::Manager::StoreIndex') } 
                 $self->meta->get_all_attributes;
+}
+
+
+sub save($self,$store=undef) {
+    $self->store_db( $store ) if $store;
+
+    $self->store_db->set($self);
 }
 
 1;
@@ -89,13 +110,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::NoSQL::Store::Manager::Model - Role for classes to be handled by DBIx::NoSQL::Store::Manager
 
 =head1 VERSION
 
-version 0.2.2
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -159,7 +182,7 @@ the L<DBIx::NoSQL::Store::Manager::StoreIndex> trait.
 =head2 store_db
 
 The L<DBIx::NoSQL::Store::Manager> store to which the object belongs
-to. Required.
+to. 
 
 =head2 store_model
 
@@ -171,7 +194,7 @@ would become C<Thingy>).
 Not that as it's a class-level attribute, it can't be passed to
 C<new()>, but has to be set via C<class_has>:
 
-    class_has +store_model => (
+    class_has '+store_model' => (
         default => 'SomethingElse',
     );
 
@@ -189,19 +212,27 @@ to.
 
 =head2 store()
 
-Serializes the object into the store.
+DEPRECATED - use C<save()> instead.
+
+Serializes the object into the store. 
 
 =head2 delete()
 
 Deletes the object from the store.
 
+=head2 save( $store )
+
+Saves the object in the store. The C<$store> object can be given as an argument if 
+the object was not created via a master C<DBIx::NoSQL::Store::Manager> object
+and C<store_db> was not already provided via the constructor.
+
 =head1 AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

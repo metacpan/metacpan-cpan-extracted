@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::TagSet;
+$Net::Amazon::EC2::TagSet::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

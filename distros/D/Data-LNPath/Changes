@@ -6,3 +6,9 @@ Revision history for Data-LNPath
 0.04    08/10/2017
 		Allow for aliasing of exported methods 
 			use Data::LNPath qw/path/, { as => { path => 'lnpath' } }
+
+0.05    29/12/2017
+		Thanks to svacht (Stavros Vachtsevanos) for identifying some flaws.
+		- Allow false values to be returned
+		- Add mechanism to not die miserably and return undef
+			use Data::LNPath qw/path/, { return_undef => 1 }

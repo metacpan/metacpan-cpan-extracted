@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester;
-$Authen::U2F::Tester::VERSION = '0.01';
+$Authen::U2F::Tester::VERSION = '0.02';
 # ABSTRACT: FIDO/U2F Authentication Test Client
 
 use Moose;
@@ -29,9 +29,15 @@ use namespace::autoclean;
 my $COUNTER = 0;
 
 
-has keypair => (
+has key => (
     is       => 'ro',
     isa      => 'Crypt::PK::ECC',
+    required => 1);
+
+
+has keystore => (
+    is       => 'ro',
+    does     => 'Authen::U2F::Tester::Role::Keystore',
     required => 1);
 
 
@@ -47,11 +53,17 @@ around BUILDARGS => sub {
         my %args = @_;
 
         if (my $keyfile = delete $args{key_file}) {
-            $args{keypair} = Crypt::PK::ECC->new($keyfile);
+            $args{key} = Crypt::PK::ECC->new($keyfile);
         }
 
         if (my $certfile = delete $args{cert_file}) {
             $args{certificate} = Crypt::OpenSSL::X509->new_from_file($certfile);
+        }
+
+        # if no keystore was given, use the wrapped keystore
+        unless (defined $args{keystore}) {
+            require Authen::U2F::Tester::Keystore::Wrapped;
+            $args{keystore} = Authen::U2F::Tester::Keystore::Wrapped->new(key => $args{key});
         }
 
         return $self->$orig(%args);
@@ -67,14 +79,14 @@ sub register {
 
     # check if this device has already been registered
     for my $registered (@registered_handles) {
-        if ($self->is_known_handle($registered)) {
+        if ($self->keystore->exists($registered)) {
             return Authen::U2F::Tester::Error->new(DEVICE_INELIGIBLE);
         }
     }
 
     # generate a new keypair for this application
     my $keypair = Authen::U2F::Tester::Keypair->new;
-    my $handle  = $self->keypair->encrypt($keypair->private_key, 'SHA256');
+    my $handle  = $self->keystore->put($keypair->private_key);
     my $cert    = $self->certificate->as_string(Crypt::OpenSSL::X509::FORMAT_ASN1);
 
     my %client_data = (
@@ -91,7 +103,7 @@ sub register {
         $handle,
         $keypair->public_key;
 
-    my $signature = $self->keypair->sign_hash(sha256($sign_data));
+    my $signature = $self->key->sign_hash(sha256($sign_data));
 
     my $response = pack 'a a65 C/a* a* a*',
         chr(0x05), $keypair->public_key, $handle, $cert, $signature;
@@ -106,7 +118,7 @@ sub register {
 sub sign {
     my ($self, $app_id, $challenge, @handles) = @_;
 
-    my $handle = first { $self->is_known_handle($_) } @handles;
+    my $handle = first { $self->keystore->exists($_) } @handles;
 
     unless (defined $handle) {
         return Authen::U2F::Tester::Error->new(DEVICE_INELIGIBLE);
@@ -120,12 +132,7 @@ sub sign {
 
     my $client_data = encode_json(\%client_data);
 
-    # the handle is a wrapped private key, which for this library simply means
-    # is the private key, encrypted using our own secret key.  We know the
-    # handle will decrypt because is_knonwn_handle() already checked that.
-    my $private_key = $self->keypair->decrypt(decode_base64url($handle));
-    my $pkec = Crypt::PK::ECC->new;
-    $pkec->import_key_raw($private_key, 'nistp256');
+    my $pkec = $self->keystore->get($handle);
 
     my $counter = ++$COUNTER;
 
@@ -150,20 +157,6 @@ sub sign {
         client_data => encode_base64url($client_data));
 }
 
-
-sub is_known_handle {
-    my ($self, $handle) = @_;
-
-    $handle = decode_base64url($handle);
-
-    if (eval { $self->keypair->decrypt($handle); 1 }) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -176,7 +169,7 @@ Authen::U2F::Tester - FIDO/U2F Authentication Test Client
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -266,7 +259,7 @@ Alternatively, the key and certificate can be passed in directly as objects:
 
 =item *
 
-keypair
+key
 
 An L<Crypt::PK::ECC> object.
 
@@ -279,19 +272,33 @@ An L<Crypt::OpenSSL::X509> object.
 =back
 
 In order to create and use the tester, you will need both an Elliptic Curve
-keypair, and a SSL X.509 certificate.  The key can be generated using OpenSSL:
+key, and a SSL X.509 certificate.  The key can be generated using OpenSSL:
 
  % openssl ecparam -name secp256r1 -genkey -noout -out key.pem
 
 Then this key can be used to generate a self signed X.509 certificate:
 
- % openssl req -key key.pem -x509 -days 3560 -sh256 \
+ % openssl req -key key.pem -x509 -days 3560 -sha256 \
      -subj '/C=US/ST=Texas/O=Untrusted U2F Org/CN=virtual-u2f' \
      -out cert.pem
 
-=head2 keypair(): Crypt::PK::ECC
+Note that this key is also used to encrypt key handles that the tester
+generates for registration requests.
 
-Get the private keypair for this tester.
+=head2 key(): Crypt::PK::ECC
+
+Get the key for this tester.
+
+=head2 keystore(): Authen::U2F::Tester::Role::Keystore
+
+This returns the key store instance that the tester uses.  The default key
+store is a "wrapped" key store as described in the FIDO/U2F specs.  What this
+means is it does not actually store anything, but instead encrypts the private
+key using the tester's private key, and returns that as the key handle. This
+key store will accept any encrypted private key as a valid key handle so long
+as it can be decrypted by the tester's private key.  This is similar to how
+many physical U2F devices work in the real world.  See
+L<Authen::U2F::Tester::Keystore::Wrapped> for more information.
 
 =head2 certificate(): Crypt::OpenSSL::X509
 
@@ -383,11 +390,6 @@ Example:
  # verification.
  print $res->signature_data;
  print $res->client_data;
-
-=head2 is_known_handle($handle): bool
-
-Return true if the given C<$handle> was generated by this tester.  C<$handle>
-is a string containing a potential keyhandle, in Base64 URL format.
 
 =for Pod::Coverage OK DEVICE_INELIGIBLE
 

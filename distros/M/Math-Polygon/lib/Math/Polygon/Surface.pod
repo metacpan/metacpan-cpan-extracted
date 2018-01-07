@@ -21,13 +21,15 @@ from that outer polygon.
 
 =over 4
 
-=item $obj-E<gt>B<new>( [%options], [$polygons], %options )
+=item $obj-E<gt>B<new>( [%options], [@polygons], %options )
 
-=item Math::Polygon::Surface-E<gt>B<new>( [%options], [$polygons], %options )
+=item Math::Polygon::Surface-E<gt>B<new>( [%options], [@polygons], %options )
 
-You may add %options after and/or before the $polygons.  You may also use
-the "outer" and "inner" options.  $polygons are references to ARRAYs of points,
-each an ARRAY of X and Y, but better instantiated L<Math::Polygon|Math::Polygon> objects.
+You may merge %options with @polygons.  You may also use
+the "outer" and "inner" options.
+
+Each polygon is a references to an ARRAY of points, each an ARRAY of X
+and Y, but better pass L<Math::Polygon|Math::Polygon> objects.
 
  -Option--Default
   inner   []
@@ -35,11 +37,11 @@ each an ARRAY of X and Y, but better instantiated L<Math::Polygon|Math::Polygon>
 
 =over 2
 
-=item inner => ARRAY-OF-POLYGONS
+=item inner => \@polygons
 
 The inner polygons, zero or more L<Math::Polygon|Math::Polygon> objects.
 
-=item outer => POLYGON
+=item outer => $polygon
 
 The outer polygon, a L<Math::Polygon|Math::Polygon>.
 
@@ -123,12 +125,12 @@ line is the outer, the other lines represent the inner polygons.
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.07,
-built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.10,
+built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

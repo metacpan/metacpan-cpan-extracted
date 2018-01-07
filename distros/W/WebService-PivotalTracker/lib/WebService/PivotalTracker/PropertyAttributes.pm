@@ -3,7 +3,7 @@ package WebService::PivotalTracker::PropertyAttributes;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use Scalar::Util qw( blessed );
 use Sub::Quote qw( quote_sub );
@@ -70,3 +70,46 @@ EOF
 }
 
 1;
+
+# ABSTRACT: An internal tool; nothing to see here, move along
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::PivotalTracker::PropertyAttributes - An internal tool; nothing to see here, move along
+
+=head1 VERSION
+
+version 0.10
+
+=head1 DESCRIPTION
+
+This package has no user-facing parts.
+
+=for Pod::Coverage *EVERYTHING*
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-PivotalTracker/issues>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by MaxMind, Inc.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+__END__
+
+__END__
+

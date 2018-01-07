@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-12-27'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2018-01-05'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,12 +26,15 @@ my %Rev_Canonical_Currencies = (
     xem => 'nem',
 );
 
+my @Markets = qw(idr btc);
+
 my @Market_Pairs = (
     'btc_idr',
     'bch_idr',
     'btg_idr',
     'eth_idr',
     'etc_idr',
+    'ignis_idr',
     'ltc_idr',
     'nxt_idr',
     'waves_idr',
@@ -71,6 +74,9 @@ my $sch_currency = ['str*', in=>\@Currencies];
 my $sch_pair = ['str*', {
     match=>qr/\A\w{3,4}_\w{3,4}\z/,
     in=>\@Market_Pairs,
+}];
+my $sch_market = ['str*', {
+    in=>\@Markets,
 }];
 
 my %args_tapi = (
@@ -159,6 +165,23 @@ my %arg_0_pair = (
     },
 );
 
+my %arg_market = (
+    market => {
+        summary => 'Market',
+        schema => $sch_market,
+        default => 'idr',
+    },
+);
+
+my %arg_0_market = (
+    market => {
+        summary => 'Market',
+        schema => $sch_market,
+        default => 'idr',
+        pos => 0,
+    },
+);
+
 my %arg_0_type = (
     type => {
         schema => $sch_type,
@@ -191,6 +214,7 @@ sub _init {
     );
 }
 
+# convert CLI-level pair to API-level
 sub _convert_pair {
     my $pair = shift;
     my ($cur1, $cur2) = $pair =~ /\A(\w{3,5})_(\w{3,5})\z/
@@ -744,6 +768,60 @@ sub trade_history {
     [200, "OK", \@rows, $resmeta];
 }
 
+$SPEC{trade_history_total} = {
+    v => 1.1,
+    summary => 'Show total amount of trades',
+    args => {
+        %args_tapi,
+        %arg_0_market,
+        %args_filter_time,
+    },
+};
+sub trade_history_total {
+    my %args = @_;
+    _init(\%args);
+
+    my %res = (
+        num_sells => 0,
+        num_buys  => 0,
+        total_amount => 0,
+        total_fee    => 0,
+    );
+
+    for my $pair (@Market_Pairs) {
+        my ($cur1, $cur2) = $pair =~ /(\w+)_(\w+)$/;
+        next unless $cur2 eq $args{market};
+
+        my $pair0 = _convert_pair($pair);
+        my ($cur10, $cur20) = $pair0 =~ /(\w+)_(\w+)$/;
+
+        my $res0;
+        eval {
+            $res0 = $btcindo->get_trade_history(
+                pair => $pair0,
+                (since => $args{time_from}) x !!(defined $args{time_from}),
+                (end   => $args{time_to}  ) x !!(defined $args{time_to}  ),
+            )->{return};
+        };
+        if ($@) {
+            log_warn "Can't get trade history for pair $pair: $@, skipped";
+            next;
+        }
+
+        for my $row (@{ $res0->{trades} }) {
+            if ($row->{type} eq 'sell') {
+                $res{num_sells}++;
+            } elsif ($row->{type} eq 'buy') {
+                $res{num_buys}++;
+            }
+            $res{total_amount} += $row->{$cur10} * $row->{price};
+            $res{total_fee}    += $row->{fee};
+        }
+    }
+
+    [200, "OK", \%res];
+}
+
 $SPEC{open_orders} = {
     v => 1.1,
     summary => 'Show open orders',
@@ -981,6 +1059,7 @@ Perinci::CmdLine::Any->new(
 
         # not yet
         #"profit" => { url => '/main/profit', },
+        "trade-history-total" => { url => '/main/trade_history_total', show_in_help => 0 },
     },
     log => 1,
 )->run;
@@ -1000,7 +1079,7 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.016 of btcindo (from Perl distribution App-btcindo), released on 2017-12-27.
+This document describes version 0.017 of btcindo (from Perl distribution App-btcindo), released on 2018-01-05.
 
 =head1 SYNOPSIS
 
@@ -1123,6 +1202,10 @@ Create a new order.
 =head2 B<trade-history>
 
 Show history of trades.
+
+=head2 B<trade-history-total>
+
+Show total amount of trades.
 
 =head2 B<trades>
 
@@ -1273,7 +1356,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1301,7 +1384,7 @@ Filter by currency.
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -1311,7 +1394,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1351,7 +1434,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -1399,7 +1482,7 @@ Default value:
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -1429,7 +1512,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1473,7 +1556,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =back
 
@@ -1503,7 +1586,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -1539,7 +1622,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -1558,6 +1641,36 @@ Filter by beginning trade ID.
 =item B<--trade-id-to>=I<s>
 
 Filter by ending trade ID.
+
+=back
+
+=head2 Options for subcommand trade-history-total
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--market>=I<s>
+
+Market.
+
+Default value:
+
+ "idr"
+
+Valid values:
+
+ ["idr","btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--time-from>=I<s>
+
+Filter by beginning time.
+
+=item B<--time-to>=I<s>
+
+Filter by ending time.
 
 =back
 
@@ -1585,7 +1698,7 @@ Filter by currency.
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -1748,6 +1861,14 @@ List of available configuration parameters:
  trade_id_from (see --trade-id-from)
  trade_id_to (see --trade-id-to)
 
+=head2 Configuration for subcommand trade-history-total
+
+ key (see --key)
+ market (see --market)
+ secret (see --secret)
+ time_from (see --time-from)
+ time_to (see --time-to)
+
 =head2 Configuration for subcommand trades
 
  type (see --type)
@@ -1795,7 +1916,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

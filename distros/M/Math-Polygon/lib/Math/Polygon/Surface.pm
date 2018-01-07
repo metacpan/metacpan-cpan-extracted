@@ -1,15 +1,19 @@
-# Copyrights 2004-2017 by [Mark Overmeer].
+# Copyrights 2004-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use strict;
-use warnings;
+# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Math::Polygon::Surface;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 use Math::Polygon;
+
+use strict;
+use warnings;
 
 
 sub new(@)
@@ -54,11 +58,15 @@ sub init($$)
     $self;
 }
 
+#------------
+
 
 sub outer() { shift->{MS_outer} }
 
 
 sub inner() { @{shift->{MS_inner}} }
+
+#------------
 
 
 sub bbox() { shift->outer->bbox }
@@ -78,6 +86,8 @@ sub perimeter()
     $per    += $_->perimeter for $self->inner;
     $per;
 }
+
+#------------
 
 
 sub lineClip($$$$)

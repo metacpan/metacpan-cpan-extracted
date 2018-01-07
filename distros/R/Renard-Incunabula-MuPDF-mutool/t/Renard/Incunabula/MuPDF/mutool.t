@@ -15,7 +15,7 @@ my $pdf_ref_path = try {
 	plan skip_all => "$_";
 };
 
-plan tests => 4;
+plan tests => 6;
 
 subtest 'PDF page to PNG' => sub {
 	my $png_data = Renard::Incunabula::MuPDF::mutool::get_mutool_pdf_page_as_png( $pdf_ref_path, 1, 1.0 );
@@ -37,7 +37,7 @@ subtest 'Get characters for preface' => sub {
 	my $text_concat = "";
 
 	my $root = dpathi($stext);
-	my $char_iterator = $root->isearch( '/page/*/block/*/line/*/span/*/char/*' );
+	my $char_iterator = $root->isearch( '/page/*/block/*/line/*/font/*/char/*' );
 	while( $char_iterator->isnt_exhausted ) {
 		$text_concat .= $char_iterator->value->deref->{c};
 	}
@@ -56,6 +56,23 @@ subtest 'Get outline of PDF document' => sub {
 			text => '1.2.6 General Features',
 			page => 31 }),
 		'has expected outline item';
+};
+
+subtest 'Get PDF trailer and info object raw' => sub {
+	my $trailer = Renard::Incunabula::MuPDF::mutool::get_mutool_get_trailer_raw( $pdf_ref_path );
+
+	my $info_obj_id = 109959;
+
+	like $trailer , qr|\Q/Info $info_obj_id 0 R\E|, 'trailer has reference to info object';
+
+	my $info_obj = Renard::Incunabula::MuPDF::mutool::get_mutool_get_object_raw( $pdf_ref_path, $info_obj_id );
+	like $info_obj, qr|\Q/Author (Adobe Systems Incorporated)\E|, 'info object has author information';
+};
+
+subtest 'Get parsed info object' => sub {
+	my $info = Renard::Incunabula::MuPDF::mutool::get_mutool_get_info_object_parsed( $pdf_ref_path );
+
+	is $info->resolve_key('Subject')->data, 'Adobe Portable Document Format (PDF)', "correct subject";
 };
 
 done_testing;

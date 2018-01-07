@@ -1,16 +1,19 @@
-# Copyrights 2004-2017 by [Mark Overmeer].
+# Copyrights 2004-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use strict;
-use warnings;
+# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Math::Polygon::Clip;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 use base 'Exporter';
+
+use strict;
+use warnings;
 
 our @EXPORT = qw/
  polygon_line_clip
@@ -49,7 +52,7 @@ sub polygon_fill_clip1($@)
         $x = $xmax if $x > $xmax;
         $y = $ymin if $y < $ymin;
         $y = $ymax if $y > $ymax;
-	push @cropped, [$x, $y];
+        push @cropped, [$x, $y];
     }
 
     polygon_beautify {despike => 1}, @cropped;
@@ -76,7 +79,7 @@ sub polygon_line_clip($@)
         {   push @{$frags[-1]}, _cross_inside $bbox, $from, $next;
         }
         elsif($nextin)               # entering
-	{   my @cross = _cross_inside $bbox, $from, $next;
+        {   my @cross = _cross_inside $bbox, $from, $next;
             push @frags, [ @cross, $next ];
         }
         else                         # pass thru bbox?
@@ -117,10 +120,10 @@ sub _sector($$)  # left-top 678,345,012 right-bottom
 {   my ($bbox, $point) = @_;
     my $xsector = $point->[0] < $bbox->[0] ? 0
                 : $point->[0] < $bbox->[2] ? 1
-		:                            2;
+                :                            2;
     my $ysector = $point->[1] < $bbox->[1] ? 0
                 : $point->[1] < $bbox->[3] ? 1
-		:                            2;
+                :                            2;
     $ysector * 3 + $xsector;
 }
 
@@ -128,11 +131,12 @@ sub _cross($$$)
 {   my ($bbox, $from, $to) = @_;
     my ($xmin, $ymin, $xmax, $ymax) = @$bbox;
 
-    my @cross = ( _cross_x($xmin, $from, $to)
-                , _cross_x($xmax, $from, $to)
-                , _cross_y($ymin, $from, $to)
-                , _cross_y($ymax, $from, $to)
-		);
+    my @cross =
+      ( _cross_x($xmin, $from, $to)
+      , _cross_x($xmax, $from, $to)
+      , _cross_y($ymin, $from, $to)
+      , _cross_y($ymax, $from, $to)
+      );
 
     # order the results
       $from->[0] < $to->[0] ? sort({$a->[0] <=> $b->[0]} @cross)
@@ -143,7 +147,7 @@ sub _cross($$$)
 
 sub _cross_inside($$$)
 {   my ($bbox, $from, $to) = @_;
-    grep { _inside($bbox, $_) } _cross($bbox, $from, $to);
+    grep _inside($bbox, $_), _cross($bbox, $from, $to);
 }
 
 sub _remove_doubles(@)
@@ -163,7 +167,6 @@ sub _cross_x($$$)
     my ($tx, $ty) = @$to;
     return () unless $fx < $x && $x < $tx || $tx < $x && $x < $fx;
     my $y = $fy + ($x - $fx)/($tx - $fx) * ($ty - $fy);
-#warn "X: $x,$y <-- $fx,$fy $tx,$ty\n";
     (($fy <= $y && $y <= $ty) || ($ty <= $y && $y <= $fy)) ? [$x,$y] : ();
 }
 
@@ -173,7 +176,6 @@ sub _cross_y($$$)
     my ($tx, $ty) = @$to;
     return () unless $fy < $y && $y < $ty || $ty < $y && $y < $fy;
     my $x = $fx + ($y - $fy)/($ty - $fy) * ($tx - $fx);
-#warn "Y: $x,$y <-- $fx,$fy $tx,$ty\n";
     (($fx <= $x && $x <= $tx) || ($tx <= $x && $x <= $fx)) ? [$x,$y] : ();
 }
 

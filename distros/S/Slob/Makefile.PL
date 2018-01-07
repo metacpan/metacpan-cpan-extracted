@@ -14,7 +14,9 @@ WriteMakefile(
 	LICENSE           => 'perl',
 	SIGN              => 1,
 	PREREQ_PM         => {
-		qw/Compress::Raw::Lzma 0/,
+		qw/Compress::Raw::Bzip2 0
+		   Compress::Raw::Lzma  0
+		   Compress::Raw::Zlib  0/,
 	},
 	META_ADD          => {
 		dynamic_config => 0,

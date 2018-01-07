@@ -27,32 +27,32 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'DateTime::Infinite' => [
-                                     qr/^.+$/
-                                   ],
+                                       qr/^.+$/
+                                     ],
              'DateTime::Duration' => [
-                                     qr/^[A-Z_]+$/
-                                   ],
+                                       qr/^[A-Z_]+$/
+                                     ],
              'DateTime' => [
-                           qr/^[A-Z_]+$/,
-                           qr/0$/,
-                           qr/^STORABLE/,
-                           qr/^utc_year$/,
-                           qr/^timegm$/,
-                           qr/^day_of_month$/,
-                           qr/^doq$/,
-                           qr/^dow$/,
-                           qr/^doy$/,
-                           qr/^iso8601$/,
-                           qr/^local_rd_as_seconds$/,
-                           qr/^mday$/,
-                           qr/^min$/,
-                           qr/^mon$/,
-                           qr/^sec$/,
-                           qr/^wday$/,
-                           qr/^DefaultLanguage$/,
-                           qr/^era$/,
-                           qr/^language$/
-                         ]
+                             qr/^[A-Z_]+$/,
+                             qr/0$/,
+                             qr/^STORABLE/,
+                             qr/^utc_year$/,
+                             qr/^timegm$/,
+                             qr/^day_of_month$/,
+                             qr/^doq$/,
+                             qr/^dow$/,
+                             qr/^doy$/,
+                             qr/^iso8601$/,
+                             qr/^local_rd_as_seconds$/,
+                             qr/^mday$/,
+                             qr/^min$/,
+                             qr/^mon$/,
+                             qr/^sec$/,
+                             qr/^wday$/,
+                             qr/^DefaultLanguage$/,
+                             qr/^era$/,
+                             qr/^language$/
+                           ]
            );
 
 my @also_private;

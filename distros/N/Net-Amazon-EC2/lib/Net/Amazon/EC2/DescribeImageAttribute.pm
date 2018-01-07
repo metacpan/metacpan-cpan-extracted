@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::DescribeImageAttribute;
+$Net::Amazon::EC2::DescribeImageAttribute::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

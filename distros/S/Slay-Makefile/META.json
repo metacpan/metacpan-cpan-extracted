@@ -1,0 +1,49 @@
+{
+   "abstract" : "Wrapper to Slay::Maker that reads the rules from a file",
+   "author" : [
+      "Slaven Rezic <srezic@cpan.org>",
+      "Mark Nodine <mnodine@alum.mit.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Slay-Makefile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "File::Path" : "0",
+            "Slay::Maker" : "0.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/eserte/Slay-Makefile.git"
+      }
+   },
+   "version" : "0.13"
+}

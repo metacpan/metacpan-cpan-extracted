@@ -22,7 +22,7 @@ Lingua::EN::AddressParse::Grammar was written by Kim Ryan, kimryan at cpan d-o-t
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2016 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -35,7 +35,7 @@ use strict;
 use warnings;
 use Locale::SubCountry;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 #-------------------------------------------------------------------------------
 # Rules that define valid orderings of an addresses components
@@ -510,7 +510,7 @@ q{
         GROVE|
         HAVEN|
         HEATH|
-        HILL|
+        HILL|        
         HOLLOW|
         ISLAND|
         ISLE|
@@ -578,7 +578,7 @@ q{
             $return = "$item[1]$item[2]"
         }
         |
-        # New York State has streets such as 'Dutch Street Road'
+        # TO DO: New York State has streets such as 'Dutch Street Road'
         #any_word /STREET / .../ROAD|RD /
         #{
         #    $return = "$item[1]$item[2]"
@@ -709,6 +709,7 @@ q{
         HEATH|
         HL|HILL|
         HWA?Y|HIGHWAY|
+        HOLE|
         HOLLOW|
         ISLE?|IS|  # Note that Island is a valid street type, but can get confused with suburb name, such as: Main St Clare Island. So don't include it
         KEY|

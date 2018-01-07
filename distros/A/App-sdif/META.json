@@ -1,7 +1,7 @@
 {
    "abstract" : "sdif and family tools, cdif and watchdiff",
    "author" : [
-      "Kaz Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.13",
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.5.1",
+            "Getopt::EX" : "v1.7.1",
             "List::Util" : "1.45",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
@@ -62,15 +62,36 @@
       "App::cdif::Tmpfile" : {
          "file" : "lib/App/cdif/Tmpfile.pm"
       },
+      "App::cdif::colors" : {
+         "file" : "lib/App/cdif/colors.pm"
+      },
+      "App::cdif::debug" : {
+         "file" : "lib/App/cdif/debug.pm"
+      },
+      "App::cdif::default" : {
+         "file" : "lib/App/cdif/default.pm"
+      },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v3.4.1"
+         "version" : "v4.2.0"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
       },
+      "App::sdif::autocolor" : {
+         "file" : "lib/App/sdif/autocolor.pm"
+      },
+      "App::sdif::autocolor::Apple_Terminal" : {
+         "file" : "lib/App/sdif/autocolor/Apple_Terminal.pm"
+      },
       "App::sdif::colors" : {
          "file" : "lib/App/sdif/colors.pm"
+      },
+      "App::sdif::debug" : {
+         "file" : "lib/App/sdif/debug.pm"
+      },
+      "App::sdif::default" : {
+         "file" : "lib/App/sdif/default.pm"
       },
       "App::sdif::osx_autocolor" : {
          "file" : "lib/App/sdif/osx_autocolor.pm"
@@ -87,9 +108,10 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "3.4.1",
+   "version" : "4.2.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
+      "Kaz Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ]
 }

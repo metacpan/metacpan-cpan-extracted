@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Fatal;
-use Test::More 0.88;
+use Test2::V0;
 
 use Markdent::Dialect::Theory::BlockParser;
 use Markdent::Handler::MinimalTree;
@@ -52,7 +51,7 @@ my $handler = Markdent::Handler::MinimalTree->new();
 
 {
     is(
-        exception {
+        dies {
             my $parser = Markdent::Parser->new(
                 dialects           => 'Theory',
                 block_parser_class => 'Markdent::Parser::BlockParser',

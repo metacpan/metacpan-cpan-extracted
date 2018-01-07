@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 12;
+plan tests => 13;
 
 my @module_files = (
     'WebService/PivotalTracker.pm',
@@ -15,6 +15,7 @@ my @module_files = (
     'WebService/PivotalTracker/Entity.pm',
     'WebService/PivotalTracker/Label.pm',
     'WebService/PivotalTracker/Me.pm',
+    'WebService/PivotalTracker/Person.pm',
     'WebService/PivotalTracker/Project.pm',
     'WebService/PivotalTracker/ProjectIteration.pm',
     'WebService/PivotalTracker/PropertyAttributes.pm',
@@ -53,7 +54,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

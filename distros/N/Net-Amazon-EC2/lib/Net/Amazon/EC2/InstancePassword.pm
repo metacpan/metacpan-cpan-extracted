@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::InstancePassword;
+$Net::Amazon::EC2::InstancePassword::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

@@ -12,7 +12,6 @@ WriteMakefile1(
     PREREQ_PM => {
         'Module::Load' => 0,
         'DBI' => 0,
-        'Storable' => 0,
         'DBD::SQLite' => 0,
         'Scalar::Util' => 0,
     },
@@ -25,7 +24,6 @@ WriteMakefile1(
     TEST_REQUIRES => {
         'Test::More' => 0,
     },
-    EXE_FILES => ['script/mars'],
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'ActiveRecord::Simple-*' },
 );

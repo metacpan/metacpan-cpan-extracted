@@ -3,7 +3,7 @@ package WebService::PivotalTracker::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use Type::Library
     -base,
@@ -16,6 +16,7 @@ use Type::Library
     LabelObject
     LWPObject
     MD5Hex
+    PersonObject
     ProjectType
     PTAPIObject
     StoryState
@@ -75,6 +76,8 @@ declare MD5Hex,
     $_[0]->parent->inline_check( $_[1] ) . " && $_[1] =~ m/^[0-9a-f]{32}\$/i"
     };
 
+class_type PersonObject, { class => 'WebService::PivotalTracker::Person' };
+
 enum ProjectType, [
     qw(
         demo
@@ -102,3 +105,43 @@ enum StoryState, [
 enum StoryType, [qw( feature bug chore release )];
 
 1;
+
+# ABSTRACT: Type definitions used in this distro
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::PivotalTracker::Types - Type definitions used in this distro
+
+=head1 VERSION
+
+version 0.10
+
+=head1 DESCRIPTION
+
+This package has no user-facing parts.
+
+=for Pod::Coverage *EVERYTHING*
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-PivotalTracker/issues>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by MaxMind, Inc.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

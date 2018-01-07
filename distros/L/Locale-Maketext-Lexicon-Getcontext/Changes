@@ -1,5 +1,13 @@
 Revision history for Locale-Maketext-Lexicon-Getcontext
 
+0.05 / 2018-01-05 / SAPER
+
+  [Feature]
+  - Add the disable_maketext_conversion option (for ProductOpener)
+
+  [Documentation]
+  - Copy the rest of the documentation from Locale::Maketext::Lexicon::Gettext
+
 0.04 / 2017-01-12 / SAPER
 
   [Code]

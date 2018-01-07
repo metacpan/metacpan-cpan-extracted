@@ -4,7 +4,7 @@
       "Michael G Schwern <schwern@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,7 @@
    "provides" : {
       "Test::Sims" : {
          "file" : "lib/Test/Sims.pm",
-         "version" : "20130412"
+         "version" : "20180103"
       }
    },
    "release_status" : "stable",
@@ -49,5 +49,5 @@
          "url" : "http://github.com/schwern/Test-Sims/tree/master"
       }
    },
-   "version" : "20130412"
+   "version" : "20180103"
 }

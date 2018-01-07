@@ -1,5 +1,5 @@
 {
-   "abstract" : "extract components of a street address, presented as a text string",
+   "abstract" : "extract components of a street address from free format text",
    "author" : [
       "Kim Ryan <kimryan at cpan org>"
    ],
@@ -42,11 +42,11 @@
    "provides" : {
       "Lingua::EN::AddressParse" : {
          "file" : "lib/Lingua/EN/AddressParse.pm",
-         "version" : "1.26"
+         "version" : "1.27"
       },
       "Lingua::EN::AddressParse::Grammar" : {
          "file" : "lib/Lingua/EN/AddressParse/Grammar.pm",
-         "version" : "1.26"
+         "version" : "1.27"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/kimryan/Lingua-EN-AddressParse"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

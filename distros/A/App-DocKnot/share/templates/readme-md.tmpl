@@ -153,9 +153,11 @@ made any sense to you, don't bother with this flag.
 [% build.suffix %]
 [% END %][% IF !readme.testing %]
 ## Testing
-
+[% IF test.prefix %]
+[% test.prefix %]
+[% ELSE %]
 [% name %] comes with a test suite, which you can run after building with:
-
+[% END %]
 ```
     make check
 ```

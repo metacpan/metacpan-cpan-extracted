@@ -1,0 +1,62 @@
+{
+   "abstract" : "The great new Test::BDD::Cucumber::Definitions!",
+   "author" : [
+      "Mikhail Ivanov <m.ivanych@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-BDD-Cucumber-Definitions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DDP" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::XS" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Params::ValidationCompiler" : "0",
+            "Test::BDD::Cucumber" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions.git",
+         "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -31,6 +31,11 @@ input parameter
 - the given operations as fields of either `Query` if a `GET`,
 or `Mutation` otherwise
 
+If an output type has `additionalProperties` (effectively a hash whose
+values are of a specified type), this poses a problem for GraphQL which
+does not have such a concept. It will be treated as being made up of a
+list of pairs of objects (i.e. hashes) with two keys: `key` and `value`.
+
 The queries will be run against the spec's server.  If the spec starts
 with a `/`, and a [Mojolicious](https://metacpan.org/pod/Mojolicious) app is supplied (see below), that
 server will instead be the given app.
@@ -47,9 +52,13 @@ containing a JSON specification, of an OpenAPI v2. Optionally, a
 
 This is available as `\&GraphQL::Plugin::Convert::OpenAPI::make_field_resolver`
 in case it is wanted for use outside of the "bundle" of the `to_graphql`
-method. It takes one argument, a hash-ref mapping from a GraphQL operation
-field-name to an `operationId`, and returns a closure that can be used
-as a field resolver.
+method. It takes arguments:
+
+- a hash-ref mapping from a GraphQL operation field-name to an `operationId`
+- a hash-ref mapping from a GraphQL type-name to true if that type needs
+transforming from a hash into pairs
+
+and returns a closure that can be used as a field resolver.
 
 # DEBUGGING
 

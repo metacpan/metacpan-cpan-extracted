@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::LogWindow;
 # ABSTRACT: Role for log window
-$Renard::Curie::Component::MainWindow::Role::LogWindow::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::Role::LogWindow::VERSION = '0.004';
 use Moo::Role;
 
 use Renard::Curie::Component::LogWindow;
@@ -35,7 +35,7 @@ Renard::Curie::Component::MainWindow::Role::LogWindow - Role for log window
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 

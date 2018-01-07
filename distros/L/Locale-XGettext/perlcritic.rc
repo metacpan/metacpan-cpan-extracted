@@ -16,3 +16,6 @@
 
 ; Prototypes are good and important, contrary to what Conway thinks.
 [-Subroutines::ProhibitSubroutinePrototypes]
+
+; Outsmarts automatic versioning.
+[-TestingAndDebugging::RequireUseStrict]

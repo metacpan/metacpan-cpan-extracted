@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.049
+Version 0.050
 
 =head1 SYNOPSIS
 

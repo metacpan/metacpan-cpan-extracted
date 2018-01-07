@@ -1,0 +1,55 @@
+NAME
+    Complete::PPR - Completion routines related to PPR
+
+VERSION
+    This document describes version 0.001 of Complete::PPR (from Perl
+    distribution Complete-PPR), released on 2017-12-31.
+
+DESCRIPTION
+FUNCTIONS
+  complete_ppr_subpattern
+    Usage:
+
+     complete_ppr_subpattern(%args) -> array
+
+    Complete from available PPR subpattern names.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-PPR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-PPR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-PPR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete
+
+    Other "Complete::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

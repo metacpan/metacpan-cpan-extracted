@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Test::Deep;
-use Test::More;
+use Test2::V0;
 use Tree::Simple::Visitor::ToNestedArray;
 
 BEGIN {
@@ -22,7 +21,6 @@ use Markdent::Handler::HTMLStream::Document;
 use Markdent::Handler::HTMLStream::Fragment;
 use Markdent::Handler::MinimalTree;
 use Markdent::Parser;
-use Test::Builder;
 
 use Exporter qw( import );
 
@@ -55,9 +53,7 @@ sub parse_ok {
     diag( Dumper($results) )
         if $ENV{MARKDENT_TEST_VERBOSE};
 
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-    cmp_deeply( $results, $expect_tree, $desc );
+    is( $results, $expect_tree, $desc );
 }
 
 sub tree_from_handler {
@@ -93,8 +89,6 @@ sub html_fragment_ok {
                 unless $skip_validation;
 
             s/\n+$/\n/ for $got_html, $expect_html;
-
-            local $Test::Builder::Level = $Test::Builder::Level + 1;
 
             my $diff = html_text_diff( $got_html, $expect_html );
             ok( !$diff, $desc )
@@ -138,8 +132,6 @@ $expect_html
 EOF
 
             _html_validates_ok($got_html);
-
-            local $Test::Builder::Level = $Test::Builder::Level + 1;
 
             my $diff = html_text_diff( $got_html, $real_expect_html );
             ok( !$diff, $desc )

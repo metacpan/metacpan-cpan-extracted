@@ -13,6 +13,7 @@ my @files = (
     'lib/WebService/PivotalTracker/Entity.pm',
     'lib/WebService/PivotalTracker/Label.pm',
     'lib/WebService/PivotalTracker/Me.pm',
+    'lib/WebService/PivotalTracker/Person.pm',
     'lib/WebService/PivotalTracker/Project.pm',
     'lib/WebService/PivotalTracker/ProjectIteration.pm',
     'lib/WebService/PivotalTracker/PropertyAttributes.pm',
@@ -21,7 +22,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/basic.t',
-    't/fixtures/services/v5/stories/120292647.json',
+    't/fixtures/6dacc86cc06f5740ef4d9ae3cd8624cb.json',
     't/lib/Test/UA.pm'
 );
 

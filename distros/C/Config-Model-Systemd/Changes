@@ -1,3 +1,10 @@
+0.236.1 2018-01-03
+
+  Systemd model update:
+    * update from systemd 236 documentation
+    * parse-man: cope with new structure of systemd.exec
+      documentation
+
 0.235.1 2017-10-14
 
   Systemd model update:

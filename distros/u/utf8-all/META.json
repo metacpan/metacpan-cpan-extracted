@@ -88,7 +88,7 @@
    "provides" : {
       "utf8::all" : {
          "file" : "lib/utf8/all.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -103,7 +103,7 @@
          "web" : "https://github.com/doherty/utf8-all"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

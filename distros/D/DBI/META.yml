@@ -16,7 +16,7 @@ conflicts:
   DBD::RAM: '0.072'
   SQL::Statement: '1.33'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +27,7 @@ no_index:
     - t
     - inc
 requires:
+  Storable: '2.16'
   perl: '5.008'
 resources:
   IRC: irc://irc.perl.org/#dbi
@@ -34,8 +35,8 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.637'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.639'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_suggests:
   Clone: 0.34
   DB_File: 0

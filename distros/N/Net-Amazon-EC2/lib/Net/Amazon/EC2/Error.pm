@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::Error;
+$Net::Amazon::EC2::Error::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

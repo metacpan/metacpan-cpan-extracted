@@ -16,15 +16,15 @@ name: Dist-Zilla-Plugin-Test-Map-Tube
 provides:
   Dist::Zilla::Plugin::Test::Map::Tube:
     file: lib/Dist/Zilla/Plugin/Test/Map/Tube.pm
-    version: 0.23
+    version: 0.24
 requires:
   Dist::Zilla: 0
   Dist::Zilla::Role::FileGatherer: 0
   Dist::Zilla::Role::PrereqSource: 0
   Moose: 0
-  Test::Map::Tube: 0.35
+  Test::Map::Tube: 0.37
   perl: 5.008
 resources:
   repository: https://github.com/manwar/Dist-Zilla-Plugin-Test-Map-Tube.git
-version: 0.23
+version: 0.24
 x_serialization_backend: 'YAML::Tiny version 1.56'

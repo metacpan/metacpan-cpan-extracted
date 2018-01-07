@@ -4,7 +4,7 @@
       "Ed J <etj@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -60,6 +60,7 @@
       },
       "test" : {
          "requires" : {
+            "Import::Into" : "0",
             "Test::Deep" : "1.127",
             "Test::Exception" : "0.42",
             "Test::More" : "0.88"
@@ -80,6 +81,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.24",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

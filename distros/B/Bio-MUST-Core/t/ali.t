@@ -26,6 +26,9 @@ my $class = 'Bio::MUST::Core::Ali';
 # HMA4
 # P1B-type ATPase 4
 EOT
+    my $new_ali = $ali->clone;
+    is_deeply $new_ali, $ali,
+        'got expected Ali clone';
 }
 
 my @exp_full_ids = (

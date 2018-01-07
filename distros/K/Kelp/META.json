@@ -1,0 +1,90 @@
+{
+   "abstract" : "A web framework light, yet rich in nutrients.",
+   "author" : [
+      "Stefan G."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Kelp",
+   "prereqs" : {
+      "build" : {
+         "recommends" : {
+            "Test::Pod" : "1.41",
+            "perl" : "5.010"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Inspector" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Cookies" : "0",
+            "JSON" : "0",
+            "Log::Dispatch" : "0",
+            "Plack::Test" : "0",
+            "Plack::Util" : "0",
+            "Scalar::Util" : "0",
+            "Sys::Hostname" : "0",
+            "Template::Tiny" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "feature" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::File" : "0",
+            "Plack::Middleware::Session" : "0",
+            "Test::Exception" : "0",
+            "Test::Harness" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/naturalist/kelp/issues"
+      },
+      "homepage" : "http://naturalist.github.io/kelp/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/naturalist/kelp.git",
+         "web" : "https://github.com/naturalist/kelp"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

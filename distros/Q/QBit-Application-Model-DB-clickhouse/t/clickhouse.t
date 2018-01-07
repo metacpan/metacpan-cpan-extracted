@@ -41,7 +41,7 @@ sub check_create_table {
     `f_uint8` UInt8,
     `f_uint32` UInt32,
     `f_enum` Enum8('one' = 1, 'two' = 2)
-) ENGINE = MergeTree(`f_date`, (`f_date` , `f_uint8`), 8192);
+) ENGINE = MergeTree(`f_date`, (`f_date`, `f_uint8`), 8192);
 }, 'Check create_sql'
     );
 }

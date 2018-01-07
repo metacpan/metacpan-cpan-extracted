@@ -5,6 +5,7 @@ README
 lib/File/Path/Tiny.pm
 lib/File/Path/Tiny.pod
 t/00.load.t
+t/01.symtogsafe.t
 t/perlcritic.t
 t/perltidy.t
 t/pkg-changes.t

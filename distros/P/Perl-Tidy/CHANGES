@@ -1,4 +1,90 @@
 Perltidy Change Log
+  2018 01 01
+      - Added new flag -wn (--weld-nested-containers) which addresses these issues:
+        RT #123749: Problem with promises; 
+        RT #119970: opening token stacking strange behavior;
+        RT #81853: Can't stack block braces
+
+        This option causes closely nested pairs of opening and closing containers
+        to be "welded" together and essentially be formatted as a single unit,
+        with just one level of indentation.
+
+        Since this is a new flag it is set to be "off" by default but it has given 
+        excellent results in testing. 
+
+        EXAMPLE 1, multiple blocks, default formatting:
+            do {
+                {
+                    next if $x == $y;    # do something here
+                }
+            } until $x++ > $z;
+
+        perltidy -wn
+            do { {
+                next if $x == $y;
+            } } until $x++ > $z;
+
+         EXAMPLE 2, three levels of wrapped function calls, default formatting:
+                p(
+                    em(
+                        conjug(
+                            translate( param('verb') ), param('tense'),
+                            param('person')
+                        )
+                    )
+                );
+
+            # perltidy -wn
+                p( em( conjug(
+                    translate( param('verb') ),
+                    param('tense'), param('person')
+                ) ) );
+
+            # EXAMPLE 3, chained method calls, default formatting:
+            get('http://mojolicious.org')->then(
+                sub {
+                    my $mojo = shift;
+                    say $mojo->res->code;
+                    return get('http://metacpan.org');
+                }
+            )->then(
+                sub {
+                    my $cpan = shift;
+                    say $cpan->res->code;
+                }
+            )->catch(
+                sub {
+                    my $err = shift;
+                    warn "Something went wrong: $err";
+                }
+            )->wait;
+
+            # perltidy -wn
+            get('http://mojolicious.org')->then( sub {
+                my $mojo = shift;
+                say $mojo->res->code;
+                return get('http://metacpan.org');
+            } )->then( sub {
+                my $cpan = shift;
+                say $cpan->res->code;
+            } )->catch( sub {
+                my $err = shift;
+                warn "Something went wrong: $err";
+            } )->wait;
+
+
+      - Fixed RT #114359: Missparsing of "print $x ** 0.5;
+
+      - Deactivated the --check-syntax flag for better security.  It will be
+        ignored if set.  
+
+      - Corrected minimum perl version from 5.004 to 5.008 based on perlver
+        report.  The change is required for coding involving wide characters.
+
+      - For certain severe errors, the source file will be copied directly to the
+        output without formatting. These include ending in a quote, ending in a
+        here doc, and encountering an unidentified character.
+
   2017 12 14
       - RT #123749, partial fix.  "Continuation indentation" is removed from lines 
         with leading closing parens which are part of a call chain. 

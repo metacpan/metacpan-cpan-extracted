@@ -22,7 +22,7 @@
 # ABSTRACT: Extract Strings To PO Files
 
 package Locale::XGettext;
-
+$Locale::XGettext::VERSION = '0.3';
 use strict;
 
 use Locale::TextDomain 1.20 qw(Locale-XGettext);
@@ -457,6 +457,14 @@ sub option {
     return $self->{__options}->{$key};
 }
 
+sub setOption {
+    my ($self, $key, $value) = @_;
+
+    $self->{__options}->{$key} = $value;
+
+    return $self;
+}
+
 sub output {
     my ($self) = @_;
     
@@ -574,7 +582,7 @@ sub versionInformation {
     
     return __x('{program} ({package}) {version}
 Please see the source for copyright information!
-', program => $0, package => $package, version => $version);
+', program => $self->programName, package => $package, version => $version);
 }
 
 sub canExtractAll {
@@ -953,18 +961,21 @@ sub __setFlags {
     return \@flags;
 }
 
+sub programName { $0 }
+
 sub __displayUsage {
     my ($self) = @_;
     
     if ($self->needInputFiles) {
-        print __x("Usage: {program} [OPTION] [INPUTFILE]...\n", program => $0);
+        print __x("Usage: {program} [OPTION] [INPUTFILE]...\n",
+                  program => $self->programName);
         print "\n";
     
         print __(<<EOF);
 Extract translatable strings from given input files.
 EOF
     } else {
-        print __x("Usage: {program} [OPTION]\n", program => $0);
+        print __x("Usage: {program} [OPTION]\n", program => $self->programName);
         print "\n";
     
         print __(<<EOF);
@@ -1182,13 +1193,13 @@ sub __usageError {
     if ($message) {
         $message =~ s/\s+$//;
         $message = __x("{program_name}: {error}\n",
-                       program_name => $0, error => $message);
+                       program_name => $self->programName, error => $message);
     } else {
         $message = '';
     }
     
     die $message . __x("Try '{program_name} --help' for more information!\n",
-                       program_name => $0);
+                       program_name => $self->programName);
 }
 
 1;

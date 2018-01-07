@@ -14,21 +14,23 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 e896df157523e8ea1d5d83755aeede5424d60885 Build.PL
+SHA1 9a1f2ab199a0673cd8d0306eecd30ab97d2265b5 Build.PL
 SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
-SHA1 8b6c9b0256793094b8d22999324cbb5c4abb8452 ChangeLog
-SHA1 8363408ef43ef727a802ae58abc388a53b3afd9d Changes
+SHA1 ea0ea929fe417e076ea3c498aa86cc094543c1dc ChangeLog
+SHA1 21af337f76cdfd5bd0df07c9aa007673db720d19 Changes
 SHA1 4e1d0209dcf3f33004676902775e878089cc2d5d GNUmakefile
-SHA1 8f5040570fdadeeff30926f500b38918b2fffcf3 MANIFEST
-SHA1 2ccd03459393cbc69b0dd911b3522c833bb846fe META.json
-SHA1 0e322388889e72a8a5c2c7732a99d3f94cb6b9fa META.yml
-SHA1 77da584d392a06e32a8427748462769406fb15b9 Makefile.PL
+SHA1 977c846e7958465faf794f6f8f5fcbf0a3b7fd8e MANIFEST
+SHA1 933d2b826fbc341eb409fd90411fb5824f240477 META.json
+SHA1 db2002114a72867398306371cce84da25ef6e0cb META.yml
+SHA1 e10ed8927490a767418c222be43af8413f091acc Makefile.PL
 SHA1 3ae10a40184e53d7d0ad2ff8762d77704e26ae4c README.md
 SHA1 bf8876342e9c23cb2edd2791a5c25f236de63e1c THANKS
 SHA1 0914ae01ba4db9a0662a58204dd91b6c59400506 configure
 SHA1 19b4049870fd9b6306778d8fd3fbdcc51f169c55 data/cdda.bin
 SHA1 4d48af2fbdb4a0c1601da469a1676757a3c31155 data/cdda.cue
 SHA1 8a4b2a0c48b67e109899b783e63fc1b424bdc6cc data/cdda.toc
+SHA1 346beddcbe1499a2c3152e2794a34b3f03330596 data/cdtext-test.toc
+SHA1 6a1f3e36afbea8037c7d2419ef6e815dc19d5e7d data/cdtext.cdt
 SHA1 c807ef36a3836f32e93f82ea28ee2d109e92c426 data/copying.iso
 SHA1 70b651d67810fdeb96e015f829aa20469c3309a5 data/isofs-m1.bin
 SHA1 8cb48199b6e90bdc7b97d9d7215c82247d2b1ec0 data/isofs-m1.cue
@@ -37,7 +39,8 @@ SHA1 9fb285486e930b739ebae64eeedeb42e67bbb1e8 examples/README
 SHA1 f6b6d441850c5ab1922bb169d1ec8275c14a51ad examples/audio.pl
 SHA1 cde423159ef4ae5f69d50320bd082d593c196a16 examples/cd-read.pl
 SHA1 b32034f8928ce7e35839d2d49da0fdae722c5a64 examples/cdchange.pl
-SHA1 64adb3b6d43bb10f41c8e868dd5bfe5be7812ccf examples/cdtext.pl
+SHA1 1b7e55ceeb1fbbb3e806dc98c058652b13a32574 examples/cdtext-raw.pl
+SHA1 0d0edda0599a7ed29cf5582b5f66a3b09ff4cfe8 examples/cdtext.pl
 SHA1 846314cbb63211abeb0688ab6d8564df4cc6eec6 examples/checkcd.pl
 SHA1 4039472251e2a05da71e32bdefeafea1c90efd96 examples/device.pl
 SHA1 85b8db4d1ce7868dd98e1ce96420ad8080e00a00 examples/drives.pl
@@ -47,31 +50,30 @@ SHA1 7ff21532b1a1fff551c3c854f45df02b006c8772 examples/iso1.pl
 SHA1 5ae951fbffd8e4f207b3e743b41e55dbad80bc43 examples/iso2.pl
 SHA1 054b80cd74769dcc5abdb0425b91385376d82a91 examples/iso3.pl
 SHA1 11a3786020d6ed46a4bee7cb944e181d82388a52 examples/tracks.pl
-SHA1 57e415e66d603607ca63baa82e67dba0540c872e lib/Device/Cdio.pm
-SHA1 5e797f0765827075dc0f2b395204991d4beb3def lib/Device/Cdio/Device.pm
+SHA1 90af7aeff2b18e30b1d2024622a20238a2bdae86 lib/Device/Cdio.pm
+SHA1 5160887f061cb9d2446f20b7221aab9c0f4e3fd4 lib/Device/Cdio/Device.pm
 SHA1 59660b6db81e7b306ebe7d7cd23f2ba049494dee lib/Device/Cdio/ISO9660.pm
 SHA1 9df90acad20086f3f8c6cd5962b1b6863d04cc80 lib/Device/Cdio/ISO9660/FS.pm
 SHA1 c358737cda8ac7d7f70c5c03456b455481f12c01 lib/Device/Cdio/ISO9660/IFS.pm
-SHA1 66c1fb6fda9e202c06cea9b9aa8b1a145d46e1ec lib/Device/Cdio/Track.pm
+SHA1 155cca9c9ceaff21d20864a77c8c87d8ead3c6a9 lib/Device/Cdio/Track.pm
 SHA1 1e127d321eacff1d11351fa5ad0ba48c37dc2149 lib/Device/Cdio/Util.pm
-SHA1 bb2e304c7820c15cae1fbc01153e55b22b3daaa9 lib/perlcdio.pm
-SHA1 355cc0ab50aa3447d004881febfd1d2b420e8288 lib/perliso9660.pm
-SHA1 47d11878ccc7a98474bf8f9625580a8ee8808fba lib/perlmmc.pm
-SHA1 e59d760d0bd036e4596efd96427aad1a48a4680d perlcdio_wrap.c
-SHA1 ff6cfb77168a888c58fab32a028442525c86880a perliso9660_wrap.c
-SHA1 4fc5dd484be48e457fce07709774c15dd35eeb9f perlmmc_wrap.c
+SHA1 829a67f1e2a7319c98eb1ab61f285558bd4ec5b8 lib/perlcdio.pm
+SHA1 41b00ba4731f36f3cd8f1becd44d1b9fe0825ffd lib/perliso9660.pm
+SHA1 eea41467d68b0cccd35dc5ea6261cebd63fdde0a lib/perlmmc.pm
+SHA1 28d013d459d08948eb3041613d5bc83c46053785 perlcdio_wrap.c
+SHA1 499b4d1182c08d48c3e1e8ee2f0c5969a3f70796 perliso9660_wrap.c
+SHA1 4ba894a5683ea3b22a86149dd34936d6885e04be perlmmc_wrap.c
 SHA1 026db667631e5c92621cdd717e93c8b053d4736e swig/audio.swg
-SHA1 b238dfeeec61979747834c1ba95420179589b93d swig/cdtext.swg
+SHA1 ba9abeaaf37888031e7a5997f010b010ffebd97d swig/cdtext.swg
 SHA1 12dc444c2391f1384a9e48b047a78ff831f7d275 swig/device.swg
-SHA1 53223f7763919106df6c3ce8a4bd1b46d0cf5855 swig/device_const.swg
-SHA1 f057c267a611db7583aded37e75549eb41f1ec2b swig/disc.swg
+SHA1 fee0ba184fb7f1c7f5a15c4443ee7ccff1fbaa2c swig/device_const.swg
+SHA1 5ebcc414317ca38383a0b9008416dea0e049cec8 swig/disc.swg
 SHA1 53f63607569d1c2456567b2e8d80d3b730ee0444 swig/perlcdio.swg
-SHA1 0c0b55616ed72a8fa515a6fa165fa46513795d33 swig/perliso9660.swg
-SHA1 7c7f913697e63eccdd1ea7873a559d70ebe5aa2e swig/perlmmc.swg
+SHA1 96f5a56c5656cf86eec6952e8a0dcbd40bf3f564 swig/perliso9660.swg
+SHA1 aa841afa223dc9c345e4e8cf1fa94f9e27135ec6 swig/perlmmc.swg
 SHA1 36c11ca632fa0de5a4dc6c29ca31e6d479c8a1bc swig/read.swg
 SHA1 8f2314f0b0b5048e5057d95b24e3b2daf5854780 swig/track.swg
 SHA1 c50d9bf6bf4e388f346a7e1d15fc708c4491a570 swig/types.swg
-SHA1 39cb79d00764081cb833aeee9fe589899cca22c4 t/.gdb_history
 SHA1 9b89e57d5444e67638ad1477e6db059c823d08a4 t/00.load.t
 SHA1 30e79551031400b0d9662dd8e908f26682b72258 t/01.pod-coverage.t
 SHA1 e3629617f384b836b1b1687bad1f4d051b81796f t/01.pod.t
@@ -84,15 +86,13 @@ SHA1 db3d8bc149e7768de4f8ea483708b3bf2c9e1236 t/07.iso.t
 SHA1 17a7b118e28439e5ed37c6915c31ec4bfcc45307 t/07.iso1.t
 SHA1 30c51e5f69e4934bd54cbfc903a985c29368e3bf t/07.iso2.t
 SHA1 50276658d97517cec082e86304ab9be4d18753b0 t/07.iso3.t
-SHA1 5123a7a6065132b69f3b060542b39e0bccae521c t/10.cdda.t
-SHA1 86c719c9dbe1ea4b39b601c1117522da58f31669 t/10.cdtext.t
+SHA1 eb0106af77ec82afab9448312cfb1cb617c70070 t/10.cdda.t
+SHA1 ef53580f6f19c99eeb0c9336a2df2cc06599e6e2 t/10.cdtext.t
 SHA1 45533382456d1c0e61afd853d7ecb6205eb16b62 t/10.read.t
 SHA1 0fc01e8d5b215274c213e48f589a188a70367dd0 t/11.dev.t
-SHA1 346beddcbe1499a2c3152e2794a34b3f03330596 t/cdtext.toc
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAln6gVgACgkQGo3lAIJ17CHslACfTDhhCD7qM0WQQeHuL+w5Av0p
-unQAnimtUQvVYV1CKvXKua2hPjMIKf4v
-=Y9EO
+iEYEARECAAYFAlpJLLcACgkQGo3lAIJ17CHOvQCfQMm58rVwg063z0jkzEk1gvJp
+QxwAn3uMF5SQ2rYcENQ0YJGIiz5rWeyT
+=xD+S
 -----END PGP SIGNATURE-----

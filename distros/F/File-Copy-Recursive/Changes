@@ -1,25 +1,32 @@
 Revision history for Perl extension File::Copy::Recursive.
 
-0.38  
+0.39 Fri Dec 29 13:26:12 2017
+    - tidy code
+    - Change into directory before emptying it
+    - Stop emptying/removing a path if it is changed out from underneath us
+    - pathrm() fixes
+    - Actual unit tests!
+
+0.38  Sun Dec  7 22:35:42 2008
     - do rmove() symlink fixups like rcopy() from ver 0.37
     - rt 29750 (added $DirPerms)
     - Added requested rcopy_glob() && rmove_glob() for convenience
-    
+
 0.37  Thu Oct  9 11:52:54 2008
     - rt 38959 POD fix ups
     - improved rcopy() symlink logic and do &goto; to preserve the stack
     - added "tests" to the TODO list, patches welcome!
-    
+
 0.36  Wed Apr 16 15:32:36 2008
     - made all bareword file handles be lexical variables if the perl is new enough to support it (5.6.0 and up, see 'Indirect Filehandles' in perlopentut)
 
 0.35  Mon Aug 27 16:18:53 2007
 	- fixed rt 29008
-	
+
 0.34  Tue Aug 21 09:41:05 2007
 	- samecheck return; instead of croak;
 	- remaining croak()'s to $! = .. return;
-	
+
 0.33  Thu May 10 12:19:36 2007
 	- Sorry missed this one w/ 0.32... rt 25529
 
@@ -42,10 +49,10 @@ Revision history for Perl extension File::Copy::Recursive.
 0.28  Thu Sep  7 15:27:06 2006
 	- rebundled with make dist under COPY_EXTENDED_ATTRIBUTES_DISABLE=true for
 	 21378, thnaks Robert Boone for that excellent solution!
-	
+
 0.27  Wed Sep  6 23:46:16 2006
 	- quick rename so it can be uploaded fresh due to pause upload mishap
-	
+
 0.26  Wed Sep  6 23:45:16 2006
     - added local DIE SIG as per 21351
     - handle symlinks whose target's are missing more gracefully - 21267
@@ -59,10 +66,10 @@ Revision history for Perl extension File::Copy::Recursive.
 0.23  Thu Jun  1 08:40:53 2006
 	- fixed bug 19637
 
-0.22  Thu May 11 08:18:36 2006 
+0.22  Thu May 11 08:18:36 2006
 	- fixed bug 19205
 
-0.21  Mon Apr 24 12:28:11 2006  
+0.21  Mon Apr 24 12:28:11 2006
         - made dircopy() use fcopy() instead of copy() for files so that it'd behave consistently and correctly
 	- updated some POD
 
@@ -84,14 +91,14 @@ Revision history for Perl extension File::Copy::Recursive.
         - changed handles to variables as per "Perl Best Pratices"
         - change a readir to us single quote sinstead o double since no interpolation is being done
 
-0.16  Mon Aug 29 08:06:14 2005  
+0.16  Mon Aug 29 08:06:14 2005
 	- fixed fcopy() + $RMTrgFil spurious behavior when target is a directory
 
 0.15  Fri Aug 26 08:40:26 2005
 	- changed $RMTrgDir and $RMTrgFil to carp() instead of warn() and with slightly more useful message
 	- fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
 	- added "TO DO" regarding an OO interface
-	
+
 0.14  Thu Aug 25 14:19:58 2005
 	- added $RMTrgDir and $RMTrgFil functionality
 
@@ -103,12 +110,12 @@ Revision history for Perl extension File::Copy::Recursive.
 	- Fixed absolute path bug in pathmk()
 
 0.11  Sun Aug 21 16:04:10 2005
-	- Added the *move and path* funtions
+	- Added the *move and path* functions
 	- Added $CopyLoop
 	- Made fcopy() recursively create its base directories if necessary like dircopy() did in 0.09 on
 
 0.10  Sat Aug  6 17:01:12 2005
-	- fixed indent in "SEE ALSO" POD that made it render badly	
+	- fixed indent in "SEE ALSO" POD that made it render badly
 	- Added $PFSCheck
 
 0.09  Fri Aug  5 18:59:11 2005
@@ -121,7 +128,7 @@ Revision history for Perl extension File::Copy::Recursive.
 
 0.07  Mon Jul 18 18:32:36 2005
         - changed dircopy to return if subsequent copy fails (IE liek permission denied) so that "or [warn|die] $!" will work recursively also
- 
+
 0.06  Fri Apr 15 11:25:27 2005
         - cleaned up Makefile.PL
         - added symlink preservation support (Thanks to Troy Goodson for pointing out that need)
@@ -129,10 +136,10 @@ Revision history for Perl extension File::Copy::Recursive.
 0.05  Mon Jan 24 19:10:50 2005
 	- removed Makefile.PL perl version restriction
 
-0.04  Tue Jan 18 20:59:44 2005 
+0.04  Tue Jan 18 20:59:44 2005
 	- added File::Copy::Recursive::VERSION(), not sure why I missed it before ;p
 	- removed use 5.008001; since its not dependant on any version
- 
+
 0.03  Mon Jan 17 19:11:19 2005
 	- fixed documentation misspelling
 

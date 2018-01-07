@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Jiffy;
+
+my $app = App::Jiffy->new;
+exit( $app->run(@ARGV) ? 0 : 1 );

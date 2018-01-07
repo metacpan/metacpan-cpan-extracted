@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "classes for parsing bioinformatics program output",
+  "ABSTRACT" => "Classes for parsing bioinformatics programs output",
   "AUTHOR" => "Denis BAURAIN <denis.baurain\@uliege.be>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.173510",
+  "VERSION" => "0.173640",
   "test" => {
     "TESTS" => "t/*.t"
   }

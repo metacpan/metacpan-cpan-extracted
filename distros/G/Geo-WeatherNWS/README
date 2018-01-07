@@ -9,10 +9,8 @@ The documentation on how to use the module is available via perldoc.
 Requirements:
 
 	Net::FTP
-	POSIX
+	IO::Handle
 	Carp
-	LWP::UserAgent (only if http is used)
-    Test::More
 
 Install this module in the normal way:
 

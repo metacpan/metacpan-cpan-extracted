@@ -1,7 +1,76 @@
+2017-12-31  rocky <rb@dustyfeet.com>
+
+	* Changes, admin-tools/how-to-make-a-release.txt: Get ready for
+	release 2.0.0
+
+2017-12-28  R. Bernstein <rocky@cpan.org>
+
+	* t/10.cdtext.t: Remove old comment
+
+2017-12-23  rocky <rb@dustyfeet.com>
+
+	* MANIFEST, META.yml, lib/Device/Cdio.pm: Bump version.
+	Administrivia
+
+2017-12-23  rocky <rb@dustyfeet.com>
+
+	* MANIFEST, t/cdtext.toc => data/cdtext-test.toc,
+	examples/cdtext-raw.pl, lib/Device/Cdio/Device.pm, swig/cdtext.swg,
+	t/.gdb_history, t/10.cdtext.t: Reinstate all CD-Text tests...  Add example program and data to parse a CD-Text data file
+
+2017-12-23  rocky <rb@dustyfeet.com>
+
+	* examples/cdtext.pl, lib/Device/Cdio/Device.pm, swig/cdtext.swg: 
+	Improve Cd-Text handling
+
+2017-12-23  rocky <rb@dustyfeet.com>
+
+	* examples/cdtext.pl, lib/Device/Cdio/Device.pm, t/10.cdtext.t: 
+	Correct cdtext handling for libcdio 2.0.0 API
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* lib/Device/Cdio/Track.pm, swig/perlmmc.swg: Correct get_track_isrc
+	routine Fixes #5
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* .travis.yml: Another Travis config attempt
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* .travis.yml: Another Travis config attempt
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* .travis.yml: Travis yaml typo
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* .travis.yml: Bump libcdio version used in Travis CI
+
+2017-12-18  rocky <rb@dustyfeet.com>
+
+	* circle.yml, examples/cdtext.pl, lib/Device/Cdio/Device.pm,
+	swig/cdtext.swg, t/10.cdda.t, t/10.cdtext.t: Work on cdtext for
+	libcdio 1.1.0
+
+2017-12-17  R. Bernstein <rocky@cpan.org>
+
+	* META.yml, examples/cdtext.pl, lib/Device/Cdio/Device.pm,
+	swig/cdtext.swg: Revise CD-Text for current libcdio 1.1.0 API
+
+2017-12-06  rocky <rb@dustyfeet.com>
+
+	* .travis.yml, Build.PL, swig/device_const.swg, swig/disc.swg,
+	swig/perliso9660.swg, t/10.cdtext.t: Start upgrade to 1.1.0
+	interface
+
 2017-11-01  R. Bernstein <rocky@cpan.org>
 
-	* META.yml, admin-tools/how-to-make-a-release.txt,
-	lib/Device/Cdio.pm: Get ready for release 0.4.0
+	* ChangeLog, Changes, META.yml,
+	admin-tools/how-to-make-a-release.txt, lib/Device/Cdio.pm: Get ready
+	for release 0.4.0
 
 2017-10-31  rocky <rb@dustyfeet.com>
 
@@ -41,8 +110,8 @@
 
 2017-10-30  R. Bernstein <rocky@cpan.org>
 
-	* .gitignore, Build.PL, ChangeLog, MANIFEST, swig/cdtext.swg,
-	swig/cdtext_new.swg, swig/cdtext_old.swg: Simplify: No longer have
+	* .gitignore, Build.PL, ChangeLog, MANIFEST, swig/{cdtext_new.swg
+	=> cdtext.swg}, swig/cdtext_old.swg: Simplify: No longer have
 	cdtext_{old,new}
 
 2017-10-30  R. Bernstein <rocky@cpan.org>
@@ -81,11 +150,11 @@
 
 2017-10-30  R. Bernstein <rocky@cpan.org>
 
-	* .circleci.yml, circle.yml: CircleCI test 3
+	* .circleci.yml => circle.yml: CircleCI test 3
 
 2017-10-30  R. Bernstein <rocky@cpan.org>
 
-	* .circleci.yml, .circleci/circle.yml: CircleCI testing
+	* .circleci/circle.yml => .circleci.yml: CircleCI testing
 
 2017-10-30  R. Bernstein <rocky@cpan.org>
 
@@ -366,7 +435,7 @@
 
 2011-08-08  r <rocky@gnu.org>
 
-	* MANIFEST, README, README.md: Use Markdown for README which looks
+	* MANIFEST, README => README.md: Use Markdown for README which looks
 	better on github.
 
 2011-08-08  r <rocky@gnu.org>
@@ -383,12 +452,12 @@
 
 2011-08-07  r <rocky@gnu.org>
 
-	* Build.PL, MANIFEST, MANIFEST.SKIP, audio.swg, device.swg,
-	device_const.swg, disc.swg, perlcdio.swg, perliso9660.swg,
-	perlmmc.swg, read.swg, swig/audio.swg, swig/device.swg,
-	swig/device_const.swg, swig/disc.swg, swig/perlcdio.swg,
-	swig/perliso9660.swg, swig/perlmmc.swg, swig/read.swg,
-	swig/track.swg, swig/types.swg, track.swg, types.swg: Move swig
+	* Build.PL, MANIFEST, MANIFEST.SKIP, audio.swg => swig/audio.swg,
+	device.swg => swig/device.swg, device_const.swg =>
+	swig/device_const.swg, disc.swg => swig/disc.swg, perlcdio.swg =>
+	swig/perlcdio.swg, perliso9660.swg => swig/perliso9660.swg,
+	perlmmc.swg => swig/perlmmc.swg, read.swg => swig/read.swg,
+	track.swg => swig/track.swg, types.swg => swig/types.swg: Move swig
 	files to a SWIG directory.
 
 2011-08-06  r <rocky@gnu.org>
@@ -499,7 +568,7 @@
 2011-07-30  R. Bernstein <rocky@cpan.org>
 
 	* .gitignore, Build.PL, COPYING, THANKS, examples/.gitignore,
-	examples/iso0.pl, lib/.cvsignore, lib/.gitignore,
+	examples/iso0.pl, lib/{.cvsignore => .gitignore},
 	lib/Device/Cdio.pm, perlmmc.swg, t/01.pod-coverage.t, t/01.pod.t,
 	t/07.iso.t, t/07.iso2.t: Use Jerry G Geiger's Build.PL patch to get
 	close to having this work automatically.  I still needed to copy

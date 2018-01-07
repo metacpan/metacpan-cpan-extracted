@@ -64,5 +64,5 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness/issues
   repository: http://github.com/Test-More/Test2-Harness/
-version: '0.001043'
+version: '0.001045'
 x_serialization_backend: 'YAML::Tiny version 1.70'

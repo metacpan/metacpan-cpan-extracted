@@ -7,7 +7,7 @@ Attean::API::Query - Utility package defining query-related roles
 
 =head1 VERSION
 
-This document describes Attean::API::Query version 0.017
+This document describes Attean::API::Query version 0.018
 
 =head1 SYNOPSIS
 
@@ -24,11 +24,11 @@ This is a utility package for defining query-related roles:
 
 =cut
 
-package Attean::API::DirectedAcyclicGraph 0.017 {
-	use Moo::Role;
+package Attean::API::DirectedAcyclicGraph 0.018 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(ArrayRef ConsumerOf);
-	use namespace::clean;
+
+	use Moo::Role;
 
 # =item C<< children >>
 # 
@@ -149,15 +149,15 @@ package Attean::API::DirectedAcyclicGraph 0.017 {
 	}
 }
 
-package Attean::API::SPARQLSerializable 0.017 {
+package Attean::API::SPARQLSerializable 0.018 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
-	use Moo::Role;
 	use Encode qw(decode_utf8);
 	use Attean::API::Iterator;
 	use Attean::API::Serializer;
 	use AtteanX::Serializer::SPARQL;
-	use namespace::clean;
+
+	use Moo::Role;
 
 	requires 'sparql_tokens';
 	
@@ -402,7 +402,7 @@ package Attean::API::SPARQLSerializable 0.017 {
 	}
 }
 
-package Attean::API::SPARQLQuerySerializable 0.017 {
+package Attean::API::SPARQLQuerySerializable 0.018 {
 	use Moo::Role;
 	use namespace::clean;
 	with 'Attean::API::SPARQLSerializable';
@@ -417,7 +417,7 @@ package Attean::API::SPARQLQuerySerializable 0.017 {
 
 =cut
 
-package Attean::API::Algebra 0.017 {
+package Attean::API::Algebra 0.018 {
 	use Moo::Role;
 
 	with 'Attean::API::SPARQLSerializable';
@@ -494,7 +494,7 @@ package Attean::API::Algebra 0.017 {
 
 =cut
 
-package Attean::API::QueryTree 0.017 {
+package Attean::API::QueryTree 0.018 {
 	use Moo::Role;
 	with 'Attean::API::DirectedAcyclicGraph';
 }
@@ -503,7 +503,7 @@ package Attean::API::QueryTree 0.017 {
 
 =cut
 
-package Attean::API::NullaryQueryTree 0.017 {
+package Attean::API::NullaryQueryTree 0.018 {
 	use Moo::Role;
 	sub arity { return 0 }
 	with 'Attean::API::QueryTree';
@@ -513,7 +513,7 @@ package Attean::API::NullaryQueryTree 0.017 {
 
 =cut
 
-package Attean::API::UnaryQueryTree 0.017 {
+package Attean::API::UnaryQueryTree 0.018 {
 	use Moo::Role;
 	sub arity { return 1 }
 	with 'Attean::API::QueryTree';
@@ -528,7 +528,7 @@ package Attean::API::UnaryQueryTree 0.017 {
 
 =cut
 
-package Attean::API::BinaryQueryTree 0.017 {
+package Attean::API::BinaryQueryTree 0.018 {
 	use Moo::Role;
 	sub arity { return 2 }
 	with 'Attean::API::QueryTree';
@@ -538,7 +538,7 @@ package Attean::API::BinaryQueryTree 0.017 {
 
 =cut
 
-package Attean::API::PropertyPath 0.017 {
+package Attean::API::PropertyPath 0.018 {
 	use Moo::Role;
 	with 'Attean::API::QueryTree';
 	requires 'as_string';
@@ -549,10 +549,10 @@ package Attean::API::PropertyPath 0.017 {
 
 =cut
 
-package Attean::API::UnaryPropertyPath 0.017 {
-	use Moo::Role;
+package Attean::API::UnaryPropertyPath 0.018 {
 	use Types::Standard qw(ConsumerOf);
-	use namespace::clean;
+
+	use Moo::Role;
 
 	sub arity { return 1 }
 # 	has 'path' => (is => 'ro', isa => ConsumerOf['Attean::API::PropertyPath'], required => 1);
@@ -579,10 +579,10 @@ package Attean::API::UnaryPropertyPath 0.017 {
 
 =cut
 
-package Attean::API::NaryPropertyPath 0.017 {
-	use Moo::Role;
+package Attean::API::NaryPropertyPath 0.018 {
 	use Types::Standard qw(ArrayRef ConsumerOf);
-	use namespace::clean;
+
+	use Moo::Role;
 
 # 	has 'children' => (is => 'ro', isa => ArrayRef[ConsumerOf['Attean::API::PropertyPath']], required => 1);
 	requires 'separator';
@@ -606,7 +606,7 @@ package Attean::API::NaryPropertyPath 0.017 {
 
 =cut
 
-package Attean::API::UnionScopeVariables 0.017 {
+package Attean::API::UnionScopeVariables 0.018 {
 	use Moo::Role;
 	sub in_scope_variables {
 		my $self	= shift;
@@ -622,7 +622,7 @@ package Attean::API::UnionScopeVariables 0.017 {
 
 =cut
 
-package Attean::API::IntersectionScopeVariables 0.017 {
+package Attean::API::IntersectionScopeVariables 0.018 {
 	use Moo::Role;
 	sub in_scope_variables {
 		my $self	= shift;
@@ -656,7 +656,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

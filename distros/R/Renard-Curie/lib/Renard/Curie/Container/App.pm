@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Container::App;
 # ABSTRACT: A Bread::Board container for the application
-$Renard::Curie::Container::App::VERSION = '0.003';
+$Renard::Curie::Container::App::VERSION = '0.004';
 use Moose;
 use Bread::Board::Declare;
 
@@ -68,7 +68,7 @@ Renard::Curie::Container::App - A Bread::Board container for the application
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::App;
 # ABSTRACT: A document viewing application
-$Renard::Curie::App::VERSION = '0.003';
+$Renard::Curie::App::VERSION = '0.004';
 use Moo 2.001001;
 
 use Renard::Incunabula::Frontend::Gtk3::Helper;
@@ -9,7 +9,8 @@ use Renard::Incunabula::Frontend::Gtk3::Helper;
 use File::Spec;
 use File::Basename;
 use Module::Util qw(:all);
-use Renard::Incunabula::Common::Types qw(InstanceOf Str DocumentModel);
+use Renard::Incunabula::Common::Types qw(InstanceOf Str);
+use Renard::Incunabula::Document::Types qw(DocumentModel);
 use Getopt::Long::Descriptive;
 
 use MooX::Role::Logger ();
@@ -91,7 +92,7 @@ Renard::Curie::App - A document viewing application
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

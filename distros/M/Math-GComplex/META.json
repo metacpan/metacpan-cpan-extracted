@@ -1,0 +1,57 @@
+{
+   "abstract" : "Generic complex number library.",
+   "author" : [
+      "Daniel Șuteu <trizen@protonmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-GComplex",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::AnyNum" : "0.20"
+         },
+         "requires" : {
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Math::GComplex" : {
+         "file" : "lib/Math/GComplex.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/Math-GComplex/issues"
+      },
+      "homepage" : "https://github.com/trizen/Math-GComplex",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/Math-GComplex"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

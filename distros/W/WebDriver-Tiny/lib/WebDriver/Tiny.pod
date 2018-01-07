@@ -471,7 +471,7 @@ L<Selenium::Remote::Driver>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2015 CV-Library Ltd.
+Copyright © 2018 CV-Library Ltd.
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.

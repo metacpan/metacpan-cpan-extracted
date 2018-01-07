@@ -36,6 +36,7 @@
       "runtime" : {
          "requires" : {
             "Bible::Reference" : "1.02",
+            "Clone" : "0",
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::Privacy" : "0",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/gryphonshafer/Bible-OBML"
       }
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

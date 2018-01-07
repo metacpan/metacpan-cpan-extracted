@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Pen;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Carp;
 
@@ -61,6 +61,29 @@ colour names. A colour name may optionally be prefixed by C<hi-> for the
 high-intensity version (may not be supported by all terminals). Some terminals
 may support a palette of 256 colours instead, some 16, and some only 8. The
 pen object will not check this as it cannot be reliably detected in all cases.
+
+=item fg:rgb8 => STRING
+
+=item bg:rgb8 => STRING
+
+Foreground or background colour secondary RGB8 specification. The value is a
+string encoding the three 8-bit values in hexadecimal notation, prefixed by a
+hash (C<#>) symbol; for example
+
+   #13579B
+
+On input, either lower- or upper-case is accepted; on output the letters will
+be upper-case.
+
+These attribute can only be set if the corresponding regular index attribute
+is also set. Changing or clearing the regular index will also clear the RGB8
+version.
+
+Applications wishing to use this attribute should be aware that the majority
+of terminal drivers will not be able to support it, and so should make sure to
+set an approriate regular colour index as well. Some terminals using the
+F<xterm> driver may make use of it, however, and therefore ignore the index
+version.
 
 =item b => BOOL
 
@@ -334,14 +357,14 @@ use overload '==' => sub { refaddr($_[0]) == refaddr($_[1]) };
 package Tickit::Pen::Immutable;
 use base qw( Tickit::Pen );
 use constant mutable => 0;
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 sub as_immutable { return $_[0] }
 
 package Tickit::Pen::Mutable;
 use base qw( Tickit::Pen );
 use constant mutable => 1;
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 # Adds further methods in XS
 

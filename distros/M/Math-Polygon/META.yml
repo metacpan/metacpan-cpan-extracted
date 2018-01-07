@@ -1,5 +1,5 @@
 ---
-abstract: 'Polygon calculations'
+abstract: 'basic polygon calculations'
 author:
   - 'Mark Overmeer'
 build_requires:
@@ -21,4 +21,4 @@ requires:
   Math::Trig: 0
   Scalar::Util: 1.13
   Test::More: 0.47
-version: 1.07
+version: 1.10

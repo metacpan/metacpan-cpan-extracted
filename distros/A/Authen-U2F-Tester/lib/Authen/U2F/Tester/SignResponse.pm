@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::SignResponse;
-$Authen::U2F::Tester::SignResponse::VERSION = '0.01';
+$Authen::U2F::Tester::SignResponse::VERSION = '0.02';
 # ABSTRACT: U2F Tester Sign Response
 
 use Moose;
@@ -36,7 +36,7 @@ Authen::U2F::Tester::SignResponse - U2F Tester Sign Response
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

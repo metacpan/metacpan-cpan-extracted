@@ -1,0 +1,9 @@
+0.002  2018-01-03
+
+  * Fix lack of true return value on module
+  * Fix missing method call in save()
+  * Improve examples in synopsis (sri)
+
+0.001  2017-12-09
+
+  * Initial release

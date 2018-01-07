@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 use Carp;
 use DateTime::Duration;
@@ -17,7 +17,7 @@ use DateTime::Locale 1.06;
 use DateTime::TimeZone 2.02;
 use DateTime::Types;
 use POSIX qw( floor fmod );
-use Params::ValidationCompiler 0.13 qw( validation_for );
+use Params::ValidationCompiler 0.26 qw( validation_for );
 use Scalar::Util qw( blessed );
 use Try::Tiny;
 
@@ -86,13 +86,23 @@ sub SECONDS_PER_DAY () {86400}
 
 sub duration_class () {'DateTime::Duration'}
 
-my ( @MonthLengths, @LeapYearMonthLengths );
+my (
+    @MonthLengths,
+    @LeapYearMonthLengths,
+    @QuarterLengths,
+    @LeapYearQuarterLengths,
+);
 
 BEGIN {
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
     @LeapYearMonthLengths = @MonthLengths;
     $LeapYearMonthLengths[1]++;
+
+    @QuarterLengths = ( 90, 91, 92, 92 );
+
+    @LeapYearQuarterLengths = @QuarterLengths;
+    $LeapYearQuarterLengths[0]++;
 }
 
 {
@@ -241,7 +251,7 @@ sub _new {
             # If true, this means that the actual calculated leap
             # second does not occur in the second given to new()
             ( $self->{utc_rd_secs} - 86399 < $p{second} - 59 )
-            ) {
+        ) {
             Carp::croak("Invalid second value ($p{second})\n");
         }
     }
@@ -322,7 +332,7 @@ sub _handle_offset_modifier {
                 || (   $offset == 0
                     && $self->{local_rd_secs} > 86399 )
             )
-            ) {
+        ) {
             my $mod
                 = $self->_day_length( $utc_rd_days - 1 ) - SECONDS_PER_DAY;
 
@@ -953,6 +963,22 @@ sub datetime {
 
 sub is_leap_year { $_[0]->_is_leap_year( $_[0]->year ) }
 
+sub month_length {
+    $_[0]->_month_length( $_[0]->year, $_[0]->month );
+}
+
+sub quarter_length {
+    return (
+          $_[0]->_is_leap_year( $_[0]->year )
+        ? $LeapYearQuarterLengths[ $_[0]->quarter - 1 ]
+        : $QuarterLengths[ $_[0]->quarter - 1 ]
+    );
+}
+
+sub year_length {
+    $_[0]->_is_leap_year( $_[0]->year ) ? 366 : 365;
+}
+
 sub is_last_day_of_month {
     $_[0]->day == $_[0]->_month_length( $_[0]->year, $_[0]->month );
 }
@@ -960,32 +986,29 @@ sub is_last_day_of_month {
 sub week {
     my $self = shift;
 
-    unless ( defined $self->{local_c}{week_year} ) {
+    $self->{utc_c}{week_year} ||= $self->_week_values;
 
-        # This algorithm was taken from Date::Calc's DateCalc.c file
-        my $jan_one_dow_m1
-            = ( ( $self->_ymd2rd( $self->year, 1, 1 ) + 6 ) % 7 );
+    return @{ $self->{utc_c}{week_year} }[ 0, 1 ];
+}
 
-        $self->{local_c}{week_number}
-            = int( ( ( $self->day_of_year - 1 ) + $jan_one_dow_m1 ) / 7 );
-        $self->{local_c}{week_number}++ if $jan_one_dow_m1 < 4;
+# This algorithm comes from
+# https://en.wikipedia.org/wiki/ISO_week_date#Calculating_the_week_number_of_a_given_date
+sub _week_values {
+    my $self = shift;
 
-        if ( $self->{local_c}{week_number} == 0 ) {
-            $self->{local_c}{week_year} = $self->year - 1;
-            $self->{local_c}{week_number}
-                = $self->_weeks_in_year( $self->{local_c}{week_year} );
-        }
-        elsif ($self->{local_c}{week_number} == 53
-            && $self->_weeks_in_year( $self->year ) == 52 ) {
-            $self->{local_c}{week_number} = 1;
-            $self->{local_c}{week_year}   = $self->year + 1;
-        }
-        else {
-            $self->{local_c}{week_year} = $self->year;
-        }
+    my $week
+        = int( ( ( $self->day_of_year - $self->day_of_week ) + 10 ) / 7 );
+
+    my $year = $self->year;
+    if ( $week == 0 ) {
+        $year--;
+        return [ $year, $self->_weeks_in_year($year) ];
+    }
+    elsif ( $week == 53 && $self->_weeks_in_year($year) == 52 ) {
+        return [ $year + 1, 1 ];
     }
 
-    return @{ $self->{local_c} }{ 'week_year', 'week_number' };
+    return [ $year, $week ];
 }
 
 sub _weeks_in_year {
@@ -2231,7 +2254,7 @@ sub STORABLE_freeze {
         qw( utc_rd_days
         utc_rd_secs
         rd_nanosecs )
-        ) {
+    ) {
         $serialized .= "$key:$self->{$key}|";
     }
 
@@ -2311,7 +2334,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 
@@ -2960,13 +2983,13 @@ very good ISO8601 format, as it lacks a time zone.  If called as
 C<< $dt->iso8601() >> you cannot change the separator, as ISO8601 specifies
 that "T" must be used to separate them.
 
-=head2 $dt->stringify()
+=head3 $dt->stringify()
 
 This method returns a stringified version of the object. It is how
-stringification overloading is limited. If the object has a formatter, then
-it's C<format_datetime()> method is used to produce a string. Otherwise, this
-method calls C<< $dt->iso8601() >> to produce a string. See L<Formatters And
-Stringification> for details.
+stringification overloading is implemented. If the object has a formatter,
+then its C<format_datetime()> method is used to produce a string. Otherwise,
+this method calls C<< $dt->iso8601() >> to produce a string. See L<Formatters
+And Stringification> for details.
 
 =head3 $dt->is_leap_year()
 
@@ -2977,6 +3000,18 @@ datetime object is in a leap year.
 
 This method returns a true or false value indicating whether or not the
 datetime object is the last day of the month.
+
+=head3 $dt->month_length()
+
+This method returns the number of days in the current month.
+
+=head3 $dt->quarter_length()
+
+This method returns the number of days in the current quarter.
+
+=head3 $dt->year_length()
+
+This method returns the number of days in the current year.
 
 =head3 $dt->week()
 
@@ -4551,7 +4586,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4566,6 +4601,14 @@ Christian Hansen <chansen@cpan.org>
 =item *
 
 Daisuke Maki <dmaki@cpan.org>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Dan Stewart <danielandrewstewart@gmail.com>
 
 =item *
 
@@ -4614,6 +4657,10 @@ Michael Conrad <mike@nrdvana.net>
 =item *
 
 Michael R. Davis <mrdvt92@users.noreply.github.com>
+
+=item *
+
+M Somerville <dracos@users.noreply.github.com>
 
 =item *
 

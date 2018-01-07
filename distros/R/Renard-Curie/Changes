@@ -1,19 +1,54 @@
+0.004 2018-01-06 01:12:22-0600
+
+  Features
+
+   - Add a widget/dialog to show PDF metadata under File -> Properties menu
+     item.
+
+     See <https://github.com/project-renard/curie/issues/13>,
+     <https://github.com/project-renard/curie/pull/216>.
+
+  Refactoring
+   - Remove extra functions in CurieTestHelper.
+
+     See <https://github.com/project-renard/curie/pull/214>.
+
+   - Move PageDrawingArea behaviours into roles.
+
+     See <https://github.com/project-renard/curie/issues/217>,
+     <https://github.com/project-renard/curie/pull/218>,
+     <https://github.com/project-renard/curie/issues/219>,
+     <https://github.com/project-renard/curie/pull/221>.
+
+   - Update to use the split Renard-Incunabula distributions.
+
+     See
+
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>,
+       - <https://github.com/project-renard/curie/pull/223>.
+
+  Bug fixes
+   - Prevent negative zoom level when zooming out
+
+     See <https://github.com/project-renard/curie/issues/220>,
+     <https://github.com/project-renard/curie/pull/222>.
+
 0.003 2017-07-11 23:39:52-0500
   Refactoring
    - Split out repositories from Renard-Curie-0.002.
 
      project-renard/p5-Renard-Incunabula
-       s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup
-       s/Renard::Curie::Types/Renard::Incunabula::Common::Types
+       s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup/
+       s/Renard::Curie::Types/Renard::Incunabula::Common::Types/
        s/Renard::Curie::Error/Renard::Incunabula::Common::Error/
        s/Renard::Curie::Model::Document/Renard::Incunabula::Document/
        s/Renard::Curie::Model::Outline/Renard::Incunabula::Outline/
-       s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile
-       s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable
-       s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable
-       s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable
-       s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable
-       s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable
+       s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile/
+       s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable/
+       s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable/
+       s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable/
+       s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable/
+       s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable/
        s/Renard::Curie::Model::Page::Role::CairoRenderableFromPNG/Renard::Incunabula::Page::Role::CairoRenderableFromPNG/
        s/Renard::Curie::Model::Page::Role::Bounds/Renard::Incunabula::Page::Role::Bounds/
        s/Renard::Curie::Model::Page::Role::BoundsFromCairoImageSurface/Renard::Incunabula::Page::Role::BoundsFromCairoImageSurface/
@@ -63,7 +98,7 @@
 
   Bug fixes
    - Zooming causes two redraws because of the call to size request inside of
-     the draw callback. Seperating the size request from drawing fixes this.
+     the draw callback. Separating the size request from drawing fixes this.
 
      See <https://github.com/project-renard/curie/issues/197>,
      <https://github.com/project-renard/curie/pull/194>.

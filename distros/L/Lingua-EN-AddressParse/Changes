@@ -1,5 +1,12 @@
 Revision history for Perl CPAN module Lingua::EN::AddressParse
 
+1.27 05 Jan 2018
+    Stopped errors from undefined base_satreet_name componet. Giothub issue reported by Bill Baker
+    Allowed for house names at start of address, such as 'Manor House 12 Smith St...
+    Added more street types
+    Removed Island as a street type, too many clashes with Island appearing in other components
+    Added extra test case to main.t for street direction prefix
+
 1.26 15 Sep 2016
     the auto_clean option now standardises more street types, sub property types and identifiers
     added more street names, types and sub property identifier patterns

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Rates;
 # ABSTRACT: Evolutionary rates for sequence sites
-$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.173500';
+$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -11,7 +11,7 @@ use feature qw(say);
 
 use Carp;
 use Const::Fast;
-use List::AllUtils qw(min max each_arrayref);
+use List::AllUtils qw(each_arrayref);
 use POSIX;
 
 extends 'Bio::MUST::Core::SeqMask';
@@ -34,14 +34,14 @@ has '+mask' => (
 
 sub min_rate {
     my $self = shift;
-    return min @{ $self->mask };
+    return List::AllUtils::min @{ $self->mask };
 }
 
 
 
 sub max_rate {
     my $self = shift;
-    return max @{ $self->mask };
+    return List::AllUtils::max @{ $self->mask };
 }
 
 
@@ -61,8 +61,8 @@ sub delta_rates {
 
     my $ea = each_arrayref [ $self->all_states ], [ $othr->all_states ];
     while (my ($s_rate, $o_rate) = $ea->() ) {
-        push @deltas, abs( $s_rate - $o_rate );     # TODO: improve this
-    }
+        push @deltas, 0 + ( sprintf "%.13f", abs( $s_rate - $o_rate ) );
+    }   # Note: trick to get identical results across platforms
 
     # TODO: check that $self->new() is really correct
     return $self->new( mask => \@deltas );
@@ -237,7 +237,7 @@ Bio::MUST::Core::SeqMask::Rates - Evolutionary rates for sequence sites
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::DescribeImagesResponse;
+$Net::Amazon::EC2::DescribeImagesResponse::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

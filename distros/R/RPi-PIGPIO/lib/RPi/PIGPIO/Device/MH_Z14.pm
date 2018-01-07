@@ -113,12 +113,22 @@ sub read {
 
     my $request = chr(255) . chr(1) . chr(134) . chr(0) x 5 . chr((255 - 135) + 1);
 
-    $pi->serial_write($h, $request);
+    my $rv = $pi->serial_write($h, $request);
+
+    if ($rv) { #non-zero value means write failed
+        croak "Serial write command failed for port :".$self->{tty};
+    }
 
     my ($count,$attempts) = (0, 100);
 
-    while (! ($count = $pi->serial_data_available($h) && $attempts--) ) {
+    while (! ($count = $pi->serial_data_available($h)) && $attempts ) {
+        $attempts--;
         usleep(1000);
+    }
+
+    if (! $count) { #Sensor didn't answer
+        croak "Serial write command failed for port :".$self->{tty};
+        return;
     }
 
     my $recv = $pi->serial_read($h,$count);

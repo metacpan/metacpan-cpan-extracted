@@ -15,10 +15,10 @@ name: Text-Numbers-100
 provides:
   Text::Numbers::100:
     file: lib/Text/Numbers/100.pm
-    version: '20171129'
+    version: '20171228'
 requires:
   Carp: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171129'
+version: '20171228'

@@ -199,7 +199,7 @@ sub ast_to_rperl__generate {
         # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_244 & TypeInnerProperties_245 below
         # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
         if ( $property_name ne $property_key ) {
-            die 'ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
+            die 'ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                 . $property_name . q{'}
                 . ' does not equal OO properties key ' . q{'}
                 . $property_key . q{'}
@@ -316,7 +316,7 @@ sub ast_to_rperl__generate {
                 $property_name =~ s/^(\w+)\s*$/$1/gxms;             # strip trailing whitespace, caused by grammar matching operator names with trailing spaces
 
                 if ( $property_name ne $property_key ) {
-                    die 'ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
+                    die 'ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                         . $property_name . q{'}
                         . ' does not equal OO properties key ' . q{'}
                         . $property_key . q{'}
@@ -518,8 +518,10 @@ EOL
         }
     }
 
-    #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n");
-    #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n");
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n");
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n");
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n");
+    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n");
 
     # NEED FIX WIN32: change hard-coded forward-slash in generated path name below?
     # NEED FIX: handle absolute vs relative include paths
@@ -529,9 +531,10 @@ EOL
 
 #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $module_file_name = ' . $module_file_name . "\n");
 
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n");
     if ( ( exists $modes->{_enable_sse} ) and ( defined $modes->{_enable_sse} ) ) {
-        foreach my string $module_path_name ( keys %{ $modes->{_enable_sse} } ) {
-            if ( ( $module_path_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_sse}->{$module_path_name} ) ) {
+        foreach my string $enabled_file_name ( keys %{ $modes->{_enable_sse} } ) {
+            if ( ( $enabled_file_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_sse}->{$enabled_file_name} ) ) {
                 $cpp_source_group->{H_INCLUDES} .= '#include <rperlsse.h>' . "\n";
             }
         }
@@ -539,8 +542,8 @@ EOL
 
 #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n");
     if ( ( exists $modes->{_enable_gmp} ) and ( defined $modes->{_enable_gmp} ) ) {
-        foreach my string $module_path_name ( keys %{ $modes->{_enable_gmp} } ) {
-            if ( ( $module_path_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_gmp}->{$module_path_name} ) ) {
+        foreach my string $enabled_file_name ( keys %{ $modes->{_enable_gmp} } ) {
+            if ( ( $enabled_file_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_gmp}->{$enabled_file_name} ) ) {
                 $cpp_source_group->{H_INCLUDES} .= '#include <rperlgmp.h>' . "\n";
             }
         }
@@ -548,9 +551,19 @@ EOL
 
 #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n");
     if ( ( exists $modes->{_enable_gsl} ) and ( defined $modes->{_enable_gsl} ) ) {
-        foreach my string $module_path_name ( keys %{ $modes->{_enable_gsl} } ) {
-            if ( ( $module_path_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_gsl}->{$module_path_name} ) ) {
+        foreach my string $enabled_file_name ( keys %{ $modes->{_enable_gsl} } ) {
+            if ( ( $enabled_file_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_gsl}->{$enabled_file_name} ) ) {
                 $cpp_source_group->{H_INCLUDES} .= '#include <rperlgsl.h>' . "\n";
+            }
+        }
+    }
+
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n");
+    if ( ( exists $modes->{_enable_mongodb} ) and ( defined $modes->{_enable_mongodb} ) ) {
+        foreach my string $enabled_file_name ( keys %{ $modes->{_enable_mongodb} } ) {
+            if ( ( $enabled_file_name =~ /$module_file_name$/xms ) and ( $modes->{_enable_mongodb}->{$enabled_file_name} ) ) {
+#                RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_mongodb}->{' . $enabled_file_name . '} = TRUE' . "\n");
+                $cpp_source_group->{H_INCLUDES} .= '#include <RPerl/Support/MongoDB.h>' . "\n";
             }
         }
     }
@@ -583,7 +596,7 @@ EOL
             $is_rperl_system = 1;
         }
     }
-    
+
     if ( $parent_name =~ /^\w+Perl::Config$/ ) {    # DEV NOTE, CORRELATION #rp027: MathPerl::Config, PhysicsPerl::Config, etc
         #        RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), skipping system config file $parent_name = ' . $parent_name . "\n");
     }
@@ -755,7 +768,7 @@ EOL
         # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
         if ( $property_name ne $property_key ) {
             # DEV NOTE, CORRELATION #rp030: matches numbering of ECOGEPPRP20 in RPerl/CompileUnit/Module/Class.pm
-            die 'ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
+            die 'ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                 . $property_name . q{'}
                 . ' does not equal OO properties key ' . q{'}
                 . $property_key . q{'}
@@ -880,7 +893,7 @@ EOL
             # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
             if ( $property_name ne $property_key ) {
                 # DEV NOTE, CORRELATION #rp030: matches numbering of ECOGEPPRP20 in RPerl/CompileUnit/Module/Class.pm
-                die 'ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
+                die 'ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                     . $property_name . q{'}
                     . ' does not equal OO properties key ' . q{'}
                     . $property_key . q{'}

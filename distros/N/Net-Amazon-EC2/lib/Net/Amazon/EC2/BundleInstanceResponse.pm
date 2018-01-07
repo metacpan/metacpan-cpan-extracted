@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::BundleInstanceResponse;
+$Net::Amazon::EC2::BundleInstanceResponse::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

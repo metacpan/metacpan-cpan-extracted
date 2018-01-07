@@ -16,13 +16,13 @@ WriteMakefile(
     "ExtUtils::MakeMaker" => '6.63_03',
   },
   "PREREQ_PM" => {
-    "Mojolicious" => '5.48', # Mojo::JSON::to_json
+    "Mojolicious" => '7.53', # promises
     "strict" => 0,
     "warnings" => 0,
-    "GraphQL" => '0.20', # plugin convert
+    "GraphQL" => '0.26', # promises
   },
   "TEST_REQUIRES" => {
-    "Mojolicious" => 0,
+    "Mojolicious" => '7.53', # promises
     "Test::More" => "0.92",
   },
   META_MERGE => {

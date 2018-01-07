@@ -4,7 +4,7 @@ Module::Build -> new
 (
  module_name    => 'Lingua::EN::AddressParse',
  license        => 'perl',
- dist_abstract  => "extract components of a street address, presented as a text string",
+ dist_abstract  => "extract components of a street address from free format text",
  dist_author    => 'Kim Ryan <kimryan at cpan org>',
  build_requires =>
  {
@@ -19,13 +19,13 @@ Module::Build -> new
  {
 	locale              => 1.00,
 	strict              => 1.04,
-    Carp                => 1.08,
+   Carp                => 1.08,
 	Test::Pod::Coverage => 1.04,
 	utf8                => 1.09,
 	warnings            => 1.12,
-    Parse::RecDescent   => 1.00,
-    Locale::SubCountry  => 1.41,
-    Lingua::EN::NameParse => 1.24
+   Parse::RecDescent   => 1.00,
+   Locale::SubCountry  => 1.41,
+   Lingua::EN::NameParse => 1.24
  },
  meta_merge =>
  {

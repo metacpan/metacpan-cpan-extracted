@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow;
 # ABSTRACT: Main window of the application
-$Renard::Curie::Component::MainWindow::VERSION = '0.003';
+$Renard::Curie::Component::MainWindow::VERSION = '0.004';
 use Renard::Incunabula::Frontend::Gtk3::Helper;
 
 use Gtk3;
@@ -14,7 +14,8 @@ use Moo 2.001001;
 use MooX::Role::Logger ();
 use MooX::Lsub;
 
-use Renard::Incunabula::Common::Types qw(InstanceOf Path Str DocumentModel);
+use Renard::Incunabula::Common::Types qw(InstanceOf Path Str);
+use Renard::Incunabula::Document::Types qw(DocumentModel);
 
 lsub window => method() { # :ReturnType(InstanceOf['Gtk3::Window'])
 	(InstanceOf['Gtk3::Window'])->(
@@ -80,7 +81,7 @@ Renard::Curie::Component::MainWindow - Main window of the application
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

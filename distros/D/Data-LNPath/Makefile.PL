@@ -22,4 +22,10 @@ WriteMakefile(
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-LNPath-*' },
+	META_MERGE => {
+        'meta-spec' => { version => 2 },
+        x_contributors => [
+        	'Stavros Vachtsevanos (svacht)' 
+		],
+    }
 );

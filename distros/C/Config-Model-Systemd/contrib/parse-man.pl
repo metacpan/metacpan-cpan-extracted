@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2017 by Dominique Dumont.
+# This software is Copyright (c) 2015-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -52,6 +52,7 @@ sub parse_xml ($list, $map) {
     my %data = ( element => [] );
     my $config_class;
     my $file ;
+    my $subsystem;
 
     my $desc = sub ($t, $elt) {
         my $txt = $elt->text;
@@ -113,7 +114,8 @@ sub parse_xml ($list, $map) {
             my $varname = $term_elt->first_child('varname')->text;
             my ($name, $extra_info) = $varname =~ /C<([\w-]+)=([^>]*)>/ ;
 
-            die "Error: cannot extract parameter name from '$varname'" unless defined $name;
+            next unless defined $name;
+            say "-  $config_class: storing parameter $name";
 
             # we hope that deprecated items are listed in the same order with the new items
             push $data{element}->@*, [$config_class => $name => $desc => $extra_info => shift @supersedes ];
@@ -122,7 +124,7 @@ sub parse_xml ($list, $map) {
 
     my $set_config_class = sub ($name) {
         $config_class = 'Systemd::'.( $map->{$name} || 'Section::'.ucfirst($name));
-        say  $file->basename(".xml").": Parsing class $config_class";
+        say "Parsing class $config_class from " . $file->basename(".xml") . ':';
     };
 
     my $parse_sub_title = sub {
@@ -150,11 +152,12 @@ sub parse_xml ($list, $map) {
             # varname handling is done before the variable handling
             # below
             'varname' => $turn_to_pod_c,
-            'refsect1[string(title)=~ /Options/]/variablelist/varlistentry' => $variable,
+            'refsect1/variablelist/varlistentry' => $variable,
         }
     );
 
-    foreach my $subsystem ($list->@*) {
+    foreach my $_subsystem ($list->@*) {
+        $subsystem = $_subsystem;
         $file = $systemd_man_path->child("systemd.$subsystem.xml");
         $set_config_class->($subsystem);
         $twig->parsefile($file);

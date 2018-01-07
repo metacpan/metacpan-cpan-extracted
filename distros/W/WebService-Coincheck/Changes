@@ -1,0 +1,7 @@
+Revision history for Perl extension WebService::Coincheck
+
+0.02    Sat Jan  6 20:04:04 JST 2018
+        - remove build status and coverage from POD
+
+0.01    Wed Jan 3 21:40:32 JST 2018
+        - original version

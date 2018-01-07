@@ -36,7 +36,7 @@
 /* -------------------------------------------------------------------------------------------- */
 /* Exhaustion event name is hardcoded                                                           */
 /* -------------------------------------------------------------------------------------------- */
-#define MARPAESLIF_EVENTTYPE_EXHAUSTED_NAME "'exhauted'"
+#define MARPAESLIF_EVENTTYPE_EXHAUSTED_NAME "'exhausted'"
 
 /* -------------------------------------------------------------------------------------------- */
 /* Util macros on symbol                                                                        */
@@ -10132,20 +10132,20 @@ static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *ma
       /* ... then we can realloc to minimum buffer size */
 
       /* Before reallocating, we need to move the remaining bytes at the beginning */
-      memmove(buffers, buffers + inputl, inputl);
+      memmove(buffers, marpaESLIFRecognizerp->inputs, inputl);
       /* Try to realloc */
       wantedl = bufsizl;
       MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "Resizing internal buffer size from %ld bytes to %ld bytes", (unsigned long) bufferallocl, (unsigned long) wantedl);
-      tmps = realloc(buffers, wantedl + 1); /* We always add a NUL byte for convenience */
+      tmps = realloc(buffers, wantedl + 1); /* We always add a hiden NUL byte for convenience */
       if (tmps == NULL) {
-        /* We could have continue, this is not truely fatal - but we are in a bad shape anyway -; */
+        /* We COULD continue, this is not truely fatal - but we are in a bad shape anyway -; */
         MARPAESLIF_ERRORF(marpaESLIFRecognizerp->marpaESLIFp, "realloc failure, %s", strerror(errno));
         goto err;
       }
       buffers       = *(marpaESLIFRecognizerp->buffersp)      = tmps;        /* Buffer pointer */
       bufferallocl  = *(marpaESLIFRecognizerp->bufferalloclp) = wantedl;     /* Allocated size */
       bufferl       = *(marpaESLIFRecognizerp->bufferlp)      = inputl;      /* Number of valid bytes */
-      globalOffsetp += inputl;                                             /* We "forget" inputl bytes: increase global offset (size_t turnaround not checked) */
+      globalOffsetp += inputl;                                               /* We "forget" inputl bytes: increase global offset (size_t turnaround not checked) */
       *(marpaESLIFRecognizerp->globalOffsetpp) = globalOffsetp;
       /* Pointer inside internal buffer is back to the beginning */
       marpaESLIFRecognizerp->inputs = buffers;

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::LaunchPermission;
+$Net::Amazon::EC2::LaunchPermission::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

@@ -7,13 +7,15 @@ package Udev::FFI;
 use strict;
 use warnings;
 
+use Carp qw( croak );
+
 use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
 use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.099005';
+$Udev::FFI::VERSION = '0.099006';
 
 
 
@@ -101,14 +103,12 @@ sub new_monitor {
     my $self = shift;
     my $source = shift || 'udev';
 
-    if($source ne 'udev' && $source ne 'kernel') {
-        $@ = 'Valid sources identifiers are "udev" and "kernel"';
-        return undef;
-    }
+    croak('Valid sources identifiers are "udev" and "kernel"')
+        if $source ne 'udev' && $source ne 'kernel';
 
     my $monitor = udev_monitor_new_from_netlink($self->{_context}, $source);
     unless(defined($monitor)) {
-        $@ = "Can't create udev monitor from netlink";
+        $@ = $! || "Can't create udev monitor from netlink";
         return undef;
     }
 
@@ -122,7 +122,7 @@ sub new_enumerate {
 
     my $enumerate = udev_enumerate_new($self->{_context});
     unless(defined($enumerate)) {
-        $@ = "Can't create enumerate context";
+        $@ = $! || "Can't create enumerate context";
         return undef;
     }
 
@@ -156,8 +156,8 @@ Udev::FFI - Perl bindings for libudev using ffi.
     use Udev::FFI;
 
     # get udev library version
-    my $udev_version = Udev::FFI::udev_version()
-        or die "Can't get udev library version: $@";
+    my $udev_version = Udev::FFI->udev_version() or
+        die "Can't get udev library version: $@";
 
 
     # create Udev::FFI object
@@ -167,7 +167,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     # create udev monitor
     my $monitor = $udev->new_monitor() or
-        die "Can't create udev monitor: $@.\n";
+        die "Can't create udev monitor: $@";
 
     # add filter to monitor
     unless($monitor->filter_by_subsystem_devtype('block')) {
@@ -207,7 +207,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     # enumerate devices
     my $enumerate = $udev->new_enumerate() or
-        die "Can't create enumerate context\n";
+        die "Can't create enumerate context: $@";
 
     $enumerate->add_match_subsystem('block');
     $enumerate->scan_devices();
@@ -273,15 +273,29 @@ $@.
 
 =head1 METHODS
 
-=over 4
+=head2 new_monitor ( [SOURCE] )
 
-=item new_monitor ( [SOURCE] )
+Create new udev monitor and connect to a specified event source. Valid sources
+identifiers are C<'udev'> and C<'kernel'>. This argument is optional and
+defaults to C<'udev'>.
 
-=item new_enumerate ()
+Return new L<Udev::FFI::Monitor> object on success, undef with the error in $@
+on failure.
 
-E<nbsp>
+    my $monitor = $udev->new_monitor() or
+        die "Can't create udev monitor: $@";
 
-=item new_device_from_syspath ( SYSPATH )
+=head2 new_enumerate ()
+
+Create an enumeration context to scan /sys.
+
+Return new L<Udev::FFI::Enumerate> object on success, undef with the error in $@
+on failure.
+
+    my $enumerate = $udev->new_enumerate() or
+        die "Can't create enumerate context: $@";
+
+=head2 new_device_from_syspath ( SYSPATH )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The syspath is the absolute path to the device, including the
@@ -298,7 +312,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
         my $device = $udev->new_device_from_syspath($_);
     # ... some code
 
-=item new_device_from_devnum ( TYPE, DEVNUM )
+=head2 new_device_from_devnum ( TYPE, DEVNUM )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked-up by its type and major/minor number.
@@ -306,9 +320,10 @@ database entry. The device is looked-up by its type and major/minor number.
 Return new L<Udev::FFI::Device> object or undef, if device does not exist.
 
     use Udev::FFI::Devnum qw(makedev);
-    my $device = $udev->new_device_from_devnum('b', makedev(8, 1));
+    my $device0 = $udev->new_device_from_devnum('b', makedev(8, 1));
+    my $device1 = $udev->new_device_from_devnum('c', makedev(189, 515));
 
-=item new_device_from_subsystem_sysname ( SUBSYSTEM, SYSNAME )
+=head2 new_device_from_subsystem_sysname ( SUBSYSTEM, SYSNAME )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked up by the subsystem and name string of the
@@ -320,20 +335,20 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
     my $device1 = $udev->new_device_from_subsystem_sysname('net', 'lo');
     my $device2 = $udev->new_device_from_subsystem_sysname('mem', 'urandom');
 
-=item new_device_from_device_id ( ID )
+=head2 new_device_from_device_id ( ID )
 
 Create new udev device, and fill in information from the sys device and the udev
 database entry. The device is looked-up by a special string:
 
 =over 8
 
-=item b8:2 - block device major:minor
+C<'b8:1'> - block device major:minor
 
-=item c128:1 - char device major:minor
+C<'c128:2'> - char device major:minor
 
-=item n3 - network device ifindex
+C<'n2'> - network device ifindex
 
-=item +sound:card29 - kernel driver core subsystem:device name
+C<'+sound:card29'> - kernel driver core subsystem:device name
 
 =back
 
@@ -341,7 +356,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
 
     my $device = $udev->new_device_from_device_id('b8:1');
 
-=item new_device_from_environment ()
+=head2 new_device_from_environment ()
 
 Create new udev device, and fill in information from the current process
 environment. This only works reliable if the process is called from a udev rule.
@@ -359,7 +374,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
         # $device is the device from the udev rule (backlight in this example)
         # work with $device
 
-=item Udev::FFI::udev_version ()
+=head2 Udev::FFI->udev_version ()
 
 Return the version of the udev library. Because the udev library does not
 provide a function to get the version number, this function runs the `udevadm`
@@ -369,12 +384,12 @@ Return undef with the error in $@ on failure. Also you can check $! value:
 ENOENT (`udevadm` not found) or EACCES (permission denied).
 
     # simple
-    my $udev_version = Udev::FFI::udev_version()
-        or die "Can't get udev library version: $@";
+    my $udev_version = Udev::FFI->udev_version() or
+        die "Can't get udev library version: $@";
     
     # or catch the error
     use Errno qw( :POSIX );
-    my $udev_version = Udev::FFI::udev_version();
+    my $udev_version = Udev::FFI->udev_version();
     unless(defined $udev_version) {
         if($!{ENOENT}) {
             # udevadm not found
@@ -385,8 +400,6 @@ ENOENT (`udevadm` not found) or EACCES (permission denied).
     
         die "Can't get udev library version: $@";
     }
-
-=back
 
 =head1 EXAMPLES
 

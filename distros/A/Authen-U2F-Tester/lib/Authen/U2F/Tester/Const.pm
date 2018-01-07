@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::Const;
-$Authen::U2F::Tester::Const::VERSION = '0.01';
+$Authen::U2F::Tester::Const::VERSION = '0.02';
 # ABSTRACT: Constants for Authen::U2F::Tester
 
 use base 'Exporter';
@@ -46,7 +46,7 @@ Authen::U2F::Tester::Const - Constants for Authen::U2F::Tester
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

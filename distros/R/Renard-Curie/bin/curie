@@ -43,7 +43,7 @@ BEGIN {
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 use Renard::Curie::Container::App;
 
 Renard::Curie::Container::App->new->app->main;
@@ -60,7 +60,7 @@ curie: a document reader
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

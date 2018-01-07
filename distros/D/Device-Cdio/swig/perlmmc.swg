@@ -485,14 +485,14 @@ to eject media / open tray. mmc_eject_media sometimes does not work.");
 int mmc_close_tray(CdIo_t *p_cdio);
 
 
-char * mmc_get_isrc(CdIo_t *p_cdio, track_t track);
+extern char * mmc_get_isrc(CdIo_t *p_cdio, track_t track);
 %inline %{
 extern int mmc_close_tray(CdIo_t *p_cdio);
 extern int mmc_start_stop_unit (const CdIo_t *p_cdio);
-extern char *mmc_isrc_get_track_isrc (const CdIo_t *p_cdio, track_t i_track);
+extern char *mmc_get_track_isrc (const CdIo_t *p_cdio, track_t i_track);
 
  char * mmc_get_isrc(CdIo_t *p_cdio, track_t track) {
-    return mmc_isrc_get_track_isrc (p_cdio, track);
+    return mmc_get_track_isrc (p_cdio, track);
 }
 %}
 

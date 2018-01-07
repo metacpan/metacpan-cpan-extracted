@@ -1,11 +1,5 @@
-use 5.014;
-use strict;
-use warnings;
-use Test::More;
-use Test::Exception;
-use Test::Deep;
-use JSON::MaybeXS;
-use Data::Dumper;
+use lib 't/lib';
+use GQLTest;
 
 my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
 
@@ -15,19 +9,6 @@ BEGIN {
   use_ok( 'GraphQL::Type::Scalar', qw($String $Int $Boolean) ) || print "Bail out!\n";
   use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
   use_ok( 'GraphQL::Language::Parser', qw(parse) ) || print "Bail out!\n";
-}
-
-sub run_test {
-  my ($args, $expected) = @_;
-  my $got = execute(@$args);
-  is_deeply $got, $expected or diag nice_dump($got);
-}
-
-sub nice_dump {
-  my ($got) = @_;
-  local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
-  $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
-  Dumper $got;
 }
 
 subtest 'throws if no document is provided' => sub {
@@ -43,8 +24,8 @@ subtest 'throws if no document is provided' => sub {
 };
 
 subtest 'executes arbitrary code' => sub {
-  my $deep_data;
-  my $data = {
+  my ($deep_data, $data);
+  $data = {
     a => sub { 'Apple' },
     b => sub { 'Banana' },
     c => sub { 'Cookie' },
@@ -56,6 +37,7 @@ subtest 'executes arbitrary code' => sub {
       return 'Pic of size: ' . ($size || 50);
     },
     deep => sub { $deep_data },
+    promise => sub { FakePromise->resolve($data) },
   };
 
   $deep_data = {
@@ -65,8 +47,8 @@ subtest 'executes arbitrary code' => sub {
     deeper => sub { [$data, undef, $data] }
   };
 
-  my $DeepDataType;
-  my $DataType = GraphQL::Type::Object->new(
+  my ($DeepDataType, $DataType);
+  $DataType = GraphQL::Type::Object->new(
     name => 'DataType',
     fields => sub { {
       a => { type => $String },
@@ -84,6 +66,7 @@ subtest 'executes arbitrary code' => sub {
         }
       },
       deep => { type => $DeepDataType },
+      promise => { type => $DataType },
     } }
   );
 
@@ -110,6 +93,9 @@ query Example($size: Int) {
   f
   ...on DataType {
     pic(size: $size)
+    promise {
+      a
+    }
   }
   deep {
     a
@@ -137,6 +123,7 @@ EOF
       e => 'Egg',
       f => 'Fish',
       pic => 'Pic of size: 100',
+      promise => { a => 'Apple' },
       deep => {
         a => 'Already Been Done',
         b => 'Boring',
@@ -221,6 +208,7 @@ subtest 'provides info about current execution state' => sub {
     operation
     parent_type
     path
+    promise_code
     return_type
     root_value
     schema
@@ -305,6 +293,13 @@ subtest 'nulls out error subtrees' => sub {
     syncRawError
     syncReturnError
     syncReturnErrorList
+    async
+    # asyncReject - no because Perl no "Error" exception class
+    asyncRawReject
+    asyncEmptyReject
+    # asyncError - no because Perl no "Error" exception class
+    asyncRawError
+    # asyncReturnError - no because Perl no "Error" exception class
   }';
   my $data = {
     sync => sub { 'sync' },
@@ -319,6 +314,14 @@ subtest 'nulls out error subtrees' => sub {
         GraphQL::Error->coerce('Error getting syncReturnErrorList3')
       ];
     },
+    async => sub { FakePromise->resolve('async') },
+    asyncRawError => sub {
+      FakePromise->resolve('')->then(sub {
+        die "Error getting asyncRawError\n"
+      })
+    },
+    asyncRawReject => sub { FakePromise->reject('Error getting asyncRawReject') },
+    asyncEmptyReject => sub { FakePromise->reject },
   };
   my $ast = parse($doc);
   my $schema = GraphQL::Schema->new(
@@ -330,44 +333,101 @@ subtest 'nulls out error subtrees' => sub {
         syncRawError => { type => $String },
         syncReturnError => { type => $String },
         syncReturnErrorList => { type => $String->list },
+        async => { type => $String },
+        asyncRawReject => { type => $String },
+        asyncRawError => { type => $String },
+        asyncEmptyReject => { type => $String },
       }
     )
   );
-  my $got = execute($schema, $ast, $data);
-  is_deeply $got->{data}, {
-    sync => 'sync',
-    syncError => undef,
-    syncRawError => undef,
-    syncReturnError => undef,
-    syncReturnErrorList => ['sync0', undef, 'sync2', undef],
-  } or diag nice_dump($got);
-  is_deeply [ sort { $a->{message} cmp $b->{message} } @{ $got->{errors} } ], [
-    {
-      message   => "Error getting syncError\n",
-      locations => [{ line => 4, column => 5 }],
-      path    => ['syncError']
+  run_test([$schema, $ast, $data], {
+    data => {
+      sync => 'sync',
+      syncError => undef,
+      syncRawError => undef,
+      syncReturnError => undef,
+      syncReturnErrorList => ['sync0', undef, 'sync2', undef],
+      async => 'async',
+      asyncRawError => undef,
+      asyncRawReject => undef,
+      asyncEmptyReject => undef,
     },
-    {
-      message   => "Error getting syncRawError\n",
-      locations => [{ line => 5, column => 5 }],
-      path    => ['syncRawError']
-    },
-    {
-      message   => "Error getting syncReturnError",
-      locations => [{ line => 6, column => 5 }],
-      path    => ['syncReturnError']
-    },
-    {
-      message   => "Error getting syncReturnErrorList1",
-      locations => [{ line => 7, column => 3 }],
-      path    => ['syncReturnErrorList', 1]
-    },
-    {
-      message   => "Error getting syncReturnErrorList3",
-      locations => [{ line => 7, column => 3 }],
-      path    => ['syncReturnErrorList', 3]
-    },
-  ] or diag nice_dump($got->{errors});
+    errors => bag(
+      {
+        'locations' => [{ 'column' => 3, 'line' => 14 }],
+        'message' => "Error getting asyncRawError\n",
+        'path' => [ 'asyncRawError' ]
+      },
+      {
+        'locations' => [{ 'column' => 5, 'line' => 10 }],
+        'message' => 'Error getting asyncRawReject',
+        'path' => [ 'asyncRawReject' ]
+      },
+      {
+        message   => "Error getting syncError\n",
+        locations => [{ line => 4, column => 5 }],
+        path    => ['syncError']
+      },
+      {
+        message   => "Error getting syncRawError\n",
+        locations => [{ line => 5, column => 5 }],
+        path    => ['syncRawError']
+      },
+      {
+        message   => "Error getting syncReturnError",
+        locations => [{ line => 6, column => 5 }],
+        path    => ['syncReturnError']
+      },
+      {
+        message   => "Error getting syncReturnErrorList1",
+        locations => [{ line => 7, column => 5 }],
+        path    => ['syncReturnErrorList', 1]
+      },
+      {
+        message   => "Error getting syncReturnErrorList3",
+        locations => [{ line => 7, column => 5 }],
+        path    => ['syncReturnErrorList', 3]
+      },
+      {
+        'locations' => [{ 'column' => 5, 'line' => 12 }],
+        'message' => "Unknown error",
+        'path' => [ 'asyncEmptyReject' ]
+      },
+    ),
+  });
+};
+
+subtest 'nulls error subtree for promise rejection #1071' => sub {
+  my $doc = '{
+    foods {
+      name
+    }
+  }';
+  my $ast = parse($doc);
+  my $schema = GraphQL::Schema->new(
+    query => GraphQL::Type::Object->new(
+      name => 'Query',
+      fields => {
+        foods => {
+          type => GraphQL::Type::Object->new(
+            name => 'Food',
+            fields => { name => { type => $String } },
+          )->list,
+          resolve => sub { FakePromise->reject('Dangit') },
+        },
+      },
+    )
+  );
+  my $got = run_test([ $schema, $ast ], {
+    data => { foods => undef },
+    errors => [
+      {
+        'locations' => [{ 'column' => 3, 'line' => 5 }],
+        'message' => "Dangit",
+        'path' => [ 'foods' ]
+      },
+    ]
+  });
 };
 
 subtest 'Full response path is included for non-nullable fields' => sub {
@@ -413,19 +473,14 @@ query {
   }
 }
 EOF
-  my $result = execute($schema, parse($query));
-  is_deeply $result, {
-    data => {
-      nullableA => {
-        aliasedA => { nonNullA => { anotherA => {} } },
-      },
-    },
+  run_test([$schema, parse($query)], {
+    data => { nullableA => { aliasedA => undef } },
     errors => [{
       message => 'Catch me if you can',
       locations => [{ line => 7, column => 9 }],
       path => ['nullableA', 'aliasedA', 'nonNullA', 'anotherA', 'throws'],
     }],
-  } or diag nice_dump $result;
+  });
 };
 
 subtest 'uses the inline operation if no operation name is provided' => sub {
@@ -660,14 +715,7 @@ subtest 'does not include illegal fields in output' => sub {
     ),
   );
 
-  run_test([$schema, $ast], {
-    data => {},
-    errors => [ {
-      locations => [ { 'column' => 3, 'line' => 3 } ],
-      message => 'No field M.thisIsIllegalDontIncludeMe.',
-      path => [ 'thisIsIllegalDontIncludeMe' ],
-    } ],
-  });
+  run_test([$schema, $ast], { data => undef });
 };
 
 subtest 'does not include arguments that were not set' => sub {

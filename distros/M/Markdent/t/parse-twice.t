@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
-use Test::Deep;
+use Test2::V0;
 
 use File::Slurp qw( read_file );
 
@@ -27,7 +26,7 @@ for my $handler ( $th1, $th2 ) {
     $parser->parse( markdown => $markdown );
 }
 
-cmp_deeply(
+is(
     tree_from_handler($th1),
     tree_from_handler($th2),
     'make sure we get the same results from parsing the same string twice in a row'

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::SystemStatus;
+$Net::Amazon::EC2::SystemStatus::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

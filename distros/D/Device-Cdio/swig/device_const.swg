@@ -1,5 +1,5 @@
 /* -*- c -*-
-  Copyright (C) 2006, 2008, 2011, 2012 Rocky Bernstein <rocky@cpan.org>
+  Copyright (C) 2006, 2008, 2011-2012, 2017 Rocky Bernstein <rocky@cpan.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -82,11 +82,9 @@
 /* driver_id_t enums. */
 %constant long int DRIVER_UNKNOWN = DRIVER_UNKNOWN;
 %constant long int DRIVER_AIX = DRIVER_AIX;
-%constant long int DRIVER_BSDI = DRIVER_BSDI;
 %constant long int DRIVER_FREEBSD = DRIVER_FREEBSD;
 %constant long int DRIVER_LINUX = DRIVER_LINUX;
 %constant long int DRIVER_SOLARIS = DRIVER_SOLARIS;
-%constant long int DRIVER_OSX = DRIVER_OSX;
 %constant long int DRIVER_WIN32 = DRIVER_WIN32;
 %constant long int DRIVER_CDRDAO = DRIVER_CDRDAO;
 %constant long int DRIVER_BINCUE = DRIVER_BINCUE;

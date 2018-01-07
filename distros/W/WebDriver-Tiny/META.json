@@ -44,11 +44,11 @@
    "provides" : {
       "WebDriver::Tiny" : {
          "file" : "lib/WebDriver/Tiny.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       },
       "WebDriver::Tiny::Elements" : {
          "file" : "lib/WebDriver/Tiny/Elements.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/cv-library/WebDriver-Tiny"
       }
    },
-   "version" : "0.100",
+   "version" : "0.101",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

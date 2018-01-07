@@ -15,7 +15,6 @@ name: HackaMol
 requires:
   Capture::Tiny: '0.28'
   Cwd: '0.0'
-  File::Slurp: '0.00'
   HTTP::Tiny: '0.070'
   JSON::XS: '3.01'
   List::MoreUtils: '0.410'
@@ -38,7 +37,7 @@ requires:
   Time::HiRes: '0.0'
   YAML::XS: '0.41'
 resources:
-  homepage: https://github.com/demianriccardi/HackaMol
-  repository: https://github.com/demianriccardi/HackaMol.git
-version: '0.046'
+  homepage: https://github.com/demianriccardi/p5-HackaMol
+  repository: https://github.com/demianriccardi/p5-HackaMol.git
+version: '0.047'
 x_serialization_backend: 'YAML::Tiny version 1.70'

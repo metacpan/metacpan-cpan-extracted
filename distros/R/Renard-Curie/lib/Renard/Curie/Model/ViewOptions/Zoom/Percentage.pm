@@ -1,9 +1,9 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::ViewOptions::Zoom::Percentage;
 # ABSTRACT: A set of options for zooming by a fixed amount
-$Renard::Curie::Model::ViewOptions::Zoom::Percentage::VERSION = '0.003';
+$Renard::Curie::Model::ViewOptions::Zoom::Percentage::VERSION = '0.004';
 use Moo;
-use Renard::Incunabula::Common::Types qw(ZoomLevel);
+use Renard::Incunabula::Document::Types qw(ZoomLevel);
 
 extends 'Renard::Curie::Model::ViewOptions::Zoom';
 
@@ -27,7 +27,7 @@ Renard::Curie::Model::ViewOptions::Zoom::Percentage - A set of options for zoomi
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

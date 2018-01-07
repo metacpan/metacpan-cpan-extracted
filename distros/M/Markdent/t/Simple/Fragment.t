@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
 
 use Markdent::Simple::Fragment;
 

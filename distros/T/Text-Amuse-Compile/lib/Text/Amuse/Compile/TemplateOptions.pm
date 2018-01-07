@@ -340,10 +340,19 @@ centered, on the second page, raggedright, in smaller size.
 Use the default komascript style where chapters and parts have sans
 font.
 
+=item * nobold
+
+Prevent the use of bold fonts and replace them with italics.
+
 =item * secondary_footnotes_alpha
 
 By default, secondary footnotes use arabic numbering between parens.
 You can switch to alpha per-page setting this option to 1 (boolean).
+
+=item * start_with_empty_page
+
+Start the PDF with an empty page (not with the title page, which will
+be placed on the next recto page).
 
 =item * headings
 
@@ -415,6 +424,7 @@ has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
 has sansfontsections => (is => 'rw', isa => Bool, default => sub { 0 });
 has secondary_footnotes_alpha => (is => 'rw', isa => Bool, default => sub { 0 });
 has nobold => (is => 'rw', isa => Bool, default => sub { 0 });
+has start_with_empty_page => (is => 'rw', isa => Bool, default => sub { 0 });
 
 sub all_headings {
     my @headings = (
@@ -599,6 +609,7 @@ sub config_setters {
                impressum sansfontsections
                secondary_footnotes_alpha
                nobold
+               start_with_empty_page
                opening beamertheme beamercolortheme/);
 }
 

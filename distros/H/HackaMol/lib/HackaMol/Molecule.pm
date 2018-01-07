@@ -1,5 +1,5 @@
 package HackaMol::Molecule;
-$HackaMol::Molecule::VERSION = '0.046';
+$HackaMol::Molecule::VERSION = '0.047';
 #ABSTRACT: Molecule class for HackaMol
 use 5.008;
 use Moose;
@@ -40,6 +40,23 @@ has 'groups' => (
     },
 );
 
+# an array to map t to some other label (e.g. model number from pdb)
+has 'model_ids' => (
+    traits  => ['Array'],
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [] },
+    predicate => 'has_models',
+    handles => {
+        "push_model_ids"   => 'push',
+        "get_model_id"    => 'get',
+        "set_model_id"    => 'set',
+        "all_model_ids"    => 'elements',
+        "count_model_ids"  => 'count',
+    },
+    lazy => 1,
+);
+
 sub BUILD {
     my $self = shift;
     foreach my $bond ( $self->all_bonds ) {
@@ -75,15 +92,11 @@ after 'push_groups' => sub {
 sub charge {
   my $self = shift;
   my $t = $self->t;
-  my $q = 0;
-  if ($self->has_charges){
-    $q = $self->get_charges($t);
-  }
   if (@_){
     my $new_q = shift;
     $self->set_charges($t,$new_q);
   }
-  return $q;
+  return $self->get_charges($t) || 0 ; # default to 0
 }
 
 # need to increase atom bond_count when push
@@ -262,7 +275,7 @@ HackaMol::Molecule - Molecule class for HackaMol
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

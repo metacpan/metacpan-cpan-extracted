@@ -1,3 +1,4 @@
+use 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -9,6 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Text/Amuse.pm',
     LICENSE          => 'Perl_5',
     PL_FILES         => {},
+    MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },

@@ -1,0 +1,36 @@
+---
+abstract: 'Galois Fields arithmetics'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Path::Tiny: '0.096'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.007'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-GF
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Math::Polynomial: '1.014'
+  Moo: '2.003002'
+  Ouch: '0.0410'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/polettix/Math-GF/issues
+  homepage: https://github.com/polettix/Math-GF
+  repository: https://github.com/polettix/Math-GF.git
+version: '0.004'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'

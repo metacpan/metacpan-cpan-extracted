@@ -25,7 +25,7 @@ for my $lvl (-2 .. 5) {
     }
 
     # die
-    for my $lvl_name (qw(FATAL INFO NOTICE)) {
+    for my $lvl_name (qw(FATAL ALERT INFO)) {
         my $cmd = 'use Log::Log4Cli; $Log::Log4Cli::LEVEL = ' . $lvl .
             '; die_' . lc($lvl_name) . " '$lvl_name die msg', 123";
         my ($out, $err) = capture { system($^X, "-MLog::Log4Cli", "-e", $cmd) };

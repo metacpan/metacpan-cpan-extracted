@@ -16,7 +16,6 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Capture::Tiny'     => 0,
-        'Term::ANSIColor'   => 0,
         'Test::More'        => 0,
     },
     META_MERGE => {
@@ -28,6 +27,7 @@ WriteMakefile(
         'parent'            => 0,
         'strict'            => 0,
         'warnings'          => 0,
+        'Carp'              => 0,
         'Term::ANSIColor'   => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

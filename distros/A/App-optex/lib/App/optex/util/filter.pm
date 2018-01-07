@@ -9,7 +9,10 @@ use Encode;
 use Data::Dumper;
 
 my($mod, $argv);
-sub initialize { ($mod, $argv) = @_ }
+
+sub initialize {
+    ($mod, $argv) = @_;
+}
 
 binmode STDIN,  ":encoding(utf8)";
 binmode STDOUT, ":encoding(utf8)";
@@ -97,6 +100,7 @@ sub io_filter (&@) {
     if ($opt{STDERR}) {
 	open STDOUT, '>&', \*STDERR or die "dup: $!";
     }
+    local @ARGV;
     $sub->();
     exit 0;
 }
@@ -117,6 +121,7 @@ sub set {
 	    io_filter { exec $filter or die "exec: $!\n" } $io => 1;
 	}
     }
+    ();
 }
 	
 =item B<set>()
@@ -180,6 +185,7 @@ sub io_color {
 	    }
 	} $io => 1;
     }
+    ();
 }
 
 =item B<io_color>( B<IO>=I<color> )
@@ -274,13 +280,15 @@ Gzip standard input.
 
 __DATA__
 
-option --if -M__PACKAGE__::set(STDIN=$<shift>)
-option --of -M__PACKAGE__::set(STDOUT=$<shift>)
-option --ef -M__PACKAGE__::set(STDERR=$<shift>)
+mode function
 
-option --isub --if &$<shift>
-option --osub --of &$<shift>
-option --esub --ef &$<shift>
+option --if &set(STDIN=$<shift>)
+option --of &set(STDOUT=$<shift>)
+option --ef &set(STDERR=$<shift>)
 
-option --set-io-color -M__PACKAGE__::io_color($<shift>)
-option --io-color --set-io-color STDERR=555/511E
+option --isub &set(STDIN=&$<shift>)
+option --osub &set(STDOUT=&$<shift>)
+option --esub &set(STDERR=&$<shift>)
+
+option --set-io-color &io_color($<shift>)
+option --io-color --set-io-color STDERR=555/412;E

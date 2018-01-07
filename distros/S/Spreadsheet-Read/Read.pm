@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.75";
+our $VERSION = "0.76";
 sub  Version { $VERSION }
 
 use Carp;
@@ -835,6 +835,9 @@ sub ReadData {
     if ($opt{parser} ? _parser ($opt{parser}) eq "sxc"
 		     : ($txt =~ m/^<\?xml/ or -f $txt)) {
 	$can{sxc} or croak "Spreadsheet::ReadSXC not installed";
+	ref $txt and
+	    croak ("Sorry, references as input are not (yet) supported by Spreadsheet::ReadSXC");
+
 	my $using = "using $can{sxc}-" . $can{sxc}->VERSION;
 	my $sxc_options = { %parser_opts, OrderBySheet => 1 }; # New interface 0.20 and up
 	my $sxc;
@@ -1949,7 +1952,7 @@ H.Merijn Brand, <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2017 H.Merijn Brand
+Copyright (C) 2005-2018 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

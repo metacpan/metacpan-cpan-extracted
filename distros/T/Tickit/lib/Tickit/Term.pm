@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Term;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Carp;
 
@@ -171,6 +171,33 @@ Sets the size of the output buffer
 
 Waits for the terminal startup process to complete, up to the timeout given in
 seconds.
+
+=cut
+
+=head2 pause
+
+   $term->pause
+
+Suspends operation of the terminal by resetting it to its default state.
+
+=cut
+
+=head2 resume
+
+   $term->resume
+
+Resumes operation of the terminal after a L</pause>.
+
+Typically these two methods are used together, either side of a blocking wait
+around a C<SIGSTOP>.
+
+   sub suspend
+   {
+      $term->pause;
+      kill STOP => $$;
+      $term->resume;
+      $rootwin->expose;
+   }
 
 =cut
 

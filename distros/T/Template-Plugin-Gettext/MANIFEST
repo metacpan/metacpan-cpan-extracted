@@ -3,6 +3,7 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 NEWS
@@ -23,6 +24,7 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/automatic.t
 t/basic.t
+t/bugs.t
 t/expand.t
 t/filter-filter.t
 t/filter-method.t
@@ -34,4 +36,5 @@ t/release-cpan-changes.t
 t/templates/interpolate-1.tt
 t/templates/interpolate-2.tt
 t/templates/interpolate-3.tt
+t/templates/nested.tt
 t/templates/template.tt

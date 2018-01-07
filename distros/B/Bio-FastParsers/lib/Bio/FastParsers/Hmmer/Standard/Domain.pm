@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Domain;
 # ABSTRACT: internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.173510';
+$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -35,6 +35,9 @@ around BUILDARGS => sub {
         = @header_vals == 3 ? $header_vals[2] : join 'e-', @header_vals[2,3]
     ;
 
+    # coerce numeric fields to numbers
+    %outargs = map { $_ => 0 + $outargs{$_} } keys %outargs;
+
     # parse domain alignment
 
     # Alignment is made of 4 lines: best match to profile, scoring
@@ -54,7 +57,7 @@ around BUILDARGS => sub {
     my $scoreseq = substr $scoreline, length $skip, length $tmpseq;
     my $profileseq = substr $profileline, length $skip, length $tmpseq;
     my $probabilities = substr $probline, length $skip, length $tmpseq;
-    $outargs{'seq'}      = $tmpseq;
+    $outargs{'seq'} = $tmpseq;
     $outargs{'scoreseq'} = $scoreseq;
     $outargs{'profile'} = $profileseq;
     $outargs{'probabilities'} = $probabilities;
@@ -70,8 +73,9 @@ around BUILDARGS => sub {
     my @summary_slots = qw(4 6 7 8 10 11 13 14 16);
 
     # parse summary
+    # and coerce numeric fields to numbers
     my @fields = split /\s+/xms, $summary;
-    my @summary_vals = map { $fields[$_] } @summary_slots;
+    my @summary_vals = map { 0 + $fields[$_] } @summary_slots;
     my %summary_hash = mesh @summary_attrs, @summary_vals;
 
     # return expected constructor hash
@@ -83,7 +87,7 @@ around BUILDARGS => sub {
 #       This one too ?
 
 sub get_degap_scoreseq {
-    my $self = shift;
+    my $self   = shift;
     my $tmpseq = $self->seq;
     my $score  = $self->scoreseq;
 
@@ -128,7 +132,7 @@ Bio::FastParsers::Hmmer::Standard::Domain - internal class for standard HMMER pa
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

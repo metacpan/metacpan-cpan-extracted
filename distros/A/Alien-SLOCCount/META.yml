@@ -1,0 +1,35 @@
+---
+abstract: 'Build and make available the sloccount tool'
+author:
+  - 'Joenio Costa <joenio@joenio.me>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Alien::flex: '0'
+  Config: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SLOCCount
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+resources:
+  repository: https://github.com/joenio/alien-sloccount
+version: '0.05'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.32'
+  requires:
+    share:
+      Alien::flex: '0'
+      Config: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

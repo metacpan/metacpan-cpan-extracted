@@ -1,5 +1,15 @@
 Revision history for Changes
 
+0.65    2018-01-05 15:59:18
+        [CHANGES]
+         * Updated for libtickit 0.2:
+            + RGB8 pen attributes
+            + tickit_renderbuffer_{skiprect,copyrect,moverect}
+            + tickit_term_{pause,resume}
+
+        [BUGFIXES]
+         * Provide $term->pause+resume methods (RT107131)
+
 0.64    2017-11-30 01:42:26
         [CHANGES]
          * Perform Tickit 0.64 deprecations:

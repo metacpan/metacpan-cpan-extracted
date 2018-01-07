@@ -1,29 +1,12 @@
-#============================================================= -*-perl-*-
-#
-# Class::Base
-#
-# DESCRIPTION
-#   Module implementing a common base class from which other modules
-#   can be derived.
-#
-# AUTHOR
-#   Andy Wardley    <abw@kfs.org>
-#
-# COPYRIGHT
-#   Copyright (C) 1996-2002 Andy Wardley.  All Rights Reserved.
-#
-#   This module is free software; you can redistribute it and/or
-#   modify it under the same terms as Perl itself.
-#
-#
-#========================================================================
-
 package Class::Base;
+our $AUTHORITY = 'cpan:YANICK';
+# ABSTRACT: useful base class for deriving other modules 
+$Class::Base::VERSION = '0.09';
 
 use strict;
+use warnings;
 
-our $VERSION  = '0.08';
-
+use Clone;
 
 #------------------------------------------------------------------------
 # new(@config)
@@ -71,8 +54,7 @@ sub new {
 #------------------------------------------------------------------------
 
 sub init {
-    my ($self, $config) = @_;
-    return $self;
+    return $_[0];
 }
 
 
@@ -84,8 +66,7 @@ sub init {
 #------------------------------------------------------------------------
 
 sub clone {
-    my $self = shift;
-    bless { %$self }, ref($self);
+    return Clone::clone(shift);
 }
 
 
@@ -102,21 +83,19 @@ sub clone {
 
 sub error {
     my $self = shift;
-    my $errvar;
+    my $errvar = do {
+        # get a reference to the object or package variable we're munging
+        no strict qw( refs );
+        ref $self ? \$self->{ _ERROR } : \${"$self\::ERROR"};
+    };
 
-    { 
-	# get a reference to the object or package variable we're munging
-	no strict qw( refs );
-	$errvar = ref $self ? \$self->{ _ERROR } : \${"$self\::ERROR"};
-    }
     if (@_) {
-	# don't join if first arg is an object (may force stringification)
-	$$errvar = ref($_[0]) ? shift : join('', @_);
-	return undef;
+        # don't join if first arg is an object (may force stringification)
+        $$errvar = ref($_[0]) ? shift : join('', @_);
+        return undef;
     }
-    else {
-	return $$errvar;
-    }
+
+    return $$errvar;
 }
 
 
@@ -135,7 +114,8 @@ sub id {
     return  ($self->{ _ID } = shift) if ref $self && @_;
 
     # otherwise return id as $self->{ _ID } or class name 
-    my $id = $self->{ _ID } if ref $self;
+    my $id;
+    $id = $self->{ _ID } if ref $self;
     $id ||= ref($self) || $self;
 
     return $id;
@@ -250,8 +230,6 @@ sub debug {
 
 sub debugging {
     my $self  = shift;
-    my $class = ref $self;
-    my $flag;
 
     no strict 'refs';
 
@@ -265,10 +243,19 @@ sub debugging {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Class::Base - useful base class for deriving other modules 
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -306,7 +293,6 @@ Class::Base - useful base class for deriving other modules
 
     # debug() prints to STDERR if debugging enabled
     $object->debug('The ', $animal, ' sat on the ', $place);
-
 
 =head1 DESCRIPTION
 
@@ -615,7 +601,6 @@ or
     my $object = My::Class->new({ foo => 'bar' }) # params hashref
 	  || die My::Class->error;                # class method
 
-
 =head2 init(\%config)
 
 Object initialiser method which is called by the C<new()> method, passing
@@ -766,29 +751,39 @@ of course subclass the method to return some other value.  When called
 with an argument it uses that value to set its internal C<_ID> field
 which will be returned by subsequent calls to C<id()>.
 
-=head1 AUTHOR
-
-Andy Wardley E<lt>abw@kfs.orgE<gt>
-
-=head1 VERSION
-
-This is version 0.04 of Class::Base.
-
 =head1 HISTORY
 
 This module began life as the Template::Base module distributed as 
 part of the Template Toolkit. 
 
 Thanks to Brian Moseley and Matt Sergeant for suggesting various
-enhancments, some of which went into version 0.02.
+enhancements, some of which went into version 0.02.
 
 Version 0.04 was uploaded by Gabor Szabo.
 
-=head1 COPYRIGHT
+=head1 AUTHORS
 
-Copyright (C) 1996-2012 Andy Wardley.  All Rights Reserved.
+=over 4
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+=item *
+
+Andy Wardley    <abw@kfs.org>
+
+=item *
+
+Gabor Szabo  <gabor@szabgab.com>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2016, 2014, 2012 by Andy Wardley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

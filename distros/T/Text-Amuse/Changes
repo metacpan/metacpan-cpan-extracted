@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.95 2017-12-28
+
+ - Add function to rewrite headers
+ - Require min perl 5.10.1 (RT #123958)
+
 0.94 2017-12-25
 
  - Fix regressions in inline parsing

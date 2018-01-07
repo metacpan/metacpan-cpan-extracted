@@ -24,7 +24,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'App::Prove' => '0'
+                                        'App::Prove' => '0',
+                                        'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
                                       'Class::Unload' => '0',
@@ -41,6 +42,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Class::Inspector' => '0',
                                    'File::Basename' => '0',
                                    'File::Spec' => '0',
                                    'JSON::PP' => '2.00',
@@ -51,6 +53,7 @@ do { my $x = {
                                    'Test::Roo' => '0',
                                    'Time::Piece' => '1.16',
                                    'Time::Seconds' => '0',
+                                   'feature' => '0',
                                    'lib' => '0',
                                    'strict' => '0',
                                    'warnings' => '0'

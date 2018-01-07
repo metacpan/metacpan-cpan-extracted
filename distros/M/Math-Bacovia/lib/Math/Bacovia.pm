@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    $Math::Bacovia::VERSION = '0.01';
+    $Math::Bacovia::VERSION = '0.03';
 }
 
 use List::UtilsBy::XS qw();
@@ -66,8 +66,7 @@ sub _check_type ($) {
         $$ref = 'Math::Bacovia::Number'->new($$ref);
     }
     else {
-        require Carp;
-        Carp::croak("[ERROR] Undefined value!");
+        $$ref = $ZERO;
     }
 }
 
@@ -445,10 +444,10 @@ sub atan {
 #>>>
 }
 
-# atan2(x, y) = atan(x / y)
+# atan2(x, y) = -i * log((y + x*i) / sqrt(x^2 + y^2))
 sub atan2 {
     my ($x, $y) = @_;
-    $x->{_atan2} //= 'Math::Bacovia::Fraction'->new($x, $y)->atan;
+    $x->{_atan2} //= 'Math::Bacovia::Log'->new('Math::Bacovia::Fraction'->new($y + $x * i, &sqrt($x**$TWO + $y**$TWO))) * -i;
 }
 
 # tanh(x) = (exp(2x) - 1) / (exp(2x) + 1)

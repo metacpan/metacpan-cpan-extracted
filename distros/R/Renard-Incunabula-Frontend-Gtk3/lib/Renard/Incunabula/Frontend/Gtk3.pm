@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Frontend::Gtk3;
 # ABSTRACT: Provides helpers for dealing with Gtk3 code
-$Renard::Incunabula::Frontend::Gtk3::VERSION = '0.003';
+$Renard::Incunabula::Frontend::Gtk3::VERSION = '0.004';
 1;
 
 __END__
@@ -16,7 +16,7 @@ Renard::Incunabula::Frontend::Gtk3 - Provides helpers for dealing with Gtk3 code
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SEE ALSO
 

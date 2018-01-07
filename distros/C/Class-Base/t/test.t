@@ -11,8 +11,6 @@
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 #
-# $Id: test.pl,v 1.1.1.1 2002/04/05 09:29:34 abw Exp $
-#
 #========================================================================
 
 use strict;
@@ -23,7 +21,7 @@ use Class::Base;
 #------------------------------------------------------------------------
 # mini test harness
 #------------------------------------------------------------------------
-use Test::More tests => 93;
+use Test::More tests => 45;
 
 #------------------------------------------------------------------------
 # quick hack to allow STDERR to be tied to a variable.
@@ -117,19 +115,24 @@ ok( $mod );
 ok( ! $mod->error() );
 is( $mod->name(), 'foo' );
 
-#------------------------------------------------------------------------
-# test clone() method
-#------------------------------------------------------------------------
+subtest 'clone() method' => sub {
+    my $clone = $mod->clone;
+    ok $mod ;
+    ok ! $mod->error ;
+    is $mod->name, 'foo', 'clone is ok';
 
-my $clone = $mod->clone();
-ok( $mod );
-ok( ! $mod->error() );
-is( $mod->name(), 'foo', 'clone is ok' );
+    subtest 'deep cloning' => sub {
+        my $mod = Class::Test::Name->new( name => { a => 'ref' } );
+        my $clone = $mod->clone;
+        $clone->name->{a} = 'changed ref';
+
+        is $clone->name->{a}, 'changed ref', "the clone changes";
+        is $mod->name->{a}, 'ref', "the original didn't change";
+    };
+};
 
 
-#------------------------------------------------------------------------
-# test id method and constructor parameters
-#------------------------------------------------------------------------
+subtest 'id method and constructor parameters' => sub {
 
 my $obj = Class::Base->new();
 ok( $obj );
@@ -164,11 +167,11 @@ $obj->debug('hello world');
 ok( $stderr eq '[wiz] hello world' ) 
     or print "stderr is [$stderr] not '[wiz] hello world'\n";
 
-#------------------------------------------------------------------------
-# test debugging method and params
-#------------------------------------------------------------------------
+};
 
-$obj = Class::Base->new( );
+subtest 'debugging method and params' => sub {
+
+my $obj = Class::Base->new( );
 ok( $obj, 'debugging object created' );
 ok( ! $obj->debugging );
 ok(   $obj->debugging(1) );
@@ -228,10 +231,9 @@ ok( ! $My::Class::Base::DEBUG );
 
 My::Class::Base->debugging(1);
 ok( $My::Class::Base::DEBUG );
+};
 
-#------------------------------------------------------------------------
-# test package $DEBUG variable sets default object DEBUG flag
-#------------------------------------------------------------------------
+subtest 'package $DEBUG variable sets default object DEBUG flag' => sub {
 
 My::Class::Base->debugging(0);
 ok( ! $My::Class::Base::DEBUG, 'class debugging is off' );
@@ -252,6 +254,7 @@ ok( $obj2->debugging, 'object is debugging' );
 $stderr = '';
 $obj2->debug('foo');
 is( $stderr, '[My::Class::Base] foo', 'foo printed' );
+};
 
 
 #------------------------------------------------------------------------
@@ -327,7 +330,7 @@ sub init {
 package main;
 
 $pkg = 'My::Params::Test';
-$obj = $pkg->new();
+my $obj = $pkg->new();
 ok( $obj, 'got an object' );
 ok( ! exists $obj->{ ONE }, 'ONE does not exist' );
 

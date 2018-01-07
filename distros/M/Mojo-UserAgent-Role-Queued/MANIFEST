@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/example1.t
+examples/stress/sites_from_feeds.txt
+examples/stress/stress-the-internet.t
+lib/Mojo/UserAgent/Role/Queued.pm
+minil.toml
+t/00_compile.t
+t/01-compose.t
+META.yml
+MANIFEST

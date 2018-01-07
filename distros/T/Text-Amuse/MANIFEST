@@ -1,5 +1,6 @@
 bin/muse-quick.pl
 Changes
+examples/add-pubdate.pl
 examples/generate-roman-numbers.pl
 examples/mass-testing.pl
 lib/Text/Amuse.pm
@@ -47,6 +48,7 @@ t/partials.t
 t/pod-coverage.t
 t/pod.t
 t/regexp.t
+t/rewrite-header.t
 t/splat.t
 t/splat_html.t
 t/splat_latex.t

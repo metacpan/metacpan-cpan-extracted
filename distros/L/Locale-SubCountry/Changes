@@ -1,5 +1,8 @@
 Revision history for Perl CPAN module Locale::SubCountry
 
+2.04 29 Dec 2017    
+    Added strict and warnings pragmas to Codes.pm as per github request by manwar
+
 2.03 27 Dec 2017    
     Updated to alioth.debian.org codes 3.77 (Dec 2017)
 

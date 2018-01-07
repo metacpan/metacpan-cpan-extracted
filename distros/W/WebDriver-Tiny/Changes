@@ -1,3 +1,7 @@
+0.101 2018-01-02
+    - Try harder to get a meaningful error message.
+    - Make use of subroutine signatures.
+
 0.100 2017-12-21
     - This is a breaking chance, we now support the latest WebDriver spec and
       test on the latest geckodriver, I suspect phantomjs no longer works, but

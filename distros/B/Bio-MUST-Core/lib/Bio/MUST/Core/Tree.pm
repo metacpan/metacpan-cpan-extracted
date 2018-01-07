@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-$Bio::MUST::Core::Tree::VERSION = '0.173500';
+$Bio::MUST::Core::Tree::VERSION = '0.173620';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -87,11 +87,11 @@ sub _change_ids_ {
 
     # update only terminal nodes
     for my $tip ( @{ $self->tree->get_terminals } ) {
-        my $seq_id = SeqId->new(full_id => $tip->get_name);
-        my $new_id = $abbr ? $id_mapper->abbr_id_for($seq_id->full_id)
-                           : $id_mapper->long_id_for($seq_id->full_id);
-        $tip->set_name($new_id);
-    }
+        my $seq_id = SeqId->new( full_id => $tip->get_name );
+        my $new_id = $abbr ? $id_mapper->abbr_id_for( $seq_id->full_id )
+                           : $id_mapper->long_id_for( $seq_id->full_id );
+        $tip->set_name($new_id) if $new_id;
+    }                       # Note: leave id alone if not found
 
     return;
 }
@@ -471,7 +471,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

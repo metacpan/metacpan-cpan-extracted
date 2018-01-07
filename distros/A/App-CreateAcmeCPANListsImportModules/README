@@ -3,9 +3,9 @@ NAME
     Acme::CPANLists::Import::* modules
 
 VERSION
-    This document describes version 0.07 of
+    This document describes version 0.080 of
     App::CreateAcmeCPANListsImportModules (from Perl distribution
-    App-CreateAcmeCPANListsImportModules), released on 2017-07-08.
+    App-CreateAcmeCPANListsImportModules), released on 2018-01-01.
 
 FUNCTIONS
   create_acme_cpanlists_import_modules
@@ -36,9 +36,18 @@ FUNCTIONS
         This requires "App::lcpan" to be installed and a local CPAN index to
         exist and be fairly recent.
 
+    *   ignore_empty => *bool*
+
+        If set to true, will not create if there are no extracte module
+        names found.
+
     *   modules* => *array[hash]*
 
     *   namespace* => *str*
+
+    *   typos => *hash*
+
+        Module names that should be replaced by their fixed spellings.
 
     *   user_agent => *str*
 
@@ -90,7 +99,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

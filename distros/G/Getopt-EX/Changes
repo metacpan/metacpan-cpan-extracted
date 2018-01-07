@@ -1,5 +1,17 @@
 Revision history for Perl extension Getopt-EX
 
+v1.7.1 2018-01-04T00:25:06Z
+
+    - Bug fix.
+
+v1.7.0 2018-01-03T23:42:03Z
+
+    - Process default option same as others.
+
+v1.6.0 2017-12-29T01:51:01Z
+
+    - Introduce new "mode" command.
+
 v1.5.1 2017-12-21T14:09:25Z
 
     - Accept multiple BASECLASSes.

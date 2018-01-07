@@ -1,5 +1,5 @@
 ---
-abstract: 'extract components of a street address, presented as a text string'
+abstract: 'extract components of a street address from free format text'
 author:
   - 'Kim Ryan <kimryan at cpan org>'
 build_requires:
@@ -17,10 +17,10 @@ name: Lingua-EN-AddressParse
 provides:
   Lingua::EN::AddressParse:
     file: lib/Lingua/EN/AddressParse.pm
-    version: '1.26'
+    version: '1.27'
   Lingua::EN::AddressParse::Grammar:
     file: lib/Lingua/EN/AddressParse/Grammar.pm
-    version: '1.26'
+    version: '1.27'
 requires:
   Carp: '1.08'
   Lingua::EN::NameParse: '1.24'
@@ -34,5 +34,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kimryan/Lingua-EN-AddressParse
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

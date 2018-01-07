@@ -1,0 +1,7 @@
+Revision history for Perl extension Test-Snapshot
+
+0.02	Sun Jan  7 05:57:36 GMT 2018
+ - allow snapshot filenames keep digits, dashes, letters
+
+0.01	Sun Jan  7 03:27:51 GMT 2018
+ - first version

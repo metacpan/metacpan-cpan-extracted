@@ -28,129 +28,134 @@ sub main {
 sub parse_render {
     my ($self) = @_;
 
-    my $content = join( "\n",
-        q\~ Jude 1 ~\,
-        q\\,
-        q\|1| Jude, [or ^Judas^] {Mt 13:55; Mk 6:3; Joh 14:22; Ac 1:13} a slave [or\,
-        q\^servant^] {Ti 1:1} of Jesus Christ, and brother of James, [or ^Jacob^] to\,
-        q\those having been set apart [or ^loved^ or ^sanctified^] in God ^the^ Father,\,
-        q\{Ro 1:6-7} and having been kept [or ^called^] by [or ^for^ or ^in^] Jesus\,
-        q\Christ: {Joh 17:12; 1Pt 1:5}\,
-        q\\,
-        q\= The Sin and Punishment of the Ungodly =\,
-        q\\,
-        q\|14| Enoch, {Ge 5:18, 21-24} ^the^ seventh from Adam, also prophesied to these\,
-        q\saying:\,
-        q\\,
-        q\    Behold, ^the^ Lord came with myriads of His saints [or ^holy ones^] {Dt\,
-        q\    33:2; Da 7:10; Mt 16:27; He 12:22} |15| to do judgment against all {2Pt\,
-        q\    2:6-9} and to rebuke all the ungodly ^because of^ [or ^concerning^] all\,
-        q\    the ungodly works they did and about all the ^harsh^ [literally ^hard^]\,
-        q\    things which ungodly sinners spoke against Him. [taken from the Jewish\,
-        q\    ^First Book of Enoch^ written approximately in the first century B.C.]\,
-        q\    {1Ti 1:9}\,
-        q\\,
-        q\|16| These are murmurers, complainers, {Nu 16:11, 41; 1Co 10:10} following\,
-        q\^after^ [or ^according to^] their lusts, {Jdg 1:18; 2Pt 2:10} and their mouths\,
-        q\speak of proud things {2Pt 2:18} ^showing admiration^ [literally ^admiring\,
-        q\faces^] to gain ^an advantage^. [literally ^for the sake of you^] {2Pt 2:3}\,
-        q\\,
-        q\= Persevere in the Love of God =\,
-        q\\,
-        q\|17| But beloved, remember the words spoken before by the apostles {Ep 4:11} of\,
-        q\our Lord, Jesus Christ, {He 2:3; 2Pt 3:2} |18| because they told you that in\,
-        q\the last ^days^ [literally ^at the last time^] {Ac 20:29; 1Ti 4:1; 2Ti 4:3; 2Pt\,
-        q\3:3} ^there^ will be mockers following their own ungodly lusts. {2Pt 2:1, 3:3}\,
-        q\\,
+    my $test = sub {
+        my ( $content, $data, $name ) = @_;
+
+        oldstyle_diff;
+        eq_or_diff( $self->parse($content), $data, '$self->parse; # ' . $name );
+        eq_or_diff( $self->render($data), $content, '$self->render; # ' . $name );
+    };
+
+    $test->(
+        join( "\n",
+            q\~ Jude 1 ~\,
+            q\\,
+            q\|1| Jude, a slave of Jesus Christ, and brother of James, to those having been\,
+            q\set apart in God ^the^ Father, and having been kept by Jesus Christ.\,
+            q\\,
+        ),
+        [
+            {
+                'reference' => {
+                    'book'    => 'Jude',
+                    'chapter' => '1',
+                    'verse'   => '1'
+                },
+                'content' => [
+                    'Jude, a slave of Jesus Christ, and brother of James, to those having been set apart in God',
+                    [
+                        'italic',
+                        'the'
+                    ],
+                    'Father, and having been kept by Jesus Christ.'
+                ]
+            }
+        ],
+        'Simple single verse with italic',
     );
 
-    my $data = [
-        {
-            'reference' => { 'verse' => '1', 'chapter' => '1', 'book' => 'Jude' },
+    $test->(
+        join( "\n",
+            q\~ Jude 1 ~\,
+            q\\,
+            q\|1| Jude, [or ^Judas^] {Mt 13:55; Mk 6:3; Joh 14:22; Ac 1:13} a slave [or\,
+            q\^servant^] {Ti 1:1} of Jesus Christ, and brother of James, [or ^Jacob^] to\,
+            q\those having been set apart [or ^loved^ or ^sanctified^] in God ^the^ Father,\,
+            q\{Ro 1:6-7} and having been kept [or ^called^] by [or ^for^ or ^in^] Jesus\,
+            q\Christ: {Joh 17:12; 1Pt 1:5}\,
+            q\\,
+        ),
+        [ {
+            'reference' => { 'verse' => '1', 'book' => 'Jude', 'chapter' => '1' },
             'content' => [
                 'Jude,', [ 'footnote', 'or', [ 'italic', 'Judas' ] ], [
-                'crossreference', [ 'Mt 13:55', 'Mk 6:3', 'Joh 14:22', 'Ac 1:13' ]
-                ], 'a slave', [ 'footnote', 'or', [ 'italic', 'servant' ] ], [
-                'crossreference', [ 'Ti 1:1' ] ],
-                'of Jesus Christ, and brother of James,', [ 'footnote', 'or',
-                [ 'italic', 'Jacob' ] ], 'to those having been set apart',
-                [ 'footnote', 'or', [ 'italic', 'loved' ],
-                'or', [ 'italic', 'sanctified' ] ], 'in God', [ 'italic', 'the' ],
-                'Father,', [ 'crossreference', [ 'Ro 1:6-7' ] ],
-                'and having been kept', [ 'footnote', 'or', [ 'italic', 'called'
-                ] ], 'by', [
-                'footnote', 'or', [ 'italic', 'for' ], 'or', [ 'italic', 'in' ] ],
-                'Jesus Christ:', [ 'crossreference', [ 'Joh 17:12', '1Pt 1:5' ] ], [
-                'paragraph' ]
+                'crossreference', [ 'Mt 13:55', 'Mk 6:3', 'Joh 14:22', 'Ac 1:13' ] ],
+                'a slave', [ 'footnote', 'or', [ 'italic', 'servant' ] ], [ 'crossreference', [
+                'Ti 1:1' ] ], 'of Jesus Christ, and brother of James,', [ 'footnote', 'or', [
+                'italic', 'Jacob' ] ], 'to those having been set apart', [ 'footnote', 'or', [
+                'italic', 'loved' ], 'or', [ 'italic', 'sanctified' ] ], 'in God', [ 'italic',
+                'the' ], 'Father,', [ 'crossreference', [ 'Ro 1:6-7' ] ],
+                'and having been kept', [ 'footnote', 'or', [ 'italic', 'called' ] ], 'by',
+                [ 'footnote', 'or', [ 'italic', 'for' ], 'or', [ 'italic', 'in' ] ], 'Jesus Christ:',
+                [ 'crossreference', [ 'Joh 17:12', '1Pt 1:5' ] ]
             ]
-        },
-        {
-            'reference' => { 'verse' => '14', 'chapter' => '1', 'book' => 'Jude' },
-            'content' => [
-                'Enoch,', [ 'crossreference', [ 'Ge 5:18, 21-24' ] ], [
-                'italic', 'the' ],
-                'seventh from Adam, also prophesied to these saying:',
-                [ 'paragraph' ], [ 'blockquote', 'Behold,', [ 'italic',
-                'the' ], 'Lord came with myriads of His saints', [ 'footnote', 'or',
-                [ 'italic', 'holy ones' ] ], [ 'crossreference', [ 'Dt 33:2',
-                'Da 7:10', 'Mt 16:27', 'He 12:22' ] ] ]
-            ],
-            'header' => [ 'The Sin and Punishment of the Ungodly' ]
-        },
-        {
-            'reference' => { 'verse' => '15', 'chapter' => '1', 'book' => 'Jude' },
-            'content' => [
-                [ 'blockquote', 'to do judgment against all' ], [ 'crossreference',
-                [ '2Pt 2:6-9' ] ], 'and to rebuke all the ungodly', [ 'italic',
-                'because of' ], [ 'footnote', 'or', [ 'italic', 'concerning' ] ],
-                'all the ungodly works they did and about all the', [ 'italic',
-                'harsh' ], [ 'footnote', 'literally', [ 'italic', 'hard' ] ],
-                'things which ungodly sinners spoke against Him.', [ 'footnote',
-                'taken from the Jewish', [ 'italic', 'First Book of Enoch' ],
-                'written approximately in the first century B.C.' ], [
-                'crossreference', [ '1Ti 1:9' ] ], [ 'paragraph' ]
-            ]
-        },
-        {
-            'reference' => { 'verse' => '16', 'chapter' => '1', 'book' => 'Jude' },
-            'content' => [
-                'These are murmurers, complainers,', [ 'crossreference', [
-                'Nu 16:11, 41', '1Co 10:10' ] ], 'following', [ 'italic',
-                'after' ], [ 'footnote', 'or', [ 'italic', 'according to' ] ],
-                'their lusts,', [ 'crossreference', [ 'Jdg 1:18', '2Pt 2:10' ] ],
-                'and their mouths speak of proud things', [ 'crossreference', [
-                '2Pt 2:18' ] ], [ 'italic', 'showing admiration' ], [ 'footnote',
-                'literally', [ 'italic', 'admiring faces' ] ], 'to gain', [
-                'italic', 'an advantage' ], '.', [ 'footnote', 'literally', [
-                'italic', 'for the sake of you' ] ], [ 'crossreference', [ '2Pt 2:3'
-                ] ], [ 'paragraph' ]
-            ]
-        },
-        {
-            'reference' => { 'verse' => '17', 'chapter' => '1', 'book' => 'Jude' },
-            'content' => [
-                'But beloved, remember the words spoken before by the apostles', [
-                'crossreference', [ 'Ep 4:11' ] ], 'of our Lord, Jesus Christ,', [
-                'crossreference', [ 'He 2:3', '2Pt 3:2' ] ]
-            ],
-            'header' => [ 'Persevere in the Love of God' ]
-        },
-        {
-            'reference' => { 'verse' => '18', 'chapter' => '1', 'book' => 'Jude' },
-            'content' => [
-                'because they told you that in the last', [ 'italic', 'days' ], [
-                'footnote', 'literally', [ 'italic', 'at the last time' ] ], [
-                'crossreference', [ 'Ac 20:29', '1Ti 4:1', '2Ti 4:3', '2Pt 3:3' ] ],
-                [ 'italic', 'there' ],
-                'will be mockers following their own ungodly lusts.',
-                [ 'crossreference', [ '2Pt 2:1, 3:3' ] ]
-            ]
-        }
-    ];
+        } ],
+        'Complex single verse with footnotes and crossreferences',
+    );
 
-    oldstyle_diff;
-    eq_or_diff( $self->parse($content), $data, '$self->parse($content)' );
-    eq_or_diff( $self->render($data), $content, '$self->render($data)' );
+    $test->(
+        join( "\n",
+            q\~ Jude 1 ~\,
+            q\\,
+            q\= Header Alpha =\,
+            q\\,
+            q\|1| Jude, a slave of Jesus Christ, and brother of James, to those having been\,
+            q\set apart in God ^the^ Father, and having been kept by Jesus Christ. |2| This\,
+            q\is a second verse, but it's fake.\,
+            q\\,
+            q\= Header Beta =\,
+            q\\,
+            q\|3| This is a third verse, also fake.\,
+            q\\,
+        ),
+        [
+            {
+                'header' => [ 'Header Alpha' ], 'content' => [
+                'Jude, a slave of Jesus Christ, and brother of James, to those having been set apart in God',
+                [ 'italic', 'the' ], 'Father, and having been kept by Jesus Christ.' ], 'reference' => {
+                'book' => 'Jude', 'verse' => '1', 'chapter' => '1' }
+            },
+            {
+                'reference' => {
+                'book' => 'Jude', 'chapter' => '1', 'verse' => '2' }, 'content' =>
+                [ 'This is a second verse, but it\'s fake.', [ 'paragraph' ] ]
+            },
+            {
+                'header' => [ 'Header Beta' ], 'reference' => { 'book' => 'Jude', 'chapter' =>
+                '1', 'verse' => '3' }, 'content' => [ 'This is a third verse, also fake.' ]
+            }
+        ],
+        '3 simple verses with 2 headers',
+    );
+
+    $test->(
+        join( "\n",
+            q\~ Romans 12 ~\,
+            q\\,
+            q\|14| These are words.\,
+            q\\,
+            q\    Behold, these are more words\,
+            q\      and another line of words.\,
+            q\    |15| For he who |16| reads lines\,
+            q\      shall |17| have words.\,
+            q\\,
+            q\|18| Then there's more.\,
+            q\\,
+        ),
+        [
+            { 'reference' => { 'verse' => '14', 'chapter' => '12', 'book' =>
+            'Romans' }, 'content' => [ 'These are words.', [ 'paragraph' ], [ 'blockquote', 'Behold, these are more words' ],
+            [ 'break' ], [ 'blockquote_indent', 'and another line of words.' ], [
+            'break' ] ] }, { 'content' => [ [ 'blockquote', 'For he who' ] ], 'reference' => { 'verse' =>
+            '15', 'chapter' => '12', 'book' => 'Romans' } }, { 'content' => [ [ 'blockquote', 'reads lines' ], [ 'break' ],
+            [ 'blockquote_indent', 'shall' ] ], 'reference' => { 'book' => 'Romans',
+            'chapter' => '12', 'verse' => '16' } }, { 'content' => [ [ 'blockquote_indent', 'have words.' ], [
+            'paragraph' ] ], 'reference' => { 'verse' => '17', 'chapter' => '12',
+            'book' => 'Romans' } }, { 'content' => [ 'Then there\'s more.' ],
+            'reference' => { 'chapter' => '12', 'verse' => '18', 'book' => 'Romans' } }
+        ],
+        'Blockquote and indented blockquote run with trailing verse',
+    );
 
     return;
 }

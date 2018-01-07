@@ -31,6 +31,8 @@ test:	{ @OKS }
 		$sm->parse($deps->[0]);
 	    }
 	    $sm->make;
+	    s{(at SlayMakefile\.main line \d+)\.}{$1}g for @OUTPUT;
+	    s{ \(did you forget to declare "my \$.*?"\?\)}{}g for @OUTPUT;
 	    open T, ">$target";
 	    print T @OUTPUT;
 	    close T;

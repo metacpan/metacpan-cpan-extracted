@@ -1,11 +1,11 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::ViewOptions::Grid;
 # ABSTRACT: A set of options for grids
-$Renard::Curie::Model::ViewOptions::Grid::VERSION = '0.003';
+$Renard::Curie::Model::ViewOptions::Grid::VERSION = '0.004';
 use Moo;
 use MooX::Lsub;
 use Renard::Incunabula::Common::Types qw(Maybe PositiveInt);
-use Renard::Incunabula::Common::Error;
+use Renard::Curie::Error;
 
 # Need to use the ::BuildArgs version since is_continuous_view is a lsub.
 with qw(MooX::BuildArgs MooX::Role::CloneSet::BuildArgs);
@@ -15,7 +15,7 @@ has [ qw/rows columns/ ] => (
 	required => 1,
 	isa => sub {
 		( Maybe[PositiveInt] )->check($_[0]) or
-			Renard::Incunabula::Common::Error::ViewOptions::InvalidGridOptions->throw(
+			Renard::Curie::Error::ViewOptions::InvalidGridOptions->throw(
 				msg => 'Grid extent must be Maybe[PositiveInt]',
 			);
 	},
@@ -28,7 +28,7 @@ lsub is_continuous_view => method() {
 
 method BUILD() {
 	unless( defined $self->rows or defined $self->columns ) {
-		Renard::Incunabula::Common::Error::ViewOptions::InvalidGridOptions->throw({
+		Renard::Curie::Error::ViewOptions::InvalidGridOptions->throw({
 			msg => "At least one of the grid extents must be defined",
 		});
 	}
@@ -48,7 +48,7 @@ Renard::Curie::Model::ViewOptions::Grid - A set of options for grids
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

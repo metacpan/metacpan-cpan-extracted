@@ -31,7 +31,7 @@ sub new {
     bless {values => \@flat}, $class;
 }
 
-sub inside {
+sub get {
     my ($x) = @_;
     (@{$x->{values}});
 }
@@ -81,13 +81,14 @@ sub neg {
 
 sub numeric {
     my ($x) = @_;
-    $x->{_num} //= do {
-        my $sum = $Math::Bacovia::ZERO->{value};
-        foreach my $value (@{$x->{values}}) {
-            $sum += $value->numeric;
-        }
-        $sum;
-    };
+
+    my $sum = $Math::Bacovia::ZERO->{value};
+
+    foreach my $value (@{$x->{values}}) {
+        $sum += $value->numeric;
+    }
+
+    $sum;
 }
 
 sub pretty {

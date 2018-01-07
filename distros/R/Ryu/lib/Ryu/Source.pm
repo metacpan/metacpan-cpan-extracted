@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 =head1 NAME
 
@@ -326,6 +326,58 @@ Shortcut for C<< ->each(sub { print "$_\n" }) >>.
 sub say {
     my ($self) = @_;
     $self->each(sub { local $\; print "$_\n" });
+}
+
+=head2 hexdump
+
+Convert input bytes to a hexdump representation, for example:
+
+ 00000000 00 00 12 04 00 00 00 00 00 00 03 00 00 00 80 00 >................<
+ 00000010 04 00 01 00 00 00 05 00 ff ff ff 00 00 04 08 00 >................<
+ 00000020 00 00 00 00 7f ff 00 00                         >........<
+
+One line is emitted for each 16 bytes.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<continuous> - accumulates data for a continuous stream, and
+does not reset the offset counter. Note that this may cause the last
+output to be delayed until the source completes.
+
+=back
+
+=cut
+
+sub hexdump {
+    my ($self, %args) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+    my $offset = 0;
+    my $in = '';
+    $self->each_while_source(sub {
+        my @out;
+        if($args{continuous}) {
+            $in .= $_;
+            return if length($in) < 16;
+        } else {
+            $in = $_;
+            $offset = 0;
+        }
+        while(length(my $bytes = substr $in, 0, 16, '')) {
+            my $encoded = join '', unpack 'H*' => $bytes;
+            $encoded =~ s/[[:xdigit:]]{2}\K(?=[[:xdigit:]])/ /g;
+            my $ascii = $bytes =~ s{[^[:print:]]}{.}gr;
+            $src->emit(sprintf '%08x %-47.47s %-18.18s', $offset, $encoded, ">$ascii<");
+            $offset += length($bytes);
+            return if $args{continuous} and length($in) < 16;
+        }
+    }, $src);
 }
 
 =head2 throw
@@ -1778,6 +1830,31 @@ sub each_while_source {
     $src
 }
 
+=head2 map_source
+
+Provides a L</chained> source which has more control over what it
+emits than a standard L</map> or L</filter> implementation.
+
+ $original->map_source(sub {
+  my ($item, $src) = @_;
+  $src->emit('' . reverse $item);
+ });
+
+=cut
+
+sub map_source {
+    my ($self, $code) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+    $self->each_while_source(sub {
+        $code->($_, $src) for $_;
+    }, $src);
+}
+
 =head2 new_future
 
 Used internally to get a L<Future>.
@@ -1829,5 +1906,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
 

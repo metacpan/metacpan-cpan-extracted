@@ -26,8 +26,8 @@ Gzip::Faster - simple and fast gzip and gunzip
 
 =head1 VERSION
 
-This documents version 0.20 of Gzip::Faster
-corresponding to git commit L<0d061b7f467e8177e4654a2f36199abeccfd71bf|https://github.com/benkasminbullock/gzip-faster/commit/0d061b7f467e8177e4654a2f36199abeccfd71bf> made on Sat Jun 17 09:02:52 2017 +0900.
+This documents version 0.21 of Gzip::Faster
+corresponding to git commit L<0b018b1a4df5f509a16c4262936b601382b6c3d6|https://github.com/benkasminbullock/gzip-faster/commit/0b018b1a4df5f509a16c4262936b601382b6c3d6> made on Fri Dec 29 10:54:29 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -75,9 +75,9 @@ the compressed version of C<$plain>.
     my $plain = gunzip ($zipped);
 
 This uncompresses C<$zipped> and returns the result of the
-uncompression. It returns the undefined value if C<$zipped> is the
-undefined value or an empty string. Otherwise, it throws a fatal error
-if C<$zipped> is not in the gzip format.
+uncompression. It prints a warning and returns the undefined value if
+C<$zipped> is the undefined value or an empty string. It throws a
+fatal error if C<$zipped> is not in the gzip format.
 
 =head2 gzip_file
 
@@ -139,12 +139,13 @@ version 0.18. Modification time writing was added in version 0.19.
 
     my $deflated = deflate ($plain);
 
-Compress C<$plain> into the deflate format. This format is similar to
-L</gzip> except that it doesn't contain a gzip header. The output can
-be inflated either with L</inflate> or with L</gunzip>.
+This compresses C<$plain> into the deflate format. The deflate format
+is similar to the L</gzip> format, except that it doesn't contain a
+gzip header. The output of C<deflate> can be inflated either with
+L</inflate> or with L</gunzip>.
 
-There is an example of using L</deflate> to write a PNG in the
-module's tests in F<t/png.t>.
+To see an example of using L</deflate> to write a PNG image file, see
+L<F<t/png.t>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/t/png.t> in the module's tests.
 
 C<deflate> was added in version 0.16.
 
@@ -152,26 +153,28 @@ C<deflate> was added in version 0.16.
 
     my $inflated = inflate ($deflated);
 
-Inflate the output of L</deflate>. Although the code is slightly
-different, for all practical purposes this is identical to L</gunzip>,
-and it's included only for completeness. In other words, you can use
-inflate and gunzip interchangeably.
+This inflates the output of L</deflate>. For all practical purposes
+this is identical to L</gunzip>, and it's included only for
+completeness. In other words, you can use inflate and gunzip
+interchangeably.
 
 C<inflate> was added in version 0.16.
 
 =head2 deflate_raw
 
-This is similar to L</deflate> except that it doesn't write the check
-sum value in the data at all. The output must be inflated with
-L</inflate_raw>.
+This is similar to L</deflate>, except that it doesn't write check sum
+value in the data. The output is incompatible with L</inflate> and
+L</gunzip>, and must be inflated with L</inflate_raw>.
 
 C<deflate_raw> was added in version 0.16.
 
 =head2 inflate_raw
 
-This inflates data output by L</deflate_raw>. Although the code is
-basically similar to L</inflate> and L</gunzip>, it won't work on the
-output of L</gzip> and L</deflate>.
+This inflates data output by L</deflate_raw>. It won't work on the
+output of L</gzip> and L</deflate>. It prints a warning and returns
+the undefined value if its input is the undefined value or an empty
+string. It throws a fatal error if its input is not in the deflate
+format.
 
 C<inflate_raw> was added in version 0.16.
 
@@ -278,7 +281,7 @@ produces output
     Got back file name blash.gz
 
 
-(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/examples/file-name.pl> in the distribution.)
+(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/examples/file-name.pl> in the distribution.)
 
 
 The module currently has a hard-coded limit of 1024 bytes as the
@@ -560,6 +563,12 @@ to L</gunzip_file> was not a scalar reference.
 
 (Warning) The user tried to compress or decompress the undefined value.
 
+=item Attempt to (un)compress empty string
+
+(Warning) The user tried to compress or decompress an empty string, as in
+
+    my $out = inflate ('');
+
 =back
 
 There are other diagnostic messages in the module to detect bugs. A
@@ -570,7 +579,7 @@ and F<lib/Gzip/Faster.pm> in the distribution.
 =head1 INSTALLATION
 
 Installation follows standard Perl methods. Detailed instructions can
-be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/README> in the distribution. The
+be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/README> in the distribution. The
 following are some extra notes for people who get stuck.
 
 Gzip::Faster requires the compression library L</zlib> (also called
@@ -761,7 +770,7 @@ produces output
     #  ###### #          ##########
 
 
-(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/examples/inflate.pl> in the distribution.)
+(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/examples/inflate.pl> in the distribution.)
 
 
 =back
@@ -825,6 +834,9 @@ object-oriented functions.
 Version 0.18 added the ability to set and get file names to the
 g*zip*file functions, and version 0.19 added modification times.
 
+Version 0.21 added warnings upon input of empty strings to L</gzip>,
+L</gunzip>, and friends.
+
 =head1 ACKNOWLEDGEMENTS
 
 zgrim reported an important bug related to zlib.
@@ -835,6 +847,7 @@ L<Compress::Raw::Zlib>.
 The tests in F<t/png.t> and the example L</View the image data of a
 PNG> use material taken from L<Image::PNG::Write::BW> by Andrea Nall
 (<ANALL>).
+
 
 
 =head1 AUTHOR

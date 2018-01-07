@@ -1,60 +1,64 @@
-Revision history for Perl extension Test::ClassAPI
+Revision history for Test-ClassAPI
 
-1.06 Mon 13 Jul 2009
+1.07      2017-12-28 23:44:29Z
+        - switch packaging to Dist::Zilla, which makes the distribution
+          installable again on perl 5.27.7  (See RT#123867)
+
+1.06 2009-07-13
 	- No functional changes
 	- Updating to Module::Install::DSL 0.91
 	- Updating to new author tests
 	- Updating minimum Perl version to 5.6
 
-1.05 Thu 10 Jul 2008
+1.05 2008-07-10
 	- No functional changes.
 	- Updating to Module::Install 0.76
 
-1.04 Sun 11 Mar 2007
+1.04 2007-03-11
 	- No functional changes. No need to upgrade
 	- Adding a missing Params::Util dependency
 	- Upgrading to Module::Install 0.65
 
-1.03 Thu 15 Feb 2007
+1.03 2007-02-15
 	- Moving from old CVS to new SVN repository
 	- Cleaning up unit tests
 	- Updating some too-old dependencies
 	- Upgrading Makefile.PL to use Module::Install 0.64
 
-1.02 Sun Sep  5 2004
+1.02 2004-09-05
 	- Cleaned up unit tests
 
-1.01 Fri Sep  3 2004
+1.01 2004-09-03
 	- Adding support for collision detection, via the 'collisions' option
 
-1.00 Thu Sep  2 2004
+1.00 2004-09-02
 	- Adding support for =implements, which cascades like =isa
 	  but isn't expected to obey proper inheritance.
 
-0.9  Wed Jul 21 2004
+0.9  2004-07-21
 	- Implicitly assume Module=class for any section without a plan entry
 
-0.8  Tue Jul 20 2004
+0.8  2004-07-20
 	- Fixed a bug in the way missing methods are reported
 
-0.7  Mon Jul 19 2004
+0.7  2004-07-21
 	- Ignore Exporter methods we don't overload
 
-0.6  Mon Jul 19 2004
+0.6  2004-07-19
 	- Removed a dependency on Class::ISA
 	- Upgraded tests to new standard
 
-0.5  Unknown
+0.5  2004-06-21
 	- Added support for the 'complete' modifier
 
-0.4  Sat Apr 17 2004
+0.4  2004-04-17
 	- Added support for the 'isa' test
 
-0.3  Fri Apr 16 2004
+0.3  2004-04-16
 	- Fixed a bug where it was testing all the entries, not just the ones in the schedule
 
-0.2  Fri Apr 16 2004
+0.2  2004-04-16
 	- Converted to a possibly a better specification format
 
-0.1  Thu Apr 24 00:38:55 2003
+0.1  2003-04-24 00:38:55Z
 	- original version

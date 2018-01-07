@@ -7,7 +7,7 @@ use Carp qw(confess);
 use Mock::Sub::Child;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 my %opts;
 
@@ -25,18 +25,13 @@ sub new {
     return $self;
 }
 sub mock {
-    my $self = shift;
-    my $sub = shift;
+    my ($self, $sub, %p) = @_;
 
     if (ref($self) ne 'Mock::Sub'){
         confess
             "calling mock() on the Mock::Sub class is no longer permitted. " .
             "create a new mock object with Mock::Sub->new;, then call mock " .
             "with my \$sub_object = \$mock->mock('sub_name'); ";
-    }
-    my %p = @_;
-    for (keys %p){
-        $self->{$_} = $p{$_};
     }
 
     if (! defined wantarray){
@@ -45,8 +40,16 @@ sub mock {
 
     my $child = Mock::Sub::Child->new(no_warnings => $self->{no_warnings});
 
-    $child->side_effect($self->{side_effect});
-    $child->return_value($self->{return_value});
+    my $side_effect = defined $p{side_effect}
+        ? $p{side_effect}
+        : $self->{side_effect};
+
+    my $return_value = defined $p{return_value}
+        ? $p{return_value}
+        : $self->{return_value};
+
+    $child->side_effect($side_effect);
+    $child->return_value($return_value);
 
     $self->{objects}{$sub}{obj} = $child;
     $child->_mock($sub);

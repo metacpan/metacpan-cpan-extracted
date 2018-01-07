@@ -7,8 +7,8 @@ Udev::FFI - Perl bindings for libudev using ffi.
     use Udev::FFI;
 
     # get udev library version
-    my $udev_version = Udev::FFI::udev_version()
-        or die "Can't get udev library version: $@";
+    my $udev_version = Udev::FFI->udev_version() or
+        die "Can't get udev library version: $@";
 
 
     # create Udev::FFI object
@@ -18,7 +18,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     # create udev monitor
     my $monitor = $udev->new_monitor() or
-        die "Can't create udev monitor: $@.\n";
+        die "Can't create udev monitor: $@";
 
     # add filter to monitor
     unless($monitor->filter_by_subsystem_devtype('block')) {
@@ -58,7 +58,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
     # enumerate devices
     my $enumerate = $udev->new_enumerate() or
-        die "Can't create enumerate context\n";
+        die "Can't create enumerate context: $@";
 
     $enumerate->add_match_subsystem('block');
     $enumerate->scan_devices();
@@ -120,108 +120,129 @@ Udev::FFI exposes OO interface to libudev.
 
 # METHODS
 
-- new\_monitor ( \[SOURCE\] )
-- new\_enumerate ()
+## new\_monitor ( \[SOURCE\] )
 
-     
+Create new udev monitor and connect to a specified event source. Valid sources
+identifiers are `'udev'` and `'kernel'`. This argument is optional and
+defaults to `'udev'`.
 
-- new\_device\_from\_syspath ( SYSPATH )
+Return new [Udev::FFI::Monitor](https://metacpan.org/pod/Udev::FFI::Monitor) object on success, undef with the error in $@
+on failure.
 
-    Create new udev device, and fill in information from the sys device and the udev
-    database entry. The syspath is the absolute path to the device, including the
-    sys mount point.
+    my $monitor = $udev->new_monitor() or
+        die "Can't create udev monitor: $@";
 
-    Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+## new\_enumerate ()
 
-        my $device0 = $udev->new_device_from_syspath('/sys/class/block/sda1');
-        my $device1 = $udev->new_device_from_syspath('/sys/class/net/eth0');
-        
-        # ... some code
-        my @devices = $enumerate->get_list_entries();
-        for(@devices) {
-            my $device = $udev->new_device_from_syspath($_);
-        # ... some code
+Create an enumeration context to scan /sys.
 
-- new\_device\_from\_devnum ( TYPE, DEVNUM )
+Return new [Udev::FFI::Enumerate](https://metacpan.org/pod/Udev::FFI::Enumerate) object on success, undef with the error in $@
+on failure.
 
-    Create new udev device, and fill in information from the sys device and the udev
-    database entry. The device is looked-up by its type and major/minor number.
+    my $enumerate = $udev->new_enumerate() or
+        die "Can't create enumerate context: $@";
 
-    Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+## new\_device\_from\_syspath ( SYSPATH )
 
-        use Udev::FFI::Devnum qw(makedev);
-        my $device = $udev->new_device_from_devnum('b', makedev(8, 1));
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The syspath is the absolute path to the device, including the
+sys mount point.
 
-- new\_device\_from\_subsystem\_sysname ( SUBSYSTEM, SYSNAME )
+Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
 
-    Create new udev device, and fill in information from the sys device and the udev
-    database entry. The device is looked up by the subsystem and name string of the
-    device.
+    my $device0 = $udev->new_device_from_syspath('/sys/class/block/sda1');
+    my $device1 = $udev->new_device_from_syspath('/sys/class/net/eth0');
+    
+    # ... some code
+    my @devices = $enumerate->get_list_entries();
+    for(@devices) {
+        my $device = $udev->new_device_from_syspath($_);
+    # ... some code
 
-    Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+## new\_device\_from\_devnum ( TYPE, DEVNUM )
 
-        my $device0 = $udev->new_device_from_subsystem_sysname('block', 'sda1');
-        my $device1 = $udev->new_device_from_subsystem_sysname('net', 'lo');
-        my $device2 = $udev->new_device_from_subsystem_sysname('mem', 'urandom');
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked-up by its type and major/minor number.
 
-- new\_device\_from\_device\_id ( ID )
+Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
 
-    Create new udev device, and fill in information from the sys device and the udev
-    database entry. The device is looked-up by a special string:
+    use Udev::FFI::Devnum qw(makedev);
+    my $device0 = $udev->new_device_from_devnum('b', makedev(8, 1));
+    my $device1 = $udev->new_device_from_devnum('c', makedev(189, 515));
 
-    - b8:2 - block device major:minor
-    - c128:1 - char device major:minor
-    - n3 - network device ifindex
-    - +sound:card29 - kernel driver core subsystem:device name
+## new\_device\_from\_subsystem\_sysname ( SUBSYSTEM, SYSNAME )
 
-    Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked up by the subsystem and name string of the
+device.
 
-        my $device = $udev->new_device_from_device_id('b8:1');
+Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
 
-- new\_device\_from\_environment ()
+    my $device0 = $udev->new_device_from_subsystem_sysname('block', 'sda1');
+    my $device1 = $udev->new_device_from_subsystem_sysname('net', 'lo');
+    my $device2 = $udev->new_device_from_subsystem_sysname('mem', 'urandom');
 
-    Create new udev device, and fill in information from the current process
-    environment. This only works reliable if the process is called from a udev rule.
+## new\_device\_from\_device\_id ( ID )
 
-    Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+Create new udev device, and fill in information from the sys device and the udev
+database entry. The device is looked-up by a special string:
 
-        # in udev.rules (for example)
-        # SUBSYSTEM=="backlight", ACTION=="change", IMPORT{program}="/path/script.pl"
-        
-        # in script
-        my $udev = Udev::FFI->new() or
-            die "Can't create Udev::FFI object: $@";
-        my $device = $udev->new_device_from_environment();
-        if(defined $device) {
-            # $device is the device from the udev rule (backlight in this example)
-            # work with $device
+> `'b8:1'` - block device major:minor
+>
+> `'c128:2'` - char device major:minor
+>
+> `'n2'` - network device ifindex
+>
+> `'+sound:card29'` - kernel driver core subsystem:device name
 
-- Udev::FFI::udev\_version ()
+Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
 
-    Return the version of the udev library. Because the udev library does not
-    provide a function to get the version number, this function runs the \`udevadm\`
-    utility.
+    my $device = $udev->new_device_from_device_id('b8:1');
 
-    Return undef with the error in $@ on failure. Also you can check $! value:
-    ENOENT (\`udevadm\` not found) or EACCES (permission denied).
+## new\_device\_from\_environment ()
 
-        # simple
-        my $udev_version = Udev::FFI::udev_version()
-            or die "Can't get udev library version: $@";
-        
-        # or catch the error
-        use Errno qw( :POSIX );
-        my $udev_version = Udev::FFI::udev_version();
-        unless(defined $udev_version) {
-            if($!{ENOENT}) {
-                # udevadm not found
-            }
-            elsif($!{EACCES}) {
-                # permission denied
-            }
-        
-            die "Can't get udev library version: $@";
+Create new udev device, and fill in information from the current process
+environment. This only works reliable if the process is called from a udev rule.
+
+Return new [Udev::FFI::Device](https://metacpan.org/pod/Udev::FFI::Device) object or undef, if device does not exist.
+
+    # in udev.rules (for example)
+    # SUBSYSTEM=="backlight", ACTION=="change", IMPORT{program}="/path/script.pl"
+    
+    # in script
+    my $udev = Udev::FFI->new() or
+        die "Can't create Udev::FFI object: $@";
+    my $device = $udev->new_device_from_environment();
+    if(defined $device) {
+        # $device is the device from the udev rule (backlight in this example)
+        # work with $device
+
+## Udev::FFI->udev\_version ()
+
+Return the version of the udev library. Because the udev library does not
+provide a function to get the version number, this function runs the \`udevadm\`
+utility.
+
+Return undef with the error in $@ on failure. Also you can check $! value:
+ENOENT (\`udevadm\` not found) or EACCES (permission denied).
+
+    # simple
+    my $udev_version = Udev::FFI->udev_version() or
+        die "Can't get udev library version: $@";
+    
+    # or catch the error
+    use Errno qw( :POSIX );
+    my $udev_version = Udev::FFI->udev_version();
+    unless(defined $udev_version) {
+        if($!{ENOENT}) {
+            # udevadm not found
         }
+        elsif($!{EACCES}) {
+            # permission denied
+        }
+    
+        die "Can't get udev library version: $@";
+    }
 
 # EXAMPLES
 

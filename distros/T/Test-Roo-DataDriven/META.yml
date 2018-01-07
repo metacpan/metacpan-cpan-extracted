@@ -3,6 +3,7 @@ abstract: 'simple data-driven tests with Test::Roo'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  Class::Inspector: '0'
   File::Basename: '0'
   File::Spec: '0'
   JSON::PP: '2.00'
@@ -13,6 +14,7 @@ build_requires:
   Test::Roo: '0'
   Time::Piece: '1.16'
   Time::Seconds: '0'
+  feature: '0'
   lib: '0'
   strict: '0'
   warnings: '0'
@@ -28,9 +30,10 @@ name: Test-Roo-DataDriven
 provides:
   Test::Roo::DataDriven:
     file: lib/Test/Roo/DataDriven.pm
-    version: v0.3.0
+    version: v0.3.1
 recommends:
   App::Prove: '0'
+  Ref::Util::XS: '0'
 requires:
   Class::Unload: '0'
   Path::Tiny: '0.004'
@@ -42,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Test-Roo-DataDriven/issues
   repository: git://github.com/robrwo/Test-Roo-DataDriven.git
-version: v0.3.0
+version: v0.3.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'

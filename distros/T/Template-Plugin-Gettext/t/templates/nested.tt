@@ -1,0 +1,2 @@
+[% USE gtx = Gettext %]
+[% q.strftime(gtx.gettext('%Y/%m/%d'), asset_date) %]

@@ -38,7 +38,6 @@ use Data::Uniqid qw(uniqid);
 
 sub add_campaigns {
   my $client = shift;
-
   # Create a budget, which can be shared by multiple campaigns.
   my $budget = Google::Ads::AdWords::v201710::Budget->new({
       # Required attributes.
@@ -57,6 +56,7 @@ sub add_campaigns {
   my $budgetId =
     $client->BudgetService()->mutate({operations => ($budget_operation)})
     ->get_value()->get_budgetId()->get_value();
+
   # Create campaigns.
   my $num_campaigns = 2;
   my @operations    = ();

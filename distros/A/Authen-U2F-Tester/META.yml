@@ -14,35 +14,14 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Authen-U2F-Tester
-provides:
-  Authen::U2F::Tester:
-    file: lib/Authen/U2F/Tester.pm
-    version: '0.01'
-  Authen::U2F::Tester::Const:
-    file: lib/Authen/U2F/Tester/Const.pm
-    version: '0.01'
-  Authen::U2F::Tester::Error:
-    file: lib/Authen/U2F/Tester/Error.pm
-    version: '0.01'
-  Authen::U2F::Tester::Keypair:
-    file: lib/Authen/U2F/Tester/Keypair.pm
-    version: '0.01'
-  Authen::U2F::Tester::RegisterResponse:
-    file: lib/Authen/U2F/Tester/RegisterResponse.pm
-    version: '0.01'
-  Authen::U2F::Tester::Role::Response:
-    file: lib/Authen/U2F/Tester/Role/Response.pm
-    version: '0.01'
-  Authen::U2F::Tester::SignResponse:
-    file: lib/Authen/U2F/Tester/SignResponse.pm
-    version: '0.01'
 requires:
+  Carp: '0'
   Crypt::OpenSSL::X509: '0'
   Crypt::PK::ECC: '0'
   Digest::SHA: '0'
@@ -63,5 +42,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester
   homepage: http://search.cpan.org/dist/Authen-U2F-Tester/
   repository: git://github.com/mschout/perl-authen-u2f-tester.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

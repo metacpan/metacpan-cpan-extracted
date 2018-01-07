@@ -8,7 +8,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 1.01;
+package App::DocKnot 1.02;
 
 use 5.018;
 use autodie;
@@ -154,6 +154,23 @@ sub _code_for_to_text {
         # Undo backtick escaping.
         $text =~ s{ `` }{\`}xmsg;
 
+        # Rewrite quoted paragraphs to have four spaces of additional
+        # indentation.
+        $text =~ s{
+            \n \n               # start of paragraph
+            (                   # start of the text
+              (> \s+)           #   quote mark on first line
+              \S [^\n]* \n      #   first line
+              (?:               #   all subsequent lines
+                \2 \S [^\n]* \n #     start with the same prefix
+              )*                #   any number of subsequent lines
+            )                   # end of the text
+        }{
+            my ($text, $prefix) = ($1, $2);
+            $text =~ s{ ^ \Q$prefix\E }{  }xmsg;
+            "\n\n" . $text;
+        }xmsge;
+
         # Remove URLs from all links, replacing them with numeric references,
         # and accumulate the mapping of numbers to URLs in %urls.
         my %urls;
@@ -233,6 +250,30 @@ sub _code_for_to_thread {
             my $text = $1;
             $text =~ s{ [*] }{ }xms;
             "\\bullet[\n\n" . $text . "\n]\n";
+        }xmsge;
+
+        # Do the same thing, but with numbered lists.  This doesn't handle
+        # numbers larger than 9 currently, since that requires massaging the
+        # spacing.
+        $text =~ s{
+            (                   # capture whole contents
+                ^ (\s*)         #   indent before number
+                \d [.] (\s+)    #   number and following indent
+                [^\n]+ \n       #   rest of line
+                (?: \s* \n )*   #   optional blank lines
+                (\2 [ ][ ] \3)  #   matching indent
+                [^\n]+ \n       #   rest of line
+                (?:             #   one or more of
+                    \4          #       matching indent
+                    [^\n]+ \n   #       rest of line
+                |               #   or
+                    \s* \n      #       blank lines
+                )+              #   end of indented block
+            )                   # full bullet with leading bullet
+        }{
+            my $text = $1;
+            $text =~ s{ \A (\s*) \d [.] }{$1  }xms;
+            "\\number[\n\n" . $text . "\n]\n\n";
         }xmsge;
 
         # Rewrite compact bulleted lists.
@@ -389,12 +430,13 @@ sub _wrap_paragraph {
     $paragraph =~ s{ (?: \A | (?<=\n) ) \Q$indent\E }{}xmsg;
 
     # Remove any existing newlines, preserving two spaces after periods.
-    $paragraph =~ s{ [.] \n (\S) }{.  $1}xmsg;
+    $paragraph =~ s{ [.] ([)\"]?) \n (\S) }{.$1  $2}xmsg;
     $paragraph =~ s{ \n(\S) }{ $1}xmsg;
 
     # Force locally correct configuration of Text::Wrap.
     local $Text::Wrap::break    = qr{\s+}xms;
     local $Text::Wrap::columns  = $self->{width} + 1;
+    local $Text::Wrap::huge     = 'overflow';
     local $Text::Wrap::unexpand = 0;
 
     # Do the wrapping.  This modifies @paragraphs in place.
@@ -557,6 +599,7 @@ sub generate {
     }
 
     # Load testing sections if they exist.
+    eval { $vars{test}{prefix} = $self->_load_metadata('test', 'prefix') };
     eval { $vars{test}{suffix} = $self->_load_metadata('test', 'suffix') };
 
     # Add code references for our defined helper functions.
@@ -684,7 +727,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013, 2014, 2015, 2016 Russ Allbery <rra@cpan.org>
+Copyright 2013, 2014, 2015, 2016, 2017 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

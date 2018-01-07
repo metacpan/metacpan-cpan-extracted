@@ -1,5 +1,5 @@
 package HackaMol::Roles::SelectionRole;
-$HackaMol::Roles::SelectionRole::VERSION = '0.046';
+$HackaMol::Roles::SelectionRole::VERSION = '0.047';
 #ABSTRACT: Atom selections in molecules
 use Moose::Role;
 use HackaMol::AtomGroup;
@@ -7,8 +7,8 @@ use Carp;
 
 
 my %common_selection = (
-    'sidechain'  => '$_->record_name eq "ATOM" and not $_->name =~ /^(N|CA|C|O)$/',
-    'backbone'   => '$_->record_name eq "ATOM" and     $_->name =~ /^(N|CA|C|O)$/',
+    'sidechain'  => '$_->record_name eq "ATOM" and not $_->name =~ /^(N|CA|C|O|OXT)$/',  
+    'backbone'   => '$_->record_name eq "ATOM" and     $_->name =~ /^(N|CA|C|O)$/', # backbone restricted to ATOM to avoid HETATM weirdness, e.g. het cys in 1v1q
     'water'      => '$_->resname =~ m/HOH|TIP|H2O/ and $_->record_name eq "HETATM"',
     'protein'    => '$_->record_name eq "ATOM"',
     'ligands'    => '($_->resname !~ m/HOH|TIP|H2O/ ) and $_->record_name eq "HETATM"',
@@ -123,7 +123,7 @@ HackaMol::Roles::SelectionRole - Atom selections in molecules
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 DESCRIPTION
 

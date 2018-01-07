@@ -1,8 +1,104 @@
+NAME
+    Complete::Env - Completion routines related to environment variables
+
+VERSION
+    This document describes version 0.400 of Complete::Env (from Perl
+    distribution Complete-Env), released on 2017-12-31.
+
 DESCRIPTION
+FUNCTIONS
+  complete_env
+    Usage:
+
+     complete_env(%args) -> array
+
+    Complete from environment variables.
+
+    On Windows, environment variable names are all converted to uppercase.
+    You can use case-insensitive option ("ci") to match against original
+    casing.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_env_elem
+    Usage:
+
+     complete_env_elem(%args) -> array
+
+    Complete from elements of an environment variable.
+
+    An environment variable like PATH contains colon- (or, on Windows,
+    semicolon-) separated elements. This routine complete from the elements
+    of such variable.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   env* => *str*
+
+        Name of environment variable to use.
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_path_env_elem
+    Usage:
+
+     complete_path_env_elem(%args) -> array
+
+    Complete from elements of PATH environment variable.
+
+    PATH environment variable contains colon- (or, on Windows, semicolon-)
+    separated elements. This routine complete from those elements.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Env>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Env>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Env>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Complete
 
-    Other Complete::* modules.
+    Other "Complete::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

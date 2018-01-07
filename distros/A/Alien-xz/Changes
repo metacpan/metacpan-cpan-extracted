@@ -1,5 +1,9 @@
 Revision history for Alien-xz
 
+0.07      2018-01-06 09:09:11 -0500
+  - Fixed important typo in POD
+  - Work around intermitent test failures on Windows
+
 0.06      2017-07-07 03:21:02 -0400
   - Adjust prereqs to require SSL libraries needed for https
 

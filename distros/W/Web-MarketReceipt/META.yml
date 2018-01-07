@@ -27,7 +27,7 @@ no_index:
 provides:
   Web::MarketReceipt:
     file: lib/Web/MarketReceipt.pm
-    version: '0.03'
+    version: '0.04'
   Web::MarketReceipt::Order:
     file: lib/Web/MarketReceipt/Order.pm
   Web::MarketReceipt::Verifier:
@@ -39,6 +39,7 @@ provides:
   Web::MarketReceipt::Verifier::GooglePlay:
     file: lib/Web/MarketReceipt/Verifier/GooglePlay.pm
 requires:
+  Class::Accessor::Lite: '0'
   Crypt::OpenSSL::RSA: '0'
   Exception::Tiny: '0'
   Furl: '0'
@@ -47,12 +48,15 @@ requires:
   MIME::Base64: '0'
   Mouse: '0'
   Try::Tiny: '0'
+  parent: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/kayac/p5-Web-MarketReceipt/issues
   homepage: https://github.com/kayac/p5-Web-MarketReceipt
   repository: git://github.com/kayac/p5-Web-MarketReceipt.git
-version: '0.03'
+version: '0.04'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'hitode909 <hitode909@gmail.com>'
+  - 'root <root@3330ac66f871.(none)>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

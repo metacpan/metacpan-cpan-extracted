@@ -1,11 +1,12 @@
 use alienfile;
 
-requires 'Alien::gmake' => 0.14;
-
 # Do not probe for system libmupdf becasue we need to compile with shared
 # library flags.
 
 share {
+	requires 'Alien::gmake' => 0.14;
+	requires 'Alien::patch' => 0.08;
+
 	plugin Download => (
 		url => 'https://mupdf.com/downloads/',
 		version => qr/mupdf-([\w\.]+)-source\.tar\.gz/,
@@ -36,7 +37,8 @@ share {
 		push @EXTRA_MAKE_FLAGS, q|'RANLIB_CMD=xcrun ranlib $@'|;
 	}
 	build [
-		"%{gmake} HAVE_GLFW=no $XCFLAGS prefix=%{.install.prefix} install"
+		'%{patch} -p1 < %{.install.patch}/0001-Change-MSVC-specific-ifdef-to-Win32-specific.patch',
+		"%{gmake} HAVE_GLFW=no HAVE_GLUT=no HAVE_X11=no $XCFLAGS prefix=%{.install.prefix} install"
 			. join(' ', ('', @EXTRA_MAKE_FLAGS)),
 	];
 

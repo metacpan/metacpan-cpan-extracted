@@ -4,7 +4,9 @@ MANIFEST
 README
 t/Slob.t
 t/freedict-uncompressed.slob
+t/freedict-bz2.slob
 t/freedict-lzma2.slob
+t/freedict-zlib.slob
 lib/Slob.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

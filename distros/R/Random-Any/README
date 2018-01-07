@@ -1,0 +1,51 @@
+NAME
+    Random::Any - Try to use Math::Random::Secure::rand(), fallback on
+    builtin rand()
+
+VERSION
+    This document describes version 0.003 of Random::Any (from Perl
+    distribution Random-Any), released on 2018-01-02.
+
+SYNOPSIS
+     use Random::Any qw(rand);
+
+     say rand();
+
+DESCRIPTION
+    This module provides a single export "rand()" that tries to use
+    Math::Random::Secure's "rand()" first and, if that module is not
+    available, falls back on the builtin rand().
+
+EXPORTS
+  -warn => bool
+    Can be set to true to emit a warning if Math::Random::Secure is not
+    available.
+
+FUNCTIONS
+  rand
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Random-Any>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Random-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Random-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Math::Random::Secure
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

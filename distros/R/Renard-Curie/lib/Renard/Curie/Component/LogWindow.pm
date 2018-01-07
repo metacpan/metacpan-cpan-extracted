@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::LogWindow;
 # ABSTRACT: Component that collects log messages
-$Renard::Curie::Component::LogWindow::VERSION = '0.003';
+$Renard::Curie::Component::LogWindow::VERSION = '0.004';
 use Moo;
 use Renard::Incunabula::Frontend::Gtk3::Helper;
 use MooX::HandlesVia;
@@ -93,7 +93,7 @@ Renard::Curie::Component::LogWindow - Component that collects log messages
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Build and make available the doxyparse tool",
+   "author" : [
+      "Joenio Costa <joenio@joenio.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Doxyparse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.25"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/joenio/alien-doxyparse"
+      }
+   },
+   "version" : "0.04",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 1.32",
+      "requires" : {
+         "share" : {
+            "Alien::CMake" : "0",
+            "Alien::bison" : "0",
+            "Alien::flex" : "0",
+            "Alien::m4" : "0",
+            "Config" : "0"
+         },
+         "system" : {}
+      }
+   }
+}

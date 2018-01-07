@@ -12,7 +12,7 @@ SYNOPSIS
       auto_clean  => 1,
       force_case  => 1,
       abbreviate_subcountry => 0,
-      abbreviated_subcountry_only => 1,
+      abbreviated_subcountry_only => 0,
       force_post_code => 0
     );
 

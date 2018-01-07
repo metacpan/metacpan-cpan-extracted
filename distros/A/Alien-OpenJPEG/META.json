@@ -4,13 +4,13 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Alien-OpenJPEG",
    "prereqs" : {
@@ -18,8 +18,6 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
-            "Alien::Build::Plugin::Gather::Dino" : "0",
-            "Alien::gmake" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -34,8 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base::Dino" : "0",
-            "parent" : "0",
+            "Alien::Base" : "0.038",
+            "Alien::Role::Dino" : "0",
+            "Role::Tiny::With" : "0",
+            "base" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -58,7 +58,26 @@
          "web" : "https://github.com/project-renard/p5-Alien-OpenJPEG"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+   "version" : "0.002",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::Dino" : "0",
+            "Alien::gmake" : "0.11",
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

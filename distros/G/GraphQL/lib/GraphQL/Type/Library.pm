@@ -7,6 +7,7 @@ use Type::Library
   -base,
   -declare => qw(
     StrNameValid FieldMapInput ValuesMatchTypes DocumentLocation JSONable
+    ErrorResult
   );
 use Type::Utils -all;
 use Types::TypeTiny -all;
@@ -227,6 +228,10 @@ A hash-ref describing the operation (C<query>, etc) being executed.
 the operation's arguments, filled out with the variables hash supplied
 to the request.
 
+=item promise_code
+
+A hash-ref. The relevant value supplied to the C<execute> function.
+
 =back
 
 =back
@@ -338,12 +343,24 @@ declare "DocumentLocation",
     column => Int,
   ];
 
+=head2 ErrorResult
+
+Hash-ref that has keys C<message>, C<location>, C<path>.
+
+=cut
+
+declare "ErrorResult",
+  as Dict[
+    message => Str,
+    path => Optional[ArrayRef[Str]],
+    locations => Optional[ArrayRef[DocumentLocation]],
+  ];
+
 =head2 ExecutionResult
 
 Hash-ref that has keys C<data> and/or C<errors>.
 
-The C<errors>, if present, will be an array-ref of hashes, with keys
-C<message>, C<location>, C<path>.
+The C<errors>, if present, will be an array-ref of C<ErrorResult>.
 
 The C<data> if present will be the return data, being a hash-ref whose
 values are either further hashes, array-refs, or scalars. It will be
@@ -358,13 +375,45 @@ declare "JSONable",
 declare "ExecutionResult",
   as Dict[
     data => Optional[JSONable],
-    errors => Optional[ArrayRef[
-      Dict[
-        message => Str,
-        path => Optional[ArrayRef[Str]],
-        locations => Optional[ArrayRef[DocumentLocation]],
-      ]
-    ]],
+    errors => Optional[ArrayRef[ErrorResult]],
+  ];
+
+=head2 ExecutionPartialResult
+
+Hash-ref that has keys C<data> and/or C<errors>. Like L</ExecutionResult>
+above, but the C<errors>, if present, will be an array-ref of
+L<GraphQL::Error> objects.
+
+=cut
+
+declare "ExecutionPartialResult",
+  as Dict[
+    data => Optional[JSONable],
+    errors => Optional[ArrayRef[InstanceOf['GraphQL::Error']]],
+  ];
+
+=head2 Promise
+
+An object that has a C<then> method.
+
+=cut
+
+declare "Promise",
+  as HasMethods['then'];
+
+=head2 PromiseCode
+
+A hash-ref with three keys: C<resolve>, C<all>, C<reject>. The values are
+all code-refs that take one value (for C<all>, an array-ref), and create
+the given kind of Promise.
+
+=cut
+
+declare "PromiseCode",
+  as Dict[
+    resolve => CodeLike,
+    all => CodeLike,
+    reject => CodeLike,
   ];
 
 =head1 AUTHOR

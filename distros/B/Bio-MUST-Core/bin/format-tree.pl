@@ -162,7 +162,7 @@ format-tree.pl - Format trees for printing
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 USAGE
 

@@ -1,6 +1,6 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Frontend::Gtk3::Helper;
-$Renard::Incunabula::Frontend::Gtk3::Helper::VERSION = '0.003';
+$Renard::Incunabula::Frontend::Gtk3::Helper::VERSION = '0.004';
 # ABSTRACT: Collection of helper utilities for Gtk3 and Glib
 
 
@@ -147,7 +147,7 @@ Renard::Incunabula::Frontend::Gtk3::Helper - Collection of helper utilities for 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 FUNCTIONS
 

@@ -128,6 +128,10 @@ sub _is_access_token_valid {
       OAUTH2_TOKEN_INFO_URL . "?access_token=" . uri_escape($access_token);
     my $res = $self->get___user_agent()->request(GET $url);
     if (!$res->is_success()) {
+      my $err_msg = $res->decoded_content();
+      $self->get_api_client()->get_die_on_faults()
+        ? die($err_msg)
+        : warn($err_msg);
       return 0;
     }
     my $content_hash = $self->__parse_auth_response($res->decoded_content());
@@ -141,7 +145,7 @@ sub _is_access_token_valid {
     $self->set_access_token_expires(time + $content_hash->{expires_in});
   }
 
-  return time < $self->get_access_token_expires() - 10;
+  return time < ($self->get_access_token_expires() - 10);
 }
 
 sub __parse_auth_response {
@@ -159,12 +163,6 @@ sub __parse_auth_response {
   }
 
   return \%content_hash;
-}
-
-sub _throw_error {
-  my ($self, $err_msg) = @_;
-
-  $self->get_api_client()->get_die_on_faults() ? die($err_msg) : warn($err_msg);
 }
 
 # To be implemented by concrete implementations.

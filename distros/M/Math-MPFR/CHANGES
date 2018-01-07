@@ -1,3 +1,15 @@
+4.0
+ - Add Rmpfr_free_cache2 and Rmpfr_free_pool.
+ - Add MPFR_RNDF rounding mode
+ - Fix bug in Rmpfr_cmp_NV and add the tests (test 8 in t/nan_cmp.t) that would have
+   detected it. The bug affected only quadmath builds of perl, and only then if
+   CAN_PASS_FLOAT128 was not defined.
+ - Improve performance of Rmpfr_set_NV and Rmpfr_cmp_NV for quadmath builds of perl
+   where CAN_PASS_FLOAT128 is not defined.
+ - Add Rmpfr_rootn_ui (mpfr-4.0.0 and later only).
+ - Add tests to Rmpfr_get_q.t to check that Rmpfr_get_q canonicalizes the rational.
+   (Trizen pointed out that, with 4.0.0-RC1, mpfr_get_q did NOT canonicalize.)
+
 3.36
  - Add Rmpfr_rec_root, provided by Vincent Lefevre:
    (See https://sympa.inria.fr/sympa/arc/mpfr/2016-12/msg00032.html)
@@ -9,7 +21,8 @@
  - Add overloading of comparisons with mpq_t and mpz_t
  - use mpfr library of version of mpfr_get_q (in preference to homegrown rendition) iff
    MPFR_VERSION_MAJOR >= 4.
- - Workaround mpfr_get_float128() failure to round subnormals reliably.
+ - Workaround mpfr_get_float128() failure to round subnormals reliably. (Workaround was removed
+   soon after - when the mpfr_get_float128 problem was fixed in mpfr source.)
 
 3.35
  - In Makefile.PL define -DNV_IS_DOUBLE if appropriate (for use in math_mpfr_include.h as part of

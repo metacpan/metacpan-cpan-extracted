@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::ViewOptions::Zoom;
 # ABSTRACT: An abstract class for a set of options for zooming
-$Renard::Curie::Model::ViewOptions::Zoom::VERSION = '0.003';
+$Renard::Curie::Model::ViewOptions::Zoom::VERSION = '0.004';
 use Moo;
 
 with qw(MooX::Role::CloneSet);
@@ -20,7 +20,7 @@ Renard::Curie::Model::ViewOptions::Zoom - An abstract class for a set of options
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

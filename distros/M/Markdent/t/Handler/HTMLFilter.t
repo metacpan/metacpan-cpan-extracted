@@ -2,8 +2,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Test::More 0.88;
-use Test::Deep;
+use Test2::V0;
 
 use Markdent::Handler::HTMLFilter;
 use Markdent::Handler::MinimalTree;
@@ -69,7 +68,7 @@ EOF
     diag( Dumper($results) )
         if $ENV{MARKDENT_TEST_VERBOSE};
 
-    cmp_deeply( $results, $expect, 'all HTML events have been dropped' );
+    is( $results, $expect, 'all HTML events have been dropped' );
 }
 
 done_testing();

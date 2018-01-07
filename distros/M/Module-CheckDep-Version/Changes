@@ -1,5 +1,11 @@
 Revision history for Module-CheckDep-Version
 
+0.09    2017-12-29
+        - make t/05 rely on newly uploaded Test::Module::CheckDep::Version, as
+          the one we used previously does not have consistent prereq version
+          mismatches
+        - new prereq, Hook::Output::Tiny to test _display()
+
 0.08    2017-07-20
         - no functional changes
         - fix POD link to CPAN in DESCRIPTION

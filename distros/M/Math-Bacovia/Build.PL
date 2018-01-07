@@ -12,6 +12,15 @@ my $builder = Module::Build->new(
      dist_author        => q{Daniel Șuteu <trizen@protonmail.com>},
      dist_version_from  => 'lib/Math/Bacovia.pm',
      release_status     => 'stable',
+
+    meta_merge => {
+                   resources => {
+                                 bugtracker => "https://github.com/trizen/Math-Bacovia/issues",
+                                 homepage   => "https://github.com/trizen/Math-Bacovia",
+                                 repository => "https://github.com/trizen/Math-Bacovia",
+                                },
+                  },
+
      configure_requires => {
                             'Module::Build' => 0,
                            },

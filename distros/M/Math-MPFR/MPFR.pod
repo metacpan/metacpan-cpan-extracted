@@ -6,8 +6,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
 =head1 DEPENDENCIES
 
-   This module needs the MPFR and GMP C libraries. (Install GMP
-   first as it is a pre-requisite for MPFR.)
+   This module needs the MPFR and GMP C libraries. (Install the
+   GMP library first as it is a pre-requisite for MPFR.)
 
    The GMP library is available from http://gmplib.org
    The MPFR library is available from http://www.mpfr.org/
@@ -113,17 +113,37 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     MPFR_RNDU (numeric value = 2): Round towards +infinity.
     MPFR_RNDD (numeric value = 3): Round towards -infinity.
 
-   You can use either rendition with Math-MPFR-3.0 or later.
+   You can use either the "GMP_*" or the "MPFR_*" renditions.
 
-   The mpfr-3.0.0 library also provides:
-    MPFR_RNDA (numeric value = 4): Round away from zero.
+   Also available are:
+    mpfr-3.0.0 and later:
+      MPFR_RNDA (numeric value = 4): Round away from zero.
+    mpfr-4.0.0 and later:
+      MPFR_RNDF (numeric value = 5): Faithful rounding.
 
-   It, too, can be used with Math-MPFR-3.0 or later, but
-   will cause a fatal error iff the mpfr library against
-   which Math::MPFR is built is earlier than version 3.0.0.
+    These last two rounding modes will cause a fatal error
+    if the mpfr library against which Math::MPFR has been
+    built is not sufficiently recent.
 
-    The 'round to nearest' mode works as in the IEEE
-    P754 standard: in case the number to be rounded
+    MPFR_RNDF is experimental - the computed value is either
+    that corresponding to MPFR_RNDD or that corresponding to
+    MPFR_RNDU. In particular when those values are identical,
+    i.e., when the result of the corresponding operation is
+    exactly representable, that exact result is returned.
+    Thus, the computed result can take at most two possible
+    values, and in absence of underflow/overflow, the
+    corresponding error is strictly less than one ulp (unit in
+    the last place) of that result and of the exact result.
+    For MPFR_RNDF, the returned value and the inexact flag are
+    unspecified, the divide-by-zero flag is as with other
+    roundings, and the underflow and overflow flags match what
+    would be obtained in the case the computed value is the
+    same as with MPFR_RNDD or MPFR_RNDU. The results may not
+    be reproducible, and it may not work with all functions.
+    Please report bugs.
+
+    MPFR_RNDN (the 'round to nearest' mode) works as in the
+    IEEE P754 standard: in case the number to be rounded
     lies exactly in the middle of two representable
     numbers, it is rounded to the one with the least
     significant bit set to zero.  For example, the
@@ -171,10 +191,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    associated with these objects by calling Rmpfr_clear($op)
    for each object, or Rmpfr_clears($op1, $op2, ....).
    Alternatively such objects will be cleaned up when the script
-   ends. I don't know why you would want to create unblessed
-   objects. The point is that you can if you want to.
-   The test suite does no testing of unblessed objects ... beware
-   of bugs if you go down that path.
+   ends.
+   Because these objects have not been blessed into the Math::MPFR
+   package, the overloaded operators will not work with them.
 
 =head1 MIXING GMP OBJECTS WITH MPFR OBJECTS
 
@@ -200,23 +219,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 =head1 PASSING __float128 VALUES
 
    There are 3 ways to pass __float128 values to/from
-   Math::MPFR:
+   Math::MPFR. Option 1) is the preferred option:
 
-    1) Install Math::Float128, build the mpfr-4.0.0 (or later)
-    library with the configure option --enable-float128, and build
-    Math::MPFR by providing the "F128=1" arg to the Makefile.pl:
-
-      perl Makefile.PL F128=1
-
-    Then you can pass the values of the Math::Float128 objects to
-    and from Math::MPFR objects using:
-
-      Rmpfr_set_FLOAT128() and Rmpfr_get_FLOAT128()
-
-    2) Build perl (5.21.4 or later) with -Dusequadmath; build the
+    1) Build perl (5.21.4 or later) with -Dusequadmath; build the
     mpfr-4.0.0 (or later) library with the configure option
     --enable-float128, and then build Math::MPFR by providing the
-    "F128=1" arg to the Makefile.pl:
+    "F128=1" arg to the Makefile.PL (which will define the symbol
+    MPFR_WANT_FLOAT128):
 
       perl Makefile.PL F128=1
 
@@ -231,15 +240,55 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     And assigning the NV as Math::MPFR->new($nv) will also work as
     intended.
 
+    NOTE:
+      If you have built perl with -Dusequadmath, but the mpfr
+      library was not built with --enable-float128 (or the F128=1
+      arg was not given to the Makefile.PL) , then both
+      Rmpfr_set_NV() and Rmpfr_get_NV() will still set/get
+      __float128 values.
+      Also, overloaded operations that receive an NV will still
+      evaluate that (__float128) NV to it's full precision.
+      It's only Rmpfr_set_float128() and Rmpfr_get_float128() that
+      will not be available.
+
+    2) Install Math::Float128, build the mpfr-4.0.0 (or later)
+    library with the configure option --enable-float128, and build
+    Math::MPFR by providing the "F128=1" arg to the Makefile.pl:
+
+      perl Makefile.PL F128=1
+
+    Then you can pass the values of the Math::Float128 objects to
+    and from Math::MPFR objects using:
+
+      Rmpfr_set_FLOAT128() and Rmpfr_get_FLOAT128()
+
     3) Convert the __float128 values to a string and pass them to
     and from Math::MPFR using:
 
       Rmpfr_set_str() and Rmpfr_get_str()
 
+=head1 PASSING _Decimal64 VALUES
+
+   Install Math::Decimal64 and build the mpfr library (version
+   3.1.0 or later) with the --enable-decimal-float option, and
+   build Math::MPFR by providing the "D64=1" arg to the
+   Makefile.PL (which will define MPFR_WANT_DECIMAL_FLOATS):
+
+     perl Makefile.PL D64=1
+
+   You can then pass _Decimal64 values between Math::MPFR and
+   Math::Decimal64 using:
+
+      Rmpfr_set_DECIMAL64() and Rmpfr_get_DECIMAL64()
+
+   NOTE: It is allowable to pass both "D64=1" and "F128=1" args
+     to the Makefile.PL:
+
+       perl Makefile.PL D64=1 F128=1
 
 =head1 FUNCTIONS
 
-   These next 3 functions are demonstrated above:
+   These next 3 functions are demonstrated above (in SYNOPSIS):
    $rop = Rmpfr_init();
    $rop = Rmpfr_init2($p);
    $str = Rmpfr_get_str($op, $base, $digits, $rnd); # 1 < $base < 37
@@ -290,8 +339,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    of your Perl's NV is less than the precision of a 'long double'.
 
    "$f128" means a __float128. Don't use these functions unless your
-   Perl's NV has quad precision && mpfr has been configured with
-   '--enable-float128'. (Note that versions of mpfr prior to 3.2.0
+   Perl's NV is a __float128 && mpfr has been configured with
+   '--enable-float128'. (Note that versions of mpfr prior to 4.0.0
    cannot be configured with '--enable-float128'.)
 
    "$bool" means a value (usually a 'signed long int') in which
@@ -474,18 +523,30 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
    $si = Rmpfr_set_f($rop, $f, $rnd); # $f is a mpf object.
    $si = Rmpfr_set_flt($rop, $float, $rnd); # mpfr-3.0.0 and later only
-   $si = Rmpfr_set_float128($rop, $f128, $rnd); # mpfr-4.0.0 and later
-   $si = Rmpfr_set_DECIMAL64($rop, $D64, $rnd) # mpfr-3.1.1 and later
-                                               # only. $D64 is a
+   $si = Rmpfr_set_float128($rop, $f128, $rnd);# nvtype is __float128
+                                               # && mpfr-4.0.0 or later
+                                               # && mpfr lib built with
+                                               # --enable-float128 &&
+                                               # F128=1 cmd line arg
+                                               # given to Makefile.PL
+   $si = Rmpfr_set_DECIMAL64($rop, $D64, $rnd) # mpfr-3.1.0 or later &&
+                                               # mpfr lib built with
+                                               # --enable-decimal-float
+                                               # && D64=1 arg given to
+                                               # Makefile.PL. $D64 is a
                                                # Math::Decimal64 object
-   $si = Rmpfr_set_FLOAT128($rop, $F128, $rnd) # mpfr-4.0.0 and later
-                                               # only. $F128 is a
-                                               # Math::Float128 object
+   $si = Rmpfr_set_FLOAT128($rop, $F128, $rnd);# mpfr-4.0.0 and later
+                                               # && mpfr lib built with
+                                               # --enable-float128 &&
+                                               # F128=1 cmd line arg
+                                               # given to Makefile.PL.
+                                               # $F128 is a
+                                               # Math::Float128 object.
     Set the value of $rop from 2nd arg, rounded to the precision of
     $rop towards the given direction $rnd.  Please note that even a
     'long int' may have to be rounded if the destination precision
     is less than the machine word width.  The return value is zero
-    when $rop=2nd arg, positive when $rop>2nd arg, and negative when
+    when $rop==2nd arg, positive when $rop>2nd arg, and negative when
     $rop<2nd arg.  For 'mpfr_set_d', be careful that the input
     number $double may not be exactly representable as a double-precision
     number (this happens for 0.1 for instance), in which case it is
@@ -754,20 +815,27 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $double = Rmpfr_get_d($op, $rnd);
    $ld     = Rmpfr_get_ld($op, $rnd);
-   $f128   = Rmpfr_get_float128($op, $rnd); # nvtype must be quad prec.
-                                            # mpfr-4.0.0 or later &&
-                                            # built with __float128
-                                            # support
+   $f128   = Rmpfr_get_float128($op, $rnd);# nvtype is __float128
+                                           # && mpfr-4.0.0 or later
+                                           # && mpfr lib built with
+                                           # --enable-float128 &&
+                                           # F128=1 cmd line arg
+                                           # given to Makefile.PL
    $nv     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
    $float  = Rmpfr_get_flt($op, $rnd);   # mpfr-3.0.0 and later
    Rmpfr_get_LD($LD, $op, $rnd); # $LD is a Math::LongDouble object.
-   Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.1 and later &&
-                                         # built with _Decimal64
-                                         # support. $d64 is a
-                                         # Math::Decimal64 object.
-   Rmpfr_get_FLOAT128($F128, $op, $rnd); # mpfr-4.0.0 and later.
-                                         # $F128 is a Math::Float128
-                                         # object.
+   Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
+                                         # mpfr lib built with
+                                         # --enable-decimal-float
+                                         # && D64=1 arg given to
+                                         # Makefile.PL. $D64 is a
+                                         # Math::Decimal64 object
+   Rmpfr_get_FLOAT128($F128, $op, $rnd);# mpfr-4.0.0 and later &&
+                                        # mpfrlib built with
+                                        # --enable-float128 && F128=1
+                                        # arg given to Makefile.PL.
+                                        # $F128 is a Math::Float128
+                                        # object.
     Convert $op to a 'double', a 'long double', a __float128, an 'NV',
     a float, a Math::LongDouble object, a Math::Decimal64 object, or
     a Math::Float128 object using the rounding mode $rnd.
@@ -915,9 +983,16 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to the cubic root of $op, rounded in the direction $rnd.
 
    $si = Rmpfr_root($rop, $op, $ui $rnd);
+    Deprecated in mpfr-4.0.0 - use Rmpfr_rootn_ui with mpfr-4.0.0.
     Set $rop to the $ui'th root of $op, rounded in the direction
     $rnd.  Return 0 if the operation is exact, a non-zero value
     otherwise.
+
+   $si = Rmpfr_rootn_ui($rop, $op, $ui $rnd); # mpfr-4.0.0 and later
+    Same as Rmpfr_root except that $rop is set to +0 (instead of -0)
+    when $op is -0 and $ui is even.
+    This function (and Rmpfr_cbrt) agree with the rootn function of
+    the IEEE 754-2008 standard (Section 9.2).
 
    $si = Rmpfr_pow_ui($rop, $op, $ui, $rnd);
    $si = Rmpfr_pow_si($rop, $op, $si, $rnd);
@@ -1253,6 +1328,27 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Free the cache used by the functions computing constants if
     needed (currently 'mpfr_const_log2', 'mpfr_const_pi' and
     'mpfr_const_euler').
+
+   Rmpfr_free_cache2($ui);        # mpfr-4.0.0 and later only
+    Free various caches and pools used by MPFR internally, as
+    specified by $ui, which is a set of flags:
+     a) those local to the current thread if flag
+        MPFR_FREE_LOCAL_CACHE is set;
+     b) those shared by all threads if flag
+        MPFR_FREE_GLOBAL_CACHE is set.
+
+    The other bits of $ui are currently ignored and are reserved for
+    future use; they should be zero.
+    Note:
+    Rmpfr_free_cache2(MPFR_FREE_LOCAL_CACHE|MPFR_FREE_GLOBAL_CACHE)
+    is currently equivalent to mpfr_free_cache().
+
+   Rmpfr_free_pool()             # mpfr-4.0.0 and later only
+    Free the pools used by mpfr internally.
+    Note:
+    This function is automatically called after the thread-local
+    caches are freed (with mpfr_free_cache or mpfr_free_cache2).
+
 
    $si = Rmpfr_beta($rop, $op1, $op2, $rnd); # mpfr-4.0.0 &
                                              # later only
@@ -1858,7 +1954,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_grandom($rop1, $rop2, $state, $rnd);
     Available only with mpfr-3.1.0 and later.
-    Deprecated as of mpfr-4.0.0.
+    Deprecated in mpfr-4.0.0. Use Rmpfr_nrandom with mpfr-4.0.0.
     Generate two random floats according to a standard normal
     gaussian distribution. The floating-point numbers $rop1 and
     $rop2 can be seen as if a random real number were generated
@@ -2278,6 +2374,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    #####################
 
+=head1 TODO
+
+    Look at wrapping mpfr_mp_memory_cleanup, mp_set_memory_functions
+
 =head1 BUGS
 
     You can get segfaults if you pass the wrong type of argument to the
@@ -2294,7 +2394,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2017 Sisyphus
+    Copyright 2006-2018 Sisyphus
 
 =head1 AUTHOR
 

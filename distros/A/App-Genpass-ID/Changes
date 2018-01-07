@@ -1,3 +1,8 @@
+0.003   2018-01-02 (PERLANCAR)
+
+	- Use App::Genpass::WordList as base (add option 'patterns').
+
+
 0.002   2017-11-07 (PERLANCAR)
 
 	- Fix CLI name.

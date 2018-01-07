@@ -1,0 +1,36 @@
+---
+abstract: 'A minimalist time tracking app focused on precision and effortlessness.'
+author:
+  - 'Sean Zellmer <sean@lejeunerenard.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Jiffy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Dancer: '0'
+  JSON::MaybeXS: '0'
+  MongoDB: '0'
+  Moo: '0'
+  YAML::Any: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/lejeunerenard/jiffy/issues
+  homepage: https://github.com/lejeunerenard/jiffy
+  repository: https://github.com/lejeunerenard/jiffy.git
+version: '0.05'

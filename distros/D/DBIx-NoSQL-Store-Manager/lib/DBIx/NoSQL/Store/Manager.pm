@@ -1,24 +1,23 @@
 package DBIx::NoSQL::Store::Manager;
-BEGIN {
-  $DBIx::NoSQL::Store::Manager::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $DBIx::NoSQL::Store::Manager::VERSION = '0.2.2';
-}
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: DBIx::NoSQL as a Moose object store 
+$DBIx::NoSQL::Store::Manager::VERSION = '1.0.0';
+use 5.20.0;
 
 use strict;
 use warnings;
 
 use Moose;
 
+# TODO  type tiny
 use Moose::Util::TypeConstraints;
 
 use DBIx::NoSQL 0.0020;
-use Method::Signatures;
 use Module::Pluggable require => 1;
 
 extends 'DBIx::NoSQL::Store';
+
+use experimental 'signatures';
 
 
 subtype Model
@@ -32,7 +31,7 @@ has models => (
     traits => [ 'Array' ],
     is => 'ro',
     isa => 'Model',
-    default => method {
+    default => sub($self) {
         [ join "::", ($self->meta->class_precedence_list)[0], 'Model', '' ];
     },
     handles => {
@@ -53,7 +52,7 @@ has _models => (
     },
 );
 
-method _register_models( @models ) {
+sub _register_models( $self, @models ) {
     # expand namespaces into their plugins
     @models = map { 
         s/::$// ? do {
@@ -79,7 +78,7 @@ method _register_models( @models ) {
     }
 }
 
-method BUILD($args) {
+sub BUILD($self,$args) {
     $args->{models} ||= [ 
         join "::", ($self->meta->class_precedence_list)[0], 'Model', '' 
     ];
@@ -88,11 +87,30 @@ method BUILD($args) {
 };
 
 
-method new_model_object(@args) { $self->create(@args) }
 
-method create ( $model, @args ) {
+sub new_model_object($self,$model,@args) { 
     $self->model_class($model)->new( store_db => $self, @args);   
 }
+
+
+sub create ( $self,  $model, @args ) {
+    my $object = $self->new_model_object( $model => @args );
+    $object->save;
+    return $object;
+}
+
+# $store->set( $model, $key, $hashref )
+# $store->set( $object )  
+around set => sub($orig,$self,@rest) {
+
+    if( @rest == 1 ) {  # object call
+        my $object = shift @rest;
+        $object->store_db($self) unless $object->has_store_db;
+        
+        return $orig->( $self, map { $object->$_ } qw/ store_model store_key pack / ); 
+    }
+    $orig->($self, @rest );
+};
 
 1;
 
@@ -100,13 +118,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store 
 
 =head1 VERSION
 
-version 0.2.2
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -177,14 +197,20 @@ Returns the full class name of all models known to the store.
 
 Returns the full class name of the given model.
 
-=head2 create( $model_name, @args )
-
 =head2 new_model_object( $model_name, @args )
 
 Shortcut constructor for a model class of the store. Equivalent to
 
     my $class = $store->model_class( $model_name );
     my $thingy = $class->new( store_db => $store, @args );
+
+=head2 create( $model, @args )
+
+Create a new model object and save it. Morally equivalent to
+
+    $store->new_model_object( $model, @args )->save;
+
+Returns the new object.
 
 =head1 SEE ALSO
 
@@ -198,11 +224,11 @@ Shortcut constructor for a model class of the store. Equivalent to
 
 =head1 AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

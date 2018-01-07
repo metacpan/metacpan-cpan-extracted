@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..16\n";
+print "1..20\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -130,4 +130,64 @@ else {
     warn "\nExpected 'undef'\nGot '", Rmpfr_print_rnd_mode(MPFR_RNDA), "'\n";
     print "not ok 16\n";
   }
+}
+
+if(MPFR_RNDF == 5) {print "ok 17\n"}
+else {
+  warn "\n Expected 5, got ", MPFR_RNDF, "\n";
+  print "not ok 17\n";
+}
+
+if(MPFR_VERSION_MAJOR >= 4) {
+  my $op1 = Math::MPFR->new('17.7');
+  my $op2 = Math::MPFR->new('9.9');
+
+  my $ropu = Math::MPFR->new();
+  my $ropf = Math::MPFR->new();
+  my $ropd = Math::MPFR->new();
+
+  my $inex1 = Rmpfr_mul($ropu, $op1, $op2, MPFR_RNDU);
+  my $inex2 = Rmpfr_mul($ropd, $op1, $op2, MPFR_RNDD);
+
+  if($inex1 && $inex2) {print "ok 18\n"}
+  else {
+    warn "\n \$inex1: $inex1, \$inex2: $inex2\n";
+    print "not ok 18\n";
+  }
+
+  Rmpfr_mul($ropf, $op1, $op2, MPFR_RNDF);
+
+  if($ropf == $ropu || $ropf == $ropd) {print "ok 19\n"}
+  else {
+    warn "\n \$ropu: $ropu\n \$ropf: $ropf\n \$ropd: $ropd\n";
+    print "not ok 19\n";
+  }
+
+  Rmpfr_set_default_rounding_mode(MPFR_RNDF);
+
+  my $check = $op1 * $op2;
+
+  if($check == $ropu || $check == $ropd) {print "ok 20\n"}
+  else {
+    warn "\n \$ropu: $ropu\n \$check: $check\n \$ropd: $ropd\n";
+    print "not ok 20\n";
+  }
+
+  # Restore original default rounding mode
+  Rmpfr_set_default_rounding_mode(MPFR_RNDN);
+}
+else {
+
+  my $ropf = Math::MPFR->new();
+
+  eval {Rmpfr_mul($ropf, Math::MPFR->new('17.7'), Math::MPFR->new('9.9'), MPFR_RNDF)};
+
+  if($@ =~ /^Illegal rounding value supplied for this version/) {print "ok 18\n"}
+  else {
+    warn "\n\$\@: $@";
+    print "not ok 18\n";
+  }
+
+  warn "\n Skipping tests 19 and 20 - requires mpfr-4.0.0 or later\n";
+  for(19..20) {print "ok $_\n"}
 }

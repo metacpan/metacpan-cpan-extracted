@@ -45,12 +45,12 @@ for my $time_zone (qw|GMT UTC Asia/Tokyo America/Whitehorse|) {
 
     my $tzoffset = tzoffset(CORE::localtime);
     cmpthese timethese -10 => +{
-        'dt(cached)' => sub { $dt_parser->parse_datetime($text) },
+        # 'dt(cached)' => sub { $dt_parser->parse_datetime($text) },
         'pt'         => sub { timelocal(POSIX::strptime($text, $pattern)) },
         'ts(cached)' => sub { $ts_parser->parse($text) },
         'tp(cached)' => sub { $tp_parser->strptime($text, $pattern) },
-        'dt'         => sub { DateTime::Format::Strptime->new(pattern => $pattern, time_zone => $time_zone)->parse_datetime($text) },
-        'ts'         => sub { Time::Strptime::Format->new($pattern, { time_zone => $time_zone })->parse($text)                                                  },
+        # 'dt'         => sub { DateTime::Format::Strptime->new(pattern => $pattern, time_zone => $time_zone)->parse_datetime($text) },
+        # 'ts'         => sub { Time::Strptime::Format->new($pattern, { time_zone => $time_zone })->parse($text)                                                  },
         'tp'         => sub { Time::Piece->localtime->strptime($text, $pattern) },
         'tm'         => sub { Time::Moment->from_string($text.$tzoffset, lenient => 1) },
     };

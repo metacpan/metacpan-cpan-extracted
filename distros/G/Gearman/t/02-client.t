@@ -56,7 +56,7 @@ subtest "new_task_set", sub {
 };
 
 subtest "js socket", sub {
-    my $gts = t::Server->new();
+    my $gts         = t::Server->new();
     my @job_servers = $gts->job_servers();
     @job_servers || plan skip_all => $t::Server::ERROR;
 
@@ -70,12 +70,11 @@ subtest "js socket", sub {
 };
 
 subtest 'Client: "on_fail" handler is triggered on timeout' => sub {
-    my ($now, $then) = (time);
-
     my $gts         = t::Server->new();
     my @job_servers = $gts->job_servers();
     @job_servers || plan skip_all => $t::Server::ERROR;
 
+    my ($reason, $now, $then) = (q(NO REASON), time);
     my $c              = new_ok($mn, [job_servers => [@job_servers]]);
     my $timeout        = 2;
     my $initial_error  = '"on_fail" was NOT triggered';
@@ -84,8 +83,13 @@ subtest 'Client: "on_fail" handler is triggered on timeout' => sub {
     my $res_ref        = $c->do_task(
         task_that_does_not_exist => '',
         {
-            timeout     => $timeout,
-            on_fail     => sub { $then = time; $error = $expected_error },
+            timeout => $timeout,
+            on_fail => sub {
+                ## keep the given reason
+                ($reason) = @_;
+                $then  = time;
+                $error = $expected_error;
+            },
             on_complete => sub {
                 die '"on_complete" handler was called unexpectedly';
             },
@@ -96,6 +100,23 @@ subtest 'Client: "on_fail" handler is triggered on timeout' => sub {
     ok(
         (defined $then) && ($then - $now >= $timeout),
         "Timeout of ${timeout}s was elapsed"
+    );
+
+    # check if reason was set as expected
+    # fixes unwanted behaviour:
+    #
+    #   Task task_that_does_not_exist elapsed timeout [1514988291.35953s]
+    #
+    # Should be (e.g.):
+    #
+    #   Task task_that_does_not_exist elapsed timeout [2s]
+    #
+    # Proves fix of issue #35
+    # https://github.com/p-alik/perl-Gearman/issues/35
+    like(
+        $reason,
+        qr/Task [^[:space:]]+ elapsed timeout \[${timeout}s\]/,
+        q(Failure reason contains given timeout value)
     );
 
     $expected_error = qq(ALRM handler fired after ${timeout}s);

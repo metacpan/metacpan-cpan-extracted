@@ -40,6 +40,7 @@ my $build = Module::Build->new
 		      'Mouse'             => 0,
 		     },
    build_requires => {
+       'Config::Model'     => '2.116', # for BackendMgr::backend_obj
        'Config::Model::Itself' => '2.012', # for t/model_extension.t
        'Test::More'        => 0,
        'Test::Exception'   => 0,

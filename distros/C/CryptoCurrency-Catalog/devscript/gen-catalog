@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use File::Slurper qw(write_text);
+use Data::Dump;
+
+my $catalog_path = "$Bin/../devdata/catalog.csv";
+
+my %symbol_change; # key = safename
+LOAD_SYMBOL_CHANGE: {
+    open my $fh, "<", "$Bin/../devdata/symbol-change.csv" or die;
+    <$fh>;
+    while (defined(my $line = <$fh>)) {
+        chomp $line;
+        my @ff = split /\t/, $line;
+        $symbol_change{$ff[0]} = $ff[1];
+    }
+}
+
+my %completion; # key = incomplete name or safename
+LOAD_COMPLETION: {
+    open my $fh, "<", "$Bin/../devdata/completion.csv" or die;
+    <$fh>;
+    while (defined(my $line = <$fh>)) {
+        chomp $line;
+        my @ff = split /\t/, $line;
+        $completion{$ff[0]} = $ff[1];
+    }
+}
+
+my @scrape_result;
+my %by_symbol;
+my %by_safename;
+my %by_name;
+LOAD_SCRAPE_RESULT: {
+    open my $fh, "<", "$Bin/../devdata/scrape-result.csv" or die;
+    <$fh>;
+    while (defined(my $line = <$fh>)) {
+        chomp $line;
+        my @ff = split /\t/, $line;
+        my ($symbol, $name, $safename) = @ff;
+
+        if ($symbol_change{$safename}) {
+            $symbol = $symbol_change{$safename};
+        }
+
+        if ($completion{$safename}) {
+            $name = $completion{$safename};
+        } elsif ($completion{$name}) {
+            $name = $completion{$name};
+        }
+
+        $by_symbol{$symbol} and die "Duplicate symbol $symbol";
+        $by_symbol{$symbol} = {name => $name, safename => $safename};
+
+        $by_name{$name} and die "Duplicate name $name";
+        $by_name{$name} = {safename => $safename, symbol => $symbol};
+
+        $by_safename{$safename} and die "Duplicate safename $safename";
+        $by_safename{$safename} = {name => $name, symbol => $symbol};
+
+        push @scrape_result, [$symbol, $name, $safename];
+    }
+}
+
+write_text($catalog_path, join("", map {join("\t", @$_)."\n"} @scrape_result));

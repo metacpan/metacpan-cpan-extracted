@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ Crypt::LE - Let's Encrypt API interfacing module and client.
 
 =head1 VERSION
 
-Version 0.28
+Version 0.28a
 
 =head1 SYNOPSIS
 
@@ -630,7 +630,7 @@ sub directory {
     my $self = shift;
     unless ($self->{directory}) {
         my ($status, $content) = $self->_request("https://$self->{server}/directory");
-        if ($status == SUCCESS) {
+        if ($status == SUCCESS and $content and (ref $content eq 'HASH')) {
             $self->{directory} = $content;
             return $self->_status(OK, "Directory loaded successfully.");
         } else {
@@ -1336,13 +1336,13 @@ Returns: OK | UNSUPPORTED | INVALID_DATA | ERROR.
 =cut
 
 sub export_pfx {
-    my ($self, $file, $pass, $cert, $key, $ca) = @_;
+    my ($self, $file, $pass, $cert, $key, $ca, $tag) = @_;
     my $unsupported = "PFX export is not supported (requires specific build of PKCS12 library for Windows).";
     return $self->_status(UNSUPPORTED, $unsupported) unless $pkcs12_available;
     return $self->_status(INVALID_DATA, "Password is required") unless $pass;
     my $pkcs12 = Crypt::OpenSSL::PKCS12->new();
     eval {
-        $pkcs12->create($cert, $key, $pass, $file, $ca, "ZeroSSL exported");
+        $pkcs12->create($cert, $key, $pass, $file, $ca, $tag || "ZeroSSL exported");
     };
     return $self->_status(UNSUPPORTED, $unsupported) if ($@ and $@=~/Usage/);
     return $self->_status(ERROR, $@) if $@;

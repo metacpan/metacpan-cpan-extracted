@@ -38,14 +38,14 @@
    "provides" : {
       "Locale::SubCountry" : {
          "file" : "lib/Locale/SubCountry.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Locale::SubCountry::Codes" : {
          "file" : "lib/Locale/SubCountry/Codes.pm"
       },
       "Locale::SubCountry::World" : {
          "file" : "lib/Locale/SubCountry.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "https://github.com/kimryan/Locale-SubCountry"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

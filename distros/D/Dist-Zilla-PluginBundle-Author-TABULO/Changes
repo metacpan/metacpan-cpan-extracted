@@ -1,0 +1,847 @@
+Revision history for Dist-Zilla-PluginBundle-Author-TABULO
+
+0.197     2018-01-03 01:46:36Z
+         - Fix POD section ordering wrt to the newly added
+          sections (WARNING, ...).
+
+0.182     2018-01-03 01:38:02Z
+          - Attempt to fix POD section ordering wrt to the newly added
+            sections (WARNING, ...).
+
+0.181     2018-01-03 01:16:19Z
+          - Fixed .mailmap issues
+
+0.180     2018-01-03 01:02:23Z
+          - first version that appears to pas the tests after forking from
+            ETHER's plugin-bundle: <Dist-Zilla-PluginBundle-Author-ETHER>(v0.132)
+
+          - Fixed tests that were failing when authority <> 'cpan:ETHER'
+
+            Once the initial quasi-massive renaming & search/replace following
+            the initial fork activity was over, one would have thought that
+            things would just work...
+
+            The reality was far from it, and there were quite few tests failing,
+            mostly related to the source code and the tests both carrying an
+            overall assumption that the CPAN authority for the PluginBundle itself
+            would always be 'cpan:ETHER'.
+
+            That combined with a authority-dependent settings for the
+            StaticInstall plugin and also the choice for the licence file name
+            between : LICENCE vs LICENSE (notice the spelling).
+
+            For some reason, all along, I kept singing "Tomaito, tomaatoo..."" :-)
+
+            Finally, we now have all the tests passing again...
+
+          - Did initial customization for TABULO, such as the addition of
+            POD WikiDoc Transformer to the POD::Weaver plugin-bundle.
+
+            At second thought, I should have probably left those customizations
+            to a later release, in order to make a clear distinction. However,
+            there is really very little of that indeed in this version.
+
+          - Adopted PODs, adding an intro to the DESCRIPTION and two sections :
+            'WARNING' and 'ORIGINAL AUTHOR'.
+          --------------------------------------------------------------------
+
+0.132     2017-12-13 07:15:09Z
+          - fix test to work with [@Git::VersionManager] 0.003
+
+0.131     2017-09-16 04:29:15Z
+          - spelling fix in generated CONTRIBUTING file (thanks, Edward
+            Betts!)
+          - added .travis.yml to minting profile
+          - plugins used by the bundle are now injected into develop-suggests
+            prerequisites, rather than develop-requires, so Travis no longer
+            feels obliged to install them when testing the built distribution
+
+0.130     2017-08-28 01:13:46Z
+          - fix test that is broken with older [CopyFilesFromRelease]
+          - fix inverted condition in [Git::Check] configuration (wrong since
+            version 0.126)
+          - fix airplane mode, broken since version 0.127
+          - [@Git::VersionManager] and [MetaProvides::Update] are moved off to
+            their own distribution, Dist-Zilla-PluginBundle-Git-VersionManager
+
+0.129     2017-08-21 04:45:42Z
+          - fix a new test to avoid triggering the "looks like you're
+            installing from cpan, rather than building a distribution in the
+            repository" heuristic when using Dist::Zilla (e.g. on older perls)
+
+0.128     2017-08-16 23:39:44Z
+          - version extraction and updating plugins now fully extracted out
+            into their own plugin bundle, [@Git::VersionManager], to be soon
+            released in its own distribution
+
+0.127     2017-08-06 03:16:22Z
+          - fix test library's type handling on older Dist::Zilla
+
+0.126     2017-08-02 04:31:30Z
+          - minor fixes to distribution prereqs
+          - fixed logic for adding default configs for certain plugins and
+            their roles
+
+0.125     2017-05-21 01:43:09Z
+          - fix tests to work on older perls (thanks, [EnsureLatestPerl])
+          - [UseUnsafeInc] (with dot_in_INC=0) is only enabled in perls
+            compiled with -DDEFAULT_INC_EXCLUDES_DOT.
+
+0.124     2017-05-13 16:34:59Z
+          - added [EnsureLatestPerl] to before-release checks
+          - added [EnsureUnsafeInc] (with dot_in_INC=0)
+
+0.123     2017-04-27 21:04:35Z
+          - bump up prereq for Test::Portability::Files (used by
+            [Test::Portability]) for better compliance with ANSI filename
+            formats
+          - bump up prereq for [VerifyPhases] to get share_map fix
+          - added [CheckMetaResources]
+
+0.122     2017-02-03 01:27:46Z
+          - properly display ANSI colours on MSWin32 (Roy Ivy Ⅲ)
+          - a fake release (one where no PAUSE upload is performed) can now be
+            achieved by setting the FAKE_RELEASE environment variable
+
+0.121     2016-10-17 01:38:51Z
+          - stop prompting on release when we contain a develop prereq on
+            ourselves at the version we are releasing
+          - bump the required version of [Git::Contributors], to get the fix
+            for attribution commits
+          - don't include Test::Pod::No404s under Travis (GitHub #7, Dave Rolsky)
+
+0.120     2016-09-11 00:03:52Z
+          - avoid fatal errors on MSWin32 or any system where symlink support
+            is not available (see github #5)
+          - silence "no bash" warnings during testing
+          - respect necessary prereqs for configs provided by plugin roles
+
+0.119     2016-09-04 22:48:25Z
+          - Module::Metadata is no longer used as a test prereq (via
+            [Test::ReportPrereqs]) if ExtUtils::MakeMaker is the sole
+            installer, to avoid adding possibly-unwanted prereqs (Graham Knop)
+
+0.118     2016-08-07 21:59:49Z
+          - in tests, report the installed version of more tools, to aid in
+            diagnosing buggy CPANTesters reports
+
+0.117     2016-06-19 17:13:44Z
+          - new 'authority' configuration option
+          - bump prereq version for [Test::CPAN::Changes], to avoid the broken
+            0.011 release
+
+0.116     2016-06-12 01:07:29Z
+          - bump prereq version for [Test::Portability] for the new xt/author
+            placement
+          - removed [AuthorityFromModule], as recent PAUSE improvements have
+            rendered it redundant
+
+0.115     2016-05-28 20:33:51Z
+          - [Test::PodSpelling] now also tests files in examples/, lib/,
+            script/, t/, xt/ directories
+          - bump prereq version for [Test::Pod::No404s] for the new xt/author
+            placement (RT#114799)
+          - fix tests that fail with Dist::Zilla::Plugin::NextRelease 6.005
+
+0.114     2016-04-27 04:26:51Z
+          - fix PodWeaver config test that broke when Dist::Zilla::Tester
+            behaviour changed
+
+0.113     2016-04-23 16:11:17Z
+          - remove last vestiges of Path::Class
+
+0.112     2016-03-14 02:35:38Z
+          - adjust minting template so vim modeline is always high enough to
+            be respected (first five lines)
+          - use new version_extractor = Module::Metadata feature in
+            [Test::ReportPrereqs]
+
+0.111     2016-02-10 04:50:57Z
+          - use more sophisticated markup for the irc channel in SUPPORT pod
+          - avoid mangling pod sections labelled something like "SUPPORTED
+            INTERFACES" into the "SUPPORT" section
+
+0.110     2015-12-23 07:57:17Z
+          - run [Git::Contributors] later, after other prereq plugins have run
+
+0.109     2015-12-02 02:59:09Z
+          - avoid importing Test::Deep::none in tests, to avoid clashing with
+            List::Util
+          - strip ANSI colours when testing release output
+
+0.108     2015-11-12 04:55:28Z
+          - drop dots after URLs in CONTRIBUTING, which broke hyperlinking
+          - switch from [GenerateFile::ShareDir] to
+            [GenerateFile::FromShareDir]
+
+0.107     2015-10-14 01:29:39Z
+          - bump prereq version for [PodSyntaxTests], [PodCoverageTests] for
+            the new xt/author placement
+
+0.106     2015-10-11 00:00:09Z
+          - bump prereq version for [InstallGuide] (RT#107659)
+          - bump prereq version for [Test::PodSpelling] (RT#107660)
+
+0.105     2015-09-27 17:23:09Z
+          - fix cleanup of old LICENSE file after moving it to LICENCE during
+            release (broken in 0.103)
+          - fix declared version dependency on [Test::Kwalitee], to ensure it
+            has the "filename" configuration option (RT#107362)
+
+0.104     2015-09-19 21:48:10Z
+          - add a L<> around the support mailing list address woven into pod
+          - automatically use "LICENCE" rather than "LICENSE" in distributions
+            with first-come maintainers who are not Americans
+
+0.103     2015-09-04 02:22:42Z
+          - switch to [MungeFile] for munging
+            Dist::Zilla::MintingProfile::Author::ETHER and its data files
+            during the build
+          - weave a standard SUPPORT section into pod, appending it to any
+            existing content in that section
+
+0.102     2015-08-15 02:15:25Z
+          - declare proper prereq version for Pod::Weaver::Section::Legal
+          - switch from one hacky mechanism to determine the 'Legal' pod
+            header to another hacky mechanism, but at least this one is more
+            likely to do what I want
+          - use :PerlExecFiles in [Test::Compile]
+          - [AutoPrereqs] now looks for develop prerequisites in xt/
+          - dist.ini in newly-minted dists will now never have trailing
+            whitespace
+
+0.101     2015-08-08 20:18:26Z
+          - depend on the most recent List transformer, for the text wrapping
+            feature
+          - add use of the Verbatim transformer to the weaver plugin bundle
+          - LICENSE file is now renamed as LICENCE for my own distributions
+            (where I have authority) (or when the 'licence' option is set to
+            'LICENCE'), and the pod section will read "COPYRIGHT AND LICENCE"
+
+0.100     2015-07-19 05:16:43Z
+          - ensure all static install configurations are correct and
+            consistent with each other
+          - fix test that breaks if [RewriteVersion] is not at least version
+            0.010
+
+0.099     2015-07-18 03:44:44Z
+          - bump prereq on [Test::Pod::No404s], to get prereq injection
+          - upgrade [MojibakeTests], to get the file in xt/author and prereq
+            injection
+          - pass add_tarball_name = 0 to [RewriteVersion(::*)?] configs
+          - set x_static_install flag in some distributions
+
+0.098     2015-06-29 03:31:18Z
+          - fix test that broke due to [RewriteVersion::Transitional] 0.006
+
+0.097     2015-06-25 04:11:43Z
+          - bump up prereq for [Test::EOL], for the 'finders' option
+          - fix bash commands when building in a directory with whitespace
+          - also copy INSTALL from the build and commit it to the repository
+          - new =type collector in weaver bundle
+
+0.096     2015-06-16 02:04:57Z
+          - fix Module::Build::Tiny prohibition to also work with
+            [ModuleBuildTiny::Fallback]
+          - add header and footer regions to podweaver bundle, which is very
+            useful for adding directives before any content
+
+0.095     2015-06-15 03:37:11Z
+          - switch to my weaver plugin bundle in newly-minted distributions;
+            preventing older sharedir installs from interfering
+          - always copy ppport.h from release back to the repository
+          - define weaver plugin bundle config in a more compact and readable
+            syntax
+          - do not permit Module::Build::Tiny to be used as an installer if
+            perl 5.006 compatibility is desired
+          - remove use of build_warnings option in [Git::Check] (added in
+            0.074)
+
+0.094     2015-06-01 03:30:00Z
+          - eliminate remaining uses of List::MoreUtils
+          - remove universal application of [ShareDir] - distributions using
+            sharedirs must add it themselves
+          - add Pod::Weaver::PluginBundle::Author::ETHER and use it in my dzil
+            plugin bundle
+
+0.093     2015-05-22 03:44:45Z
+          - move kwalitee.t to xt/author
+          - reduced logging output during normal builds
+
+0.092     2015-04-12 06:18:30Z
+          - update all the $VERSION values, not just the first in each file
+          - generate meta provides data from exactly what is in each file
+          - fix whitespace in minted dist.ini for Dist::Zilla plugins
+
+0.091     2015-03-28 04:56:11Z
+          - avoid gathering any existing ppport.h, as well as Makefile.PL and
+            other files that we regenerate during the build
+          - never gather inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
+
+0.090     2015-03-19 06:56:54Z
+          - drop annoying -TRIAL suffix on git tag names - tags will now
+            always be in the consistent form: v1.234
+          - Changes in the release snapshot commit now exactly matches what
+            was in the release (without the $NEXT template variable)
+
+0.089     2015-03-06 04:35:28Z
+          - ensure correct version of [Test::CleanNamespaces] is used, to ward
+            off test failures due to mismatched filenames
+
+0.088     2015-03-05 04:33:03Z
+          - fix use of [Test::CheckBreaks] in dist.ini of minted dists
+          - add mailing list and irc metadata for minted Test distribution
+          - now passing along any payload for [Git::NextVersion] to the
+            replacement used by [RewriteVersion::Transitional]
+          - added [Test::CleanNamespaces]
+
+0.087     2015-02-20 02:47:43Z
+          - now requiring a more conservative minimum version for
+            Module::Build::Tiny, when it is used.
+          - fix the 'default' minting profile
+          - lower the default maximum-allowed minimum perl version in built
+            distributions from 5.008001 to 5.006.
+
+0.086     2015-02-01 01:38:17Z
+          - no longer scans inc/ for configure_requires minimum perl version
+          - generated CONTRIBUTING file now mentions the existence of a TODO
+            file in the repository (which is never packaged)
+          - dropped the use of "use warnings FATAL => 'all';' in this
+            distribution's tests, and in newly-minted distributions
+          - add 'default' minting profile, which is the same as 'github'
+          - switched from using [Git::NextVersion] and [PkgVersion] as the
+            version provider and version inserter (respectively) to
+            [RewriteVersion::Transitional] and
+            [BumpVersionAfterRelease::Transitional]
+
+0.085     2015-01-16 01:45:19Z
+          - fix test failure with metadata mismatch created by [Run::*] 0.031
+
+0.084     2015-01-09 21:46:59Z
+          - fix tests that failed in 0.083 for anyone who did not have a
+            ~/.pause file
+
+0.083     2015-01-08 04:24:23Z
+          - fix regression in 0.082 that caused new generated files not to be
+            committed to git after a release
+          - -remove = <plugin> now also accepts the unique plugin name, not
+            just the class, for more targeted plugin removal
+
+0.082     2015-01-03 20:15:37Z
+          - use [Git::Describe]'s new on_package_line feature
+          - (temporarily?) revert use of 'our' syntax for $VERSION
+            declarations (see RT#101095)
+
+0.081     2014-12-10 02:09:34Z
+          - $VERSION statements inserted into modules now use 'our' syntax
+            rather than fully-qualfied variable names
+          - added more files to the list of things we will never gather from
+            the dist, for future-proofing
+
+0.080     2014-11-22 04:53:32Z
+          - avoid failing on perl 5.21.6 where aliased.pm is warning
+
+0.079     2014-11-15 08:27:51Z
+          - now using colours in diagnostic mesages
+
+0.078     2014-10-29 00:47:46Z
+          - documented the first version each configuration option became
+            available
+          - remove duplicate [MetaConfig] in tests, to avoid issues with meta
+            merging in Dist::Zilla 5.022 (RT#99852)
+          - ensure environment variables are in the right state during tests
+
+0.077     2014-10-26 21:16:11Z
+          - switch from [EOLTests] to [Test::EOL]
+
+0.076     2014-10-18 22:07:58Z
+          - bump optional dependency on [MakeMaker::Awesome] to avoid old bug
+            with loaded modules
+          - copy_file_from_release option now appends to, rather than
+            overshadows, the defaults, so users do not need to repeat the
+            defaults (which may change over time)
+          - reset default eumm_version in MakeMaker plugins to 0, as done in
+            [MakeMaker] version 5.020
+          - new 'changes_version_columns' configuration option, for
+            tweaking [NextRelease] format strings
+
+0.075     2014-10-12 01:02:55Z
+          - fix tests that died when run outside a git repository
+
+0.074     2014-10-12 00:01:59Z
+          - refer to "the maintainer(s)", rather than "me", in generated
+            CONTRIBUTING file
+          - use new build_warnings option in [Git::Check]
+
+0.073     2014-09-06 02:07:00Z
+          - fixed a few small omissions in the minting profile for new
+            Dist::Zilla plugin distributions
+          - no longer performing side effects for plugins that are -remove'd
+            in the final configuration
+          - added [AuthorityFromModule] (twinned for now with [Authority],
+            until supported is added in PAUSE)
+          - bump prereq on [ModuleBuildTiny::Fallback], to get fixes for
+            interaction with [CheckBin], [CheckLib]
+
+0.072     2014-08-20 04:33:59Z
+          - fix syntax that parses badly on all perls before 5.21.1 - hey
+            that's new enough for everyone, right?
+
+0.071     2014-08-19 01:11:20Z
+          - fix test that broke when I released version 0.09 of
+            Dist::Zilla::Plugin::Test::NoTabs
+          - remove prereq declaration for plugin that is only actually ever
+            used for ether herself
+          - now adding all plugins pulled in by the plugin bundle to the built
+            distribution's develop prereqs (to add to the plugins outside the
+            bundle, that were already being added by [Prereqs::AuthorDeps])
+
+0.070     2014-08-16 18:48:19Z
+          - revert git contributor change from v0.069; opened
+            (github) CPAN-API/metacpan-web#1270 instead.
+          - order contributors by number of commits, descending
+          - no longer adding an $AUTHORITY variable to modules, as nothing
+            (save Class::MOP, Moose and Moo) has ever used it - this also
+            avoids shifting our line numbers by 3
+
+0.069     2014-08-07 02:44:38Z
+          - bump prereq on [Git::Contributors] to allow tests to pass when
+            running outside of a git repository
+          - remove hacks for [ReadmeAnyFromPod], now that the stable release
+            is out supporting phase=release
+          - fix test failure when installer's ~/.pause cannot be parsed
+          - fix test failure on older Dist::Zilla where TestRunners did not
+            dump their configuration into metadata
+          - now including authors in contributor lists, except for the
+            releaser herself
+
+0.068     2014-08-06 04:15:24Z
+          - README.pod is now generated only in the repository, after
+            release, so it never shows up in the shipped dist
+          - include a default .mailmap in the minted dist; invite the user to
+            update .mailmap if the contributor data is not quite right
+          - avoid errors from in XS-based distributions where a token Makefile.PL
+            is included and we try to generate our own over top
+          - more directories added to no_index
+          - now instead of installing release with [InstallRelease], switch to
+            [Run::AfterRelease] with an author-specific PAUSE URL, to help out
+            cpanm-reporter
+          - adjust the command that updates the .latest symlink, to account
+            for @#$!@#$ incompatibilities between implementations of `ln`
+          - at last! add [Git::Contributors]
+
+0.067     2014-07-25 01:09:13Z
+          - disabled [EnsurePrereqsInstalled] for now - it is too annoying
+            getting travis to install everything soon enough!
+
+0.066     2014-07-18 03:25:10Z
+          - internally-hardcoded extra arguments to be passed to optional
+            plugins are now handled in a more generic way, now encompassing
+            all plugins that might be used
+          - minted Dist::Zilla plugins now contain an extra bit of needed
+            prereq declaration, for valid metadata production
+          - airplane mode can now also be enabled via the DZIL_AIRPLANE
+            environment variable
+          - now converting the main module to README.pod (pod instead of
+            markdown) for committing to the repository
+          - fix test of expected files produced by bundle to handle the new
+            data file put out by [Test::ReportPrereqs] 0.014.
+          - XS-based distributions (*.xs files found in repository root) must
+            now have a basic Makefile.PL provided to assist development
+
+0.065     2014-06-09 20:36:31Z
+          - fix dist.ini in minted dzil plugin dist (v0.064)
+          - include tailored [MetaResources] for minted dzil plugin's dist.ini
+          - inject [SurgicalPodWeaver] in develop prereqs, if selected via the
+            surgical_podweaver option
+          - include placeholder for keyword declarations in minted modules
+          - xt/ tests are now once again run after t/
+          - engage maximum fallbackiness!  default installers now
+            [ModuleBuildTiny::Fallback], [MakeMaker::Fallback]
+          - skip running after-build shell commands on systems with no bash,
+            to avoid failing tests on various architectures
+
+0.064     2014-05-21 16:56:30Z
+          - one more .latest symlink fix
+          - add [CheckIssues]
+          - drop automatic develop prereq on Dist::Zilla <what I have>
+
+0.063     2014-05-11 17:53:12Z
+          - really fix failing tests this time (from v0.060)
+          - fix updating of .ackrc file and .latest symlink in various build
+            scenarios (from v0.061)
+
+0.062     2014-05-08 17:02:13Z
+          - remove using plugins in tests that will cause the test build to
+            fail if users don't have develop prereqs installed
+
+0.061     2014-05-04 21:28:33Z
+          - fix ln flags for linux
+          - fix filefinders used in no-tabs tests
+
+0.060     2014-05-03 22:52:01Z
+          - fix adjustment of existing .latest symlink at build time
+          - added use of [EnsurePrereqsInstalled], to check ; authordeps are
+            satisfied
+          - Dist::Zilla::Plugin::BlockRelease (used by airplane mode) has been
+            broken out into its own distribution
+          - removed unnecessary use of StopWords in this dist, dists being
+            built and dists being minted
+
+0.059     2014-04-26 22:32:12Z
+          - revisions to and fixes for generated CONTRIBUTING document
+
+0.058     2014-04-19 05:38:04Z
+          - minimum perl version really really fixed now
+          - drop [Test::UnusedVars] - too many false positives; perl-critic is
+            better suited to address these sorts of issues
+          - Makefile.PL now checks for 'git' command, so we can get NA reports
+            for every smoker that tried to look at us (before attempting to
+            install all the prerequisites)
+          - customized minting output if the dist is a Dist::Zilla plugin
+
+0.057     2014-04-11 01:04:20Z
+          - minimum perl version really softened to 5.10.1, except when
+            minting distributions (which should have happened in v0.051)
+          - when building as 'dzil build' or 'dzil release', add a .latest
+            symlink to facilitate future grepping across repositories
+
+0.056     2014-04-08 02:43:13Z
+          - automatically add keywords to metadata, extracted from # KEYWORDS:
+            comment in main module
+          - switch from [Test::Version] to [CheckStrictVersion]
+
+0.055     2014-03-24 04:03:47Z
+          - fix missing prereq declaration needed from last release
+
+0.054     2014-03-23 04:49:15Z
+          - pass default_jobs => 9 option to all installer tools in use, and
+            [RunExtraTests]
+          - also ensure we never index corpus/; only list no_index directories
+            when they actually exist
+
+0.053     2014-03-12 15:01:19Z
+          - now using [Test::CleanNamespaces] to build this distribution as
+            well as in newly-minted distributions
+          - make airplane mode actually work (doh!)
+
+0.052     2014-02-25 04:56:32Z
+          - [VerifyPhases] added (another information-only plugin)
+          - added missing prereq (from v0.051)
+          - minted clean-namespaces.t test no longer skips ::Conflicts
+            module (added in v0.019)
+
+0.051     2014-02-23 01:10:45Z
+          - fix argument passed to [Git::Commit] that no longer works now that
+            it uses Path::Tiny instead of Path::Class
+          - new "surgical_podweaver" configuration option
+          - minimum perl version softened to 5.010, except for when minting
+            distributions (still at 5.013002)
+
+0.050     2014-02-13 17:39:49Z
+          - adjusted CONTRIBUTING content for XS-based dists - I promise to
+            include a token Makefile.PL to allow development without dzil.
+
+0.049     2014-01-29 02:56:31Z
+          - fixed tests that can fail on systems with no spelling dictionaries
+            installed
+
+0.048     2014-01-21 04:07:40Z
+          - removed [PruneCruft], which does nothing useful with
+            [Git::GatherDir]
+          - removed [ManifestSkip] which does nothing useful when there is no
+            MANIFEST.SKIP file
+          - add an option for what files to copy from the release, for easier
+            customization
+          - added a dummy option for [Git::Check], to work around an issue in
+            Config::MVP::Assembler::WithBundles::_add_bundle_contents
+
+0.047     2014-01-14 05:34:39Z
+          - adjusted plugin order so [PkgVersion] gets a chance to insert into
+            the first blank line of the package (new in 5.010) before other
+            modules insert their code lines
+          - pod removed from in the middle of source is now replaced with a
+            commented-out version of itself, to avoid altering line numbers
+
+0.046     2014-01-11 19:23:31Z
+          - ensure that .pod files are also eligible for indexing
+          - minting profile switched to using a dist sharedir to store
+            profiles, so we can now ship using Module::Build::Tiny
+
+0.045     2014-01-06 18:32:05Z
+          - fixed transposed link text in documentation (thanks, rwstauner!)
+          - fixed new tests that fail when run outside a git repository
+
+0.044     2014-01-04 18:46:04Z
+          - adjust airplane mode so it performs all (non-network) pre-release
+            checks first, before aborting the release
+          - minor tweaks to CONTRIBUTING text
+
+0.043     2013-12-14 17:34:14Z
+          - stale [@Git] modules now being checked for again
+
+0.042     2013-12-08 00:24:09Z
+          - drop use of [-Encoding] Pod::Weaver plugin - no longer needed with
+            Pod::Weaver 4
+          - update generated CONTRIBUTING file to filter out local plugins
+            when running 'dzil authordeps --missing', and to mention the irc
+            channel when available
+          - new "airplane" mode, to facilitate development while the network is
+            not available
+
+0.041     2013-11-29 06:02:08Z
+          - add explicit dep on Pod::Markdown, to get the version that creates
+            metacpan hyperlinks
+          - add [Test::Portability]
+          - no longer prompting about stale [@Git] modules
+
+0.040     2013-11-12 17:50:39Z
+          - [Git::CheckFor::MergeConflicts] is working again
+          - work around failure of minting test where a development release of
+            a plugin is required to generate all expected files
+
+0.039     2013-11-11 02:30:24Z
+          - fix config for [Git::Commit], to properly commit files that were
+            newly added to the dist
+          - now generating full starting content for CONTRIBUTING, README.md,
+            LICENSE when minting a new distribution
+
+0.038     2013-11-09 22:46:12Z
+          - fixed typo in CONTRIBUTING file (thanks, Сергей Романов!)
+          - added use of [Prereqs::AuthorDeps], for more entries in develop
+            prereqs
+
+0.037     2013-11-02 20:58:18Z
+          - fix regexp error while creating CONTRIBUTING file
+
+0.036     2013-11-02 20:54:09Z
+          - version format in Changes file altered from appending -TRIAL to
+            the version (which violates CPAN::Meta::Spec) to adding
+            ' (TRIAL RELEASE)' after the timestamp
+          - temporarily (?) disable broken [Git::CheckFor::MergeConflicts]
+          - more tweaks to CONTRIBUTING text
+          - plugins which are only used in certain conditions are now also
+            declared as runtime requirements, to make it easier for
+            contributors (requested by haarg)
+
+0.035     2013-10-31 05:50:52Z
+          - drop the ego tag in Changes on every release
+
+0.034     2013-10-31 02:05:20Z
+          - more tweaks to CONTRIBUTING text
+
+0.033     2013-10-24 01:47:28Z
+          - now only generating README.md, LICENSE and CONTRIBUTING in the
+            build directory, and copying back to the repository (and
+            committing) only at release time
+
+0.032     2013-10-17 02:26:03Z
+          - fix some bad templates for files used in the minting profile
+          - added [CheckSelfDependency]
+          - all prereqs that are used based on config settings are now
+            (guaranteed to be) included in the pluginbundle as runtime
+            recommendations, as well as injected into the built dist as
+            develop requirements (RT#89530)
+          - more tweaks to CONTRIBUTING text
+
+0.031     2013-10-13 17:43:37Z
+          - fix discrepancy for [Test::Compile] between prereq versions in
+            metadata, and runtime required version (RT#89429)
+
+0.030     2013-10-12 22:09:46Z
+          - xt_mode must be used in [Test::Compile] when xt/ tests run before
+            t/ (because 'make'/'Build' has not been run yet)
+          - fixed broken gathering of sharedir
+
+0.029     2013-10-12 21:27:40Z
+          --- a.k.a. "the ribasushi release"
+          - dropped [Test::CheckDeps]
+          - xt/ tests are now run before t/
+          - compile test now generated as xt/author/00-compile.t
+          - prereqs are noisly, but non-fatally, verified in
+            t/00-report-prereqs.t
+          - now generating a custom CONTRIBUTING file
+
+0.028     2013-10-06 06:17:12Z
+          - injected t/00-check-deps.t no longer bails out when failures are
+            encountered
+          - the shell command used to update the local .ackrc is now POSIX
+            shell compatible
+          - fix unit tests that broke when Dist::Zilla::Plugin::InstallGuide
+            1.200001 was released (which retroactively broke the 0.027
+            release)
+
+0.027     2013-09-27 03:50:26Z
+          - minted dists once again use the default 'installer' value (now
+            [MakeMaker::Fallback] and [ModuleBuildTiny], since 0.025)
+          - added missing required prereqs, and now properly skipping relevant
+            tests when optional dependencies are not installed (with guard
+            tests to verify that all prereqs are properly declared) (RT#88977)
+
+0.026     2013-09-25 02:00:04Z
+          - skip relevant tests when optional dependencies are not installed
+
+0.025     2013-09-22 22:04:46Z
+          - added missing dependency on [MojibakeTests] (RT#88807)
+          - fixed bad dependency for NoTabs tester that changed names
+          - make tests run without git again (broken in 0.024) by removing all
+            git-based plugins for testing
+          - now generating a t/00-report-prereqs.t
+          - 'installer' option can now be specified more than once, for
+            stacking plugins
+          - new installer default: MakeMaker::Fallback and ModuleBuildTiny
+            (RT#88642)
+
+0.024     2013-09-19 02:29:14Z
+          - now also support the server = catagits option, for Catalyst
+            repositories hosted at Shadowcat Systems
+          - switch to [Test::NoTabs], also testing examples/ files
+          - bump prereq on [Test::CheckDeps] to get CPAN::Meta::Check
+            dependency that we can now remove from here
+          - vim modeline added to .pm in minted dist
+          - default 'installer' backend now defaults to 'none', forcing
+            consumers to explicitly state a preference; minted dists specify
+            ModuleBuildTiny, the previous default (RT#88642)
+
+0.023     2013-09-11 01:43:22Z
+          - now checking for stale prereqs at dist release time
+
+0.022     2013-09-10 01:48:53Z
+          - warnings tests bypassed during installation, to prevent
+            installation issues in the presence of deprecation warnings from
+            upstream dependencies (in this case, via Moose 2.1100) - and
+            similar change made in test generated via minting profile
+          - bumped dependency version for [Test::PodSpelling] and wordlists
+          - bumped dependency on Dist::Zilla, for yaml encoding fixes
+
+0.021     2013-09-07 19:41:06Z
+          - disable invocation of cpanm-reporter (see RT#88367)
+          - added [MojibakeTests], for testing file encoding at release time
+
+0.020     2013-09-02 23:50:35Z
+          - set new die_on_existing_version option in [PkgVersion]
+          - after releasing and we install the dist, submit a cpantesters
+            report
+
+0.019     2013-08-21 19:16:27Z
+          - now supporting dists hosted elsewhere than github (currently
+            gitmo, p5sagit, or other), via the 'server' option
+          - Test::Version now runs in strict mode
+          - generated clean-namespaces.t test now skips ::Conflicts module
+          - [Test::Kwalitee] now included in bundle, rather than adding it
+            into the minted dist.ini separately
+
+0.018     2013-08-16 05:11:06Z
+          - now using [PromptIfStale] to ensure the plugin bundle is always
+            the latest version, and all plugins are checked at release time
+          - bring back [Test::CPAN::Changes], now that the spec has become a
+            bit more reasonable (removed since v0.015)
+          - Changes entries are now made with times in UTC, with a trailing
+            'Z' rather than the CLDR 'ZZZZ' format code
+
+0.017     2013-08-04 16:12:17Z
+          - update minimum version of perl required, re syntax used in
+            templates applied during minting
+          - inject a forced dependency on a fixed CPAN::Meta::Check
+          - skip pluginbundle tests if .git dir is not present (too many
+            plugins rely on git data)
+
+0.016     2013-08-03 19:44:15Z
+          - added basic tests for the pluginbundle and minter
+          - clean up .ackrc editing at build time
+
+0.015     2013-08-01 23:02:32Z
+          - [Test::CPAN::Changes] omitted if its version >= 0.21, pending
+            resolution of too-strict datetime formats (e.g. RT#87499)
+
+0.014     2013-07-30 00:25:48Z
+          - fix dist.ini munging done at release time (v0.013)
+          - injected compile test now also checks files in examples/
+          - ExecDir now looks for installable executables in script/, for
+            compatibility with Module::Build::Tiny
+
+0.013     2013-07-28 23:59:41Z
+          - inserts --ignore-dir line into .ackrc at build time
+          - when releasing this pluginbundle, dist.ini is edited (and
+            committed) to force a dependency on the newly-released version, and
+            all other local dist.inis using this bundle are also edited
+            (without committing)
+          - issue tracking is disabled in newly-created github repositories
+
+0.012     2013-07-17 01:32:35Z
+          - do not require trial versions of [Test::Compile], allowing
+            flexibility as which we choose to build with
+
+0.011     2013-07-06 00:59:57Z
+          - compile test will also check for warnings, when author is testing
+
+0.010     2013-06-28 18:28:01Z
+          - t/00-check-deps.t test now has TODO tests for 'recommends' and
+            'suggests' prereqs
+          - release test for unused variables reinstated
+
+0.009     2013-06-20 17:18:12Z
+          - 'installer' now defaults to ModuleBuildTiny
+          - (experimental) namespaces-are-clean release test added to minting
+            profile, although this won't pass for many types of dists as many
+            things are sloppy about modifying the package stash
+
+0.008     2013-06-11 22:59:23Z
+          - fix bad templating in minted module
+          - during minting, push the initial commit to github after creating
+            the remote
+
+0.007     2013-05-30 01:48:34Z
+          - minting profile updates:
+            - extra kwalitee tests enabled by default
+            - test now has 'use <main module>;', prefers done_testing,
+              and now fails, rather than not compiling
+            - main module now avoids the list transformer where it breaks pod
+              coverage tests; includes more template pod
+          - config option added for changing the installer backend (still
+            defaults to MakeMaker, for now)
+
+0.006     2013-05-11 00:06:41Z
+          - support dropped for directly passing stopwords via a mvp argument
+            -- it's easier to just use a directive right in pod (and they can
+            be added via ConfigSlicer too, if needed)
+          - minting process now prompts to create a repository on github
+          - alter max_target_perl setting for *this dist itself only* to
+            commit to run on 5.16.3+, not 5.8.8+
+          - the version of Dist::Zilla used to build this distribution is
+            injected as a develop prerequisite for users of the plugin bundle
+          - the version of this bundle used to mint a dist is set as the
+            minimum version for subsequent builds of the dist
+          - after release, the github repository is updated with the
+            distribution's abstract as its description, and the metacpan page
+            as its homepage.
+
+0.005     2013-04-28 15:47:40Z
+          - bump version for [Test::Compile] and [Test::CheckDeps] (RT#84900,
+            RT#84904, RT#84905)
+
+0.004     2013-04-27 03:56:11Z
+          - fix missing .gitignore in minted dists
+          - [-Encoding] podweaver plugin added to this distribution and
+            minted dists
+          - extra stopwords added, after disabling my local aspell dictionary
+          - Pod::Weaver plugins used in this bundle are added as runtime
+            prerequisites
+
+0.003     2013-04-21 17:22:48Z
+          - now building ourself with ourselves, [@Author::ETHER].
+          - [Test::UnusedVars] added
+          - RT mail link cleaned up
+          - bump prereqs for Dist::Zilla::Role::PluginBundle::PluginRemover,
+            Dist::Zilla::Plugin::Test::CPAN::Changes
+          - document the multiple mechanisms for adding stopwords (and add the
+            [-Stopwords] weaver plugin, which seems to be needed sometimes)
+
+0.002     2013-04-14 22:40:08Z
+          - do not index our profiles/, to avoid its contents from showing up
+            under "Documentation" on metacpan
+          - users of [@Author::ETHER] can now -remove plugins
+
+0.001     2013-04-14 20:52:50Z
+          - Initial release, incorporating the minting profile that I had been
+            using locally in ~/.dzil/profiles/github.

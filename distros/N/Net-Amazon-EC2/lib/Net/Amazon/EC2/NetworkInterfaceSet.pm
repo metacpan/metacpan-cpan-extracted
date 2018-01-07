@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::NetworkInterfaceSet;
+$Net::Amazon::EC2::NetworkInterfaceSet::VERSION = '0.35';
 use strict;
 use Moose;
 

@@ -1,5 +1,11 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.10    Sun Jan  7 05:27:35 GMT 2018
+ - exportable promise_code()
+
+0.09    Sat Dec 30 08:52:15 GMT 2017
+ - works with promises
+
 0.08    Sat  9 Dec 07:09:08 GMT 2017
  - add Docker support
 

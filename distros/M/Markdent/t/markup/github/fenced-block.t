@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
 
 use lib 't/lib';
 
@@ -148,6 +148,35 @@ EOF
             'fenced code block with language indicator'
         );
     }
+}
+
+{
+    my $code = <<'EOF';
+---
+test
+---
+EOF
+
+    my $text = <<"EOF";
+```
+$code
+```
+EOF
+
+    my $expect = [
+        {
+            type     => 'code_block',
+            code     => $code,
+            language => undef,
+        },
+    ];
+
+    parse_ok(
+        { dialects => 'GitHub' },
+        $text,
+        $expect,
+        'fenced code block with dashes in it - dashes are not treated as two-line header'
+    );
 }
 
 done_testing();

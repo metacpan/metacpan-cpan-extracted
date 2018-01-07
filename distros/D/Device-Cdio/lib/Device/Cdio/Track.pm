@@ -28,6 +28,7 @@ Device::Cdio::Track - Class for track aspects of Device::Cdio.
 use strict;
 use Exporter;
 use perlcdio;
+use perlmmc;
 use Device::Cdio::Util qw(_rearrange _check_arg_count _extra_args);
 use Device::Cdio;
 use Device::Cdio::Device;
@@ -283,7 +284,7 @@ sub is_track_green {
 
 =head2 get_track_isrc
 
-$isrc = $track->get_track_isrc;
+$isrc = $track->get_track_isrc($insert_dashes=0);
 
 Returns an empty string or the International Standard Recording Code.
 Which is presented in 4 hyphen-separated substrings: "CC-XXX-YY-NNNNN"
@@ -298,11 +299,14 @@ Which is presented in 4 hyphen-separated substrings: "CC-XXX-YY-NNNNN"
 
 sub get_track_isrc {
     my ($self, @p) = @_;
+    my $insert_dashes = defined $p[0] && $p[0];
     my $isrc =  perlcdioc::cdio_get_track_isrc($self->{device}, $self->{track});
     if(!$isrc) {
         $isrc =  perlmmcc::mmc_get_isrc($self->{device}, $self->{track});
     }
-    $isrc =~ s/(\w\w)(\w\w\w)(\w\w)(\w+)/$1-$2-$3-$4/;    #"CC-XXX-YY-NNNNN"
+    if ($isrc && $insert_dashes) {
+	$isrc =~ s/(\w\w)(\w\w\w)(\w\w)(\w+)/$1-$2-$3-$4/;    #"CC-XXX-YY-NNNNN"
+    }
     return $isrc;
 }
 =pod

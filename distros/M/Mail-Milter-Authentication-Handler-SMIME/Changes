@@ -1,5 +1,11 @@
 Revision history for Mail-Milter-Authentication-Smime
 
+1.1.7   2017-12-31
+        - Updated manifest
+
+1.1.6   2017-12-31
+        - Added dummy zonefile as required for testing
+
 1.1.5   2017-12-16
         - Use central testing module for tests
 

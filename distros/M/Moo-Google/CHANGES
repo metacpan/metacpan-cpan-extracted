@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2016-05-25 00:00:00 +0000 to present.
+Changes from 2017-01-04 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.02 at 2017-05-25 23:19:06 +0000
+version 0.03 at 2018-01-04 15:47:06 +0000
 -----------------------------------------
+
+  Change: 65472780d7be3fcf7705b97b83e95918e27a739b
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-01-04 18:46:37 +0000
+
+    Added contribution guidelines 
+
+  Change: 4994b671e42aa42f926c1697f591bec803169a5e
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-01-04 18:10:27 +0000
+
+    Fixed issue #1 - there was a misprint in tests 
 
   Change: 6ce87e3b7076c140702ded052415ebe1c8064069
   Author: Pavel Serikov <pavel.p.serikov@gmail.com>

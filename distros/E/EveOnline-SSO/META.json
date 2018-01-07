@@ -4,7 +4,7 @@
       "Andrey Kuzmin <chipsoid@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -66,7 +66,7 @@
    "provides" : {
       "EveOnline::SSO" : {
          "file" : "lib/EveOnline/SSO.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "EveOnline::SSO::Client" : {
          "file" : "lib/EveOnline/SSO/Client.pm"
@@ -83,9 +83,9 @@
          "web" : "https://github.com/Chipsoid/EveOnline-SSO"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:CHIPSOID",
    "x_contributors" : [
-      "Andrey Kuzmin <chips@reg.ru>"
+      "Андрей Кузьмин <chips@reg.ru>"
    ]
 }

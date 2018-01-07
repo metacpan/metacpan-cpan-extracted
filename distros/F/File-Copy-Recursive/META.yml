@@ -1,12 +1,33 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         File-Copy-Recursive
-version:      0.38
-version_from: Recursive.pm
-installdirs:  site
+---
+abstract: 'Perl extension for recursively copying files and directories'
+author:
+  - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Copy-Recursive
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    File::Copy:                    0
-    File::Spec:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Cwd: '0'
+  File::Copy: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Path::Iter: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::File: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+version: '0.39'

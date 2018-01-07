@@ -8,7 +8,7 @@ use Pod::Usage 1.69;
 use CPAN;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 my ( $distro, $help, $version_check );
 
 GetOptions(
@@ -39,7 +39,14 @@ CPAN::HandleConfig->load;
 my $prefs_dir = $CPAN::Config->{prefs_dir};
 die "$prefs_dir does not exist or it is not readable\n"
   unless ( -d $prefs_dir );
-DumpFile( File::Spec->catfile( $prefs_dir, $filename ), \%data );
+my $full_path = File::Spec->catfile( $prefs_dir, $filename );
+
+if (-f $full_path) {
+    warn "$full_path already exists, will not overwrite it.";
+    exit(1);
+} else {
+    DumpFile( $full_path, \%data );
+}
 
 __END__
 

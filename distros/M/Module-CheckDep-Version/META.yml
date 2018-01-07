@@ -3,11 +3,12 @@ abstract: "Compare the required version of a distribution's prerequisites agains
 author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
+  Hook::Output::Tiny: '0.05'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  MetaCPAN::Client: '2.0107'
+  MetaCPAN::Client: '2.010700'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/module-checkdep-version/issues
   repository: https://github.com/stevieb9/module-checkdep-version.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

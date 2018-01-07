@@ -1,10 +1,20 @@
+0.173620  2017-12-29 00:58:54+01:00 Europe/Brussels
+    - Additions
+      - Ali: new clone method
+      - Ali: improved documentation
+    - Changes:
+      - Tree: shorten_ids/restore_ids now ignore missing ids in IdMapper
+    - Fixes
+      - Rates: tests should pass on more platforms
+      - Taxonomy: GCA-based taxon ids now retain their true taxonomic rank
+    
 0.173500  2017-12-17 00:35:51+01:00 Europe/Brussels
-	- Additions
-	  binaries: new script split-matrix.pl (to extract genes from a supermatrix)
-	- Changes
-	  Taxonomy: LCA inference algorithm can now follow a majority-rule approach
-	- Fixes
-	  Taxonomy: tests are now disabled by default
+    - Additions
+      - binaries: new script split-matrix.pl (to extract genes from a supermatrix)
+    - Changes
+      - Taxonomy: LCA inference algorithm can now follow a majority-rule approach
+    - Fixes
+      - Taxonomy: tests are now disabled by default
 
 0.173470  2017-12-13 09:14:04+01:00 Europe/Brussels
-	- first release
+    - first release

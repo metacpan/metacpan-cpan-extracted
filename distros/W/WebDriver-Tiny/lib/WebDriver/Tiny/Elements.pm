@@ -1,9 +1,9 @@
-package WebDriver::Tiny::Elements 0.100;
+package WebDriver::Tiny::Elements 0.101;
 
 use 5.020;
-use feature 'postderef';
+use feature qw/postderef signatures/;
 use warnings;
-no  warnings 'experimental::postderef';
+no  warnings 'experimental';
 
 # Manip
 sub append { bless [ shift->@*, map @$_[ 1.. $#$_ ], @_ ] }
@@ -13,40 +13,38 @@ sub size   { $#{ $_[0] } }
 sub slice  { my ( $drv, @ids ) = shift->@*; bless [ $drv, @ids[@_] ] }
 sub split  { my ( $drv, @ids ) = $_[0]->@*; map { bless [ $drv, $_ ] } @ids }
 
-sub uniq {
-    my ( $drv, @ids ) = $_[0]->@*;
+sub uniq($self) {
+    my ( $drv, @ids ) = @$self;
 
     bless [ $drv, keys %{ { map { $_ => undef } @ids } } ];
 }
 
-sub attr { $_[0]->_req( GET => "/attribute/$_[1]" ) }
-sub css  { $_[0]->_req( GET =>       "/css/$_[1]" ) }
-sub prop { $_[0]->_req( GET =>  "/property/$_[1]" ) }
+sub attr($self, $value) { $self->_req( GET => "/attribute/$value" ) }
+sub  css($self, $value) { $self->_req( GET =>       "/css/$value" ) }
+sub prop($self, $value) { $self->_req( GET =>  "/property/$value" ) }
 
-sub clear { $_[0]->_req( POST => '/clear' ); $_[0] }
-sub click { $_[0]->_req( POST => '/click' ); $_[0] }
-sub tap   { $_[0]->_req( POST => '/tap'   ); $_[0] }
+sub clear($self) { $self->_req( POST => '/clear' ); $self }
+sub click($self) { $self->_req( POST => '/click' ); $self }
+sub   tap($self) { $self->_req( POST => '/tap'   ); $self }
 
-sub enabled  { $_[0]->_req( GET => '/enabled'   ) }
-sub rect     { $_[0]->_req( GET => '/rect'      ) }
-sub selected { $_[0]->_req( GET => '/selected'  ) }
-sub tag      { $_[0]->_req( GET => '/name'      ) }
-sub visible  { $_[0]->_req( GET => '/displayed' ) }
+sub  enabled($self) { $self->_req( GET => '/enabled'   ) }
+sub     rect($self) { $self->_req( GET => '/rect'      ) }
+sub selected($self) { $self->_req( GET => '/selected'  ) }
+sub      tag($self) { $self->_req( GET => '/name'      ) }
+sub  visible($self) { $self->_req( GET => '/displayed' ) }
 
 sub html { $_[0][0]->js( 'return arguments[0].outerHTML', $_[0] ) }
 
 *find = \&WebDriver::Tiny::find;
 
-sub screenshot {
-    my ($self, $file) = @_;
-
+sub screenshot($self, $file = undef) {
     require MIME::Base64;
 
     my $data = MIME::Base64::decode_base64(
         $self->_req( GET => '/screenshot' )
     );
 
-    if ( @_ == 2 ) {
+    if ( defined $file ) {
         open my $fh, '>', $file or die $!;
         print $fh $data;
         close $fh or die $!;
@@ -57,16 +55,13 @@ sub screenshot {
     $data;
 }
 
-sub send_keys {
-    my ( $self, $keys ) = @_;
-
+sub send_keys($self, $keys) {
     $self->_req( POST => '/value', { text => "$keys" } );
-
     $self;
 }
 
-sub text {
-    my ( $drv, @ids ) = $_[0]->@*;
+sub text($self) {
+    my ( $drv, @ids ) = @$self;
 
     join ' ', map $drv->_req( GET => "/element/$_/text" ), @ids;
 }

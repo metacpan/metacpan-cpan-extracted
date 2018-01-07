@@ -4,16 +4,31 @@ App::sdif::colors
 
 =head1 SYNOPSIS
 
+  sdif -Mcolors --light
   sdif -Mcolors --green
-  sdif -Mcolors --dark_green
   sdif -Mcolors --cmy
-  sdif -Mcolors --dark_cmy
   sdif -Mcolors --mono
-  sdif -Mcolors --dark_mono
+
+  sdif -Mcolors --dark
+  sdif -Mcolors --dark-green
+  sdif -Mcolors --dark-cmy
+  sdif -Mcolors --dark-mono
+
+=head1 DESCRIPTION
+
+Read `perldoc -m App::sdif::colors` to see the actual definition.
+
+Option B<--light> or B<--dark> is set by B<-Mautocolor> module
+according to the brightness of the terminal screen.  You can override
+them in your F<~/.sdifrc> like:
+
+    option --light --cmy
+    option --dark  --dark-cmy
 
 =head1 SEE ALSO
 
-L<App::sdif::osx_autocolor>
+L<App::sdif::autocolor>,
+L<App::sdif::autocolor::Apple_Terminal>
 
 =cut
 
@@ -23,8 +38,10 @@ package App::sdif::colors;
 
 __DATA__
 
-define :CDIF      APPEND=DELETE=K/545,*CHANGE=K/455
-define :DARK_CDIF APPEND=DELETE=555/311,*CHANGE=555/113
+define {NOP} $<move(0,0)>
+
+option --light {NOP}
+option --dark  --dark-green
 
 option	--green \
 	--cm ?COMMAND=010/555;S		\
@@ -33,18 +50,7 @@ option	--green \
 	--cm    UMARK=			\
 	--cm    ?LINE=220		\
 	--cm    ?TEXT=K/454		\
-	--cm    UTEXT=			\
-	--cdifopts '--cm :CDIF'
-
-option	--dark_green \
-	--cm ?COMMAND=555/121;		\
-	--cm    ?FILE=555/121;D		\
-	--cm    ?MARK=333/L05		\
-	--cm    UMARK=			\
-	--cm    ?LINE=220		\
-	--cm    ?TEXT=555/L03		\
-	--cm    UTEXT=444		\
-	--cdifopts '--cm :DARK_CDIF'
+	--cm    UTEXT=
 
 option	--cmy \
 	--cm OCOMMAND=C/555;S		\
@@ -57,24 +63,9 @@ option	--cmy \
 	--cm    NMARK=M/444		\
 	--cm    MMARK=Y/444		\
 	--cm    UMARK=/444		\
-	--cm    ?LINE=Y			\
+	--cm    ?LINE=220		\
 	--cm    ?TEXT=K/554		\
-	--cm    UTEXT=			\
-	--cdifopts '--cm :CDIF'
-
-option	--dark_cmy \
-	--cm OCOMMAND=555/011		\
-	--cm NCOMMAND=555/202		\
-	--cm MCOMMAND=555/110		\
-	--cm    OFILE=555/011;D		\
-	--cm    NFILE=555/202;D		\
-	--cm    MFILE=555/K;D		\
-	--cm    ?MARK=333/L05		\
-	--cm    UMARK=			\
-	--cm    ?LINE=110		\
-	--cm    ?TEXT=555/L03		\
-	--cm    UTEXT=			\
-	--cdifopts '--cm :DARK_CDIF'
+	--cm    UTEXT=
 
 option	--mono \
 	--cm ?COMMAND=111;S	\
@@ -84,14 +75,45 @@ option	--mono \
 	--cm    ?LINE=222	\
 	--cm    ?TEXT=000/L23	\
 	--cm    UTEXT=111	\
-	--cdifopts '--cm APPEND=DELETE=555/333,*CHANGE=000/444'
+	--cdifopts='--mono'
 
-option	--dark_mono \
-	--cm ?COMMAND=333;S	\
-	--cm    ?FILE=333;DS	\
-	--cm    ?MARK=000/333	\
-	--cm    UMARK=		\
-	--cm    ?LINE=333	\
-	--cm    ?TEXT=555/L03	\
-	--cm    UTEXT=444	\
-	--cdifopts '--cm APPEND=DELETE=555/111,*CHANGE=000/222'
+define {DARK_BG1} L10
+define {DARK_BG2} L04
+
+expand	--dark-screen \
+	--cm    ?MARK=000/{DARK_BG1}	\
+	--cm    UMARK=			\
+	--cm    ?TEXT=555/{DARK_BG2}	\
+	--cm    UTEXT=444
+
+option	--dark-green \
+	--dark-screen 			\
+	--cm ?COMMAND=K/232;		\
+	--cm    ?FILE=K/232;D		\
+	--cm    ?LINE=220		\
+	--cdifopts='--dark-green'
+
+option	--dark-cmy \
+	--dark-screen			\
+	--cm OCOMMAND=K/122		\
+	--cm    OFILE=K/122;D		\
+	--cm NCOMMAND=K/313		\
+	--cm    NFILE=K/313;D		\
+	--cm MCOMMAND=K/332		\
+	--cm    MFILE=K/332;D		\
+	--cm    ?LINE=220		\
+	--cdifopts='--dark-cmy'
+
+option	--dark-mono \
+	--dark-screen			\
+	--cm ?COMMAND=/{DARK_BG1}	\
+	--cm    ?FILE=D/{DARK_BG1}	\
+	--cm    ?LINE=111		\
+	--cdifopts='--dark-mono'
+
+##
+## for backward compatinbility
+##
+option --dark_green --dark-green
+option --dark_cmy   --dark-cmy
+option --dark_mono  --dark-mono

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::RunningInstances;
+$Net::Amazon::EC2::RunningInstances::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

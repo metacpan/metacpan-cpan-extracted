@@ -54,9 +54,6 @@ WriteMakefile(
     clean      => { FILES    => 'RedisDB-Parser-*' },
     META_MERGE => {
         requires => { perl => 5.008004, },
-        no_index => {
-            file => 'README.pod'
-        },
         resources => {
 
             homepage   => 'https://github.com/trinitum/perl-RedisDB-Parser',

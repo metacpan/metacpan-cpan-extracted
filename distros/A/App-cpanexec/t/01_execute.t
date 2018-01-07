@@ -12,7 +12,7 @@ my $cwd = Cwd::cwd();
 sub test_run {
   my ($test_name, $status, $search, @args) = @_;
   my($stdout, $stderr, $exit) = capture {
-    system "$cwd/script/cpane", @args;
+    system $^X, "$cwd/script/cpane", @args;
   };
 
   my $msg = '';

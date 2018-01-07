@@ -1,0 +1,131 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Job::Async
+at lib/Job/Async.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Job::Async - L<IO::Async> abstraction for dispatching tasks to workers and receiving results
+
+=head1 DESCRIPTION
+
+More API details are in the respective base classes:
+
+=over 4
+
+=item * L<Job::Async::Client> - queues jobs for workers to process
+
+=item * L<Job::Async::Worker> - handles the job processing part
+
+=back
+
+Normally, clients and workers would be in separate processes, probably distributed across
+multiple servers.
+
+=head2 worker
+
+Attaches a L<Job::Async::Worker> instance as a child of this manager object,
+and returns the new worker instance.
+
+Takes two parameters:
+
+=over 4
+
+=item * C<$type> - used to select the worker class, e.g. C<memory> or C<redis>
+
+=item * C<$cfg> - the configuration parameters to pass to the new worker, as a hashref
+
+=back
+
+Example:
+
+ my $worker = $jobman->worker(
+  redis => { uri => 'redis://server', mode => 'reliable' }
+ );
+ $worker->start;
+ $worker->jobs->each(sub { $_->done($_->data('x') . $_->data('y')) });
+ $worker->trigger;
+
+=head2 client
+
+Attaches a L<Job::Async::Client> instance as a child of this manager object,
+and returns the new client instance.
+
+Takes two parameters:
+
+=over 4
+
+=item * C<$type> - used to select the worker class, e.g. C<memory> or C<redis>
+
+=item * C<$cfg> - the configuration parameters to pass to the new worker, as a hashref
+
+=back
+
+Example:
+
+ print "Job result was " . $jobman->client(
+  redis => { uri => 'redis://server', mode => 'reliable' }
+ )->submit(
+  x => 123,
+  y => 456
+ )->get;
+
+=head1 SEE ALSO
+
+The main feature missing from the other alternatives is job completion notification - seems that
+"fire and forget" is a popular model.
+
+=over 4
+
+=item * L<Gearman> - venerable contender for background job handling, usually database-backed
+
+=item * L<TheScwhartz> - reliable job queuing, database-backed again
+
+=item * L<Minion> - integrates with L<Mojolicious>, normally seems to be used with a PostgreSQL
+backend. Has some useful routing and admin features. Does have some support for notification -
+see L<Minion::Notifier> for example - but at the time of writing this came with significant
+overhead.
+
+=item * L<Mojo::Redis::Processor> - a curious hybrid of L<Mojo::Redis2> and L<RedisDB>, using
+pub/sub and a race on C<SETNX> calls to handle multiple instances possibly trying to queue
+the same job at once.
+
+=item * L<Redis::JobQueue>
+
+=item * L<Qless>
+
+=item * L<Queue::Q>
+
+=item * L<Vayne>
+
+=item * L<Resque>
+
+=item * L<Disque>
+
+=item * L<Sque>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+

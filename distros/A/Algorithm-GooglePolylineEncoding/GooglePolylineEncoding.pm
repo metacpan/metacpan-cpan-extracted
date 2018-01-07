@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2010,2012,2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2010,2012,2017,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -17,7 +17,7 @@ use 5.006; # sprintf("%b")
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 sub encode_number {
 #   1. Take the initial signed value:
@@ -89,7 +89,15 @@ sub encode_level {
     my $number = shift;
 #   2. Convert the decimal value to a binary value:
 #      10101110
-    my $bin = sprintf '%b', $number;
+    my $bin;
+    if ($number > ~0) {
+	# sprintf '%b' works only for integers
+	require Math::BigInt;
+	$bin = Math::BigInt->new($number)->as_bin;
+	$bin =~ s{^0b}{};
+    } else {
+	$bin = sprintf '%b', $number;
+    }
 #   3. Break the binary value out into 5-bit chunks (starting from the right hand side):
 #      101 01110
     $bin = '0'x(5-length($bin)%5) . $bin if length($bin)%5 != 0; # pad
@@ -238,7 +246,7 @@ Slaven Rezic <srezic@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009,2010,2012,2017 Slaven Rezic. All rights reserved.
+Copyright (c) 2009,2010,2012,2017,2018 Slaven Rezic. All rights reserved.
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

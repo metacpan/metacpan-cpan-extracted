@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.4.0';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.5.0';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -142,7 +142,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 SYNOPSIS
 

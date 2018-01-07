@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.173500';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -1293,7 +1293,7 @@ sub setup_taxdir {
     }
 
     #... second, the accession_id version
-    _make_gca_files($dir);
+    $class->_make_gca_files($dir);
 
     # return true on success (only check main files)
     if ( -r file($dir, 'gca0-names.dmp') && -r file($dir, 'gca0-nodes.dmp') ) {
@@ -1327,8 +1327,13 @@ sub setup_taxdir {
 }
 
 sub _make_gca_files {
-    my $dir = shift;
+    my $class = shift;
+    my $dir   = shift;
 
+    const my $FS       => qq{\t|\t};
+    const my $FS_REGEX => qr{\t \| \t}xms;
+
+    my %rank_for;
     my %parent_taxid_for;
 
     # open nodes.dmp file
@@ -1338,13 +1343,14 @@ sub _make_gca_files {
     # get taxon_id and parent_taxon_id from nodes.dmp file
     while (my $line = <$in>) {
         chomp $line;
-        my ($taxon_id, $parent_taxon_id)
-            = $line =~ m/^ (\d+) \t \| \t (\d+) \t/xmsg;
+        my ($taxon_id, $parent_taxon_id, $rank) = $line
+            =~ m/^ (\d+) $FS_REGEX (\d+) $FS_REGEX ([^\t]+) $FS_REGEX/xmsg;
+        $rank_for{$taxon_id} = $rank;
         $parent_taxid_for{$taxon_id} = $parent_taxon_id;
     }
 
     # create helper Taxonomy object
-    my $tax = Bio::MUST::Core::Taxonomy->new( tax_dir => $dir );
+    my $tax = $class->new( tax_dir => $dir );
 
     # define remote assembly reports filenames
     # Note: the order is significant (last files dominate over first files)
@@ -1362,11 +1368,11 @@ sub _make_gca_files {
     my $base_acc = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS';
 
     for my $target (@targets_acc) {
-        ### $target
+        #### $target
 
         my $url = "$base_acc/$target";
         my $file = join '/', $dir, $target;
-        ### $file
+        #### $file
 
         ### Downloading: $url
         my $ret_code = getstore($url, $file);
@@ -1386,16 +1392,15 @@ sub _make_gca_files {
 
             my ($accession, $taxon_id, $species_taxon_id)
                 = (split /\t/xms, $line)[0,5,6];
-
+            # TODO: check merged taxon_ids in case of undef warnings
             my @taxonomy = $tax->get_taxonomy($taxon_id);
             my $org = $taxonomy[-1];
 
             # use parent taxon_id if no taxon_id for strain
             if ($species_taxon_id == $taxon_id) {
                 $species_taxon_id = $parent_taxid_for{$taxon_id};
-
-                $fix_for{$taxon_id}{node_for} = $species_taxon_id;
                 $fix_for{$taxon_id}{name_for} = $org;
+                $fix_for{$taxon_id}{node_for} = $species_taxon_id;
             }
 
             $name_for{$accession} = $org;
@@ -1409,11 +1414,11 @@ sub _make_gca_files {
     open my $names_out, '>', $names_gca_file;
 
     for my $accession ( keys %name_for ) {
-        say {$names_out} join "\t\|\t",
+        say {$names_out} join $FS,
             $accession, $name_for{$accession}, q{}, 'scientific name';
     }
     for my $taxon_id  ( keys %fix_for  ) {
-        say {$names_out} join "\t\|\t",
+        say {$names_out} join $FS,
             $taxon_id, $fix_for{$taxon_id}{name_for}, q{}, 'scientific name';
     }
 
@@ -1422,12 +1427,12 @@ sub _make_gca_files {
     open my $nodes_out, '>', $nodes_gca_file;
 
     for my $accession ( keys %node_for ) {
-        say {$nodes_out} join "\t\|\t",
+        say {$nodes_out} join $FS,
             $accession, $node_for{$accession}, 'no rank';
     }
     for my $taxon_id  ( keys %fix_for  ) {
-        say {$nodes_out} join "\t\|\t",
-            $taxon_id, $fix_for{$taxon_id}{node_for}, 'no rank';
+        say {$nodes_out} join $FS,
+            $taxon_id, $fix_for{$taxon_id}{node_for}, $rank_for{$taxon_id};
     }
 
     return;
@@ -1531,7 +1536,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

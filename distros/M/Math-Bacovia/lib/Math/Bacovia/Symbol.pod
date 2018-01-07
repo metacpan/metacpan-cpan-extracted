@@ -16,6 +16,11 @@ Math::Bacovia::Symbol - Represents a symbolic value.
     say $y->sqrt->numeric;     #=> 8
     say (($x + $y)->pretty);   #=> (x + y)
 
+    foreach my $n (1..5) {
+        $x->set($n);
+        say "sinh(log($n)) = ", $x->log->sinh->simple->numeric;
+    }
+
 =head1 METHODS
 
 This section describes the methods provided by the B<Math::Bacovia::Symbol> module.
@@ -27,6 +32,18 @@ This section describes the methods provided by the B<Math::Bacovia::Symbol> modu
 
 Constructs and returns a new B<Math::Bacovia::Symbol> object.
 
+=head2 set
+
+    $obj->set($value);
+
+Assigns a (numerical) value to the symbolic self-object.
+
+=head2 get
+
+    my ($name, $value) = $obj->get;
+
+Returns the name and the internal value of the self-object (if any).
+
 =head2 eq
 
     $x == $y
@@ -37,12 +54,6 @@ Return a true value when C<x> and C<y> are symbolically equal.
 =head1 SPECIAL METHODS
 
 This section describes the special methods provided by the B<Math::Bacovia::Symbol> module.
-
-=head2 inside
-
-    my ($value) = $obj->inside;
-
-Returns the internal value of the self-object.
 
 =head2 pretty
 
@@ -127,7 +138,7 @@ L<https://github.com/trizen/Math-Bacovia>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Daniel Șuteu.
+Copyright 2017-2018 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

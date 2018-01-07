@@ -3,7 +3,7 @@
 
    ./tools/make-c-file.pl
 
-   at Thu Mar  2 14:23:54 2017 
+   at Sat Dec 30 13:43:37 2017 
 */
 
 /* We are not going to open any files using any facility of HTML Tidy,
@@ -24,353 +24,370 @@ support. */
 #ifndef __TIDY_PLATFORM_H__
 #define __TIDY_PLATFORM_H__
 
-/** @file tidyplatform.h - Platform specifics
-
-  (c) 1998-2016 (W3C) MIT, ERCIM, Keio University
-  See tidy.h for the copyright notice.
-  
-  This file is included by tidy.h, and need not 
-  be included sepearately. It sets a number of 
-  default defines, and a PLATFORM_NAME, and includes
-  the most common system headers.
-
-*/
+/**************************************************************************//**
+ * @file
+ * Platform specific definitions, specifics, and headers. This file is
+ * included by `tidy.h` already, and need not be included separately. Among
+ * other things, the PLATFORM_NAME is defined and the most common systems
+ * headers are included.
+ *
+ * @note It should be largely unnecessary to modify this file unless adding
+ * support for a completely new architecture. Most options defined in this
+ * file specify defaults that can be overriden by the build system; for
+ * example, passing -D flags to CMake.
+ *
+ * @author  Charles Reitzel [creitzel@rcn.com]
+ * @author  HTACG, et al (consult git log)
+ *
+ * @copyright
+ *     Copyright (c) 1998-2017 World Wide Web Consortium (Massachusetts
+ *     Institute of Technology, European Research Consortium for Informatics
+ *     and Mathematics, Keio University).
+ * @copyright
+ *     See tidy.h for license.
+ *
+ * @date      Created 2001-05-20 by Charles Reitzel
+ * @date      Updated 2002-07-01 by Charles Reitzel
+ * @date      Further modifications: consult git log.
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
-  Uncomment and edit one of the following #defines if you
-  want to specify the config file at compile-time.
-*/
+/*=============================================================================
+ * Unix console application features
+ *   By default on Unix-like systems when building for the console program,
+ *   support runtime configuration files in /etc/ and in ~/. To prevent this,
+ *   set ENABLE_CONFIG_FILES to NO. Specify -DTIDY_CONFIG_FILE and/or
+ *   -DTIDY_USER_CONFIG_FILE to override the default paths in tidyplatform.h.
+ * @note: this section refactored to support #584.
+ *===========================================================================*/
 
-/* #define TIDY_CONFIG_FILE "/etc/tidy_config.txt" */ /* original */
-/* #define TIDY_CONFIG_FILE "/etc/tidyrc" */
-/* #define TIDY_CONFIG_FILE "/etc/tidy.conf" */
+/* #define ENABLE_CONFIG_FILES */
 
-/*
-  Uncomment the following #define if you are on a system
-  supporting the HOME environment variable.
-  It enables tidy to find config files named ~/.tidyrc if 
-  the HTML_TIDY environment variable is not set.
-*/
-/* #define TIDY_USER_CONFIG_FILE "~/.tidyrc" */
+#if defined(TIDY_ENABLE_CONFIG_FILES)
+#  if !defined(TIDY_CONFIG_FILE)
+#    define TIDY_CONFIG_FILE "/etc/tidy.conf"
+#  endif
+#  if !defined(TIDY_USER_CONFIG_FILE)
+#    define TIDY_USER_CONFIG_FILE "~/.tidyrc"
+#  endif
+#else
+#  if defined(TIDY_CONFIG_FILE)
+#    undef TIDY_CONFIG_FILE
+#  endif
+#  if defined(TIDY_USER_CONFIG_FILE)
+#    undef TIDY_USER_CONFIG_FILE
+#  endif
+#endif
 
-/*
-  Uncomment the following #define if your
-  system supports the call getpwnam(). 
-  E.g. Unix and Linux.
 
-  It enables tidy to find files named 
-  ~your/foo for use in the HTML_TIDY environment
-  variable or CONFIG_FILE or USER_CONFIGFILE or
-  on the command line: -config ~joebob/tidy.cfg
-
-  Contributed by Todd Lewis.
-*/
+/*=============================================================================
+ * Unix tilde expansion support
+ *   By default on Unix-like systems when building for the console program,
+ *   this flag is set so that Tidy knows getpwname() is available. It allows
+ *   tidy to find files named ~your/foo for use in the HTML_TIDY environment
+ *   variable or TIDY_CONFIG_FILE or TIDY_USER_CONFIG_FILE or on the command
+ *   command line: -config ~joebob/tidy.cfg
+ * Contributed by Todd Lewis.
+ *===========================================================================*/
 
 /* #define SUPPORT_GETPWNAM */
 
 
-/* Enable/disable support for Big5 and Shift_JIS character encodings */
-#ifndef SUPPORT_ASIAN_ENCODINGS
-#define SUPPORT_ASIAN_ENCODINGS 1
-#endif
-
-/* Enable/disable support for UTF-16 character encodings */
-#ifndef SUPPORT_UTF16_ENCODINGS
-#define SUPPORT_UTF16_ENCODINGS 1
-#endif
-
-/* Enable/disable support for additional accessibility checks */
-#ifndef SUPPORT_ACCESSIBILITY_CHECKS
-#define SUPPORT_ACCESSIBILITY_CHECKS 1
-#endif
+/*=============================================================================
+ * Optional Tidy features support
+ *===========================================================================*/
 
 /* Enable/disable support for additional languages */
 #ifndef SUPPORT_LOCALIZATIONS
-#define SUPPORT_LOCALIZATIONS 1
+#  define SUPPORT_LOCALIZATIONS 1
+#endif
+    
+/* Enable/disable support for console */
+#ifndef SUPPORT_CONSOLE_APP
+#  define SUPPORT_CONSOLE_APP 1
 #endif
 
 
-/* Convenience defines for Mac platforms */
+/*=============================================================================
+ * Platform specific convenience definitions
+ *===========================================================================*/
+
+/* === Convenience defines for Mac platforms === */
 
 #if defined(macintosh)
 /* Mac OS 6.x/7.x/8.x/9.x, with or without CarbonLib - MPW or Metrowerks 68K/PPC compilers */
-#define MAC_OS_CLASSIC
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Mac OS"
-#endif
+#  define MAC_OS_CLASSIC
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Mac OS"
+#  endif
 
 /* needed for access() */
-#if !defined(_POSIX) && !defined(NO_ACCESS_SUPPORT)
-#define NO_ACCESS_SUPPORT
-#endif
+#  if !defined(_POSIX) && !defined(NO_ACCESS_SUPPORT)
+#    define NO_ACCESS_SUPPORT
+#  endif
 
-#ifdef SUPPORT_GETPWNAM
-#undef SUPPORT_GETPWNAM
-#endif
+#  ifdef SUPPORT_GETPWNAM
+#    undef SUPPORT_GETPWNAM
+#  endif
 
 #elif defined(__APPLE__) && defined(__MACH__)
-/* Mac OS X (client) 10.x (or server 1.x/10.x) - gcc or Metrowerks MachO compilers */
-#define MAC_OS_X
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Mac OS X"
-#endif
+    /* Mac OS X (client) 10.x (or server 1.x/10.x) - gcc or Metrowerks MachO compilers */
+#  define MAC_OS_X
+#  ifndef PLATFORM_NAME
+#    include "TargetConditionals.h"
+#    if TARGET_OS_IOS
+#      define PLATFORM_NAME "Apple iOS"
+#    elif TARGET_OS_MAC
+#      define PLATFORM_NAME "Apple macOS"
+#    elif TARGET_OS_TV
+#      define PLATFORM_NAME "Apple tvOS"
+#    elif TARGET_OS_WATCH
+#      define PLATFORM_NAME "Apple watchOS"
+#    else
+#      define PLATFORM_NAME "Apple Unknown OS"
+#    endif
+#  endif
 #endif
 
 #if defined(MAC_OS_CLASSIC) || defined(MAC_OS_X)
 /* Any OS on Mac platform */
-#define MAC_OS
-#define FILENAMES_CASE_SENSITIVE 0
-#define strcasecmp strcmp
+#  define MAC_OS
+#  define FILENAMES_CASE_SENSITIVE 0
+#  define strcasecmp strcmp
 #endif
 
-/* Convenience defines for BSD like platforms */
- 
+/* === Convenience defines for BSD-like platforms === */
+
 #if defined(__FreeBSD__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "FreeBSD"
-#endif
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "FreeBSD"
+#  endif
 
 #elif defined(__NetBSD__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "NetBSD"
-#endif
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "NetBSD"
+#  endif
 
 #elif defined(__OpenBSD__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "OpenBSD"
-#endif
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "OpenBSD"
+#  endif
 
 #elif defined(__DragonFly__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "DragonFly"
-#endif
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "DragonFly"
+#  endif
 
 #elif defined(__MINT__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "FreeMiNT"
-#endif
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "FreeMiNT"
+#  endif
 
 #elif defined(__bsdi__)
-#define BSD_BASED_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "BSD/OS"
+#  define BSD_BASED_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "BSD/OS"
+#  endif
 #endif
 
-#endif
+/* === Convenience defines for Windows platforms === */
 
-/* Convenience defines for Windows platforms */
- 
 #if defined(WINDOWS) || defined(_WIN32)
 
-#define WINDOWS_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Windows"
-#endif
+#  define WINDOWS_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Windows"
+#  endif
 
-#if defined(__MWERKS__) || defined(__MSL__)
-/* not available with Metrowerks Standard Library */
+#  if defined(__MWERKS__) || defined(__MSL__)
+     /* not available with Metrowerks Standard Library */
+#    ifdef SUPPORT_GETPWNAM
+#      undef SUPPORT_GETPWNAM
+#    endif
+     /* needed for setmode() */
+#    if !defined(NO_SETMODE_SUPPORT)
+#      define NO_SETMODE_SUPPORT
+#    endif
+#    define strcasecmp _stricmp
+#  endif
 
-#ifdef SUPPORT_GETPWNAM
-#undef SUPPORT_GETPWNAM
-#endif
+#  if defined(__BORLANDC__)
+#    define strcasecmp stricmp
+#  endif
 
-/* needed for setmode() */
-#if !defined(NO_SETMODE_SUPPORT)
-#define NO_SETMODE_SUPPORT
-#endif
+#  define FILENAMES_CASE_SENSITIVE 0
+#  define SUPPORT_POSIX_MAPPED_FILES 0
 
-#define strcasecmp _stricmp
+#endif /* WINDOWS */
 
-#endif
+/* === Convenience defines for Linux platforms === */
 
-#if defined(__BORLANDC__)
-#define strcasecmp stricmp
-#endif
-
-#define FILENAMES_CASE_SENSITIVE 0
-#define SUPPORT_POSIX_MAPPED_FILES 0
-
-#endif
-
-/* Convenience defines for Linux platforms */
- 
 #if defined(linux) && defined(__alpha__)
-/* Linux on Alpha - gcc compiler */
-#define LINUX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Linux/Alpha"
-#endif
+   /* Linux on Alpha - gcc compiler */
+#  define LINUX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Linux/Alpha"
+#  endif
 
 #elif defined(linux) && defined(__sparc__)
-/* Linux on Sparc - gcc compiler */
-#define LINUX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Linux/Sparc"
-#endif
+    /* Linux on Sparc - gcc compiler */
+#  define LINUX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Linux/Sparc"
+#  endif
 
 #elif defined(linux) && (defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__))
-/* Linux on x86 - gcc compiler */
-#define LINUX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Linux/x86"
-#endif
+    /* Linux on x86 - gcc compiler */
+#  define LINUX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Linux/x86"
+#  endif
 
 #elif defined(linux) && defined(__powerpc__)
-/* Linux on PPC - gcc compiler */
-#define LINUX_OS
-
-#if defined(__linux__) && defined(__powerpc__)
-
-/* #if #system(linux) */
-/* MkLinux on PPC  - gcc (egcs) compiler */
-/* #define MAC_OS_MKLINUX */
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "MkLinux"
-#endif
-
-#else
-
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Linux/PPC"
-#endif
-
-#endif
+    /* Linux on PPC - gcc compiler */
+#  define LINUX_OS
+#  if defined(__linux__) && defined(__powerpc__)
+#    ifndef PLATFORM_NAME
+       /* MkLinux on PPC  - gcc (egcs) compiler */
+#      define PLATFORM_NAME "MkLinux"
+#    endif
+#  else
+#    ifndef PLATFORM_NAME
+#      define PLATFORM_NAME "Linux/PPC"
+#    endif
+#  endif
 
 #elif defined(linux) || defined(__linux__)
-/* generic Linux */
-#define LINUX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Linux"
+    /* generic Linux */
+#  define LINUX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Linux"
+#  endif
 #endif
 
-#endif
-
-/* Convenience defines for Solaris platforms */
+/* === Convenience defines for Solaris platforms === */
  
 #if defined(sun)
-#define SOLARIS_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Solaris"
-#endif
+#  define SOLARIS_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Solaris"
+#  endif
 #endif
 
-/* Convenience defines for HPUX + gcc platforms */
+/* === Convenience defines for HPUX + gcc platforms === */
 
 #if defined(__hpux)
-#define HPUX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "HPUX"
-#endif
+#  define HPUX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "HPUX"
+#  endif
 #endif
 
-/* Convenience defines for RISCOS + gcc platforms */
+/* === Convenience defines for RISCOS + gcc platforms === */
 
 #if defined(__riscos__)
-#define RISC_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "RISC OS"
-#endif
+#  define RISC_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "RISC OS"
+#  endif
 #endif
 
-/* Convenience defines for OS/2 + icc/gcc platforms */
+/* === Convenience defines for OS/2 + icc/gcc platforms === */
 
 #if defined(__OS2__) || defined(__EMX__)
-#define OS2_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "OS/2"
-#endif
-#define FILENAMES_CASE_SENSITIVE 0
-#define strcasecmp stricmp
+#  define OS2_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "OS/2"
+#  endif
+#  define FILENAMES_CASE_SENSITIVE 0
+#  define strcasecmp stricmp
 #endif
 
-/* Convenience defines for IRIX */
+/* === Convenience defines for IRIX === */
 
 #if defined(__sgi)
-#define IRIX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "SGI IRIX"
-#endif
+#  define IRIX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "SGI IRIX"
+#  endif
 #endif
 
-/* Convenience defines for AIX */
+/* === Convenience defines for AIX === */
 
 #if defined(_AIX)
-#define AIX_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "IBM AIX"
-#endif
+#  define AIX_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "IBM AIX"
+#  endif
 #endif
 
-
-/* Convenience defines for BeOS platforms */
+/* === Convenience defines for BeOS platforms === */
 
 #if defined(__BEOS__)
-#define BE_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "BeOS"
-#endif
+#  define BE_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "BeOS"
+#  endif
 #endif
 
-/* Convenience defines for Cygwin platforms */
+/* === Convenience defines for Cygwin platforms === */
 
 #if defined(__CYGWIN__)
-#define CYGWIN_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Cygwin"
-#endif
-#define FILENAMES_CASE_SENSITIVE 0
+#  define CYGWIN_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "Cygwin"
+#  endif
+#  define FILENAMES_CASE_SENSITIVE 0
 #endif
 
-/* Convenience defines for OpenVMS */
+/* === Convenience defines for OpenVMS === */
 
 #if defined(__VMS)
-#define OPENVMS_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "OpenVMS"
-#endif
-#define FILENAMES_CASE_SENSITIVE 0
+#  define OPENVMS_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "OpenVMS"
+#  endif
+#  define FILENAMES_CASE_SENSITIVE 0
 #endif
 
-/* Convenience defines for DEC Alpha OSF + gcc platforms */
+/* === Convenience defines for DEC Alpha OSF + gcc platforms === */
 
 #if defined(__osf__)
-#define OSF_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "DEC Alpha OSF"
-#endif
+#  define OSF_OS
+#  ifndef PLATFORM_NAME
+#    define PLATFORM_NAME "DEC Alpha OSF"
+#  endif
 #endif
 
-/* Convenience defines for ARM platforms */
+/* === Convenience defines for ARM platforms === */
 
 #if defined(__arm)
-#define ARM_OS
-
-#if defined(forARM) && defined(__NEWTON_H)
-
-/* Using Newton C++ Tools ARMCpp compiler */
-#define NEWTON_OS
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "Newton"
+#  define ARM_OS
+#  if defined(forARM) && defined(__NEWTON_H)
+     /* Using Newton C++ Tools ARMCpp compiler */
+#    define NEWTON_OS
+#    ifndef PLATFORM_NAME
+#      define PLATFORM_NAME "Newton"
+#    endif
+#  else
+#    ifndef PLATFORM_NAME
+#      define PLATFORM_NAME "ARM"
+#    endif
+#  endif
 #endif
 
-#else
 
-#ifndef PLATFORM_NAME
-#define PLATFORM_NAME "ARM"
-#endif
-
-#endif
-
-#endif
+/*=============================================================================
+ * Standard Library Includes
+ *===========================================================================*/
 
 #include <ctype.h>
 #include <stdio.h>
@@ -381,205 +398,230 @@ extern "C" {
 #include <assert.h>
 
 #ifdef NEEDS_MALLOC_H
-#include <malloc.h>
+#  include <malloc.h>
 #endif
 
 #ifdef SUPPORT_GETPWNAM
-#include <pwd.h>
+#  include <pwd.h>
 #endif
 
 #ifdef NEEDS_UNISTD_H
-#include <unistd.h>  /* needed for unlink on some Unix systems */
+#  include <unistd.h>  /* needed for unlink on some Unix systems */
 #endif
 
-/* By default, use case-sensitive filename comparison.
-*/
+
+/*=============================================================================
+ * Case sensitive file systems
+ *===========================================================================*/
+
+/* By default, use case-sensitive filename comparison. */
 #ifndef FILENAMES_CASE_SENSITIVE
-#define FILENAMES_CASE_SENSITIVE 1
+#  define FILENAMES_CASE_SENSITIVE 1
 #endif
 
 
-/*
-  Tidy preserves the last modified time for the files it
-  cleans up.
-*/
-
-/*
-  If your platform doesn't support <utime.h> and the
-  utime() function, or <sys/futime> and the futime()
-  function then set PRESERVE_FILE_TIMES to 0.
-  
-  If your platform doesn't support <sys/utime.h> and the
-  futime() function, then set HAS_FUTIME to 0.
-  
-  If your platform supports <utime.h> and the
-  utime() function requires the file to be
-  closed first, then set UTIME_NEEDS_CLOSED_FILE to 1.
-*/
+/*=============================================================================
+ * Last modified time preservation
+ *   Tidy preserves the last modified time for the files it cleans up.
+ *
+ *   If your platform doesn't support <utime.h> and the utime() function, or
+ *   <sys/futime> and the futime() function then set PRESERVE_FILE_TIMES to 0.
+ *
+ *   If your platform doesn't support <sys/utime.h> and the futime() function,
+ *   then set HAS_FUTIME to 0.
+ *
+ *   If your platform supports <utime.h> and the utime() function requires the
+ *   file to be closed first, then set UTIME_NEEDS_CLOSED_FILE to 1.
+ *===========================================================================*/
 
 /* Keep old PRESERVEFILETIMES define for compatibility */
 #ifdef PRESERVEFILETIMES
-#undef PRESERVE_FILE_TIMES
-#define PRESERVE_FILE_TIMES PRESERVEFILETIMES
+#  undef PRESERVE_FILE_TIMES
+#  define PRESERVE_FILE_TIMES PRESERVEFILETIMES
 #endif
 
 #ifndef PRESERVE_FILE_TIMES
-#if defined(RISC_OS) || defined(OPENVMS_OS) || defined(OSF_OS)
-#define PRESERVE_FILE_TIMES 0
-#else
-#define PRESERVE_FILE_TIMES 1
-#endif
+#  if defined(RISC_OS) || defined(OPENVMS_OS) || defined(OSF_OS)
+#    define PRESERVE_FILE_TIMES 0
+#  else
+#    define PRESERVE_FILE_TIMES 1
+#  endif
 #endif
 
 #if PRESERVE_FILE_TIMES
 
-#ifndef HAS_FUTIME
-#if defined(CYGWIN_OS) || defined(BE_OS) || defined(OS2_OS) || defined(HPUX_OS) || defined(SOLARIS_OS) || defined(LINUX_OS) || defined(BSD_BASED_OS) || defined(MAC_OS) || defined(__MSL__) || defined(IRIX_OS) || defined(AIX_OS) || defined(__BORLANDC__) || defined(__GLIBC__)
-#define HAS_FUTIME 0
-#else
-#define HAS_FUTIME 1
-#endif
-#endif
+#  ifndef HAS_FUTIME
+#    if defined(CYGWIN_OS) || defined(BE_OS) || defined(OS2_OS) || defined(HPUX_OS) || defined(SOLARIS_OS) || defined(LINUX_OS) || defined(BSD_BASED_OS) || defined(MAC_OS) || defined(__MSL__) || defined(IRIX_OS) || defined(AIX_OS) || defined(__BORLANDC__) || defined(__GLIBC__)
+#      define HAS_FUTIME 0
+#    else
+#      define HAS_FUTIME 1
+#    endif
+#  endif
 
-#ifndef UTIME_NEEDS_CLOSED_FILE
-#if defined(SOLARIS_OS) || defined(BSD_BASED_OS) || defined(MAC_OS) || defined(__MSL__) || defined(LINUX_OS)
-#define UTIME_NEEDS_CLOSED_FILE 1
-#else
-#define UTIME_NEEDS_CLOSED_FILE 0
-#endif
-#endif
+#  ifndef UTIME_NEEDS_CLOSED_FILE
+#    if defined(SOLARIS_OS) || defined(BSD_BASED_OS) || defined(MAC_OS) || defined(__MSL__) || defined(LINUX_OS)
+#      define UTIME_NEEDS_CLOSED_FILE 1
+#    else
+#      define UTIME_NEEDS_CLOSED_FILE 0
+#    endif
+#  endif
 
-#if defined(MAC_OS_X) || (!defined(MAC_OS_CLASSIC) && !defined(__MSL__))
-#include <sys/types.h> 
-#include <sys/stat.h>
-#else
-#include <stat.h>
-#endif
+#  if defined(MAC_OS_X) || (!defined(MAC_OS_CLASSIC) && !defined(__MSL__))
+#    include <sys/types.h>
+#    include <sys/stat.h>
+#  else
+#    include <stat.h>
+#  endif
 
-#if HAS_FUTIME
-#include <sys/utime.h>
-#else
-#include <utime.h>
-#endif /* HASFUTIME */
+#  if HAS_FUTIME
+#    include <sys/utime.h>
+#  else
+#    include <utime.h>
+#  endif
 
-/*
-  MS Windows needs _ prefix for Unix file functions.
-  Not required by Metrowerks Standard Library (MSL).
+/* MS Windows needs _ prefix for Unix file functions.
+   Not required by Metrowerks Standard Library (MSL).
   
-  Tidy uses following for preserving the last modified time.
+   Tidy uses following for preserving the last modified time.
 
-  WINDOWS automatically set by Win16 compilers.
-  _WIN32 automatically set by Win32 compilers.
+   WINDOWS automatically set by Win16 compilers.
+   _WIN32 automatically set by Win32 compilers.
 */
+#  if defined(_WIN32) && !defined(__MSL__) && !defined(__BORLANDC__)
+#    define futime _futime
+#    define fstat _fstat
+#    define utimbuf _utimbuf /* Windows seems to want utimbuf */
+#    define stat _stat
+#    define utime _utime
+#    define vsnprintf _vsnprintf
+#  endif
+
+#endif
+
+
+/*=============================================================================
+ * Windows file functions
+ * Windows needs _ prefix for Unix file functions.
+ * Not required by Metrowerks Standard Library (MSL).
+ *
+ * WINDOWS automatically set by Win16 compilers.
+ * _WIN32 automatically set by Win32 compilers.
+ *===========================================================================*/
+
 #if defined(_WIN32) && !defined(__MSL__) && !defined(__BORLANDC__)
 
-#define futime _futime
-#define fstat _fstat
-#define utimbuf _utimbuf /* Windows seems to want utimbuf */
-#define stat _stat
-#define utime _utime
-#define vsnprintf _vsnprintf
-#endif /* _WIN32 */
-
-#endif /* PRESERVE_FILE_TIMES */
-
-/*
-  MS Windows needs _ prefix for Unix file functions.
-  Not required by Metrowerks Standard Library (MSL).
-  
-  WINDOWS automatically set by Win16 compilers.
-  _WIN32 automatically set by Win32 compilers.
-*/
-#if defined(_WIN32) && !defined(__MSL__) && !defined(__BORLANDC__)
-
-#if !(defined(__WATCOMC__) || defined(__MINGW32__))
+#  if !(defined(__WATCOMC__) || defined(__MINGW32__))
 /* This wrapper was added by ./tools/make-c-file.pl. */
 #ifndef PERL_REVISION
-#define fileno _fileno
+#    define fileno _fileno
 #endif /* def PERL_REVISION */
 
 /* This wrapper was added by ./tools/make-c-file.pl. */
 #ifndef PERL_REVISION
-#define setmode _setmode
+#    define setmode _setmode
 #endif /* def PERL_REVISION */
 
+#  endif
+
+# if defined(_MSC_VER)
+/* This wrapper was added by ./tools/make-c-file.pl. */
+#ifndef PERL_REVISION
+#    define fileno _fileno
+#endif /* def PERL_REVISION */
+
+#if !defined(NDEBUG) && !defined(ENABLE_DEBUG_LOG) && !defined(DISABLE_DEBUG_LOG)
+#define ENABLE_DEBUG_LOG
+#endif
 #endif
 
 /* This wrapper was added by ./tools/make-c-file.pl. */
 #ifndef PERL_REVISION
-#define access _access
+#  define access _access
 #endif /* def PERL_REVISION */
 
-#define strcasecmp _stricmp
+#  define strcasecmp _stricmp
 
-#ifndef va_copy
-#define va_copy(dest, src) (dest = src)
-#endif
+#  ifndef va_copy
+#    define va_copy(dest, src) (dest = src)
+#  endif
 
-#if _MSC_VER > 1000
-#pragma warning( disable : 4189 ) /* local variable is initialized but not referenced */
-#pragma warning( disable : 4100 ) /* unreferenced formal parameter */
-#pragma warning( disable : 4706 ) /* assignment within conditional expression */
-#endif
+#  if _MSC_VER > 1000
+#    pragma warning( disable : 4189 ) /* local variable is initialized but not referenced */
+#    pragma warning( disable : 4100 ) /* unreferenced formal parameter */
+#    pragma warning( disable : 4706 ) /* assignment within conditional expression */
+#  endif
 
-#if _MSC_VER > 1300
-#pragma warning( disable : 4996 ) /* disable depreciation warning */
-#endif
+#  if _MSC_VER > 1300
+#    pragma warning( disable : 4996 ) /* disable depreciation warning */
+#  endif
 
 #endif /* _WIN32 */
 
 #if defined(_WIN32)
 
-#if (defined(_USRDLL) || defined(_WINDLL) || defined(BUILD_SHARED_LIB)) && !defined(TIDY_EXPORT) && !defined(TIDY_STATIC)
-#ifdef BUILDING_SHARED_LIB
-#define TIDY_EXPORT __declspec( dllexport ) 
-#else
-#define TIDY_EXPORT __declspec( dllimport ) 
-#endif
-#else
-#define TIDY_EXPORT extern
-#endif
+#  if (defined(_USRDLL) || defined(_WINDLL) || defined(BUILD_SHARED_LIB)) && !defined(TIDY_EXPORT) && !defined(TIDY_STATIC)
+#    ifdef BUILDING_SHARED_LIB
+#      define TIDY_EXPORT __declspec( dllexport )
+#    else
+#      define TIDY_EXPORT __declspec( dllimport )
+#    endif
+#  else
+#    define TIDY_EXPORT extern
+#  endif
 
-#ifndef TIDY_CALL
-#ifdef _WIN64
-#  define TIDY_CALL __fastcall
-#else
-#  define TIDY_CALL __stdcall
-#endif
-#endif
+#  ifndef TIDY_CALL
+#    ifdef _WIN64
+#      define TIDY_CALL __fastcall
+#    else
+#      define TIDY_CALL __stdcall
+#    endif
+#  endif
 
 #endif /* _WIN32 */
 
-/* hack for gnu sys/types.h file which defines unsigned int and unsigned int */
+
+/*=============================================================================
+ * Hack for gnu sys/types.h file which defines unsigned int and unsigned int
+ *===========================================================================*/
 
 #if defined(BE_OS) || defined(SOLARIS_OS) || defined(BSD_BASED_OS) || defined(OSF_OS) || defined(IRIX_OS) || defined(AIX_OS)
-#include <sys/types.h>
-#endif
-#if !defined(HPUX_OS) && !defined(CYGWIN_OS) && !defined(MAC_OS_X) && !defined(BE_OS) && !defined(SOLARIS_OS) && !defined(BSD_BASED_OS) && !defined(OSF_OS) && !defined(IRIX_OS) && !defined(AIX_OS) && !defined(LINUX_OS)
-/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: # undef unsigned int */
-/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: typedef unsigned int unsigned int; */
-#endif
-#if defined(HPUX_OS) || defined(CYGWIN_OS) || defined(MAC_OS) || defined(BSD_BASED_OS) || defined(_WIN32)
-/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: # undef unsigned int */
-/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: typedef unsigned long unsigned int; */
+#  include <sys/types.h>
 #endif
 
-/*
-With GCC 4,  __attribute__ ((visibility("default"))) can be used along compiling with tidylib 
-with "-fvisibility=hidden". See http://gcc.gnu.org/wiki/Visibility and build/gmake/Makefile.
-*/
+#if !defined(HPUX_OS) && !defined(CYGWIN_OS) && !defined(MAC_OS_X) && !defined(BE_OS) && !defined(SOLARIS_OS) && !defined(BSD_BASED_OS) && !defined(OSF_OS) && !defined(IRIX_OS) && !defined(AIX_OS) && !defined(LINUX_OS)
+/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: #  undef unsigned int */
+   /* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: typedef unsigned int unsigned int; */
+#endif
+
+#if defined(HPUX_OS) || defined(CYGWIN_OS) || defined(MAC_OS) || defined(BSD_BASED_OS) || defined(_WIN32)
+/* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: #  undef unsigned int */
+   /* COMMENTED OUT TYPEDEF by ./tools/make-c-file.pl: typedef unsigned long unsigned int; */
+#endif
+
+
+/*=============================================================================
+ * Visibility support
+ *   With GCC 4,  __attribute__ ((visibility("default"))) can be used
+ *   along compiling with tidylib with "-fvisibility=hidden". See
+ *   http://gcc.gnu.org/wiki/Visibility and build/gmake/Makefile.
+ *===========================================================================*/
 /*
 #if defined(__GNUC__) && __GNUC__ >= 4
-#define TIDY_EXPORT __attribute__ ((visibility("default")))
+#  define TIDY_EXPORT __attribute__ ((visibility("default")))
 #endif
 */
 
+
+/*=============================================================================
+ * Other definitions
+ *===========================================================================*/
+
 #ifndef TIDY_EXPORT /* Define it away for most builds */
-#define TIDY_EXPORT 
+#  define TIDY_EXPORT
 #endif
 
 #ifndef TIDY_STRUCT
-#define TIDY_STRUCT
+#  define TIDY_STRUCT
 #endif
 
 typedef unsigned char byte;
@@ -587,39 +629,39 @@ typedef unsigned char byte;
 typedef unsigned int tchar;         /* single, full character */
 typedef char tmbchar;       /* single, possibly partial character */
 #ifndef TMBSTR_DEFINED
-typedef tmbchar* tmbstr;    /* pointer to buffer of possibly partial chars */
-typedef const tmbchar* ctmbstr; /* Ditto, but const */
-#define NULLSTR (tmbstr)""
-#define TMBSTR_DEFINED
+   typedef tmbchar* tmbstr;    /* pointer to buffer of possibly partial chars */
+   typedef const tmbchar* ctmbstr; /* Ditto, but const */
+#  define NULLSTR (tmbstr)""
+#  define TMBSTR_DEFINED
 #endif
 
 #ifndef TIDY_CALL
-#define TIDY_CALL
+#  define TIDY_CALL
 #endif
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
-# define ARG_UNUSED(x) x __attribute__((unused))
+#  define ARG_UNUSED(x) x __attribute__((unused))
+#  define FUNC_UNUSED __attribute__((unused))
 #else
-# define ARG_UNUSED(x) x
+#  define ARG_UNUSED(x) x
+#  define FUNC_UNUSED
 #endif
 
 /* HAS_VSNPRINTF triggers the use of "vsnprintf", which is safe related to
    buffer overflow. Therefore, we make it the default unless HAS_VSNPRINTF
    has been defined. */
 #ifndef HAS_VSNPRINTF
-# define HAS_VSNPRINTF 1
+#  define HAS_VSNPRINTF 1
 #endif
 
 #ifndef SUPPORT_POSIX_MAPPED_FILES
-# define SUPPORT_POSIX_MAPPED_FILES 1
+#  define SUPPORT_POSIX_MAPPED_FILES 1
 #endif
 
-/*
-  bool is a reserved word in some but
-  not all C++ compilers depending on age
-  work around is to avoid bool altogether
-  by introducing a new enum called Bool
+/* `bool` is a reserved word in some but not all C++ compilers depending on age.
+   age. Work around is to avoid bool by introducing a new enum called `Bool`.
 */
+    
 /* We could use the C99 definition where supported
 typedef _Bool Bool;
 #define no (_Bool)0
@@ -637,7 +679,7 @@ extern void* null;
 */
 
 #if defined(DMALLOC)
-/* #include "dmalloc.h" */
+#  include "dmalloc.h"
 #endif
 
 /* Opaque data structure.
@@ -664,7 +706,6 @@ opaque_type( TidyIterator );
 
 #endif /* __TIDY_PLATFORM_H__ */
 
-
 /*
  * DISABLEDLOCALVARIABLES
  * mode: c
@@ -676,292 +717,820 @@ opaque_type( TidyIterator );
 #ifndef __TIDYENUM_H__
 #define __TIDYENUM_H__
 
-/** @file tidyenum.h - Separated public enumerations header
-
-  Simplifies enum re-use in various wrappers.  e.g. SWIG
-  generated wrappers and COM IDL files.
-
-  (c) 1998-2016 (W3C) MIT, ERCIM, Keio University
-  See tidy.h for the full copyright notice.
-
-  Created 2001-05-20 by Charles Reitzel
-  Updated 2002-07-01 by Charles Reitzel - 1st Implementation
-
-*/
+/**************************************************************************//**
+ * @file
+ * Separated public enumerations header providing important indentifiers for
+ * LibTidy and internal users, as well as code-generator macros used to
+ * generate many of them.
+ *
+ * The use of enums simplifies enum re-use in various wrappers, e.g. SWIG,
+ * generated wrappers, and COM IDL files.
+ *
+ * This file also contains macros to generate additional enums for use in
+ * Tidy's language localizations and/or to access Tidy's strings via the API.
+ * See detailed information elsewhere in this file's documentation.
+ *
+ * @note LibTidy does *not* guarantee the value of any enumeration member,
+ * including the starting integer value, except where noted. Always use enum
+ * members rather than their values!
+ *
+ * Enums that have starting values have starting values for a good reason,
+ * mainly to prevent string key overlap.
+ *
+ * @author  Dave Raggett [dsr@w3.org]
+ * @author  HTACG, et al (consult git log)
+ *
+ * @copyright
+ *     Copyright (c) 1998-2017 World Wide Web Consortium (Massachusetts
+ *     Institute of Technology, European Research Consortium for Informatics
+ *     and Mathematics, Keio University).
+ * @copyright
+ *     See tidy.h for license.
+ *
+ * @date      Created 2001-05-20 by Charles Reitzel
+ * @date      Updated 2002-07-01 by Charles Reitzel
+ * @date      Further modifications: consult git log.
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Enumerate configuration options
-*/
+/***************************************************************************//**
+ ** @defgroup public_enum_gen Tidy Strings Generation Macros
+ ** @ingroup internal_api
+ **
+ ** Tidy aims to provide a consistent API for library users, and so we go to
+ ** some lengths to provide a `tidyStrings` enum that consists of the message
+ ** code for every string that Tidy can emit (used internally), and the array
+ ** `tidyStringsKeys[]` containing string representations of each message code.
+ **
+ ** In order to keep code maintainable and make it simple to add new messages,
+ ** the message code enums and `tidyStringsKeys[]` are generated dynamically
+ ** with preprocessor macros defined below.
+ **
+ ** Any visible FOREACH_MSG_* macro (including new ones) must be applied to the
+ ** `tidyStrings` enum with the `MAKE_ENUM()` macro in this file, and to the
+ ** `tidyStringsKeys[]` (in `messages.c`) with `MAKE_STRUCT` in this file.
+ **
+ ** Modern IDE's will dynamically pre-process all of these macros, enabling
+ ** code-completion of these enums and array of structs.
+ **
+ ** @{
+ ******************************************************************************/
 
-/** Categories of Tidy configuration options
-*/
+/* MARK: - Code Generation Macros */
+/** @name Code Generation Macros
+ ** These macros generate the enums and arrays from the Content Generation
+ ** Macros defined below.
+ ** @{
+ */
+
+/** Used to populate the contents of an enumerator, such as `tidyStrings`. */
+#define MAKE_ENUM(MESSAGE) MESSAGE,
+
+/** Used to populate the contents of a structure, such as tidyStringsKeys[]. */
+#define MAKE_STRUCT(MESSAGE) {#MESSAGE, MESSAGE},
+
+
+/** @} */
+/* MARK: - Content Generation Macros */
+/** @name Content Generation Macros
+ ** These macros generate the individual entries in the enums and structs used
+ ** to manage strings in Tidy.
+ ** @{
+ */
+
+/** Codes for populating TidyConfigCategory enumeration. */
+#define FOREACH_TIDYCONFIGCATEGORY(FN)                                    \
+    FN(TidyDiagnostics)      /**< Diagnostics */                          \
+    FN(TidyDisplay)          /**< Affecting screen display */             \
+    FN(TidyDocumentIO)       /**< Pertaining to document I/O */           \
+    FN(TidyEncoding)         /**< Relating to encoding */                 \
+    FN(TidyFileIO)           /**< Pertaining to file I/O */               \
+    FN(TidyMarkupCleanup)    /**< Cleanup related options */              \
+    FN(TidyMarkupEntities)   /**< Entity related options */               \
+    FN(TidyMarkupRepair)     /**< Document repair related options */      \
+    FN(TidyMarkupTeach)      /**< Teach tidy new things */                \
+    FN(TidyMarkupXForm)      /**< Transform HTML one way or another */    \
+    FN(TidyPrettyPrint)      /**< Pretty printing options */              \
+    FN(TidyInternalCategory) /**< Option is internal only. */             \
+
+
+/** These message codes comprise every possible message that can be output by
+ ** Tidy that are *not* diagnostic style messages, and are *not* console
+ ** application specific messages.
+ */
+#define FOREACH_MSG_MISC(FN) \
+/** line %d column %d */                           FN(LINE_COLUMN_STRING)          \
+/** discarding */                                  FN(STRING_DISCARDING)           \
+/** error and errors */                            FN(STRING_ERROR_COUNT_ERROR)    \
+/** warning and warnings */                        FN(STRING_ERROR_COUNT_WARNING)  \
+/** Accessibility hello message */                 FN(STRING_HELLO_ACCESS)         \
+/** HTML Proprietary */                            FN(STRING_HTML_PROPRIETARY)     \
+/** plain text */                                  FN(STRING_PLAIN_TEXT)           \
+/** replacing */                                   FN(STRING_REPLACING)            \
+/** specified */                                   FN(STRING_SPECIFIED)            \
+/** XML declaration */                             FN(STRING_XML_DECLARATION)      \
+/** no */                                          FN(TIDYCUSTOMNO_STRING)         \
+/** block level */                                 FN(TIDYCUSTOMBLOCKLEVEL_STRING) \
+/** empty */                                       FN(TIDYCUSTOMEMPTY_STRING)      \
+/** inline */                                      FN(TIDYCUSTOMINLINE_STRING)     \
+/** pre */                                         FN(TIDYCUSTOMPRE_STRING)        \
+
+    
+/** These messages are used to generate additional dialogue style output from
+ ** Tidy when certain conditions exist, and provide more verbose explanations
+ ** than the short report.
+ */
+#define FOREACH_FOOTNOTE_MSG(FN) \
+    FN(FOOTNOTE_TRIM_EMPTY_ELEMENT) \
+    FN(TEXT_ACCESS_ADVICE1)         \
+    FN(TEXT_ACCESS_ADVICE2)         \
+    FN(TEXT_BAD_FORM)               \
+    FN(TEXT_BAD_MAIN)               \
+    FN(TEXT_HTML_T_ALGORITHM)       \
+    FN(TEXT_INVALID_URI)            \
+    FN(TEXT_INVALID_UTF16)          \
+    FN(TEXT_INVALID_UTF8)           \
+    FN(TEXT_M_IMAGE_ALT)            \
+    FN(TEXT_M_IMAGE_MAP)            \
+    FN(TEXT_M_LINK_ALT)             \
+    FN(TEXT_M_SUMMARY)              \
+    FN(TEXT_SGML_CHARS)             \
+    FN(TEXT_USING_BODY)             \
+    FN(TEXT_USING_FONT)             \
+    FN(TEXT_USING_FRAMES)           \
+    FN(TEXT_USING_LAYER)            \
+    FN(TEXT_USING_NOBR)             \
+    FN(TEXT_USING_SPACER)           \
+    FN(TEXT_VENDOR_CHARS)           \
+    FN(TEXT_WINDOWS_CHARS)
+
+
+/** These messages are used to generate additional dialogue style output from
+ ** Tidy when certain conditions exist, and provide more verbose explanations
+ ** than the short report.
+ */
+#define FOREACH_DIALOG_MSG(FN) \
+/* TidyDialogueSummary */  FN(STRING_ERROR_COUNT)          \
+/* TidyDialogueSummary */  FN(STRING_NEEDS_INTERVENTION)   \
+/* TidyDialogueSummary */  FN(STRING_NO_ERRORS)            \
+/* TidyDialogueSummary */  FN(STRING_NOT_ALL_SHOWN)        \
+/* TidyDialogueInfo */     FN(TEXT_GENERAL_INFO_PLEA)      \
+/* TidyDialogueInfo */     FN(TEXT_GENERAL_INFO)
+
+
+/** These are report messages, i.e., messages that appear in Tidy's table
+ ** of errors and warnings.
+ */
+#define FOREACH_REPORT_MSG(FN)        \
+    FN(ADDED_MISSING_CHARSET)         \
+    FN(ANCHOR_NOT_UNIQUE)             \
+    FN(APOS_UNDEFINED)                \
+    FN(ATTR_VALUE_NOT_LCASE)          \
+    FN(ATTRIBUTE_IS_NOT_ALLOWED)      \
+    FN(ATTRIBUTE_VALUE_REPLACED)      \
+    FN(BACKSLASH_IN_URI)              \
+    FN(BAD_ATTRIBUTE_VALUE_REPLACED)  \
+    FN(BAD_ATTRIBUTE_VALUE)           \
+    FN(BAD_CDATA_CONTENT)             \
+    FN(BAD_SUMMARY_HTML5)             \
+    FN(BAD_SURROGATE_LEAD)            \
+    FN(BAD_SURROGATE_PAIR)            \
+    FN(BAD_SURROGATE_TAIL)            \
+    FN(CANT_BE_NESTED)                \
+    FN(COERCE_TO_ENDTAG)              \
+    FN(CONTENT_AFTER_BODY)            \
+    FN(CUSTOM_TAG_DETECTED)           \
+    FN(DISCARDING_UNEXPECTED)         \
+    FN(DOCTYPE_AFTER_TAGS)            \
+    FN(DUPLICATE_FRAMESET)            \
+    FN(ELEMENT_NOT_EMPTY)             \
+    FN(ELEMENT_VERS_MISMATCH_ERROR)   \
+    FN(ELEMENT_VERS_MISMATCH_WARN)    \
+    FN(ENCODING_MISMATCH)             \
+    FN(ESCAPED_ILLEGAL_URI)           \
+    FN(FILE_CANT_OPEN)                \
+    FN(FILE_CANT_OPEN_CFG)            \
+    FN(FILE_NOT_FILE)                 \
+    FN(FIXED_BACKSLASH)               \
+    FN(FOUND_STYLE_IN_BODY)           \
+    FN(ID_NAME_MISMATCH)              \
+    FN(ILLEGAL_NESTING)               \
+    FN(ILLEGAL_URI_CODEPOINT)         \
+    FN(ILLEGAL_URI_REFERENCE)         \
+    FN(INSERTING_AUTO_ATTRIBUTE)      \
+    FN(INSERTING_TAG)                 \
+    FN(INVALID_ATTRIBUTE)             \
+    FN(INVALID_NCR)                   \
+    FN(INVALID_SGML_CHARS)            \
+    FN(INVALID_UTF8)                  \
+    FN(INVALID_UTF16)                 \
+    FN(INVALID_XML_ID)                \
+    FN(JOINING_ATTRIBUTE)             \
+    FN(MALFORMED_COMMENT)             \
+    FN(MALFORMED_COMMENT_DROPPING)    \
+    FN(MALFORMED_COMMENT_EOS)         \
+    FN(MALFORMED_COMMENT_WARN)        \
+    FN(MALFORMED_DOCTYPE)             \
+    FN(MISMATCHED_ATTRIBUTE_ERROR)    \
+    FN(MISMATCHED_ATTRIBUTE_WARN)     \
+    FN(MISSING_ATTR_VALUE)            \
+    FN(MISSING_ATTRIBUTE)             \
+    FN(MISSING_DOCTYPE)               \
+    FN(MISSING_ENDTAG_BEFORE)         \
+    FN(MISSING_ENDTAG_FOR)            \
+    FN(MISSING_ENDTAG_OPTIONAL)       \
+    FN(MISSING_IMAGEMAP)              \
+    FN(MISSING_QUOTEMARK)             \
+    FN(MISSING_QUOTEMARK_OPEN)        \
+    FN(MISSING_SEMICOLON_NCR)         \
+    FN(MISSING_SEMICOLON)             \
+    FN(MISSING_STARTTAG)              \
+    FN(MISSING_TITLE_ELEMENT)         \
+    FN(MOVED_STYLE_TO_HEAD)           \
+    FN(NESTED_EMPHASIS)               \
+    FN(NESTED_QUOTATION)              \
+    FN(NEWLINE_IN_URI)                \
+    FN(NOFRAMES_CONTENT)              \
+    FN(NON_MATCHING_ENDTAG)           \
+    FN(OBSOLETE_ELEMENT)              \
+    FN(OPTION_REMOVED)                \
+    FN(OPTION_REMOVED_APPLIED)        \
+    FN(OPTION_REMOVED_UNAPPLIED)      \
+    FN(PREVIOUS_LOCATION)             \
+    FN(PROPRIETARY_ATTR_VALUE)        \
+    FN(PROPRIETARY_ATTRIBUTE)         \
+    FN(PROPRIETARY_ELEMENT)           \
+    FN(REMOVED_HTML5)                 \
+    FN(REPEATED_ATTRIBUTE)            \
+    FN(REPLACING_ELEMENT)             \
+    FN(REPLACING_UNEX_ELEMENT)        \
+    FN(SPACE_PRECEDING_XMLDECL)       \
+    FN(STRING_CONTENT_LOOKS)        \
+    FN(STRING_ARGUMENT_BAD)           \
+    FN(STRING_DOCTYPE_GIVEN)        \
+    FN(STRING_MISSING_MALFORMED)      \
+    FN(STRING_MUTING_TYPE)            \
+    FN(STRING_NO_SYSID)             \
+    FN(STRING_UNKNOWN_OPTION)         \
+    FN(SUSPECTED_MISSING_QUOTE)       \
+    FN(TAG_NOT_ALLOWED_IN)            \
+    FN(TOO_MANY_ELEMENTS_IN)          \
+    FN(TOO_MANY_ELEMENTS)             \
+    FN(TRIM_EMPTY_ELEMENT)            \
+    FN(UNESCAPED_AMPERSAND)           \
+    FN(UNEXPECTED_END_OF_FILE_ATTR)   \
+    FN(UNEXPECTED_END_OF_FILE)        \
+    FN(UNEXPECTED_ENDTAG_ERR)         \
+    FN(UNEXPECTED_ENDTAG_IN)          \
+    FN(UNEXPECTED_ENDTAG)             \
+    FN(UNEXPECTED_EQUALSIGN)          \
+    FN(UNEXPECTED_GT)                 \
+    FN(UNEXPECTED_QUOTEMARK)          \
+    FN(UNKNOWN_ELEMENT_LOOKS_CUSTOM)  \
+    FN(UNKNOWN_ELEMENT)               \
+    FN(UNKNOWN_ENTITY)                \
+    FN(USING_BR_INPLACE_OF)           \
+    FN(VENDOR_SPECIFIC_CHARS)         \
+    FN(WHITE_IN_URI)                  \
+    FN(XML_DECLARATION_DETECTED)      \
+    FN(XML_ID_SYNTAX)
+
+
+/** These are report messages added by Tidy's accessibility module. 
+ ** Note that commented out items don't have checks for them at this time,
+ ** and it was probably intended that some test would eventually be written.
+ */
+#define FOREACH_ACCESS_MSG(FN)                                          \
+/** [1.1.1.1] */     FN(IMG_MISSING_ALT)                                \
+/** [1.1.1.2] */     FN(IMG_ALT_SUSPICIOUS_FILENAME)                    \
+/** [1.1.1.3] */     FN(IMG_ALT_SUSPICIOUS_FILE_SIZE)                   \
+/** [1.1.1.4] */     FN(IMG_ALT_SUSPICIOUS_PLACEHOLDER)                 \
+/** [1.1.1.10] */    FN(IMG_ALT_SUSPICIOUS_TOO_LONG)                    \
+/** [1.1.1.11] */    /* FN(IMG_MISSING_ALT_BULLET) */                   \
+/** [1.1.1.12] */    /* FN(IMG_MISSING_ALT_H_RULE) */                   \
+/** [1.1.2.1] */     FN(IMG_MISSING_LONGDESC_DLINK)                     \
+/** [1.1.2.2] */     FN(IMG_MISSING_DLINK)                              \
+/** [1.1.2.3] */     FN(IMG_MISSING_LONGDESC)                           \
+/** [1.1.2.5] */     /* FN(LONGDESC_NOT_REQUIRED) */                    \
+/** [1.1.3.1] */     FN(IMG_BUTTON_MISSING_ALT)                         \
+/** [1.1.4.1] */     FN(APPLET_MISSING_ALT)                             \
+/** [1.1.5.1] */     FN(OBJECT_MISSING_ALT)                             \
+/** [1.1.6.1] */     FN(AUDIO_MISSING_TEXT_WAV)                         \
+/** [1.1.6.2] */     FN(AUDIO_MISSING_TEXT_AU)                          \
+/** [1.1.6.3] */     FN(AUDIO_MISSING_TEXT_AIFF)                        \
+/** [1.1.6.4] */     FN(AUDIO_MISSING_TEXT_SND)                         \
+/** [1.1.6.5] */     FN(AUDIO_MISSING_TEXT_RA)                          \
+/** [1.1.6.6] */     FN(AUDIO_MISSING_TEXT_RM)                          \
+/** [1.1.8.1] */     FN(FRAME_MISSING_LONGDESC)                         \
+/** [1.1.9.1] */     FN(AREA_MISSING_ALT)                               \
+/** [1.1.10.1] */    FN(SCRIPT_MISSING_NOSCRIPT)                        \
+/** [1.1.12.1] */    FN(ASCII_REQUIRES_DESCRIPTION)                     \
+/** [1.2.1.1] */     FN(IMG_MAP_SERVER_REQUIRES_TEXT_LINKS)             \
+/** [1.4.1.1] */     FN(MULTIMEDIA_REQUIRES_TEXT)                       \
+/** [1.5.1.1] */     FN(IMG_MAP_CLIENT_MISSING_TEXT_LINKS)              \
+/** [2.1.1.1] */     FN(INFORMATION_NOT_CONVEYED_IMAGE)                 \
+/** [2.1.1.2] */     FN(INFORMATION_NOT_CONVEYED_APPLET)                \
+/** [2.1.1.3] */     FN(INFORMATION_NOT_CONVEYED_OBJECT)                \
+/** [2.1.1.4] */     FN(INFORMATION_NOT_CONVEYED_SCRIPT)                \
+/** [2.1.1.5] */     FN(INFORMATION_NOT_CONVEYED_INPUT)                 \
+/** [2.2.1.1] */     FN(COLOR_CONTRAST_TEXT)                            \
+/** [2.2.1.2] */     FN(COLOR_CONTRAST_LINK)                            \
+/** [2.2.1.3] */     FN(COLOR_CONTRAST_ACTIVE_LINK)                     \
+/** [2.2.1.4] */     FN(COLOR_CONTRAST_VISITED_LINK)                    \
+/** [3.2.1.1] */     FN(DOCTYPE_MISSING)                                \
+/** [3.3.1.1] */     FN(STYLE_SHEET_CONTROL_PRESENTATION)               \
+/** [3.5.1.1] */     FN(HEADERS_IMPROPERLY_NESTED)                      \
+/** [3.5.2.1] */     FN(POTENTIAL_HEADER_BOLD)                          \
+/** [3.5.2.2] */     FN(POTENTIAL_HEADER_ITALICS)                       \
+/** [3.5.2.3] */     FN(POTENTIAL_HEADER_UNDERLINE)                     \
+/** [3.5.3.1] */     FN(HEADER_USED_FORMAT_TEXT)                        \
+/** [3.6.1.1] */     FN(LIST_USAGE_INVALID_UL)                          \
+/** [3.6.1.2] */     FN(LIST_USAGE_INVALID_OL)                          \
+/** [3.6.1.4] */     FN(LIST_USAGE_INVALID_LI)                          \
+/** [4.1.1.1] */     /* FN(INDICATE_CHANGES_IN_LANGUAGE) */             \
+/** [4.3.1.1] */     FN(LANGUAGE_NOT_IDENTIFIED)                        \
+/** [4.3.1.1] */     FN(LANGUAGE_INVALID)                               \
+/** [5.1.2.1] */     FN(DATA_TABLE_MISSING_HEADERS)                     \
+/** [5.1.2.2] */     FN(DATA_TABLE_MISSING_HEADERS_COLUMN)              \
+/** [5.1.2.3] */     FN(DATA_TABLE_MISSING_HEADERS_ROW)                 \
+/** [5.2.1.1] */     FN(DATA_TABLE_REQUIRE_MARKUP_COLUMN_HEADERS)       \
+/** [5.2.1.2] */     FN(DATA_TABLE_REQUIRE_MARKUP_ROW_HEADERS)          \
+/** [5.3.1.1] */     FN(LAYOUT_TABLES_LINEARIZE_PROPERLY)               \
+/** [5.4.1.1] */     FN(LAYOUT_TABLE_INVALID_MARKUP)                    \
+/** [5.5.1.1] */     FN(TABLE_MISSING_SUMMARY)                          \
+/** [5.5.1.2] */     FN(TABLE_SUMMARY_INVALID_NULL)                     \
+/** [5.5.1.3] */     FN(TABLE_SUMMARY_INVALID_SPACES)                   \
+/** [5.5.1.6] */     FN(TABLE_SUMMARY_INVALID_PLACEHOLDER)              \
+/** [5.5.2.1] */     FN(TABLE_MISSING_CAPTION)                          \
+/** [5.6.1.1] */     FN(TABLE_MAY_REQUIRE_HEADER_ABBR)                  \
+/** [5.6.1.2] */     FN(TABLE_MAY_REQUIRE_HEADER_ABBR_NULL)             \
+/** [5.6.1.3] */     FN(TABLE_MAY_REQUIRE_HEADER_ABBR_SPACES)           \
+/** [6.1.1.1] */     FN(STYLESHEETS_REQUIRE_TESTING_LINK)               \
+/** [6.1.1.2] */     FN(STYLESHEETS_REQUIRE_TESTING_STYLE_ELEMENT)      \
+/** [6.1.1.3] */     FN(STYLESHEETS_REQUIRE_TESTING_STYLE_ATTR)         \
+/** [6.2.1.1] */     FN(FRAME_SRC_INVALID)                              \
+/** [6.2.2.1] */     FN(TEXT_EQUIVALENTS_REQUIRE_UPDATING_APPLET)       \
+/** [6.2.2.2] */     FN(TEXT_EQUIVALENTS_REQUIRE_UPDATING_SCRIPT)       \
+/** [6.2.2.3] */     FN(TEXT_EQUIVALENTS_REQUIRE_UPDATING_OBJECT)       \
+/** [6.3.1.1] */     FN(PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_SCRIPT)    \
+/** [6.3.1.2] */     FN(PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_OBJECT)    \
+/** [6.3.1.3] */     FN(PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_EMBED)     \
+/** [6.3.1.4] */     FN(PROGRAMMATIC_OBJECTS_REQUIRE_TESTING_APPLET)    \
+/** [6.5.1.1] */     FN(FRAME_MISSING_NOFRAMES)                         \
+/** [6.5.1.2] */     FN(NOFRAMES_INVALID_NO_VALUE)                      \
+/** [6.5.1.3] */     FN(NOFRAMES_INVALID_CONTENT)                       \
+/** [6.5.1.4] */     FN(NOFRAMES_INVALID_LINK)                          \
+/** [7.1.1.1] */     FN(REMOVE_FLICKER_SCRIPT)                          \
+/** [7.1.1.2] */     FN(REMOVE_FLICKER_OBJECT)                          \
+/** [7.1.1.3] */     FN(REMOVE_FLICKER_EMBED)                           \
+/** [7.1.1.4] */     FN(REMOVE_FLICKER_APPLET)                          \
+/** [7.1.1.5] */     FN(REMOVE_FLICKER_ANIMATED_GIF)                    \
+/** [7.2.1.1] */     FN(REMOVE_BLINK_MARQUEE)                           \
+/** [7.4.1.1] */     FN(REMOVE_AUTO_REFRESH)                            \
+/** [7.5.1.1] */     FN(REMOVE_AUTO_REDIRECT)                           \
+/** [8.1.1.1] */     FN(ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_SCRIPT)  \
+/** [8.1.1.2] */     FN(ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_OBJECT)  \
+/** [8.1.1.3] */     FN(ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_APPLET)  \
+/** [8.1.1.4] */     FN(ENSURE_PROGRAMMATIC_OBJECTS_ACCESSIBLE_EMBED)   \
+/** [9.1.1.1] */     FN(IMAGE_MAP_SERVER_SIDE_REQUIRES_CONVERSION)      \
+/** [9.3.1.1] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_DOWN)   \
+/** [9.3.1.2] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_UP)     \
+/** [9.3.1.3] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_CLICK)        \
+/** [9.3.1.4] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_OVER)   \
+/** [9.3.1.5] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_OUT)    \
+/** [9.3.1.6] */     FN(SCRIPT_NOT_KEYBOARD_ACCESSIBLE_ON_MOUSE_MOVE)   \
+/** [10.1.1.1] */    FN(NEW_WINDOWS_REQUIRE_WARNING_NEW)                \
+/** [10.1.1.2] */    FN(NEW_WINDOWS_REQUIRE_WARNING_BLANK)              \
+/** [10.2.1.1] */    /* FN(LABEL_NEEDS_REPOSITIONING_BEFORE_INPUT) */   \
+/** [10.2.1.2] */    /* FN(LABEL_NEEDS_REPOSITIONING_AFTER_INPUT) */    \
+/** [10.4.1.1] */    /* FN(FORM_CONTROL_REQUIRES_DEFAULT_TEXT) */       \
+/** [10.4.1.2] */    /* FN(FORM_CONTROL_DEFAULT_TEXT_INVALID_NULL) */   \
+/** [10.4.1.3] */    /* FN(FORM_CONTROL_DEFAULT_TEXT_INVALID_SPACES) */ \
+/** [11.2.1.1] */    FN(REPLACE_DEPRECATED_HTML_APPLET)                 \
+/** [11.2.1.2] */    FN(REPLACE_DEPRECATED_HTML_BASEFONT)               \
+/** [11.2.1.3] */    FN(REPLACE_DEPRECATED_HTML_CENTER)                 \
+/** [11.2.1.4] */    FN(REPLACE_DEPRECATED_HTML_DIR)                    \
+/** [11.2.1.5] */    FN(REPLACE_DEPRECATED_HTML_FONT)                   \
+/** [11.2.1.6] */    FN(REPLACE_DEPRECATED_HTML_ISINDEX)                \
+/** [11.2.1.7] */    FN(REPLACE_DEPRECATED_HTML_MENU)                   \
+/** [11.2.1.8] */    FN(REPLACE_DEPRECATED_HTML_S)                      \
+/** [11.2.1.9] */    FN(REPLACE_DEPRECATED_HTML_STRIKE)                 \
+/** [11.2.1.10] */   FN(REPLACE_DEPRECATED_HTML_U)                      \
+/** [12.1.1.1] */    FN(FRAME_MISSING_TITLE)                            \
+/** [12.1.1.2] */    FN(FRAME_TITLE_INVALID_NULL)                       \
+/** [12.1.1.3] */    FN(FRAME_TITLE_INVALID_SPACES)                     \
+/** [12.4.1.1] */    FN(ASSOCIATE_LABELS_EXPLICITLY)                    \
+/** [12.4.1.2] */    FN(ASSOCIATE_LABELS_EXPLICITLY_FOR)                \
+/** [12.4.1.3] */    FN(ASSOCIATE_LABELS_EXPLICITLY_ID)                 \
+/** [13.1.1.1] */    FN(LINK_TEXT_NOT_MEANINGFUL)                       \
+/** [13.1.1.2] */    FN(LINK_TEXT_MISSING)                              \
+/** [13.1.1.3] */    FN(LINK_TEXT_TOO_LONG)                             \
+/** [13.1.1.4] */    FN(LINK_TEXT_NOT_MEANINGFUL_CLICK_HERE)            \
+/** [13.1.1.5] */    /* FN(LINK_TEXT_NOT_MEANINGFUL_MORE) */            \
+/** [13.1.1.6] */    /* FN(LINK_TEXT_NOT_MEANINGFUL_FOLLOW_THIS) */     \
+/** [13.2.1.1] */    FN(METADATA_MISSING)                               \
+/** [13.2.1.2] */    /* FN(METADATA_MISSING_LINK) */                    \
+/** [13.2.1.3] */    FN(METADATA_MISSING_REDIRECT_AUTOREFRESH)          \
+/** [13.10.1.1] */   FN(SKIPOVER_ASCII_ART)
+
+
+/** These message codes comprise every message is exclusive to theTidy console
+ ** application. It it possible to build LibTidy without these strings.
+ */
+#if SUPPORT_CONSOLE_APP
+#define FOREACH_MSG_CONSOLE(FN) \
+        FN(TC_LABEL_COL)                    \
+        FN(TC_LABEL_FILE)                   \
+        FN(TC_LABEL_LANG)                   \
+        FN(TC_LABEL_LEVL)                   \
+        FN(TC_LABEL_OPT)                    \
+        FN(TC_MAIN_ERROR_LOAD_CONFIG)       \
+        FN(TC_OPT_ACCESS)                   \
+        FN(TC_OPT_ASCII)                    \
+        FN(TC_OPT_ASHTML)                   \
+        FN(TC_OPT_ASXML)                    \
+        FN(TC_OPT_BARE)                     \
+        FN(TC_OPT_BIG5)                     \
+        FN(TC_OPT_CLEAN)                    \
+        FN(TC_OPT_CONFIG)                   \
+        FN(TC_OPT_ERRORS)                   \
+        FN(TC_OPT_FILE)                     \
+        FN(TC_OPT_GDOC)                     \
+        FN(TC_OPT_HELP)                     \
+        FN(TC_OPT_HELPCFG)                  \
+        FN(TC_OPT_HELPENV)                  \
+        FN(TC_OPT_HELPOPT)                  \
+        FN(TC_OPT_IBM858)                   \
+        FN(TC_OPT_INDENT)                   \
+        FN(TC_OPT_ISO2022)                  \
+        FN(TC_OPT_LANGUAGE)                 \
+        FN(TC_OPT_LATIN0)                   \
+        FN(TC_OPT_LATIN1)                   \
+        FN(TC_OPT_MAC)                      \
+        FN(TC_OPT_MODIFY)                   \
+        FN(TC_OPT_NUMERIC)                  \
+        FN(TC_OPT_OMIT)                     \
+        FN(TC_OPT_OUTPUT)                   \
+        FN(TC_OPT_QUIET)                    \
+        FN(TC_OPT_RAW)                      \
+        FN(TC_OPT_SHIFTJIS)                 \
+        FN(TC_OPT_SHOWCFG)                  \
+        FN(TC_OPT_EXP_CFG)                  \
+        FN(TC_OPT_EXP_DEF)                  \
+        FN(TC_OPT_UPPER)                    \
+        FN(TC_OPT_UTF16)                    \
+        FN(TC_OPT_UTF16BE)                  \
+        FN(TC_OPT_UTF16LE)                  \
+        FN(TC_OPT_UTF8)                     \
+        FN(TC_OPT_VERSION)                  \
+        FN(TC_OPT_WIN1252)                  \
+        FN(TC_OPT_WRAP)                     \
+        FN(TC_OPT_XML)                      \
+        FN(TC_OPT_XMLCFG)                   \
+        FN(TC_OPT_XMLSTRG)                  \
+        FN(TC_OPT_XMLERRS)                  \
+        FN(TC_OPT_XMLOPTS)                  \
+        FN(TC_OPT_XMLHELP)                  \
+        FN(TC_STRING_CONF_HEADER)           \
+        FN(TC_STRING_CONF_NAME)             \
+        FN(TC_STRING_CONF_TYPE)             \
+        FN(TC_STRING_CONF_VALUE)            \
+        FN(TC_STRING_CONF_NOTE)             \
+        FN(TC_STRING_OPT_NOT_DOCUMENTED)    \
+        FN(TC_STRING_OUT_OF_MEMORY)         \
+        FN(TC_STRING_FATAL_ERROR)           \
+        FN(TC_STRING_FILE_MANIP)            \
+        FN(TC_STRING_LANG_MUST_SPECIFY)     \
+        FN(TC_STRING_LANG_NOT_FOUND)        \
+        FN(TC_STRING_MUST_SPECIFY)          \
+        FN(TC_STRING_PROCESS_DIRECTIVES)    \
+        FN(TC_STRING_CHAR_ENCODING)         \
+        FN(TC_STRING_MISC)                  \
+        FN(TC_STRING_XML)                   \
+        FN(TC_STRING_UNKNOWN_OPTION)        \
+        FN(TC_STRING_UNKNOWN_OPTION_B)      \
+        FN(TC_STRING_VERS_A)                \
+        FN(TC_STRING_VERS_B)                \
+        FN(TC_TXT_HELP_1)                   \
+        FN(TC_TXT_HELP_2A)                  \
+        FN(TC_TXT_HELP_2B)                  \
+        FN(TC_TXT_HELP_3)                   \
+        FN(TC_TXT_HELP_3A)                  \
+        FN(TC_TXT_HELP_CONFIG)              \
+        FN(TC_TXT_HELP_CONFIG_NAME)         \
+        FN(TC_TXT_HELP_CONFIG_TYPE)         \
+        FN(TC_TXT_HELP_CONFIG_ALLW)         \
+        FN(TC_TXT_HELP_ENV_1)               \
+        FN(TC_TXT_HELP_ENV_1A)              \
+        FN(TC_TXT_HELP_ENV_1B)              \
+        FN(TC_TXT_HELP_ENV_1C)              \
+        FN(TC_TXT_HELP_LANG_1)              \
+        FN(TC_TXT_HELP_LANG_2)              \
+        FN(TC_TXT_HELP_LANG_3)
+#endif /* SUPPORT_CONSOLE_APP */
+
+/** @} */
+
+/** @} end group public_enum_gen */
+
+
+/* MARK: - Public Enumerations */
+/***************************************************************************//**
+ ** @defgroup public_enumerations Public Enumerations
+ ** @ingroup public_api
+ **
+ ** @copybrief tidyenum.h
+ ******************************************************************************/
+
+/** @addtogroup public_enumerations
+ ** @{ */
+    
+/** @name Configuration Options Enumerations
+ **
+ ** These enumerators are used to define available configuration options and
+ ** their option categories.
+ **
+ ** @{ */
+
+
+/** Option IDs are used used to get and/or set configuration option values and
+ **        retrieve their descriptions.
+ **
+ ** @remark These enum members all have associated localized strings available
+ **         which describe the purpose of the option. These descriptions are
+ **         available via their enum values only.
+ **
+ ** @sa     `config.c:option_defs[]` for internal implementation details; that
+ **         array is where you will implement options defined in this enum; and
+ **         it's important to add a string describing the option to
+ **         `language_en.h`, too.
+ */
 typedef enum
 {
-  TidyMarkup,          /**< Markup options: (X)HTML version, etc */
-  TidyDiagnostics,     /**< Diagnostics */
-  TidyPrettyPrint,     /**< Output layout */
-  TidyEncoding,        /**< Character encodings */
-  TidyMiscellaneous    /**< File handling, message format, etc. */
+    TidyUnknownOption = 0,       /**< Unknown option! */
+    
+    TidyAccessibilityCheckLevel, /**< Accessibility check level */
+    TidyAltText,                 /**< Default text for alt attribute */
+    TidyAnchorAsName,            /**< Define anchors as name attributes */
+    TidyAsciiChars,              /**< Convert quotes and dashes to nearest ASCII char */
+    TidyBlockTags,               /**< Declared block tags */
+    TidyBodyOnly,                /**< Output BODY content only */
+    TidyBreakBeforeBR,           /**< Output newline before <br> or not? */
+    TidyCharEncoding,            /**< In/out character encoding */
+    TidyCoerceEndTags,           /**< Coerce end tags from start tags where probably intended */
+    TidyCSSPrefix,               /**< CSS class naming for clean option */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    TidyCustomTags,              /**< Internal use ONLY */
+#endif
+    TidyDecorateInferredUL,      /**< Mark inferred UL elements with no indent CSS */
+    TidyDoctype,                 /**< User specified doctype */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    TidyDoctypeMode,             /**< Internal use ONLY */
+#endif
+    TidyDropEmptyElems,          /**< Discard empty elements */
+    TidyDropEmptyParas,          /**< Discard empty p elements */
+    TidyDropPropAttrs,           /**< Discard proprietary attributes */
+    TidyDuplicateAttrs,          /**< Keep first or last duplicate attribute */
+    TidyEmacs,                   /**< If true, format error output for GNU Emacs */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    TidyEmacsFile,               /**< Internal use ONLY */
+#endif
+    TidyEmptyTags,               /**< Declared empty tags */
+    TidyEncloseBlockText,        /**< If yes text in blocks is wrapped in P's */
+    TidyEncloseBodyText,         /**< If yes text at body is wrapped in P's */
+    TidyErrFile,                 /**< File name to write errors to */
+    TidyEscapeCdata,             /**< Replace <![CDATA[]]> sections with escaped text */
+    TidyEscapeScripts,           /**< Escape items that look like closing tags in script tags */
+    TidyFixBackslash,            /**< Fix URLs by replacing \ with / */
+    TidyFixComments,             /**< Fix comments with adjacent hyphens */
+    TidyFixUri,                  /**< Applies URI encoding if necessary */
+    TidyForceOutput,             /**< Output document even if errors were found */
+    TidyGDocClean,               /**< Clean up HTML exported from Google Docs */
+    TidyHideComments,            /**< Hides all (real) comments in output */
+    TidyHtmlOut,                 /**< Output plain HTML, even for XHTML input.*/
+    TidyInCharEncoding,          /**< Input character encoding (if different) */
+    TidyIndentAttributes,        /**< Newline+indent before each attribute */
+    TidyIndentCdata,             /**< Indent <!CDATA[ ... ]]> section */
+    TidyIndentContent,           /**< Indent content of appropriate tags */
+    TidyIndentSpaces,            /**< Indentation n spaces/tabs */
+    TidyInlineTags,              /**< Declared inline tags */
+    TidyJoinClasses,             /**< Join multiple class attributes */
+    TidyJoinStyles,              /**< Join multiple style attributes */
+    TidyKeepFileTimes,           /**< If yes last modied time is preserved */
+    TidyKeepTabs,                /**< If yes keep input source tabs */
+    TidyLiteralAttribs,          /**< If true attributes may use newlines */
+    TidyLogicalEmphasis,         /**< Replace i by em and b by strong */
+    TidyLowerLiterals,           /**< Folds known attribute values to lower case */
+    TidyMakeBare,                /**< Make bare HTML: remove Microsoft cruft */
+    TidyMakeClean,               /**< Replace presentational clutter by style rules */
+    TidyMark,                    /**< Add meta element indicating tidied doc */
+    TidyMergeDivs,               /**< Merge multiple DIVs */
+    TidyMergeEmphasis,           /**< Merge nested B and I elements */
+    TidyMergeSpans,              /**< Merge multiple SPANs */
+    TidyMetaCharset,             /**< Adds/checks/fixes meta charset in the head, based on document type */
+    TidyMuteReports,             /**< Filter these messages from output. */
+    TidyMuteShow,                /**< Show message ID's in the error table */
+    TidyNCR,                     /**< Allow numeric character references */
+    TidyNewline,                 /**< Output line ending (default to platform) */
+    TidyNumEntities,             /**< Use numeric entities */
+    TidyOmitOptionalTags,        /**< Suppress optional start tags and end tags */
+    TidyOutCharEncoding,         /**< Output character encoding (if different) */
+    TidyOutFile,                 /**< File name to write markup to */
+    TidyOutputBOM,               /**< Output a Byte Order Mark (BOM) for UTF-16 encodings */
+    TidyPPrintTabs,              /**< Indent using tabs istead of spaces */
+    TidyPreserveEntities,        /**< Preserve entities */
+    TidyPreTags,                 /**< Declared pre tags */
+    TidyPriorityAttributes,      /**< Attributes to place first in an element */
+    TidyPunctWrap,               /**< consider punctuation and breaking spaces for wrapping */
+    TidyQuiet,                   /**< No 'Parsing X', guessed DTD or summary */
+    TidyQuoteAmpersand,          /**< Output naked ampersand as &amp; */
+    TidyQuoteMarks,              /**< Output " marks as &quot; */
+    TidyQuoteNbsp,               /**< Output non-breaking space as entity */
+    TidyReplaceColor,            /**< Replace hex color attribute values with names */
+    TidyShowErrors,              /**< Number of errors to put out */
+    TidyShowInfo,                /**< If true, info-level messages are shown */
+    TidyShowMarkup,              /**< If false, normal output is suppressed */
+    TidyShowMetaChange,          /**< show when meta http-equiv content charset was changed - compatibility */
+    TidyShowWarnings,            /**< However errors are always shown */
+    TidySkipNested,              /**< Skip nested tags in script and style CDATA */
+    TidySortAttributes,          /**< Sort attributes */
+    TidyStrictTagsAttr,          /**< Ensure tags and attributes match output HTML version */
+    TidyStyleTags,               /**< Move sytle to head */
+    TidyTabSize,                 /**< Expand tabs to n spaces */
+    TidyUpperCaseAttrs,          /**< Output attributes in upper not lower case */
+    TidyUpperCaseTags,           /**< Output tags in upper not lower case */
+    TidyUseCustomTags,           /**< Enable Tidy to use autonomous custom tags */
+    TidyVertSpace,               /**< degree to which markup is spread out vertically */
+    TidyWarnPropAttrs,           /**< Warns on proprietary attributes */
+    TidyWord2000,                /**< Draconian cleaning for Word2000 */
+    TidyWrapAsp,                 /**< Wrap within ASP pseudo elements */
+    TidyWrapAttVals,             /**< Wrap within attribute values */
+    TidyWrapJste,                /**< Wrap within JSTE pseudo elements */
+    TidyWrapLen,                 /**< Wrap margin */
+    TidyWrapPhp,                 /**< Wrap within PHP pseudo elements */
+    TidyWrapScriptlets,          /**< Wrap within JavaScript string literals */
+    TidyWrapSection,             /**< Wrap within <![ ... ]> section tags */
+    TidyWriteBack,               /**< If true then output tidied markup */
+    TidyXhtmlOut,                /**< Output extensible HTML */
+    TidyXmlDecl,                 /**< Add <?xml?> for XML docs */
+    TidyXmlOut,                  /**< Create output as XML */
+    TidyXmlPIs,                  /**< If set to yes PIs must end with ?> */
+    TidyXmlSpace,                /**< If set to yes adds xml:space attr as needed */
+    TidyXmlTags,                 /**< Treat input as XML */
+    N_TIDY_OPTIONS               /**< Must be last */
+} TidyOptionId;
+
+
+/** Categories of Tidy configuration options, which are used mostly by user
+ ** interfaces to sort Tidy options into related groups.
+ **
+ ** @remark These enum members all have associated localized strings available
+ **         suitable for use as a category label, and are available with either
+ **         the enum value, or a string version of the name.
+ **
+ ** @sa     `config.c:option_defs[]` for internal implementation details.
+ */
+typedef enum
+{
+    TidyUnknownCategory = 300,  /**< Unknown Category! */
+    FOREACH_TIDYCONFIGCATEGORY(MAKE_ENUM)
 } TidyConfigCategory;
 
 
-/** Option IDs Used to get/set option values.
-
-    These TidyOptionId are used throughout libtidy, and also
-    have associated localized strings to describe them.
- 
-    Note this enum MUST start at zero due to historical design-time
-    decisions that make assumptions about this starting value.
-*/
-typedef enum
-{
-  TidyUnknownOption,   /**< Unknown option! */
-  TidyIndentSpaces,    /**< Indentation n spaces/tabs */
-  TidyWrapLen,         /**< Wrap margin */
-  TidyTabSize,         /**< Expand tabs to n spaces */
-
-  TidyCharEncoding,    /**< In/out character encoding */
-  TidyInCharEncoding,  /**< Input character encoding (if different) */
-  TidyOutCharEncoding, /**< Output character encoding (if different) */
-  TidyNewline,         /**< Output line ending (default to platform) */
-
-  TidyDoctypeMode,     /**< See doctype property */
-  TidyDoctype,         /**< User specified doctype */
-
-  TidyDuplicateAttrs,  /**< Keep first or last duplicate attribute */
-  TidyAltText,         /**< Default text for alt attribute */
-
-  /* obsolete */
-  TidySlideStyle,      /**< Style sheet for slides: not used for anything yet */
-
-  TidyErrFile,         /**< File name to write errors to */
-  TidyOutFile,         /**< File name to write markup to */
-  TidyWriteBack,       /**< If true then output tidied markup */
-  TidyShowMarkup,      /**< If false, normal output is suppressed */
-  TidyShowInfo,        /**< If true, info-level messages are shown */
-  TidyShowWarnings,    /**< However errors are always shown */
-  TidyQuiet,           /**< No 'Parsing X', guessed DTD or summary */
-  TidyIndentContent,   /**< Indent content of appropriate tags */
-                       /**< "auto" does text/block level content indentation */
-  TidyCoerceEndTags,   /**< Coerce end tags from start tags where probably intended */
-  TidyOmitOptionalTags,/**< Suppress optional start tags and end tags */
-  TidyHideEndTags,     /**< Legacy name for TidyOmitOptionalTags */
-  TidyXmlTags,         /**< Treat input as XML */
-  TidyXmlOut,          /**< Create output as XML */
-  TidyXhtmlOut,        /**< Output extensible HTML */
-  TidyHtmlOut,         /**< Output plain HTML, even for XHTML input.
-                           Yes means set explicitly. */
-  TidyXmlDecl,         /**< Add <?xml?> for XML docs */
-  TidyUpperCaseTags,   /**< Output tags in upper not lower case */
-  TidyUpperCaseAttrs,  /**< Output attributes in upper not lower case */
-  TidyMakeBare,        /**< Make bare HTML: remove Microsoft cruft */
-  TidyMakeClean,       /**< Replace presentational clutter by style rules */
-  TidyGDocClean,       /**< Clean up HTML exported from Google Docs */
-  TidyLogicalEmphasis, /**< Replace i by em and b by strong */
-  TidyDropPropAttrs,   /**< Discard proprietary attributes */
-  TidyDropFontTags,    /**< Discard presentation tags */
-  TidyDropEmptyElems,  /**< Discard empty elements */
-  TidyDropEmptyParas,  /**< Discard empty p elements */
-  TidyFixComments,     /**< Fix comments with adjacent hyphens */
-  TidyBreakBeforeBR,   /**< Output newline before <br> or not? */
-
-  /* obsolete */
-  TidyBurstSlides,     /**< Create slides on each h2 element */
-
-  TidyNumEntities,     /**< Use numeric entities */
-  TidyQuoteMarks,      /**< Output " marks as &quot; */
-  TidyQuoteNbsp,       /**< Output non-breaking space as entity */
-  TidyQuoteAmpersand,  /**< Output naked ampersand as &amp; */
-  TidyWrapAttVals,     /**< Wrap within attribute values */
-  TidyWrapScriptlets,  /**< Wrap within JavaScript string literals */
-  TidyWrapSection,     /**< Wrap within <![ ... ]> section tags */
-  TidyWrapAsp,         /**< Wrap within ASP pseudo elements */
-  TidyWrapJste,        /**< Wrap within JSTE pseudo elements */
-  TidyWrapPhp,         /**< Wrap within PHP pseudo elements */
-  TidyFixBackslash,    /**< Fix URLs by replacing \ with / */
-  TidyIndentAttributes,/**< Newline+indent before each attribute */
-  TidyXmlPIs,          /**< If set to yes PIs must end with ?> */
-  TidyXmlSpace,        /**< If set to yes adds xml:space attr as needed */
-  TidyEncloseBodyText, /**< If yes text at body is wrapped in P's */
-  TidyEncloseBlockText,/**< If yes text in blocks is wrapped in P's */
-  TidyKeepFileTimes,   /**< If yes last modied time is preserved */
-  TidyWord2000,        /**< Draconian cleaning for Word2000 */
-  TidyMark,            /**< Add meta element indicating tidied doc */
-  TidyEmacs,           /**< If true format error output for GNU Emacs */
-  TidyEmacsFile,       /**< Name of current Emacs file */
-  TidyLiteralAttribs,  /**< If true attributes may use newlines */
-  TidyBodyOnly,        /**< Output BODY content only */
-  TidyFixUri,          /**< Applies URI encoding if necessary */
-  TidyLowerLiterals,   /**< Folds known attribute values to lower case */
-  TidyHideComments,    /**< Hides all (real) comments in output */
-  TidyIndentCdata,     /**< Indent <!CDATA[ ... ]]> section */
-  TidyForceOutput,     /**< Output document even if errors were found */
-  TidyShowErrors,      /**< Number of errors to put out */
-  TidyAsciiChars,      /**< Convert quotes and dashes to nearest ASCII char */
-  TidyJoinClasses,     /**< Join multiple class attributes */
-  TidyJoinStyles,      /**< Join multiple style attributes */
-  TidyEscapeCdata,     /**< Replace <![CDATA[]]> sections with escaped text */
-
-#if SUPPORT_ASIAN_ENCODINGS
-  TidyLanguage,        /**< Language property: not used for anything yet */
-  TidyNCR,             /**< Allow numeric character references */
-#else
-  TidyLanguageNotUsed,
-  TidyNCRNotUsed,
-#endif
-#if SUPPORT_UTF16_ENCODINGS
-  TidyOutputBOM,      /**< Output a Byte Order Mark (BOM) for UTF-16 encodings */
-                      /**< auto: if input stream has BOM, we output a BOM */
-#else
-  TidyOutputBOMNotUsed,
-#endif
-
-  TidyReplaceColor,    /**< Replace hex color attribute values with names */
-  TidyCSSPrefix,       /**< CSS class naming for -clean option */
-
-  TidyInlineTags,      /**< Declared inline tags */
-  TidyBlockTags,       /**< Declared block tags */
-  TidyEmptyTags,       /**< Declared empty tags */
-  TidyPreTags,         /**< Declared pre tags */
-
-  TidyAccessibilityCheckLevel, /**< Accessibility check level
-                                   0 (old style), or 1, 2, 3 */
-
-  TidyVertSpace,       /**< degree to which markup is spread out vertically */
-#if SUPPORT_ASIAN_ENCODINGS
-  TidyPunctWrap,       /**< consider punctuation and breaking spaces for wrapping */
-#else
-  TidyPunctWrapNotUsed,
-#endif
-  TidyMergeEmphasis,       /**< Merge nested B and I elements */
-  TidyMergeDivs,           /**< Merge multiple DIVs */
-  TidyDecorateInferredUL,  /**< Mark inferred UL elements with no indent CSS */
-  TidyPreserveEntities,    /**< Preserve entities */
-  TidySortAttributes,      /**< Sort attributes */
-  TidyMergeSpans,          /**< Merge multiple SPANs */
-  TidyAnchorAsName,        /**< Define anchors as name attributes */
-  TidyPPrintTabs,          /**< Indent using tabs istead of spaces */
-  TidySkipNested,          /**< Skip nested tags in script and style CDATA */
-  TidyStrictTagsAttr,      /**< Ensure tags and attributes match output HTML version */
-  TidyEscapeScripts,       /**< Escape items that look like closing tags in script tags */
-  N_TIDY_OPTIONS           /**< Must be last */
-} TidyOptionId;
-
-    
-/** Option data types
-*/
+/** A Tidy configuration option can have one of these data types. */
 typedef enum
 {
   TidyString,          /**< String */
   TidyInteger,         /**< Integer or enumeration */
-  TidyBoolean          /**< Boolean flag */
+  TidyBoolean          /**< Boolean */
 } TidyOptionType;
 
 
+/** @}
+ ** @name Configuration Options Pick List and Parser Enumerations
+ **
+ ** These enums define enumerated states for the configuration options that
+ ** take values that are not simple yes/no, strings, or simple integers.
+ **
+ ** @{ */
+
 /** AutoBool values used by ParseBool, ParseTriState, ParseIndent, ParseBOM
-*/
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-   TidyNoState,     /**< maps to 'no' */
+   TidyNoState = 0, /**< maps to 'no' */
    TidyYesState,    /**< maps to 'yes' */
    TidyAutoState    /**< Automatic */
 } TidyTriState;
 
-/** TidyNewline option values to control output line endings.
-*/
+
+/** Values used by ParseUseCustomTags, which describes how Autonomous Custom
+ ** tags (ACT's) found by Tidy are treated.
+ **
+ ** @remark These enum members all have associated localized strings available
+ **         for internal LibTidy use, and also have public string keys in the
+ **         form MEMBER_STRING, e.g., TIDYCUSTOMBLOCKLEVEL_STRING
+ **
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-    TidyLF,         /**< Use Unix style: LF */
+    TidyCustomNo = 0,       /**< Do not allow autonomous custom tags */
+    TidyCustomBlocklevel,   /**< ACT's treated as blocklevel */
+    TidyCustomEmpty,        /**< ACT's treated as empty tags */
+    TidyCustomInline,       /**< ACT's treated as inline tags */
+    TidyCustomPre           /**< ACT's treated as pre tags */
+} TidyUseCustomTagsState;
+
+
+/** TidyNewline option values to control output line endings. 
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
+typedef enum
+{
+    TidyLF = 0,     /**< Use Unix style: LF */
     TidyCRLF,       /**< Use DOS/Windows style: CR+LF */
     TidyCR          /**< Use Macintosh style: CR */
 } TidyLineEnding;
 
-
-/** Mode controlling treatment of doctype
-*/
+    
+/** TidyEncodingOptions option values specify the input and/or output encoding.
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-    TidyDoctypeHtml5,   /**< <!DOCTYPE html> */
-    TidyDoctypeOmit,    /**< Omit DOCTYPE altogether */
-    TidyDoctypeAuto,    /**< Keep DOCTYPE in input.  Set version to content */
-    TidyDoctypeStrict,  /**< Convert document to HTML 4 strict content model */
-    TidyDoctypeLoose,   /**< Convert document to HTML 4 transitional
-                             content model */
-    TidyDoctypeUser     /**< Set DOCTYPE FPI explicitly */
+    TidyEncRaw = 0,
+    TidyEncAscii,
+    TidyEncLatin0,
+    TidyEncLatin1,
+    TidyEncUtf8,
+#ifndef NO_NATIVE_ISO2022_SUPPORT
+    TidyEncIso2022,
+#endif
+    TidyEncMac,
+    TidyEncWin1252,
+    TidyEncIbm858,
+    TidyEncUtf16le,
+    TidyEncUtf16be,
+    TidyEncUtf16,
+    TidyEncBig5,
+    TidyEncShiftjis
+} TidyEncodingOptions;
+
+
+/** Mode controlling treatment of doctype
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
+typedef enum
+{
+    TidyDoctypeHtml5 = 0, /**< <!DOCTYPE html> */
+    TidyDoctypeOmit,      /**< Omit DOCTYPE altogether */
+    TidyDoctypeAuto,      /**< Keep DOCTYPE in input.  Set version to content */
+    TidyDoctypeStrict,    /**< Convert document to HTML 4 strict content model */
+    TidyDoctypeLoose,     /**< Convert document to HTML 4 transitional content model */
+    TidyDoctypeUser       /**< Set DOCTYPE FPI explicitly */
 } TidyDoctypeModes;
 
 /** Mode controlling treatment of duplicate Attributes
-*/
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-    TidyKeepFirst,
-    TidyKeepLast
+    TidyKeepFirst = 0, /**< Keep the first instance of an attribute */
+    TidyKeepLast       /**< Keep the last instance of an attribute */
 } TidyDupAttrModes;
 
 /** Mode controlling treatment of sorting attributes
-*/
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-    TidySortAttrNone,
-    TidySortAttrAlpha
+    TidySortAttrNone = 0,  /**< Don't sort attributes */
+    TidySortAttrAlpha      /**< Sort attributes alphabetically */
 } TidyAttrSortStrategy;
 
-
-/* I/O and Message handling interface
-**
-** By default, Tidy will define, create and use
-** instances of input and output handlers for
-** standard C buffered I/O (i.e. FILE* stdin,
-** FILE* stdout and FILE* stderr for content
-** input, content output and diagnostic output,
-** respectively.  A FILE* cfgFile input handler
-** will be used for config files.  Command line
-** options will just be set directly.
-*/
-
-/** Message severity level
- *  These TidyReportLevel are used throughout libtidy, but don't
- *  have associated localized strings to describe them because
- *  TidyReportLevel is externally-facing, and changing the enum
- *  starting int can break existing API's for poorly-written
- *  applications using libtidy. See enum `TidyReportLevelKeys`.
-*/
+/** Mode controlling capitalization of things, such as attributes.
+ ** @remark This enum's starting value is guaranteed to remain stable.
+ */
 typedef enum
 {
-  TidyInfo,             /**< Information about markup usage */
-  TidyWarning,          /**< Warning message */
-  TidyConfig,           /**< Configuration error */
-  TidyAccess,           /**< Accessibility message */
-  TidyError,            /**< Error message - output suppressed */
-  TidyBadDocument,      /**< I/O or file system error */
-  TidyFatal             /**< Crash! */
-} TidyReportLevel;
-
-/** Message severity level - string lookup keys
- *  These TidyReportLevelKeys are used throughout libtidy, and
- *  have associated localized strings to describe them. They
- *  correspond to enum `TidyReportLevel`.
-*/
-typedef enum
-{
-  TidyInfoString = 600,
-  TidyWarningString,
-  TidyConfigString,
-  TidyAccessString,
-  TidyErrorString,
-  TidyBadDocumentString,
-  TidyFatalString
-} TidyReportLevelKeys;
+    TidyUppercaseNo = 0,   /**< Don't uppercase. */
+    TidyUppercaseYes,      /**< Do uppercase. */
+    TidyUppercasePreserve  /**< Preserve case. */
+} TidyUppercase;
 
 
-/* Document tree traversal functions
-*/
+/** @}
+ ** @name Document Tree
+ ** @{
+ */
 
 /** Node types
-*/
+ */
 typedef enum
 {
   TidyNode_Root,        /**< Root */
@@ -982,511 +1551,608 @@ typedef enum
 
 
 /** Known HTML element types
-*/
+ */
 typedef enum
 {
-  TidyTag_UNKNOWN,  /**< Unknown tag! */
-  TidyTag_A,        /**< A */
-  TidyTag_ABBR,     /**< ABBR */
-  TidyTag_ACRONYM,  /**< ACRONYM */
-  TidyTag_ADDRESS,  /**< ADDRESS */
-  TidyTag_ALIGN,    /**< ALIGN */
-  TidyTag_APPLET,   /**< APPLET */
-  TidyTag_AREA,     /**< AREA */
-  TidyTag_B,        /**< B */
-  TidyTag_BASE,     /**< BASE */
-  TidyTag_BASEFONT, /**< BASEFONT */
-  TidyTag_BDO,      /**< BDO */
-  TidyTag_BGSOUND,  /**< BGSOUND */
-  TidyTag_BIG,      /**< BIG */
-  TidyTag_BLINK,    /**< BLINK */
-  TidyTag_BLOCKQUOTE,   /**< BLOCKQUOTE */
-  TidyTag_BODY,     /**< BODY */
-  TidyTag_BR,       /**< BR */
-  TidyTag_BUTTON,   /**< BUTTON */
-  TidyTag_CAPTION,  /**< CAPTION */
-  TidyTag_CENTER,   /**< CENTER */
-  TidyTag_CITE,     /**< CITE */
-  TidyTag_CODE,     /**< CODE */
-  TidyTag_COL,      /**< COL */
-  TidyTag_COLGROUP, /**< COLGROUP */
-  TidyTag_COMMENT,  /**< COMMENT */
-  TidyTag_DD,       /**< DD */
-  TidyTag_DEL,      /**< DEL */
-  TidyTag_DFN,      /**< DFN */
-  TidyTag_DIR,      /**< DIR */
-  TidyTag_DIV,      /**< DIF */
-  TidyTag_DL,       /**< DL */
-  TidyTag_DT,       /**< DT */
-  TidyTag_EM,       /**< EM */
-  TidyTag_EMBED,    /**< EMBED */
-  TidyTag_FIELDSET, /**< FIELDSET */
-  TidyTag_FONT,     /**< FONT */
-  TidyTag_FORM,     /**< FORM */
-  TidyTag_FRAME,    /**< FRAME */
-  TidyTag_FRAMESET, /**< FRAMESET */
-  TidyTag_H1,       /**< H1 */
-  TidyTag_H2,       /**< H2 */
-  TidyTag_H3,       /**< H3 */
-  TidyTag_H4,       /**< H4 */
-  TidyTag_H5,       /**< H5 */
-  TidyTag_H6,       /**< H6 */
-  TidyTag_HEAD,     /**< HEAD */
-  TidyTag_HR,       /**< HR */
-  TidyTag_HTML,     /**< HTML */
-  TidyTag_I,        /**< I */
-  TidyTag_IFRAME,   /**< IFRAME */
-  TidyTag_ILAYER,   /**< ILAYER */
-  TidyTag_IMG,      /**< IMG */
-  TidyTag_INPUT,    /**< INPUT */
-  TidyTag_INS,      /**< INS */
-  TidyTag_ISINDEX,  /**< ISINDEX */
-  TidyTag_KBD,      /**< KBD */
-  TidyTag_KEYGEN,   /**< KEYGEN */
-  TidyTag_LABEL,    /**< LABEL */
-  TidyTag_LAYER,    /**< LAYER */
-  TidyTag_LEGEND,   /**< LEGEND */
-  TidyTag_LI,       /**< LI */
-  TidyTag_LINK,     /**< LINK */
-  TidyTag_LISTING,  /**< LISTING */
-  TidyTag_MAP,      /**< MAP */
-  TidyTag_MATHML,   /**< MATH  (HTML5) [i_a]2 MathML embedded in [X]HTML */
-  TidyTag_MARQUEE,  /**< MARQUEE */
-  TidyTag_MENU,     /**< MENU */
-  TidyTag_META,     /**< META */
-  TidyTag_MULTICOL, /**< MULTICOL */
-  TidyTag_NOBR,     /**< NOBR */
-  TidyTag_NOEMBED,  /**< NOEMBED */
-  TidyTag_NOFRAMES, /**< NOFRAMES */
-  TidyTag_NOLAYER,  /**< NOLAYER */
-  TidyTag_NOSAVE,   /**< NOSAVE */
-  TidyTag_NOSCRIPT, /**< NOSCRIPT */
-  TidyTag_OBJECT,   /**< OBJECT */
-  TidyTag_OL,       /**< OL */
-  TidyTag_OPTGROUP, /**< OPTGROUP */
-  TidyTag_OPTION,   /**< OPTION */
-  TidyTag_P,        /**< P */
-  TidyTag_PARAM,    /**< PARAM */
-  TidyTag_PICTURE,  /**< PICTURE (HTML5) */
-  TidyTag_PLAINTEXT,/**< PLAINTEXT */
-  TidyTag_PRE,      /**< PRE */
-  TidyTag_Q,        /**< Q */
-  TidyTag_RB,       /**< RB */
-  TidyTag_RBC,      /**< RBC */
-  TidyTag_RP,       /**< RP */
-  TidyTag_RT,       /**< RT */
-  TidyTag_RTC,      /**< RTC */
-  TidyTag_RUBY,     /**< RUBY */
-  TidyTag_S,        /**< S */
-  TidyTag_SAMP,     /**< SAMP */
-  TidyTag_SCRIPT,   /**< SCRIPT */
-  TidyTag_SELECT,   /**< SELECT */
-  TidyTag_SERVER,   /**< SERVER */
-  TidyTag_SERVLET,  /**< SERVLET */
-  TidyTag_SMALL,    /**< SMALL */
-  TidyTag_SPACER,   /**< SPACER */
-  TidyTag_SPAN,     /**< SPAN */
-  TidyTag_STRIKE,   /**< STRIKE */
-  TidyTag_STRONG,   /**< STRONG */
-  TidyTag_STYLE,    /**< STYLE */
-  TidyTag_SUB,      /**< SUB */
-  TidyTag_SUP,      /**< SUP */
-  TidyTag_SVG,      /**< SVG  (HTML5) */
-  TidyTag_TABLE,    /**< TABLE */
-  TidyTag_TBODY,    /**< TBODY */
-  TidyTag_TD,       /**< TD */
-  TidyTag_TEXTAREA, /**< TEXTAREA */
-  TidyTag_TFOOT,    /**< TFOOT */
-  TidyTag_TH,       /**< TH */
-  TidyTag_THEAD,    /**< THEAD */
-  TidyTag_TITLE,    /**< TITLE */
-  TidyTag_TR,       /**< TR */
-  TidyTag_TT,       /**< TT */
-  TidyTag_U,        /**< U */
-  TidyTag_UL,       /**< UL */
-  TidyTag_VAR,      /**< VAR */
-  TidyTag_WBR,      /**< WBR */
-  TidyTag_XMP,      /**< XMP */
-  TidyTag_NEXTID,   /**< NEXTID */
+  TidyTag_UNKNOWN,       /**< Unknown tag! Must be first */
+  TidyTag_A,             /**< A */
+  TidyTag_ABBR,          /**< ABBR */
+  TidyTag_ACRONYM,       /**< ACRONYM */
+  TidyTag_ADDRESS,       /**< ADDRESS */
+  TidyTag_ALIGN,         /**< ALIGN */
+  TidyTag_APPLET,        /**< APPLET */
+  TidyTag_AREA,          /**< AREA */
+  TidyTag_B,             /**< B */
+  TidyTag_BASE,          /**< BASE */
+  TidyTag_BASEFONT,      /**< BASEFONT */
+  TidyTag_BDO,           /**< BDO */
+  TidyTag_BGSOUND,       /**< BGSOUND */
+  TidyTag_BIG,           /**< BIG */
+  TidyTag_BLINK,         /**< BLINK */
+  TidyTag_BLOCKQUOTE,    /**< BLOCKQUOTE */
+  TidyTag_BODY,          /**< BODY */
+  TidyTag_BR,            /**< BR */
+  TidyTag_BUTTON,        /**< BUTTON */
+  TidyTag_CAPTION,       /**< CAPTION */
+  TidyTag_CENTER,        /**< CENTER */
+  TidyTag_CITE,          /**< CITE */
+  TidyTag_CODE,          /**< CODE */
+  TidyTag_COL,           /**< COL */
+  TidyTag_COLGROUP,      /**< COLGROUP */
+  TidyTag_COMMENT,       /**< COMMENT */
+  TidyTag_DD,            /**< DD */
+  TidyTag_DEL,           /**< DEL */
+  TidyTag_DFN,           /**< DFN */
+  TidyTag_DIR,           /**< DIR */
+  TidyTag_DIV,           /**< DIF */
+  TidyTag_DL,            /**< DL */
+  TidyTag_DT,            /**< DT */
+  TidyTag_EM,            /**< EM */
+  TidyTag_EMBED,         /**< EMBED */
+  TidyTag_FIELDSET,      /**< FIELDSET */
+  TidyTag_FONT,          /**< FONT */
+  TidyTag_FORM,          /**< FORM */
+  TidyTag_FRAME,         /**< FRAME */
+  TidyTag_FRAMESET,      /**< FRAMESET */
+  TidyTag_H1,            /**< H1 */
+  TidyTag_H2,            /**< H2 */
+  TidyTag_H3,            /**< H3 */
+  TidyTag_H4,            /**< H4 */
+  TidyTag_H5,            /**< H5 */
+  TidyTag_H6,            /**< H6 */
+  TidyTag_HEAD,          /**< HEAD */
+  TidyTag_HR,            /**< HR */
+  TidyTag_HTML,          /**< HTML */
+  TidyTag_I,             /**< I */
+  TidyTag_IFRAME,        /**< IFRAME */
+  TidyTag_ILAYER,        /**< ILAYER */
+  TidyTag_IMG,           /**< IMG */
+  TidyTag_INPUT,         /**< INPUT */
+  TidyTag_INS,           /**< INS */
+  TidyTag_ISINDEX,       /**< ISINDEX */
+  TidyTag_KBD,           /**< KBD */
+  TidyTag_KEYGEN,        /**< KEYGEN */
+  TidyTag_LABEL,         /**< LABEL */
+  TidyTag_LAYER,         /**< LAYER */
+  TidyTag_LEGEND,        /**< LEGEND */
+  TidyTag_LI,            /**< LI */
+  TidyTag_LINK,          /**< LINK */
+  TidyTag_LISTING,       /**< LISTING */
+  TidyTag_MAP,           /**< MAP */
+  TidyTag_MATHML,        /**< MATH  (HTML5) [i_a]2 MathML embedded in [X]HTML */
+  TidyTag_MARQUEE,       /**< MARQUEE */
+  TidyTag_MENU,          /**< MENU */
+  TidyTag_META,          /**< META */
+  TidyTag_MULTICOL,      /**< MULTICOL */
+  TidyTag_NOBR,          /**< NOBR */
+  TidyTag_NOEMBED,       /**< NOEMBED */
+  TidyTag_NOFRAMES,      /**< NOFRAMES */
+  TidyTag_NOLAYER,       /**< NOLAYER */
+  TidyTag_NOSAVE,        /**< NOSAVE */
+  TidyTag_NOSCRIPT,      /**< NOSCRIPT */
+  TidyTag_OBJECT,        /**< OBJECT */
+  TidyTag_OL,            /**< OL */
+  TidyTag_OPTGROUP,      /**< OPTGROUP */
+  TidyTag_OPTION,        /**< OPTION */
+  TidyTag_P,             /**< P */
+  TidyTag_PARAM,         /**< PARAM */
+  TidyTag_PICTURE,       /**< PICTURE (HTML5) */
+  TidyTag_PLAINTEXT,     /**< PLAINTEXT */
+  TidyTag_PRE,           /**< PRE */
+  TidyTag_Q,             /**< Q */
+  TidyTag_RB,            /**< RB */
+  TidyTag_RBC,           /**< RBC */
+  TidyTag_RP,            /**< RP */
+  TidyTag_RT,            /**< RT */
+  TidyTag_RTC,           /**< RTC */
+  TidyTag_RUBY,          /**< RUBY */
+  TidyTag_S,             /**< S */
+  TidyTag_SAMP,          /**< SAMP */
+  TidyTag_SCRIPT,        /**< SCRIPT */
+  TidyTag_SELECT,        /**< SELECT */
+  TidyTag_SERVER,        /**< SERVER */
+  TidyTag_SERVLET,       /**< SERVLET */
+  TidyTag_SMALL,         /**< SMALL */
+  TidyTag_SPACER,        /**< SPACER */
+  TidyTag_SPAN,          /**< SPAN */
+  TidyTag_STRIKE,        /**< STRIKE */
+  TidyTag_STRONG,        /**< STRONG */
+  TidyTag_STYLE,         /**< STYLE */
+  TidyTag_SUB,           /**< SUB */
+  TidyTag_SUP,           /**< SUP */
+  TidyTag_SVG,           /**< SVG  (HTML5) */
+  TidyTag_TABLE,         /**< TABLE */
+  TidyTag_TBODY,         /**< TBODY */
+  TidyTag_TD,            /**< TD */
+  TidyTag_TEXTAREA,      /**< TEXTAREA */
+  TidyTag_TFOOT,         /**< TFOOT */
+  TidyTag_TH,            /**< TH */
+  TidyTag_THEAD,         /**< THEAD */
+  TidyTag_TITLE,         /**< TITLE */
+  TidyTag_TR,            /**< TR */
+  TidyTag_TT,            /**< TT */
+  TidyTag_U,             /**< U */
+  TidyTag_UL,            /**< UL */
+  TidyTag_VAR,           /**< VAR */
+  TidyTag_WBR,           /**< WBR */
+  TidyTag_XMP,           /**< XMP */
+  TidyTag_NEXTID,        /**< NEXTID */
 
-  TidyTag_ARTICLE,
-  TidyTag_ASIDE,
-  TidyTag_AUDIO,
-  TidyTag_BDI,
-  TidyTag_CANVAS,
-  TidyTag_COMMAND,
-  TidyTag_DATALIST,
-  TidyTag_DETAILS,
-  TidyTag_DIALOG,
-  TidyTag_FIGCAPTION,
-  TidyTag_FIGURE,
-  TidyTag_FOOTER,
-  TidyTag_HEADER,
-  TidyTag_HGROUP,
-  TidyTag_MAIN,
-  TidyTag_MARK,
-  TidyTag_MENUITEM,
-  TidyTag_METER,
-  TidyTag_NAV,
-  TidyTag_OUTPUT,
-  TidyTag_PROGRESS,
-  TidyTag_SECTION,
-  TidyTag_SOURCE,
-  TidyTag_SUMMARY,
-  TidyTag_TEMPLATE,
-  TidyTag_TIME,
-  TidyTag_TRACK,
-  TidyTag_VIDEO,
+  TidyTag_ARTICLE,       /**< ARTICLE */
+  TidyTag_ASIDE,         /**< ASIDE */
+  TidyTag_AUDIO,         /**< AUDIO */
+  TidyTag_BDI,           /**< BDI */
+  TidyTag_CANVAS,        /**< CANVAS */
+  TidyTag_COMMAND,       /**< COMMAND */
+  TidyTag_DATALIST,      /**< DATALIST */
+  TidyTag_DETAILS,       /**< DETAILS */
+  TidyTag_DIALOG,        /**< DIALOG */
+  TidyTag_FIGCAPTION,    /**< FIGCAPTION */
+  TidyTag_FIGURE,        /**< FIGURE */
+  TidyTag_FOOTER,        /**< FOOTER */
+  TidyTag_HEADER,        /**< HEADER */
+  TidyTag_HGROUP,        /**< HGROUP */
+  TidyTag_MAIN,          /**< MAIN */
+  TidyTag_MARK,          /**< MARK */
+  TidyTag_MENUITEM,      /**< MENUITEM */
+  TidyTag_METER,         /**< METER */
+  TidyTag_NAV,           /**< NAV */
+  TidyTag_OUTPUT,        /**< OUTPUT */
+  TidyTag_PROGRESS,      /**< PROGRESS */
+  TidyTag_SECTION,       /**< SECTION */
+  TidyTag_SOURCE,        /**< SOURCE */
+  TidyTag_SUMMARY,       /**< SUMMARY */
+  TidyTag_TEMPLATE,      /**< TEMPLATE */
+  TidyTag_TIME,          /**< TIME */
+  TidyTag_TRACK,         /**< TRACK */
+  TidyTag_VIDEO,         /**< VIDEO */
 
-  N_TIDY_TAGS       /**< Must be last */
+  N_TIDY_TAGS            /**< Must be last */
 } TidyTagId;
 
-/* Attribute interrogation
-*/
 
 /** Known HTML attributes
-*/
+ */
 typedef enum
 {
-  TidyAttr_UNKNOWN,           /**< UNKNOWN= */
-  TidyAttr_ABBR,              /**< ABBR= */
-  TidyAttr_ACCEPT,            /**< ACCEPT= */
-  TidyAttr_ACCEPT_CHARSET,    /**< ACCEPT_CHARSET= */
-  TidyAttr_ACCESSKEY,         /**< ACCESSKEY= */
-  TidyAttr_ACTION,            /**< ACTION= */
-  TidyAttr_ADD_DATE,          /**< ADD_DATE= */
-  TidyAttr_ALIGN,             /**< ALIGN= */
-  TidyAttr_ALINK,             /**< ALINK= */
-  TidyAttr_ALLOWFULLSCREEN,   /**< ALLOWFULLSCREEN= */
-  TidyAttr_ALT,               /**< ALT= */
-  TidyAttr_ARCHIVE,           /**< ARCHIVE= */
-  TidyAttr_AXIS,              /**< AXIS= */
-  TidyAttr_BACKGROUND,        /**< BACKGROUND= */
-  TidyAttr_BGCOLOR,           /**< BGCOLOR= */
-  TidyAttr_BGPROPERTIES,      /**< BGPROPERTIES= */
-  TidyAttr_BORDER,            /**< BORDER= */
-  TidyAttr_BORDERCOLOR,       /**< BORDERCOLOR= */
-  TidyAttr_BOTTOMMARGIN,      /**< BOTTOMMARGIN= */
-  TidyAttr_CELLPADDING,       /**< CELLPADDING= */
-  TidyAttr_CELLSPACING,       /**< CELLSPACING= */
-  TidyAttr_CHAR,              /**< CHAR= */
-  TidyAttr_CHAROFF,           /**< CHAROFF= */
-  TidyAttr_CHARSET,           /**< CHARSET= */
-  TidyAttr_CHECKED,           /**< CHECKED= */
-  TidyAttr_CITE,              /**< CITE= */
-  TidyAttr_CLASS,             /**< CLASS= */
-  TidyAttr_CLASSID,           /**< CLASSID= */
-  TidyAttr_CLEAR,             /**< CLEAR= */
-  TidyAttr_CODE,              /**< CODE= */
-  TidyAttr_CODEBASE,          /**< CODEBASE= */
-  TidyAttr_CODETYPE,          /**< CODETYPE= */
-  TidyAttr_COLOR,             /**< COLOR= */
-  TidyAttr_COLS,              /**< COLS= */
-  TidyAttr_COLSPAN,           /**< COLSPAN= */
-  TidyAttr_COMPACT,           /**< COMPACT= */
-  TidyAttr_CONTENT,           /**< CONTENT= */
-  TidyAttr_COORDS,            /**< COORDS= */
-  TidyAttr_DATA,              /**< DATA= */
-  TidyAttr_DATAFLD,           /**< DATAFLD= */
-  TidyAttr_DATAFORMATAS,      /**< DATAFORMATAS= */
-  TidyAttr_DATAPAGESIZE,      /**< DATAPAGESIZE= */
-  TidyAttr_DATASRC,           /**< DATASRC= */
-  TidyAttr_DATETIME,          /**< DATETIME= */
-  TidyAttr_DECLARE,           /**< DECLARE= */
-  TidyAttr_DEFER,             /**< DEFER= */
-  TidyAttr_DIR,               /**< DIR= */
-  TidyAttr_DISABLED,          /**< DISABLED= */
-  TidyAttr_ENCODING,          /**< ENCODING= */
-  TidyAttr_ENCTYPE,           /**< ENCTYPE= */
-  TidyAttr_FACE,              /**< FACE= */
-  TidyAttr_FOR,               /**< FOR= */
-  TidyAttr_FRAME,             /**< FRAME= */
-  TidyAttr_FRAMEBORDER,       /**< FRAMEBORDER= */
-  TidyAttr_FRAMESPACING,      /**< FRAMESPACING= */
-  TidyAttr_GRIDX,             /**< GRIDX= */
-  TidyAttr_GRIDY,             /**< GRIDY= */
-  TidyAttr_HEADERS,           /**< HEADERS= */
-  TidyAttr_HEIGHT,            /**< HEIGHT= */
-  TidyAttr_HREF,              /**< HREF= */
-  TidyAttr_HREFLANG,          /**< HREFLANG= */
-  TidyAttr_HSPACE,            /**< HSPACE= */
-  TidyAttr_HTTP_EQUIV,        /**< HTTP_EQUIV= */
-  TidyAttr_ID,                /**< ID= */
-  TidyAttr_ISMAP,             /**< ISMAP= */
-  TidyAttr_ITEMID,            /**< ITEMID= */
-  TidyAttr_ITEMPROP,          /**< ITEMPROP= */
-  TidyAttr_ITEMREF,           /**< ITEMREF= */
-  TidyAttr_ITEMSCOPE,         /**< ITEMSCOPE= */
-  TidyAttr_ITEMTYPE,          /**< ITEMTYPE= */
-  TidyAttr_LABEL,             /**< LABEL= */
-  TidyAttr_LANG,              /**< LANG= */
-  TidyAttr_LANGUAGE,          /**< LANGUAGE= */
-  TidyAttr_LAST_MODIFIED,     /**< LAST_MODIFIED= */
-  TidyAttr_LAST_VISIT,        /**< LAST_VISIT= */
-  TidyAttr_LEFTMARGIN,        /**< LEFTMARGIN= */
-  TidyAttr_LINK,              /**< LINK= */
-  TidyAttr_LONGDESC,          /**< LONGDESC= */
-  TidyAttr_LOWSRC,            /**< LOWSRC= */
-  TidyAttr_MARGINHEIGHT,      /**< MARGINHEIGHT= */
-  TidyAttr_MARGINWIDTH,       /**< MARGINWIDTH= */
-  TidyAttr_MAXLENGTH,         /**< MAXLENGTH= */
-  TidyAttr_MEDIA,             /**< MEDIA= */
-  TidyAttr_METHOD,            /**< METHOD= */
-  TidyAttr_MULTIPLE,          /**< MULTIPLE= */
-  TidyAttr_NAME,              /**< NAME= */
-  TidyAttr_NOHREF,            /**< NOHREF= */
-  TidyAttr_NORESIZE,          /**< NORESIZE= */
-  TidyAttr_NOSHADE,           /**< NOSHADE= */
-  TidyAttr_NOWRAP,            /**< NOWRAP= */
-  TidyAttr_OBJECT,            /**< OBJECT= */
-  TidyAttr_OnAFTERUPDATE,     /**< OnAFTERUPDATE= */
-  TidyAttr_OnBEFOREUNLOAD,    /**< OnBEFOREUNLOAD= */
-  TidyAttr_OnBEFOREUPDATE,    /**< OnBEFOREUPDATE= */
-  TidyAttr_OnBLUR,            /**< OnBLUR= */
-  TidyAttr_OnCHANGE,          /**< OnCHANGE= */
-  TidyAttr_OnCLICK,           /**< OnCLICK= */
-  TidyAttr_OnDATAAVAILABLE,   /**< OnDATAAVAILABLE= */
-  TidyAttr_OnDATASETCHANGED,  /**< OnDATASETCHANGED= */
-  TidyAttr_OnDATASETCOMPLETE, /**< OnDATASETCOMPLETE= */
-  TidyAttr_OnDBLCLICK,        /**< OnDBLCLICK= */
-  TidyAttr_OnERRORUPDATE,     /**< OnERRORUPDATE= */
-  TidyAttr_OnFOCUS,           /**< OnFOCUS= */
-  TidyAttr_OnKEYDOWN,         /**< OnKEYDOWN= */
-  TidyAttr_OnKEYPRESS,        /**< OnKEYPRESS= */
-  TidyAttr_OnKEYUP,           /**< OnKEYUP= */
-  TidyAttr_OnLOAD,            /**< OnLOAD= */
-  TidyAttr_OnMOUSEDOWN,       /**< OnMOUSEDOWN= */
-  TidyAttr_OnMOUSEMOVE,       /**< OnMOUSEMOVE= */
-  TidyAttr_OnMOUSEOUT,        /**< OnMOUSEOUT= */
-  TidyAttr_OnMOUSEOVER,       /**< OnMOUSEOVER= */
-  TidyAttr_OnMOUSEUP,         /**< OnMOUSEUP= */
-  TidyAttr_OnRESET,           /**< OnRESET= */
-  TidyAttr_OnROWENTER,        /**< OnROWENTER= */
-  TidyAttr_OnROWEXIT,         /**< OnROWEXIT= */
-  TidyAttr_OnSELECT,          /**< OnSELECT= */
-  TidyAttr_OnSUBMIT,          /**< OnSUBMIT= */
-  TidyAttr_OnUNLOAD,          /**< OnUNLOAD= */
-  TidyAttr_PROFILE,           /**< PROFILE= */
-  TidyAttr_PROMPT,            /**< PROMPT= */
-  TidyAttr_RBSPAN,            /**< RBSPAN= */
-  TidyAttr_READONLY,          /**< READONLY= */
-  TidyAttr_REL,               /**< REL= */
-  TidyAttr_REV,               /**< REV= */
-  TidyAttr_RIGHTMARGIN,       /**< RIGHTMARGIN= */
-  TidyAttr_ROLE,              /**< ROLE= */
-  TidyAttr_ROWS,              /**< ROWS= */
-  TidyAttr_ROWSPAN,           /**< ROWSPAN= */
-  TidyAttr_RULES,             /**< RULES= */
-  TidyAttr_SCHEME,            /**< SCHEME= */
-  TidyAttr_SCOPE,             /**< SCOPE= */
-  TidyAttr_SCROLLING,         /**< SCROLLING= */
-  TidyAttr_SELECTED,          /**< SELECTED= */
-  TidyAttr_SHAPE,             /**< SHAPE= */
-  TidyAttr_SHOWGRID,          /**< SHOWGRID= */
-  TidyAttr_SHOWGRIDX,         /**< SHOWGRIDX= */
-  TidyAttr_SHOWGRIDY,         /**< SHOWGRIDY= */
-  TidyAttr_SIZE,              /**< SIZE= */
-  TidyAttr_SPAN,              /**< SPAN= */
-  TidyAttr_SRC,               /**< SRC= */
-  TidyAttr_SRCSET,            /**< SRCSET= (HTML5) */
-  TidyAttr_STANDBY,           /**< STANDBY= */
-  TidyAttr_START,             /**< START= */
-  TidyAttr_STYLE,             /**< STYLE= */
-  TidyAttr_SUMMARY,           /**< SUMMARY= */
-  TidyAttr_TABINDEX,          /**< TABINDEX= */
-  TidyAttr_TARGET,            /**< TARGET= */
-  TidyAttr_TEXT,              /**< TEXT= */
-  TidyAttr_TITLE,             /**< TITLE= */
-  TidyAttr_TOPMARGIN,         /**< TOPMARGIN= */
-  TidyAttr_TRANSLATE,         /**< TRANSLATE= */
-  TidyAttr_TYPE,              /**< TYPE= */
-  TidyAttr_USEMAP,            /**< USEMAP= */
-  TidyAttr_VALIGN,            /**< VALIGN= */
-  TidyAttr_VALUE,             /**< VALUE= */
-  TidyAttr_VALUETYPE,         /**< VALUETYPE= */
-  TidyAttr_VERSION,           /**< VERSION= */
-  TidyAttr_VLINK,             /**< VLINK= */
-  TidyAttr_VSPACE,            /**< VSPACE= */
-  TidyAttr_WIDTH,             /**< WIDTH= */
-  TidyAttr_WRAP,              /**< WRAP= */
-  TidyAttr_XML_LANG,          /**< XML_LANG= */
-  TidyAttr_XML_SPACE,         /**< XML_SPACE= */
-  TidyAttr_XMLNS,             /**< XMLNS= */
+  TidyAttr_UNKNOWN,                /**< UNKNOWN= */
+  TidyAttr_ABBR,                   /**< ABBR= */
+  TidyAttr_ACCEPT,                 /**< ACCEPT= */
+  TidyAttr_ACCEPT_CHARSET,         /**< ACCEPT_CHARSET= */
+  TidyAttr_ACCESSKEY,              /**< ACCESSKEY= */
+  TidyAttr_ACTION,                 /**< ACTION= */
+  TidyAttr_ADD_DATE,               /**< ADD_DATE= */
+  TidyAttr_ALIGN,                  /**< ALIGN= */
+  TidyAttr_ALINK,                  /**< ALINK= */
+  TidyAttr_ALLOWFULLSCREEN,        /**< ALLOWFULLSCREEN= */
+  TidyAttr_ALT,                    /**< ALT= */
+  TidyAttr_ARCHIVE,                /**< ARCHIVE= */
+  TidyAttr_AXIS,                   /**< AXIS= */
+  TidyAttr_BACKGROUND,             /**< BACKGROUND= */
+  TidyAttr_BGCOLOR,                /**< BGCOLOR= */
+  TidyAttr_BGPROPERTIES,           /**< BGPROPERTIES= */
+  TidyAttr_BORDER,                 /**< BORDER= */
+  TidyAttr_BORDERCOLOR,            /**< BORDERCOLOR= */
+  TidyAttr_BOTTOMMARGIN,           /**< BOTTOMMARGIN= */
+  TidyAttr_CELLPADDING,            /**< CELLPADDING= */
+  TidyAttr_CELLSPACING,            /**< CELLSPACING= */
+  TidyAttr_CHAR,                   /**< CHAR= */
+  TidyAttr_CHAROFF,                /**< CHAROFF= */
+  TidyAttr_CHARSET,                /**< CHARSET= */
+  TidyAttr_CHECKED,                /**< CHECKED= */
+  TidyAttr_CITE,                   /**< CITE= */
+  TidyAttr_CLASS,                  /**< CLASS= */
+  TidyAttr_CLASSID,                /**< CLASSID= */
+  TidyAttr_CLEAR,                  /**< CLEAR= */
+  TidyAttr_CODE,                   /**< CODE= */
+  TidyAttr_CODEBASE,               /**< CODEBASE= */
+  TidyAttr_CODETYPE,               /**< CODETYPE= */
+  TidyAttr_COLOR,                  /**< COLOR= */
+  TidyAttr_COLS,                   /**< COLS= */
+  TidyAttr_COLSPAN,                /**< COLSPAN= */
+  TidyAttr_COMPACT,                /**< COMPACT= */
+  TidyAttr_CONTENT,                /**< CONTENT= */
+  TidyAttr_COORDS,                 /**< COORDS= */
+  TidyAttr_DATA,                   /**< DATA= */
+  TidyAttr_DATAFLD,                /**< DATAFLD= */
+  TidyAttr_DATAFORMATAS,           /**< DATAFORMATAS= */
+  TidyAttr_DATAPAGESIZE,           /**< DATAPAGESIZE= */
+  TidyAttr_DATASRC,                /**< DATASRC= */
+  TidyAttr_DATETIME,               /**< DATETIME= */
+  TidyAttr_DECLARE,                /**< DECLARE= */
+  TidyAttr_DEFER,                  /**< DEFER= */
+  TidyAttr_DIR,                    /**< DIR= */
+  TidyAttr_DISABLED,               /**< DISABLED= */
+  TidyAttr_DOWNLOAD,               /**< DOWNLOAD= */
+  TidyAttr_ENCODING,               /**< ENCODING= */
+  TidyAttr_ENCTYPE,                /**< ENCTYPE= */
+  TidyAttr_FACE,                   /**< FACE= */
+  TidyAttr_FOR,                    /**< FOR= */
+  TidyAttr_FRAME,                  /**< FRAME= */
+  TidyAttr_FRAMEBORDER,            /**< FRAMEBORDER= */
+  TidyAttr_FRAMESPACING,           /**< FRAMESPACING= */
+  TidyAttr_GRIDX,                  /**< GRIDX= */
+  TidyAttr_GRIDY,                  /**< GRIDY= */
+  TidyAttr_HEADERS,                /**< HEADERS= */
+  TidyAttr_HEIGHT,                 /**< HEIGHT= */
+  TidyAttr_HREF,                   /**< HREF= */
+  TidyAttr_HREFLANG,               /**< HREFLANG= */
+  TidyAttr_HSPACE,                 /**< HSPACE= */
+  TidyAttr_HTTP_EQUIV,             /**< HTTP_EQUIV= */
+  TidyAttr_ID,                     /**< ID= */
+  TidyAttr_IS,                     /**< IS= */
+  TidyAttr_ISMAP,                  /**< ISMAP= */
+  TidyAttr_ITEMID,                 /**< ITEMID= */
+  TidyAttr_ITEMPROP,               /**< ITEMPROP= */
+  TidyAttr_ITEMREF,                /**< ITEMREF= */
+  TidyAttr_ITEMSCOPE,              /**< ITEMSCOPE= */
+  TidyAttr_ITEMTYPE,               /**< ITEMTYPE= */
+  TidyAttr_LABEL,                  /**< LABEL= */
+  TidyAttr_LANG,                   /**< LANG= */
+  TidyAttr_LANGUAGE,               /**< LANGUAGE= */
+  TidyAttr_LAST_MODIFIED,          /**< LAST_MODIFIED= */
+  TidyAttr_LAST_VISIT,             /**< LAST_VISIT= */
+  TidyAttr_LEFTMARGIN,             /**< LEFTMARGIN= */
+  TidyAttr_LINK,                   /**< LINK= */
+  TidyAttr_LONGDESC,               /**< LONGDESC= */
+  TidyAttr_LOWSRC,                 /**< LOWSRC= */
+  TidyAttr_MARGINHEIGHT,           /**< MARGINHEIGHT= */
+  TidyAttr_MARGINWIDTH,            /**< MARGINWIDTH= */
+  TidyAttr_MAXLENGTH,              /**< MAXLENGTH= */
+  TidyAttr_MEDIA,                  /**< MEDIA= */
+  TidyAttr_METHOD,                 /**< METHOD= */
+  TidyAttr_MULTIPLE,               /**< MULTIPLE= */
+  TidyAttr_NAME,                   /**< NAME= */
+  TidyAttr_NOHREF,                 /**< NOHREF= */
+  TidyAttr_NORESIZE,               /**< NORESIZE= */
+  TidyAttr_NOSHADE,                /**< NOSHADE= */
+  TidyAttr_NOWRAP,                 /**< NOWRAP= */
+  TidyAttr_OBJECT,                 /**< OBJECT= */
+  TidyAttr_OnAFTERUPDATE,          /**< OnAFTERUPDATE= */
+  TidyAttr_OnBEFOREUNLOAD,         /**< OnBEFOREUNLOAD= */
+  TidyAttr_OnBEFOREUPDATE,         /**< OnBEFOREUPDATE= */
+  TidyAttr_OnBLUR,                 /**< OnBLUR= */
+  TidyAttr_OnCHANGE,               /**< OnCHANGE= */
+  TidyAttr_OnCLICK,                /**< OnCLICK= */
+  TidyAttr_OnDATAAVAILABLE,        /**< OnDATAAVAILABLE= */
+  TidyAttr_OnDATASETCHANGED,       /**< OnDATASETCHANGED= */
+  TidyAttr_OnDATASETCOMPLETE,      /**< OnDATASETCOMPLETE= */
+  TidyAttr_OnDBLCLICK,             /**< OnDBLCLICK= */
+  TidyAttr_OnERRORUPDATE,          /**< OnERRORUPDATE= */
+  TidyAttr_OnFOCUS,                /**< OnFOCUS= */
+  TidyAttr_OnKEYDOWN,              /**< OnKEYDOWN= */
+  TidyAttr_OnKEYPRESS,             /**< OnKEYPRESS= */
+  TidyAttr_OnKEYUP,                /**< OnKEYUP= */
+  TidyAttr_OnLOAD,                 /**< OnLOAD= */
+  TidyAttr_OnMOUSEDOWN,            /**< OnMOUSEDOWN= */
+  TidyAttr_OnMOUSEMOVE,            /**< OnMOUSEMOVE= */
+  TidyAttr_OnMOUSEOUT,             /**< OnMOUSEOUT= */
+  TidyAttr_OnMOUSEOVER,            /**< OnMOUSEOVER= */
+  TidyAttr_OnMOUSEUP,              /**< OnMOUSEUP= */
+  TidyAttr_OnRESET,                /**< OnRESET= */
+  TidyAttr_OnROWENTER,             /**< OnROWENTER= */
+  TidyAttr_OnROWEXIT,              /**< OnROWEXIT= */
+  TidyAttr_OnSELECT,               /**< OnSELECT= */
+  TidyAttr_OnSUBMIT,               /**< OnSUBMIT= */
+  TidyAttr_OnUNLOAD,               /**< OnUNLOAD= */
+  TidyAttr_PROFILE,                /**< PROFILE= */
+  TidyAttr_PROMPT,                 /**< PROMPT= */
+  TidyAttr_RBSPAN,                 /**< RBSPAN= */
+  TidyAttr_READONLY,               /**< READONLY= */
+  TidyAttr_REL,                    /**< REL= */
+  TidyAttr_REV,                    /**< REV= */
+  TidyAttr_RIGHTMARGIN,            /**< RIGHTMARGIN= */
+  TidyAttr_ROLE,                   /**< ROLE= */
+  TidyAttr_ROWS,                   /**< ROWS= */
+  TidyAttr_ROWSPAN,                /**< ROWSPAN= */
+  TidyAttr_RULES,                  /**< RULES= */
+  TidyAttr_SCHEME,                 /**< SCHEME= */
+  TidyAttr_SCOPE,                  /**< SCOPE= */
+  TidyAttr_SCROLLING,              /**< SCROLLING= */
+  TidyAttr_SELECTED,               /**< SELECTED= */
+  TidyAttr_SHAPE,                  /**< SHAPE= */
+  TidyAttr_SHOWGRID,               /**< SHOWGRID= */
+  TidyAttr_SHOWGRIDX,              /**< SHOWGRIDX= */
+  TidyAttr_SHOWGRIDY,              /**< SHOWGRIDY= */
+  TidyAttr_SIZE,                   /**< SIZE= */
+  TidyAttr_SPAN,                   /**< SPAN= */
+  TidyAttr_SRC,                    /**< SRC= */
+  TidyAttr_SRCSET,                 /**< SRCSET= (HTML5) */
+  TidyAttr_STANDBY,                /**< STANDBY= */
+  TidyAttr_START,                  /**< START= */
+  TidyAttr_STYLE,                  /**< STYLE= */
+  TidyAttr_SUMMARY,                /**< SUMMARY= */
+  TidyAttr_TABINDEX,               /**< TABINDEX= */
+  TidyAttr_TARGET,                 /**< TARGET= */
+  TidyAttr_TEXT,                   /**< TEXT= */
+  TidyAttr_TITLE,                  /**< TITLE= */
+  TidyAttr_TOPMARGIN,              /**< TOPMARGIN= */
+  TidyAttr_TRANSLATE,              /**< TRANSLATE= */
+  TidyAttr_TYPE,                   /**< TYPE= */
+  TidyAttr_USEMAP,                 /**< USEMAP= */
+  TidyAttr_VALIGN,                 /**< VALIGN= */
+  TidyAttr_VALUE,                  /**< VALUE= */
+  TidyAttr_VALUETYPE,              /**< VALUETYPE= */
+  TidyAttr_VERSION,                /**< VERSION= */
+  TidyAttr_VLINK,                  /**< VLINK= */
+  TidyAttr_VSPACE,                 /**< VSPACE= */
+  TidyAttr_WIDTH,                  /**< WIDTH= */
+  TidyAttr_WRAP,                   /**< WRAP= */
+  TidyAttr_XML_LANG,               /**< XML_LANG= */
+  TidyAttr_XML_SPACE,              /**< XML_SPACE= */
+  TidyAttr_XMLNS,                  /**< XMLNS= */
+     
+  TidyAttr_EVENT,                  /**< EVENT= */
+  TidyAttr_METHODS,                /**< METHODS= */
+  TidyAttr_N,                      /**< N= */
+  TidyAttr_SDAFORM,                /**< SDAFORM= */
+  TidyAttr_SDAPREF,                /**< SDAPREF= */
+  TidyAttr_SDASUFF,                /**< SDASUFF= */
+  TidyAttr_URN,                    /**< URN= */
 
-  TidyAttr_EVENT,             /**< EVENT= */
-  TidyAttr_METHODS,           /**< METHODS= */
-  TidyAttr_N,                 /**< N= */
-  TidyAttr_SDAFORM,           /**< SDAFORM= */
-  TidyAttr_SDAPREF,           /**< SDAPREF= */
-  TidyAttr_SDASUFF,           /**< SDASUFF= */
-  TidyAttr_URN,               /**< URN= */
-
-  TidyAttr_ASYNC,
-  TidyAttr_AUTOCOMPLETE,
-  TidyAttr_AUTOFOCUS,
-  TidyAttr_AUTOPLAY,
-  TidyAttr_CHALLENGE,
-  TidyAttr_CONTENTEDITABLE,
-  TidyAttr_CONTEXTMENU,
-  TidyAttr_CONTROLS,
-  TidyAttr_CROSSORIGIN,       /**< CROSSORIGIN= */
-  TidyAttr_DEFAULT,
-  TidyAttr_DIRNAME,
-  TidyAttr_DRAGGABLE,
-  TidyAttr_DROPZONE,
-  TidyAttr_FORM,
-  TidyAttr_FORMACTION,
-  TidyAttr_FORMENCTYPE,
-  TidyAttr_FORMMETHOD,
-  TidyAttr_FORMNOVALIDATE,
-  TidyAttr_FORMTARGET,
-  TidyAttr_HIDDEN,
-  TidyAttr_HIGH,
-  TidyAttr_ICON,
-  TidyAttr_KEYTYPE,
-  TidyAttr_KIND,
-  TidyAttr_LIST,
-  TidyAttr_LOOP,
-  TidyAttr_LOW,
-  TidyAttr_MANIFEST,
-  TidyAttr_MAX,
-  TidyAttr_MEDIAGROUP,
-  TidyAttr_MIN,
-  TidyAttr_NOVALIDATE,
-  TidyAttr_OPEN,
-  TidyAttr_OPTIMUM,
-  TidyAttr_OnABORT,
-  TidyAttr_OnAFTERPRINT,
-  TidyAttr_OnBEFOREPRINT,
-  TidyAttr_OnCANPLAY,
-  TidyAttr_OnCANPLAYTHROUGH,
-  TidyAttr_OnCONTEXTMENU,
-  TidyAttr_OnCUECHANGE,
-  TidyAttr_OnDRAG,
-  TidyAttr_OnDRAGEND,
-  TidyAttr_OnDRAGENTER,
-  TidyAttr_OnDRAGLEAVE,
-  TidyAttr_OnDRAGOVER,
-  TidyAttr_OnDRAGSTART,
-  TidyAttr_OnDROP,
-  TidyAttr_OnDURATIONCHANGE,
-  TidyAttr_OnEMPTIED,
-  TidyAttr_OnENDED,
-  TidyAttr_OnERROR,
-  TidyAttr_OnHASHCHANGE,
-  TidyAttr_OnINPUT,
-  TidyAttr_OnINVALID,
-  TidyAttr_OnLOADEDDATA,
-  TidyAttr_OnLOADEDMETADATA,
-  TidyAttr_OnLOADSTART,
-  TidyAttr_OnMESSAGE,
-  TidyAttr_OnMOUSEWHEEL,
-  TidyAttr_OnOFFLINE,
-  TidyAttr_OnONLINE,
-  TidyAttr_OnPAGEHIDE,
-  TidyAttr_OnPAGESHOW,
-  TidyAttr_OnPAUSE,
-  TidyAttr_OnPLAY,
-  TidyAttr_OnPLAYING,
-  TidyAttr_OnPOPSTATE,
-  TidyAttr_OnPROGRESS,
-  TidyAttr_OnRATECHANGE,
-  TidyAttr_OnREADYSTATECHANGE,
-  TidyAttr_OnREDO,
-  TidyAttr_OnRESIZE,
-  TidyAttr_OnSCROLL,
-  TidyAttr_OnSEEKED,
-  TidyAttr_OnSEEKING,
-  TidyAttr_OnSHOW,
-  TidyAttr_OnSTALLED,
-  TidyAttr_OnSTORAGE,
-  TidyAttr_OnSUSPEND,
-  TidyAttr_OnTIMEUPDATE,
-  TidyAttr_OnUNDO,
-  TidyAttr_OnVOLUMECHANGE,
-  TidyAttr_OnWAITING,
-  TidyAttr_PATTERN,
-  TidyAttr_PLACEHOLDER,
-  TidyAttr_POSTER,
-  TidyAttr_PRELOAD,
-  TidyAttr_PUBDATE,
-  TidyAttr_RADIOGROUP,
-  TidyAttr_REQUIRED,
-  TidyAttr_REVERSED,
-  TidyAttr_SANDBOX,
-  TidyAttr_SCOPED,
-  TidyAttr_SEAMLESS,
-  TidyAttr_SIZES,
-  TidyAttr_SPELLCHECK,
-  TidyAttr_SRCDOC,
-  TidyAttr_SRCLANG,
-  TidyAttr_STEP,
-  TidyAttr_ARIA_ACTIVEDESCENDANT,
-  TidyAttr_ARIA_ATOMIC,
-  TidyAttr_ARIA_AUTOCOMPLETE,
-  TidyAttr_ARIA_BUSY,
-  TidyAttr_ARIA_CHECKED,
-  TidyAttr_ARIA_CONTROLS,
-  TidyAttr_ARIA_DESCRIBEDBY,
-  TidyAttr_ARIA_DISABLED,
-  TidyAttr_ARIA_DROPEFFECT,
-  TidyAttr_ARIA_EXPANDED,
-  TidyAttr_ARIA_FLOWTO,
-  TidyAttr_ARIA_GRABBED,
-  TidyAttr_ARIA_HASPOPUP,
-  TidyAttr_ARIA_HIDDEN,
-  TidyAttr_ARIA_INVALID,
-  TidyAttr_ARIA_LABEL,
-  TidyAttr_ARIA_LABELLEDBY,
-  TidyAttr_ARIA_LEVEL,
-  TidyAttr_ARIA_LIVE,
-  TidyAttr_ARIA_MULTILINE,
-  TidyAttr_ARIA_MULTISELECTABLE,
-  TidyAttr_ARIA_ORIENTATION,
-  TidyAttr_ARIA_OWNS,
-  TidyAttr_ARIA_POSINSET,
-  TidyAttr_ARIA_PRESSED,
-  TidyAttr_ARIA_READONLY,
-  TidyAttr_ARIA_RELEVANT,
-  TidyAttr_ARIA_REQUIRED,
-  TidyAttr_ARIA_SELECTED,
-  TidyAttr_ARIA_SETSIZE,
-  TidyAttr_ARIA_SORT,
-  TidyAttr_ARIA_VALUEMAX,
-  TidyAttr_ARIA_VALUEMIN,
-  TidyAttr_ARIA_VALUENOW,
-  TidyAttr_ARIA_VALUETEXT,
+  TidyAttr_ASYNC,                  /**< ASYNC= */
+  TidyAttr_AUTOCOMPLETE,           /**< AUTOCOMPLETE= */
+  TidyAttr_AUTOFOCUS,              /**< AUTOFOCUS= */
+  TidyAttr_AUTOPLAY,               /**< AUTOPLAY= */
+  TidyAttr_CHALLENGE,              /**< CHALLENGE= */
+  TidyAttr_CONTENTEDITABLE,        /**< CONTENTEDITABLE= */
+  TidyAttr_CONTEXTMENU,            /**< CONTEXTMENU= */
+  TidyAttr_CONTROLS,               /**< CONTROLS= */
+  TidyAttr_CROSSORIGIN,            /**< CROSSORIGIN= */
+  TidyAttr_DEFAULT,                /**< DEFAULT= */
+  TidyAttr_DIRNAME,                /**< DIRNAME= */
+  TidyAttr_DRAGGABLE,              /**< DRAGGABLE= */
+  TidyAttr_DROPZONE,               /**< DROPZONE= */
+  TidyAttr_FORM,                   /**< FORM= */
+  TidyAttr_FORMACTION,             /**< FORMACTION= */
+  TidyAttr_FORMENCTYPE,            /**< FORMENCTYPE= */
+  TidyAttr_FORMMETHOD,             /**< FORMMETHOD= */
+  TidyAttr_FORMNOVALIDATE,         /**< FORMNOVALIDATE= */
+  TidyAttr_FORMTARGET,             /**< FORMTARGET= */
+  TidyAttr_HIDDEN,                 /**< HIDDEN= */
+  TidyAttr_HIGH,                   /**< HIGH= */
+  TidyAttr_ICON,                   /**< ICON= */
+  TidyAttr_KEYTYPE,                /**< KEYTYPE= */
+  TidyAttr_KIND,                   /**< KIND= */
+  TidyAttr_LIST,                   /**< LIST= */
+  TidyAttr_LOOP,                   /**< LOOP= */
+  TidyAttr_LOW,                    /**< LOW= */
+  TidyAttr_MANIFEST,               /**< MANIFEST= */
+  TidyAttr_MAX,                    /**< MAX= */
+  TidyAttr_MEDIAGROUP,             /**< MEDIAGROUP= */
+  TidyAttr_MIN,                    /**< MIN= */
+  TidyAttr_NOVALIDATE,             /**< NOVALIDATE= */
+  TidyAttr_OPEN,                   /**< OPEN= */
+  TidyAttr_OPTIMUM,                /**< OPTIMUM= */
+  TidyAttr_OnABORT,                /**< OnABORT= */
+  TidyAttr_OnAFTERPRINT,           /**< OnAFTERPRINT= */
+  TidyAttr_OnBEFOREPRINT,          /**< OnBEFOREPRINT= */
+  TidyAttr_OnCANPLAY,              /**< OnCANPLAY= */
+  TidyAttr_OnCANPLAYTHROUGH,       /**< OnCANPLAYTHROUGH= */
+  TidyAttr_OnCONTEXTMENU,          /**< OnCONTEXTMENU= */
+  TidyAttr_OnCUECHANGE,            /**< OnCUECHANGE= */
+  TidyAttr_OnDRAG,                 /**< OnDRAG= */
+  TidyAttr_OnDRAGEND,              /**< OnDRAGEND= */
+  TidyAttr_OnDRAGENTER,            /**< OnDRAGENTER= */
+  TidyAttr_OnDRAGLEAVE,            /**< OnDRAGLEAVE= */
+  TidyAttr_OnDRAGOVER,             /**< OnDRAGOVER= */
+  TidyAttr_OnDRAGSTART,            /**< OnDRAGSTART= */
+  TidyAttr_OnDROP,                 /**< OnDROP= */
+  TidyAttr_OnDURATIONCHANGE,       /**< OnDURATIONCHANGE= */
+  TidyAttr_OnEMPTIED,              /**< OnEMPTIED= */
+  TidyAttr_OnENDED,                /**< OnENDED= */
+  TidyAttr_OnERROR,                /**< OnERROR= */
+  TidyAttr_OnHASHCHANGE,           /**< OnHASHCHANGE= */
+  TidyAttr_OnINPUT,                /**< OnINPUT= */
+  TidyAttr_OnINVALID,              /**< OnINVALID= */
+  TidyAttr_OnLOADEDDATA,           /**< OnLOADEDDATA= */
+  TidyAttr_OnLOADEDMETADATA,       /**< OnLOADEDMETADATA= */
+  TidyAttr_OnLOADSTART,            /**< OnLOADSTART= */
+  TidyAttr_OnMESSAGE,              /**< OnMESSAGE= */
+  TidyAttr_OnMOUSEWHEEL,           /**< OnMOUSEWHEEL= */
+  TidyAttr_OnOFFLINE,              /**< OnOFFLINE= */
+  TidyAttr_OnONLINE,               /**< OnONLINE= */
+  TidyAttr_OnPAGEHIDE,             /**< OnPAGEHIDE= */
+  TidyAttr_OnPAGESHOW,             /**< OnPAGESHOW= */
+  TidyAttr_OnPAUSE,                /**< OnPAUSE= */
+  TidyAttr_OnPLAY,                 /**< OnPLAY= */
+  TidyAttr_OnPLAYING,              /**< OnPLAYING= */
+  TidyAttr_OnPOPSTATE,             /**< OnPOPSTATE= */
+  TidyAttr_OnPROGRESS,             /**< OnPROGRESS= */
+  TidyAttr_OnRATECHANGE,           /**< OnRATECHANGE= */
+  TidyAttr_OnREADYSTATECHANGE,     /**< OnREADYSTATECHANGE= */
+  TidyAttr_OnREDO,                 /**< OnREDO= */
+  TidyAttr_OnRESIZE,               /**< OnRESIZE= */
+  TidyAttr_OnSCROLL,               /**< OnSCROLL= */
+  TidyAttr_OnSEEKED,               /**< OnSEEKED= */
+  TidyAttr_OnSEEKING,              /**< OnSEEKING= */
+  TidyAttr_OnSHOW,                 /**< OnSHOW= */
+  TidyAttr_OnSTALLED,              /**< OnSTALLED= */
+  TidyAttr_OnSTORAGE,              /**< OnSTORAGE= */
+  TidyAttr_OnSUSPEND,              /**< OnSUSPEND= */
+  TidyAttr_OnTIMEUPDATE,           /**< OnTIMEUPDATE= */
+  TidyAttr_OnUNDO,                 /**< OnUNDO= */
+  TidyAttr_OnVOLUMECHANGE,         /**< OnVOLUMECHANGE= */
+  TidyAttr_OnWAITING,              /**< OnWAITING= */
+  TidyAttr_PATTERN,                /**< PATTERN= */
+  TidyAttr_PLACEHOLDER,            /**< PLACEHOLDER= */
+  TidyAttr_POSTER,                 /**< POSTER= */
+  TidyAttr_PRELOAD,                /**< PRELOAD= */
+  TidyAttr_PUBDATE,                /**< PUBDATE= */
+  TidyAttr_RADIOGROUP,             /**< RADIOGROUP= */
+  TidyAttr_REQUIRED,               /**< REQUIRED= */
+  TidyAttr_REVERSED,               /**< REVERSED= */
+  TidyAttr_SANDBOX,                /**< SANDBOX= */
+  TidyAttr_SCOPED,                 /**< SCOPED= */
+  TidyAttr_SEAMLESS,               /**< SEAMLESS= */
+  TidyAttr_SIZES,                  /**< SIZES= */
+  TidyAttr_SPELLCHECK,             /**< SPELLCHECK= */
+  TidyAttr_SRCDOC,                 /**< SRCDOC= */
+  TidyAttr_SRCLANG,                /**< SRCLANG= */
+  TidyAttr_STEP,                   /**< STEP= */
+  TidyAttr_ARIA_ACTIVEDESCENDANT,  /**< ARIA_ACTIVEDESCENDANT */
+  TidyAttr_ARIA_ATOMIC,            /**< ARIA_ATOMIC= */
+  TidyAttr_ARIA_AUTOCOMPLETE,      /**< ARIA_AUTOCOMPLETE= */
+  TidyAttr_ARIA_BUSY,              /**< ARIA_BUSY= */
+  TidyAttr_ARIA_CHECKED,           /**< ARIA_CHECKED= */
+  TidyAttr_ARIA_CONTROLS,          /**< ARIA_CONTROLS= */
+  TidyAttr_ARIA_DESCRIBEDBY,       /**< ARIA_DESCRIBEDBY= */
+  TidyAttr_ARIA_DISABLED,          /**< ARIA_DISABLED= */
+  TidyAttr_ARIA_DROPEFFECT,        /**< ARIA_DROPEFFECT= */
+  TidyAttr_ARIA_EXPANDED,          /**< ARIA_EXPANDED= */
+  TidyAttr_ARIA_FLOWTO,            /**< ARIA_FLOWTO= */
+  TidyAttr_ARIA_GRABBED,           /**< ARIA_GRABBED= */
+  TidyAttr_ARIA_HASPOPUP,          /**< ARIA_HASPOPUP= */
+  TidyAttr_ARIA_HIDDEN,            /**< ARIA_HIDDEN= */
+  TidyAttr_ARIA_INVALID,           /**< ARIA_INVALID= */
+  TidyAttr_ARIA_LABEL,             /**< ARIA_LABEL= */
+  TidyAttr_ARIA_LABELLEDBY,        /**< ARIA_LABELLEDBY= */
+  TidyAttr_ARIA_LEVEL,             /**< ARIA_LEVEL= */
+  TidyAttr_ARIA_LIVE,              /**< ARIA_LIVE= */
+  TidyAttr_ARIA_MULTILINE,         /**< ARIA_MULTILINE= */
+  TidyAttr_ARIA_MULTISELECTABLE,   /**< ARIA_MULTISELECTABLE= */
+  TidyAttr_ARIA_ORIENTATION,       /**< ARIA_ORIENTATION= */
+  TidyAttr_ARIA_OWNS,              /**< ARIA_OWNS= */
+  TidyAttr_ARIA_POSINSET,          /**< ARIA_POSINSET= */
+  TidyAttr_ARIA_PRESSED,           /**< ARIA_PRESSED= */
+  TidyAttr_ARIA_READONLY,          /**< ARIA_READONLY= */
+  TidyAttr_ARIA_RELEVANT,          /**< ARIA_RELEVANT= */
+  TidyAttr_ARIA_REQUIRED,          /**< ARIA_REQUIRED= */
+  TidyAttr_ARIA_SELECTED,          /**< ARIA_SELECTED= */
+  TidyAttr_ARIA_SETSIZE,           /**< ARIA_SETSIZE= */
+  TidyAttr_ARIA_SORT,              /**< ARIA_SORT= */
+  TidyAttr_ARIA_VALUEMAX,          /**< ARIA_VALUEMAX= */
+  TidyAttr_ARIA_VALUEMIN,          /**< ARIA_VALUEMIN= */
+  TidyAttr_ARIA_VALUENOW,          /**< ARIA_VALUENOW= */
+  TidyAttr_ARIA_VALUETEXT,         /**< ARIA_VALUETEXT= */
 
   /* SVG attributes (SVG 1.1) */
-  TidyAttr_X,                   /**< X= */
-  TidyAttr_Y,                   /**< Y= */
-  TidyAttr_VIEWBOX,             /**< VIEWBOX= */
-  TidyAttr_PRESERVEASPECTRATIO, /**< PRESERVEASPECTRATIO= */
-  TidyAttr_ZOOMANDPAN,          /**< ZOOMANDPAN= */
-  TidyAttr_BASEPROFILE,         /**< BASEPROFILE= */
-  TidyAttr_CONTENTSCRIPTTYPE,   /**< CONTENTSCRIPTTYPE= */
-  TidyAttr_CONTENTSTYLETYPE,    /**< CONTENTSTYLETYPE= */
+  TidyAttr_X,                      /**< X= */
+  TidyAttr_Y,                      /**< Y= */
+  TidyAttr_VIEWBOX,                /**< VIEWBOX= */
+  TidyAttr_PRESERVEASPECTRATIO,    /**< PRESERVEASPECTRATIO= */
+  TidyAttr_ZOOMANDPAN,             /**< ZOOMANDPAN= */
+  TidyAttr_BASEPROFILE,            /**< BASEPROFILE= */
+  TidyAttr_CONTENTSCRIPTTYPE,      /**< CONTENTSCRIPTTYPE= */
+  TidyAttr_CONTENTSTYLETYPE,       /**< CONTENTSTYLETYPE= */
+
   /* MathML <math> attributes */
-  TidyAttr_DISPLAY,             /**< DISPLAY= (html5) */
+  TidyAttr_DISPLAY,                /**< DISPLAY= (html5) */
 
   /* RDFa global attributes */
-  TidyAttr_ABOUT,             /**< ABOUT= */
-  TidyAttr_DATATYPE,          /**< DATATYPE= */
-  TidyAttr_INLIST,            /**< INLIST= */
-  TidyAttr_PREFIX,            /**< PREFIX= */
-  TidyAttr_PROPERTY,          /**< PROPERTY= */
-  TidyAttr_RESOURCE,          /**< RESOURCE= */
-  TidyAttr_TYPEOF,            /**< TYPEOF= */
-  TidyAttr_VOCAB,             /**< VOCAB= */
-
-  TidyAttr_INTEGRITY,         /**< INTEGRITY= */
-
-  TidyAttr_AS,               /**< AS= */
-
-  TidyAttr_XMLNSXLINK,        /**< svg xmls:xlink="url" */
-
-  N_TIDY_ATTRIBS              /**< Must be last */
+  TidyAttr_ABOUT,                  /**< ABOUT= */
+  TidyAttr_DATATYPE,               /**< DATATYPE= */
+  TidyAttr_INLIST,                 /**< INLIST= */
+  TidyAttr_PREFIX,                 /**< PREFIX= */
+  TidyAttr_PROPERTY,               /**< PROPERTY= */
+  TidyAttr_RESOURCE,               /**< RESOURCE= */
+  TidyAttr_TYPEOF,                 /**< TYPEOF= */
+  TidyAttr_VOCAB,                  /**< VOCAB= */
+   
+  TidyAttr_INTEGRITY,              /**< INTEGRITY= */
+   
+  TidyAttr_AS,                     /**< AS= */
+   
+  TidyAttr_XMLNSXLINK,             /**< svg xmls:xlink="url" */
+   
+  N_TIDY_ATTRIBS                   /**< Must be last */
 } TidyAttrId;
+
+    
+/** @}
+ ** @name I/O and Message Handling Interface
+ **
+ ** Messages used throughout LibTidy and exposed to the public API have
+ ** attributes which are communicated with these enumerations.
+ **
+ ** @{
+ */
+
+
+/** Message severity level, used throughout LibTidy to indicate the severity
+ ** or status of a message
+ **
+ ** @remark These enum members all have associated localized strings available
+ **         via their enum values. These strings are suitable for use as labels.
+ */
+typedef enum
+{
+    TidyInfo = 350,         /**< Report: Information about markup usage */
+    TidyWarning,            /**< Report: Warning message */
+    TidyConfig,             /**< Report: Configuration error */
+    TidyAccess,             /**< Report: Accessibility message */
+    TidyError,              /**< Report: Error message - output suppressed */
+    TidyBadDocument,        /**< Report: I/O or file system error */
+    TidyFatal,              /**< Report: Crash! */
+    TidyDialogueSummary,    /**< Dialogue: Summary-related information */
+    TidyDialogueInfo,       /**< Dialogue: Non-document related information */
+    TidyDialogueFootnote,   /**< Dialogue: Footnote */
+    TidyDialogueDoc = TidyDialogueFootnote, /**< Dialogue: Deprecated (renamed) */
+} TidyReportLevel;
+
+    
+/** Indicates the data type of a format string parameter used when Tidy
+ ** emits reports and dialogue as part of the messaging callback functions.
+ ** See `messageobj.h` for more information on this API.
+ */
+typedef enum
+{
+    tidyFormatType_INT = 0,         /**< Argument is signed integer. */
+    tidyFormatType_UINT,            /**< Argument is unsigned integer. */
+    tidyFormatType_STRING,          /**< Argument is a string. */
+    tidyFormatType_DOUBLE,          /**< Argument is a double. */
+    tidyFormatType_UNKNOWN  = 20    /**< Argument type is unknown! */
+} TidyFormatParameterType;
+
+
+/** @} */
+/** @} end group public_enumerations*/
+
+    
+/* MARK: - Public Enumerations (con't) */
+/** @addtogroup public_enumerations
+ ** @{ */
+
+/** @name Messages 
+ ** @{ */
+
+/** The enumeration contains a list of every possible string that Tidy and the
+ ** console application can output, _except_ for strings from the following
+ ** enumerations:
+ ** - `TidyOptionId`
+ ** - `TidyConfigCategory`
+ ** - `TidyReportLevel`
+ **
+ ** They are used as keys internally within Tidy, and have corresponding text
+ ** keys that are used in message callback filters (these are defined in
+ ** `tidyStringsKeys[]`, but API users don't require access to it directly).
+ */
+typedef enum
+{
+    /* This MUST be present and first. */
+    TIDYSTRINGS_FIRST = 500,
+
+    FOREACH_MSG_MISC(MAKE_ENUM)
+    FOREACH_FOOTNOTE_MSG(MAKE_ENUM)
+    FOREACH_DIALOG_MSG(MAKE_ENUM)
+    REPORT_MESSAGE_FIRST,
+    FOREACH_REPORT_MSG(MAKE_ENUM)
+    REPORT_MESSAGE_LAST,
+    FOREACH_ACCESS_MSG(MAKE_ENUM)
+
+#if SUPPORT_CONSOLE_APP
+    FOREACH_MSG_CONSOLE(MAKE_ENUM)
+#endif
+
+    /* This MUST be present and last. */
+    TIDYSTRINGS_LAST
+
+} tidyStrings;
+
+
+/** @} */
+/** @} end group public_enumerations */
+
 
 #ifdef __cplusplus
 }  /* extern "C" */
@@ -1496,66 +2162,70 @@ typedef enum
 #ifndef __TIDY_H__
 #define __TIDY_H__
 
-/** @file tidy.h - Defines HTML Tidy API implemented by tidy library.
-
-  Public interface is const-correct and doesn't explicitly depend
-  on any globals.  Thus, thread-safety may be introduced w/out
-  changing the interface.
-
-  Looking ahead to a C++ wrapper, C functions always pass 
-  this-equivalent as 1st arg.
-
-
-  Copyright (c) 1998-2016 World Wide Web Consortium
-  (Massachusetts Institute of Technology, European Research 
-  Consortium for Informatics and Mathematics, Keio University).
-  All Rights Reserved.
-
-  Contributing Author(s):
-
-     Dave Raggett <dsr@w3.org>
-
-  The contributing author(s) would like to thank all those who
-  helped with testing, bug fixes and suggestions for improvements. 
-  This wouldn't have been possible without your help.
-
-  COPYRIGHT NOTICE:
- 
-  This software and documentation is provided "as is," and
-  the copyright holders and contributing author(s) make no
-  representations or warranties, express or implied, including
-  but not limited to, warranties of merchantability or fitness
-  for any particular purpose or that the use of the software or
-  documentation will not infringe any third party patents,
-  copyrights, trademarks or other rights. 
-
-  The copyright holders and contributing author(s) will not be held
-  liable for any direct, indirect, special or consequential damages
-  arising out of any use of the software or documentation, even if
-  advised of the possibility of such damage.
-
-  Permission is hereby granted to use, copy, modify, and distribute
-  this source code, or portions hereof, documentation and executables,
-  for any purpose, without fee, subject to the following restrictions:
-
-  1. The origin of this source code must not be misrepresented.
-  2. Altered versions must be plainly marked as such and must
-     not be misrepresented as being the original source.
-  3. This Copyright notice may not be removed or altered from any
-     source or altered source distribution.
- 
-  The copyright holders and contributing author(s) specifically
-  permit, without fee, and encourage the use of this source code
-  as a component for supporting the Hypertext Markup Language in
-  commercial products. If you use this source code in a product,
-  acknowledgment is not required but would be appreciated.
-
-
-  Created 2001-05-20 by Charles Reitzel
-  Updated 2002-07-01 by Charles Reitzel - 1st Implementation
-  Updated 2015-06-09 by Geoff R. McLane - Add more doxygen syntax
-
-*/
+/***************************************************************************//**
+ * @file
+ * Defines HTML Tidy public API implemented by LibTidy.
+ *
+ * This public interface provides the entire public API for LibTidy, and
+ * is the sole interface that you should use when implementing LibTidy in
+ * your own applications.
+ *
+ * See tidy.c as an example application implementing the public API.
+ *
+ * This API is const-correct and doesn't explicitly depend on any globals.
+ * Thus, thread-safety may be introduced without changing the interface.
+ *
+ * The API limits all exposure to internal structures and provides only
+ * accessors that return simple types such as C strings and integers, which
+ * makes it quite suitable for integration with any number of other languages.
+ *
+ * @author  Dave Raggett [dsr@w3.org]
+ * @author  HTACG, et al (consult git log)
+ * 
+ * @remarks The contributing author(s) would like to thank all those who 
+ *          helped with testing, bug fixes and suggestions for improvements.
+ *          This wouldn't have been possible without your help.
+ *
+ * @copyright
+ *     Copyright (c) 1998-2017 World Wide Web Consortium (Massachusetts
+ *     Institute of Technology, European Research Consortium for Informatics
+ *     and Mathematics, Keio University).
+ * @par
+ *     All Rights Reserved.
+ * @par
+ *     This software and documentation is provided "as is," and the copyright 
+ *     holders and contributing author(s) make no representations or warranties,
+ *     express or implied, including but not limited to, warranties of 
+ *     merchantability or fitness for any particular purpose or that the use of
+ *     the software or documentation will not infringe any third party patents,
+ *     copyrights, trademarks or other rights.
+ *     @par
+ *     The copyright holders and contributing author(s) will not be held liable
+ *     for any direct, indirect, special or consequential damages arising out of
+ *     any use of the software or documentation, even if advised of the
+ *     possibility of such damage.
+ * @par
+ *     Permission is hereby granted to use, copy, modify, and distribute this
+ *     source code, or portions hereof, documentation and executables, for any
+ *     purpose, without fee, subject to the following restrictions:
+ * @par
+ *        1. The origin of this source code must not be misrepresented.
+ *        2. Altered versions must be plainly marked as such and must not be
+ *           misrepresented as being the original source.
+ *        3. This Copyright notice may not be removed or altered from any source
+ *           or altered source distribution.
+ * @par
+ *     The copyright holders and contributing author(s) specifically permit,
+ *     without fee, and encourage the use of this source code as a component for
+ *     supporting the Hypertext Markup Language in commercial products. If you
+ *     use this source code in a product, acknowledgment is not required but
+ *     would be appreciated.
+ *
+ * @date Created 2001-05-20 by Charles Reitzel
+ * @date Updated 2002-07-01 by Charles Reitzel - 1st Implementation
+ * @date Updated 2015-06-09 by Geoff R. McLane - Add more doxygen syntax
+ * @date Additional updates: consult git log
+ ******************************************************************************/
 
 /* #include "tidyplatform.h" */
 /* #include "tidyenum.h" */
@@ -1563,492 +2233,997 @@ typedef enum
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+/***************************************************************************//**
+ ** @defgroup internal_api Internal API
+ ** The Internal API is used exclusively within LibTidy. If you are an
+ ** HTML Tidy developer, then the internals API will be of especial
+ ** importance to you.
+ **
+ ** @note Always check first to determine whether or not an internal API
+ **       representation exists for a public API function before invoking a
+ **       public API function internally. In most cases, the public API
+ **       functions simply call an internal function.
+ ** - - -
+ ** @note This documentation _is not_ a substitute for browsing the source
+ **       code. Although the public API is fairly well documented, the
+ **       internal API is a very long, very slow, work-in-progress.
+ ******************************************************************************/
 
-/** @defgroup Opaque Opaque Types
-**
-** Cast to implementation types within lib.
-** Reduces inter-dependencies/conflicts w/ application code.
-** @{
-*/
+/***************************************************************************//**
+ ** @defgroup public_api External Public API
+ ** The Public API is the API that LibTidy programmers must access in order 
+ ** to harness HTML Tidy as a library. The API limits all exposure to internal
+ ** structures and provides only accessors that return simple types such as
+ ** C strings and integers, which makes it quite suitable for integration with
+ ** any number of other languages.
+ ** @{
+ ******************************************************************************/
+
+
+/* MARK: - Opaque Types */
+/***************************************************************************//**
+ ** @defgroup Opaque Opaque Types
+ **
+ ** Instances of these types are returned by LibTidy API functions, however
+ ** they are opaque; you cannot see into them, and must use accessor functions
+ ** to access the contents. This ensures that interfacing to LibTidy remains
+ ** as universal as possible.
+ **
+ ** @note Internally LibTidy developers will cast these to internal
+ **       implementation types with access to all member fields.
+ ** @{
+ ******************************************************************************/
 
 /** @struct TidyDoc
-**  Opaque document datatype
-*/
-opaque_type( TidyDoc );
+ ** Instances of this represent a Tidy document, which encapsulates everything
+ ** there is to know about a single Tidy session. Many of the API functions
+ ** return instance of TidyDoc, or expect instances as parameters.
+ */
 
 /** @struct TidyOption
-**  Opaque option datatype
-*/
-opaque_type( TidyOption );
+ ** Instances of this represent a Tidy configuration option, which contains
+ ** useful data about these options. Functions related to configuration options
+ ** return or accept instances of this type.
+ */
 
 /** @struct TidyNode
-**  Opaque node datatype
-*/
-opaque_type( TidyNode );
+ ** Single nodes of a TidyDocument are represented by this datatype. It can be
+ ** returned by various API functions, or accepted as a function argument.
+ */
 
 /** @struct TidyAttr
-**  Opaque attribute datatype
+ ** Attributes of a TidyNode are represented by this data type. The public API
+ ** functions related to attributes work with this type.
+ */
+
+/** @struct TidyMessage
+ ** Instances of this type represent messages generated by Tidy in reference
+ ** to your document. This API is available in some of Tidy's message callback
+ ** functions.
 */
+
+/** @struct TidyMessageArgument
+ ** Instances of this type represent the arguments that compose part of the
+ ** message represented by TidyMessage. These arguments have an API to query
+ ** information about them.
+*/
+
+/* Prevent Doxygen from listing these as functions. */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+opaque_type( TidyDoc );
+opaque_type( TidyOption );
+opaque_type( TidyNode );
 opaque_type( TidyAttr );
+opaque_type( TidyMessage );
+opaque_type( TidyMessageArgument );
+
+#endif
+
 
 /** @} end Opaque group */
+/* MARK: - Memory Allocation */
+/***************************************************************************//**
+ ** @defgroup Memory Memory Allocation
+ **
+ ** Tidy can use a user-provided allocator for all memory allocations.  If this
+ ** allocator is not provided, then a default allocator is used which simply
+ ** wraps standard C malloc()/free() calls. These wrappers call the panic()
+ ** function upon any failure. The default panic function prints an out of
+ ** memory message to **stderr**, and calls `exit(2)`.
+ **
+ ** For applications in which it is unacceptable to abort in the case of memory
+ ** allocation, then the panic function can be replaced with one which
+ ** `longjmps()` out of the LibTidy code. For this to clean up completely, you
+ ** should be careful not to use any Tidy methods that open files as these will
+ ** not be closed before `panic()` is called.
+ **
+ ** Calling the `xxxWithAllocator()` family (`tidyCreateWithAllocator`,
+ ** `tidyBufInitWithAllocator`, `tidyBufAllocWithAllocator`) allow setting
+ ** custom allocators.
+ **
+ ** All parts of the document use the same allocator. Calls that require a
+ ** user-provided buffer can optionally use a different allocator.
+ **
+ ** For reference in designing a plug-in allocator, most allocations made by
+ ** LibTidy are less than 100 bytes, corresponding to attribute names and
+ ** values, etc.
+ **
+ ** There is also an additional class of much larger allocations which are where
+ ** most of the data from the lexer is stored. It is not currently possible to
+ ** use a separate allocator for the lexer; this would be a useful extension.
+ **
+ ** In general, approximately 1/3rd of the memory used by LibTidy is freed
+ ** during the parse, so if memory usage is an issue then an allocator that can
+ ** reuse this memory is a good idea.
+ **
+ ** **To create your own allocator, do something like the following:**
+ ** @code{.c}
+ ** typedef struct _MyAllocator {
+ **    TidyAllocator base;
+ **    // ...other custom allocator state...
+ ** } MyAllocator;
+ **
+ ** void* MyAllocator_alloc(TidyAllocator *base, void *block, size_t nBytes) {
+ **     MyAllocator *self = (MyAllocator*)base;
+ **     // ...
+ ** }
+ ** // etc.
+ **
+ ** static const TidyAllocatorVtbl MyAllocatorVtbl = {
+ **     MyAllocator_alloc,
+ **     MyAllocator_realloc,
+ **     MyAllocator_free,
+ **     MyAllocator_panic
+ ** };
+ **
+ ** myAllocator allocator;
+ ** TidyDoc doc;
+ **
+ ** allocator.base.vtbl = &MyAllocatorVtbl;
+ ** //...initialise allocator specific state...
+ ** doc = tidyCreateWithAllocator(&allocator);
+ ** @endcode
+ **
+ ** Although this looks slightly long-winded, the advantage is that to create a
+ ** custom allocator you simply need to set the vtbl pointer correctly. The vtbl
+ ** itself can reside in static/global data, and hence does not need to be
+ ** initialised each time an allocator is created, and furthermore the memory
+ ** is shared amongst all created allocators.
+ **
+ ** @{
+ ******************************************************************************/
+
+/* Forward declarations and typedefs. */
+struct _TidyAllocatorVtbl;
+struct _TidyAllocator;
+
+typedef struct _TidyAllocatorVtbl TidyAllocatorVtbl;
+typedef struct _TidyAllocator TidyAllocator;
+
+    
+/** Tidy's built-in default allocator. */
+struct _TidyAllocator {
+    const TidyAllocatorVtbl *vtbl; /**< The allocator's function table. */
+};
+
+
+/** This structure is the function table for an allocator. Note that all
+    functions in this table must be provided. */
+struct _TidyAllocatorVtbl
+{
+/* Doxygen has no idea how to parse these. */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    void* (TIDY_CALL *alloc)( TidyAllocator *self, size_t nBytes );
+    void* (TIDY_CALL *realloc)(TidyAllocator *self, void *block, size_t nBytes );
+    void (TIDY_CALL *free)(TidyAllocator *self, void *block);
+    void (TIDY_CALL *panic)(TidyAllocator *self, ctmbstr msg);
+#else
+    /** Called to allocate a block of nBytes of memory */
+    void* *alloc(TidyAllocator *self, /**< The TidyAllocator to use to alloc memory. */
+                 size_t nBytes        /**< The number of bytes to allocate. */
+                 );
+
+    /** Called to resize (grow, in general) a block of memory.
+        Must support being called with `NULL`. */
+    void* *realloc(TidyAllocator *self, /**< The TidyAllocator to use to realloc memory. */
+                   void *block,         /**< The pointer to the existing block. */
+                   size_t nBytes        /**< The number of bytes to allocate. */
+                   );
+    
+    /** Called to free a previously allocated block of memory.
+     */
+    void *free(TidyAllocator *self,  /**< The TidyAllocator to use to free memory. */
+               void *block           /**< The block to free. */
+               );
+
+    /** Called when a panic condition is detected. Must support `block == NULL`.
+        This function is not called if either alloc() or realloc() fails; it is
+        up to the allocator to do this. Currently this function can only be
+        called if an error is detected in the tree integrity via the internal
+        function CheckNodeIntegrity(). This is a situation that can only arise
+        in the case of a programming error in LibTidy. You can turn off node
+        integrity checking by defining the constant `NO_NODE_INTEGRITY_CHECK` 
+        during the build.
+    **/
+    void *panic(TidyAllocator *self,  /**< The TidyAllocator to use to panic. */
+                ctmbstr msg           /**< The panic message. */
+                );
+#endif /* Doxygen Fix */
+};
+
+
+/** Callback for `malloc` replacement */
+typedef void* (TIDY_CALL *TidyMalloc)( size_t len );
+
+/** Callback for `realloc` replacement */
+typedef void* (TIDY_CALL *TidyRealloc)( void* buf, size_t len );
+
+/** Callback for `free` replacement */
+typedef void  (TIDY_CALL *TidyFree)( void* buf );
+
+/** Callback for out of memory panic state */
+typedef void  (TIDY_CALL *TidyPanic)( ctmbstr mssg );
+
+
+/** Give Tidy a `malloc()` replacement */
+TIDY_EXPORT Bool TIDY_CALL tidySetMallocCall( TidyMalloc fmalloc );
+
+/** Give Tidy a `realloc()` replacement */
+TIDY_EXPORT Bool TIDY_CALL tidySetReallocCall( TidyRealloc frealloc );
+
+/** Give Tidy a `free()` replacement */
+TIDY_EXPORT Bool TIDY_CALL tidySetFreeCall( TidyFree ffree );
+
+/** Give Tidy an "out of memory" handler */
+TIDY_EXPORT Bool TIDY_CALL tidySetPanicCall( TidyPanic fpanic );
+
+
+/** @} end Memory group */
+/* MARK: - Basic Operations */
+/***************************************************************************//**
+ ** @defgroup Basic Basic Operations
+ **
+ ** For an excellent example of how to invoke LibTidy, please consult
+ ** `console/tidy.c:main()` for in-depth implementation details. A simplified
+ ** example can be seen on our site: http://www.html-tidy.org/developer/
+ **
+ ** @{
+ ******************************************************************************/
+
+/** @name Instantiation and Destruction
+ ** @{
+ */
+    
+/** The primary creation of a document instance. Instances of a TidyDoc are used
+ ** throughout the API as a token to represent a particular document. You must
+ ** create at least one TidyDoc instance to initialize the library and begin
+ ** interaction with the API. When done using a TidyDoc instance, be sure to
+ ** `tidyRelease(myTidyDoc);` in order to free related memory.
+ ** @result Returns a TidyDoc instance.
+ */
+TIDY_EXPORT TidyDoc TIDY_CALL     tidyCreate(void);
+
+/** Create a document supplying your own, custom TidyAllocator instead of using
+ ** the built-in default. See the @ref Memory module if you want to create and
+ ** use your own allocator.
+ ** @param allocator The allocator to use for creating the document.
+ ** @result Returns a TidyDoc instance.
+ */
+TIDY_EXPORT TidyDoc TIDY_CALL     tidyCreateWithAllocator(TidyAllocator *allocator);
+
+/** Free all memory and release the TidyDoc. The TidyDoc can not be used after 
+ ** this call.
+ ** @param tdoc The TidyDoc to free.
+ */
+TIDY_EXPORT void TIDY_CALL        tidyRelease(TidyDoc tdoc);
+
+    
+/** @}
+ ** @name Host Application Data
+ ** @{
+ */
+   
+ 
+/** Allows the host application to store a chunk of data with each TidyDoc
+ ** instance. This can be useful for callbacks, such as saving a reference to
+ ** `self` within the document.
+ */
+TIDY_EXPORT void TIDY_CALL        tidySetAppData(TidyDoc tdoc,  /**< The document in which to store the data. */
+                                                 void* appData  /**< The pointer to a block of data to store. */
+                                                 );
+
+/** Returns the data previously stored with `tidySetAppData()`.
+ ** @param tdoc  document where data has been stored.
+ ** @result The pointer to the data block previously stored. 
+ */
+TIDY_EXPORT void* TIDY_CALL       tidyGetAppData(TidyDoc tdoc);
+
+    
+/** @}
+ ** @name LibTidy Version Information
+ ** @{
+ */
+
+    
+/** Get the release date for the current library.
+ ** @result The string representing the release date.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL     tidyReleaseDate(void);
+
+/** Get the version number for the current library.
+ ** @result The string representing the version number.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL     tidyLibraryVersion(void);
+
+/** Get the platform for which Tidy was built.
+ ** @result The string representing the version number.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL     tidyPlatform(void);
+
+    
+/** @}
+ ** @name Diagnostics and Repair
+ ** @{
+ */
+
+    
+/** Get status of current document.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyStatus( TidyDoc tdoc );
+
+/** Gets the version of HTML that was output, as an integer, times 100. For
+ ** example, HTML5 will return 500; HTML4.0.1 will return 401.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the HTML version number (x100).
+ */
+TIDY_EXPORT int TIDY_CALL         tidyDetectedHtmlVersion( TidyDoc tdoc );
+
+/** Indicates whether the output document is or isn't XHTML.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns `yes` if the document is an XHTML type.
+ */
+TIDY_EXPORT Bool TIDY_CALL        tidyDetectedXhtml( TidyDoc tdoc );
+
+/** Indicates whether or not the input document was XML. If TidyXml tags is
+ ** true, or there was an XML declaration in the input document, then this
+ ** function will return yes.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns `yes` if the input document was XML.
+ */
+TIDY_EXPORT Bool TIDY_CALL        tidyDetectedGenericXml( TidyDoc tdoc );
+
+/** Indicates the number of TidyError messages that were generated. For any
+ ** value greater than `0`, output is suppressed unless TidyForceOutput is set.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the number of TidyError messages that were generated.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL        tidyErrorCount( TidyDoc tdoc );
+
+/** Indicates the number of TidyWarning messages that were generated.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the number of TidyWarning messages that were generated.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL        tidyWarningCount( TidyDoc tdoc );
+
+/** Indicates the number of TidyAccess messages that were generated.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the number of TidyAccess messages that were generated.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL        tidyAccessWarningCount( TidyDoc tdoc );
+
+/** Indicates the number of configuration error messages that were generated.
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns the number of configuration error messages that were
+ **         generated.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL        tidyConfigErrorCount( TidyDoc tdoc );
+
+/** Write more complete information about errors to current error sink.
+ ** @param tdoc An instance of a TidyDoc to query.
+ */
+TIDY_EXPORT void TIDY_CALL        tidyErrorSummary( TidyDoc tdoc );
+
+/** Write more general information about markup to current error sink.
+ ** @param tdoc An instance of a TidyDoc to query.
+ */
+TIDY_EXPORT void TIDY_CALL        tidyGeneralInfo( TidyDoc tdoc );
+
+
+/** @}
+ ** @name Configuration, File, and Encoding Operations
+ ** @{
+ */
+    
+    
+/** Load an ASCII Tidy configuration file and set the configuration per its
+ ** contents.
+ ** @result Returns 0 upon success, or any other value if there was an error.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyLoadConfig(TidyDoc tdoc,      /**< The TidyDoc to which to apply the configuration. */
+                                                 ctmbstr configFile /**< The complete path to the file to load. */
+                                                 );
+
+/** Load a Tidy configuration file with the specified character encoding, and
+ ** set the configuration per its contents. 
+ ** @result Returns 0 upon success, or any other value if there was an error.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyLoadConfigEnc(TidyDoc tdoc,       /**< The TidyDoc to which to apply the configuration. */
+                                                    ctmbstr configFile, /**< The complete path to the file to load. */
+                                                    ctmbstr charenc     /**< The encoding to use. See the _enc2iana struct for valid values. */
+                                                    );
+
+/** Determine whether or not a particular file exists. On Unix systems, the use
+ ** of the tilde to represent the user's home directory is supported.
+ ** @result Returns `yes` or `no`, indicating whether or not the file exists.
+ */
+TIDY_EXPORT Bool TIDY_CALL        tidyFileExists(TidyDoc tdoc,     /**< The TidyDoc on whose behalf you are checking. */
+                                                 ctmbstr filename  /**< The path to the file whose existence you wish to check. */
+                                                 );
+
+
+/** Set the input/output character encoding for parsing markup. Valid values
+ ** include `ascii`, `latin1`, `raw`, `utf8`, `iso2022`, `mac`, `win1252`,
+ ** `utf16le`, `utf16be`, `utf16`, `big5`, and `shiftjis`. These values are not
+ ** case sensitive.
+ ** @note This is the same as using TidySetInCharEncoding() and 
+ **       TidySetOutCharEncoding() to set the same value.
+ ** @result Returns 0 upon success, or a system standard error number `EINVAL`.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySetCharEncoding(TidyDoc tdoc,  /**< The TidyDoc for which you are setting the encoding. */
+                                                      ctmbstr encnam /**< The encoding name as described above. */
+                                                      );
+
+/** Set the input encoding for parsing markup.  Valid values include `ascii`, 
+ ** `latin1`, `raw`, `utf8`, `iso2022`, `mac`, `win1252`, `utf16le`, `utf16be`,
+ ** `utf16`, `big5`, and `shiftjis`. These values are not case sensitive.
+ ** @result Returns 0 upon success, or a system standard error number `EINVAL`.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySetInCharEncoding(TidyDoc tdoc,  /**< The TidyDoc for which you are setting the encoding. */
+                                                        ctmbstr encnam /**< The encoding name as described above. */
+                                                        );
+
+/** Set the input encoding for writing markup.  Valid values include `ascii`,
+ ** `latin1`, `raw`, `utf8`, `iso2022`, `mac`, `win1252`, `utf16le`, `utf16be`,
+ ** `utf16`, `big5`, and `shiftjis`. These values are not case sensitive.
+ ** @result Returns 0 upon success, or a system standard error number `EINVAL`.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySetOutCharEncoding(TidyDoc tdoc,  /**< The TidyDoc for which you are setting the encoding. */
+                                                         ctmbstr encnam /**< The encoding name as described above. */
+                                                         );
+
+
+/** @} */
+/** @} end Basic group */
+/* MARK: - Configuration Options */
+/***************************************************************************//**
+ ** @defgroup Configuration Configuration Options
+ **
+ ** Functions for getting and setting Tidy configuration options.
+ **
+ ** @note In general, you should expect that options you set should stay set.
+ **       This isn't always the case, though, because Tidy will adjust options
+ **       for internal use during the lexing, parsing, cleaning, and printing
+ **       phases, but will restore them after the printing process. If you
+ **       require access to user configuration values at any time between the
+ **       tidyParseXXX() process and the tidySaveXXX() process, make sure to
+ **       keep your own copy.
+ ** @{
+ ******************************************************************************/
+
+/** @name Option Callback Functions
+ ** @{
+ */
+
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetOptionCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** Note that this is deprecated and you should instead migrate to
+ ** tidySetConfigCallback().
+ ** @param option The option name that was provided.
+ ** @param value The option value that was provided
+ ** @return Your callback function will return `yes` if it handles the provided
+ **         option, or `no` if it does not. In the latter case, Tidy will issue
+ **         an unknown configuration option error.
+ */
+typedef Bool (TIDY_CALL *TidyOptCallback)(ctmbstr option, ctmbstr value);
+
+/** Applications using TidyLib may want to augment command-line and
+ ** configuration file options. Setting this callback allows a LibTidy
+ ** application developer to examine command-line and configuration file options
+ ** after LibTidy has examined them and failed to recognize them.
+ ** Note that this is deprecated and you should instead migrate to
+ ** tidySetConfigCallback().
+ ** @result Returns `yes` upon success.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidySetOptionCallback(TidyDoc tdoc,                /**< The document to apply the callback to. */
+                                                          TidyOptCallback pOptCallback /**< The name of a function of type TidyOptCallback() to serve as your callback. */
+                                                          );
+
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetConfigCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tdoc The document instance for which the callback was invoked.
+ ** @param option The option name that was provided.
+ ** @param value The option value that was provided
+ ** @return Your callback function will return `yes` if it handles the provided
+ **         option, or `no` if it does not. In the latter case, Tidy will issue
+ **         an unknown configuration option error.
+ */
+typedef Bool (TIDY_CALL *TidyConfigCallback)(TidyDoc tdoc, ctmbstr option, ctmbstr value);
+
+/** Applications using TidyLib may want to augment command-line and
+ ** configuration file options. Setting this callback allows a LibTidy
+ ** application developer to examine command-line and configuration file options
+ ** after LibTidy has examined them and failed to recognize them.
+ ** @result Returns `yes` upon success.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidySetConfigCallback(TidyDoc tdoc,                      /**< The document to apply the callback to. */
+                                                          TidyConfigCallback pConfigCallback /**< The name of a function of type TidyConfigCallback() to serve as your callback. */
+                                                          );
+
+    
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetConfigChangeCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tdoc The document instance for which the callback was invoked.
+ ** @param option The option that will be changed.
+ */
+typedef void (TIDY_CALL *TidyConfigChangeCallback)(TidyDoc tdoc, TidyOption option);
+
+/** Applications using TidyLib may want to be informed when changes to options
+ ** are made. Temporary changes made internally by Tidy are not reported, but
+ ** permanent changes made by Tidy (such as indent-spaces or output-encoding)
+ ** will be reported.
+ ** @note This callback is not currently implemented.
+ ** @result Returns `yes` upon success.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidySetConfigChangeCallback(TidyDoc tdoc,                      /**< The document to apply the callback to. */
+                                                                TidyConfigChangeCallback pCallback /**< The name of a function of type TidyConfigChangeCallback() to serve as your callback. */
+                                                                );
+
+
+/** @}
+ ** @name Option ID Discovery
+ ** @{
+ */
+
+/** Get ID of given Option
+ ** @param opt An instance of a TidyOption to query.
+ ** @result The TidyOptionId of the given option.
+ */
+TIDY_EXPORT TidyOptionId TIDY_CALL  tidyOptGetId( TidyOption opt );
+
+/** Returns the TidyOptionId (enum value) by providing the name of a Tidy
+ ** configuration option.
+ ** @param optnam The name of the option ID to retrieve.
+ ** @result The TidyOptionId of the given `optname`.
+ */
+TIDY_EXPORT TidyOptionId TIDY_CALL  tidyOptGetIdForName(ctmbstr optnam);
+
+/** @}
+ ** @name Getting Instances of Tidy Options
+ ** @{
+ */
+
+/** Initiates an iterator for a list of TidyOption instances, which allows you
+ ** to iterate through all of the available options. In order to iterate through
+ ** the available options, initiate the iterator with this function, and then
+ ** use tidyGetNextOption() to retrieve the first and subsequent options. For
+ ** example:
+ ** @code{.c}
+ **   TidyIterator itOpt = tidyGetOptionList( tdoc );
+ **   while ( itOpt ) {
+ **     TidyOption opt = tidyGetNextOption( tdoc, &itOpt );
+ **     // Use other API to query or set set option values
+ **   }
+ ** @endcode
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyGetOptionList( TidyDoc tdoc );
+
+/** Given a valid TidyIterator initiated with tidyGetOptionList(), returns
+ ** the instance of the next TidyOption.
+ ** @note This function will return internal-only option types including
+ **       `TidyInternalCategory`; you should *never* use these. Always ensure
+ **       that you use `tidyOptGetCategory()` before assuming that an option
+ **       is okay to use in your application.
+ ** @result An instance of TidyOption.
+ */
+TIDY_EXPORT TidyOption TIDY_CALL    tidyGetNextOption(TidyDoc tdoc,     /**< The document for which you are retrieving options. */
+                                                      TidyIterator* pos /**< The TidyIterator (initiated with tidyGetOptionList()) token. */
+                                                      );
+
+/** Retrieves an instance of TidyOption given a valid TidyOptionId.
+ ** @result An instance of TidyOption matching the provided TidyOptionId.
+ */
+TIDY_EXPORT TidyOption TIDY_CALL    tidyGetOption(TidyDoc tdoc,      /**< The document for which you are retrieving the option. */
+                                                  TidyOptionId optId /**< The TidyOptionId to retrieve. */
+                                                  );
+
+/** Returns an instance of TidyOption by providing the name of a Tidy
+ ** configuration option.
+ ** @result The TidyOption of the given `optname`.
+ */
+TIDY_EXPORT TidyOption TIDY_CALL    tidyGetOptionByName(TidyDoc tdoc,  /**< The document for which you are retrieving the option. */
+                                                        ctmbstr optnam /**< The name of the Tidy configuration option. */
+                                                        );
+
+/** @}
+ ** @name Information About Options
+ ** @{
+ */
+
+/** Get name of given Option
+ ** @param opt An instance of a TidyOption to query.
+ ** @result The name of the given option.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetName( TidyOption opt );
+
+/** Get datatype of given Option
+ ** @param opt An instance of a TidyOption to query.
+ ** @result The TidyOptionType of the given option.
+ */
+TIDY_EXPORT TidyOptionType TIDY_CALL tidyOptGetType( TidyOption opt );
+
+/** Indicates that an option takes a list of items.
+ ** @param opt An instance of a TidyOption to query.
+ ** @result A bool indicating whether or not the option accepts a list.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyOptionIsList( TidyOption opt );
+
+/** Is Option read-only? Some options (mainly internal use only options) are
+ ** read-only.
+ ** @deprecated This is no longer a valid test for the public API; instead
+ **   you should test an option's availability using `tidyOptGetCategory()`
+ **   against `TidyInternalCategory`. This API will be removed!
+ ** @param opt An instance of a TidyOption to query.
+ ** @result Returns `yes` or `no` depending on whether or not the specified
+ **         option is read-only.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptIsReadOnly( TidyOption opt );
+
+/** Get category of given Option
+ ** @param opt An instance of a TidyOption to query.
+ ** @result The TidyConfigCategory of the specified option.
+ */
+TIDY_EXPORT TidyConfigCategory TIDY_CALL tidyOptGetCategory( TidyOption opt );
+
+/** Get default value of given Option as a string 
+ ** @param opt An instance of a TidyOption to query.
+ ** @result A string indicating the default value of the specified option.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetDefault( TidyOption opt );
+
+/** Get default value of given Option as an unsigned integer 
+ ** @param opt An instance of a TidyOption to query.
+ ** @result An unsigned integer indicating the default value of the specified
+ **         option.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL         tidyOptGetDefaultInt( TidyOption opt );
+
+/** Get default value of given Option as a Boolean value 
+ ** @param opt An instance of a TidyOption to query.
+ ** @result A boolean indicating the default value of the specified option.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptGetDefaultBool( TidyOption opt );
+
+/** Initiates an iterator for a list of TidyOption pick-list values, which
+ ** allows you iterate through all of the available option values. In order to
+ ** iterate through the available values, initiate the iterator with this
+ ** function, and then use tidyOptGetNextPick() to retrieve the first and 
+ ** subsequent option values. For example:
+ ** @code{.c}
+ **   TidyIterator itOpt = tidyOptGetPickList( opt );
+ **   while ( itOpt ) {
+ **     printf("%s", tidyOptGetNextPick( opt, &itOpt ));
+ **   }
+ ** @endcode
+ ** @param opt An instance of a TidyOption to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetPickList( TidyOption opt );
+
+/** Given a valid TidyIterator initiated with tidyOptGetPickList(), returns a
+ ** string representing a possible option value.
+ ** @result A string containing the next pick-list option value.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextPick(TidyOption opt,   /**< An instance of a TidyOption to query. */
+                                                       TidyIterator* pos /**< The TidyIterator (initiated with tidyOptGetPickList()) token. */
+                                                       );
+
+/** @}
+ ** @name Option Value Functions
+ ** @{
+ */
+
+/** Get the current value of the option ID for the given document.
+ ** @remark The optId *must* have a @ref TidyOptionType of @ref TidyString!
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetValue(TidyDoc tdoc,      /**< The tidy document whose option value you wish to check. */
+                                                    TidyOptionId optId /**< The option ID whose value you wish to check. */
+                                                    );
+
+/** Set the option value as a string.
+ ** @remark The optId *must* have a @ref TidyOptionType of @ref TidyString!
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptSetValue(TidyDoc tdoc,       /**< The tidy document for which to set the value. */
+                                                    TidyOptionId optId, /**< The option ID of the value to set. */
+                                                    ctmbstr val         /**< The string value to set. */
+                                                    );
+
+/** Set named option value as a string, regardless of the @ref TidyOptionType.
+ ** @remark This is good setter if you are unsure of the type.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptParseValue(TidyDoc tdoc,   /**< The tidy document for which to set the value. */
+                                                      ctmbstr optnam, /**< The name of the option to set; this is the string value from the UI, e.g., `error-file`. */
+                                                      ctmbstr val     /**< The value to set, as a string. */
+                                                      );
+
+/** Get current option value as an integer.
+ ** @result Returns the integer value of the specified option.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL         tidyOptGetInt(TidyDoc tdoc,      /**< The tidy document for which to get the value. */
+                                                  TidyOptionId optId /**< The option ID to get. */
+                                                  );
+
+/** Set option value as an integer.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptSetInt(TidyDoc tdoc,       /**< The tidy document for which to set the value. */
+                                                  TidyOptionId optId, /**< The option ID to set. */
+                                                  unsigned int val           /**< The value to set. */
+                                                  );
+
+/** Get current option value as a Boolean flag.
+ ** @result Returns a bool indicating the value.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptGetBool(TidyDoc tdoc,      /**< The tidy document for which to get the value. */
+                                                   TidyOptionId optId /**< The option ID to get. */
+                                                   );
+
+/** Set option value as a Boolean flag.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptSetBool(TidyDoc tdoc,       /**< The tidy document for which to set the value. */
+                                                   TidyOptionId optId, /**< The option ID to set. */
+                                                   Bool val            /**< The value to set. */
+                                                   );
+
+/** Reset option to default value by ID.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptResetToDefault(TidyDoc tdoc,    /**< The tidy document for which to reset the value. */
+                                                          TidyOptionId opt /**< The option ID to reset. */
+                                                          );
+
+/** Reset all options to their default values.
+ ** @param tdoc The tidy document for which to reset all values.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptResetAllToDefault( TidyDoc tdoc );
+
+/** Take a snapshot of current config settings. These settings are stored
+ ** within the tidy document. Note, however, that snapshots do not reliably
+ ** survive the tidyParseXXX() process, as Tidy uses the snapshot mechanism
+ ** in order to store the current configuration right at the beginning of the
+ ** parsing process.
+ ** @param tdoc The tidy document for which to take a snapshot.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptSnapshot( TidyDoc tdoc );
+
+/** Apply a snapshot of config settings to a document.
+ ** @param tdoc The tidy document for which to apply a snapshot.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptResetToSnapshot( TidyDoc tdoc );
+
+/** Any settings different than default? 
+ ** @param tdoc The tidy document to check.
+ ** @result Returns a bool indicating whether or not a difference exists.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptDiffThanDefault( TidyDoc tdoc );
+
+/** Any settings different than snapshot?
+ ** @param tdoc The tidy document to check.
+ ** @result Returns a bool indicating whether or not a difference exists.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptDiffThanSnapshot( TidyDoc tdoc );
+
+/** Copy current configuration settings from one document to another. Note
+ ** that the destination document's existing settings will be stored as that
+ ** document's snapshot prior to having its option values overwritten by the
+ ** source document's settings.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL          tidyOptCopyConfig(TidyDoc tdocTo,  /**< The destination tidy document. */
+                                                      TidyDoc tdocFrom /**< The source tidy document. */
+                                                      );
+
+/** Get character encoding name. Used with @ref TidyCharEncoding,
+ ** @ref TidyOutCharEncoding, and @ref TidyInCharEncoding.
+ ** @result The encoding name as a string for the specified option.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetEncName(TidyDoc tdoc,      /**< The tidy document to query. */
+                                                      TidyOptionId optId /**< The option ID whose value to check. */
+                                                      );
+
+/** Get the current pick list value for the option ID, which can be useful for
+ ** enum types.
+ ** @result Returns a string indicating the current value of the specified
+ **         option.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetCurrPick(TidyDoc tdoc,      /**< The tidy document to query. */
+                                                       TidyOptionId optId /**< The option ID whose value to check. */
+                                                       );
+
+/** Initiates an iterator for a list of user-declared tags, including autonomous
+ ** custom tags detected in the document if @ref TidyUseCustomTags is not set to
+ ** **no**. This iterator allows you to iterate through all of the custom tags. 
+ ** In order to iterate through the tags, initiate the iterator with this
+ ** function, and then use tidyOptGetNextDeclTag() to retrieve the first and
+ ** subsequent tags. For example:
+ ** @code{.c}
+ **   TidyIterator itTag = tidyOptGetDeclTagList( tdoc );
+ **   while ( itTag ) {
+ **     printf("%s", tidyOptGetNextDeclTag( tdoc, TidyBlockTags, &itTag ));
+ **   }
+ ** @endcode
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetDeclTagList( TidyDoc tdoc );
+
+/** Given a valid TidyIterator initiated with tidyOptGetDeclTagList(), returns a
+ ** string representing a user-declared or autonomous custom tag.
+ ** @remark Specifying optId limits the scope of the tags to one of 
+ **         @ref TidyInlineTags, @ref TidyBlockTags, @ref TidyEmptyTags, or 
+ **         @ref TidyPreTags. Note that autonomous custom tags (if used) are
+ **         added to one of these option types, depending on the value of
+ **         @ref TidyUseCustomTags.
+ ** @result A string containing the next tag.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextDeclTag(TidyDoc tdoc,       /**< The tidy document to query. */
+                                                          TidyOptionId optId, /**< The option ID matching the type of tag to retrieve. */
+                                                          TidyIterator* iter  /**< The TidyIterator (initiated with tidyOptGetDeclTagList()) token.  */
+                                                          );
+
+/** Initiates an iterator for a list of priority attributes. This iterator
+ ** allows you to iterate through all of the priority attributes defined with
+ ** the `priority-attributes` configuration option. In order to iterate through
+ ** the attributes, initiate the iterator with this function, and then use
+ ** tidyOptGetNextPriorityAttr() to retrieve the first and subsequent attributes.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itAttr = tidyOptGetPriorityAttrList( tdoc );
+ **   while ( itAttr ) {
+ **     printf("%s", tidyOptGetNextPriorityAttr( tdoc, &itAttr ));
+ **   }
+ ** @endcode
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetPriorityAttrList( TidyDoc tdoc );
+
+/** Given a valid TidyIterator initiated with tidyOptGetPriorityAttrList(),
+ ** returns a string representing a priority attribute.
+ ** @result A string containing the next tag.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextPriorityAttr(TidyDoc tdoc,       /**< The tidy document to query. */
+                                                               TidyIterator* iter  /**< The TidyIterator (initiated with tidyOptGetPriorityAttrList()) token.  */
+                                                               );
+
+/** Initiates an iterator for a list of muted messages. This iterator allows
+ ** you to iterate through all of the priority attributes defined with the
+ ** `mute` configuration option. In order to iterate through the list, initiate
+ ** with this function, and then use tidyOptGetNextMutedMessage() to retrieve
+ ** the first and subsequent attributes.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itAttr = tidyOptGetMutedMessageList( tdoc );
+ **   while ( itAttr ) {
+ **     printf("%s", tidyOptGetNextMutedMessage( tdoc, &itAttr ));
+ **   }
+ ** @endcode
+ ** @param tdoc An instance of a TidyDoc to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetMutedMessageList( TidyDoc tdoc );
+
+/** Given a valid TidyIterator initiated with tidyOptGetMutedMessageList(),
+ ** returns a string representing a muted message.
+ ** @result A string containing the next tag.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextMutedMessage(TidyDoc tdoc,       /**< The tidy document to query. */
+                                                               TidyIterator* iter  /**< The TidyIterator (initiated with tidyOptGetMutedMessageList()) token.  */
+                                                               );
+
+/** @}
+ ** @name Option Documentation
+ ** @{
+ */
+
+/** Get the description of the specified option.
+ ** @result Returns a string containing a description of the given option.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetDoc(TidyDoc tdoc,  /**< The tidy document to query. */
+                                                  TidyOption opt /**< The option ID of the option. */
+                                                  );
+
+/** Initiates an iterator for a list of options related to a given option. This
+ ** iterator allows you to iterate through all of the related options, if any.
+ ** In order to iterate through the options, initiate the iterator with this
+ ** function, and then use tidyOptGetNextDocLinks() to retrieve the first and
+ ** subsequent options. For example:
+ ** @code{.c}
+ **   TidyIterator itOpt = tidyOptGetDocLinksList( tdoc, TidyJoinStyles );
+ **   while ( itOpt ) {
+ **     TidyOption my_option = tidyOptGetNextDocLinks( tdoc, &itOpt );
+ **     // do something with my_option
+ **   }
+ ** @endcode
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetDocLinksList(TidyDoc tdoc,  /**< The tidy document to query. */
+                                                           TidyOption opt /**< The option whose related options you wish to find. */
+                                                           );
+
+/** Given a valid TidyIterator initiated with tidyOptGetDocLinksList(), returns
+ ** a TidyOption instance.
+ ** @result Returns in instance of TidyOption.
+ */
+TIDY_EXPORT TidyOption TIDY_CALL    tidyOptGetNextDocLinks(TidyDoc tdoc,     /**< The tidy document to query. */
+                                                           TidyIterator* pos /**< The TidyIterator (initiated with tidyOptGetDocLinksList()) token. */
+                                                           );
+
+/** @} */
+/** @} end Configuration group */
+/* MARK: - I/O and Messages */
+/***************************************************************************//**
+ ** @defgroup IO I/O and Messages
+ **
+ ** Tidy provides flexible I/O. By default, Tidy will define, create and use 
+ ** instances of input and output handlers for standard C buffered I/O (i.e.,
+ ** `FILE* stdin`, `FILE* stdout`, and `FILE* stderr` for content input,
+ ** content output and diagnostic output, respectively. A `FILE* cfgFile` 
+ ** input handler will be used for config files. Command line options will
+ ** just be set directly.
+ **
+ ** @{
+ ******************************************************************************/
+
+/** @name Forward declarations and typedefs.
+ ** @{ 
+ */
 
 TIDY_STRUCT struct _TidyBuffer;
 typedef struct _TidyBuffer TidyBuffer;
 
-
-/** @defgroup Memory  Memory Allocation
-**
-** Tidy uses a user provided allocator for all
-** memory allocations.  If this allocator is
-** not provided, then a default allocator is
-** used which simply wraps standard C malloc/free
-** calls.  These wrappers call the panic function
-** upon any failure.  The default panic function
-** prints an out of memory message to stderr, and
-** calls exit(2).
-**
-** For applications in which it is unacceptable to
-** abort in the case of memory allocation, then the
-** panic function can be replaced with one which
-** longjmps() out of the tidy code.  For this to
-** clean up completely, you should be careful not
-** to use any tidy methods that open files as these
-** will not be closed before panic() is called.
-**
-** TODO: associate file handles with tidyDoc and
-** ensure that tidyDocRelease() can close them all.
-**
-** Calling the withAllocator() family (
-** tidyCreateWithAllocator, tidyBufInitWithAllocator,
-** tidyBufAllocWithAllocator) allow settings custom
-** allocators).
-**
-** All parts of the document use the same allocator.
-** Calls that require a user provided buffer can
-** optionally use a different allocator.
-**
-** For reference in designing a plug-in allocator,
-** most allocations made by tidy are less than 100
-** bytes, corresponding to attribute names/values, etc.
-**
-** There is also an additional class of much larger
-** allocations which are where most of the data from
-** the lexer is stored.  (It is not currently possible
-** to use a separate allocator for the lexer, this
-** would be a useful extension).
-**
-** In general, approximately 1/3rd of the memory
-** used by tidy is freed during the parse, so if
-** memory usage is an issue then an allocator that 
-** can reuse this memory is a good idea.
-**
-** @{
-*/
-
-/** Prototype for the allocator's function table */
-struct _TidyAllocatorVtbl;
-/** The allocators function table */
-typedef struct _TidyAllocatorVtbl TidyAllocatorVtbl;
-
-/** Prototype for the allocator */
-struct _TidyAllocator;
-/** The allocator **/
-typedef struct _TidyAllocator TidyAllocator;
-
-/**  An allocator's function table.  All functions here must
-    be provided.
- */
-struct _TidyAllocatorVtbl {
-    /** Called to allocate a block of nBytes of memory */
-    void* (TIDY_CALL *alloc)( TidyAllocator *self, size_t nBytes );
-    /** Called to resize (grow, in general) a block of memory.
-        Must support being called with NULL.
-    */
-    void* (TIDY_CALL *realloc)( TidyAllocator *self, void *block, size_t nBytes );
-    /** Called to free a previously allocated block of memory */
-    void (TIDY_CALL *free)( TidyAllocator *self, void *block);
-    /** Called when a panic condition is detected.  Must support
-        block == NULL.  This function is not called if either alloc 
-        or realloc fails; it is up to the allocator to do this.
-        Currently this function can only be called if an error is
-        detected in the tree integrity via the internal function
-        CheckNodeIntegrity().  This is a situation that can
-        only arise in the case of a programming error in tidylib.
-        You can turn off node integrity checking by defining
-        the constant NO_NODE_INTEGRITY_CHECK during the build.
-    **/
-    void (TIDY_CALL *panic)( TidyAllocator *self, ctmbstr msg );
-};
-
-/** An allocator.  To create your own allocator, do something like
-    the following:
-    \code
-    typedef struct _MyAllocator {
-       TidyAllocator base;
-       ...other custom allocator state...
-    } MyAllocator;
-    
-    void* MyAllocator_alloc(TidyAllocator *base, void *block, size_t nBytes)
-    {
-        MyAllocator *self = (MyAllocator*)base;
-        ...
-    }
-    (etc)
-
-    static const TidyAllocatorVtbl MyAllocatorVtbl = {
-        MyAllocator_alloc,
-        MyAllocator_realloc,
-        MyAllocator_free,
-        MyAllocator_panic
-    };
-
-    myAllocator allocator;
-    TidyDoc doc;
-
-    allocator.base.vtbl = &amp;MyAllocatorVtbl;
-    ...initialise allocator specific state...
-    doc = tidyCreateWithAllocator(&allocator);
-    \endcode
-
-    Although this looks slightly long winded, the advantage is that to create
-    a custom allocator you simply need to set the vtbl pointer correctly.
-    The vtbl itself can reside in static/global data, and hence does not
-    need to be initialised each time an allocator is created, and furthermore
-    the memory is shared amongst all created allocators.
-*/
-struct _TidyAllocator {
-    const TidyAllocatorVtbl *vtbl;
-};
-
-/** Callback for "malloc" replacement */
-typedef void* (TIDY_CALL *TidyMalloc)( size_t len );
-/** Callback for "realloc" replacement */
-typedef void* (TIDY_CALL *TidyRealloc)( void* buf, size_t len );
-/** Callback for "free" replacement */
-typedef void  (TIDY_CALL *TidyFree)( void* buf );
-/** Callback for "out of memory" panic state */
-typedef void  (TIDY_CALL *TidyPanic)( ctmbstr mssg );
-
-
-/** Give Tidy a malloc() replacement */
-TIDY_EXPORT Bool TIDY_CALL tidySetMallocCall( TidyMalloc fmalloc );
-/** Give Tidy a realloc() replacement */
-TIDY_EXPORT Bool TIDY_CALL tidySetReallocCall( TidyRealloc frealloc );
-/** Give Tidy a free() replacement */
-TIDY_EXPORT Bool TIDY_CALL tidySetFreeCall( TidyFree ffree );
-/** Give Tidy an "out of memory" handler */
-TIDY_EXPORT Bool TIDY_CALL tidySetPanicCall( TidyPanic fpanic );
-
-/** @} end Memory group */
-
-/** @defgroup Basic Basic Operations
-**
-** Tidy public interface
-**
-** Several functions return an integer document status:
-**
-** <pre>
-** 0    -> SUCCESS
-** >0   -> 1 == TIDY WARNING, 2 == TIDY ERROR
-** <0   -> SEVERE ERROR
-** </pre>
-** 
-The following is a short example program.
-
-<pre>
-\#include &lt;tidy.h&gt;
-\#include &lt;tidybuffio.h&gt;
-\#include &lt;stdio.h&gt;
-\#include &lt;errno.h&gt;
-
-
-int main(int argc, char **argv )
-{
-  const char* input = "&lt;title&gt;Foo&lt;/title&gt;&lt;p&gt;Foo!";
-  TidyBuffer output;
-  TidyBuffer errbuf;
-  int rc = -1;
-  Bool ok;
-
-  TidyDoc tdoc = tidyCreate();                     // Initialize "document"
-  tidyBufInit( &amp;output );
-  tidyBufInit( &amp;errbuf );
-  printf( "Tidying:\t\%s\\n", input );
-
-  ok = tidyOptSetBool( tdoc, TidyXhtmlOut, yes );  // Convert to XHTML
-  if ( ok )
-    rc = tidySetErrorBuffer( tdoc, &amp;errbuf );      // Capture diagnostics
-  if ( rc &gt;= 0 )
-    rc = tidyParseString( tdoc, input );           // Parse the input
-  if ( rc &gt;= 0 )
-    rc = tidyCleanAndRepair( tdoc );               // Tidy it up!
-  if ( rc &gt;= 0 )
-    rc = tidyRunDiagnostics( tdoc );               // Kvetch
-  if ( rc &gt; 1 )                                    // If error, force output.
-    rc = ( tidyOptSetBool(tdoc, TidyForceOutput, yes) ? rc : -1 );
-  if ( rc &gt;= 0 )
-    rc = tidySaveBuffer( tdoc, &amp;output );          // Pretty Print
-
-  if ( rc &gt;= 0 )
-  {
-    if ( rc &gt; 0 )
-      printf( "\\nDiagnostics:\\n\\n\%s", errbuf.bp );
-    printf( "\\nAnd here is the result:\\n\\n\%s", output.bp );
-  }
-  else
-    printf( "A severe error (\%d) occurred.\\n", rc );
-
-  tidyBufFree( &amp;output );
-  tidyBufFree( &amp;errbuf );
-  tidyRelease( tdoc );
-  return rc;
-}
-</pre>
-** @{
-*/
-
-/** The primary creation of a TidyDoc.
- ** This must be the first call before most of the Tidy API which require the TidyDoc parameter.
- ** When completed tidyRelease( TidyDoc tdoc ); should be called to release all memory
- */
-TIDY_EXPORT TidyDoc TIDY_CALL     tidyCreate(void);
-
-/** Create a Tidoc supplying the TidyAllocator.
- ** See the TidyAllocator structure for creating an allocator
- */
-TIDY_EXPORT TidyDoc TIDY_CALL     tidyCreateWithAllocator( TidyAllocator *allocator );
-
-/** Free all memory and release the TidyDoc.
- ** TidyDoc can not be used after this call.
- */
-TIDY_EXPORT void TIDY_CALL        tidyRelease( TidyDoc tdoc );
-
-/** Let application store a chunk of data w/ each Tidy instance.
-**  Useful for callbacks.
-*/
-TIDY_EXPORT void TIDY_CALL        tidySetAppData( TidyDoc tdoc, void* appData );
-
-/** Get application data set previously */
-TIDY_EXPORT void* TIDY_CALL       tidyGetAppData( TidyDoc tdoc );
-
-/** Get release date (version) for current library 
- ** @deprecated tidyReleaseDate() is deprecated in favor of semantic
- ** versioning and should be replaced with tidyLibraryVersion().
+/** @}
+ ** @name Input Source
+ ** If you wish to write to your own input sources, then these types, structs,
+ ** and functions will allow them to work seamlessly with Tidy.
+ ** @{
  */
 
-TIDY_EXPORT ctmbstr TIDY_CALL     tidyReleaseDate(void);
+/** End of input "character" */
+#define EndOfStream (~0u)
 
-/** Get version number for the current library */
-TIDY_EXPORT ctmbstr TIDY_CALL     tidyLibraryVersion(void);
-
-/* Diagnostics and Repair
-*/
-
-/** Get status of current document. */
-TIDY_EXPORT int TIDY_CALL         tidyStatus( TidyDoc tdoc );
-
-/** Detected HTML version: 0, 2, 3 or 4 */
-TIDY_EXPORT int TIDY_CALL         tidyDetectedHtmlVersion( TidyDoc tdoc );
-
-/** Input is XHTML? */
-TIDY_EXPORT Bool TIDY_CALL        tidyDetectedXhtml( TidyDoc tdoc );
-
-/** Input is generic XML (not HTML or XHTML)? */
-TIDY_EXPORT Bool TIDY_CALL        tidyDetectedGenericXml( TidyDoc tdoc );
-
-/** Number of Tidy errors encountered.  If > 0, output is suppressed
-**  unless TidyForceOutput is set.
-*/
-TIDY_EXPORT unsigned int TIDY_CALL        tidyErrorCount( TidyDoc tdoc );
-
-/** Number of Tidy warnings encountered. */
-TIDY_EXPORT unsigned int TIDY_CALL        tidyWarningCount( TidyDoc tdoc );
-
-/** Number of Tidy accessibility warnings encountered. */
-TIDY_EXPORT unsigned int TIDY_CALL        tidyAccessWarningCount( TidyDoc tdoc );
-
-/** Number of Tidy configuration errors encountered. */
-TIDY_EXPORT unsigned int TIDY_CALL        tidyConfigErrorCount( TidyDoc tdoc );
-
-/* Get/Set configuration options
-*/
-/** Load an ASCII Tidy configuration file */
-TIDY_EXPORT int TIDY_CALL         tidyLoadConfig( TidyDoc tdoc, ctmbstr configFile );
-
-/** Load a Tidy configuration file with the specified character encoding */
-TIDY_EXPORT int TIDY_CALL         tidyLoadConfigEnc( TidyDoc tdoc, ctmbstr configFile,
-                                                     ctmbstr charenc );
-
-TIDY_EXPORT Bool TIDY_CALL        tidyFileExists( TidyDoc tdoc, ctmbstr filename );
-
-
-/** Set the input/output character encoding for parsing markup.
-**  Values include: ascii, latin1, raw, utf8, iso2022, mac,
-**  win1252, utf16le, utf16be, utf16, big5 and shiftjis.  Case in-sensitive.
-*/
-TIDY_EXPORT int TIDY_CALL         tidySetCharEncoding( TidyDoc tdoc, ctmbstr encnam );
-
-/** Set the input encoding for parsing markup.
-** As for tidySetCharEncoding but only affects the input encoding
-**/
-TIDY_EXPORT int TIDY_CALL         tidySetInCharEncoding( TidyDoc tdoc, ctmbstr encnam );
-
-/** Set the output encoding.
-**/
-TIDY_EXPORT int TIDY_CALL         tidySetOutCharEncoding( TidyDoc tdoc, ctmbstr encnam );
-
-/** @} end Basic group */
-
-
-/** @defgroup Configuration Configuration Options
-**
-** Functions for getting and setting Tidy configuration options.
-** @{
-*/
-
-/** Applications using TidyLib may want to augment command-line and
-**  configuration file options.  Setting this callback allows an application 
-**  developer to examine command-line and configuration file options after
-**  TidyLib has examined them and failed to recognize them.
-**/
-
-typedef Bool (TIDY_CALL *TidyOptCallback)( ctmbstr option, ctmbstr value );
-
-TIDY_EXPORT Bool TIDY_CALL          tidySetOptionCallback( TidyDoc tdoc, TidyOptCallback pOptCallback );
-
-/** Get option ID by name */
-TIDY_EXPORT TidyOptionId TIDY_CALL  tidyOptGetIdForName( ctmbstr optnam );
-
-/** Get iterator for list of option */
-/** 
-Example:
-<pre>
-TidyIterator itOpt = tidyGetOptionList( tdoc );
-while ( itOpt )
-{
-  TidyOption opt = tidyGetNextOption( tdoc, &itOpt );
-  .. get/set option values ..
-}
-</pre>
-*/
-
-TIDY_EXPORT TidyIterator TIDY_CALL  tidyGetOptionList( TidyDoc tdoc );
-/** Get next Option */
-TIDY_EXPORT TidyOption TIDY_CALL    tidyGetNextOption( TidyDoc tdoc, TidyIterator* pos );
-
-/** Lookup option by ID */
-TIDY_EXPORT TidyOption TIDY_CALL    tidyGetOption( TidyDoc tdoc, TidyOptionId optId );
-/** Lookup option by name */
-TIDY_EXPORT TidyOption TIDY_CALL    tidyGetOptionByName( TidyDoc tdoc, ctmbstr optnam );
-
-/** Get ID of given Option */
-TIDY_EXPORT TidyOptionId TIDY_CALL  tidyOptGetId( TidyOption opt );
-
-/** Get name of given Option */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetName( TidyOption opt );
-
-/** Get datatype of given Option */
-TIDY_EXPORT TidyOptionType TIDY_CALL tidyOptGetType( TidyOption opt );
-
-/** Is Option read-only? */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptIsReadOnly( TidyOption opt );
-
-/** Get category of given Option */
-TIDY_EXPORT TidyConfigCategory TIDY_CALL tidyOptGetCategory( TidyOption opt );
-
-/** Get default value of given Option as a string */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetDefault( TidyOption opt );
-
-/** Get default value of given Option as an unsigned integer */
-TIDY_EXPORT unsigned int TIDY_CALL         tidyOptGetDefaultInt( TidyOption opt );
-
-/** Get default value of given Option as a Boolean value */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptGetDefaultBool( TidyOption opt );
-
-/** Iterate over Option "pick list" */
-TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetPickList( TidyOption opt );
-/** Get next string value of Option "pick list" */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextPick( TidyOption opt, TidyIterator* pos );
-
-/** Get string Option current value. Note, the optID "must" be a type 'TidyString'! */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetValue( TidyDoc tdoc, TidyOptionId optId );
-/** Set Option value as a string */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptSetValue( TidyDoc tdoc, TidyOptionId optId, ctmbstr val );
-/** Set named Option value as a string.  Good if not sure of type. */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptParseValue( TidyDoc tdoc, ctmbstr optnam, ctmbstr val );
-
-/** Get current Option value as an integer */
-TIDY_EXPORT unsigned int TIDY_CALL         tidyOptGetInt( TidyDoc tdoc, TidyOptionId optId );
-/** Set Option value as an integer */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptSetInt( TidyDoc tdoc, TidyOptionId optId, unsigned int val );
-
-/** Get current Option value as a Boolean flag */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptGetBool( TidyDoc tdoc, TidyOptionId optId );
-/** Set Option value as a Boolean flag */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptSetBool( TidyDoc tdoc, TidyOptionId optId, Bool val );
-
-/** Reset option to default value by ID */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptResetToDefault( TidyDoc tdoc, TidyOptionId opt );
-/** Reset all options to their default values */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptResetAllToDefault( TidyDoc tdoc );
-
-/** Take a snapshot of current config settings */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptSnapshot( TidyDoc tdoc );
-/** Reset config settings to snapshot (after document processing) */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptResetToSnapshot( TidyDoc tdoc );
-
-/** Any settings different than default? */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptDiffThanDefault( TidyDoc tdoc );
-/** Any settings different than snapshot? */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptDiffThanSnapshot( TidyDoc tdoc );
-
-/** Copy current configuration settings from one document to another */
-TIDY_EXPORT Bool TIDY_CALL          tidyOptCopyConfig( TidyDoc tdocTo, TidyDoc tdocFrom );
-
-/** Get character encoding name.  Used with TidyCharEncoding,
-**  TidyOutCharEncoding, TidyInCharEncoding */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetEncName( TidyDoc tdoc, TidyOptionId optId );
-
-/** Get current pick list value for option by ID.  Useful for enum types. */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetCurrPick( TidyDoc tdoc, TidyOptionId optId);
-
-/** Iterate over user declared tags */
-TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetDeclTagList( TidyDoc tdoc );
-/** Get next declared tag of specified type: TidyInlineTags, TidyBlockTags,
-**  TidyEmptyTags, TidyPreTags */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetNextDeclTag( TidyDoc tdoc, 
-                                                          TidyOptionId optId,
-                                                          TidyIterator* iter );
-/** Get option description */
-TIDY_EXPORT ctmbstr TIDY_CALL       tidyOptGetDoc( TidyDoc tdoc, TidyOption opt );
-
-/** Iterate over a list of related options */
-TIDY_EXPORT TidyIterator TIDY_CALL  tidyOptGetDocLinksList( TidyDoc tdoc,
-                                                  TidyOption opt );
-/** Get next related option */
-TIDY_EXPORT TidyOption TIDY_CALL    tidyOptGetNextDocLinks( TidyDoc tdoc,
-                                                  TidyIterator* pos );
-
-/** @} end Configuration group */
-
-/** @defgroup IO  I/O and Messages
-**
-** By default, Tidy will define, create and use 
-** instances of input and output handlers for 
-** standard C buffered I/O (i.e. FILE* stdin,
-** FILE* stdout and FILE* stderr for content
-** input, content output and diagnostic output,
-** respectively.  A FILE* cfgFile input handler
-** will be used for config files.  Command line
-** options will just be set directly.
-**
-** @{
-*/
-
-/*****************
-   Input Source
-*****************/
 /** Input Callback: get next byte of input */
 typedef int  (TIDY_CALL *TidyGetByteFunc)( void* sourceData );
 
@@ -2058,580 +3233,1125 @@ typedef void (TIDY_CALL *TidyUngetByteFunc)( void* sourceData, byte bt );
 /** Input Callback: is end of input? */
 typedef Bool (TIDY_CALL *TidyEOFFunc)( void* sourceData );
 
-/** End of input "character" */
-#define EndOfStream (~0u)
-
-/** TidyInputSource - Delivers raw bytes of input
-*/
+/** This type defines an input source capable of delivering raw bytes of input.
+ */
 TIDY_STRUCT
 typedef struct _TidyInputSource
 {
-  /* Instance data */
-  void*               sourceData;  /**< Input context.  Passed to callbacks */
+  void*               sourceData;  /**< Input context. Passed to callbacks. */
 
-  /* Methods */
-  TidyGetByteFunc     getByte;     /**< Pointer to "get byte" callback */
-  TidyUngetByteFunc   ungetByte;   /**< Pointer to "unget" callback */
-  TidyEOFFunc         eof;         /**< Pointer to "eof" callback */
+  TidyGetByteFunc     getByte;     /**< Pointer to "get byte" callback. */
+  TidyUngetByteFunc   ungetByte;   /**< Pointer to "unget" callback. */
+  TidyEOFFunc         eof;         /**< Pointer to "eof" callback. */
 } TidyInputSource;
 
-/** Facilitates user defined source by providing
-**  an entry point to marshal pointers-to-functions.
-**  Needed by .NET and possibly other language bindings.
-*/
-TIDY_EXPORT Bool TIDY_CALL tidyInitSource( TidyInputSource*  source,
-                                          void*             srcData,
-                                          TidyGetByteFunc   gbFunc,
-                                          TidyUngetByteFunc ugbFunc,
-                                          TidyEOFFunc       endFunc );
+/** Facilitates user defined source by providing an entry point to marshal
+ ** pointers-to-functions. This is needed by .NET, and possibly other language
+ ** bindings.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyInitSource(TidyInputSource*  source,  /**< The source to populate with data. */
+                                          void*             srcData, /**< The input context. */
+                                          TidyGetByteFunc   gbFunc,  /**< Pointer to the "get byte" callback. */
+                                          TidyUngetByteFunc ugbFunc, /**< Pointer to the "unget" callback. */
+                                          TidyEOFFunc       endFunc  /**< Pointer to the "eof" callback. */
+                                          );
 
-/** Helper: get next byte from input source */
+/** Helper: get next byte from input source.
+ ** @param source A pointer to your input source.
+ ** @result Returns a byte as an unsigned integer.
+ */
 TIDY_EXPORT unsigned int TIDY_CALL tidyGetByte( TidyInputSource* source );
 
-/** Helper: unget byte back to input source */
-TIDY_EXPORT void TIDY_CALL tidyUngetByte( TidyInputSource* source, unsigned int byteValue );
+/** Helper: unget byte back to input source. */
+TIDY_EXPORT void TIDY_CALL tidyUngetByte(TidyInputSource* source, /**< The input source. */
+                                         unsigned int byteValue           /**< The byte to push back. */
+                                         );
 
-/** Helper: check if input source at end */
+/** Helper: check if input source at end.
+ ** @param source The input source.
+ ** @result Returns a bool indicating whether or not the source is at EOF.
+ */
 TIDY_EXPORT Bool TIDY_CALL tidyIsEOF( TidyInputSource* source );
 
+/** @}
+ ** @name Output Sink
+ ** @{
+ */
 
-/****************
-   Output Sink
-****************/
 /** Output callback: send a byte to output */
 typedef void (TIDY_CALL *TidyPutByteFunc)( void* sinkData, byte bt );
 
-
-/** TidyOutputSink - accepts raw bytes of output
-*/
+/** This type defines an output destination capable of accepting raw bytes
+ ** of output
+ */
 TIDY_STRUCT
 typedef struct _TidyOutputSink
 {
-  /* Instance data */
-  void*               sinkData;  /**< Output context.  Passed to callbacks */
+  void*               sinkData;  /**< Output context. Passed to callbacks. */
 
-  /* Methods */
   TidyPutByteFunc     putByte;   /**< Pointer to "put byte" callback */
 } TidyOutputSink;
 
-/** Facilitates user defined sinks by providing
-**  an entry point to marshal pointers-to-functions.
-**  Needed by .NET and possibly other language bindings.
+/** Facilitates user defined sinks by providing an entry point to marshal 
+ ** pointers-to-functions. This is needed by .NET, and possibly other language
+ ** bindings.
+ ** @result Returns a bool indicating success or failure.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyInitSink(TidyOutputSink* sink,     /**< The sink to populate with data. */
+                                        void*           snkData,  /**< The output context. */
+                                        TidyPutByteFunc pbFunc    /**< Pointer to the "put byte" callback function. */
+                                        );
+
+/** Helper: send a byte to output. */
+TIDY_EXPORT void TIDY_CALL tidyPutByte(TidyOutputSink* sink, /**< The output sink to send a byte. */
+                                       unsigned int byteValue        /**< The byte to be sent. */
+                                       );
+
+/** @}
+ ** @name Emacs-compatible reporting support.
+ ** If you work with Emacs and prefer Tidy's report output to be in a form
+ ** that is easy for Emacs to parse, then these functions may be valuable.
+ ** @{
+ */
+
+/** Set the file path to use for reports when `TidyEmacs` is being used. This
+ ** function provides a proper interface for using the hidden, internal-only
+ ** `TidyEmacsFile` configuration option.
+ */
+TIDY_EXPORT void TIDY_CALL tidySetEmacsFile(TidyDoc tdoc,    /**< The tidy document for which you are setting the filePath. */
+                                            ctmbstr filePath /**< The path of the document that should be reported. */
+                                            );
+
+/** Get the file path to use for reports when `TidyEmacs` is being used. This
+ ** function provides a proper interface for using the hidden, internal-only
+ ** `TidyEmacsFile` configuration option.
+ ** @param tdoc The tidy document for which you want to fetch the file path.
+ ** @result Returns a string indicating the file path.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetEmacsFile( TidyDoc tdoc );
+    
+/** @}
+ ** @name Error Sink
+ ** Send Tidy's output to any of several destinations with these functions.
+ ** @{
+ */
+
+/** Set error sink to named file. 
+ ** @result Returns a file handle.
+ */
+TIDY_EXPORT FILE* TIDY_CALL tidySetErrorFile(TidyDoc tdoc,     /**< The document to set. */
+                                             ctmbstr errfilnam /**< The file path to send output. */
+                                             );
+
+/** Set error sink to given buffer. 
+ ** @result Returns 0 upon success or a standard error number.
+ */
+TIDY_EXPORT int TIDY_CALL tidySetErrorBuffer(TidyDoc tdoc,      /**< The document to set. */
+                                             TidyBuffer* errbuf /**< The TidyBuffer to collect output. */
+                                             );
+
+/** Set error sink to given generic sink.
+ ** @result Returns 0 upon success or a standard error number.
+ */
+TIDY_EXPORT int TIDY_CALL tidySetErrorSink(TidyDoc tdoc,        /**< The document to set. */
+                                           TidyOutputSink* sink /**< The TidyOutputSink to collect output. */
+                                           );
+
+/** @}
+ ** @name Error and Message Callbacks - TidyReportFilter
+ ** A simple callback to filter or collect messages by diagnostic level,
+ ** for example, TidyInfo, TidyWarning, etc. Its name reflects its original
+ ** purpose as a filter, by which your application can inform LibTidy whether
+ ** or not to output a particular report.
+ **
+ ** @{
+ */
+
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetReportFilter().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tdoc Indicates the tidy document the message comes from.
+ ** @param lvl Specifies the TidyReportLevel of the message.
+ ** @param line Indicates the line number in the source document the message applies to.
+ ** @param col Indicates the column in the source document the message applies to.
+ ** @param mssg Specifies the complete message as Tidy would emit it.
+ ** @return Your callback function will return `yes` if Tidy should include the
+ **         report in its own output sink, or `no` if Tidy should suppress it.
+ */
+typedef Bool (TIDY_CALL *TidyReportFilter)( TidyDoc tdoc, TidyReportLevel lvl, unsigned int line, unsigned int col, ctmbstr mssg );
+
+/** This function informs Tidy to use the specified callback to send reports. */
+TIDY_EXPORT Bool TIDY_CALL tidySetReportFilter(TidyDoc tdoc,                 /**< The tidy document for which the callback applies. */
+                                               TidyReportFilter filtCallback /**< A pointer to your callback function of type TidyReportFilter. */
+                                               );
+
+/** @}
+ ** @name Error and Message Callbacks - TidyReportCallback
+ ** A simple callback to filter or collect messages reported by Tidy.
+ ** Unlike TidyReportFilter, more data are provided (including a `va_list`),
+ ** making this callback suitable for applications that provide more
+ ** sophisticated handling of reports.
+ ** @remark The use of a `va_list` may preclude using this callback from
+ **         non-C-like languages, which is uncharacteristic of Tidy. For more
+ **         flexibility, consider using TidyMessageCallback instead.
+ ** @note This callback was previously `TidyMessageFilter3` in older versions
+ **       of LibTidy.
+ ** @{
+ */
+
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetReportCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tdoc Indicates the tidy document the message comes from.
+ ** @param lvl Specifies the TidyReportLevel of the message.
+ ** @param line Indicates the line number in the source document the message applies to.
+ ** @param col Indicates the column in the source document the message applies to.
+ ** @param code Specifies the message code representing the message. Note that
+ **        this code is a string value that the API promises to hold constant,
+ **        as opposed to an enum value that can change at any time. Although
+ **        this is intended so that you can look up your own application's
+ **        strings, you can retrieve Tidy's format string with this code by
+ **        using tidyErrorCodeFromKey() and then the tidyLocalizedString()
+ **        family of functions.
+ ** @param args Is a `va_list` of arguments used to fill Tidy's message format string.
+ ** @return Your callback function will return `yes` if Tidy should include the
+ **         report in its own output sink, or `no` if Tidy should suppress it.
+ */
+typedef Bool (TIDY_CALL *TidyReportCallback)( TidyDoc tdoc, TidyReportLevel lvl,
+                                              unsigned int line, unsigned int col, ctmbstr code, va_list args );
+
+/** This function informs Tidy to use the specified callback to send reports. */
+TIDY_EXPORT Bool TIDY_CALL tidySetReportCallback(TidyDoc tdoc,                   /**< The tidy document for which the callback applies. */
+                                                 TidyReportCallback filtCallback /**< A pointer to your callback function of type TidyReportCallback. */
+                                                 );
+
+/** @}
+ ** @name Error and Message Callbacks - TidyMessageCallback
+ ** A sophisticated and extensible callback to filter or collect messages
+ ** reported by Tidy. It returns only an opaque type `TidyMessage` for every
+ ** report and dialogue message, and this message can be queried with the
+**  TidyMessageCallback API, below. Note that unlike the older filters, this
+**  callback exposes *all* output that LibTidy emits (excluding the console
+**  application, which is a client of LibTidy).
 */
-TIDY_EXPORT Bool TIDY_CALL tidyInitSink( TidyOutputSink* sink, 
-                                        void*           snkData,
-                                        TidyPutByteFunc pbFunc );
 
-/** Helper: send a byte to output */
-TIDY_EXPORT void TIDY_CALL tidyPutByte( TidyOutputSink* sink, unsigned int byteValue );
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetMessageCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tmessage An opaque type used as a token against which other API
+ **        calls can be made.
+ ** @return Your callback function will return `yes` if Tidy should include the
+ **         report in its own output sink, or `no` if Tidy should suppress it.
+ */
+typedef Bool (TIDY_CALL *TidyMessageCallback)( TidyMessage tmessage );
+
+/** This function informs Tidy to use the specified callback to send reports. */
+TIDY_EXPORT Bool TIDY_CALL tidySetMessageCallback(TidyDoc tdoc,                    /**< The tidy document for which the callback applies. */
+                                                  TidyMessageCallback filtCallback /**< A pointer to your callback function of type TidyMessageCallback. */
+                                                  );
+
+/** @name TidyMessageCallback API
+ ** When using `TidyMessageCallback` you will be supplied with a TidyMessage 
+ ** object, which is used as a token to be interrogated with the following
+ ** API before the callback returns.
+ ** @remark Upon returning from the callback, this object is destroyed so do
+ ** not attempt to copy it, or keep it around, or use it in any way.
+ **
+ ** @{
+ */
+
+/** Get the tidy document this message comes from. 
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the TidyDoc that generated the message.
+ */
+TIDY_EXPORT TidyDoc TIDY_CALL tidyGetMessageDoc( TidyMessage tmessage );
+
+/** Get the message code.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns a code representing the message. This code can be used
+ **         directly with the localized strings API; however we never make
+ **         any guarantees about the value of these codes. For code stability
+ **         don't store this value in your own application. Instead use the
+ **         enum field or use the message key string value.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL tidyGetMessageCode( TidyMessage tmessage );
+
+/** Get the message key string.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns a string representing the message. This string is intended
+ **         to be stable by the LibTidy API, and is suitable for use as a key
+ **         in your own applications.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageKey( TidyMessage tmessage );
+
+/** Get the line number the message applies to.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the line number, if any, that generated the message.
+ */
+TIDY_EXPORT int TIDY_CALL tidyGetMessageLine( TidyMessage tmessage );
+
+/** Get the column the message applies to.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the column number, if any, that generated the message.
+ */
+TIDY_EXPORT int TIDY_CALL tidyGetMessageColumn( TidyMessage tmessage );
+
+/** Get the TidyReportLevel of the message.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns a TidyReportLevel indicating the severity or status of the
+ **         message.
+ */
+TIDY_EXPORT TidyReportLevel TIDY_CALL tidyGetMessageLevel( TidyMessage tmessage );
 
 
-/****************
-   Errors
-****************/
-/** Callback to filter messages by diagnostic level:
-**  info, warning, etc.  Just set diagnostic output 
-**  handler to redirect all diagnostics output.  Return true
-**  to proceed with output, false to cancel.
-*/
-typedef Bool (TIDY_CALL *TidyReportFilter)( TidyDoc tdoc, TidyReportLevel lvl,
-                                           unsigned int line, unsigned int col, ctmbstr mssg );
+/** Get the muted status of the message, that is, whether or not the
+ ** current configuration indicated that this message should be muted.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns a Bool indicating that the config indicates muting this
+ **         message.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyGetMessageIsMuted( TidyMessage tmessage );
 
-typedef Bool (TIDY_CALL *TidyReportFilter2)( TidyDoc tdoc, TidyReportLevel lvl,
-                                           unsigned int line, unsigned int col, ctmbstr mssg, va_list args );
+/** Get the default format string, which is the format string for the message
+ ** in Tidy's default localization (en_us).
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the default localization format string of the message.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageFormatDefault( TidyMessage tmessage );
 
-typedef Bool (TIDY_CALL *TidyReportFilter3)( TidyDoc tdoc, TidyReportLevel lvl,
-                                                unsigned int line, unsigned int col, ctmbstr code, va_list args );
+/** Get the localized format string. If a localized version of the format string
+ ** doesn't exist, then the default version will be returned.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the localized format string of the message.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageFormat( TidyMessage tmessage );
 
-/** Give Tidy a filter callback to use */
-TIDY_EXPORT Bool TIDY_CALL    tidySetReportFilter( TidyDoc tdoc,
-                                                  TidyReportFilter filtCallback );
+/** Get the message with the format string already completed, in Tidy's
+ ** default localization.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the message in the default localization.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageDefault( TidyMessage tmessage );
 
-TIDY_EXPORT Bool TIDY_CALL    tidySetReportFilter2( TidyDoc tdoc,
-                                                  TidyReportFilter2 filtCallback );
+/** Get the message with the format string already completed, in Tidy's
+ ** current localization.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the message in the current localization.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessage( TidyMessage tmessage );
 
-TIDY_EXPORT Bool TIDY_CALL    tidySetReportFilter3( TidyDoc tdoc,
-                                                       TidyReportFilter3 filtCallback );
+/** Get the position part part of the message in the default language.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the positional part of a string as Tidy would display it
+ **         in the console application.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessagePosDefault( TidyMessage tmessage );
 
-/** Set error sink to named file */
-TIDY_EXPORT FILE* TIDY_CALL   tidySetErrorFile( TidyDoc tdoc, ctmbstr errfilnam );
-/** Set error sink to given buffer */
-TIDY_EXPORT int TIDY_CALL     tidySetErrorBuffer( TidyDoc tdoc, TidyBuffer* errbuf );
-/** Set error sink to given generic sink */
-TIDY_EXPORT int TIDY_CALL     tidySetErrorSink( TidyDoc tdoc, TidyOutputSink* sink );
+/** Get the position part part of the message in the current language.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the positional part of a string as Tidy would display it
+ **         in the console application.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessagePos( TidyMessage tmessage );
 
+/** Get the prefix part of a message in the default language.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the message prefix part of a string as Tidy would display
+ **         it in the console application.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessagePrefixDefault( TidyMessage tmessage );
 
-/****************
-   Printing
-****************/
-/** Callback to track the progress of the pretting printing process.
-**
-*/
+/** Get the prefix part of a message in the current language.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the message prefix part of a string as Tidy would display
+ **         it in the console application.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessagePrefix( TidyMessage tmessage );
+
+/** Get the complete message as Tidy would emit it in the default localization.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the complete message just as Tidy would display it on the
+ **         console.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageOutputDefault( TidyMessage tmessage );
+
+/** Get the complete message as Tidy would emit it in the current localization.
+ ** @param tmessage Specify the message that you are querying.
+ ** @result Returns the complete message just as Tidy would display it on the
+ **         console.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetMessageOutput( TidyMessage tmessage );
+
+/** @} end subgroup TidyMessageCallback API */
+
+/** @name TidyMessageCallback Arguments API
+ ** When using `TidyMessageCallback` you will be supplied with a TidyMessage
+ ** object which can be used as a token against which to query using this API.
+ ** This API deals strictly with _arguments_ that a message may or may not have;
+ ** these are the same arguments that Tidy would apply to a format string in
+ ** order to fill in the placeholder fields and deliver a complete report or
+ ** dialogue string to you.
+ **
+ ** @{
+ */
+
+/** Initiates an iterator for a list of arguments related to a given message.
+ ** This iterator allows you to iterate through all of the arguments, if any.
+ ** In order to iterate through the arguments, initiate the iterator with this
+ ** function, and then use tidyGetNextMessageArgument() to retrieve the first
+ ** and subsequent arguments. For example:
+ ** @code{.c}
+ **   TidyIterator itArg = tidyGetMessageArguments( tmessage );
+ **   while ( itArg ) {
+ **     TidyMessageArgument my_arg = tidyGetNextMessageArgument( tmessage, &itArg );
+ **     // do something with my_arg, such as inspect its value or format
+ **   }
+ ** @endcode
+ ** @param tmessage The message about whose arguments you wish to query.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL tidyGetMessageArguments( TidyMessage tmessage );
+
+/** Given a valid TidyIterator initiated with tidyGetMessageArguments(), returns
+ ** an instance of the opaque type TidyMessageArgument, which serves as a token
+ ** against which the remaining argument API functions may be used to query
+ ** information.
+ ** @result Returns an instance of TidyMessageArgument.
+ */
+TIDY_EXPORT TidyMessageArgument TIDY_CALL tidyGetNextMessageArgument(TidyMessage tmessage, /**< The message whose arguments you want to access. */
+                                                                     TidyIterator* iter    /**< The TidyIterator (initiated with tidyOptGetDocLinksList()) token. */
+                                                                     );
+
+/** Returns the `TidyFormatParameterType` of the given message argument.
+ ** @result Returns the type of parameter of type TidyFormatParameterType.
+ */
+TIDY_EXPORT TidyFormatParameterType TIDY_CALL tidyGetArgType(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                                             TidyMessageArgument* arg /**< The argument that you are querying. */
+                                                             );
+
+/** Returns the format specifier of the given message argument. The memory for
+ ** this string is cleared upon termination of the callback, so do be sure to
+ ** make your own copy.
+ ** @result Returns the format specifier string of the given argument.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetArgFormat(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                               TidyMessageArgument* arg /**< The argument that you are querying. */
+                                               );
+
+/** Returns the string value of the given message argument. An assertion
+ ** will be generated if the argument type is not a string.
+ ** @result Returns the string value of the given argument.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetArgValueString(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                                    TidyMessageArgument* arg /**< The argument that you are querying. */
+                                                    );
+
+/** Returns the unsigned integer value of the given message argument. An
+ ** assertion will be generated if the argument type is not an unsigned int.
+ ** @result Returns the unsigned integer value of the given argument.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL tidyGetArgValueUInt(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                               TidyMessageArgument* arg /**< The argument that you are querying. */
+                                               );
+
+/** Returns the integer value of the given message argument. An assertion
+ ** will be generated if the argument type is not an integer.
+ ** @result Returns the integer value of the given argument.
+ */
+TIDY_EXPORT int TIDY_CALL tidyGetArgValueInt(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                             TidyMessageArgument* arg /**< The argument that you are querying. */
+                                             );
+
+/**
+ *  Returns the double value of the given message argument. An assertion
+ *  will be generated if the argument type is not a double.
+ ** @result Returns the double value of the given argument.
+ */
+TIDY_EXPORT double TIDY_CALL tidyGetArgValueDouble(TidyMessage tmessage,    /**< The message whose arguments you want to access. */
+                                                   TidyMessageArgument* arg /**< The argument that you are querying. */
+                                                   );
+
+/** @} end subgroup TidyMessageCallback Arguments API */
+
+/** @name Printing
+ ** LibTidy applications can somewhat track the progress of the tidying process
+ ** by using this provided callback. It relates where something in the source
+ ** document ended up in the output.
+ ** @{
+ */
+    
+/** This typedef represents the required signature for your provided callback
+ ** function should you wish to register one with tidySetMessageCallback().
+ ** Your callback function will be provided with the following parameters.
+ ** @param tdoc Indicates the source tidy document.
+ ** @param line Indicates the line in the source document at this point in the process.
+ ** @param col Indicates the column in the source document at this point in the process.
+ ** @param destLine Indicates the line number in the output document at this point in the process.
+ */
 typedef void (TIDY_CALL *TidyPPProgress)( TidyDoc tdoc, unsigned int line, unsigned int col, unsigned int destLine );
 
-TIDY_EXPORT Bool TIDY_CALL   tidySetPrettyPrinterCallback( TidyDoc tdoc,
-                                                  TidyPPProgress callback );
+/** This function informs Tidy to use the specified callback for tracking the
+ ** pretty-printing process progress.
+ */
+TIDY_EXPORT Bool TIDY_CALL   tidySetPrettyPrinterCallback(TidyDoc tdoc,
+                                                          TidyPPProgress callback
+                                                          );
 
+/** @} */
 /** @} end IO group */
+/* MARK: - Document Parse */
+/***************************************************************************//**
+ ** @defgroup Parse Document Parse
+ **
+ ** Functions for parsing markup from a given input source, as well as string
+ ** and filename functions for added convenience. HTML/XHTML version determined
+ ** from input.
+ **
+ ** @{
+ ******************************************************************************/
 
-/* TODO: Catalog all messages for easy translation
-TIDY_EXPORT ctmbstr     tidyLookupMessage( int errorNo );
-*/
+/** Parse markup in named file.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyParseFile(TidyDoc tdoc,    /**< The tidy document to use for parsing. */
+                                                ctmbstr filename /**< The filename to parse. */
+                                                );
 
-
-
-/** @defgroup Parse Document Parse
-**
-** Parse markup from a given input source.  String and filename 
-** functions added for convenience.  HTML/XHTML version determined
-** from input.
-** @{
-*/
-
-/** Parse markup in named file */
-TIDY_EXPORT int TIDY_CALL         tidyParseFile( TidyDoc tdoc, ctmbstr filename );
-
-/** Parse markup from the standard input */
+/** Parse markup from the standard input.
+ ** @param tdoc The tidy document to use for parsing.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
 TIDY_EXPORT int TIDY_CALL         tidyParseStdin( TidyDoc tdoc );
 
-/** Parse markup in given string */
-TIDY_EXPORT int TIDY_CALL         tidyParseString( TidyDoc tdoc, ctmbstr content );
+/** Parse markup in given string.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyParseString(TidyDoc tdoc,   /**< The tidy document to use for parsing. */
+                                                  ctmbstr content /**< The string to parse. */
+                                                  );
 
-/** Parse markup in given buffer */
-TIDY_EXPORT int TIDY_CALL         tidyParseBuffer( TidyDoc tdoc, TidyBuffer* buf );
+/** Parse markup in given buffer.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyParseBuffer(TidyDoc tdoc,   /**< The tidy document to use for parsing. */
+                                                  TidyBuffer* buf /**< The TidyBuffer containing data to parse. */
+                                                  );
 
-/** Parse markup in given generic input source */
-TIDY_EXPORT int TIDY_CALL         tidyParseSource( TidyDoc tdoc, TidyInputSource* source);
+/** Parse markup in given generic input source.
+ ** @result Returns the highest of `2` indicating that errors were present in
+ **         the document, `1` indicating warnings, and `0` in the case of
+ **         everything being okay.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyParseSource(TidyDoc tdoc,           /**< The tidy document to use for parsing. */
+                                                  TidyInputSource* source /**< A TidyInputSource containing data to parse. */
+                                                  );
+
 
 /** @} End Parse group */
+/* MARK: - Diagnostics and Repair */
+/***************************************************************************//**
+ ** @defgroup Clean Diagnostics and Repair
+ **
+ ** After parsing the document, you can use these functions to attempt cleanup,
+ ** repair, get additional diagnostics, and determine the document type.
+ ** @{
+ ******************************************************************************/
 
-
-/** @defgroup Clean Diagnostics and Repair
-**
-** @{
-*/
-/** Execute configured cleanup and repair operations on parsed markup */
+/** Execute configured cleanup and repair operations on parsed markup.
+ ** @param tdoc The tidy document to use.
+ ** @result An integer representing the status.
+ */
 TIDY_EXPORT int TIDY_CALL         tidyCleanAndRepair( TidyDoc tdoc );
 
-/** Run configured diagnostics on parsed and repaired markup. 
-**  Must call tidyCleanAndRepair() first.
-*/
+/** Reports the document type and diagnostic statistics on parsed and repaired 
+ ** markup. You must call tidyCleanAndRepair() before using this function.
+ ** @param tdoc The tidy document to use.
+ ** @result An integer representing the status.
+ */
 TIDY_EXPORT int TIDY_CALL         tidyRunDiagnostics( TidyDoc tdoc );
 
+/** Reports the document type into the output sink.
+ ** @param tdoc The tidy document to use.
+ ** @result An integer representing the status.
+ */
 TIDY_EXPORT int TIDY_CALL         tidyReportDoctype( TidyDoc tdoc );
 
+
 /** @} end Clean group */
+/* MARK: - Document Save Functions */
+/***************************************************************************//**
+ ** @defgroup Save Document Save Functions
+ **
+ ** Save currently parsed document to the given output sink. File name
+ ** and string/buffer functions provided for convenience.
+ **
+ ** @{
+ ******************************************************************************/
 
+/** Save the tidy document to the named file.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySaveFile(TidyDoc tdoc,    /**< The tidy document to save. */
+                                               ctmbstr filename /**< The destination file name. */
+                                               );
 
-/** @defgroup Save Document Save Functions
-**
-** Save currently parsed document to the given output sink.  File name
-** and string/buffer functions provided for convenience.
-** @{
-*/
-
-/** Save to named file */
-TIDY_EXPORT int TIDY_CALL         tidySaveFile( TidyDoc tdoc, ctmbstr filename );
-
-/** Save to standard output (FILE*) */
+/** Save the tidy document to standard output (FILE*).
+ ** @param tdoc The tidy document to save.
+ ** @result An integer representing the status.
+ */
 TIDY_EXPORT int TIDY_CALL         tidySaveStdout( TidyDoc tdoc );
 
-/** Save to given TidyBuffer object */
-TIDY_EXPORT int TIDY_CALL         tidySaveBuffer( TidyDoc tdoc, TidyBuffer* buf );
+/** Save the tidy document to given TidyBuffer object.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySaveBuffer(TidyDoc tdoc,   /**< The tidy document to save. */
+                                                 TidyBuffer* buf /**< The buffer to place the output. */
+                                                 );
 
-/** Save document to application buffer.  If TidyShowMarkup and
-**  the document has no errors, or TidyForceOutput, the current 
-**  document, per the current configuration, will be Pretty Printed
-**  to the application buffer.  The document byte length,
-**  not character length, will be placed in *buflen. The document 
-**  will not be null terminated. If the buffer is not big enough,
-**  ENOMEM will be returned, else the actual document status.
-*/
-TIDY_EXPORT int TIDY_CALL         tidySaveString( TidyDoc tdoc,
-                                                 tmbstr buffer, unsigned int* buflen );
+/** Save the tidy document to an application buffer. If TidyShowMarkup and the
+ ** document has no errors, or TidyForceOutput, then the current document (per
+ ** the current configuration) will be pretty printed to this application
+ ** buffer. The document byte length (not character length) will be placed into
+ ** *buflen. The document will not be null terminated. If the buffer is not big
+ ** enough, ENOMEM will be returned, else the actual document status.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySaveString(TidyDoc tdoc,  /**< The tidy document to save. */
+                                                 tmbstr buffer, /**< The buffer to save to. */
+                                                 unsigned int* buflen   /**< [out] The byte length written. */
+                                                 );
 
-/** Save to given generic output sink */
-TIDY_EXPORT int TIDY_CALL         tidySaveSink( TidyDoc tdoc, TidyOutputSink* sink );
+/** Save to given generic output sink.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidySaveSink(TidyDoc tdoc,        /**< The tidy document to save. */
+                                               TidyOutputSink* sink /**< The output sink to save to. */
+                                               );
+
+/** Save current settings to named file. Only writes non-default values.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyOptSaveFile(TidyDoc tdoc,  /**< The tidy document to save. */
+                                                  ctmbstr cfgfil /**< The filename to save the configuration to. */
+                                                  );
+
+/** Save current settings to given output sink. Only non-default values are
+ ** written.
+ ** @result An integer representing the status.
+ */
+TIDY_EXPORT int TIDY_CALL         tidyOptSaveSink(TidyDoc tdoc,        /**< The tidy document to save. */
+                                                  TidyOutputSink* sink /**< The output sink to save the configuration to. */
+                                                  );
+
 
 /** @} end Save group */
+/* MARK: - Document Tree */
+/***************************************************************************//**
+ ** @defgroup Tree Document Tree
+ **
+ ** A parsed (and optionally repaired) document is represented by Tidy as a
+ ** tree, much like a W3C DOM. This tree may be traversed using these 
+ ** functions. The following snippet gives a basic idea how these functions
+ ** can be used.
+ **
+ ** @code{.c}
+ ** void dumpNode( TidyNode tnod, int indent ) {
+ **   TidyNode child;
+ ** 
+ **   for ( child = tidyGetChild(tnod); child; child = tidyGetNext(child) ) {
+ **     ctmbstr name;
+ **     switch ( tidyNodeGetType(child) ) {
+ **     case TidyNode_Root:       name = "Root";                    break;
+ **     case TidyNode_DocType:    name = "DOCTYPE";                 break;
+ **     case TidyNode_Comment:    name = "Comment";                 break;
+ **     case TidyNode_ProcIns:    name = "Processing Instruction";  break;
+ **     case TidyNode_Text:       name = "Text";                    break;
+ **     case TidyNode_CDATA:      name = "CDATA";                   break;
+ **     case TidyNode_Section:    name = "XML Section";             break;
+ **     case TidyNode_Asp:        name = "ASP";                     break;
+ **     case TidyNode_Jste:       name = "JSTE";                    break;
+ **     case TidyNode_Php:        name = "PHP";                     break;
+ **     case TidyNode_XmlDecl:    name = "XML Declaration";         break;
+ ** 
+ **     case TidyNode_Start:
+ **     case TidyNode_End:
+ **     case TidyNode_StartEnd:
+ **     default:
+ **       name = tidyNodeGetName( child );
+ **       break;
+ **     }
+ **     assert( name != NULL );
+ **     printf( "\%*.*sNode: \%s\\n", indent, indent, " ", name );
+ **     dumpNode( child, indent + 4 );
+ **   }
+ ** }
+ ** 
+ ** void dumpDoc( TidyDoc tdoc ) {
+ **   dumpNode( tidyGetRoot(tdoc), 0 );
+ ** }
+ ** 
+ ** void dumpBody( TidyDoc tdoc ) {
+ **   dumpNode( tidyGetBody(tdoc), 0 );
+ ** }
+ ** @endcode
+ **
+ ** @{
+ ******************************************************************************/
 
+/** @name Nodes for Document Sections
+ ** @{
+ */
 
-/** @addtogroup Basic
-** @{
-*/
-/** Save current settings to named file.
-    Only non-default values are written. */
-TIDY_EXPORT int TIDY_CALL         tidyOptSaveFile( TidyDoc tdoc, ctmbstr cfgfil );
-
-/** Save current settings to given output sink.
-    Only non-default values are written. */
-TIDY_EXPORT int TIDY_CALL         tidyOptSaveSink( TidyDoc tdoc, TidyOutputSink* sink );
-
-
-/* Error reporting functions 
-*/
-
-/** Write more complete information about errors to current error sink. */
-TIDY_EXPORT void TIDY_CALL        tidyErrorSummary( TidyDoc tdoc );
-
-/** Write more general information about markup to current error sink. */
-TIDY_EXPORT void TIDY_CALL        tidyGeneralInfo( TidyDoc tdoc );
-
-/** @} end Basic group (again) */
-
-
-/** @defgroup Tree Document Tree
-**
-** A parsed and, optionally, repaired document is
-** represented by Tidy as a Tree, much like a W3C DOM.
-** This tree may be traversed using these functions.
-** The following snippet gives a basic idea how these
-** functions can be used.
-**
-<pre>
-void dumpNode( TidyNode tnod, int indent )
-{
-  TidyNode child;
-
-  for ( child = tidyGetChild(tnod); child; child = tidyGetNext(child) )
-  {
-    ctmbstr name;
-    switch ( tidyNodeGetType(child) )
-    {
-    case TidyNode_Root:       name = "Root";                    break;
-    case TidyNode_DocType:    name = "DOCTYPE";                 break;
-    case TidyNode_Comment:    name = "Comment";                 break;
-    case TidyNode_ProcIns:    name = "Processing Instruction";  break;
-    case TidyNode_Text:       name = "Text";                    break;
-    case TidyNode_CDATA:      name = "CDATA";                   break;
-    case TidyNode_Section:    name = "XML Section";             break;
-    case TidyNode_Asp:        name = "ASP";                     break;
-    case TidyNode_Jste:       name = "JSTE";                    break;
-    case TidyNode_Php:        name = "PHP";                     break;
-    case TidyNode_XmlDecl:    name = "XML Declaration";         break;
-
-    case TidyNode_Start:
-    case TidyNode_End:
-    case TidyNode_StartEnd:
-    default:
-      name = tidyNodeGetName( child );
-      break;
-    }
-    assert( name != NULL );
-    printf( "\%*.*sNode: \%s\\n", indent, indent, " ", name );
-    dumpNode( child, indent + 4 );
-  }
-}
-
-void dumpDoc( TidyDoc tdoc )
-{
-  dumpNode( tidyGetRoot(tdoc), 0 );
-}
-
-void dumpBody( TidyDoc tdoc )
-{
-  dumpNode( tidyGetBody(tdoc), 0 );
-}
-</pre>
-
-@{
-
-*/
-
+/** Get the root node.
+ ** @param tdoc The document to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetRoot( TidyDoc tdoc );
+
+/** Get the HTML node.
+ ** @param tdoc The document to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetHtml( TidyDoc tdoc );
+
+/** Get the HEAD node.
+ ** @param tdoc The document to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetHead( TidyDoc tdoc );
+
+/** Get the BODY node.
+ ** @param tdoc The document to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetBody( TidyDoc tdoc );
 
-/* remove a node */
-TIDY_EXPORT TidyNode TIDY_CALL    tidyDiscardElement( TidyDoc tdoc, TidyNode tnod );
+/** @}
+ ** @name Relative Nodes
+ ** @{
+ */
 
-/* parent / child */
+/** Get the parent of the indicated node.
+ ** @param tnod The node to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetParent( TidyNode tnod );
+
+/** Get the child of the indicated node.
+ ** @param tnod The node to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetChild( TidyNode tnod );
 
-/* siblings */
+/** Get the next sibling node.
+ ** @param tnod The node to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetNext( TidyNode tnod );
+
+/** Get the previous sibling node.
+ ** @param tnod The node to query.
+ ** @result Returns a tidy node.
+ */
 TIDY_EXPORT TidyNode TIDY_CALL    tidyGetPrev( TidyNode tnod );
 
-/* Null for non-element nodes and all pure HTML
-TIDY_EXPORT ctmbstr     tidyNodeNsLocal( TidyNode tnod );
-TIDY_EXPORT ctmbstr     tidyNodeNsPrefix( TidyNode tnod );
-TIDY_EXPORT ctmbstr     tidyNodeNsUri( TidyNode tnod );
-*/
+/** @}
+ ** @name Miscellaneous Node Functions
+ ** @{
+ */
 
-/* Iterate over attribute values */
+/** Remove the indicated node.
+ ** @result Returns the next tidy node.
+ */
+TIDY_EXPORT TidyNode TIDY_CALL    tidyDiscardElement(TidyDoc tdoc, /**< The tidy document from which to remove the node. */
+                                                     TidyNode tnod /**< The node to remove */
+                                                     );
+
+/** @}
+ ** @name Node Attribute Functions
+ ** @{
+ */
+
+/** Get the first attribute.
+ ** @param tnod The node for which to get attributes.
+ ** @result Returns an instance of TidyAttr.
+ */
 TIDY_EXPORT TidyAttr TIDY_CALL    tidyAttrFirst( TidyNode tnod );
+
+/** Get the next attribute.
+ ** @param tattr The current attribute, so the next one can be returned.
+ ** @result Returns and instance of TidyAttr.
+ */
 TIDY_EXPORT TidyAttr TIDY_CALL    tidyAttrNext( TidyAttr tattr );
 
+/** Get the name of a TidyAttr instance.
+ ** @param tattr The tidy attribute to query.
+ ** @result Returns a string indicating the name of the attribute.
+ */
 TIDY_EXPORT ctmbstr TIDY_CALL     tidyAttrName( TidyAttr tattr );
+
+/** Get the value of a TidyAttr instance.
+ ** @param tattr The tidy attribute to query.
+ ** @result Returns a string indicating the value of the attribute.
+ */
 TIDY_EXPORT ctmbstr TIDY_CALL     tidyAttrValue( TidyAttr tattr );
 
-TIDY_EXPORT void TIDY_CALL        tidyAttrDiscard( TidyDoc itdoc, TidyNode tnod, TidyAttr tattr );
+/** Discard an attribute. */
+TIDY_EXPORT void TIDY_CALL        tidyAttrDiscard(TidyDoc itdoc, /**< The tidy document from which to discard the attribute. */
+                                                  TidyNode tnod, /**< The node from which to discard the attribute. */
+                                                  TidyAttr tattr /**< The attribute to discard. */
+                                                  );
 
-/* Null for pure HTML
-TIDY_EXPORT ctmbstr     tidyAttrNsLocal( TidyAttr tattr );
-TIDY_EXPORT ctmbstr     tidyAttrNsPrefix( TidyAttr tattr );
-TIDY_EXPORT ctmbstr     tidyAttrNsUri( TidyAttr tattr );
-*/
+/** Get the attribute ID given a tidy attribute.
+ ** @param tattr The attribute to query.
+ ** @result Returns the TidyAttrId of the given attribute.
+ **/
+TIDY_EXPORT TidyAttrId TIDY_CALL  tidyAttrGetId( TidyAttr tattr );
 
-/** @} end Tree group */
+/** Indicates whether or not a given attribute is an event attribute.
+ ** @param tattr The attribute to query.
+ ** @result Returns a bool indicating whether or not the attribute is an event.
+ **/
+TIDY_EXPORT Bool TIDY_CALL        tidyAttrIsEvent( TidyAttr tattr );
 
+/** Get an instance of TidyAttr by specifying an attribute ID.
+ ** @result Returns a TidyAttr instance.
+ */
+TIDY_EXPORT TidyAttr TIDY_CALL    tidyAttrGetById(TidyNode tnod,   /**< The node to query. */
+                                                  TidyAttrId attId /**< The attribute ID to find. */
+                                                  );
 
-/** @defgroup NodeAsk Node Interrogation
-**
-** Get information about any givent node.
-** @{
-*/
+/** @}
+ ** @name Additional Node Interrogation
+ ** @{
+ */
 
-/* Node info */
+/** Get the type of node.
+ ** @param tnod The node to query.
+ ** @result Returns the type of node as TidyNodeType.
+ */
 TIDY_EXPORT TidyNodeType TIDY_CALL tidyNodeGetType( TidyNode tnod );
-TIDY_EXPORT ctmbstr TIDY_CALL     tidyNodeGetName( TidyNode tnod );
 
+/** Get the name of the node.
+ ** @param tnod The node to query.
+ ** @result Returns a string indicating the name of the node.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyNodeGetName( TidyNode tnod );
+
+/** Indicates whether or not a node is a text node.
+ ** @param tnod The node to query.
+ ** @result Returns a bool indicating whether or not the node is a text node.
+ */
 TIDY_EXPORT Bool TIDY_CALL tidyNodeIsText( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsProp( TidyDoc tdoc, TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsHeader( TidyNode tnod ); /* h1, h2, ... */
 
-TIDY_EXPORT Bool TIDY_CALL tidyNodeHasText( TidyDoc tdoc, TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeGetText( TidyDoc tdoc, TidyNode tnod, TidyBuffer* buf );
+/** Indicates whether or not the node is a propriety type.
+ ** @result Returns a bool indicating whether or not the node is a proprietary type.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyNodeIsProp(TidyDoc tdoc, /**< The document to query. */
+                                          TidyNode tnod /**< The node to query */
+                                          );
 
-/* Copy the unescaped value of this node into the given TidyBuffer as UTF-8 */
-TIDY_EXPORT Bool TIDY_CALL tidyNodeGetValue( TidyDoc tdoc, TidyNode tnod, TidyBuffer* buf );
+/** Indicates whether or not a node represents and HTML header element, such
+ ** as h1, h2, etc.
+ ** @param tnod The node to query.
+ ** @result Returns a bool indicating whether or not the node is an HTML header.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyNodeIsHeader( TidyNode tnod );
 
+/** Indicates whether or not the node has text.
+ ** @result Returns the type of node as TidyNodeType.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyNodeHasText(TidyDoc tdoc, /**< The document to query. */
+                                           TidyNode tnod /**< The node to query. */
+                                           );
+
+/** Gets the text of a node and places it into the given TidyBuffer.
+ ** @result Returns a bool indicating success or not.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyNodeGetText(TidyDoc tdoc,   /**< The document to query. */
+                                           TidyNode tnod,  /**< The node to query. */
+                                           TidyBuffer* buf /**< [out] A TidyBuffer used to receive the node's text. */
+                                           );
+
+/** Get the value of the node. This copies the unescaped value of this node into
+ ** the given TidyBuffer at UTF-8.
+ ** @result Returns a bool indicating success or not.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidyNodeGetValue(TidyDoc tdoc,   /**< The document to query */
+                                            TidyNode tnod,  /**< The node to query */
+                                            TidyBuffer* buf /**< [out] A TidyBuffer used to receive the node's value. */
+                                            );
+
+/** Get the tag ID of the node.
+ ** @param tnod The node to query.
+ ** @result Returns the tag ID of the node as TidyTagId.
+ */
 TIDY_EXPORT TidyTagId TIDY_CALL tidyNodeGetId( TidyNode tnod );
 
+/** Get the line number where the node occurs.
+ ** @param tnod The node to query.
+ ** @result Returns the line number.
+ */
 TIDY_EXPORT unsigned int TIDY_CALL tidyNodeLine( TidyNode tnod );
+
+/** Get the column location of the node.
+ ** @param tnod The node to query.
+ ** @result Returns the column location of the node.
+ */
 TIDY_EXPORT unsigned int TIDY_CALL tidyNodeColumn( TidyNode tnod );
 
-/** @defgroup NodeIsElementName Deprecated node interrogation per TagId
-**
-** @deprecated The functions tidyNodeIs{ElementName} are deprecated and 
-** should be replaced by tidyNodeGetId.
-** @{
-*/
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsHTML( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsHEAD( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTITLE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBASE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsMETA( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBODY( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsFRAMESET( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsFRAME( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsIFRAME( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsNOFRAMES( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsHR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH1( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH2( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsPRE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsLISTING( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsP( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsUL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsOL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDIR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsLI( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDD( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTABLE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsCAPTION( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTD( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTH( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsCOL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsCOLGROUP( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsA( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsLINK( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsB( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsI( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSTRONG( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsEM( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBIG( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSMALL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsPARAM( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsOPTION( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsOPTGROUP( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsIMG( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsMAP( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsAREA( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsNOBR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsWBR( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsFONT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsLAYER( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSPACER( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsCENTER( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSTYLE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSCRIPT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsNOSCRIPT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsFORM( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsTEXTAREA( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBLOCKQUOTE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsAPPLET( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsOBJECT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDIV( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSPAN( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsINPUT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsQ( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsLABEL( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH3( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH4( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH5( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsH6( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsADDRESS( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsXMP( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSELECT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBLINK( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsMARQUEE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsEMBED( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsBASEFONT( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsISINDEX( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsS( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsSTRIKE( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsU( TidyNode tnod );
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsMENU( TidyNode tnod );
 
-/* HTML5 */
-TIDY_EXPORT Bool TIDY_CALL tidyNodeIsDATALIST( TidyNode tnod ); /* bit like OPTIONS */
+/** @} */
+/** @} end Tree group */
+/* MARK: - Message Key Management */
+/***************************************************************************//**
+ ** @defgroup MessagesKeys Message Key Management
+ **
+ ** These functions serve to manage message codes, i.e., codes that are used
+ ** Tidy and communicated via its callback filters to represent reports and
+ ** dialogue that Tidy emits.
+ **
+ ** @remark These codes only reflect complete messages, and are specifically
+ **         distinct from the internal codes that are used to lookup individual
+ **         strings for localization purposes.
+ **
+ ** @{
+ ******************************************************************************/
+
+/**
+ ** Given a message code, return the text key that represents it.
+ ** @param code The error code to lookup.
+ ** @result The string representing the error code.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyErrorCodeAsKey(unsigned int code);
+
+/**
+ ** Given a text key representing a message code, return the unsigned int that
+ ** represents it.
+ **
+ ** @remark We establish that for external purposes, the API will ensure that
+ **         string keys remain consistent. *Never* count on the integer value
+ **         of a message code. Always use this function to ensure that the
+ **         integer is valid if you need one.
+ ** @param code The string representing the error code.
+ ** @result Returns an integer that represents the error code, which can be
+ **         used to lookup Tidy's built-in strings. If the provided string does
+ **         not have a matching message code, then UINT_MAX will be returned.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL tidyErrorCodeFromKey(ctmbstr code);
+
+/** Initiates an iterator for a list of message codes available in Tidy.
+ ** This iterator allows you to iterate through all of the code. In orde to
+ ** iterate through the codes, initiate the iterator with this function, and
+ ** then use getNextErrorCode() to retrieve the first and subsequent codes.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itMessage = getErrorCodeList();
+ **   while ( itMessage ) {
+ **     unsigned int code = getNextErrorCode( &itMessage );
+ **     // do something with the code, such as lookup a string.
+ **   }
+ ** @endcode
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL getErrorCodeList(void);
+
+/** Given a valid TidyIterator initiated with getErrorCodeList(), returns
+ ** an instance of the opaque type TidyMessageArgument, which serves as a token
+ ** against which the remaining argument API functions may be used to query
+ ** information.
+ ** @param iter The TidyIterator (initiated with getErrorCodeList()) token.
+ ** @result Returns a message code.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL getNextErrorCode( TidyIterator* iter );
 
 
-/** @} End NodeIsElementName group */
-
-/** @} End NodeAsk group */
-
-
-/** @defgroup Attribute Attribute Interrogation
-**
-** Get information about any given attribute.
-** @{
-*/
-
-TIDY_EXPORT TidyAttrId TIDY_CALL tidyAttrGetId( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsEvent( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsProp( TidyAttr tattr );
-
-/** @defgroup AttrIsAttributeName Deprecated attribute interrogation per AttrId
-**
-** @deprecated The functions  tidyAttrIs{AttributeName} are deprecated and 
-** should be replaced by tidyAttrGetId.
-** @{
-*/
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsHREF( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsSRC( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsID( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsNAME( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsSUMMARY( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsALT( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsLONGDESC( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsUSEMAP( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsISMAP( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsLANGUAGE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsTYPE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsVALUE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsCONTENT( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsTITLE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsXMLNS( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsDATAFLD( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsWIDTH( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsHEIGHT( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsFOR( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsSELECTED( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsCHECKED( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsLANG( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsTARGET( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsHTTP_EQUIV( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsREL( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnMOUSEMOVE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnMOUSEDOWN( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnMOUSEUP( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnCLICK( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnMOUSEOVER( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnMOUSEOUT( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnKEYDOWN( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnKEYUP( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnKEYPRESS( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnFOCUS( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsOnBLUR( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsBGCOLOR( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsLINK( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsALINK( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsVLINK( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsTEXT( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsSTYLE( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsABBR( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsCOLSPAN( TidyAttr tattr );
-TIDY_EXPORT Bool TIDY_CALL tidyAttrIsROWSPAN( TidyAttr tattr );
-
-/** @} End AttrIsAttributeName group */
-
-/** @} end AttrAsk group */
+/** @} end MessagesKeys group */
+/* MARK: - Localization Support */
+/***************************************************************************//**
+ ** @defgroup Localization Localization Support
+ **
+ ** These functions help manage localization in Tidy.
+ **
+ ** @{
+ ******************************************************************************/
 
 
-/** @defgroup AttrGet Attribute Retrieval
-**
-** Lookup an attribute from a given node
-** @{
-*/
+/** @name Tidy's Locale
+ ** @{
+ */
 
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetById( TidyNode tnod, TidyAttrId attId );
+/** Tells Tidy to use a different language for output.
+ ** @param  languageCode A Windows or POSIX language code, and must match
+ **         a TIDY_LANGUAGE for an installed language.
+ ** @result Indicates that a setting was applied, but not necessarily the
+ **         specific request, i.e., true indicates a language and/or region
+ **         was applied. If es_mx is requested but not installed, and es is
+ **         installed, then es will be selected and this function will return
+ **         true. However the opposite is not true; if es is requested but
+ **         not present, Tidy will not try to select from the es_XX variants.
+ */
+TIDY_EXPORT Bool TIDY_CALL tidySetLanguage( ctmbstr languageCode );
 
-/** @defgroup AttrGetAttributeName Deprecated attribute retrieval per AttrId
-**
-** @deprecated The functions tidyAttrGet{AttributeName} are deprecated and 
-** should be replaced by tidyAttrGetById.
-** For instance, tidyAttrGetID( TidyNode tnod ) can be replaced by 
-** tidyAttrGetById( TidyNode tnod, TidyAttr_ID ). This avoids a potential
-** name clash with tidyAttrGetId for case-insensitive languages.
-** @{
-*/
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetHREF( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetSRC( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetID( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetNAME( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetSUMMARY( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetALT( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetLONGDESC( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetUSEMAP( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetISMAP( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetLANGUAGE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetTYPE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetVALUE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetCONTENT( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetTITLE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetXMLNS( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetDATAFLD( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetWIDTH( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetHEIGHT( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetFOR( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetSELECTED( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetCHECKED( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetLANG( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetTARGET( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetHTTP_EQUIV( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetREL( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnMOUSEMOVE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnMOUSEDOWN( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnMOUSEUP( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnCLICK( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnMOUSEOVER( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnMOUSEOUT( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnKEYDOWN( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnKEYUP( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnKEYPRESS( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnFOCUS( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetOnBLUR( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetBGCOLOR( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetLINK( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetALINK( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetVLINK( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetTEXT( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetSTYLE( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetABBR( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetCOLSPAN( TidyNode tnod );
-TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetROWSPAN( TidyNode tnod );
+/** Gets the current language used by Tidy.
+ ** @result Returns a string indicating the currently set language.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyGetLanguage(void);
 
-/** @} End AttrGetAttributeName group */
+/** @}
+ ** @name Locale Mappings
+ ** @{
+ */
 
-/** @} end AttrGet group */
+/** @struct tidyLocalMapItem
+ ** Represents an opaque type we can use for tidyLocaleMapItem, which
+ ** is used to iterate through the language list, and used to access
+ ** the windowsName() and the posixName().
+ */
+/* Prevent Doxygen from listing this as a function. */
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+opaque_type(tidyLocaleMapItem);
+#endif
+    
+/** Initiates an iterator for a list of Tidy's Windows<->POSIX locale mappings.
+ ** This iterator allows you to iterate through this list. In order to
+ ** iterate through the list, initiate the iterator with this function, and then
+ ** use getNextWindowsLanguage() to retrieve the first and subsequent codes.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itList = getWindowsLanguageList();
+ **   while ( itList ) {
+ **     tidyLocaleMapItem *item = getNextWindowsLanguage( &itList );
+ **     // do something such as get the TidyLangWindowsName(item).
+ **   }
+ ** @endcode
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL getWindowsLanguageList(void);
+
+/** Given a valid TidyIterator initiated with getWindowsLanguageList(), returns
+ ** a pointer to a tidyLocaleMapItem, which can be further interrogated with
+ ** TidyLangWindowsName() or TidyLangPosixName().
+ ** @param iter The TidyIterator (initiated with getWindowsLanguageList()) token.
+ ** @result Returns a pointer to a tidyLocaleMapItem.
+ */
+TIDY_EXPORT const tidyLocaleMapItem* TIDY_CALL getNextWindowsLanguage( TidyIterator* iter );
+
+/** Given a `tidyLocalMapItem`, return the Windows name.
+ ** @param item An instance of tidyLocalMapItem to query.
+ ** @result Returns a string with the Windows name of the mapping.
+ */
+TIDY_EXPORT const ctmbstr TIDY_CALL TidyLangWindowsName( const tidyLocaleMapItem *item );
+
+/** Given a `tidyLocalMapItem`, return the POSIX name.
+ ** @param item An instance of tidyLocalMapItem to query.
+ ** @result Returns a string with the POSIX name of the mapping.
+ */
+TIDY_EXPORT const ctmbstr TIDY_CALL TidyLangPosixName( const tidyLocaleMapItem *item );
+
+/** @}
+ ** @name Getting Localized Strings
+ ** @{
+ */
+
+/** Provides a string given `messageType` in the current localization for
+ ** `quantity`. Some strings have one or more plural forms, and this function
+ ** will ensure that the correct singular or plural form is returned for the
+ ** specified quantity.
+ ** @result Returns the desired string.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyLocalizedStringN(unsigned int messageType, /**< The message type. */
+                                                   unsigned int quantity     /**< The quantity. */
+                                                   );
+
+/** Provides a string given `messageType` in the current localization for the
+ ** single case.
+ ** @param messageType The message type.
+ ** @result Returns the desired string.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyLocalizedString( unsigned int messageType );
+
+/** Provides a string given `messageType` in the default localization (which
+ ** is `en`).
+ ** @param messageType The message type.
+ ** @result Returns the desired string.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL tidyDefaultString( unsigned int messageType );
+
+/** Initiates an iterator for a list of string key codes available in Tidy.
+ ** This iterator allows you to iterate through all of the codes. In order to
+ ** iterate through the codes, initiate the iterator with this function, and
+ ** then use getNextStringKey() to retrieve the first and subsequent codes.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itKey = getErrorCodeList();
+ **   while ( itKey ) {
+ **     unsigned int code = getNextStringKey( &itKey );
+ **     // do something with the code, such as lookup a string.
+ **   }
+ ** @endcode
+ ** @remark These are provided for documentation generation purposes, and
+ **         probably aren't of much use to the average LibTidy implementor.
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL getStringKeyList(void);
+
+/** Given a valid TidyIterator initiated with getStringKeyList(), returns
+ ** an unsigned integer representing the next key value.
+ ** @remark These are provided for documentation generation purposes, and
+ **         probably aren't of much use to the average LibTidy implementor.
+ ** @param iter The TidyIterator (initiated with getStringKeyList()) token.
+ ** @result Returns a message code.
+ */
+TIDY_EXPORT unsigned int TIDY_CALL getNextStringKey( TidyIterator* iter );
+
+/** @}
+ ** @name Available Languages
+ ** @{
+ */
+
+/** Initiates an iterator for a list of Tidy's installed languages. This
+ ** iterator allows you to iterate through this list. In order to iterate
+ ** through the list, initiate the iterator with this function, and then use
+ ** use getNextInstalledLanguage() to retrieve the first and subsequent strings.
+ ** For example:
+ ** @code{.c}
+ **   TidyIterator itList = getInstalledLanguageList();
+ **   while ( itList ) {
+ **     printf("%s",  getNextInstalledLanguage( &itList ));
+ **   }
+ ** @endcode
+ ** @result Returns a TidyIterator, which is a token used to represent the
+ **         current position in a list within LibTidy.
+ */
+TIDY_EXPORT TidyIterator TIDY_CALL getInstalledLanguageList(void);
+
+/** Given a valid TidyIterator initiated with getInstalledLanguageList(),
+ ** returns a string representing a language name that is installed in Tidy.
+ ** @param iter The TidyIterator (initiated with getInstalledLanguageList())
+ **        token.
+ ** @result Returns a string indicating the installed language.
+ */
+TIDY_EXPORT ctmbstr TIDY_CALL getNextInstalledLanguage( TidyIterator* iter );
+
+/** @} */
+
+/** @} end MessagesKeys group */
+/** @} end public_api group */
+
 
 #ifdef __cplusplus
 }  /* extern "C" */
@@ -2649,15 +4369,25 @@ TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetROWSPAN( TidyNode tnod );
 #ifndef __TIDY_BUFFIO_H__
 #define __TIDY_BUFFIO_H__
 
-/** @file tidybuffio.h - Treat buffer as an I/O stream.
-
-  (c) 1998-2016 (W3C) MIT, ERCIM, Keio University
-  See tidy.h for the copyright notice.
-
-  Requires buffer to automatically grow as bytes are added.
-  Must keep track of current read and write points.
-
-*/
+/**************************************************************************//**
+ * @file
+ * Treat buffer as a stream that Tidy can use for I/O operations. It offers
+ * the ability for the buffer to grow as bytes are added, and keeps track
+ * of current read and write points.
+ *
+ * @author
+ *     HTACG, et al (consult git log)
+ *
+ * @copyright
+ *     Copyright (c) 1998-2017 World Wide Web Consortium (Massachusetts
+ *     Institute of Technology, European Research Consortium for Informatics
+ *     and Mathematics, Keio University).
+ * @copyright
+ *     See tidy.h for license.
+ *
+ * @date
+ *     Consult git log.
+ ******************************************************************************/
 
 /* #include "tidyplatform.h" */
 /* #include "tidy.h" */
@@ -2666,15 +4396,18 @@ TIDY_EXPORT TidyAttr TIDY_CALL tidyAttrGetROWSPAN( TidyNode tnod );
 extern "C" {
 #endif
 
-/** TidyBuffer - A chunk of memory */
+/** A TidyBuffer is chunk of memory that can be used for multiple I/O purposes
+ ** within Tidy.
+ ** @ingroup IO
+ */
 TIDY_STRUCT
 struct _TidyBuffer 
 {
     TidyAllocator* allocator;  /**< Memory allocator */
-    byte* bp;           /**< Pointer to bytes */
-    unsigned int  size;         /**< # bytes currently in use */
-    unsigned int  allocated;    /**< # bytes allocated */ 
-    unsigned int  next;         /**< Offset of current input position */
+    byte* bp;                  /**< Pointer to bytes */
+    unsigned int  size;                /**< Number of bytes currently in use */
+    unsigned int  allocated;           /**< Number of bytes allocated */
+    unsigned int  next;                /**< Offset of current input position */
 };
 
 /** Initialize data structure using the default allocator */
@@ -2759,24 +4492,21 @@ TIDY_EXPORT void TIDY_CALL tidyInitOutputBuffer( TidyOutputSink* outp, TidyBuffe
  * end:
  */
 /*
-    This file was generated by the command
+This file was generated by the following command:
 
-       cfunctions /usr/home/ben/projects/html-valid/tools/../extra.c
+cfunctions /usr/home/ben/projects/html-valid/tools/../extra.c
 
-    at 14:23:54 on Thursday  2 March 2017, local time.
 */
 #ifndef CFH_EXTRA_H
 #define CFH_EXTRA_H
 
-/* From '/usr/home/ben/projects/html-valid/tools/../extra.c': */
+#line 7 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void SetFilename (TidyDoc tdoc, ctmbstr filename);
 
-#line 9 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void SetFilename (TidyDoc tdoc , ctmbstr filename );
+#line 16 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void CopyAllocator (TidyDoc tdoc, TidyBuffer* buf);
 
-#line 19 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void CopyAllocator (TidyDoc tdoc , TidyBuffer * buf );
-
-#line 24 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+#line 21 "/usr/home/ben/projects/html-valid/tools/../extra.c"
 typedef struct html_valid_tag {
     const char * name;
     unsigned int versions;
@@ -2784,28 +4514,28 @@ typedef struct html_valid_tag {
 }
 html_valid_tag_t;
 
-#line 38 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+#line 29 "/usr/home/ben/projects/html-valid/tools/../extra.c"
 extern const int n_html_tags;
 
-#line 39 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+#line 30 "/usr/home/ben/projects/html-valid/tools/../extra.c"
 extern const int n_attributes;
 
-#line 44 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void TagInformation (html_valid_tag_t * tags );
+#line 35 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void TagInformation (html_valid_tag_t* tags);
 
-#line 60 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void TagAttributes (unsigned int tag_id , unsigned int version , const char ** yes_no , int * n_attr_ptr );
+#line 47 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void TagAttributes (unsigned int tag_id, unsigned int version, const char** yes_no, int* n_attr_ptr);
 
-#line 107 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void TagAllAttributes (const char ** yes_no );
+#line 94 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void TagAllAttributes (const char** yes_no);
 
-#line 115 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+#line 102 "/usr/home/ben/projects/html-valid/tools/../extra.c"
 
 #if 0
-void get_option_doc (TidyOptionId ti , const char ** doc , const TidyOptionId ** xrefs );
+ void get_option_doc (TidyOptionId ti, const char** doc, const TidyOptionId** xrefs);
 
-#line 137 "/usr/home/ben/projects/html-valid/tools/../extra.c"
-void reset_doc (TidyDoc tdoc );
+#line 119 "/usr/home/ben/projects/html-valid/tools/../extra.c"
+void reset_doc (TidyDoc tdoc);
 
 #endif /* 0 */
 

@@ -3,20 +3,20 @@ abstract: 'Helps build semi-random data for testing'
 author:
   - 'Michael G Schwern <schwern@pobox.com>'
 build_requires:
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.32
+  Module::Build: '0.32'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Sims
 provides:
   Test::Sims:
     file: lib/Test/Sims.pm
-    version: 20130412
+    version: '20180103'
 requires:
   perl: v5.8.1
 resources:
@@ -24,4 +24,4 @@ resources:
   homepage: http://github.com/schwern/Test-Sims
   license: http://dev.perl.org/licenses/
   repository: http://github.com/schwern/Test-Sims/tree/master
-version: 20130412
+version: '20180103'

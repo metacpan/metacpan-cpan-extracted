@@ -8,7 +8,7 @@ use parent qw/Exporter/;
 our @EXPORT_OK = qw/encode_base91 decode_base91/;
 our @EXPORT = ();
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
 require XSLoader;
 XSLoader::load('Convert::Base91', $VERSION);

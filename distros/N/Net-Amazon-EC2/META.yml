@@ -1,38 +1,39 @@
 ---
 abstract: 'Perl interface to the Amazon Elastic Compute Cloud (EC2) environment.'
 author:
-  - 'Jeff Kim <cpan@chosec.com>'
+  - 'Mark Allen <mrallen1@yahoo.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::Exception: 0
-  Test::More: 0
+  Test::Exception: '0'
+  Test::More: '0'
+  blib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Amazon-EC2
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  Carp: 0
-  Digest::SHA: 0
-  LWP::Protocol::https: 0
-  LWP::UserAgent: 0
-  MIME::Base64: 0
-  Moose: 0.38
-  POSIX: 0
-  Params::Validate: 0
-  URI: 0
-  URI::Escape: 0
-  XML::Simple: 2.18
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  POSIX: '0'
+  Params::Validate: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+  overload: '0'
+  strict: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/mrallen1/net-amazon-ec2
-version: '0.33'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Amazon-EC2
+  homepage: https://metacpan.org/dist/Net-Amazon-EC2
+  repository: git://github.com/mrallen1/net-amazon-ec2.git
+version: '0.35'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -41,7 +41,7 @@ sub add_expanded_text_ads {
   my $num_ads    = 5;
   my @operations = ();
   for (my $i = 0 ; $i < $num_ads ; $i++) {
-    # Create text ad.
+    # Create expanded text ad.
     my $expanded_text_ad = Google::Ads::AdWords::v201710::ExpandedTextAd->new({
         headlinePart1 => "Cruise to Mars #" . substr(uniqid(), 0, 8),
         headlinePart2 => "Best Space Cruise Line",

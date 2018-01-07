@@ -8,15 +8,13 @@ use parent qw(Math::Bacovia);
 
 our $VERSION = $Math::Bacovia::VERSION;
 
-my %cache;
-
 sub new {
     my ($class, $value) = @_;
     Math::Bacovia::_check_type(\$value);
-    $cache{$value->stringify} //= bless {value => $value}, $class;
+    bless {value => $value}, $class;
 }
 
-sub inside {
+sub get {
     $_[0]->{value};
 }
 
@@ -65,7 +63,7 @@ Class::Multimethods::multimethod eq => (__PACKAGE__, '*') => sub {
 
 sub numeric {
     my ($x) = @_;
-    $x->{_num} //= CORE::exp($x->{value}->numeric);
+    CORE::exp($x->{value}->numeric);
 }
 
 sub pretty {

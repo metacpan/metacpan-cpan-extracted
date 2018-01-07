@@ -7,7 +7,7 @@ WriteMakefile
 (
     'NAME'         => 'Lingua::EN::AddressParse',
     'VERSION_FROM' => 'lib/Lingua/EN/AddressParse.pm',
-    'ABSTRACT'     => 'extract components of a street address, presented as a text string',
+    'ABSTRACT'     => 'extract components of a street address from free format text',
     'AUTHOR'       => 'Kim Ryan',
     'PREREQ_PM'    =>
     {

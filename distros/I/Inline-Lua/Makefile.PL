@@ -62,7 +62,7 @@ use Config;
 
 my %makefile_params;
 
-unless($ENV{'PERL_MM_OPT'}) {
+unless($ENV{'PERL_MM_OPT'} && $ENV{'PERL_MM_OPT'} =~ /(INC|LIBS)(?![a-z])/i) {
     my ( $inc, $libs ) = get_lua_config();
 
     if (!$inc && !$libs ) {
@@ -96,17 +96,15 @@ WriteMakefile(
   'ABSTRACT' => 'Perl extension for embedding Lua scripts into Perl code',
   'AUTHOR' => 'Rob Hoelz <rob@hoelz.ro>',
   'LICENSE' => 'perl',
-  'VERSION' => '0.12',
+  'VERSION' => '0.14',
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '0'
   },
   'PREREQ_PM' => {
-    'Inline' => '0'
+    'Inline' => '0',
+    'Test::Exception' => '0'
   },
   'TEST_REQUIRES' => {
-    'File::Spec' => '0',
-    'IO::Handle' => '0',
-    'IPC::Open3' => '0',
     'Test::More' => '0'
   },
     DEFINE            => '',

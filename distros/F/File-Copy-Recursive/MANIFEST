@@ -2,6 +2,9 @@ Changes
 Makefile.PL
 MANIFEST
 README
-Recursive.pm
-t/1.t
+lib/File/Copy/Recursive.pm
+t/00.load.t
+t/01.legacy.t
+t/02.legacy-symtogsafe.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

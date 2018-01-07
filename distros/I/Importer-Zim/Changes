@@ -1,7 +1,13 @@
 
 Release history for Importer-Zim
 
-0.8.0     2017-11-09 14:21:25-08:00 America/Los_Angeles
+0.9.0     2017-12-29 15:57:11-08:00 America/Los_Angeles
+
+    - Setup default backends with IMPORTER_ZIM_BACKEND
+    - prereqs: Make +EndOfScope the fallback backend
+    - dist.ini: use @Author::FERREIRA bundle
+
+v0.8     2017-11-09 14:21:25-08:00 America/Los_Angeles
 
     - +Base gets loaded if import() gets called
     - From zim::import() to Import::Zim::Base::import_into()

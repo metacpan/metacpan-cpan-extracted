@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::Volume;
+$Net::Amazon::EC2::Volume::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

@@ -2,10 +2,10 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.021000';
+$MetaCPAN::Client::VERSION = '2.022000';
 use Moo;
 use Carp;
-use Ref::Util qw< is_arrayref is_hashref >;
+use Ref::Util qw< is_arrayref is_hashref is_ref >;
 use URI::Escape qw< uri_escape_utf8 >;
 
 use MetaCPAN::Client::Request;
@@ -318,7 +318,7 @@ sub _get_or_search {
     is_hashref($arg) and
         return $self->_search( $type, $arg, $params );
 
-    defined $arg and ! ref($arg)
+    defined $arg and !is_ref($arg)
         and return $self->_get($type, $arg, $params);
 
     croak "$type: invalid args (takes scalar value or search parameters hashref)";
@@ -413,7 +413,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.021000
+version 2.022000
 
 =head1 SYNOPSIS
 
@@ -671,7 +671,7 @@ Some fields are not indexed in Elasticsearch but stored as part of
 the entire document.
 
 These fields can still be read, but without the internal Elasticsearch
-optimizations and the server will interally read the whole document.
+optimizations and the server will internally read the whole document.
 
 Why do we even need those? because we don't index everything and some things
 we can't to begin with (like non-leaf fields that hold a structure)

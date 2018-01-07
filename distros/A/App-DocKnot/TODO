@@ -1,53 +1,18 @@
                             DocKnot To-Do List
 
 This file contains loose development notes for the current state of this
-project.
+project.  Listed here are only the things left to be done.
 
 Metadata required for README files:
 
-* Authors
-* How to list me as maintainer
-* Dates and holders of copyright
-* License summary for top of README
-* One-line description
-* Blurb
-* Long description
-* Requirements
-* Test requirements
-* Whether to mention maintainer tests
 * Hacking requirements
-* Install instructions (possibly move to a separate file)
-* Install boilerplate for Kerberos, --enable-reduced-depends
-* Configuration instructions
-* Optional sections
-* Home page
-* Git repository
-* Bug tracking (GitHub, CPAN, internal JIRA)
-* Stanford support information
-* Thanks
-* License summary
+* Generate a separate install file for Debian packaging
 * Pointers to long licenses
 
 Metadata required for web pages:
 
 * Short description for index
 * Category (obsolete packages have their pages manually maintained)
-* Quote
-* Description
-* Download URL pattern
-* Version name
-* Archive link
-* List of documentation by category for sidebar
-* Ohloh URL
-* Debian PTS URL
-* Bug tracking URL
-* Debian package information (history, package names, etc.)
-* Requirements
-* Full list of documentation by category
-* License summary
-* Security advisory links
-* Cut-off version with security issues
-* Whether there are xz releases (or fix release to always make them)
 
 Metadata required for release:
 
@@ -57,12 +22,24 @@ Metadata required for release:
 * License overrides for build-license
 * Default license for build-license
 
-Overall design:
+Additional output:
 
-* Directory of metadata in each project
-* Include the metadata in the distribution as source
-* Add README file to the metadata directory explaining it
-* properties.json file with main information
-* docs.json with all docs, whether to link in sidebar
-* Separate files for text components
-* Use *.txt or *.th extensions to distinguish markup language
+* Per-package RSS files from NEWS, excluding unreleased versions
+* Generate external pointer files for spin for package documentation
+* Update my software index
+* Update my web site sitemap
+* Set Open HUB metadata from package metadata via API
+
+DocKnot itself:
+
+* Pull the version number of a package from a single source
+* Pull the synopsis for a Perl module from the Perl build system
+* Document the metadata format
+* Incorporate spin into this package (and rewrite as Perl modules)
+* Incorporate cvs2xhtml into this package
+* Incorporate faq2html into this package (and rewrite as a Perl module)
+* Incorporate release into this package
+* Incorporate check-dist into release and automatically run it
+* Automatically run build-license during the release process
+* Incorporate build-license into this package (and rewrite as a Perl module)
+* Add metadata files and overrides to build-license

@@ -1,13 +1,14 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Format::PDF::Page;
 # ABSTRACT: Page from a PDF document
-$Renard::Incunabula::Format::PDF::Page::VERSION = '0.003';
+$Renard::Incunabula::Format::PDF::Page::VERSION = '0.004';
 use Moo;
 use MooX::HandlesVia;
 use Cairo;
 use POSIX qw(ceil);
 
-use Renard::Incunabula::Common::Types qw(Str InstanceOf ZoomLevel PageNumber HashRef);
+use Renard::Incunabula::Common::Types qw(Str InstanceOf HashRef);
+use Renard::Incunabula::Document::Types qw(ZoomLevel PageNumber);
 
 has document => (
 	is => 'ro',
@@ -72,7 +73,7 @@ Renard::Incunabula::Format::PDF::Page - Page from a PDF document
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 

@@ -44,7 +44,7 @@ subtest 'short blank node label mapping' => sub {
 subtest 'UUID blank node label mapping' => sub {
 	my $mapper			= Attean::TermMap->uuid_blank_map;
 	my $bindings_mapper	= $mapper->binding_mapper;
-	my $uuid_blank		= qr/^_:0x[0-9A-Z]{32}$/;
+	my $uuid_blank		= qr/^_:0x[0-9A-Za-z]{32}$/;
 	{
 		note('Mapping Iterator<Term>');
 		my $iter	= Attean::ListIterator->new(values => [blank('a'), blank('zzz')], item_type => 'Attean::API::Term');
@@ -73,6 +73,14 @@ subtest 'UUID blank node label mapping' => sub {
 		like($c->subject->ntriples_string, $uuid_blank);
 		like($d->subject->ntriples_string, $uuid_blank);
 	}
+};
+
+subtest 'canonicalize literal' => sub {
+		my $i = Attean::Literal->integer('+12');
+		my $m = Attean::TermMap->canonicalization_map;
+		my $new_i = $m->map($i);
+
+		is($new_i->ntriples_string, '"12"^^<http://www.w3.org/2001/XMLSchema#integer>');
 };
 
 done_testing();

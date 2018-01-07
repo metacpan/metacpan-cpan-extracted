@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::Error;
-$Authen::U2F::Tester::Error::VERSION = '0.01';
+$Authen::U2F::Tester::Error::VERSION = '0.02';
 # ABSTRACT: Authen::U2F::Tester Error Response
 
 use Moose;
@@ -51,7 +51,7 @@ Authen::U2F::Tester::Error - Authen::U2F::Tester Error Response
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

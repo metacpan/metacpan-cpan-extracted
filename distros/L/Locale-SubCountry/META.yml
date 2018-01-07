@@ -17,12 +17,12 @@ name: Locale-SubCountry
 provides:
   Locale::SubCountry:
     file: lib/Locale/SubCountry.pm
-    version: '2.03'
+    version: '2.04'
   Locale::SubCountry::Codes:
     file: lib/Locale/SubCountry/Codes.pm
   Locale::SubCountry::World:
     file: lib/Locale/SubCountry.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   JSON: '1'
   locale: '1'
@@ -32,5 +32,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kimryan/Locale-SubCountry
-version: '2.03'
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

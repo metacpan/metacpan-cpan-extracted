@@ -29,10 +29,11 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
+        'Hook::Output::Tiny' => '0.05',
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'MetaCPAN::Client'  => 2.010700,
+        'MetaCPAN::Client'  => '2.010700',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Module-CheckDep-Version-*' },

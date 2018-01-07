@@ -1,0 +1,13 @@
+
+Revision history for Job-Async
+
+0.002     2018-01-02 00:54:36+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependency fixes:
+
+    - Declare explicit dep on Math::Random::Secure, for UUID generation
+
+0.001     2017-12-29 20:28:25+08:00 Asia/Kuala_Lumpur
+    Initial release. May include some new features.
+

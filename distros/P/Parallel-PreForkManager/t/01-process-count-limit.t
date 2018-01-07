@@ -7,9 +7,7 @@ use English;
 
 use Test::More;
 
-use List::Util 1.45 qw{ uniq };
-
-plan tests => 1;
+plan tests => 2;
 
 my @Results;
 
@@ -28,9 +26,11 @@ for ( my $i=0;$i<20;$i++ ) {
 
 $Worker->RunJobs();
 
-@Results = uniq sort @Results;
+@Results = @Results;
 
-is( scalar @Results, 40, 'Process count correct' );
+is( scalar @Results, 40, 'Work done count correct' );
+
+is( $Worker->{ 'ChildrenForked' } <= 20, 1, 'Process count correctly limited' );
 
 sub LogCallback {
     my ( $Self, $Data ) = @_;

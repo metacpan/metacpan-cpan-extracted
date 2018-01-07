@@ -11,7 +11,7 @@ use strict;
 use Carp;
 use utf8;
 
-our $VERSION = '20171129';
+our $VERSION = '20171228';
 
 #-------------------------------------------------------------------------------
 # Translate
@@ -1775,7 +1775,7 @@ sub translations{
       88=>'quatre-vingt-huit',
       89=>'quatre-vingt-neuf',
       90=>'quatre-vingt-dix',
-      91=>'quatre-vingt-un',
+      91=>'quatre-vingt-onze',
       92=>'quatre-vingt-douze',
       93=>'quatre-vingt-treize',
       94=>'quatre-vingt-quatorze',

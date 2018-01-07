@@ -5,7 +5,7 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.173500';
+$Bio::MUST::Core::VERSION = '0.173620';
 use strict;
 use warnings;
 
@@ -40,15 +40,24 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.173500
-
-=head1 SYNOPSIS
-
-    # TODO
+version 0.173620
 
 =head1 DESCRIPTION
 
-    # TODO
+This distribution is the base of the C<Bio::MUST> module collection designed
+for writing phylogenomic applications in Perl. Their main strength lies in
+their transparent handling of the NCBI Taxonomy database (see
+L<https://www.ncbi.nlm.nih.gov/taxonomy>), for example to automatically label
+ancestral nodes in phylogenetic trees.
+
+C<Bio::MUST> classes do not need (and are not meant as a replacement for)
+L<BioPerl>. In contrast, they depend on both L<Bio::LITE::Taxonomy> and
+L<Bio::Phylo>, two non-BioPerl distribution for dealing with biological data.
+
+C<Bio::MUST> modules have been used in production since 2013 but are not yet
+ready for wider adoption due to their lack of documentation. This should
+improve over time. Meanwhile, adventurous users can have a look at the
+L<Bio::MUST::Core::Ali> class which is already fully documented.
 
 =head1 AUTHOR
 

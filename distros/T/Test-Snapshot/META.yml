@@ -1,0 +1,35 @@
+---
+abstract: 'test against data stored in automatically-named file'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  Test2::API: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '7.04'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Snapshot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  File::Path: '2.07'
+  Test2::API: '0'
+  Test::More: '0.96'
+  perl: '5.008003'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/mohawk2/Test-Snapshot/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/Test-Snapshot
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,77 @@
+NAME
+    CryptoCurrency::Catalog - Catalog of cryptocurrencies
+
+VERSION
+    This document describes version 20180106 of CryptoCurrency::Catalog
+    (from Perl distribution CryptoCurrency-Catalog), released on 2018-01-06.
+
+SYNOPSIS
+     use CryptoCurrency::Catalog;
+
+     my $cat = CryptoCurrency::Catalog->new;
+
+     my $record = $cat->by_symbol("ETH");        # => { symbol => "ETH", name=>"Ethereum", safename=>"ethereum" }
+     my $record = $cat->by_ticker("eth");        # alias for by_symbol(), lowercase also works
+     my $record = $cat->by_name("Ethereum");     # note: case-sensitive
+     my $record = $cat->by_safename("ethereum");
+     my $record = $cat->by_slug("Ethereum");     # alias for by_safename(), mixed case also works
+
+     my @symbols = $cat->all_symbols(); # => ("BTC", "ETH", ...)
+
+     my @data = $cat->all_data; # => ({symbol=>"BTC", name=>"Bitcoin", safename=>"bitcoin"}, {...}, ...)
+
+DESCRIPTION
+    This class attempts to provide a list/catalog of cryptocurrencies. The
+    main source for this catalog is the Cryptocurrency Market
+    Capitalizations website (<https://coinmarketcap.com/>, or CMC for
+    short). This catalog is updated to the list on CMC as of Jan 6, 2018
+    (1384 coins and tokens).
+
+    CMC does not provide unique symbols nor unique names, only unique
+    "safenames" (slugs). Whenever there is a clash, this catalog modifies
+    the clashing symbol and/or unique name to make symbol and name to be
+    unique again (usually the coin/token with the smaller market cap "loses"
+    the name).
+
+    There is no guarantee that the symbol/name/safename of old/unlisted
+    coins or tokens will not be reused.
+
+METHODS
+  new
+  by_symbol
+  by_ticker
+    Alias for "by_symbol".
+
+  by_name
+  by_safename
+  by_slug
+    Alias for "by_safename".
+
+  all_symbols
+  all_data
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CryptoCurrency-Catalog>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CryptoCurrency-Catalog>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CryptoCurrency-Catalo
+    g>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

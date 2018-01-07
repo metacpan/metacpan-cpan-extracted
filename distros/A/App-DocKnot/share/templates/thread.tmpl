@@ -25,7 +25,7 @@
 
 [% indent(quote.text, 4) %]
 
-][[% quote.author %]][[% quote.work %]]
+][[% quote.author %]][[% IF quote.title %][% quote.title %], [% END %][% IF !quote.work || quote.work.match('"') %][% quote.work %][% ELSE %]\cite[[% quote.work %]][% END %][% IF quote.date %], [% quote.date %][% END %]]
 [% END %]
 \div(sidebar)[
     \h2[Download]
@@ -43,7 +43,12 @@
     \link[readme.html][General overview] \break
     \link[news.html][Change summary][% FOREACH doc IN docs.user %] \break
     \link[[% doc.name %].html][[% doc.title %]][% END %]
-
+[% IF advisories %]
+    \h2[Security Advisories]
+[% FOREACH advisory IN advisories %]
+    \link[security/[% advisory.date %].html]
+        [[% advisory.date %]]: [% name %] [% advisory.versions %]\break
+[% END %][% END %]
     \h2[Development]
 
     \link[todo.html][To-do list][% IF vcs.github %] \break
@@ -97,7 +102,9 @@ The distribution:
 ]
 
 An \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/]
-[archive of older releases] is also available.
+[archive of older releases] is also available.[% IF advisories %]
+\class(alert)[Versions older than [% advisories.0.threshold %] have known
+security vulnerabilities and should not be used.][% END %]
 [% IF debian.summary %]
 [% to_thread(debian.summary) | trim %]  See the
 \link[https://tracker.debian.org/pkg/[% packaging.debian %]][Debian
@@ -124,7 +131,12 @@ also \link[[% vcs.browse %]][browse the current development source].
     \doc[news.html][Change summary][% FOREACH doc IN docs.user %]
     \doc[[% doc.name %].html][[% doc.title %]][% END %]
     \doc[license.html][License and copyright]
-
+[% IF advisories %]
+    Security advisories:
+[% FOREACH advisory IN advisories %]
+    \doc[security/[% advisory.date %].html]
+        [[% advisory.date %]: [% advisory.versions %]
+[% END %][% END %]
     Developer documentation:
 
     \doc[todo.html][To-do list][% IF vcs.github %]
@@ -154,7 +166,12 @@ User documentation:
 \doc[news.html][Change summary][% FOREACH doc IN docs.user %]
 \doc[[% doc.name %].html][[% doc.title %]][% END %]
 \doc[license.html][License and copyright]
-
+[% IF advisories %]
+Security advisories:
+[% FOREACH advisory IN advisories %]
+\doc[security/[% advisory.date %].html]
+    [[% advisory.date %]: [% advisory.versions %]]
+[% END %][% END %]
 Developer documentation:
 
 \doc[todo.html][To-do list][% IF vcs.github %]
@@ -176,7 +193,7 @@ and license:
         [% copr.holder %]
 [% END %]
 
-[% indent(license.full, 4) %]
+[% indent(to_thread(license.full), 4) %]
 [% IF license.notices %]
 [% indent(to_thread(license.notices), 4) %]
 [% END %]

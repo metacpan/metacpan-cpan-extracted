@@ -1,5 +1,5 @@
 package Dancer2::Plugin::JSManager;
-$Dancer2::Plugin::JSManager::VERSION = '0.011';
+$Dancer2::Plugin::JSManager::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -11,10 +11,10 @@ sub BUILD {
   # default autoload to 1 if not set
   my $autoload = $s->config->{autoload} //= 1;
 
-  if ($autoload) { 
+  if ($autoload) {
     $s->app->add_hook( Dancer2::Core::Hook->new (
       name => 'before_template',
-      code => sub { 
+      code => sub {
         my $tokens = shift;
         $s->_inject_js($tokens);
       }
@@ -33,7 +33,7 @@ sub _inject_js {
     # default to <head> if no location given
     my $location = 'js_' . ($values->{injection_pt} ||= 'head');
 
-    if ( $values->{fallback} ) { 
+    if ( $values->{fallback} ) {
       $tokens->{$location} .= sprintf qq(<script onerror="load_js('%s')" src="%s"></script>\n), $values->{fallback}, $values->{uri};
     } else {
       $tokens->{$location} .= sprintf qq(<script src="%s"></script>\n), $values->{uri};
@@ -55,7 +55,7 @@ Dancer2::Plugin::JSManager - Manage website javascript files with the Dancer2 co
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 OVERVIEW
 
@@ -68,36 +68,36 @@ in the order you'd like them to appear in the web page like so:
 
     plugins:
       JSManager:
-          ; 'autoload' defaults to 1 if not supplied. Setting to 0 turns off all javascript.  
-          autoload: 1                                                
+          ; 'autoload' defaults to 1 if not supplied. Setting to 0 turns off all javascript.
+          autoload: 1
 
-          ; create a variable called 'libraries'  
+          ; create a variable called 'libraries'
           libraries:
 
-            ; A name you give to the library, must be preceded by a dash  
-            - jquery:                                                
+            ; A name you give to the library, must be preceded by a dash
+            - jquery:
 
-              ; The URL where the js file is hosted on the CDN       
-              uri: 'https://code.jquery.com/jquery-1.11.1.min.js'  
+              ; The URL where the js file is hosted on the CDN
+              uri: 'https://code.jquery.com/jquery-1.11.1.min.js'
 
-              ;Path to local js file in case CDN is unavailable     
-              fallback: '/js/jquery-1.11.1.min.js'                 
+              ;Path to local js file in case CDN is unavailable
+              fallback: '/js/jquery-1.11.1.min.js'
 
-            ; This library depends on the previous library so we put it second   
-            - jqm:                                                   
+            ; This library depends on the previous library so we put it second
+            - jqm:
               uri: 'http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js'
               fallback: '/js/jquery.mobile-1.4.5.min.js'
 
             - growler:
-              ; if a file is not on a CDN simply put the path to the local file   
-              uri: '/js/jquery.growl.min.js'                       
+              ; if a file is not on a CDN simply put the path to the local file
+              uri: '/js/jquery.growl.min.js'
 
-              ; control where in the template the javascript will appear (see below for more explanation)  
-              injection_pt: 'body_top'                            
+              ; control where in the template the javascript will appear (see below for more explanation)
+              injection_pt: 'body_top'
 
 After modifying your config file, all you have to do is put a variable called C<js_head>
 in the head portion of your tempalte. So, for example, if you are using L<Template::Toolkit>,
-you would add the following into the C<<head\>> section of your HTML template: 
+you would add the following into the C<<head\>> section of your HTML template:
 
     [% js_head %]
 

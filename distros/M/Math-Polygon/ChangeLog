@@ -4,6 +4,29 @@ Revision history for Perl extension Math::Polygon
    paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
 20121024 Request by Rick Rutgers: widening polygon contour
 
+version 1.10: Wed  3 Jan 11:04:43 CET 2018
+	Another release, to test releasing to github.
+
+	Changes:
+	- require perl 5.10
+
+	Improvements:
+	- documentation improvements
+
+version 1.09: Wed  3 Jan 10:56:42 CET 2018
+	Another release, to test releasing to github.
+
+	Improvements:
+	- format option to object string() and points()
+
+version 1.08: Tue  2 Jan 12:01:29 CET 2018
+
+	Improvements:
+	- convert to GIT
+	- move to GitHub
+	- documentation improvements
+	- indentation tabs should be blanks.
+
 version 1.07: Wed 27 Dec 11:14:00 CET 2017
 
 	Fixes:

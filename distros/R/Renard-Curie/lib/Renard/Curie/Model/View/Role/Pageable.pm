@@ -1,9 +1,10 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Role::Pageable;
 # ABSTRACT: Role for view models that are paged
-$Renard::Curie::Model::View::Role::Pageable::VERSION = '0.003';
+$Renard::Curie::Model::View::Role::Pageable::VERSION = '0.004';
 use Moo::Role;
-use Renard::Incunabula::Common::Types qw(Bool PageNumber);
+use Renard::Incunabula::Common::Types qw(Bool);
+use Renard::Incunabula::Document::Types qw(PageNumber);
 
 has page_number => (
 	is => 'rw',
@@ -56,13 +57,13 @@ Renard::Curie::Model::View::Role::Pageable - Role for view models that are paged
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 
 =head2 page_number
 
-A L<PageNumber|Renard:Curie::Types/PageNumber> for the current page being
+A L<PageNumber|Renard::Incunabula::Document::Types/PageNumber> for the current page being
 drawn.
 
 =head1 METHODS

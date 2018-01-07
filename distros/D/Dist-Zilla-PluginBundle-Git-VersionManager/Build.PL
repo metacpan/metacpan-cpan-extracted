@@ -87,7 +87,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-PluginBundle-Git-VersionManager",
-      "dist_version" => "0.003",
+      "dist_version" => "0.004",
       "license" => "perl",
       "module_name" => "Dist::Zilla::PluginBundle::Git::VersionManager",
       "recursive_test_files" => 1,
@@ -118,6 +118,8 @@ EOW
         "warnings" => 0
       },
       "test_requires" => {
+        "CPAN::Meta::Check" => "0.011",
+        "CPAN::Meta::Requirements" => 0,
         "Exporter" => 0,
         "File::Spec" => 0,
         "JSON::MaybeXS" => 0,
@@ -137,6 +139,8 @@ EOW
 
 
     my %fallback_build_requires = (
+      "CPAN::Meta::Check" => "0.011",
+      "CPAN::Meta::Requirements" => 0,
       "Exporter" => 0,
       "File::Spec" => 0,
       "JSON::MaybeXS" => 0,

@@ -1,0 +1,13 @@
+Revision history for Digest-PBKDF2
+
+0.013   2017-12-31
+    - Mark salt_len test TODO, because of intermittent failure;
+      getting a 'Usage' message from somewhere on some systems,
+      and I have not been able to reproduce it.
+
+0.012   2017-12-30
+    - Require newer Test::More
+
+0.011   2017-12-30
+    - Fix test by updating version constraint on
+      Crypt::PBKDF2

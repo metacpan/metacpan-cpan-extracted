@@ -21,7 +21,7 @@ requires:
   HTML::PullParser: '0'
   IO::HTML: '1'
   Pod::Simple::Wiki: '0.19'
-  Text::Amuse: '0.94'
+  Text::Amuse: '0.95'
 resources:
   repository: https://github.com/melmothx/text-amuse-preprocessor
-version: '0.51'
+version: '0.52'

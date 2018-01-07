@@ -4,13 +4,13 @@
       "Project Renard"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Renard-Incunabula-Frontend-Gtk3",
    "prereqs" : {
@@ -22,10 +22,10 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "strict" : "0",
@@ -43,6 +43,10 @@
             "Moo::Role" : "0",
             "Renard::Incunabula::Common::Setup" : "0",
             "Renard::Incunabula::Common::Types" : "0",
+            "Type::Library" : "0.008",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
             "perl" : "5.006"
          }
       },
@@ -64,7 +68,7 @@
          "web" : "https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

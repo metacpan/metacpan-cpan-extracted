@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 our $CLIENT = "Net-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -53,10 +53,17 @@ sub authuri {
 
 sub uploaduri {
   my $Self = shift;
+  my $accountId = shift;
+  die "need account" unless $accountId;
   my $scheme = $Self->{scheme} // 'http';
   my $host = $Self->{host} // 'localhost';
   my $port = $Self->{port} // ($scheme eq 'http' ? 80 : 443);
-  my $url = $Self->{uploadurl} // '/jmap/upload/';
+  my $url = $Self->{uploadurl} // '/jmap/upload/{accountId}/';
+
+  my %map = (
+    accountId => $accountId,
+  );
+  $url =~ s/\{([a-zA-Z0-9_]+)\}/$map{$1}||''/ges;
 
   return $url if $url =~ m/^http/;
 
@@ -98,24 +105,22 @@ sub uri {
   return "$scheme://$host:$port$url";
 }
 
-sub AuthRequest {
-  my ($Self, $Requests, %Headers) = @_;
+sub JSONPOST {
+  my ($Self, $Uri, $Request, %Headers) = @_;
 
   $Headers{'Content-Type'} //= "application/json";
   $Headers{'Accept'} //= "application/json";
 
-  my $uri = $Self->authuri();
-
-  my $Response = $Self->ua->post($uri, {
+  my $Response = $Self->ua->post($Uri, {
     headers => \%Headers,
-    content => encode_json($Requests),
+    content => encode_json($Request),
   });
 
   my $jdata;
   $jdata = eval { decode_json($Response->{content}) } if $Response->{success};
 
   if ($ENV{DEBUGJMAP}) {
-    warn "JMAP " . Dumper($Requests, $Response);
+    warn "JMAP " . Dumper($Uri, \%Headers, $Request, $Response);
   }
 
   # check your own success on the Response object
@@ -123,12 +128,18 @@ sub AuthRequest {
     return ($Response, $jdata);
   }
 
-  confess "JMAP request for $Self->{user} failed ($uri): $Response->{status} $Response->{reason}: $Response->{content}"
+  confess "JMAP request for $Self->{user} failed ($Uri): $Response->{status} $Response->{reason}: $Response->{content}"
     unless $Response->{success};
 
   confess "INVALID JSON $Response->{content}" unless $jdata;
 
   return $jdata;
+}
+
+sub AuthRequest {
+  my ($Self, $Request, %Headers) = @_;
+
+  return $Self->JSONPOST($Self->authuri(), $Request, %Headers);
 }
 
 sub Login {
@@ -161,9 +172,7 @@ sub Login {
 }
 
 sub Request {
-  my ($Self, $Requests, %Headers) = @_;
-
-  $Headers{'Content-Type'} //= "application/json";
+  my ($Self, $Request, %Headers) = @_;
 
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();
@@ -172,31 +181,19 @@ sub Request {
     $Headers{'Authorization'} = "Bearer $Self->{token}";
   }
 
-  my $uri = $Self->uri();
+  return $Self->JSONPOST($Self->uri(), $Request, %Headers);
+}
 
-  my $Response = $Self->ua->post($uri, {
-    headers => \%Headers,
-    content => encode_json($Requests),
-  });
+sub CallMethods {
+  my ($Self, $MethodCalls, $Using, %Headers) = @_;
 
-  my $jdata;
-  $jdata = eval { decode_json($Response->{content}) } if $Response->{success};
+  $Using ||= ['ietf:jmapmail'];
 
-  if ($ENV{DEBUGJMAP}) {
-    warn "JMAP " . Dumper($Requests, $Response);
-  }
+  my $Request = { using => $Using, methodCalls => $MethodCalls };
 
-  # check your own success on the Response object
-  if (wantarray) {
-    return ($Response, $jdata);
-  }
+  my $Response = $Self->Request($Request, %Headers);
 
-  confess "JMAP request for $Self->{user} failed ($uri): $Response->{status} $Response->{reason}: $Response->{content}"
-    unless $Response->{success};
-
-  confess "INVALID JSON $Response->{content}" unless $jdata;
-
-  return $jdata;
+  return $Response->{methodResponses};
 }
 
 sub _get_type {
@@ -212,10 +209,8 @@ sub Upload {
 
   my %Headers;
   $Headers{'Content-Type'} = $type || _get_type($data);
+  $accountId = $accountId || $Self->{user};
 
-  if (defined $accountId) {
-      $Headers{'X-JMAP-AccountId'} = $accountId;
-  }
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();
   }
@@ -223,7 +218,7 @@ sub Upload {
     $Headers{'Authorization'} = "Bearer $Self->{token}";
   }
 
-  my $uri = $Self->uploaduri();
+  my $uri = $Self->uploaduri($accountId);
 
   my $Response = $Self->ua->post($uri, {
     headers => \%Headers,

@@ -27,7 +27,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.099005'
+    version: '0.099006'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.099005'
+version: '0.099006'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.046';
+$HackaMol::VERSION = '0.047';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -15,19 +15,28 @@ use MooseX::StrictConstructor;
 use Scalar::Util qw(refaddr);
 use Carp;
 
-with 
-  'HackaMol::Roles::NameRole'     ,
-  'HackaMol::Roles::MolReadRole'  ,
-  'HackaMol::Roles::PathRole'     ,
-  'HackaMol::Roles::ExeRole'      ,
+has 'readline_func' => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+	predicate => 'has_readline_func',
+	clearer   => 'clear_readline_func',
+);
+
+with
+  'HackaMol::Roles::NameRole',
+  'HackaMol::Roles::MolReadRole',
+  'HackaMol::Roles::PathRole',
+  'HackaMol::Roles::ExeRole',
   'HackaMol::Roles::FileFetchRole',
   'HackaMol::Roles::NERFRole';
+
+
 
 sub pdbid_mol {
     my $self   = shift;
     my $pdbid  = shift || croak "Croak on passing pdbid, e.g. 2cba";
     my ($file) = $self->getstore_pdbid($pdbid);
-    return ( $self->read_file_mol($file) ) if $file;
+    return $self->read_file_mol($file);
 }
 
 sub read_file_push_coords_mol {
@@ -49,12 +58,28 @@ sub read_file_push_coords_mol {
     }
 }
 
+sub read_pdbfile_mol {
+
+    # keeps the header, and a map of model_ids
+    my $self = shift;
+    my $file = shift;
+    my ( $header, $atoms, $model_ids ) = $self->read_file_pdb_parts($file);
+    return (
+        HackaMol::Molecule->new(
+            name      => $file,
+            atoms     => $atoms,
+            info      => $header,
+            model_ids => $model_ids
+        )
+    );
+}
+
 sub read_file_mol {
     my $self = shift;
     my $file = shift;
 
     my @atoms = $self->read_file_atoms($file);
-    my $name  = $file . ".mol";
+    my $name  = $file;
     return ( HackaMol::Molecule->new( name => $name, atoms => [@atoms] ) );
 }
 
@@ -193,14 +218,49 @@ sub group_by_atom_attrs {
 
 }
 
+sub mol_disulfide_bonds {
+
+    # take atom group
+    my $self  = shift;
+    my $mol   = shift;
+    my $fudge = shift;
+    $fudge = 0.15 unless defined($fudge);
+
+    my @sulfs = $mol->select_group("Z 16")->all_atoms;
+    return unless @sulfs;
+    my $dcut  = 2 * $sulfs[0]->covalent_radius + $fudge;
+    my $nm    = "S-S";
+    my $count = 1;
+    my @bonds = ();
+    foreach my $is ( 0 .. $#sulfs ) {
+        my $at_i = $sulfs[$is];
+        foreach my $js ( $is + 1 .. $#sulfs ) {
+            my $at_j = $sulfs[$js];
+            my $dist = $at_j->distance($at_i);
+            if ( $dist <= $dcut ) {
+                push @bonds,
+                  HackaMol::Bond->new(
+                    name  => $nm . "_" . $count++,
+                    atoms => [ $at_i, $at_j ],
+                  );
+            }
+        }
+    }
+    return @bonds;
+}
+
 sub find_disulfide_bonds {
+
+    # to be deprecated
+    # works fine for single disulfide bonds
+    # but does not
     my $self = shift;
 
     my @sulf = grep { $_->Z == 16 } @_;
-    my @ss   = $self->find_bonds_brute(
+    my @ss = $self->find_bonds_brute(
         bond_atoms => [@sulf],
         candidates => [@sulf],
-        fudge      => 0.15, # 0.45 is too large
+        fudge      => 0.15,      # 0.45 is too large
         max_bonds  => 1,
     );
     return @ss;
@@ -226,7 +286,6 @@ sub find_bonds_brute {
     foreach my $at_i (@bond_atoms) {
         next if ( $at_i->bond_count >= $max_bonds );
         my $cov_i = $at_i->covalent_radius;
-        my $xyz_i = $at_i->xyz;
 
         foreach my $at_j (@atoms) {
             next if ( refaddr($at_i) == refaddr($at_j) );
@@ -436,24 +495,26 @@ sub rmsd {
       unless ( $nrd1 == $nrd2 && $nrd1 > 0 );
 
     my @w;
-    if( defined($w) ){
-      @w = @{$w};
+    if ( defined($w) ) {
+        @w = @{$w};
     }
-    else{
-      @w = map{1} 0 .. $nrd1-1;
+    else {
+        @w = map { 1 } 0 .. $nrd1 - 1;
     }
 
-    die "rmsd error: atom array weight must have same dimension as groups\n" unless ($nrd1 == scalar(@w));
-    my $sum_weights = 0; # will be same as number of atoms if no weights are defined
+    die "rmsd error: atom array weight must have same dimension as groups\n"
+      unless ( $nrd1 == scalar(@w) );
+    my $sum_weights =
+      0;    # will be same as number of atoms if no weights are defined
 
     $sum_weights += $_ foreach @w;
 
-    my @xyz_1 = map{$_->xyz} $g1->all_atoms; 
-    my @xyz_2 = map{$_->xyz} $g2->all_atoms; 
-    
+    my @xyz_1 = map { $_->xyz } $g1->all_atoms;
+    my @xyz_2 = map { $_->xyz } $g2->all_atoms;
+
     my $sqr_dev = 0;
-    $sqr_dev += $w[$_]*$xyz_1[$_]->dist2($xyz_2[$_]) foreach 0 .. $#xyz_1;
-    return sqrt($sqr_dev/$sum_weights);
+    $sqr_dev += $w[$_] * $xyz_1[$_]->dist2( $xyz_2[$_] ) foreach 0 .. $#xyz_1;
+    return sqrt( $sqr_dev / $sum_weights );
 }
 
 sub _qrotatable {
@@ -605,7 +666,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 DESCRIPTION
 
@@ -734,18 +795,25 @@ separation against the sum of the covalent radii + fudge. It will not test
 for bond between atoms if either atom has >= max_bonds. It does not return 
 a self bond for an atom (C< next if refaddr($ati) == refaddr($atj) >).
 
+=head2 mol_disulfide_bonds
+
+    my @ss = $bldr->mol_disulfide_bonds($mol, [$fudge]); # default $fudge = 0.15
+
+Returns all disulfide bonds with lengths leq 2 x S->covalent_radius + $fudge. $mol can be an AtomGroup 
+or Molecule. 
+
 =head2 find_disulfide_bonds
 
-the argument is a list of atoms, e.g. '($mol->all_atoms)'. 
+    my @ss = $bldr->find_disulfide_bonds(@atoms); 
 
-this method returns disulfide bonds as bond objects.
+DEPRECATED. Uses find_bonds_brute with fudge of 0.15 and max_bonds 1. mol_disulfides was developed
+after finding funky cysteine clusters (e.g. 1f3h)
 
 =head2 rmsd ($group1,$group2,$weights)
 
-args: two hackmol objects (HackaMol::AtomGroup or HackaMol::Molecule) with same number of atoms;
-      optional array_reference of weights that can be used to adjust the contribution from each atom.
+    my $rmsd = $bldr->rmsd($group1, $group2, [$weights]); #optional weights need to be tested
 
-Returns the root mean square deviation of the two sets of coordinates
+Computes the root mean square deviation between atomic vectors of the two AtomGroup/Molecule objects.
 
 =head2 superpose_rt ($group1, $group2)
 
@@ -770,9 +838,8 @@ A typical workflow:
   my $total_rmsd = HackaMol->new()->rmsd($mol1,$mol2);
   # $total_rmsd is from all atoms in each mol
 
-the algorithm is lifted from Bio::PDB::Structure, which in turn implements
-method from S. Kearsley, Acta Cryst. A45, 208-210 1989
-may not be very fast.  better suited to PDL
+the algorithm is lifted from Bio::PDB::Structure, which implements
+algorithm from S. Kearsley, Acta Cryst. A45, 208-210 1989
 
 returns:
        1. rotation matrix [3 rows, each is a MVR , e.g. x' = row_1 * xyz]
@@ -784,6 +851,16 @@ returns:
 =head2 name 
 
 name is a rw str provided by HackaMol::NameRole.
+
+=head2 readline_func
+
+hook to add control to parsing files
+
+    HackaMol->new(
+                    readline_func => sub {return "PDB_SKIP" unless /LYS/ }
+    )
+    ->pdbid_mol("2cba")
+    ->print_pdb; # will parse lysines because the PDB reader looks for the PDB_SKIP return value
 
 =head1 SYNOPSIS 
 

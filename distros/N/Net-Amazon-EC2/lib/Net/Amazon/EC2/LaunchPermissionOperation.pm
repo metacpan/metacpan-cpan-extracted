@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::LaunchPermissionOperation;
+$Net::Amazon::EC2::LaunchPermissionOperation::VERSION = '0.35';
 use strict;
 use Moose;
 

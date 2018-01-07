@@ -2,7 +2,7 @@ package Power::Outlet;
 use strict;
 use warnings;
 
-our $VERSION='0.16';
+our $VERSION='0.19';
 
 =head1 NAME
 
@@ -41,6 +41,21 @@ The current scope of these packages is network attached power outlets. I have st
 
 I hope to integrate with services like IFTTT (ifttt.com).  I would appreciate community support to help develop drivers for USB controlled power strips and serial devices like the X10 family.
 
+=head2 Home Assistant
+
+Integration with Home Assistant L<https://home-assistant.io/> should be as easy as configuring a Command Line Switch. 
+
+  switch:
+    - platform: command_line
+      switches:
+        ibootbar_1:
+          command_on: /usr/bin/power-outlet iBootBar ON host mybar.local outlet 1
+          command_off: /usr/bin/power-outlet iBootBar OFF host mybar.local outlet 1
+          command_state: /usr/bin/power-outlet iBootBar QUERY host mybar.local outlet 1 | /bin/grep -q ON
+          friendly_name: My iBootBar Outlet 1
+
+See L<https://home-assistant.io/components/switch.command_line/>
+
 =head1 USAGE
 
 The Perl one liner
@@ -55,22 +70,23 @@ The included command line script
 
 =head2 new
 
-  my $outlet=Power::Outlet->new(type=>"iBoot",    host=>"mylamp");
-  my $outlet=Power::Outlet->new(type=>"iBootBar", host=>"mybar", outlet=>1);
-  my $outlet=Power::Outlet->new(type=>"WeMo",     host=>"mywemo");
+  my $outlet = Power::Outlet->new(type=>"iBoot",    host=>"mylamp");
+  my $outlet = Power::Outlet->new(type=>"iBootBar", host=>"mybar", outlet=>1);
+  my $outlet = Power::Outlet->new(type=>"WeMo",     host=>"mywemo");
 
 =cut
 
 sub new {
-  my $this=shift;
-  my $base=ref($this) || $this;
-  my %data=@_;
-  my $type=$data{"type"} or die("Error: the type parameter is required.");
-  my $class=join("::", $base, $type);
+  my $this   = shift;
+  my $base   = ref($this) || $this;
+  my %data   = @_;
+  my $type   = $data{"type"} or die("Error: the type parameter is required.");
+  my $class  = join("::", $base, $type);
+  local $@;
   eval "use $class";
-  my $error=$@;
+  my $error  = $@;
   die(qq{Errot: Cannot find package "$class" for outlet type "$type"\n}) if $error;
-  my $outlet=$class->new(%data);
+  my $outlet = $class->new(%data);
   return $outlet;
 }
 

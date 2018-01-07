@@ -4,7 +4,7 @@ use warnings;
 
 use parent 'App::Yath::Command';
 
-our $VERSION = '0.001043';
+our $VERSION = '0.001045';
 
 use Test2::Harness::Util qw/open_file/;
 use App::Yath::Util qw/is_generated_test_pl/;
@@ -89,6 +89,18 @@ Exit after showing what yath thinks your options mean
 =item --help
 
 Exit after showing this help message
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=item -V
+
+=item --version
+
+Show version information
 
 =back
 

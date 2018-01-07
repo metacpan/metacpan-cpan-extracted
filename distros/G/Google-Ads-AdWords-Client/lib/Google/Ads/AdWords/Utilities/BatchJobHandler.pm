@@ -59,8 +59,8 @@ sub upload_operations {
   my ($self, $operations, $url, $timeout) = @_;
 
   my $status = Google::Ads::AdWords::Utilities::BatchJobHandlerStatus->new({
-      total_content_length => 0,
-      resumable_upload_uri => $url
+    total_content_length => 0,
+    resumable_upload_uri => $url
   });
   my $is_last_request = 1;
 
@@ -78,21 +78,21 @@ sub upload_incremental_operations {
   my ($self, $operations, $status, $is_last_request, $timeout) = @_;
   if (!$status) {
     return Google::Ads::AdWords::Utilities::BatchJobHandlerError->new({
-        type        => "UPLOAD",
-        description => "Required: BatchJobHandlerStatus"
+      type        => "UPLOAD",
+      description => "Required: BatchJobHandlerStatus"
     });
   }
 
   Google::Ads::Common::Utilities::AdsUtilityRegistry->add_ads_utilities(
-      "BatchJobHandler");
+    "BatchJobHandler");
 
   my $url                  = $status->get_resumable_upload_uri();
   my $total_content_length = $status->get_total_content_length();
   my $is_first_request     = $total_content_length == 0;
   if (!$url || $url eq '') {
     return Google::Ads::AdWords::Utilities::BatchJobHandlerError->new({
-        type        => "UPLOAD",
-        description => "Required: BatchJobHandlerStatus.resumable_upload_uri"
+      type        => "UPLOAD",
+      description => "Required: BatchJobHandlerStatus.resumable_upload_uri"
     });
   }
 
@@ -100,8 +100,8 @@ sub upload_incremental_operations {
   # to that URI for the URI to which the operations will be uploaded. That
   # URI will then be stored in the BatchJobHelperStatus.
   if ($is_first_request) {
-    my $response = $self->
-      __initialize_upload($url, $self->get_client(), $timeout);
+    my $response =
+      $self->__initialize_upload($url, $self->get_client(), $timeout);
     if (!$response) {
       return $response;
     }
@@ -185,8 +185,8 @@ sub __update_tags {
 
 # Set the headers for the incremental operations requests.
 sub __set_incremental_operations_headers {
-  my ($self, $request, $total_content_length, $content_length,
-    $is_last_request) = @_;
+  my ($self, $request, $total_content_length, $content_length, $is_last_request)
+    = @_;
   # Set the Content-Length.
   $request->header("Content-Length" => $content_length);
   # Determine and set the content range.
@@ -323,14 +323,14 @@ sub download_response() {
     $decoded_content
   );
 
-  my $parser =
-    Google::Ads::SOAP::Deserializer::MessageParser->new({strict => "1"});
+  my $parser = Google::Ads::SOAP::Deserializer::MessageParser->new({
+      strict      => "1"});
   my $version = $self->get_client()->get_version();
   my $service =
     "Google::Ads::AdWords::${version}::TypeMaps::BatchJobOpsService";
   eval "require $service";
   $parser->class_resolver($service);
-  eval { $parser->parse_string($xml) };
+  eval { $parser->parse_string($xml, $self->get_client()) };
   if ($@) {
     return Google::Ads::AdWords::Utilities::BatchJobHandlerError->new({
         type        => "UPLOAD",

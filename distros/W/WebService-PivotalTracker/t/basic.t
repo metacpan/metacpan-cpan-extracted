@@ -30,15 +30,18 @@ my $story = $pt->story( story_id => 120292647 );
 is(
     $story,
     object {
-        call id              => 120292647;
-        call project_id      => 557367;
-        call name            => 'Do a thing!';
-        call description     => 'We want to do a thing.';
-        call story_type      => 'feature';
-        call current_state   => 'unscheduled';
-        call estimate        => undef;
-        call accepted_at     => undef;
-        call deadline        => undef;
+        call id            => 120292647;
+        call project_id    => 557367;
+        call name          => 'Do a thing!';
+        call description   => 'We want to do a thing.';
+        call story_type    => 'feature';
+        call current_state => 'unscheduled';
+        call estimate      => undef;
+        call accepted_at   => undef;
+        call deadline      => undef;
+        call requested_by  => object {
+            call name => 'Darth Vader';
+        };
         call requested_by_id => 670657;
         call owner_ids       => [];
         call task_ids        => [];

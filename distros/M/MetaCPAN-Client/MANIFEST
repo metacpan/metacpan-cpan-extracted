@@ -74,9 +74,11 @@ t/api/permission.t
 t/api/pod.t
 t/api/rating.t
 t/api/release.t
+t/api/reverse-dependencies.t
 t/entity.t
 t/lib/Functions.pm
 t/request.t
+t/result_custom.t
 t/resultset.t
 t/scroll.t
 t/ua_trap.t

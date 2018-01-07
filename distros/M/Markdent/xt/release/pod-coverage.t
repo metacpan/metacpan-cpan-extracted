@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
 eval 'use Test::Pod::Coverage 1.04';

@@ -1,0 +1,11 @@
+Revision history for Test-Module-CheckDep-Version
+
+0.03    2017-12-29
+        - added a simple sub to return the version
+
+0.02    2017-12-28
+        - modified prereq version of Mock::Sub
+
+0.01    2017-12-28
+        - initial import
+

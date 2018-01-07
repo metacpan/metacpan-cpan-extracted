@@ -1,0 +1,70 @@
+{
+   "abstract" : "Base class for representing documents",
+   "author" : [
+      "Project Renard"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Renard-Incunabula-Document",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Lsub" : "0",
+            "Renard::Incunabula::Common::Setup" : "0",
+            "Renard::Incunabula::Common::Types" : "0",
+            "Type::Library" : "0.008",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "autovivification" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "lib" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/project-renard/p5-Renard-Incunabula-Document",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/project-renard/p5-Renard-Incunabula-Document.git",
+         "web" : "https://github.com/project-renard/p5-Renard-Incunabula-Document"
+      }
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

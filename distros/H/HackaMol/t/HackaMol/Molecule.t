@@ -39,6 +39,10 @@ my $max_t = $atoms[0]->count_coords - 1;
 my $mol = HackaMol::Molecule->new( name => 'trp-cage', atoms => [@atoms] );
 
 is( $mol->charge, 0, 'molecule with no charge gives 0 charge' );
+$mol->push_charges(-1);
+is( $mol->charge, -1, 'molecule charge from charges' );
+$mol->charge(1);
+is( $mol->charge, 1, 'set molecule charge' );
 is( $mol->count_atoms, 283, 'number of atoms: 283' );
 # check mass of molecule.  Have not checked whether the number
 # for 2ll5 is actually correct.

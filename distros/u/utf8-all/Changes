@@ -1,5 +1,9 @@
 Revision history for Perl module utf8-all
 
+0.024     2018-01-05
+  * Adapted force_global test to work when the perl unicode flag is active
+                                                              [gh-48; HayoBaan]
+
 0.023     2017-05-29
   * Global effects (e.g. adding UTF-8 to STD* layers) now only enabled when
     utf8::all is used from the main package. Options exist to override this

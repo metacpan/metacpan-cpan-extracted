@@ -3,7 +3,7 @@ package Log::Dispatch::Scribe;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Log::Dispatch 2.00;
 use base qw(Log::Dispatch::Output);

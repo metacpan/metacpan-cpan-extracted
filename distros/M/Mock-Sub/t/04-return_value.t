@@ -40,7 +40,7 @@ BEGIN {
 
     $foo->return_value(undef);
     $ret = Two::test;
-    is (ref $ret, 'One', "return_value() undef's the value properly");
+    is ($ret, undef, "return_value() undef's the value properly");
 }
 {# return_value
 

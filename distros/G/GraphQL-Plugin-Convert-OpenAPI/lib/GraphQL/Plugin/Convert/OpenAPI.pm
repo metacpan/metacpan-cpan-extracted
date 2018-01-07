@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI;
 use OpenAPI::Client;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -48,6 +48,7 @@ sub make_field_resolver {
     my $property = ref($root_value) eq 'HASH'
       ? $root_value->{$field_name}
       : $root_value;
+    my $is_oac = 0;
     my $result = eval {
       return $property->($args, $context, $info) if ref $property eq 'CODE';
       return $property if ref $root_value eq 'HASH';
@@ -55,21 +56,28 @@ sub make_field_resolver {
         if !$root_value->can($field_name);
       return $root_value->$field_name($args, $context, $info)
         if !UNIVERSAL::isa($root_value, 'OpenAPI::Client');
+      $is_oac = 1;
       # call OAC method
-      my $got = $root_value->call($mapping->{$field_name} => $args);
-      DEBUG and _debug('OpenAPI.resolver(got)', $got->res->json);
-      die $got->res->body."\n" if !$got->res->is_success;
-      $got->res->json;
+      DEBUG and _debug('OpenAPI.resolver(c)', $mapping->{$field_name}, $args);
+      my $got = $root_value->call_p($mapping->{$field_name} => $args)->then(
+        sub {
+          my $json = shift->res->json;
+          DEBUG and _debug('OpenAPI.resolver(got)', $json);
+          my $return_type = $info->{return_type};
+          $return_type = $return_type->of while $return_type->can('of');
+          if ($type2hashpairs->{$return_type->to_string}) {
+            $json = [ map {
+              +{ key => $_, value => $json->{$_} }
+            } sort keys %{$json || {}} ];
+          }
+          DEBUG and _debug('OpenAPI.resolver(rettype)', $return_type->to_string, $json);
+          $json;
+        }, sub {
+          DEBUG and _debug('OpenAPI.resolver(error)', shift->res->body);
+        }
+      );
     };
     die $@ if $@;
-    my $return_type = $info->{return_type};
-    $return_type = $return_type->of while $return_type->can('of');
-    if ($type2hashpairs->{$return_type->to_string}) {
-      $result = [ map {
-        +{ key => $_, value => $result->{$_} }
-      } sort keys %{$result || {}} ];
-    }
-    DEBUG and _debug('OpenAPI.resolver(rettype)', $return_type->to_string, $result);
     $result;
   };
 }
@@ -91,7 +99,10 @@ sub _get_type {
     $rawtype =~ s:^#/definitions/::;
     return $rawtype;
   }
-  if ($info->{additionalProperties}) {
+  if (
+    $info->{additionalProperties}
+      or (($info->{type}//'') eq 'object' and !$info->{properties})
+  ) {
     my $type = _get_type(
       {
         type => 'array',
@@ -99,7 +110,7 @@ sub _get_type {
           type => 'object',
           properties => {
             key => { type => 'string' },
-            value => $info->{additionalProperties},
+            value => $info->{additionalProperties} // { type => 'string' },
           },
         },
       },
@@ -206,7 +217,9 @@ sub _get_spec_from_info {
     my $spec = +{
       kind => 'enum',
       name => $name,
-      values => +{ map { (_trim_name($_) => {}) } @$values },
+      values => +{ map {
+        (_trim_name($_) || 'EMPTY' => { value => $_ })
+      } @$values },
     };
     $spec->{description} = $refinfo->{title} if $refinfo->{title};
     $spec->{description} = $refinfo->{description}
@@ -461,6 +474,11 @@ or C<Mutation> otherwise
 
 =back
 
+If an output type has C<additionalProperties> (effectively a hash whose
+values are of a specified type), this poses a problem for GraphQL which
+does not have such a concept. It will be treated as being made up of a
+list of pairs of objects (i.e. hashes) with two keys: C<key> and C<value>.
+
 The queries will be run against the spec's server.  If the spec starts
 with a C</>, and a L<Mojolicious> app is supplied (see below), that
 server will instead be the given app.
@@ -477,9 +495,22 @@ L<Mojolicious> app can be given as the second argument.
 
 This is available as C<\&GraphQL::Plugin::Convert::OpenAPI::make_field_resolver>
 in case it is wanted for use outside of the "bundle" of the C<to_graphql>
-method. It takes one argument, a hash-ref mapping from a GraphQL operation
-field-name to an C<operationId>, and returns a closure that can be used
-as a field resolver.
+method. It takes arguments:
+
+=over
+
+=item
+
+a hash-ref mapping from a GraphQL operation field-name to an C<operationId>
+
+=item
+
+a hash-ref mapping from a GraphQL type-name to true if that type needs
+transforming from a hash into pairs
+
+=back
+
+and returns a closure that can be used as a field resolver.
 
 =head1 DEBUGGING
 

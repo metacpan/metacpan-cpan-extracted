@@ -1,6 +1,6 @@
 package Map::Tube::Kolkatta::Line::L1;
 
-$Map::Tube::Kolkatta::Line::L1::VERSION   = '0.11';
+$Map::Tube::Kolkatta::Line::L1::VERSION   = '0.12';
 $Map::Tube::Kolkatta::Line::L1::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Kolkatta::Line::L1 - Kolkatta Metro Map: Line 1.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

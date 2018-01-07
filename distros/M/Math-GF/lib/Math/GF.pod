@@ -1,0 +1,296 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Math::GF - Galois Fields arithmetics
+
+=head1 VERSION
+
+This document describes Math::GF version 0.004.
+
+=head1 SYNOPSIS
+
+   use Math::GF;
+
+   # prime orders leverage on Math::GF::Zn
+   my $GF5 = Math::GF->new(order => 5);
+
+   # prints "yes!" because 5 is prime
+   say 'yes!' if $GF5->order_is_prime;
+   # prints "order 5 = 5^1"
+   say 'order ', $GF5->order, ' = ', $GF5->p, '^', $GF5->n;
+
+   # generate some elements
+   my $zero_gf5 = $GF5->additive_neutral;
+   my $one_gf5  = $GF5->multiplicative_neutral;
+   my $four_gf5 = $GF5->e(4);                # scalar context
+   my ($two_gf5, $three_gf5) = $GF5->(2, 3); # list context
+
+   # use some operations, both print "yes!"
+   say 'yes!' if $two_gf5   == $one_gf5  + $one_gf5;
+   say 'yes!' if $three_gf5 == $four_gf5 * $two_gf5;
+
+   # non-prime orders leverage on Math::GF::Extension
+   my $GF8 = Math::GF->new(order => 8);
+
+   # prints "order not prime!"
+   say 'order not prime!' unless $GF8->order_is_prime;
+
+   # prints "order 8 = 2^3"
+   say 'order ', $GF8->order, ' = ', $GF8->p, '^', $GF8->n;
+
+   # same operations as before anyway, no change in API
+   my $zero_gf8 = $GF8->additive_neutral;
+   my $one_gf8  = $GF8->multiplicative_neutral;
+   my ($three_gf8, $five_gf8) = $GF8->e(3, 5);
+
+   # use some operations... no more modulo operations in GF(2^3)
+   say 'yes!' if $three_gf8 * $five_gf8 == $GF8->e(4);
+
+   # import a factory function for building elements
+   Math::GF->import_builder(81, name => 'GF81'); # GF(3^4)
+   say 'yes!' if GF81(5) * GF81(8) == GF81(19);
+
+   # Need all elements? No problem
+   my @all_gf27 = Math::GF->new(order => 27)->all;
+
+=head1 DESCRIPTION
+
+This module allows you to generate and handle operations inside a Galois
+Field (GF) of I<any> allowed order:
+
+=over
+
+=item *
+
+orders that are too big are likely to explode
+
+=item *
+
+orders that aren't prime number powers do not have associated Galois
+Fields.
+
+=back
+
+It's easy to generate a new GF of a given order:
+
+   my $GF5 = Math::GF->new(order => 5); # GF(5)
+   my $GF8 = Math::GF->new(order => 8); # GF(2^3)
+
+Since a GF of order I<N> has exactly I<N> elements, it's easy to refer to
+them with integers from I<0> to I<< N - 1 >>. If you want to actually
+generate the associated element you can use the L</e> method:
+
+   my $e5_gf8 = $GF8->e(5);
+
+If you're planning to work extensively with a specific GF, or just want
+some syntactic sugar, you can import a factory function in your package
+that will generate elements in the specific GF:
+
+
+   # by default, import a function named GF_p_n for GF(p^n)
+   Math::GF->import_builder(8);
+   my $e5 = GF_2_3(5);
+
+   # you can give your name though
+   Math::GF->import_builder(8, name => 'GF8');
+   my $e5_gf8 = GF8(5);
+
+If you need all elements, look at the L</all> method. It's the same as
+doing this:
+
+   my @all = map { $GF8->e($_) } 0 .. 8 - 1;
+
+but easier to type and possibly a bit quicker.
+
+Elements associated to I<0> and I<1> have the I<usual> meaning of the
+additive and multiplicative neutral elements, respectively. You can also
+get them with L</additive_neutral> and L</multiplicative_neutral>.
+
+=head1 METHODS
+
+In the following, C<$GF> is supposed to be a C<Math::GF> object.
+
+=begin HIDE
+
+=head2 B<< BUILDARGS >>
+
+Pre-munge arguments before they reach the BUILD method. See documentation
+for L<Moo>.
+
+=end HIDE
+
+=head2 B<< additive_neutral >>
+
+   my $zero = $GF->additive_neutral;
+
+the neutral element of the Galois Field with respect to the addition
+operation. Same as C<< $GF->e(0) >>.
+
+=head2 B<< all >>
+
+   my @all_elements = $GF->all;
+
+generate all elements of the Galois Field.
+
+=head2 B<< e >>
+
+   my $e5 = $GF->e(5);
+   my @some = $GF->e(2, 3, 5, 7);
+
+factory method to generate one or more elements in the field. When called
+in scalar context it always operate on the first provided argument only.
+
+=head2 B<< element_class >>
+
+   my $class_name = $GF->element_class;
+
+the underlying class for generating elements. It defaults to
+L<Math::GF::Zn> when the L</order> is a prime number and
+L<Math::GF::Extension> when it is not; there is probably little
+motivation for you to fiddle with this.
+
+=head2 B<< import_builder >>
+
+   Math::GF->import_builder($order, %args);
+
+
+import a factory function in the caller's package for easier generation of
+elements in the GF of the specified C<$order>.
+
+By default, the name of the imported function is C<GF_p> or C<GF_p_n>
+where C<p> is a prime and C<n> is the power of the prime such that C<<
+$order = p ** n >> (the C<n> part is omitted if it is equal to C<1>). For
+example:
+
+   Math::GF->import_builder(5); # imports GF_5()
+   Math::GF->import_builder(8); # imports GF_2_3()
+
+You can pass your own C<name> in the C<%args> though:
+
+   Math::GF->import_builder(8, name => 'GF8'); # imports GF8()
+
+The imported function is a wrapper around L</e>:
+
+   my $one = GF_2_3(1);
+   my @some = GF_5(1, 3, 4);
+
+Allowed keys in C<%args>:
+
+=over
+
+=item C<< level >>
+
+by default the function is imported in the caller's package. This allows
+you to alter which level in the call stack you want to peek for importing
+the sub.
+
+=item C<< name >>
+
+the name of the method, see above for the default.
+
+=back
+
+=head2 B<< multiplicative_neutral >>
+
+   my $one = $GF->multiplicative_neutral;
+
+the neutral element of the Galois Field with respect to the multiplication
+operation. Same as C<< $GF>e(1) >>.
+
+=head2 B<< n >>
+
+   my $power = $GF->n;
+
+the L</order> of a Galois Field must be a power of a prime L</p>, this
+method provides the value of the power. E.g. if the I<order> is C<8>, the
+prime is C<2> and the power is C<3>.
+
+=head2 B<< order >>
+
+   my $order = $GF->order;
+
+the I<order> of the Galois Field. Only powers of a single prime are
+allowed.
+
+=head2 B<< order_is_prime >>
+
+   my $boolean = $GF->order_is_prime;
+
+the L</order> of a Galois Field can only be a power of a prime, with the
+special case in which this power is 1, i.e. the I<order> itself is a prime
+number. This method provided a true value in this case, false otherwise.
+
+=head2 B<< p >>
+
+   my $prime = $GF->p;
+
+the L</order> of a Galois Field must be a power of a prime, this method
+provides the value of the prime number. E.g. if the I<order> is C<8>, the
+prime is C<2> and the power is C<3>. See also L</n>.
+
+=head2 B<< prod_table >>
+
+   my $pt = $GF->prod_table;
+
+a table that can be used to evaluate the product of two elements in the
+field.
+
+The table is provided as a reference to an Array of Arrays. The elements
+in the field are associated to indexes from C<0> to C<< order - 1 >>;
+table element C<< $pt->[$A][$B] >> represents the result of the product
+between element associated to C<$A> and element associated to C<$B>.
+
+You shouldn't in general need to fiddle with this table, as it is used
+behind the scenes by C<Math::GF::Extension>, where all operations are
+overloaded.
+
+=head2 B<< sum_table >>
+
+   my $st = $GF->sum_table;
+
+a table that can be used to evaluate the product of two elements in the
+field.
+
+The table is provided as a reference to an Array of Arrays. The elements
+in the field are associated to indexes from C<0> to C<< order - 1 >>;
+table element C<< $pt->[$A][$B] >> represents the result of the addition
+between element associated to C<$A> and element associated to C<$B>.
+
+You shouldn't in general need to fiddle with this table, as it is used
+behind the scenes by C<Math::GF::Extension>, where all operations are
+overloaded.
+
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs through GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Math::Polynomial> is used behind the scenes to generate the tables in
+case the order is not a prime.
+
+L<Math::GF::Zn> is used for generating elements in the field and handling
+operations between them in an easy way in case of prime L</order>.
+L<Math::GF::Extension> is used for elements in the field in case of
+non-prime L</order>s.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017, 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

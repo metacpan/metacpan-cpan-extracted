@@ -1,0 +1,73 @@
+{
+   "abstract" : "test against data stored in automatically-named file",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Snapshot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.04"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "File::Path" : "2.07",
+            "Test2::API" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/Test-Snapshot/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/Test-Snapshot"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
+}

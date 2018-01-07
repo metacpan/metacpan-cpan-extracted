@@ -1,3 +1,6 @@
+1.03 2018-01-03
+ - Fix tests to be author tests, and work without RT in @INC
+
 1.02 2017-02-20
  - Drop support for RT 4.0
  - Fix display of RT-Send-To header on RT 4.2 and above

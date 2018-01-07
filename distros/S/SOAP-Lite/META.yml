@@ -47,6 +47,6 @@ requires:
   perl: v5.6.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite
-  repository: https://github.com/redhotpenguin/soaplite.git
-version: '1.24'
+  repository: https://github.com/redhotpenguin/perl-soaplite.git
+version: '1.26'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -10,7 +10,7 @@ use Data::Dumper;
 use Sys::Hostname;
 use Plack::Util;
 
-our $VERSION = 0.9081;
+our $VERSION = 1.01;
 
 # Basic attributes
 attr -host => hostname;
@@ -367,7 +367,7 @@ into your current one for testing and debugging purposes.
 =item
 
 B<Enhanced Logging>. Log messages at different levels of emergency. Log to a
-file, screen, or anything supported by Log::Dispatcher.
+file, screen, or anything supported by Log::Dispatch.
 
 =cut
 
@@ -1375,7 +1375,7 @@ Ivan Baidakou (basiliscos)
 
 roy-tate
 
-Konstantin Yakunin (twinhooker)
+Konstantin Yakunin (@yakunink)
 
 Benjamin Hengst (notbenh)
 

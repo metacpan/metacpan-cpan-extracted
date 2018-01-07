@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2018 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software; you can redistribute it and/or modify it
@@ -21,10 +21,8 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-
+$Template::Plugin::Gettext::VERSION = '0.3';
 use strict;
-
-our $VERSION = 0.1;
 
 use Locale::TextDomain 1.20 qw(com.cantanea.Template-Plugin-Gettext);
 use Locale::Messages;
@@ -35,6 +33,8 @@ use Cwd qw(abs_path);
 use base qw(Template::Plugin);
 
 my %bound_dirs;
+my %textdomains;
+
 our @DEFAULT_DIRS;
 our @LOCALE_DIRS;
 
@@ -57,6 +57,14 @@ sub new {
 
     $textdomain = 'textdomain' unless defined $textdomain && length $textdomain;
     $charset = 'utf-8' unless defined $charset && length $charset;
+
+    my $template = $ctx->stash->get('component')->name;
+    if ('input text' eq $template || 'input file handle' eq $template) {
+        my $maybe_template = $ctx->stash->get('gettext_filename');
+        $template = $maybe_template
+            if defined $maybe_template && length $maybe_template;
+    }
+    $textdomains{$textdomain}->{$template} = 1;
 
     unless (exists $bound_dirs{$textdomain}) {
         unless (@search_dirs) {
@@ -442,6 +450,14 @@ sub __find_domain($) {
     delete $bound_dirs{$domain};
 
     return 1;
+}
+
+sub textdomains {
+    return %textdomains;
+}
+
+sub resetTextdomains {
+    undef %textdomains;
 }
 
 1;

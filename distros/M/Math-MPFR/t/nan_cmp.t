@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 #use Devel::Peek;
 
-print "1..7\n";
+print "1..8\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -226,4 +226,33 @@ else {
   print "not ok 7\n";
 }
 
+$ok = '';
+
+my $pinf = 999 ** (999 ** 999);
+
+$ok .= Rmpfr_cmp_NV($nan, $pinf) == 0 ? 'a' : 'A';
+$ok .= Rmpfr_erangeflag_p() ? 'b' : 'B';
+Rmpfr_clear_erangeflag();
+
+$ok .= Rmpfr_cmp_NV($nan, $pinf * -1) == 0 ? 'c' : 'C';
+$ok .= Rmpfr_erangeflag_p() ? 'd' : 'D';
+Rmpfr_clear_erangeflag();
+
+$ok .= Rmpfr_cmp_NV($nan, 0.0) == 0 ? 'e' : 'E';
+$ok .= Rmpfr_erangeflag_p() ? 'f' : 'F';
+Rmpfr_clear_erangeflag();
+
+$ok .= Rmpfr_cmp_NV($nan, 1.0) == 0 ? 'g' : 'G';
+$ok .= Rmpfr_erangeflag_p() ? 'h' : 'H';
+Rmpfr_clear_erangeflag();
+
+$ok .= Rmpfr_cmp_NV($nan, -1.0) == 0 ? 'i' : 'I';
+$ok .= Rmpfr_erangeflag_p() ? 'j' : 'J';
+Rmpfr_clear_erangeflag();
+
+if($ok eq 'abcdefghij') {print "ok 8\n"}
+else {
+  warn "8: $ok\n";
+  print "not ok 8\n";
+}
 

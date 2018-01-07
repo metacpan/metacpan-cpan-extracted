@@ -3,16 +3,17 @@ package JIP::Daemon;
 use 5.006;
 use strict;
 use warnings;
-use JIP::ClassField;
+use JIP::ClassField 0.05;
+use File::Spec;
 use POSIX ();
 use Carp qw(carp croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.03';
+our $VERSION = '0.041';
 
 my $maybe_set_subname = sub { $ARG[1]; };
 
-# Will be shipping with Perl 5.22
+# Supported on Perl 5.22+
 eval {
     require Sub::Util;
 
@@ -39,7 +40,7 @@ my $default_log_callback = sub {
     }
 };
 
-has $_ => (get => q{+}, set => q{-}) for qw(
+has [qw(
     pid
     uid
     gid
@@ -50,7 +51,12 @@ has $_ => (get => q{+}, set => q{-}) for qw(
     is_detached
     log_callback
     on_fork_callback
-);
+    stdout
+    stderr
+    program_name
+)] => (get => q{+}, set => q{-});
+
+has devnull => (get => q{+}, set => q{-}, default => File::Spec->devnull);
 
 sub new {
     my ($class, %param) = @ARG;
@@ -121,6 +127,30 @@ sub new {
         $on_fork_callback = $maybe_set_subname->('on_fork_callback', $on_fork_callback);
     }
 
+    my $stdout;
+    if (exists $param{'stdout'}) {
+        $stdout = $param{'stdout'};
+
+        croak q{Bad argument "stdout"}
+            unless defined $stdout and length $stdout;
+    }
+
+    my $stderr;
+    if (exists $param{'stderr'}) {
+        $stderr = $param{'stderr'};
+
+        croak q{Bad argument "stderr"}
+            unless defined $stderr and length $stderr;
+    }
+
+    my $program_name = $PROGRAM_NAME;
+    if (exists $param{'program_name'}) {
+        $program_name = $param{'program_name'};
+
+        croak q{Bad argument "program_name"}
+            unless defined $program_name and length $program_name;
+    }
+
     return bless({}, $class)
         ->_set_dry_run($dry_run)
         ->_set_uid($uid)
@@ -131,7 +161,11 @@ sub new {
         ->_set_log_callback($log_callback)
         ->_set_on_fork_callback($on_fork_callback)
         ->_set_pid($PROCESS_ID)
-        ->_set_is_detached(0);
+        ->_set_is_detached(0)
+        ->_set_stdout($stdout)
+        ->_set_stderr($stderr)
+        ->_set_program_name($program_name)
+        ->_set_devnull;
 }
 
 sub daemonize {
@@ -153,6 +187,7 @@ sub daemonize {
                 or croak(sprintf q{Can't start a new session: %s}, $OS_ERROR);
 
             $self->reopen_std;
+            $self->change_program_name;
 
             $self->_set_pid(POSIX::getpid())->_set_is_detached(1);
         }
@@ -179,12 +214,29 @@ sub daemonize {
 sub reopen_std {
     my $self = shift;
 
-    open STDIN,  '</dev/null'
-        or croak(sprintf q{Can't reopen STDIN: %s},  $OS_ERROR);
-    open STDOUT, '>/dev/null'
-        or croak(sprintf q{Can't reopen STDOUT: %s}, $OS_ERROR);
-    open STDERR, '>/dev/null'
-        or croak(sprintf q{Can't reopen STDERR: %s}, $OS_ERROR);
+    my $stdin = q{<}. $self->devnull;
+
+    my $stdout;
+    if (defined $self->stdout) {
+        $stdout = $self->stdout;
+        $self->_log('Reopen STDOUT to: %s', $stdout);
+    }
+    else {
+        $stdout = q{+>}. $self->devnull;
+    }
+
+    my $stderr;
+    if (defined $self->stderr) {
+        $stderr = $self->stderr;
+        $self->_log('Reopen STDERR to: %s', $stderr);
+    }
+    else {
+        $stderr = q{+>}. $self->devnull;
+    }
+
+    open STDIN,  $stdin  or croak(sprintf q{Can't reopen STDIN: %s},  $OS_ERROR);
+    open STDOUT, $stdout or croak(sprintf q{Can't reopen STDOUT: %s}, $OS_ERROR);
+    open STDERR, $stderr or croak(sprintf q{Can't reopen STDERR: %s}, $OS_ERROR);
 
     return $self;
 }
@@ -241,6 +293,24 @@ sub status {
     return $pid, POSIX::kill($pid, 0) ? 1 : 0, $self->is_detached;
 }
 
+sub change_program_name {
+    my $self = shift;
+
+    my $old_program_name = $PROGRAM_NAME;
+    my $new_program_name = $self->program_name;
+
+    if ($new_program_name ne $old_program_name) {
+        $self->_log(
+            'The program name changed from %s to %s',
+            $old_program_name,
+            $new_program_name,
+        );
+        $PROGRAM_NAME = $new_program_name;
+    }
+
+    return $self;
+}
+
 # private methods
 sub _log {
     my $self = shift;
@@ -260,7 +330,7 @@ JIP::Daemon - Daemonize server process.
 
 =head1 VERSION
 
-Version 0.03
+This document describes C<JIP::Daemon> version C<0.041>.
 
 =head1 SYNOPSIS
 
@@ -315,7 +385,7 @@ With on_fork_callback:
 
 =head1 ATTRIBUTES
 
-L<JIP::Daemon> implements the following attributes.
+C<JIP::Daemon> implements the following attributes.
 
 =head2 pid
 
@@ -390,14 +460,38 @@ With custom callback:
 
 After daemonizing, and before exiting, run the given code in parent process.
 
-=head1 METHODS
+=head2 devnull
+
+    my $devnull = $proc->devnull;
+
+Returns a string representation of the null device.
+
+=head2 stdout
+
+    my $stdout = $proc->stdout;
+
+If this parameter is supplied, redirect STDOUT to file.
+
+=head2 stderr
+
+    my $stderr = $proc->stderr;
+
+If this parameter is supplied, redirect STDERR to file.
+
+=head2 program_name
+
+    my $program_name = $proc->program_name;
+
+Returns a string with name of the process.
+
+=head1 SUBROUTINES/METHODS
 
 =head2 new
 
     my $proc = JIP::Daemon->new;
     my $proc = JIP::Daemon->new(dry_run => 1);
 
-Construct a new L<JIP::Daemon> object.
+Construct a new C<JIP::Daemon> object.
 
 =head2 daemonize
 
@@ -411,18 +505,34 @@ Daemonize server process.
 
 Reopen STDIN, STDOUT, STDERR to /dev/null.
 
+    my $proc = JIP::Daemon->new(
+        stdout => '+>/path/to/out.log',
+        stderr => '+>/path/to/err.log',
+    );
+
+    $proc = $proc->reopen_std;
+
+The C<stdout> and C<stderr> arguments are file names that will be opened and be used to replace the standard file descriptors. These special modes only work with two-argument form of C<open>.
+
 =head2 drop_privileges
 
     my $proc = JIP::Daemon->new(uid => 1000, gid => 1000, umask => 0, cwd => q{/});
     $proc = $proc->drop_privileges;
 
-Change uid/gid/umask/cwd on demand.
+Change C<uid>/C<gid>/C<umask>/C<cwd> on demand.
 
 =head2 try_kill
 
     my $is_alive = $proc->try_kill(0);
 
-This is identical to Perl's builtin kill() function for sending signals to processes (often to terminate them).
+This is identical to Perl's builtin C<kill()> function for sending signals to processes (often to terminate them).
+
+=head2 change_program_name
+
+    my $proc = JIP::Daemon->new(program_name => 'tratata');
+    $proc = $proc->change_program_name;
+
+Changes the name of the program.
 
 =head2 status
 
@@ -430,9 +540,17 @@ This is identical to Perl's builtin kill() function for sending signals to proce
 
 Returns a list of process attributes: PID, is alive, is detached (in backgroung).
 
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<JIP::Daemon> requires no configuration files or environment variables.
+
 =head1 SEE ALSO
 
-POSIX, Privileges::Drop, Object::ForkAware, Proc::Daemon, Daemon::Daemonize
+L<POSIX>, L<Privileges::Drop>, L<Object::ForkAware>, L<Proc::Daemon>, L<Daemon::Daemonize>.
 
 =head1 AUTHOR
 
@@ -440,7 +558,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

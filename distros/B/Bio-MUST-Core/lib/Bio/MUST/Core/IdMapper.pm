@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdMapper;
 # ABSTRACT: Id mapper for translating sequence ids
-$Bio::MUST::Core::IdMapper::VERSION = '0.173500';
+$Bio::MUST::Core::IdMapper::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -20,12 +20,13 @@ with 'Bio::MUST::Core::Roles::Commentable';
 has $_ . '_ids' => (
     traits   => ['Array'],
     is       => 'ro',
-    isa      => 'ArrayRef[Str]',
+    isa      => 'Bio::MUST::Core::Types::full_ids',
     default  => sub { [] },
+    coerce   => 1,
+    writer   => '_set_' . $_ . '_ids',
     handles  => {
         'count_' . $_ . '_ids' => 'count',
           'all_' . $_ . '_ids' => 'elements',
-          'add_' . $_ . '_id'  => 'push',
     },
 ) for qw(long abbr);
 
@@ -110,6 +111,12 @@ sub load {
 
     my $mapper = $class->new();
 
+    # Note: we now use temporary arrays because Moose coercions add a lot of
+    # overhead if pushing directly (through delegation) on the attributes
+
+    my @long_ids;
+    my @abbr_ids;
+
     LINE:
     while (my $line = <$in>) {
         chomp $line;
@@ -120,9 +127,12 @@ sub load {
 
         # extract long and abbreviated ids
         my ($long_id, $abbr_id) = split $sep, $line;
-        $mapper->add_long_id($long_id);
-        $mapper->add_abbr_id($abbr_id);
+        push @long_ids, $long_id;
+        push @abbr_ids, $abbr_id;
     }
+
+    $mapper->_set_long_ids( \@long_ids );
+    $mapper->_set_abbr_ids( \@abbr_ids );
 
     return $mapper;
 }
@@ -165,7 +175,7 @@ Bio::MUST::Core::IdMapper - Id mapper for translating sequence ids
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

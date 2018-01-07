@@ -40,3 +40,4 @@ t/pki_store/certs/servers/test.example.com/fullchain.pem
 t/pki_store/certs/servers/test.example.com/privkey.pem
 t/pki_store/certs/servers/test.example.com/server.pem
 t/pki_store/make.sh
+t/zonefile

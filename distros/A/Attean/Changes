@@ -5,6 +5,22 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.018  2018-01-06
+
+ - (Update) Added tests for turtle parser escape handling (#55).
+ - (Update) Allow UUIDs to have lowercase hex digits (#102).
+ - (Update) Documentation fixes (#105 from @Varadinsky).
+ - (Update) Fixed as_string serialization of CONSTRUCT algebras (#97).
+ - (Update) Improve code coverage for Attean::TermMap (#107 from
+   @Varadinsky).
+ - (Update) Improvements to HashJoin query planning (#103 from @KjetilK).
+ - (Update) Removed LICENSE file and updated licensing statement in
+   individual modules (#116).
+ - (Update) Updated Makefile.PL for perl 5.26.
+ - (Update) Updated required version of IRI (#118).
+ - (Update) Use Moo::Role instead of namespace::clean to cleanup namespaces
+   (#112 from @baby-gnu).
+
 0.017  2016-06-09
 
  - (Addition) Port SPARQL-JSON serializer to Attean (#20, #101 from

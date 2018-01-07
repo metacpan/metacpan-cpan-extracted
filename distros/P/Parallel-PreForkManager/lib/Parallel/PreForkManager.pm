@@ -3,7 +3,7 @@ package Parallel::PreForkManager;
 use strict;
 use warnings;
 
-our $VERSION = '1.20170417'; # VERSION
+our $VERSION = '1.20180106'; # VERSION
 
 use Carp;
 use IO::Handle;
@@ -25,6 +25,7 @@ sub new {
         'WaitComplete'     => 1,
         'JobQueue'         => [],
         'Select'           => IO::Select->new(),
+        'ChildrenForked'   => 0,
     };
 
     foreach my $Arg ( qw { Timeout ChildCount WaitComplete ParentCallback ProgressCallback JobsPerChild ChildSetupHook ChildTeardownHook } ) {
@@ -197,6 +198,7 @@ sub StartChild {
 
     if ($pid) {
         # Parent
+        $Self->{ 'ChildrenForked' }++;
 
         # Close unused pipes
         close($ToParent);
@@ -227,7 +229,8 @@ sub StartChild {
         $Self->Child($FromParent);
 
         # When the worker subroutine completes, exit
-        exit 0;
+        # &Child should already have done the exit.
+        exit 0; # uncoverable statement
     }
     else {
         confess("Failed to fork: $!");
@@ -397,6 +400,7 @@ Methods can be defined for child setup and teardown.
 =head1 SYNOPSIS
 
     use Parallel::PreForkManager;
+    use English qw( -no_match_vars );
 
     my $Worker = Parallel::PreForkManager->new({
         'ChildHandler'      => \&WorkHandler,
@@ -436,7 +440,7 @@ Methods can be defined for child setup and teardown.
         my ( $Self, $Thing ) = @_;
         my $Val = $Thing->{'Value'};
         $Self->ProgressCallback( 'Log', "WORKER $PID - $Val" );
-        return "Printed $Val in $PID";
+        return { 'Data' => "Printed $Val in $PID" };
     }
 
     sub CallbackHandler {
@@ -587,6 +591,11 @@ IPC Send.
 
 =back
 
+=head1 JSON
+
+Note: All communication between the parent and a child are serialised using JSON.pm, please
+be aware of the data type restrictions of JSON serialisation.
+
 =head1 DEPENDENCIES
 
   Carp
@@ -613,7 +622,7 @@ Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017, Marc Bradshaw.
+Copyright (c) 2018, Marc Bradshaw.
 
 =head1 CREDITS
 

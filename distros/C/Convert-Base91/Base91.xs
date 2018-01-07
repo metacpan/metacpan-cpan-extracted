@@ -5,7 +5,7 @@
 
 #include "ppport.h"
 
-#include <base91.c>
+#include <base91-0.6.0/base91.c>
 
 typedef struct base91 {
 	struct basE91 b91;

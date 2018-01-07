@@ -26,16 +26,16 @@ produces output
     <moonshines> is not HTML5
 
 
-(This example is included as L<F<tagset-synopsis.pl>|https://api.metacpan.org/source/BKB/HTML-Valid-0.06/examples/tagset-synopsis.pl> in the distribution.)
+(This example is included as L<F<tagset-synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Valid-0.07/examples/tagset-synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents HTML::Valid::Tagset version 0.06
-corresponding to git commit L<453a1be0d5696738e405061f5ed1ad475b04c443|https://github.com/benkasminbullock/html-valid/commit/453a1be0d5696738e405061f5ed1ad475b04c443> released on Thu Mar 2 14:23:28 2017 +0900.
+This documents HTML::Valid::Tagset version 0.07
+corresponding to git commit L<9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab|https://github.com/benkasminbullock/html-valid/commit/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab> released on Sat Dec 30 13:41:36 2017 +0900.
 
 This Perl module is built on top of the L</HTML Tidy> library version
-5.4.0.
+5.6.0.
 
 
 =head1 DESCRIPTION
@@ -75,8 +75,9 @@ compatibility with HTML::Tagset refers to HTML::Tagset version 3.20.
 
 =head2 @allTags
 
-This contains all the tags as an array. The tags are sorted in
-order. It is exactly the same thing as the keys of L</%isKnown>.
+This contains all the HTML tags that this module knows of as an array
+sorted in alphabetical order. It is exactly the same thing as the keys
+of L</%isKnown>.
 
 This is only in HTML::Valid::Tagset, not in HTML::Tagset.
 
@@ -160,19 +161,22 @@ This is compatible with HTML::Tagset.
 
 =head2 %isHTML2
 
-This is true for elements which are in L</HTML 2.0>.
+This hashset is true for elements which are part of the L</HTML 2.0>
+standard.
 
 This is only in HTML::Valid::Tagset, not in HTML::Tagset.
 
 =head2 %isHTML3
 
-This is true for elements which are in L</HTML 3.2>.
+This hashset is true for elements which are part of the L</HTML 3.2>
+standard.
 
 This is only in HTML::Valid::Tagset, not in HTML::Tagset.
 
 =head2 %isHTML4
 
-This is true for elements which are in L</HTML 4.01>.
+This hashset is true for elements which are part of the L</HTML 4.01>
+standard.
 
 This is only in HTML::Valid::Tagset, not in HTML::Tagset.
 
@@ -203,8 +207,8 @@ outputs
     <plaintext> went out with scrambled eggs.
 
 
-This is true for elements which are valid in L</HTML5>. It is not
-true for obsolete elements like the <plaintext> tag (see
+This is true for elements which are valid HTML tags in L</HTML5>. It
+is not true for obsolete elements like the <plaintext> tag (see
 L</%isObsolete>), or proprietary elements such as the <blink> tag
 which have never been part of any HTML standard (see
 L</%isProprietary>). Further, some elements neither marked as obsolete
@@ -417,7 +421,7 @@ backwards compatibility. See also L</Issues with HTML::Tagset>.
 
 =head1 UNIMPLEMENTED
 
-The following parts of HTML::Tagset are not implemented in version 0.06 of HTML::Valid::Tagset.
+The following parts of HTML::Tagset are not implemented in version 0.07 of HTML::Valid::Tagset.
 
 =head2 %boolean_attr
 

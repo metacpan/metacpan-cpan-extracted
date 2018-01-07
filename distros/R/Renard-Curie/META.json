@@ -4,13 +4,13 @@
       "Project Renard"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Renard-Curie",
    "prereqs" : {
@@ -22,16 +22,17 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12"
          }
       },
       "runtime" : {
          "requires" : {
+            "Alien::MuPDF" : "0.010",
             "Bread::Board::Declare" : "0",
             "Cairo" : "0",
             "File::Basename" : "0",
@@ -47,6 +48,7 @@
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Base" : "0",
             "Log::Any::Adapter::Util" : "0",
+            "Modern::Perl" : "0",
             "Module::Util" : "0",
             "Moo" : "2.001001",
             "Moo::Role" : "0",
@@ -59,16 +61,25 @@
             "MooX::Struct" : "0",
             "Moose" : "0",
             "POSIX" : "0",
-            "Renard::Curie::Setup" : "0",
-            "Renard::Incunabula::Common::Error" : "0",
+            "Renard::Incunabula" : "0.004",
             "Renard::Incunabula::Common::Setup" : "0",
             "Renard::Incunabula::Common::Types" : "0",
+            "Renard::Incunabula::Document" : "0.004",
+            "Renard::Incunabula::Document::Types" : "0",
+            "Renard::Incunabula::Format::Cairo" : "0.004",
+            "Renard::Incunabula::Format::Cairo::Types" : "0",
+            "Renard::Incunabula::Format::PDF" : "0.004",
             "Renard::Incunabula::Format::PDF::Document" : "0",
+            "Renard::Incunabula::Format::PDF::InformationDictionary" : "0",
+            "Renard::Incunabula::Frontend::Gtk3" : "0.004",
             "Renard::Incunabula::Frontend::Gtk3::Helper" : "0",
+            "Renard::Incunabula::Frontend::Gtk3::Types" : "0",
+            "Renard::Incunabula::MuPDF::mutool" : "0.004",
             "Test::Deep::NoTest" : "0",
             "URI" : "0",
             "URI::file" : "0",
             "constant" : "0",
+            "custom::failures" : "0",
             "lib" : "0",
             "perl" : "5.012",
             "strict" : "0",
@@ -80,8 +91,9 @@
          "requires" : {
             "File::Temp" : "0",
             "Log::Any" : "0",
-            "Path::Tiny" : "0",
-            "Renard::Incunabula::Format::Cairo::ImageSurface::Document" : "0",
+            "Renard::Incunabula::Common::Error" : "0",
+            "Renard::Incunabula::Devel::TestHelper" : "0",
+            "Renard::Incunabula::Format::Cairo::Devel::TestHelper" : "0",
             "Renard::Incunabula::Outline" : "0",
             "Test::Exception" : "0.43",
             "Test::MockModule" : "0",
@@ -102,13 +114,13 @@
          "web" : "https://github.com/project-renard/curie"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Chirag <chiragghanshani@gmail.com>",
       "Helen Bach <haydeez.emma.roydz@gmail.com>",
       "Stanislav Yotov <yotov.st@gmail.com>",
       "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

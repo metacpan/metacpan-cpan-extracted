@@ -1,5 +1,8 @@
 Revision history for HTML-Latemp-GenMakeHelpers
 
+0.5.3   2017-12-29
+    - Remove the deps on the "unchanged" file. It was not needed.
+
 0.5.2   2017-12-25
     - Try to fix the $VERSION.
 

@@ -50,7 +50,7 @@ use LWP::Socket;
 
 use Moo;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 
 has 'ua' => (
@@ -166,7 +166,8 @@ sub get_token {
 
     return JSON::XS::decode_json( $self->demo ) if $self->demo;
 
-    $self->ua->default_header('Authorization' => "Basic " . encode_base64($self->client_id.':'.$self->client_secret) );
+    my $base64 = encode_base64($self->client_id.':'.$self->client_secret,"");
+    $self->ua->default_header('Authorization' => "Basic " . $base64 );
     $self->ua->default_header('Content-Type' => "application/x-www-form-urlencoded");
 
     my $post_params = {};

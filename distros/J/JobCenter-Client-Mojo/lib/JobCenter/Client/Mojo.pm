@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.30'; # VERSION
+our $VERSION = '0.31'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -82,7 +82,7 @@ sub new {
 			return;
 		}
 		my $ns = MojoX::NetstringStream->new(stream => $stream);
-		$self ->{ns} = $ns;
+		$self->{ns} = $ns;
 		my $conn = $rpc->newconnection(
 			owner => $self,
 			write => sub { $ns->write(@_) },
@@ -321,6 +321,33 @@ sub find_jobs {
 
 	return $err, @$jobs if ref $jobs eq 'ARRAY';
 	return $err;
+}
+
+sub get_api_status {
+	my ($self, $what) = @_;
+	croak('no what?') unless $what;
+
+	my $result;
+	Mojo::IOLoop->delay->steps(
+	sub {
+		my $d = shift;
+		$self->conn->call('get_api_status', { what => $what }, $d->begin(0));
+	},
+	sub {
+		#say 'call returned: ', Dumper(\@_);
+		my ($d, $e, $r) = @_;
+		if ($e) {
+			$self->log->debug("get_api_status got error $e");
+			$result = $e;
+			return;
+		}
+		$result = $r;
+	})->catch(sub {
+		my ($err) = @_;
+		$self->log->eror("something went wrong with get_api_status: $err");
+	})->wait();
+
+	return $result;
 }
 
 sub get_job_status {

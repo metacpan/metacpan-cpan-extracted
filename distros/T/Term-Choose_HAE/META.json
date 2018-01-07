@@ -4,7 +4,7 @@
       "Matthaeus Kiem <cuer2s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,7 +25,8 @@
             "File::Spec::Functions" : "0",
             "FindBin" : "0",
             "Test::Fatal" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "lib" : "0"
          }
       },
       "configure" : {
@@ -42,6 +43,8 @@
             "Term::Choose::Constants" : "1.505",
             "Term::Choose::LineFold" : "1.505",
             "Text::ANSI::WideUtil" : "0",
+            "if" : "0",
+            "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -56,6 +59,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose_HAE"
       }
    },
-   "version" : "0.051",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.052",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

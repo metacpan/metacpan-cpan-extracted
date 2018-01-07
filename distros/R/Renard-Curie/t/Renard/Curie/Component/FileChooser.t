@@ -4,6 +4,7 @@ use Test::Most tests => 2;
 
 use lib 't/lib';
 use CurieTestHelper;
+use Renard::Incunabula::Devel::TestHelper;
 
 use Renard::Incunabula::Common::Setup;
 use Renard::Incunabula::Frontend::Gtk3::Helper;
@@ -29,7 +30,7 @@ subtest 'Check that the open file dialog with filters is created' => sub {
 
 subtest "Menu: File -> Open" => sub {
 	my $pdf_ref_path = try {
-		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
 		plan skip_all => "$_";
 	};

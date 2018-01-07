@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::ConfirmProductInstanceResponse;
+$Net::Amazon::EC2::ConfirmProductInstanceResponse::VERSION = '0.35';
 use strict;
 use Moose;
 

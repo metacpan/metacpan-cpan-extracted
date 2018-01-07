@@ -20,6 +20,8 @@ Incunabula
 Project
 Renard
 Role
+SizeRequest
+Types
 UI
 UIFileFromPackageName
 lib

@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Class::Inspector" => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
     "JSON::PP" => "2.00",
@@ -35,11 +36,12 @@ my %WriteMakefileArgs = (
     "Test::Roo" => 0,
     "Time::Piece" => "1.16",
     "Time::Seconds" => 0,
+    "feature" => 0,
     "lib" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +49,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::Inspector" => 0,
   "Class::Unload" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,
@@ -61,6 +64,7 @@ my %FallbackPrereqs = (
   "Time::Piece" => "1.16",
   "Time::Seconds" => 0,
   "curry" => 0,
+  "feature" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,

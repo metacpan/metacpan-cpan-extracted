@@ -1,7 +1,7 @@
 #!perl
 
 package goauth;
-$goauth::VERSION = '0.02';
+$goauth::VERSION = '0.03';
 
 # ABSTRACT: CLI tool for easily getting of Google Mojo access tokens. Supports multiple users
 
@@ -84,7 +84,7 @@ goauth - CLI tool for easily getting of Google Mojo access tokens. Supports mult
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -5838,6 +5838,7 @@ lib/Google/Ads/Common/CaptchaRequiredError.pm
 lib/Google/Ads/Common/Constants.pm
 lib/Google/Ads/Common/ErrorUtils.pm
 lib/Google/Ads/Common/HTTPTransport.pm
+lib/Google/Ads/Common/LibXmlParser.pm
 lib/Google/Ads/Common/MapUtils.pm
 lib/Google/Ads/Common/MediaUtils.pm
 lib/Google/Ads/Common/OAuth2ApplicationsHandler.pm

@@ -37,7 +37,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Future" : "0.30",
+            "Class::Method::Modifiers" : "0",
+            "Future" : "0.37",
             "IO::Async" : "0",
             "List::Util" : "1.29",
             "Log::Any" : "1.050",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "1.003",
+   "version" : "1.005",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

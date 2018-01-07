@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -99,10 +99,10 @@ sub __wr_cell {
             for my $cl ( 0 .. $col - 1 ) {
                 my $i = $self->{rc2idx}[$row][$cl];
                 $lngth += $self->__print_columns( $self->{list}[$i] );
-                $lngth += $self->{pad_one_row};
+                $lngth += $self->{pad};
             }
         }
-        $self->__goto( $row - $self->{row_on_top}, $lngth );
+        $self->__goto( $row - $self->{p_begin}, $lngth );
         select $trapstdout;
         print BOLD_UNDERLINE if $self->{marked}[$row][$col];    # use escape sequences for Win32 too and translate them with Win32::Console::ANSI
         print REVERSE        if $is_current_pos;                # so Parse::ANSIColor::Tiny can take into account these highlightings
@@ -111,7 +111,7 @@ sub __wr_cell {
         $self->{i_col} += $self->__print_columns( $self->{list}[$idx] );
     }
     else {
-        $self->__goto( $row - $self->{row_on_top}, $col * $self->{col_width} );
+        $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
         select $trapstdout;
         print BOLD_UNDERLINE if $self->{marked}[$row][$col];
         print REVERSE        if $is_current_pos;
@@ -185,7 +185,7 @@ Term::Choose_HAE - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 0.051
+Version 0.052
 
 =cut
 
@@ -251,7 +251,8 @@ to mark the selected items in list context.
 
 =head1 OPTIONS
 
-C<Term::Choose_HAE> inherits the options from L<Term::Choose|Term::Choose/OPTIONS> and adds the option I<fill_up>:
+C<Term::Choose_HAE> inherits the options from L<Term::Choose|Term::Choose/OPTIONS> (except the option I<ll>) and adds
+the option I<fill_up>:
 
 =head2 fill_up
 
@@ -308,7 +309,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015-2016 Matthäus Kiem.
+Copyright (C) 2015-2018 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

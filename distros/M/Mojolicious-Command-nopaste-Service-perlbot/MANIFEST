@@ -11,6 +11,7 @@ lib/Mojolicious/Command/nopaste/Service/perlbot.pm
 perlcritic.rc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/01-paste.t
 xt/author/00-compile.t
 xt/author/critic.t
 xt/author/pod-syntax.t

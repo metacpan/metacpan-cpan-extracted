@@ -1,5 +1,21 @@
 Revision history for Net-Async-Redis
 
+1.005     2018-01-06 18:18:22+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependencies:
+
+    - Class::Method::Modifiers, and make sure we have a recent version of Future.pm
+
+1.004     2017-12-29 20:10:42+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Performance improvements:
+
+    - DISCARD/EXEC are now pipelined, we don't need to wait for the
+    write before sending more commands
+
+
 1.003     2017-12-26 18:00:36+08:00 Asia/Kuala_Lumpur
     New features:
 

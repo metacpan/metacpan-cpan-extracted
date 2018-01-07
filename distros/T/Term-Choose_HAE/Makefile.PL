@@ -31,12 +31,15 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Term/Choose_HAE.pm',
     EXE_FILES        => [],
     BUILD_REQUIRES   => {
+        'lib'                   => 0,
         'File::Spec::Functions' => 0,
         'FindBin'               => 0,
         'Test::More'            => 0,
         'Test::Fatal'           => 0,
     },
     PREREQ_PM => {
+        'if'                      => 0,
+        'parent'                  => 0,
         'strict'                  => 0,
         'warnings'                => 0,
         'Exporter'                => 0,

@@ -11733,14 +11733,14 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR ECOGEASRP06, CODE GENERATOR, ABSTRACT SYNTAX TO RPerl: C-style for() loop header variable mismatch, initial-condition variable '
+    ERROR ECOGEASRP06, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, VARIABLE-CHECKING MISMATCH: C-style for() loop header, initial-condition variable '
                 . q{'}
                 . $variable_symbol0 . q{'}
                 . ' is different than exit-condition variable ' . q{'}
                 . $variable_symbol1 . q{'}
                 . ', dying
 
-    ERROR ECOGEASCP06, CODE GENERATOR, ABSTRACT SYNTAX TO C++: C-style for() loop header variable mismatch, initial-condition variable ' . q{'}
+    ERROR ECOGEASCP06, CODE GENERATOR, ABSTRACT SYNTAX TO C++, VARIABLE-CHECKING MISMATCH: C-style for() loop header, initial-condition variable ' . q{'}
                 . $variable_symbol0 . q{'}
                 . ' is different than exit-condition variable ' . q{'}
                 . $variable_symbol1 . q{'}
@@ -11952,13 +11952,13 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR ECOGEASRP20, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: data type mismatch, ' . q{'}
+    ERROR ECOGEASRP20, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, TYPE-CHECKING MISMATCH: ' . q{'}
                             . $type . q{'}
                             . ' type is different than ' . q{'}
                             . $constructor_type . q{'}
                             . ' constructor type, dying
 
-    ERROR ECOGEASCP20, CODE GENERATOR, ABSTRACT SYNTAX TO C++: data type mismatch, ' . q{'}
+    ERROR ECOGEASCP20, CODE GENERATOR, ABSTRACT SYNTAX TO C++, TYPE-CHECKING MISMATCH: ' . q{'}
                             . $type . q{'}
                             . ' type is different than ' . q{'}
                             . $constructor_type . q{'}
@@ -11974,13 +11974,13 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
+    ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                 . $property_name . q{'}
                 . ' does not equal OO properties key ' . q{'}
                 . $property_key . q{'}
                 . ', dying
 
-    ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
+    ERROR ECOGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                 . $property_name . q{'}
                 . ' does not equal OO properties key ' . q{'}
                 . $property_key . q{'}
@@ -11996,13 +11996,13 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR ECOGEASRP22, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
+    ERROR ECOGEASRP22, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                     . $type_inner_name . q{'}
                     . ' does not end with OO properties or hash key ' . q{'}
                     . $key_name . q{'}
                     . ', dying
 
-    ERROR ECOGEASCP22, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
+    ERROR ECOGEASCP22, CODE GENERATOR, ABSTRACT SYNTAX TO C++, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                     . $type_inner_name . q{'}
                     . ' does not end with OO properties or hash key ' . q{'}
                     . $key_name . q{'}
@@ -12316,7 +12316,7 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR ECOGEPPRP20, CODE GENERATOR, PURE PERL TO RPERL: redundant name mismatch, inner type name ' . q{'}
+    ERROR ECOGEPPRP20, CODE GENERATOR, PURE PERL TO RPERL, NAME-CHECKING MISMATCH: redundant inner type name ' . q{'}
                     . $object_property_inner_type_name . q{'}
                     . ' does not equal OO properties key ' . q{'}
                     . $object_property_key . q{'}
@@ -15859,8 +15859,8 @@ RPerl currently supports the following array stringification subroutines, with s
 
 In Perl, we use the comma C<,> character to separate elements in a C<"list">, which may then be utilized either as the operands passed as input to an appropriate operation, or as the values stored inside an array data structure.  Thus, an array variable may be assigned the value of an enclosed list, but in RPerl the reverse is not true.  (Please see L</Section 3.7: Array Assignment> for more information.)
 
-    my                 @variable_storing_array_by_value     = ('list', 'enclosed', 'within', 'round',  'parentheses');  # fine in  Perl, error in RPerl, list assigned to stored-by-value     array
-    my string_arrayref $variable_storing_array_by_reference = ['list', 'enclosed', 'within', 'square', 'brackets'];     # fine in RPerl, fine  in RPerl, list assigned to stored-by-reference array
+    my                 @variable_storing_array_by_value     = ('list', 'enclosed', 'within', 'round',  'parentheses');  # fine in Perl, error in RPerl, list assigned to stored-by-value     array
+    my string_arrayref $variable_storing_array_by_reference = ['list', 'enclosed', 'within', 'square', 'brackets'];     # fine in Perl, fine  in RPerl, list assigned to stored-by-reference array
 
     my ($list, $of, $variables) = @variable_storing_array_by_value;      # fine  in Perl, error in RPerl, stored-by-value     array assigned to list
     my [$list, $of, $variables] = $variable_storing_array_by_reference;  # error in Perl, error in RPerl, stored-by-reference array assigned to list

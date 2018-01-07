@@ -23,7 +23,7 @@ do { my $x = {
                                       'Getopt::Long' => '0',
                                       'Mojo::Base' => '0',
                                       'Mojo::JSON' => '0',
-                                      'Mojolicious::Command::nopaste' => '0'
+                                      'Mojolicious::Command::nopaste' => '0.10'
                                     }
                     },
        'test' => {
@@ -33,6 +33,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Path::Tiny' => '0',
                                    'Test::More' => '0',
                                    'strict' => '0',
                                    'warnings' => '0'

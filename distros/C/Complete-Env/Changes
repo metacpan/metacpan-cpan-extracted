@@ -1,4 +1,7 @@
-Revision history for Complete-Env
+0.400   2017-12-31 (PERLANCAR)
+
+        - Handle path separator on Windows [RT#120969]. Thanks BAYMAX.
+
 
 0.39    2016-10-18 (PERLANCAR)
 

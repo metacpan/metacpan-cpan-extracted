@@ -1,0 +1,65 @@
+{
+   "abstract" : "Perl interface to the Amazon Elastic Compute Cloud (EC2) environment.",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Amazon-EC2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "overload" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-Amazon-EC2@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Amazon-EC2"
+      },
+      "homepage" : "https://metacpan.org/dist/Net-Amazon-EC2",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/net-amazon-ec2.git",
+         "web" : "https://github.com/mrallen1/net-amazon-ec2"
+      }
+   },
+   "version" : "0.35",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

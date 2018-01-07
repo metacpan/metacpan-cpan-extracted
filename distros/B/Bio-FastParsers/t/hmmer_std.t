@@ -19,9 +19,9 @@ check_iterations(
 
 check_info_and_targets(
     file('test', 'hmmer3.stdout'),
-        [ qw(Meredith169AA 6705) ],
+        [ 'Meredith169AA', 6705 ],
         [
-            [ qw(0 12909.9 47.3 0 4943.5 15.5), 3.0, qw(3 Abrocoma_bennettii), undef ],
+            [ 0, 12909.9, 47.3, 0, 4943.5, 15.5, 3.0, 3, 'Abrocoma_bennettii', undef ],
         ],
 );
 
@@ -29,20 +29,20 @@ check_domains(
     file('test', 'hmmer3.stdout'),
     [
         [
-            [ qw(3876.6 0) ],
-            [ qw(4102.0 0) ],
-            [ qw(4943.5 0) ],
+            [ 3876.6, 0 ],
+            [ 4102.0, 0 ],
+            [ 4943.5, 0 ],
         ],
     ],
 );
 
 check_info_and_targets(
     file('test', 'hmmer_short.stdout'),
-        [ qw(tmpfile_Qfco 6705) ],
+        [ 'tmpfile_Qfco', 6705 ],
         [
-            [ qw(0 12909.9 47.3 0 4943.5 15.5), 3.0, qw(3 Abrocoma_bennettii), undef ],
-            [ 0, 12562.0, qw(71.7 0 11808.5 45.4 2.8 2 Aepyprymnus_rufescens), undef ],
-            [ qw(0 12214.1 81.9 0 5245.2 11.3), 4.0, qw(4 Acrobates_pygmaeus), undef ],
+            [ 0, 12909.9, 47.3, 0, 4943.5,  15.5, 3.0, 3, 'Abrocoma_bennettii', undef ],
+            [ 0, 12562.0, 71.7, 0, 11808.5, 45.4, 2.8, 2, 'Aepyprymnus_rufescens', undef ],
+            [ 0, 12214.1, 81.9, 0, 5245.2,  11.3, 4.0, 4, 'Acrobates_pygmaeus', undef ],
         ],
 );
 
@@ -50,20 +50,20 @@ check_domains(
     file('test', 'hmmer_short.stdout'),
     [
         [
-            [ qw(3876.6 0) ],
-            [ qw(4102.0 0) ],
-            [ qw(4943.5 0) ],
+            [ 3876.6, 0 ],
+            [ 4102.0, 0 ],
+            [ 4943.5, 0 ],
         ],
         [
-            [ qw(757.3 3.1e-231) ],
-            [ qw(11808.5 0) ],
+            [ 757.3, 3.1e-231 ],
+            [ 11808.5, 0 ],
         ],
         [
-            [ qw(762.4 9.3e-233) ],
-            [ qw(1351.8 0) ],
-            [ qw(5245.2 0) ],
-            [ qw(4873.3 0) ],
-        ],
+            [ 762.4, 9.3e-233 ],
+            [ 1351.8, 0 ],
+            [ 5245.2, 0 ],
+            [ 4873.3, 0 ],
+        ],,
     ],
 );
 
@@ -86,17 +86,17 @@ check_scoreseq(
 
 check_info_and_targets(
     file('test', 'hmmer_description.stdout'),
-        [ qw(GNTPAN12210_noloxo 779) ],
+        [ 'GNTPAN12210_noloxo', 779 ],
         [
-            [ qw(0 1563.7 0 0 1563.4 0), 1.0, qw(1  L), 'oxodonta_africana@ENSLAFP00000006713_that is really long with strange stuff' ],
+            [ 0, 1563.7, 0, 0, 1563.4, 0, 1.0, 1, 'L', 'oxodonta_africana@ENSLAFP00000006713_that is really long with strange stuff' ],
         ],
 );
 
 check_info_and_targets(
     file('test', 'hmmer_domthresh.stdout'),
-        [ qw(tmpfile_IV_h_model 524) ],
+        [ 'tmpfile_IV_h_model', 524 ],
         [
-            [ qw(4.6e-05 9.6 21.6 0.014 1.4 21.6), 3.0, qw(0  Scoe_bact|CAB99155), undef ],
+            [ 4.6e-05, 9.6, 21.6, 0.014, 1.4, 21.6, 3.0, 0, 'Scoe_bact|CAB99155', undef ],
         ],
 );
 
@@ -139,11 +139,11 @@ sub check_info_and_targets {
         'got expected infos';
 
     my @target_attrs = qw(
-               evalue    score    bias
-            best_dom_evalue     best_dom_score  best_dom_bias
-                exp      dom
-            query_name          target_description
-        );
+        evalue score bias
+        best_dom_evalue best_dom_score best_dom_bias
+        exp dom
+        query_name target_description
+    );
 
     my $n = 0;
     while (my $target = $iteration->next_target) {
@@ -151,7 +151,7 @@ sub check_info_and_targets {
         isa_ok $target, $class . '::Target';
         cmp_deeply [ map { $target->$_ } @target_attrs ],
             shift @{ $exp_targets },
-            'got exp values for all methods for target-' . $n++
+            'got expected values for all methods for target-' . $n++
         ;
     }
 
@@ -183,7 +183,7 @@ sub check_domains {
             isa_ok $domain, $class . '::Domain';
             cmp_deeply [ map { $domain->$_ } @dom_attrs ],
                 shift @{ $exp_target },
-                'got exp values for all methods for domain-'
+                'got expected values for all methods for domain-'
                     . $n++ .' in ' . $target->name
             ;
         }

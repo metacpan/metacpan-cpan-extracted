@@ -1,0 +1,43 @@
+---
+abstract: 'Bible Gateway content conversion to Open Bible Markup Language (OBML)'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Moose: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  constant: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bible-OBML-Gateway
+requires:
+  Bible::OBML: '0'
+  Bible::Reference: '1.02'
+  Mojo::DOM: '0'
+  Mojo::File: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Moose: '0'
+  MooseX::Privacy: '0'
+  Throwable: '0'
+  Try::Tiny: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Bible-OBML-Gateway/issues
+  homepage: https://github.com/gryphonshafer/Bible-OBML-Gateway
+  repository: https://github.com/gryphonshafer/Bible-OBML-Gateway.git
+version: '1.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -87,3 +87,4 @@ t/30_slaymake.t
 t/Common.smak
 t/runtests.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

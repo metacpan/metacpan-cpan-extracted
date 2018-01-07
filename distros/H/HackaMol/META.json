@@ -23,7 +23,6 @@
          "requires" : {
             "Capture::Tiny" : "0.28",
             "Cwd" : "0.0",
-            "File::Slurp" : "0.00",
             "HTTP::Tiny" : "0.070",
             "JSON::XS" : "3.01",
             "List::MoreUtils" : "0.410",
@@ -50,14 +49,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/demianriccardi/HackaMol",
+      "homepage" : "https://github.com/demianriccardi/p5-HackaMol",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/demianriccardi/HackaMol.git",
-         "web" : "https://github.com/demianriccardi/HackaMol"
+         "url" : "https://github.com/demianriccardi/p5-HackaMol.git",
+         "web" : "https://github.com/demianriccardi/p5-HackaMol"
       }
    },
-   "version" : "0.046",
+   "version" : "0.047",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

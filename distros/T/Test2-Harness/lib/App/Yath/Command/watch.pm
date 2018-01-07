@@ -2,7 +2,7 @@ package App::Yath::Command::watch;
 use strict;
 use warnings;
 
-our $VERSION = '0.001043';
+our $VERSION = '0.001045';
 
 use Time::HiRes qw/sleep/;
 
@@ -104,6 +104,18 @@ Exit after showing what yath thinks your options mean
 =item --help
 
 Exit after showing this help message
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=item -V
+
+=item --version
+
+Show version information
 
 =back
 

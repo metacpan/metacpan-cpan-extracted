@@ -20,5 +20,5 @@ requires:
 resources:
   bugtracker: https://github.com/sdondley/Dancer2-Plugin-JSManager/issues
   repository: git://github.com/sdondley/Dancer2-Plugin-JSManager.git
-version: '0.011'
+version: '0.013'
 x_serialization_backend: 'YAML::Tiny version 1.70'

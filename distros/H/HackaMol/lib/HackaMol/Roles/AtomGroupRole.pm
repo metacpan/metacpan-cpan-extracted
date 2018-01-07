@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.046';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.047';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -49,6 +49,13 @@ has 'qcat_print' => (
     isa     => 'Bool',
     lazy    => 1,
     default => 0,
+);
+
+has 'info' => (
+	is  => 'rw',
+	isa => 'Str',
+	lazy => 1,
+    default   => "",
 );
 
 sub dipole {
@@ -429,7 +436,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Moo::Google::Util;
-$Moo::Google::Util::VERSION = '0.02';
+$Moo::Google::Util::VERSION = '0.03';
 
 # ABSTRACT: Portable functions
 
@@ -77,7 +77,7 @@ Moo::Google::Util - Portable functions
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 METHODS
 

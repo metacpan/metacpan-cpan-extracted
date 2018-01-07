@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000008
+version 1.000010
 
 # SYNOPSIS
 
@@ -76,6 +76,15 @@ you can configure one or more alternative namespaces by setting the git config
 key `submit-work.question-namespaces`. This should be a space-separated list
 of namespaces under which questions can live.
 
+# REQUESTER NAME IN PULL REQUESTS
+
+By default, the name of the PT story's requester will be included in the pull
+request text. This is helpful if you relay your project's PRs to Slack, as the
+requester can get alerted when their name is used.
+
+If you want to disable this, set the git config key
+`submit-work.include-requester-name-in-pr` to `0`.
+
 # COMMAND LINE OPTIONS
 
 This tool accepts the following options:
@@ -143,12 +152,11 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 - Greg Oschwald <goschwald@maxmind.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Mark Fowler <mfowler@maxmind.com>
-- Patrick Cronin <PatrickCronin@users.noreply.github.com>
 - Patrick Cronin <pcronin@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MaxMind, Inc.
+This software is Copyright (c) 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -1,3 +1,9 @@
+0.45 2018-01-04
+
+- Provisional support for png_set_compression_level removed
+- Documentation of two undocumented functions and a bug
+- Documentation of pnginspect
+
 0.44 2017-06-28
 
 - Revert back to old method of detecting libpng, discard Devel::CheckLib

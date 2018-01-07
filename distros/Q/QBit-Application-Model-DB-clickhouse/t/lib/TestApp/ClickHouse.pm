@@ -14,7 +14,7 @@ __PACKAGE__->meta(
                 {name => 'f_uint32', type => 'UInt32',},
                 {name => 'f_enum',   type => 'Enum8', values => ['one', 'two']},
             ],
-            engine => {MergeTree => ['f_date', [',' => ['f_date', 'f_uint8']], \8192]}
+            engine => {MergeTree => ['f_date', {'' => ['f_date', 'f_uint8']}, \8192]}
         },
     },
 );

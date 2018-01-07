@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQL - SPARQL Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQL version 0.017
+This document describes AtteanX::Serializer::SPARQL version 0.018
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Serializer::SPARQL version 0.017
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQL 0.017 {
+package AtteanX::Serializer::SPARQL 0.018 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
@@ -246,7 +246,7 @@ L<IO::Handle> object C<< $fh >>.
 		return;
 	}
 	
-=item C<< serialize_iter_to_bytes( $fh, $iterator ) >>
+=item C<< serialize_iter_to_bytes( $iterator ) >>
 
 Serializes the SPARQL token objects from C<< $iterator >>
 and returns the serialization as a UTF-8 encoded byte string.
@@ -281,7 +281,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams. This
+Copyright (c) 2014--2018 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

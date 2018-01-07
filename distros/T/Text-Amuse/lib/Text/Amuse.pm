@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.94
+Version 0.95
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 
 =head1 SYNOPSIS
@@ -592,9 +592,11 @@ sub hyphenation {
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 
 The updated manual can be found at
-L<http://www.amusewiki.org/library/manual> and is also present between
-the test files (C<t/testfiles/manual.muse>), even if is just seldom
-updated.
+L<http://www.amusewiki.org/library/manual> or
+L<https://github.com/melmothx/amusewiki-site/blob/master/m/ml/manual.muse>
+
+See the section "Differences between Text::Amuse and Emacs Muse".
+
 
 =head3 Inline markup
 

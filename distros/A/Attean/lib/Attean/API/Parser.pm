@@ -7,7 +7,7 @@ Attean::API::Parser - Parser role
 
 =head1 VERSION
 
-This document describes Attean::API::Parser version 0.017
+This document describes Attean::API::Parser version 0.018
 
 =head1 DESCRIPTION
 
@@ -52,9 +52,10 @@ parsing.
 
 use Type::Tiny::Role;
 
-package Attean::API::Parser 0.017 {
-	use Moo::Role;
+package Attean::API::Parser 0.018 {
 	use Types::Standard qw(CodeRef Bool);
+
+	use Moo::Role;
 	use namespace::clean;
 	
 	has 'handler' => (is => 'rw', isa => CodeRef, default => sub { sub {} });
@@ -88,19 +89,19 @@ C<lazy_iris> attribute.
 	}
 }
 
-package Attean::API::AbbreviatingParser 0.017 {
-	use Moo::Role;
+package Attean::API::AbbreviatingParser 0.018 {
 	use Types::Standard qw(ConsumerOf InstanceOf Maybe);
 	use URI::NamespaceMap;
 	use Scalar::Util qw(blessed);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	with 'Attean::API::Parser';
 	has 'base' 		=> (is => 'rw', isa => ConsumerOf['Attean::API::IRI'], coerce => sub { blessed($_[0]) ? Attean::IRI->new($_[0]->as_string) : Attean::IRI->new($_[0]) }, predicate => 'has_base');
 	has 'namespaces'	=> (is => 'ro', isa => Maybe[InstanceOf['URI::NamespaceMap']]);
 }
 
-package Attean::API::PushParser 0.017 {
+package Attean::API::PushParser 0.018 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 
@@ -164,7 +165,7 @@ package Attean::API::PushParser 0.017 {
 	}
 }
 
-package Attean::API::PullParser 0.017 {
+package Attean::API::PullParser 0.018 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 	
@@ -206,7 +207,7 @@ package Attean::API::PullParser 0.017 {
 	}
 }
 
-package Attean::API::AtOnceParser 0.017 {
+package Attean::API::AtOnceParser 0.018 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 	
@@ -267,7 +268,7 @@ package Attean::API::AtOnceParser 0.017 {
 	
 }
 
-package Attean::API::TermParser 0.017 {
+package Attean::API::TermParser 0.018 {
 	# Parser returns objects that conform to Attean::API::Term
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -277,7 +278,7 @@ package Attean::API::TermParser 0.017 {
 	}
 }
 
-package Attean::API::TripleParser 0.017 {
+package Attean::API::TripleParser 0.018 {
 	# Parser returns objects that conform to Attean::API::Triple
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -287,7 +288,7 @@ package Attean::API::TripleParser 0.017 {
 	}
 }
 
-package Attean::API::QuadParser 0.017 {
+package Attean::API::QuadParser 0.018 {
 	# Parser returns objects that conform to Attean::API::Quad
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -297,7 +298,7 @@ package Attean::API::QuadParser 0.017 {
 	}
 }
 
-package Attean::API::MixedStatementParser 0.017 {
+package Attean::API::MixedStatementParser 0.018 {
 	# Parser returns objects that conform to either Attean::API::Triple or Attean::API::Quad
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -307,7 +308,7 @@ package Attean::API::MixedStatementParser 0.017 {
 	}
 }
 
-package Attean::API::ResultOrTermParser 0.017 {
+package Attean::API::ResultOrTermParser 0.018 {
 	# Parser returns objects that conform to either Attean::API::Result or Attean::API::Term
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -317,7 +318,7 @@ package Attean::API::ResultOrTermParser 0.017 {
 	}
 }
 
-package Attean::API::ResultParser 0.017 {
+package Attean::API::ResultParser 0.018 {
 	# Parser returns objects that conform to Attean::API::Result
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -348,7 +349,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

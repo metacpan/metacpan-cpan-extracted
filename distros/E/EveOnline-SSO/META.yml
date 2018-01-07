@@ -3,18 +3,18 @@ abstract: 'Module for Single Sign On in EveOnline API-services.'
 author:
   - 'Andrey Kuzmin <chipsoid@cpan.org>'
 build_requires:
-  HTTP::Request: '0'
-  JSON::XS: '0'
-  Test::Differences: '0'
-  Test::More: '0.98'
+  HTTP::Request: 0
+  JSON::XS: 0
+  Test::Differences: 0
+  Test::More: 0.98
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build::Tiny: 0.035
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: EveOnline-SSO
 no_index:
   directory:
@@ -29,25 +29,25 @@ no_index:
 provides:
   EveOnline::SSO:
     file: lib/EveOnline/SSO.pm
-    version: '0.02'
+    version: 0.03
   EveOnline::SSO::Client:
     file: lib/EveOnline/SSO/Client.pm
 requires:
-  JSON::XS: '0'
-  LWP::Socket: '0'
-  LWP::UserAgent: '0'
-  MIME::Base64: '0'
-  Modern::Perl: '0'
-  Moo: '0'
-  Storable: '0'
-  URI::Escape: '0'
-  URI::URL: '0'
-  perl: '5.008001'
+  JSON::XS: 0
+  LWP::Socket: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Modern::Perl: 0
+  Moo: 0
+  Storable: 0
+  URI::Escape: 0
+  URI::URL: 0
+  perl: 5.008001
 resources:
   bugtracker: https://github.com/Chipsoid/EveOnline-SSO/issues
   homepage: https://github.com/Chipsoid/EveOnline-SSO
   repository: git://github.com/Chipsoid/EveOnline-SSO.git
-version: '0.02'
+version: 0.03
 x_authority: cpan:CHIPSOID
 x_contributors:
-  - 'Andrey Kuzmin <chips@reg.ru>'
+  - 'Андрей Кузьмин <chips@reg.ru>'

@@ -1,3 +1,28 @@
+0.010 2018-01-04 20:40:51-0600
+  - Expand the download regex so that x.y.z versions match. This change was
+    introduced with MuPDF v1.12.0.
+
+    Fixes <https://rt.cpan.org/Public/Bug/Display.html?id=123916>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/39>. Thanks to
+    SREZIC++ for the bug report. See
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/40>.
+
+  - Change headers so that that MuPDF can link against Strawberry Perl using
+    Inline::C. See
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/30>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/44>.
+
+  - Apply patch so that MuPDF v1.12.0 can be built under MinGW toolchain
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/43>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/44>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/45>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/46>.
+
+  - Disable X11 and GLUT features so that GUI features are not built when they
+    do not need to be. See
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/41>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/42>.
+
 0.009 2017-05-14 21:09:35-0500
   - Fix macOS ranlib call in mupdf-1.11.
     See bug #697842 <https://bugs.ghostscript.com/show_bug.cgi?id=697842>.

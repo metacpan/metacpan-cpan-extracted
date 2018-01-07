@@ -21,9 +21,10 @@ no_index:
     - inc
 requires:
   File::Temp: '0'
+  perl: '5.010001'
 resources:
   IRC: irc://chat.freenode.net/#amusewiki
   WebIRC: https://webchat.freenode.net/?channels=#amusewiki
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse
-version: '0.94'
+version: '0.95'

@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::DescribeSubnetResponse;
+$Net::Amazon::EC2::DescribeSubnetResponse::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

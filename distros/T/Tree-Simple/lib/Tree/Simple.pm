@@ -3,7 +3,7 @@ package Tree::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 use Scalar::Util qw(blessed);
 
@@ -469,12 +469,12 @@ sub traverse {
     (ref($post) eq "CODE") || die "Incorrect Object Type : post traversal function is not a function"
         if defined($post);
     foreach my $child ($self->getAllChildren()) {
-        my $ret = $func->($child);
+        my $ret = $func->($child) || '';
 
         # Propagate up the stack.
         return $ret if 'ABORT' eq $ret;
 
-        $ret = $child->traverse($func, $post);
+        $ret = $child->traverse($func, $post) || '';
         return $ret if 'ABORT' eq $ret;
 
         defined($post) && $post->($child);

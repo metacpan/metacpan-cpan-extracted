@@ -94,7 +94,6 @@ test/AhHMA4.acc
 test/AhHMA4.ali
 test/AhHMA4.bb
 test/AhHMA4.bit
-test/AhHMA4.blastp
 test/AhHMA4_5.idl
 test/AhHMA4_5.lis
 test/AhHMA4_5_filtered.ali

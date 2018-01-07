@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -18,8 +18,7 @@ use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 use Term::Choose::Util     qw( term_size insert_sep unicode_sprintf );
 use Term::ProgressBar      qw();
 
-use constant CLEAR_SCREEN => "\e[H\e[J";
-
+use constant CLEAR_SCREEN => "\e[H\e[J"; #
 
 
 sub new {
@@ -193,7 +192,7 @@ sub print_table {
     }
     $self->{binray_regexp} = qr/[\x00-\x08\x0B-\x0C\x0E-\x1F]/;
     if ( $self->{progress_bar} ) {
-        print 'Computing: ...' . "\n";
+#        print 'Computing: ...' . "\n";
         $self->{show_progress} = int @$a_ref * @{$a_ref->[0]} / $self->{progress_bar};
     }
     $self->__calc_col_width( $a_ref );
@@ -204,6 +203,7 @@ sub print_table {
             $self->{$key} = $backup_opt->{$key};
         }
     }
+
 }
 
 
@@ -236,16 +236,14 @@ sub __inner_print_tbl {
     if ( length $self->{prompt} ) {
         @header = ( $self->{prompt} );
     }
-    #if ( @$list > 1 ) {
-        if ( $self->{keep_header} ) {
-            my $col_names = shift @$list;
-            push @header, $col_names;
-            push @header, $header_sep if $self->{grid};
-        }
-        else {
-            splice( @$list, 1, 0, $header_sep ) if $self->{grid};
-        }
-    #}
+    if ( $self->{keep_header} ) {
+        my $col_names = shift @$list;
+        push @header, $col_names;
+        push @header, $header_sep if $self->{grid};
+    }
+    else {
+        splice( @$list, 1, 0, $header_sep ) if $self->{grid};
+    }
     my $prompt = join( "\n", @header );
     my $old_row = 0;
     my $auto_jumped_to_first_row = 2;
@@ -255,6 +253,14 @@ sub __inner_print_tbl {
         if ( ( term_size() )[0] != $width ) {
             ( $width ) = term_size();
             $self->__inner_print_tbl( $a_ref );
+            return;
+        }
+        if ( ( $self->{keep_header} && ! @$list ) || ( @$list == 1 ) ) {
+            # Choose
+            choose(
+                [ undef, @{$a_ref->[0]} ],
+                { prompt => 'EMPTY table!', layout => 0, clear_screen => 1, mouse => $self->{mouse}, undef => '<<' }
+            );
             return;
         }
         # Choose
@@ -589,7 +595,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.055
+Version 0.056
 
 =cut
 
@@ -913,7 +919,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Matthäus Kiem.
+Copyright 2013-2018 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

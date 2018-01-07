@@ -7,7 +7,7 @@ Attean::API::Binding - Name to term bindings
 
 =head1 VERSION
 
-This document describes Attean::API::Binding version 0.017
+This document describes Attean::API::Binding version 0.018
 
 =head1 DESCRIPTION
 
@@ -71,11 +71,11 @@ otherwise.
 
 use Type::Tiny::Role;
 
-package Attean::API::Binding 0.017 {
-	use Moo::Role;
+package Attean::API::Binding 0.018 {
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(zip);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	requires 'value';
 	requires 'variables';
@@ -173,14 +173,14 @@ C<< $binding >>.
 	}
 }
 
-package Attean::API::TripleOrQuadPattern 0.017 {
+package Attean::API::TripleOrQuadPattern 0.018 {
 	use Encode qw(encode);
 	use List::MoreUtils qw(zip);
 	use Scalar::Util qw(blessed);
 	use Attean::RDF;
 	use Attean::API::Query;
+
 	use Moo::Role;
-	use namespace::clean;
 
 	with 'Attean::API::SPARQLSerializable';
 	
@@ -279,10 +279,12 @@ parsed from C<< $string >> in SPARQL syntax.
 	}
 }
 
-package Attean::API::TripleOrQuad 0.017 {
-	use Moo::Role;
+package Attean::API::TripleOrQuad 0.018 {
 	use List::MoreUtils qw(any);
 	use Carp;
+
+	use Moo::Role;
+
 	with 'Attean::API::TripleOrQuadPattern';
 
 	sub BUILD {
@@ -293,11 +295,12 @@ package Attean::API::TripleOrQuad 0.017 {
 	}
 }
 
-package Attean::API::TriplePattern 0.017 {
+package Attean::API::TriplePattern 0.018 {
 	use Moo::Role;
 	use List::MoreUtils qw(zip);
 	use Scalar::Util qw(blessed);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	sub variables { return qw(subject predicate object) }
 
@@ -345,7 +348,7 @@ package Attean::API::TriplePattern 0.017 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Triple 0.017 {
+package Attean::API::Triple 0.018 {
 	use Moo::Role;
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -380,11 +383,11 @@ package Attean::API::Triple 0.017 {
 	with 'Attean::API::TriplePattern', 'Attean::API::TripleOrQuad', 'Attean::API::Binding';
 }
 
-package Attean::API::QuadPattern 0.017 {
+package Attean::API::QuadPattern 0.018 {
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(zip);
+
 	use Moo::Role;
-	use namespace::clean;
 	
 	sub variables { return qw(subject predicate object graph) }
 	sub value {
@@ -437,7 +440,7 @@ package Attean::API::QuadPattern 0.017 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Quad 0.017 {
+package Attean::API::Quad 0.018 {
 	use Moo::Role;
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -464,11 +467,11 @@ package Attean::API::Quad 0.017 {
 }
 
 
-package Attean::API::Result 0.017 {
-	use Moo::Role;
+package Attean::API::Result 0.018 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(HashRef);
-	use namespace::clean;
+
+	use Moo::Role;
 	
 	has 'eval_stash' => (is => 'rw', isa => HashRef);
 
@@ -573,7 +576,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams.
+Copyright (c) 2014--2018 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

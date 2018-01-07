@@ -1,3 +1,9 @@
+libqbit-application-model-db-clickhouse-perl (0.006) raring; urgency=low
+
+  * fixed: cycle and documentations
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 07 Jan 2018 13:17:19 +0300
+
 libqbit-application-model-db-clickhouse-perl (0.005) raring; urgency=low
 
   * move sub into base class

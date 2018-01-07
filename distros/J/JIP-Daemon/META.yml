@@ -6,6 +6,8 @@ build_requires:
   Capture::Tiny: '0'
   Carp: '0'
   English: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Mock::Quick: '0'
   Test::More: '0'
 configure_requires:
@@ -24,7 +26,12 @@ no_index:
 requires:
   Carp: '0'
   English: '0'
-  JIP::ClassField: '0.03'
+  File::Spec: '0'
+  JIP::ClassField: '0.05'
   POSIX: '0'
   perl: '5.006'
-version: '0.03'
+resources:
+  bugtracker: https://github.com/outtaspace/jip_daemon/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/outtaspace/jip_daemon.git
+version: '0.041'

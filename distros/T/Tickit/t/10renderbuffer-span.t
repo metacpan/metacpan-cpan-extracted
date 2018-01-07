@@ -117,7 +117,7 @@ is( $rb->cols,  20, '$rb->cols' );
                  GOTO(1,4), SETPEN(), PRINT("AB") ],
                'RenderBuffer correctly converts SvIV' );
 
-   is( $count, 2, 'FETCH called only twice' );
+   cmp_ok( $count, "<=", 2, 'FETCH called no more than twice' );
 }
 
 # Span splitting

@@ -233,19 +233,18 @@ perldoc command.
 
 You can also look for information at:
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-Bacovia
+* MetaCPAN
+  - https://metacpan.org/pod/Math::Bacovia
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Math-Bacovia
+* AnnoCPAN, Annotated CPAN documentation
+  - http://annocpan.org/dist/Math-Bacovia
 
-    Search CPAN
-        http://search.cpan.org/dist/Math-Bacovia/
-
+* CPAN Ratings
+  - http://cpanratings.perl.org/d/Math-Bacovia
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Daniel Șuteu
+Copyright (C) 2017-2018 Daniel Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

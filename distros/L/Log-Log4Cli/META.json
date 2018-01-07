@@ -23,7 +23,6 @@
       "build" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "Term::ANSIColor" : "0",
             "Test::More" : "0"
          }
       },
@@ -34,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Term::ANSIColor" : "0",
             "parent" : "0",
             "perl" : "5.008",
@@ -48,5 +48,5 @@
          "url" : "https://github.com/mr-mixas/Log-Log4Cli.pm"
       }
    },
-   "version" : "0.19"
+   "version" : "0.20"
 }

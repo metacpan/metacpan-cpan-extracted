@@ -1,0 +1,275 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[pam-krb5][software]
+
+\h1[pam-krb5]
+
+\quote[
+
+    "You're always going to have some people who can't appreciate the
+    thrill of a tepid change for the somewhat better," explained one
+    source.
+
+][Joyce McGreevy]["Look, ma, no hands!", \cite[Salon], 2003-11-17]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[pam-krb5][pam-krb5]
+        [kerberos/pam-krb5-\version[pam-krb5]]
+
+    \link[https://packages.debian.org/source/sid/libpam-krb5]
+         [Debian packages] \break
+    \link[https://archives.eyrie.org/software/ARCHIVE/pam-krb5/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[pam-krb5.html][Manual page]
+
+    \h2[Security Advisories]
+
+    \link[security/2009-02-11.html]
+        [2009-02-11]: pam-krb5 3.12 and earlier\break
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/pam-krb5]
+         [GitHub] \break
+    \link[https://github.com/rra/pam-krb5/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=kerberos/pam-krb5.git]
+         [Git repository] \break
+    \link[https://www.openhub.net/p/pamkrb5]
+         [Open HUB code analysis] \break
+    \link[https://tracker.debian.org/pkg/libpam-krb5]
+         [Debian package tracker]
+]
+
+\h2[Blurb]
+
+pam-krb5 is a Kerberos PAM module for either MIT Kerberos or Heimdal.  It
+supports ticket refreshing by screen savers, configurable authorization
+handling, authentication of non-local accounts for network services,
+password changing, and password expiration, as well as all the standard
+expected PAM features.  It works correctly with OpenSSH, even with
+ChallengeResponseAuthentication and PrivilegeSeparation enabled, and
+supports extensive configuration either by PAM options or in krb5.conf or
+both.  PKINIT is supported with recent versions of both MIT Kerberos and
+Heimdal and FAST is supported with recent MIT Kerberos.
+
+\h2[Description]
+
+pam-krb5 provides a Kerberos PAM module that supports authentication, user
+ticket cache handling, simple authorization (via .k5login or checking
+Kerberos principals against local usernames), and password changing.  It
+can be configured through either options in the PAM configuration itself
+or through entries in the system krb5.conf file, and it tries to work
+around PAM implementation flaws in commonly-used PAM-enabled applications
+such as OpenSSH and xdm.  It supports both PKINIT and FAST to the extent
+that the underlying Kerberos libraries support these features.
+
+This is not the Kerberos PAM module maintained on Sourceforge and used on
+Red Hat systems.  It is an independent implementation that, if it ever
+shared any common code, diverged long ago.  It supports some features that
+the Sourceforge module does not (particularly around authorization), and
+does not support some options (particularly ones not directly related to
+Kerberos) that it does.  This module will never support Kerberos v4 or
+AFS.  For an AFS session module that works with this module (or any other
+Kerberos PAM module), see
+\link[https://www.eyrie.org/~eagle/software/pam-afs-session/][pam-afs-session].
+
+If there are other options besides AFS and Kerberos v4 support from the
+Sourceforge PAM module that you're missing in this module, please let me
+know.
+
+\h2[Requirements]
+
+Either MIT Kerberos (or Kerberos implementations based on it) or Heimdal
+are supported.  MIT Keberos 1.3 or later may be required; this module has
+not been tested with earlier versions.
+
+For PKINIT support, Heimdal 0.8rc1 or later or MIT Kerberos 1.6.3 or later
+are required.  Earlier MIT Kerberos 1.6 releases have a bug in their
+handling of PKINIT options.
+
+For FAST (Flexible Authentication Secure Tunneling) support, MIT Kerberos
+1.7 or higher is required.  For anonymous FAST support, anonymous
+authentication (generally anonymous PKINIT) support is required in both
+the Kerberos libraries and in the local KDC.
+
+This module should work on Linux and Solaris (and build with gcc, clang,
+or the Sun C compiler), but has been far more heavily tested on Linux.
+There is beta-quality support for the AIX NAS Kerberos implementation.
+Other PAM implementations will probably require some porting, although
+untested build system support is present for FreeBSD, Mac OS X, and HP-UX.
+I personally can only test on Linux and rely on others to report problems
+on other operating systems.
+
+Old versions of OpenSSH are known to call \code[pam_authenticate] followed
+by \code[pam_setcred(PAM_REINITIALIZE_CRED)] without first calling
+\code[pam_open_session], thereby requesting that an existing ticket cache
+be renewed (similar to what a screensaver would want) rather than
+requesting a new ticket cache be created.  Since this behavior is
+indistinguishable at the PAM level from a screensaver, pam-krb5 when used
+with these old versions of OpenSSH will refresh the ticket cache of the
+OpenSSH daemon rather than setting up a new ticket cache for the user.
+The resulting ticket cache will have the correct permissions (this is not
+a security concern), but will not be named correctly or referenced in the
+user's environment and will be overwritten by the next user login.  The
+best solution to this problem is to upgrade OpenSSH.  I'm not sure exactly
+when this problem was fixed, but at the very least OpenSSH 4.3 and later
+do not exhibit it.
+
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake 1.11 or later.  For
+bootstrap or if you change configure.ac or any of the m4 files it includes
+and need to regenerate configure or config.h.in, you will need Autoconf
+2.64 or later.  Perl is also required to generate manual pages from a
+fresh Git checkout.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[pam-krb5][pam-krb5]
+        [kerberos/pam-krb5-\version[pam-krb5]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/pam-krb5/] [archive
+of older releases] is also available.  \class(alert)[Versions older than
+3.13 have known security vulnerabilities and should not be used.]
+
+Debian packages are available from Debian in Debian 4.0 (etch) and later
+releases as libpam-krb5 and libpam-heimdal.  The former packages are built
+against the MIT Kerberos libraries and the latter against the Heimdal
+libraries.  See the
+\link[https://tracker.debian.org/pkg/libpam-krb5][Debian package tracker]
+for more information.
+
+pam-krb5 is maintained using the Git version control system.  To check out
+the current development tree, see
+\link[https://github.com/rra/pam-krb5][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/kerberos/pam-krb5.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=kerberos/pam-krb5.git][browse the current
+development source].
+
+\h2[Documentation]
+
+User documentation:
+
+\doc[readme.html][README]
+\doc[news.html][Change summary]
+\doc[pam-krb5.html][Manual page]
+\doc[license.html][License and copyright]
+
+Security advisories:
+
+\doc[security/2009-02-11.html]
+    [2009-02-11: 3.12 and earlier]
+
+Developer documentation:
+
+\doc[todo.html][To-do list]
+\doc[https://github.com/rra/pam-krb5]
+    [GitHub]
+\doc[https://github.com/rra/pam-krb5/issues]
+    [Bug tracker]
+\doc[https://www.openhub.net/p/pamkrb5]
+    [Open HUB code analysis]
+
+\h2[License]
+
+The pam-krb5 package as a whole is covered by the following copyright and
+license:
+
+\block[
+
+    Copyright 2005-2010, 2014-2015, 2017
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2009-2011
+        The Board of Trustees of the Leland Stanford Junior University
+
+    Copyright 2005
+        Andres Salomon <dilinger@debian.org>
+
+    Copyright 1999-2000
+        Frank Cusack <fcusack@fcusack.com>
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    \number[
+
+       Redistributions of source code must retain the above copyright
+       notice, and the entire permission notice in its entirety, including
+       the disclaimer of warranties.
+
+    ]
+
+    \number[
+
+       Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+    ]
+
+    \number[
+
+       The name of the author may not be used to endorse or promote products
+       derived from this software without specific prior written permission.
+
+    ]
+
+    ALTERNATIVELY, this product may be distributed under the terms of the
+    GNU General Public License, in which case the provisions of the GPL
+    are required INSTEAD OF the above restrictions.  (This clause is
+    necessary due to a potential bad interaction between the GPL and the
+    restrictions contained in a BSD-style copyright.)
+
+    THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+    BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+    OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+    USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the pam-krb5 source distribution.
+
+\signature

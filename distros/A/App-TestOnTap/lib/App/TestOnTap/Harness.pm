@@ -24,6 +24,7 @@ sub new
 									{
 										formatter => __getFormatter($args),
 										jobs => $args->getJobs(),
+										merge => $args->getMerge(),
 										callbacks => { after_test => $args->getWorkDirManager()->getResultCollector() },
 										'exec' => __getExecMapper($args),
 										scheduler_class => 'App::TestOnTap::Scheduler'

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our (%ERROR, $caller);
 BEGIN {
@@ -21,7 +21,10 @@ sub import {
 	my ($pkg, $sub) = shift;
 	return unless my @export = @_;
 	my $opts = ref $export[scalar @export - 1] ? pop @export : {};
+	
+	$ERROR{no_error} = 1 if $opts->{return_undef};
 	%ERROR = (%ERROR, %{ $opts->{errors} }) if $opts->{errors};
+
 	@export = qw/lnpath/ if scalar @export == 1 && $export[0] eq 'all';
 	$caller = scalar caller();
 	{
@@ -34,7 +37,11 @@ sub import {
 
 sub lnpath {
 	my ($data, $key) = @_;
-	return _extract_path('', 0, $data, split '/', _unescape($key));
+	my $val = eval { _extract_path('', 0, $data, split '/', _unescape($key)) };
+	if ($@) {
+		die $@ unless ($ERROR{no_error});
+	}	
+	return $val;
 }
 
 sub _unescape {
@@ -51,17 +58,17 @@ sub _extract_path {
 		my ($key, $ref) = (shift @path, ref $data);
 		$follow = sprintf "%s/%s", $follow, $key;
 		if ($ref eq 'HASH') {
-			$data = $data->{$key}
-				or _error('invalid_key', $key, $follow);
+			$data = $data->{$key};
+			_error('invalid_key', $key, $follow) if ! defined $data;
 		} 
 		elsif ( $ref eq 'ARRAY' ) {
-			$data = $data->[$key - 1] 
-				or _error('invalid_index', $key, $follow);
+			$data = $data->[$key - 1];
+			_error('invalid_index', $key, $follow) if ! defined $data;
 		} 
 		elsif ( $ref && blessed $data ) {
 			my ($meth, $params) = _meth_params($key, $data);
-			$data = $data->$meth(@{ $params })
-				or _error('invalid_method', $key, $follow);
+			$data = $data->$meth(@{ $params });
+			_error('invalid_method', $key, $follow) if ! defined $data;
 		} 
 		else {
 			_error('invalid_path', $key, $follow) if (exists $ERROR{invalid_path});
@@ -121,7 +128,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

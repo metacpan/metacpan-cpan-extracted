@@ -22,8 +22,9 @@ Commandline options and arguments understood for TestOnTap processing
     [ { --skip || --include } <query> ]
     [ --jobs <n> ]
     [ --order <strategy> ]
-    [ --timer ]
-    [ --no-harness ]
+    [ --timer || --no-timer ]
+    [ --harness || --no-harness ]
+    [ --merge || --no-merge ]
     [ --configuration <cfgfile> || --cfg <cfgfile> ]
     [ --archive ]
     [ --savedirectory <path> ]
@@ -136,6 +137,8 @@ The path must not exist beforehand.
 
 For details of the work directory, see the L<manual regarding 'persisted results'|App::TestOnTap/"PERSISTED RESULT">.
 
+NOTE: by using this flag, the C<--merge> option is automatically turned on.
+
 =item B<--skip E<lt>queryE<gt>> or B<--include E<lt>queryE<gt>> 
 
 Note: the --skip and --include flags are mutually exclusive - simply choose the one that is
@@ -201,15 +204,17 @@ This will explicitly shuffle the order randomly.
 
 =back
 
-=item B<--timer>
+=item B<--timer>, B<--no-timer>
 
-This turns on the display of timing information for tests when running.
+Using C<--timer> turns on the display of timing information for tests when running.
 
 Note that the information is always present in persisted results, this just controls the display when running a suite. 
 
-=item B<--no-harness>
+=item B<--harness>, B<--no-harness>
 
-This turns on a special mode where tests are run with no capture and parsing of
+By default test output is handled by a test harness.
+
+Using C<--no-harness> turns on a special mode where tests are run with no capture and parsing of
 output. Printouts go directly to stdout/err, and stdin is active.
 
 This can be convenient to directly see the TAP (or other) output which can be handy
@@ -241,6 +246,20 @@ for example C<--verbose>, C<--jobs>, C<--timer>. Also, the work directory
 will miss most of the data normally seen, such as TAP output, aggregated
 test results etc. 
 
+=item B<--merge>, B<--no-merge>
+
+By default, writes to stderr in tests are passed directly through to the console (but see below).
+
+However, as STDERR is unbuffered, this tends to make the console look very ugly and
+the output are only marginally in sync with the ordinary harness output.
+
+Using C<--merge> makes the harness merge stdout and stderr as one, which makes them
+synchronized. However, the output is no longer visible unless C<--verbose> is used.
+
+If any of the options C<--archive>, C<--savedirectory> or C<--workdirectory> are given, merging
+is turned on, in order to force the output to the result 'tap' files. If this is not desired,
+use C<--no-merge> explicitly.
+
 =item B<--configuration E<lt>cfgfileE<gt>> (or B<--cfg ...>)
 
 By default, the test suite is required to have a configuration file (even if it's empty).
@@ -267,6 +286,8 @@ Giving only C<--savedirectory some/path>, the result archive will be a regular s
 directory some/path (the directory may or may not exist beforehand).
 
 For details of saved results, see the L<manual regarding 'persisted results'|App::TestOnTap/"PERSISTED RESULT">.
+
+NOTE: by using either of these flags, the C<--merge> option is automatically turned on.
 
 =item B<--define E<lt>keyE<gt>=E<lt>valueE<gt>>
 

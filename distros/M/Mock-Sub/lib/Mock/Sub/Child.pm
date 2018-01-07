@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(confess);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 sub new {
     my $self = bless {}, shift;
@@ -109,13 +109,16 @@ sub _mock {
                 }
             }
 
-            if (defined $mock->{return}[0]){
+            return if ! defined $mock->{return};
+
+            if ($mock->{return}[0] && $mock->{return}[0] eq 'params'){
+                return ! wantarray ? $_[0] : @_;
+            }
+            else {
                 return ! wantarray && @{ $mock->{return} } == 1
                     ? $mock->{return}[0]
                     : @{ $mock->{return} };
             }
-
-            return ! wantarray ? $_[0] : @_;
         };
     }
     $self->{state} = 1;

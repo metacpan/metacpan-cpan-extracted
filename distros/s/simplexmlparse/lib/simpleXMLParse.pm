@@ -2,13 +2,14 @@ package simpleXMLParse;
 
 # Perl Module: simpleXMLParse
 # Author: Daniel Edward Graham
-# Copyright (c) Daniel Edward Graham 2008-2015
-# Date: 4/06/2015 
+# Copyright (c) Daniel Edward Graham 2008-2018
+# Date: 01/01/2018
 # License: LGPL 3.0
 # 
 
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use Data::Dumper;
 @ISA = qw(Exporter);
 
 # This allows declaration	use simpleXMLParse ':all';
@@ -24,13 +25,13 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 	
 );
 
-$VERSION = '3.0';
+$VERSION = '3.1';
 
 use Carp;
 use strict;
 no warnings;
 
-use open ':encoding(utf8)';
+#use open ':encoding(utf8)';
 
 my @cdata;
 my $cdataInd = 0;
@@ -46,10 +47,34 @@ sub new {
     my $self = {};
     $self->{"xml"}  = undef;
     $self->{"data"} = undef;
-    open( INFILE, "$fn" ) or croak "Unable to process [$fn]\n";
-    $self->{"xml"} = join '', <INFILE>;
+    open (INFILE1, "$fn") or croak "Unable to process [$fn] $! \n";
+    binmode(INFILE1);
+    my ($c1, $c2, $c3);
+    read(INFILE1, $c1, 1);
+    read(INFILE1, $c2, 1);
+    read(INFILE1, $c3, 1);
+    close(INFILE1);
+    if (($c1 eq "\xFE" && $c2 eq "\xFF") || ($c1 eq "\xFF" && $c2 eq "\xFE")) {
+        # UTF-16
+        open(INFILE, '<:encoding(UTF-16)', "$fn") or croak "Unable to process [$fn] $!\n";
+        $self->{"xml"} = join '', <INFILE>;
+    } else {
+	if ($c1 eq "\xEF" && $c2 eq "\xBB" && $c3 eq "\xBF") {
+	    # UTF-8 with BOM...
+            open(INFILE, '<:encoding(UTF-8)', "$fn") or croak "Unable to process [$fn] $!\n";
+            my $str = join '', <INFILE>;
+#	    $str =~ s/^\xEF\xBB\xBF//g;
+	    $str =~ s/^\x{fffe}//g;
+	    $str =~ s/^\x{feff}//g;
+            $self->{"xml"} = $str;
+	 } else {
+	    # UTF-8 with NO BOM
+            open(INFILE, '<:encoding(UTF-8)', "$fn") or croak "Unable to process [$fn] $!\n";
+            $self->{"xml"} = join '', <INFILE>;
+	  }
+       }
     close(INFILE);
-    $self->{"data"} = _ParseXML( $self->{"xml"} );
+    $self->{"data"} = _ParseXML( $self->{"xml"}, $altstyle );
     my $ret = bless $self;
     if ($altstyle) {
         $ret->_convertToStyle();
@@ -72,6 +97,8 @@ sub _convertToStyle {
             foreach my $j (keys %$i) {
                 if ($j =~ /^(.*?)\_(.*?)\_([0-9]+)\_attr$/) {
                     my ($attrnm, $tagnm, $cnt) = ($1, $2, $3);
+                    $attrnm =~ s/0x0/_/gs;
+                    $tagnm =~ s/0x0/_/gs;
                     my $n = undef;
                     if (ref($i->{$tagnm}) eq "ARRAY") {
                         my $hold;
@@ -79,7 +106,7 @@ sub _convertToStyle {
                             $hold = $i->{$tagnm}->[$cnt];
                             $i->{$tagnm}->[$cnt] = { };
                             if ($hold !~ /^\s*$/ ) {
-                                $i->{$tagnm}->[$cnt]->{VALUE} = $hold;
+                                $i->{$tagnm}->[$cnt]->{content} = $hold;
                             }
                         }      
                         while (defined($i->{$tagnm}->[$cnt]->{$attrnm.$n})) {
@@ -98,7 +125,7 @@ sub _convertToStyle {
                              $hold = $i->{$tagnm};
                              $i->{$tagnm} = { };
                              if ($hold !~ /^\s*$/) {
-                                 $i->{$tagnm}->{VALUE} = $hold;
+                                 $i->{$tagnm}->{content} = $hold;
                              }
                              $i->{$tagnm}->{$attrnm} = $i->{$j};
                          }
@@ -151,6 +178,12 @@ sub _unescp {
     return $firsttag;
 }
 
+sub hconv {
+    my $arg = $_[0];
+    my $p = pack "H*", $arg;
+    return $p;
+}
+
 sub _entity {
     my $text = shift;
     $text =~ s/\&lt\;/\</g;
@@ -158,11 +191,12 @@ sub _entity {
     $text =~ s/\&amp\;/\&/g;
     $text =~ s/\&apos\;/\'/g;
     $text =~ s/\&quot\;/\"/g;
+    $text =~ s/\&\#x([0-9a-fA-F]+)\;/&hconv($1)/ge;
     return $text;
 }
 
 sub _ParseXML {
-    my ($xml) = @_;
+    my ($xml, $altstyle) = @_;
 #    $xml =~ s/\n//g;
     $xml =~ s/\<\!\[CDATA\[(.*?)\]\]\>/&_cdatasub($1)/egs;
     $xml =~ s/\<\!\-\-.*?\-\-\>//gs;
@@ -206,12 +240,17 @@ sub _ParseXML {
         $attr = $1;
         $innerxml = "";
         $xmlfragment = $2;
+        $attr =~ s/\/\>$//gs;
       } else {
         if (!ref($xml)) {
             $xml = _entity($xml);
             $xml =~ s/0x0CDATA0x0(\d+?)0x0/&_cdatasubout($1)/egs;
         }
-        return $xml;
+        if ($xml eq '') {
+            return {};
+        } else {
+            return $xml;
+        }
       }
     }
     my $ixml = $innerxml;
@@ -227,7 +266,7 @@ sub _ParseXML {
             die "Invalid XML innerxml: $innerxml\nixml: $ixml\nxmlfragment: $xmlfragment\n";
         }
     }        
-    my $nextparse = _ParseXML($innerxml);
+    my $nextparse = _ParseXML($innerxml, $altstyle);
     $rethash->{&_unescp($firsttag)} = $nextparse;
     my @attrarr;
     while ( $attr =~ s/^[\s\n]*([^\s\=\n]+)\s*\=\s*(\".*?\"|\'.*?\')(.*)$/$3/gs ) {
@@ -239,7 +278,12 @@ sub _ParseXML {
     }
     my $attrcnt = 0;
     while ( my $val = shift(@attrarr) ) {
-        $rethash->{ "$val" . "_".&_unescp(${firsttag})."_" . $attrcnt . "_attr" } = shift(@attrarr);
+        my ($val1, $firsttag1) = ($val, $firsttag);
+        if ($altstyle) {
+            $val1 =~ s/_/0x0/gs;
+            $firsttag1 =~ s/_/0x0/gs;
+        }
+        $rethash->{ "$val1" . "_".&_unescp(${firsttag1})."_" . $attrcnt . "_attr" } = shift(@attrarr);
     }
     my $retflag = 0;
     my ( $xmlfragment1, $xmlfragment2 );
@@ -271,19 +315,27 @@ sub _ParseXML {
             last;
           }
         }
+        $attr =~ s/\/\>$//gs;
         $attr =~ s/\>$//gs;
         my %opening = ( );
         my %closing = ( );
         my $frag = $xmlfragment1;
-        while ($frag =~ /^(.*?)\<([^\s\n\/]+)[^\/]*?\>(.*)$/s) {
+        while ($frag =~ /^(.*?)\<([^\s\n\/\>]+)(\>|[\s\n]\>|[\s\n][^\>]*[^\/]\>)(.*)$/s) {
             my $tg = $2;
-            $frag = $3;
+            $frag = $4;
             $opening{$tg}++;
         }
         my $frag = $xmlfragment1;
-        while ($frag =~ /^(.*?)\<\/([^\s\n]+)\>(.*)$/s) {
+        while ($frag =~ /^(.*?)\<\/([^\s\n\>]+)[\s\n]*\>(.*)$/s) {
             my $tg = $2;
             $frag = $3;
+            $closing{$tg}++;
+        }
+        my $frag = $xmlfragment1;
+        while ($frag =~ /^(.*?)\<([^\s\n\/\>]+)[^\>]*?\/\>(.*)$/s) {
+            my $tg = $2;
+            $frag = $3;
+            $opening{$tg}++;
             $closing{$tg}++;
         }
         my $flag = 0;
@@ -317,17 +369,26 @@ sub _ParseXML {
             push @attrarr, _entity($val);
         }
         while ( my $val = shift(@attrarr) ) {
-                $rethash->{ "$val" . "_".&_unescp(${firsttag})."_" . $attrcnt . "_attr" } = shift(@attrarr);
+            my ($val1, $firsttag1) = ($val, $firsttag);
+            if ($altstyle) {
+                $val1 =~ s/_/0x0/gs;
+                $firsttag1 =~ s/_/0x0/gs;
+            }
+            $rethash->{ "$val1" . "_".&_unescp(${firsttag1})."_" . $attrcnt . "_attr" } = shift(@attrarr);
         }
         $attrcnt++;
-        $nextparse    = _ParseXML($innerxml);
+        $nextparse    = _ParseXML($innerxml, $altstyle);
         push @retarr, $nextparse;
     }
     if (@retarr) {
-        $rethash->{_unescp($firsttag)} = \@retarr;
+        if (@retarr == 1) {
+            $rethash->{_unescp($firsttag)} = $retarr[0];
+        } else {
+            $rethash->{_unescp($firsttag)} = \@retarr;
+        }
     }
     $xmlfragment =~ s/${firsttag}0x0/${firsttag}/gs;
-    my $remainderparse = _ParseXML($xmlfragment);
+    my $remainderparse = _ParseXML($xmlfragment, $altstyle);
     my $attrcnt;
     my $attrfrag;
     if ( ref($remainderparse) eq "HASH" ) {
@@ -339,7 +400,8 @@ sub _ParseXML {
         return $rethash;
     }
     else {
-        return undef;
+#        return undef;
+        return {};
     }
 }
 
@@ -373,7 +435,7 @@ simpleXMLParse - Perl extension for pure perl XML parsing
 
 =head1 AUTHOR
 
-Daniel Graham, E<lt>dgraham@firstteamsoft.com<gt>
+Daniel Graham, E<lt>daniel@firstteamsoft.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

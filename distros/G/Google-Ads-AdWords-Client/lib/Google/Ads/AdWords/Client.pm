@@ -16,7 +16,7 @@ package Google::Ads::AdWords::Client;
 
 use strict;
 use version;
-our $VERSION = qv("4.18.0");
+our $VERSION = qv("5.0.0");
 
 use Google::Ads::AdWords::Constants;
 use Google::Ads::AdWords::Deserializer;
@@ -48,6 +48,10 @@ my %validate_only_of : ATTR(:name<validate_only> :default<0>);
 my %partial_failure_of : ATTR(:name<partial_failure> :default<0>);
 my %reporting_config_of : ATTR(:name<reporting_config> :default<>);
 my %include_utilities_of : ATTR(:name<include_utilities> :default<>);
+# Hisorically, the SOAP XML library was XML::XPath. Due to performance issues
+# and bugs, the new SOAP XML library is XML::LibXML. This will be removed
+# after the new library proves itself.
+my %soap_legacy_of : ATTR(:name<soap_legacy> :default<0>);
 
 my %properties_file_of : ATTR(:init_arg<properties_file> :default<>);
 my %services_of : ATTR(:name<services> :default<{}>);
@@ -91,6 +95,7 @@ sub START {
     $partial_failure_of{$ident} ||= $properties{partialFailure};
     $include_utilities_of{$ident} ||=
       $properties{"header.userAgent.includeUtilities"};
+    $soap_legacy_of{$ident} ||= $properties{"soap.legacy"};
 
     # Construct the ReportingConfiguration.
     $reporting_config_of{$ident} ||=
@@ -118,6 +123,7 @@ sub START {
     Google::Ads::AdWords::Reports::ReportingConfiguration->new();
   $include_utilities_of{$ident} = 1
     unless defined $include_utilities_of{$ident};
+  $soap_legacy_of{$ident} ||= 0;
 
   # Setup of auth handlers
   my %auth_handlers = ();

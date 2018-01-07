@@ -156,3 +156,29 @@ Revision history for Perl module ActiveRecord::Simple
         * Fixed error messages
         * Different fixes
 
+0.95    2017-09-22
+        + Method "sql_fetch_all"
+        + Method "sql_fetch_row"
+
+0.96    2017-09-25
+        + Method "all"
+        + Mixins now can get $class
+        + Added class Meta.pm, access via method "META" in ARS::Model
+        * Improved relations
+        * Fixed "auto_load" behavior
+
+0.97    2017-10-13
+        - Method "fields"
+        - Classes
+        - SQL::Traslator things
+
+1.00    2018-XX-XX
+        * New faster accessors
+        * Improved tests
+        * Updated sandbox
+        + New option "make_columns_accessors"
+        - script/mars
+        - "abstract" method
+        - "select" method
+        * Improved documentation
+

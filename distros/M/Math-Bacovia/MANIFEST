@@ -5,10 +5,10 @@ examples/binomial_theorem.pl
 examples/faulhaber_s_formula.pl
 examples/faulhaber_s_formula_2.pl
 examples/generalized_fibonacci.pl
-examples/hyperbolic_simplifications.pl
 examples/log_factorial_asymptotic.pl
 examples/quadratic_polynomials_zeros.pl
 examples/summation.pl
+examples/trigonometric_function_simplifications.pl
 examples/zeta_2n.pl
 lib/Math/Bacovia.pm
 lib/Math/Bacovia.pod

@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "DateTime::TimeZone" => "2.02",
     "Dist::CheckConflicts" => "0.02",
     "POSIX" => 0,
-    "Params::ValidationCompiler" => "0.13",
+    "Params::ValidationCompiler" => "0.26",
     "Scalar::Util" => 0,
     "Specio" => "0.18",
     "Specio::Declare" => 0,
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => "0.005",
     "utf8" => 0
   },
-  "VERSION" => "1.44",
+  "VERSION" => "1.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +71,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "POSIX" => 0,
-  "Params::ValidationCompiler" => "0.13",
+  "Params::ValidationCompiler" => "0.26",
   "Scalar::Util" => 0,
   "Specio" => "0.18",
   "Specio::Declare" => 0,

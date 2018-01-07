@@ -239,7 +239,7 @@ my $options = [
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ', page => 0, pad => 3, order => 1,
       justify => 2, keep => 8, clear_screen => 1 },
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ' x 100, page => 0, pad => 3, order => 1,
-      justify => 2, keep => 8, clear_screen => 1, pad_one_row => 4 },
+      justify => 2, keep => 8, clear_screen => 1 },
     { prompt => 'abc 12345678 def' x 50, default => 10, empty =>' ', undef => '--', beep => 1,
       no_spacebar => [ 11 .. 2000 ], lf => [ 0, 4 ], keep => 16 },
     { max_height => 20, max_width => 60, layout => 0, mark => [ 0, 10, 100 ] },
@@ -435,14 +435,6 @@ my $option_ll = [
     },
 ];
 
-my $pad_one_row = [
-    {
-        list      => [ qw( 1 The black cat this_is_a_long_word climbed the green tree ) ],
-        used_keys => [ qw( END LEFT SPACE LEFT LEFT LEFT ENTER ) ],
-        expected  => "<this_is_a_long_word green>",
-        options   => { prompt => 'one_row', default => 3, pad_one_row => 3 }
-    },
-];
 
 sub return_test_data {
     my $type = shift;
@@ -452,7 +444,6 @@ sub return_test_data {
     elsif ( $type eq 'long'        ) { return $long; }
     elsif ( $type eq 'short'       ) { return $short; }
     elsif ( $type eq 'option_ll'   ) { return $option_ll; }
-    elsif ( $type eq 'pad_one_row' ) { return $pad_one_row; }
 
 }
 

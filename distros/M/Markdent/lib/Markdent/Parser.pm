@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
@@ -92,7 +92,7 @@ sub BUILD {
         grep {defined}
         map  { $_->init_arg() }
         $self->_span_parser_class()->meta()->get_all_attributes()
-        ) {
+    ) {
 
         $sp_args{$key} = $args->{$key}
             if exists $args->{$key};
@@ -107,7 +107,7 @@ sub BUILD {
         grep {defined}
         map  { $_->init_arg() }
         $self->_block_parser_class()->meta()->get_all_attributes()
-        ) {
+    ) {
 
         $bp_args{$key} = $args->{$key}
             if exists $args->{$key};
@@ -247,7 +247,7 @@ Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

@@ -99,7 +99,6 @@ lib/Plack/Test/Suite.pm
 lib/Plack/Util.pm
 lib/Plack/Util/Accessor.pm
 script/plackup
-share/#foo
 share/baybridge.jpg
 share/face.jpg
 t/HTTP-Message-PSGI/content_length.t

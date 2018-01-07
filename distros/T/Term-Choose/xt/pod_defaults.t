@@ -5,7 +5,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Test::More;
 
 
-my @long = ( qw( pad pad_one_row empty undef ll default max_height max_width lf keep no_spacebar mark ) );
+my @long = ( qw( pad empty undef ll default max_height max_width lf keep no_spacebar mark ) );
 my @simple = ( qw( justify layout order clear_screen page mouse beep hide_cursor index ) ); # prompt
 my @all = ( @long, @simple );
 my @deprecated = ( qw() );
@@ -63,24 +63,14 @@ for my $key ( @simple ) {
 
 for my $key ( @long ) {
     next if $key ~~ @deprecated;
-    if ( $key eq 'pad_one_row' ) {
-        for my $line ( @{$pod{$key}} ) {
-            if ( $line =~ /default:\s([^)]+)\)/ ) {
-                $pod_default{$key} = $1;
-                last;
-            }
+    for my $line ( @{$pod{$key}} ) {
+        if ( $line =~ /default:\s["']([^'"]+)["'](?:\)|\s*)/ ) {
+            $pod_default{$key} = $1;
+            last;
         }
-    }
-    else {
-        for my $line ( @{$pod{$key}} ) {
-            if ( $line =~ /default:\s["']([^'"]+)["'](?:\)|\s*)/ ) {
-                $pod_default{$key} = $1;
-                last;
-            }
-            if ( $line =~ /default:\s(\w+)(?:\)|\s*)/ ) {
-                $pod_default{$key} = $1;
-                last;
-            }
+        if ( $line =~ /default:\s(\w+)(?:\)|\s*)/ ) {
+            $pod_default{$key} = $1;
+            last;
         }
     }
 }
@@ -92,14 +82,5 @@ is( scalar keys %pod_default, scalar keys %option_default, 'scalar keys %pod_def
 
 for my $key ( sort keys %option_default ) {
     next if $key ~~ @deprecated;
-    if ( $key eq 'pad_one_row' ) {
-        my $por = 0;
-        if ( $pod_default{$key} eq 'value of the option I<pad>' ) {
-            $por = 1;
-        }
-        is( $por, '1', "option $key: default value in pod OK" );
-    }
-    else {
-        is( $option_default{$key}, $pod_default{$key}, "option $key: default value in pod matches default value in code" );
-    }
+    is( $option_default{$key}, $pod_default{$key}, "option $key: default value in pod matches default value in code" );
 }

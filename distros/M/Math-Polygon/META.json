@@ -1,5 +1,5 @@
 {
-   "abstract" : "Polygon calculations",
+   "abstract" : "basic polygon calculations",
    "author" : [
       "Mark Overmeer"
    ],
@@ -39,5 +39,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.07"
+   "version" : "1.10"
 }

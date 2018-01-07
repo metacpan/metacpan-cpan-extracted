@@ -2,9 +2,11 @@
 native:
   debian:
     packages:
+      - cmake
       - libjpeg-dev
   macos-homebrew:
     packages:
+      - cmake
       - pkg-config
       - cairo
       - fontconfig
@@ -20,4 +22,6 @@ native:
       #- openjpeg
   msys2-mingw64:
     packages:
+      - mingw-w64-x86_64-cmake
       - mingw-w64-x86_64-libjpeg-turbo
+      - mingw-w64-x86_64-freetype

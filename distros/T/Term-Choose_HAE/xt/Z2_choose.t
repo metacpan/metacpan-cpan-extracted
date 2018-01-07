@@ -65,7 +65,7 @@ my $key = Z_Data_Test_Choose::key_seq();
     }
 }
 
-my @types = ( qw( long short option_ll pad_one_row ) );
+my @types = ( qw( long short ) );
 my $rows = 24;
 my $cols = 80;
 

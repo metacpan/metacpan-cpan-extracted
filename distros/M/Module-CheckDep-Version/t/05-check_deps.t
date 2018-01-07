@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
+use Hook::Output::Tiny;
 use Module::CheckDep::Version qw(check_deps);
 use Test::More;
 
@@ -40,7 +41,12 @@ use constant AUTH => 'STEVEB';
 
 { # module
 
-    my $ret = check_deps(AUTH, module => 'RPi::WiringPi', return => 1);
+    my $ret = check_deps(
+        AUTH,
+        module => 'Test::Module::CheckDep::Version',
+        return => 1
+    );
+
     is ref $ret, 'HASH', "returns ok";
     is keys %$ret, 1, "with module param, only one result returned ok";
 }
@@ -71,6 +77,35 @@ use constant AUTH => 'STEVEB';
 
         is $exc < $inc, 1, "ignore_any => 0 ok";
 }    
+
+{ # _display
+
+    my $hook = Hook::Output::Tiny->new;
+
+    my $ret = check_deps(
+        'STEVEB',
+        module => 'Test::Module::CheckDep::Version',
+        return => 1
+    );
+
+    $hook->hook('stdout');
+
+    Module::CheckDep::Version::_display($ret);
+
+    $hook->unhook;
+
+    my @output = $hook->stdout;
+
+    like
+        $output[0],
+        qr/Test-Module-CheckDep-Version/,
+        "output to STDOUT has dist name ok";
+
+    like
+        $output[1],
+        qr/Mock::Sub/,
+        "output to STDOUT has the lower version prereq ok";
+}
 
 sub handler {
     my $data = shift;

@@ -15,8 +15,8 @@ my $store = MyComics->new;
 is_deeply [ sort $store->model_names ], [ 'Comic' ], "all_models";
 is_deeply [ sort $store->model_classes ], [ 'MyComics::Model::Comic' ], "all_model_classes";
 
-my $db = 't/db/comics.sqlite';
-unlink $db;   # to start fresh
+my $db = ":memory:";
+#unlink $db;   # to start fresh
 
 $store = MyComics->connect( $db );
 
@@ -35,8 +35,9 @@ $store->create( 'Comic',
     series => 'One Bloody Year',
 )->store;
 
-ok $store->exists( Comic => 'One Bloody Year-1' ), 'OBY';
-ok $store->exists( Comic => 'Terra Obscura-2' ), 'TO';
+# TODO order of the keys
+ok $store->exists( Comic => '1-One Bloody Year' ), 'OBY';
+ok $store->exists( Comic => '2-Terra Obscura' ), 'TO';
 
 is_deeply [ sort { $a->[0] cmp $b->[0] } MyComics::Model::Comic->indexes ] 
     => [ [ 'penciler'], ['writer'] ], 'indexes';

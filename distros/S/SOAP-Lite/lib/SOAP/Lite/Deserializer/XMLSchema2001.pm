@@ -2,7 +2,7 @@ package SOAP::Lite::Deserializer::XMLSchema2001;
 
 use strict;
 
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use SOAP::Lite::Deserializer::XMLSchema1999;
 use SOAP::Lite::Deserializer::XMLSchemaSOAP1_1;

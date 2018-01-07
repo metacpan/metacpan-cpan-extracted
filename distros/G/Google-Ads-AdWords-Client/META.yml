@@ -23,25 +23,25 @@ name: Google-Ads-AdWords-Client
 provides:
   Google::Ads::AdWords::Client:
     file: lib/Google/Ads/AdWords/Client.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Constants:
     file: lib/Google/Ads/AdWords/Constants.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Deserializer:
     file: lib/Google/Ads/AdWords/Deserializer.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::FaultDetail:
     file: lib/Google/Ads/AdWords/FaultDetail.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Logging:
     file: lib/Google/Ads/AdWords/Logging.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/AdWords/OAuth2ApplicationsHandler.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::OAuth2ServiceAccountsHandler:
     file: lib/Google/Ads/AdWords/OAuth2ServiceAccountsHandler.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Reports::DateRange:
     file: lib/Google/Ads/AdWords/Reports/DateRange.pm
     version: 0
@@ -71,7 +71,7 @@ provides:
     version: 0
   Google::Ads::AdWords::Reports::ReportingConfiguration:
     file: lib/Google/Ads/AdWords/Reports/ReportingConfiguration.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Reports::Selector:
     file: lib/Google/Ads/AdWords/Reports/Selector.pm
     version: 0
@@ -83,7 +83,7 @@ provides:
     version: 0
   Google::Ads::AdWords::Serializer:
     file: lib/Google/Ads/AdWords/Serializer.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::Utilities::BatchJobHandler:
     file: lib/Google/Ads/AdWords/Utilities/BatchJobHandler.pm
     version: v3.4.0
@@ -95,7 +95,7 @@ provides:
     version: v3.4.0
   Google::Ads::AdWords::Utilities::PageProcessor:
     file: lib/Google/Ads/AdWords/Utilities/PageProcessor.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::AdWords::v201702::AccessReason:
     file: lib/Google/Ads/AdWords/v201702/AccessReason.pm
     version: 0
@@ -16488,6 +16488,9 @@ provides:
   Google::Ads::Common::HTTPTransport:
     file: lib/Google/Ads/Common/HTTPTransport.pm
     version: v3.4.0
+  Google::Ads::Common::LibXmlParser:
+    file: lib/Google/Ads/Common/LibXmlParser.pm
+    version: v3.4.0
   Google::Ads::Common::MapUtils:
     file: lib/Google/Ads/Common/MapUtils.pm
     version: v3.4.0
@@ -16511,13 +16514,13 @@ provides:
     version: v3.4.0
   Google::Ads::Common::ReportDownloadHandler:
     file: lib/Google/Ads/Common/ReportDownloadHandler.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::Common::ReportUtils:
     file: lib/Google/Ads/Common/ReportUtils.pm
     version: v3.4.0
   Google::Ads::Common::Utilities::AdsUtilityRegistry:
     file: lib/Google/Ads/Common/Utilities/AdsUtilityRegistry.pm
-    version: v4.18.0
+    version: v5.0.0
   Google::Ads::Common::XPathSAXParser:
     file: lib/Google/Ads/Common/XPathSAXParser.pm
     version: v3.4.0
@@ -16560,9 +16563,10 @@ requires:
   SOAP::WSDL: 2.000010
   Template: 0
   URI::Escape: 0
+  XML::LibXML: 0
   XML::Simple: 0
   XML::XPath: 0
   perl: v5.14.0
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v4.18.0
+version: v5.0.0

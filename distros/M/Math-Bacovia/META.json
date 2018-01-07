@@ -37,7 +37,7 @@
    "provides" : {
       "Math::Bacovia" : {
          "file" : "lib/Math/Bacovia.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Math::Bacovia::Difference" : {
          "file" : "lib/Math/Bacovia/Difference.pm"
@@ -69,10 +69,17 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/Math-Bacovia/issues"
+      },
+      "homepage" : "https://github.com/trizen/Math-Bacovia",
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/Math-Bacovia"
+      }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

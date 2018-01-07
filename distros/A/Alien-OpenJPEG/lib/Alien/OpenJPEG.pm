@@ -1,10 +1,13 @@
 package Alien::OpenJPEG;
 # ABSTRACT: Alien package for the OpenJPEG library
-$Alien::OpenJPEG::VERSION = '0.001';
+$Alien::OpenJPEG::VERSION = '0.002';
 use strict;
 use warnings;
 
-use parent qw(Alien::Base::Dino);
+use base qw( Alien::Base );
+use Role::Tiny::With qw( with );
+
+with 'Alien::Role::Dino';
 
 1;
 
@@ -20,7 +23,7 @@ Alien::OpenJPEG - Alien package for the OpenJPEG library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SEE ALSO
 

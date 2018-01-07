@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.262 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2017-12-24.
+    This document describes version 0.263 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2018-01-07.
 
 SYNOPSIS
     See the included script wordlist.
@@ -65,6 +65,10 @@ FUNCTIONS
     *   action => *str* (default: "grep")
 
     *   arg => *array[str]*
+
+    *   color => *str* (default: "auto")
+
+        When to highlight search string/matching pattern with color.
 
     *   detail => *bool*
 
@@ -128,6 +132,9 @@ FUNCTIONS
 
 ENVIRONMENT
   DEBUG => bool
+  COLOR => bool
+    Set color on/off when --color=auto (the default).
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-wordlist>.
@@ -153,7 +160,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

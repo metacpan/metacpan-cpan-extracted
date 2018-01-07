@@ -16,7 +16,7 @@ name: Math-Bacovia
 provides:
   Math::Bacovia:
     file: lib/Math/Bacovia.pm
-    version: '0.01'
+    version: '0.03'
   Math::Bacovia::Difference:
     file: lib/Math/Bacovia/Difference.pm
   Math::Bacovia::Exp:
@@ -42,6 +42,9 @@ requires:
   Set::Product::XS: '0.04'
   perl: '5.014'
 resources:
+  bugtracker: https://github.com/trizen/Math-Bacovia/issues
+  homepage: https://github.com/trizen/Math-Bacovia
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.01'
+  repository: https://github.com/trizen/Math-Bacovia
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -59,11 +59,11 @@ outputs
 
 =head1 VERSION
 
-This documents HTML::Valid version 0.06
-corresponding to git commit L<453a1be0d5696738e405061f5ed1ad475b04c443|https://github.com/benkasminbullock/html-valid/commit/453a1be0d5696738e405061f5ed1ad475b04c443> released on Thu Mar 2 14:23:28 2017 +0900.
+This documents HTML::Valid version 0.07
+corresponding to git commit L<9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab|https://github.com/benkasminbullock/html-valid/commit/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab> released on Sat Dec 30 13:41:36 2017 +0900.
 
 This Perl module is built on top of the L</HTML Tidy> library version
-5.4.0.
+5.6.0.
 
 
 =head1 DESCRIPTION
@@ -1257,10 +1257,13 @@ New W3 Consortium validator.
 
 =item L<HTML::Lint>
 
+=item L<HTML::Normalize>
+
 =item HTML::Validator
 
-There is another module called HTML::Validator, but it can only found
-on Backpan, dating from 2000. It uses an external XML validating tool.
+There is another module called HTML::Validator, but it can only be
+found on Backpan, dating from 2000. It uses an external XML validating
+tool. See L<http://backpan.perl.org/authors/id/S/SA/SAIT/>.
 
 =back
 
@@ -1284,8 +1287,8 @@ A small HTML validator: really all this does is make sure your tags are balanced
 
 This module is built from L</HTML Tidy> source code using a script
 which converts the HTML Tidy library into a single C file. This is
-available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/453a1be0d5696738e405061f5ed1ad475b04c443/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
-functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/453a1be0d5696738e405061f5ed1ad475b04c443/extra.c> into the library to access
+available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
+functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab/extra.c> into the library to access
 internals which are not part of the public interface. This is used for
 creating the machine-readable file of option documentation included
 above in L</OPTIONS> and for creating the tables of tags and

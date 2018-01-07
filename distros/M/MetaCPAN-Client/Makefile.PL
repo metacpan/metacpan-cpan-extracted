@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "2.021000",
+  "VERSION" => "2.022000",
   "test" => {
     "TESTS" => "t/*.t t/api/*.t"
   }

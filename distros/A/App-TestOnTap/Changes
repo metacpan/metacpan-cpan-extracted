@@ -1,5 +1,14 @@
 Revision history for App-TestOnTap
 
+0.050	2017-12-28
+
+	
+	Add support for merging in the harness
+	Pack changes
+	-Make the _pp_script executable
+	-Embed more info (user, host, env) into the packed bin
+	-Allow script to avoid any info at all
+
 0.049	2017-12-13
 
 	Change the layout of the resulttree to more easily understood naming

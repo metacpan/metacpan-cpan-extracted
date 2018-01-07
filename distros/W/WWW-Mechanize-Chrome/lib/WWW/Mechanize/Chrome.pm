@@ -12,11 +12,12 @@ use Carp qw(croak carp);
 use WWW::Mechanize::Link;
 use IO::Socket::INET;
 use Chrome::DevToolsProtocol;
+use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION = '0.07';
+our $VERSION = '0.09';
+our @CARP_NOT;
 
 =head1 NAME
 
@@ -91,8 +92,23 @@ Specify additional parameters to the Chrome executable.
 
 Interesting parameters might be
 
+    '--start-maximized',
     '--window-size=1280x1696'
     '--ignore-certificate-errors'
+    '--disable-background-networking',
+    '--disable-client-side-phishing-detection',
+    '--disable-component-update',
+    '--disable-hang-monitor',
+    '--disable-prompt-on-repost',
+    '--disable-sync',
+    '--disable-web-resources',
+
+    '--disable-default-apps',
+    '--disable-infobars',
+    '--disable-popup-blocking',
+    '--disable-default-apps',
+    '--disable-web-security',
+    '--allow-running-insecure-content',
 
 =item B<profile>
 
@@ -167,6 +183,10 @@ sub build_command_line {
 
     if ($options->{profile}) {
         push @{ $options->{ launch_arg }}, "--profile-directory=$options->{ profile }";
+    };
+
+    if( ! exists $options->{enable_first_run}) {
+        push @{ $options->{ launch_arg }}, "--no-first-run";
     };
 
     push @{ $options->{ launch_arg }}, "--headless"
@@ -290,6 +310,10 @@ sub new($class, %options) {
         $options{ frames }= 1;
     };
 
+    if( ! exists $options{ download_directory }) {
+        $options{ download_directory }= '';
+    };
+
     $options{ js_events } ||= [];
     if( ! exists $options{ transport }) {
         $options{ transport } ||= $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT };
@@ -341,7 +365,7 @@ sub new($class, %options) {
         log => $options{ log },
     );
     # Synchronously connect here, just for easy API compatibility
-    
+
     my $err;
     $self->driver->connect(
         new_tab => !$options{ reuse },
@@ -350,7 +374,7 @@ sub new($class, %options) {
         $err = $_err;
         Future->done( $err );
     })->get;
-        
+
     # if Chrome started, but so slow or unresponsive that we cannot connect
     # to it, kill it manually to avoid waiting for it indefinitely
     if ( $err ) {
@@ -378,6 +402,7 @@ sub new($class, %options) {
         $self->driver->send_message('Page.enable'),    # capture DOMLoaded
         $self->driver->send_message('Network.enable'), # capture network
         $self->driver->send_message('Runtime.enable'), # capture console messages
+        $self->set_download_directory_future($self->{download_directory}),
     )->get;
 
     if( ! exists $options{ tab }) {
@@ -402,6 +427,12 @@ Returns a listener object. If that object is discarded, the listener callback
 will be removed.
 
 Calling this method in void context croaks.
+
+To see the browser console live from your Perl script, use the following:
+
+  my $console = $mech->add_listener('Runtime.consoleAPICalled', sub {
+      print $_[0]->{params}->{args}->[0]->{value} || Dumper \@_;
+  });
 
 =cut
 
@@ -508,6 +539,14 @@ sub autodie {
     $_[0]->{autodie}
 }
 
+=head2 C<< $mech->allow( %options ) >>
+
+  $mech->allow( javascript => 1 );
+
+Allow or disallow execution of Javascript
+
+=cut
+
 sub allow {
     my($self,%options)= @_;
 
@@ -519,6 +558,88 @@ sub allow {
     };
 
     Future->wait_all( @await )->get;
+}
+
+=head2 C<< $mech->emulateNetworkConditions( %options ) >>
+
+  # Go offline
+  $mech->emulateNetworkConditions(
+      offline => JSON::PP::true,
+      latency => 10, # ms ping
+      downloadThroughput => 0, # bytes/s
+      uploadThroughput => 0, # bytes/s
+      connectionType => 'offline', # cellular2g, cellular3g, cellular4g, bluetooth, ethernet, wifi, wimax, other.
+  );
+
+=cut
+
+sub emulateNetworkConditions_future( $self, %options ) {
+    $options{ offline } //= JSON::PP::false,
+    $options{ latency } //= -1,
+    $options{ downloadThroughput } //= -1,
+    $options{ uploadThroughput } //= -1,
+    $self->driver->send_message('Network.emulateNetworkConditions', %options)
+}
+
+sub emulateNetworkConditions( $self, %options ) {
+    $self->emulateNetworkConditions_future( %options )->get
+}
+
+=head2 C<< $mech->setRequestInterception( @patterns ) >>
+
+  $mech->setRequestInterception(
+      { urlPattern => '*', resourceType => 'Document', interceptionStage => 'Request'},
+      { urlPattern => '*', resourceType => 'Media', interceptionStage => 'Response'},
+  );
+
+Sets the list of request patterns and resource types for which the interception
+callback will be invoked.
+
+=cut
+
+sub setRequestInterception_future( $self, @patterns ) {
+    $self->driver->send_message('Network.setRequestInterception', @patterns)
+}
+
+sub setRequestInterception( $self, @patterns ) {
+    $self->requestInterception_future( @patterns )->get
+}
+
+=head2 C<< $mech->on_request_intercepted( $cb ) >>
+
+  $mech->on_request_intercepted( sub {
+      my( $mech, $info ) = @_;
+      warn $info->{request}->{url};
+      $mech->continueInterceptedRequest_future(
+          interceptionId => $info->{interceptionId}
+      )
+  });
+
+A callback for intercepted requests that match the patterns set up
+via C<setRequestInterception>.
+
+If you return a future from this callback, it will not be discarded but kept in
+a safe place.
+
+=cut
+
+sub on_request_intercepted( $self, $cb ) {
+    if( $cb ) {
+        my $s = $self;
+        weaken $s;
+        $self->{ on_request_intercept_listener } =
+        $self->add_listener('Network.requestIntercepted', sub( $ev ) {
+            if( $s->{ on_request_intercepted }) {
+                $self->log('debug', sprintf 'Request intercepted %s: %s',
+                                    $ev->{params}->{interceptionId},
+                                    $ev->{params}->{request}->{url});
+                $s->{ on_request_intercepted }->( $s, $ev->{params} );
+            };
+        });
+    } else {
+        delete $self->{ on_request_intercept_listener };
+    };
+    $self->{ on_request_intercepted } = $cb;
 }
 
 =head2 C<< $mech->on_dialog( $cb ) >>
@@ -534,9 +655,9 @@ A callback for Javascript dialogs (C<< alert() >>, C<< prompt() >>, ... )
 =cut
 
 sub on_dialog( $self, $cb ) {
-    my $s = $self;
-    weaken $s;
     if( $cb ) {
+        my $s = $self;
+        weaken $s;
         $self->{ on_dialog_listener } =
         $self->add_listener('Page.javascriptDialogOpening', sub( $ev ) {
             if( $s->{ on_dialog }) {
@@ -577,23 +698,33 @@ sub handle_dialog( $self, $accept, $prompt = undef ) {
     });
 };
 
-=head2 C<< $mech->js_errors() >>
+=head2 C<< $mech->js_console_entries() >>
 
-  print $_->{message}
-      for $mech->js_errors();
+  print $_->{type}, " ", $_->{message}, "\n"
+      for $mech->js_console_entries();
 
 An interface to the Javascript Error Console
 
-Returns the list of errors in the JEC
+Returns the list of entries in the JEC
 
-Maybe this should be called C<js_messages> or
-C<js_console_messages> instead.
+=cut
+
+sub js_console_entries( $self ) {
+    @{$self->{js_events}}
+}
+
+=head2 C<< $mech->js_errors() >>
+
+  print "JS error: ", $_->{message}, "\n"
+      for $mech->js_errors();
+
+Returns the list of errors in the JEC
 
 =cut
 
 sub js_errors {
     my ($self) = @_;
-    @{$self->{js_events}}
+    grep { ($_->{type} || '') ne 'log' } $self->js_console_entries
 }
 
 =head2 C<< $mech->clear_js_errors() >>
@@ -644,7 +775,13 @@ sub eval_in_page {
                            $result->{error}->{data},
                            $result->{error}->{code}
         );
-    };
+    } elsif( $result->{exceptionDetails} ) {
+        $self->signal_condition(
+            join "\n", grep { defined $_ }
+                           $result->{exceptionDetails}->{text},
+                           $result->{exceptionDetails}->{exception}->{description},
+        );
+    }
 
     return $result->{result}->{value}, $result->{result}->{type};
 };
@@ -793,7 +930,8 @@ sub _collectEvents( $self, @info ) {
 }
 
 sub _fetchFrameId( $self, $ev ) {
-    if( $ev->{method} eq 'Page.frameStartedLoading' ) {
+    if( $ev->{method} eq 'Page.frameStartedLoading'
+        || $ev->{method} eq 'Page.frameScheduledNavigation' ) {
         $self->log('debug', sprintf "Found frame id as %s", $ev->{params}->{frameId});
         return $ev->{params}->{frameId};
     };
@@ -821,22 +959,60 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     undef $self->{frameId};
     my $frameId = $options{ frameId };
 
-    my $scheduled = $self->driver->one_shot('Page.frameScheduledNavigation', 'Page.frameStartedLoading');
+    my $scheduled = $self->driver->one_shot(
+        'Page.frameScheduledNavigation',
+        'Page.frameStartedLoading',
+        #'Page.frameResized',              # download
+        'Inspector.detached',             # Browser (window) was closed by user
+    );
     my $navigated;
     my $does_navigation;
+    my $target_url = $options{ url };
+
     {
     my $s = $self;
     weaken $s;
-     $does_navigation = $scheduled
-          ->then(sub( $ev ) {
-              $s->log('trace', "Navigation started, logging");
-              $navigated++;
+    $does_navigation = $scheduled
+        ->then(sub( $ev ) {
+            if(     $ev->{method} eq 'Page.frameResized'
+                and 0+keys %{ $ev->{params} } == 0 ) {
+                # This is dead code that is never reached (see above)
+                # Chrome v64 doesn't indicate at all to the API that a
+                # download started :-(
+                # Also, we won't know that it finished, or what name the
+                # file got
+                $s->log('trace', "Download started, returning synthesized event");
+                $navigated++;
+                $s->{ frameId } = $ev->{params}->{frameId};
+                Future->done(
+                    # Since Chrome v64,
+                    { method => 'MechanizeChrome.download', params => {
+                        frameId => $ev->{params}->{frameId},
+                        loaderId => $ev->{params}->{loaderIdId},
+                        response => {
+                            status => 200,
+                            statusText => 'faked response',
+                            headers => {
+                                'Content-Disposition' => 'attachment; filename=unknown',
+                            }
+                    }}
+                })
 
-              $frameId ||= $s->_fetchFrameId( $ev );
-              $s->{ frameId } = $frameId;
-              $s->_waitForNavigationEnd( %options );
-          });
-      };
+            } elsif( $ev->{method} eq 'Inspector.detached' ) {
+                $s->log('error', "Inspector was detached");
+                Future->fail("Inspector was detached");
+
+            } else {
+                  $s->log('trace', "Navigation started, logging");
+                  $navigated++;
+
+                  $frameId ||= $s->_fetchFrameId( $ev );
+                  $s->{ frameId } = $frameId;
+
+                  $s->_waitForNavigationEnd( %options );
+            };
+        });
+    };
 
     # Kick off the navigation ourselves
     my $nav = $get_navigation_future->()->get;
@@ -848,7 +1024,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     if( $navigated or $options{ navigates }) {
         @events = $does_navigation->get;
         # Handle all the events, by turning them into a ->response again
-        my $res = $self->httpMessageFromEvents( $self->frameId, \@events );
+        my $res = $self->httpMessageFromEvents( $self->frameId, \@events, $target_url );
         $self->update_response( $res );
     } else {
         $self->log('trace', "No navigation occurred, not collecting events");
@@ -876,7 +1052,7 @@ sub get($self, $url, %options ) {
         $s->driver->send_message(
             'Page.navigate',
             url => "$url"
-    )}, %options, navigates => 1 );
+    )}, url => "$url", %options, navigates => 1 );
 
     return $self->response;
 };
@@ -932,7 +1108,7 @@ sub httpRequestFromChromeRequest( $self, $event ) {
     my $req = HTTP::Request->new(
         $event->{params}->{request}->{method},
         $event->{params}->{request}->{url},
-        HTTP::Headers->new( $event->{params}->{request}->{headers} ),
+        HTTP::Headers->new( %{ $event->{params}->{request}->{headers}} ),
     );
 };
 
@@ -986,58 +1162,109 @@ sub httpResponseFromChromeNetworkFail( $self, $res ) {
     my $response = HTTP::Response->new(
         $res->{params}->{response}->{status} || 599, # No error code exists for files
         $res->{params}->{response}->{errorText},
-        HTTP::Headers->new( {}),
+        HTTP::Headers->new(),
     );
 };
 
-sub httpMessageFromEvents( $self, $frameId, $events ) {
+sub httpResponseFromChromeUrlUnreachable( $self, $res ) {
+    my $response = HTTP::Response->new(
+        599, # No error code exists for files
+        "Unreachable URL: " . $res->{params}->{frame}->{unreachableUrl},
+        HTTP::Headers->new(),
+    );
+};
+
+sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
     my ($requestId,$loaderId);
-    my @events = grep {    exists $_->{params}->{frameId} && $_->{params}->{frameId} eq $frameId
-                        or exists $_->{params}->{frame}->{id} && $_->{params}->{frame}->{id} eq $frameId
-                        or exists $_->{params}->{frame}->{id} && $_->{params}->{frame}->{id} eq $frameId
-                        or $requestId && exists $_->{params}->{requestId} && $_->{params}->{requestId} eq $requestId
-                 }
-                 map {
-                     # Extract the loaderId and requestId
-                     if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
-                         $requestId ||= $_->{params}->{requestId};
-                         $loaderId ||= $_->{params}->{loaderId};
-                     };
-                     $_
-                 } @$events;
+
+    if( $url ) {
+        # Find the request id of the request
+        for( @$events ) {
+            if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
+                if( $url and $_->{params}->{request}->{url} eq $url ) {
+                    $requestId = $_->{params}->{requestId};
+                } else {
+                    $requestId ||= $_->{params}->{requestId};
+                };
+            }
+        };
+    };
+
+    # Just silence some undef warnings
+    if( ! defined $requestId) {
+        $requestId = ''
+    };
+
+    my @events = grep {
+        my $this_frame =    (exists $_->{params}->{frameId} && $_->{params}->{frameId})
+                         || (exists $_->{params}->{frame}->{id} && $_->{params}->{frame}->{id});
+        if(     exists $_->{params}->{requestId}
+            and $_->{params}->{requestId} eq $requestId
+        ) {
+            "Matches our request id"
+        } elsif( ! exists $_->{params}->{requestId}
+                 and $this_frame eq $frameId
+        ) {
+            "Matches our frame id and has no associated request"
+        } else {
+            ""
+        }
+
+    } map {
+        # Extract the loaderId and requestId, if we haven't found it yet
+        if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
+            $requestId ||= $_->{params}->{requestId};
+            $loaderId ||= $_->{params}->{loaderId};
+        };
+        $_
+    } @$events;
+
     my %events;
     for (@events) {
+        #warn join " - ", $_->{method}, $_->{params}->{loaderId}, $_->{params}->{frameId};
         $events{ $_->{method} } ||= $_;
     };
 
     # Create HTTP::Request object from 'Network.requestWillBeSent'
     my $request;
     my $response;
-    if( ! $events{ 'Network.requestWillBeSent' }) {
-        #warn "Didn't see a 'Network.requestWillBeSent' event, cannot synthesize response well";
-    } else {
-        # $request = $self->httpRequestFromChromeRequest( $events{ 'Network.requestWillBeSent' });
-    };
 
-    if(     $events{ "Page.frameNavigated" }
-        and $events{ "Page.frameNavigated" }->{params}->{frame}->{url} ne 'about:blank' ) {
-        # Create HTTP::Response object from 'Network.responseReceived'
-        if( my $res = $events{ 'Network.loadingFailed' }) {
-            $response = $self->httpResponseFromChromeNetworkFail( $res );
-            $response->request( $request );
-
-        } elsif ( $res = $events{ 'Network.responseReceived' }) {
-            $response = $self->httpResponseFromChromeResponse( $res );
-            $response->request( $request );
-
-        } else {
-            die "Didn't see a 'Network.responseReceived' event, cannot synthesize response";
-        };
-    } else {
+    my $about_blank_loaded =    $events{ "Page.frameNavigated" }
+                             && $events{ "Page.frameNavigated" }->{params}->{frame}->{url} eq 'about:blank';
+    if( $about_blank_loaded ) {
+    #warn "About:blank";
         $response = HTTP::Response->new(
             200,
             'OK',
         );
+    } elsif ( my $res = $events{ 'Network.responseReceived' }) {
+    #warn "Network.responseReceived";
+            $response = $self->httpResponseFromChromeResponse( $res );
+            $response->request( $request );
+
+    } elsif( $res = $events{ 'Network.loadingFailed' }) {
+    #warn "Network.loadingFailed";
+        $response = $self->httpResponseFromChromeNetworkFail( $res );
+        $response->request( $request );
+
+    } elsif ( $res = $events{ 'Page.frameNavigated' }
+              and $res->{params}->{frame}->{unreachableUrl}) {
+    #warn "Network.frameNavigated";
+        $response = $self->httpResponseFromChromeUrlUnreachable( $res );
+        $response->request( $request );
+
+    } elsif( $res = $events{ "MechanizeChrome.download" } ) {
+    #warn "MechanizeChrome.download";
+        $response = HTTP::Response->new(
+            $res->{params}->{response}->{status} || 200, # is 0 for files?!
+            $res->{params}->{response}->{statusText},
+            HTTP::Headers->new( %{ $res->{params}->{response}->{headers} }),
+        )
+
+    } else {
+        require Data::Dumper;
+        warn Data::Dumper::Dumper( $events );
+        die "Didn't see a 'Network.responseReceived' event for frameId $frameId, requestId $requestId, cannot synthesize response";
     };
     $response
 }
@@ -1145,9 +1372,40 @@ current request.
 
 sub reload( $self, %options ) {
     $self->_mightNavigate( sub {
-        $self->driver->send_message('Page.reload', %options )->get
+        $self->driver->send_message('Page.reload', %options )
     }, navigates => 1, %options);
 }
+
+=head2 C<< $mech->set_download_directory( $dir ) >>
+
+    my $downloads = tempdir();
+    $mech->set_download_directory( $downloads );
+
+Enables automatic file downloads and sets the directory where the files
+will be downloaded to. Setting this to undef will disable downloads again.
+
+The directory in C<$dir> must be an absolute path, since Chrome does not know
+about the current directory of your Perl script.
+
+=cut
+
+sub set_download_directory_future( $self, $dir="" ) {
+    $self->{download_directory} = $dir;
+    if( "" eq $dir ) {
+        $self->driver->send_message('Page.setDownloadBehavior',
+            behavior => 'deny',
+        )
+    } else {
+        $self->driver->send_message('Page.setDownloadBehavior',
+            behavior => 'allow',
+            downloadPath => $dir
+        )
+    };
+};
+
+sub set_download_directory( $self, $dir="" ) {
+    $self->set_download_directory_future($dir)->get
+};
 
 =head2 C<< $mech->add_header( $name => $value, ... ) >>
 
@@ -1164,9 +1422,10 @@ Note that currently, we only support one value per header.
 =cut
 
 sub _set_extra_headers( $self, %headers ) {
+    $self->log('debug',"Setting additional headers", \%headers);
     $self->driver->send_message('Network.setExtraHTTPHeaders',
         headers => \%headers
-    )->get
+    )->get;
 };
 
 sub add_header( $self, %headers ) {
@@ -1581,7 +1840,7 @@ or C<< ->selector >> when you want more control.
 
 =cut
 
-%link_spec = (
+our %link_spec = (
     a      => { url => 'href', },
     area   => { url => 'href', },
     frame  => { url => 'src', },
@@ -2870,10 +3129,33 @@ sub get_set_value {
                 $self->driver->send_message('DOM.setAttributeValue', nodeId => 0+$obj->nodeId, name => 'value', value => "$value" )->get;
 
             } elsif( 'selected' eq $method ) {
-                # needs more logic to find the correct child
-                $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function(newValue) { if( newValue ) { this.selected = newValue } else { delete this.selected } }', arguments => [ $value ])->get;
+                # ignoring undef; but [] would reset to no option
+                if (defined $value) {
+                    $value = [ $value ] unless ref $value;
+                    $self->driver->send_message(
+                        'Runtime.callFunctionOn',
+                        objectId => $id,
+                        functionDeclaration => q|
+function(newValue) {
+  var i, j;
+  if (this.multiple == true) {
+    for (i=0; i<this.options.length; i++) {
+      this.options[i].selected = false
+    }
+  }
+  for (j=0; j<newValue.length; j++) {
+    for (i=0; i<this.options.length; i++) {
+      if (this.options[i].value == newValue[j]) {
+        this.options[i].selected = true
+      }
+    }
+  }
+}|,
+                        arguments => [{ value => $value }],
+                    )->get;
+                }
             } elsif( 'content' eq $method ) {
-                $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function(newValue) { this.innerHTML = newValue }', arguments => [ $value ])->get;
+                $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function(newValue) { this.innerHTML = newValue }', arguments => [{ value => $value }])->get;
             } else {
                 die "Don't know how to set the value for node '$tag', sorry";
             };
@@ -2887,8 +3169,25 @@ sub get_set_value {
         # We could save some work here for the simple case of single-select
         # dropdowns by not enumerating all options
         if ('SELECT' eq uc $tag) {
-            my @options = $self->xpath('.//option', node => $fields[0] );
-            my @values = map { $_->{value} } grep { $_->{selected} } @options;
+            my $id = $obj->{objectId};
+            my $arr = $self->driver->send_message(
+                    'Runtime.callFunctionOn',
+                    objectId => $id,
+                    functionDeclaration => '
+function() {
+  var i;
+  var arr = [];
+  for (i=0; i<this.options.length; i++) {
+    if (this.options[i].selected == true) {
+      arr.push(this.options[i].value);
+    }
+  }
+  return arr;
+}',
+                    arguments => [],
+                    returnByValue => JSON::true)->get->{result};
+
+            my @values = @{$arr->{value}};
             if (wantarray) {
                 return @values
             } else {
@@ -3440,8 +3739,7 @@ use feature 'signatures';
 
 use Scalar::Util 'weaken';
 
-use vars qw($VERSION);
-$VERSION = '0.07';
+our $VERSION = '0.09';
 
 has 'attributes' => (
     is => 'lazy',
@@ -3494,7 +3792,7 @@ sub _nodeId($self) {
     if( !$nid or ( $self->_generation and $self->_generation != $generation )) {
         # Re-resolve, and hopefully we still have our objectId
         $nid = $self->_fetchNodeId();
-        $self->_generation( $generation);
+        $self->_generation( $generation );
     } else {
         $nid = Future->done( $nid );
     }
@@ -3506,10 +3804,10 @@ sub nodeId($self) {
 }
 
 sub get_attribute( $self, $attribute ) {
-    my $nid = $self->_nodeId();
     my $s = $self;
     weaken $s;
     if( $attribute eq 'innerText' ) {
+        my $nid = $self->_nodeId();
         my $html = $nid->then(sub( $nodeId ) {
             $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
         })->get()->{outerHTML};
@@ -3520,6 +3818,7 @@ sub get_attribute( $self, $attribute ) {
         return $html
 
     } elsif( $attribute eq 'innerHTML' ) {
+        my $nid = $self->_nodeId();
         my $html = $nid->then(sub( $nodeId ) {
             $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
         })->get()->{outerHTML};
@@ -3529,7 +3828,6 @@ sub get_attribute( $self, $attribute ) {
         $html =~ s!<[^>]+>\z!!;
         return $html
     } else {
-
         return $self->attributes->{ $attribute }
     }
 }
@@ -3644,6 +3942,11 @@ information to the console. Check that Chrome starts:
 
 C<< chrome >>
 
+=head2 Chrome versions
+
+Note that the Chrome version numbers do not denote availability of features.
+Features can still be added to Chrome v62 when Chrome v64 is already out.
+
 =head1 RUNNING THE TEST SUITE
 
 The normal test invocation is 'make test'.
@@ -3727,7 +4030,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

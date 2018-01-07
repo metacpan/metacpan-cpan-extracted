@@ -1,3 +1,10 @@
+0.102		2017-12-30	T. R. Wyant
+    Iridium 6 decayed December 23 2017. Update canned Space Track status
+    for this.
+
+    Update Sladen Iridium status web page scraper for changes in web
+    page.
+
 0.101		2017-12-07	T. R. Wyant
     Make 'decayed' internal status override anything from external
     sources. The idea is that the canned table is from Space Track, and

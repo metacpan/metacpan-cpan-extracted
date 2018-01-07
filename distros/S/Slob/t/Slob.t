@@ -2,11 +2,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 25;
 BEGIN { use_ok('Slob') };
 
-for my $path (qw/freedict-uncompressed.slob freedict-lzma2.slob/) {
-	my $slob = Slob->new("t/$path");
+for my $path (<t/freedict-*.slob>) {
+	note "Now using $path";
+	my $slob = Slob->new($path);
 
 	my $nr_of_entries = $slob->ref_count;
 

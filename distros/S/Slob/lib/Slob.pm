@@ -3,14 +3,16 @@ package Slob;
 use 5.014000;
 use strict;
 use warnings;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use constant MAGIC => "!-1SLOB\x1F";
 
 use Carp qw/croak verbose/;
 use Encode;
 
+use Compress::Raw::Bzip2;
 use Compress::Raw::Lzma;
+use Compress::Raw::Zlib;
 
 our %UNCOMPRESS = (
 	'' => sub { $_[0] },
@@ -19,9 +21,37 @@ our %UNCOMPRESS = (
 		my ($lzma2, $code, $output);
 		($lzma2, $code) = Compress::Raw::Lzma::RawDecoder->new(Filter => Lzma::Filter::Lzma2());
 		die "Error creating LZMA2 decoder: $code\n" unless $code == LZMA_OK;
+
 		$code = $lzma2->code($input, $output);
-		die "Did not reach end of stream" if $code == LZMA_OK;
-		die "Error decoding LZMA2: $code" if $code != LZMA_STREAM_END;
+		die "Did not reach end of stream\n" if $code == LZMA_OK;
+		die "Error decoding LZMA2: $code\n" if $code != LZMA_STREAM_END;
+		$output
+	},
+
+	'bz2' => sub {
+		my ($input) = @_;
+		my ($bz2, $code, $output);
+		($bz2, $code)= Compress::Raw::Bunzip2->new;
+		die "Error creating Bunzip2: $code\n" unless $code == Z_OK;
+
+		$code = $bz2->bzinflate($input, $output);
+		die "Did not reach end of stream\n" if $code == BZ_OK;
+		die "Error decoding Bzip2: $code\n" if $code != BZ_STREAM_END;
+
+		$output
+	},
+
+	'zlib' => sub {
+		my ($input) = @_;
+		my ($zlib, $code, $output);
+		($zlib, $code) = Compress::Raw::Zlib::Inflate->new(
+			-WindowBits => WANT_GZIP_OR_ZLIB
+		);
+		die "Error creating Zlib inflate: $code\n" unless $code == Z_OK;
+
+		$code = $zlib->inflate($input, \$output, 1);
+		die "Did not reach end of stream\n" if $code == Z_OK;
+		die "Error inflating zlib: $code\n" if $code != Z_STREAM_END;
 		$output
 	}
 );
@@ -333,7 +363,7 @@ Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Marius Gavrilescu
+Copyright (C) 2017-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.1 or,

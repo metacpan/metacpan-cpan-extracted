@@ -3,6 +3,7 @@ abstract: 'Perl library for the Pivotal Tracker REST API'
 author:
   - 'Dave Rolsky <autarch@urth.org>'
 build_requires:
+  Digest::MD5: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   HTTP::Response: '0'
@@ -16,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,37 +26,40 @@ name: WebService-PivotalTracker
 provides:
   WebService::PivotalTracker:
     file: lib/WebService/PivotalTracker.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Client:
     file: lib/WebService/PivotalTracker/Client.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Comment:
     file: lib/WebService/PivotalTracker/Comment.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Entity:
     file: lib/WebService/PivotalTracker/Entity.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Label:
     file: lib/WebService/PivotalTracker/Label.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Me:
     file: lib/WebService/PivotalTracker/Me.pm
-    version: '0.07'
+    version: '0.10'
+  WebService::PivotalTracker::Person:
+    file: lib/WebService/PivotalTracker/Person.pm
+    version: '0.10'
   WebService::PivotalTracker::Project:
     file: lib/WebService/PivotalTracker/Project.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::ProjectIteration:
     file: lib/WebService/PivotalTracker/ProjectIteration.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::PropertyAttributes:
     file: lib/WebService/PivotalTracker/PropertyAttributes.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Story:
     file: lib/WebService/PivotalTracker/Story.pm
-    version: '0.07'
+    version: '0.10'
   WebService::PivotalTracker::Types:
     file: lib/WebService/PivotalTracker/Types.pm
-    version: '0.07'
+    version: '0.10'
 requires:
   Cpanel::JSON::XS: '0'
   DateTime::Format::RFC3339: '0'
@@ -81,10 +85,10 @@ resources:
   bugtracker: https://github.com/maxmind/WebService-PivotalTracker/issues
   homepage: http://metacpan.org/release/WebService-PivotalTracker
   repository: git://github.com/maxmind/WebService-PivotalTracker.git
-version: '0.07'
+version: '0.10'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.022001'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
@@ -92,7 +96,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@MAXMIND/MakeMaker'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -112,27 +116,27 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@MAXMIND/Git::GatherDir'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@MAXMIND/ManifestSkip'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: '@MAXMIND/License'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@MAXMIND/ExecDir'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@MAXMIND/ShareDir'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@MAXMIND/Manifest'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@MAXMIND/CheckVersionIncrement'
@@ -140,15 +144,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@MAXMIND/TestRelease'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@MAXMIND/ConfirmRelease'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MAXMIND::VersionProvider
       name: '@MAXMIND/MAXMIND::VersionProvider'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@MAXMIND/Authority'
@@ -156,26 +160,26 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@MAXMIND/AutoPrereqs'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@MAXMIND/CopyFilesFromBuild'
-      version: '0.163040'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@MAXMIND/GitHub::Meta'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@MAXMIND/GitHub::Update'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@MAXMIND/MetaResources'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -184,18 +188,18 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.008'
+              version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000026'
           version: '0.004'
       name: '@MAXMIND/MetaProvides::Package'
-      version: '2.004002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::Meta::Contributors
       name: '@MAXMIND/Meta::Contributors'
@@ -203,19 +207,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@MAXMIND/MetaConfig'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@MAXMIND/MetaJSON'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@MAXMIND/MetaYAML'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@MAXMIND/NextRelease'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -223,7 +227,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@MAXMIND/Test::More with Test2'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -231,7 +235,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@MAXMIND/Modules for use with tidyall'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -239,7 +243,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@MAXMIND/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -252,7 +256,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@MAXMIND/Dist::Zilla::PluginBundle::MAXMIND'
-      version: '0.051'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -271,7 +275,11 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::MAXMIND::VersionProvider
             - Pod::Weaver::PluginBundle::MAXMIND
       name: '@MAXMIND/PromptIfStale'
-      version: '0.051'
+      version: '0.054'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: '@MAXMIND/Test::Pod::Coverage::Configurable'
+      version: '0.06'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -294,13 +302,14 @@ x_Dist_Zilla:
             - PayPal
             - Rolsky
             - "Rolsky's"
+            - distro
           wordlist: Pod::Wordlist
       name: '@MAXMIND/Test::PodSpelling'
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@MAXMIND/PodSyntaxTests'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -363,6 +372,10 @@ x_Dist_Zilla:
       name: '@MAXMIND/Test::Portability'
       version: '2.001000'
     -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@MAXMIND/Test::Synopsis'
+      version: '2.000007'
+    -
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@MAXMIND/Test::TidyAll'
       version: '0.04'
@@ -383,11 +396,11 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@MAXMIND/Test::Compile'
-      version: '2.056'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@MAXMIND/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@MAXMIND/Test::Version'
@@ -395,18 +408,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::Contributors
       name: '@MAXMIND/MAXMIND::Contributors'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@MAXMIND/Git::Contributors'
-      version: '0.029'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -492,7 +505,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@MAXMIND/generate SUPPORT'
-              version: '1.02'
+              version: '1.06'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@MAXMIND/allow override SUPPORT'
@@ -518,7 +531,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::WeaverConfig
       name: '@MAXMIND/MAXMIND::WeaverConfig'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -549,11 +562,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@MAXMIND/CPANFile'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MAXMIND::License
       name: '@MAXMIND/MAXMIND::License'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@MAXMIND/CheckStrictVersion'
@@ -565,7 +578,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000026'
           version: '0.004'
       name: '@MAXMIND/CheckSelfDependency'
       version: '0.011'
@@ -576,31 +589,31 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent
       name: '@MAXMIND/MAXMIND::CheckChangesHasContent'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
       name: '@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
       name: '@MAXMIND/Git::CheckFor::MergeConflicts'
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@MAXMIND/MAXMIND::TidyAll'
-      version: '0.80'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@MAXMIND/UploadToCPAN'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -618,10 +631,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
       name: '@MAXMIND/Git::Check'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -640,12 +653,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit generated files'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -653,16 +666,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.07
+          tag: v0.10
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Git::Tag'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -671,10 +684,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
       name: '@MAXMIND/Git::Push'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -685,7 +698,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@MAXMIND/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -700,12 +713,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit version bump'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -714,10 +727,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.10.1
+          git_version: 2.15.1
           repo_root: .
       name: '@MAXMIND/Push version bump'
-      version: '2.041'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -725,59 +738,59 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.008'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.008'
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.008'
+    version: '6.010'
 x_authority: cpan:MAXMIND
 x_contributors:
   - 'Dave Rolsky <drolsky@maxmind.com>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Greg Oschwald <goschwald@maxmind.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

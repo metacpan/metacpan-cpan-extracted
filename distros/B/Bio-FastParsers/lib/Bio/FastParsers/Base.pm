@@ -1,6 +1,6 @@
 package Bio::FastParsers::Base;
 # ABSTRACT: internal (base) class for all FastParsers
-$Bio::FastParsers::Base::VERSION = '0.173510';
+$Bio::FastParsers::Base::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -36,7 +36,7 @@ Bio::FastParsers::Base - internal (base) class for all FastParsers
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

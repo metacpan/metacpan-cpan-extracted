@@ -22,4 +22,4 @@ requires:
   Tk: 0
 resources:
   repository: git://github.com/eserte/tk-histentry.git
-version: 0.44
+version: 0.45

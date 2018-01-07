@@ -13,7 +13,7 @@ use Math::MPC qw();
 
 use POSIX qw(ULONG_MAX LONG_MIN);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -383,6 +383,53 @@ use overload
     }
 }
 
+# Convert two real-number strings into an MPC object
+sub _reals2mpc {
+    my ($re, $im) = @_;
+
+    my $r = Math::MPC::Rmpc_init2($PREC);
+
+    $re = _str2obj($re);
+    $im = _str2obj($im);
+
+    my $sig = join(' ', ref($re), ref($im));
+
+    if ($sig eq q{Math::MPFR Math::MPFR}) {
+        Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPz Math::GMPz}) {
+        Math::MPC::Rmpc_set_z_z($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPz Math::MPFR}) {
+        Math::MPC::Rmpc_set_z_fr($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::MPFR Math::GMPz}) {
+        Math::MPC::Rmpc_set_fr_z($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPz Math::GMPq}) {
+        Math::MPC::Rmpc_set_z_q($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPq Math::GMPz}) {
+        Math::MPC::Rmpc_set_q_z($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPq Math::GMPq}) {
+        Math::MPC::Rmpc_set_q_q($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::GMPq Math::MPFR}) {
+        Math::MPC::Rmpc_set_q_fr($r, $re, $im, $ROUND);
+    }
+    elsif ($sig eq q{Math::MPFR Math::GMPq}) {
+        Math::MPC::Rmpc_set_fr_q($r, $re, $im, $ROUND);
+    }
+    else {    # this should never happen
+        $re = _any2mpfr($re);
+        $im = _any2mpfr($im);
+        Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
+    }
+
+    return $r;
+}
+
 # Create and return a new {GMP*, MPFR, MPC} object, given a base-10 numerical string
 sub _str2obj {
     my ($s) = @_;
@@ -413,7 +460,16 @@ sub _str2obj {
                );
     }
 
-    # Complex number
+    # Complex number (form: "(3 4)")
+    if (substr($s, 0, 1) eq '(' and substr($s, -1) eq ')') {
+        my ($re, $im) = split(' ', substr($s, 1, -1));
+
+        if (defined($re) and defined($im)) {
+            return _reals2mpc($re, $im);
+        }
+    }
+
+    # Complex number (form: "3+4i")
     if (substr($s, -1) eq 'i') {
 
         if ($s eq 'i' or $s eq '+i') {
@@ -445,37 +501,11 @@ sub _str2obj {
         }
 
         if (defined($re) and defined($im)) {
-
-            my $r = Math::MPC::Rmpc_init2($PREC);
-
-            $re = _str2obj($re);
-            $im = _str2obj($im);
-
-            my $sig = join(' ', ref($re), ref($im));
-
-            if ($sig eq q{Math::MPFR Math::MPFR}) {
-                Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
-            }
-            elsif ($sig eq q{Math::GMPz Math::GMPz}) {
-                Math::MPC::Rmpc_set_z_z($r, $re, $im, $ROUND);
-            }
-            elsif ($sig eq q{Math::GMPz Math::MPFR}) {
-                Math::MPC::Rmpc_set_z_fr($r, $re, $im, $ROUND);
-            }
-            elsif ($sig eq q{Math::MPFR Math::GMPz}) {
-                Math::MPC::Rmpc_set_fr_z($r, $re, $im, $ROUND);
-            }
-            else {    # this should never happen
-                $re = _any2mpfr($re);
-                $im = _any2mpfr($im);
-                Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
-            }
-
-            return $r;
+            return _reals2mpc($re, $im);
         }
     }
 
-    # Floating point value
+    # Floating-point
     if ($s =~ tr/e.//) {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         if (Math::MPFR::Rmpfr_set_str($r, $s, 10, $ROUND)) {
@@ -484,7 +514,10 @@ sub _str2obj {
         return $r;
     }
 
-    # Fractional value
+    # Remove the plus sign
+    $s =~ s/^\+//;
+
+    # Fraction
     if (index($s, '/') != -1 and $s =~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_str($r, $s, 10);
@@ -492,8 +525,7 @@ sub _str2obj {
         return $r;
     }
 
-    $s =~ s/^\+//;
-
+    # Integer
     eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // goto &_nan;
 }
 
@@ -670,7 +702,6 @@ sub _any2mpq {
         if (Math::MPFR::Rmpfr_number_p($x)) {
             my $q = Math::GMPq::Rmpq_init();
             Math::MPFR::Rmpfr_get_q($q, $x);
-            Math::GMPq::Rmpq_canonicalize($q);
             return $q;
         }
         return;
@@ -3648,7 +3679,7 @@ sub is_polygonal ($$) {
 
     $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0)      // return 0;
+    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0) // return 0;
     $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // return 0;
 
     __is_polygonal__($n, $k);
@@ -3665,7 +3696,7 @@ sub is_polygonal2 ($$) {
 
     $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
 
-    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0)      // return 0;
+    $n = (__is_int__($n)         ? _any2mpz($n)  : return 0) // return 0;
     $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // return 0;
 
     __is_polygonal__($n, $k, 1);

@@ -3,6 +3,7 @@ abstract: 'Execute application within local environment.'
 author:
   - 'Serguei Okladnikov <oklaspec@gmail.com>'
 build_requires:
+  Capture::Tiny: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,13 +27,14 @@ no_index:
 provides:
   App::cpanexec:
     file: lib/App/cpanexec.pm
-    version: '0.03'
+    version: '0.08'
 requires:
+  local::lib: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/oklas/cpanexec/issues
   homepage: https://github.com/oklas/cpanexec
   repository: git://github.com/oklas/cpanexec.git
-version: '0.03'
+version: '0.08'
 x_authority: cpan:OKLAS
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

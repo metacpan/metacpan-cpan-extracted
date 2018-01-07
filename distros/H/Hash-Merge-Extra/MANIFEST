@@ -5,11 +5,9 @@ MANIFEST
 README
 t/00-load.t
 t/L_ADDITIVE.t
-t/L_MERGE_PATCH.t
 t/L_OVERRIDE.t
 t/L_REPLACE.t
 t/R_ADDITIVE.t
-t/R_MERGE_PATCH.t
 t/R_OVERRIDE.t
 t/R_REPLACE.t
 t/import.t

@@ -1,5 +1,8 @@
 Revision history for Perl extension Web-MarketReceipt
 
+0.04 2018-01-04T06:46:50Z
+    - fix cpants
+
 0.03 2017-12-28T06:10:37Z
     - support password and exclude-old-transactions
 

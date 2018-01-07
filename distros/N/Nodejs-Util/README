@@ -1,20 +1,148 @@
-append:FUNCTIONS
+NAME
+    Nodejs::Util - Utilities related to Node.js
 
- system_nodejs([ \%opts ], @argv)
+VERSION
+    This document describes version 0.009 of Nodejs::Util (from Perl
+    distribution Nodejs-Util), released on 2018-01-07.
+
+FUNCTIONS
+  nodejs_available
+    Usage:
+
+     nodejs_available(%args) -> [status, msg, result, meta]
+
+    Check the availability of Node.js.
+
+    This is a more advanced alternative to "nodejs_path()". Will check for
+    "node" or "nodejs" in the PATH, like "nodejs_path()". But you can also
+    specify minimum version (and other options in the future). And it will
+    return more details.
+
+    Will return status 200 if everything is okay. Actual result will return
+    the path to executable, and result metadata will contain extra result
+    like detected version in "func.version".
+
+    Will return satus 412 if something is wrong. The return message will
+    tell the reason.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *bool*
+
+        Find all node.js instead of the first found.
+
+        If this option is set to true, will return an array of paths intead
+        of path.
+
+    *   min_version => *str*
+
+    *   path => *str*
+
+        Search this instead of PATH environment variable.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  nodejs_path
+    Usage:
+
+     nodejs_path(%args) -> any
+
+    Check the availability of Node.js executable in PATH.
+
+    Return the path to executable or undef if none is available. Node.js is
+    usually installed as 'node' or 'nodejs'.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *bool*
+
+        Find all node.js instead of the first found.
+
+        If this option is set to true, will return an array of paths intead
+        of path.
+
+    Return value: (any)
+
+  system_nodejs
+    Usage:
+
+     system_nodejs([ \%opts ], @argv)
 
     Will call IPC::System::Options's system(), but with node.js binary as
     the first argument. Known options:
 
-      * harmony_scoping => bool
+    *   harmony_scoping => bool
 
-      If set to 1, will attempt to enable block scoping. This means at
-      least node.js v0.5.10 (where --harmony_scoping is first recognized).
-      But --harmony_scoping is no longer needed after v2.0.0 and no longer
-      recognized in later versions.
+        If set to 1, will attempt to enable block scoping. This means at
+        least node.js v0.5.10 (where "--harmony_scoping" is first
+        recognized). But "--harmony_scoping" is no longer needed after
+        v2.0.0 and no longer recognized in later versions.
 
-      * path => str
+    *   path => str
 
-      Will be passed to nodejs_available().
+        Will be passed to "nodejs_available()".
 
-    Other options will be passed to IPC::System::Options's system().
+    Other options will be passed to "IPC::System::Options"'s "system()".
+
+  nodejs_module_path
+    Usage:
+
+     nodejs_module_path([ \%opts, ] $module)
+
+    Search module in filesystem according to Node.js rule described in
+    <https://nodejs.org/api/modules.html>. $module can be either a
+    relative/absolute path (e.g. "./bip39.js", "../bip39.js", or
+    "/home/foo/bip39.js"), a filename (e.g. "bip39.js"), or a filename with
+    the ".js" removed (e.g. "bip39").
+
+    Known options:
+
+    *   parse_package_json => bool (default: 0)
+
+        Not yet implemented.
+
+    *   cwd => str
+
+        Use this directory instead of using "Cwd::get_cwd()".
+
+    *   all => bool
+
+        If set to true, will return an array of all found paths instead of
+        the first found path.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Nodejs-Util>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Nodejs-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Nodejs-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

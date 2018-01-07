@@ -98,7 +98,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 
@@ -210,7 +210,7 @@ sub set_chunk
 {
     my ($png, $chunk, $value) = @_;
     if ($chunk eq 'IDAT') {
-	croak "Use get_rows";
+	croak "Use set_rows";
     }
     if ($known_chunks{$chunk}) {
 	no strict 'refs';

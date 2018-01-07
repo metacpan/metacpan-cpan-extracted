@@ -428,12 +428,14 @@ sub udev_version {
         local $SIG{__WARN__} = sub {}; # silence shell output if error
 
         if(open my $ph, '-|', $full_path, '--version') {
-            if(<$ph> !~ /^(\d+)\s*$/) {
-                $@ = "Can't get udev version from `udevadm` utility";
-                return undef;
+            my $out = <$ph>;
+
+            if(defined($out) && $out =~ /^(\d+)\s*$/) {
+                return $1;
             }
 
-            return $1;
+            $@ = "Can't get udev version from `udevadm` utility";
+            return undef;
         }
     }
 

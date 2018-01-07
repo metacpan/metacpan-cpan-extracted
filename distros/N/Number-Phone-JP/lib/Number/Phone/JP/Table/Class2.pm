@@ -3,9 +3,9 @@ package Number::Phone::JP::Table::Class2;
 use strict;
 use warnings;
 
-our $VERSION = '0.20171201';
+our $VERSION = '0.20180104';
 
-# Table last modified: 2017-12-01
+# Table last modified: 2018-01-04
 our %TEL_TABLE = (
     # Pref => q<Assoc-Pref-Regex>,
     '09120'  => '\d+', # ブラステル
@@ -14,8 +14,7 @@ our %TEL_TABLE = (
     '09155'  => '\d+', # NTT-ME
     '09156'  => '\d+', # NTT-ME
     '09181'  => '\d+', # 関西コムネット
-    '09191'  => '\d+', # NTTぷらら
-    '09192'  => '\d+', # NTTぷらら
+    '09192'  => '\d+', # フリービット
 );
 
 1;

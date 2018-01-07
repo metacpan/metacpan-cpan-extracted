@@ -14,7 +14,7 @@ package MCE::Core::Input::Sequence;
 use strict;
 use warnings;
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 ## Items below are folded into MCE.
 
@@ -122,7 +122,9 @@ sub _worker_sequence_queue {
       if ($_chunk_size == 1 || $_begin == $_end) {
          $_ = $_offset * $_step + $_begin;
          $_ = _sprintf("%$_fmt", $_) if (defined $_fmt);
-         $_ = [ $_, $_ ] if ($_bounds_only);
+         if ($_chunk_size > 1 || $_bounds_only) {
+            $_ = ($_bounds_only) ? [ $_, $_ ] : [ $_ ];
+         }
          $_wuf->($self, $_, $_chunk_id);
       }
       else {

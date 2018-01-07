@@ -1,0 +1,32 @@
+
+Release history for Module-Spec
+
+0.5.1     2018-01-05 08:41:58-08:00 America/Los_Angeles
+
+    - Add a note about the current status of the code (alpha quality)
+
+v0.5     2018-01-04 15:57:01-08:00 America/Los_Angeles
+
+    - More param checking for Module::Spec->new()
+    - Fix a test, reducing requirement to Perl 5.10.1
+
+v0.4     2018-01-03 12:34:13-08:00 America/Los_Angeles
+
+    - On try_module, only forgive "Can't locate " missing module errors
+    - Document that exceptions are not throw from the perspective of the caller
+    - Document that single quotes are not accepted as package separators
+    - Extend and improve tests
+
+v0.3     2018-01-02 21:34:58-08:00 America/Los_Angeles
+
+    - Implement need_module($spec, { require => $r })
+    - Implement try_module($spec, { require => $r })
+
+v0.2     2018-01-02 19:55:20-08:00 America/Los_Angeles
+
+    - Don't use "zim" in tests
+
+v0.1     2018-01-02 17:26:00-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Initial version
+

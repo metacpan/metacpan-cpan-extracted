@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use WebService::PivotalTracker::PropertyAttributes;
 use WebService::PivotalTracker::Story;
@@ -58,3 +58,83 @@ sub _self_uri {
 ## use critic
 
 1;
+
+# ABSTRACT: A single iteration in a project
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::PivotalTracker::ProjectIteration - A single iteration in a project
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This class represents a single project iteration.
+
+=for Test::Synopsis my $pt;
+
+  my $iterations = $pt->project_iterations(...)->[0];
+  say $_->name for $iteration->stories->@*;
+
+=head1 ATTRIBUTES
+
+This class provides the following attribute accessor methods. Each one
+corresponds to a property defined by the L<PT REST API V5 iteration resource
+docs|https://www.pivotaltracker.com/help/api/rest/v5#iteration_resource>.
+
+=head2 number
+
+=head2 length
+
+=head2 team_strength
+
+=head2 start
+
+This will be returned as a L<DateTime> object.
+
+=head2 finish
+
+This will be returned as a L<DateTime> object.
+
+=head2 kind
+
+=head2 raw_content
+
+The raw JSON used to create this object.
+
+=head1 METHODS
+
+This class provides the following methods:
+
+=head2 $iter->stories
+
+This method contains an array reference of
+L<WebService::PivotalTracker::Story> object contained in the iteration.
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-PivotalTracker/issues>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by MaxMind, Inc.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

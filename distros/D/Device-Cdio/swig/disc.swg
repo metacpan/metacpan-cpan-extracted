@@ -38,7 +38,7 @@ Get the LSN of the end of the CD.
 
 perlcdio.INVALID_LSN is returned on error.");
 lsn_t cdio_get_disc_last_lsn(const CdIo_t *p_cdio);
-  
+
 
 %feature("autodoc",
 "get_disc_mode(p_cdio) -> str
@@ -59,13 +59,13 @@ int cdio_get_joliet_level(const CdIo_t *p_cdio);
 
 /*!
   Get the media catalog number (MCN) from the CD.
-  
+
   @return the media catalog number or NULL if there is none or we
   don't have the ability to get it.
-  
+
   Note: string is malloc'd so caller has to free() the returned
   string when done with it.
-  
+
 */
 %rename cdio_get_mcn get_mcn;
 %newobject cdio_get_mcn; // free malloc'd return value
@@ -75,7 +75,7 @@ char * cdio_get_mcn (const CdIo_t *p_cdio);
 %feature("autodoc",
 "get_num_tracks(p_cdio)->int
 
-Return the number of tracks on the CD. 
+Return the number of tracks on the CD.
 On error $perlcdio::INVALID_TRACK is returned.");
 track_t cdio_get_num_tracks (const CdIo_t *p_cdio);
 
@@ -83,7 +83,7 @@ track_t cdio_get_num_tracks (const CdIo_t *p_cdio);
 
 %inline %{
 const char *
-get_disc_mode (CdIo_t *p_cdio) 
+get_disc_mode (CdIo_t *p_cdio)
 {
   discmode_t discmode = cdio_get_discmode(p_cdio);
   if (CDIO_DISC_MODE_ERROR == discmode)
@@ -92,43 +92,31 @@ get_disc_mode (CdIo_t *p_cdio)
 }
 %}
 
-SV * get_cdtext (CdIo_t *p_cdio, int track);
-%inline %{
-SV * get_cdtext (CdIo_t *p_cdio, int track)
-{
-    HV * cdtext_hash;
-    cdtext_t *cdtext; const char *str; int num; unsigned int l=0;
-#if LIBCDIO_VERSION_NUM <= 83
-    cdtext = cdio_get_cdtext (p_cdio, (track_t) track);
-#else
-    cdtext = cdio_get_cdtext (p_cdio);
-#endif
-    if(!cdtext)
-        return newSV(0); //we return undef if there is no cdtext on the disk
-    cdtext_hash = newHV();
-    for (num=0; num<MAX_CDTEXT_FIELDS; num++) {
-#if LIBCDIO_VERSION_NUM <= 83
-        if(cdtext_get_const(num,cdtext)) {
-#else
-        if(cdtext_get_const(cdtext,num,track)) {
-#endif
-            l++;
-            str = cdtext_field2str(num);
-            hv_store(cdtext_hash, str, strlen(str),
-#if LIBCDIO_VERSION_NUM <= 83
-                newSVpv(cdtext_get_const(num,cdtext), 0), 0);
-#else
-                newSVpv(cdtext_get_const(cdtext,num,track), 0), 0);
-#endif
-        }
-    }
-    if(!l) {
-        SvREFCNT_dec((SV*)cdtext_hash);
-        return newSV(0);
-    } // we could easily return the number of strings, too.
-    return newRV_noinc(sv_2mortal((SV*)cdtext_hash));
-}
-%}
+/* SV * get_cdtext (CdIo_t *p_cdio); */
+/* %inline %{ */
+/* SV * get_cdtext (CdIo_t *p_cdio) */
+/* { */
+/*     HV * cdtext_hash; */
+/*     cdtext_t *cdtext; const char *str; int num; unsigned int l=0; */
+/*     cdtext = cdio_get_cdtext (p_cdio); */
+/*     if(!cdtext) */
+/*         return newSV(0); //we return undef if there is no cdtext on the disk */
+/*     cdtext_hash = newHV(); */
+/*     for (num=0; num<MAX_CDTEXT_FIELDS; num++) { */
+/*         if(cdtext_get_const(cdtext,num,track)) { */
+/*             l++; */
+/*             str = cdtext_field2str(num); */
+/*             hv_store(cdtext_hash, str, strlen(str), */
+/*                 newSVpv(cdtext_get_const(cdtext,num, track), 0), 0); */
+/*         } */
+/*     } */
+/*     if(!l) { */
+/*         SvREFCNT_dec((SV*)cdtext_hash); */
+/*         return newSV(0); */
+/*     } // we could easily return the number of strings, too. */
+/*     return newRV_noinc(sv_2mortal((SV*)cdtext_hash)); */
+/* } */
+/* %} */
 
 uint32_t get_cddb_discid(CdIo_t *p_cdio);
 %inline %{
@@ -136,7 +124,7 @@ static int
 cddb_dec_digit_sum(int n)
 {
   int ret=0;
-  
+
   for (;;) {
     ret += n%10;
     n    = n/10;
@@ -160,9 +148,9 @@ uint32_t get_cddb_discid(CdIo_t *p_cdio)
 
     cdio_get_track_msf(p_cdio, 1, &start_msf);
     cdio_get_track_msf(p_cdio, CDIO_CDROM_LEADOUT_TRACK, &msf);
-  
+
     t = cdio_audio_get_msf_seconds(&msf)-cdio_audio_get_msf_seconds(&start_msf);
-  
+
     return ((n % 0xff) << 24 | t << 8 | i_tracks);
 }
 %}
@@ -182,7 +170,7 @@ SV * guess_cd_type(const CdIo_t *cdio, int start_session, track_t track_num) {
     hv_store(iso_analysis, "isofs_size",10, newSVuv(t.isofs_size),0);
     hv_store(iso_analysis, "UDFVerMinor",11,
             newSVuv((unsigned int)t.UDFVerMinor),0);
-    hv_store(iso_analysis, "UDFVerMajor",11, 
+    hv_store(iso_analysis, "UDFVerMajor",11,
         newSVuv((unsigned int)t.UDFVerMajor),0);
 
     return  newRV_noinc(sv_2mortal((SV*)iso_analysis));

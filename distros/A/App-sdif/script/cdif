@@ -1084,3 +1084,9 @@ B<cdif> is naturally not very fast because it uses normal diff command
 as a back-end processor to compare words.
 
 =cut
+
+#  LocalWords:  cdif diff rcs rcsdiff colormap commandcolor markcolor
+#  LocalWords:  textcolor stdin OMARK NMARK OTEXT NTEXT OCHANGE CMARK
+#  LocalWords:  NCHANGE CTEXT MMARK MTEXT Cyan RGB nomark stat
+#  LocalWords:  noold nocommand nounknown watchdiff mecab tokenizer
+#  LocalWords:  Kazumasa Utashiro sdif

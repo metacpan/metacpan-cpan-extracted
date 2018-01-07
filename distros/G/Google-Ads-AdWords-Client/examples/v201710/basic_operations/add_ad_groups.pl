@@ -40,74 +40,101 @@ my $campaign_id = "INSERT_CAMPAIGN_ID_HERE";
 
 # Example main subroutine.
 sub add_ad_groups {
-  my $client      = shift;
-  my $campaign_id = shift;
+  my ($client, $campaign_id) = @_;
 
-  my $num_ad_groups = 2;
-  my @operations    = ();
-  for (my $i = 0 ; $i < $num_ad_groups ; $i++) {
-    # Create ad group.
-    my $ad_group = Google::Ads::AdWords::v201710::AdGroup->new({
-        name       => "Earth to Mars Cruises #" . uniqid(),
-        campaignId => $campaign_id,
-        biddingStrategyConfiguration =>
-          Google::Ads::AdWords::v201710::BiddingStrategyConfiguration->new({
-            bids => [
-              Google::Ads::AdWords::v201710::CpcBid->new({
-                  bid => Google::Ads::AdWords::v201710::Money->new({
-                    microAmount => 1000000
-                  }),
-                }
-              ),
-            ]}
-          ),
-        # Additional properties (non-required).
-        status => "ENABLED",
-        # Set the rotation mode.
-        adGroupAdRotationMode =>
-          Google::Ads::AdWords::v201710::AdGroupAdRotationMode->new({
-            adRotationMode => 'OPTIMIZE'
-          }),
-        settings => [
-          # Targeting restriction settings. Depending on the
-          # criterionTypeGroup value, most TargetingSettingDetail only
-          # affect Display campaigns. However, the USER_INTEREST_AND_LIST
-          # value works for RLSA campaigns - Search campaigns targeting
-          # using a remarketing list.
-          Google::Ads::AdWords::v201710::TargetingSetting->new({
-              details => [
-                # Restricting to serve ads that match your ad group placements.
-                # This is equivalent to choosing "Target and bid" in the UI.
-                Google::Ads::AdWords::v201710::TargetingSettingDetail->new({
-                    criterionTypeGroup => "PLACEMENT",
-                    targetAll          => 0
-                  }
-                ),
-                # Using your ad group verticals only for bidding. This is equivalent
-                # to choosing "Bid only" in the UI.
-                Google::Ads::AdWords::v201710::TargetingSettingDetail->new({
-                    criterionTypeGroup => "VERTICAL",
-                    targetAll          => 1
-                })
-              ]
-          })
-        ]
+  my @operations = ();
+
+  # Create ad group.
+  my $ad_group = Google::Ads::AdWords::v201710::AdGroup->new({
+    name       => sprintf("Earth to Mars Cruises #%s", uniqid()),
+    status     => "ENABLED",
+    campaignId => $campaign_id
+  });
+
+  # Optional settings.
+
+  # Restricting to serve ads that match your ad group placements.
+  # This is equivalent to choosing "Target and bid" in the UI.
+  my $placements = Google::Ads::AdWords::v201710::TargetingSettingDetail->new({
+    criterionTypeGroup => "PLACEMENT",
+    targetAll          => 0
+  });
+
+  # Using your ad group verticals only for bidding. This is equivalent
+  # to choosing "Bid only" in the UI.
+  my $verticals = Google::Ads::AdWords::v201710::TargetingSettingDetail->new({
+    criterionTypeGroup => "VERTICAL",
+    targetAll          => 1
+  });
+
+  # Targeting restriction settings. Depending on the criterionTypeGroup value,
+  # most TargetingSettingDetail only affect Display campaigns. However, the
+  # USER_INTEREST_AND_LIST value works for RLSA campaigns - Search campaigns
+  # targeting using a remarketing list.
+  my $targeting = Google::Ads::AdWords::v201710::TargetingSetting->new({
+      details => [$placements, $verticals]});
+  $ad_group->set_settings([$targeting]);
+
+  # Set the rotation mode.
+  my $rotation_mode = Google::Ads::AdWords::v201710::AdGroupAdRotationMode->new(
+    {
+      adRotationMode => 'OPTIMIZE'
     });
-    # Create operation.
-    my $ad_group_operation =
-      Google::Ads::AdWords::v201710::AdGroupOperation->new({
-        operator => "ADD",
-        operand  => $ad_group
-      });
-    push @operations, $ad_group_operation;
-  }
+  $ad_group->set_adGroupAdRotationMode($rotation_mode);
+
+  # Create ad group bid.
+  my $bidding_strategy_configuration =
+    Google::Ads::AdWords::v201710::BiddingStrategyConfiguration->new({
+      bids => [
+        Google::Ads::AdWords::v201710::CpcBid->new({
+            bid => Google::Ads::AdWords::v201710::Money->new({
+                microAmount => 1000000
+              }
+            ),
+          }
+        ),
+      ]});
+  $ad_group->set_biddingStrategyConfiguration($bidding_strategy_configuration);
+
+  # Add as many additional ad groups as you need.
+  my $ad_group_2 = Google::Ads::AdWords::v201710::AdGroup->new({
+    name       => sprintf("Earth to Mars Cruises #%s", uniqid()),
+    status     => "ENABLED",
+    campaignId => $campaign_id
+  });
+
+  my $bidding_strategy_configuration_2 =
+    Google::Ads::AdWords::v201710::BiddingStrategyConfiguration->new({
+      bids => [
+        Google::Ads::AdWords::v201710::CpcBid->new({
+            bid => Google::Ads::AdWords::v201710::Money->new({
+                microAmount => 1000000
+              }
+            ),
+          }
+        ),
+      ]});
+  $ad_group_2->set_biddingStrategyConfiguration(
+    $bidding_strategy_configuration_2);
+
+  # Create operations.
+  my $operation = Google::Ads::AdWords::v201710::AdGroupOperation->new({
+    operator => "ADD",
+    operand  => $ad_group
+  });
+  push @operations, $operation;
+  my $operation_2 = Google::Ads::AdWords::v201710::AdGroupOperation->new({
+    operator => "ADD",
+    operand  => $ad_group_2
+  });
+  push @operations, $operation_2;
 
   # Add ad groups.
   my $result = $client->AdGroupService()->mutate({operations => \@operations});
 
   # Display ad groups.
   foreach my $ad_group (@{$result->get_value()}) {
-    printf "Ad group with name \"%s\" and id \"%d\" was added.\n",
+    printf "Ad group with name \"%s\" and ID %d was added.\n",
       $ad_group->get_name(), $ad_group->get_id();
   }
 

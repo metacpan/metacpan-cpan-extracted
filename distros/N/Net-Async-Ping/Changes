@@ -1,10 +1,21 @@
 Revision history for Net-Async-Ping
 
+0.003000  2018-01-06 10:00:12-08:00 America/Los_Angeles
+  - Add ICMPv6 support
+    (Thanks Alexander Hartmaier!)
+  - Run ICMP socket tests when any of the users groups is allowed
+  - Fix wrong version in Net::Async::Ping::ICMP
+
+0.002001  2018-01-01 10:58:45-08:00 America/Los_Angeles
+ - Various cleanups and a memory leak fix
+   (Thanks Paul "LeoNerd" Evans!)
+
 0.002000  2017-03-19 20:55:36-07:00 America/Los_Angeles
  - Add ICMP support
    (Thanks Andy Beverley!)
    (Fixes GH#2, GH#3, and GH#4)
  - Add missing dep (Test::Fatal)
+
 0.001001  2015-05-30 22:42:04-05:00 America/Chicago
  - Fix warning on (some) failures to ping
  - Improve tests (thanks for the help Jakub Narębski!)

@@ -1,12 +1,10 @@
 use Modern::Perl;
 package Renard::Incunabula::Common::Error;
 # ABSTRACT: Exceptions
-$Renard::Incunabula::Common::Error::VERSION = '0.003';
+$Renard::Incunabula::Common::Error::VERSION = '0.004';
 use custom::failures qw/
 	Programmer::Logic
 	IO::FileNotFound
-	User::InvalidPageNumber
-	ViewOptions::InvalidGridOptions
 	/;
 
 1;
@@ -23,15 +21,11 @@ Renard::Incunabula::Common::Error - Exceptions
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 
 =over 4
-
-=item * L<failure>
-
-=item * L<failure>
 
 =item * L<failure>
 

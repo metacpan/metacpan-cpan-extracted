@@ -1,0 +1,613 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::GComplex - Generic complex number library.
+
+=head1 VERSION
+
+Version 0.05
+
+=head1 SYNOPSIS
+
+Math::GComplex provides a generic interface to complex number operations, accepting any type of number as a component of a complex number, including native Perl numbers and numerical objects provided by other mathematical libraries, such as L<Math::AnyNum>.
+
+    use 5.014;
+    use Math::GComplex;
+    use Math::AnyNum qw(:overload);
+
+    my $x = Math::GComplex->new(3, 4);
+    my $y = Math::GComplex->new(7, 5);
+
+    say $x + $y;        #=> (10 9)
+    say $x - $y;        #=> (-4 -1)
+    say $x * $y;        #=> (1 43)
+    say $x / $y;        #=> (41/74 13/74)
+
+=head1 DESCRIPTION
+
+Math::GComplex is a lightweight library, which focuses primarily on providing a friendly interface to complex number operations and good performance.
+
+In most cases, it can be used as drop-in replacement for L<Math::Complex>.
+
+Due to its simple and elegant design, this library is between 2x up to 8x faster than L<Math::Complex>.
+
+=head1 EXPORT
+
+The following functions are exportable:
+
+    :trig
+        sin sinh asin asinh
+        cos cosh acos acosh
+        tan tanh atan atanh
+        cot coth acot acoth
+        sec sech asec asech
+        csc csch acsc acsch
+        atan2
+
+    :special
+        log logn exp sqrt cbrt root
+
+    :misc
+        cplx abs acmp sgn conj inv real imag reals
+
+Each function can be exported individually, as:
+
+    use Math::GComplex qw(acosh);
+
+There is also the possibility of exporting an entire group of functions, as:
+
+    use Math::GComplex qw(:trig);
+
+The imaginary unit, C<i = sqrt(-1)>, is also exportable, as:
+
+    use Math::GComplex qw(i);
+
+Additionally, by specifying the C<:all> keyword, all the exportable functions, including the C<i> constant, will be exported:
+
+    use Math::GComplex qw(:all);
+
+The C<:overload> keyword enables constant overloading, which makes
+each number a Math::GComplex object and also exports the C<i> constant:
+
+    use Math::GComplex qw(:overload);
+    CORE::say 3 + 4*i;                          #=> (3 4)
+    CORE::say log(-1);                          #=> (0 3.14159265358979)
+
+B<NOTE:> C<:overload> is lexical to the current scope only.
+
+The syntax for disabling the C<:overload> behavior in the current scope, is:
+
+    no Math::GComplex;        # :overload will be disabled in the current scope
+
+Nothing is exported by default.
+
+=head1 INITIALIZATION
+
+=head2 new
+
+    my $z = Math::GComplex->new($real, $imag);
+
+Creates and returns a new B<Math::GComplex> object.
+
+=head2 cplx
+
+    my $z = cplx($real, $imag);
+
+Creates and returns a new B<Math::GComplex> object.
+
+=head2 i
+
+    my $i = Math::GComplex::i();
+
+Returns the imaginary unit as a B<Math::GComplex> object, equivalent with C<cplx(0, 1)>.
+
+=head1 BASIC OPERATIONS
+
+This section describes all the basic operations provided by this module.
+
+=head2 add
+
+    $x + $y
+    $x->add($y)
+
+Addition of C<$x> and C<$y>, defined as:
+
+    (a + b*i) + (x + y*i) = (a + x) + (b + y)*i
+
+=head2 sub
+
+    $x - $y
+    $x->sub($y)
+
+Subtraction of C<$y> from C<$x>, defined as:
+
+    (a + b*i) - (x + y*i) = (a - x) + (b - y)*i
+
+=head2 mul
+
+    $x * $y
+    $x->mul($y)
+
+Multiplication of C<$x> and C<$y>, defined as:
+
+    (a + b*i) * (x + y*i) = i*(a*y + b*x) + a*x - b*y
+
+=head2 div
+
+    $x / $y
+    $x->div($y)
+
+Division of C<$x> by C<$y>, defined as:
+
+    (a + b*i) / (x + y*i) = (a*x + b*y)/(x*x + y*y) + (b*x - a*y)/(x*x + y*y)*i
+
+=head2 mod
+
+    $x % $y
+    $x->mod($y)
+
+Remainder of C<$x> when divided by C<$y>, defined as:
+
+    mod(x, y) = x - y*floor(x/y)
+
+=head2 neg
+
+    -$x
+    $x->neg
+
+Additive inverse of C<$x>, defined as:
+
+    neg(a + b*i) = -a - b*i
+
+=head2 conj
+
+    ~$x
+    $x->conj
+
+Complex conjugate of C<$x>, defined as:
+
+    conj(a + b*i) = a - b*i
+
+=head2 inv
+
+    $x->inv
+
+Multiplicative inverse of C<$x>, defined as:
+
+    inv(x) = 1/x
+
+=head2 abs
+
+    $x->abs
+
+Absolute value of C<$x>, defined as:
+
+    abs(a + b*i) = sqrt(a^2 + b^2)
+
+=head2 sgn
+
+    $x->sgn
+
+The sign of C<$x>, defined as:
+
+    sgn(x) = x / abs(x)
+
+=head1 SPECIAL FUNCTIONS
+
+This section describes the special mathematical functions provided by this module.
+
+=head2 log
+
+    log($x)
+    $x->log
+
+Natural logarithm of C<$x>, defined as:
+
+    log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a)*i
+
+=head2 logn
+
+    $x->logn($y)
+
+Logarithm of C<$x> to base C<$y>, defined as:
+
+    logn(a, b) = log(a) / log(b)
+
+=head2 exp
+
+    exp($x)
+    $x->exp
+
+Natural exponentiation of C<$x>, defined as:
+
+    exp(a + b*i) = exp(a)*cos(b) + exp(a)*sin(b)*i
+
+=head2 sqrt
+
+    sqrt($x)
+    $x->sqrt
+
+Square root of C<$x>, defined as:
+
+    sqrt(x) = exp(log(x) / 2)
+
+=head2 cbrt
+
+    $x->cbrt
+
+Cube root of C<$x>, defined as:
+
+    cbrt(x) = exp(log(x) / 3)
+
+=head2 root
+
+    $x->root($y)
+
+Nth root of C<$x>, defined as:
+
+    root(a, x) = a^(1/x)
+
+=head2 pow
+
+    $x**$y
+    $x->pow($y)
+
+Raises C<$x> to power C<$y> and returns the result, defined as:
+
+    a^x = exp(log(a) * x)
+
+=head1 TRIGONOMETRIC FUNCTIONS
+
+This section includes all the trigonometric functions provied by Math::GComplex.
+
+=head2 sin / sinh / asin / asinh
+
+    $x->sin
+    $x->sinh
+    $x->asin
+    $x->asinh
+
+Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
+
+Defined as:
+
+    sin(x) = (exp(x * i) - exp(-i * x))/(2*i)
+    sinh(x) = (exp(2*x) - 1) / (2*exp(x))
+    asin(x) = -i * log(i*x + sqrt(1 - x^2))
+    asinh(x) = log(sqrt(x^2 + 1) + x)
+
+=head2 cos / cosh / acos / acosh
+
+    $x->cos
+    $x->cosh
+    $x->acos
+    $x->acosh
+
+Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
+
+Defined as:
+
+    cos(x) = (exp(-i*x) + exp(i*x)) / 2
+    cosh(x) = (exp(2*x) + 1) / (2*exp(x))
+    acos(x) = -2*i*log(i*sqrt((1 - x)/2) + sqrt((1 + x)/2))
+    acosh(x) = log(x + sqrt(x - 1) * sqrt(x + 1))
+
+=head2 tan / tanh / atan / atanh
+
+    $x->tan
+    $x->tanh
+    $x->atan
+    $x->atanh
+
+Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
+
+Defined as:
+
+    tan(x) = (2*i)/(exp(2*i*x) + 1) - i
+    tanh(x) = (exp(2*x) - 1) / (exp(2*x) + 1)
+    atan(x) = i * (log(1 - i*x) - log(1 + i*x)) / 2
+    atanh(x) = (log(1 + x) - log(1 - x)) / 2
+
+=head2 cot / coth / acot / acoth
+
+    $x->cot
+    $x->coth
+    $x->acot
+    $x->acoth
+
+Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
+
+Defined as:
+
+    cot(x) = (2*i)/(exp(2*i*x) - 1) + i
+    coth(x) = (exp(2*x) + 1) / (exp(2*x) - 1)
+    acot(x) = atan(1/x)
+    acoth(x) = atanh(1/x)
+
+=head2 sec / sech / asec / asech
+
+    $x->sec
+    $x->sech
+    $x->asec
+    $x->asech
+
+Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
+
+Defined as:
+
+    sec(x) = 2/(exp(-i*x) + exp(i*x))
+    asec(x) = acos(1/x)
+    sech(x) = (2 * exp(x)) / (exp(2*x) + 1)
+    asech(x) = acosh(1/x)
+
+=head2 csc / csch / acsc / acsch
+
+    $x->csc
+    $x->csch
+    $x->acsc
+    $x->acsch
+
+Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
+
+Defined as:
+
+    csc(x) = -(2*i)/(exp(-i*x) - exp(i*x))
+    csch(x) = (2*exp(x)) / (exp(2*x) - 1)
+    acsc(x) = asin(1/x)
+    acsch(x) = asinh(1/x)
+
+=head2 atan2
+
+    atan2($x, $y)
+    $x->atan2($y)
+
+The arc tangent of C<$x> and C<$y>, defined as:
+
+    atan2(a, b) = -i * log((b + a*i) / sqrt(a^2 + b^2))
+
+=head1 MISCELLANEOUS FUNCTIONS
+
+This section describes the various useful methods provided by this module.
+
+=head2 floor
+
+    $x->floor
+
+The floor function, defined as:
+
+    floor(a + b*i) = floor(a) + floor(b)*i
+
+=head2 ceil
+
+    $x->ceil
+
+The ceil function, defined as:
+
+    ceil(a + b*i) = ceil(a) + ceil(b)*i
+
+=head2 int
+
+    int($x)
+    $x->int
+
+The integer-truncation function, defined as:
+
+    int(a + b*i) = int(a) + int(b)*i
+
+=head2 real
+
+    $x->real
+
+Return the real part of C<$x>.
+
+=head2 imag
+
+    $x->imag
+
+Returns the imaginary part of C<$x>.
+
+=head2 reals
+
+    ($real, $imag) = $x->reals
+
+Returns the real and the imaginary part of C<$x>, as real numbers.
+
+=head1 * Comparisons
+
+=head2 eq
+
+    $x == $y
+    $x->eq($y)
+
+Equality check: returns a true value when C<$x> and C<$y> are equal.
+
+=head2 ne
+
+    $x != $y
+    $x->ne($y)
+
+Inequality check: returns a true value when C<$x> and C<$y> are not equal.
+
+=head2 gt
+
+    $x > $y
+    $x->gt($y)
+
+Returns a true value when C<$x> is greater than C<$y>.
+
+=head2 ge
+
+    $x >= $y
+    $x->ge($y)
+
+Returns a true value when C<$x> is equal or greater than C<$y>.
+
+=head2 lt
+
+    $x < $y
+    $x->lt($y)
+
+Returns a true value when C<$x> is less than C<$y>.
+
+=head2 le
+
+    $x <= $y
+    $x->le($y)
+
+Returns a true value when C<$x> is equal or less than C<$y>.
+
+=head2 cmp
+
+    $x <=> $y
+    $x->cmp($y)
+
+Compares C<$x> to C<$y> and returns a negative value when C<$x> is less than C<$y>,
+0 when C<$x> and C<$y> are equal, and a positive value when C<$x> is greater than C<$y>.
+
+Complex numbers are compared as:
+
+    (real($x) <=> real($y)) ||
+    (imag($x) <=> imag($y))
+
+=head2 acmp
+
+    $x->acmp($y)
+
+Absolute comparison of C<$x> and C<$y>, defined as:
+
+    acmp(x, y) = abs(x) <=> abs(y)
+
+=head1 * Conversions
+
+=head2 boolify
+
+    $x->boolify
+
+Returns a true value when either the real part or the imaginary part of C<$x> is non-zero.
+
+=head2 numify
+
+    $x->numify
+
+Returns the real part of C<$x>.
+
+=head2 stringify
+
+    $x->stringify
+
+Returns a stringification version of C<$x>.
+
+Example:
+
+    Math::GComplex->new( 3, -4)->stringify;    # "(3 -4)"
+    Math::GComplex->new(-5,  6)->stringify;    # "(-5 6)"
+
+=head1 LIMITATIONS
+
+Being a generic interface, it assumes that all the special cases (such as division by zero) are handled by the library of which type the components of a complex number are.
+
+When the components of a complex number are native Perl numbers, the "division by zero" and the "logarithm of zero" cases are implicitly handled by this library.
+However the user may still encounter incorrect results due to overflow or underflow in some special cases (such as C<coth(1e6) = (NaN NaN)> and C<cosh(1e6) = (NaN NaN)>).
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu, C<< <trizen at protonmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests at L<https://github.com/trizen/Math-GComplex/issues>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Math::GComplex
+
+You can also look for information at:
+
+=over 4
+
+=item * Github
+
+L<https://github.com/trizen/Math-GComplex>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Math-GComplex>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Math-GComplex>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Math-GComplex/>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Other math libraries
+
+L<Math::AnyNum> - Arbitrary size precision for integers, rationals, floating-points and complex numbers.
+
+L<Math::GMP> - High speed arbitrary size integer math.
+
+L<Math::GMPz> - perl interface to the GMP library's integer (mpz) functions.
+
+L<Math::GMPq> - perl interface to the GMP library's rational (mpq) functions.
+
+L<Math::MPFR> - perl interface to the MPFR (floating point) library.
+
+L<Math::MPC> - perl interface to the MPC (multi precision complex) library.
+
+L<Math::Complex> - complex numbers and associated mathematical functions.
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 Daniel "Trizen" Șuteu.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

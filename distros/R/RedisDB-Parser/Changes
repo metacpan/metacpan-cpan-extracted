@@ -1,3 +1,7 @@
+2.23 Wed Jan  3 2018 Pavel Shaydo <zwon@cpan.org>
+    - remove README.pod. Thanks to Kent Fredric for drawing my attention
+    to it. See #1 for details
+
 2.22 Fri Oct 30 2015 Pavel Shaydo <zwon@cpan.org>
     - parse method now returns number of parsed replies
 

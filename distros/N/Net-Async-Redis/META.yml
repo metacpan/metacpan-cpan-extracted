@@ -22,7 +22,8 @@ meta-spec:
   version: '1.4'
 name: Net-Async-Redis
 requires:
-  Future: '0.30'
+  Class::Method::Modifiers: '0'
+  Future: '0.37'
   IO::Async: '0'
   List::Util: '1.29'
   Log::Any: '1.050'
@@ -37,5 +38,5 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: http://search.cpan.org/perldoc?Net-Async-Redis
   repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '1.003'
+version: '1.005'
 x_serialization_backend: 'YAML::Tiny version 1.70'

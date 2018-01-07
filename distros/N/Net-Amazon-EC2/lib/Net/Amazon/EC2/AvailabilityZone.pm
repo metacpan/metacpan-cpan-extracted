@@ -1,4 +1,5 @@
 package Net::Amazon::EC2::AvailabilityZone;
+$Net::Amazon::EC2::AvailabilityZone::VERSION = '0.35';
 use Moose;
 
 =head1 NAME

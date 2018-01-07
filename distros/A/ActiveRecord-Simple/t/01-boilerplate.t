@@ -3,7 +3,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;
@@ -51,6 +51,5 @@ TODO: {
 
   module_boilerplate_ok('lib/ActiveRecord/Simple.pm');
   module_boilerplate_ok('lib/ActiveRecord/Simple/Find.pm');
-  module_boilerplate_ok('lib/ActiveRecord/Simple/Validate.pm');
 }
 

@@ -1,0 +1,18 @@
+Changes
+lib/CORBA/IDLtree.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/orbit-everything.idl
+t/orig_module.idl
+t/pod-coverage.t
+t/pod.t
+t/reopened_module.idl
+t/use.t
+demoapp/myfile.idl
+demoapp/README
+demoapp/idl2cpp.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -27,7 +27,7 @@ isa_ok $cert, 'Crypt::OpenSSL::X509';
 
 my $tester = new_ok 'Authen::U2F::Tester', [
     certificate => $cert,
-    keypair     => $pk
+    key         => $pk
 ];
 
 # also test using key_file and cert_file

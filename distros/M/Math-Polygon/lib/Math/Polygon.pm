@@ -1,14 +1,18 @@
-# Copyrights 2004-2017 by [Mark Overmeer].
+# Copyrights 2004-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use strict;
-use warnings;
+# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Math::Polygon;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.10';
 
+
+use strict;
+use warnings;
 
 use Math::Polygon::Calc;
 use Math::Polygon::Clip;
@@ -42,6 +46,8 @@ sub init($$)
     $self;
 }
 
+#------------------
+
 
 sub nrPoints() { scalar @{shift->{MP_points}} }
 
@@ -49,13 +55,20 @@ sub nrPoints() { scalar @{shift->{MP_points}} }
 sub order() { @{shift->{MP_points}} -1 }
 
 
-sub points() { wantarray ? @{shift->{MP_points}} : shift->{MP_points} }
+sub points(;$)
+{   my ($self, $format) = @_;
+	my $points = $self->{MP_points};
+	$points    = [ polygon_format $format, @$points ] if $format;
+    wantarray ? @$points : $points;
+}
 
 
 sub point(@)
 {   my $points = shift->{MP_points};
     wantarray ? @{$points}[@_] : $points->[shift];
 }
+
+#------------------
 
 
 sub bbox()
@@ -120,7 +133,7 @@ sub startMinXY()
 sub beautify(@)
 {   my ($self, %opts) = @_;
     my @beauty = polygon_beautify \%opts, $self->points;
-    @beauty>2 ? $self->new(points => \@beauty) : ();
+    @beauty > 2 ? $self->new(points => \@beauty) : ();
 }
 
 
@@ -161,6 +174,8 @@ sub distance($)
 
 
 sub isClosed() { polygon_is_closed(shift->points) }
+
+#------------------
 
 
 sub resize(@)
@@ -239,6 +254,8 @@ sub simplify(@)
        );
 }
 
+#------------------
+
 
 sub lineClip($$$$)
 {   my ($self, @bbox) = @_;
@@ -256,6 +273,9 @@ sub fillClip1($$$$)
 #-------------
 
 
-sub string() { polygon_string(shift->points) }
+sub string(;$)
+{   my ($self, $format) = @_;
+    polygon_string($self->points($format));
+}
 
 1;

@@ -27,17 +27,23 @@ with visual effect to emphasize modified part.
 
 See individual manual of each command for detail.
 
+# INSTALL
+
+## CPANM
+
+    $ cpanm App::sdif
+
 # SEE ALSO
 
 [sdif](https://metacpan.org/pod/sdif), [cdif](https://metacpan.org/pod/cdif), [watchdiff](https://metacpan.org/pod/watchdiff)
 
 # LICENSE
 
-Copyright (C) Kaz Utashiro.
+Copyright (C) Kazumasa Utashiro.
 
 These commands and libraries are free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
 # AUTHOR
 
-Kaz Utashiro <kaz@utashiro.com>
+Kazumasa Utashiro

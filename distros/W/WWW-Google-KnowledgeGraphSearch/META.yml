@@ -20,10 +20,10 @@ no_index:
 provides:
   WWW::Google::KnowledgeGraphSearch:
     file: lib/WWW/Google/KnowledgeGraphSearch.pm
-    version: '0.04'
+    version: '0.05'
   WWW::Google::KnowledgeGraphSearch::Result:
     file: lib/WWW/Google/KnowledgeGraphSearch/Result.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   JSON: '2.90'
   Moo: '2.000000'
@@ -34,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-KnowledgeGraphSearch.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

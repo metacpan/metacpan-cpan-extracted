@@ -24,8 +24,13 @@ Math::Polygon - Class for maintaining polygon data
 
 =head1 DESCRIPTION
 
-This class provides an OO interface around L<Math::Polygon::Calc|Math::Polygon::Calc>
-and L<Math::Polygon::Clip|Math::Polygon::Clip>.
+This class provides an Object Oriented interface around
+L<Math::Polygon::Calc|Math::Polygon::Calc>, L<Math::Polygon::Clip|Math::Polygon::Clip>, and other.  Together,
+these modules provide basic transformations on 2D polygons in pure perl.
+
+B<WARNING:> these computations may show platform dependent ronding
+differences.  These may also originate from compilation options of
+the Perl version you installed.
 
 =head1 METHODS
 
@@ -33,15 +38,15 @@ and L<Math::Polygon::Clip|Math::Polygon::Clip>.
 
 =over 4
 
-=item $obj-E<gt>B<new>( [%options], [@points], [%options] )
+=item $obj-E<gt>B<new>(%options, [@points], %options)
 
-=item Math::Polygon-E<gt>B<new>( [%options], [@points], [%options] )
+=item Math::Polygon-E<gt>B<new>(%options, [@points], %options)
 
-You may add %options after and/or before the $points.  You may also use
-the "points" options to get the points listed.  $points are references
-to an ARRAY of X and Y.
+You may add %options before and/or after the @points.  You may also use
+the "points" option to set the points.  Each point in @points is
+(a references) to an ARRAY with two elements: an X and a Y coordinate.
 
-When C<new> is called as instance method, it is believed that the
+When C<new()> is called as instance method, it is believed that the
 new polygon is derived from the callee, and therefore some facts
 (like clockwise or anti-clockwise direction) will get copied unless
 overruled.
@@ -53,17 +58,17 @@ overruled.
 
 =over 2
 
-=item bbox => ARRAY
+=item bbox => [$xmin,$ymin, $xmax,$ymax]
 
-Usually computed from the figure automatically, but can also be
-specified as [xmin,ymin,xmax, ymax].  See L<bbox()|Math::Polygon/"Geometry">.
+Usually computed from the shape automatically, but can also be
+overruled. See L<bbox()|Math::Polygon/"Geometry">.
 
 =item clockwise => BOOLEAN
 
 Is not specified, it will be computed by the L<isClockwise()|Math::Polygon/"Geometry"> method
 on demand.
 
-=item points => ARRAY-of-POINTS
+=item points => \@points
 
 See L<points()|Math::Polygon/"Attributes"> and L<nrPoints()|Math::Polygon/"Attributes">.
 
@@ -88,7 +93,7 @@ Returns the number of points,
 
 =item $obj-E<gt>B<order>()
 
-Returns the number of unique points: one less than L<nrPoints()|Math::Polygon/"Attributes">.
+Returns the number of (unique?) points: one less than L<nrPoints()|Math::Polygon/"Attributes">.
 
 =item $obj-E<gt>B<point>( $index, [$index,...] )
 
@@ -100,17 +105,24 @@ example:
   my $point = $poly->point(2);
   my ($first, $last) = $poly->point(0, -1);
 
-=item $obj-E<gt>B<points>()
+=item $obj-E<gt>B<points>( [FORMAT] )
 
 In LIST context, the points are returned as list, otherwise as
-reference to an ARRAY.
+reference to an ARRAY of points.
+
+[1.09] When a FORMAT is given, each coordinate will get processed.
+This may be useful to hide platform specific rounding errors.  FORMAT
+may be a CODE reference or a C<printf()> alike string.
+See L<Math::Polygon::Calc::polygon_format()|Math::Polygon::Calc/"FUNCTIONS">.
 
 example: 
 
   my @points = $poly->points;
   my $first  = $points[0];
-  my $x0 = $points[0][0]; # $first->[0]
-  my $y0 = $points[0][1]; # $first->[1]
+  my $x0 = $points[0][0];    # == $first->[0]  --> X
+  my $y0 = $points[0][1];    # == $first->[1]  --> Y
+
+  my @points = $poly->points("%.2f");
 
 =back
 
@@ -147,9 +159,9 @@ example:
 Returns a new, beautified version of this polygon.
 Function L<Math::Polygon::Calc::polygon_beautify()|Math::Polygon::Calc/"FUNCTIONS">.
 
-Polygons, certainly after some computations, can have a lot of
-horrible artifacts: points which are double, spikes, etc.  This
-functions provided by this module beautify
+Polygons, certainly after some computations, can have a lot of horrible
+artifacts: points which are double, spikes, etc.  This functions provided
+by this module beautify them.  A new polygon is returned.
 
  -Option       --Default
   remove_spikes  <false>
@@ -192,16 +204,22 @@ example:
 
   $poly->counterClockwise
 
-=item $obj-E<gt>B<distance>(POINT)
+=item $obj-E<gt>B<distance>($point)
 
 [1.05] Returns the distance of the point to the closest point on the border of
 the polygon, zero if the point is on an edge.
 
-=item $obj-E<gt>B<equal>( <$other | ARRAY,[$tolerance]> | $points )
+=item $obj-E<gt>B<equal>( <$other | \@points,[$tolerance]> | $points )
 
 Compare two polygons, on the level of points. When the polygons are
 the same but rotated, this will return false. See L<same()|Math::Polygon/"Geometry">.
 Function L<Math::Polygon::Calc::polygon_equal()|Math::Polygon::Calc/"FUNCTIONS">.
+
+example: 
+
+  if($poly->equal($other_poly, 0.1)) ...
+  if($poly->equal(\@points, 0.1)) ...
+  if($poly->equal(@points)) ...
 
 =item $obj-E<gt>B<isClockwise>()
 
@@ -230,12 +248,18 @@ example:
  my $fence = $poly->perimeter;
  print "fence length: $fence $poly_units\n"
 
-=item $obj-E<gt>B<same>( <$other | ARRAY,[$tolerance]> | $points )
+=item $obj-E<gt>B<same>( <$other_polygon | \@points, [$tolerance]> | @points )
 
 Compare two polygons, where the polygons may be rotated wrt each
 other. This is (much) slower than L<equal()|Math::Polygon/"Geometry">, but some algorithms
 will cause un unpredictable rotation in the result.
 Function L<Math::Polygon::Calc::polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
+
+example: 
+
+  if($poly->same($other_poly, 0.1)) ...
+  if($poly->same(\@points, 0.1)) ...
+  if($poly->same(@points)) ...
 
 =item $obj-E<gt>B<startMinXY>()
 
@@ -347,7 +371,7 @@ See L<Math::Polygon::Transform::polygon_resize()|Math::Polygon::Transform/"FUNCT
 
 =over 2
 
-=item center => POINT
+=item center => $point
 
 =item scale => FLOAT
 
@@ -454,18 +478,23 @@ Function L<Math::Polygon::Clip::polygon_line_clip()|Math::Polygon::Clip/"FUNCTIO
 
 =over 4
 
-=item $obj-E<gt>B<string>()
+=item $obj-E<gt>B<string>( [FORMAT] )
+
+Print the polygon.
+
+[1.09] When a FORMAT is specified, all coordinates will get formatted
+first.  This may hide platform dependent rounding differences.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.07,
-built on December 27, 2017. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Math-Polygon distribution version 1.10,
+built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,5 +1,30 @@
                        User-Visible DocKnot Changes
 
+DocKnot 1.02 (2017-12-31)
+
+    Support quoted paragraphs (each line starting with ">") and turn them
+    into indentation when turning markup into plain text.
+
+    Support numbered lists when converting to thread.
+
+    Force long, unbreakable lines to be left intact when wrapping.
+
+    When wrapping paragraphs, preserve two spaces after periods even when
+    the period comes before a closing parenthesis or quote mark.
+
+    Support test/prefix metadata, which replaces the introduction to the
+    test instructions.
+
+    Add new license text BSD-3-clause-or-GPL-1+ to support pam-krb5.
+    Support markdown formatting in license texts when converting to
+    thread to handle the numbered clauses.
+
+    Support more complex quote attributions in thread output, and
+    automatically add \cite[] around work names if they don't contain
+    double quotes.
+
+    Add security advisory support to the thread template.
+
 DocKnot 1.01 (2016-12-25)
 
     Add build and test instructions for Autoconf packages, including

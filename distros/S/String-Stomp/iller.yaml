@@ -8,6 +8,7 @@ prereqs:
   runtime:
     requires:
       - perl: 5.010001
+      - Exporter
   test:
     requires:
       - syntax
@@ -18,6 +19,7 @@ prereqs:
 
 plugins:
  - +config: Author::CSSON
+ - +remove_plugin: Test::Kwalitee::Extra
 ---
 doctype: weaver
 

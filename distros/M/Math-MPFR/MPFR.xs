@@ -760,17 +760,13 @@ SV * Rmpfr_set_NV(pTHX_ mpfr_t * p, SV * q, unsigned int round) {
 
      if(!SvNOK(q)) croak("Second arg given to Rmpfr_set_NV is not an NV");
 
-#if MPFR_VERSION_MAJOR < 3
-     if((mp_rnd_t)round > 3)
-       croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
-#endif
      return newSViv(mpfr_set_float128(*p, (float128)SvNVX(q), (mp_rnd_t)round));
 
 #elif defined(NV_IS_FLOAT128)
 
-     char * buffer;
-     int exp, exp2 = 0;
-     float128 ld, buffer_size;
+     char buffer[45];
+     int exp;
+     float128 ld;
      int returned;
 
      if(!SvNOK(q)) croak("Second arg given to Rmpfr_set_NV is not an NV");
@@ -793,26 +789,19 @@ SV * Rmpfr_set_NV(pTHX_ mpfr_t * p, SV * q, unsigned int round) {
        return newSViv(0);
      }
 
-     ld = frexpq(ld, &exp);
+     ld = frexpq(ld, &exp); /* 0.5 <= returned value < 1.0 */
 
-     while(ld != floorq(ld)) {
-          ld *= 2;
-          exp2 += 1;
-     }
+     /* Convert ld to an integer by right shifting it 113 bits */
+     ld *= 1.0384593717069655257060992658440192e34Q;      /* ld *= powq(2.0Q, 113); */
 
-     buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-     buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-     Newxz(buffer, buffer_size + 5, char);
-
-     returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
+     returned = quadmath_snprintf(buffer, 45, "%.0Qf", ld);
      if(returned < 0) croak("In Rmpfr_set_NV, encoding error in quadmath_snprintf function");
-     if(returned >= buffer_size + 5) croak("In Rmpfr_set_NV, buffer given to quadmath_snprintf function was too small");
-     returned = mpfr_set_str(*p, buffer, 10, (mp_rnd_t)round);
-     Safefree(buffer);
+     if(returned >= 45) croak("In Rmpfr_set_NV, buffer given to quadmath_snprintf function was too small");
 
-     if (exp2 > exp) mpfr_div_2ui(*p, *p, exp2 - exp, GMP_RNDN);
-     else mpfr_mul_2ui(*p, *p, exp - exp2, GMP_RNDN);
+     returned = mpfr_set_str(*p, buffer, 10, (mp_rnd_t)round);
+
+     mpfr_mul_2si(*p, *p, exp - 113, GMP_RNDN);
+
      return newSViv(returned);
 
 #else
@@ -846,14 +835,14 @@ int Rmpfr_cmp_NV(pTHX_ mpfr_t * a, SV * b) {
 #elif defined(NV_IS_FLOAT128)
 
      mpfr_t t;
-     char * buffer;
-     int exp, exp2 = 0;
-     float128 ld, buffer_size;
+     char buffer[45];
+     int exp;
+     float128 ld;
      int returned;
 
      ld = (float128)SvNV(b);
-     if(ld != ld) {
-       mpfr_set_erangeflag;
+     if(ld != ld || mpfr_nan_p(*a)) {
+       mpfr_set_erangeflag();
        return 0;
      }
 
@@ -879,27 +868,19 @@ int Rmpfr_cmp_NV(pTHX_ mpfr_t * a, SV * b) {
      }
 
 
-     ld = frexpq(ld, &exp);
+     ld = frexpq(ld, &exp); /* 0.5 <= returned value < 1.0 */
 
-     while(ld != floorq(ld)) {
-          ld *= 2;
-          exp2 += 1;
-     }
+     /* Convert ld to an integer by right shifting it 113 bits */
+     ld *= 1.0384593717069655257060992658440192e34Q;      /* ld *= powq(2.0Q, 113); */
 
-     buffer_size = ld < 0.0Q ? ld * -1.0Q : ld;
-     buffer_size = ceilq(logq(buffer_size + 1) / 2.30258509299404568401799145468436418Q);
-
-     Newxz(buffer, buffer_size + 5, char);
-
-     returned = quadmath_snprintf(buffer, (size_t)buffer_size + 5, "%.0Qf", ld);
+     returned = quadmath_snprintf(buffer, 45, "%.0Qf", ld);
      if(returned < 0) croak("In Rmpfr_set_NV, encoding error in quadmath_snprintf function");
-     if(returned >= buffer_size + 5) croak("In Rmpfr_set_NV, buffer given to quadmath_snprintf function was too small");
+     if(returned >= 45) croak("In Rmpfr_set_NV, buffer given to quadmath_snprintf function was too small");
+
      mpfr_init2(t, FLT128_MANT_DIG);
      returned = mpfr_set_str(t, buffer, 10, GMP_RNDN);
-     Safefree(buffer);
 
-     if (exp2 > exp) mpfr_div_2ui(t, t, exp2 - exp, GMP_RNDN);
-     else mpfr_mul_2ui(t, t, exp - exp2, GMP_RNDN);
+     mpfr_mul_2si(t, t, exp - 113, GMP_RNDN);
 
      returned = mpfr_cmp(*a, t);
      mpfr_clear(t);
@@ -1561,12 +1542,12 @@ int Rmpfr_trunc(mpfr_t * a, mpfr_t * b) {
      return mpfr_trunc(*a, *b);
 }
 
-/* NO LONGER SUPPORTED
+/* NO LONGER SUPPORTED - use Rmpfr_nextabove instead
 SV * Rmpfr_add_one_ulp(mpfr_t * p, SV * round) {
      return newSViv(mpfr_add_one_ulp(*p, (mp_rnd_t)SvUV(round)));
 } */
 
-/* NO LONGER SUPPORTED
+/* NO LONGER SUPPORTED - use Rmpfr_nextbelow instead
 SV * Rmpfr_sub_one_ulp(mpfr_t * p, SV * round) {
      return newSViv(mpfr_sub_one_ulp(*p, (mp_rnd_t)SvUV(round)));
 } */
@@ -2030,6 +2011,22 @@ int Rmpfr_zero_p(mpfr_t * a) {
 
 void Rmpfr_free_cache(void) {
      mpfr_free_cache();
+}
+
+void Rmpfr_free_cache2(unsigned int way) {
+#if MPFR_VERSION_MAJOR >= 4
+     mpfr_free_cache2((mpfr_free_cache_t) way);
+#else
+     croak("Rmpfr_free_cache2 not implmented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
+#endif
+}
+
+void Rmpfr_free_pool(void) {
+#if MPFR_VERSION_MAJOR >= 4
+     mpfr_free_pool();
+#else
+     croak("Rmpfr_free_pool not implmented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
+#endif
 }
 
 SV * Rmpfr_get_version(pTHX) {
@@ -6375,7 +6372,14 @@ SV * Rmpfr_set_DECIMAL64(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
 
 #else
 
-    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(3,1,0)
+    if( mpfr_buildopt_decimal_p() ) {
+      warn("To make Rmpfr_set_DECIMAL64 available, rebuild Math::MPFR and pass \"D64=1\" as an arg to the Makefile.PL\n");
+      croak("See \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+    }
+#endif
+
+    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
 
 #endif
 }
@@ -6418,7 +6422,14 @@ void Rmpfr_get_DECIMAL64(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 
 #else
 
-    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(3,1,0)
+    if( mpfr_buildopt_decimal_p() ) {
+      warn("To make Rmpfr_get_DECIMAL64 available, rebuild Math::MPFR and pass \"D64=1\" as an arg to the Makefile.PL\n");
+      croak("See \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+    }
+#endif
+
+    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
 
 #endif
 }
@@ -6537,7 +6548,13 @@ SV * Rmpfr_get_float128(pTHX_ mpfr_t * op, SV * rnd) {
 #ifdef CAN_PASS_FLOAT128
      return newSVnv(mpfr_get_float128(*op, (mp_rnd_t)SvUV(rnd)));
 #else
-     croak("Cannot use Rmpfr_get_float128 to return an NV");
+#if MPFR_VERSION_MAJOR >= 4
+     if(mpfr_buildopt_float128_p()) {
+       warn("To make Rmpfr_get_float128 available, rebuild Math::MPFR and pass \"F128=1\" as an arg to the Makefile.PL\n");
+       croak("See \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
+     }
+#endif
+     croak("Cannot use Rmpfr_get_float128 to return an NV - see \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
 #endif
 }
 
@@ -6565,8 +6582,13 @@ void Rmpfr_get_FLOAT128(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
     else croak("1st arg (which needs to be a Math::Float128 object) supplied to Rmpfr_get_FLOAT128 is not an object");
 
 #else
-
-    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#if MPFR_VERSION_MAJOR >= 4
+     if(mpfr_buildopt_float128_p()) {
+       warn("To make Rmpfr_get_FLOAT128 available, rebuild Math::MPFR and pass \"F128=1\" as an arg to the Makefile.PL\n");
+       croak("See \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
+     }
+#endif
+    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - - see \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
 
 #endif
 }
@@ -6594,8 +6616,13 @@ SV * Rmpfr_set_FLOAT128(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
     else croak("2nd arg (which needs to be a Math::Float128 object) supplied to Rmpfr_set_FLOAT128 is not an object");
 
 #else
-
-    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - see the Makefile.PL");
+#if MPFR_VERSION_MAJOR >= 4
+     if(mpfr_buildopt_float128_p()) {
+       warn("To make Rmpfr_set_FLOAT128 available, rebuild Math::MPFR and pass \"F128=1\" as an arg to the Makefile.PL\n");
+       croak("See \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
+     }
+#endif
+    croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - see \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
 
 #endif
 }
@@ -6605,7 +6632,13 @@ SV * Rmpfr_set_float128(pTHX_ mpfr_t * rop, SV * q, SV * rnd) {
 #ifdef CAN_PASS_FLOAT128
      return newSViv(mpfr_set_float128(*rop, (float128)SvNV(q), (mp_rnd_t)SvUV(rnd)));
 #else
-     croak("Cannot use Rmpfr_set_float128 to set an NV");
+#if MPFR_VERSION_MAJOR >= 4
+     if(mpfr_buildopt_float128_p()) {
+       warn("To make Rmpfr_set_float128 available, rebuild Math::MPFR and pass \"F128=1\" as an arg to the Makefile.PL\n");
+       croak("See \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
+     }
+#endif
+     croak("Cannot use Rmpfr_set_float128 to set an NV - see \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
 #endif
 
 }
@@ -6677,7 +6710,7 @@ void _d_bytes(pTHX_ SV * str, unsigned int bits) {
   mpfr_t temp;
   double ld;
   int i, n = 8;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 53)
@@ -6697,9 +6730,6 @@ void _d_bytes(pTHX_ SV * str, unsigned int bits) {
 
   mpfr_clear(temp);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_d_bytes function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -6712,7 +6742,6 @@ void _d_bytes(pTHX_ SV * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 }
@@ -6724,7 +6753,7 @@ void _d_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
   dXSARGS;
   double ld;
   int i, n = 8;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 53)
@@ -6738,9 +6767,6 @@ void _d_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
 
   ld = mpfr_get_d(*str, GMP_RNDN);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_d_bytes_fr function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -6753,7 +6779,6 @@ void _d_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 }
@@ -6766,7 +6791,7 @@ void _dd_bytes(pTHX_ SV * str, unsigned int bits) {
   mpfr_t temp;
   double msd, lsd;
   int i, n = 8;
-  char * buff;
+  char buff[4];
   void * pm = &msd;
   void * pl = &lsd;
 
@@ -6786,9 +6811,6 @@ void _dd_bytes(pTHX_ SV * str, unsigned int bits) {
 
   mpfr_clear(temp);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_dd_bytes function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -6811,7 +6833,6 @@ void _dd_bytes(pTHX_ SV * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(16);
 
 }
@@ -6824,7 +6845,7 @@ void _dd_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
   mpfr_t temp;
   double msd, lsd;
   int i, n = 8;
-  char * buff;
+  char buff[4];
   void * pm = &msd;
   void * pl = &lsd;
 
@@ -6844,9 +6865,6 @@ void _dd_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
 
   mpfr_clear(temp);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_dd_bytes_fr function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -6869,7 +6887,6 @@ void _dd_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(16);
 
 }
@@ -6883,7 +6900,7 @@ void _ld_bytes(pTHX_ SV * str, unsigned int bits) {
   mpfr_t temp;
   long double ld;
   int i, n;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 64 && bits != 113) {
@@ -6905,9 +6922,6 @@ void _ld_bytes(pTHX_ SV * str, unsigned int bits) {
 
   mpfr_clear(temp);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_ld_bytes function");
-
   sp = mark;
 
   n = bits == 64 ? 10 : 16;
@@ -6922,7 +6936,6 @@ void _ld_bytes(pTHX_ SV * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 }
@@ -6935,7 +6948,7 @@ void _ld_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
   dXSARGS;
   long double ld;
   int i, n;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 64 && bits != 113) {
@@ -6951,9 +6964,6 @@ void _ld_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
 
   ld = mpfr_get_ld(*str, GMP_RNDN);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_ld_bytes_fr function");
-
   sp = mark;
 
   n = bits == 64 ? 10 : 16;
@@ -6968,7 +6978,6 @@ void _ld_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 }
@@ -6988,7 +6997,7 @@ void _f128_bytes(pTHX_ SV * str, unsigned int bits) {
   mpfr_t temp;
   float128 ld;
   int i, n = 16;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 113)
@@ -7008,9 +7017,6 @@ void _f128_bytes(pTHX_ SV * str, unsigned int bits) {
 
   mpfr_clear(temp);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_f128_bytes function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -7023,7 +7029,6 @@ void _f128_bytes(pTHX_ SV * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 #endif
@@ -7043,7 +7048,7 @@ void _f128_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
   dXSARGS;
   float128 ld;
   int i, n = 16;
-  char * buff;
+  char buff[4];
   void * p = &ld;
 
   if(bits != 113)
@@ -7057,9 +7062,6 @@ void _f128_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
 
   ld = mpfr_get_float128(*str, GMP_RNDN);
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in Math::MPFR::_f128_bytes_fr function");
-
   sp = mark;
 
 #ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
@@ -7072,7 +7074,6 @@ void _f128_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 
 #endif
@@ -7342,7 +7343,7 @@ SV * _lsb(pTHX_ mpfr_t * a) {
   return newSVuv((UV)p);
 }
 
-int Rmpfr_rec_root(pTHX_ mpfr_t * rop, mpfr_t * op, unsigned long root, SV * rnd) {
+int Rmpfr_rec_root(pTHX_ mpfr_t * rop, mpfr_t * op, unsigned long root, SV * round) {
   /*
     Originally supplied by Vincent Lefevre to mpfr mailing list.
     See https://sympa.inria.fr/sympa/arc/mpfr/2016-12/msg00032.html
@@ -7396,10 +7397,18 @@ int Rmpfr_rec_root(pTHX_ mpfr_t * rop, mpfr_t * op, unsigned long root, SV * rnd
        ) {
     mpfr_set_prec(t, mpfr_get_prec(t) + 8);
     inex1 = mpfr_ui_div(t, 1, *op, GMP_RNDZ);
-    inex2 = mpfr_root(*rop, t, root, (mpfr_rnd_t)SvUV(rnd));
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,0,0)
+    inex2 = mpfr_rootn_ui(*rop, t, root, (mpfr_rnd_t)SvUV(round));
+#else
+    inex2 = mpfr_root(*rop, t, root, (mpfr_rnd_t)SvUV(round));
+#endif
     if(!inex1) return inex2;
     mpfr_nextabove(t);
-    inex3 = mpfr_root(u, t, root, (mpfr_rnd_t)SvUV(rnd));
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,0,0)
+    inex3 = mpfr_rootn_ui(u, t, root, (mpfr_rnd_t)SvUV(round));
+#else
+    inex3 = mpfr_root(u, t, root, (mpfr_rnd_t)SvUV(round));
+#endif
   }
   return inex2;
 }
@@ -7409,6 +7418,14 @@ int Rmpfr_beta(mpfr_t * rop, mpfr_t * op1, mpfr_t * op2, int round) {
     return(mpfr_beta(*rop, *op1, *op2, (mp_rnd_t)round));
 #else
     croak("Rmpfr_beta not implemented - need at least mpfr-4.0.0, have only %s", MPFR_VERSION_STRING);
+#endif
+}
+
+int Rmpfr_rootn_ui (mpfr_t * rop, mpfr_t * op, unsigned long k, int round) {
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,0,0)
+    return(mpfr_rootn_ui(*rop, *op, k, (mp_rnd_t)round));
+#else
+    croak("Rmpfr_rootn_ui not implemented - need at least mpfr-4.0.0, have only %s", MPFR_VERSION_STRING);
 #endif
 }
 
@@ -9727,6 +9744,38 @@ Rmpfr_free_cache ()
         /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
+void
+Rmpfr_free_cache2 (way)
+	unsigned int	way
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpfr_free_cache2(way);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+Rmpfr_free_pool ()
+
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpfr_free_pool();
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
 SV *
 Rmpfr_get_version ()
 CODE:
@@ -11688,13 +11737,13 @@ CODE:
 OUTPUT:  RETVAL
 
 int
-Rmpfr_rec_root (rop, op, root, rnd)
+Rmpfr_rec_root (rop, op, root, round)
 	mpfr_t *	rop
 	mpfr_t *	op
 	unsigned long	root
-	SV *	rnd
+	SV *	round
 CODE:
-  RETVAL = Rmpfr_rec_root (aTHX_ rop, op, root, rnd);
+  RETVAL = Rmpfr_rec_root (aTHX_ rop, op, root, round);
 OUTPUT:  RETVAL
 
 int
@@ -11702,5 +11751,12 @@ Rmpfr_beta (rop, op1, op2, round)
 	mpfr_t *	rop
 	mpfr_t *	op1
 	mpfr_t *	op2
+	int	round
+
+int
+Rmpfr_rootn_ui (rop, op, k, round)
+	mpfr_t *	rop
+	mpfr_t *	op
+	unsigned long	k
 	int	round
 

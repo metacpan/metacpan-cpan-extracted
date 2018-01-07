@@ -1,12 +1,7 @@
 package DBIx::NoSQL::Store::Manager::StoreKey;
-BEGIN {
-  $DBIx::NoSQL::Store::Manager::StoreKey::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $DBIx::NoSQL::Store::Manager::StoreKey::VERSION = '0.2.2';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Marks attributes defining the object's key in the store
-
+$DBIx::NoSQL::Store::Manager::StoreKey::VERSION = '1.0.0';
 
 use Moose::Role;
 Moose::Util::meta_attribute_alias('StoreKey');
@@ -17,13 +12,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::NoSQL::Store::Manager::StoreKey - Marks attributes defining the object's key in the store
 
 =head1 VERSION
 
-version 0.2.2
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -45,11 +42,11 @@ trait, the id will be the concatenated values of those attributes.
 
 =head1 AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2018, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

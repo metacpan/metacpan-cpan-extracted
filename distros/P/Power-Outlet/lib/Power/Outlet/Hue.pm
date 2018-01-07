@@ -2,10 +2,9 @@ package Power::Outlet::Hue;
 use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
-use List::Util qw{first};
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION='0.16';
+our $VERSION='0.17';
 
 =head1 NAME
 
@@ -46,13 +45,40 @@ Default: 1
 =cut
 
 sub id {
-  my $self=shift;
-  $self->{"id"}=shift if @_;
-  $self->{"id"}=$self->_id_default unless defined $self->{"id"};
+  my $self      = shift;
+  $self->{"id"} = shift if @_;
+  $self->{"id"} = $self->_id_default unless defined $self->{"id"};
   return $self->{"id"};
 }
 
 sub _id_default {1};
+
+=head2 resource
+
+Resource for the particular object as presented on the Philips Hue Bridge
+
+Default: lights
+
+Currently supported Resources from L<https://developers.meethue.com/documentation/core-concepts>
+
+  lights    - resource which contains all the light resources
+  groups    - resource which contains all the groups
+  config    - resource which contains all the configuration items
+  schedules - which contains all the schedules
+  scenes    - which contains all the scenes
+  sensors   - which contains all the sensors
+  rules     - which contains all the rules
+
+=cut
+
+sub resource {
+  my $self            = shift;
+  $self->{"resource"} = shift if @_;
+  $self->{"resource"} = $self->_resource_default unless defined $self->{"resource"};
+  return $self->{"resource"};
+}
+
+sub _resource_default {'lights'};
 
 =head2 host
 
@@ -83,9 +109,9 @@ Default: newdeveloper (Hue Emulator default)
 =cut
 
 sub username {
-  my $self=shift;
-  $self->{"username"}=shift if @_;
-  $self->{"username"}=$self->_username_default unless defined $self->{"username"};
+  my $self            = shift;
+  $self->{"username"} = shift if @_;
+  $self->{"username"} = $self->_username_default unless defined $self->{"username"};
   return $self->{"username"};
 }
 
@@ -98,14 +124,30 @@ Returns the configured friendly name for the device
 =cut
 
 sub _name_default { #overloaded _name_default so the name will be cached for the life of this object
-  my $self=shift;
-  my $url=$self->url; #isa URI from Power::Outlet::Common::IP::HTTP
-  $url->path(sprintf("/api/%s/lights/%s", $self->username, $self->id));
-  my $res=$self->json_request(GET => $url); #isa perl structure
+  my $self = shift;
+  my $url  = $self->url; #isa URI from Power::Outlet::Common::IP::HTTP
+  $url->path($self->_path);
+  my $res  = $self->json_request(GET => $url); #isa perl structure
   return $res->{"name"}; #isa string
 }
 
 =head1 METHODS
+
+=cut
+
+#head2 _path
+
+#Builds the URL path
+
+#cut
+
+sub _path {
+  my $self     = shift;
+  my $state    = shift;
+  my @state    = defined($state)          ? ($state)          : ();
+  my @resource = defined($self->resource) ? ($self->resource) : (); #support undef resource just in case needed
+  return join('/', '', 'api', $self->username, @resource, $self->id, @state);
+}
 
 =head2 query
 
@@ -119,25 +161,25 @@ Sends an HTTP message to the device to query the current state
 
 
 sub query {
-  my $self=shift;
+  my $self = shift;
   if (defined wantarray) { #scalar and list context
 
     #url configuration
-    my $url=$self->url; #isa URI from Power::Outlet::Common::IP::HTTP
-    $url->path(sprintf("/api/%s/lights/%s", $self->username, $self->id));
+    my $url = $self->url; #isa URI from Power::Outlet::Common::IP::HTTP
+    $url->path($self->_path);
 
     #web request
-    my $res=$self->json_request(GET => $url); #isa perl structure
+    my $res = $self->json_request(GET => $url); #isa perl structure
 
     #Response is an ARRAY on error and a HASH on success
     if (ref($res) eq "HASH") {
       die("Error: (query) state does not exists")              unless exists $res->{"state"};
       die("Error: (query) state is not a hash")                unless ref($res->{"state"}) eq "HASH";
       die("Error: (query) state does not provide on property") unless exists $res->{"state"}->{"on"};
-      my $state=$res->{"state"}->{"on"}; #isa boolean true/false
+      my $state = $res->{"state"}->{"on"}; #isa boolean true/false
       return $state ? "ON" : "OFF";
     } elsif (ref($res) eq "ARRAY") {
-      my $hash=shift(@$res);
+      my $hash  = shift(@$res);
       die(sprintf(qq{Error: (query) "%s"}, $hash->{"error"}->{"description"})) if exists $hash->{"error"};
       die(sprintf("Error: (query) Unkown Error: URL: %s\n\n%s", $url, Dumper($res)));
     } else {
@@ -183,18 +225,18 @@ sub _call {
 
   #url configuration
   my $url     = $self->url; #isa URI from Power::Outlet::Common::IP::HTTP
-  $url->path(sprintf("/api/%s/%s/state", $self->username, $self->id));
+  $url->path($self->_path('state'));
 
   #web request
   my $array   = $self->json_request(PUT => $url, {on=>$boolean}); #isa perl structure
 
   #error handling
   die("Error: ($input) failed to return expected JSON format") unless ref($array) eq "ARRAY";
-  my $hash=shift(@$array);
+  my $hash    = shift(@$array);
   die("Error: ($input) Failed to return expected JSON format") unless ref($hash) eq "HASH";
   die(sprintf(qq{Error: ($input) "%s"}, $hash->{"error"}->{"description"})) if exists $hash->{"error"};
   die(sprintf("Error: ($input) Unkown Error: URL: %s\n\n%s", $url, Dumper($array))) unless exists $hash->{"success"};
-  my $success=$hash->{"success"};
+  my $success = $hash->{"success"};
   #state normalization
   my $key     = sprintf("/lights/%s/state/on", $self->id);
   die("Error: ($input) Unkown success state") unless exists $success->{$key};
@@ -232,9 +274,11 @@ DavisNetworks.com supports all Perl applications including this package.
   CPAN ID: MRDVT
   DavisNetworks.com
 
+Thanks to Mathias Neerup manee12 at student.sdu.dk - L<https://rt.cpan.org/Ticket/Display.html?id=123965>
+
 =head1 COPYRIGHT
 
-Copyright (c) 2013 Michael R. Davis
+Copyright (c) 2018 Michael R. Davis
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
@@ -242,7 +286,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head1 SEE ALSO
 
-L<http://www.developers.meethue.com/philips-hue-api>, L<http://steveyo.github.io/Hue-Emulator/>
+L<http://www.developers.meethue.com/philips-hue-api>, L<http://steveyo.github.io/Hue-Emulator/>, L<https://home-assistant.io/components/emulated_hue/>
 
 =cut
 

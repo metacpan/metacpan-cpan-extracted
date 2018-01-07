@@ -5,7 +5,6 @@ examples/optional-end-tag.pl
 examples/proprietary.pl
 examples/synopsis.pl
 examples/tagset-synopsis.pl
-guff
 html-valid-perl.c
 lib/HTML/Valid.pm
 lib/HTML/Valid.pod

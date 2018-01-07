@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-systemd/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-systemd.git
-version: 0.235.1
+version: 0.236.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

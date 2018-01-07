@@ -1,12 +1,7 @@
 Revision history for Perl extension Geo::WeatherNWS.
 
-1.053 Sat Dec 22 12:40:00 2012
-    - Minor changes: clean up and avoid division by zero.
-
-1.052 Thu Dec 20 15:08:00 2012
-    - Handle undefined dewpoint
-    - Minor performance improvement
-    - Add test for getreporthttp
+1.054 Mon Jan  1 12:12:00 2018
+    - Switched from using POSIX module to File::Temp module
 
 1.051 Tue Mon 27 22:13:00 2012
     - Add POD documention for new functions.

@@ -2,6 +2,13 @@ use warnings;
 use strict;
 use Math::MPFR qw (:mpfr);
 
+unless(Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS()) {
+  print "1..1\n";
+  warn "\n Skipping all tests - Math::MPFR not built with MPFR_WANT_DECIMAL_FLOATS defined\n";
+  print "ok 1\n";
+  exit 0;
+}
+
 my $t = 3;
 print "1..$t\n";
 

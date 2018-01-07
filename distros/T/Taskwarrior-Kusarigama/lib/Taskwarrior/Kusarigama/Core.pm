@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Core;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Set of core functions interacting with Taskwarrior
-$Taskwarrior::Kusarigama::Core::VERSION = '0.4.0';
+$Taskwarrior::Kusarigama::Core::VERSION = '0.5.0';
 
 use strict;
 use warnings;
@@ -96,7 +96,7 @@ sub export_tasks {
 
     run3 [qw/ task rc.recurrence=no rc.hooks=off export /, @query], undef, \my $out;
 
-    return @{ from_json $out };
+    return eval { @{ from_json $out } };
 }
 
 
@@ -132,7 +132,7 @@ Taskwarrior::Kusarigama::Core - Set of core functions interacting with Taskwarri
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 DESCRIPTION
 

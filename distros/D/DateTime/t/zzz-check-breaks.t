@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.018
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
 
 use Test::More tests => 2;
 
 SKIP: {
-    eval 'require DateTime::Conflicts; DateTime::Conflicts->check_conflicts';
+    eval { +require DateTime::Conflicts; DateTime::Conflicts->check_conflicts };
     skip('no DateTime::Conflicts module found', 1) if not $INC{'DateTime/Conflicts.pm'};
 
     diag $@ if $@;

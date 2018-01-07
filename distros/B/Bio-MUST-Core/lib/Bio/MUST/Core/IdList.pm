@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.173500';
+$Bio::MUST::Core::IdList::VERSION = '0.173620';
 use Moose;
 use namespace::autoclean;
 
@@ -23,12 +23,13 @@ with 'Bio::MUST::Core::Roles::Commentable',
 has 'ids' => (
     traits   => ['Array'],
     is       => 'ro',
-    isa      => 'ArrayRef[Str]',
+    isa      => 'Bio::MUST::Core::Types::full_ids',
     default  => sub { [] },
+    coerce   => 1,
+    writer   => '_set_ids',
     handles  => {
         count_ids => 'count',
           all_ids => 'elements',
-          add_id  => 'push',
     },
 );
 
@@ -77,7 +78,7 @@ sub negative_list {
     my $self     = shift;
     my $listable = shift;
 
-    # filter out seqs that are in the original list
+    # filter out seq ids that are in the original list
     my @ids = map { $_->full_id } $listable->all_seq_ids;
     return $self->new( ids => [ grep { not $self->is_listed($_) } @ids ] );
 }
@@ -172,6 +173,8 @@ sub load {
 
     my $list = $class->new();
 
+    my @ids;
+
     LINE:
     while (my $line = <$in>) {
         chomp $line;
@@ -180,8 +183,10 @@ sub load {
         next LINE if $line =~ $EMPTY_LINE
                   || $list->is_comment($line);
 
-        $list->add_id($line);
+        push @ids, $line;
     }
+
+    $list->_set_ids( \@ids );
 
     return $list;
 }
@@ -195,7 +200,9 @@ sub load_lis {
     open my $in, '<', $infile;
 
     my $list = $class->new();
+
     my $count;
+    my @ids;
 
     LINE:
     while (my $line = <$in>) {
@@ -211,8 +218,10 @@ sub load_lis {
             next LINE;
         }
 
-        $list->add_id($line);
+        push @ids, $line;
     }
+
+    $list->_set_ids( \@ids );
 
     carp 'Warning: id list size does not match id count in header!'
         unless $list->count_ids == $count;
@@ -262,7 +271,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

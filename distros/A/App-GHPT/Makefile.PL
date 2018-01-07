@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Path::Class" => 0,
     "Term::CallEditor" => 0,
     "Term::Choose" => 0,
-    "WebService::PivotalTracker" => "0.04",
+    "WebService::PivotalTracker" => "0.10",
     "autodie" => "2.25",
     "experimental" => 0,
     "feature" => 0,
@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test::Output" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.000008",
+  "VERSION" => "1.000010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,7 +117,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Test::Output" => 0,
   "Try::Tiny" => 0,
-  "WebService::PivotalTracker" => "0.04",
+  "WebService::PivotalTracker" => "0.10",
   "autodie" => "2.25",
   "experimental" => 0,
   "feature" => 0,

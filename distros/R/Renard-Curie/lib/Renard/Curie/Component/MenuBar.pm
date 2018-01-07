@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MenuBar;
 # ABSTRACT: Component that provides a menu bar for the application
-$Renard::Curie::Component::MenuBar::VERSION = '0.003';
+$Renard::Curie::Component::MenuBar::VERSION = '0.004';
 use Moo;
 use Renard::Incunabula::Frontend::Gtk3::Helper;
 use URI;
@@ -36,6 +36,9 @@ method BUILD(@) {
 	$self->builder->get_object('menu-item-file-open')
 		->signal_connect( activate =>
 			\&on_menu_file_open_activate_cb, $self );
+	$self->builder->get_object('menu-item-file-properties')
+		->signal_connect( activate =>
+			\&on_menu_file_properties_activate_cb, $self );
 	$self->builder->get_object('menu-item-file-quit')
 		->signal_connect( activate =>
 			\&on_menu_file_quit_activate_cb, $self );
@@ -145,6 +148,10 @@ callback on_menu_file_open_activate_cb($event, $self) {
 	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_open_file_dialog_cb => $event );
 }
 
+callback on_menu_file_properties_activate_cb($event, $self) {
+	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_document_properties_dialog_cb => $event );
+}
+
 callback on_menu_file_quit_activate_cb($event, $self) {
 	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_application_quit_cb => $event );
 }
@@ -204,7 +211,7 @@ Renard::Curie::Component::MenuBar - Component that provides a menu bar for the a
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 EXTENDS
 
@@ -256,6 +263,12 @@ Initialises the menu bar signals.
   callback on_menu_file_open_activate_cb($event, $self)
 
 Callback for the C<< File -> Open >> menu item.
+
+=head2 on_menu_file_properties_activate_cb
+
+  callback on_menu_file_properties_activate_cb($event, $self) {
+
+Callback for the C<< File -> Properties >> menu item.
 
 =head2 on_menu_file_quit_activate_cb
 

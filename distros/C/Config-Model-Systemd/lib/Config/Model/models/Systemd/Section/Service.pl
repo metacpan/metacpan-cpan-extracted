@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2017 by Dominique Dumont.
+# This software is Copyright (c) 2015-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -370,7 +370,9 @@ started successfully first. They are not invoked if the service was never starte
 start-up failed, for example because any of the commands specified in C<ExecStart>,
 C<ExecStartPre> or C<ExecStartPost> failed (and weren\'t prefixed with
 C<->, see above) or timed out. Use C<ExecStopPost> to invoke commands when a
-service failed to start up correctly and is shut down again.
+service failed to start up correctly and is shut down again. Also note that, service restart requests are
+implemented as stop operations followed by start operations. This means that C<ExecStop> and
+C<ExecStopPost> are executed during a service restart operation.
 
 It is recommended to use this setting for commands that communicate with the service requesting clean
 termination. When the commands specified with this option are executed it should be assumed that the service is
@@ -416,24 +418,32 @@ as "5min 20s". Defaults to 100ms.',
       },
       'TimeoutStartSec',
       {
-        'description' => 'Configures the time to wait for start-up. If a
+        'description' => "Configures the time to wait for start-up. If a
 daemon service does not signal start-up completion within the
 configured time, the service will be considered failed and
 will be shut down again. Takes a unit-less value in seconds,
-or a time span value such as "5min 20s". Pass
+or a time span value such as \"5min 20s\". Pass
 C<infinity> to disable the timeout logic. Defaults to
 C<DefaultTimeoutStartSec> from the manager
 configuration file, except when
 C<Type=oneshot> is used, in which case the
 timeout is disabled by default (see
 L<systemd-system.conf(5)>).
-',
+
+If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
+the start time to be extended beyond C<TimeoutStartSec>. The first receipt of this message
+must occur before C<TimeoutStartSec> is exceeded, and once the start time has exended beyond
+C<TimeoutStartSec>, the service manager will allow the service to continue to start, provided
+the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
+startup status is finished by C<READY=1>. (see
+L<sd_notify(3)>).
+",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'TimeoutStopSec',
       {
-        'description' => 'Configures the time to wait for stop. If a
+        'description' => "Configures the time to wait for stop. If a
 service is asked to stop, but does not terminate in the
 specified time, it will be terminated forcibly via
 C<SIGTERM>, and after another timeout of
@@ -441,12 +451,19 @@ equal duration with C<SIGKILL> (see
 C<KillMode> in
 L<systemd.kill(5)>).
 Takes a unit-less value in seconds, or a time span value such
-as "5min 20s". Pass C<infinity> to disable the
+as \"5min 20s\". Pass C<infinity> to disable the
 timeout logic. Defaults to
 C<DefaultTimeoutStopSec> from the manager
 configuration file (see
 L<systemd-system.conf(5)>).
-',
+
+If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
+the stop time to be extended beyond C<TimeoutStopSec>. The first receipt of this message
+must occur before C<TimeoutStopSec> is exceeded, and once the stop time has exended beyond
+C<TimeoutStopSec>, the service manager will allow the service to continue to stop, provided
+the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
+(see L<sd_notify(3)>).
+",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -461,11 +478,20 @@ C<TimeoutStopSec> to the specified value.
       },
       'RuntimeMaxSec',
       {
-        'description' => 'Configures a maximum time for the service to run. If this is used and the service has been
+        'description' => "Configures a maximum time for the service to run. If this is used and the service has been
 active for longer than the specified time it is terminated and put into a failure state. Note that this setting
 does not have any effect on C<Type=oneshot> services, as they terminate immediately after
 activation completed. Pass C<infinity> (the default) to configure no runtime
-limit.',
+limit.
+
+If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
+the runtime to be extended beyond C<RuntimeMaxSec>. The first receipt of this message
+must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has exended beyond
+C<RuntimeMaxSec>, the service manager will allow the service to continue to run, provided
+the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
+shutdown is acheived by C<STOPPING=1> (or termination). (see
+L<sd_notify(3)>).
+",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -761,15 +787,6 @@ list of socket units is merged. If the empty string is
 assigned to this option, the list of sockets is reset, and all
 prior uses of this setting will have no
 effect.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'FailureAction',
-      {
-        'description' => 'Configure the action to take when the service enters a failed state. Takes the same values as
-the unit setting C<StartLimitAction> and executes the same actions (see
-L<systemd.unit(5)>). Defaults to
-C<none>. ',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

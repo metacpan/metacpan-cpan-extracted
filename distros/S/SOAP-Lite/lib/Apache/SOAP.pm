@@ -13,7 +13,7 @@ use vars qw(@ISA $VERSION);
 use SOAP::Transport::HTTP;
 
 @ISA = qw(SOAP::Transport::HTTP::Apache);
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 my $server = __PACKAGE__->new;
 

@@ -107,4 +107,25 @@ is_deeply( { $norv_pen->getattrs },
            { rv => '' },
            'pen ->default_from does not overwrite defined-but-false attributes' );
 
+# RGB8 in pens
+{
+   my $pen = Tickit::Pen->new(
+      fg => 15,
+      "fg:rgb8" => "#f0f0f0",
+   );
+
+   ok( $pen->hasattr( "fg:rgb8" ), '$pen has fg:rgb8' );
+   is( $pen->getattr( "fg:rgb8" ), "#F0F0F0", '$pen fg:rgb8 attr value' );
+
+   $pen->chattr( "fg:rgb8" => "#F1F2F3" );
+   is( $pen->getattr( "fg:rgb8" ), "#F1F2F3", '$pen fg:rgb8 attr new value' );
+
+   is_deeply( { $pen->getattrs },
+              { fg => 15, "fg:rgb8" => "#F1F2F3" },
+              '$pen->getattrs' );
+
+   $pen->chattr( "fg:rgb8" => undef );
+   ok( !$pen->hasattr( "fg:rgb8" ), '$pen has no fg:rgb8' );
+}
+
 done_testing;

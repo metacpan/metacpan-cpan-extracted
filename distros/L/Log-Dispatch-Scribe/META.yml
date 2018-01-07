@@ -24,4 +24,4 @@ requires:
   Test::MockObject: '0'
   Test::More: '0'
   Test::Timer: '0'
-version: '0.06'
+version: '0.07'

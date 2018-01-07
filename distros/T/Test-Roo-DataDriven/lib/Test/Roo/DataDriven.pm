@@ -3,6 +3,7 @@ package Test::Roo::DataDriven;
 # ABSTRACT: simple data-driven tests with Test::Roo
 
 # RECOMMEND PREREQ: App::Prove
+# RECOMMEND PREREQ: Ref::Util::XS
 
 use v5.10.1;
 
@@ -18,7 +19,7 @@ use namespace::autoclean;
 
 requires 'run_tests';
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 
 sub _build_data_files {
@@ -35,8 +36,7 @@ sub _build_data_files {
     }
     else {
         @paths =
-          map { path($_) }
-          is_arrayref( $args->{files} )
+          map { path($_) } is_arrayref( $args->{files} )
           ? @{ $args->{files} }
           : ( $args->{files} );
     }
@@ -92,14 +92,14 @@ sub run_data_tests {
         if ( is_arrayref($data) ) {
 
             my @cases = @$data;
-            my $i     = 1;
+            my $i     = 0;
 
             foreach my $case (@cases) {
 
                 my $desc = sprintf(
                     '%s (%u of %u)',
                     $case->{description} // $file->basename,    #
-                    $i++,                                       #
+                    ++$i,                                       #
                     scalar(@cases)                              #
                 );
 
@@ -162,7 +162,7 @@ Test::Roo::DataDriven - simple data-driven tests with Test::Roo
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -478,7 +478,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Robert Rothenberg.
+This software is Copyright (c) 2018 by Robert Rothenberg.
 
 This is free software, licensed under:
 

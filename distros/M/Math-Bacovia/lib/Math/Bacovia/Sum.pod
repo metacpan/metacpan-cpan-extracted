@@ -22,6 +22,12 @@ This section describes the methods provided by the B<Math::Bacovia::Sum> module.
 
 Constructs and returns a new B<Math::Bacovia::Sum> object.
 
+=head2 get
+
+    my @values = $obj->get;
+
+Returns the internal values of the self-object.
+
 =head2 add
 
     $x + $y
@@ -73,12 +79,6 @@ Return a true value when C<x> and C<y> are symbolically equal.
 =head1 SPECIAL METHODS
 
 This section describes the special methods provided by the B<Math::Bacovia::Sum> module.
-
-=head2 inside
-
-    my @values = $obj->inside;
-
-Returns the internal values of the self-object.
 
 =head2 alternatives
 
@@ -170,7 +170,7 @@ L<https://github.com/trizen/Math-Bacovia>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Daniel Șuteu.
+Copyright 2017-2018 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

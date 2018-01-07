@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config::Model" : "2.116",
             "Config::Model::Itself" : "2.012",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
@@ -41,7 +42,7 @@
    "provides" : {
       "Config::Model::Backend::Augeas" : {
          "file" : "lib/Config/Model/Backend/Augeas.pm",
-         "version" : "0.122"
+         "version" : "0.123"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "0.122",
+   "version" : "0.123",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

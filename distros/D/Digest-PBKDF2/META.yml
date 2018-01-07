@@ -3,25 +3,26 @@ abstract: 'This module is a subclass of Digest using the Crypt::PBKDF2 algorithm
 author:
   - 'Amiri Barksdale <abarksdale@campusexplorer.com>'
 build_requires:
-  Scalar::Util: '0'
-  Test::Exception: '0'
-  Test::More: '0'
+  Scalar::Util: '1.49'
+  Test::Exception: '0.43'
+  Test::More: '1.302120'
   lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Digest-PBKDF2
 requires:
-  Crypt::PBKDF2: '0.112020'
+  Crypt::PBKDF2: '0.161520'
   Digest::base: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: git://github.com/amiri/Digest-PBKDF2.git
-version: '0.010'
+version: '0.013'
+x_serialization_backend: 'YAML::Tiny version 1.70'

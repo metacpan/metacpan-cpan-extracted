@@ -5,7 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Alien::GMP: '1.07'
+  Alien::GSL: '1.01'
+  IO::Socket::SSL: '2.043'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 keywords:
@@ -47,7 +49,6 @@ requires:
   ExtUtils::MakeMaker: '7.04'
   File::Which: '1.21'
   Filter::Simple: '0.91'
-  IO::Socket::SSL: '2.043'
   IPC::Run3: '0.048'
   Inline: '0.80'
   Inline::C: '0.76'
@@ -58,6 +59,7 @@ requires:
   Math::GSL: '0.39'
   Module::Refresh: '0.17'
   Module::ScanDeps: '1.19'
+  MongoDB: v1.8.0
   PadWalker: '2.1'
   Parse::Eyapp: '1.21'
   Perl::Critic: '1.121'
@@ -76,5 +78,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '3.402000'
+version: '3.600000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

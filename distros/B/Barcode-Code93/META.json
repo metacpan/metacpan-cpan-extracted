@@ -1,0 +1,65 @@
+{
+   "abstract" : "Generate data for Code 93 barcodes",
+   "author" : [
+      "Mark A. Stratman <stratman@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Barcode-Code93",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Barcode::Code93" : {
+         "file" : "lib/Barcode/Code93.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mstratman/Barcode-Code93",
+         "web" : "https://github.com/mstratman/Barcode-Code93"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::XS version 2.34"
+}
+

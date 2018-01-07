@@ -51,7 +51,9 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Alien::GMP" : "1.07",
+            "Alien::GSL" : "1.01",
+            "IO::Socket::SSL" : "2.043"
          }
       },
       "runtime" : {
@@ -65,7 +67,6 @@
             "ExtUtils::MakeMaker" : "7.04",
             "File::Which" : "1.21",
             "Filter::Simple" : "0.91",
-            "IO::Socket::SSL" : "2.043",
             "IPC::Run3" : "0.048",
             "Inline" : "0.80",
             "Inline::C" : "0.76",
@@ -76,6 +77,7 @@
             "Math::GSL" : "0.39",
             "Module::Refresh" : "0.17",
             "Module::ScanDeps" : "1.19",
+            "MongoDB" : "v1.8.0",
             "PadWalker" : "2.1",
             "Parse::Eyapp" : "1.21",
             "Perl::Critic" : "1.121",
@@ -107,6 +109,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "3.402000",
+   "version" : "3.600000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

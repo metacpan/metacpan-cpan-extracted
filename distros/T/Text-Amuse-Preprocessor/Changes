@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.52 2017-12-29
+
+ - Bump Text::Amuse prerequisite
+
 0.51 2017-12-26
 
  - Add support to make non-break spaces explicit --show-nbsp

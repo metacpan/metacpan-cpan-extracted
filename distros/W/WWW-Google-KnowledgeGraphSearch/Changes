@@ -1,5 +1,8 @@
 Revision history for WWW::Google::KnowledgeGraphSearch
 
+0.05  Sun Jan 07 06:55:00 2018
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.04  Wed Dec 27 11:20:00 2017
       - Added key 'provides' to the Makefile.PL script.
 

@@ -142,10 +142,12 @@ BUILDING
 [% indent(to_text(build.suffix), 2) %]
 [% END %][% IF !readme.testing %]
 TESTING
-
+[% IF test.prefix %]
+[% indent(to_text(test.prefix), 2) %]
+[% ELSE %]
   [% name %] comes with a test suite, which you can run after building
   with:
-
+[% END %]
       make check
 
   If a test fails, you can run a single test with verbose output via:
@@ -154,9 +156,9 @@ TESTING
 
   Do this instead of running the test program directly since it will
   ensure that necessary environment variables are set up.
-[% END %][% IF test.suffix %]
+[% IF test.suffix %]
 [% indent(to_text(test.suffix), 2) %]
-[% END %][% END %]
+[% END %][% END %][% END %]
 [% FOREACH section IN readme.sections %][% section.title FILTER upper %]
 
 [% indent(to_text(section.body), 2) %]

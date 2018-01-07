@@ -1,5 +1,5 @@
 package Net::Async::Ping::ICMP;
-$Net::Async::Ping::ICMP::VERSION = '0.001001';
+$Net::Async::Ping::ICMP::VERSION = '0.003000';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -9,6 +9,7 @@ use Time::HiRes;
 use Carp;
 use Net::Ping;
 use IO::Async::Socket;
+use Scalar::Util qw/blessed/;
 
 use Socket qw( SOCK_RAW SOCK_DGRAM AF_INET NI_NUMERICHOST inet_aton pack_sockaddr_in unpack_sockaddr_in getnameinfo inet_ntop);
 
@@ -68,7 +69,7 @@ sub configure_unknown
 sub ping {
     my $self = shift;
     # Maintain compat with old API
-    my $legacy = ref $_[0] eq 'IO::Async::Loop::Poll';
+    my $legacy = blessed $_[0] and $_[0]->isa('IO::Async::Loop');
     my $loop   = $legacy ? shift : $self->loop;
 
     my ($host, $timeout) = @_;
@@ -82,13 +83,13 @@ sub ping {
     # Let's try a ping socket (unprivileged ping) first. See
     # https://lwn.net/Articles/422330/
     my ($ping_socket, $ident);
-    if ($self->use_ping_socket && socket($fh, AF_INET, SOCK_DGRAM, $proto_num))
+    if ($self->use_ping_socket && $fh->socket(AF_INET, SOCK_DGRAM, $proto_num))
     {
         $ping_socket = 1;
         ($ident) = unpack_sockaddr_in getsockname($fh);
     }
     else {
-        socket($fh, AF_INET, SOCK_RAW, $proto_num) ||
+        $fh->socket(AF_INET, SOCK_RAW, $proto_num) ||
             croak("Unable to create ICMP socket ($!). Are you running as root?"
               ." If not, and your system supports ping sockets, try setting"
               ." /proc/sys/net/ipv4/ping_group_range");
@@ -150,7 +151,6 @@ sub ping {
                 } elsif ($from_type == ICMP_TIME_EXCEEDED) {
                     $f->fail('ICMP Timeout');
                 }
-                $legacy ? $loop->remove($socket) : $ping->remove_child($socket);
             },
         );
 
@@ -162,9 +162,14 @@ sub ping {
            $f,
            $loop->timeout_future(after => $timeout)
         )
-        ->then(
-            sub { Future->done(Time::HiRes::tv_interval($t0)) }
-        )
+        ->then( sub {
+            Future->done(Time::HiRes::tv_interval($t0))
+        })
+        ->followed_by( sub {
+            my $f = shift;
+            $socket->remove_from_parent;
+            $f;
+        })
     });
 }
 
@@ -196,7 +201,7 @@ Net::Async::Ping::ICMP
 
 =head1 VERSION
 
-version 0.002000
+version 0.003000
 
 =head1 DESCRIPTION
 
@@ -248,17 +253,13 @@ An error was received from L<IO::Async::Socket>.
 
 Net::Async::Ping::ICMP
 
-=head1 VERSION
-
-version 0.001001
-
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

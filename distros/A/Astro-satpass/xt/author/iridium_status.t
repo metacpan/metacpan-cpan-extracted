@@ -30,14 +30,14 @@ my $test = 0;
 my $ua = LWP::UserAgent->new(
 #    ssl_opts	=> { verify_hostname	=> 0 },	# Necessary until Perl recognizes McCants' cert.
 );
-my $asof = time_gm( 0, 0, 20, 29, 10, 2017 );
+my $asof = time_gm( 0, 0, 22, 25, 11, 2017 );
 foreach (
 	["T. S. Kelso's Iridium list",
 	'http://celestrak.com/SpaceTrack/query/iridium.txt',
 	$asof,
 	kelso => <<'KELSO'],
 24793IRIDIUM 7 [+]
-24794IRIDIUM 6 [+]
+24794IRIDIUM 6 [-]
 24795IRIDIUM 5 [-]
 24796IRIDIUM 4 [-]
 24836IRIDIUM 914 [-]
@@ -55,7 +55,7 @@ foreach (
 24904IRIDIUM 25 [+]
 24905IRIDIUM 46 [+]
 24906IRIDIUM 23 [+]
-24907IRIDIUM 22 [+]
+24907IRIDIUM 22 [-]
 24925DUMMY MASS 1 [-]
 24926DUMMY MASS 2 [-]
 24944IRIDIUM 29 [-]
@@ -63,11 +63,11 @@ foreach (
 24946IRIDIUM 33 [-]
 24948IRIDIUM 28 [-]
 24950IRIDIUM 31 [+]
-24965IRIDIUM 19 [+]
+24965IRIDIUM 19 [-]
 24966IRIDIUM 35 [+]
 24967IRIDIUM 36 [-]
 24968IRIDIUM 37 [+]
-24969IRIDIUM 34 [+]
+24969IRIDIUM 34 [-]
 25039IRIDIUM 43 [-]
 25040IRIDIUM 41 [+]
 25041IRIDIUM 40 [-]
@@ -121,7 +121,7 @@ foreach (
 27373IRIDIUM 90 [B]
 27374IRIDIUM 94 [+]
 27375IRIDIUM 95 [+]
-27376IRIDIUM 96 [+]
+27376IRIDIUM 96 [P]
 27450IRIDIUM 97 [+]
 27451IRIDIUM 98 [+]
 KELSO
@@ -142,10 +142,136 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 25 November 2017 **</strong></p>
+<p align="center"><strong>** Updated 25 December 2017 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
+
+<p align="left"><strong>Iridium 6 (24794, 1997-020C) decayed on
+23 December 2017</strong></p>
+
+<p align="left"><strong>The fourth Iridium Next launch took place
+on 23 December 2017 and was directed towards orbital plane 2. It
+included Iridiums 116, 130, 131, 134, 135, 137, 138, 141, 151 and
+153.</strong></p>
+
+<p align="left">For a summary of the Iridium launch sequence, see
+my <a href="iridium_launch.htm">Iridium Launch Chronology</a>.
+There is now also a summary of <a href="iridfail.htm">Iridium
+Failures</a>.</p>
+
+<pre><em><strong>Note that the Iridium Next satellites are not expected to produce flares from the Main Mission Antenna in the same way as the original Iridium satellites.</strong></em></pre>
+
+<pre>Orbital  &lt;------------------- Operational satellites -------------------&gt;  Spares
+Plane
+
+Plane 1:  <a href="iridium74and21.htm">21</a>    72    75    70    62    14    64    65    66    67    68     
+
+Plane 2:  22    <a href="iridium94.htm">94</a>    76    25    23    46    47    20    49    <a
+href="iridium11and26.htm">11</a>     3     (<strong>116, 130, 131, 134, 135, 137, 138, 141, 151, 153)</strong> (note: Iridium 23 is probably a partial failure)
+                                                                          <strong>   (Iridiums 113, 120 and Iridiums 115, 124 migrating from Plane 3 towards plane 2 and/or plane 1</strong>
+Plane 3: <strong>117</strong>    <a href="iridium28and95.htm">95</a>    45   <strong>123</strong>   <strong>126</strong>    32    <a
+href="iridium33collision.htm">91</a>   <strong>121</strong>   <strong>118</strong>    59    60  <strong> </strong>  (31) (55) (58)
+                                                                           <strong>  (Iridium 128 migrating from Plane 3 towards plane 4)</strong>
+Plane 4: <strong>119</strong>   <strong>122</strong>    35 <strong>  107</strong>   <strong>132</strong>   <strong>129</strong>   <strong>127</strong> <a
+href="iridium36and97.htm">97</a>/<strong>133</strong>  <strong>125</strong>   <strong>136</strong>   <strong>139</strong>     (61) (37)
+
+Plane 5:  50    56    52    53    <a href="iridium9and84.htm">84</a>    10    54    12    13    83    <a
+href="iridium16and86.htm">86</a>     <a href="iridium91.htm">90 (launched to plane 3, but has been migrated to plane 5)</a>
+                                                                           <strong>  (Iridium 108 and Iridium 105 migrating from Plane 6 towards plane 5)</strong>
+Plane 6: <strong>102   112   104   114   103   109   106</strong>    80    98    41  <strong> 111</strong>     (18)<strong> </strong>(15) (81) <strong>
+</strong>                                                            </pre>
+
+<pre>Original &lt;----- Failed or retired -----&gt;                   &lt;- Failed or retired -&gt;    <em>Note that some of the failed</em> <em>satellites have drifted from the original orbital planes</em>
+Orbital  (but still in orbit)                              (decayed)
+Plane                                	          <em>     </em>
+Plane 1:  73t  63                                           74d           (Iridium 74 deliberately de-orbited. It was probably already a partial failure.)
+Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>           	 	            48d           (Iridium 48 deliberately de-orbited.)
+Plane 3:  <a href="iridium28and95.htm">28</a>   29<font
+color="#FF0000">   </font><a href="iridium33collision.htm"><font
+color="#FF0000">33</font></a>t  57           		            27d  30d      (Iridium 30 deliberately de-orbited.)
+Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7   51    5   19  34  96                8d   6d      (Iridium  8, Iridium 51, Iridium 5, Iridium 6, Iridium 19, Iridium 34 and Iridium 96 deliberately de-orbited. Iridium 7, Iridium 51 and Iridium 6 were probably already partial failures.)
+Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t          		            85d   <a
+href="iridium9and84.htm">9</a>d      (Iridium  9 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
+Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a
+href="iridium17and77.htm">17</a>t  42t 39  40  82  43       79d  77d      (Iridium 40, Iridium 82, Iridium 43, and Iridium 77 deliberately de-orbited.)</pre>
+
+<p>t indicates satellites that have been reported as tumbling out
+of control. </p>
+
+<p><strong>Notes:</strong></p>
+
+<p>This is Rod Sladen's personal opinion of the status of the
+Iridium constellation, and the information herein has not been
+confirmed by the new owners, Iridium Satellite LLC, nor by Boeing
+who are maintaining the system for them.</p>
+
+<p>Iridium&nbsp;11 (until recently referred to by OIG as
+Iridium&nbsp;20), Iridium&nbsp;14, Iridium&nbsp;20 (until
+recently referred to by OIG as Iridium&nbsp;11) and
+Iridium&nbsp;21 are the second (i.e. replacement) satellites
+known by those names. They were previously known as
+Iridium&nbsp;20a, Iridium&nbsp;14a, Iridium&nbsp;11a and
+Iridium&nbsp;21a respectively. </p>
+
+<p>Iridium&nbsp;911, Iridium&nbsp;914, Iridium&nbsp;920,
+Iridium&nbsp;921 are the (failed) satellites originally known as
+Iridium&nbsp;11, Iridium&nbsp;14, Iridium&nbsp;20 and
+Iridium&nbsp;21 respectively. </p>
+
+<p>d indicates satellites that have already decayed: <br>
+Iridium 79 (25470, 1998-051D) decayed on 29 November 2000 <br>
+(see <a href="http://www.satobs.org/seesat/Nov-2000/0256.html">http://www.satobs.org/seesat/Nov-2000/0256.html</a>),
+<br>
+Iridium 85 (25529, 1998-066C) decayed on 30 December 2000 <br>
+(see <a href="http://www.satobs.org/seesat/Dec-2000/0409.html">http://www.satobs.org/seesat/Dec-2000/0409.html</a>),<br>
+Iridium 48 (25107, 1997-082D) decayed on 5 May 2001 <br>
+(see <a href="http://www.satobs.org/seesat/May-2001/0028.html">http://www.satobs.org/seesat/May-2001/0028.html</a>),
+and<br>
+Iridium 27 (24947, 1997-051D) decayed on 1 February 2002 <br>
+(see <a href="http://www.satobs.org/seesat/Feb-2002/0002.html">http://www.satobs.org/seesat/Feb-2002/0002.html</a>)<br>
+Iridium 9 (24838, 1997-030C) decayed on 11 March 2003<br>
+(see <a href="http://www.satobs.org/seesat/Mar-2003/0116.html">http://www.satobs.org/seesat/Mar-2003/0116.html</a>)</p>
+
+<p><a href="iridium5and51.htm">Iridium 5 and Iridium 51 were
+confused</a> during August 2001.</p>
+
+<p>Note that the identities of various members of the Iridium
+constellation have been confused at various times in the past. <br>
+Some interchanges of identities seems to have become permanent: <br>
+Iridium 24 is tumbling, and correctly labelled by Spacecom as
+Iridium 24, and correctly tracked, but under 25105 (1997-082B)
+which are the catalog number and launch identifier which
+originally belonged to Iridium 46. <br>
+Iridium 46 is operational, and correctly labelled by Spacecom as
+Iridium 46, and correctly tracked, but under 24905 (1997-043C)
+which are the catalog number and launch identifier which
+originally belonged to Iridium 24. <br>
+Iridium 11 is operational, and is now correctly labelled by
+Spacecom as Iridium 11, and correctly tracked, but under 25578
+(1998-074B) which are the catalog number and launch identifier
+which originally belonged to (the second) Iridium 20. <br>
+Iridium 20 is operational, and is now correctly labelled by
+Spacecom as Iridium 20, and correctly tracked, but under 25577
+(1998-074A) which are the catalog number and launch identifier
+which originally belonged to (the second) Iridium 11. </p>
+
+<p><a name="Recent changes"><strong>Recent changes</strong></a>: </p>
+
+<p align="left">(14 December 2017): <strong>The process of
+de-orbiting Iridium 96 (27376, 2002-005E has started.</strong></p>
+
+<p align="left">(by early December 2017): <br>
+The orbit of Iridium 61 (25263, 1998-018B) has been lowered by
+15km and it is presumably being retained as a spare for plane 4.<br>
+The orbit of Iridium 37 (24968, 1997-056D) has been lowered by
+15km and it is presumably being retained as a spare for plane 4.<br>
+<strong>The process of de-orbiting Iridium 34 (24969, 1997-056E)
+has started.<br>
+The process of de-orbiting Iridium 19 (24965, 1997-056A) has
+started.<br>
+The process of de-orbiting Iridium 6 (24794, 1997-020C) has
+started.</strong></p>
 
 <p align="left">(24 November 2017) <strong>Iridium 8 (24792,
 1997-020A) decayed on 24 November 2017.</strong></p>
@@ -220,109 +346,6 @@ the operational orbit.</p>
 <p align="left">(9 October 2017) The third batch of 10 Iridium
 Next satellites (107, 119, 122, 125, 127, 129, 132, 133, 136,
 139) were successfully launched to orbital plane 4. </p>
-
-<p align="left">For a summary of the Iridium launch sequence, see
-my <a href="iridium_launch.htm">Iridium Launch Chronology</a>.
-There is now also a summary of <a href="iridfail.htm">Iridium
-Failures</a>.</p>
-
-<pre><em><strong>Note that the Iridium Next satellites are not expected to produce flares from the Main Mission Antenna in the same way as the original Iridium satellites.</strong></em></pre>
-
-<pre>Orbital  &lt;------------------- Operational satellites -------------------&gt;  Spares
-Plane
-
-Plane 1:  <a href="iridium74and21.htm">21</a>    72    75    70    62    14    64    65    66    67    68     
-
-Plane 2:  22    <a href="iridium94.htm">94</a>    76    25    23    46    47    20    49    <a
-href="iridium11and26.htm">11</a>     3     (note: Iridium 23 is probably a partial failure)
-                                                                          <strong>   (Iridiums 113, 120 and Iridiums 115, 124 migrating from Plane 3 towards plane 2 and/or plane 1</strong>
-Plane 3: <strong>117</strong>    <a href="iridium28and95.htm">95</a>    45   <strong>123</strong>   <strong>126</strong>    32    <a
-href="iridium33collision.htm">91</a>   <strong>121</strong>   <strong>118</strong>    59    60  <strong> </strong>  (31) (55) (58)
-                                                                           <strong>  (Iridium 128 migrating from Plane 3 towards plane 4)</strong>
-Plane 4:19/<strong>119</strong> 34/<strong>122</strong> 35 <strong>  107</strong>   <strong>132</strong>   <strong>129</strong>   <strong>127</strong> <a
-href="iridium36and97.htm">97</a>/<strong>133</strong> 96/<strong>125</strong> 37/<strong>136</strong> 61/<strong>139</strong> ((6)) (note: Iridium 6 probably partial failure)
-
-Plane 5:  50    56    52    53    <a href="iridium9and84.htm">84</a>    10    54    12    13    83    <a
-href="iridium16and86.htm">86</a>     <a href="iridium91.htm">90 (launched to plane 3, but has been migrated to plane 5)</a>
-                                                                           <strong>  (Iridium 108 and Iridium 105 migrating from Plane 6 towards plane 5)</strong>
-Plane 6: <strong>102   112   104   114   103   109   106</strong>    80    98    41  <strong> 111</strong>     (18)<strong> </strong>(15) (81) <strong>
-</strong>                                                            </pre>
-
-<pre>Original &lt;----- Failed -----&gt;                             &lt;- Failed -&gt;    <em>Note that some of the failed</em> <em>satellites have drifted from the original orbital planes</em>
-Orbital  (but still in orbit)                              (decayed)
-Plane                                	          <em>     </em>
-Plane 1:  73t  63                                           74d           (Iridium 74 deliberately de-orbited. It was probably already a partial failure.)
-Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>           	 	            48d           (Iridium 48 deliberately de-orbited.)
-Plane 3:  <a href="iridium28and95.htm">28</a>   29<font
-color="#FF0000">   </font><a href="iridium33collision.htm"><font
-color="#FF0000">33</font></a>t  57           		            27d  30d      (Iridium 30 deliberately de-orbited.)
-Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7   51   5                              8d           (Iridium  8, Iridium 51 and Iridium 5 deliberately de-orbited. Iridium 7 and Iridium 51 were probably already partial failures.)
-Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t          		            85d   <a
-href="iridium9and84.htm">9</a>d      (Iridium  9 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
-Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a
-href="iridium17and77.htm">17</a>t 42t 39  40  82  43        79d  77d      (Iridium 40, Iridium 82, Iridium 43, and Iridium 77 deliberately de-orbited.)</pre>
-
-<p>t indicates satellites that have been reported as tumbling out
-of control. </p>
-
-<p><strong>Notes:</strong></p>
-
-<p>This is Rod Sladen's personal opinion of the status of the
-Iridium constellation, and the information herein has not been
-confirmed by the new owners, Iridium Satellite LLC, nor by Boeing
-who are maintaining the system for them.</p>
-
-<p>Iridium&nbsp;11 (until recently referred to by OIG as
-Iridium&nbsp;20), Iridium&nbsp;14, Iridium&nbsp;20 (until
-recently referred to by OIG as Iridium&nbsp;11) and
-Iridium&nbsp;21 are the second (i.e. replacement) satellites
-known by those names. They were previously known as
-Iridium&nbsp;20a, Iridium&nbsp;14a, Iridium&nbsp;11a and
-Iridium&nbsp;21a respectively. </p>
-
-<p>Iridium&nbsp;911, Iridium&nbsp;914, Iridium&nbsp;920,
-Iridium&nbsp;921 are the (failed) satellites originally known as
-Iridium&nbsp;11, Iridium&nbsp;14, Iridium&nbsp;20 and
-Iridium&nbsp;21 respectively. </p>
-
-<p>d indicates satellites that have already decayed: <br>
-Iridium 79 (25470, 1998-051D) decayed on 29 November 2000 <br>
-(see <a href="http://www.satobs.org/seesat/Nov-2000/0256.html">http://www.satobs.org/seesat/Nov-2000/0256.html</a>),
-<br>
-Iridium 85 (25529, 1998-066C) decayed on 30 December 2000 <br>
-(see <a href="http://www.satobs.org/seesat/Dec-2000/0409.html">http://www.satobs.org/seesat/Dec-2000/0409.html</a>),<br>
-Iridium 48 (25107, 1997-082D) decayed on 5 May 2001 <br>
-(see <a href="http://www.satobs.org/seesat/May-2001/0028.html">http://www.satobs.org/seesat/May-2001/0028.html</a>),
-and<br>
-Iridium 27 (24947, 1997-051D) decayed on 1 February 2002 <br>
-(see <a href="http://www.satobs.org/seesat/Feb-2002/0002.html">http://www.satobs.org/seesat/Feb-2002/0002.html</a>)<br>
-Iridium 9 (24838, 1997-030C) decayed on 11 March 2003<br>
-(see <a href="http://www.satobs.org/seesat/Mar-2003/0116.html">http://www.satobs.org/seesat/Mar-2003/0116.html</a>)</p>
-
-<p><a href="iridium5and51.htm">Iridium 5 and Iridium 51 were
-confused</a> during August 2001.</p>
-
-<p>Note that the identities of various members of the Iridium
-constellation have been confused at various times in the past. <br>
-Some interchanges of identities seems to have become permanent: <br>
-Iridium 24 is tumbling, and correctly labelled by Spacecom as
-Iridium 24, and correctly tracked, but under 25105 (1997-082B)
-which are the catalog number and launch identifier which
-originally belonged to Iridium 46. <br>
-Iridium 46 is operational, and correctly labelled by Spacecom as
-Iridium 46, and correctly tracked, but under 24905 (1997-043C)
-which are the catalog number and launch identifier which
-originally belonged to Iridium 24. <br>
-Iridium 11 is operational, and is now correctly labelled by
-Spacecom as Iridium 11, and correctly tracked, but under 25578
-(1998-074B) which are the catalog number and launch identifier
-which originally belonged to (the second) Iridium 20. <br>
-Iridium 20 is operational, and is now correctly labelled by
-Spacecom as Iridium 20, and correctly tracked, but under 25577
-(1998-074A) which are the catalog number and launch identifier
-which originally belonged to (the second) Iridium 11. </p>
-
-<p><a name="Recent changes"><strong>Recent changes</strong></a>: </p>
 
 <p align="left">(28 September 2017): <strong>Iridium 30 (24949,
 1997-051F) decayed on 28 September 2017.</strong></p>
@@ -450,7 +473,7 @@ it is presumably being retained as a spare for plane 6.<br>
 Iridium 103 (2017-003B) is <strong>in service</strong> at Plane
 6. Slot 5, replacing Iridium 80 (25469, 1998-051C). <strong><br>
 </strong>- The orbit of Iridium 80 has been raised by 10km
-allowing it to move to another slot in plane 6..<br>
+allowing it to move to another slot in plane 6.<br>
 Iridium 109 (2017-003C) is <strong>in service</strong> at Plane
 6. Slot 6, replacing Iridium 77 (25471, 1998-051E).<br>
 - Iridium 77 initially remained near its previous orbital
@@ -465,25 +488,25 @@ remain in the insertion orbit, but have now started migrating
 from Orbital Plane 6 towards Orbital Plane 5</strong></p>
 
 <p>Iridium 111 (2017-003K) was raised to the operational orbit at
-Plane 6. Slot 11, a few seconds behind Iridium 43 (25039,
+Plane 6, Slot 11, a few seconds behind Iridium 43 (25039,
 1997-069A)<br>
 Iridium 102 (2017-003D) was raised to the operational orbit at
-Plane 6. Slot 1, a few seconds behind Iridium 18 (24872,
+Plane 6, Slot 1, a few seconds behind Iridium 18 (24872,
 1997-034D)<br>
 Iridium 112 (2017-003J) was raised to the operational orbit at
-Plane 6. Slot 2, a few seconds behind Iridium 98 (27451,
+Plane 6, Slot 2, a few seconds behind Iridium 98 (27451,
 2002-031B)<br>
 Iridium 104 (2017-003F) was raised to the operational orbit at
-Plane 6. Slot 3, a few seconds behind Iridium 40 (25041,
+Plane 6, Slot 3, a few seconds behind Iridium 40 (25041,
 1997-069C)<br>
 Iridium 114 (2017-003G) was raised to the operational orbit at
-Plane 6. Slot 4, a few seconds behind Iridium 15 (24869,
+Plane 6, Slot 4, a few seconds behind Iridium 15 (24869,
 1997-034A)<br>
 Iridium 103 (2017-003B) was raised to the operational orbit at
-Plane 6. Slot 5, a few seconds behind Iridium 80 (25469,
+Plane 6, Slot 5, a few seconds behind Iridium 80 (25469,
 1998-051C)<br>
 Iridium 109 (2017-003C) was raised to the operational orbit at
-Plane 6. Slot 6, a few seconds behind Iridium 77 (25471,
+Plane 6, Slot 6, a few seconds behind Iridium 77 (25471,
 1998-051E)</p>
 
 <p>On 17 February 2017, Iridium Communications announced that the

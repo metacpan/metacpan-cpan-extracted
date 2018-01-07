@@ -1,6 +1,6 @@
 package Bio::FastParsers::Constants;
 # ABSTRACT: Distribution-wide constants for Bio::FastParsers
-$Bio::FastParsers::Constants::VERSION = '0.173510';
+$Bio::FastParsers::Constants::VERSION = '0.173640';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Bio::FastParsers::Constants - Distribution-wide constants for Bio::FastParsers
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

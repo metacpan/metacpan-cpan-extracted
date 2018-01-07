@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Renard::Incunabula::Common::Setup;
 # ABSTRACT: Packages that can be imported into every module
-$Renard::Incunabula::Common::Setup::VERSION = '0.003';
+$Renard::Incunabula::Common::Setup::VERSION = '0.004';
 use autodie;
 
 use Import::Into;
@@ -57,7 +57,7 @@ Renard::Incunabula::Common::Setup - Packages that can be imported into every mod
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

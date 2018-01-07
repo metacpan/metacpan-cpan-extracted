@@ -17,7 +17,7 @@ if (! $vars) {
 
 WriteMakefile (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.44',
+    VERSION      => '0.45',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',

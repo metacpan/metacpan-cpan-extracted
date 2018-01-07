@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2016-2018 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software; you can redistribute it and/or modify it
@@ -19,7 +19,7 @@
 # USA.
 
 package Locale::XGettext::TT2;
-
+$Locale::XGettext::TT2::VERSION = '0.3';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);
@@ -35,7 +35,7 @@ This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 Written by Guido Flohr (http://www.guido-flohr.net/).
 ',
-    program => $0, years => '2016-2017', 
+    program => $0, years => '2016-2018', 
     version => $Locale::XGettext::VERSION);
 }
 
@@ -52,6 +52,17 @@ sub canExtractAll {
 
 sub canKeywords {
     shift;
+}
+
+sub languageSpecificOptions {
+    return [
+        [
+            'plugin|plug-in=s',
+            'plug_in',
+            '    --plug-in=PLUG-IN, --plugin=PLUG-IN',
+            __"the plug-in name (defaults to 'Gettext')",
+        ]
+    ];
 }
 
 sub defaultKeywords {
@@ -109,7 +120,7 @@ sub readFile {
 }
 
 package Locale::XGettext::TT2::Parser;
-
+$Locale::XGettext::TT2::Parser::VERSION = '0.3';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);
@@ -122,7 +133,9 @@ sub split_text {
     my $chunks = $self->SUPER::split_text($text) or return;
 
     my $keywords = $self->{__xgettext}->keywords;
-    
+    my $plug_in = $self->{__xgettext}->option('plug_in');
+    $plug_in = 'Gettext' if !defined $plug_in;
+
     my $ident;
     while (my $chunk = shift @$chunks) {
         if (!ref $chunk) {
@@ -135,12 +148,12 @@ sub split_text {
         next if !ref $tokens;
 
         if ('USE' eq $tokens->[0] && 'IDENT' eq $tokens->[2]) {
-            if ('Gettext' eq $tokens->[3]
+            if ($plug_in eq $tokens->[3]
                 && (4 == @$tokens
                     || '(' eq $tokens->[4])) {
-                $ident = 'Gettext';
+                $ident = $plug_in;
             } elsif ('ASSIGN' eq $tokens->[4] && 'IDENT' eq $tokens->[6]
-                     && 'Gettext' eq $tokens->[7]) {
+                     && $plug_in eq $tokens->[7]) {
                 $ident = $tokens->[3];
             }
             next;
@@ -148,47 +161,45 @@ sub split_text {
 
         next if !defined $ident;
 
-        if ('IDENT' eq $tokens->[0] && $ident eq $tokens->[1]
-            && 'DOT' eq $tokens->[2] && 'IDENT' eq $tokens->[4]
-            && exists $keywords->{$tokens->[5]}) {
-            my $keyword = $keywords->{$tokens->[5]};
-            $self->__extractEntry($text, $lineno, $keyword, 
-                                  @$tokens[6 .. $#$tokens]);
-        } else {
-            for (my $i = 0; $i < @$tokens; $i += 2) {
-                if ('FILTER' eq $tokens->[$i]
+        for (my $i = 0; $i < @$tokens; $i += 2) {
+            if ('IDENT' eq $tokens->[$i] && $ident eq $tokens->[$i + 1]
+                && 'DOT' eq $tokens->[$i + 2] && 'IDENT' eq $tokens->[$i + 4]
+                && exists $keywords->{$tokens->[$i + 5]}) {
+                my $keyword = $keywords->{$tokens->[$i + 5]};
+                $self->__extractEntry($text, $lineno, $keyword, 
+                                    @$tokens[$i + 6 .. $#$tokens]);
+            } elsif ('FILTER' eq $tokens->[$i]
                     && 'IDENT' eq $tokens->[$i + 2]
                     && exists $keywords->{$tokens->[$i + 3]}
                     && '(' eq $tokens->[$i + 4]) {
-                    my @tokens;
-                    my $keyword = $keywords->{$tokens->[$i + 3]};
-                    # Inject the block contents as the first argument.
-                    if ($i) {
-                        my $first_arg;
-                        if ($tokens->[$i - 2] eq 'LITERAL') {
-                            $first_arg = $tokens->[$i - 1];
-                        } else {
-                            next;
-                        }
-                        splice @$tokens, 6 + $i, 0, 
-                               'LITERAL', $first_arg, 'COMMA', ',';
+                my @tokens;
+                my $keyword = $keywords->{$tokens->[$i + 3]};
+                # Inject the block contents as the first argument.
+                if ($i) {
+                    my $first_arg;
+                    if ($tokens->[$i - 2] eq 'LITERAL') {
+                        $first_arg = $tokens->[$i - 1];
                     } else {
-                        next if !@$chunks;
-                        my $first_arg;
-                        if (ref $chunks->[0]) {
-                            next if $chunks->[0]->[2] ne 'ITEXT';
-                            $first_arg = $chunks->[0]->[0];
-                        } elsif ('TEXT' eq $chunks->[0]) {
-                            $first_arg = $chunks->[1];
-                        } else {
-                            next;
-                        }
-                        splice @$tokens, 6, 0, 
-                               'LITERAL', $first_arg, 'COMMA', ',';
+                        next;
                     }
-                    $self->__extractEntry($text, $lineno, $keyword,
-                                          @$tokens[$i + 4 .. $#$tokens]);
+                    splice @$tokens, 6 + $i, 0, 
+                        'LITERAL', $first_arg, 'COMMA', ',';
+                } else {
+                    next if !@$chunks;
+                    my $first_arg;
+                    if (ref $chunks->[0]) {
+                        next if $chunks->[0]->[2] ne 'ITEXT';
+                        $first_arg = $chunks->[0]->[0];
+                    } elsif ('TEXT' eq $chunks->[0]) {
+                        $first_arg = $chunks->[1];
+                    } else {
+                        next;
+                    }
+                    splice @$tokens, 6, 0, 
+                        'LITERAL', $first_arg, 'COMMA', ',';
                 }
+                $self->__extractEntry($text, $lineno, $keyword,
+                                    @$tokens[$i + 4 .. $#$tokens]);
             }
         }
     }

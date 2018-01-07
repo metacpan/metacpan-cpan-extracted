@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Bible::OBML",
   "PREREQ_PM" => {
     "Bible::Reference" => "1.02",
+    "Clone" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::Privacy" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t t/Bible/*.t t/Bible/OBML/*.t"
   }
@@ -46,6 +47,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Bible::Reference" => "1.02",
+  "Clone" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

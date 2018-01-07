@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Net-Async-Redis,
-version 1.003:
+version 1.005:
 
   Redis support for IO::Async
 

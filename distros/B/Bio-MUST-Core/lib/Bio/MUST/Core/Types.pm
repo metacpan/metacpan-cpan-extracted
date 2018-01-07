@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.173500';
+$Bio::MUST::Core::Types::VERSION = '0.173620';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -74,6 +74,18 @@ coerce 'Bio::MUST::Core::SeqId'
     => via { Bio::MUST::Core::SeqId->new(full_id => $_) }
 ;
 
+# auto-build ArrayRef[full_id] from ArrayRef[SeqId] or ArrayRef[Seq]
+# useful for IdList and IdMapper objects
+subtype 'Bio::MUST::Core::Types::full_ids'
+    => as 'ArrayRef[Str]';
+
+coerce 'Bio::MUST::Core::Types::full_ids'
+    => from 'ArrayRef[Bio::MUST::Core::SeqId]'
+    => via { [ map { $_->full_id } @{$_} ] }
+
+    => from 'ArrayRef[Bio::MUST::Core::Seq]'
+    => via { [ map { $_->full_id } @{$_} ] }
+;
 
 # quite tolerant subtype designed to preserve original casing
 # however FASTA '-' symbols are converted to ALI '*' during coercion
@@ -119,7 +131,7 @@ coerce 'Bio::MUST::Core::IdList'
     => from 'ArrayRef[Str]'
     => via { Bio::MUST::Core::IdList->new( ids => $_ ) }
 
-# TODO: uncomment and check this
+# TODO: uncomment and check this (still useful?)
 #     => from 'ArrayRef[Bio::MUST::Core::SeqId]'
 #     => via { Bio::MUST::Core::IdList->new(
 #         ids => [ map { $_->full_id } @{$_} ]
@@ -137,7 +149,7 @@ coerce 'Bio::MUST::Core::IdList'
     => via { Bio::MUST::Core::IdList->load( $_ ) }
 ;
 
-# TODO: add coercion for IdMapper from HashRef[SeqId], HashRef[Seq]
+# TODO: add coercion for IdMapper from HashRef[SeqId], HashRef[Seq]?
 
 coerce 'Bio::MUST::Core::IdMapper'
     => from 'HashRef[Str]'
@@ -197,7 +209,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.173500
+version 0.173620
 
 =head1 SYNOPSIS
 

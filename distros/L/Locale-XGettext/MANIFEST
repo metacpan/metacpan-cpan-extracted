@@ -3,9 +3,9 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
-NEWS
 README.md
 README.pod
 bin/xgettext-txt

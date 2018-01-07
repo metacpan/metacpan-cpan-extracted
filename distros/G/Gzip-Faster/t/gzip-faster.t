@@ -6,9 +6,6 @@ use FindBin '$Bin';
 use Test::More;
 use Gzip::Faster ':all';
 
-my $gzipped_empty = gzip ('');
-is ($gzipped_empty, undef, "Empty input results in the undefined value");
-
 my $tests = 'test this';
 my $zipped = gzip ($tests);
 my $unzipped = gunzip ($zipped);
@@ -216,6 +213,17 @@ $warning = undef;
 gunzip_file ($filename, mod_time => 'monkeyshines');
 ok ($warning, "got warning");
 like ($warning, qr/scalar reference/, "Warning on non-reference");
+
+my @subs = (\& inflate, \& inflate_raw, \& gunzip,
+	    \& gzip, \& deflate, \& deflate_raw);
+
+for my $sub (@subs) {
+    $warning = undef;
+    my $emptyout = &{$sub} ('');
+    is ($emptyout, undef, "got undefined value (un)compressing empty string"); 
+    ok ($warning, "got warning");
+    like ($warning, qr/empty string/);
+}
 
 # Delete  the file now we have used it.
 

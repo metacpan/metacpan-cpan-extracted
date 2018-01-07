@@ -1,5 +1,13 @@
 Revision history for HackaMol
 
+0.047     2017-12-28 19:50:18-07:00 America/Denver
+  * added mol_disulfide_bonds($mol,$fudge) to HackaMol.pm
+  * added read_pdbfile_mol to HackaMol.pm for reading pdb header and model ids
+  * added attr 'info' to HM::Role::AtomGroupRole 
+  * added attr 'model_ids' to HM::Molecule 
+  * pdb models are again ignored if the number of atoms changes
+  * readline_func hook added to main HackaMol class to allow modified parse of PDBs  
+
 0.046     2017-10-10 20:36:46-06:00 America/Denver
   * add selection hash attribute to manage selections (todo, use it or lose it!).
   * fix model read bug where number of atoms grows between models (see the unusual 2d6b)

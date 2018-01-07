@@ -1,0 +1,36 @@
+---
+abstract: 'L<Net::Async::Redis> backend for L<Job::Async>'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::HexString: '0'
+  Test::More: '0.98'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Job-Async-Redis
+requires:
+  Future: '0.37'
+  Job::Async: '0.001'
+  Log::Any: '1.050'
+  Net::Async::Redis: '1.004'
+  curry: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Job-Async-Redis/issues
+  repository: git://github.com/team-at-cpan/Job-Async-Redis.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

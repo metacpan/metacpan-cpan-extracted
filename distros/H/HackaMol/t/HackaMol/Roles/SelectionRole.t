@@ -32,7 +32,7 @@ ok(
 is( $backbone->natoms,                   152, 'select_group("backbone")' );
 is( $mol->select_group('water')->natoms, 2,   'select_group("water")' );
 is( $mol->select_group("sidechain")->natoms,
-    142, 'select_group("sidechain")' );
+    141, 'select_group("sidechain")' );
 
 is($mol->select_group("chain 1")->natoms,2, "integer chain no warnings");
 
@@ -93,6 +93,7 @@ $mol->set_selection_cr(
                 or $_->name eq 'CA'
                 or $_->name eq 'C' 
                 or $_->name eq 'O' 
+                or $_->name eq 'OXT' 
             )
         } @_;
     }

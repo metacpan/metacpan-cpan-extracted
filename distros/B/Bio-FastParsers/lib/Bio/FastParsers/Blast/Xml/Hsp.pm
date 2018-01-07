@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Hsp;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Hsp::VERSION = '0.173510';
+$Bio::FastParsers::Blast::Xml::Hsp::VERSION = '0.173640';
 use Moose;
 use namespace::autoclean;
 
@@ -194,7 +194,7 @@ Bio::FastParsers::Blast::Xml::Hsp - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.173510
+version 0.173640
 
 =head1 SYNOPSIS
 

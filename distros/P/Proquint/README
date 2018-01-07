@@ -1,0 +1,31 @@
+NAME
+    Proquint - convert to and from proquint strings
+
+VERSION
+    0.003 (2018-01-03)
+
+SYNOPSIS
+        use Proquint ':all';
+
+        my $quint = uint32proquint(0xCF000001);    # "lusab-babad"
+        my $int   = proquint32uint($quint);        # 0xCF000001
+
+        my $quint2 = hex2proquint("dead1234beef"); # "tupot-damuh-ruroz"
+        my $hex    = proquint2hex($quint2);        # "dead1234beef"
+
+DESCRIPTION
+    Proquints <https://arxiv.org/html/0901.4016> are readable, spellable,
+    and pronounceable identifiers. The Proquints module converts 32-bit
+    integers and hexadecimal strings to and from proquints.
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2018 Mark Lawrence <nomad@null.net>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+

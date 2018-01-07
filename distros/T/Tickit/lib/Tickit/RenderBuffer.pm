@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::RenderBuffer;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Carp;
 use Scalar::Util qw( refaddr );
@@ -374,6 +374,14 @@ and no buffer changes are made.
 
 =cut
 
+=head2 skiprect
+
+   $rb->skiprect( $rect )
+
+Sets the range of cells given by the rectangle to skipped state.
+
+=cut
+
 =head2 text_at
 
    $cols = $rb->text_at( $line, $col, $text, $pen )
@@ -576,6 +584,23 @@ pen, and updates the position.
 While this is also achieveable by the C<text> and C<text_at> methods, these
 methods are implemented without storing a text segment, so can be more
 efficient than many single-column wide C<text_at> calls.
+
+=cut
+
+=head2 copyrect
+
+=head2 moverect
+
+   $rb->copyrect( $dest, $src )
+
+   $rb->moverect( $dest, $src )
+
+Copies (or moves) buffered content from one rectangular region to another.
+The two regions may overlap.
+
+The move operation is identical to the copy operation followed by setting the
+vacated areas of the source rectangle not covered by the destination to
+skipping state.
 
 =cut
 

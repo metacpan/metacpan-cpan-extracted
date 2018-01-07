@@ -1,15 +1,22 @@
 Revision history for Perl extension Tk::HistEntry.
 
-0.44	- stable release with all changes in 0.43_50..0.43_51
+0.45	2017-12-31
+	- stable release with all changes in 0.44_50
 
-0.43_51
+0.44_50	2017-01-01
+	- converted t/newclass.t to Test::More
+
+0.44	2016-11-24
+	- stable release with all changes in 0.43_50..0.43_51
+
+0.43_51	2016-11-23
 	- tests do not hang anymore on twm
 	- converted one test file to Test::More
 
-0.43_50
+0.43_50	2008-09-23
 	- more robust test against missing DISPLAYs
 
-0.43
+0.43	2007-02-02
 	- no code changes, just fixed a possibly failing test
 	  (depending on setting of window focus)
 

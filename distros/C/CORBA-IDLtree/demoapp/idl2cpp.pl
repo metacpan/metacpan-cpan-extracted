@@ -486,6 +486,7 @@ sub idl2cpp {
         emit(typeof($arg[0]) . " $name = ");
         emit join(' ', @{$arg[1]});
     } elsif ($type == CORBA::IDLtree::ENUM) {
+        @arg = CORBA::IDLtree::enum_literals($subord);
         emit "enum $name { ";
         if ($#arg > 2) {
             $indentlevel += 5;

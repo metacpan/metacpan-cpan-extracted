@@ -1,5 +1,5 @@
 package Alien::MuPDF;
-$Alien::MuPDF::VERSION = '0.009';
+$Alien::MuPDF::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -42,6 +42,11 @@ sub Inline {
 					'lib',  $_ ) }
 				qw(libmupdf.a libmupdfthird.a)
 			);
+		$params->{PRE_HEAD} = <<'		EOF';
+		#if defined(_MSC_VER) || defined(__MINGW32__)
+		#  define NO_XSLOCKS /* To avoid PerlProc_setjmp/PerlProc_longjmp unresolved symbols */
+		#endif
+		EOF
 
 		return $params;
 	}
@@ -59,7 +64,7 @@ Alien::MuPDF - Alien package for the MuPDF PDF rendering library
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 METHODS
 
@@ -75,6 +80,8 @@ This module supports L<Inline's with functionality|Inline/"Playing 'with' Others
 =head1 SEE ALSO
 
 L<MuPDF|http://mupdf.com/>
+
+L<Repository information|http://project-renard.github.io/doc/development/repo/p5-Alien-MuPDF/>
 
 =head1 AUTHOR
 

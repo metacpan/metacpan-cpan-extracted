@@ -3,7 +3,7 @@
 # Tests for the App::DocKnot module API.
 #
 # Written by Russ Allbery <rra@cpan.org>
-# Copyright 2013, 2016 Russ Allbery <rra@cpan.org>
+# Copyright 2013, 2016, 2017 Russ Allbery <rra@cpan.org>
 #
 # See LICENSE for licensing terms.
 
@@ -16,7 +16,7 @@ use lib 't/lib';
 use File::Spec;
 use Test::RRA qw(is_file_contents);
 
-use Test::More tests => 17;
+use Test::More tests => 21;
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot') }

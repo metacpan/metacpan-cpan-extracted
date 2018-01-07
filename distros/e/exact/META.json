@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,8 +50,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0",
-            "blib" : "1.01"
+            "Test::More" : "0"
          }
       }
    },
@@ -67,7 +66,7 @@
          "web" : "https://github.com/gryphonshafer/exact"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "1.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

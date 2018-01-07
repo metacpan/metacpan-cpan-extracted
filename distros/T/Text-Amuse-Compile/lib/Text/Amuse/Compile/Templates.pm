@@ -826,6 +826,14 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 \hyphenation{ [% doc.hyphenation %] }
 [% END %]
 
+[% IF safe_options.start_with_empty_page %]
+% start with an empty page
+\thispagestyle{empty}
+\strut
+\cleardoublepage
+[% END %]
+
+
 [% IF safe_options.nocoverpage %]
 \thispagestyle{empty}
 [% ELSE %]

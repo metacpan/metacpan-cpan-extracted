@@ -1,5 +1,9 @@
 Changes for Locale-XGettext.
 
+0.3  2017-12-31
+  - Allow overriding program name.
+  - Allow setting CLI options for internal use.
+
 0.2 2017-09-14
   - Allow arbitrary keywords.
   - Check for sufficient version of Getopt::Long.

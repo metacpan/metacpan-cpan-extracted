@@ -1,0 +1,8 @@
+SOME HEADER information
+SOME MORE HEADER information
+MODEL        2                                                                  
+ATOM      1  N   ASN     1      -8.901   4.127  -0.555  1.00  0.00           N 1 
+ENDMDL
+MODEL        4                                                                  
+ATOM      1  N   ASN     1     -18.901   4.127  -0.555  1.00  0.00           N 1 
+ENDMDL

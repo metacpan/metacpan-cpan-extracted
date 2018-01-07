@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Barcelona
 
+0.53  Sat Jan 06 10:15:00 2018
+      - Now using namespace::autoclean.
+
+0.52  Sat Dec 30 02:00:00 2017
+      - Updated dependency on Map::Tube v3.43.
+
 0.51  Fri Dec 08 15:55:00 2017
       - Updated dependency on Map::Tube v3.42.
 

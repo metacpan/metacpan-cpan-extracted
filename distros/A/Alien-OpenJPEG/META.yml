@@ -5,8 +5,6 @@ author:
 build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
-  Alien::Build::Plugin::Gather::Dino: '0'
-  Alien::gmake: '0'
   ExtUtils::MakeMaker: '6.52'
   Test2::V0: '0'
   Test::Alien: '0'
@@ -18,20 +16,38 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-OpenJPEG
 requires:
-  Alien::Base::Dino: '0'
-  parent: '0'
+  Alien::Base: '0.038'
+  Alien::Role::Dino: '0'
+  Role::Tiny::With: '0'
+  base: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/project-renard/p5-Alien-OpenJPEG
   repository: https://github.com/project-renard/p5-Alien-OpenJPEG.git
-version: '0.001'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.002'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::Dino: '0'
+      Alien::gmake: '0.11'
+      Archive::Tar: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -3,7 +3,7 @@ HACKING
 
 Development of SOAP::Lite takes place on GitHub.
 
-git@github.com:redhotpenguin/soaplite.git
+git@github.com:redhotpenguin/perl-soaplite.git
 
 Come on by and fork it and submit a pull request.
 

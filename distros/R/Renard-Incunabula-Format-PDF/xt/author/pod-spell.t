@@ -13,6 +13,7 @@ __DATA__
 Document
 Format
 Incunabula
+InformationDictionary
 PDF
 Page
 Project

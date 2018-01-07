@@ -1,0 +1,58 @@
+NAME
+    alias::module - Alias one module as another
+
+VERSION
+    This document describes version 0.001 of alias::module (from Perl
+    distribution alias-module), released on 2018-01-06.
+
+SYNOPSIS
+     package Your::Alias::Name;
+     use alias::module 'Some::Real::Module::Name';
+
+DESCRIPTION
+    This module aliases one module name to another.
+
+     package Your::Alias::Name;
+     use alias::module 'Some::Real::Module::Name';
+
+    is equivalent to:
+
+     package Your::Alias::Name;
+     BEGIN {
+         $Package::Alias::BRAVE = 1;
+         require Some::Real::Module::Name;
+     }
+     use Package::Alias 'Your::Alias::Name' => 'Some::Real::Module::Name';
+
+    It is useful if you want to let users access a module's functionality
+    under a different (usually shorter) name.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/alias-module>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-alias-module>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=alias-module>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Package::Alias
+
+    abbreviation
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
