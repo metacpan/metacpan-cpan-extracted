@@ -39,35 +39,13 @@ sub create_data_dir {
         return;
     }
 
-    my $data_dir = File::Spec->catdir( $self->cache_dir, '.hpcrunner-data' );
-    my $project = "NULL_PROJECT";
-    $project = $self->project if $self->has_project;
-
-    ##Create initial document
-    my $dt = DateTime->now( time_zone => 'local' );
-    $dt = "$dt";
-    $dt =~ s/:/-/g;
-
+    my $data_dir = File::Spec->catdir( $self->logdir, 'stats' );
     my $ug   = Data::UUID->new;
     my $uuid = $ug->create();
     $uuid = $ug->to_string($uuid);
-
     $self->submission_uuid($uuid);
-
-    my $path = File::Spec->catdir( $data_dir, $project );
-    make_path($path);
-
-    if ( $self->has_project ) {
-        $path =
-          File::Spec->catdir( $data_dir, $project,
-            $dt . '__PR_' . $project . '__UID_' . $uuid );
-    }
-    else {
-        $path =
-          File::Spec->catdir( $data_dir, $project, $dt . '__UID_' . $uuid );
-    }
-
-    return $path;
+    
+    return $data_dir;
 }
 
 1;

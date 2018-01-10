@@ -6,7 +6,7 @@ use JIP::Conf;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.02';
+our $VERSION = '0.021';
 
 sub register {
     my ($self, $app, $param_hashref) = @ARG;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::JIPConf - Plugin for JIP::Conf.
 
 =head1 VERSION
 
-Version 0.02
+This document describes C<Mojolicious::Plugin::JIPConf> version C<0.021>.
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

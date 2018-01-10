@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 
 
 
@@ -16,7 +16,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 1.054
+Version 1.055
 
 
 =head1 DESCRIPTION
@@ -238,10 +238,6 @@ An example C<read_arguments> method:
 The information returned by the method C<read_arguments> is used to build the entries of the C<db-browser> options
 I<Fields> and I<Login Data>.
 
-    read_arguments()  =>  option "Fields"      =>  $connect_parameter->{required}
-                          option "Login Data"  =>  $connect_parameter->{read_arg}
-                                               =>  $connect_parameter->{keep_secret}
-
 =cut
 
 sub read_arguments {
@@ -276,8 +272,6 @@ An example C<environment_variables> method:
     }
 
 See the C<db-browser> option I<ENV Variables>.
-
-    environment_variables()  =>  option "ENV Variables"  =>  $connect_parameter->{use_env_var}
 
 =cut
 
@@ -326,9 +320,8 @@ Example form the plugin C<App::DBBrowser::DB::SQLite>:
         ];
     }
 
-See the C<db-browser> option I<DB Options>.
-
-    choose_arguments()  =>  option "DB Options"  =>  $connect_parameter->{chosen_arg}
+C<choose_arguments> determines the database handle attributes with predefined values offered in the C<db-browser> option
+I<DB Options>.
 
 =cut
 

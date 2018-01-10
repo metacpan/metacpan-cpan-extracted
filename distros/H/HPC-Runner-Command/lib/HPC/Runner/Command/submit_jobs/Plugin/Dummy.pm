@@ -148,7 +148,7 @@ sub update_job_deps {
 
     return unless $self->has_array_deps;
 
-    my $array_deps_file = File::Spec->catdir( $self->logdir, 'array_deps.txt' );
+    my $array_deps_file = File::Spec->catdir( $self->logdir, 'array_deps.tsv' );
 
     foreach my $current_task ( sort keys %{ $self->array_deps } ) {
         my $v = $self->array_deps->{$current_task};

@@ -1,4 +1,7 @@
-Revision history for Version-Util
+0.730   2018-01-09 (PERLANCAR)
+
+	- Relax version regex pattern.
+
 
 0.72    2016-03-02 (PERLANCAR)
 

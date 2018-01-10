@@ -1,6 +1,10 @@
+#!perl
+
 use strict;
 use warnings;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 my $html = '</body>';
 

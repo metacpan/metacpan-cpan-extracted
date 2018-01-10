@@ -19,6 +19,7 @@ my %parms = (
     ABSTRACT_FROM   => 'lib/HTML/Lint.pm',
     PMLIBDIRS       => [qw(lib/)],
     AUTHOR          => 'Andy Lester <andy@petdance.com>',
+    MIN_PERL_VERSION=> 5.006,
     PREREQ_PM       => {
         'Exporter'              => 0,
         'Test::More'            => 0,
@@ -49,13 +50,13 @@ if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
             bugtracker => 'https://github.com/petdance/html-lint/issues',
             license    => 'http://www.opensource.org/licenses/artistic-license-2.0.php',
             repository => 'https://github.com/petdance/html-lint',
-        }
+        },
     };
 }
 
 WriteMakefile( %parms );
 
-sub MY::postamble {
+sub MY::postamble { ## no critic ( Subroutines::ProhibitQualifiedSubDeclarations )
     my $postamble = <<'MAKE_FRAG';
 
 .PHONY: tags critic
@@ -68,7 +69,7 @@ tags:
 		--languages=Perl --langmap=Perl:+.t \
 
 critic:
-	perlcritic -1 -q -profile perlcriticrc lib/ bin/weblint Makefile.PL
+	perlcritic -1 -q -profile perlcriticrc $(ack -f --perl)
 
 PROF_ARGS = -Mblib blib/script/weblint index.html
 

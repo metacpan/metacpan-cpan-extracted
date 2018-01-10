@@ -11,7 +11,7 @@ plan tests => 9;
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::LockSocket', '0.01';
+    use_ok 'JIP::LockSocket', '0.021';
     require_ok 'JIP::LockSocket';
 
     diag(

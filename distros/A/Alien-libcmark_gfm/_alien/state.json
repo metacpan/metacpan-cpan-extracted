@@ -1,0 +1,38 @@
+{
+   "install" : {
+      "patch" : null,
+      "stage" : "/Users/dylan/src/mozilla/bmo-cmark/Alien-libcmark_gfm/blib/lib/auto/share/dist/Alien-Libcmark_gfm",
+      "mm" : {
+         "distname" : "Alien-Libcmark_gfm"
+      },
+      "root" : "/Users/dylan/src/mozilla/bmo-cmark/Alien-libcmark_gfm/_alien",
+      "old" : {
+         "runtime" : {
+            "perl_module_version" : "0.1",
+            "install_type" : "share",
+            "legacy" : {
+               "finished_installing" : 1,
+               "version" : null,
+               "original_prefix" : "/Users/dylan/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/darwin-2level/auto/share/dist/Alien-Libcmark_gfm",
+               "install_type" : "share"
+            },
+            "alien_build_version" : "1.32",
+            "prefix" : "/Users/dylan/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/darwin-2level/auto/share/dist/Alien-Libcmark_gfm"
+         },
+         "preifx" : "/Users/dylan/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/darwin-2level/auto/share/dist/Alien-Libcmark_gfm"
+      }
+   },
+   "args" : [
+      "root",
+      "_alien",
+      "meta_prop",
+      {}
+   ],
+   "runtime" : {
+      "alien_build_version" : "1.32",
+      "legacy" : {
+         "name" : "libcmark-gfm"
+      },
+      "install_type" : "share"
+   }
+}

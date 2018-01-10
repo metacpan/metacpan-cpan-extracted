@@ -19,7 +19,7 @@ use App::BitBucketCli::Branch;
 use App::BitBucketCli::PullRequest;
 use YAML::Syck qw/Dump/;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 has url => (
     is      => 'rw',
@@ -238,7 +238,7 @@ App::BitBucketCli::Core - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Core version 0.002
+This documentation refers to App::BitBucketCli::Core version 0.003
 
 
 =head1 SYNOPSIS
@@ -267,7 +267,7 @@ This documentation refers to App::BitBucketCli::Core version 0.002
 
 =head2 C<pull_requests ( $project, $repository, $state )>
 
-Gets all of the pull reequests in C<$state>.
+Gets all of the pull requests in C<$state>.
 
 =head2 C<repositories ( $project )>
 

@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
     # [ 'config-unknown-directive' => q{Set #1 (6:5) Unknown directive "bongo"} ],

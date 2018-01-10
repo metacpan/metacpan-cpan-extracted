@@ -11,10 +11,10 @@ plan tests => 10;
 subtest 'Require some module' => sub {
     plan tests => 4;
 
-    use_ok 'JIP::Object', '0.03';
+    use_ok 'JIP::Object', '0.031';
 
     require_ok 'JIP::Object';
-    is $JIP::Object::VERSION, '0.03';
+    is $JIP::Object::VERSION, '0.031';
 
     diag(
         sprintf 'Testing JIP::Object %s, Perl %s, %s',
@@ -172,7 +172,7 @@ subtest 'The Universal class' => sub {
     plan tests => 10;
 
     # Class methods
-    is(JIP::Object->VERSION, '0.03');
+    is(JIP::Object->VERSION, '0.031');
 
     ok(JIP::Object->isa('JIP::Object'));
 
@@ -183,7 +183,7 @@ subtest 'The Universal class' => sub {
     # Object methods
     my $obj = JIP::Object->new;
 
-    is $obj->VERSION, '0.03';
+    is $obj->VERSION, '0.031';
 
     ok $obj->isa('JIP::Object');
     ok not $obj->isa('JIP::ClassField');

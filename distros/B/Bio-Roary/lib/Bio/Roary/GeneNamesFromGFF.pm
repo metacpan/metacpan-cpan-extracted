@@ -1,5 +1,5 @@
 package Bio::Roary::GeneNamesFromGFF;
-$Bio::Roary::GeneNamesFromGFF::VERSION = '3.11.0';
+$Bio::Roary::GeneNamesFromGFF::VERSION = '3.11.1';
 # ABSTRACT: Parse a GFF and efficiently extract ID -> Gene Name
 
 
@@ -81,7 +81,7 @@ Bio::Roary::GeneNamesFromGFF - Parse a GFF and efficiently extract ID -> Gene Na
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

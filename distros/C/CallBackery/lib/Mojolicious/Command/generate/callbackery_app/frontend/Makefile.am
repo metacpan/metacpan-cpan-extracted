@@ -1,7 +1,6 @@
 % my $p = shift;
 
 AUTOMAKE_OPTIONS=foreign
-CLASS=<%= $p->{name} %>
 
 EXTRA_DIST = config.json Manifest.json source/index.html \
 	$(shell find source/class source/resource source/translation -type d \( -name ".??*" -o -name "build" \) -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
@@ -22,4 +21,4 @@ endif
 # clean-local:
 deepclean:
 	test -d ./cache && rm -r ./cache || true
-	test -f source/script/$(CLASS).js && rm source/script/* || true
+	test -f source/script/$(QX_CLASS).js && rm source/script/* || true

@@ -80,6 +80,7 @@ sub update_job_deps {
     my $array_deps_file = File::Spec->catdir( $self->logdir, 'array_deps.tsv' );
     my $array_log_file  = File::Spec->catdir( $self->logdir, 'array_deps.log' );
 
+    ##TODO Add TaskID, TaskTags, Task Tags
     while ( my ( $current_task, $v ) = each %{ $self->array_deps } ) {
         my $dep_tasks = join( ':', @{$v} );
         my $cmd =
@@ -95,7 +96,7 @@ sub update_job_deps {
         my $info =
             "Task Deps:\t"
           . $current_task . "\t"
-          . $dep_tasks . "\n"
+          . $dep_tasks . "\t"
           . "ExitCode: $exitcode\n";
         $info .= "Stderr: $stderr\n" if $stderr;
         $info .= "Stdout: $stdout\n" if $stdout;

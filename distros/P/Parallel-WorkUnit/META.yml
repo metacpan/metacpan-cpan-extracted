@@ -1,5 +1,5 @@
 ---
-abstract: 'Provide easy-to-use forking with ability to pass back data'
+abstract: 'Provide multi-paradigm forking with ability to pass back data'
 author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
@@ -17,7 +17,7 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '1.100'
+    version: '1.110'
 recommends:
   AnyEvent: '0'
 requires:
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '1.100'
+version: '1.110'
 x_serialization_backend: 'YAML::Tiny version 1.70'

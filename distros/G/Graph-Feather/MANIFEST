@@ -1,0 +1,13 @@
+eg/example.pl
+MANIFEST
+t/02parity.t
+t/99podcov.t
+t/98podsyn.t
+t/01basic.t
+t/03refattr.t
+lib/Graph/Feather.pm
+README
+Changes
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

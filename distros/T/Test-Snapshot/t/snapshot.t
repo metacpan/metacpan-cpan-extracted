@@ -36,7 +36,7 @@ isnt $exit, 0, 'fails first time';
 
 (undef, undef, $exit) = capture {
   local $ENV{TEST_SNAPSHOT_UPDATE} = 1;
-  system qw(prove -b), $filename;
+  system $^X, qw(-S prove -b), $filename;
 };
 isnt $exit, 0, 'fails second time, snapshots were not created';
 

@@ -4,13 +4,13 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Test-Mock-Time",
    "no_index" : {
@@ -27,11 +27,14 @@
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.17",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -44,14 +47,14 @@
             "Scalar::Util" : "0",
             "Test::MockModule" : "0",
             "bignum" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "recommends" : {
             "EV" : "0",
             "Mojolicious" : "6",
-            "Time::HiRes" : "0"
+            "Time::HiRes" : "1.9724"
          },
          "requires" : {
             "Test::Exception" : "0",
@@ -65,7 +68,7 @@
    "provides" : {
       "Test::Mock::Time" : {
          "file" : "lib/Test/Mock/Time.pm",
-         "version" : "v0.1.6"
+         "version" : "v0.1.7"
       }
    },
    "release_status" : "stable",
@@ -80,6 +83,10 @@
          "web" : "https://github.com/powerman/perl-Test-Mock-Time"
       }
    },
-   "version" : "v0.1.6"
+   "version" : "v0.1.7",
+   "x_contributors" : [
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

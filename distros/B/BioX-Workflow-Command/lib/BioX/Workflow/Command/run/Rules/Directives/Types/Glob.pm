@@ -32,4 +32,6 @@ sub process_directive_glob {
     $self->$k( \@data );
 }
 
+no Moose;
+
 1;

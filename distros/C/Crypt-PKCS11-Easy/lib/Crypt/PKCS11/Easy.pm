@@ -1,5 +1,5 @@
 package Crypt::PKCS11::Easy;
-$Crypt::PKCS11::Easy::VERSION = '0.172091';
+$Crypt::PKCS11::Easy::VERSION = '0.180080';
 # ABSTRACT: Wrapper around Crypt::PKCS11 to make using a HSM not suck
 
 use v5.16.3;    # CentOS7
@@ -852,7 +852,7 @@ Crypt::PKCS11::Easy - Wrapper around Crypt::PKCS11 to make using a HSM not suck
 
 =head1 VERSION
 
-version 0.172091
+version 0.180080
 
 =head1 SYNOPSIS
 
@@ -1149,7 +1149,7 @@ Ioan Rogers <ioan.rogers@sophos.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Sophos Ltd.
+This software is copyright (c) 2018 by Sophos Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

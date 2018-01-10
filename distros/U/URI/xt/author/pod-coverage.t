@@ -26,79 +26,79 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'URI::_query' => [
-                                qr/^(?:equery|query|query_form|query_form_hash|query_keywords|query_param|query_param_append|query_param_delete)$/
-                              ],
              'URI::_userpass' => [
                                    qr/^(?:password|user)$/
-                                 ],
-             'URI::_segment' => [
-                                  qr/^(?:new)$/
-                                ],
-             'URI::file::Unix' => [
-                                    qr/^(?:file)$/
-                                  ],
-             'URI::file::Base' => [
-                                    qr/^(?:dir|file|new)$/
-                                  ],
-             'URI::file::FAT' => [
-                                   qr/^(?:fix_path)$/
-                                 ],
-             'URI::mailto' => [
-                                qr/^(?:headers|to)$/
-                              ],
-             'URI::Heuristic' => [
-                                   qr/^(?:MY_COUNTRY|uf_url|uf_urlstr)$/
-                                 ],
-             'URI::Escape' => [
-                                qr/^(?:escape_char)$/
-                              ],
-             'URI::ftp' => [
-                             qr/^(?:password|user)$/
-                           ],
-             'URI::file' => [
-                              qr/^(?:os_class)$/
-                            ],
-             'URI::_punycode' => [
-                                   qr/^(?:adapt|code_point|digit_value|min)$/
                                  ],
              'URI::gopher' => [
                                 qr/^(?:gopher_type|gtype|search|selector|string)$/
                               ],
-             'URI::WithBase' => [
-                                  qr/^(?:can|clone|eq|new_abs)$/
-                                ],
+             'URI::_punycode' => [
+                                   qr/^(?:adapt|code_point|digit_value|min)$/
+                                 ],
              'URI::urn' => [
                              qr/^(?:nid|nss)$/
                            ],
-             'URI::news' => [
-                              qr/^(?:group|message)$/
+             'URI::file' => [
+                              qr/^(?:os_class)$/
                             ],
+             'URI::sip' => [
+                             qr/^(?:params|params_form)$/
+                           ],
              'URI::file::Win32' => [
                                      qr/^(?:file|fix_path)$/
                                    ],
-             'URI::ldapi' => [
-                               qr/^(?:un_path)$/
-                             ],
+             'URI::ftp' => [
+                             qr/^(?:password|user)$/
+                           ],
+             'URI::Heuristic' => [
+                                   qr/^(?:MY_COUNTRY|uf_url|uf_urlstr)$/
+                                 ],
+             'URI::mailto' => [
+                                qr/^(?:headers|to)$/
+                              ],
+             'URI::Escape' => [
+                                qr/^(?:escape_char)$/
+                              ],
+             'URI::_query' => [
+                                qr/^(?:equery|query|query_form|query_form_hash|query_keywords|query_param|query_param_append|query_param_delete)$/
+                              ],
+             'URI::file::Base' => [
+                                    qr/^(?:dir|file|new)$/
+                                  ],
              'URI::URL' => [
                              qr/^(?:address|article|crack|dos_path|encoded822addr|eparams|epath|frag)$/,
                              qr/^(?:full_path|groupart|keywords|local_path|mac_path|netloc|newlocal|params|path|path_components|print_on|query|strict|unix_path|url|vms_path)$/
                            ],
-             'URI::sip' => [
-                             qr/^(?:params|params_form)$/
-                           ],
-             'URI::file::Mac' => [
-                                   qr/^(?:dir|file)$/
+             'URI::WithBase' => [
+                                  qr/^(?:can|clone|eq|new_abs)$/
+                                ],
+             'URI::ldapi' => [
+                               qr/^(?:un_path)$/
+                             ],
+             'URI::file::OS2' => [
+                                   qr/^(?:file)$/
+                                 ],
+             'URI::file::FAT' => [
+                                   qr/^(?:fix_path)$/
                                  ],
              'URI' => [
                         qr/^(?:STORABLE_freeze|STORABLE_thaw|TO_JSON|implementor)$/
                       ],
+             'URI::news' => [
+                              qr/^(?:group|message)$/
+                            ],
+             'URI::_segment' => [
+                                  qr/^(?:new)$/
+                                ],
+             'URI::file::Mac' => [
+                                   qr/^(?:dir|file)$/
+                                 ],
              'URI::pop' => [
                              qr/^(?:auth|user)$/
                            ],
-             'URI::file::OS2' => [
-                                   qr/^(?:file)$/
-                                 ]
+             'URI::file::Unix' => [
+                                    qr/^(?:file)$/
+                                  ]
            );
 
 my @also_private;

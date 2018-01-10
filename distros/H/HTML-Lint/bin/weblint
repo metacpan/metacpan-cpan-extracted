@@ -5,6 +5,7 @@ use strict;
 
 use Getopt::Long;
 use HTML::Lint;
+use HTML::Lint::Error;
 use HTML::Lint::HTML4;
 
 my $help;
@@ -40,8 +41,7 @@ for my $url ( @ARGV ) {
     my @lines;
     $lint->newfile( $url );
     if ( $url =~ /^https?:/ ) {
-        eval { require LWP::Simple };
-        if ( $@ ) {
+        if ( !eval { require LWP::Simple; 1; } ) {
             warn q{Can't retrieve URLs without LWP::Simple installed};
             next;
         }

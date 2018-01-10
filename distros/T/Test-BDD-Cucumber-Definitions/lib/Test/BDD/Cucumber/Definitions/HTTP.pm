@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Test::BDD::Cucumber::StepFile qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::HTTP::Util qw(S C);
+use Test::BDD::Cucumber::Definitions::HTTP::Util qw(C :util);
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -15,49 +15,42 @@ our $VERSION = '0.02';
 When qr/http request header "(.+?)" is set to "(.+)"/, sub {
     my ( $header, $value ) = ( $1, $2 );
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::header_set( $header, $value );
+    header_set( $header, $value );
 };
 
 # Set http request content
 When qr/http request content is set to/, sub {
     my ($content) = C->data();
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::content_set($content);
+    content_set($content);
 };
 
 # Send request
 When qr/http request "(.+?)" to "(.+)"/, sub {
     my ( $method, $url ) = ( $1, $2 );
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::request_send( $method, $url );
+    request_send( $method, $url );
 };
 
 # Check http response code
 Then qr/http response code must be "(.+)"/, sub {
     my ($code) = ($1);
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::code_eq($code);
+    code_eq($code);
 };
 
 # Check http response header
 Then qr/http response header "(.+)" must be like "(.+)"/, sub {
     my ( $name, $value ) = ( $1, $2 );
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::header_re( $name, $value );
+    header_re( $name, $value );
 };
 
 # Check http response content
 Then qr/http response content must be like "(.+)"/, sub {
     my ($value) = ($1);
 
-    Test::BDD::Cucumber::Definitions::HTTP::Util::content_re($value);
-};
-
-# Decode http response content
-Then qr/http response content must be decoded as "(.+)"/, sub {
-    my ($format) = ($1);
-
-    Test::BDD::Cucumber::Definitions::HTTP::Util::content_decode($format);
+    content_re($value);
 };
 
 1;

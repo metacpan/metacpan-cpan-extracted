@@ -7,6 +7,7 @@ use Template::Mustache;
 
 sub interpol_directive {
     my $self   = shift;
+    my $k = shift;
     my $source = shift;
     my $text   = '';
 
@@ -24,7 +25,7 @@ sub interpol_directive {
     $text = Template::Mustache->render( $source, $self );
     $self->interpol_directive_cache->{$source} = $text;
     return $text;
-    
+
 }
 
 1;

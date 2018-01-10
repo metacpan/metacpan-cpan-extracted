@@ -3,21 +3,25 @@ abstract: 'Webqq Login Encryption Library'
 author:
   - 'sjdy521 <sjdy521@163.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Webqq-Encryption
 no_index:
   directory:
     - t
     - inc
 requires:
-  Crypt::RSA: 0
-  Digest::MD5: 0
+  Crypt::OpenSSL::Bignum: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Digest::MD5: '0'
 resources:
   repository: git://github.com/sjdy521/Webqq-Encryption.git
-version: 1.5
+version: '1.6'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

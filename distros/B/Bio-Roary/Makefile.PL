@@ -76,7 +76,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Output" => 0
   },
-  "VERSION" => "3.11.0",
+  "VERSION" => "3.11.1",
   "test" => {
     "TESTS" => "t/*.t t/Bio/Roary/*.t t/Bio/Roary/CommandLine/*.t t/Bio/Roary/External/*.t t/Bio/Roary/Output/*.t t/Bio/Roary/QC/*.t"
   }

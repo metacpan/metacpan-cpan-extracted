@@ -1,5 +1,10 @@
 Changelog for Crypt-PKCS11-Easy
 
+0.180080 2018-01-08T18:25:03Z
+ - Add perl 5.26 to travis builds (Ioan Rogers)
+ - don't hard-code slot ids in tests, they can no longer be relied on (Ioan
+   Rogers)
+
 0.172091 2017-07-28T14:58:58Z
  - Fix Changes
 

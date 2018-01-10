@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use FindBin;
-use Test::More tests => 9;
+use Test::More tests => 11;
 use File::Path qw(  remove_tree );
 
 use lib '../lib';
@@ -39,5 +39,11 @@ my $index_html = join '', <$i_fh>;
 close $i_fh;
 like $index_html, qr!Sample/Module.pm.html!;
 like $index_html, qr!Sample/Project.pm.html!;
+
+# Source code is generated
+ok( -f "$FindBin::Bin/01_project_output/src/Sample/Project.pm" );
+
+# Source code link is present
+like $html, qr!>Source<!;
 
 remove_tree("$FindBin::Bin/01_project_output");

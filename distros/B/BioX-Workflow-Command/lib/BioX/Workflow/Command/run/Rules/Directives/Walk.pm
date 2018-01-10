@@ -3,22 +3,30 @@ package BioX::Workflow::Command::run::Rules::Directives::Walk;
 use Moose::Role;
 use namespace::autoclean;
 
-use Data::Walk;
+use Data::Walk 2.01;
 use Path::Tiny;
+
+has 'errors' => (
+   is => 'rw',
+   isa => 'HashRef',
+   default => sub {return {}},
+);
 
 sub walk_process_data {
     my $self = shift;
     my $keys = shift;
 
     foreach my $k ( @{$keys} ) {
+        $DB::single = 2;
         next if ref($k);
         my $v = $self->$k;
         ##Leftover of backwards compatibility
         if ( $k eq 'find_by_dir' ) {
             $self->process_directive( $k, $v );
         }
-        elsif($self->search_registered_process_directives($k, $v)){
-          next;
+        ##If its a type search for the type
+        elsif ( $self->search_registered_process_directives( $k, $v ) ) {
+            next;
         }
         else {
             $self->process_directive( $k, $v );
@@ -33,6 +41,7 @@ sub search_registered_process_directives {
     my $v    = shift;
 
     foreach my $key ( keys %{ $self->register_process_directives } ) {
+        $DB::single = 2;
         next unless exists $self->register_process_directives->{$key}->{lookup};
         next
           unless exists $self->register_process_directives->{$key}->{builder};
@@ -60,9 +69,10 @@ sub process_directive {
     my $v    = shift;
     my $path = shift;
 
+    #TODO Need to keep track of errors here
     if ( ref($v) ) {
         walk {
-            wanted => sub { $self->walk_directives( @_ ) }
+            wanted => sub { $self->walk_directives(@_) }
           },
           $self->$k;
     }
@@ -71,6 +81,7 @@ sub process_directive {
         $text = $self->interpol_directive($v) if $v;
         $self->$k($text);
     }
+
 }
 
 =head3 walk_directives

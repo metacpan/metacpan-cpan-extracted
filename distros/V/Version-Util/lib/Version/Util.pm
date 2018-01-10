@@ -1,7 +1,7 @@
 package Version::Util;
 
-our $DATE = '2016-03-02'; # DATE
-our $VERSION = '0.72'; # VERSION
+our $DATE = '2018-01-09'; # DATE
+our $VERSION = '0.730'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ sub _max2 {
 sub _add_or_subtract_version {
     my ($which, $v, $inc) = @_;
 
-    state $re = qr/\Av?(\d{1,3})(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?\z/;
+    state $re = qr/\Av?(\d{1,15})(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?\z/;
 
     $v =~ $re or die "Invalid version '$v', must match $re";
     my ($v_maj, $v_min, $v_pl) = ($1, $2, $3);
@@ -155,7 +155,7 @@ Version::Util - Version-number utilities
 
 =head1 VERSION
 
-This document describes version 0.72 of Version::Util (from Perl distribution Version-Util), released on 2016-03-02.
+This document describes version 0.730 of Version::Util (from Perl distribution Version-Util), released on 2018-01-09.
 
 =head1 DESCRIPTION
 
@@ -215,7 +215,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Version-Ut
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Version-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Version-Util>.
 
 =head1 BUGS
 
@@ -235,7 +235,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

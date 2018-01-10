@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -377,6 +377,29 @@ sub register( $self, $app, $config ) {
             action => 'index',
         );
 
+    # Merge configuration
+    if ( $config->{read_schema} ) {
+        my $schema = $app->yancy->backend->read_schema;
+        for my $c ( keys %$schema ) {
+            my $coll = $config->{collections}{ $c } ||= {};
+            my $conf_props = $coll->{properties};
+            my $schema_props = delete $schema->{ $c }{properties};
+            for my $k ( keys $schema->{ $c }->%* ) {
+                $coll->{ $k } ||= $schema->{ $c }{ $k };
+            }
+            for my $p ( keys $schema_props->%* ) {
+                my $conf_prop = $conf_props->{ $p } ||= {};
+                my $schema_prop = $schema_props->{ $p };
+                for my $k ( keys %$schema_prop ) {
+                    $conf_prop->{ $k } ||= $schema_prop->{ $k };
+                }
+            }
+        }
+        # ; say 'Merged Config';
+        # ; use Data::Dumper;
+        # ; say Dumper $config;
+    }
+
     # Add OpenAPI spec
     $app->plugin( OpenAPI => {
         route => $route->any( '/api' )->name( 'yancy.api' ),
@@ -623,7 +646,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

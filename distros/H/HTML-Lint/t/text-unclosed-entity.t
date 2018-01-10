@@ -3,7 +3,8 @@
 use warnings;
 use strict;
 
-require 't/LintTest.pl';
+use lib 't/';
+use Util;
 
 checkit( [
     [ 'text-unclosed-entity' => qr/Entity &ouml; is missing its closing semicolon/ ],
@@ -28,7 +29,7 @@ __DATA__
         &sup; &sup2; But can we find an unclosed entity at the end of the line &#63
         <p>
         What about unclosed unknown entities in the &middle of the line?
-        Here's an awesome link to <a href="http://www.youtube.com/watch?v=8yLhA0ROGi4&feature=related">"You Better Swim"</a> from the SpongeBob movie.
+        Here's an awesome link to <a href="http://www.youtube.com/watch?v=8yLhA0ROGi4&amp;feature=related">"You Better Swim"</a> from the SpongeBob movie.
         <!--
         Here in the safety of comments, we can put whatever &invalid; and &malformed entities we want, &
         nobody can stop us.  Except maybe Cheech & Chong.

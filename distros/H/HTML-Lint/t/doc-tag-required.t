@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
     [ 'doc-tag-required' => qr/<html> tag is required/ ],
@@ -9,8 +13,8 @@ checkit( [
 __DATA__
 <!-- doc-tag-required -->
     <HEAD>
-	<TITLE>Test stuff</TITLE>
+        <TITLE>Test stuff</TITLE>
     </HEAD>
     <BODY BGCOLOR="white">
-	<P>This is my paragraph</P>
+        <P>This is my paragraph</P>
     </BODY>

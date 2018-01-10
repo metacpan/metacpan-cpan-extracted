@@ -5,6 +5,16 @@
 
 REVISION HISTORY - Set::Object
 
+=head1 1.39, 2018-01-08
+
+=over
+
+=item *
+
+Skip installing Changes.pod (PR #5, kentfredric)
+
+=back
+
 =head1 1.38, 2017-11-11
 
 =over

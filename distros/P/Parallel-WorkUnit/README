@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Parallel-WorkUnit,
-version 1.100:
+version 1.110:
 
-  Provide easy-to-use forking with ability to pass back data
+  Provide multi-paradigm forking with ability to pass back data
 
-This software is copyright (c) 2017 by Joelle Maslak.
+This software is copyright (c) 2018 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

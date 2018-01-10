@@ -14,11 +14,11 @@ HTML::Lint - check for HTML errors in a string or file
 
 =head1 VERSION
 
-Version 2.26
+Version 2.30
 
 =cut
 
-our $VERSION = '2.26';
+our $VERSION = '2.30';
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,13 @@ See L<HTML::Parser>'s C<parse_file> method for details.
 
 sub parse_file {
     my $self = shift;
-    return $self->parser->parse_file( @_ );
+
+    my $rc = $self->parser->parse_file( @_ );
+
+    $self->{_parse_called} = 1;
+    $self->eof;
+
+    return $rc;
 }
 
 =head2 $lint->eof()
@@ -162,7 +168,7 @@ HTML::Parser's eof() method.
 
 =cut
 
-sub eof {
+sub eof {   ## no critic ( Subroutines::ProhibitBuiltinHomonyms )
     my $self = shift;
 
     my $rc;
@@ -332,7 +338,7 @@ If you want to turn off all HTML::Lint warnings for a block of code, use
 
 And turn them back on with
 
-    <!-- html-lint all: off -->
+    <!-- html-lint all: on -->
 
 You don't have to use "on" and "off".  For "on", you can use "true"
 or "1".  For "off", you can use "0" or "false".
@@ -358,8 +364,6 @@ DO NOT send bug reports to http://rt.cpan.org/ or http://code.google.com/
 
 =item * Form fields that aren't in a FORM
 
-=item * Check for valid entities, and that they end with semicolons
-
 =item * DIVs with nothing in them.
 
 =item * HEIGHT= that have percents in them.
@@ -372,7 +376,7 @@ DO NOT send bug reports to http://rt.cpan.org/ or http://code.google.com/
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2016 Andy Lester.
+Copyright 2005-2018 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License v2.0.

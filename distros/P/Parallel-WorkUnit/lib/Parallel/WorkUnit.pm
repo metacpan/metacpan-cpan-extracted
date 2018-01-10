@@ -1,13 +1,13 @@
-#
-# Copyright (C) 2015-2017 Joelle Maslak
+
+# Copyright (C) 2015-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '1.100';
+$Parallel::WorkUnit::VERSION = '1.110';
 use v5.8;
 
-# ABSTRACT: Provide easy-to-use forking with ability to pass back data
+# ABSTRACT: Provide multi-paradigm forking with ability to pass back data
 
 use strict;
 use warnings;
@@ -49,6 +49,10 @@ subtype 'Parallel::WorkUnit::PositiveInt', as 'Int',
   where { $_ > 0 },
   message { "The number you provided, $_, was not a positive number" };
 
+subtype 'Parallel::WorkUnit::NonNegativeInt', as 'Int',
+  where { $_ >= 0 },
+  message { "The number you provided, $_, was not a non-negative number" };
+
 
 has use_anyevent => (
     is      => 'rw',
@@ -64,6 +68,20 @@ has _cv => (
 has _last_error => (
     is  => 'rw',
     isa => 'Maybe[Str]',
+);
+
+has _ordered_count => (
+    is       => 'rw',
+    isa      => 'Parallel::WorkUnit::NonNegativeInt',
+    init_arg => undef,
+    default  => 0,
+);
+
+has _ordered_responses => (
+    is       => 'rw',
+    isa      => 'ArrayRef',
+    init_arg => undef,
+    default  => sub { [] },
 );
 
 
@@ -117,8 +135,27 @@ sub BUILD {
 
 
 sub async {
-    if ( $#_ != 2 ) { confess 'invalid call'; }
-    my ( $self, $sub, $callback ) = @_;
+    if ( $#_ < 1 ) { confess 'invalid call'; }
+    my $self = shift;
+    my $sub  = shift;
+
+    my $callback;
+    if ( scalar(@_) == 0 ) {
+        # No callback provided
+
+        my $cbnum = $self->_ordered_count;
+        $self->_ordered_count( $cbnum + 1 );
+
+        # We create a callback that populates the ordered responses
+        $callback = sub {
+            @{ $self->_ordered_responses }[$cbnum] = shift;
+        };
+    } elsif ( scalar(@_) == 1 ) {
+        # Callback provided
+        $callback = shift;
+    } else {
+        confess 'invalid call';
+    }
 
     # If there are pending errors, throw that.
     if ( defined( $self->_last_error ) ) { die( $self->_last_error ); }
@@ -209,7 +246,7 @@ sub waitall {
             $self->_cv( AnyEvent->condvar );
         }
 
-        return;
+        return $self->_get_and_reset_ordered_responses();
     }
 
     # Using AnyEvent?
@@ -222,12 +259,28 @@ sub waitall {
             die($err);
         }
 
-        return;
+        return $self->_get_and_reset_ordered_responses();
     }
 
     # Tail recursion
     if ( $self->_waitone() ) { goto &waitall }
-    return;
+
+    return @{ $self->_get_and_reset_ordered_responses() };
+}
+
+# Gets the _ordered_responses and returns the reference.  Also
+# resets the _ordered_responses and the _ordered_counts to an
+# empty list and zero respectively.
+sub _get_and_reset_ordered_responses {
+    if ( $#_ != 0 ) { confess 'invalid call'; }
+    my $self = shift;
+
+    my (@r) = @{ $self->_ordered_responses() };
+
+    $self->_ordered_responses( [] );
+    $self->_ordered_count(0);
+
+    return @r;
 }
 
 
@@ -359,8 +412,19 @@ sub count {
 
 
 sub queue {
-    if ( $#_ != 2 ) { confess 'invalid call'; }
-    my ( $self, $sub, $callback ) = @_;
+    if ( $#_ < 1 ) { confess 'invalid call'; }
+    my $self = shift;
+    my $sub  = shift;
+
+    my $callback;
+    if ( scalar(@_) == 0 ) {
+        # We're okay, don't need to do anything - no callback
+    } elsif ( scalar(@_) == 1 ) {
+        # We have a callback
+        $callback = shift;
+    } else {
+        confess 'invalid call';
+    }
 
     # If there are pending errors, throw that.
     if ( defined( $self->_last_error ) ) { die( $self->_last_error ); }
@@ -483,7 +547,11 @@ sub _start_queued_children() {
         if ( ( !defined( $self->max_children ) ) || ( $self->count < $self->max_children ) ) {
             # Start queued child
             my $ele = shift @{ $self->_queued_children };
-            $self->async( $ele->[0], $ele->[1] );
+            if ( !defined( $ele->[1] ) ) {
+                $self->async( $ele->[0] );
+            } else {
+                $self->async( $ele->[0], $ele->[1] );
+            }
         } else {
             # Can't unqueue
             return;
@@ -568,11 +636,11 @@ __END__
 
 =head1 NAME
 
-Parallel::WorkUnit - Provide easy-to-use forking with ability to pass back data
+Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back data
 
 =head1 VERSION
 
-version 1.100
+version 1.110
 
 =head1 SYNOPSIS
 
@@ -584,15 +652,30 @@ version 1.100
 
   $wu->waitall();
 
+
+  #
+  # Limiting Maximum Parallelization
+  #
   $wu->max_children(5);
   $wu->queue( sub { ... }, \&callback );
   $wu->waitall();
+
+  
+  #
+  # Ordered Responses
+  #
+  use AnyEvent;
+  my $wu = Parallel::WorkUnit->new();
+  $wu->async( sub { ... } );
+
+  @results = $wu->waitall();
 
 
   #
   # AnyEvent Interface
   #
   use AnyEvent;
+  my $wu = Parallel::WorkUnit->new();
 
   $wu->use_anyevent(1);
   $wu->async( sub { ... }, \&callback );
@@ -633,7 +716,7 @@ the C<AnyEvent> event loop.
 
   say "Max number of children: " . $wu->max_children();
 
-If set to a value other than undef, limits the number of outstanding
+If set to a value other than zero or undef, limits the number of outstanding
 queue children (created by the C<queue()> method) that can be executing
 at any given time.
 
@@ -658,6 +741,12 @@ for additional information.
 
 =head2 async( sub { ... }, \&callback )
 
+  $wu->async( sub { return 1 }, \&callback );
+
+  # When using ordered return mode
+  $wu->async( sub { return 1 } );
+  @results = $wu->waitall();
+
 Spawns work on a new forked process.  The forked process inherits
 all Perl state from the parent process, as would be expected with
 a standard C<fork()> call.  The child shares nothing with the
@@ -668,13 +757,15 @@ anonymous sub (C<sub { ... }>) and should return a scalar.  Any
 scalar that L<Storable>'s C<freeze()> method can deal with
 is acceptable (for instance, a hash reference or C<undef>).
 
-When the work is completed, it serializes the result and streams
-it back to the parent process via a pipe.  The parent, in a
-C<waitall()> call, will call the callback function with the
-unserialized return value.
+The result is serialized and streamed back to the parent process
+via a pipe.  The parent, in a C<waitall()> call, will call the
+callback function (if provided) with the unserialized return value.
 
-Should the child process C<die>, the parent process will also
-die (inside the C<waitall()> method).
+If a callback is not provided, the parent, in the C<waitall()> call,
+will gather these results and return them as an ordered list.
+
+In all modes, should the child process C<die>, the parent process
+will also die (inside the C<waitall()> method).
 
 The PID of the child is returned to the parent process when
 this method is executed.
@@ -698,6 +789,14 @@ method will return.
 
 If a child dies unexpectedly, this method will C<die()> and propagate a
 modified exception.
+
+In the standard (not ordered) mode, I.E. where the C<ordered> attribute
+is set to false, this will return nothing.
+
+In the ordered mode, I.E. where the C<ordered> attribute is set to
+true, this will return the results of the async calls in an ordered
+list.  The list will be ordered by the order in which the async calls
+were executed.
 
 =head2 waitone()
 
@@ -738,13 +837,20 @@ C<max_children>) and not returning a PID.  Instead, a value of 1
 is returned if the process is immediately started, C<undef>
 otherwise.
 
+The result is serialized and streamed back to the parent process
+via a pipe.  The parent, in a C<waitall()> call, will call the
+callback function (if provided) with the unserialized return value.
+
+If a callback is not provided, the parent, in the C<waitall()> call,
+will gather these results and return them as an ordered list.
+
 =head1 AUTHOR
 
 Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Joelle Maslak.
+This software is copyright (c) 2018 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

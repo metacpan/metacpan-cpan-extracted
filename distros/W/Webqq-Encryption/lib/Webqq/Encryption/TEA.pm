@@ -82,7 +82,7 @@ sub _load_je{
 sub encrypt {
     my ($key,$data) = @_;
     my $p = Webqq::Encryption::TEA::Perl::encrypt(hexToStr($data),hexToStr($key));
-    return  MIME::Base64::encode_base64($p,"") if $p;
+    return lc join "",unpack "H*",$p;
 
     my $je = _load_je();
     $p = $je->eval(qq#
@@ -93,7 +93,7 @@ sub encrypt {
         return(r);
     #);
     if($p and !$@){
-        return MIME::Base64::encode_base64($p,"");
+        return $p;
     }
     else{
         croak "Webqq::Encryption::TEA error: $@\n";

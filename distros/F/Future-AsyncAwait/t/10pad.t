@@ -48,19 +48,29 @@ use List::Util qw( sum );
 }
 
 # outside
+# Make sure to test this twice because of pad lexical sharing - see RT124026
 {
    my $capture = "outer";
 
    my $closure = async sub {
+      $capture .= "X";
       await $_[0];
       return $capture;
    };
 
    my $f1 = Future->new;
-   my $fret = $closure->( $f1 );
+   my $f2 = Future->new;
+   my $fret = Future->needs_all(
+      $closure->( $f1 ),
+      $closure->( $f2 ),
+   );
 
    $f1->done;
-   is( scalar $fret->get, "outer", '$fret now ready after done for closure' );
+   $f2->done;
+
+   is_deeply( [ $fret->get ], [ "outerXX", "outerXX" ],
+      '$fret now ready after done for closure'
+   );
 }
 
 # captured variables of nested subs

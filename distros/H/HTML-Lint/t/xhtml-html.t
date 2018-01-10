@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
 ], [<DATA>] );

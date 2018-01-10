@@ -24,7 +24,7 @@ this modifies a global table, and is not on a per-object basis.
 
 =cut
 
-use base 'Exporter';
+use parent 'Exporter';
 our @EXPORT_OK = qw( %isKnownAttribute %isRequired %isNonrepeatable %isObsolete );
 
 sub _hash   { return { map { ($_ => 1) } @_ } }
@@ -60,7 +60,7 @@ our %isKnownAttribute = (
     blockquote  => _hash( @std, qw( cite ) ),
     body        => _hash( @std,
                     qw( alink background bgcolor link marginheight marginwidth onload onunload text vlink ),
-                    _ie_only( qw( bgproperties leftmargin topmargin ) )
+                    _ie_only( qw( bgproperties leftmargin topmargin ) ),
                     ),
     br          => _hash( @core, qw( clear ) ),
     button      => _hash( @std, qw( accesskey disabled name onblur onfocus tabindex type value ) ),
@@ -205,7 +205,7 @@ Andy Lester C<andy at petdance.com>
 
 =head1 COPYRIGHT
 
-Copyright 2005-2016 Andy Lester.
+Copyright 2005-2018 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License v2.0.

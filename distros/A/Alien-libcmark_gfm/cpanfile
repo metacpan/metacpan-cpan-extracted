@@ -1,0 +1,17 @@
+
+on 'build' => sub {
+  requires "Alien::Build" => "0.32";
+  requires "Alien::Build::MM" => "0.32";
+  requires "ExtUtils::MakeMaker" => "6.52";
+};
+
+on 'configure' => sub {
+  requires "Alien::Build" => "1.08";
+  requires "Alien::Build::MM" => "0.32";
+  requires "Alien::Build::Plugin::Build::CMake" => "0.99";
+  requires "Alien::Build::Plugin::Download::Git" => "0.01";
+  requires "Alien::Build::Plugin::Extract::Directory" => "0.65";
+  requires "Alien::Build::Plugin::Fetch::Git" => "0.01";
+  requires "Alien::Build::Plugin::Prefer::SortVersions" => "0.65";
+  requires "ExtUtils::MakeMaker" => "6.52";
+};

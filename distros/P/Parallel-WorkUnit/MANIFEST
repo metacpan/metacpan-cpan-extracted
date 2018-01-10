@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+errors.err
 lib/Parallel/WorkUnit.pm
 t/01-Basic.t
 t/02-System.t
@@ -14,7 +15,11 @@ t/03-Storable-Error.t
 t/04-Queue.t
 t/05-AnyEvent.t
 t/06-AnyEvent-Queue.t
+t/07-Ordered-Basic.t
+t/08-Ordered-Queue.t
+t/09-Ordered-AnyEvent-Queue.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/data/perlcriticrc
+t/errors.err
 t/release-kwalitee.t

@@ -12,14 +12,13 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
+
+extends qw/App::BitBucketCli::Base/;
 
 has [qw/
     description
-    id
     key
-    link
-    links
     name
     public
     type
@@ -27,11 +26,24 @@ has [qw/
     is  => 'rw',
 );
 
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
 
-sub TO_JSON {
-    my ($self) = @_;
-    return { %{ $self } };
-}
+    my $args
+        = !@args     ? {}
+        : @args == 1 ? $args[0]
+        :              {@args};
+
+    if ( $args->{links} ) {
+        $args->{links} = App::BitBucketCli::Links->new($args->{links});
+    }
+
+    if ( $args->{link} ) {
+        $args->{link} = App::BitBucketCli::Link->new($args->{link});
+    }
+
+    return $class->$orig($args);
+};
 
 1;
 
@@ -43,7 +55,7 @@ App::BitBucketCli::Project - Stores a projects details
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Project version 0.002
+This documentation refers to App::BitBucketCli::Project version 0.003
 
 =head1 SYNOPSIS
 
@@ -58,7 +70,7 @@ This documentation refers to App::BitBucketCli::Project version 0.002
 
 =head1 SUBROUTINES/METHODS
 
-
+=head2 C<BUILDARGS ()>
 
 =head2 C<TO_JSON ()>
 

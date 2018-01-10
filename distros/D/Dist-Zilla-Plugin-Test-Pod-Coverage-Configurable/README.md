@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable - dzil pod coverage tests
 
 # VERSION
 
-version 0.06
+version 0.07
 
 # SYNOPSIS
 
@@ -23,14 +23,14 @@ version 0.06
 
 This is a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) plugin that creates a POD coverage test for your
 distro. Unlike the plugin that ships with dzil in core, this one is quite
-configurable. The coverage test is generated as `xt/release/pod-coverage.t`.
+configurable. The coverage test is generated as `xt/author/pod-coverage.t`.
 
 [Test::Pod::Coverage](https://metacpan.org/pod/Test::Pod::Coverage) `1.08`, [Test::More](https://metacpan.org/pod/Test::More) `0.88`, and
 [Pod::Coverage::TrustPod](https://metacpan.org/pod/Pod::Coverage::TrustPod) will be added as `develop requires` dependencies.
 
 # NAME
 
-Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable - a configurable release test for Pod coverage
+Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable - a configurable author test for Pod coverage
 
 # CONFIGURATION
 
@@ -73,10 +73,13 @@ multiple times.
 
 # SUPPORT
 
-Bugs may be submitted through [the RT bug tracker](http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable)
-(or [bug-dist-zilla-plugin-test-pod-coverage-configurable@rt.cpan.org](mailto:bug-dist-zilla-plugin-test-pod-coverage-configurable@rt.cpan.org)).
+Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable](http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable) or via email to [bug-dist-zilla-plugin-test-pod-coverage-configurable@rt.cpan.org](mailto:bug-dist-zilla-plugin-test-pod-coverage-configurable@rt.cpan.org).
 
-I am also usually active on IRC as 'drolsky' on `irc://irc.perl.org`.
+I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+
+# SOURCE
+
+The source code repository for Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable can be found at [https://github.com/houseabsolute/Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable](https://github.com/houseabsolute/Dist-Zilla-Plugin-Test-Pod-Coverage-Configurable).
 
 # DONATIONS
 
@@ -97,16 +100,20 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # AUTHOR
 
-Dave Rolsky &lt;autarch@urth.org>
+Dave Rolsky <autarch@urth.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-David Golden &lt;dagolden@cpan.org>
+- David Golden <dagolden@cpan.org>
+- Karen Etheridge <ether@cpan.org>
 
-# COPYRIGHT AND LICENCE
+# COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 - 2016 by Dave Rolsky.
+This software is Copyright (c) 2014 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

@@ -54,6 +54,8 @@ LOAD_SCRAPE_RESULT: {
             $name = $completion{$name};
         }
 
+        $name =~ /\.\.\./ and die "Name '$name' still contains ellipsis";
+
         $by_symbol{$symbol} and die "Duplicate symbol $symbol";
         $by_symbol{$symbol} = {name => $name, safename => $safename};
 
@@ -67,4 +69,5 @@ LOAD_SCRAPE_RESULT: {
     }
 }
 
+@scrape_result = sort {$a->[0] cmp $b->[0]} @scrape_result;
 write_text($catalog_path, join("", map {join("\t", @$_)."\n"} @scrape_result));

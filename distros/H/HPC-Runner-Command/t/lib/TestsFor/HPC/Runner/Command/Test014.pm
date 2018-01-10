@@ -180,18 +180,9 @@ sub test_005 : Tags(use_batches) {
     $test->_log_commands;
 
     my $complete_file =
-      File::Spec->catdir( $test->data_dir, 'job', 'complete.json' );
-    my $running_file =
-      File::Spec->catdir( $test->data_dir, 'job', 'running.json' );
+      File::Spec->catdir( $test->data_dir, 'job', '0001.json' );
 
     ok( -e $complete_file );
-    ok( -e $running_file );
-
-    # $test->lock_file->touchpath;
-    # my $ret = $test->check_lock;
-    # is( $ret, 0, 'Lock file exists and should not be removed' );
-
-    # diag($test->archive->get_content($complete_file));
     ok(1);
 
     chdir($Bin);

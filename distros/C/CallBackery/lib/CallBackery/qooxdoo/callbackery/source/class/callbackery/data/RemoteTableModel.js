@@ -101,8 +101,18 @@ qx.Class.define('callbackery.data.RemoteTableModel', {
             rpc.callAsyncSmart(function(data) {
                 data.forEach(function(col) {
                     for (var id in col) {
-                        if (that.__types[id] == 'date') {
-                            col[id] = new Date(col[id]);
+                        switch (that.__types[id]){
+                            case 'date':
+                                col[id] = new Date(col[id]);
+                                break;
+                            case 'string':
+                            case 'str':
+                                col[id] = new String(col[id]);
+                                break;
+                            case 'number':
+                            case 'num':
+                                col[id] = parseFloat(col[id]);
+                                break;
                         }
                     }
                 });

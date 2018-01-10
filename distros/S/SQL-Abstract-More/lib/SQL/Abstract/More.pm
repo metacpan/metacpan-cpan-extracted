@@ -18,7 +18,7 @@ BEGIN {*puke = \&SQL::Abstract::puke;}
 # remove all previously defined functions
 use namespace::clean;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 
 #----------------------------------------------------------------------
@@ -93,6 +93,7 @@ my %params_for_new = (
   join_syntax          => {type => HASHREF,          default  =>
                                                         \%common_join_syntax},
   join_assoc_right     => {type => BOOLEAN,          default  => 0},
+  join_with_USING      => {type => BOOLEAN,          default  => 0},
   max_members_IN       => {type => SCALAR,           optional => 1},
   multicols_sep        => {type => SCALAR|SCALARREF, optional => 1},
   has_multicols_in_SQL => {type => BOOLEAN,          optional => 1},
@@ -726,6 +727,9 @@ sub _single_join {
     # substitute left/right tables names for '%1$s', '%2$s'
     $sql = sprintf $sql, $left->{name}, $right->{name};
 
+    # replace the ON clause by a USING clause, if so desired
+    $self->_try_replace_ON_by_USING($syntax, $sql) if $self->{join_with_USING};
+
     # build the final sql
     $sql = sprintf $syntax, $left->{sql}, $right->{sql}, $sql;
   }
@@ -743,6 +747,31 @@ sub _single_join {
 
   return \%result;
 }
+
+
+
+sub _try_replace_ON_by_USING {
+  my ($self, $syntax, $sql) = @_;
+
+  # if there is an ON clause, replace it by a USING clause
+  $syntax =~ s/\bON\s+%s/USING (%s)/ or return;
+
+  # if there are equality conditions like Table1.col=Table2.col, just keep col
+  my $n_cond = $sql =~ s/\w+\.(\w+)\s*=\s*\w+\.\1\b/$1/g or return;
+
+  # if there were several equalities, replace the AND's by commas
+  my $n_and  = $sql =~ s/\s+\bAND\b/,/g;
+
+  # the number of equalities must match the number of AND's minus 1
+  $n_cond == $n_and + 1 or return;
+
+  # remove unnecessary parentheses
+  $sql =~ s/^(\(\s*)+// and $sql =~ s/(\)\s*)+$//;
+
+  # all criteria are good, let's replace strings in the caller (call-by-name)
+  @_[1, 2] = ($syntax, $sql);
+}
+
 
 
 #----------------------------------------------------------------------
@@ -919,7 +948,8 @@ sub _assert_no_bindtype_columns {
 }
 
 
-sub _insert_value {
+sub _insert_value { # called from _insert_values() in parent class
+
   # unfortunately, we can't just override the ARRAYREF part, so the whole
   # parent method is copied here
 
@@ -1282,6 +1312,25 @@ operators to be used in the L</join> method, and
 values are associated SQL clauses with placeholders
 in C<sprintf> format. The default is described
 below under the L</join> method.
+
+=item join_with_USING
+
+A boolean instructing to replace "ON" clauses by "USING" clauses
+in SQL joins. If this option is true, SQL like this:
+
+  .. FROM T1 JOIN T2 ON (T1.A=T2.A AND T1.B=T2.B) JOIN T3 ON (T2.C=T3.C)
+
+will be replaced by :
+
+  .. FROM T1 JOIN T2 USING (A, B) JOIN T3 USING (C)
+
+The substitution only occurs if the join is on equality operators with
+identical column names on both sides. The advantage of using this option
+is that the joined columns will appear only once in the results, and
+they do not need to be prefixed by a table name if they are needed
+in the select list or in the WHERE part of the SQL.
+
+Caveat : this feature does not work with option C<quote_char>.
 
 =item join_assoc_right
 

@@ -1,4 +1,34 @@
-SYNOPSIS
+NAME
+    App::grepdate - Grep date in text
 
+VERSION
+    This document describes version 0.002 of App::grepdate (from Perl
+    distribution App-grepdate), released on 2018-01-10.
+
+SYNOPSIS
     See the included script grepdate.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-grepdate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-grepdate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-grepdate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

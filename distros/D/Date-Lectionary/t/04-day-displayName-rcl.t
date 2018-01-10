@@ -193,7 +193,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "Sixth Sunday after the Epiphany",
+    "Last Sunday after Epiphany",
     'Validating that 2015-02-15 returns the correct day.'
 );
 
@@ -724,7 +724,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "Fifth Sunday after the Epiphany",
+    "Last Sunday after Epiphany",
     'Validating that 2016-02-07 returns the correct day.'
 );
 
@@ -1278,7 +1278,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "Last Sunday after the Epiphany",
+    "Last Sunday after Epiphany",
     'Validating that 2017-02-26 returns the correct day.'
 );
 

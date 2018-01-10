@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose;
 
@@ -30,6 +30,11 @@ has 'index' => (
 );
 
 has 'forcegen' => (
+    is  => 'ro',
+    isa => 'Bool',
+);
+
+has 'nosourcecode' => (
     is  => 'ro',
     isa => 'Bool',
 );

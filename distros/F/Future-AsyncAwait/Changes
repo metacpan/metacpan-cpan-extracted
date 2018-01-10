@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.11    2018-01-07 16:35:25
+        [BUGFIXES]
+         * Fixes for markstack restoration calculation
+         * Don't save/restore PAD slots relating to outer captures or
+           protosubs (RT124026)
+
 0.10    2017-08-13 23:25:33
         [BUGFIXES]
          * Implement enough of SAVEt_DESTRUCTOR_X to make try/finally work

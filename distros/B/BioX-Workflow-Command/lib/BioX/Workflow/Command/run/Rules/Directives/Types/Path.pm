@@ -6,7 +6,7 @@ use namespace::autoclean;
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 use Path::Tiny;
 use Cwd;
-use Data::Walk;
+use Data::Walk 2.01;
 
 =head2 File Options
 
@@ -110,7 +110,7 @@ after 'BUILD' => sub {
         {
             builder => 'process_directive_path',
             lookup =>
-              [ '^indir$', '^outdir$', '^INPUT$', '^OUTPUT$', '.*_dir$' ]
+              [ '^indir$', '^outdir$', '^INPUT$', '^OUTPUT$', '.*_dir$', '^cwd$' ]
         }
     );
 };
@@ -138,14 +138,14 @@ sub process_directive_path {
 
     if ( ref($v) ) {
         walk {
-            wanted => sub { $self->walk_directives_path( @_ ) }
+            wanted => sub { $self->walk_directives_path(@_) }
           },
           $self->$k;
     }
     else {
         my $text = '';
         $text = $self->interpol_directive($v) if $v;
-        if (  $text ne '' ) {
+        if ( $text ne '' ) {
             $text = $self->return_path($text);
         }
         $self->$k($text);
@@ -186,7 +186,9 @@ sub return_path {
     else {
         $text = path($text);
     }
-    return $text;
+    return "$text";
 }
+
+no Moose;
 
 1;

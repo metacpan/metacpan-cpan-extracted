@@ -41,10 +41,12 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Try::Tiny" => 0,
     "feature" => 0,
+    "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Exporter" => 0,
     "File::Temp" => 0,
     "HTTP::Request::Common" => 0,
     "IO::File" => 0,
@@ -55,7 +57,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,6 +69,7 @@ my %FallbackPrereqs = (
   "Class::Inspector" => 0,
   "Data::Dumper" => 0,
   "Encode" => 0,
+  "Exporter" => 0,
   "File::Basename" => 0,
   "File::Path" => 0,
   "File::Slurp" => 0,
@@ -91,6 +94,7 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "feature" => 0,
   "lib" => 0,
+  "namespace::autoclean" => 0,
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,

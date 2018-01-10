@@ -1,11 +1,19 @@
 package BioX::Workflow::Command;
 
 use v5.10;
-our $VERSION = '2.3.1';
+our $VERSION = '2.3.2';
 
-use MooseX::App qw(Color);
+use MooseX::App 1.39 qw(Color);
 
 app_strict 0;
+app_exclude(
+    'BioX::Workflow::Command::run::Rules',
+    'BioX::Workflow::Command::run::Utils',
+    'BioX::Workflow::Command::Utils',
+    'BioX::Workflow::Command::inspect::Utils',
+    'BioX::Workflow::Command::Exceptions',
+    'BioX::Workflow::Command::inspect::Exceptions',
+);
 
 with 'BioX::Workflow::Command::Utils::Log';
 with 'BioSAILs::Utils::Plugin';
@@ -16,7 +24,7 @@ option '+config_base' => (
     default => '.bioxworkflow',
 );
 
-sub BUILD {}
+sub BUILD { }
 
 after 'BUILD' => sub {
     my $self = shift;
@@ -32,8 +40,6 @@ after 'BUILD' => sub {
     }
 };
 
-
-#This class is not compatible with namespace::autoclean...
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

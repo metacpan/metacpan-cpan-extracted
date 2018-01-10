@@ -2,8 +2,11 @@ bin/bb-cli
 Build.PL
 Changes
 lib/App/BitBucketCli.pm
+lib/App/BitBucketCli/Base.pm
 lib/App/BitBucketCli/Branch.pm
 lib/App/BitBucketCli/Core.pm
+lib/App/BitBucketCli/Link.pm
+lib/App/BitBucketCli/Links.pm
 lib/App/BitBucketCli/Project.pm
 lib/App/BitBucketCli/PullRequest.pm
 lib/App/BitBucketCli/Repository.pm

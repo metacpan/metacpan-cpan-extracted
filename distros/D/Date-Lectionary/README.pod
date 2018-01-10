@@ -1,7 +1,13 @@
-
 =head1 NAME
 
-Date::Lectionary
+Date::Lectionary - Readings for the Christian Lectionary
+
+=head1 VERSION
+
+Version 1.20180109
+
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -45,15 +51,9 @@ A Date::Lectionary::Year object containing attributes related to the liturgical 
 
 C<name>: Returns 'A', 'B', or 'C' depending on the liturgical year the date given at object construction resides in.
 
-=head3 year
-
-A Date::Lectionary::Year object containing attributes related to the liturgical year the date given at object construction resides in.
-
-name: Returns 'A', 'B', or 'C' depending on the liturgical year the date given at object construction resides in.
-
 =head3 readings
 
-Return an ArrayRef of the String representation of the day's readings if there are any.  Readings in the ArrayRef are ordered in the array according to the order the readings are given in the lectionary.
+Return an ArrayRef of the String representation of the day's readings if there are any.  Readings in the ArrayRef are ordered in the array according to the order the readings are given in the lectionary.  If mutliple readings exist for the day, an ArrayRef of HashRefs will be given.
 
   my $singleReading = Date::Lectionary->new(
       'date'       => Time::Piece->strptime( "2016-11-13", "%Y-%m-%d" ),
@@ -72,41 +72,81 @@ Return an ArrayRef of the String representation of the day's readings if there a
   say ${ $multiReading->readings }[0]{name}; #Will print 'Christmas, Proper I', the first services of Christmas Day in the RCL
   say ${ $multiReading->readings }[1]{readings}[0]; #Will print 'Isaiah 62:6-12', the first reading of the second service 'Christmas, Proper II' on Christmas Day in the RCL.
 
-=head1 INSTALLATION
 
-To install this module, run the following commands:
+=cut
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+=head1 SUBROUTINES/METHODS
 
-The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary> -- and tested via TravisCI.
 
-=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary'><img src='https://travis-ci.org/marmanold/Date-Lectionary.svg?branch=master' /></a>
+=cut
 
-=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary/badge.svg?branch=master' alt='Coverage Status' /></a>
+=head2 BUILD
 
-=head1 SUPPORT AND DOCUMENTATION
+Constructor for the Date::Lectionary object.  Takes a Time::Piect object, C<date>, to create the object.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+
+=cut
+
+=head2 _buildMultiReadings
+
+Private method that returns an ArrayRef of HashRefs for the multiple services and lectionary readings associated with the date.
+
+
+=cut
+
+=head2 _buildReadings
+
+Private method that returns an ArrayRef of strings for the lectionary readings associated with the date.
+
+
+=cut
+
+=head2 _determineAdvent
+
+Private method that takes a Time::Piece date object to returns a Date::Advent object containing the dates for Advent of the current liturgical year.
+
+
+=cut
+
+=head1 AUTHOR
+
+Michael Wayne Arnold, C<< <marmanold at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-date-lectionary at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
 
     perldoc Date::Lectionary
 
+
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary
+=over 4
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Date-Lectionary
+=item * RT: CPAN's request tracker (report bugs here)
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Date-Lectionary
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary>
 
-    Search CPAN
-        http://search.cpan.org/dist/Date-Lectionary
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Date-Lectionary>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Date-Lectionary>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Date-Lectionary/>
+
+=back
+
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -114,10 +154,17 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Michael Wayne Arnold
+Copyright 2016-2017 MICHAEL WAYNE ARNOLD
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-See L<http://dev.perl.org/licenses/> for more information.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+=cut
+

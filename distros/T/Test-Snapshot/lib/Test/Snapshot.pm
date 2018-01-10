@@ -11,7 +11,7 @@ require File::Path;
 require File::Basename;
 require Data::Dumper;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 our @EXPORT = qw(is_deeply_snapshot);
 
 sub is_deeply_snapshot {

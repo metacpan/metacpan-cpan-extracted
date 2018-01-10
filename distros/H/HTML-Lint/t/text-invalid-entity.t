@@ -3,12 +3,12 @@
 use warnings;
 use strict;
 
-require 't/LintTest.pl';
+use lib 't/';
+use Util;
 
+# We used to have text-invalid-entity if the entities had an invalid value, but we no longer do.
 checkit( [
     [ 'text-unknown-entity' => qr/Entity &metalhorns; is unknown/ ],
-    [ 'text-invalid-entity' => qr/Entity &#8675309; is invalid/ ],
-    [ 'text-invalid-entity' => qr/Entity &#xdeadbeef; is invalid/ ],
     [ 'text-unknown-entity' => qr/Entity &xdeadbeef; is unknown/ ],
 ], [<DATA>] );
 
@@ -36,7 +36,7 @@ __DATA__
         <p>
         Another deceased cow: &xdeadbeef; <!-- Not a valid hex entity, but unknown to our lookup tables -->
         <p>
-        Here's an awesome link to <a href="http://www.youtube.com/watch?v=8yLhA0ROGi4&feature=related">"You Better Swim"</a> from the SpongeBob movie.
+        Here's an awesome link to <a href="http://www.youtube.com/watch?v=8yLhA0ROGi4&amp;feature=related">"You Better Swim"</a> from the SpongeBob movie.
         <!--
         Here in the safety of comments, we can put whatever &invalid; and &malformed entities we want, &
         nobody can stop us.  Except maybe Cheech & Chong.

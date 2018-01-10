@@ -178,4 +178,6 @@ after 'BUILD' => sub {
         { builder => 'create_ITERABLE_attr', lookup => ['.*_list$'] } );
 };
 
+no Moose;
+
 1;

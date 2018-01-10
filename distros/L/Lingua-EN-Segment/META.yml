@@ -30,5 +30,5 @@ requires:
 resources:
   homepage: https://github.com/skington/lingua-en-segment
   repository: https://github.com/skington/lingua-en-segment.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

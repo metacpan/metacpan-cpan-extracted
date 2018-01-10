@@ -8,7 +8,6 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use BioX::Workflow::Command;
 use YAML::XS;
-use Data::Walk;
 use File::Slurp;
 use File::Spec;
 use DateTime;
@@ -93,6 +92,7 @@ sub test_001 {
 
     $test->post_process_rules;
     is_deeply($test->samples, ['Sample_01']);
+    diag Dumper($test->samples);
 
     is_deeply($test->process_obj->{t3_rule1}->{meta}->[18], '#HPC jobname=t3_rule1');
     is_deeply($test->process_obj->{t3_rule1}->{meta}->[19], '#HPC deps=some_dep');

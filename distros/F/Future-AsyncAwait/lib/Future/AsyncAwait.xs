@@ -58,6 +58,46 @@ typedef struct {
   SV **padslots;
 } SuspendedState;
 
+static void debug_sv_summary(const SV *sv)
+{
+  fprintf(stderr, "SV{type=%d,refcnt=%d", SvTYPE(sv), SvREFCNT(sv));
+
+  if(SvROK(sv))
+    fprintf(stderr, ",ROK");
+  else if(SvIOK(sv))
+    fprintf(stderr, ",IV=%d", SvIVX(sv));
+
+  fprintf(stderr, "}");
+}
+
+static void debug_showstack(const char *name)
+{
+#ifdef DEBUG_SHOW_STACKS
+  SV **sp;
+
+  fprintf(stderr, "%s:\n", name ? name : "Stack");
+
+  PERL_CONTEXT *cx = CX_CUR();
+
+  I32 floor = cx->blk_oldsp;
+  I32 *mark = PL_markstack + cx->blk_oldmarksp + 1;
+
+  fprintf(stderr, "  marks (TOPMARK=@%d):\n", TOPMARK - floor);
+  for(; mark <= PL_markstack_ptr; mark++)
+    fprintf(stderr,  "    @%d\n", *mark - floor);
+
+  mark = PL_markstack + cx->blk_oldmarksp + 1;
+  for(sp = PL_stack_base + floor + 1; sp <= PL_stack_sp; sp++) {
+    fprintf(stderr, sp == PL_stack_sp ? "-> " : "   ");
+    fprintf(stderr, "%p = ", *sp);
+    debug_sv_summary(*sp);
+    while(mark <= PL_markstack_ptr && PL_stack_base + *mark == sp)
+      fprintf(stderr, " [*M]"), mark++;
+    fprintf(stderr, "\n");
+  }
+#endif
+}
+
 #define save_clearpadrange(padix, count)  MY_save_clearpadrange(aTHX_ padix, count)
 static void MY_save_clearpadrange(pTHX_ PADOFFSET padix, U32 count)
 {
@@ -241,6 +281,24 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     croak("TODO: handle cx->blk_oldsaveix");
 }
 
+static bool padname_is_normal_lexical(PADNAME *pname)
+{
+  /* PAD slots without names are certainly not lexicals */
+  if(!pname || !PadnameLEN(pname))
+    return FALSE;
+
+  /* Outer lexical captures are not lexicals */
+  if(PadnameOUTER(pname))
+    return FALSE;
+
+  /* Protosubs for closures are not lexicals */
+  if(PadnamePV(pname)[0] == '&')
+    return FALSE;
+
+  /* anything left is a normal lexical */
+  return TRUE;
+}
+
 #define suspendedstate_suspend(state, cv)  MY_suspendedstate_suspend(aTHX_ state, cv)
 static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 {
@@ -276,21 +334,21 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
         /* nothing else special */
         continue;
 
-      case CXt_LOOP_PLAIN:
       case CXt_LOOP_ARY:
       case CXt_LOOP_LIST:
       case CXt_LOOP_LAZYSV:
       case CXt_LOOP_LAZYIV:
-      {
-        frame->type = type;
-        frame->loop = cx->blk_loop;
-        frame->gimme = cx->blk_gimme;
-
-        if(cx->cx_type & (CXp_FOR_GV|CXp_FOR_LVREF))
+        if(!CxPADLOOP(cx))
           /* non-lexical foreach will effectively work like 'local' and we
            * can't really support local
            */
           croak("Cannot suspend a foreach loop on non-lexical iterator");
+
+        /* fallthrough */
+      case CXt_LOOP_PLAIN:
+        frame->type = type;
+        frame->loop = cx->blk_loop;
+        frame->gimme = cx->blk_gimme;
 
         if(type == CXt_LOOP_LAZYSV) {
           /* these two fields are refcounted, so we need to save them from
@@ -301,7 +359,6 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
         }
 
         continue;
-      }
 
       case CXt_EVAL: {
         if(!(cx->cx_type & CXp_TRYBLOCK))
@@ -346,8 +403,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   for(i = 1; i <= pad_max; i++) {
     PADNAME *pname = (i <= padnames_max) ? padnames[i] : NULL;
 
-    /* Only the lexicals that have names; if there's no name then skip it. */
-    if(!pname || !PadnameLEN(pname)) {
+    if(!padname_is_normal_lexical(pname)) {
       state->padslots[i-1] = NULL;
       continue;
     }
@@ -379,7 +435,8 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
   if(frame->marklen) {
     for(i = 0; i < frame->marklen; i++) {
-      PUSHMARK(PL_stack_base + frame->marks[i] - cx->blk_oldsp);
+      I32 absmark = frame->marks[i] + cx->blk_oldsp;
+      PUSHMARK(PL_stack_base + absmark);
     }
 
     Safefree(frame->marks);
@@ -704,6 +761,8 @@ static OP *pp_await(pTHX)
     PUSHMARK(SP);
 
     suspendedstate_resume(state, curcv);
+
+    debug_showstack("Stack after resume");
   }
   else {
     f = POPs;
@@ -719,6 +778,8 @@ static OP *pp_await(pTHX)
     future_get_to_stack(f, GIMME_V);
     return PL_op->op_next;
   }
+
+  debug_showstack("Stack before suspend");
 
   if(!state) {
     /* Clone the CV and then attach suspendedstate magic to it */

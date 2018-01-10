@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Core;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 has core => (
     is      => 'ro',
@@ -48,8 +48,26 @@ sub projects {
         }
         $self->core->projects();
 
+    my %len;
     for my $project (@projects) {
-        print $project->name . "\n";
+        $len{name} = length $project->name if !$len{name} || $len{name} < length $project->name;
+        $len{key} = length $project->key if !$len{key} || $len{key} < length $project->key;
+    }
+    for my $project (@projects) {
+        if ( $self->opt->long ) {
+            my $desc = $project->description || '';
+            if ( $desc ) {
+                $desc =~ s/^\s+//xms;
+
+                $desc = join "\n" . ' ' x ( $len{name} + $len{key} + 2 ),
+                    split /\r?\n/, $desc;
+            }
+
+            printf "%-$len{name}s %-$len{key}s %s\n", $project->name, $project->key, $desc;
+        }
+        else {
+            print $project->name . "\n";
+        }
     }
 }
 
@@ -61,8 +79,18 @@ sub repositories {
         }
         $self->core->repositories($self->opt->{project});
 
+    my %len;
     for my $repository (@repositories) {
-        print $repository->name . "\n";
+        $len{name} = length $repository->name if !$len{name} || $len{name} < length $repository->name;
+        $len{state} = length $repository->state if !$len{state} || $len{state} < length $repository->state;
+    }
+    for my $repository (@repositories) {
+        if ( $self->opt->long ) {
+            printf "%-$len{name}s %-$len{state}s %s\n", $repository->name, $repository->state, $repository->self;
+        }
+        else {
+            print $repository->name . "\n";
+        }
     }
 }
 
@@ -118,7 +146,7 @@ App::BitBucketCli - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli version 0.002
+This documentation refers to App::BitBucketCli version 0.003
 
 =head1 SYNOPSIS
 

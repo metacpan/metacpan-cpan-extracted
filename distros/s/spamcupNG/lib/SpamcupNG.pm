@@ -26,7 +26,7 @@ our %MAP = (
 
 lock_hash(%MAP);
 
-our $VERSION = '0.6'; # VERSION
+our $VERSION = '0.7'; # VERSION
 
 =head1 NAME
 

@@ -249,7 +249,6 @@ sub search_registered_types {
         my $lookup_ref = $self->register_types->{$key}->{lookup};
         my $builder    = $self->register_types->{$key}->{builder};
 
-
         ## We look for keys one of two ways - either they have a pattern match or a declared type
         foreach my $lookup ( @{$lookup_ref} ) {
             if ( $k =~ m/$lookup/ ) {

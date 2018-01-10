@@ -25,4 +25,5 @@ sub create_HASH_attr {
     );
 }
 
+no Moose;
 1;

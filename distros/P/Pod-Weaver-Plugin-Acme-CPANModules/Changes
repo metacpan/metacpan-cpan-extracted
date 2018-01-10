@@ -1,0 +1,8 @@
+0.002   2018-01-09 (PERLANCAR)
+
+	- Only process /^Acme::CPANModules::/.
+
+
+0.001   2018-01-09 (PERLANCAR)
+
+        - First release.

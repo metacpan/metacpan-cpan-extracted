@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use File::Slurper qw(write_text);
+
+my $catalog_path = "$Bin/../devdata/catalog.csv";
+
+my @scrape_result;
+my %by_safename;
+my %by_name;
+LOAD_SCRAPE_RESULT: {
+    open my $fh, "<", "$Bin/../devdata/scrape-result.csv" or die;
+    <$fh>;
+    while (defined(my $line = <$fh>)) {
+        chomp $line;
+        my @ff = split /\t/, $line;
+        my ($name, $safename) = @ff;
+
+        $by_name{$name} and die "Duplicate name $name";
+        $by_name{$name} = {safename => $safename};
+
+        $by_safename{$safename} and die "Duplicate safename $safename";
+        $by_safename{$safename} = {name => $name};
+
+        push @scrape_result, [$name, $safename];
+    }
+}
+
+@scrape_result = sort {$a->[0] cmp $b->[0]} @scrape_result;
+write_text($catalog_path, join("", map {join("\t", @$_)."\n"} @scrape_result));

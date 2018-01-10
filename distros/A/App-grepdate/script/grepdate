@@ -1,0 +1,176 @@
+#!perl
+
+our $DATE = '2018-01-10'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    # highlight => 1,
+    reverse => 0,
+    parser => 'Date::Extract::PERLANCAR',
+);
+my $Parser;
+my $Code_Parse;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'reverse|v'        => \$Opts{reverse},
+        'parser=s'         => \$Opts{parser},
+        'version|V'        => sub {
+            no warnings 'once';
+            say "grepdate version ", ($main::VERSION // 'dev');
+            exit 0;
+        },
+        'help|h'           => sub {
+            print <<USAGE;
+Usage:
+  grepdate [OPTIONS]... [FILES]...
+  grepdate --help|-h
+  grepdate --version|-V
+Options:
+  --reverse, -v
+  --parser=s
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+
+    if ($Opts{parser} eq 'Date::Extract::PERLANCAR') {
+        require Date::Extract::PERLANCAR;
+        $Parser = Date::Extract::PERLANCAR->new(format => 'combined');
+        $Code_Parse = sub { $Parser->extract($_[0]) };
+    } elsif ($Opts{parser} eq 'Date::Extract::ID') {
+        require Date::Extract::ID;
+        $Parser = Date::Extract::ID->new(format => 'combined');
+        $Code_Parse = sub { $Parser->extract($_[0]) };
+    } elsif ($Opts{parser} eq 'DateTime::Format::Alami::EN') {
+        require DateTime::Format::Alami::EN;
+        $Parser = DateTime::Format::Alami::EN->new;
+        $Code_Parse = sub {
+            my $h;
+            eval { $h = $Parser->parse_datetime($_[0], {format=>'combined'}) };
+            return undef if $@;
+            $h;
+        };
+    } elsif ($Opts{parser} eq 'DateTime::Format::Alami::ID') {
+        require DateTime::Format::Alami::ID;
+        $Parser = DateTime::Format::Alami::ID->new;
+        $Code_Parse = sub {
+            my $h;
+            eval { $h = $Parser->parse_datetime($_[0], {format=>'combined'}) };
+            return undef if $@;
+            $h;
+        };
+    }
+}
+
+sub run {
+    require Date::Extract::PERLANCAR;
+
+    my $parser = Date::Extract::PERLANCAR->new(
+        format => "combined",
+        returns => "first",
+    );
+    while (<>) {
+        my $found;
+        my $h = $Code_Parse->($_);
+        if ($h) {
+            $found++;
+            s/(\Q$h->{verbatim}\E)/\e[1;31m$1\e[0m/;
+        }
+        if ($Opts{reverse}) {
+            next if $found;
+        } else {
+            next unless $found;
+        }
+        print;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Grep date in text
+# PODNAME: grepdate
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grepdate - Grep date in text
+
+=head1 VERSION
+
+This document describes version 0.002 of grepdate (from Perl distribution App-grepdate), released on 2018-01-10.
+
+=head1 SYNOPSIS
+
+ grepdate [OPTION]... [FILES]...
+
+=head1 DESCRIPTION
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --reverse, -v
+
+=item * --parser=s (default: Date::Extract::PERLANCAR)
+
+Choose either L<Date::Extract::PERLANCAR>, L<Date::Extract::ID>,
+L<DateTime::Format::Alami::EN>, L<DateTime::Format::Alami::ID>.
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-grepdate>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-grepdate>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-grepdate>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

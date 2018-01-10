@@ -7,7 +7,7 @@ our @EXPORT = qw(update_msbuild_project update_msbuild update_msbuild_filters);
 use strict;
 use warnings;
 
-our $VERSION = '0.3'; # VERSION
+our $VERSION = '0.4'; # VERSION
 
 
 
@@ -281,7 +281,7 @@ Makefile::Update::MSBuild - Update list of sources and headers in MSBuild projec
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

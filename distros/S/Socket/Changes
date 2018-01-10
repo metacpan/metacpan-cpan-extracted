@@ -1,5 +1,15 @@
 Revision history for Socket
 
+2.025   2018-01-09 15:12:51
+        [CHANGES]
+         * Add IPPROTO_ICMPV6
+
+        [BUGFIXES]
+         * Fix for C++11 compilers - require a space either side of
+           string-pasting macros (thanks Karl Williamson)
+         * Fix for machines lacking HAS_SOCKADDR_IN6 (RT116913) (thanks ilmari)
+         * Print to STDERR on test failures (RT123436) (thanks ilmari)
+
 2.024   2016/08/11 13:49:48
         [BUGFIXES]
          * Restore back-compat to pre-2.011 behaviour on undefined port

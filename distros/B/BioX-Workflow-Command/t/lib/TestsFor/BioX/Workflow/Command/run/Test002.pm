@@ -8,7 +8,6 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use BioX::Workflow::Command;
 use YAML::XS;
-use Data::Walk;
 use Storable qw(dclone);
 use File::Spec;
 use File::Slurp;

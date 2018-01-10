@@ -1,30 +1,32 @@
-Webqq::Encryption v1.5
+Webqq::Encryption v1.6
 ========================
 
 安装方法:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-   推荐使用CPAN安装
-  
-   cpan -i Webqq::Encryption
-
-依赖模块:
+    1.安装依赖模块:
     
-    Crypt::RSA
-    Digest::MD5
+    Crypt::OpenSSL::RSA
+    Crypt::OpenSSL::Bignum
 
-若Crypt::RSA安装有困难导致Webqq::Encryption安装不成功，可以选择安装替代模块，然后再强制安装Webqq::Encryption
-1）安装Crypt::OpenSSL::RSA 和 Crypt::OpenSSL::Bignum （Centos下可以通过yum -y install perl-Crypt-OpenSSL-* 来方便安装）
-2）安装 JE 模块（这是一个纯perl实现的javascript引擎 使用js代码计算RSA 速度较慢）
+    1) windows
+
+        安装 StrawberryPerl 之后则自带上述依赖模块 官方网站 http://strawberryperl.com/
+
+    2) RedHat/Centos
+
+        yum install -y perl-Crypt-OpenSSL-RSA perl-Crypt-OpenSSL-Bignum
+
+    3) Ubuntu/MacOS
+
+        apt-get install libcrypt-opensssl-bignum-perl libcrypt-openssl-rsa-perl
+
+
+   2. 在线安装 Webqq::Encryption
+   
+        cpanm Webqq::Encryption
 
 COPYRIGHT and LICENCE
 
 Copyright (C) 2014 by sjdy521
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify it under BSD 2-clause "Simplified" license

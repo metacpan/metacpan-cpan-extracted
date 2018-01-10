@@ -29,14 +29,15 @@ my %default = (
 sub new() {
 	my ($class, $args) = @_;
 	$args = {} if !$args;
+	my $main_schema = delete $$args{'main_schema'};
 	my $self = merge($args, \%default);
 	bless $self, $class;
 
 	$$self{'namespaces'} = [];
-	if ($args->{'main_schema'}) {
-		$self->add_schema($$args{'main_schema'});
+	if ($main_schema) {
+		$self->add_schema($main_schema);
+		$$self{'main_schema'} = $main_schema->namespace();
 	}
-	$$self{'main_schema'} = $$args{'main_schema'}->namespace();
 
 	return $self;
 }
@@ -65,7 +66,7 @@ sub get_lb_files() {
 	foreach my $ns (@{$$self{'namespaces'}}) {
 		my $main_xpath = $$schemas{$ns}->xpath();
 		my $lbs = $main_xpath->findnodes("//*[local-name() = 'linkbaseRef']"  );
-		for my $lb (@$lbs) {
+		foreach my $lb (@$lbs) {
 			my $lb_file = $lb->getAttribute('xlink:href');
 			if ($lb_file !~ /^http|^\//) {
 				my $namespace = $lb->getAttribute('namespace');
@@ -84,8 +85,9 @@ sub get_other_schemas() {
 	my @out_array;
 	$ns = $$self{'main_schema'} if !$ns;
  	my $main_xpath = $$self{'schemas'}{$ns}->xpath();
+	#print STDERR "XML_XPATH=".Dumper($main_xpath);
 	my $other_schemas = $main_xpath->findnodes("//*[local-name() = 'import']");
-	for my $other (@$other_schemas) {
+	foreach my $other (@$other_schemas) {
 		my $location_url  = $other->getAttribute('schemaLocation');
 		if ($location_url !~ /^http|^\//) {
 			my $namespace = $other->getAttribute('namespace');
@@ -140,7 +142,7 @@ sub add_schema() {
 		push @{$$self{'namespaces'}}, $ns;
 		$$self{'schemas'}{$ns} = $schema;	
 		my $element_nodes = $schema->xpath()->findnodes("//*[local-name() = 'element']");
-		for my $el_xml (@$element_nodes) {
+		foreach my $el_xml (@$element_nodes) {
 			my $e = XBRL::JPFR::Element->new($el_xml);
 			my $id = $e->id();
 			next if !$id;

@@ -15,7 +15,7 @@ has 'remove_from_json' => (
             'remove_from_json', 'register_namespace',
             '_ERROR',           'register_process_directives',
             'register_types',   'run_stats',
-            'interpol_directive_cache'
+            'interpol_directive_cache', 'before_meta',
         ];
     },
 );
@@ -46,5 +46,8 @@ sub read_json_file {
 
     return $json;
 }
+
+# no Moose;
+no Moose::Role;
 
 1;

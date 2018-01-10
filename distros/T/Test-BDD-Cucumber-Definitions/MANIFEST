@@ -1,5 +1,7 @@
 Changes
 lib/Test/BDD/Cucumber/Definitions.pm
+lib/Test/BDD/Cucumber/Definitions/Data.pm
+lib/Test/BDD/Cucumber/Definitions/Data/Util.pm
 lib/Test/BDD/Cucumber/Definitions/HTTP.pm
 lib/Test/BDD/Cucumber/Definitions/HTTP/Util.pm
 Makefile.PL

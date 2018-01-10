@@ -3,9 +3,9 @@
 use warnings;
 use strict;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
-BEGIN { use_ok( 'HTML::Lint::Error' ); }
+use HTML::Lint::Error;
 
 my $err = HTML::Lint::Error->new( undef, undef, undef, 'elem-empty-but-closed' );
 

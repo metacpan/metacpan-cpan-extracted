@@ -1,5 +1,26 @@
 Revision history for App-bitbucket-cli
 
+0.003   2018-01-07
+        Updating for release of version 0.003
+        Added new dependency (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added new modules to base tests (Ivan Wills)
+        New stop words (Ivan Wills)
+        Fixed missing POD docs (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Adding new files to manifest (Ivan Wills)
+        Improving on the output of projects (Ivan Wills)
+        Using new A::B::Base and Link(s) classes (Ivan Wills)
+        Abstracting links to classes (Ivan Wills)
+        New base class for other classes (Ivan Wills)
+        New edits (Ivan Wills)
+        Adding long list for projects (Ivan Wills)
+        Fixing documentation (Ivan Wills)
+        Fixing the fact that name already exists so should not be calculated (Ivan Wills)
+        Adding long option to repositories command (Ivan Wills)
+        Made common parameters actually common (Ivan Wills)
+        Starting to add better docs (Ivan Wills)
+
 0.002   2017-12-11
         Updating for release of version 0.002
         Adding TravisCI config (Ivan Wills)

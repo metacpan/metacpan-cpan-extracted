@@ -20,6 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'DDP'                           => 0,
         'HTTP::Tiny'                    => 0,
+        'JSON::Path'                    => 0,
         'JSON::XS'                      => 0,
         'Moose::Util::TypeConstraints'  => 0,
         'Params::ValidationCompiler'    => 0,

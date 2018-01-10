@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
     [ 'elem-unopened' => qr/<\/p> with no opening <P>/i ],
@@ -9,9 +13,9 @@ checkit( [
 __DATA__
 <HTML> <!-- for elem-unopened -->
     <HEAD>
-	<TITLE>Test stuff</TITLE>
+        <TITLE>Test stuff</TITLE>
     </HEAD>
     <BODY BGCOLOR="white">
-	This is my paragraph</P>
+        This is my paragraph</P>
     </BODY>
 </HTML>

@@ -7,7 +7,7 @@ use Hash::AsObject;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.02';
+our $VERSION = '0.021';
 
 sub init {
     my ($path_to_file, $path_to_variable) = @ARG;
@@ -24,7 +24,7 @@ sub init {
 
     # Require file
     eval { require $path_to_file } or do {
-        croak(sprintf qq{Can't parse config "%s": %s}, $path_to_file, $EVAL_ERROR);
+        croak(sprintf q{Can't parse config "%s": %s}, $path_to_file, $EVAL_ERROR);
     };
 
     # Fetch hash_ref from package
@@ -54,7 +54,7 @@ JIP::Conf - Perl-ish configuration plugin
 
 =head1 VERSION
 
-Version 0.02
+This document describes C<JIP::Conf> version C<0.021>.
 
 =cut
 
@@ -76,7 +76,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -1,3 +1,9 @@
+0.591   2018-01-10 (PERLANCAR)
+
+	- Switch from using DZP:Acme::CPANLists::Blacklist to
+	  DZP:Acme::CPANModules::Blacklist.
+
+
 0.590   2017-08-01 (PERLANCAR)
 
 	- Add plugin: DZP:Test::Perl::Critic.

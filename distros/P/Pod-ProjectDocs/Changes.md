@@ -1,3 +1,6 @@
+## 0.50 2018-01-09
+- Added `-nosourcecode` option to suppress inclusion of the original sources.
+
 ## 0.49 2017-09-20
 - Switch to metacpan for external perldoc links.
 - Ported to Moose.

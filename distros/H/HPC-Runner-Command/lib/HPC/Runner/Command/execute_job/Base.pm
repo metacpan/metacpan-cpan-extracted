@@ -36,6 +36,7 @@ has 'job_scheduler_id' => (
           || $ENV{SBATCH_JOB_ID}
           || $ENV{PBS_JOBID}
           || $ENV{JOB_ID}
+          || $ENV{AWS_BATCH_JOB_ARRAY_INDEX}
           || '';
         if ( $self->can('task_id') && $self->task_id ) {
             $scheduler_id = $scheduler_id . '_' . $self->task_id;

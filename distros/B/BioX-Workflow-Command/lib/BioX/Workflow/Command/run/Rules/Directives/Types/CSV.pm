@@ -42,4 +42,6 @@ sub process_directive_csv {
     $self->$k($data);
 }
 
+no Moose;
+
 1;

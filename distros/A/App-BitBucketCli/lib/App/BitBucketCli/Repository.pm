@@ -12,26 +12,21 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
+
+extends qw/App::BitBucketCli::Base/;
 
 has [qw/
-    id
-    link
-    links
     state
+    slug
+    name
 /] => (
     is  => 'rw',
 );
 
-sub name {
+sub self {
     my ($self) = @_;
-    my ($name) = $self->link->{url} =~ m{([^/]+)/browse$};
-    return $name;
-}
-
-sub TO_JSON {
-    my ($self) = @_;
-    return { %{ $self }, name => $self->name };
+    return $self->links->{self}[0]{href};
 }
 
 1;
@@ -44,7 +39,7 @@ App::BitBucketCli::Repository - Stores details of a repository
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Repository version 0.002
+This documentation refers to App::BitBucketCli::Repository version 0.003
 
 =head1 SYNOPSIS
 
@@ -59,9 +54,9 @@ This documentation refers to App::BitBucketCli::Repository version 0.002
 
 =head1 SUBROUTINES/METHODS
 
-=head2 C<name ()>
+=head2 C<self ()>
 
-Extracts the repository name
+Returns the "self" url.
 
 =head2 C<TO_JSON ()>
 
@@ -76,6 +71,12 @@ Used by L<JSON::XS> for dumping the object
 =head2 links
 
 =head2 state
+
+=head2 slug
+
+=head2 name
+
+The name of the repository
 
 =head1 DIAGNOSTICS
 

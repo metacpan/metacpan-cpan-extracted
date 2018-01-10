@@ -1,3 +1,13 @@
+0.07 Jan 8 2018
+
+	* JPFR/Taxonomy.pm: Fixed a following bug
+		Use of uninitialized value in subroutine entry at XML/LibXML/XPathContext.pm line 73.
+		XPathContext: lost current node at XBRL/JPFR/Taxonomy.pm line 88.
+
+		corrupted size vs. prev_size
+
+		corrupted double-linked list
+
 0.06 Jun 29 2015
 
 	* bin/timeseries: Donnot attach values for items of textBlockItemType

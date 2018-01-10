@@ -1,5 +1,5 @@
 package Finance::GDAX::API;
-our $VERSION = '0.01';
+our $VERSION = '0.07';
 use 5.20.0;
 use warnings;
 use JSON;

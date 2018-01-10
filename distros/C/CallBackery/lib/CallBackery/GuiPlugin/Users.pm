@@ -34,7 +34,7 @@ has tableCfg => sub {
     return [
         {
             label => trm('UserId'),
-            type => 'str',
+            type => 'number',
             width => '1*',
             key => 'cbuser_id',
             sortable => $self->true,
@@ -42,34 +42,34 @@ has tableCfg => sub {
         },
         {
             label => trm('Username'),
-            type => 'str',
+            type => 'string',
             width => '3*',
             key => 'cbuser_login',
             sortable => $self->true,
         },
         {
             label => trm('Given Name'),
-            type => 'str',
+            type => 'string',
             width => '4*',
             key => 'cbuser_given',
             sortable => $self->true,
         },
         {
             label => trm('Family Name'),
-            type => 'str',
+            type => 'string',
             width => '4*',
             key => 'cbuser_family',
             sortable => $self->true,
         },
         {
             label => trm('Rights'),
-            type => 'str',
+            type => 'string',
             width => '8*',
             key => 'cbuser_cbrights',
         },
         {
             label => trm('Note'),
-            type => 'str',
+            type => 'string',
             width => '8*',
             key => 'cbuser_note',
         },

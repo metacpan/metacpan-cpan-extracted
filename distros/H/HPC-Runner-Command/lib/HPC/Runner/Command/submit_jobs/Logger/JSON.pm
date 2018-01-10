@@ -47,10 +47,10 @@ sub update_json_submission {
     my $hpc_meta = $self->gen_hpc_meta;
     my $json_text = encode_json $hpc_meta;
 
-    my $file_name = File::Spec->catdir( $self->logdir, 'submission.json' );
+    # my $file_name = File::Spec->catdir( $self->logdir, 'submission.json' );
     $self->_make_the_dirs( $self->logdir );
 
-    write_file($file_name, $json_text);
+    # write_file($file_name, $json_text);
     write_file(File::Spec->catdir($self->data_dir, 'submission.json'), $json_text);
 
     return $hpc_meta;

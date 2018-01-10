@@ -68,7 +68,7 @@ sub create_json_task {
         $self->write_lock;
         $self->add_to_running( $data_dir, $task_obj );
         try {
-          $self->lock_file->remove;
+            $self->lock_file->remove;
         };
     }
 
@@ -97,39 +97,30 @@ sub update_json_task {
         }
     }
 
-    # my $task_obj = $self->get_from_running($data_dir);
-    my $task_obj = {};
+    my $task_obj = $self->get_from_running($data_dir);
 
-    $task_obj->{exit_time}  = $self->table_data->{exit_time};
-    $task_obj->{duration}   = $self->table_data->{duration};
-    $task_obj->{exit_code}  = $self->table_data->{exitcode};
-    $task_obj->{task_tags}  = $tags;
-    $task_obj->{cmdpid}     = $self->table_data->{cmdpid};
-    $task_obj->{start_time} = $self->table_data->{start_time};
-    $task_obj->{task_id}    = $self->table_data->{task_id};
+    # my $task_obj = {};
 
-    # $task_obj->{memory_profile} = {};
-    #
-    # foreach my $stat (@stats) {
-    #     $task_obj->{memory_profile}->{$stat}->{low} =
-    #       $self->task_mem_data->{low}->{$stat};
-    #     $task_obj->{memory_profile}->{$stat}->{high} =
-    #       $self->task_mem_data->{high}->{$stat};
-    #     $task_obj->{memory_profile}->{$stat}->{mean} =
-    #       $self->task_mem_data->{mean}->{$stat};
-    #     $task_obj->{memory_profile}->{$stat}->{count} =
-    #       $self->task_mem_data->{count}->{$stat};
-    # }
+    $task_obj->{exit_time}    = $self->table_data->{exit_time};
+    $task_obj->{duration}     = $self->table_data->{duration};
+    $task_obj->{exit_code}    = $self->table_data->{exitcode};
+    $task_obj->{task_tags}    = $tags;
+    $task_obj->{cmdpid}       = $self->table_data->{cmdpid};
+    $task_obj->{start_time}   = $self->table_data->{start_time};
+    $task_obj->{task_id}      = $self->table_data->{task_id};
+    $task_obj->{scheduler_id} = $self->table_data->{scheduler_id}
+      if $self->table_data->{scheduler_id};
+    $task_obj->{hostname} = $self->hostname;
 
     if ( !$self->no_log_json ) {
         $self->check_lock;
         $self->write_lock;
 
-        $self->remove_from_running($data_dir);
+        # $self->remove_from_running($data_dir);
         ##TODO Add in mem for job
         $self->add_to_complete( $data_dir, $task_obj );
         try {
-          $self->lock_file->remove;
+            $self->lock_file->remove;
         };
     }
 
@@ -143,7 +134,8 @@ sub add_to_complete {
     my $data_dir  = shift;
     my $task_data = shift;
 
-    my $c_file = File::Spec->catfile( $data_dir, 'complete.json' );
+    my $pad = sprintf "%.4d", $self->counter;
+    my $c_file = File::Spec->catfile( $data_dir, $pad . '.json' );
 
     my $json_obj = $self->read_json($c_file);
 
@@ -161,7 +153,7 @@ sub create_task_file {
     my $json_obj = shift;
 
     my $t_file = File::Spec->catfile( $data_dir, $self->counter . '.json' );
-    $self->write_json( $t_file, $json_obj,  );
+    $self->write_json( $t_file, $json_obj, );
 }
 
 sub add_to_running {
@@ -169,9 +161,10 @@ sub add_to_running {
     my $data_dir  = shift;
     my $task_data = shift;
 
-    my $r_file = File::Spec->catfile( $data_dir, 'running.json' );
+    my $pad = sprintf "%.4d", $self->counter;
+    my $r_file = File::Spec->catfile( $data_dir, $pad . '.json' );
 
-    my $json_obj = $self->read_json( $r_file,  );
+    my $json_obj = $self->read_json( $r_file, );
     $json_obj->{ $self->counter } = $task_data;
 
     $self->write_json( $r_file, $json_obj, );
@@ -183,7 +176,7 @@ sub remove_from_running {
 
     my $r_file = File::Spec->catfile( $data_dir, 'running.json' );
 
-    my $json_obj = $self->read_json( $r_file,  );
+    my $json_obj = $self->read_json( $r_file, );
 
     delete $json_obj->{ $self->table_data->{task_id} };
     $self->write_json( $r_file, $json_obj, );
@@ -193,8 +186,8 @@ sub get_from_running {
     my $self     = shift;
     my $data_dir = shift;
 
-    my $r_file   = File::Spec->catfile( $data_dir, 'running.json' );
-    my $json_obj = $self->read_json( $r_file,  );
+    my $r_file = File::Spec->catfile( $data_dir, 'running.json' );
+    my $json_obj = $self->read_json( $r_file, );
 
     return $json_obj->{ $self->table_data->{task_id} };
 }
@@ -231,7 +224,7 @@ sub write_json {
         $json_text = '';
     };
 
-    write_file($file, $json_text);
+    write_file( $file, $json_text );
 }
 
 1;

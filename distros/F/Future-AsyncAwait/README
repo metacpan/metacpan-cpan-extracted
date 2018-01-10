@@ -4,18 +4,18 @@ NAME
 
 SYNOPSIS
 
-     use Future::AsyncAwait;
+       use Future::AsyncAwait;
     
-     async sub do_a_thing
-     {
-        my $first = await do_first_thing();
+       async sub do_a_thing
+       {
+          my $first = await do_first_thing();
     
-        my $second = await do_second_thing();
+          my $second = await do_second_thing();
     
-        return combine_things( $first, $second );
-     }
+          return combine_things( $first, $second );
+       }
     
-     do_a_thing()->get;
+       do_a_thing()->get;
 
 DESCRIPTION
 
@@ -38,13 +38,13 @@ DESCRIPTION
     expression, and it forces the return value of the function to always be
     a Future instance.
 
-     async sub myfunc
-     {
-        return 123;
-     }
+       async sub myfunc
+       {
+          return 123;
+       }
     
-     my $f = myfunc();
-     my $result = $f->get;
+       my $f = myfunc();
+       my $result = $f->get;
 
     This async-declared function always returns a Future instance when
     invoked. The returned future instance will eventually complete when the
@@ -59,9 +59,9 @@ DESCRIPTION
     an operand and yields the eventual result of it. Superficially it can
     be thought of similar to invoking the get method on the future.
 
-     my $result = await $f;
+       my $result = await $f;
     
-     my $result = $f->get;
+       my $result = $f->get;
 
     However, the key difference (and indeed the entire reason for being a
     new syntax keyword) is the behaviour when the future is still pending
@@ -87,135 +87,141 @@ DESCRIPTION
 EARLY-VERSION WARNING
 
     WARNING: The actual semantics in this module are in an early state of
-    implementation. Some things work but most do not. Don't expect to be
-    able to use this module for much real code yet.
+    implementation. Some things will randomly break. While it seems stable
+    enough for small-scale development and experimental testing, don't
+    expect to be able to use this module reliably in production yet.
 
  Things That Work Already
 
-    Any function that doesn't actually await anything, and just returns
-    immediate futures is already working fine with this module.
+    Most simple cases involving awaiting on still-pending futures should be
+    working:
 
-    Instead of writing
-
-     sub foo
-     {
-        ...
-        return Future->done( @result );
-     }
-
-    you can now simply write
-
-     async sub foo
-     {
-        ...
-        return @result;
-     }
-
-    with the added side-benefit that any exceptions thrown by the elided
-    code will be turned into an immediate-failed Future rather than making
-    the call itself propagate the exception, which is usually what you
-    wanted when dealing with futures.
-
-    In addition, some simple cases involving awaiting on still-pending
-    futures should be working:
-
-     async sub bar
-     {
-        my ( $f ) = @_;
+       async sub foo
+       {
+          my ( $f ) = @_;
     
-        return 1 + await( $f ) + 3;
-     }
+          BEFORE();
+          await $f;
+          AFTER();
+       }
     
-     async sub splot
-     {
-        while( COND ) {
-           await func();
-        }
-     }
+       async sub bar
+       {
+          my ( $f ) = @_;
     
-     async sub wibble
-     {
-        if( COND ) {
-           await func();
-        }
-     }
+          return 1 + await( $f ) + 3;
+       }
     
-     async sub wobble
-     {
-        foreach my $var ( THINGs ) {
-           await func();
-        }
-     }
+       async sub splot
+       {
+          while( COND ) {
+             await func();
+          }
+       }
     
-     async sub splat
-     {
-        eval {
-           await func();
-        };
-     }
+       async sub wibble
+       {
+          if( COND ) {
+             await func();
+          }
+       }
+    
+       async sub wobble
+       {
+          foreach my $var ( THINGs ) {
+             await func();
+          }
+       }
+    
+       async sub splat
+       {
+          eval {
+             await func();
+          };
+       }
 
     Plain lexical variables are preserved across an await deferral:
 
-     async sub quux
-     {
-        my $message = "Hello, world\n";
-        await func();
-        print $message;
-     }
+       async sub quux
+       {
+          my $message = "Hello, world\n";
+          await func();
+          print $message;
+       }
 
  Things That Don't Yet Work
 
     local variable assignments inside an async function will confuse the
     suspend mechanism:
 
-     our $DEBUG = 0;
+       our $DEBUG = 0;
     
-     async sub quark
-     {
-        local $DEBUG = 1;
-        await func();
-     }
+       async sub quark
+       {
+          local $DEBUG = 1;
+          await func();
+       }
 
     Since foreach loops on non-lexical iterator variables (usually package
     variables) effectively imply a local-like behaviour, these are also
     disallowed.
 
-     our $VAR;
+       our $VAR;
     
-     async sub splurt
-     {
-        foreach $VAR ( LIST ) {
-           await ...
-        }
-     }
+       async sub splurt
+       {
+          foreach $VAR ( LIST ) {
+             await ...
+          }
+       }
 
     Additionally, complications with the savestack appear to be affecting
     some uses of package-level our variables captured by async functions:
 
-     our $VAR;
+       our $VAR;
     
-     async sub bork
-     {
-        print "VAR is $VAR\n";
-        await func();
-     }
+       async sub bork
+       {
+          print "VAR is $VAR\n";
+          await func();
+       }
 
     See also the "TODO" list for further things.
+
+ Async Without Await
+
+    Any function that doesn't actually await anything, and just returns
+    immediate futures can be neatened by this module too.
+
+    Instead of writing
+
+       sub imm
+       {
+          ...
+          return Future->done( @result );
+       }
+
+    you can now simply write
+
+       async sub imm
+       {
+          ...
+          return @result;
+       }
+
+    with the added side-benefit that any exceptions thrown by the elided
+    code will be turned into an immediate-failed Future rather than making
+    the call itself propagate the exception, which is usually what you
+    wanted when dealing with futures.
 
 WITH OTHER MODULES
 
  Syntax::Keyword::Try
 
-    At the time of writing (Future::AsyncAwait version 0.09,
-    Syntax::Keyword::Try version 0.06) a basic try/catch block inside an
-    async sub works fine, provided that neither try nor catch blocks
-    attempt to return.
-
-    Attempting to return from inside a try or catch will fail - see
-    RT122795 <https://rt.cpan.org/Ticket/Display.html?id=122795>.
-
-    Attempting to use a finally block will fail - see RT122796
-    <https://rt.cpan.org/Ticket/Display.html?id=122796>.
+    As of Future::AsyncAwait version 0.10 and Syntax::Keyword::Try version
+    0.07, cross-module integration tests assert that basic try/catch blocks
+    inside an async sub work correctly, including those that attempt to
+    return from inside try.
 
 SEE ALSO
 

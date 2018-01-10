@@ -8,10 +8,9 @@ WriteMakefile(
     DISTNAME            => 'Webqq-Encryption',
     LICENSE             => "perl",
     PREREQ_PM         => {
-        #"JE"                    => 0,
-        "Crypt::RSA"            => 0,
-        #"Crypt::OpenSSL::RSA"   => 0,
-        #"Crypt::OpenSSL::Bignum"=> 0,
+        #"Crypt::RSA"            => 0,
+        "Crypt::OpenSSL::RSA"   => 0,
+        "Crypt::OpenSSL::Bignum"=> 0,
         "Digest::MD5"           => 0,
     }, # e.g., Module::Name => 1.1
     dist              => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -2,7 +2,7 @@
 use v5.22;
 use strict;
 use warnings;
-use Test::More tests => 175;
+use Test::More tests => 182;
 use Test::Exception;
 
 use Time::Piece;
@@ -177,7 +177,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "The Fifth Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2015-02-08 returns the correct day.'
 );
 
@@ -187,7 +187,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "The Sixth Sunday of Epiphany",
+    "The Last Sunday after Epiphany",
     'Validating that 2015-02-15 returns the correct day.'
 );
 
@@ -702,7 +702,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "The Fourth Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2016-01-31 returns the correct day.'
 );
 
@@ -712,7 +712,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "The Fifth Sunday of Epiphany",
+    "The Last Sunday after Epiphany",
     'Validating that 2016-02-07 returns the correct day.'
 );
 
@@ -1250,7 +1250,7 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "The Seventh Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2017-02-19 returns the correct day.'
 );
 
@@ -1707,4 +1707,74 @@ is(
     $sunday->day->name,
     "The First Sunday of Christmas",
     'Validating that 2017-12-31 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-01-07", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The First Sunday of Epiphany",
+    'Validating that 2018-01-07 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-01-14", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Second Sunday of Epiphany",
+    'Validating that 2018-01-14 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-01-21", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Third Sunday of Epiphany",
+    'Validating that 2018-01-21 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-01-28", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Fourth Sunday of Epiphany",
+    'Validating that 2018-01-28 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-02-04", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Second to Last Sunday after Epiphany",
+    'Validating that 2018-02-04 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-02-11", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Last Sunday after Epiphany",
+    'Validating that 2018-02-11 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-02-18", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The First Sunday in Lent",
+    'Validating that 2018-02-18 returns the correct day.'
 );

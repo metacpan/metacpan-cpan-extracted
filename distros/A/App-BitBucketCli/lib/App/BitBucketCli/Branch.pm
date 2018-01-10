@@ -12,11 +12,12 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
+
+extends qw/App::BitBucketCli::Base/;
 
 has [qw/
     displayId
-    id
     isDefault
     latestChangeset
     latestCommit
@@ -74,11 +75,6 @@ sub _lastChangeTime {
     return $time ? int $time / 1000 : 0;
 }
 
-sub TO_JSON {
-    my ($self) = @_;
-    return { %{ $self }, metadata => undef };
-}
-
 1;
 
 __END__
@@ -89,7 +85,7 @@ App::BitBucketCli::Branch - Stores details about a repository's branch
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Branch version 0.002
+This documentation refers to App::BitBucketCli::Branch version 0.003
 
 =head1 SYNOPSIS
 

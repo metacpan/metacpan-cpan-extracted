@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: A simple REST controller for Mojolicious
 
 #pod =head1 DESCRIPTION
@@ -156,7 +156,7 @@ Yancy::Controller::Yancy - A simple REST controller for Mojolicious
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

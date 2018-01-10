@@ -1,3 +1,13 @@
+20180109  2018-01-09 (PERLANCAR)
+
+	  - Update to CMC 2018-01-09 (new coins: AppCoins (APPC), CanYaCoin
+	    (CAN), Lamden (TAU)).
+
+	  - Sort catalog asciibetically for easier diff when updating.
+
+	  - [doc] Mention CryptoExchange::Catalog.
+
+
 20180106   2018-01-06 (PERLANCAR)
 
         - First release.

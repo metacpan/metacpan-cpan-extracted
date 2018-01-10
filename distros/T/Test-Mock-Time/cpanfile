@@ -1,4 +1,4 @@
-requires 'perl', '5.010001';
+requires 'perl', '5.008001';
 
 requires 'Export::Attrs';
 requires 'List::Util', '1.33';
@@ -13,7 +13,7 @@ on configure => sub {
 on test => sub {
     requires 'Test::Exception';
     requires 'Test::More', '0.96';
-    recommends 'Time::HiRes';
+    recommends 'Time::HiRes', '1.9724';
     recommends 'EV';
     recommends 'Mojolicious', '6';
     suggests 'AnyEvent';

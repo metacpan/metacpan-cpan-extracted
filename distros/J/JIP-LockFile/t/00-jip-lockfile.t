@@ -14,7 +14,7 @@ my $NEED_TMP_FILE = 1;
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::LockFile', '0.05';
+    use_ok 'JIP::LockFile', '0.051';
     require_ok 'JIP::LockFile';
 
     diag(

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Future::AsyncAwait;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -23,18 +23,18 @@ C<Future::AsyncAwait> - deferred subroutine syntax for futures
 
 =head1 SYNOPSIS
 
- use Future::AsyncAwait;
+   use Future::AsyncAwait;
 
- async sub do_a_thing
- {
-    my $first = await do_first_thing();
+   async sub do_a_thing
+   {
+      my $first = await do_first_thing();
 
-    my $second = await do_second_thing();
+      my $second = await do_second_thing();
 
-    return combine_things( $first, $second );
- }
+      return combine_things( $first, $second );
+   }
 
- do_a_thing()->get;
+   do_a_thing()->get;
 
 =head1 DESCRIPTION
 
@@ -56,13 +56,13 @@ its work in a I<potentially> asynchronous fashion. This has two effects: it
 permits the body of the function to use the C<await> expression, and it forces
 the return value of the function to always be a L<Future> instance.
 
- async sub myfunc
- {
-    return 123;
- }
+   async sub myfunc
+   {
+      return 123;
+   }
 
- my $f = myfunc();
- my $result = $f->get;
+   my $f = myfunc();
+   my $result = $f->get;
 
 This C<async>-declared function always returns a C<Future> instance when
 invoked. The returned future instance will eventually complete when the
@@ -77,9 +77,9 @@ The C<await> keyword forms an expression which takes a C<Future> instance as
 an operand and yields the eventual result of it. Superficially it can be
 thought of similar to invoking the C<get> method on the future.
 
- my $result = await $f;
+   my $result = await $f;
 
- my $result = $f->get;
+   my $result = $f->get;
 
 However, the key difference (and indeed the entire reason for being a new
 syntax keyword) is the behaviour when the future is still pending and is not
@@ -104,120 +104,141 @@ on any itself.
 =head1 EARLY-VERSION WARNING
 
 B<WARNING>: The actual semantics in this module are in an early state of
-implementation. Some things work but most do not. Don't expect to be able to
-use this module for much real code yet.
+implementation. Some things will randomly break. While it seems stable enough
+for small-scale development and experimental testing, don't expect to be able
+to use this module reliably in production yet.
 
 =head2 Things That Work Already
 
-Any function that doesn't actually await anything, and just returns immediate
-futures is already working fine with this module.
+Most simple cases involving awaiting on still-pending futures should be
+working:
 
-Instead of writing
+   async sub foo
+   {
+      my ( $f ) = @_;
 
- sub foo
- {
-    ...
-    return Future->done( @result );
- }
+      BEFORE();
+      await $f;
+      AFTER();
+   }
 
-you can now simply write
+   async sub bar
+   {
+      my ( $f ) = @_;
 
- async sub foo
- {
-    ...
-    return @result;
- }
+      return 1 + await( $f ) + 3;
+   }
 
-with the added side-benefit that any exceptions thrown by the elided code will
-be turned into an immediate-failed C<Future> rather than making the call
-itself propagate the exception, which is usually what you wanted when dealing
-with futures.
+   async sub splot
+   {
+      while( COND ) {
+         await func();
+      }
+   }
 
-In addition, some simple cases involving awaiting on still-pending futures
-should be working:
+   async sub wibble
+   {
+      if( COND ) {
+         await func();
+      }
+   }
 
- async sub bar
- {
-    my ( $f ) = @_;
+   async sub wobble
+   {
+      foreach my $var ( THINGs ) {
+         await func();
+      }
+   }
 
-    return 1 + await( $f ) + 3;
- }
-
- async sub splot
- {
-    while( COND ) {
-       await func();
-    }
- }
-
- async sub wibble
- {
-    if( COND ) {
-       await func();
-    }
- }
-
- async sub wobble
- {
-    foreach my $var ( THINGs ) {
-       await func();
-    }
- }
-
- async sub splat
- {
-    eval {
-       await func();
-    };
- }
+   async sub splat
+   {
+      eval {
+         await func();
+      };
+   }
 
 Plain lexical variables are preserved across an C<await> deferral:
 
- async sub quux
- {
-    my $message = "Hello, world\n";
-    await func();
-    print $message;
- }
+   async sub quux
+   {
+      my $message = "Hello, world\n";
+      await func();
+      print $message;
+   }
 
 =head2 Things That Don't Yet Work
 
 C<local> variable assignments inside an C<async> function will confuse the
 suspend mechanism:
 
- our $DEBUG = 0;
+   our $DEBUG = 0;
 
- async sub quark
- {
-    local $DEBUG = 1;
-    await func();
- }
+   async sub quark
+   {
+      local $DEBUG = 1;
+      await func();
+   }
 
 Since C<foreach> loops on non-lexical iterator variables (usually package
 variables) effectively imply a C<local>-like behaviour, these are also
 disallowed.
 
- our $VAR;
+   our $VAR;
 
- async sub splurt
- {
-    foreach $VAR ( LIST ) {
-       await ...
-    }
- }
+   async sub splurt
+   {
+      foreach $VAR ( LIST ) {
+         await ...
+      }
+   }
 
 Additionally, complications with the savestack appear to be affecting some
 uses of package-level C<our> variables captured by async functions:
 
- our $VAR;
+   our $VAR;
 
- async sub bork
- {
-    print "VAR is $VAR\n";
-    await func();
- }
+   async sub bork
+   {
+      print "VAR is $VAR\n";
+      await func();
+   }
 
 See also the L</TODO> list for further things.
+
+=head2 Async Without Await
+
+Any function that doesn't actually await anything, and just returns immediate
+futures can be neatened by this module too.
+
+Instead of writing
+
+   sub imm
+   {
+      ...
+      return Future->done( @result );
+   }
+
+you can now simply write
+
+   async sub imm
+   {
+      ...
+      return @result;
+   }
+
+with the added side-benefit that any exceptions thrown by the elided code will
+be turned into an immediate-failed C<Future> rather than making the call
+itself propagate the exception, which is usually what you wanted when dealing
+with futures.
+
+=head1 WITH OTHER MODULES
+
+=head2 Syntax::Keyword::Try
+
+As of C<Future::AsyncAwait> version 0.10 and L<Syntax::Keyword::Try> version
+0.07, cross-module integration tests assert that basic C<try/catch> blocks
+inside an C<async sub> work correctly, including those that attempt to
+C<return> from inside C<try>.
 
 =cut
 
@@ -241,21 +262,6 @@ sub import_into
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
-
-=head1 WITH OTHER MODULES
-
-=head2 Syntax::Keyword::Try
-
-At the time of writing (C<Future::AsyncAwait> version 0.09,
-L<Syntax::Keyword::Try> version 0.06) a basic C<try/catch> block inside an
-C<async sub> works fine, provided that neither C<try> nor C<catch> blocks
-attempt to C<return>.
-
-Attempting to C<return> from inside a C<try> or C<catch> will fail - see
-L<RT122795|https://rt.cpan.org/Ticket/Display.html?id=122795>.
-
-Attempting to use a C<finally> block will fail - see
-L<RT122796|https://rt.cpan.org/Ticket/Display.html?id=122796>.
 
 =head1 SEE ALSO
 

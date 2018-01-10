@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   HTML::Parser: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.200'
+version: '0.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

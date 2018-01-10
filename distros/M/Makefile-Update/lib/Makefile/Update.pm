@@ -10,7 +10,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(read_files_list upmake);
 
-our $VERSION = '0.3'; # VERSION
+our $VERSION = '0.4'; # VERSION
 
 
 
@@ -142,7 +142,7 @@ Makefile::Update - Update make files.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

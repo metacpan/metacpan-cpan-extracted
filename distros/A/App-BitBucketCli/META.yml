@@ -18,27 +18,37 @@ name: App-BitBucketCli
 provides:
   App::BitBucketCli:
     file: lib/App/BitBucketCli.pm
-    version: '0.002'
+    version: '0.003'
+  App::BitBucketCli::Base:
+    file: lib/App/BitBucketCli/Base.pm
+    version: '0.003'
   App::BitBucketCli::Branch:
     file: lib/App/BitBucketCli/Branch.pm
-    version: '0.002'
+    version: '0.003'
   App::BitBucketCli::Core:
     file: lib/App/BitBucketCli/Core.pm
-    version: '0.002'
+    version: '0.003'
+  App::BitBucketCli::Link:
+    file: lib/App/BitBucketCli/Link.pm
+    version: '0.003'
+  App::BitBucketCli::Links:
+    file: lib/App/BitBucketCli/Links.pm
+    version: '0.003'
   App::BitBucketCli::Project:
     file: lib/App/BitBucketCli/Project.pm
-    version: '0.002'
+    version: '0.003'
   App::BitBucketCli::PullRequest:
     file: lib/App/BitBucketCli/PullRequest.pm
-    version: '0.002'
+    version: '0.003'
   App::BitBucketCli::Repository:
     file: lib/App/BitBucketCli/Repository.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Getopt::Alt: v0.4.5
   JSON::XS: '0'
   Moo: '2.0'
   Path::Tiny: '0.076'
+  Scalar::Util: '0'
   WWW::Mechanize: '0'
   YAML::Syck: '0'
   perl: '5.006'
@@ -46,5 +56,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::BitBucketCli
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-bitbucket-cli.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

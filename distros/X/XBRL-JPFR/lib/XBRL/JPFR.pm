@@ -577,9 +577,19 @@ sub make_xpath {
 	my ($self, $in_file, $prefix) = @_;
 
 	my $xml_doc =XML::LibXML->load_xml( location => $in_file);
-	my $ns = $self->extract_namespaces($xml_doc);
+	#print STDERR "IN_FILE=$in_file\n";
+	#print STDERR "IN_FILE=$in_file\n".Dumper($xml_doc);
+	#print STDERR "STRING=". $xml_doc->toString(). "\n";
+	#print STDERR "VALID=". $xml_doc->is_valid(). "\n";
+	#my $root = $xml_doc->documentElement();
+	#print STDERR "ROOT=".Dumper($root);
+	#my @nodes = $root->getChildrenByTagName('*');
+	#print STDERR "NODES=".Dumper(\@nodes);
+	#my $ns = $self->extract_namespaces($xml_doc);
+	#print STDERR "NS=".Dumper($ns);
 
 	my $xml_xpath = XML::LibXML::XPathContext->new($xml_doc);
+	#print STDERR "XML_XPATH=".Dumper($xml_xpath);
 
 	my @prefixes = keys %$ns;
 	for (@prefixes) {
@@ -593,6 +603,8 @@ sub make_xpath {
 
 	#p3xbrl.com leaves out the link namespace in its schemas
 	$xml_xpath->registerNs('link', 'http://www.xbrl.org/2003/linkbase');
+	#my @nodes = $xml_xpath->findnodes("//*[local-name() = 'import']");
+	#print STDERR "NODES=".Dumper(\@nodes);
 
 	return $xml_xpath;
 }

@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::QueryRoary;
-$Bio::Roary::CommandLine::QueryRoary::VERSION = '3.11.0';
+$Bio::Roary::CommandLine::QueryRoary::VERSION = '3.11.1';
 # ABSTRACT: Take in a groups file and the protein fasta files and output selected data
 
 
@@ -259,7 +259,7 @@ Bio::Roary::CommandLine::QueryRoary - Take in a groups file and the protein fast
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

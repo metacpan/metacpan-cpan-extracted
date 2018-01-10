@@ -1,5 +1,5 @@
 package Bio::Roary::JobRunner::Local;
-$Bio::Roary::JobRunner::Local::VERSION = '3.11.0';
+$Bio::Roary::JobRunner::Local::VERSION = '3.11.1';
 # ABSTRACT: Execute a set of commands locally
 
 
@@ -64,7 +64,7 @@ Bio::Roary::JobRunner::Local - Execute a set of commands locally
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

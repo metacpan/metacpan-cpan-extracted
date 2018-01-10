@@ -7,7 +7,7 @@ use 5.008000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provide easy-to-use forking with ability to pass back data",
+  "ABSTRACT" => "Provide multi-paradigm forking with ability to pass back data",
   "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.100",
+  "VERSION" => "1.110",
   "test" => {
     "TESTS" => "t/*.t"
   }

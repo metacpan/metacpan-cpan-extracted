@@ -3,6 +3,7 @@ abstract: 'A web framework light, yet rich in nutrients.'
 author:
   - 'Stefan G.'
 build_requires:
+  Exporter: '0'
   File::Temp: '0'
   HTTP::Request::Common: '0'
   IO::File: '0'
@@ -44,11 +45,12 @@ requires:
   Test::More: '0'
   Try::Tiny: '0'
   feature: '0'
+  namespace::autoclean: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/naturalist/kelp/issues
   homepage: http://naturalist.github.io/kelp/
   repository: git://github.com/naturalist/kelp.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

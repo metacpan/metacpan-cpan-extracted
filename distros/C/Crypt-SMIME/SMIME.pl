@@ -15,7 +15,7 @@ our %EXPORT_TAGS = (
    );
 Exporter::export_ok_tags('constants');
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -134,7 +134,7 @@ sub _getContentType {
 	foreach my $line (split /\r\n/, $mime) {
 		if(!length($line)) {
 			return $headline;
-		} elsif($line =~ m/^([^:]+):\s?(.*)/) {
+		} elsif($line =~ m/^([^\s:][^:]*?):\s?(.*)/) {
 			my ($key, $value) = ($1, $2);
 			$headkey = $key;
 

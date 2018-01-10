@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
     [ 'elem-input-alt-missing' => qr/<input name="dave" type="image"> does not have non-blank ALT text defined/i ],

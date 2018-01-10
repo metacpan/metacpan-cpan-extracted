@@ -1,5 +1,5 @@
 package Bio::Roary::CombinedProteome;
-$Bio::Roary::CombinedProteome::VERSION = '3.11.0';
+$Bio::Roary::CombinedProteome::VERSION = '3.11.1';
 # ABSTRACT: Take in multiple FASTA sequences containing proteomes and concat them together and output a FASTA file, filtering out more than 5% X's
 
 
@@ -49,7 +49,7 @@ Bio::Roary::CombinedProteome - Take in multiple FASTA sequences containing prote
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

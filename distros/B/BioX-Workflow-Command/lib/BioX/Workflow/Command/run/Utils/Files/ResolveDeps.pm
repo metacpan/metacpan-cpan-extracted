@@ -68,28 +68,6 @@ sub post_process_rules {
     $self->print_process_workflow;
 }
 
-sub print_process_workflow {
-    my $self = shift;
-
-    $self->app_log->info('Post processing rules and printing workflow...');
-    foreach my $rule ( $self->all_rule_names ) {
-
-        #TODO This should be named select_rule_names
-        my $index = $self->first_index_select_rule_keys( sub { $_ eq $rule } );
-        next if $index == -1;
-
-        my $meta = $self->process_obj->{$rule}->{meta} || [];
-        my $text = $self->process_obj->{$rule}->{text} || [];
-
-        map { $self->fh->say($_) } @{$meta};
-        $self->fh->say('');
-        map { $self->fh->say($_); $self->fh->say('') } @{$text};
-
-        $self->print_stats_rules($rule);
-
-    }
-}
-
 sub print_stats_rules {
     my $self = shift;
     my $rule = shift;

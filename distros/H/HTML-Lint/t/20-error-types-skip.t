@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 8;
 
-BEGIN { use_ok( 'HTML::Lint' ); }
-BEGIN { use_ok( 'HTML::Lint::Error', ':types' ); }
+use HTML::Lint;
+use HTML::Lint::Error ':types';
 
 my $text = do { local $/ = undef; <DATA> };
 

@@ -38,6 +38,8 @@ EOF
     $self->cwd(join '/', @dir) if @dir;
 
     my $name = class_to_file $class;
+    my $qxclass = $name;
+    $name =~ s/_/-/g;
     my $class_path = class_to_path $class;
     # Configure Main Dir
     my $file = {
@@ -64,9 +66,9 @@ EOF
         'frontend/Makefile.am' => 'frontend/Makefile.am',
         'frontend/Manifest.json' => 'frontend/Manifest.json',
         'frontend/config.json' => 'frontend/config.json',
-        'frontend/source/class/app/Application.js' => 'frontend/source/class/'.$name.'/Application.js',
-        'frontend/source/class/app/__init__.js' => 'frontend/source/class/'.$name.'/__init__.js',
-        'frontend/source/class/app/theme/Theme.js' => 'frontend/source/class/'.$name.'/theme/Theme.js',
+        'frontend/source/class/app/Application.js' => 'frontend/source/class/'.$qxclass.'/Application.js',
+        'frontend/source/class/app/__init__.js' => 'frontend/source/class/'.$qxclass.'/__init__.js',
+        'frontend/source/class/app/theme/Theme.js' => 'frontend/source/class/'.$qxclass.'/theme/Theme.js',
         'frontend/source/index.html' => 'frontend/source/index.html',
         't/basic.t' => 't/basic.t',
     };
@@ -81,11 +83,13 @@ EOF
         $in =~ /name\s*=\s*(\S.+\S)/ and $fullName = $1;
         $in =~ /email\s*=\s*(\S+)/ and $email = $1;
     }
+    
 
     for my $key (keys %$file){
         $self->render_to_rel_file($key, $name.'/'.$file->{$key}, {
             class => $class,
             name => $name,
+            qxclass => $qxclass,
             class_path => $class_path,
             year => (localtime time)[5]+1900,
             email => $email,

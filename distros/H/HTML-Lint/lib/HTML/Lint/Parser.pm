@@ -6,10 +6,11 @@ use strict;
 use HTML::Parser 3.20;
 use HTML::Tagset 3.03;
 
+use HTML::Lint::Error ();
 use HTML::Lint::HTML4 qw( %isKnownAttribute %isRequired %isNonrepeatable %isObsolete );
 use HTML::Entities qw( %char2entity %entity2char );
 
-use base 'HTML::Parser';
+use parent 'HTML::Parser';
 
 =head1 NAME
 
@@ -17,11 +18,11 @@ HTML::Lint::Parser - Parser for HTML::Lint.  No user-serviceable parts inside.
 
 =head1 VERSION
 
-Version 2.26
+Version 2.30
 
 =cut
 
-our $VERSION = '2.26';
+our $VERSION = '2.30';
 
 =head1 SYNOPSIS
 
@@ -52,6 +53,7 @@ sub new {
             text_h             => [ \&_text,           'self,text' ],
             strict_names       => 0,
             empty_element_tags => 1,
+            attr_encoded       => 1,
         );
     bless $self, $class;
 
@@ -130,6 +132,8 @@ sub _start {
             if ( !$validattr->{$attr} ) {
                 $self->gripe( 'attr-unknown', tag => $tag, attr => $attr );
             }
+
+            $self->_entity($val, 'attr');
         } # while attribs
     }
     else {
@@ -161,6 +165,14 @@ sub _start {
 sub _text {
     my ($self,$text) = @_;
 
+    $self->_entity($text, 'text');
+
+    return;
+}
+
+sub _entity {
+    my ($self,$text,$type) = @_;
+
     if ( not $self->{_entity_lookup} ) {
         my @entities = sort keys %HTML::Entities::entity2char;
         # Strip his semicolons
@@ -171,7 +183,7 @@ sub _text {
     while ( $text =~ /([^\x09\x0A\x0D -~])/g ) {
         my $bad = $1;
         $self->gripe(
-            'text-use-entity',
+            $type . '-use-entity',
                 char => sprintf( '\x%02lX', ord($bad) ),
                 entity => $char2entity{ $bad } || '&#' . ord($bad) . ';',
         );
@@ -181,26 +193,27 @@ sub _text {
         my $match = $1;
 
         if ( $match eq '' ) {
-            $self->gripe( 'text-use-entity', char => '&', entity => '&amp;' );
-        } elsif ( $match !~ m/;$/ ) {
+            $self->gripe( $type . '-use-entity', char => '&', entity => '&amp;' );
+        }
+        elsif ( $match !~ m/;$/ ) {
             if ( exists $self->{_entity_lookup}->{$match}
                  || $match =~ m/^#(\d+)$/ || $match =~ m/^#x[\dA-F]+$/i) {
-                $self->gripe( 'text-unclosed-entity', entity => "&$match;" );
-            } else {
-                $self->gripe( 'text-unknown-entity', entity => "&$match" );
+                $self->gripe( $type . '-unclosed-entity', entity => "&$match;" );
             }
-        } elsif ( $match =~ m/^#(\d+);$/ ) {
-            if ( $1 > 65536 ) {
-                $self->gripe( 'text-invalid-entity', entity => "&$match" );
+            else {
+                $self->gripe( $type . '-unknown-entity', entity => "&$match" );
             }
-        } elsif ( $match =~ m/^#x([\dA-F]+);$/i ) {
-            if ( length($1) > 4 ) {
-                $self->gripe( 'text-invalid-entity', entity => "&$match" );
-            }
-        } else {
+        }
+        elsif ( $match =~ m/^#(\d+);$/ ) {
+            # All numeric entities are OK.  We used to check that they were in a given range.
+        }
+        elsif ( $match =~ m/^#x([\dA-F]+);$/i ) {
+            # All hex entities OK.  We used to check that they were in a given range.
+        }
+        else {
             $match =~ s/;$//;
-            unless ( exists $self->{_entity_lookup}->{$match} ) {
-                $self->gripe( 'text-unknown-entity', entity => "&$match;" );
+            if ( !exists $self->{_entity_lookup}->{$match} ) {
+                $self->gripe( $type . '-unknown-entity', entity => "&$match;" );
             }
         }
     }
@@ -269,8 +282,8 @@ sub _normalize_value {
     my $what = shift;
 
     $what = _trim( $what );
-    return 1 if $what =~ /^(?:1|on|true)$/;
-    return 0 if $what =~ /^(?:0|off|false)$/;
+    return 1 if $what eq '1' || $what eq 'on'  || $what eq 'true';
+    return 0 if $what eq '0' || $what eq 'off' || $what eq 'false';
     return undef;
 }
 
@@ -281,7 +294,7 @@ sub _trim {
     return $_[0];
 }
 
-sub _end {
+sub _end {  ## no critic ( Subroutines::ProhibitManyArgs ) I have no choice in what these args are.
     my ($self,$tag,$line,$column,$tokenpos,@attr) = @_;
 
     $self->{_line} = $line;
@@ -364,7 +377,7 @@ sub _in_context {
 }
 
 # Overridden tag-specific stuff
-sub _start_img {
+sub _start_img {    ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )  # Called by parser based on tag name.
     my ($self,$tag,%attr) = @_;
 
     my ($h,$w,$src) = @attr{qw( height width src )};
@@ -381,7 +394,7 @@ sub _start_img {
     return;
 }
 
-sub _start_input {
+sub _start_input {  ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )  # Called by parser based on tag name.
     my ($self,$tag,%attr) = @_;
 
     my ($type,$alt) = @attr{qw( type alt )};

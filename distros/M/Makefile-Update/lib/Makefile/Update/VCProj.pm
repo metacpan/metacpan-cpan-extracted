@@ -7,7 +7,7 @@ our @EXPORT = qw(update_vcproj);
 use strict;
 use warnings;
 
-our $VERSION = '0.3'; # VERSION
+our $VERSION = '0.4'; # VERSION
 
 
 
@@ -186,7 +186,7 @@ Makefile::Update::VCProj - Update list of sources and headers in Visual C++ proj
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

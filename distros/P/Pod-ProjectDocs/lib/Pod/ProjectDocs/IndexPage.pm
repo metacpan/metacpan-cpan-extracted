@@ -3,7 +3,7 @@ package Pod::ProjectDocs::IndexPage;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File', 'Pod::ProjectDocs::Template';

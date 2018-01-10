@@ -1,5 +1,10 @@
 Revision history for Crypt::SMIME
 
+0.20    Wed Jan 10 14:32:56 JST 2018
+        - Fix a bug in _getContentType, Patch by unrtstRMSPAM [...]
+          cpan.org:
+          https://rt.cpan.org/Public/Bug/Display.html?id=124035
+
 0.19    Fri Dec  2 13:22:27 JST 2016
         - Use RFC-5652 CMS functions instead of PKCS#7 ones for better
           interoperability,  Suggested by Hib Engler <h [...]

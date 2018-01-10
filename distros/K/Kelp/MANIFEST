@@ -61,6 +61,7 @@ t/lib/MyApp/Routes2.pm
 t/lib/MyApp2.pm
 t/lib/MyApp2/Controller.pm
 t/lib/MyApp2/Controller/Bar.pm
+t/lib/UtilPackage.pm
 t/loaded_modules.t
 t/log/keep
 t/middleware.t
@@ -78,6 +79,7 @@ t/module_template_null.t
 t/pattern_build.t
 t/pattern_cache.t
 t/pattern_match.t
+t/redefine_attrs.t
 t/request.t
 t/request_session.t
 t/response.t

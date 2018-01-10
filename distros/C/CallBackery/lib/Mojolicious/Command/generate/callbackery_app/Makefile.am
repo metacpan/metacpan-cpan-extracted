@@ -4,9 +4,7 @@
 AUTOMAKE_OPTIONS =  foreign
 
 
-SUBDIRS = thirdparty lib etc frontend
-
-BIN = bin/$(MJ_SCRIPT).pl
+SUBDIRS = thirdparty lib etc frontend bin
 
 PUB := $(shell find public -type d -name ".??*" -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
 
@@ -18,7 +16,7 @@ PERLTESTS := $(shell find t -name "*.t")
 THIRDPARTY_DIR := $(shell pwd)/thirdparty
 
 EXTRA_DIST = VERSION PERL_MODULES COPYRIGHT LICENSE CHANGES AUTHORS bootstrap $(PUB) \
-	$(wildcard t/*.t) $(BIN) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
+	$(wildcard t/*.t) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
 
 
 YEAR := $(shell date +%Y)
@@ -26,8 +24,6 @@ DATE := $(shell date +%Y-%m-%d)
 
 datadir = $(prefix)
 nobase_data_DATA = $(PUB) $(TEMPL) $(SHARE)
-
-dist_bin_SCRIPTS = $(BIN)
 
 all-local:
 	$(GMAKE) public/script/$(QX_CLASS).js
@@ -38,13 +34,6 @@ README COPYRIGHT: VERSION
 dist-hook:
 	$(PERL) -i -p -e 's/#VERSION#/$(PACKAGE_VERSION)/g;s/#YEAR#/$(YEAR)/g;s/#DATE#/$(DATE)/g;' $(distdir)/public/index.html $(distdir)/public/script/$(QX_CLASS).js
 	$(PERL) -i -p -e 's/\$$VERSION\s*=\s*".+?";/\$$VERSION = "$(PACKAGE_VERSION)";/;'  $(distdir)/lib/$(MJ_CLASS).pm
-
-install-exec-hook:
-	[ "$(PERL5LIB)" == "" ] || cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{.*# PERL5LIB}{use lib qw($(PERL5LIB)); # PERL5LIB}' $(BIN) || true
-	cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{.*# LIBDIR}{use lib qw($(libdir)); # LIBDIR}' $(BIN)
-	cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{^#!.*perl.*}{#!$(PERL)};' $(BIN)
-	[ ! -d $(THIRDPARTY_DIR)/lib/perl5 ] || cp -fr $(THIRDPARTY_DIR)/lib/perl5/* $(DESTDIR)$(libdir)
-
 
 test:
 	$(PERL) "-MExtUtils::Command::MM" "-e" "test_harness(0, 'lib','thirdparty/lib/perl5')" t/*.t

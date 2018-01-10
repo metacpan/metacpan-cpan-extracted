@@ -1,3 +1,10 @@
+0.201		2018-01-09	T. R. Wyant
+    RT 1237 - Table-in-table bug. Tables containing other tables should
+    no longer be truncated.
+
+    RT 7262 - Better error message when calling parse() without
+    argument.
+
 0.200		2017-12-27	T. R. Wyant
     Fix RT 32010: Test fails under Perl 5.10.0.
 

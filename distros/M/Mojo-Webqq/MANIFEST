@@ -56,6 +56,7 @@ lib/Mojo/Webqq/Message/Remote/_send_sess_message.pm
 lib/Mojo/Webqq/Message/XMLescape.pm
 lib/Mojo/Webqq/Model.pm
 lib/Mojo/Webqq/Model/Base.pm
+lib/Mojo/Webqq/Model/Ext.pm
 lib/Mojo/Webqq/Model/Remote/_get_discuss_info.pm
 lib/Mojo/Webqq/Model/Remote/_get_discuss_list_info.pm
 lib/Mojo/Webqq/Model/Remote/_get_friend_info.pm
@@ -79,7 +80,6 @@ lib/Mojo/Webqq/Model/Remote/_shutup_group_member.pm
 lib/Mojo/Webqq/Model/Remote/get_qq_from_id.pm
 lib/Mojo/Webqq/Model/Remote/get_single_long_nick.pm
 lib/Mojo/Webqq/Plugin.pm
-lib/Mojo/Webqq/Plugin/FFM.pm
 lib/Mojo/Webqq/Plugin/FmPush.pm
 lib/Mojo/Webqq/Plugin/FuckAndroid.pm
 lib/Mojo/Webqq/Plugin/FuckDaShen.pm
@@ -120,8 +120,10 @@ lib/Mojo/Webqq/Run.pm
 lib/Mojo/Webqq/Server.pm
 lib/Mojo/Webqq/User.pm
 lib/Mojo/Webqq/Util.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+NOTICE
 Plugin.md
 README.md
 screenshot/donate.jpg

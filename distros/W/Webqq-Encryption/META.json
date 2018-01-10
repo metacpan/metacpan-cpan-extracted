@@ -4,7 +4,7 @@
       "sjdy521 <sjdy521@163.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -25,9 +25,15 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Crypt::RSA" : "0",
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
             "Digest::MD5" : "0"
          }
       }
@@ -40,5 +46,6 @@
          "web" : "https://github.com/sjdy521/Webqq-Encryption"
       }
    },
-   "version" : "1.5"
+   "version" : "1.6",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

@@ -1,5 +1,8 @@
 Revision history for URI
 
+1.73      2018-01-09 06:42:51Z
+    - Update documentation for URI::_punycode (GH Issue #45)
+
 1.72      2017-07-25
     - Convert the dist to Dist::Zilla for authoring.
     - Remove recommendation of Business::ISBN as urn/isbn.pm is deprecated

@@ -1,5 +1,8 @@
 Revision history for JIP-Object
 
+0.031   2018-01-08
+        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+
 0.03    2016-05-02
         Added support for multiple attributes in a single declaration.
         More tests.

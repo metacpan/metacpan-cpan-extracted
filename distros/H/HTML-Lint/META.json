@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -39,7 +39,8 @@
             "HTML::Tagset" : "3.03",
             "Test::Builder" : "0",
             "Test::Builder::Tester" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
@@ -56,6 +57,6 @@
          "url" : "https://github.com/petdance/html-lint"
       }
    },
-   "version" : "2.26",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.30",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

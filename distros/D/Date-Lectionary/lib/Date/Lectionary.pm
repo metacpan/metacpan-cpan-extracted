@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Moose;
+use MooseX::StrictConstructor;
 use Carp;
 use Try::Tiny;
 use XML::LibXML;
@@ -22,11 +23,11 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20170809
+Version 1.20180109
 
 =cut
 
-our $VERSION = '1.20170809';
+our $VERSION = '1.20180109';
 
 =head1 SYNOPSIS
 
@@ -144,8 +145,7 @@ sub BUILD {
 
     my $advent = _determineAdvent( $self->date );
 
-    $self->_setYear(
-        Date::Lectionary::Year->new( 'year' => $advent->firstSunday->year ) );
+    $self->_setYear( Date::Lectionary::Year->new( 'year' => $advent->firstSunday->year ) );
 
     $self->_setDay(
         Date::Lectionary::Day->new(
@@ -155,18 +155,10 @@ sub BUILD {
     );
 
     if ( $self->day->multiLect eq 'yes' ) {
-        $self->_setReadings(
-            _buildMultiReadings(
-                $self->day->subLects, $self->lectionary, $self->year->name
-            )
-        );
+        $self->_setReadings( _buildMultiReadings( $self->day->subLects, $self->lectionary, $self->year->name ) );
     }
     else {
-        $self->_setReadings(
-            _buildReadings(
-                $self->day->name, $self->lectionary, $self->year->name
-            )
-        );
+        $self->_setReadings( _buildReadings( $self->day->name, $self->lectionary, $self->year->name ) );
     }
 }
 
@@ -211,18 +203,14 @@ sub _buildReadings {
     my $readings;
 
     try {
-        $data_location =
-          dist_file( 'Date-Lectionary', $lectionary . '_lect.xml' );
+        $data_location = dist_file( 'Date-Lectionary', $lectionary . '_lect.xml' );
         $readings = $parser->parse_file($data_location);
     }
     catch {
-        carp
-"The readings database for the $lectionary lectionary could not be found or parsed.";
+        carp "The readings database for the $lectionary lectionary could not be found or parsed.";
     };
 
-    my $compiled_xpath = XML::LibXML::XPathExpression->new(
-"/lectionary/year[\@name=\"$year\" or \@name=\"holidays\"]/day[\@name=\"$displayName\"]/lesson"
-    );
+    my $compiled_xpath = XML::LibXML::XPathExpression->new("/lectionary/year[\@name=\"$year\" or \@name=\"holidays\"]/day[\@name=\"$displayName\"]/lesson");
 
     my @readings;
     try {
@@ -231,8 +219,7 @@ sub _buildReadings {
         }
     }
     catch {
-        carp
-"Readings for $displayName in year $year could not be parsed from the database.";
+        carp "Readings for $displayName in year $year could not be parsed from the database.";
     };
 
     return \@readings;
@@ -254,8 +241,7 @@ sub _determineAdvent {
         return $advent;
     }
     catch {
-        confess "Could not calculate Advent for the given date ["
-          . $date->ymd . "].";
+        confess "Could not calculate Advent for the given date [" . $date->ymd . "].";
     };
 }
 
@@ -305,13 +291,15 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Michael Wayne Arnold.
+Copyright 2016-2017 MICHAEL WAYNE ARNOLD
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-See L<http://dev.perl.org/licenses/> for more information.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 =cut

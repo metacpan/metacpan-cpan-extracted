@@ -1,5 +1,8 @@
 Revision history for JIP-LockFile
 
+0.051   2018-01-07
+        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+
 0.05    2015-06-01
         Fixed Windows (mswin32) bugs in tests.
 

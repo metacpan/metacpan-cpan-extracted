@@ -6,6 +6,41 @@ NOTE: All bugs and requests are now being handled through GitHub.
 
 Please DO NOT send bug reports to http://rt.cpan.org/.
 
+2.30    Sun Jan  7 22:02:25 CST 2018
+    No changes since 2.27_03.
+
+
+2.27_03 Wed Jan  3 17:07:07 CST 2018
+    [FIXES]
+    Removed the text-invalid-entity and attr-invalid-entity, which were
+    for entities that had an invalid numeric value, anything greater
+    than &#65536.  There is no longer a restriction on the numeric values
+    of HTML entities. (GH#60)
+
+
+2.27_02 Wed Dec 27 11:46:28 CST 2017
+    There are be no functionality changes since 2.27_01.
+
+    [INTERNALS]
+    Many Perl::Critic cleanups.
+
+
+2.27_01 Fri Dec 22 15:54:32 CST 2017
+    [ENHANCEMENTS]
+    Adds checking of entities in attributes, not just text.  Thanks,
+    Klaus S. Madsen.
+
+    [FIXES]
+    Calling ->parsefile() would generate an error.  Thanks, Shlomi
+    Fish. (GH#58)
+
+    [INTERNALS]
+    Prepare for perl 5.26.0 which removes '.' from @INC.  Thanks,
+    Jim Keenan.
+
+    Fix disttest target.  Thanks, Shlomi Fish.
+
+
 2.26    Thu Dec 29 22:36:54 CST 2016
     Stable release.  No changes from previous release.
 

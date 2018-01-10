@@ -3,11 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 1;
 
-BEGIN { use_ok( 'Test::HTML::Lint' ); }
-BEGIN { use_ok( 'HTML::Lint' ); }
-BEGIN { use_ok( 'HTML::Lint::Error' ); }
+use HTML::Lint;
+use HTML::Lint::Error;
+use Test::HTML::Lint;
+
 
 my $lint = HTML::Lint->new();
 $lint->only_types( HTML::Lint::Error::FLUFF );

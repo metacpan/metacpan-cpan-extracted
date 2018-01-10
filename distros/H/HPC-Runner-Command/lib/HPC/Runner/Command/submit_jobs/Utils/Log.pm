@@ -61,12 +61,12 @@ sub summarize_jobs {
     my $x    = 0;
     my @rows = ();
 
-    #SIGHS
     #cmd_start is zero indexes
     #But batches are 1 indexes
     #WHY DO I DO THIS TO MYSELF
     foreach my $job ( $self->all_schedules ) {
 
+        $DB::single = 2;
         my $cmd_start         = $self->jobs->{$job}->{cmd_start};
         my $commands_per_node = $self->jobs->{$job}->commands_per_node;
 
@@ -81,13 +81,13 @@ sub summarize_jobs {
             my $batch_index_end   = $batch_indexes->{batch_index_end} - 1;
 
             my $start_array =
-              $self->jobs->{$job}->batches->[$batch_index_start]->{cmd_start} +
-              $cmd_start;
+              $cmd_start +
+              $self->jobs->{$job}->batches->[$batch_index_start]->{cmd_start};
 
             my $end_array =
+              $cmd_start +
               $self->jobs->{$job}->batches->[$batch_index_end]->{cmd_start} +
-              $cmd_start - 1 +
-              $self->jobs->{$job}->commands_per_node;
+              $self->jobs->{$job}->batches->[$batch_index_end]->{cmd_count} - 1;
 
             my $len = $end_array - $start_array + 1;
 
@@ -112,27 +112,32 @@ sub write_job_project_table {
     my $self = shift;
 
     my $job_file = File::Spec->catdir( $self->logdir, 'project_job_table.md' );
-    write_file( $job_file, '| Job | Status | Notes |'."\n" );
+    write_file( $job_file, '| Job | Status | Notes |' . "\n" );
     foreach my $job ( $self->all_schedules ) {
-      write_file($job_file, {append => 1}, '| '.$job.' | | |'."\n");
+        write_file( $job_file, { append => 1 }, '| ' . $job . ' | | |' . "\n" );
     }
-    $self->app_log->info('Project table per job: '.$job_file);
+    $self->app_log->info( 'Project table per job: ' . $job_file );
 }
 
 sub write_task_project_table {
     my $self = shift;
 
-    my $task_file = File::Spec->catdir( $self->logdir, 'project_task_table.md' );
-    write_file( $task_file, '| Job | TaskID | Status | Notes |'."\n" );
+    my $task_file =
+      File::Spec->catdir( $self->logdir, 'project_task_table.md' );
+    write_file( $task_file, '| Job | TaskID | Status | Notes |' . "\n" );
     foreach my $job ( $self->all_schedules ) {
-        my $cmd_start         = $self->jobs->{$job}->{cmd_start} + 1;
-        my $cmd_end = $self->jobs->{$job}->cmd_counter + $cmd_start - 1;
-        for(my $x=$cmd_start; $x<=$cmd_end; $x++){
-          write_file($task_file, {append => 1}, '| '.$job.' | '.$x.' | | |'."\n");
+        my $cmd_start = $self->jobs->{$job}->{cmd_start} + 1;
+        my $cmd_end   = $self->jobs->{$job}->cmd_counter + $cmd_start - 1;
+        for ( my $x = $cmd_start ; $x <= $cmd_end ; $x++ ) {
+            write_file(
+                $task_file,
+                { append => 1 },
+                '| ' . $job . ' | ' . $x . ' | | |' . "\n"
+            );
         }
     }
 
-    $self->app_log->info('Project table per task: '.$task_file);
+    $self->app_log->info( 'Project table per task: ' . $task_file );
 }
 
 1;

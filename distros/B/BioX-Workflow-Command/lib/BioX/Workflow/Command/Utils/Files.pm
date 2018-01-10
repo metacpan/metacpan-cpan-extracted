@@ -103,6 +103,8 @@ sub load_yaml_workflow {
     if ( !exists $self->workflow_data->{global} ) {
         $self->workflow_data->{global} = [];
     }
+    
+    $self->get_line_declarations if $valid;
 
     return $valid;
 }

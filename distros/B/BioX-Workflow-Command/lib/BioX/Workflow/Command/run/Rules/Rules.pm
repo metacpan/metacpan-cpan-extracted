@@ -5,13 +5,17 @@ use namespace::autoclean;
 
 use Storable qw(dclone);
 use Data::Merger qw(merger);
-use Data::Walk;
 use Data::Dumper;
 use File::Path qw(make_path remove_tree);
 use Try::Tiny;
 use Path::Tiny;
 
 use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
+
+use BioX::Workflow::Command::run::Rules::Exceptions::KeyDeclaration;
+use BioX::Workflow::Command::run::Rules::Exceptions::OneRuleName;
+
+with 'BioX::Workflow::Command::run::Rules::Directives::Inspect';
 
 =head1 Name
 
@@ -166,7 +170,6 @@ option 'omit_match' => (
 );
 
 # TODO Change this to rules?
-
 has 'rule_keys' => (
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -224,17 +227,12 @@ sub iterate_rules {
     $self->filter_rule_keys;
 
     foreach my $rule (@$rules) {
-
         $self->local_rule($rule);
-        $self->process_rule;
+        my $except = $self->process_rule;
+        next if $except;
         $self->p_rule_name( $self->rule_name );
         $self->p_local_attr( dclone( $self->local_attr ) );
-
     }
-
-    $self->post_process_rules;
-
-    $self->fh->close();
 }
 
 =head3 filter_rule_keys
@@ -272,6 +270,7 @@ sub set_rule_names {
     my $rules = $self->workflow_data->{rules};
 
     my @rule_names = map { my ($key) = keys %{$_}; $key } @{$rules};
+    @rule_names = map { my $t = $_; $t =~ s/^\s+|\s+$//g; $t } @rule_names;
     $self->rule_names( \@rule_names );
     $self->app_log->info( 'Found rules:' . "\t" . join( ', ', @rule_names ) );
 }
@@ -422,7 +421,8 @@ This function is just a placeholder for the other functions we need to process a
 sub process_rule {
     my $self = shift;
 
-    $self->sanity_check_rule;
+    my $except = $self->sanity_check_rule;
+    return $except if $except;
 
     $self->local_attr( dclone( $self->global_attr ) );
 
@@ -432,6 +432,7 @@ sub process_rule {
 
     $self->get_keys;
     $self->template_process;
+    return 0;
 }
 
 =head3 sanity_check_rule
@@ -445,45 +446,72 @@ Check the rule to make sure it only has 1 key
 sub sanity_check_rule {
     my $self = shift;
 
-    my @keys = keys %{ $self->local_rule };
+    my $except;
 
-    # $self->app_log->info("");
-    # $self->app_log->info("Beginning sanity check");
-    if ( $#keys != 0 ) {
-        $self->app_log->fatal(
-            'Sanity check fail: There should be one rule name!');
-        $self->sanity_check_fail;
-        return;
-    }
-
-    $self->rule_name( $keys[0] );
-
-    # $self->app_log->info( 'Sanity check on rule ' . $self->rule_name );
+    $except = $self->sanity_check_rule_one_rule_name;
+    return $except if $except;
 
     if ( !exists $self->local_rule->{ $self->rule_name }->{process} ) {
-        $self->app_log->fatal(
-            'Sanity check fail: Rule does not have a process!');
-        $self->sanity_check_fail;
-        return;
+        $self->local_rule->{ $self->rule_name }->{process} = '';
+        $self->app_log->warn(
+'Rule does not have a process. If you have registered a namespace please ignore this error.'
+        );
     }
 
     if ( !exists $self->local_rule->{ $self->rule_name }->{local} ) {
         $self->local_rule->{ $self->rule_name }->{local} = [];
     }
     else {
-        my $ref = $self->local_rule->{ $self->rule_name }->{local};
-
-        if ( !ref($ref) eq 'ARRAY' ) {
-            $self->app_log->fatal(
-'Sanity check fail: Your variable declarations should begin with an array!'
-            );
-            $self->sanity_check_fail;
-            return;
-        }
+        $except = $self->sanity_check_rule_local_structure;
+        return $except if $except;
     }
 
     $self->app_log->info(
         'Rule: ' . $self->rule_name . ' passes sanity check' );
+    return 0;
+}
+
+sub sanity_check_rule_one_rule_name {
+    my $self = shift;
+
+    my @keys = keys %{ $self->local_rule };
+    $self->rule_name( $keys[0] );
+
+    return if $#keys == 0;
+
+    my $except =
+      BioX::Workflow::Command::run::Rules::Exceptions::OneRuleName->new();
+    $self->app_log->info( 'Rule: ' . $self->rule_name . ' fails sanity check' );
+    if(exists $self->local_rule->{process}){
+      $self->app_log->warn('\'Process\' found at same indentation as rule name. Increase the indentation for this key!');
+    }
+    if(exists $self->local_rule->{local}){
+      $self->app_log->warn('\'Local\' found at same indentation as rule name. Increase the indentation for this key!');
+    }
+
+    $except->warn( $self->app_log );
+    $self->sanity_check_fail;
+
+    $self->inspect_obj->{errors}->{rules}->{ $self->rule_name }->{structure} =
+      'OneRuleName';
+    return $except;
+}
+
+sub sanity_check_rule_local_structure {
+    my $self = shift;
+    my $ref  = $self->local_rule->{ $self->rule_name }->{local};
+
+    return if ref($ref) eq 'ARRAY';
+
+    my $except =
+      BioX::Workflow::Command::run::Rules::Exceptions::KeyDeclaration->new();
+    $self->app_log->info( 'Rule: ' . $self->rule_name . ' fails sanity check' );
+    $except->warn( $self->app_log );
+    $self->sanity_check_fail;
+    $self->inspect_obj->{errors}->{rules}->{ $self->rule_name }->{structure} =
+      'KeyDeclaration';
+
+    return $except;
 }
 
 =head3 template_process
@@ -502,7 +530,6 @@ sub template_process {
     my $dummy_texts = $self->check_iterables( $dummy_sample, [] );
 
     if ( !$self->local_attr->override_process ) {
-
         foreach my $sample ( $self->all_samples ) {
             foreach my $text ( @{$dummy_texts} ) {
                 my $new_text = $text;
@@ -510,6 +537,7 @@ sub template_process {
                 push( @$texts, $new_text );
             }
         }
+
         $self->process_obj->{ $self->rule_name }->{text} = $texts;
         $self->process_obj->{ $self->rule_name }->{run_stats} =
           $self->local_attr->run_stats;
@@ -574,8 +602,6 @@ sub check_iterables {
     #First check the global for any lists
     my $use_iters = $self->use_iterables;
 
-    # $self->walk_indir_outdir($use_iters);
-
     if ( !$use_iters ) {
         $texts = $self->in_template_process( $sample, $texts );
         return $texts;
@@ -610,8 +636,6 @@ sub in_template_process {
     $self->sample($sample);
     my $text = $self->eval_process();
 
-    # my $log  = $self->write_file_log();
-    # $text .= $log;
     push( @{$texts}, $text ) if $self->print_within_rule;
 
     return $texts;
@@ -621,6 +645,7 @@ sub walk_attr {
     my $self = shift;
 
     my $attr = dclone( $self->local_attr );
+    $attr->sample( $self->sample ) if $self->has_sample;
     $self->check_indir_outdir($attr);
 
     $attr->walk_process_data( $self->rule_keys );
@@ -632,8 +657,6 @@ sub eval_process {
     my $self = shift;
 
     my $attr = $self->walk_attr;
-    $attr->sample( $self->sample ) if $self->has_sample;
-
     $self->walk_indir_outdir($attr);
 
     my $text = $self->eval_rule($attr);
@@ -643,6 +666,24 @@ sub eval_process {
     $self->clear_files;
 
     ##Carry stash when not in template
+    my $sample = $attr->sample;
+
+    $self->return_rule_as_obj($attr);
+
+    if ( $text =~ m/The following errors/ ) {
+        $self->app_log->warn( 'Error for \'process\' Line #: '
+              . $self->inspect_obj->{line_numbers}->{rules}
+              ->{ $self->rule_name }->{process}->{line} );
+        my $dummytext = $text;
+        $dummytext =~ s/__DUMMYSAMPLE123456789__/Sample_XYZ/g;
+        $self->inspect_obj->{errors}->{rules}->{ $self->rule_name }->{process}
+          ->{msg} = $dummytext;
+
+        $self->inspect_obj->{errors}->{rules}->{ $self->rule_name }->{process}
+          ->{error_types} = $self->get_error_types( 'process', $dummytext );
+    }
+
+    $attr->sample($sample);
     $self->local_attr->stash( dclone( $attr->stash ) );
 
     return $text;
@@ -682,9 +723,10 @@ sub eval_rule {
         $self->app_log->warn(
                 'There were 1 or more errors evaluating rule:  '
               . $self->rule_name . '. '
-              . 'Please check the output file for details.' );
-        $attr->_ERROR(0);
+              . 'Please check the output file for details.'
+              . "\n" );
     }
+    $attr->_ERROR(0);
 
     return $text;
 }
@@ -712,7 +754,6 @@ sub get_keys {
 
     $self->local_rule_keys( dclone( \@local_keys ) );
 
-    #This should be an object for extending
     my @special_keys = ( 'indir', 'outdir', 'INPUT', 'OUTPUT' );
     foreach my $key (@special_keys) {
         if ( !$seen{$key} ) {
@@ -731,8 +772,6 @@ sub walk_indir_outdir {
     my $attr = shift;
 
     my $text = $attr->interpol_directive( $attr->outdir );
-
-    # $DB::single = 2;
     $self->walk_indir_outdir_sample( $attr, $text );
 }
 
@@ -743,8 +782,6 @@ sub walk_indir_outdir_sample {
 
     my $use_iters    = $self->use_iterables;
     my $dummy_sample = $self->dummy_sample;
-
-    my @samples = @{ $attr->samples } if $attr->has_samples;
 
     foreach my $sample ( $attr->all_samples ) {
         my $new_text = $text;
@@ -957,7 +994,7 @@ sub sanity_check_fail {
 global:
     - indir: data/raw
     - outdir: data/processed
-    - sample_rule: (sample.*)$
+    - sample_rule: (sample.*)\$
     - by_sample_outdir: 1
     - find_sample_bydir: 1
     - copy1:
@@ -975,9 +1012,34 @@ global:
 EOF
     $self->app_log->fatal('Skipping this rule.');
     $self->app_log->fatal(
-'Here is an example workflow. For more information please see biox-workflow.pl new --help.'
+'Here is an example workflow. For more information please see biox new --help.'
     );
     $self->app_log->fatal($rule_example);
 }
+
+sub print_process_workflow {
+    my $self = shift;
+
+    $self->app_log->info('Post processing rules and printing workflow...');
+    foreach my $rule ( $self->all_rule_names ) {
+
+        #TODO This should be named select_rule_names
+        my $index = $self->first_index_select_rule_keys( sub { $_ eq $rule } );
+        next if $index == -1;
+
+        my $meta = $self->process_obj->{$rule}->{meta} || [];
+        my $text = $self->process_obj->{$rule}->{text} || [];
+
+        map { $self->fh->say($_) } @{$meta};
+        $self->fh->say('');
+        map { $self->fh->say($_); $self->fh->say('') } @{$text};
+
+        $self->print_stats_rules($rule);
+
+    }
+}
+
+
+no Moose::Role;
 
 1;

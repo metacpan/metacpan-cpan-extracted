@@ -7,7 +7,7 @@ use Cwd qw/realpath/;
 use File::Basename qw/basename dirname/;
 use File::Spec ();
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 our @ISA = qw/DynaLoader/;
 
 bootstrap RPM2 $VERSION;

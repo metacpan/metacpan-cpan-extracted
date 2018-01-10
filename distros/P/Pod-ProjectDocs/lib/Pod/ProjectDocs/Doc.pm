@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Doc;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File';
@@ -50,7 +50,9 @@ has 'data' => (
   [% name | html %]
 </div>
 <div>
+[% IF !nosourcecode %]
 <a href="[% src | relpath %]">Source</a>
+[% END %]
 </div>
 DATA
 );

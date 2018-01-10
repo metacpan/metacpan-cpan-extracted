@@ -74,4 +74,6 @@ sub process_directive_config {
     $self->$k($config);
 }
 
+no Moose;
+
 1;

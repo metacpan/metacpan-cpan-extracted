@@ -15,12 +15,28 @@ use FindBin qw/$Bin/;
 use App::BitBucketCli;
 use YAML::Syck qw/LoadFile/;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
 
 sub main {
+    my @common = (
+        'colors|c=s%',
+        'force|f!',
+        'host|h=s',
+        'long|l',
+        'out|o=s',
+        'password|P=s',
+        'project|p=s',
+        'remote|m=s',
+        'repository|r=s',
+        'regexp|R',
+        'sleep|s=i',
+        'test|T!',
+        'username|U=s',
+        'verbose|v+',
+    );
     my ($options, $cmd, $opt) = get_options(
         {
             name        => 'bb-cli',
@@ -36,20 +52,24 @@ sub main {
             },
             sub_command => {
                 branch    => [
+                    @common,
                     'long|l',
                     'recipient|R=s',
-                    'verbose|v+',
                 ],
                 projects => [
+                    @common,
                 ],
                 repositories => [
+                    @common,
                     'project|p=s',
                 ],
                 repository => [
+                    @common,
                     'project|p=s',
                     'repository|r=s',
                 ],
                 pull_requests => [
+                    @common,
                     'repository|r=s',
                     'project|p=s',
                 ],
@@ -62,22 +82,7 @@ sub main {
                 }
             },
         },
-        [
-            'colors|c=s%',
-            'force|f!',
-            'host|h=s',
-            'long|l',
-            'out|o=s',
-            'password|P=s',
-            'project|p=s',
-            'remote|m=s',
-            'repository|r=s',
-            'regexp|R',
-            'sleep|s=i',
-            'test|T!',
-            'username|U=s',
-            'verbose|v+',
-        ],
+        \@common,
     );
 
     $options = set_defaults($options);
@@ -157,11 +162,16 @@ bb-cli - Command line tool for communicating with BitBucket Server
 
 =head1 VERSION
 
-0his documentation refers to bb-cli version 0.002
+0his documentation refers to bb-cli version 0.003
 
 =head1 SYNOPSIS
 
    bb-cli [option]
+   bb-cli projects [options]
+   bb-cli repositories [options]
+   bb-cli repository [options]
+   bb-cli branch [options]
+   bb-cli pull_requests [options]
 
  OPTIONS:
   -o --other         other option

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Moose;
+use MooseX::StrictConstructor;
 use MooseX::Aliases;
 use Carp;
 use Try::Tiny;
@@ -24,11 +25,11 @@ Date::Lectionary::Day - Determines the Day in the Christian Liturgical Year
 
 =head1 VERSION
 
-Version 1.20170809
+Version 1.20180109
 
 =cut
 
-our $VERSION = '1.20170809';
+our $VERSION = '1.20180109';
 
 =head1 SYNOPSIS
 
@@ -139,9 +140,9 @@ has 'subLects' => (
 );
 
 has 'includeFeasts' => (
-    is      => 'ro', 
-    isa     => 'IncludeFeasts', 
-    default => 'yes', 
+    is      => 'ro',
+    isa     => 'IncludeFeasts',
+    default => 'yes',
 );
 
 =head2 BUILD
@@ -156,19 +157,14 @@ sub BUILD {
     my $advent = _determineAdvent( $self->date );
     my $easter = _determineEaster( $advent->firstSunday->year + 1 );
 
-    my %commonNameInfo =
-      _determineDay( $self->date, $self->lectionary, $self->includeFeasts, $advent, $easter );
+    my %commonNameInfo = _determineDay( $self->date, $self->lectionary, $self->includeFeasts, $advent, $easter );
     $self->_setCommonName( $commonNameInfo{commonName} );
-    $self->_setDisplayName(
-        _determineDisplayName( $self->lectionary, $commonNameInfo{commonName} )
-    );
-    $self->_setAltName(
-        _determineAltName( $self->lectionary, $commonNameInfo{commonName} ) );
+    $self->_setDisplayName( _determineDisplayName( $self->lectionary, $commonNameInfo{commonName} ) );
+    $self->_setAltName( _determineAltName( $self->lectionary, $commonNameInfo{commonName} ) );
 
     $self->_setType( $commonNameInfo{type} );
 
-    my %multiLectInfo =
-      _determineMultiLect( $self->lectionary, $commonNameInfo{commonName} );
+    my %multiLectInfo = _determineMultiLect( $self->lectionary, $commonNameInfo{commonName} );
     $self->_setMultiLect( $multiLectInfo{multiLect} );
     $self->_setSubLects( $multiLectInfo{multiNames} );
 }
@@ -188,24 +184,20 @@ sub _determineMultiLect {
     my $lectionary;
 
     try {
-        $data_location =
-          dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
+        $data_location = dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
         $lectionary = $parser->parse_file($data_location);
     }
     catch {
-        confess
-          "The lectionary cross reference file could not be found or parsed.";
+        confess "The lectionary cross reference file could not be found or parsed.";
     };
 
     my $compiled_xpath;
 
     try {
-        $compiled_xpath = XML::LibXML::XPathExpression->new(
-            "/xref/day[\@multi=\"$commonName\"]/alt[\@type='$tradition']");
+        $compiled_xpath = XML::LibXML::XPathExpression->new("/xref/day[\@multi=\"$commonName\"]/alt[\@type='$tradition']");
     }
     catch {
-        confess
-"The XPATH expression to to query the cross reference database could not be compiled.";
+        confess "The XPATH expression to to query the cross reference database could not be compiled.";
     };
 
     my @multiNames;
@@ -223,8 +215,7 @@ sub _determineMultiLect {
         }
     }
     catch {
-        confess
-"An unpected error occured while querying the cross reference database.";
+        confess "An unpected error occured while querying the cross reference database.";
     };
 }
 
@@ -243,28 +234,22 @@ sub _determineDisplayName {
     my $lectionary;
 
     try {
-        $data_location =
-          dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
+        $data_location = dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
         $lectionary = $parser->parse_file($data_location);
     }
     catch {
-        confess
-          "The lectionary cross reference file could not be found or parsed.";
+        confess "The lectionary cross reference file could not be found or parsed.";
     };
 
     my $compiled_xpath;
     my $multi_xpath;
 
     try {
-        $compiled_xpath = XML::LibXML::XPathExpression->new(
-            "/xref/day[\@name=\"$commonName\"]/alt[\@type='$tradition']");
-        $multi_xpath =
-          XML::LibXML::XPathExpression->new(
-            "/xref/day[\@multi=\"$commonName\"]");
+        $compiled_xpath = XML::LibXML::XPathExpression->new("/xref/day[\@name=\"$commonName\"]/alt[\@type='$tradition']");
+        $multi_xpath    = XML::LibXML::XPathExpression->new("/xref/day[\@multi=\"$commonName\"]");
     }
     catch {
-        confess
-"The XPATH expression to to query the cross reference database could not be compiled.";
+        confess "The XPATH expression to to query the cross reference database could not be compiled.";
     };
 
     my $displayName;
@@ -283,8 +268,7 @@ sub _determineDisplayName {
         }
     }
     catch {
-        confess
-"An unpected error occured while querying the cross reference database.";
+        confess "An unpected error occured while querying the cross reference database.";
     };
 
 }
@@ -304,25 +288,21 @@ sub _determineAltName {
     my $lectionary;
 
     try {
-        $data_location =
-          dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
+        $data_location = dist_file( 'Date-Lectionary', 'date_lectionary_xref.xml' );
         $lectionary = $parser->parse_file($data_location);
     }
     catch {
-        confess
-          "The lectionary cross reference file could not be found or parsed.";
+        confess "The lectionary cross reference file could not be found or parsed.";
     };
 
     my $compiled_xpath;
     my $multi_xpath;
 
     try {
-        $compiled_xpath = XML::LibXML::XPathExpression->new(
-            "/xref/day[\@name=\"$commonName\"]/alt[\@type='$tradition-alt']");
+        $compiled_xpath = XML::LibXML::XPathExpression->new("/xref/day[\@name=\"$commonName\"]/alt[\@type='$tradition-alt']");
     }
     catch {
-        confess
-"The XPATH expression to to query the cross reference database could not be compiled.";
+        confess "The XPATH expression to to query the cross reference database could not be compiled.";
     };
 
     my $altName;
@@ -332,8 +312,7 @@ sub _determineAltName {
         return $altName;
     }
     catch {
-        confess
-"An unpected error occured while querying the cross reference database.";
+        confess "An unpected error occured while querying the cross reference database.";
     };
 
 }
@@ -354,8 +333,7 @@ sub _determineAdvent {
         return $advent;
     }
     catch {
-        confess "Could not calculate Advent for the given date ["
-          . $date->ymd . "].";
+        confess "Could not calculate Advent for the given date [" . $date->ymd . "].";
     };
 }
 
@@ -372,8 +350,7 @@ sub _determineEaster {
 
     try {
         my ( $easterMonth, $easterDay ) = easter($easterYear);
-        $easter = Time::Piece->strptime(
-            $easterYear . "-" . $easterMonth . "-" . $easterDay, "%Y-%m-%d" );
+        $easter = Time::Piece->strptime( $easterYear . "-" . $easterMonth . "-" . $easterDay, "%Y-%m-%d" );
         return $easter;
     }
     catch {
@@ -649,8 +626,7 @@ sub _determineAshWednesday {
         return $ashWednesday;
     }
     catch {
-        confess "Could not calculate Ash Wednesday for Easter ["
-          . $easter->ymd . "].";
+        confess "Could not calculate Ash Wednesday for Easter [" . $easter->ymd . "].";
     };
 }
 
@@ -671,8 +647,7 @@ sub _determineAscension {
         return $ascension;
     }
     catch {
-        confess "Could not calculate Ascension for Easter ["
-          . $easter->ymd . "].";
+        confess "Could not calculate Ascension for Easter [" . $easter->ymd . "].";
     };
 }
 
@@ -693,8 +668,7 @@ sub _determinePentecost {
         return $pentecost;
     }
     catch {
-        confess "Could not calculate Pentecost for Easter ["
-          . $easter->ymd . "].";
+        confess "Could not calculate Pentecost for Easter [" . $easter->ymd . "].";
     };
 }
 
@@ -789,6 +763,29 @@ sub _determineEasterWeek {
     return undef;
 }
 
+=head2 _hasChristmas2
+
+Private method to determine if there is a second Sunday of Christmas in the current liturgical year.  Returns 1 when there is a second Sunday of Christmas and 0 otherwise.
+
+=cut
+
+sub _hasChristmas2 {
+    my $advent   = shift;
+    my $epiphany = shift;
+
+    my $firstChristmas = nextSunday( $advent->fourthSunday );
+    my $dateMarker     = nextSunday($firstChristmas);
+
+    if ( $dateMarker < $epiphany ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+
+    return 0;
+}
+
 =head2 _determineChristmasEpiphany
 
 Private method that matches the date given at construction against the Sundays in Christmastide and Epiphany.  Returns a string representation of the name of the Sunday in the lectionary.
@@ -802,6 +799,12 @@ sub _determineChristmasEpiphany {
 
     my $ashWednesday = shift;
 
+    my $lectionary = shift;
+
+    my $epiphany = Time::Piece->strptime( $date->year . "-01-06", "%Y-%m-%d" );
+
+    my $christmas2 = _hasChristmas2( $advent, $epiphany );
+
     #Is the date in Christmastide?
     my $dateMarker = nextSunday( $advent->fourthSunday );
     if ( $date == $dateMarker ) {
@@ -809,57 +812,34 @@ sub _determineChristmasEpiphany {
     }
 
     $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
+    if ( $date == $dateMarker && $christmas2 == 1 ) {
         return "The Second Sunday of Christmas";
     }
-
-    #Is the date in Epiphany?
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
+    elsif ( $date == $dateMarker ) {
         return "The First Sunday of Epiphany";
     }
 
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Second Sunday of Epiphany";
-    }
+    my @epiphanySundays = ( "The First Sunday of Epiphany", "The Second Sunday of Epiphany", "The Third Sunday of Epiphany", "The Fourth Sunday of Epiphany", "The Fifth Sunday of Epiphany", "The Sixth Sunday of Epiphany", "The Seventh Sunday of Epiphany", "The Last Sunday after Epiphany" );
 
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Third Sunday of Epiphany";
-    }
+    #Is the date in Epiphany?
+    my $sunCount = 0;
+    foreach my $sunday (@epiphanySundays) {
+        $dateMarker = nextSunday($dateMarker);
+        if ( $date == $dateMarker && $date == prevSunday($ashWednesday) ) {
+            return "The Last Sunday after Epiphany";
+        }
+        if ( $date == $dateMarker && $date == prevSunday( prevSunday($ashWednesday) ) && $lectionary eq 'acna' ) {
+            return "The Second to Last Sunday after Epiphany";
+        }
 
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Fourth Sunday of Epiphany";
-    }
+        if ( $date == $dateMarker && $christmas2 == 1 ) {
+            return $epiphanySundays[$sunCount];
+        }
+        elsif ( $date == $dateMarker && $christmas2 == 0 ) {
+            return $epiphanySundays[ $sunCount + 1 ];
+        }
 
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Fifth Sunday of Epiphany";
-    }
-
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Sixth Sunday of Epiphany";
-    }
-
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Seventh Sunday of Epiphany";
-    }
-
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker && $date != prevSunday($ashWednesday) ) {
-        return "The Second to Last Sunday after Epiphany";
-    }
-    elsif ( $date == $dateMarker && $date == prevSunday($ashWednesday) ) {
-        return "The Last Sunday after Epiphany";
-    }
-
-    $dateMarker = nextSunday($dateMarker);
-    if ( $date == $dateMarker ) {
-        return "The Last Sunday after Epiphany";
+        $sunCount++;
     }
 
     confess "There are no further Sundays of Christmastide or Epiphany.";
@@ -961,164 +941,137 @@ sub _determineOrdinary {
         return "Trinity Sunday";
     }
 
-    my $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-05-25", "%Y-%m-%d" ) );
+    my $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-05-25", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 8";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-06-01", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-06-01", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 9";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-06-08", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-06-08", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 10";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-06-15", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-06-15", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 11";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-06-22", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-06-22", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 12";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-06-29", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-06-29", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 13";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-07-06", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-07-06", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 14";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-07-13", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-07-13", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 15";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-07-20", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-07-20", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 16";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-07-27", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-07-27", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 17";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-08-03", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-08-03", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 18";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-08-10", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-08-10", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 19";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-08-17", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-08-17", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 20";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-08-24", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-08-24", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 21";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-08-31", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-08-31", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 22";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-09-07", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-09-07", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 23";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-09-14", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-09-14", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 24";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-09-21", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-09-21", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 25";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-09-28", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-09-28", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 26";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-10-05", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-10-05", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 27";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-10-12", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-10-12", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 28";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-10-19", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-10-19", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 29";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-10-26", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-10-26", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 30";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-11-02", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-11-02", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 31";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-11-09", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-11-09", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 32";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-11-16", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-11-16", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Ordinary 33";
     }
 
-    $dateMarker = closestSunday(
-        Time::Piece->strptime( $pentecost->year . "-11-23", "%Y-%m-%d" ) );
+    $dateMarker = closestSunday( Time::Piece->strptime( $pentecost->year . "-11-23", "%Y-%m-%d" ) );
     if ( $date == $dateMarker ) {
         return "Christ the King";
     }
@@ -1133,8 +1086,8 @@ Private method that takes the Time::Piece data given at construction and, using 
 =cut
 
 sub _determineDay {
-    my $date       = shift;
-    my $lectionary = shift;
+    my $date          = shift;
+    my $lectionary    = shift;
     my $includeFeasts = shift;
 
     my $advent = shift;
@@ -1196,31 +1149,27 @@ sub _determineDay {
     }
 
     #Feast Day Celebrations
-    if($includeFeasts eq 'yes'){
+    if ( $includeFeasts eq 'yes' ) {
         my %feastDay = _determineFeasts( $date, $lectionary );
         if ( $feastDay{commonName} ) {
             return ( commonName => $feastDay{commonName}, type => $feastDay{type} );
-        }   
+        }
     }
 
     #If the date isn't a Sunday and we've determined it is not a fixed holiday
     #then there are no readings for that day.
     if ( $date->wday != 1 ) {
         return (
-            commonName => $date->fullday . ', '
-              . $date->fullmonth . ' '
-              . $date->mday . ', '
-              . $date->year,
-            type => 'noLect'
+            commonName => $date->fullday . ', ' . $date->fullmonth . ' ' . $date->mday . ', ' . $date->year,
+            type       => 'noLect'
         );
     }
 
     #Sundays of the Liturgical Year
     if ( $date < $ashWednesday ) {
         return (
-            commonName =>
-              _determineChristmasEpiphany( $date, $advent, $ashWednesday ),
-            type => 'Sunday'
+            commonName => _determineChristmasEpiphany( $date, $advent, $ashWednesday, $lectionary ),
+            type       => 'Sunday'
         );
     }
 
@@ -1291,13 +1240,15 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Michael Wayne Arnold.
+Copyright 2016-2017 MICHAEL WAYNE ARNOLD
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-See L<http://dev.perl.org/licenses/> for more information.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 =cut

@@ -5,10 +5,10 @@ use Mojo::Base -base;
 use WebService::MusicBrainz::Request;
 use Data::Dumper;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 has 'request';
-has valid_resources => sub { ['area','artist','label','recording','release','release_group'] };
+has valid_resources => sub { ['area','artist','discid','label','recording','release','release_group'] };
 has relationships => sub {
     my $rels = ['area-rels','artist-rels','event-rels','instrument-rels','label-rels','place-rels','recording-rels','release-rels','release-group-rels','series-rels','url-rels','work-rels'];
     return $rels;
@@ -19,6 +19,7 @@ has subquery_map => sub {
     my %subquery_map;
 
     $subquery_map{artist}        = ['recordings','releases','release-groups','works'];
+    $subquery_map{discid}        = ['artists','artist-credits','collections','labels','recordings','release-groups' ];
     $subquery_map{label}         = ['releases'];
     $subquery_map{recording}     = ['artists','releases'];
     $subquery_map{release}       = ['artists','collections','labels','recordings','release-groups' ];
@@ -32,6 +33,7 @@ has search_fields_by_resource => sub {
 
     $search_fields{area}          = ['aid','alias','area','begin','comment','end','ended','sortname','iso','iso1','iso2','iso3','type'];
     $search_fields{artist}        = ['area','beginarea','endarea','arid','artist','artistaccent','alias','begin','comment','country','end','ended','gender','ipi','sortname','tag','type'];
+    $search_fields{discid}        = ['discid'];
     $search_fields{label}         = ['alias','area','begin','code','comment','country','end','ended','ipi','label','labelaccent','laid','sortname','type','tag'];
     $search_fields{recording}     = ['arid','artist','artistname','creditname','comment','country','date','dur','format','isrc','number','position','primarytype','puid','qdur','recording','recordingaccent','reid','release','rgid','rid','secondarytype','status','tid','trnum','tracks','tracksrelease','tag','type','video'];
     $search_fields{release_group} = ['arid','artist','comment','creditname','primarytype','rgid','releasegroup','releasegroupaccent','releases','release','reid','secondarytype','status','tag','type'];
@@ -84,8 +86,15 @@ sub search {
     if(exists $search_query->{mbid}) {
         $self->request()->mbid($search_query->{mbid});
         delete $search_query->{mbid};
+    }
 
-        # only use "inc" parameters when a specific MBID is given
+    if(exists $search_query->{discid}) {
+        $self->request()->discid($search_query->{discid});
+        delete $search_query->{discid};
+    }
+
+    # only use "inc" parameters when a specific MBID or DISCID is given
+    if ($self->request()->mbid() or $self->request()->discid()) {
         if(exists $search_query->{inc}) {
             my @inc_subqueries;
 

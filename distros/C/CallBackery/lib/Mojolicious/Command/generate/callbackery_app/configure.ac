@@ -7,7 +7,7 @@ AC_CONFIG_AUX_DIR(conftools)
 
 MJ_CLASS=<%= $p->{class} %>
 MJ_SCRIPT=<%= $p->{name} %>
-QX_CLASS=<%= $p->{name} %>
+QX_CLASS=<%= $p->{qxclass} %>
 
 AC_SUBST(MJ_CLASS)
 AC_SUBST(MJ_SCRIPT)
@@ -138,6 +138,7 @@ AC_CONFIG_FILES([
     Makefile
     etc/Makefile
     lib/Makefile
+    bin/Makefile
     frontend/Makefile
     thirdparty/Makefile
 ])

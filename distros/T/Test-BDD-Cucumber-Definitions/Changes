@@ -1,5 +1,15 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.05    2018-01-09
+        - Support for the environment variable BDD_HTTP_HOST has been added
+
+0.04    2018-01-08
+        - Fix dependencies
+
+0.03    2018-01-08
+        - Functions for working with data are transferred to the Data module
+        - Util modules export their functions
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

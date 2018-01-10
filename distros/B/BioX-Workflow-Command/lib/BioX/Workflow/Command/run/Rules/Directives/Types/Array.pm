@@ -34,7 +34,10 @@ sub transform_aoh {
   my @data = map { {$lookup => $_} } @{$v};
 
   $self->$k(\@data);
-  
+
 }
+
+# no Moose;
+no Moose::Role;
 
 1;

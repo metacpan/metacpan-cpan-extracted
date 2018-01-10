@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -333,6 +333,11 @@ our $VERSION = '0.008';
 #pod
 #pod =over
 #pod
+#pod =item x-hidden
+#pod
+#pod If this is true, the collection will be hidden from the list in the Yancy
+#pod web app. This does not prevent using the API to edit this data.
+#pod
 #pod =item x-id-field
 #pod
 #pod This key sets the name of the collection's ID field to use to uniquely
@@ -388,6 +393,14 @@ our $VERSION = '0.008';
 #pod a custom controller and set the class here. For details how to create
 #pod a custom controller, see L<Yancy::Controller::Yancy>.
 #pod
+#pod =head3 C<read_schema>
+#pod
+#pod When this is set, Yancy will read your backend to see what collections
+#pod you have available. Any collections and fields that you do not configure
+#pod will be assigned default configuration from your database schema. You
+#pod can use the configuration to override information that Yancy gets
+#pod incorrect.
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<JSON schema|http://json-schema.org>, L<Mojolicious>
@@ -431,7 +444,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -760,6 +773,11 @@ to control how it is treated by Yancy.
 
 =over
 
+=item x-hidden
+
+If this is true, the collection will be hidden from the list in the Yancy
+web app. This does not prevent using the API to edit this data.
+
 =item x-id-field
 
 This key sets the name of the collection's ID field to use to uniquely
@@ -814,6 +832,14 @@ There are additional configuration keys to alter how Yancy works.
 To customize how Yancy responds to API requests with data, you can create
 a custom controller and set the class here. For details how to create
 a custom controller, see L<Yancy::Controller::Yancy>.
+
+=head3 C<read_schema>
+
+When this is set, Yancy will read your backend to see what collections
+you have available. Any collections and fields that you do not configure
+will be assigned default configuration from your database schema. You
+can use the configuration to override information that Yancy gets
+incorrect.
 
 =head1 SEE ALSO
 

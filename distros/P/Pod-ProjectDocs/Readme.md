@@ -70,6 +70,10 @@ for your projects. It also creates an optional index page.
 
     whether you want to generate HTML document even if source files are not updated (default is 0).
 
+- `nosourcecode`
+
+    whether to suppress inclusion of the original source code in the generated output (default is 0).
+
 - `except`
 
     the files matches this regex won't be parsed.
@@ -103,7 +107,7 @@ without creating a custom perl script.
 # COPYRIGHT AND LICENSE
 
 - © 2005 by Lyo Kato
-- © 2017 by Martin Gruner
+- © 2018 by Martin Gruner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

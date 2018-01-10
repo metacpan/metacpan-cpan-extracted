@@ -1,0 +1,35 @@
+---
+abstract: 'Find or Build libcmark-gfm'
+author:
+  - 'Dylan William Hardison <dylan@hardison.net>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+configure_requires:
+  Alien::Build: '1.08'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::Download::Git: '0.01'
+  Alien::Build::Plugin::Extract::Directory: '0.65'
+  Alien::Build::Plugin::Fetch::Git: '0.01'
+  Alien::Build::Plugin::Prefer::SortVersions: '0.65'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libcmark_gfm
+version: '0.01'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::cmake3: '0.02'
+      Alien::git: '0'
+      Config: '0'
+      Sort::Versions: '0'
+    system: {}
+x_serialization_backend: 'YAML::Tiny version 1.70'

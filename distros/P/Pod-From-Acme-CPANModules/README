@@ -1,0 +1,59 @@
+NAME
+    Pod::From::Acme::CPANModules - Create "INCLUDED MODULES" POD sections
+    from $LIST
+
+VERSION
+    This document describes version 0.001 of Pod::From::Acme::CPANModules
+    (from Perl distribution Pod-From-Acme-CPANModules), released on
+    2018-01-09.
+
+SYNOPSIS
+     use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
+
+     my $res = gen_pod_from_acme_cpanmodules(module => 'Acme::CPANModules::PERLANCAR::Favorites');
+
+FUNCTIONS
+  gen_pod_from_acme_cpanmodules
+    Usage:
+
+     gen_pod_from_acme_cpanmodules(%args) -> any
+
+    Create "INCLUDED MODULES" POD sections from $LIST.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   list => *hash*
+
+        As an alternative to `module`, you can directly supply $LIST here.
+
+    *   module => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-From-Acme-CPANModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-From-Acme-CPANModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-From-Acme-CPANMod
+    ules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

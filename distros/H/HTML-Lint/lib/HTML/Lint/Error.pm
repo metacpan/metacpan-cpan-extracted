@@ -3,9 +3,8 @@ package HTML::Lint::Error;
 use warnings;
 use strict;
 
-use base 'Exporter';
+use parent 'Exporter';
 
-our @EXPORT = ();
 our @EXPORT_OK = qw( STRUCTURE HELPER FLUFF );
 our %EXPORT_TAGS = ( types => [@EXPORT_OK] );
 
@@ -107,10 +106,12 @@ sub _expand_error {
         $str = "Unknown code: $errcode";
     }
 
-    while ( @_ ) {
-        my $var = shift;
-        my $val = shift;
-        $str =~ s/\$\{$var\}/$val/g if defined $str;
+    if ( defined $str ) {
+        while ( @_ ) {
+            my $var = shift;
+            my $val = shift;
+            $str =~ s/\$\{$var\}/$val/g;
+        }
     }
 
     $self->{_errtext} = $str;
@@ -169,7 +170,8 @@ sub where {
     if ( not ref $_[0] ) {
         $line = shift;
         $col = shift;
-    } else {
+    }
+    else {
         my $self = shift;
         $line = $self->line;
         $col = $self->column;
@@ -232,7 +234,7 @@ for a specific error.
 
 =cut
 
-%errors = (
+%errors = ( ## no critic ( ValuesAndExpressions::RequireInterpolationOfMetachars )
     'api-parse-not-called'     => ['The parse() method has not been called on this file.', CONFIG],
     'api-eof-not-called'       => ['The eof() method has not been called on this file.', CONFIG],
     'config-unknown-directive' => ['Unknown directive "${directive}"', CONFIG],
@@ -251,8 +253,10 @@ for a specific error.
 
     'attr-repeated'            => ['${attr} attribute in <${tag}> is repeated', STRUCTURE],
     'attr-unknown'             => ['Unknown attribute "${attr}" for tag <${tag}>', FLUFF],
+    'attr-unclosed-entity'     => ['Entity ${entity} is missing its closing semicolon', STRUCTURE],
+    'attr-unknown-entity'      => ['Entity ${entity} is unknown', STRUCTURE],
+    'attr-use-entity'          => ['Character "${char}" should be written as ${entity}', STRUCTURE],
 
-    'text-invalid-entity'      => ['Entity ${entity} is invalid', STRUCTURE],
     'text-unclosed-entity'     => ['Entity ${entity} is missing its closing semicolon', STRUCTURE],
     'text-unknown-entity'      => ['Entity ${entity} is unknown', STRUCTURE],
     'text-use-entity'          => ['Character "${char}" should be written as ${entity}', STRUCTURE],
@@ -262,7 +266,7 @@ for a specific error.
 
 You called the C<errors()> method before calling C<parse()> and C<eof()>.
 
-=head2 api-parse-not-called
+=head2 api-eof-not-called
 
 You called the C<errors()> method before calling C<eof()>.
 
@@ -318,10 +322,6 @@ ATTR attribute in C<< <tag> >> is repeated.
 
 Unknown attribute "ATTR" for tag C<< <tag> >>.
 
-=head2 text-invalid-entity
-
-Entity ENTITY is invalid
-
 =head2 text-unclosed-entity
 
 Entity ENTITY is missing its closing semicolon
@@ -336,7 +336,7 @@ Character "CHAR" should be written as ENTITY
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2016 Andy Lester.
+Copyright 2005-2018 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License v2.0.

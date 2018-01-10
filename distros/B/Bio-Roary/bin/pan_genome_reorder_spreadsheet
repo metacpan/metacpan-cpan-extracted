@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::RoaryReorderSpreadsheet;
-$Bio::Roary::Main::RoaryReorderSpreadsheet::VERSION = '3.11.0';
+$Bio::Roary::Main::RoaryReorderSpreadsheet::VERSION = '3.11.1';
 # ABSTRACT: Take in a tree and a spreadsheet and output a reordered spreadsheet
 # PODNAME: pan_genome_reorder_spreadsheet
 
@@ -25,7 +25,7 @@ pan_genome_reorder_spreadsheet - Take in a tree and a spreadsheet and output a r
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

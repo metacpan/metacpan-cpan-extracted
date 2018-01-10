@@ -1,5 +1,5 @@
 package Bio::Roary::Output::GroupsMultifastaNucleotide;
-$Bio::Roary::Output::GroupsMultifastaNucleotide::VERSION = '3.11.0';
+$Bio::Roary::Output::GroupsMultifastaNucleotide::VERSION = '3.11.1';
 # ABSTRACT:  Take in a GFF files and a groups file and output one multifasta file per group with nucleotide sequences.
 
 
@@ -166,7 +166,12 @@ sub _cleanup_fasta {
     open( my $out, '>', $outfile );
     while ( my $line = <$in> ) {
         chomp $line;
-        $line =~ s/"//g if ( $line =~ /^>/ );
+        if ( $line =~ /^>/ )
+		{
+			$line =~ s/"//g ;
+			# newer versions of Bedtools add (-) or (+) to the end of the sequence name, remove them
+			$line =~ s!\([-+]\)!!;
+		}
 	
 	if($line =~ /^(>[^:]+)/)
 	{
@@ -205,7 +210,7 @@ Bio::Roary::Output::GroupsMultifastaNucleotide - Take in a GFF files and a group
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

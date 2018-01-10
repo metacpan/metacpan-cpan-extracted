@@ -1,4 +1,7 @@
 Revision history for Date::Julian::Simple
 
+0.02  Tue Jan 09 12:20:00 2018
+      - Added key 'provides' to the Makefile.PL script.
+
 0.01  Sun Jul 23 10:45:00 2017
       - First version, released, to celebrate the 1000th consecutive releases to CPAN.

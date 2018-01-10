@@ -42,5 +42,7 @@ add_stopwords(qw/
     locke
     toRef
     updatedDate
+    href
+    rel
 /);
 all_pod_files_spelling_ok();

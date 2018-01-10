@@ -3,25 +3,25 @@ package JIP::LockSocket;
 use 5.006;
 use strict;
 use warnings;
-use JIP::ClassField;
+use JIP::ClassField 0.05;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 use Socket qw(inet_aton pack_sockaddr_in PF_INET SOCK_STREAM);
 
-our $VERSION = '0.02';
+our $VERSION = '0.021';
 
-map { has $_ => (get => '+', set => '-') } qw(port addr socket is_locked);
+has [qw(port addr socket is_locked)] => (get => q{+}, set => q{-});
 
 sub new {
     my ($class, %param) = @ARG;
 
     # Mandatory options
-    croak qq{Mandatory argument "port" is missing\n}
+    croak q{Mandatory argument "port" is missing}
         unless exists $param{'port'};
 
     # Check "port"
     my $port = $param{'port'};
-    croak qq{Bad argument "port"\n}
+    croak q{Bad argument "port"}
         unless defined $port and $port =~ m{^\d+$}x;
 
     # Check "addr"
@@ -46,7 +46,7 @@ sub lock {
     my $socket = $self->_init_socket;
 
     bind($socket, pack_sockaddr_in($self->port, $self->_get_inet_addr))
-        or croak(sprintf qq{Can't lock port "%s": %s\n}, $self->port, $OS_ERROR);
+        or croak(sprintf q{Can't lock port "%s": %s}, $self->port, $OS_ERROR);
 
     return $self->_set_socket($socket)->_set_is_locked(1);
 }
@@ -91,7 +91,7 @@ sub _get_inet_addr {
 
 sub _init_socket {
     socket(my $socket, PF_INET, SOCK_STREAM, getprotobyname('tcp'))
-        or croak(sprintf qq{Can't init socket: %s\n}, $OS_ERROR);
+        or croak(sprintf q{Can't init socket: %s}, $OS_ERROR);
 
     return $socket;
 }
@@ -106,7 +106,7 @@ JIP::LockSocket - application lock/mutex based on sockets
 
 =head1 VERSION
 
-Version 0.01
+This document describes C<JIP::LockSocket> version C<0.021>.
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ Version 0.01
 
 =head1 SEE ALSO
 
-Lock::File, Lock::Socket and JIP::LockFile
+L<Lock::File>, L<Lock::Socket> and L<JIP::LockFile>.
 
 =head1 AUTHOR
 
@@ -152,7 +152,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -1,5 +1,8 @@
 Revision history for JIP-LockSocket
 
+0.021   2018-01-08
+        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+
 0.02    2015-05-17
         get_port() is now port().
         get_addr() is now addr().

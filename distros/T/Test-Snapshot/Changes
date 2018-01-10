@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-Snapshot
 
+0.03	Mon Jan  8 10:28:49 GMT 2018
+ - use perl -S to find correct prove in test
+
 0.02	Sun Jan  7 05:57:36 GMT 2018
  - allow snapshot filenames keep digits, dashes, letters
 

@@ -12,6 +12,7 @@ my $builder = Module::Build->new(
         'Getopt::Alt'    => '0.4.5',
         'Moo'            => '2.0',
         'Path::Tiny'     => '0.076',
+        'Scalar::Util'   => 0,
         'JSON::XS'       => 0,
         'WWW::Mechanize' => 0,
         'YAML::Syck'     => 0,

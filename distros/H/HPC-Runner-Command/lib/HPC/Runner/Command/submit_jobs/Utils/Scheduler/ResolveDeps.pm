@@ -104,7 +104,7 @@ Run a sanity check on the schedule. All the job deps should have existing job na
 sub sanity_check_schedule {
     my $self = shift;
 
-    $DB::single = 2;
+    # $DB::single = 2;
 
     my @jobnames = keys %{ $self->graph_job_deps };
     @jobnames = sort(@jobnames);
@@ -117,7 +117,7 @@ sub sanity_check_schedule {
 
     #Search the dependencies for matching jobs
     foreach my $job (@jobnames) {
-        $DB::single = 2;
+        # $DB::single = 2;
         my $row = [];
         my $ref = $self->graph_job_deps->{$job};
         push( @$row, $job );
@@ -127,7 +127,7 @@ sub sanity_check_schedule {
 
         #TODO This should be a proper error
         foreach my $r (@$ref) {
-            $DB::single = 2;
+            # $DB::single = 2;
 
             if ( !exists $self->graph_job_deps->{$r} ) {
                 $ref->[$y] = "**$r**";
@@ -228,6 +228,11 @@ sub chunk_commands_jobs {
           $self->jobs->{ $self->current_job }->commands_per_node;
 
         my @cmds = @{ $self->parse_cmd_file };
+
+        if($commands_per_node > scalar @cmds){
+          $commands_per_node = scalar @cmds;
+          $self->jobs->{$self->current_job}->commands_per_node($commands_per_node);
+        }
 
         my $iter = natatime $commands_per_node, @cmds;
 

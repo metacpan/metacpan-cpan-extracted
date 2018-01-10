@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.05';
+our $VERSION = '0.051';
 
 my $maybe_set_subname = sub { $ARG[1]; };
 
@@ -171,7 +171,7 @@ JIP::ClassField - Create attribute accessor for hash-based objects
 
 =head1 VERSION
 
-Version 0.05
+This document describes C<JIP::ClassField> version C<0.051>.
 
 =head1 SYNOPSIS
 
@@ -224,7 +224,7 @@ Version 0.05
 
 =head1 SEE ALSO
 
-Class::Accessor and Mojo::Base.
+L<Class::Accessor> and L<Mojo::Base>.
 
 =head1 AUTHOR
 
@@ -232,7 +232,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

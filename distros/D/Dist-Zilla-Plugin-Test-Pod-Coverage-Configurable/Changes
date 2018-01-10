@@ -1,3 +1,12 @@
+0.07     2018-01-09
+
+- Include the plugin version in the comment at the top of the generated test
+  file. Implemented by Karen Etheridge. GH #2.
+
+- Sort the module keys in the trustme dump for smaller diffs between
+  releases. Implemented by Karen Etheridge. GH #2.
+
+
 0.06     2016-05-08
 
 - The added test is not added in xt/author instead of xt/release.

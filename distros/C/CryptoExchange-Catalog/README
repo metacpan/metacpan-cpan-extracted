@@ -1,0 +1,63 @@
+NAME
+    CryptoExchange::Catalog - Catalog of cryptoexchanges
+
+VERSION
+    This document describes version 20180109 of CryptoExchange::Catalog
+    (from Perl distribution CryptoExchange-Catalog), released on 2018-01-09.
+
+SYNOPSIS
+     use CryptoExchange::Catalog;
+
+     my $cat = CryptoExchange::Catalog->new;
+
+     my $record = $cat->by_name("BX Thailand");     # note: case-sensitive. => {name=>"BX Thailand", safename=>"bx-thailand"}
+     my $record = $cat->by_safename("bx-thailand");
+     my $record = $cat->by_slug("bx-thailand");     # alias for by_safename(), mixed case also works
+
+     my @names = $cat->all_names(); # => ("Binance", "Bithumb", ...)
+
+     my @data = $cat->all_data; # => ({name=>"Binance", safename=>"binance"}, {...}, ...)
+
+DESCRIPTION
+    This class attempts to provide a list/catalog of cryptocurrency
+    exchanges. The main source for this catalog is the Cryptocurrency Market
+    Capitalizations website (<https://coinmarketcap.com/>, or CMC for
+    short).
+
+METHODS
+  new
+  by_name
+  by_safename
+  by_slug
+    Alias for "by_safename".
+
+  all_names
+  all_data
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CryptoExchange-Catalog>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CryptoExchange-Catalog>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CryptoExchange-Catalo
+    g>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CryptoCurrency::Catalog
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

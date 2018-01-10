@@ -1,10 +1,16 @@
 ==================================================
-Changes from 2016-06-25 00:00:00 +0000 to present.
+Changes from 2017-01-09 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.6 at 2017-06-25 22:14:14 +0000
+version 0.7 at 2018-01-09 19:50:59 +0000
 ----------------------------------------
+
+  Change: 7ad46ed7d9b439a1fee88c0e199604ec69dc40b9
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-09 17:50:39 +0000
+
+    Small fix regarding license information 
 
   Change: 203d6c4607b153b5ee3fe01944610109b72ccb21
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -34,10 +40,6 @@ version 0.6 at 2017-06-25 22:14:14 +0000
     The expected configuration file is now ".spamcupNG.yml". Fixed the
     README regarding setup procedures. Now waiting CPAN to cleanup the
     mess I did with the distribution name to upload it again. :) 
-
-----------------------------------------
-version 0.4 at 2017-06-02 00:32:07 +0000
-----------------------------------------
 
   Change: cc1530e474ea3158553abdbabe5d196e5239d92d
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

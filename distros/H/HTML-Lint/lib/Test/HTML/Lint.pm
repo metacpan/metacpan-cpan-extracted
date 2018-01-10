@@ -18,11 +18,11 @@ Test::HTML::Lint - Test::More-style wrapper around HTML::Lint
 
 =head1 VERSION
 
-Version 2.26
+Version 2.30
 
 =cut
 
-$VERSION = '2.26';
+$VERSION = '2.30';
 
 my $Tester = Test::Builder->new;
 
@@ -200,7 +200,7 @@ All bugs and requests are now being handled through GitHub.
 
     https://github.com/petdance/html-lint/issues
 
-DO NOT send bug reports to http://rt.cpan.org/ or http://code.google.com/
+DO NOT send bug reports to http://rt.cpan.org/.
 
 
 =head1 TO DO
@@ -222,7 +222,7 @@ this module is taken.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2016 Andy Lester.
+Copyright 2005-2018 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.

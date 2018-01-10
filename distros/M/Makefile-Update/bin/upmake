@@ -4,7 +4,7 @@
 #
 # ABSTRACT: Simple script to update list of files in a make or project file.
 #
-our $VERSION = '0.3'; # VERSION
+our $VERSION = '0.4'; # VERSION
 
 
 use strict;
@@ -20,6 +20,7 @@ use lib catdir($Bin, updir, 'lib');
 
 use Makefile::Update;
 use Makefile::Update::Bakefile0;
+use Makefile::Update::CMakefile;
 use Makefile::Update::Makefile;
 use Makefile::Update::MSBuild;
 use Makefile::Update::VCProj;
@@ -90,6 +91,8 @@ foreach my $fname (@ARGV) {
         upmake($options, \&update_vcproj, get_project_sources_and_headers($1));
     } elsif ($fname =~ /^[Mm]akefile/ || $fname =~ /\.make?$/) {
         upmake($options, \&update_makefile, $vars);
+    } elsif ($fname =~ /^CMakeLists\.txt$/i || $fname =~ /\.cmake$/) {
+        upmake($options, \&update_cmakefile, $vars);
     } else {
         die qq{File "$fname" is of unknown type, can't update.\n}
     }
@@ -107,7 +110,7 @@ upmake - Simple script to update list of files in a make or project file.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

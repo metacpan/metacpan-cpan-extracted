@@ -1,6 +1,10 @@
+#!perl
+
 use warnings;
 use strict;
-require 't/LintTest.pl';
+
+use lib 't/';
+use Util;
 
 checkit( [
     [ 'config-unknown-value' => qr/Unknown value "14" for elem-img-sizes-missing directive$/ ],

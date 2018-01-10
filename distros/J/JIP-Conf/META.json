@@ -4,7 +4,7 @@
       "Vladimir Zhavoronkov <flyweight@yandex.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -21,11 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "English" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -39,8 +35,29 @@
             "Hash::AsObject" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/outtaspace/jip_conf/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/outtaspace/jip_conf.git",
+         "web" : "https://github.com/outtaspace/jip_conf"
+      }
+   },
+   "version" : "0.021"
 }

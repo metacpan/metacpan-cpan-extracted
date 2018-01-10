@@ -15,6 +15,7 @@ sub test_001 : Tags(req) {
     require_ok('BioX::Workflow::Command::run');
     require_ok('BioX::Workflow::Command::new');
     require_ok('BioX::Workflow::Command::add');
+    require_ok('BioX::Workflow::Command::inspect');
 
     require_ok('BioX::Workflow::Command::run::Utils::Attributes');
     require_ok('BioX::Workflow::Command::run::Rules::Directives');
@@ -42,8 +43,6 @@ sub test_001 : Tags(req) {
     require_ok('BioX::Workflow::Command::Utils::Create');
     require_ok('BioX::Workflow::Command::Utils::Files');
     require_ok('BioX::Workflow::Command::Utils::Log');
-    # require_ok('BioX::Workflow::Command::Utils::Plugin');
-    # require_ok('BioX::Workflow::Command::Utils::Traits');
 
     ##DEPRACATED
     # require_ok('BioX::Workflow::Command::Utils::Files::TrackChanges');

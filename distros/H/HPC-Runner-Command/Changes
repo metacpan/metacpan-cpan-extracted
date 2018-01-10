@@ -1,5 +1,8 @@
 Revision history for HPC-Runner-Command
 
+3.2.12  2018-01-10 14:18:45 GST
+	- added back in stats command
+
 3.2.11  2017-09-11 13:50:17 GST
 	- Milestones - https://github.com/biosails/HPC-Runner-Command/milestone/3
 

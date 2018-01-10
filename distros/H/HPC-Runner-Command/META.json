@@ -58,6 +58,7 @@
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Find::Rule" : "0",
+            "File::Glob" : "0",
             "File::Path" : "0",
             "File::Slurp" : "0",
             "File::Spec" : "0",
@@ -117,6 +118,7 @@
             "Test::Class::Moose" : "0",
             "Test::Class::Moose::Load" : "0",
             "Test::Class::Moose::Runner" : "0",
+            "Test::Exception" : "0.43",
             "Test::More" : "0",
             "Text::Diff" : "0",
             "strict" : "0",
@@ -136,7 +138,7 @@
          "web" : "https://github.com/biosails/HPC-Runner-Command"
       }
    },
-   "version" : "3.2.11",
+   "version" : "3.2.12",
    "x_contributors" : [
       "Travis CI <nobody@nobody.org>"
    ],

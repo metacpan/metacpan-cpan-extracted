@@ -66,7 +66,7 @@ EOF
 };
 
 # -----------------------------------------------------------------------------
-plan tests => 17;
+plan tests => 18;
 use_ok('Crypt::SMIME', ':constants');
 
 my $password = '';
@@ -147,3 +147,17 @@ my $encrypted;
   $smime->setPublicKey($crt);
   is($smime->check($decrypted),$verify, 'verify result of decrypt.');
 }
+
+subtest 'Bug #124035' => sub {
+    # https://rt.cpan.org/Public/Bug/Display.html?id=124035
+    plan tests => 1;
+
+    my $smime = Crypt::SMIME->new();
+    my $msg   = qq{Content-Type: multipart/signed; micalg=sha1;\r\n}
+              . qq{    boundary="8323329-949354117-1422908037=:4488"\r\n}
+              . qq{    protocol="application/pkcs7-signature";\r\n}
+              . qq{\r\n}
+              . qq{...\r\n};
+
+    ok($smime->isSigned($msg));
+};

@@ -98,14 +98,15 @@
       "test" : {
          "requires" : {
             "Env::Path" : "0",
-            "Test::More" : "0.88"
+            "Test::File::ShareDir::Dist" : "0",
+            "Test::More" : "1.302083"
          }
       }
    },
    "provides" : {
       "App::Netdisco" : {
          "file" : "lib/App/Netdisco.pm",
-         "version" : "2.038005"
+         "version" : "2.038009"
       },
       "App::Netdisco::AnyEvent::Nbtstat" : {
          "file" : "lib/App/Netdisco/AnyEvent/Nbtstat.pm"
@@ -766,6 +767,6 @@
       "x_IRC" : "irc://irc.freenode.org/#netdisco",
       "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/netdisco-users"
    },
-   "version" : "2.038005",
+   "version" : "2.038009",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

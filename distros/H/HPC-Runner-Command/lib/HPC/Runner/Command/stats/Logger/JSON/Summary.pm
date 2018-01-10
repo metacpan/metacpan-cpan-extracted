@@ -3,6 +3,8 @@ package HPC::Runner::Command::stats::Logger::JSON::Summary;
 use Moose::Role;
 use namespace::autoclean;
 
+with 'HPC::Runner::Command::stats::Logger::JSON::Utils';
+
 use JSON;
 use Try::Tiny;
 use File::Slurp;
@@ -13,9 +15,11 @@ sub iter_tasks_summary {
     my $submission_id = shift;
     my $jobname       = shift;
 
-    my $running = $self->count_running_tasks( $submission_id, $jobname );
-    my $success = $self->count_successful_tasks( $submission_id, $jobname );
-    my $fail = $self->count_failed_tasks( $submission_id, $jobname );
+    my $tasks = $self->read_json_files( $submission_id, $jobname );
+    my $running =
+      $self->count_running_tasks( $submission_id, $jobname, $tasks );
+    my $success = $self->count_successful_tasks(  $submission_id, $jobname, $tasks );
+    my $fail = $self->count_failed_tasks(  $submission_id, $jobname, $tasks );
     my $complete = $success + $fail;
 
     $self->task_data->{$jobname} = {
@@ -30,82 +34,73 @@ sub count_running_tasks {
     my $self          = shift;
     my $submission_id = shift;
     my $jobname       = shift;
+    my $tasks         = shift;
 
-    my $running_file =
-      File::Spec->catdir( $self->data_dir, $jobname, 'running.json' );
+    my @task_ids = keys %{$tasks};
+    my $running  = 0;
 
-    if ( -e $running_file ) {
-        my $running_json = read_file($running_file);
-        ##TODO Add in some error checking
-        my $running;
-        try {
-            $running = decode_json($running_json);
-        }
-        catch {
-            $running = {};
-        };
-        my @keys = keys %{$running};
-        return scalar @keys;
+    foreach my $task_id (@task_ids) {
+        my $task = $tasks->{$task_id};
+        $running++ unless exists $task->{exit_code};
     }
-    else {
-        return 0;
-    }
+
+    return $running;
 }
 
 sub get_running_tasks {
     my $self          = shift;
     my $submission_id = shift;
     my $jobname       = shift;
+    my $tasks         = shift;
 
-    my $running_file =
-      File::Spec->catdir( $self->data_dir, $jobname, 'running.json' );
+    my @task_ids = keys %{$tasks};
+    my $running  = {};
 
-    if ( -e $running_file ) {
-        my $running_json = read_file($running_file);
-        ##TODO Add in some error checking
-        my $running = decode_json($running_json);
-        return $running;
-    }
-    else {
-        return {};
+    foreach my $task_id (@task_ids) {
+        my $task = $tasks->{$task_id};
+        if ( !exists $task->{exit_code} ) {
+            $running->{$task_id} = $task;
+        }
     }
 
+    return $running;
 }
 
 sub get_completed_tasks {
     my $self          = shift;
     my $submission_id = shift;
     my $jobname       = shift;
+    my $tasks         = shift;
 
-    my $complete_file =
-      File::Spec->catdir( $self->data_dir, $jobname, 'complete.json' );
+    my @task_ids = keys %{$tasks};
+    my $complete = {};
 
-    if ( -e $complete_file ) {
-        my $complete_json = read_file($complete_file);
-        ##TODO Add in some error checking
-        my $complete = decode_json($complete_json);
-        return $complete;
-    }
-    else {
-        return {};
+    foreach my $task_id (@task_ids) {
+        my $task = $tasks->{$task_id};
+        if ( exists $task->{exit_code} ) {
+            $complete->{$task_id} = $task;
+        }
     }
 
+    return $complete;
 }
 
 sub count_successful_tasks {
     my $self          = shift;
     my $submission_id = shift;
     my $jobname       = shift;
+    my $tasks         = shift;
 
-    return $self->search_complete( $jobname, 1 );
+    return $self->search_complete( $tasks, $jobname, 1 );
 }
 
 sub count_failed_tasks {
     my $self          = shift;
     my $submission_id = shift;
     my $jobname       = shift;
+    my $tasks         = shift;
 
-    return $self->search_complete( $jobname, 0 );
+    return $self->search_complete( $tasks, $jobname, 0 );
 }
 
 =head3 search_complete
@@ -116,27 +111,12 @@ See which jobs completed successfully
 
 sub search_complete {
     my $self    = shift;
+    my $tasks   = shift;
     my $jobname = shift;
     my $success = shift;
 
-    my $complete_file =
-      File::Spec->catdir( $self->data_dir, $jobname, 'complete.json' );
-
-    if ( -e $complete_file ) {
-        my $complete_json = read_file($complete_file);
-        my $complete;
-        try {
-            $complete = decode_json($complete_json);
-        }
-        catch {
-            $complete = {};
-        };
-        ##TODO Add in some error checking
-        return $self->look_for_exit_code( $complete, $success );
-    }
-    else {
-        return 0;
-    }
+    return 0 unless $tasks;
+    return $self->look_for_exit_code( $tasks, $success );
 }
 
 sub look_for_exit_code {

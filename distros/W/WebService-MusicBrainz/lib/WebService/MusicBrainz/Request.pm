@@ -10,6 +10,7 @@ has ua => sub { Mojo::UserAgent->new() };
 has 'format' => 'json';
 has 'search_resource';
 has 'mbid';
+has 'discid';
 has 'inc' => sub { [] };
 has 'query_params';
 has offset => 0;
@@ -27,6 +28,7 @@ sub make_url {
     push @url_parts, $self->url_base();
     push @url_parts, $self->search_resource();
     push @url_parts, $self->mbid() if $self->mbid;
+    push @url_parts, $self->discid() if $self->discid;
 
     my $url_str = join '/', @url_parts;
 

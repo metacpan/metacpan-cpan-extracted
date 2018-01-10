@@ -57,7 +57,7 @@ sub interpol_directive {
     return $text;
 }
 
-memoize('my_broken');
+# memoize('my_broken');
 
 sub my_broken {
     my %args    = @_;
@@ -78,7 +78,7 @@ sub my_broken {
 # The following errors were encountered:
 # $text
 # $error
-###################################################
+####################################################
 EOF
 }
 

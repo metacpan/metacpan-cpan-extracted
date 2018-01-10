@@ -3,26 +3,30 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Getopt::Long;
 use Pod::Usage;
 use Pod::ProjectDocs;
 
-my ( $out, $lib, $title, $lang, $desc, $index, $verbose, $forcegen, $except );
+my (
+    $out,   $lib,     $title,    $lang,         $desc,
+    $index, $verbose, $forcegen, $nosourcecode, $except
+);
 my $help = @ARGV == 0;
 
 my %opt = (
-    'help|?'      => \$help,
-    'out|o=s'     => \$out,
-    'lib|l=s@'    => \$lib,
-    'except|e=s@' => \$except,
-    'title|t=s'   => \$title,
-    'desc|d=s'    => \$desc,
-    'index!'      => \$index,
-    'verbose|v'   => \$verbose,
-    'forcegen!'   => \$forcegen,
-    'lang=s'      => \$lang,
+    'help|?'        => \$help,
+    'out|o=s'       => \$out,
+    'lib|l=s@'      => \$lib,
+    'except|e=s@'   => \$except,
+    'title|t=s'     => \$title,
+    'desc|d=s'      => \$desc,
+    'index!'        => \$index,
+    'verbose|v'     => \$verbose,
+    'forcegen!'     => \$forcegen,
+    'nosourcecode!' => \$nosourcecode,
+    'lang=s'        => \$lang,
 );
 
 GetOptions(%opt);
@@ -30,15 +34,16 @@ GetOptions(%opt);
 pod2usage(1) if $help;
 
 my $p = Pod::ProjectDocs->new(
-    outroot  => $out,
-    libroot  => $lib,
-    except   => $except,
-    title    => $title,
-    desc     => $desc,
-    index    => $index,
-    verbose  => $verbose,
-    forcegen => $forcegen,
-    lang     => $lang,
+    outroot      => $out,
+    libroot      => $lib,
+    except       => $except,
+    title        => $title,
+    desc         => $desc,
+    index        => $index,
+    verbose      => $verbose,
+    forcegen     => $forcegen,
+    nosourcecode => $nosourcecode,
+    lang         => $lang,
 );
 $p->gen();
 

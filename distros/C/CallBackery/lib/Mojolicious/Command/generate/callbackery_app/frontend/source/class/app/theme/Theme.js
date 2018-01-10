@@ -4,7 +4,7 @@
    License:   ???
    Authors:   <%= $p->{fullName} %> <<%= $p->{email} %>>
  *********************************************************************** */
-qx.Theme.define("<%= $p->{name} %>.theme.Theme", {
+qx.Theme.define("<%= $p->{qxclass} %>.theme.Theme", {
     meta : {
         color : callbackery.theme.Color,
         decoration : callbackery.theme.Decoration,

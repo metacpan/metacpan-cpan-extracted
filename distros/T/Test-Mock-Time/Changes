@@ -1,5 +1,8 @@
 Revision history for Test-Mock-Time
 
+v0.1.7  2018-01-09 21:05:29 EET
+	- Add support for perl-5.8.
+
 v0.1.6  2016-02-29 23:22:56 EET
 	- Reformat doc.
 	- Drop support for Mojolicious < 6.0.

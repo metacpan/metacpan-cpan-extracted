@@ -44,8 +44,8 @@ t/controller/multi_tenant.t
 t/filter.t
 t/helpers.t
 t/lib/Local/Schema.pm
-t/lib/Local/Schema/Result/People.pm
-t/lib/Local/Schema/Result/User.pm
+t/lib/Local/Schema/Result/people.pm
+t/lib/Local/Schema/Result/user.pm
 t/lib/Local/Test.pm
 t/lib/Yancy/Plugin/Test.pm
 t/plugin/auth/basic.t

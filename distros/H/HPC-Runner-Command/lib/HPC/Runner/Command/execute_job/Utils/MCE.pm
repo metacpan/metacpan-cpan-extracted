@@ -45,10 +45,22 @@ has 'read_command' => (
     lazy      => 1,
     default   => sub {
         my $self = shift;
+        if ( $self->can('task_id') && !defined $self->task_id ) {
+            $self->single_node(1);
+            return;
+        }
+        if ( $self->can('batch_index_start')
+            && !defined $self->batch_index_start )
+        {
+            $self->single_node(1);
+            return;
+        }
         if ( $self->can('task_id') && $self->can('batch_index_start') ) {
             return $self->task_id - $self->batch_index_start;
         }
-        elsif ( $self->can('batch_index_start') ) {
+        elsif ( $self->can('batch_index_start')
+            && defined $self->batch_index_start )
+        {
             return $self->batch_index_start - 1;
         }
         else {
@@ -167,6 +179,10 @@ sub run_mce {
     $self->append_logfile(".log");
     $self->log( $self->init_log );
 
+    if($self->single_node){
+      print "Logging to ".$self->logfile."\n";
+    }
+
     $self->mce->spawn;
 
     #MCE specific
@@ -220,14 +236,7 @@ sub parse_file_mce {
         "Error opening file  " . $self->infile . "  " . $! );
     die print "The infile does not exist!\n" unless $fh;
 
-    if ( $self->single_node ) {
-        $self->log_main_messages( 'info', 'Running in single node mode' );
-        while (<$fh>) {
-            my $line = $_;
-            $self->process_lines($line);
-        }
-    }
-    elsif ( defined $self->read_command ) {
+    if ( defined $self->read_command ) {
         $self->log_main_messages( 'info',
             'Executing Command # ' . $self->read_command );
         my $cmds = $self->parse_cmd_file($fh);
@@ -235,6 +244,13 @@ sub parse_file_mce {
         foreach my $cmd (@$cmds) {
             map { $self->process_lines( $_ . "\n" ) } split( "\n", $cmd );
             $self->wait(0);
+        }
+    }
+    elsif ( $self->single_node ) {
+        $self->log_main_messages( 'info', 'Running in single node mode' );
+        while (<$fh>) {
+            my $line = $_;
+            $self->process_lines($line);
         }
     }
     else {
@@ -265,21 +281,22 @@ sub parse_cmd_file {
         my $line = $_;
         next unless $line;
         next unless $line =~ m/\S/;
+        next if $line =~ /^\s*$/ ;
 
         $cmd .= $line;
         next if $line =~ m/\\$/;
         next if $line =~ m/^#/;
         if ( $x == $self->read_command && $cmd_count < $self->commands ) {
-            $add_cmds = 1;
+              $add_cmds = 1;
         }
         if ($add_cmds) {
-            push( @cmds, $cmd );
-            $cmd_count++;
+              push( @cmds, $cmd );
+              $cmd_count++;
         }
         $x++;
 
         if ( $x >= $self->read_command && $cmd_count >= $self->commands ) {
-            last;
+              last;
         }
         $cmd = '';
     }
@@ -290,92 +307,108 @@ sub parse_cmd_file {
 
 ##TODO separate out single node mode
 sub process_lines {
-    my $self = shift;
-    my $line = shift;
+      my $self = shift;
+      my $line = shift;
 
-    if ( $line =~ m/^#TASK/ ) {
-        $self->add_cmd($line);
-    }
+      return unless $line;
+      if ( $line =~ m/^#TASK/ ) {
+          $self->add_cmd($line);
+      }
 
-    $self->check_single_node($line) if $self->single_node;
+      $self->check_single_node($line) if $self->single_node;
 
-    return if $line =~ m/^#/;
-    $self->add_cmd($line);
+      return if $line =~ m/^#/;
+      $self->add_cmd($line);
 
-    ##Bash style we continue to the next lime if the current line ends in \
-    return if $line =~ m/\\$/;
-    if ( $self->match_cmd(qr/^wait$/) ) {
-        $self->hold_pool;
-    }
-    else {
-        $self->add_pool;
-    }
+      ##Bash style we continue to the next lime if the current line ends in \
+      return if $line =~ m/\\$/;
+      return unless $self->has_cmd;
+      if ( $self->match_cmd(qr/^wait$/) ) {
+          $self->hold_pool;
+      }
+      else {
+          $self->add_pool;
+      }
 }
 
 sub check_single_node {
-    my $self = shift;
-    my $line = shift;
+      my $self = shift;
+      my $line = shift;
 
-    if ( $line =~ m/^#HPC jobname=/ ) {
-        $self->hold_pool;
-        $self->_clear_mce;
-        my ( $t1, $t2 ) = parse_meta($line);
-        $self->jobname($t2);
-        ##Trigger outdir
-        $self->logname($t2);
-        $self->logfile( $self->set_logfile );
-        $self->logdir( $self->set_logdir );
-    }
-    if ( $line =~ m/^#HPC procs=/ ) {
-        $self->hold_pool;
-        $self->_clear_mce;
-        my ( $t1, $t2 ) = parse_meta($line);
-        $self->procs($t2);
-        $self->hold_pool;
-    }
+      if ( $line =~ m/^#HPC jobname=/ ) {
+          $self->hold_pool;
+          $self->_clear_mce;
+          my ( $t1, $t2 ) = parse_meta($line);
+          $self->jobname($t2);
+          print "Starting jobname $t2\n";
+          ##Trigger outdir
+          $self->logname($t2);
+          $self->logfile( $self->set_logfile );
+          $self->logdir( $self->set_logdir );
+      }
+      if ( $line =~ m/^#HPC procs=/ ) {
+          $self->hold_pool;
+          $self->_clear_mce;
+          my ( $t1, $t2 ) = parse_meta($line);
+          $self->procs($t2);
+          $self->hold_pool;
+      }
 }
 
 sub add_pool {
-    my $self = shift;
-    $self->log_main_messages( 'debug', "Enqueuing command:\n\t" . $self->cmd );
+      my $self = shift;
 
-    ##Task ID is the counter for the array
-    $self->task_id( $self->counter ) if $self->can('task_id');
+      return unless $self->has_cmd;
 
-    $self->queue->enqueue( $self->counter, $self->cmd );
-    $self->clear_cmd;
-    $self->inc_counter;
+      my $cmd = $self->cmd;
+      if ( $cmd =~ /^\s*$/ ) {
+        $self->clear_cmd;
+        return;
+      }
+
+      $self->log_main_messages( 'debug',
+          "Enqueuing command:\n\t" . $self->cmd );
+
+      ##Task ID is the counter for the array
+      $self->task_id( $self->counter ) if $self->can('task_id');
+
+      $self->queue->enqueue( $self->counter, $self->cmd );
+      $self->clear_cmd;
+      $self->inc_counter;
 }
 
 sub hold_pool {
-    my $self = shift;
+      my $self = shift;
 
-    $self->log_main_messages( 'debug', "Beginning command:\n\t" . $self->cmd )
-      if $self->has_cmd;
-    $self->log_main_messages( 'debug',
-        'Waiting for all threads to complete...' )
-      if $self->has_cmd;
+      $self->log_main_messages( 'debug', "Beginning command:\n\t" . $self->cmd )
+        if $self->has_cmd;
+      $self->log_main_messages( 'debug',
+          'Waiting for all threads to complete...' )
+        if $self->has_cmd;
 
-    $self->wait(1);
-    push( @{ $self->jobref }, [] );
-    $self->queue->enqueue( (undef) x ( $self->procs * 2 ) );
-    $self->mce->run(0);    # 0 indicates do not shutdown after running
+      $self->wait(1);
+      push( @{ $self->jobref }, [] );
+      $self->queue->enqueue( (undef) x ( $self->procs * 2 ) );
+      $self->mce->run(0);    # 0 indicates do not shutdown after running
 
-    $self->log_main_messages( 'debug',
-        'All children have completed processing!' );
-    $self->clear_cmd;
+      ##Don't need this for first message
+      $self->log_main_messages( 'debug',
+          'All children have completed processing!' )
+        if $self->has_cmd;
+
+      $self->clear_cmd;
 }
 
 memoize('parse_meta');
 
 sub parse_meta {
-    my $line = shift;
-    my ( @match, $t1, $t2 );
+      my $line = shift;
+      my ( @match, $t1, $t2 );
 
-    @match = $line =~ m/ (\w+)=(.+)$/;
-    ( $t1, $t2 ) = ( $match[0], $match[1] );
+      @match = $line =~ m/ (\w+)=(.+)$/;
+      ( $t1, $t2 ) = ( $match[0], $match[1] );
 
-    return ( $t1, $2 );
+      return ( $t1, $2 );
 }
 
 =head3 run_command_mce
@@ -385,16 +418,16 @@ MCE knows which subcommand to use from Runner/MCE - object mce
 =cut
 
 sub run_command_mce {
-    my $self = shift;
+      my $self = shift;
 
-    my $pid = $$;
+      my $pid = $$;
 
-    #$DB::single = 2;
+      #$DB::single = 2;
 
-    push( @{ $self->jobref->[-1] }, $pid );
-    $self->_log_commands($pid);
+      push( @{ $self->jobref->[-1] }, $pid );
+      $self->_log_commands($pid);
 
-    return;
+      return;
 }
 
 =head1 AUTHOR

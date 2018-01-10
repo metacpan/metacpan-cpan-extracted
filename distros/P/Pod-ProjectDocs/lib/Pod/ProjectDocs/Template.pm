@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose::Role;
 

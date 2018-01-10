@@ -43,7 +43,7 @@
          "url" : "http://github.com/joenio/alien-doxyparse"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.32",
       "requires" : {

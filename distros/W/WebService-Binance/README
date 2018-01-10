@@ -1,0 +1,49 @@
+NAME
+
+    WebService::Cryptopia
+
+DESCRIPTION
+
+    Query the Binance API
+
+    https://www.binance.com/restapipub.html
+
+ATTRIBUTES
+
+    user_agent
+
+      Optional. A new LWP::UserAgent will be created for you if you don't
+      already have one you'd like to reuse.
+
+    base_url
+
+      Optional. The base URL at binance. I don't see any likely reason to
+      overwrite this...
+
+    api_version
+
+      Optional. Default: 1
+
+METHODS
+
+    api_public
+
+      Query the public API
+
+    lookup_symbol
+
+      Binance works with symbols which represent the exchange rate between
+      a pair of currencies. e.g. BTCETH represents exchnage rate from
+      Bitcoin (BTC) -> Etherium (ETH). This method does a best-guess at
+      what the two currencies are from a given symbol. Usage:
+
+          my( $from, $to ) = $binance->lookup_symbol( 'BTCETH' );
+
+COPYRIGHT
+
+    Copyright 2018, Robin Clarke, Germany
+
+AUTHOR
+
+    Robin Clarke <perl@robinclarke.net>
+

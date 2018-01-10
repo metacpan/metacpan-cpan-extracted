@@ -112,7 +112,7 @@ option 'metastr' => (
 option 'logname' => (
     isa      => 'Str',
     is       => 'rw',
-    default  => 'hpcrunner_logs',
+    default  => '000_hpcrunner_logs',
     required => 0,
 );
 

@@ -23,4 +23,8 @@ requires:
   English: '0'
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.03'
+resources:
+  bugtracker: https://github.com/outtaspace/jip_object/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/outtaspace/jip_object.git
+version: '0.031'

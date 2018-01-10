@@ -1,3 +1,8 @@
+0.003 09-01-2018
+    [Documentation]
+        Fixed a missed method rename in the synopsis - thanks
+        Ben Bullock (benkasminbullock on GitHub)!
+
 0.002 14-12-2017
     [Bugfix]
         Return correct values for bigram possibilities.

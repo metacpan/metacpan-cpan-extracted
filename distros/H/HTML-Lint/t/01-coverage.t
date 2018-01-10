@@ -2,13 +2,14 @@
 
 # This test verifies that there is a t/*.t file for every possible Lint error.
 
+use strict;
+use warnings;
+
 use Test::More 'no_plan';
 
-BEGIN {
-    use_ok( 'HTML::Lint::Error' );
-}
+use HTML::Lint::Error;
 
-my @errors = do { no warnings; keys %HTML::Lint::Error::errors };
+my @errors = keys %HTML::Lint::Error::errors;
 
 isnt( scalar @errors, 0, 'There are at least some errors to be found.' );
 

@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::Template';
@@ -70,12 +70,13 @@ sub _generate_header_box {
         $doc,
         $doc->data,
         {
-            title    => $doc->config->title,
-            desc     => $doc->config->desc,
-            name     => $doc->name,
-            outroot  => $doc->config->outroot,
-            src      => $doc->get_output_src_path,
-            mgr_desc => $mgr_desc,
+            title        => $doc->config->title,
+            desc         => $doc->config->desc,
+            name         => $doc->name,
+            outroot      => $doc->config->outroot,
+            src          => $doc->get_output_src_path,
+            mgr_desc     => $mgr_desc,
+            nosourcecode => $doc->config->nosourcecode,
         }
     );
     return $text if $^O ne 'MSWin32';

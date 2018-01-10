@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provide easy-to-use forking with ability to pass back data",
+   "abstract" : "Provide multi-paradigm forking with ability to pass back data",
    "author" : [
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "1.100"
+         "version" : "1.110"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "1.100",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.110",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

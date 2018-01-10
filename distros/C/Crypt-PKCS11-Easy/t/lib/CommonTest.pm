@@ -109,15 +109,12 @@ sub _new_pkcs11 {
 
     $ENV{SOFTHSM2_CONF} = $self->hsm_config_file;
 
-    my $args = [module => 'libsofthsm2'];
+    $args{module} = 'libsofthsm2' unless $args{module};
+    $args{pin}    = '1234'        unless $args{pin};
+    $args{token}  = 'test_keys_1' unless $args{token};
 
-    push @$args, key      => $args{key}  if $args{key};
-    push @$args, slot     => $args{slot} if defined $args{slot};
-    push @$args, function => $args{func} if $args{func};
-    push @$args, mech     => $args{mech} if $args{mech};
-    push @$args, pin      => '1234';
-
-    my $obj = new_ok $mod => $args;
+    my @arg_list = %args;
+    my $obj = new_ok $mod => \@arg_list;
 
     BAIL_OUT "Failed to initialise $mod, no point continuing" unless $obj;
 

@@ -1,7 +1,7 @@
 package App::grepdate;
 
-our $DATE = '2017-04-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-01-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Grep date in text
@@ -18,7 +18,7 @@ App::grepdate - Grep date in text
 
 =head1 VERSION
 
-This document describes version 0.001 of App::grepdate (from Perl distribution App-grepdate), released on 2017-04-25.
+This document describes version 0.002 of App::grepdate (from Perl distribution App-grepdate), released on 2018-01-10.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

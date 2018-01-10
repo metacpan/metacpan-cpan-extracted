@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/mohawk2/Test-Snapshot/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/Test-Snapshot
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

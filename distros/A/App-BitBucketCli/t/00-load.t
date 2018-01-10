@@ -8,7 +8,10 @@ use Test::Warnings;
 BEGIN {
     use_ok( 'App::BitBucketCli' );
     use_ok( 'App::BitBucketCli::Branch' );
+    use_ok( 'App::BitBucketCli::Base' );
     use_ok( 'App::BitBucketCli::Core' );
+    use_ok( 'App::BitBucketCli::Link' );
+    use_ok( 'App::BitBucketCli::Links' );
     use_ok( 'App::BitBucketCli::Project' );
     use_ok( 'App::BitBucketCli::PullRequest' );
     use_ok( 'App::BitBucketCli::Repository' );

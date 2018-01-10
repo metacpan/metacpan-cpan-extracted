@@ -4,22 +4,28 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-Makefile::Update	V:/src/my/Makefile-Update/lib/Makefile/Update.pm	/^package Makefile::Update;$/;"	p
-Makefile::Update::Bakefile0	V:/src/my/Makefile-Update/lib/Makefile/Update/Bakefile0.pm	/^package Makefile::Update::Bakefile0;$/;"	p
-Makefile::Update::MSBuild	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^package Makefile::Update::MSBuild;$/;"	p
-Makefile::Update::Makefile	V:/src/my/Makefile-Update/lib/Makefile/Update/Makefile.pm	/^package Makefile::Update::Makefile;$/;"	p
-Makefile::Update::VCProj	V:/src/my/Makefile-Update/lib/Makefile/Update/VCProj.pm	/^package Makefile::Update::VCProj;$/;"	p
-Parameters	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^Parameters: input and output file handles and array references to the sources$/;"	l
-Parameters	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^Parameters: input and output file handles, array references to the sources$/;"	l
-Parameters	V:/src/my/Makefile-Update/lib/Makefile/Update/VCProj.pm	/^Parameters: input and output file handles, array references to the sources$/;"	l
-Usage	V:/src/my/Makefile-Update/bin/upmake	/^Usage: $0 [--version] [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>$/;"	l
-_get_ext	V:/src/my/Makefile-Update/lib/Makefile/Update/Makefile.pm	/^    sub _get_ext { $_[0] =~ \/(\\.\\S+)$\/ ? $1 : undef }$/;"	s
-get_project_sources_and_headers	V:/src/my/Makefile-Update/bin/upmake	/^sub get_project_sources_and_headers$/;"	s
-read_files_list	V:/src/my/Makefile-Update/lib/Makefile/Update.pm	/^sub read_files_list$/;"	s
-update_bakefile_0	V:/src/my/Makefile-Update/lib/Makefile/Update/Bakefile0.pm	/^sub update_bakefile_0$/;"	s
-update_makefile	V:/src/my/Makefile-Update/lib/Makefile/Update/Makefile.pm	/^sub update_makefile$/;"	s
-update_msbuild	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild$/;"	s
-update_msbuild_filters	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild_filters$/;"	s
-update_msbuild_project	V:/src/my/Makefile-Update/lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild_project$/;"	s
-update_vcproj	V:/src/my/Makefile-Update/lib/Makefile/Update/VCProj.pm	/^sub update_vcproj$/;"	s
-upmake	V:/src/my/Makefile-Update/lib/Makefile/Update.pm	/^sub upmake$/;"	s
+Makefile::Update	lib/Makefile/Update.pm	/^package Makefile::Update;$/;"	p
+Makefile::Update::Bakefile0	lib/Makefile/Update/Bakefile0.pm	/^package Makefile::Update::Bakefile0;$/;"	p
+Makefile::Update::CMakefile	b:/src/perl/Makefile-Update/lib/Makefile/Update/CMakefile.pm	/^package Makefile::Update::CMakefile;$/;"	p
+Makefile::Update::CMakefile	lib/Makefile/Update/CMakefile.pm	/^package Makefile::Update::CMakefile;$/;"	p
+Makefile::Update::MSBuild	lib/Makefile/Update/MSBuild.pm	/^package Makefile::Update::MSBuild;$/;"	p
+Makefile::Update::Makefile	lib/Makefile/Update/Makefile.pm	/^package Makefile::Update::Makefile;$/;"	p
+Makefile::Update::VCProj	lib/Makefile/Update/VCProj.pm	/^package Makefile::Update::VCProj;$/;"	p
+Parameters	lib/Makefile/Update/MSBuild.pm	/^Parameters: input and output file handles and array references to the sources$/;"	l
+Parameters	lib/Makefile/Update/MSBuild.pm	/^Parameters: input and output file handles, array references to the sources$/;"	l
+Parameters	lib/Makefile/Update/VCProj.pm	/^Parameters: input and output file handles, array references to the sources$/;"	l
+Usage	bin/upmake	/^Usage: $0 [--version] [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>$/;"	l
+_get_ext	lib/Makefile/Update/Makefile.pm	/^    sub _get_ext { $_[0] =~ \/(\\.\\S+)$\/ ? $1 : undef }$/;"	s
+_var_to_cmake	b:/src/perl/Makefile-Update/lib/Makefile/Update/CMakefile.pm	/^sub _var_to_cmake$/;"	s
+get_project_sources_and_headers	bin/upmake	/^sub get_project_sources_and_headers$/;"	s
+read_files_list	lib/Makefile/Update.pm	/^sub read_files_list$/;"	s
+update_bakefile_0	lib/Makefile/Update/Bakefile0.pm	/^sub update_bakefile_0$/;"	s
+update_cmakefile	b:/src/perl/Makefile-Update/lib/Makefile/Update/CMakefile.pm	/^sub update_cmakefile$/;"	s
+update_cmakefile	lib/Makefile/Update/CMakefile.pm	/^sub update_cmakefile$/;"	s
+update_makefile	lib/Makefile/Update/Makefile.pm	/^sub update_makefile$/;"	s
+update_msbuild	lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild$/;"	s
+update_msbuild_filters	lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild_filters$/;"	s
+update_msbuild_project	lib/Makefile/Update/MSBuild.pm	/^sub update_msbuild_project$/;"	s
+update_vcproj	lib/Makefile/Update/VCProj.pm	/^sub update_vcproj$/;"	s
+upmake	lib/Makefile/Update.pm	/^sub upmake$/;"	s
+var_to_cmake	lib/Makefile/Update/CMakefile.pm	/^sub var_to_cmake$/;"	s

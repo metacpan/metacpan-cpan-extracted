@@ -398,10 +398,24 @@ sub write_pretty_meta {
     my $k    = shift;
     my $v    = shift;
 
-    $DB::single = 2;
+    my $t = $self->get_pretty_value( $k, $v );
+    if ( length($t) > 100 ) {
+        return "$self->{comment_char}\t$k:\n" . $t . "\n";
+    }
+    my $comment_char = $self->comment_char;
+    $t =~ s/#//;
+    $t =~ s/\t//;
+    return "$self->{comment_char}\t$k:\t" . $t . "\n";
+}
+
+sub get_pretty_value {
+    my $self = shift;
+    my $k    = shift;
+    my $v    = shift;
+
     my $t   = '';
     my $ref = 0;
-    if(ref($v)){
+    if ( ref($v) ) {
         $ref = 1;
         $v   = Dump($v);
     }
@@ -417,9 +431,7 @@ sub write_pretty_meta {
         $seen{$t} = 1;
     }
     $v = join( "\n", @uniq_array );
-    $t = "$self->{comment_char}\t$k:\n" . $v . "\n";
-
-    return $t;
+    return $v;
 }
 
 1;

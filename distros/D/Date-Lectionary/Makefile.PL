@@ -8,12 +8,12 @@ use File::ShareDir::Install;
 install_share dist => 'share';
 
 WriteMakefile(
-    NAME         => 'Date::Lectionary',
-    AUTHOR       => q{Michael Wayne Arnold <marmanold@cpan.org>},
-    VERSION_FROM => 'lib/Date/Lectionary.pm',
-    ABSTRACT     => 'Date::Lectionary - Readings for the Christian Lectionary',
-    LICENSE      => 'perl_5',
-    PL_FILES     => {},
+    NAME               => 'Date::Lectionary',
+    AUTHOR             => q{Michael Wayne Arnold <marmanold@cpan.org>},
+    VERSION_FROM       => 'lib/Date/Lectionary.pm',
+    ABSTRACT           => 'Date::Lectionary - Readings for the Christian Lectionary',
+    LICENSE            => 'freebsd',
+    PL_FILES           => {},
     MIN_PERL_VERSION   => 5.022000,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
@@ -38,6 +38,7 @@ WriteMakefile(
         'namespace::autoclean'         => '0.28',
         'File::Share'                  => '0.25',
         'XML::LibXML'                  => '2.0128',
+        'MooseX::StrictConstructor'    => '0.21',
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },
@@ -51,15 +52,15 @@ WriteMakefile(
         provides => {
             'Date::Lectionary' => {
                 file    => 'lib/Date/Lectionary.pm',
-                version => '1.20170809',
+                version => '1.20180109',
             },
             'Date::Lectionary::Day' => {
                 file    => 'lib/Date/Lectionary/Day.pm',
-                version => '1.20170809',
+                version => '1.20180109',
             },
             'Date::Lectionary::Year' => {
                 file    => 'lib/Date/Lectionary/Year.pm',
-                version => '1.20161227',
+                version => '1.20180109',
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

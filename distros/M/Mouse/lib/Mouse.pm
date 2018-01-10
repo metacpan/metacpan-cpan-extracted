@@ -3,7 +3,7 @@ use 5.008_005;
 
 use Mouse::Exporter; # enables strict and warnings
 
-use version; our $VERSION = version->declare('v2.5.0');
+use version; our $VERSION = version->declare('v2.5.1');
 
 use Carp         ();
 use Scalar::Util ();
@@ -160,7 +160,7 @@ Mouse - Moose minus the antlers
 
 =head1 VERSION
 
-This document describes Mouse version v2.5.0
+This document describes Mouse version v2.5.1
 
 =head1 SYNOPSIS
 
@@ -450,8 +450,7 @@ with plenty of code borrowed from L<Class::MOP> and L<Moose>
 =head1 BUGS
 
 All complex software has bugs lurking in it, and this module is no exception.
-Please report any bugs to C<bug-mouse at rt.cpan.org>, or through the web
-interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Mouse>
+Please report any bugs to L<https://github.com/gfx/p5-Mouse/issues>.
 
 =head1 COPYRIGHT AND LICENSE
 

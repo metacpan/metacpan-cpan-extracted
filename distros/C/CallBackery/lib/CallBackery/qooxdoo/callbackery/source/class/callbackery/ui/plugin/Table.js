@@ -74,11 +74,34 @@ qx.Class.define('callbackery.ui.plugin.Table', {
             var resizeBehavior = table.getTableColumnModel().getBehavior();
             cfg.table.forEach(function(col,i){
                 var tcm = table.getTableColumnModel();
-                if (col.type == 'date') {
-                    var cr =  new qx.ui.table.cellrenderer.Date;
-                    if (col.format != null) {
-                        cr.setDateFormat(new qx.util.format.DateFormat(col.format));
-                    }
+                var cr;
+                switch (col.type) {
+                    case 'date':
+                        cr =  new qx.ui.table.cellrenderer.Date;
+                        if (col.format != null) {
+                            cr.setDateFormat(new qx.util.format.DateFormat(col.format));
+                        }
+                        break;
+                    case 'str':
+                    case 'string':
+                        cr =  new qx.ui.table.cellrenderer.String(
+                            col.align,col.color,col.style,col.weight
+                        );
+                        break;
+                    case 'num':
+                    case 'number':
+                        cr =  new qx.ui.table.cellrenderer.Number(
+                            col.align,col.color,col.style,col.weight
+                        );
+                        if (col.format != null) {
+                            cr.setNumberFormat(
+                                new qx.util.format.NumberFormat(col.locale)
+                                    .set(col.format)
+                            );
+                        }
+                        break;
+                }
+                if (cr){
                     tcm.setDataCellRenderer(i, cr);
                 }
                 if (col.width != null){

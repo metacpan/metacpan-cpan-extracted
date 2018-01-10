@@ -1,7 +1,8 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: A simple auth module for a site
 
+#pod =encoding utf8
 #pod =head1 SYNOPSIS
 #pod
 #pod     # myapp.pl
@@ -330,8 +331,15 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
+=head1 DESCRIPTION
+
+This plugin provides a basic authentication and authorization scheme for
+a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
+then authorized to use the administration application and API.
+
+=encoding utf8
 =head1 SYNOPSIS
 
     # myapp.pl
@@ -384,12 +392,6 @@ version 0.008
             ],
         ],
     }
-
-=head1 DESCRIPTION
-
-This plugin provides a basic authentication and authorization scheme for
-a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
-then authorized to use the administration application and API.
 
 =head1 CONFIGURATION
 

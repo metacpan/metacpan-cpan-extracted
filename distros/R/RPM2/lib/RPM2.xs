@@ -28,12 +28,9 @@ void * _null_callback(
 	fnpyKey key, 
 	rpmCallbackData data)
 {
-	Header h = (Header) arg;
-	int flags = (int) ((long)data);
 	void * rc = NULL;
 	const char * filename = (const char *)key;
 	static FD_t fd = NULL;
-	int xx;
 
 	/* Code stolen from rpminstall.c and modified */
 	switch(what) {
@@ -45,7 +42,7 @@ void * _null_callback(
 			if (fd == NULL || Ferror(fd)) {
 				fprintf(stderr, "open of %s failed!\n", filename);
 				if (fd != NULL) {
-					xx = Fclose(fd);
+					Fclose(fd);
 					fd = NULL;
 				}
 			} else
@@ -65,7 +62,7 @@ void * _null_callback(
 				fd = fdFree(fd);
 #endif
 		if (fd != NULL) {
-			xx = Fclose(fd);
+			Fclose(fd);
 			fd = NULL;
 		}
 		break;
@@ -151,10 +148,8 @@ BOOT:
 	REGISTER_CONSTANT(RPMVSF_NOHDRCHK);
 	REGISTER_CONSTANT(RPMVSF_NEEDPAYLOAD);
 	REGISTER_CONSTANT(RPMVSF_NOSHA1HEADER);
-	REGISTER_CONSTANT(RPMVSF_NOMD5HEADER);
 	REGISTER_CONSTANT(RPMVSF_NODSAHEADER);
 	REGISTER_CONSTANT(RPMVSF_NORSAHEADER);
-	REGISTER_CONSTANT(RPMVSF_NOSHA1);
 	REGISTER_CONSTANT(RPMVSF_NOMD5);
 	REGISTER_CONSTANT(RPMVSF_NODSA);
 	REGISTER_CONSTANT(RPMVSF_NORSA);

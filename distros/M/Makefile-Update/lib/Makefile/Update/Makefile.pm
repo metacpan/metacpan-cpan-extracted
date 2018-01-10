@@ -7,7 +7,7 @@ our @EXPORT = qw(update_makefile);
 use strict;
 use warnings;
 
-our $VERSION = '0.3'; # VERSION
+our $VERSION = '0.4'; # VERSION
 
 
 
@@ -303,7 +303,7 @@ Makefile::Update::Makefile - Update lists of files in makefile variables.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

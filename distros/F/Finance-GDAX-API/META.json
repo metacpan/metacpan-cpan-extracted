@@ -4,7 +4,7 @@
       "Mark Rushing <mark@orbislumem.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Exception" : "0.35",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -44,9 +42,15 @@
             "namespace::autoclean" : "0.20",
             "perl" : "5.020"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.35",
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

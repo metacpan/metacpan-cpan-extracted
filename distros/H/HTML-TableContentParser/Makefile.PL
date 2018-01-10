@@ -11,6 +11,7 @@ my %arg = (
     'NAME'		=> 'HTML::TableContentParser',
     'VERSION_FROM'	=> 'lib/HTML/TableContentParser.pm', # finds $VERSION
     'PREREQ_PM'		=> {
+	'Carp'		=> 0,
 	'HTML::Parser'	=> 0,
 	'parent'	=> 0,
 	'strict'	=> 0,

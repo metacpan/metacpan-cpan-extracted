@@ -4,28 +4,27 @@ use 5.006;
 use strict;
 use warnings;
 use IO::File;
-use JIP::ClassField;
+use JIP::ClassField 0.05;
 use Carp qw(croak);
 use Fcntl qw(LOCK_EX LOCK_NB);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.05';
+our $VERSION = '0.051';
 
-has lock_file => (get => '+', set => '-');
-has is_locked => (get => '+', set => '-');
+has [qw(lock_file is_locked)] => (get => q{+}, set => q{-});
 
-has fh => (get => '-', set => '-');
+has fh => (get => q{-}, set => q{-});
 
 sub new {
     my ($class, %param) = @ARG;
 
     # Mandatory options
-    croak qq{Mandatory argument "lock_file" is missing\n}
+    croak q{Mandatory argument "lock_file" is missing}
         unless exists $param{'lock_file'};
 
     # Check "lock_file"
     my $lock_file = $param{'lock_file'};
-    croak qq{Bad argument "lock_file"\n}
+    croak q{Bad argument "lock_file"}
         unless defined $lock_file and length $lock_file;
 
     # Class to object
@@ -43,18 +42,18 @@ sub lock {
     return $self if $self->is_locked;
 
     my $fh = IO::File->new($self->lock_file, O_RDWR|O_CREAT)
-        or croak(sprintf qq{Can't open "%s": %s\n}, $self->lock_file, $OS_ERROR);
+        or croak(sprintf q{Can't open "%s": %s}, $self->lock_file, $OS_ERROR);
 
     flock $fh, LOCK_EX|LOCK_NB
-        or croak(sprintf qq{Can't lock "%s": %s\n}, $self->lock_file, $OS_ERROR);
+        or croak(sprintf q{Can't lock "%s": %s}, $self->lock_file, $OS_ERROR);
 
     truncate $fh, 0
-        or croak(sprintf qq{Can't truncate "%s": %s\n}, $self->lock_file, $OS_ERROR);
+        or croak(sprintf q{Can't truncate "%s": %s}, $self->lock_file, $OS_ERROR);
 
     autoflush $fh 1;
 
     $fh->print($self->_lock_message())
-        or croak(sprintf qq{Can't write message to file: %s\n}, $OS_ERROR);
+        or croak(sprintf q{Can't write message to file: %s}, $OS_ERROR);
 
     return $self->_set_fh($fh)->_set_is_locked(1);
 }
@@ -70,12 +69,12 @@ sub try_lock {
 
     if ($fh and flock $fh, LOCK_EX|LOCK_NB) {
         truncate $fh, 0
-            or croak(sprintf qq{Can't truncate "%s": %s\n}, $self->lock_file, $OS_ERROR);
+            or croak(sprintf q{Can't truncate "%s": %s}, $self->lock_file, $OS_ERROR);
 
         autoflush $fh 1;
 
         $fh->print($self->_lock_message())
-            or croak(sprintf qq{Can't write message to file: %s\n}, $OS_ERROR);
+            or croak(sprintf q{Can't write message to file: %s}, $OS_ERROR);
 
         return $self->_set_fh($fh)->_set_is_locked(1);
     }
@@ -93,7 +92,7 @@ sub unlock {
 
     # Close filehandle before file removing
     unlink $self->_set_fh(undef)->lock_file
-        or croak(sprintf qq{Can't unlink "%s": %s\n}, $self->lock_file, $OS_ERROR);
+        or croak(sprintf q{Can't unlink "%s": %s}, $self->lock_file, $OS_ERROR);
 
     return $self->_set_is_locked(0);
 }
@@ -121,7 +120,7 @@ JIP::LockFile - application lock/mutex based on files
 
 =head1 VERSION
 
-Version 0.05
+This document describes C<JIP::LockFile> version C<0.051>.
 
 =head1 SYNOPSIS
 
@@ -156,7 +155,7 @@ Version 0.05
 
 =head1 SEE ALSO
 
-Lock::File, Lock::Socket and JIP::LockSocket
+L<Lock::File>, L<Lock::Socket> and L<JIP::LockSocket>.
 
 =head1 AUTHOR
 
@@ -164,7 +163,7 @@ Vladimir Zhavoronkov, C<< <flyweight at yandex.ru> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Vladimir Zhavoronkov.
+Copyright 2015-2018 Vladimir Zhavoronkov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

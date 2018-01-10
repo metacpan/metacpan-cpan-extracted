@@ -24,7 +24,7 @@
 
   "provides" :
   {
-    "namespace"   : "<%= $p->{name} %>",
+    "namespace"   : "<%= $p->{qxclass} %>",
     "encoding"    : "utf-8",
     "class"       : "source/class",
     "resource"    : "source/resource",

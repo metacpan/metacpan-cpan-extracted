@@ -16,8 +16,12 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0'
   version: '0.9913'
+conflicts:
+  Any::Moose: '< 0.10'
+  MouseX::AttributeHelpers: '< 0.06'
+  MouseX::NativeTraits: '< 1.00'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +39,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.5.0
+    version: v2.5.1
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -72,15 +76,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.5.0
+    version: v2.5.1
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.5.0
+    version: v2.5.1
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.5.0
+    version: v2.5.1
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -101,7 +105,7 @@ resources:
   bugtracker: https://github.com/gfx/p5-Mouse/issues
   homepage: https://github.com/gfx/p5-Mouse
   repository: git://github.com/gfx/p5-Mouse.git
-version: v2.5.0
+version: v2.5.1
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'

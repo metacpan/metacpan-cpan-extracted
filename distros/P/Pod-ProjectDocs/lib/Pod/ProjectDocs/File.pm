@@ -3,7 +3,7 @@ package Pod::ProjectDocs::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose::Role;
 use IO::File;

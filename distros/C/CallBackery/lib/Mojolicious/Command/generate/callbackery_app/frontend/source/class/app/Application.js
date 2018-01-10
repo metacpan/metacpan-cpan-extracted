@@ -7,10 +7,10 @@
 
 /**
  * Main application class.
- * @asset(<%= $p->{name} %>/*)
+ * @asset(<%= $p->{qxclass} %>/*)
  *
  */
-qx.Class.define("<%= $p->{name} %>.Application", {
+qx.Class.define("<%= $p->{qxclass} %>.Application", {
     extend : callbackery.Application,
     members : {
         main : function() {

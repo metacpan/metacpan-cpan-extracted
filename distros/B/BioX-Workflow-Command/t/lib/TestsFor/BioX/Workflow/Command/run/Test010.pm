@@ -8,7 +8,6 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use BioX::Workflow::Command;
 use YAML::XS;
-use Data::Walk;
 use File::Slurp;
 use File::Spec;
 use DateTime;

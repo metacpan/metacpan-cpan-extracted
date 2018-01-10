@@ -2,8 +2,8 @@ NAME
     CryptoCurrency::Catalog - Catalog of cryptocurrencies
 
 VERSION
-    This document describes version 20180106 of CryptoCurrency::Catalog
-    (from Perl distribution CryptoCurrency-Catalog), released on 2018-01-06.
+    This document describes version 20180109 of CryptoCurrency::Catalog
+    (from Perl distribution CryptoCurrency-Catalog), released on 2018-01-09.
 
 SYNOPSIS
      use CryptoCurrency::Catalog;
@@ -24,8 +24,7 @@ DESCRIPTION
     This class attempts to provide a list/catalog of cryptocurrencies. The
     main source for this catalog is the Cryptocurrency Market
     Capitalizations website (<https://coinmarketcap.com/>, or CMC for
-    short). This catalog is updated to the list on CMC as of Jan 6, 2018
-    (1384 coins and tokens).
+    short).
 
     CMC does not provide unique symbols nor unique names, only unique
     "safenames" (slugs). Whenever there is a clash, this catalog modifies
@@ -66,6 +65,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    CryptoExchange::Catalog
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

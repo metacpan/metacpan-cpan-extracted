@@ -68,4 +68,5 @@ has 'HPC' => (
 #     return $hpc_hash;
 # }
 
+no Moose;
 1;

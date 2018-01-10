@@ -57,6 +57,9 @@ sub execute {
     $self->write_workflow_meta('start');
 
     $self->iterate_rules;
+    
+    $self->post_process_rules;
+    $self->fh->close();
 }
 
 

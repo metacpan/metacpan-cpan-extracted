@@ -1,5 +1,5 @@
 package Bio::Roary::ExtractProteomeFromGFF;
-$Bio::Roary::ExtractProteomeFromGFF::VERSION = '3.11.0';
+$Bio::Roary::ExtractProteomeFromGFF::VERSION = '3.11.1';
 # ABSTRACT: Take in a GFF file and create protein sequences in FASTA format
 
 
@@ -121,8 +121,13 @@ sub _cleanup_fasta {
     open( my $in,  '<', $infile );
     open( my $out, '>', $outfile );
     while ( my $line = <$in> ) {
-        chomp $line;
-        $line =~ s/"//g if ( $line =~ /^>/ );
+       chomp $line;
+       if ( $line =~ /^>/ )
+	   {
+	   	 $line =~ s/"//g;
+		 # newer versions of Bedtools add (-) or (+) to the end of the sequence name, remove them
+		 $line =~ s!\([-+]\)!!;
+	   }
 	
 	if($line =~ /^(>[^:]+)/)
 	{
@@ -217,7 +222,7 @@ Bio::Roary::ExtractProteomeFromGFF - Take in a GFF file and create protein seque
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

@@ -141,7 +141,7 @@ $sunday = Date::Lectionary->new(
     'date' => Time::Piece->strptime( "2015-02-08", "%Y-%m-%d" ) );
 is(
     $sunday->day->commonName,
-    "The Fifth Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2015-02-08 returns the correct day.'
 );
 
@@ -149,7 +149,7 @@ $sunday = Date::Lectionary->new(
     'date' => Time::Piece->strptime( "2015-02-15", "%Y-%m-%d" ) );
 is(
     $sunday->day->commonName,
-    "The Sixth Sunday of Epiphany",
+    "The Last Sunday after Epiphany",
     'Validating that 2015-02-15 returns the correct day.'
 );
 
@@ -489,7 +489,7 @@ $sunday = Date::Lectionary->new(
     'date' => Time::Piece->strptime( "2016-01-31", "%Y-%m-%d" ) );
 is(
     $sunday->day->commonName,
-    "The Fourth Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2016-01-31 returns the correct day.'
 );
 
@@ -497,7 +497,7 @@ $sunday = Date::Lectionary->new(
     'date' => Time::Piece->strptime( "2016-02-07", "%Y-%m-%d" ) );
 is(
     $sunday->day->commonName,
-    "The Fifth Sunday of Epiphany",
+    "The Last Sunday after Epiphany",
     'Validating that 2016-02-07 returns the correct day.'
 );
 
@@ -850,7 +850,7 @@ $sunday = Date::Lectionary->new(
     'date' => Time::Piece->strptime( "2017-02-19", "%Y-%m-%d" ) );
 is(
     $sunday->day->commonName,
-    "The Seventh Sunday of Epiphany",
+    "The Second to Last Sunday after Epiphany",
     'Validating that 2017-02-19 returns the correct day.'
 );
 

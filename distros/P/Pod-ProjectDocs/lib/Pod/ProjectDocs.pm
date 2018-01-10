@@ -3,7 +3,7 @@ package Pod::ProjectDocs;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';    # VERSION
+our $VERSION = '0.50';    # VERSION
 
 use Moose;
 
@@ -55,6 +55,8 @@ sub BUILDARGS {
 
     # check mtime by default, but can be overridden
     $args{forcegen} ||= 0;
+
+    $args{nosourcecode} = 0 if !defined $args{nosourcecode};
 
     $args{except} ||= [];
     $args{except} = [ $args{except} ] unless ref $args{except};
@@ -125,7 +127,9 @@ sub gen {
             );
 
             if ( $self->config->forcegen || $doc->is_modified ) {
-                $doc->copy_src();
+                if ( !$self->config->nosourcecode ) {
+                    $doc->copy_src();
+                }
                 $doc->publish($html);
             }
         }
@@ -253,6 +257,10 @@ set this language as xml:lang (default 'en')
 
 whether you want to generate HTML document even if source files are not updated (default is 0).
 
+=item C<nosourcecode>
+
+whether to suppress inclusion of the original source code in the generated output (default is 0).
+
 =item C<except>
 
 the files matches this regex won't be parsed.
@@ -296,7 +304,7 @@ L<Pod::Simple::XHTML>
 
 =item © 2005 by Lyo Kato
 
-=item © 2017 by Martin Gruner
+=item © 2018 by Martin Gruner
 
 =back
 

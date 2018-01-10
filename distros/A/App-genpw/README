@@ -1,0 +1,112 @@
+NAME
+    App::genpw - Generate random password
+
+VERSION
+    This document describes version 0.002 of App::genpw (from Perl
+    distribution App-genpw), released on 2018-01-09.
+
+SYNOPSIS
+    See the included script genpw.
+
+FUNCTIONS
+  genpw
+    Usage:
+
+     genpw(%args) -> [status, msg, result, meta]
+
+    Generate random password.
+
+    This is yet another utility to generate random password. Features:
+
+    *   Allow specifying pattern(s), e.g. '%8a%s' means 8 random
+        alphanumeric characters followed by a symbol.
+
+    *   Use strong random source (Math::Random::Secure) when available,
+        otherwise fallback to Perl's builtin "rand()".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   case => *str* (default: "default")
+
+        Force casing.
+
+        "default" means to not change case. "random" changes casing some
+        letters randomly to lower-/uppercase. "lower" forces lower case.
+        "upper" forces UPPER CASE. "title" forces Title case.
+
+    *   len => *posint*
+
+        If no pattern is supplied, will generate random alphanum characters
+        with this exact length.
+
+    *   max_len => *posint*
+
+        If no pattern is supplied, will generate random alphanum characters
+        with this maximum length.
+
+    *   min_len => *posint*
+
+        If no pattern is supplied, will generate random alphanum characters
+        with this minimum length.
+
+    *   num => *int* (default: 1)
+
+    *   patterns => *array[str]*
+
+        Pattern(s) to use.
+
+        A pattern is string that is similar to a printf pattern. %P (where P
+        is certain letter signifying a format) will be replaced with some
+        other string. %Nw (where N is a number) will be replaced by a word
+        of length N, %N$MP (where N and M is a number) will be replaced by a
+        word of length between N and M. Anything else will be used as-is.
+        Available conversions:
+
+         %l   Random Latin letter (A-Z, a-z)
+         %d   Random digit (0-9)
+         %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
+         %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
+         %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+         %%   A literal percent sign
+         %w   Random word
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-genpw>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-genpw>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-genpw>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    A few other utilities based on genpw: genpw-id (from App::genpw::id) and
+    genpw-wordlist (from App::genpw::wordlist).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

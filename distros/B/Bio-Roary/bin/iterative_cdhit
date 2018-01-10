@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::IterativeCdhit;
-$Bio::Roary::Main::IterativeCdhit::VERSION = '3.11.0';
+$Bio::Roary::Main::IterativeCdhit::VERSION = '3.11.1';
 # ABSTRACT: Iteratively run cdhit
 # PODNAME:  iterative_cdhit
 
@@ -25,7 +25,7 @@ iterative_cdhit - Iteratively run cdhit
 
 =head1 VERSION
 
-version 3.11.0
+version 3.11.1
 
 =head1 SYNOPSIS
 

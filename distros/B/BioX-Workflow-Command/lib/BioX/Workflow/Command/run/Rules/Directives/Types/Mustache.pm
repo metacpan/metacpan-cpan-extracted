@@ -59,4 +59,6 @@ sub render_mustache {
     return $text;
 }
 
+no Moose;
+
 1;

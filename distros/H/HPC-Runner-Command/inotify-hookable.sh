@@ -4,6 +4,10 @@ export DEV='DEV'
 RSYNC_HPC="rsync -avz ../HPC-Runner-Command gencore@dalma.abudhabi.nyu.edu:/home/gencore/hpcrunner-test/"
 RSYNC_BIOSAILS="rsync -avz ../BioSAILs gencore@dalma.abudhabi.nyu.edu:/home/gencore/hpcrunner-test/"
 RSYNC_SQL="rsync -avz ../HPC-Runner-Command-Plugin-Logger-Sqlite gencore@dalma.abudhabi.nyu.edu:/home/gencore/hpcrunner-test/"
+
+$RSYNC_HPC
+$RSYNC_BIOSAILS
+
 inotify-hookable \
     --watch-directories /home/jillian/Dropbox/projects/HPC-Runner-Libs/New/BioSAILs/lib \
     --watch-directories lib \

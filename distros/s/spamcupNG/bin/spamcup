@@ -10,7 +10,7 @@ use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use SpamcupNG qw(main_loop get_browser read_config %MAP);
 
-our $VERSION = '0.6'; #VERSION
+our $VERSION = '0.7'; #VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -352,7 +352,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Term-YAP. If not, see <http://www.gnu.org/licenses/>.
+along with spamcupNG. If not, see <http://www.gnu.org/licenses/>.
 
 =cut
 

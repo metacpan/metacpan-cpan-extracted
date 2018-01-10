@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use File::Slurper qw(read_text write_text);
+use LWP::Simple;
+
+my $url = "https://coinmarketcap.com/exchanges/volume/24-hour/all/";
+my $cache_path = "$Bin/../devdata/cmc.html";
+my $csv_path = "$Bin/../devdata/scrape-result.csv";
+
+my $content;
+{
+    if (!(@ARGV && $ARGV[0] =~ /^(-f|--force)$/) && (-f $cache_path) && (-M _) < 1.0) {
+        $content = read_text $cache_path;
+    } else {
+        $content = get $url;
+        write_text($cache_path, $content);
+    }
+}
+
+my @res;
+
+push @res, "name\tsafename\n";
+while ($content =~ m!<a href="/exchanges/(?<safename>[^/]+?)/?">(?<name>.+?)</a></h3></td>!g) {
+    push @res, "$+{name}\t$+{safename}\n";
+}
+
+write_text($csv_path, join("", @res));

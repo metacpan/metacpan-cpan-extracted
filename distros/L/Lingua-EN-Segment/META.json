@@ -51,7 +51,7 @@
          "web" : "https://github.com/skington/lingua-en-segment"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

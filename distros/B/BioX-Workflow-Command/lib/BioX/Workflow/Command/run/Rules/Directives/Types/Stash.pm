@@ -43,4 +43,7 @@ sub merge_stash {
     $self->stash($merged_data);
 }
 
+# no Moose;
+no Moose::Role;
+
 1;

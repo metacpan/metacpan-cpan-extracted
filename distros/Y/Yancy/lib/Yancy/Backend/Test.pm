@@ -1,5 +1,5 @@
 package Yancy::Backend::Test;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: A test backend for testing Yancy
 
 use v5.24;
@@ -10,6 +10,7 @@ use Mojo::JSON qw( from_json );
 use Mojo::File qw( path );
 
 our %COLLECTIONS = ();
+our %SCHEMA = ();
 
 sub new( $class, $url, $collections ) {
     my ( $path ) = $url =~ m{^[^:]+://[^/]+(?:/(.+))?$};
@@ -71,6 +72,10 @@ sub delete( $self, $coll, $id ) {
     delete $COLLECTIONS{ $coll }{ $id };
 }
 
+sub read_schema( $self ) {
+    return { %SCHEMA };
+}
+
 1;
 
 __END__
@@ -83,7 +88,7 @@ Yancy::Backend::Test - A test backend for testing Yancy
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for PkgConfig
 
+0.19026 2017-11-21
+  - Fix requirements for optional Perl::MinimumVersion test
+
 0.18026 2017-11-21
   - Add support for Slackware 64bit
 

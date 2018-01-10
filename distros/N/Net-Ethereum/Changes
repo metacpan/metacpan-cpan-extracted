@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Ethereum.
 
+0.27 09.01.2018
+  - alpha release.
+
 0.01  Sun Dec 17 23:49:53 2017
 	- original version; created by h2xs 1.23 with options
 		-XAn Net::Ethereum

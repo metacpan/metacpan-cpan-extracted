@@ -1,0 +1,35 @@
+NAME
+
+    WebService::Cryptopia
+
+DESCRIPTION
+
+    Query the Cryptopia API
+
+    https://www.cryptopia.co.nz/Forum/Thread/255
+
+ATTRIBUTES
+
+    user_agent
+
+      Optional. A new LWP::UserAgent will be created for you if you don't
+      already have one you'd like to reuse.
+
+    base_url
+
+      Optional. Default: https://www.cryptopia.co.nz/api/
+
+METHODS
+
+    api_public
+
+      Query the public API
+
+COPYRIGHT
+
+    Copyright 2018, Robin Clarke, Germany
+
+AUTHOR
+
+    Robin Clarke <perl@robinclarke.net>
+

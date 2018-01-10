@@ -3,9 +3,9 @@ NAME
     PERLANCAR when you build your dists
 
 VERSION
-    This document describes version 0.590 of
+    This document describes version 0.591 of
     Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution
-    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-08-01.
+    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2018-01-10.
 
 SYNOPSIS
      # dist.ini
@@ -34,10 +34,10 @@ DESCRIPTION
     you are not using any Rinci metadata in the code.
 
     There are extra stuffs related to checking prerequisites: I have a
-    blacklist of prerequisites to avoid so [Acme::CPANLists::Blacklist] will
-    fail the build if any of the blacklisted modules are used as a
+    blacklist of prerequisites to avoid so [Acme::CPANModules::Blacklist]
+    will fail the build if any of the blacklisted modules are used as a
     prerequisite (unless the prerequisite is explicitly whitelisted by
-    [Acme::CPANLists::Whitelist]). I avoid circular dependencies using
+    [Acme::CPANModules::Whitelist]). I avoid circular dependencies using
     [Prereqs::CheckCircular]. And I also maintain a file called
     pmversions.ini where I put minimum versions of some modules and check
     this using [Prereqs::EnsureVersion].
@@ -63,8 +63,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

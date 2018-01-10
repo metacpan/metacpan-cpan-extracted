@@ -1,7 +1,6 @@
 Build.PL
 Changes
 LICENSE
-MANIFEST.SKIP
 META.json
 README.md
 benchmarks/accessors.pl
@@ -51,7 +50,6 @@ lib/Squirrel/Role.pm
 lib/Test/Mouse.pm
 lib/ouse.pm
 minil.toml
-mouse.h
 t/000-load.t
 t/000_recipes/002_schwartz_tutorial.t
 t/000_recipes/basics-recipe10.t
@@ -383,9 +381,6 @@ xs-src/MouseAccessor.xs
 xs-src/MouseAttribute.xs
 xs-src/MouseTypeConstraints.xs
 xs-src/MouseUtil.xs
-xt/001-pod.t
-xt/003-pod_coverage.t
-xt/005-dbsub.t
-xt/006-perlcritic.t
+xs-src/mouse.h
 META.yml
 MANIFEST

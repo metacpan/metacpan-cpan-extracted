@@ -14,7 +14,7 @@ my $csv_path = "$Bin/../devdata/scrape-result.csv";
 
 my $content;
 {
-    if ((-f $cache_path) && (-M _) < 1.0) {
+    if (!(@ARGV && $ARGV[0] =~ /^(-f|--force)$/) && (-f $cache_path) && (-M _) < 1.0) {
         $content = read_text $cache_path;
     } else {
         $content = get $url;

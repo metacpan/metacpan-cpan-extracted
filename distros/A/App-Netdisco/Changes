@@ -1,3 +1,31 @@
+2.038009
+
+  [BUG FIXES]
+
+  * Fix for VLAN setting missing a variable declaration
+
+2.038008
+
+  [BUG FIXES]
+
+  * Add updated Test::More dependency to get tests passing again.
+
+2.038007
+
+  [BUG FIXES]
+
+  * Fix for VLAN setting missing a variable declaration
+
+2.038006
+
+  [ENHANCEMENTS]
+
+  * Ignore jobs started over 50 minutes ago (setting: jobs_stale_after)
+
+  [BUG FIXES]
+
+  * Update tests to work again in Travis-CI
+
 2.038005 - 2018-01-05
 
   [BUG FIXES]

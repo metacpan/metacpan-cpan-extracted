@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.590'; # VERSION
+our $DATE = '2018-01-10'; # DATE
+our $VERSION = '0.591'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -47,7 +47,7 @@ sub configure {
         'Test::Rinci',
         'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
-        ['Acme::CPANLists::Blacklist' => {module_list=>[q[PERLANCAR::Avoided::Modules I'm currently avoiding]]}],
+        ['Acme::CPANModules::Blacklist' => {module=>[q[PERLANCAR::Avoided]]}],
         'Prereqs::EnsureVersion',
         'Prereqs::CheckCircular',
         'UploadToCPAN::WWWPAUSESimple',
@@ -71,7 +71,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.590 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-08-01.
+This document describes version 0.591 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2018-01-10.
 
 =head1 SYNOPSIS
 
@@ -102,10 +102,10 @@ are not using any Rinci metadata in the code.
 
 There are extra stuffs related to checking prerequisites: I have a blacklist of
 prerequisites to avoid so
-L<[Acme::CPANLists::Blacklist]|Dist::Zilla::Plugin::Acme::CPANLists::Blacklist>
+L<[Acme::CPANModules::Blacklist]|Dist::Zilla::Plugin::Acme::CPANModules::Blacklist>
 will fail the build if any of the blacklisted modules are used as a prerequisite
 (unless the prerequisite is explicitly whitelisted by
-L<[Acme::CPANLists::Whitelist]|Dist::Zilla::Plugin::Acme::CPANLists::Whitelist>).
+L<[Acme::CPANModules::Whitelist]|Dist::Zilla::Plugin::Acme::CPANModules::Whitelist>).
 I avoid circular dependencies using
 L<[Prereqs::CheckCircular]|Dist::Zilla::Plugin::Prereqs::CheckCircular>. And I
 also maintain a file called F<pmversions.ini> where I put minimum versions of
@@ -136,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

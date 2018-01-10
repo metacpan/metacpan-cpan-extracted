@@ -528,7 +528,7 @@ require AutoLoader;
 
 @EXPORT_OK = qw( ish_int is_int is_string is_double blessed reftype
 		 refaddr is_overloaded is_object is_key set weak_set );
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 bootstrap Set::Object $VERSION;
 

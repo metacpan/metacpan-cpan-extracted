@@ -1,13 +1,12 @@
 #!perl -Tw
 
-use Test::More tests => 2;
+use strict;
+use warnings;
 
-BEGIN {
-    use_ok( 'HTML::Lint' );
-}
+use Test::More tests => 1;
 
-BEGIN {
-    use_ok( 'Test::HTML::Lint' );
-}
+use HTML::Lint;
+use Test::HTML::Lint;
 
+pass( 'Loaded modules' );
 diag( "Testing HTML::Lint $HTML::Lint::VERSION, Perl $], $^X" );

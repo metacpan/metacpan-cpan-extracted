@@ -21,10 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "English" : "0",
-            "Test::More" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -38,8 +35,27 @@
             "Scalar::Util" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/outtaspace/jip_object/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/outtaspace/jip_object.git",
+         "web" : "https://github.com/outtaspace/jip_object"
+      }
+   },
+   "version" : "0.031"
 }

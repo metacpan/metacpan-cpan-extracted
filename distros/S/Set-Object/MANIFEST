@@ -1,4 +1,5 @@
 Changes.pod
+INSTALL.SKIP
 LICENSE
 lib/Set/Object.pm
 lib/Set/Object/Weak.pm
