@@ -1,5 +1,5 @@
 #
-# $Id: Compress.pm,v a9a714e19391 2017/04/17 08:11:42 gomor $
+# $Id: Compress.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # string::gzip Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: a9a714e19391 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable gzip gunzip unzip uncompress) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -47,16 +47,16 @@ sub gunzip {
       return $self->log->error("gunzip: empty data, nothing to decompress");
    }
 
-   $self->debug && $self->log->debug("gunzip: length[".length($data)."]");
+   $self->log->debug("gunzip: length[".length($data)."]");
 
-   $self->debug && $self->log->debug("gunzip: starting");
+   $self->log->debug("gunzip: starting");
 
    my $plain = Gzip::Faster::gunzip($data)
       or return $self->log->error("gunzip: error");
 
-   $self->debug && $self->log->debug("gunzip: finished");
+   $self->log->debug("gunzip: finished");
 
-   $self->debug && $self->log->debug("gunzip: length[".length($plain)."]");
+   $self->log->debug("gunzip: length[".length($plain)."]");
 
    return \$plain;
 }
@@ -87,7 +87,7 @@ Metabrik::String::Compress - string::compress Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -126,8 +126,8 @@ cmp_deeply(
     $tzil->distmeta,
     superhashof({
         prereqs => superhashof({
-            develop => superhashof({
-                suggests => all(
+            $PREREQ_PHASE_DEFAULT=> superhashof({
+                    $PREREQ_RELATIONSHIP_DEFAULT => all(
                     superhashof({ 'Dist::Zilla::PluginBundle::Filter' => '4.000' }),
                     notexists(map { Dist::Zilla::Util->expand_config_package_name($_) } @bundle_plugins),
                 ),

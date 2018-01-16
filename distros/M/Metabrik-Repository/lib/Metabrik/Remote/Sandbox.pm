@@ -1,5 +1,5 @@
 #
-# $Id: Sandbox.pm,v a483f00cce99 2017/03/20 16:50:45 gomor $
+# $Id: Sandbox.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # remote::sandbox Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Remote::Winexe);
 
 sub brik_properties {
    return {
-      revision => '$Revision: a483f00cce99 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -386,7 +386,7 @@ sub loop_and_download_created_files {
 
    $self->brik_help_run_undef_arg('create_client', $self->_client) or return;
 
-   $output_dir ||= $self->shell->full_pwd;
+   $output_dir ||= defined($self->shell) && $self->shell->full_pwd || '/tmp';
 
    if (defined($processes)) {
       $self->brik_help_run_undef_arg('loop_and_download_created_files', $processes)
@@ -476,7 +476,7 @@ Metabrik::Remote::Sandbox - remote::sandbox Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

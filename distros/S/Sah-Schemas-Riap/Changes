@@ -1,4 +1,8 @@
-Revision history for Sah-Schemas-Riap
+1.2.4.2  2018-01-14 (PERLANCAR)
+
+        - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
+          Perinci::Sub::XCompletion::* modules.
+
 
 1.2.4.1  2016-07-25 (PERLANCAR)
 

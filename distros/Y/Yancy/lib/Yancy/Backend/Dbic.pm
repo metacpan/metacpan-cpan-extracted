@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -89,40 +89,51 @@ our $VERSION = '0.009';
 #pod
 #pod =cut
 
-use v5.24;
 use Mojo::Base 'Mojo';
-use experimental qw( signatures postderef );
 use Scalar::Util qw( looks_like_number );
-use Module::Runtime qw( use_module );
+use Mojo::Loader qw( load_class );
 
 has collections => ;
 has dbic =>;
 
-sub new( $class, $url, $collections ) {
-    my ( $dbic_class, $dsn, $optstr ) = $url =~ m{^[^:]+://([^/]+)/([^?]+)(?:\?(.+))?$};
+sub new {
+    my ( $class, $backend, $collections ) = @_;
+    if ( !ref $backend ) {
+        my ( $dbic_class, $dsn, $optstr ) = $backend =~ m{^[^:]+://([^/]+)/([^?]+)(?:\?(.+))?$};
+        if ( my $e = load_class( $dbic_class ) ) {
+            die ref $e ? "Could not load class $dbic_class: $e" : "Could not find class $dbic_class";
+        }
+        $backend = $dbic_class->connect( $dsn );
+    }
     my %vars = (
         collections => $collections,
-        dbic => use_module( $dbic_class )->connect( $dsn ),
+        dbic => $backend,
     );
     return $class->SUPER::new( %vars );
 }
 
-sub _rs( $self, $coll, $params={}, $opt={} ) {
+sub _rs {
+    my ( $self, $coll, $params, $opt ) = @_;
+    $params ||= {}; $opt ||= {};
     my $rs = $self->dbic->resultset( $coll )->search( $params, $opt );
     $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
     return $rs;
 }
 
-sub create( $self, $coll, $params ) {
+sub create {
+    my ( $self, $coll, $params ) = @_;
     my $created = $self->dbic->resultset( $coll )->create( $params );
     return { $created->get_columns };
 }
 
-sub get( $self, $coll, $id ) {
+sub get {
+    my ( $self, $coll, $id ) = @_;
     return $self->_rs( $coll )->find( $id );
 }
 
-sub list( $self, $coll, $params={}, $opt={} ) {
+sub list {
+    my ( $self, $coll, $params, $opt ) = @_;
+    $params ||= {}; $opt ||= {};
     my %rs_opt = (
         order_by => $opt->{order_by},
     );
@@ -138,15 +149,18 @@ sub list( $self, $coll, $params={}, $opt={} ) {
     return { rows => [ $rs->all ], total => $self->_rs( $coll, $params )->count };
 }
 
-sub set( $self, $coll, $id, $params ) {
+sub set {
+    my ( $self, $coll, $id, $params ) = @_;
     return $self->dbic->resultset( $coll )->find( $id )->set_columns( $params )->update;
 }
 
-sub delete( $self, $coll, $id ) {
+sub delete {
+    my ( $self, $coll, $id ) = @_;
     $self->dbic->resultset( $coll )->find( $id )->delete;
 }
 
-sub read_schema( $self ) {
+sub read_schema {
+    my ( $self ) = @_;
     my %schema;
 
     my @tables = $self->dbic->sources;
@@ -163,7 +177,7 @@ sub read_schema( $self ) {
                 _map_type( $c->{data_type} // 'varchar' ),
             };
             if ( !$c->{is_nullable} && !$is_auto && !$c->{default} ) {
-                push $schema{ $table }{ required }->@*, $column;
+                push @{ $schema{ $table }{ required } }, $column;
             }
         }
         my @keys = $source->primary_columns;
@@ -175,7 +189,8 @@ sub read_schema( $self ) {
     return \%schema;
 }
 
-sub _map_type( $db_type ) {
+sub _map_type {
+    my ( $db_type ) = @_;
     if ( $db_type =~ /^(?:text|varchar)/i ) {
         return ( type => 'string' );
     }
@@ -204,7 +219,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

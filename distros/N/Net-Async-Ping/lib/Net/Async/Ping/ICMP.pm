@@ -1,5 +1,5 @@
 package Net::Async::Ping::ICMP;
-$Net::Async::Ping::ICMP::VERSION = '0.003000';
+$Net::Async::Ping::ICMP::VERSION = '0.003001';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -11,7 +11,7 @@ use Net::Ping;
 use IO::Async::Socket;
 use Scalar::Util qw/blessed/;
 
-use Socket qw( SOCK_RAW SOCK_DGRAM AF_INET NI_NUMERICHOST inet_aton pack_sockaddr_in unpack_sockaddr_in getnameinfo inet_ntop);
+use Socket qw( SOCK_RAW SOCK_DGRAM AF_INET IPPROTO_ICMP NI_NUMERICHOST inet_aton pack_sockaddr_in unpack_sockaddr_in getnameinfo inet_ntop);
 
 use constant ICMP_ECHOREPLY   => 0; # ICMP packet types
 use constant ICMP_UNREACHABLE => 3; # ICMP packet types
@@ -78,18 +78,16 @@ sub ping {
     my $t0 = [Time::HiRes::gettimeofday];
 
     my $fh = IO::Socket->new;
-    my $proto_num = (getprotobyname('icmp'))[2] ||
-        croak("Can't get icmp protocol by name");
     # Let's try a ping socket (unprivileged ping) first. See
     # https://lwn.net/Articles/422330/
     my ($ping_socket, $ident);
-    if ($self->use_ping_socket && $fh->socket(AF_INET, SOCK_DGRAM, $proto_num))
-    {
+    if ($self->use_ping_socket
+        && $fh->socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP)) {
         $ping_socket = 1;
         ($ident) = unpack_sockaddr_in getsockname($fh);
     }
     else {
-        $fh->socket(AF_INET, SOCK_RAW, $proto_num) ||
+        $fh->socket(AF_INET, SOCK_RAW, IPPROTO_ICMP) ||
             croak("Unable to create ICMP socket ($!). Are you running as root?"
               ." If not, and your system supports ping sockets, try setting"
               ." /proc/sys/net/ipv4/ping_group_range");
@@ -105,7 +103,7 @@ sub ping {
 
     $loop->resolver->getaddrinfo(
        host     => $host,
-       protocol => $proto_num,
+       protocol => IPPROTO_ICMP,
        family   => AF_INET,
     )->then( sub {
 
@@ -201,7 +199,7 @@ Net::Async::Ping::ICMP
 
 =head1 VERSION
 
-version 0.003000
+version 0.003001
 
 =head1 DESCRIPTION
 
@@ -253,13 +251,23 @@ An error was received from L<IO::Async::Socket>.
 
 Net::Async::Ping::ICMP
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

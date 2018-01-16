@@ -4,13 +4,13 @@ package App::PDF::Link;
 
 # pdflink -- insert file links in PDF documents
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Author          : Johan Vromans
 # Created On      : Thu Sep 15 11:43:40 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jun 23 11:08:15 2017
-# Update Count    : 319
+# Last Modified On: Wed Jan 10 13:30:57 2018
+# Update Count    : 340
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -85,7 +85,9 @@ sub linktargets {
     my $x;			# current x for icon
     my $y;			# current y for icon
     my $did;
-    my $embed = $env->{embed};
+    my $embed = $env->{embed};	# 0 = linked
+				# 1 = embedded
+				# 2 = attached
 
     foreach ( @targets ) {
 	unless ( -r $_ ) {
@@ -97,17 +99,17 @@ sub linktargets {
 	my $t = substr( $_, length(File::Spec->catpath($v, $d||"", "") ) );
 	( my $ext = $t ) =~ s;^.*\.(\w+)$;$1;;
 	my $p = get_icon( $env, $pdf, $ext );
-	my $action =
-	  $p
-	    ? $embed
-	      ? $embed == 2 ? "attached" : "embedded"
-	      : "linked"
-	    : "ignored";
-
-	if ( $env->{verbose} ) {
-	    warn("\tFile: ", encode_utf8($t), " ($action)\n");
+	unless ( $p ) {
+	    warn("\tFile: ", encode_utf8($t), " (ignored)\n");
+	    next;
 	}
-	next unless $p;
+
+	my $action =
+	  $embed
+	    ? $embed == 2 ? "attached" : "embedded"
+	      : "linked";
+
+	warn("\tFile: ", encode_utf8($t), " ($action)\n");
 
 	my $dx = $env->{iconsz} + $env->{padding};
 	my $dy = $env->{iconsz} + $env->{padding};
@@ -319,9 +321,13 @@ sub app_setup {
     my $pod2usage = sub {
         # Load Pod::Usage only if needed.
         require Pod::Usage;
-        require Pod::Find;
-        Pod::Usage->import;
-        &pod2usage( -input => Pod::Find::pod_where({-inc => 1}, __PACKAGE__), @_ );
+ 	my $f = __FILE__;
+	if ( $App::Packager::PACKAGED ) {
+	    $f = App::Packager::GetResource("pod/pdflink.pod");
+	    unshift( @_, -noperldoc => 1 );
+	}
+        unshift( @_, -input => $f );
+	&Pod::Usage::pod2usage;
     };
 
     # Collect command line options in a hash, for they will be needed
@@ -339,7 +345,7 @@ sub app_setup {
 	  'all',
 	  'xpos=i',
 	  'ypos=i',
-	  'iconsize|icon=i',
+	  'iconsz|iconsize|icon=i',
 	  'icons=s%',
 	  'padding=i',
 	  'vertical',

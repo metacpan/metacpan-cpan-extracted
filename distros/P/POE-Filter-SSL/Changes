@@ -147,3 +147,7 @@ Revision history for POE-Filter-SSL
 0.38	09.12.2017
 	chain-option leaded to ignore key/crt option
 
+0.39	12.01.2018
+	Request client cerfificat only if 'clientcert'-Option has been set
+	Fixed typos in POD (rt.cpan.org #113644)
+

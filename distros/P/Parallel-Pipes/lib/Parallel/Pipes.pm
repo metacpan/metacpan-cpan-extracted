@@ -7,7 +7,7 @@ use IO::Select;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 {
     package Parallel::Pipe::Impl;
@@ -161,6 +161,7 @@ sub _fork {
     my $pid = fork;
     die "fork failed" unless defined $pid;
     if ($pid == 0) {
+        srand;
         close $_ for $read_fh1, $write_fh2, map { ($_->{read_fh}, $_->{write_fh}) } $self->pipes;
         my $there = Parallel::Pipe::There->new(read_fh  => $read_fh2, write_fh => $write_fh1);
         while (my $read = $there->read) {

@@ -68,7 +68,10 @@ sub run
                 MYDan::Agent::Load->new(
                     node => $host,
                     sp => $path{sp}, dp => $load,
-                )->run( %{$this->{agent}}, %o );
+                )->run( %{$this->{agent}}, %o, 
+		    ( defined $o{cc} ) ? () 
+		        : ( 'chown' => undef, 'chmod' => undef ) 
+		);
             };
 
             my $stat = $@ ? "FAIL $@" : 'OK';

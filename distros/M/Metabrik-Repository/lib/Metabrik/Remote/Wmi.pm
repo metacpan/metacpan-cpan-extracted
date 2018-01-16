@@ -1,5 +1,5 @@
 #
-# $Id: Wmi.pm,v 94e85541d72a 2017/02/04 16:34:12 gomor $
+# $Id: Wmi.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # remote::wmi Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 94e85541d72a $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -60,7 +60,6 @@ sub install {
    $self->SUPER::install() or return;
 
    my $datadir = $self->datadir;
-   my $shell = $self->shell;
 
    my $version = '1.3.14';
 
@@ -84,8 +83,14 @@ sub install {
    # make proto bin/wmic
    # make proto bin/winexe
 
-   my $cwd = $shell->pwd;
-   $shell->run_cd("$datadir/wmi-$version/Samba/source") or return;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
+   if (defined($self->shell)) {
+      $self->shell->run_cd("$datadir/wmi-$version/Samba/source") or return;
+   }
+   else {
+      chdir("$datadir/wmi-$version/Samba/source")
+         or return $self->log->error("install: chdir: $!");
+   }
 
    $self->system('./autogen.sh') or return;
    $self->system('./configure') or return;
@@ -93,7 +98,12 @@ sub install {
    $self->system('make proto bin/wmic') or return;
    $self->system('make proto bin/winexe') or return;
 
-   $shell->run_cd($cwd);
+   if (defined($self->shell)) {
+      $self->shell->run_cd($cwd);
+   }
+   else {
+      chdir($cwd) or return $self->log->error("install: chdir: $!");
+   }
 
    my $sf = Metabrik::System::File->new_from_brik_init($self) or return;
    $sf->sudo_copy("$datadir/wmi-$version/Samba/source/bin/wmic", '/usr/local/bin/') or return;
@@ -173,7 +183,7 @@ Metabrik::Remote::Wmi - remote::wmi Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

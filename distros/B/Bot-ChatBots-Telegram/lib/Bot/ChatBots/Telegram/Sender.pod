@@ -183,7 +183,7 @@ Flavio Poletti <polettix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
 
 This module is free software. You can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

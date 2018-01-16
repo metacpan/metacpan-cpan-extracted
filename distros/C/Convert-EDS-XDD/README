@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
 
-      perl -MConvert::EDS::XDD=eds2xdd -e "print eds2xdd 'profile.eds'" > profile.xdd
+      $ cpan Convert::EDS::XDD # install from CPAN
+      $ eds2xdd profile.eds > profile.xdd # Convert with the eds2xdd script
 
 DESCRIPTION
 
@@ -12,15 +13,19 @@ DESCRIPTION
     describe CANopen devices. The Ethernet POWERLINK Standardization Group
     specifies an EDS-based XML format for EPL devices.
 
-    This module Takes in an EDS file or a string with its content and
-    returns a XDD string. A self-contained (fatpacked) epl2xdd script is
-    available at the Github releases page
+    This module takes in an EDS file or a string with its content and
+    returns a XDD string. An eds2xdd wrapper script is also installed into
+    the PATH.
+
+    eds2xdd is also available as a self-contained (fatpacked) script at the
+    Github releases page
     <https://github.com/epl-viz/Convert-EDS-XDD/releases/latest>.
 
 LIMITATIONS
 
     May not handle all details of the EDS. Pull requests and reports
-    (issues on Github) welcome.
+    (issues on Github <https://github.com/epl-viz/Convert-EDS-XDD/issues>)
+    are welcome.
 
 METHODS AND ARGUMENTS
 
@@ -57,7 +62,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2017 Ahmad Fatoum
+    Copyright (C) 2017-2018 Ahmad Fatoum
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

@@ -1,10 +1,11 @@
 package WebService::Braintree::CreditCardGateway;
-$WebService::Braintree::CreditCardGateway::VERSION = '0.94';
+$WebService::Braintree::CreditCardGateway::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
 use WebService::Braintree::Validations qw(verify_params credit_card_signature);
@@ -46,6 +47,30 @@ sub from_nonce {
     } catch {
         confess "Payment method with nonce $nonce locked, consumed or not found";
     }
+}
+
+sub expired {
+    my ($self) = @_;
+
+    return $self->resource_collection({
+        ids_url => "/payment_methods/all/expired_ids",
+        obj_url => "/payment_methods/all/expired",
+        inflate => [qw/payment_methods credit_card CreditCard/],
+    });
+}
+
+sub expiring_between {
+    my ($self, $start, $end) = @_;
+
+    $start = $start->strftime('%m%Y');
+    $end   = $end->strftime('%m%Y');
+    my $params = "start=${start}&end=${end}";
+
+    return $self->resource_collection({
+        ids_url => "/payment_methods/all/expiring_ids?${params}",
+        obj_url => "/payment_methods/all/expiring?${params}",
+        inflate => [qw/payment_methods credit_card CreditCard/],
+    });
 }
 
 __PACKAGE__->meta->make_immutable;

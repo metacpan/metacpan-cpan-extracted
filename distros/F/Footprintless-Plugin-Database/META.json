@@ -64,59 +64,59 @@
    "provides" : {
       "Footprintless::Plugin::Database" : {
          "file" : "lib/Footprintless/Plugin/Database.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::AbstractProvider" : {
          "file" : "lib/Footprintless/Plugin/Database/AbstractProvider.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::Command::db" : {
          "file" : "lib/Footprintless/Plugin/Database/Command/db.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::Command::db::backup" : {
          "file" : "lib/Footprintless/Plugin/Database/Command/db/backup.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::Command::db::client" : {
          "file" : "lib/Footprintless/Plugin/Database/Command/db/client.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::Command::db::copy_to" : {
          "file" : "lib/Footprintless/Plugin/Database/Command/db/copy_to.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::Command::db::restore" : {
          "file" : "lib/Footprintless/Plugin/Database/Command/db/restore.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::CsvProvider" : {
          "file" : "lib/Footprintless/Plugin/Database/CsvProvider.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::DefaultCommandHelper" : {
          "file" : "lib/Footprintless/Plugin/Database/DefaultCommandHelper.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::MySqlProvider" : {
          "file" : "lib/Footprintless/Plugin/Database/MySqlProvider.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::OracleProvider" : {
          "file" : "lib/Footprintless/Plugin/Database/OracleProvider.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::PostgreSqlProvider" : {
          "file" : "lib/Footprintless/Plugin/Database/PostgreSqlProvider.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::PreparedStatementTemplate" : {
          "file" : "lib/Footprintless/Plugin/Database/PreparedStatementTemplate.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Footprintless::Plugin::Database::SqlShellAdapter" : {
          "file" : "lib/Footprintless/Plugin/Database/SqlShellAdapter.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -128,7 +128,7 @@
          "web" : "https://github.com/lucastheisen/footprintless-plugin-database"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.025000"
@@ -237,7 +237,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.03",
+                  "tag" : "v1.04",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

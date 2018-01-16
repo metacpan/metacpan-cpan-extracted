@@ -14,7 +14,7 @@ use Test::BDD::Cucumber::StepFile qw();
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(S C content_decode jsonpath_eq jsonpath_re);
 our %EXPORT_TAGS = ( util => [qw(content_decode jsonpath_eq jsonpath_re)] );

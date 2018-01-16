@@ -5,6 +5,7 @@
 #include "ppport.h"
 
 #include <zmq.h>
+#include <libzmqraw/eventmap.h>
 #include <libzmqraw/mutex.h>
 #include <libzmqraw/timers.h>
 
@@ -49,8 +50,12 @@ typedef struct
 
 typedef struct
 {
-	AV *sockets;
-	zmq_pollitem_t *items;
+	void *poller;
+	zmq_raw_event_map *interested;
+	zmq_raw_event_map *events;
+	zmq_poller_event_t *poller_events;
+	int allocated;
+	int size;
 } zmq_raw_poller;
 
 typedef struct

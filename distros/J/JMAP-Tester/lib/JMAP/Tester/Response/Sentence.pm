@@ -1,10 +1,8 @@
 use v5.10.0;
 package JMAP::Tester::Response::Sentence;
 # ABSTRACT: a single triple within a JMAP response
-$JMAP::Tester::Response::Sentence::VERSION = '0.015';
+$JMAP::Tester::Response::Sentence::VERSION = '0.016';
 use Moo;
-
-use JMAP::Tester::Abort 'abort';
 
 use namespace::clean;
 
@@ -27,31 +25,16 @@ use namespace::clean;
 #pod
 #pod =cut
 
-sub BUILDARGS {
-  my ($self, $args) = @_;
-
-  if (my $triple = delete $args->{triple}) {
-    return {
-      %$args,
-
-      name      => $triple->[0],
-      arguments => $triple->[1],
-      client_id => $triple->[2],
-    };
-  }
-  return $self->SUPER::BUILDARGS($args);
-}
-
 has name      => (is => 'ro', required => 1);
 has arguments => (is => 'ro', required => 1);
 has client_id => (is => 'ro', required => 1);
 
-has _json_typist => (
-  is => 'ro',
-  handles => {
-    _strip_json_types => 'strip_types',
-  },
-);
+has sentence_broker => (is => 'ro', required => 1);
+
+sub _strip_json_types {
+  my ($self, $whatever) = @_;
+  $self->sentence_broker->strip_json_types($whatever);
+}
 
 #pod =method as_struct
 #pod
@@ -69,7 +52,7 @@ has _json_typist => (
 sub as_struct { [ $_[0]->name, $_[0]->arguments, $_[0]->client_id ] }
 
 sub as_stripped_struct {
-  $_[0]->_strip_json_types($_[0]->as_struct);
+  $_[0]->sentence_broker->strip_json_types($_[0]->as_struct);
 }
 
 #pod =method as_pair
@@ -86,7 +69,7 @@ sub as_stripped_struct {
 sub as_pair { [ $_[0]->name, $_[0]->arguments ] }
 
 sub as_stripped_pair {
-  $_[0]->_strip_json_types($_[0]->as_pair);
+  $_[0]->sentence_broker->strip_json_types($_[0]->as_pair);
 }
 
 #pod =method as_set
@@ -103,7 +86,8 @@ sub as_set {
     name         => $_[0]->name,
     arguments    => $_[0]->arguments,
     client_id    => $_[0]->client_id,
-    _json_typist => $_[0]->_json_typist,
+
+    sentence_broker => $_[0]->sentence_broker,
   });
 }
 
@@ -123,7 +107,7 @@ sub assert_named {
 
   return $self if $self->name eq $name;
 
-  abort(
+  $self->sentence_broker->abort_callback->(
     sprintf qq{expected sentence named "%s" but got "%s"}, $name, $self->name
   );
 }
@@ -142,7 +126,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 OVERVIEW
 

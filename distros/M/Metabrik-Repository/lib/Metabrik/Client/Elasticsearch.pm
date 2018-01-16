@@ -1,5 +1,5 @@
 #
-# $Id: Elasticsearch.pm,v ec1fed18b17d 2017/10/24 11:52:27 gomor $
+# $Id: Elasticsearch.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::elasticsearch Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Rest);
 
 sub brik_properties {
    return {
-      revision => '$Revision: ec1fed18b17d $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable es es) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -57,10 +57,10 @@ sub brik_properties {
          open => [ qw(nodes_list|OPTIONAL cxn_pool|OPTIONAL) ],
          open_bulk_mode => [ qw(index|OPTIONAL type|OPTIONAL) ],
          open_scroll_scan_mode => [ qw(index|OPTIONAL size|OPTIONAL) ],
-         open_scroll => [ qw(index|OPTIONAL size|OPTIONAL) ],
+         open_scroll => [ qw(index|OPTIONAL size|OPTIONAL type|OPTIONAL query|OPTIONAL) ],
          close_scroll => [ ],
          total_scroll => [ ],
-         next_scroll => [ ],
+         next_scroll => [ qw(count|OPTIONAL) ],
          index_document => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
          update_document => [ qw(document id index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          index_bulk => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
@@ -88,6 +88,7 @@ sub brik_properties {
          get_aliases => [ qw(index) ],
          put_alias => [ qw(index alias) ],
          delete_alias => [ qw(index alias) ],
+         is_mapping_exists => [ qw(index mapping) ],
          get_mappings => [ qw(index type|OPTIONAL) ],
          create_index => [ qw(index) ],
          create_index_with_mappings => [ qw(index mappings) ],
@@ -98,6 +99,7 @@ sub brik_properties {
          get_template => [ qw(name) ],
          put_template => [ qw(name template) ],
          put_template_from_json_file => [ qw(file) ],
+         update_template_from_json_file => [ qw(file) ],
          get_settings => [ qw(index|indices_list|OPTIONAL name|names_list|OPTIONAL) ],
          put_settings => [ qw(settings_hash index|indices_list|OPTIONAL) ],
          set_index_number_of_replicas => [ qw(index|indices_list number) ],
@@ -112,7 +114,7 @@ sub brik_properties {
          parse_error_string => [ qw(string) ],
          refresh_index => [ qw(index) ],
          export_as_csv => [ qw(index size|OPTIONAL) ],
-         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
+         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL cb|OPTIONAL) ],
          get_stats_process => [ ],
          get_process => [ ],
          get_cluster_state => [ ],
@@ -314,7 +316,7 @@ sub open_scroll_scan_mode {
 #
 sub open_scroll {
    my $self = shift;
-   my ($index, $size) = @_;
+   my ($index, $size, $type, $query) = @_;
 
    my $version = $self->version or return;
    if ($version lt "5.0.0") {
@@ -322,7 +324,9 @@ sub open_scroll {
          "$version, try open_scroll_scan_mode Command instead");
    }
 
+   $query ||= { query => { match_all => {} } };
    $index ||= $self->index;
+   $type ||= $self->type;
    $size ||= $self->size;
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -331,19 +335,22 @@ sub open_scroll {
 
    my $timeout = $self->rtimeout;
 
-   #
-   # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
-   #
-   my $scroll = $es->scroll_helper(
+   my %args = (
       scroll => "${timeout}s",
       scroll_in_qs => 1,  # By default (0), pass scroll_id in request body. When 1, pass 
                           # it in query string.
       index => $index,
       size => $size,
-      body => {
-         sort => [ qw(_doc) ],
-      },
+      body => $query,
    );
+   if ($type ne '*') {
+      $args{type} = $type;
+   }
+
+   #
+   # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
+   #
+   my $scroll = $es->scroll_helper(%args);
    if (! defined($scroll)) {
       return $self->log->error("open_scroll: failed");
    }
@@ -392,13 +399,24 @@ sub total_scroll {
 
 sub next_scroll {
    my $self = shift;
+   my ($count) = @_;
+
+   $count ||= 1;
 
    my $scroll = $self->_scroll;
    $self->brik_help_run_undef_arg('open_scroll', $scroll) or return;
 
    my $next;
    eval {
-      $next = $scroll->next;
+      if ($count > 1) {
+         my @docs = $scroll->next($count);
+         if (@docs > 0) {
+            $next = \@docs;
+         }
+      }
+      else {
+         $next = $scroll->next;
+      }
    };
    if ($@) {
       chomp($@);
@@ -434,6 +452,7 @@ sub index_document {
    }
 
    if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('index_document', $hash, 'HASH') or return;
       %args = ( %args, %$hash );
    }
 
@@ -474,6 +493,7 @@ sub update_document {
    );
 
    if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('update_document', $hash, 'HASH') or return;
       %args = ( %args, %$hash );
    }
 
@@ -512,6 +532,7 @@ sub index_bulk {
    }
 
    if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('index_bulk', $hash, 'HASH') or return;
       %args = ( %args, %$hash );
    }
 
@@ -667,6 +688,7 @@ sub query {
    );
 
    if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('query', $hash, 'HASH') or return;
       %args = ( %args, %$hash );
    }
 
@@ -800,6 +822,7 @@ sub delete_document {
    );
 
    if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('delete_document', $hash, 'HASH') or return;
       %args = ( %args, %$hash );
    }
 
@@ -1118,11 +1141,14 @@ sub list_index_fields {
          return $self->log->error("list_index_fields: multiple indices found, ".
             "choose one");
       }
-      my $r2 = $self->get_mappings($index, '_default_') or return;
-      # Merge
-      for my $this_index (keys %$r2) {
-         my $default = $r2->{$this_index}{mappings}{'_default_'};
-         $r->{$this_index}{mappings}{_default_} = $default;
+      # _default_ mapping may not exists.
+      if ($self->is_mapping_exists($index, '_default_')) {
+         my $r2 = $self->get_mappings($index, '_default_');
+         # Merge
+         for my $this_index (keys %$r2) {
+            my $default = $r2->{$this_index}{mappings}{'_default_'};
+            $r->{$this_index}{mappings}{_default_} = $default;
+         }
       }
    }
    else {
@@ -1336,6 +1362,30 @@ sub update_alias {
    }
 
    return $self->put_alias($new_index, $alias);
+}
+
+sub is_mapping_exists {
+   my $self = shift;
+   my ($index, $mapping) = @_;
+
+   $self->brik_help_run_undef_arg('is_mapping_exists', $index) or return;
+   $self->brik_help_run_undef_arg('is_mapping_exists', $mapping) or return;
+
+   if (! $self->is_index_exists($index)) {
+      return 0;
+   }
+
+   my $all = $self->get_mappings($index) or return;
+   for my $this_index (keys %$all) {
+      my $mappings = $all->{$this_index}{mappings};
+      for my $this_mapping (keys %$mappings) {
+         if ($this_mapping eq $mapping) {
+            return 1;
+         }
+      }
+   }
+
+   return 0;
 }
 
 #
@@ -1556,6 +1606,29 @@ sub put_template_from_json_file {
    }
 
    my $name = $data->{template};
+
+   return $self->put_template($name, $data);
+}
+
+sub update_template_from_json_file {
+   my $self = shift;
+   my ($json_file) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('update_template_from_json_file', $json_file) or return;
+   $self->brik_help_run_file_not_found('update_template_from_json_file', $json_file) or return;
+
+   my $fj = Metabrik::File::Json->new_from_brik_init($self) or return;
+   my $data = $fj->read($json_file) or return;
+
+   if (! exists($data->{template})) {
+      return $self->log->error("put_template_from_json_file: no template name found");
+   }
+
+   my $name = $data->{template};
+
+   $self->delete_template($name);  # We ignore errors, template may not exist.
 
    return $self->put_template($name, $data);
 }
@@ -1960,63 +2033,82 @@ sub export_as_csv {
    my $total = $self->total_scroll;
    $self->log->info("export_as_csv: total [$total] for index [$index]");
 
-   my $h = {};
    my %types = ();
    my $read = 0;
    my $skipped = 0;
    my $exported = 0;
    my $start = time();
-   my $done = 'output.exported';
+   my $done = "$index.exported";
    my $start_time = time();
-   while (my $this = $self->next_scroll) {
-      $read++;
-      my $id = $this->{_id};
-      my $doc = $this->{_source};
-      my $type = $this->{_type};
-      if (! exists($types{$type})) {
-         my $fields = $self->list_index_fields($index, $type) or return;
-         #$types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
-         $types{$type}{header} = [ '_id', @$fields ];
-         $types{$type}{output} = "$index:$type.csv";
-         $done = $types{$type}{output_exported} = "$index:$type.csv.exported";
+   my %chunk = ();
+   while (my $next = $self->next_scroll(10000)) {
+      for my $this (@$next) {
+         $read++;
+         my $id = $this->{_id};
+         my $doc = $this->{_source};
+         my $type = $this->{_type} || 'doc';  # Prepare for when types will be removed from ES
+         if (! exists($types{$type})) {
+            my $fields = $self->list_index_fields($index, $type) or return;
+            #$types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
+            $types{$type}{header} = [ '_id', @$fields ];
+            if ($type ne 'doc') {
+               $types{$type}{output} = "$index:$type.csv";
+            }
+            else {
+               $types{$type}{output} = "$index.csv";
+            }
 
-         # Verify it has not been exported yet
-         if (-f $types{$type}{output_exported}) {
-            return $self->log->error("export_as_csv: export already done for index ".
-               "[$index] with type [$type] and file [$index:$type.csv]");
+            # Verify it has not been exported yet
+            if (-f $done) {
+               return $self->log->error("export_as_csv: export already done for index ".
+                  "[$index]");
+            }
+
+            $self->log->info("export_as_csv: exporting to file [".$types{$type}{output}.
+               "] for type [$type], using chunk size of [$size]");
          }
 
-         $self->log->info("export_as_csv: exporting to file [$index:$type.csv] ".
-            "for new type [$type], using chunk size of [$size]");
+         my $h = { _id => $id };
+
+         for my $k (keys %$doc) {
+            $h->{$k} = $doc->{$k};
+         }
+
+         $fc->header($types{$type}{header});
+
+         push @{$chunk{$type}}, $h;
+         if (@{$chunk{$type}} > 999) {
+            my $r = $fc->write($chunk{$type}, $types{$type}{output});
+            if (!defined($r)) {
+               $self->log->warning("export_as_csv: unable to process entry, skipping");
+               $skipped++;
+               next;
+            }
+            $chunk{$type} = [];
+         }
+
+         # Log a status sometimes.
+         if (! (++$exported % 100_000)) {
+            my $now = time();
+            my $perc = sprintf("%.02f", $exported / $total * 100);
+            $self->log->info("export_as_csv: fetched [$exported/$total] ($perc%) ".
+               "elements in ".($now - $start)." second(s) from index [$index]");
+            $start = time();
+         }
+
+         # Limit export to specified maximum
+         if ($max > 0 && $exported >= $max) {
+            $self->log->info("export_as_csv: max export reached [$exported] for index ".
+               "[$index], stopping");
+            last;
+         }
       }
+   }
 
-      $h->{_id} = $id;
-
-      for my $k (keys %$doc) {
-         $h->{$k} = $doc->{$k};
-      }
-
-      $fc->header($types{$type}{header});
-      my $r = $fc->write([ $h ], $types{$type}{output});
-      if (!defined($r)) {
-         $self->log->warning("export_as_csv: unable to process entry, skipping");
-         $skipped++;
-         next;
-      }
-
-      # Log a status sometimes.
-      if (! (++$exported % 100_000)) {
-         my $now = time();
-         $self->log->info("export_as_csv: fetched [$exported/$total] elements in ".
-            ($now - $start)." second(s) from index [$index]");
-         $start = time();
-      }
-
-      # Limit export to specified maximum
-      if ($max > 0 && $exported >= $max) {
-         $self->log->info("export_as_csv: max export reached [$exported] for index ".
-            "[$index], stopping");
-         last;
+   # Process remaining data waiting to be written
+   for my $type (keys %types) {
+      if (@{$chunk{$type}} > 0) {
+         $fc->write($chunk{$type}, $types{$type}{output});
       }
    }
 
@@ -2051,7 +2143,7 @@ sub export_as_csv {
 #
 sub import_from_csv {
    my $self = shift;
-   my ($input_csv, $index, $type, $hash) = @_;
+   my ($input_csv, $index, $type, $hash, $cb) = @_;
 
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -2139,6 +2231,16 @@ sub import_from_csv {
          # No need to index data that is empty.
          if (defined($value) && length($value)) {
             $h->{$k} = $value;
+         }
+      }
+
+      if (defined($cb)) {
+         $h = $cb->($h);
+         if (! defined($h)) {
+            $self->log->error("import_from_csv: callback failed for index [$index] ".
+               "at read [$read], skipping single entry");
+            $skipped_chunks++;
+            next;
          }
       }
 
@@ -2583,9 +2685,10 @@ sub list_datatypes {
 #
 sub get_hits_total {
    my $self = shift;
+   my ($run) = @_;
 
-   # Retrieve data stored in the $RUN Variable from Context
-   my $run = $self->context->do('$RUN');
+   $self->brik_help_run_undef_arg('get_hits_total', $run) or return;
+
    if (ref($run) eq 'HASH') {
       if (exists($run->{hits}) && exists($run->{hits}{total})) {
          return $run->{hits}{total};
@@ -2961,6 +3064,31 @@ sub restore_snapshot_for_indices {
    return $self->restore_snapshot($snapshot_name, $repository_name, $body);
 }
 
+# shard occupation
+#
+# curl -XGET "http://127.0.0.1:9200/_cat/shards?v
+# Or https://www.elastic.co/guide/en/elasticsearch/reference/1.6/cluster-nodes-stats.html
+#
+# disk occuption:
+# curl -XGET http://127.0.0.1:9200/_cat/nodes?h=ip,h,diskAvail,diskTotal
+# 
+#
+# Who is master: curl -XGET http://127.0.0.1:9200/_cat/master?v
+#
+
+# Check memory lock
+
+# curl -XGET 'localhost:9200/_nodes?filter_path=**.mlockall&pretty'
+# {
+#  "nodes" : {
+#    "3XXX" : {
+#      "process" : {
+#        "mlockall" : true
+#      }
+#    }
+#  }
+# }
+
 1;
 
 __END__
@@ -2981,7 +3109,7 @@ Template to write a new Metabrik Brik.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

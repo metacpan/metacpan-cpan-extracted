@@ -1,5 +1,5 @@
 #
-# $Id: Global.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
+# $Id: Global.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
 #
 # core::global Brik
 #
@@ -8,14 +8,14 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.27';
+our $VERSION = '1.30';
 our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: fa356d306156 $',
+      revision => '$Revision: 047dcc7d3c9d $',
       tags => [ qw(main core) ],
       attributes => { 
          device => [ qw(device) ],
@@ -125,7 +125,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

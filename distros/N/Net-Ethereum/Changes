@@ -1,5 +1,17 @@
 Revision history for Perl extension Net::Ethereum.
 
+0.28 13.01.2018
+
+Fixed:
+
+- _read_file
+- wait_for_contract
+- wait_for_transaction
+
+Added:
+
+- eth_getTransactionByHash
+
 0.27 09.01.2018
   - alpha release.
 

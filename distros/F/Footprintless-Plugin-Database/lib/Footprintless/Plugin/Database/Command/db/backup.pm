@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::Command::db::backup;
-$Footprintless::Plugin::Database::Command::db::backup::VERSION = '1.03';
+$Footprintless::Plugin::Database::Command::db::backup::VERSION = '1.04';
 # ABSTRACT: creates a backup of the database
 # PODNAME: Footprintless::Plugin::Database::Command::db::backup
 
@@ -70,7 +70,7 @@ Footprintless::Plugin::Database::Command::db::backup - creates a backup of the d
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

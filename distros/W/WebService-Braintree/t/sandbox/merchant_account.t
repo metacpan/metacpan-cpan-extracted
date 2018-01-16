@@ -22,42 +22,10 @@ use WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
 
+use Storable qw(dclone);
+
 WebService::Braintree::TestHelper->verify_sandbox
     || BAIL_OUT 'Sandbox is not prepared properly. Please read xt/README.';
-
-my $deprecated_application_params = {
-    applicant_details => {
-        company_name => 'In good company',
-        first_name => 'Joe',
-        last_name => 'Bloggs',
-        email => 'joe@bloggs.com',
-        phone => '555-555-5555',
-        address => {
-            street_address => '123 Credibility St.',
-            postal_code => '60606',
-            locality => 'Chicago',
-            region => 'IL',
-        },
-        date_of_birth => '10/9/1980',
-        ssn => '123-00-1234',
-        tax_id => '123456789',
-        routing_number => '122100024',
-        account_number => '43759348798',
-    },
-    tos_accepted => 'true',
-    master_merchant_account_id => 'sandbox_master_merchant_account',
-};
-
-subtest 'Successful Create with deprecated parameters' => sub {
-    plan skip_all => 'Deprecated parameters no longer allowed';
-
-    local $SIG{__WARN__} = sub {};
-
-    my $result = WebService::Braintree::MerchantAccount->create($deprecated_application_params);
-    ok $result->is_success;
-    is($result->merchant_account->status, WebService::Braintree::MerchantAccount::Status::Pending);
-    is($result->merchant_account->master_merchant_account->id, 'sandbox_master_merchant_account');
-};
 
 my $valid_application_params = {
     individual => {
@@ -98,265 +66,320 @@ my $valid_application_params = {
 };
 
 subtest 'Successful Create' => sub {
-    plan skip_all => 'sandbox_master_merchant_account does not work anymore';
-
     my $result = WebService::Braintree::MerchantAccount->create($valid_application_params);
-    ok $result->is_success;
+    validate_result($result) or return;
+
     is($result->merchant_account->status, WebService::Braintree::MerchantAccount::Status::Pending);
     is($result->merchant_account->master_merchant_account->id, 'sandbox_master_merchant_account');
 };
 
 subtest 'Accepts ID' => sub {
-    plan skip_all => 'sandbox_master_merchant_account does not work anymore';
+    my $params = dclone($valid_application_params);
+    $params->{id} = generate_id();
 
-    my $params_with_id = $valid_application_params;
-    my $rand = int(rand(1000));
-    $params_with_id->{'id'} = 'sub_merchant_account_id' . $rand;
-    my $result = WebService::Braintree::MerchantAccount->create($params_with_id);
+    my $result = WebService::Braintree::MerchantAccount->create($params);
+    validate_result($result) or return;
 
-    ok $result->is_success;
     is($result->merchant_account->status, WebService::Braintree::MerchantAccount::Status::Pending);
-    is($result->merchant_account->master_merchant_account->id, 'sandbox_master_merchant_account');
-    is($result->merchant_account->id, 'sub_merchant_account_id' . $rand);
+    is($result->merchant_account->master_merchant_account->id, $params->{master_merchant_account_id});
+    is($result->merchant_account->id, $params->{id});
 };
 
 subtest 'Handles Unsuccessful Result' => sub {
     my $result = WebService::Braintree::MerchantAccount->create({});
-    not_ok $result->is_success;
+    invalidate_result($result) or return;
+
     my $expected_error_code = WebService::Braintree::ErrorCodes::MerchantAccount::MasterMerchantAccountIdIsRequired;
     is($result->errors->for('merchant_account')->on('master_merchant_account_id')->[0]->code, $expected_error_code);
 };
 
-subtest 'The broken tests' => sub {
-    plan skip_all => 'sandbox_master_merchant_account does not work anymore';
+foreach my $destination (qw(Bank Email MobilePhone)) {
+    subtest "Works with FundingDestination::$destination" => sub {
+        my $params = dclone($valid_application_params);
+        $params->{id} = generate_id();
+        $params->{funding}{destination} = WebService::Braintree::MerchantAccount::FundingDestination->$destination;
 
-    subtest 'Works with FundingDestination::Bank' => sub {
-        my $params = $valid_application_params;
-        my $rand = int(rand(1000));
-        $params->{'id'} = 'sub_merchant_account_id' . $rand;
-        $params->{funding}->{destination} = WebService::Braintree::MerchantAccount::FundingDestination::Bank;
         my $result = WebService::Braintree::MerchantAccount->create($params);
+        validate_result($result) or return;
+    };
+}
 
-        ok $result->is_success;
+subtest 'Create handles required validation errors' => sub {
+    my $params = {
+        tos_accepted => 'true',
+        master_merchant_account_id => 'sandbox_master_merchant_account',
     };
 
-    subtest 'Works with FundingDestination::Email' => sub {
-        my $params = $valid_application_params;
-        my $rand = int(rand(1000));
-        $params->{'id'} = 'sub_merchant_account_id' . $rand;
-        $params->{funding}->{destination} = WebService::Braintree::MerchantAccount::FundingDestination::Email;
-        my $result = WebService::Braintree::MerchantAccount->create($params);
+    my $result = WebService::Braintree::MerchantAccount->create($params);
+    invalidate_result($result) or return;
 
-        ok $result->is_success;
+    my @errors = (
+        [
+            [ merchant_account => individual => 'first_name' ],
+            [ Individual => 'FirstNameIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => 'last_name' ],
+            [ Individual => 'LastNameIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => 'date_of_birth' ],
+            [ Individual => 'DateOfBirthIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => 'email' ],
+            [ Individual => 'EmailIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'street_address' ],
+            [ 'Individual::Address' => 'StreetAddressIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'postal_code' ],
+            [ 'Individual::Address' => 'PostalCodeIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'locality' ],
+            [ 'Individual::Address' => 'LocalityIsRequired' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'region' ],
+            [ 'Individual::Address' => 'RegionIsRequired' ],
+        ],
+        [
+            [ merchant_account => funding => 'destination' ],
+            [ 'Funding' => 'DestinationIsRequired' ],
+        ],
+    );
+    check_error($result, @$_) for @errors;
+};
+
+subtest 'Create handles invalid validation errors' => sub {
+    my $params = {
+        individual => {
+            first_name => '<>',
+            last_name => '<>',
+            email => 'bad',
+            phone => '999',
+            address => {
+                street_address => 'nope',
+                postal_code => '1',
+                region => 'QQ',
+            },
+            date_of_birth => 'hah',
+            ssn => '12345',
+        },
+        business => {
+            legal_name => '``{}',
+            dba_name => '{}``',
+            tax_id => 'bad',
+            address => {
+                street_address => 'nope',
+                postal_code => '1',
+                region => 'QQ',
+            },
+        },
+        funding => {
+            destination => 'MY WALLET',
+            routing_number => 'LEATHER',
+            account_number => 'BACK POCKET',
+            email => 'BILLFOLD',
+            mobile_phone => 'TRIFOLD',
+        },
+        tos_accepted => 'true',
+        master_merchant_account_id => 'sandbox_master_merchant_account',
     };
 
-    subtest 'Works with FundingDestination::MobilePhone' => sub {
-        my $params = $valid_application_params;
-        my $rand = int(rand(1000));
-        $params->{'id'} = 'sub_merchant_account_id' . $rand;
-        $params->{funding}->{destination} = WebService::Braintree::MerchantAccount::FundingDestination::MobilePhone;
-        my $result = WebService::Braintree::MerchantAccount->create($params);
+    my $result = WebService::Braintree::MerchantAccount->create($params);
+    invalidate_result($result) or return;
 
-        ok $result->is_success;
-    };
+    my @errors = (
+        [
+            [ merchant_account => individual => 'first_name' ],
+            [ Individual => 'FirstNameIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => 'last_name' ],
+            [ Individual => 'LastNameIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => 'email' ],
+            [ Individual => 'EmailIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => 'phone' ],
+            [ Individual => 'PhoneIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => 'ssn' ],
+            [ Individual => 'SsnIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'street_address' ],
+            [ 'Individual::Address' => 'StreetAddressIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'postal_code' ],
+            [ 'Individual::Address' => 'PostalCodeIsInvalid' ],
+        ],
+        [
+            [ merchant_account => individual => address => 'region' ],
+            [ 'Individual::Address' => 'RegionIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => 'dba_name' ],
+            [ Business => 'DbaNameIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => 'tax_id' ],
+            [ Business => 'TaxIdIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => 'legal_name' ],
+            [ Business => 'LegalNameIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => address => 'street_address' ],
+            [ 'Business::Address' => 'StreetAddressIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => address => 'postal_code' ],
+            [ 'Business::Address' => 'PostalCodeIsInvalid' ],
+        ],
+        [
+            [ merchant_account => business => address => 'region' ],
+            [ 'Business::Address' => 'RegionIsInvalid' ],
+        ],
+        [
+            [ merchant_account => funding => 'destination' ],
+            [ 'Funding' => 'DestinationIsInvalid' ],
+        ],
+        [
+            [ merchant_account => funding => 'routing_number' ],
+            [ 'Funding' => 'RoutingNumberIsInvalid' ],
+        ],
+        [
+            [ merchant_account => funding => 'account_number' ],
+            [ 'Funding' => 'AccountNumberIsInvalid' ],
+        ],
+        [
+            [ merchant_account => funding => 'email' ],
+            [ 'Funding' => 'EmailIsInvalid' ],
+        ],
+        [
+            [ merchant_account => funding => 'mobile_phone' ],
+            [ 'Funding' => 'MobilePhoneIsInvalid' ],
+        ],
+    );
+    check_error($result, @$_) for @errors;
+};
 
-    subtest 'Update updates all fields' => sub {
-        local $SIG{__WARN__} = sub {};
-        my $result = WebService::Braintree::MerchantAccount->create($deprecated_application_params);
-        ok $result->is_success;
-        my $update_params = {
-            individual => {
-                first_name => 'Job',
-                last_name => 'Leoggs',
-                email => 'job@leoggs.com',
-                phone => '555-555-1212',
-                address => {
-                    street_address => '193 Credibility St.',
-                    postal_code => '60647',
-                    locality => 'Avondale',
-                    region => 'IN',
-                },
-                date_of_birth => '10/9/1985',
-                ssn => '123-00-1235',
-            },
-            business => {
-                dba_name => 'In good company',
-                legal_name => 'In good company',
-                tax_id => '123456780',
-                address => {
-                    street_address => '193 Credibility St.',
-                    postal_code => '60647',
-                    locality => 'Avondale',
-                    region => 'IN',
-                },
-            },
-            funding => {
-                destination => WebService::Braintree::MerchantAccount::FundingDestination::Email,
-                email => 'job@leoggs.com',
-                mobile_phone => '3125551212',
-                routing_number => '122100024',
-                account_number => '43759348799',
-                descriptor => 'Job Leoggs IN',
-            },
-        };
-        $result = WebService::Braintree::MerchantAccount->update($result->merchant_account->id, $update_params);
-        ok $result->is_success;
-        is($result->merchant_account->individual_details->first_name, 'Job');
-        is($result->merchant_account->individual_details->last_name, 'Leoggs');
-        is($result->merchant_account->individual_details->email, 'job@leoggs.com');
-        is($result->merchant_account->individual_details->phone, '5555551212');
-        is($result->merchant_account->individual_details->address_details->street_address, '193 Credibility St.');
-        is($result->merchant_account->individual_details->address_details->postal_code, '60647');
-        is($result->merchant_account->individual_details->address_details->locality, 'Avondale');
-        is($result->merchant_account->individual_details->address_details->region, 'IN');
-        is($result->merchant_account->individual_details->date_of_birth, '1985-09-10');
-        is($result->merchant_account->business_details->dba_name, 'In good company');
-        is($result->merchant_account->business_details->legal_name, 'In good company');
-        is($result->merchant_account->business_details->tax_id, '123456780');
-        is($result->merchant_account->business_details->address_details->street_address, '193 Credibility St.');
-        is($result->merchant_account->business_details->address_details->postal_code, '60647');
-        is($result->merchant_account->business_details->address_details->locality, 'Avondale');
-        is($result->merchant_account->business_details->address_details->region, 'IN');
-        is($result->merchant_account->funding_details->destination, WebService::Braintree::MerchantAccount::FundingDestination::Email);
-        is($result->merchant_account->funding_details->destination, WebService::Braintree::MerchantAccount::FundingDestination::Email);
-        is($result->merchant_account->funding_details->email, 'job@leoggs.com');
-        is($result->merchant_account->funding_details->mobile_phone, '3125551212');
-        is($result->merchant_account->funding_details->routing_number, '122100024');
-        is($result->merchant_account->funding_details->account_number_last_4, '8799');
-        is($result->merchant_account->funding_details->descriptor, 'Job Leoggs IN');
-    };
-
-    subtest 'Create handles required validation errors' => sub {
-        my $params = {
-            tos_accepted => 'true',
-            master_merchant_account_id => 'sandbox_master_merchant_account',
-        };
-        my $result = WebService::Braintree::MerchantAccount->create($params);
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('individual')->on('first_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::FirstNameIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->on('last_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::LastNameIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->on('date_of_birth')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::DateOfBirthIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->on('email')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::EmailIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('street_address')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::StreetAddressIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('postal_code')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::PostalCodeIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('locality')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::LocalityIsRequired);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('region')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::RegionIsRequired);
-        is($result->errors->for('merchant_account')->for('funding')->on('destination')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::DestinationIsRequired);
-
-    };
-
-    subtest 'Create handles invalid validation errors' => sub {
-        my $params = {
-            individual => {
-                first_name => '<>',
-                last_name => '<>',
-                email => 'bad',
-                phone => '999',
-                address => {
-                    street_address => 'nope',
-                    postal_code => '1',
-                    region => 'QQ',
-                },
-                date_of_birth => 'hah',
-                ssn => '12345',
-            },
-            business => {
-                legal_name => '``{}',
-                dba_name => '{}``',
-                tax_id => 'bad',
-                address => {
-                    street_address => 'nope',
-                    postal_code => '1',
-                    region => 'QQ',
-                },
-            },
-            funding => {
-                destination => 'MY WALLET',
-                routing_number => 'LEATHER',
-                account_number => 'BACK POCKET',
-                email => 'BILLFOLD',
-                mobile_phone => 'TRIFOLD',
-            },
-            tos_accepted => 'true',
-            master_merchant_account_id => 'sandbox_master_merchant_account',
-        };
-        my $result = WebService::Braintree::MerchantAccount->create($params);
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('individual')->on('first_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::FirstNameIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->on('last_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::LastNameIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->on('email')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::EmailIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->on('phone')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::PhoneIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('street_address')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::StreetAddressIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('postal_code')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::PostalCodeIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->for('address')->on('region')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::RegionIsInvalid);
-        is($result->errors->for('merchant_account')->for('individual')->on('ssn')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::SsnIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->on('legal_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::LegalNameIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->on('dba_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::DbaNameIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->on('tax_id')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::TaxIdIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->for('address')->on('street_address')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address::StreetAddressIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->for('address')->on('postal_code')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address::PostalCodeIsInvalid);
-        is($result->errors->for('merchant_account')->for('business')->for('address')->on('region')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address::RegionIsInvalid);
-        is($result->errors->for('merchant_account')->for('funding')->on('destination')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::DestinationIsInvalid);
-        is($result->errors->for('merchant_account')->for('funding')->on('routing_number')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::RoutingNumberIsInvalid);
-        is($result->errors->for('merchant_account')->for('funding')->on('account_number')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::AccountNumberIsInvalid);
-        is($result->errors->for('merchant_account')->for('funding')->on('email')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::EmailIsInvalid);
-        is($result->errors->for('merchant_account')->for('funding')->on('mobile_phone')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::MobilePhoneIsInvalid);
-    };
-
-    subtest 'Handles tax id and legal name mutual requirement errors' => sub {
+subtest 'Handles tax id and legal name mutual requirement errors' => sub {
+    subtest 'tax_id only' => sub {
         my $result = WebService::Braintree::MerchantAccount->create({
             business => {tax_id => '1234567890'},
             tos_accepted => 'true',
             master_merchant_account_id => 'sandbox_master_merchant_account',
         });
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('business')->on('legal_name')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::LegalNameIsRequiredWithTaxId);
-        is($result->errors->for('merchant_account')->for('business')->on('tax_id')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::TaxIdMustBeBlank);
+        invalidate_result($result) or return;
 
-        $result = WebService::Braintree::MerchantAccount->create({
+        my @errors = (
+            [
+                [ merchant_account => business => 'legal_name' ],
+                [ Business => 'LegalNameIsRequiredWithTaxId' ],
+            ],
+            [
+                [ merchant_account => business => 'tax_id' ],
+                [ Business => 'TaxIdMustBeBlank' ],
+            ],
+        );
+        check_error($result, @$_) for @errors;
+    };
+
+    subtest 'legal_name only' => sub {
+        my $result = WebService::Braintree::MerchantAccount->create({
             business => {legal_name => 'foogurt'},
             tos_accepted => 'true',
             master_merchant_account_id => 'sandbox_master_merchant_account',
         });
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('business')->on('tax_id')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Business::TaxIdIsRequiredWithLegalName);
-    };
+        invalidate_result($result) or return;
 
-    subtest 'Handles funding destination requirement errors' => sub {
+        my @errors = (
+            [
+                [ merchant_account => business => 'tax_id' ],
+                [ Business => 'TaxIdIsRequiredWithLegalName' ],
+            ],
+        );
+        check_error($result, @$_) for @errors;
+    };
+};
+
+subtest 'Handles funding destination requirement errors' => sub {
+    subtest 'bank requirements' => sub {
         my $result = WebService::Braintree::MerchantAccount->create({
             funding => {destination => WebService::Braintree::MerchantAccount::FundingDestination::Bank},
             tos_accepted => 'true',
             master_merchant_account_id => 'sandbox_master_merchant_account',
         });
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('funding')->on('account_number')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::AccountNumberIsRequired);
-        is($result->errors->for('merchant_account')->for('funding')->on('routing_number')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::RoutingNumberIsRequired);
+        invalidate_result($result) or return;
 
-        $result = WebService::Braintree::MerchantAccount->create({
+        my @errors = (
+            [
+                [ merchant_account => funding => 'account_number' ],
+                [ Funding => 'AccountNumberIsRequired' ],
+            ],
+            [
+                [ merchant_account => funding => 'routing_number' ],
+                [ Funding => 'RoutingNumberIsRequired' ],
+            ],
+        );
+        check_error($result, @$_) for @errors;
+    };
+
+    subtest 'mobilephone requirements' => sub {
+        my $result = WebService::Braintree::MerchantAccount->create({
             funding => {destination => WebService::Braintree::MerchantAccount::FundingDestination::MobilePhone},
             tos_accepted => 'true',
             master_merchant_account_id => 'sandbox_master_merchant_account',
         });
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('funding')->on('mobile_phone')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::MobilePhoneIsRequired);
+        invalidate_result($result) or return;
 
-        $result = WebService::Braintree::MerchantAccount->create({
+        my @errors = (
+            [
+                [ merchant_account => funding => 'mobile_phone' ],
+                [ Funding => 'MobilePhoneIsRequired' ],
+            ],
+        );
+        check_error($result, @$_) for @errors;
+    };
+
+    subtest 'email requirements' => sub {
+        my $result = WebService::Braintree::MerchantAccount->create({
             funding => {destination => WebService::Braintree::MerchantAccount::FundingDestination::Email},
             tos_accepted => 'true',
             master_merchant_account_id => 'sandbox_master_merchant_account',
         });
-        not_ok $result->is_success;
-        is($result->errors->for('merchant_account')->for('funding')->on('email')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Funding::EmailIsRequired);
-    };
+        invalidate_result($result) or return;
 
-    subtest 'Can find a merchant account by ID' => sub {
-        my $params_with_id = $valid_application_params;
-        my $rand = int(rand(1000));
-        $params_with_id->{'id'} = 'sub_merchant_account_id' . $rand;
-        my $result = WebService::Braintree::MerchantAccount->create($params_with_id);
-        ok $result->is_success;
-        my $merchant_account = WebService::Braintree::MerchantAccount->find('sub_merchant_account_id' . $rand);
+        my @errors = (
+            [
+                [ merchant_account => funding => 'email' ],
+                [ Funding => 'EmailIsRequired' ],
+            ],
+        );
+        check_error($result, @$_) for @errors;
     };
+};
+
+subtest 'Can find a merchant account by ID' => sub {
+    my $params = dclone($valid_application_params);
+    $params->{id} = generate_id();
+
+    my $result = WebService::Braintree::MerchantAccount->create($params);
+    validate_result($result) or return;
+
+    my $merchant_account = WebService::Braintree::MerchantAccount->find($params->{id});
+    isa_ok($merchant_account, 'WebService::Braintree::MerchantAccount');
 };
 
 subtest 'Calling find with a nonexistant ID returns a NotFoundError' => sub {
@@ -366,3 +389,27 @@ subtest 'Calling find with a nonexistant ID returns a NotFoundError' => sub {
 };
 
 done_testing();
+
+sub generate_id {
+    return 'sub_merchant_account_id' . int(rand(1000));
+}
+
+# While this function may seem a little overly complicated, the alternative is
+# a whole bunch of lines that look like this:
+#
+# is($result->errors->for('merchant_account')->for('individual')->on('date_of_birth')->[0]->code, WebService::Braintree::ErrorCodes::MerchantAccount::Individual::DateOfBirthIsRequired);
+#
+# It's a lot to read this way.
+sub check_error {
+    my ($result, $error_path, $validation) = @_;
+
+    my $on = pop @$error_path;
+    my $error = $result->errors;
+    $error = $error->for($_) foreach @$error_path;
+    $error = $error->on($on)->[0]->code;
+
+    my ($class, $const) = @$validation;
+    my $expected = "WebService::Braintree::ErrorCodes::MerchantAccount::$class"->$const;
+
+    is($error, $expected, "${class}->${const}");
+}

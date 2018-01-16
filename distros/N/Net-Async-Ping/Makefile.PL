@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "asyncronously check remote host for reachability",
-  "AUTHOR" => "Arthur Axel \"fREW\" Schmidt <frioux+cpan\@gmail.com>",
+  "AUTHOR" => "Arthur Axel \"fREW\" Schmidt <frioux+cpan\@gmail.com>, Alexander Hartmaier <abraxxa\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Net::Frame::Layer::ICMPv6" => "1.1",
     "Net::Frame::Layer::IPv6" => "1.08",
     "Net::Frame::Simple" => "1.09",
+    "Socket" => "2.025",
     "Time::HiRes" => 0,
     "namespace::clean" => "0.23"
   },
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.003000",
+  "VERSION" => "0.003001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Net::Frame::Layer::ICMPv6" => "1.1",
   "Net::Frame::Layer::IPv6" => "1.08",
   "Net::Frame::Simple" => "1.09",
+  "Socket" => "2.025",
   "Test::Fatal" => 0,
   "Test::More" => "0.94",
   "Time::HiRes" => 0,

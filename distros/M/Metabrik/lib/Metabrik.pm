@@ -1,18 +1,17 @@
 #
-# $Id: Metabrik.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
+# $Id: Metabrik.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
 #
 package Metabrik;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.27';
+our $VERSION = '1.30';
 our $FIX = '0';
 
 use base qw(Class::Gomor::Hash);
 
 our @AS = qw(
-   debug
    init_done
    preinit_done
    check_use_properties_done
@@ -52,12 +51,11 @@ sub brik_license {
 
 sub brik_properties {
    return {
-      revision => '$Revision: fa356d306156 $',
+      revision => '$Revision: 047dcc7d3c9d $',
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       tags => [ ],
       attributes => {
-         debug => [ qw(0|1) ],
          init_done => [ qw(0|1) ],
          context => [ qw(core::context) ],
          global => [ qw(core::global) ],
@@ -65,7 +63,6 @@ sub brik_properties {
          shell => [ qw(core::shell) ],
       },
       attributes_default => {
-         debug => 0,
          init_done => 0,
       },
       commands => {
@@ -134,7 +131,7 @@ sub brik_help_set {
    my $name = $self->brik_name;
 
    if (! defined($attribute)) {
-      return $self->_log_info("run $name brik_help_set <attribute>");
+      return $self->log->info("run $name brik_help_set <attribute>");
    }
 
    my $classes = $self->brik_classes;
@@ -161,7 +158,7 @@ sub brik_help_run {
    my $name = $self->brik_name;
 
    if (! defined($command)) {
-      return $self->_log_info("run $name brik_help_run <command>");
+      return $self->log->info("run $name brik_help_run <command>");
    }
 
    my $classes = $self->brik_classes;
@@ -187,140 +184,13 @@ sub brik_help_run {
    return;
 }
 
-sub _msg {
-   my $self = shift;
-   my ($class, $msg) = @_;
-
-   $msg ||= 'undef';
-
-   $class = lc($class);
-   $class =~ s/^metabrik:://i;
-
-   return lc($class).": $msg";
-}
-
-sub _log_info {
-   my $self = shift;
-   my ($msg) = @_;
-
-   chomp($msg);
-
-   if (ref($self) && defined($self->{log})) {
-      $self->log->info($msg);
-   }
-   else {
-      print("[+] $msg\n");
-   }
-
-   return 1;
-}
-
-sub _log_error {
-   my $self = shift;
-   my ($msg) = @_;
-
-   chomp($msg);
-
-   my $class = $self->brik_class;
-
-   if (ref($self) && defined($self->{log})) {
-      return $self->log->error($msg, $class);
-   }
-   else {
-      my $str = $self->_msg($class, $msg);
-      print "[-] $str\n";
-   }
-
-   return;
-}
-
-sub _log_fatal {
-   my $self = shift;
-   my ($msg) = @_;
-
-   chomp($msg);
-
-   my $class = $self->brik_class;
-
-   if (ref($self) && defined($self->{log})) {
-      return $self->log->fatal($msg, $class);
-   }
-   else {
-      my $str = $self->_msg($class, $msg);
-      die("[F] $str\n");
-   }
-
-   return;
-}
-
-sub _log_warning {
-   my $self = shift;
-   my ($msg) = @_;
-
-   chomp($msg);
-
-   my $class = $self->brik_class;
-
-   if (ref($self) && defined($self->{log})) {
-      return $self->log->warning($msg, $class);
-   }
-   else {
-      my $str = $self->_msg($class, $msg);
-      print("[!] $str\n");
-   }
-
-   return 1;
-}
-
-sub _log_verbose {
-   my $self = shift;
-   my ($msg) = @_;
-
-   chomp($msg);
-
-   my $class = $self->brik_class;
-
-   if (ref($self) && defined($self->{log})) {
-      return $self->log->verbose($msg, $class);
-   }
-   else {
-      my $str = $self->_msg($class, $msg);
-      print("[*] $str\n");
-   }
-
-   return 1;
-}
-
-sub _log_debug {
-   my $self = shift;
-   my ($msg) = @_;
-
-   if (! $self->debug) {
-      return 1;
-   }
-
-   chomp($msg);
-
-   my $class = $self->brik_class;
-
-   if (ref($self) && defined($self->{log})) {
-      return $self->log->debug($msg, $class);
-   }
-   else {
-      my $str = $self->_msg($class, $msg);
-      print("[D] $str\n");
-   }
-
-   return 1;
-}
-
 sub brik_check_properties {
    my $self = shift;
    my ($properties) = @_;
 
    my $name = $self->brik_name;
    if (! $self->can('brik_properties')) {
-      return $self->_log_error("brik_check_properties: Brik [$name] has no brik_properties");
+      return $self->log->error("brik_check_properties: Brik [$name] has no brik_properties");
    }
 
    $properties ||= $self->brik_properties;
@@ -479,6 +349,16 @@ sub brik_checks {
    return $self;
 }
 
+sub _msg {
+   my ($self, $msg) = @_;
+   $msg ||= 'undef';
+   chomp($msg);
+   my $class = ref($self) || $self;
+   $class = lc($class);
+   $class =~ s/^metabrik:://i;
+   return lc($class).": $msg";
+}
+
 sub new {
    my $self = shift->SUPER::new(
       @_,
@@ -486,7 +366,109 @@ sub new {
 
    my $r = $self->brik_create_attributes;
    if (! defined($r)) {
-      return $self->_log_error("new: brik_create_attributes failed");
+      if (defined($self->log)) {
+         return $self->log->error("new: brik_create_attributes failed");
+      }
+      else {
+         my $msg = _msg($self, "new: brik_create_attributes failed");
+         print("[-] $msg\n");
+         return;
+      }
+   }
+
+   # Create a default core::loglite Brik, if not given.
+   if (! defined($self->log)) {
+      {
+         no strict 'refs';
+
+         push @{'Metabrik::Core::Loglite::ISA'}, 'Metabrik';
+
+         *{'Metabrik::Core::Loglite::allow_log_override'} = sub {
+            my $self = shift;
+            my ($value) = @_;
+            if (defined($value)) {
+               $self->{allow_log_override} = $value;
+            }
+            return $self->{allow_log_override};
+         };
+
+         *{'Metabrik::Core::Loglite::level'} = sub {
+            my $self = shift;
+            my ($value) = @_;
+            if (defined($value)) {
+               $self->{level} = $value;
+            }
+            return $self->{level};
+         };
+
+         *{'Metabrik::Core::Loglite::color'} = sub {
+            my $self = shift;
+            my ($value) = @_;
+            if (defined($value)) {
+               $self->{color} = $value;
+            }
+            return $self->{color};
+         };
+
+         *{'Metabrik::Core::Loglite::info'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            return 1 if ($self->level < 1);
+            $msg = _msg($self, $msg);
+            print("[+] $msg\n");
+            return 1;
+         };
+
+         *{'Metabrik::Core::Loglite::error'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            return 1 if ($self->level < 1);
+            $msg = _msg($self, $msg);
+            print("[-] $msg\n");
+            return;
+         };
+
+         *{'Metabrik::Core::Loglite::fatal'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            # In log level 0, we print nothing except fatal errors.
+            $msg = _msg($self, $msg);
+            die("[F] $msg\n");
+            return;
+         };
+
+         *{'Metabrik::Core::Loglite::warning'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            return 1 if ($self->level < 1);
+            $msg = _msg($self, $msg);
+            print("[!] $msg\n");
+            return 1;
+         };
+
+         *{'Metabrik::Core::Loglite::verbose'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            return 1 if ($self->level < 2);
+            $msg = _msg($self, $msg);
+            print("[*] $msg\n");
+            return 1;
+         };
+
+         *{'Metabrik::Core::Loglite::debug'} = sub {
+            my $self = shift;
+            my ($msg) = @_;
+            return 1 if ($self->level < 3);
+            $msg = _msg($self, $msg);
+            print("[D] $msg\n");
+            return 1;
+         };
+      }
+
+      $self->log(bless(
+          { level => 1, color => 0, allow_log_override => 0 },
+          'Metabrik::Core::Loglite',
+      ));
    }
 
    return $self->brik_preinit;
@@ -499,7 +481,7 @@ sub new_no_checks {
 
    my $r = $self->brik_create_attributes;
    if (! defined($r)) {
-      return $self->_log_error("new_no_checks: brik_create_attributes failed");
+      return $self->log->error("new_no_checks: brik_create_attributes failed");
    }
 
    return $self->brik_preinit_no_checks;
@@ -510,7 +492,7 @@ sub new_from_brik {
    my ($brik) = @_;
 
    if (! defined($brik)) {
-      return $self->_log_error("new_from_brik: you must give a Brik object as argument");
+      return $self->log->error("new_from_brik: you must give a Brik object as argument");
    }
 
    my $log = $brik->log;
@@ -518,25 +500,21 @@ sub new_from_brik {
    my $con = $brik->context;
    my $she = $brik->shell;
 
-   if (! defined($log)) {
-      return $self->_log_error("new_from_brik: log Attribute is undef");
+   my %args = ();
+   if (defined($log)) {
+      $args{log} = $log;
    }
-   if (! defined($glo)) {
-      return $self->_log_error("new_from_brik: glo Attribute is undef");
+   if (defined($glo)) {
+      $args{global} = $glo;
    }
-   if (! defined($con)) {
-      return $self->_log_error("new_from_brik: con Attribute is undef");
+   if (defined($con)) {
+      $args{context} = $con;
    }
-   if (! defined($she)) {
-      return $self->_log_error("new_from_brik: she Attribute is undef");
+   if (defined($she)) {
+      $args{shell} = $she;
    }
 
-   return $self->new(
-      log => $log,
-      global => $glo,
-      context => $con,
-      shell => $she,
-   );
+   return $self->new(%args);
 }
 
 sub new_from_brik_no_checks {
@@ -544,7 +522,7 @@ sub new_from_brik_no_checks {
    my ($brik) = @_;
 
    if (! defined($brik)) {
-      return $self->_log_error("new_from_brik_no_checks: you must give a Brik object as argument");
+      return $self->log->error("new_from_brik_no_checks: you must give a Brik object as argument");
    }
 
    my $log = $brik->log;
@@ -552,34 +530,30 @@ sub new_from_brik_no_checks {
    my $con = $brik->context;
    my $she = $brik->shell;
 
-   if (! defined($log)) {
-      return $self->_log_error("new_from_brik_no_checks: log Attribute is undef");
+   my %args = ();
+   if (defined($log)) {
+      $args{log} = $log;
    }
-   if (! defined($glo)) {
-      return $self->_log_error("new_from_brik_no_checks: glo Attribute is undef");
+   if (defined($glo)) {
+      $args{global} = $glo;
    }
-   if (! defined($con)) {
-      return $self->_log_error("new_from_brik_no_checks: con Attribute is undef");
+   if (defined($con)) {
+      $args{context} = $con;
    }
-   if (! defined($she)) {
-      return $self->_log_error("new_from_brik_no_checks: she Attribute is undef");
+   if (defined($she)) {
+      $args{shell} = $she;
    }
 
-   return $self->new_no_checks(
-      log => $log,
-      global => $glo,
-      context => $con,
-      shell => $she,
-   );
+   return $self->new_no_checks(%args);
 }
 
 sub new_from_brik_init {
    my $self = shift;
 
    my $brik = $self->new_from_brik(@_)
-      or return $self->_log_error("new_from_brik_init: new_from_brik failed");
+      or return $self->log->error("new_from_brik_init: new_from_brik failed");
    $brik->brik_init
-      or return $self->_log_error("new_from_brik_init: brik_init failed");
+      or return $self->log->error("new_from_brik_init: brik_init failed");
 
    return $brik;
 }
@@ -588,9 +562,31 @@ sub new_from_brik_init_no_checks {
    my $self = shift;
 
    my $brik = $self->new_from_brik_no_checks(@_)
-      or return $self->_log_error("new_from_brik_init_no_checks: new_from_brik_no_checks failed");
+      or return $self->log->error("new_from_brik_init_no_checks: new_from_brik_no_checks failed");
    $brik->brik_init_no_checks
-      or return $self->_log_error("new_from_brik_init_no_checks: brik_init_no_checks failed");
+      or return $self->log->error("new_from_brik_init_no_checks: brik_init_no_checks failed");
+
+   return $brik;
+}
+
+sub new_brik_init {
+   my $self = shift;
+
+   my $brik = $self->new(@_)
+      or return $self->log->error("new_brik_init: new failed");
+   $brik->brik_init
+      or return $self->log->error("new_brik_init: brik_init failed");
+
+   return $brik;
+}
+
+sub new_brik_init_no_checks {
+   my $self = shift;
+
+   my $brik = $self->new_no_checks(@_)
+      or return $self->log->error("new_brik_init_no_checks: new_no_checks failed");
+   $brik->brik_init_no_checks
+      or return $self->log->error("new_brik_init_no_checks: brik_init_no_checks failed");
 
    return $brik;
 }
@@ -647,11 +643,18 @@ sub brik_set_default_attributes {
 
    # Special case: automatic setting of some defaults (datadir)
    # No inheritance here, it is just for currently instanciated Brik.
+   # We either take the global datadir if avail, or the Brik's one.
+   # Global datadir is just the base path, like $ENV{HOME}."/metabrik".
+   my $datadir;
+   my $global_datadir;
    my $global = $self->global;
-   if (defined($global)
-   &&  exists($self->brik_properties->{attributes})
+   if (defined($global)) {
+      $global_datadir = $self->global->datadir;
+   }
+
+   if (exists($self->brik_properties->{attributes})
    &&  exists($self->brik_properties->{attributes}->{datadir})) {
-      my $datadir = $self->datadir;
+      $datadir = $self->datadir;
 
       my $dir;
       # If datadir is set by user, we use it blindly.
@@ -659,10 +662,10 @@ sub brik_set_default_attributes {
       if (defined($datadir)) {
          $dir = $datadir;
       }
-      # Else, we build it.
+      # Else, we build it
       else {
-         my $global_datadir = $self->global->datadir;
-         $dir = $global_datadir;
+         $dir = $global_datadir || (defined($ENV{HOME}) && $ENV{HOME}."/metabrik")
+                                || "/tmp/metabrik";
 
          (my $subdir = $self->brik_name) =~ s/::/-/g;
          if (length($subdir)) {
@@ -674,7 +677,7 @@ sub brik_set_default_attributes {
 
       if (! -d $dir) {
          mkdir($dir)
-            or return $self->_log_error("brik_set_default_attributes: mkdir [$dir] failed: $!");
+            or return $self->log->error("brik_set_default_attributes: mkdir [$dir] failed: $!");
       }
    }
 
@@ -720,9 +723,9 @@ sub brik_check_require_modules {
          eval("require $module;");
          if ($@) {
             chomp($@);
-            $self->_log_error("brik_check_require_modules: you have to install ".
+            $self->log->error("brik_check_require_modules: you have to install ".
                "module [$module]");
-            $self->_log_debug("brik_check_require_modules: $@");
+            $self->log->debug("brik_check_require_modules: $@");
             $error++;
             next;
          }
@@ -732,9 +735,9 @@ sub brik_check_require_modules {
             eval('$module->import(@imports);');
             if ($@) {
             chomp($@);
-               $self->_log_error("brik_check_require_modules: unable to import ".
+               $self->log->error("brik_check_require_modules: unable to import ".
                   "functions [@imports] from module [$module]");
-               $self->_log_debug("brik_check_require_modules: $@");
+               $self->log->debug("brik_check_require_modules: $@");
                $error++;
                next;
             }
@@ -777,7 +780,7 @@ sub brik_check_require_binaries {
    my $error = 0;
    for my $binary (keys %binaries_found) {
       if (! $binaries_found{$binary}) {
-         $self->_log_error("brik_check_require_binaries: binary [$binary] not found in PATH");
+         $self->log->error("brik_check_require_binaries: binary [$binary] not found in PATH");
          $error++;
       }
    }
@@ -802,7 +805,7 @@ sub brik_repository {
    }
 
    # Error, repository not found
-   return $self->_log_fatal("brik_repository: no Repository found for Brik [$name] (invalid format?)");
+   return $self->log->fatal("brik_repository: no Repository found for Brik [$name] (invalid format?)");
 }
 
 sub brik_category {
@@ -823,7 +826,7 @@ sub brik_category {
    }
 
    # Error, category not found
-   return $self->_log_fatal("brik_category: no Category found for Brik [$name] (invalid format?)");
+   return $self->log->fatal("brik_category: no Category found for Brik [$name] (invalid format?)");
 }
 
 sub brik_name {
@@ -877,7 +880,7 @@ sub brik_has_tag {
    my ($tag) = @_;
 
    if (! defined($tag)) {
-      return $self->_log_error($self->brik_help_run('brik_has_tag'));
+      return $self->log->error($self->brik_help_run('brik_has_tag'));
    }
 
    my %h = map { $_ => 1 } @{$self->brik_tags};
@@ -898,7 +901,7 @@ sub brik_commands {
    my $classes = $self->brik_classes;
 
    for my $class (@$classes) {
-      #$self->_log_info("brik_commands: class[$class]");
+      #$self->log->info("brik_commands: class[$class]");
 
       if (exists($class->brik_properties->{commands})) {
          for my $command (keys %{$class->brik_properties->{commands}}) {
@@ -907,7 +910,7 @@ sub brik_commands {
             next if $command =~ /^_/; # Internal stuff
             next if $command =~ /^(?:a|b|import|new|SUPER::|BEGIN|isa|can|EXPORT|AA|AS|ISA|DESTROY|__ANON__)$/; # Perl stuff
 
-            #$self->_log_info("command[$command]");
+            #$self->log->info("command[$command]");
 
             $commands->{$command} = $class->brik_properties->{commands}->{$command};
          }
@@ -929,7 +932,7 @@ sub brik_base_commands {
       next if $command =~ /^_/; # Internal stuff
       next if $command =~ /^(?:a|b|import|new|SUPER::|BEGIN|isa|can|EXPORT|AA|AS|ISA|DESTROY|__ANON__)$/; # Perl stuff
 
-      #$self->_log_info("command[$command]");
+      #$self->log->info("command[$command]");
 
       $commands->{$command} = Metabrik->brik_properties->{commands}->{$command};
    }
@@ -977,7 +980,7 @@ sub brik_own_commands {
          next if $command =~ /^_/; # Internal stuff
          next if $command =~ /^(?:a|b|import|new|SUPER::|BEGIN|isa|can|EXPORT|AA|AS|ISA|DESTROY|__ANON__)$/; # Perl stuff
 
-         #$self->_log_info("command[$command]");
+         #$self->log->info("command[$command]");
 
          $commands->{$command} = $self->brik_properties->{commands}->{$command};
       }
@@ -991,7 +994,7 @@ sub brik_has_command {
    my ($command) = @_;
 
    if (! defined($command)) {
-      return $self->_log_error($self->brik_help_run('brik_has_command'));
+      return $self->log->error($self->brik_help_run('brik_has_command'));
    }
 
    if (exists($self->brik_commands->{$command})) {
@@ -1010,7 +1013,7 @@ sub brik_attributes {
    my $classes = $self->brik_classes;
 
    for my $class (@$classes) {
-      #$self->_log_info("brik_attributes: class[$class]");
+      #$self->log->info("brik_attributes: class[$class]");
 
       if (exists($class->brik_properties->{attributes})) {
          for my $attribute (keys %{$class->brik_properties->{attributes}}) {
@@ -1089,7 +1092,7 @@ sub brik_has_attribute {
    my ($attribute) = @_;
 
    if (! defined($attribute)) {
-      return $self->_log_error($self->brik_help_run('brik_has_attribute'));
+      return $self->log->error($self->brik_help_run('brik_has_attribute'));
    }
 
    if (exists($self->brik_attributes->{$attribute})) {
@@ -1104,7 +1107,7 @@ sub brik_has_module {
    my ($module) = @_;
 
    if (! defined($module)) {
-      return $self->_log_error($self->brik_help_run('brik_has_module'));
+      return $self->log->error($self->brik_help_run('brik_has_module'));
    }
 
    eval("require $module;");
@@ -1120,7 +1123,7 @@ sub brik_has_binary {
    my ($binary) = @_;
 
    if (! defined($binary)) {
-      return $self->_log_error($self->brik_help_run('brik_has_binary'));
+      return $self->log->error($self->brik_help_run('brik_has_binary'));
    }
 
    my @path = split(':', $ENV{PATH});
@@ -1142,7 +1145,7 @@ sub brik_preinit {
 
    my $r = $self->brik_set_default_attributes;
    if (! defined($r)) {
-      return $self->_log_error("brik_preinit: brik_set_default_attributes failed");
+      return $self->log->error("brik_preinit: brik_set_default_attributes failed");
    }
 
    # We have to put it here, cause brik_use_properties method is called, and 
@@ -1150,14 +1153,14 @@ sub brik_preinit {
    # brik_preinit method is called by new(), so no problem, it will be checked.
    $r = $self->brik_checks;
    if (! defined($r)) {
-      return $self->_log_error("brik_preinit: brik_checks failed");
+      return $self->log->error("brik_preinit: brik_checks failed");
    }
 
    # Now, we can set default Attributes from brik_use_properties, all brik_properties
    # Attributes should be inited with defaults.
    $r = $self->brik_set_use_default_attributes;
    if (! defined($r)) {
-      return $self->_log_error("brik_preinit: brik_set_use_default_attributes failed");
+      return $self->log->error("brik_preinit: brik_set_use_default_attributes failed");
    }
 
    $self->preinit_done(1);
@@ -1173,14 +1176,14 @@ sub brik_preinit_no_checks {
 
    my $r = $self->brik_set_default_attributes;
    if (! defined($r)) {
-      return $self->_log_error("brik_preinit: brik_set_default_attributes failed");
+      return $self->log->error("brik_preinit: brik_set_default_attributes failed");
    }
 
    # Now, we can set default Attributes from brik_use_properties, all brik_properties
    # Attributes should be inited with defaults.
    $r = $self->brik_set_use_default_attributes;
    if (! defined($r)) {
-      return $self->_log_error("brik_preinit: brik_set_use_default_attributes failed");
+      return $self->log->error("brik_preinit: brik_set_use_default_attributes failed");
    }
 
    $self->preinit_done(1);
@@ -1374,6 +1377,10 @@ L<help core::global>
 
 =item B<new_from_brik_init_no_checks>
 
+=item B<new_brik_init>
+
+=item B<new_brik_init_no_checks>
+
 =item B<brik_self>
 
 =item B<brik_preinit>
@@ -1472,7 +1479,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

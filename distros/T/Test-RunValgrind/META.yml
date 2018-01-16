@@ -20,7 +20,7 @@ name: Test-RunValgrind
 provides:
   Test::RunValgrind:
     file: lib/Test/RunValgrind.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   Carp: '0'
   Path::Tiny: '0'
@@ -30,10 +30,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/shlomif/test-runvalgrind/issues
+  bugtracker: https://github.com/shlomif/perl-Test-RunValgrind/issues
   homepage: http://metacpan.org/release/Test-RunValgrind
-  repository: https://github.com/shlomif/perl-Test-RunValgrind.git
-version: 0.0.2
+  repository: git://github.com/shlomif/perl-Test-RunValgrind.git
+version: 0.0.3
 x_Dist_Zilla:
   perl:
     version: '5.026001'

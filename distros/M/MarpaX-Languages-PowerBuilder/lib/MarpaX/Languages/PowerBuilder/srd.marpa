@@ -1,0 +1,102 @@
+:default            ::= action => [name,values]
+:start              ::= Syntax
+lexeme default = latm => 1
+ 
+Header              ::= Encoding ('PBExportHeader$':i) rest_of_line action => header
+Comment             ::= ('$PBExportComments$') rest_of_line action => comment
+rest_of_line          ~ comment_char*
+comment_char          ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Encoding              ~ 'HA$':i
+                      | '$'
+
+pbheader            ::= Header Comment
+                      | Header
+                      | Comment
+pbheader            ::=
+
+Syntax              ::= pbheader Release Containers BinarySection action => syntax
+Release             ::= 'release':i number ';'       action => release
+Containers          ::= Container+                   action => containers
+Container           ::= Data                         action => ::first
+                      | identifier ListAttributes    action => keyval
+ListAttributes      ::= ('(') Attributes (')')       action => ::first
+ListArguments       ::= Argument*                    separator => comma action => listkeyval
+ListNestedArguments ::= NestedArgument* separator => comma          action => list
+NestedArgument      ::= ('(') string (')')                          action => ::first
+Argument            ::= ('(') ArgumentName (',') ArgumentType (')') action => keyval
+ArgumentName        ::= string                    action => ::first
+ArgumentType        ::= identifier                action => ::first
+Attributes          ::= Attribute*                action => attributes
+Attribute           ::= ColumnAttribute           action => ::first
+                      | identifier '=' Value      action => attribute
+ColumnAttribute     ::= 'column' '=' Value        action => colattribute
+Data                ::= 'data' '(' DataValues ')' action => data
+#DataValues          ::= DataValue*               separator => comma proper => 1 action => ::first
+DataValues          ::= DataValueSep*       action => list
+DataValueSep        ::= DataValue (comma)   action => ::first
+                      | DataValue           action => ::first
+DataValue           ::= 'null' action => ::first
+                      | number action => ::first
+                      | string action => ::first
+
+Value               ::= number                          action => ::first
+                      | Datatype                        action => ::first
+                      | identifier                      action => ::first
+                      | string                          action => ::first
+                      | ListAttributes                  action => ::first
+                      | ('(') ListStrings         (')') action => ::first
+                      | ('(') ListArguments       (')') action => ::first
+                      | ('(') ListNestedArguments (')') action => ::first
+
+#not sure about separator!
+ListStrings         ::= string* separator => comma
+
+Datatype            ::= identifier '(' number ')' action => datatype
+
+BinarySection       ::= ('Start of PowerBuilder Binary Data Section : Do NOT Edit')
+                        ( [\d][\d] ) <binary name> 
+                        <binary lines> 
+                        ( [\d][\d]  <binary name>)
+                        ('End of PowerBuilder Binary Data Section : No Source Expected After This Point')
+                        action => keyval
+BinarySection       ::= action => ::undef;
+<binary name>         ~ [\w.]+
+<binary lines>      ::= <binary line>*
+<binary line>         ~ <binary chars> <vertical space>
+<binary chars>        ~ <binary char>+
+<binary char>         ~ [a-fA-F0-9] [a-fA-F0-9]
+<vertical space>      ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]+
+
+comma                 ~ [,]
+
+#This <identifier>, <number> and <string> comes from https://gist.github.com/jeffreykegler/4579728#file-marpax-json-pm-L65
+identifier            ~ [_a-zA-Z$] id_rest
+id_rest               ~ [_0-9a-zA-Z$.]*
+
+number                ~ int
+                      | int frac
+                      | int exp
+                      | int frac exp 
+int                   ~ digits
+                      | '-' digits
+digits                ~ [\d]+
+frac                  ~ '.' digits
+exp                   ~ e digits
+e                     ~ 'e'
+                      | 'e+'
+                      | 'e-'
+                      | 'E'
+                      | 'E+'
+                      | 'E-'
+
+string              ::= <string lexeme> action => string
+<string lexeme>       ~ quote <string contents> quote
+# This cheats -- it recognizers a superset of legal JSON strings.
+# The bad ones can sorted out later, as desired
+quote                 ~ ["]
+<string contents>     ~ <string char>*
+<string char>         ~ [^"~] | '~' <any char>
+<any char>            ~ [\d\D]
+
+:discard              ~ whitespace
+whitespace            ~ [\s]+

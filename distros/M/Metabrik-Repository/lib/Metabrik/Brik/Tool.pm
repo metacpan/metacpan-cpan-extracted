@@ -1,5 +1,5 @@
 #
-# $Id: Tool.pm,v 28a22d60af64 2017/10/19 08:44:25 gomor $
+# $Id: Tool.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # brik::tool Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 28a22d60af64 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable program) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -75,7 +75,9 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         repository => $self->global->repository,
+         repository => defined($self->global) && $self->global->repository
+            || defined($ENV{HOME}) && $ENV{HOME}.'/metabrik/repository'
+            || '/tmp/metabrik/repository',
       },
    };
 }
@@ -83,6 +85,10 @@ sub brik_use_properties {
 sub get_require_briks {
    my $self = shift;
    my ($brik) = @_;
+
+   if (! defined($self->context)) {
+      return $self->log->error("get_require_briks: no core::context Brik");
+   }
 
    my $con = $self->context;
 
@@ -142,6 +148,10 @@ sub get_require_modules {
    my $self = shift;
    my ($brik) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("get_require_modules: no core::context Brik");
+   }
+
    my $con = $self->context;
    my $available = $con->available;
 
@@ -196,6 +206,10 @@ sub get_require_modules_recursive {
 sub get_need_packages {
    my $self = shift;
    my ($brik) = @_;
+
+   if (! defined($self->context)) {
+      return $self->log->error("get_need_packages: no core::context Brik");
+   }
 
    my $con = $self->context;
    my $available = $con->available;
@@ -297,14 +311,14 @@ sub get_brik_hierarchy_recursive {
    # We first gather the provided Brik hierarchy
    my $provided = $self->get_brik_hierarchy($brik) or return;
    for (@$provided) {
-      $self->debug && $self->log->debug("get_brik [$_]");
+      $self->log->debug("get_brik [$_]");
       $hierarchy->{$_}++;
    }
 
    # And required Briks hierarchy
    my $required = $self->get_require_briks($brik) or return;
    for (@$required) {
-      $self->debug && $self->log->debug("get_require [$_]");
+      $self->log->debug("get_require [$_]");
       $hierarchy->{$_}++;
    }
 
@@ -345,6 +359,10 @@ sub install_modules {
 
 sub install_all_need_packages {
    my $self = shift;
+
+   if (! defined($self->context)) {
+      return $self->log->error("install_all_need_packages: no core::context Brik");
+   }
 
    # We don't want to fail on a missing package, so we install Brik by Brik
    #my $packages = $self->get_need_packages or return;
@@ -468,24 +486,26 @@ sub install {
    my $packages = [];
    my $modules = [];
    for my $brik (@$briks) {
-      $packages = $self->get_need_packages_recursive($brik) or return;
-      $modules = $self->get_require_modules_recursive($brik) or return;
+      my $this_packages = $self->get_need_packages_recursive($brik) or return;
+      my $this_modules = $self->get_require_modules_recursive($brik) or return;
       my $this_briks = $self->get_require_briks_recursive($brik) or return;
+      push @$packages, @$this_packages;
+      push @$modules, @$this_modules;
 
       for my $this_brik (@$this_briks) {
-         my $this_packages = $self->get_need_packages_recursive($this_brik) or next;
-         my $this_modules = $self->get_require_modules_recursive($this_brik) or next;
-         push @$packages, @$this_packages;
-         push @$modules, @$this_modules;
+         my $this_sub_packages = $self->get_need_packages_recursive($this_brik) or next;
+         my $this_sub_modules = $self->get_require_modules_recursive($this_brik) or next;
+         push @$packages, @$this_sub_packages;
+         push @$modules, @$this_sub_modules;
       }
-
-      my $uniq_packages = {};
-      my $uniq_modules = {};
-      for (@$packages) { $uniq_packages->{$_}++; }
-      for (@$modules) { $uniq_modules->{$_}++; }
-      $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
-      $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
    }
+
+   my $uniq_packages = {};
+   my $uniq_modules = {};
+   for (@$packages) { $uniq_packages->{$_}++; }
+   for (@$modules) { $uniq_modules->{$_}++; }
+   $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
+   $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
 
    $self->install_packages($packages) or return;
    $self->install_modules($modules) or return;
@@ -684,7 +704,7 @@ $package - $brik Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.
@@ -849,7 +869,7 @@ sub get_brik_module_file {
       $inc = [ @INC ];
    }
 
-   my $repository = $self->global->repository;
+   my $repository = $self->repository;
 
    my $name = $toks[-1];
    $name = ucfirst($name);
@@ -885,7 +905,11 @@ sub clone {
    my $self = shift;
    my ($brik, $repository) = @_;
 
-   $repository ||= $self->global->repository;
+   if (! defined($self->context)) {
+      return $self->log->error("clone: no core::context Brik");
+   }
+
+   $repository ||= $self->repository;
    $self->brik_help_run_undef_arg('clone', $brik) or return;
 
    my @directories = ();
@@ -913,8 +937,8 @@ sub clone {
    my $dst_file = $repository.'/lib/Metabrik/'.$file;
    (my $dst_mkdir = $dst_file) =~ s{/[^/]+$}{};
 
-   $self->debug && $self->log->debug("clone: src[$src_file] dst[$dst_file]");
-   $self->debug && $self->log->debug("clone: mkdir[$dst_mkdir]");
+   $self->log->debug("clone: src[$src_file] dst[$dst_file]");
+   $self->log->debug("clone: mkdir[$dst_mkdir]");
 
    if (-f $dst_file) {
       return $self->log->error("clone: destination file [$dst_file] already exists");
@@ -937,6 +961,10 @@ sub clone {
 sub get_require_binaries {
    my $self = shift;
    my ($brik) = @_;
+
+   if (! defined($self->context)) {
+      return $self->log->error("get_require_binaries: no core::context Brik");
+   }
 
    my $con = $self->context;
    my $available = $con->available;
@@ -974,7 +1002,7 @@ Metabrik::Brik::Tool - brik::tool Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

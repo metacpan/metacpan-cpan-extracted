@@ -53,7 +53,7 @@ ok(${JSON->new->decode($req->body_json)}{string} eq "My test is a body test", 'b
 
 ok(my $r = $req->send, 'send seems to work');
 is($req->response_code, 400, 'valid REST error return code');
-like($req->error, '/invalid/i', 'looks like good error test returned');
+like($req->error, '/expired|invalid/i', 'looks like good error test returned');
 
 my $tmp = File::Temp->new;
 my $key = "thisisthekey";

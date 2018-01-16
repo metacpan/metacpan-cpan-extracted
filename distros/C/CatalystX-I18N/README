@@ -10,8 +10,8 @@ SYNOPSIS
          +CatalystX::I18N::Role::GetLocale
          +CatalystX::I18N::Role::DateTime
          +CatalystX::I18N::Role::Maketext
-     /; 
-     # Choose only the roles you need 
+     /;
+     # Choose only the roles you need
      # CatalystX::I18N::Role::All is a convinient shortcut to load all available roles
  
      # Optionally also load request and response roles (also loaded by CatalystX::I18N::Role::All)
@@ -20,8 +20,8 @@ SYNOPSIS
      __PACKAGE__->apply_response_class_roles(qw/CatalystX::I18N::TraitFor::Response/);
  
      # Add some I18N configuration
-     __PACKAGE__->config( 
-         name    => 'MyApp', 
+     __PACKAGE__->config(
+         name    => 'MyApp',
          I18N    => {
              default_locale     => 'de_AT',
              locales            => {
@@ -51,7 +51,7 @@ SYNOPSIS
  
      sub auto : Private {
          my ($self,$c) = @_;
-         $c->get_locale(); 
+         $c->get_locale();
          # Tries to fetch the locale from the folloing sources in the given order
          # 1. Session
          # 2. User settings
@@ -106,7 +106,7 @@ DESCRIPTION
 
     *   CatalystX::I18N::Role::DateTime
 
-        Methods for localising date and time informations.
+        Methods for localising date and time information.
 
     *   CatalystX::I18N::Role::NumberFormat
 
@@ -114,7 +114,7 @@ DESCRIPTION
 
     *   CatalystX::I18N::TraitFor::Request
 
-        Extends Catalyst::Request with usefull methods to help dealing with
+        Extends Catalyst::Request with useful methods to help dealing with
         various I18N related information in HTTP requests.
 
     *   CatalystX::I18N::TraitFor::Response
@@ -148,8 +148,8 @@ CONFIGURATION
     In order to work properly, CatalystX::I18N will need some values in your
     Catalyst configuration
 
-     __PACKAGE__->config( 
-         name    => 'MyApp', 
+     __PACKAGE__->config(
+         name    => 'MyApp',
          I18N    => {
              default_locale     => 'de_AT', # Fallback locale
              locales            => {

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::PostgreSqlProvider;
-$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.03';
+$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.04';
 # ABSTRACT: A PostgreSql provider implementation
 # PODNAME: Footprintless::Plugin::Database::AbstractProvider
 
@@ -311,7 +311,7 @@ Footprintless::Plugin::Database::AbstractProvider - A PostgreSql provider implem
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

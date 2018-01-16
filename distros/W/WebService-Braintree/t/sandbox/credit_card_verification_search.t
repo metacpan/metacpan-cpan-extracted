@@ -154,4 +154,9 @@ subtest "Searches range fields" => sub {
     is $search_results->maximum_size, 0;
 };
 
+subtest "gets all ccvs" => sub {
+    my $ccvs = WebService::Braintree::CreditCardVerification->all;
+    ok scalar @{$ccvs->ids} > 1;
+};
+
 done_testing();

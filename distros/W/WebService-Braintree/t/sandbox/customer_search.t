@@ -17,20 +17,83 @@ use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Util;
 use DateTime;
 use DateTime::Duration;
+use Storable qw(dclone);
+
+{
+    my $attrs = {
+        first_name => "NotInFaker",
+        last_name => "O'Toole",
+        email => 'timmy@example.com',
+        fax => "3145551234",
+        phone => "5551231234",
+        website => "http://example.com",
+        credit_card => credit_card({
+            cardholder_name => "NotIn Tool",
+            billing_address => {
+                first_name => "Thomas",
+                last_name => "Otool",
+                street_address => "1 E Main St",
+                extended_address => "Suite 3",
+                locality => "Chicago",
+                region => "Illinois",
+                postal_code => "60622",
+                country_name => "United States of America",
+            },
+        }),
+    };
+
+    sub create_customer {
+        my ($company, $token) = @_;
+
+        my $this = dclone($attrs);
+        $this->{company} = $company;
+        $this->{credit_card}{token} = $token;
+
+        return WebService::Braintree::Customer->create($this);
+    }
+
+    sub make_search_criteria {
+        my ($company, $token) = @_;
+
+        return {
+            company => $company,
+            payment_method_token => $token,
+            first_name => $attrs->{first_name},
+            last_name => $attrs->{last_name},
+            email => $attrs->{email},
+            phone => $attrs->{phone},
+            fax => $attrs->{fax},
+            website => $attrs->{website},
+            address_first_name => $attrs->{credit_card}{billing_address}{first_name},
+            address_last_name => $attrs->{credit_card}{billing_address}{last_name},
+            address_street_address => $attrs->{credit_card}{billing_address}{street_address},
+            address_postal_code => $attrs->{credit_card}{billing_address}{postal_code},
+            address_extended_address => $attrs->{credit_card}{billing_address}{extended_address},
+            address_locality => $attrs->{credit_card}{billing_address}{locality},
+            address_region => $attrs->{credit_card}{billing_address}{region},
+            address_country_name => $attrs->{credit_card}{billing_address}{country_name},
+            cardholder_name => $attrs->{credit_card}{cardholder_name},
+            credit_card_expiration_date => $attrs->{credit_card}{expiration_date},
+            credit_card_number => $attrs->{credit_card}{number},
+        };
+    }
+}
 
 my $unique_company = "company" . generate_unique_integer();
 my $unique_token = "token" . generate_unique_integer();
 my $result = create_customer($unique_company, $unique_token);
-# XXX Add a BAIL_OUT here?
-ok($result->is_success, "customer created successfully");
+validate_result($result, 'customer created successfully')
+    or BAIL_OUT('Cannot create customer');
+
 my $customer = WebService::Braintree::Customer->find($result->customer->id);
 
 subtest "find customer with all matching fields" => sub {
     my $criteria = make_search_criteria($unique_company, $unique_token);
     my $search_result = perform_search(Customer => $criteria);
-    ok $search_result->is_success;
+    validate_result($search_result) or return;
+
     not_ok $search_result->is_empty;
-    is substr($search_result->first->credit_cards->[0]->last_4, 0, 4), 1111;
+    is $search_result->first->credit_cards->[0]->last_4, cc_last4($criteria->{credit_card_number});
 };
 
 subtest "can find duplicate credit cards given payment method token" => sub {
@@ -63,14 +126,15 @@ subtest "can search on text fields" => sub {
 };
 
 subtest "can search on credit card number (partial match)" => sub {
+    my $last4 = cc_last4(make_search_criteria()->{credit_card_number});
     my $search_result = WebService::Braintree::Customer->search(sub {
         my $search = shift;
-        $search->credit_card_number->ends_with(1111);
+        $search->credit_card_number->ends_with($last4);
     });
 
     not_ok $search_result->is_empty;
 
-    ok grep { $_ eq "1111" } map { $_->last_4 } @{$search_result->first->credit_cards};
+    ok grep { $_->last_4 eq $last4 } @{$search_result->first->credit_cards};
 };
 
 subtest "can search on ids (multiple values)" => sub {
@@ -88,7 +152,7 @@ subtest "can search on created_at (range field)" => sub {
     my $unique_token = "token" . generate_unique_integer();
 
     my $result = create_customer($unique_company, $unique_token);
-    ok $result->is_success;
+    validate_result($result) or return;
 
     my $new_customer = WebService::Braintree::Customer->find($result->customer->id);
     my $search_result = WebService::Braintree::Customer->search(sub {
@@ -105,7 +169,8 @@ subtest "can search on address (text field)" => sub {
     my $unique_company = "company" . generate_unique_integer();
     my $unique_token = "token" . generate_unique_integer();
     my $result = create_customer($unique_company, $unique_token);
-    ok $result->is_success;
+    validate_result($result) or return;
+
     my $new_customer = WebService::Braintree::Customer->find($result->customer->id);
     my $search_result = WebService::Braintree::Customer->search(sub {
         my $search = shift;
@@ -129,60 +194,3 @@ subtest "gets all customers" => sub {
 };
 
 done_testing();
-
-sub create_customer {
-    my ($company, $token) = @_;
-
-    my $customer_attributes = {
-        first_name => "NotInFaker",
-        last_name => "O'Toole",
-        company => $company,
-        email => 'timmy@example.com',
-        fax => "3145551234",
-        phone => "5551231234",
-        website => "http://example.com",
-        credit_card => {
-            cardholder_name => "NotIn Tool",
-            number => "5431111111111111",
-            expiration_date => "05/2010",
-            token => $token,
-            billing_address => {
-                first_name => "Thomas",
-                last_name => "Otool",
-                street_address => "1 E Main St",
-                extended_address => "Suite 3",
-                locality => "Chicago",
-                region => "Illinois",
-                postal_code => "60622",
-                country_name => "United States of America",
-            },
-        },
-    };
-    return WebService::Braintree::Customer->create($customer_attributes);
-}
-
-sub make_search_criteria {
-    my ($company, $token) = @_;
-
-    return {
-        first_name => "NotInFaker",
-        last_name => "O'Toole",
-        company => $company,
-        email => 'timmy@example.com',
-        phone => "5551231234",
-        fax => "3145551234",
-        website => "http://example.com",
-        address_first_name => "Thomas",
-        address_last_name => "Otool",
-        address_street_address => "1 E Main St",
-        address_postal_code => "60622",
-        address_extended_address => "Suite 3",
-        address_locality => "Chicago",
-        address_region => "Illinois",
-        address_country_name => "United States of America",
-        payment_method_token => $token,
-        cardholder_name => "NotIn Tool",
-        credit_card_expiration_date => "05/2010",
-        credit_card_number => "5431111111111111",
-    };
-}

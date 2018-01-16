@@ -1,5 +1,5 @@
 #
-# $Id: File.pm,v 05c36070ec99 2017/05/02 06:10:24 gomor $
+# $Id: File.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # log::file Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Core::Log);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 05c36070ec99 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable logging) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -46,7 +46,6 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         debug => $self->log->debug,
          level => $self->log->level,
          output => $datadir.'/output.log',
       },
@@ -141,24 +140,9 @@ sub debug {
    my $self = shift;
    my ($msg, $caller) = @_;
 
-   # We have a conflict between the method and the accessor,
-   # we have to identify which one is accessed.
+   return 1 unless $self->level > 2;
 
-   # If no message defined, we want to access the Attribute
-   if (! defined($msg)) {
-      return $self->{debug};
-   }
-   else {
-      # If $msg is either 1 or 0, we want to set the Attribute
-      if ($msg =~ /^(?:1|0)$/) {
-         return $self->{debug} = $msg;
-      }
-      else {
-         return 1 unless $self->level > 2;
-
-         $self->_print($msg, 'DEBUG', '[D]', ($caller) ||= caller());
-      }
-   }
+   $self->_print($msg, 'DEBUG', '[D]', ($caller) ||= caller());
 
    return 1;
 }
@@ -185,7 +169,7 @@ Metabrik::Log::File - log::file Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

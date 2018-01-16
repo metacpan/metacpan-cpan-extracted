@@ -1,0 +1,26 @@
+Revision history for Perl module Mojolicious::Command::generate::routes
+
+0.01 Tue Dec 12 21:58:36 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+    - Written some POD.
+    - Created repository on Github.
+
+0.02 Sun Dec 17 00:54:36 2017
+    - Implemented run().
+    - Added initial templates.
+    - Improved documentation.
+    - Added tests for file generation from templates.
+
+0.03 Thu Jan 11 22:13:56 CET 2018
+    - Added Model templates.
+    - Added TODO template containig generated helpers and routes.
+    - Added some additional tests and cleaned up the templates.
+
+0.04 Thu Jan 11 22:48:38 CET 2018
+    - Fixed inconsistencies in the documentation.
+
+0.05 Sun Jan 14 23:50:40 CET 2018
+    - Added Mojo::SQLite to the TEST_REQURES section in Makefile.PL
+    - Added pod and manifest tests.
+    - Made path to test.db more specific.
+

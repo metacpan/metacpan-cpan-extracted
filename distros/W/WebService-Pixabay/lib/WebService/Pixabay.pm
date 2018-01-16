@@ -15,76 +15,78 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package WebService::Pixabay;
+$WebService::Pixabay::VERSION = '2.2.0';
+# ABSTRACT: Perl 5 interface to Pixabay API.
+
+use strict;
+use warnings;
+use v5.10;
 
 use Moo;
 use Function::Parameters;
-use Data::Dumper 'Dumper';
 
 with 'WebService::Client';
 
-# ABSTRACT: Perl 5 interface to Pixabay API.
-our $VERSION = '2.1.1';    # VERSION
-
-# token key
+# api_key
 has api_key => (
-                is       => 'ro',
-                required => 1
-               );
+    is       => 'ro',
+    required => 1
+);
 
-has '+base_url' => (default => 'https://pixabay.com/api/');
+has '+base_url' => ( default => 'https://pixabay.com/api/' );
 
-# get image metadata from JSON
+
 method image_search(
-                    : $q              = "yellow flower",
-                    : $lang           = "en",
-                    : $id             = "",
-                    : $response_group = "image_details",
-                    : $image_type     = "all",
-                    : $orientation    = "all",
-                    : $category       = "",
-                    : $min_width      = 0,
-                    : $min_height     = 0,
-                    : $editors_choice = "false",
-                    : $safesearch     = "false",
-                    : $order          = "popular",
-                    : $page           = 1,
-                    : $per_page       = 20,
-                    : $callback       = "",
-                    : $pretty         = "false"
-                   )
+    : $q              = "yellow flower",
+    : $lang           = "en",
+    : $id             = "",
+    : $response_group = "image_details",
+    : $image_type     = "all",
+    : $orientation    = "all",
+    : $category       = "",
+    : $min_width      = 0,
+    : $min_height     = 0,
+    : $editors_choice = "false",
+    : $safesearch     = "false",
+    : $order          = "popular",
+    : $page           = 1,
+    : $per_page       = 20,
+    : $callback       = "",
+    : $pretty         = "false"
+  )
 {
-    return $self->get("?key="
-        . $self->api_key
-        . "&q=$q&lang=$lang&id=$id&response_group=$response_group&image_type=$image_type"
-        . "&orientation=$orientation&category=$category&min_width=$min_width&mind_height=$min_height"
-        . "&editors_choice=$editors_choice&safesearch=$safesearch&order=$order&page=$page"
-        . "&per_page=$per_page&callback=$callback&pretty=$pretty");
+    return $self->get( "?key="
+          . $self->api_key
+          . "&q=$q&lang=$lang&id=$id&response_group=$response_group&image_type=$image_type"
+          . "&orientation=$orientation&category=$category&min_width=$min_width&mind_height=$min_height"
+          . "&editors_choice=$editors_choice&safesearch=$safesearch&order=$order&page=$page"
+          . "&per_page=$per_page&callback=$callback&pretty=$pretty" );
 }
 
-# get image metadata from JSON
+
 method video_search(
-                    : $q              = "yellow flower",
-                    : $lang           = "en",
-                    : $id             = "",
-                    : $video_type     = "all",
-                    : $category       = "",
-                    : $min_width      = 0,
-                    : $min_height     = 0,
-                    : $editors_choice = "false",
-                    : $safesearch     = "false",
-                    : $order          = "popular",
-                    : $page           = 1,
-                    : $per_page       = 20,
-                    : $callback       = "",
-                    : $pretty         = "false"
-                   )
+    : $q              = "yellow flower",
+    : $lang           = "en",
+    : $id             = "",
+    : $video_type     = "all",
+    : $category       = "",
+    : $min_width      = 0,
+    : $min_height     = 0,
+    : $editors_choice = "false",
+    : $safesearch     = "false",
+    : $order          = "popular",
+    : $page           = 1,
+    : $per_page       = 20,
+    : $callback       = "",
+    : $pretty         = "false"
+  )
 {
-    return $self->get("videos/?key="
-        . $self->api_key
-        . "&q=$q&lang=$lang&id=$id&video_type=$video_type"
-        . "&category=$category&min_width=$min_width&mind_height=$min_height"
-        . "&editors_choice=$editors_choice&safesearch=$safesearch&order=$order&page=$page"
-        . "&per_page=$per_page&callback=$callback&pretty=$pretty");
+    return $self->get( "videos/?key="
+          . $self->api_key
+          . "&q=$q&lang=$lang&id=$id&video_type=$video_type"
+          . "&category=$category&min_width=$min_width&mind_height=$min_height"
+          . "&editors_choice=$editors_choice&safesearch=$safesearch&order=$order&page=$page"
+          . "&per_page=$per_page&callback=$callback&pretty=$pretty" );
 }
 
 1;
@@ -101,12 +103,13 @@ WebService::Pixabay - Perl 5 interface to Pixabay API.
 
 =head1 VERSION
 
-version 2.1.1
+version 2.2.0
 
 =head1 SYNOPSIS
 
     use strict;
     use warnings;
+    use v5.10;
     
     use WebService::Pixabay;
     use Data::Dumper 'Dumper';
@@ -117,9 +120,9 @@ version 2.1.1
     my $img1 = $pix->image_search;
     my $vid1 = $pix->video_search;
     
-    # print JSON structure using Data::Dumper's 'Dumper'
-    print Dumper($img1) . "\n";
-    print Dumper($vid1) . "\n";
+    # print data structure using Data::Dumper's 'Dumper'
+    say Dumper($img1);
+    say Dumper($vid1);
     
     ###################################################
     # The parameters of the method have the same name #
@@ -140,7 +143,7 @@ version 2.1.1
         pretty => 'true'
     );
 
-    print Dumper($cust_img) . "\n";
+    say Dumper($cust_img);
 
     # -or with video_search-
 
@@ -153,7 +156,7 @@ version 2.1.1
         order => 'popular'
     );
 
-    print Dumper($cust_vid) . "\n";
+    say Dumper($cust_vid);
 
     # Handling specific hashes and arrays of values from the image_search JSON
     # example retrieving webformatURL from each arrays
@@ -165,10 +168,169 @@ version 2.1.1
         push(@urls, $url->{webformatURL});      
     }
     
-    print $urls[3] . "\n"; # image URL in the fourth row
+    say $urls[3]; # image URL in the fourth row
 
     # Getting a specific single hash or array value from video_search JSON
-    print $cust_vid->{hits}[0]{medium}{url} . "\n";
+    say $cust_vid->{hits}[0]{medium}{url};
+
+=head2 Methods
+
+=over 4
+
+=item image_search( q              => "yellow flower",
+                    lang           => "en",
+                    id             => "",
+                    response_group => "image_details",
+                    image_type     => "all",
+                    orientation    => "all",
+                    category       => "",
+                    min_width      => 0,
+                    min_height     => 0,
+                    editors_choice => "false",
+                    safesearch     => "false",
+                    order          => "popular",
+                    page           => 1,
+                    per_page       => 20,
+                    callback       => "",
+                    pretty         => "false")
+
+Description: Get image search metadata with default values as shown above.
+
+Parameter: q str A URL encoded search term. If omitted, all images are returned.
+ This value may not exceed 100 characters. 
+ Example: "yellow+flower"
+
+Parameter: lang str Language code of the language to be searched in. 
+ Accepted values: cs, da, de, en, es, fr, id, it, hu, nl, no, pl, pt, ro, sk, fi, sv, tr, vi, th, bg, ru, el, ja, ko, zh
+ Default: "en"
+
+Parameter: id str ID, hash ID, or a comma separated list of values for retrieving specific images. In a comma separated list, IDs and hash IDs cannot be used together.
+
+Parameter: response_group str Choose between retrieving high resolution images and image details. When selecting details, you can access images up to a dimension of 960 x 720 px.
+ Accepted values: "image_details", "high_resolution"
+ Default: "image_details"
+
+Parameter: image_type str Filter results by image type.
+ Accepted values: "all", "photo", "illustration", "vector"
+ Default: "all"
+
+Parameter: orientation str Whether an image is wider than it is tall, or taller than it is wide.
+ Accepted values: "all", "horizontal", "vertical"
+ Default: "all"
+
+Parameter: category str Filter results by category.
+ Accepted values: fashion, nature, backgrounds, science, education, people, feelings, religion, health, places, animals, industry, food, computer, sports, transportation, travel, buildings, business, music
+
+Parameter: min_width int Minimum image width.
+ Default: "0"
+
+Parameter: min_height int Minimum image height.
+ Default: "0"
+
+Parameter: editors_choice bool Select images that have received an Editor's Choice award.
+ Accepted values: "true", "false"
+ Default: "false"
+
+Parameter: safesearch bool A flag indicating that only images suitable for all ages should be returned.
+ Accepted values: "true", "false"
+ Default: "false"
+
+Parameter: order str How the results should be ordered.
+ Accepted values: "popular", "latest"
+ Default: "popular"
+
+Parameter: page int Returned search results are paginated. Use this parameter to select the page number.
+ Default: 1
+
+Parameter: per_page int Determine the number of results per page.
+ Accepted values: 3 - 200
+ Default: 20
+
+Parameter: callback string JSONP callback function name
+
+Parameter: pretty bool Indent JSON output. This option should not be used in production.
+ Accepted values: "true", "false"
+ Default: "false" 
+
+Returns: Image search metadata.
+
+=back
+
+=over 4
+
+=item video_search( q              => "yellow flower",
+                    lang           => "en",
+                    id             => "",
+                    video_type     => "all",
+                    orientation    => "all",
+                    category       => "",
+                    min_width      => 0,
+                    min_height     => 0,
+                    editors_choice => "false",
+                    safesearch     => "false",
+                    order          => "popular",
+                    page           => 1,
+                    per_page       => 20,
+                    callback       => "",
+                    pretty         => "false")
+
+Description: Get video search metadata with default values as shown above.
+
+Parameter: q str A URL encoded search term. If omitted, all images are returned.
+ This value may not exceed 100 characters. 
+ Example: "yellow+flower"
+
+Parameter: lang str Language code of the language to be searched in. 
+ Accepted values: cs, da, de, en, es, fr, id, it, hu, nl, no, pl, pt, ro, sk, fi, sv, tr, vi, th, bg, ru, el, ja, ko, zh
+ Default: "en"
+
+Parameter: id str ID, hash ID, or a comma separated list of values for retrieving specific images. In a comma separated list, IDs and hash IDs cannot be used together.
+
+Parameter: video_type str Filter results by video type.
+ Accepted values: "all", "film", "animation"
+ Default: "all" 
+
+Parameter: orientation str Whether an image is wider than it is tall, or taller than it is wide.
+ Accepted values: "all", "horizontal", "vertical"
+ Default: "all"
+
+Parameter: category str Filter results by category.
+ Accepted values: fashion, nature, backgrounds, science, education, people, feelings, religion, health, places, animals, industry, food, computer, sports, transportation, travel, buildings, business, music
+
+Parameter: min_width int Minimum image width.
+ Default: "0"
+
+Parameter: min_height int Minimum image height.
+ Default: "0"
+
+Parameter: editors_choice bool Select images that have received an Editor's Choice award.
+ Accepted values: "true", "false"
+ Default: "false"
+
+Parameter: safesearch bool A flag indicating that only images suitable for all ages should be returned.
+ Accepted values: "true", "false"
+ Default: "false"
+
+Parameter: order str How the results should be ordered.
+ Accepted values: "popular", "latest"
+ Default: "popular"
+
+Parameter: page int Returned search results are paginated. Use this parameter to select the page number.
+ Default: 1
+
+Parameter: per_page int Determine the number of results per page.
+ Accepted values: 3 - 200
+ Default: 20
+
+Parameter: callback string JSONP callback function name
+
+Parameter: pretty bool Indent JSON output. This option should not be used in production.
+ Accepted values: "true", "false"
+ Default: "false" 
+
+Returns: Video search metadata.
+
+=back
 
 =head1 SEE ALSO
 
@@ -192,10 +354,10 @@ faraco <skelic3@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by faraco.
+This software is Copyright (c) 2017-2018 by faraco.
 
 This is free software, licensed under:
 
-  The GNU General Public License, Version 3, June 2007
+  The MIT (X11) License
 
 =cut

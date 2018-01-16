@@ -22,19 +22,19 @@ has 'i18n_numberformat' => (
 
 sub _build_i18n_numberformat {
     my ($c) = @_;
-    
+
     my $locale = $c->locale.'.UTF-8';
     my $config = $c->i18n_config;
     my $lconv = {};
-    
+
     # Get lconv from POSIX
     # TODO: Get lconv setting only once at Catalyst startup
     {
         use locale;
         no strict 'refs';
         my %original;
-        
-        # Set locale 
+
+        # Set locale
         foreach my $category (qw(LC_NUMERIC LC_MONETARY)) {
             my $current_locale = POSIX::setlocale(&{"POSIX::".uc($category)});
             if ($current_locale ne $locale) {
@@ -42,15 +42,15 @@ sub _build_i18n_numberformat {
                 POSIX::setlocale(&{"POSIX::".uc($category)},$locale);
             }
         }
-        
+
         $lconv = POSIX::localeconv();
-        
+
         # Reset locale to original state
         while (my ($category,$locale) = each %original) {
             POSIX::setlocale(&{"POSIX::".uc($category)},$locale);
         }
     }
-    
+
     # Build custom defined for 5.8
     my $defined_or = sub {
         foreach (@_) {
@@ -58,7 +58,7 @@ sub _build_i18n_numberformat {
                 if defined $_;
         }
     };
-    
+
     # Set number format
     my $numberformat = Number::Format->new(
         -int_curr_symbol    => $defined_or->($config->{int_curr_symbol},$lconv->{int_curr_symbol},'EUR'),
@@ -80,12 +80,12 @@ sub _build_i18n_numberformat {
         -thousands_sep      => $defined_or->($config->{thousands_sep},$lconv->{thousands_sep},','),
         -decimal_point      => $defined_or->($config->{decimal_point},$lconv->{decimal_point},'.'),
 #        -grouping           => ($config->{grouping},$lconv->{grouping}),
-        
+
         -decimal_fill       => $defined_or->($config->{decimal_fill},0),
         -neg_format         => $defined_or->($config->{negative_sign},$lconv->{negative_sign},'-').'x',
         -decimal_digits     => $defined_or->($config->{frac_digits},$lconv->{frac_digits},2),
     );
-    
+
     return $numberformat;
 }
 
@@ -107,10 +107,10 @@ CatalystX::I18N::Role::NumberFormat - Support for I18N number formating
 
  package MyApp::Catalyst;
  
- use Catalyst qw/MyPlugins 
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base
     CatalystX::I18N::Role::NumberFormat/;
-
+ 
  package MyApp::Catalyst::Controller::Main;
  
  use strict;
@@ -119,7 +119,7 @@ CatalystX::I18N::Role::NumberFormat - Support for I18N number formating
  
  sub action : Local {
      my ($self,$c) = @_;
-     
+
      $c->stash->{total} = $c->i18n_numberformat->format_price(102.34);
  }
 
@@ -137,14 +137,14 @@ upon the first call of the method.
  my $number_format = $c->i18n_numberformat;
  $number_format->format_price(27.03);
 
-Returns a L<Number::Format> object for your current locale. 
+Returns a L<Number::Format> object for your current locale.
 
-The L<Number::Format> settings will be taken from L<POSIX::localeconv> but 
+The L<Number::Format> settings will be taken from L<POSIX::localeconv> but
 can be overdriven in your Catalyst I18N configuration:
 
  # Add some I18N configuration
- __PACKAGE__->config( 
-     name    => 'MyApp', 
+ __PACKAGE__->config(
+     name    => 'MyApp',
      I18N    => {
          default_locale          => 'de_AT',
          locales                 => {

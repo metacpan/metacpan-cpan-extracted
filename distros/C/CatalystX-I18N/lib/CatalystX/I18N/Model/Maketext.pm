@@ -8,29 +8,29 @@ extends 'CatalystX::I18N::Model::Base';
 
 use CatalystX::I18N::TypeConstraints;
 use Path::Class;
-
+use Scalar::Util qw(weaken);
 
 has 'gettext_style' => (
-    is          => 'rw', 
+    is          => 'rw',
     isa         => 'Bool',
     default     => 1,
 );
 
 sub BUILD {
     my ($self) = @_;
-    
+
     my $class = $self->class;
 
     # Load Maketext class
     my ($ok,$error) = Class::Load::try_load_class($class);
     Catalyst::Exception->throw(sprintf("Could not load '%s' : %s",$class,$error))
         unless $ok;
-    
+
     Catalyst::Exception->throw(sprintf("Could initialize '%s' because is is not a 'Locale::Maketext' class",$class))
         unless $class->isa('Locale::Maketext');
-    
+
     my $app = $self->_app;
-    
+
     # Load lexicons in the Maketext class if possible
     if ($class->can('load_lexicon')) {
         my (@locales,%inhertiance,$config);
@@ -42,9 +42,9 @@ sub BUILD {
         }
         $app->log->debug(sprintf("Loading maketext lexicons for locales %s",join(',',@locales)))
             if $app->debug;
-            
-        $class->load_lexicon( 
-            locales             => \@locales, 
+
+        $class->load_lexicon(
+            locales             => \@locales,
             directories         => $self->directories,
             gettext_style       => $self->gettext_style,
             inheritance         => \%inhertiance,
@@ -52,28 +52,29 @@ sub BUILD {
     } else {
         $app->log->warn(sprintf("'%s' does not implement a 'load_lexicon' method",$class))
     }
-    
+
     return;
 }
 
 sub ACCEPT_CONTEXT {
     my ( $self, $c ) = @_;
-    
+
     # set locale and fallback
     my $handle = $self->class->get_handle( $c->locale );
-    
+
     # Catch error
     Catalyst::Exception->throw(sprintf("Could not fetch lanuage handle for locale '%s'",$c->locale))
         unless ( scalar $handle );
-    
+
     if ($self->can('fail_with')) {
-        $handle->fail_with( sub { 
+        weaken($c);
+        $handle->fail_with( sub {
             $self->fail_with($c,@_);
         } );
     } else {
         $handle->fail_with( sub { } );
     }
-    
+
     return $handle;
 }
 
@@ -93,28 +94,28 @@ CatalystX::I18N::Model::Maketext - Glues Locale::Maketext into Catalyst
  package MyApp::Catalyst;
  use Catalyst qw/CatalystX::I18N::Role::Base/;
  
- __PACKAGE__->config( 
+ __PACKAGE__->config(
     'Model::Maketext' => {
         class           => 'MyApp::Maketext', # optional
-        directory       => '/path/to/maketext/files', # optional
+        directories     => '/path/to/maketext/files', # optional
     },
  );
- 
- 
+
+
  # Create a model class
  package MyApp::Model::Maketext;
  use parent qw/CatalystX::I18N::Model::Maketext/;
- 
- 
+
+
  # Create a Maketext class (must be a Locale::Maketext class)
  package MyApp::Maketext;
  use parent qw/CatalystX::I18N::Maketext/;
- 
- 
+
+
  # In your controller class(es)
  package MyApp::Controller::Main;
  use parent qw/Catalyst::Controller/;
- 
+
  sub action : Local {
      my ($self,$c) = @_;
      
@@ -125,11 +126,11 @@ CatalystX::I18N::Model::Maketext - Glues Locale::Maketext into Catalyst
 
 =head1 DESCRIPTION
 
-This model glues a L<Locale::Maketext> class 
-(eg. L<CatalystX::I18N::Maketext>) into you Catalyst application. 
+This model glues a L<Locale::Maketext> class
+(eg. L<CatalystX::I18N::Maketext>) into you Catalyst application.
 
 The method C<fail_with> will be called for each missing msgid if present
-in your model class. 
+in your model class.
 
  package MyApp::Model::Maketext;
  use parent qw/CatalystX::I18N::Model::Maketext/;
@@ -140,7 +141,7 @@ in your model class.
      return $string;
  }
 
-See L<Catalyst::Helper::Model::Maketext> for gerating an Maketext model from 
+See L<Catalyst::Helper::Model::Maketext> for gerating an Maketext model from
 the command-line.
 
 =head1 CONFIGURATION
@@ -153,21 +154,21 @@ Defaults to $APPNAME::Maketext
 
 =head3 gettext_style
 
-Enable gettext style. C<%quant(%1,document,documents)> instead of 
+Enable gettext style. C<%quant(%1,document,documents)> instead of
 C<[quant,_1,document,documents]>
 
 Default TRUE
 
-=head3 directory
+=head3 directories
 
-List of directories to be searched for maketext files.
+Array reference of directories to be searched for maketext files.
 
-See L<CatalystX::I18N::Maketext> for more details on the C<directory> 
+See L<CatalystX::I18N::Maketext> for more details on the C<directory>
 parameter
 
 =head1 SEE ALSO
 
-L<CatalystX::I18N::Maketext>, L<Locale::Maketext>, 
+L<CatalystX::I18N::Maketext>, L<Locale::Maketext>,
 L<Locale::Maketext::Lexicon> and L<CatalystX::I18N::Role::Maketext>
 
 =head1 AUTHOR

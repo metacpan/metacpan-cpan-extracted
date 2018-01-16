@@ -1,10 +1,31 @@
 ==================================================
-Changes from 2016-12-21 00:00:00 +0000 to present.
+Changes from 2017-01-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.1.1 at 2017-12-21 08:23:45 +0000
+version 0.2.0 at 2018-01-15 03:16:50 +0000
 ------------------------------------------
+
+  Change: 11f405695590d38512fd18eb37b7c60ac6ab1fad
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 11:15:34 +0000
+
+    Minor update.
+
+    - Change project license to use MIT. - Better command line handling.
+    - Tidy up. 
+
+  Change: 0286ecae2169fb0b42a2386c39483b922a310c8b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-21 19:52:33 +0000
+
+    Remove external changelog. 
+
+  Change: 82f0ca9277758786be201b09e0324fd6eb32292c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-21 16:24:20 +0000
+
+    Update test. 
 
   Change: f74ce7c7295e0711bd4b7dc9623c6bbeadbb3c97
   Author: faraco <skelic3@gmail.com>

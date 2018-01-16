@@ -1,3 +1,33 @@
+0.010  2018-01-13 23:28:06 CET
+   - remove incorrect assumption about WWW::Telegram::BotAPI
+   - release after 71 PASSes on CPAN Testers (thanks!)
+
+0.009001  2018-01-13 22:31:12 CET
+   - fix indentation in README.md for examples
+   - fix "certificate" and document it in WebHook
+   - document constructor in WebHook
+   - TRIAL release
+
+0.009  2018-01-11 21:22:52 CET
+   - fix minor issue with Kwalitee
+   - fix bugs in WebHook.pm and add logging
+   - add examples for WebHook and LongPoll
+
+0.008  2018-01-11 08:14:43 CET
+   - put "badges" together in POD to avoid indentation effect in
+     Markdown
+   - remove RT as a channel for tickets
+   - update copyright year
+   - release after 68 PASSes on CPAN Testers (thanks!)
+
+0.007  2018-01-11 00:40:26 CET
+   - fixed issues in documentation
+   - add handling of automatic registration/unregistration in
+     WebHook
+   - fixed bug in LongPoll
+   - extended LongPoll for easy send_response
+   - TRIAL release
+
 0.006  2017-03-01 22:54:52 CET
    - release after 181 PASSes on CPAN Testers (thanks!)
 

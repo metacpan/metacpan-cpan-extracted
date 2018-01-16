@@ -1,78 +1,105 @@
-SYNOPSIS
+NAME
+    Sort::Sub - Collection of sort subroutines
 
+VERSION
+    This document describes version 0.110 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2018-01-15.
+
+SYNOPSIS
      use Sort::Sub qw($naturally);
-    
+
      my @sorted = sort $naturally ('track1.mp3', 'track10.mp3', 'track2.mp3', 'track1b.mp3', 'track1a.mp3');
      # => ('track1.mp3', 'track1a.mp3', 'track1b.mp3', 'track2.mp3', 'track10.mp3')
 
     Request as subroutine:
 
      use Sort::Sub qw(naturally);
-    
+
      my @sorted = sort {naturally} (...);
 
     Request a reverse sort:
 
      use Sort::Sub qw($naturally<r>);
-    
+
      my @sorted = sort $naturally (...);
      # => ('track10.mp3', 'track2.mp3', 'track1b.mp3', 'track1a.mp3', 'track1.mp3')
 
     Request a case-insensitive sort:
 
      use Sort::Sub qw($naturally<i>);
-    
+
      my @sorted = sort $naturally (...);
 
     Request a case-insensitive, reverse sort:
 
      use Sort::Sub qw($naturally<ir>);
-    
+
      my @sorted = sort $naturally ('track2.mp3', 'Track1.mp3', 'Track10.mp3');
      => ('Track10.mp3', 'track2.mp3', 'Track1.mp3')
 
     Use with
 
 DESCRIPTION
-
-    Sort::Sub and Sort::Sub::* are a convenient packaging of any kind of
-    subroutine which you can use for sort().
+    Sort::Sub and "Sort::Sub::*" are a convenient packaging of any kind of
+    subroutine which you can use for "sort()".
 
     To use Sort::Sub, you import a list of:
 
      ["$"]NAME [ "<" [i][r] ">" ]
 
-    Where NAME is actually searched under Sort::Sub::* namespace. For
+    Where NAME is actually searched under "Sort::Sub::*" namespace. For
     example:
 
      naturally
 
-    will attempt to load Sort::Sub::naturally module and call its
-    gen_sorter subroutine.
+    will attempt to load "Sort::Sub::naturally" module and call its
+    "gen_sorter" subroutine.
 
     You can either request a subroutine name like the above or a variable
     name (e.g. $naturally).
 
     After the name, you can add some options, enclosed with angle brackets
-    <>. There are some known options, e.g. i (for case-insensitive sort) or
-    r (for reverse sort). Some examples:
+    "<>". There are some known options, e.g. "i" (for case-insensitive sort)
+    or "r" (for reverse sort). Some examples:
 
      naturally<i>
      naturally<r>
      naturally<ri>
 
 GUIDELINES FOR WRITING A SORT::SUB::* MODULE
-
     The name should be in lowercase. It should be an adverb (e.g.
-    naturally) or a phrase with words separated by underscore (_) and the
-    phrase begins with by (e.g. by_num_and_non_num_parts).
+    "naturally") or a phrase with words separated by underscore ("_") and
+    the phrase begins with "by" (e.g. "by_num_and_non_num_parts").
 
-    The module must contain a gen_sorter subroutine. It will be called
+    The module must contain a "gen_sorter" subroutine. It will be called
     with:
 
      ($is_reverse, $is_ci)
 
     Where $is_reserve will be set to true if user requests a reverse sort,
-    and $is_ci will be set to true if user requests a case-insensitive
-    sort. The subroutine should return a code reference.
+    and $is_ci will be set to true if user requests a case-insensitive sort.
+    The subroutine should return a code reference.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Sort-Sub>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

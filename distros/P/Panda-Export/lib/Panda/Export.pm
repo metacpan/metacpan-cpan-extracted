@@ -1,7 +1,7 @@
 package Panda::Export;
 use 5.012;
 
-our $VERSION = '2.2.5';
+our $VERSION = '2.2.6';
 
 =head1 NAME
 

@@ -5,8 +5,8 @@ addons:
       - aspell
 language: perl
 perl:
-  - "blead"       # builds perl from git
-  - "dev"         # latest point release
+  - blead   # builds perl from git
+  - dev     # latest point release
 {{
     use Module::CoreList;
     use List::Util 'first';

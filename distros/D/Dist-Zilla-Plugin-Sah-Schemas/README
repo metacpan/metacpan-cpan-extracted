@@ -1,39 +1,70 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building
+    Sah-Schemas-* distribution
 
+VERSION
+    This document describes version 0.010 of
+    Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2018-01-14.
+
+SYNOPSIS
     In dist.ini:
 
      [Sah::Schemas]
 
 DESCRIPTION
+    This plugin is to be used when building "Sah-Schemas-*" distribution. It
+    currently does the following to "lib/Sah/Schemas/*" .pm files:
 
-    This plugin is to be used when building Sah-Schemas-* distribution. It
-    currently does the following to lib/Sah/Schemas/* .pm files:
+    *
 
-      * 
+    It does the following to "lib/Sah/Schema/*" .pm files:
 
-    It does the following to lib/Sah/Schema/* .pm files:
+    *   Check that schema is already normalized
 
-      * Check that schema is already normalized
+        Otherwise, the build is aborted.
 
-      Otherwise, the build is aborted.
+    *   Set module abstract from the schema's summary
 
-      * Set module abstract from the schema's summary
+    *   Add a prereq to other Sah::Schema::* module if schema depends on
+        those other schemas
 
-      * Add a prereq to other Sah::Schema::* module if schema depends on
-      those other schemas
+    *   Produce pre-resolved editions of schemas into "lib/Sah/SchemaR/*"
 
-      * Produce pre-resolved editions of schemas into lib/Sah/SchemaR/*
+        These are useful if a client wants to lookup the base type of a
+        schema without having to do any extra resolving. Currently
+        Perinci::Sub::Complete uses this to reduce startup overhead when
+        doing tab completion.
 
-      These are useful if a client wants to lookup the base type of a
-      schema without having to do any extra resolving. Currently
-      Perinci::Sub::Complete uses this to reduce startup overhead when
-      doing tab completion.
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah
+    -Schemas>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Pod::Weaver::Plugin::Sah::Schemas
 
     Sah::Schemas
 
     Sah and Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

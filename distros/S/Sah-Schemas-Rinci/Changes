@@ -1,4 +1,8 @@
-Revision history for Sah-Schemas-Rinci
+1.1.82.3   2018-01-14 (PERLANCAR)
+
+           - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
+             Perinci::Sub::XCompletion::* modules.
+
 
 1.1.82.2  2016-12-10 (PERLANCAR)
 

@@ -39,7 +39,7 @@ no_index:
 provides:
   Alien::libuv:
     file: lib/Alien/libuv.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Alien::Base: '0'
   base: '0'
@@ -50,10 +50,10 @@ resources:
   bugtracker: https://github.com/genio/Alien-libuv/issues
   homepage: https://github.com/genio/Alien-libuv
   repository: https://github.com/genio/Alien-libuv.git
-version: '0.014'
+version: '0.015'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -74,7 +74,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Starter/PruneCruft'
@@ -163,7 +163,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Starter/Test::Compile'
-      version: '2.056'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
@@ -197,7 +197,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AlienBuild
       name: AlienBuild
-      version: '0.22'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
@@ -241,13 +241,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: '2.13.6 (Apple Git-96)'
+          git_version: 2.14.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -264,10 +264,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.13.6 (Apple Git-96)'
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -281,12 +281,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.13.6 (Apple Git-96)'
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -294,16 +294,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.014
+          tag: v0.015
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.13.6 (Apple Git-96)'
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -312,22 +312,22 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.13.6 (Apple Git-96)'
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: CheckChangeLog
-      version: '0.04'
+      version: '0.05'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: Test::ChangesHasContent
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -360,7 +360,7 @@ x_Dist_Zilla:
             - wordlist
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
@@ -418,6 +418,23 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.010'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::Autotools: '0'
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

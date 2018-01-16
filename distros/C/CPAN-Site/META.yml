@@ -3,29 +3,32 @@ abstract: 'adding site local modules'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CPAN-Site
 no_index:
   directory:
     - t
     - inc
 requires:
-  Archive::Tar: 1
-  Archive::Zip: 0
-  CPAN::Checksums: 0
-  Getopt::Long: 0
-  HTTP::Date: 0
-  IO::Zlib: 0
-  LWP: 0
-  Log::Report: 0.25
-  Test::More: 0.82
-  version: 0.76
-version: 1.14
+  Archive::Tar: '1'
+  Archive::Zip: '0'
+  CPAN::Checksums: '0'
+  Getopt::Long: '0'
+  HTTP::Date: '0'
+  IO::Zlib: '0'
+  LWP: '0'
+  Log::Report: '0.25'
+  Test::More: '0.82'
+  version: '0.76'
+resources:
+  repository: https://github.com/markov2/perl5-CPAN-Site.git
+version: '1.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

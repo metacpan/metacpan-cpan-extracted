@@ -1,11 +1,15 @@
 Revision history for SQL-Abstract-More
 
+1.33
+  - removed the option introduced in 1.32, replaced by new syntax for "USING"
+
 1.32 08.01.2018
   - new option "join_with_USING"
 
 1.31 12.12.2017
   - align _insert_values / _insert_value on new parent SQLA architecture
-  - does() also handles overloaded SCALAR and CODE dereferencing and is exported
+  - does() also handles overloaded SCALAR and CODE dereferencing and is
+    visible by external modules
 
 1.30 29.10.2017
   - fix typo in dependency on SQL::Abstract (require v1.84, not 1.74)

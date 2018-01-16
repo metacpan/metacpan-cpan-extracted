@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Paragraph;
 # ABSTRACT: a group of sentences in a JMAP response
-$JMAP::Tester::Response::Paragraph::VERSION = '0.015';
+$JMAP::Tester::Response::Paragraph::VERSION = '0.016';
 use Moo;
 
 use JMAP::Tester::Abort 'abort';
@@ -39,13 +39,6 @@ sub BUILD {
 }
 
 has sentences => (is => 'bare', reader => '_sentences', required => 1);
-
-has _json_typist => (
-  is => 'ro',
-  handles => {
-    _strip_json_types => 'strip_types',
-  },
-);
 
 #pod =method sentences
 #pod
@@ -162,7 +155,7 @@ sub as_struct {
 }
 
 sub as_stripped_struct {
-  $_[0]->_strip_json_types($_[0]->as_struct);
+  [ map {; $_->as_stripped_struct } $_[0]->sentences ]
 }
 
 #pod =method as_pairs
@@ -177,7 +170,7 @@ sub as_pairs {
 }
 
 sub as_stripped_pairs {
-  $_[0]->_strip_json_types($_[0]->as_pairs);
+  [ map {; $_->as_stripped_pair } $_[0]->sentences ]
 }
 
 1;
@@ -194,7 +187,7 @@ JMAP::Tester::Response::Paragraph - a group of sentences in a JMAP response
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 OVERVIEW
 

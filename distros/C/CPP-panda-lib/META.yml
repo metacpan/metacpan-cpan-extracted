@@ -9,8 +9,9 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
+  CPP::catch::test: v1.0.0
   ExtUtils::MakeMaker: '6.76'
-  Panda::Install: v1.2.8
+  Panda::Install: v1.2.9
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -23,7 +24,8 @@ no_index:
     - t
     - inc
 requires:
-  Panda::Install: v1.2.8
+  CPP::catch::test: v1.0.0
+  Panda::Install: v1.2.9
   perl: '5.010000'
-version: v1.0.5
+version: v1.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

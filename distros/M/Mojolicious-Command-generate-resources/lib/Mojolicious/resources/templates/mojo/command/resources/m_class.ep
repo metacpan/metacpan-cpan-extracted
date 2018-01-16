@@ -1,0 +1,25 @@
+% my $a = shift;
+package <%= $a->{class} %>;
+use Mojo::Base -base, -signatures;
+
+has '<%= $a->{db_helper} %>';
+
+sub add($self, $row)  {
+  return $self-><%= $a->{db_helper} %>->db->insert('<%= $a->{t} %>', $row)->last_insert_id;
+}
+
+sub all { shift-><%= $a->{db_helper} %>->db->select('<%= $a->{t} %>')->hashes->to_array }
+
+sub find($self, $id) {
+  return $self-><%= $a->{db_helper} %>->db->select('<%= $a->{t} %>', undef, {id => $id})->hash;
+}
+
+sub remove($self, $id) {
+  $self-><%= $a->{db_helper} %>->db->delete('<%= $a->{t} %>', {id => $id});
+}
+
+sub save($self, $id, $row) {
+  $self-><%= $a->{db_helper} %>->db->update('<%= $a->{t} %>', $row, {id => $id});
+}
+
+1;

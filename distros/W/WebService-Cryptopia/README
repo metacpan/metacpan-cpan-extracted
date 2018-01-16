@@ -15,6 +15,14 @@ ATTRIBUTES
       Optional. A new LWP::UserAgent will be created for you if you don't
       already have one you'd like to reuse.
 
+    api_key
+
+      Required for private api
+
+    api_secret
+
+      Required for private api
+
     base_url
 
       Optional. Default: https://www.cryptopia.co.nz/api/

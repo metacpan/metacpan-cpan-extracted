@@ -1,5 +1,5 @@
 #
-# $Id: Mount.pm,v e0e936960a85 2017/03/28 18:31:13 gomor $
+# $Id: Mount.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # system::mount Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package Metabrik::File::T
 
 sub brik_properties {
    return {
-      revision => '$Revision: e0e936960a85 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable mtab fstab mount umount system filesystem) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -134,7 +134,7 @@ Metabrik::System::Mount - system::mount Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

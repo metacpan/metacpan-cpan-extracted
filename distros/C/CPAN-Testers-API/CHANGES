@@ -1,5 +1,17 @@
 Changelog for CPAN-Testers-API
 
+0.022     2018-01-12 13:23:19-06:00 America/Chicago
+
+    [Added]
+
+    - Added the ability to filter report summaries by grade
+    - Improved speed of JSON rendering using Cpanel::JSON::XS
+
+    [Fixed]
+
+    - Fixed `/docs` route to always redirect to the latest docs
+    - Fixed `duration` field to accept fractional seconds
+
 0.021     2017-11-28 14:08:07-06:00 America/Chicago
 
     [Added]

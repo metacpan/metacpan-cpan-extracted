@@ -24,6 +24,7 @@ sub translate {
         elsif ($token->{type} eq 'exec') {
             $code .= $token->{value};
             $code .= ';' unless $token->{line};
+            $code .= "\n";
         }
         else {
             $token->{value} =~ s/}/\\}/gms;

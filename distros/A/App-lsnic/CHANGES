@@ -1,9 +1,47 @@
 ==================================================
-Changes from 2016-12-22 00:00:00 +0000 to present.
+Changes from 2017-01-14 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-12-22 22:29:48 +0000
+version 0.005 at 2018-01-14 15:14:03 +0000
+------------------------------------------
+
+  Change: 820f13fc30ca835a8757d46d168ec3e608bf7136
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-14 16:13:48 +0000
+
+    Move version after use strict 
+
+  Change: b8ee1feee158d6414488e04552407548aceabb62
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-14 16:12:34 +0000
+
+    Change version output version 
+
+  Change: bfbfac84b2acfa463ae730eff977cac3f95c475c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-14 16:09:49 +0000
+
+    Add -v for version option 
+
+  Change: ee16843fed2f16d03abdf35580e1cbaecd0cd9ac
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-01-14 16:03:35 +0000
+
+    - Added missing abstract in pod as suggested by CPANTS. 
+
+------------------------------------------
+version 0.004 at 2018-01-13 23:40:40 +0000
+------------------------------------------
+
+  Change: 7fcd7b1882ac80c9307b0e6408a146d21ea0e9a6
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-14 00:40:40 +0000
+
+    Handle unclaimed interfaces correctly 
+
+------------------------------------------
+version 0.003 at 2017-12-22 22:28:56 +0000
 ------------------------------------------
 
   Change: 2e8caf90830d5453aadc443e66c33689b6cf3e76

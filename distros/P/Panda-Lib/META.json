@@ -28,18 +28,20 @@
       },
       "configure" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.0.5",
+            "CPP::catch::test" : "v1.0.0",
+            "CPP::panda::lib" : "v1.0.6",
             "ExtUtils::MakeMaker" : "6.76",
             "Panda::Install" : "v1.2.9",
-            "Panda::XS" : "v2.1.7"
+            "Panda::XS" : "v2.1.8"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.0.5",
+            "CPP::catch::test" : "v1.0.0",
+            "CPP::panda::lib" : "v1.0.6",
             "Panda::Export" : "0",
             "Panda::Install" : "v1.2.9",
-            "Panda::XS" : "v2.1.7",
+            "Panda::XS" : "v2.1.8",
             "Time::HiRes" : "0",
             "perl" : "5.010000"
          }
@@ -55,6 +57,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.3.3",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "v1.3.4",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,9 +1,14 @@
+use strict;
+use warnings;
+
 package # hide from PAUSE
     Helper;
 
 use parent 'Exporter';
 our @EXPORT = qw(
     @REMOVED_PLUGINS
+    $PREREQ_PHASE_DEFAULT
+    $PREREQ_RELATIONSHIP_DEFAULT
     assert_no_git
     all_plugins_in_prereqs
     no_git_tempdir
@@ -26,10 +31,22 @@ delete $ENV{FAKE_RELEASE};
 
 $ENV{HOME} = Path::Tiny->tempdir->stringify;
 
+my $bundle_plugin_requirements; # hashref via CPAN::Meta::Requirements
 {
     use Dist::Zilla::PluginBundle::Author::ETHER;
     package Dist::Zilla::PluginBundle::Author::ETHER;
+    no warnings 'redefine';
     sub _pause_config { 'URMOM', 'mysekritpassword' }
+
+    use Moose;
+    __PACKAGE__->meta->make_mutable;
+    # grab a copy of _plugin_prereqs attribute so we can test that these
+    # prereqs are also reflected in the bundle's runtime-requires
+    after configure => sub {
+        my $self = shift;
+        $bundle_plugin_requirements = $self->_plugin_requirements_as_string_hash;
+    };
+    __PACKAGE__->meta->make_immutable;
 }
 
 # load this in advance, as we change directories between configuration and building
@@ -55,6 +72,9 @@ our @REMOVED_PLUGINS = qw(
     EnsurePrereqsInstalled
 );
 
+our $PREREQ_PHASE_DEFAULT = 'x_Dist_Zilla';
+our $PREREQ_RELATIONSHIP_DEFAULT = 'requires';
+
 # confirms that no git-based plugins are running.
 sub assert_no_git
 {
@@ -66,7 +86,7 @@ sub assert_no_git
 # checks that all plugins in use are in the plugin bundle dist's runtime
 # requires list
 # - some plugins can be marked 'additional' - must be in recommended prereqs
-#   AND the built dist's develop suggests list
+#   AND the built dist's plugin prereqs list
 # - some plugins can be explicitly exempted (added manually to facilitate
 #   testing)
 # TODO: move into its own distribution
@@ -77,24 +97,13 @@ sub all_plugins_in_prereqs
     my $bundle_name = $options{bundle_name} // '@Author::ETHER';    # TODO: default to dist we are in
     my %additional = map { $_ => undef } @{ $options{additional} // [] };
     my %exempt = map { $_ => undef } @{ $options{exempt} // [] };
+    my $prereq_plugin_phase = $options{prereq_plugin_phase} // $PREREQ_PHASE_DEFAULT;
+    my $prereq_plugin_relationship = $options{prereq_plugin_relationship} // $PREREQ_RELATIONSHIP_DEFAULT;
 
     my $pluginbundle_meta = -f 'META.json' ? decode_json(path('META.json')->slurp_raw) : undef;
     my $dist_meta = $tzil->distmeta;
 
-    # these are develop-suggests prereqs
-    my $plugin_name = "$bundle_name/prereqs for $bundle_name";
-    my $bundle_plugin_prereqs = $tzil->plugin_named($plugin_name);
-    cmp_deeply(
-        $bundle_plugin_prereqs,
-        methods(
-            prereq_phase => 'develop',
-            prereq_type => 'suggests',
-        ),
-        "found '$plugin_name' develop-suggests prereqs",
-    );
-    $bundle_plugin_prereqs = $bundle_plugin_prereqs->_prereq;
-
-    subtest 'all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or develop-suggests prerequisites by the distribution' => sub {
+    subtest "all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or injected as $prereq_plugin_phase-$prereq_plugin_relationship prerequisites by the distribution (unless option disabled)" => sub {
         foreach my $plugin (uniq map { find_meta($_)->name }
             grep { $_->plugin_name =~ /^$bundle_name\/[^@]/ } @{$tzil->plugins})
         {
@@ -102,26 +111,27 @@ sub all_plugins_in_prereqs
                 if exists $exempt{$plugin};
 
             # cannot be a (non-develop) prereq if the module lives in this distribution
-            next if (
+            note("$plugin is found in local directory or in 'provides' metadata; skipping"), next
+            if (
                 $pluginbundle_meta ? exists $pluginbundle_meta->{provides}{$plugin}
                : do {
                    (my $file = $plugin) =~ s{::}{/}g; $file .= '.pm';
                    path('lib', $file)->exists;
                });
 
-            # plugins with a specific :version requirement are added to
-            # prereqs via an extra injected [Prereqs] plugin
-            my $required_version = $bundle_plugin_prereqs->{find_meta($plugin)->name} // 0;
+            # plugins with a specific :version requirement are injected into
+            # built distribution's prereqs (x_Dist_Zilla-requires by default)
+            my $required_version = $bundle_plugin_requirements->{find_meta($plugin)->name} // 0;
+
+            ok(
+                exists $dist_meta->{prereqs}{$prereq_plugin_phase}{$prereq_plugin_relationship}{$plugin},
+                "$plugin is a $prereq_plugin_phase prereq of the distribution",
+            ) if $prereq_plugin_phase and $prereq_plugin_relationship;
 
             if (exists $additional{$plugin})
             {
                 # plugin was added in via an extra option, therefore the
-                # plugin should have been added to develop prereqs, and not be a runtime prereq
-                ok(
-                    exists $dist_meta->{prereqs}{develop}{suggests}{$plugin},
-                    $plugin . ' is a develop prereq of the distribution',
-                );
-
+                # plugin should exist as a recommendation of the bundle (as some tests require it)
                 cmp_deeply(
                     $pluginbundle_meta->{prereqs}{runtime}{recommends},
                     superhashof({ $plugin => $required_version }),
@@ -181,7 +191,7 @@ sub git_in_path
         $dir = $dir->parent;
     }
     continue {
-        die "too many iterations when traversing $tempdir!"
+        die "too many iterations when traversing $dir!"
             if $count++ > 100;
     }
     return $in_git;

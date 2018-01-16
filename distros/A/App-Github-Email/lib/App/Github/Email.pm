@@ -1,47 +1,46 @@
 package App::Github::Email;
+$App::Github::Email::VERSION = '0.2.0';
+# ABSTRACT: Search and print particular Github user emails.
 
 use strict;
 use warnings;
+use v5.10;
 
 use LWP::UserAgent;
 use Email::Address;
 use List::MoreUtils qw(uniq);
 
-# ABSTRACT: Search and print particular Github user emails.
-our $VERSION = '0.1.1';    # VERSION
 
-
-sub get_user
-{
+sub get_user {
     my $username = shift;
 
     my $ua = LWP::UserAgent->new;
     my $get_json =
-        $ua->get("https://api.github.com/users/$username/events/public");
+      $ua->get("https://api.github.com/users/$username/events/public");
 
-    if ($get_json->is_success)
-    {
+    if ( $get_json->is_success ) {
         my $raw_json    = $get_json->decoded_content;
         my @addresses   = Email::Address->parse($raw_json);
         my @unique_addr = uniq @addresses;
         my @retrieved_addrs;
 
-        for my $address (@unique_addr)
-        {
-            if ($address ne 'git@github.com' and not $address =~ /^":"/g)
-            {
-                push(@retrieved_addrs, $address);
+        for my $address (@unique_addr) {
+            if ( $address ne 'git@github.com' and not $address =~ /^":"/g ) {
+                push( @retrieved_addrs, $address );
             }
         }
 
         return @retrieved_addrs;
     }
 
-    else
-    {
-        die "User is not exist!\n";
+    else {
+        die "User is not exist\n";
     }
 }
+
+1;
+
+__END__
 
 =pod
 
@@ -53,14 +52,15 @@ App::Github::Email - Search and print particular Github user emails.
 
 =head1 VERSION
 
-version 0.1.1
+version 0.2.0
 
 =head1 SYNOPSIS
 
-	github-email --name <Github username>
-
-	github-email --name faraco
-	github-email --n faraco 
+	github-email --username <Github username>
+    
+    # Example
+	github-email --username faraco
+	github-email --u faraco 
 
 =head2 Functions
 
@@ -70,7 +70,7 @@ version 0.1.1
 
     description: Retrieves Github user email addresses.
 
-    parameter: C<$username> - Github account username.
+    parameter: $username - Github account username.
 
     returns: A list of email addresses.
 
@@ -82,15 +82,10 @@ faraco <skelic3@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by faraco.
+This software is Copyright (c) 2017-2018 by faraco.
 
 This is free software, licensed under:
 
-  The GNU General Public License, Version 3, June 2007
+  The MIT (X11) License
 
 =cut
-
-__END__
-
-
-1;

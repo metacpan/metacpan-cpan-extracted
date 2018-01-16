@@ -50,7 +50,7 @@ for my $user ( @ARGV )
 
 my %query = ( code => 'access', argv => \@conf, sudo => 'root' );
 
-$query{user} = `logname`;chop $query{user};
+$query{user} = `id -un`;chop $query{user};
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 
 my %result = MYDan::Agent::Client->new(

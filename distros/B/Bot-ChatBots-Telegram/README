@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Bot::ChatBots::Telegram version 0.006.
+    This document describes Bot::ChatBots::Telegram version 0.010.
 
 SYNOPSIS
 
@@ -28,7 +28,7 @@ SYNOPSIS
        sub processor {
           my $record = shift;
           # do whatever you want with $record, e.g. set a quick response
-          $record->{response} = 'your thoughs are important for us!';
+          $record->{send_response} = 'your thoughs are important for us!';
           return $record;
        }
     
@@ -45,7 +45,7 @@ METHODS
 
 BUGS AND LIMITATIONS
 
-    Report bugs either through RT or GitHub (patches welcome).
+    Report bugs through GitHub (patches welcome).
 
 SEE ALSO
 
@@ -58,7 +58,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+    Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
 
     This module is free software. You can redistribute it and/or modify it
     under the terms of the Artistic License 2.0.

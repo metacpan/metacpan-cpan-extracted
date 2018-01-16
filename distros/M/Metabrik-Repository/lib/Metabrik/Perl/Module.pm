@@ -1,5 +1,5 @@
 #
-# $Id: Module.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Module.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # perl::module Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable build test install cpan cpanm) ],
       commands => {
          build => [ qw(directory|OPTIONAL) ],
@@ -38,13 +38,17 @@ sub build {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('build', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("build: chdir: $!");
+      }
    }
 
    my @cmd = ();
@@ -56,7 +60,12 @@ sub build {
    }
    else {
       if (length($directory)) {
-         $she->run_cd($cwd) or return;
+         if (defined($self->shell)) {
+            $self->shell->run_cd($cwd) or return;
+         }
+         else {
+            chdir($cwd) or return $self->log->error("build: chdir: $!");
+         }
       }
       return $self->log->error("build: neither Build.PL nor Makefile.PL were found, abort");
    }
@@ -69,7 +78,12 @@ sub build {
    $self->use_sudo(1);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("build: chdir: $!");
+      }
    }
 
    return $r;
@@ -79,13 +93,17 @@ sub test {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('test', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("test: chdir: $!");
+      }
    }
 
    my $cmd;
@@ -97,7 +115,12 @@ sub test {
    }
    else {
       if (length($directory)) {
-         $she->run_cd($cwd) or return;
+         if (defined($self->shell)) {
+            $self->shell->run_cd($cwd) or return;
+         }
+         else {
+            chdir($cwd) or return $self->log->error("test: chdir: $!");
+         }
       }
       return $self->log->error("test: neither Build nor Makefile were found, abort");
    }
@@ -107,7 +130,12 @@ sub test {
    $self->use_sudo(1);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("test: chdir: $!");
+      }
    }
 
    return $r;
@@ -117,8 +145,7 @@ sub install {
    my $self = shift;
    my ($module) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    my $cmd;
    if ((defined($module) && -d $module) || (! defined($module))) {
@@ -126,7 +153,12 @@ sub install {
                                      # to find the module to install
       if (length($directory)) {
          $self->brik_help_run_directory_not_found('install', $directory) or return;
-         $she->run_cd($directory) or return;
+         if (defined($self->shell)) {
+            $self->shell->run_cd($directory) or return;
+         }
+         else {
+            chdir($directory) or return $self->log->error("install: chdir: $!");
+         }
       }
 
       if (-f 'Build') {
@@ -137,7 +169,12 @@ sub install {
       }
       else {
          if (length($directory)) {
-            $she->run_cd($cwd) or return;
+            if (defined($self->shell)) {
+               $self->shell->run_cd($cwd) or return;
+            }
+            else {
+               chdir($cwd) or return $self->log->error("install: chdir: $!");
+            }
          }
          return $self->log->error("install: neither Build nor Makefile were found, abort");
       }
@@ -157,7 +194,12 @@ sub install {
 
    my $r = $self->execute($cmd);
 
-   $she->run_cd($cwd) or return;
+   if (defined($self->shell)) {
+      $self->shell->run_cd($cwd) or return;
+   }
+   else {
+      chdir($cwd) or return $self->log->error("install: chdir: $!");
+   }
 
    return $r;
 }
@@ -166,13 +208,17 @@ sub dist {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('dist', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("dist: chdir: $!");
+      }
    }
 
    my $cmd;
@@ -184,7 +230,12 @@ sub dist {
    }
    else {
       if (length($directory)) {
-         $she->run_cd($cwd) or return;
+         if (defined($self->shell)) {
+            $self->shell->run_cd($cwd) or return;
+         }
+         else {
+            chdir($cwd) or return $self->log->error("dist: chdir: $!");
+         }
       }
       return $self->log->error("dist: neither Build nor Makefile were found, abort");
    }
@@ -194,7 +245,12 @@ sub dist {
    $self->use_sudo(1);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("dist: chdir: $!");
+      }
    }
 
    return $r;
@@ -204,13 +260,17 @@ sub clean {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('clean', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("clean: chdir: $!");
+      }
    }
 
    my $cmd;
@@ -222,7 +282,12 @@ sub clean {
    }
    else {
       if (length($directory)) {
-         $she->run_cd($cwd) or return;
+         if (defined($self->shell)) {
+            $self->shell->run_cd($cwd) or return;
+         }
+         else {
+            chdir($cwd) or return $self->log->error("clean: chdir: $!");
+         }
       }
       return $self->log->error("clean: neither Build nor Makefile were found, abort");
    }
@@ -232,7 +297,12 @@ sub clean {
    $self->use_sudo(1);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("clean: chdir: $!");
+      }
    }
 
    return $r;
@@ -248,7 +318,7 @@ Metabrik::Perl::Module - perl::module Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

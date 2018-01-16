@@ -148,7 +148,7 @@ $dbh->do($_DATA_SQL_CA);
 
 Customer->dbh($dbh);
 
-ok my $Bill = Customer->get(3), 'got Bill';
+ok my $Bill = Customer->objects->get(3), 'got Bill';
 ok my $achievement = Achievement->new({ title => 'Bill Achievement', id => 4 })->save, 'create achievement';
 
 is $Bill->id, 3;
@@ -170,7 +170,7 @@ ok !$Bill->achievements({ title => 'Not Existing Achievement' })->exists;
 ok my @bills_orders = $Bill->orders->fetch, 'got Bill\'s orders';
 
 is scalar @bills_orders, 1;
-ok my $order = Order->get(3), 'order';
+ok my $order = Order->objects->get(3), 'order';
 ok $order->customer, 'the order has a customer';
 is $order->customer->id, $bills_orders[0]->id;
 
@@ -179,7 +179,7 @@ ok my @achievements = $Bill->achievements->fetch;#
 is @achievements, 4;
 isa_ok $achievements[0], 'Achievement';
 
-ok my $a = Achievement->get(1);
+ok my $a = Achievement->objects->get(1);
 ok my @customers = $a->customers->order_by('id')->fetch;
 is @customers, 3;
 

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.173620';
+$Bio::MUST::Core::Ali::VERSION = '0.180140';
 use Moose;
 use namespace::autoclean;
 
@@ -479,6 +479,7 @@ sub store_fasta {
 
 
 # TODO: allow not shortening ids
+# TODO: allow specifying auto-unlink?
 
 sub temp_fasta {                            ## no critic (RequireArgUnpacking)
     my $self = shift;
@@ -731,7 +732,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.173620
+version 0.180140
 
 =head1 SYNOPSIS
 
@@ -753,7 +754,7 @@ version 0.173620
     say 'height:  ' . $ali->height;         # number of seqs
     say 'width:   ' . $ali->width;          # number of sites
     say '% miss:  ' . $ali->perc_miss;      # fraction of missing chars (%)
-    say 'seqs are ' . $ali->is_protein ? 'proteins' : 'nucleotides';
+    say 'seqs are ' . $ali->is_protein ? 'prot' : 'nucl';
 
     # turn seqs to uppercase
     $ali->uc_seqs;
@@ -784,7 +785,7 @@ version 0.173620
 
 =head1 DESCRIPTION
 
-This module defines a multiple sequence alignment (MSA) object and its
+This module implements the multiple sequence alignment (MSA) class and its
 methods. An Ali is modeled as an array of L<Bio::MUST::Core::Seq> objects.
 Consequently, sequence ids do not absolutely need to be unique for it to
 work (though id uniqueness helps a lot for sequence access and filtering).
@@ -816,7 +817,7 @@ STOCKHOLM and PHYLIP.
 
 =head2 seqs
 
-ArrayRef of L<Bio::MUST::Core::Seq> objects
+ArrayRef of L<Bio::MUST::Core::Seq> objects (optional)
 
 Most of the accessor methods described below are implemented by delegation
 to this public attribute using L<Moose::Meta::Attribute::Native/Moose native
@@ -825,7 +826,7 @@ help pages.
 
 =head2 file
 
-Path::Class::File
+L<Path::Class::File> object (optional)
 
 This optional attribute is initialized by class methods that C<load> an Ali
 from disk. It is meant to improve the introspection capabilities of the Ali.
@@ -834,7 +835,7 @@ provide them with a default value in the future.
 
 =head2 guessing
 
-Boolean
+Boolean (optional)
 
 By default, an Ali object tries to guess whether it is aligned or not by
 looking for gap-like characters in any of its Seq objects (see
@@ -844,6 +845,8 @@ When this smart behavior causes issues, one can disable it by unsetting this
 boolean attribute (see C<dont_guess> and C<guess> accessor methods).
 
 =head2 comments
+
+ArrayRef of strings (optional)
 
 An Ali object is commentable, which means that it supports all the methods
 pertaining to comment lines described in
@@ -1325,7 +1328,7 @@ This method requires one argument and accepts a second optional argument
 controlling the output format. It is a hash reference that may contain one
 or more of the following keys:
 
-    - clean: replace all ambiguous and missing states by 'X' (default: false)
+    - clean: replace all ambiguous and missing states by C<X> (default: false)
     - chunk: line width (default is 60 chars; negative values means no wrap)
     - degap: boolean value controlling degapping (default: false)
 

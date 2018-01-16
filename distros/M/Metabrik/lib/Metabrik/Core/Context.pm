@@ -1,19 +1,19 @@
 #
-# $Id: Context.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
+# $Id: Context.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
 #
 package Metabrik::Core::Context;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.27';
+our $VERSION = '1.30';
 our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: fa356d306156 $',
+      revision => '$Revision: 047dcc7d3c9d $',
       tags => [ qw(main core) ],
       attributes => {
          _lp => [ qw(INTERNAL) ],
@@ -58,37 +58,6 @@ my $CON;
 my $SHE;
 my $LOG;
 my $GLO;
-
-{
-   no warnings;
-
-   # We rewrite the log accessor so we can fetch it from within context
-   *log = sub {
-      my $self = shift;
-
-      # We can't use get() here, we would have a deep recursion
-      # We can't use call() for the same reason
-
-      my $lp = $self->_lp;
-
-      my $save = $@;
-
-      my $r;
-      eval {
-         $r = $lp->call(sub {
-            return $CON->{log};
-         });
-      };
-      if ($@) {
-         chomp($@);
-         die("[F] core::context: log: $@\n");
-      }
-
-      $@ = $save;
-
-      return $r;
-   };
-}
 
 sub new {
    my $self = shift->SUPER::new(
@@ -206,7 +175,7 @@ sub do {
       return $self->log->error("do: $@");
    }
 
-   $self->debug && $self->log->debug("do: returned[".(defined($res) ? $res : 'undef')."]");
+   $self->log->debug("do: returned[".(defined($res) ? $res : 'undef')."]");
 
    return defined($res) ? $res : 'undef';
 }
@@ -230,8 +199,8 @@ sub call {
       my @list = caller();
       my $file = $list[1];
       my $line = $list[2];
-      if ($self->debug) {
-         return $self->log->error("call: $@ (source file [$file] at line [$line])");
+      if ($self->log->level > 2) {
+         return $self->log->debug("call: $@ (source file [$file] at line [$line])");
       }
       return $self->log->error("call: $@");
    }
@@ -263,7 +232,8 @@ sub _file_find {
    my $self = shift;
    my ($path_list) = @_;
 
-   my $dirpattern = 'Metabrik/';
+   # With these patterns, we include baseclass Briks like Metabrik/Baseclass.pm
+   my $dirpattern = 'Metabrik';
    my $filepattern = '.pm$';
 
    # Escape if we are searching for a directory hierarchy
@@ -379,11 +349,9 @@ sub use {
          die("$MSG\n");
       }
 
-      if ($CON->debug) {
-         $CON->log->debug("repository[$__ctx_brik_repository]");
-         $CON->log->debug("category[$__ctx_brik_category]");
-         $CON->log->debug("module[$__ctx_brik_module]");
-      }
+      $CON->log->debug("repository[$__ctx_brik_repository]");
+      $CON->log->debug("category[$__ctx_brik_category]");
+      $CON->log->debug("module[$__ctx_brik_module]");
 
       $__ctx_brik_repository = ucfirst($__ctx_brik_repository);
       $__ctx_brik_category = ucfirst($__ctx_brik_category);
@@ -393,7 +361,7 @@ sub use {
          ? $__ctx_brik_repository.'::'
          : '').$__ctx_brik_category.'::'.$__ctx_brik_module;
 
-      $CON->debug && $CON->log->debug("module2[$__ctx_brik_module]");
+      $CON->log->debug("module2[$__ctx_brik_module]");
 
       if ($CON->is_used($__ctx_brik)) {
          $ERR = 1;
@@ -462,8 +430,8 @@ sub reuse {
          };
          if ($@) {
             chomp($@);
-            if ($self->debug) {
-               $self->log->error("reuse: reloading module [$module] failed: [$@]");
+            if ($self->log->level > 2) {
+               $self->log->debug("reuse: reloading module [$module] failed: [$@]");
             }
             else {
                $self->log->error("reuse: reloading module [$module] failed");
@@ -749,7 +717,7 @@ sub run {
       return $self->log->error($self->brik_help_run('run'));
    }
 
-   if ($self->debug) {
+   if ($self->log->level > 2) {
       my ($module, $file, $line) = caller();
       $self->log->debug("run: called by module [$module] from [$file] line[$line]");
    }
@@ -1014,7 +982,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

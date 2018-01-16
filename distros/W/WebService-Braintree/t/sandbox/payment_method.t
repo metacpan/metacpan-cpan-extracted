@@ -15,27 +15,26 @@ use lib qw(lib t/lib);
 use WebService::Braintree;
 use WebService::Braintree::ErrorCodes;
 use WebService::Braintree::Nonce;
-use WebService::Braintree::SandboxValues::CreditCardNumber;
+use WebService::Braintree::SandboxValues::Nonce;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
 use WebService::Braintree::Xml;
 use Data::GUID;
 use JSON;
 
-require 't/lib/WebService/Braintree/Nonce.pm';
-
 subtest "Create" => sub {
     subtest "it creates a paypal account method with a future payment nonce" => sub {
+        plan skip_all => "Error communicating with PayPal";
         my $nonce = WebService::Braintree::TestHelper::generate_future_payment_paypal_nonce('');
         my $customer_result = WebService::Braintree::Customer->create();
+        validate_result($customer_result) or return;
 
-        ok $customer_result->is_success;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
             payment_method_nonce => $nonce,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         isnt($payment_method_result->paypal_account->token, undef);
         isnt($payment_method_result->paypal_account->image_url, undef);
         is($payment_method_result->paypal_account->meta->name, "WebService::Braintree::PayPalAccount");
@@ -44,28 +43,28 @@ subtest "Create" => sub {
     subtest "it creates a credit card payment method with a nonce" => sub {
         my $nonce = WebService::Braintree::TestHelper::generate_unlocked_nonce();
         my $customer_result = WebService::Braintree::Customer->create();
+        validate_result($customer_result) or return;
 
-        ok $customer_result->is_success;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
             payment_method_nonce => $nonce,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         isnt($payment_method_result->credit_card->token, undef);
         is($payment_method_result->credit_card->meta->name, "WebService::Braintree::CreditCard");
     };
 
     subtest "it creates a payment method with a fake apple pay nonce" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
+        validate_result($customer_result) or return;
 
-        ok $customer_result->is_success;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce->apple_pay_mastercard,
+            payment_method_nonce => WebService::Braintree::SandboxValues::Nonce->APPLE_PAY_MASTERCARD,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         my $apple_pay_card = $payment_method_result->apple_pay_card;
         isnt($apple_pay_card->token, undef);
         is($apple_pay_card->meta->name, "WebService::Braintree::ApplePayCard");
@@ -78,29 +77,30 @@ subtest "Create" => sub {
 
     subtest "create paypal account with one-time nonce fails" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
-        ok $customer_result->is_success;
+        validate_result($customer_result) or return;
 
         my $nonce = WebService::Braintree::TestHelper::generate_one_time_paypal_nonce();
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
             payment_method_nonce => $nonce,
         });
+        invalidate_result($payment_method_result) or return;
 
-        isnt($payment_method_result->is_success, 1);
         ok($payment_method_result->errors->for("paypal_account")->on("base")->[0]->code ==
                WebService::Braintree::ErrorCodes::AltPay::PayPalAccountCannotVaultOneTimeUsePayPalAccount);
     };
 
     subtest "create can make default and set token" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
-        ok $customer_result->is_success;
+        validate_result($customer_result) or return;
+
         my $credit_card_result = WebService::Braintree::CreditCard->create({
             customer_id => $customer_result->customer->id,
             number => "5105105105105100",
             expiration_date => "05/12",
         });
+        validate_result($credit_card_result) or return;
 
-        ok $credit_card_result->is_success;
         my $nonce = WebService::Braintree::TestHelper::generate_unlocked_nonce();
         my $token = Data::GUID->new->as_string;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
@@ -111,13 +111,14 @@ subtest "Create" => sub {
                 make_default => "true",
             },
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         ok $payment_method_result->payment_method->default;
         ok($token eq $payment_method_result->payment_method->token);
     };
 
     subtest "it doesn't return an error if credit card options are present for a paypal nonce" => sub {
+        plan skip_all => "Error communicating with PayPal";
         my $customer = WebService::Braintree::Customer->create()->customer;
         my $original_token = "paypal-account-" . int(rand(10000));
         my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
@@ -134,20 +135,15 @@ subtest "Create" => sub {
                 verification_merchant_account_id => "not_a_real_merchant_account_id",
             },
         });
-
-        ok $result->is_success;
+        validate_result($result) or return;
     };
 
     subtest "it respects verify_card and verification_merchant_account_id when included outside of the nonce" => sub {
-        plan skip_all => "merchant_account 'sandbox_credit_card_non_default' broken";
-        my $nonce = WebService::Braintree::TestHelper::nonce_for_new_payment_method({
-            credit_card => {
-                number => "4000111111111115",
-                expiration_month => "11",
-                expiration_year => "2009",
-            },
+        my $nonce = nonce_for_new_payment_method({
+            credit_card => credit_card({
+                number => cc_number('fails_verification'),
+            }),
         });
-
 
         my $customer = WebService::Braintree::Customer->create()->customer;
         my $result = WebService::Braintree::PaymentMethod->create({
@@ -155,29 +151,30 @@ subtest "Create" => sub {
             customer_id => $customer->id,
             options => {
                 verify_card => "true",
-                verification_merchant_account_id => WebService::Braintree::TestHelper::NON_DEFAULT_MERCHANT_ACCOUNT_ID,
+                verification_merchant_account_id => 'sandbox_credit_card',
             },
         });
+        invalidate_result($result, 'PaymentMethod') or return;
 
-        ok !$result->is_success;
         ok($result->credit_card_verification->status eq WebService::Braintree::Transaction::Status::ProcessorDeclined);
         is($result->credit_card_verification->processor_response_code, "2000");
         is($result->credit_card_verification->processor_response_text, "Do Not Honor");
-        ok($result->credit_card_verification->merchant_account_id eq WebService::Braintree::TestHelper::NON_DEFAULT_MERCHANT_ACCOUNT_ID);
+        is($result->credit_card_verification->merchant_account_id, 'sandbox_credit_card');
     };
 
     subtest "it respects fail_on_duplicate_payment_method when included outside of the nonce" => sub {
         my $customer = WebService::Braintree::Customer->create()->customer;
+        my $cc_number = cc_number('visa');
         my $result = WebService::Braintree::CreditCard->create({
             customer_id => $customer->id,
-            number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+            number => $cc_number,
             expiration_date => "05/2012",
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
-        my $nonce = WebService::Braintree::TestHelper::nonce_for_new_payment_method({
+        my $nonce = nonce_for_new_payment_method({
             credit_card => {
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => $cc_number,
                 expiration_date => "05/2012",
             },
         });
@@ -189,8 +186,8 @@ subtest "Create" => sub {
                 fail_on_duplicate_payment_method => "true",
             },
         });
+        invalidate_result($result) or return;
 
-        ok !$result->is_success;
         is($result->errors->deep_errors()->[0]->code, "81724");
     };
 
@@ -213,8 +210,8 @@ subtest "Create" => sub {
                 street_address => "123 Abc Way",
             },
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         isnt($result->payment_method, undef);
         ok $result->payment_method->isa('WebService::Braintree::CreditCard');
 
@@ -245,8 +242,8 @@ subtest "Create" => sub {
                 street_address => "123 Abc Way",
             },
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         ok $result->payment_method->isa('WebService::Braintree::CreditCard');
 
         my $token = $result->payment_method->token;
@@ -285,8 +282,8 @@ subtest "Create" => sub {
                 street_address => "123 Abc Way",
             },
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         ok $result->payment_method->isa('WebService::Braintree::CreditCard');
         my $token = $result->payment_method->token;
         my $found_credit_card = WebService::Braintree::CreditCard->find($token);
@@ -295,6 +292,7 @@ subtest "Create" => sub {
     };
 
     subtest "it ignores passed billing address params" => sub {
+        plan skip_all => "Error communicating with PayPal";
         my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
             consent_code => "PAYPAL_CONSENT_CODE",
         });
@@ -307,8 +305,8 @@ subtest "Create" => sub {
                 street_address => "123 Abc Way",
             },
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         ok $result->payment_method->isa('WebService::Braintree::PayPalAccount');
         isnt($result->payment_method->image_url, undef);
 
@@ -351,8 +349,8 @@ subtest "Create" => sub {
             customer_id => $customer->id,
             billing_address_id => $address->id,
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         ok $result->payment_method->isa('WebService::Braintree::CreditCard');
 
         my $token = $result->payment_method->token;
@@ -363,6 +361,7 @@ subtest "Create" => sub {
     };
 
     subtest "it ignores passed billing address id" => sub {
+        plan skip_all => "Error communicating with PayPal";
         my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
             consent_code => "PAYPAL_CONSENT_CODE",
         });
@@ -373,8 +372,8 @@ subtest "Create" => sub {
             customer_id => $customer->id,
             billing_address_id => "address_id",
         });
+        validate_result($result) or return;
 
-        ok $result->is_success;
         ok $result->payment_method->isa('WebService::Braintree::PayPalAccount');
         isnt($result->payment_method->image_url, undef);
 
@@ -393,30 +392,30 @@ subtest "Update" => sub {
                 cardholder_name => "Original Holder",
                 customer_id => $customer->id,
                 cvv => "123",
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2012",
             });
 
             my $credit_card = $credit_card_result->credit_card;
+            my $new_cc_num = cc_number('mastercard');
             my $update_result = WebService::Braintree::PaymentMethod->update(
                 $credit_card->token,
                 {
                     cardholder_name => "New Holder",
                     cvv => "456",
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::MASTER_CARD,
+                    number => $new_cc_num,
                     expiration_date => "06/2013",
                 },
             );
+            validate_result($update_result) or return;
 
-            my $mastercard = WebService::Braintree::SandboxValues::CreditCardNumber::MASTER_CARD;
-            my $mastercard_length = length($mastercard);
+            my $cc_length = length($new_cc_num);
 
-            ok $update_result->is_success;
             my $updated_credit_card = $update_result->payment_method;
             ok($updated_credit_card->token eq $credit_card->token);
             is($updated_credit_card->cardholder_name, "New Holder");
-            is($updated_credit_card->bin, substr($mastercard, 0, 6));
-            is($updated_credit_card->last_4, substr($mastercard, $mastercard_length - 4, 4));
+            is($updated_credit_card->bin, substr($new_cc_num, 0, 6));
+            is($updated_credit_card->last_4, substr($new_cc_num, $cc_length - 4, 4));
             is($updated_credit_card->expiration_date, "06/2013");
         };
 
@@ -426,14 +425,14 @@ subtest "Update" => sub {
                 my $customer = $customer_result->customer;
                 my $credit_card_result = WebService::Braintree::CreditCard->create({
                     customer_id => $customer->id,
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                    number => cc_number('visa'),
                     expiration_date => "05/2012",
                     billing_address => {
                         street_address => "123 Nigeria Ave",
                     }
                 });
+                validate_result($credit_card_result) or return;
 
-                ok $credit_card_result->is_success;
                 my $credit_card = $credit_card_result->credit_card;
                 my $update_result = WebService::Braintree::PaymentMethod->update(
                     $credit_card->token,
@@ -443,8 +442,8 @@ subtest "Update" => sub {
                         },
                     },
                 );
+                validate_result($update_result) or return;
 
-                ok $update_result->is_success;
                 my $updated_credit_card = $update_result->payment_method;
                 is($updated_credit_card->billing_address->region, "IL");
                 is($updated_credit_card->billing_address->street_address, undef);
@@ -456,14 +455,14 @@ subtest "Update" => sub {
                 my $customer = $customer_result->customer;
                 my $credit_card_result = WebService::Braintree::CreditCard->create({
                     customer_id => $customer->id,
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                    number => cc_number('visa'),
                     expiration_date => "05/2012",
                     billing_address => {
                         street_address => "123 Nigeria Ave",
                     }
                 });
+                validate_result($credit_card_result) or return;
 
-                ok $credit_card_result->is_success;
                 my $credit_card = $credit_card_result->credit_card;
                 my $update_result = WebService::Braintree::PaymentMethod->update(
                     $credit_card->token,
@@ -476,8 +475,8 @@ subtest "Update" => sub {
                         },
                     },
                 );
+                validate_result($update_result) or return;
 
-                ok $update_result->is_success;
                 my $updated_credit_card = $update_result->payment_method;
                 is($updated_credit_card->billing_address->region, "IL");
                 is($updated_credit_card->billing_address->street_address, "123 Nigeria Ave");
@@ -489,14 +488,14 @@ subtest "Update" => sub {
                 my $customer = $customer_result->customer;
                 my $credit_card_result = WebService::Braintree::CreditCard->create({
                     customer_id => $customer->id,
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                    number => cc_number('visa'),
                     expiration_date => "05/2012",
                     billing_address => {
                         street_address => "123 Nigeria Ave",
                     }
                 });
+                validate_result($credit_card_result) or return;
 
-                ok $credit_card_result->is_success;
                 my $credit_card = $credit_card_result->credit_card;
                 my $update_result = WebService::Braintree::PaymentMethod->update(
                     $credit_card->token,
@@ -512,8 +511,8 @@ subtest "Update" => sub {
                         },
                     },
                 );
+                validate_result($update_result) or return;
 
-                ok $update_result->is_success;
                 my $updated_credit_card = $update_result->payment_method;
                 is($updated_credit_card->billing_address->country_name, "American Samoa");
                 is($updated_credit_card->billing_address->country_code_alpha2, "AS");
@@ -527,22 +526,22 @@ subtest "Update" => sub {
             my $customer = $customer_result->customer;
             my $credit_card_result = WebService::Braintree::CreditCard->create({
                 customer_id => $customer->id,
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2012",
             });
+            validate_result($credit_card_result) or return;
 
-            ok $credit_card_result->is_success;
             my $credit_card = $credit_card_result->credit_card;
             my $update_result = WebService::Braintree::PaymentMethod->update(
                 $credit_card->token,
                 {
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::MASTER_CARD,
+                    number => cc_number('mastercard'),
                     expiration_month => "07",
                     expiration_year => "2011",
                 },
             );
+            validate_result($update_result) or return;
 
-            ok $update_result->is_success;
             my $updated_credit_card = $update_result->payment_method;
             ok($updated_credit_card->token eq $credit_card->token);
             is($updated_credit_card->expiration_month, "07");
@@ -557,26 +556,26 @@ subtest "Update" => sub {
                 cardholder_name => "Original Holder",
                 customer_id => $customer->id,
                 cvv => "123",
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2012",
             });
+            validate_result($credit_card_result) or return;
 
-            ok $credit_card_result->is_success;
             my $credit_card = $credit_card_result->credit_card;
             my $update_result = WebService::Braintree::PaymentMethod->update(
                 $credit_card->token,
                 {
                     cardholder_name => "New Holder",
                     cvv => "456",
-                    number => WebService::Braintree::SandboxValues::CreditCardNumber::FAILS_VERIFICATION_MASTER_CARD,
+                    number => cc_number('fails_verification'),
                     expiration_date => "06/2013",
                     options => {
                         verify_card => "true",
                     },
                 },
             );
+            invalidate_result($update_result) or return;
 
-            ok !$update_result->is_success;
             ok($update_result->credit_card_verification->status, WebService::Braintree::Transaction::Status::ProcessorDeclined);
             is($update_result->credit_card_verification->gateway_rejection_reason, undef);
         };
@@ -588,7 +587,7 @@ subtest "Update" => sub {
                 cardholder_name => "Original Holder",
                 customer_id => $customer->id,
                 cvv => "123",
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2012",
                 billing_address => {
                     first_name => "Old First Name",
@@ -602,8 +601,8 @@ subtest "Update" => sub {
                     country_name => "Canada",
                 }
             });
+            validate_result($credit_card_result) or return;
 
-            ok $credit_card_result->is_success;
             my $credit_card = $credit_card_result->credit_card;
             my $result = WebService::Braintree::PaymentMethod->update(
                 $credit_card->token,
@@ -624,8 +623,8 @@ subtest "Update" => sub {
                     },
                 },
             );
+            validate_result($result) or return;
 
-            ok $result->is_success;
             my $address = $result->payment_method->billing_address;
             is($address->first_name, "New First Name");
             is($address->last_name, "New Last Name");
@@ -644,11 +643,11 @@ subtest "Update" => sub {
             my $credit_card_result = WebService::Braintree::CreditCard->create({
                 cardholder_name => "Original Holder",
                 customer_id => $customer->id,
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2012",
             });
+            validate_result($credit_card_result) or return;
 
-            ok $credit_card_result->is_success;
             my $credit_card = $credit_card_result->credit_card;
             my $result = WebService::Braintree::PaymentMethod->update(
                 $credit_card->token,
@@ -658,24 +657,25 @@ subtest "Update" => sub {
                     expiration_date => "05/2014",
                 },
             );
+            invalidate_result($result) or return;
 
-            ok !$result->is_success;
             is($result->errors->for("credit_card")->on("number")->[0]->message, "Credit card number must be 12-19 digits.");
         };
 
         subtest "it can update the default" => sub {
             my $customer_result = WebService::Braintree::Customer->create();
             my $customer = $customer_result->customer;
+            my $cc_number = cc_number('visa');
             my $card1 = WebService::Braintree::CreditCard->create({
                 customer_id => $customer->id,
                 cardholder_name => "Original Holder",
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => $cc_number,
                 expiration_date => "05/2009",
             })->credit_card;
 
             my $card2 = WebService::Braintree::CreditCard->create({
                 customer_id => $customer->id,
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => $cc_number,
                 expiration_date => "05/2012",
             })->credit_card;
 
@@ -690,14 +690,15 @@ subtest "Update" => sub {
                     },
                 },
             );
+            validate_result($result) or return;
 
-            ok $result->is_success;
             ok(!WebService::Braintree::CreditCard->find($card1->token)->is_default);
             ok(WebService::Braintree::CreditCard->find($card2->token)->is_default);
         };
     };
 
     subtest "paypal accounts" => sub {
+        plan skip_all => "Error communicating with PayPal";
         subtest "it updates a paypal account's token" => sub {
             my $customer = WebService::Braintree::Customer->create()->customer;
             my $original_token = "paypal-account-" . int(rand(10000));
@@ -730,14 +731,14 @@ subtest "Update" => sub {
             my $customer = WebService::Braintree::Customer->create()->customer;
             my $result = WebService::Braintree::CreditCard->create({
                 customer_id => $customer->id,
-                number => WebService::Braintree::SandboxValues::CreditCardNumber::VISA,
+                number => cc_number('visa'),
                 expiration_date => "05/2009",
                 options => {
                     make_default => "true",
                 },
             });
+            validate_result($result) or return;
 
-            ok $result->is_success;
             my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({ consent_code => "consent-code" });
             my $original_token = WebService::Braintree::PaymentMethod->create({
                 payment_method_nonce => $nonce,
@@ -770,6 +771,7 @@ subtest "Update" => sub {
                 payment_method_nonce => $first_nonce,
                 customer_id => $customer->id,
             });
+            validate_result($first_result) or return;
 
             my $second_nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
                 consent_code => "consent-code",
@@ -780,6 +782,7 @@ subtest "Update" => sub {
                 payment_method_nonce => $second_nonce,
                 customer_id => $customer->id,
             });
+            validate_result($second_result) or return;
 
             my $updated_result = WebService::Braintree::PaymentMethod->update(
                 $first_token,
@@ -787,8 +790,8 @@ subtest "Update" => sub {
                     token => $second_token,
                 },
             );
+            invalidate_result($updated_result) or return;
 
-            ok !$updated_result->is_success;
             is($updated_result->errors->deep_errors()->[0]->code, "92906");
         };
     };
@@ -797,13 +800,13 @@ subtest "Update" => sub {
 subtest "Delete" => sub {
     subtest "delete deletes credit card" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
-        my $nonce = WebService::Braintree::Nonce->transactable();
+        my $nonce = WebService::Braintree::SandboxValues::Nonce->TRANSACTABLE();
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
             payment_method_nonce => $nonce,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         isnt($payment_method_result->credit_card->token, undef);
         WebService::Braintree::PaymentMethod->delete($payment_method_result->credit_card->token);
     };
@@ -812,10 +815,10 @@ subtest "Delete" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
+            payment_method_nonce => WebService::Braintree::SandboxValues::Nonce->PAYPAL_FUTURE_PAYMENT,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         WebService::Braintree::PaymentMethod->delete($payment_method_result->paypal_account->token);
     };
 
@@ -831,10 +834,10 @@ subtest "Find" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce->transactable,
+            payment_method_nonce => WebService::Braintree::SandboxValues::Nonce->TRANSACTABLE,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         my $payment_method_found = WebService::Braintree::PaymentMethod->find($payment_method_result->credit_card->token);
         ok($payment_method_result->credit_card->token eq $payment_method_found->token);
     };
@@ -843,10 +846,10 @@ subtest "Find" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
+            payment_method_nonce => WebService::Braintree::SandboxValues::Nonce->PAYPAL_FUTURE_PAYMENT,
         });
+        validate_result($payment_method_result) or return;
 
-        ok $payment_method_result->is_success;
         my $payment_method_found = WebService::Braintree::PaymentMethod->find($payment_method_result->paypal_account->token);
         ok($payment_method_result->paypal_account->token eq $payment_method_found->token);
     };

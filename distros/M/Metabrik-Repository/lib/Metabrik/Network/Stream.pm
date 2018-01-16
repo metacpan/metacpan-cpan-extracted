@@ -1,5 +1,5 @@
 #
-# $Id: Stream.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Stream.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::stream Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Read);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -31,6 +31,7 @@ sub brik_properties {
          list_destination_ip_addresses => [ qw(stream) ],
          list_tcp_streams => [ qw($simple_frames_list) ],
          save_stream_payload => [ qw($simple_frames_list) ],
+         get_payloads_from_pcap => [ qw(file filter|OPTIONAL) ],
       },
       require_modules => {
          'Net::Frame::Layer::TCP' => [ ],
@@ -46,7 +47,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device,
+         device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -245,6 +246,38 @@ sub save_stream_payload {
    return $data;
 }
 
+sub get_payloads_from_pcap {
+   my $self = shift;
+   my ($file, $filter) = @_;
+
+   $self->brik_help_run_undef_arg('get_payloads_from_pcap', $file) or return;
+   $self->brik_help_run_file_not_found('get_payloads_from_pcap', $file) or return;
+
+   $filter ||= $self->filter;
+
+   my $fp = Metabrik::File::Pcap->new_from_brik_init($self) or return;
+   $fp->open($file, 'read', $filter) or return;
+
+   my @payloads = ();
+   while (1) {
+      my $h = $fp->read_next(10); # We read 10 by 10
+      last if @$h == 0; # Eof
+      for my $this (@$h) {
+         my $simple = $fp->from_read($this) or next;
+         my $network = $simple->ref->{IPv4} || $simple->ref->{IPv6};
+         my $transport = $simple->ref->{TCP};
+
+         if (defined($network) && defined($transport)) {
+            if (defined($transport) && length($transport->payload)) {
+               push @payloads, CORE::unpack('H*', $transport->payload);
+            }
+         }
+      }
+   }
+
+   return \@payloads;
+}
+
 1;
 
 __END__
@@ -255,7 +288,7 @@ Metabrik::Network::Stream - network::stream Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

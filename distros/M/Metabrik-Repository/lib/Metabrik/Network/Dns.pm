@@ -1,5 +1,5 @@
 #
-# $Id: Dns.pm,v 692f25888256 2017/09/13 17:39:35 gomor $
+# $Id: Dns.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::dns Brik
 #
@@ -12,7 +12,7 @@ use base qw(Metabrik);
 # Default attribute values put here will BE inherited by subclasses
 sub brik_properties {
    return {
-      revision => '$Revision: 692f25888256 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable ns nameserver) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -69,7 +69,7 @@ sub create_resolver {
    my %args = (
       recurse => $self->use_recursion,
       searchlist => [],
-      debug => $self->debug ? 1 : 0,
+      debug => $self->log->level > 2 ? 1 : 0,
       tcp_timeout => $timeout,
       udp_timeout => $timeout,
       port => $port,
@@ -80,18 +80,20 @@ sub create_resolver {
    );
 
    if (defined($src_ip_address)) {
+      $self->log->debug("create_resolver: using source IP [$src_ip_address]");
       $args{srcaddr} = $src_ip_address;
    }
    if (defined($src_port)) {
+      $self->log->debug("create_resolver: using source port [$src_port]");
       $args{srcport} = $src_port;
    }
 
    if ($ref eq 'ARRAY') {
-      $self->log->verbose("create_resolver: using nameserver [".join('|', @$nameserver)."]");
+      $self->log->debug("create_resolver: using nameserver [".join('|', @$nameserver)."]");
       $args{nameservers} = $nameserver;
    }
    else {
-      $self->log->verbose("create_resolver: using nameserver [$nameserver]");
+      $self->log->debug("create_resolver: using nameserver [$nameserver]");
       $args{nameservers} = [ $nameserver ];
    }
 
@@ -129,7 +131,7 @@ sub lookup {
       $resolver = $self->resolver;
    }
 
-   $self->debug && $self->log->debug("lookup: host [$host] for type [$type]");
+   $self->log->debug("lookup: host [$host] for type [$type]");
 
    my $packet;
    eval {
@@ -143,12 +145,12 @@ sub lookup {
       return $self->log->error("lookup: query failed [".$resolver->errorstring."]");
    }
 
-   $self->debug && $self->log->debug("lookup: ".$packet->string);
+   $self->log->debug("lookup: ".$packet->string);
 
    my @res = ();
    my @answers = $packet->answer;
    for my $rr (@answers) {
-      $self->debug && $self->log->debug("lookup: ".$rr->string);
+      $self->log->debug("lookup: ".$rr->string);
 
       my $h = {
          type => $rr->type,
@@ -249,12 +251,12 @@ sub background_read {
       return [];  # No error checking possible, undef means no response or timeout.
    }
 
-   $self->debug && $self->log->debug("background_read: ".$packet->string);
+   $self->log->debug("background_read: ".$packet->string);
 
    my @res = ();
    my @answers = $packet->answer;
    for my $rr (@answers) {
-      $self->debug && $self->log->debug("background_read: ".$rr->string);
+      $self->log->debug("background_read: ".$rr->string);
 
       my $h = {
          type => $rr->type,
@@ -311,7 +313,7 @@ sub version_bind {
       tcp_timeout => $timeout,
       udp_timeout => $timeout,
       port => $port,
-      debug => $self->debug ? 1 : 0,
+      debug => $self->log->level > 2 ? 1 : 0,
    ); 
    if (! defined($resolver)) {
       return $self->log->error("version_bind: Net::DNS::Resolver new failed");
@@ -341,7 +343,7 @@ Metabrik::Network::Dns - network::dns Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

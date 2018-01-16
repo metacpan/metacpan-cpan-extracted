@@ -1,5 +1,5 @@
 #
-# $Id: Query.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
+# $Id: Query.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::elasticsearch::query Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f421cd03e192 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -33,6 +33,7 @@ sub brik_properties {
          query => [ qw(query index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          get_query_result_total => [ qw($query_result|OPTIONAL) ],
          get_query_result_hits => [ qw($query_result|OPTIONAL) ],
+         get_query_result_aggregations => [ qw($query_result|OPTIONAL) ],
          get_query_result_timed_out => [ qw($query_result|OPTIONAL) ],
          get_query_result_took => [ qw($query_result|OPTIONAL) ],
          term => [ qw(kv index|OPTIONAL type|OPTIONAL) ],
@@ -79,75 +80,83 @@ sub reset_client {
 
 sub get_query_result_total {
    my $self = shift;
-   my ($query_result) = @_;
+   my ($run) = @_;
 
-   my $run = $self->context->do('$RUN');
-   $query_result ||= $run;
-   $self->brik_help_run_undef_arg('get_query_result_total', $query_result) or return;
-   $self->brik_help_run_invalid_arg('get_query_result_total', $query_result, 'HASH') or return;
+   $self->brik_help_run_undef_arg('get_query_result_total', $run) or return;
+   $self->brik_help_run_invalid_arg('get_query_result_total', $run, 'HASH') or return;
 
-   if (! exists($query_result->{hits})) {
+   if (! exists($run->{hits})) {
       return $self->log->error("get_query_result_total: invalid query result, no hits found");
    }
-   if (! exists($query_result->{hits}{total})) {
+   if (! exists($run->{hits}{total})) {
       return $self->log->error("get_query_result_total: invalid query result, no total found");
    }
 
-   return $query_result->{hits}{total};
+   return $run->{hits}{total};
 }
 
 sub get_query_result_hits {
    my $self = shift;
-   my ($query_result) = @_;
+   my ($run) = @_;
 
-   my $run = $self->context->do('$RUN');
-   $query_result ||= $run;
-   $self->brik_help_run_undef_arg('get_query_result_hits', $query_result) or return;
-   $self->brik_help_run_invalid_arg('get_query_result_hits', $query_result, 'HASH') or return;
+   $self->brik_help_run_undef_arg('get_query_result_hits', $run) or return;
+   $self->brik_help_run_invalid_arg('get_query_result_hits', $run, 'HASH') or return;
 
-   if (! exists($query_result->{hits})) {
+   if (! exists($run->{hits})) {
       return $self->log->error("get_query_result_hits: invalid query result, no hits found");
    }
-   if (! exists($query_result->{hits}{hits})) {
+   if (! exists($run->{hits}{hits})) {
       return $self->log->error("get_query_result_hits: invalid query result, no hits in hits found");
    }
 
-   return $query_result->{hits}{hits};
+   return $run->{hits}{hits};
+}
+
+sub get_query_result_aggregations {
+   my $self = shift;
+   my ($run) = @_;
+
+   $self->brik_help_run_undef_arg('get_query_result_aggregations', $run) or return;
+   $self->brik_help_run_invalid_arg('get_query_result_aggregations', $run, 'HASH')
+      or return;
+
+   if (! exists($run->{aggregations})) {
+      return $self->log->error("get_query_result_aggregations: invalid query result, ".
+         "no aggregations found");
+   }
+
+   return $run->{aggregations};
 }
 
 sub get_query_result_timed_out {
    my $self = shift;
-   my ($query_result) = @_;
+   my ($run) = @_;
 
-   my $run = $self->context->do('$RUN');
-   $query_result ||= $run;
-   $self->brik_help_run_undef_arg('get_query_result_timed_out', $query_result) or return;
-   $self->brik_help_run_invalid_arg('get_query_result_timed_out', $query_result, 'HASH')
+   $self->brik_help_run_undef_arg('get_query_result_timed_out', $run) or return;
+   $self->brik_help_run_invalid_arg('get_query_result_timed_out', $run, 'HASH')
       or return;
 
-   if (! exists($query_result->{timed_out})) {
+   if (! exists($run->{timed_out})) {
       return $self->log->error("get_query_result_timed_out: invalid query result, ".
          "no timed_out found");
    }
 
-   return $query_result->{timed_out} ? 1 : 0;
+   return $run->{timed_out} ? 1 : 0;
 }
 
 sub get_query_result_took {
    my $self = shift;
-   my ($query_result) = @_;
+   my ($run) = @_;
 
-   my $run = $self->context->do('$RUN');
-   $query_result ||= $run;
-   $self->brik_help_run_undef_arg('get_query_result_took', $query_result) or return;
-   $self->brik_help_run_invalid_arg('get_query_result_took', $query_result, 'HASH')
+   $self->brik_help_run_undef_arg('get_query_result_took', $run) or return;
+   $self->brik_help_run_invalid_arg('get_query_result_took', $run, 'HASH')
       or return;
 
-   if (! exists($query_result->{took})) {
+   if (! exists($run->{took})) {
       return $self->log->error("get_query_result_took: invalid query result, no took found");
    }
 
-   return $query_result->{took};
+   return $run->{took};
 }
 
 sub query {
@@ -191,7 +200,7 @@ sub term {
    }
    my ($key, $value) = split('=', $kv);
 
-   $self->debug && $self->log->debug("term: key[$key] value[$value]");
+   $self->log->debug("term: key[$key] value[$value]");
 
    # Optimized version on ES 5.0.0
    my $q = {
@@ -228,7 +237,7 @@ sub unique_term {
    }
    my ($key, $value) = split('=', $kv);
 
-   $self->debug && $self->log->debug("unique_term: key[$key] value[$value]");
+   $self->log->debug("unique_term: key[$key] value[$value]");
 
    # Optimized version on ES 5.0.0
    my $q = {
@@ -414,7 +423,7 @@ sub match_phrase {
    }
    my ($key, $value) = split('=', $kv);
 
-   $self->debug && $self->log->debug("match_phrase: key[$key] value[$value]");
+   $self->log->debug("match_phrase: key[$key] value[$value]");
 
    my $q = {
       size => $self->size,
@@ -443,7 +452,7 @@ sub match {
    }
    my ($key, $value) = split('=', $kv);
 
-   $self->debug && $self->log->debug("match: key[$key] value[$value]");
+   $self->log->debug("match: key[$key] value[$value]");
 
    my $q = {
       size => $self->size,
@@ -557,7 +566,7 @@ Metabrik::Client::Elasticsearch::Query - client::elasticsearch::query Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

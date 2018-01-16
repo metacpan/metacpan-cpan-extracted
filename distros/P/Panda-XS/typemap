@@ -28,6 +28,8 @@ panda::string    T_STRING
 string_view      T_STRING_VIEW
 std::string_view T_STRING_VIEW
 
+xs::XSCallbackDispatcher* XT_CALLBACKDISPATCHER
+
 ######################################################################
 OUTPUT
 
@@ -178,6 +180,8 @@ T_STRING
 T_STRING_VIEW
     sv_setpvn((SV*)$arg, $var.data(), $var.length());
 
+XT_CALLBACKDISPATCHER : T_OEXT(basetype=xs::XSCallbackDispatcher*, refcnt, backref)
+
 ######################################################################
 INPUT
 
@@ -326,3 +330,5 @@ T_STRING_VIEW
   { STRLEN __${var}_len;
     const char* __${var}_buf = SvPV($arg, __${var}_len);
     $var = decltype($var)(__${var}_buf, __${var}_len); }
+
+XT_CALLBACKDISPATCHER : T_OEXT(basetype=xs::XSCallbackDispatcher*, refcnt, backref)

@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Test::RequiresInternet;
 use Test::More tests => 5;
 
 use Mail::DKIM::Verifier;

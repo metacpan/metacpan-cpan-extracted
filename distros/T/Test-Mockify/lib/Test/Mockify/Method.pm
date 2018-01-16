@@ -113,7 +113,7 @@ sub _checkExpectedParameters{
 sub _testMatcherStore {
     my $self = shift;
     my ($MatcherStore, $NewExpectedParameterValue) = @_;
-    if( $NewExpectedParameterValue->{'Value'} ){
+    if( defined $NewExpectedParameterValue->{'Value'} ){
         if($MatcherStore and not $MatcherStore->{'Value'}){
             die('It is not possibel to mix "expected parameter" with previously set "any parameter".');
         }

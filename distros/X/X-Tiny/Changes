@@ -1,15 +1,20 @@
 Revision history for Perl module X::Tiny
 
-0.01 Wed Mar 1 2017
-- Initial release
+0.12 Sat Jan 13 2018
+- Fix stack trace not to warn on undefined arguments in stack trace.
+This means that all scalar values will be quoted in the stack trace.
+- Reorder this file to descending chronological order.
 
-0.02 Sun Apr 2 2017
-- Added “get_message” to X::Tiny::Base
-- Set minimum version to 5.10 since 5.8 doesn’t grok overload.pm lazy-load
+0.11 Tue Aug 15 2017
+- Fix stack trace logic to preserve arguments.
 
 0.1
 - Add stack trace to stringified output. This doesn’t appear to present
 any memory or performance liabilities, at least in modern Perl versions.
 
-0.11 Tue Aug 15 2017
-- Fix stack trace logic to preserve arguments.
+0.02 Sun Apr 2 2017
+- Added “get_message” to X::Tiny::Base
+- Set minimum version to 5.10 since 5.8 doesn’t grok overload.pm lazy-load
+
+0.01 Wed Mar 1 2017
+- Initial release

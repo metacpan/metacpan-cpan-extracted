@@ -1,5 +1,5 @@
 #
-# $Id: Google.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Google.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # www::google Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -102,11 +102,11 @@ sub search {
       my @merged = ();
       my $this = {};
       for (@$r) {
-         $self->debug && $self->log->debug("url: [".$_->{url}."]");
-         $self->debug && $self->log->debug("title: [".$_->{title}."]");
+         $self->log->debug("url: [".$_->{url}."]");
+         $self->log->debug("title: [".$_->{title}."]");
 
          if ($_->{title} =~ m/^@{[$cache->{$language}]}/i) {
-            $self->debug && $self->log->debug("cache: [".$_->{url}."]");
+            $self->log->debug("cache: [".$_->{url}."]");
             $merged[-1]->{cache_url} = $_->{url};
          }
          else {
@@ -206,7 +206,7 @@ Metabrik::Www::Google - www::google Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

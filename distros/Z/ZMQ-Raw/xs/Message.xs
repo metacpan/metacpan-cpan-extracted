@@ -67,7 +67,7 @@ size (self)
 	SV *self
 
 	CODE:
-		RETVAL = zmq_msg_size (ZMQ_SV_TO_PTR (Message, self));
+		RETVAL = (unsigned int)zmq_msg_size (ZMQ_SV_TO_PTR (Message, self));
 
 	OUTPUT: RETVAL
 

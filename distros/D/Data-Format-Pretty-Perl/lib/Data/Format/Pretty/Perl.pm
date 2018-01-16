@@ -1,5 +1,8 @@
 package Data::Format::Pretty::Perl;
 
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.060'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -10,8 +13,6 @@ use Data::Dump::Color qw();
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(format_pretty);
-
-our $VERSION = '0.05'; # VERSION
 
 sub content_type { "text/x-perl" }
 
@@ -64,7 +65,7 @@ Data::Format::Pretty::Perl - Pretty-print data structure as Perl code
 
 =head1 VERSION
 
-version 0.05
+This document describes version 0.060 of Data::Format::Pretty::Perl (from Perl distribution Data-Format-Pretty-Perl), released on 2018-01-14.
 
 =head1 SYNOPSIS
 
@@ -92,7 +93,7 @@ code.
 
 Return formatted data structure as Perl code. Options:
 
-=over 4
+=over
 
 =item * color => BOOL
 
@@ -107,6 +108,8 @@ Whether to add line numbers.
 
 =head2 content_type()
 
+=head1 FAQ
+
 =head1 ENVIRONMENT
 
 =head2 COLOR => BOOL
@@ -117,19 +120,13 @@ Set C<color> option (if unset).
 
 Set C<linum> option (if unset).
 
-=head1 FAQ
-
-=head1 SEE ALSO
-
-L<Data::Format::Pretty>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Data-Format-Pretty-Perl>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Format-Pretty-Perl>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-Perl>.
 
 =head1 BUGS
 
@@ -139,13 +136,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Data::Format::Pretty>
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2018, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,5 @@
 #include <xs/xs.h>
+#include <xs/XSCallbackDispatcher.h>
 #ifdef TEST_FULL
 #  include "t/src/test.h"
 #endif
@@ -93,6 +94,8 @@ void obj2av (SV* rv) {
     if (SvOK(obj)) croak("Panda::XS::obj2av: only references to undefs can be upgraded");
     SvUPGRADE(obj, SVt_PVAV);
 }
+
+INCLUDE: XSCallbackDispatcher.xsi
 
 #ifdef TEST_FULL
 

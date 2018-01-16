@@ -6,7 +6,7 @@ use warnings;
 use Test::BDD::Cucumber::StepFile qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::HTTP::Util qw(C :util);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -44,6 +44,13 @@ Then qr/http response header "(.+)" must be like "(.+)"/, sub {
     my ( $name, $value ) = ( $1, $2 );
 
     header_re( $name, $value );
+};
+
+# Check http response content
+Then qr/http response content must be "(.+)"/, sub {
+    my ($value) = ($1);
+
+    content_eq($value);
 };
 
 # Check http response content

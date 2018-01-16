@@ -137,6 +137,14 @@
             "type": "string",
             "x-mojo-placeholder": "#",
             "required": true
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "description": "Filter results by grade",
+            "type": "string",
+            "enum": [ "pass", "fail", "na", "unknown" ],
+            "required": false
           }
         ],
         "responses": {
@@ -503,7 +511,7 @@
           }
         },
         "warnings": { "type": "integer", "minimum": 0 },
-        "duration": { "type": "integer", "minimum": 0 },
+        "duration": { "type": "number", "minimum": 0 },
         "output": { "$ref": "#/definitions/TestOutput" }
       }
     },

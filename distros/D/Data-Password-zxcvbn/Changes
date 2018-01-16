@@ -1,0 +1,9 @@
+1.0.2     2018-01-12 11:51:21+00:00 Europe/London
+ - some minor fixes to POD, no functional change
+
+1.0.1     2018-01-11 16:53:43+00:00 Europe/London
+ - bug fix: UserInput would fail to recognise an input token in the
+   password, if the token was not fully lowercase
+
+1.0.0     2018-01-10 15:28:50+00:00 Europe/London
+ - initial release

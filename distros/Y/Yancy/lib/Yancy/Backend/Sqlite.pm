@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -96,25 +96,28 @@ our $VERSION = '0.009';
 #pod
 #pod =cut
 
-use v5.24;
 use Mojo::Base 'Mojo';
-use experimental qw( signatures postderef );
 use Scalar::Util qw( looks_like_number );
 use Mojo::SQLite 3.0;
 
 has sqlite =>;
 has collections =>;
 
-sub new( $class, $url, $collections ) {
-    my ( $connect ) = ( defined $url && length $url ) ? $url =~ m{^[^:]+:(.+)$} : undef;
+sub new {
+    my ( $class, $backend, $collections ) = @_;
+    if ( !ref $backend ) {
+        my ( $connect ) = ( defined $backend && length $backend ) ? $backend =~ m{^[^:]+:(.+)$} : undef;
+        $backend = Mojo::SQLite->new( defined $connect ? "sqlite:$connect" : () );
+    }
     my %vars = (
-        sqlite => Mojo::SQLite->new( defined $connect ? "sqlite:$connect" : () ),
+        sqlite => $backend,
         collections => $collections,
     );
     return $class->SUPER::new( %vars );
 }
 
-sub create( $self, $coll, $params ) {
+sub create {
+    my ( $self, $coll, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     my $inserted_id = $self->sqlite->db->insert( $coll, $params )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume id field is correct
@@ -122,16 +125,19 @@ sub create( $self, $coll, $params ) {
     return $self->get( $coll, $params->{$id_field} // $inserted_id );
 }
 
-sub get( $self, $coll, $id ) {
+sub get {
+    my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $self->sqlite->db->select( $coll, undef, { $id_field => $id } )->hash;
 }
 
-sub list( $self, $coll, $params={}, $opt={} ) {
+sub list {
+    my ( $self, $coll, $params, $opt ) = @_;
+    $params ||= {}; $opt ||= {};
     my $sqlite = $self->sqlite;
     my ( $query, @params ) = $sqlite->abstract->select( $coll, undef, $params, $opt->{order_by} );
     my ( $total_query, @total_params ) = $sqlite->abstract->select( $coll, [ \'COUNT(*) as total' ], $params );
-    if ( scalar grep defined, $opt->@{qw( limit offset )} ) {
+    if ( scalar grep defined, @{ $opt }{qw( limit offset )} ) {
         die "Limit must be number" if $opt->{limit} && !looks_like_number $opt->{limit};
         $query .= ' LIMIT ' . ( $opt->{limit} // 2**32 );
         if ( $opt->{offset} ) {
@@ -147,17 +153,20 @@ sub list( $self, $coll, $params={}, $opt={} ) {
 
 }
 
-sub set( $self, $coll, $id, $params ) {
+sub set {
+    my ( $self, $coll, $id, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $self->sqlite->db->update( $coll, $params, { $id_field => $id } );
 }
 
-sub delete( $self, $coll, $id ) {
+sub delete {
+    my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $self->sqlite->db->delete( $coll, { $id_field => $id } );
 }
 
-sub read_schema( $self ) {
+sub read_schema {
+    my ( $self ) = @_;
     my %schema;
     my $tables_q = <<ENDQ;
 SELECT * FROM SQLITE_MASTER
@@ -172,11 +181,11 @@ ENDQ
 SELECT * FROM sqlite_sequence
 ENDQ
 
-    my @tables = $self->sqlite->db->query( $tables_q )->hashes->@*;
+    my @tables = @{ $self->sqlite->db->query( $tables_q )->hashes };
     for my $t ( @tables ) {
         my $table = $t->{name};
         # ; say "Got table $table";
-        my @columns = $self->sqlite->db->query( sprintf $column_q, $table )->hashes->@*;
+        my @columns = @{ $self->sqlite->db->query( sprintf $column_q, $table )->hashes };
         # ; say "Got columns";
         # ; use Data::Dumper;
         # ; say Dumper \@columns;
@@ -187,7 +196,7 @@ ENDQ
                 _map_type( $c->{type} ),
             };
             if ( ( $c->{notnull} || $c->{pk} ) && !$is_auto && !$c->{dflt_value} ) {
-                push $schema{ $table }{ required }->@*, $column;
+                push @{ $schema{ $table }{ required } }, $column;
             }
             if ( $c->{pk} == 1 && $column ne 'id' ) {
                 $schema{ $table }{ 'x-id-field' } = $column;
@@ -198,7 +207,8 @@ ENDQ
     return \%schema;
 }
 
-sub _map_type( $db_type ) {
+sub _map_type {
+    my ( $db_type ) = @_;
     if ( $db_type =~ /^(?:text|varchar)/i ) {
         return ( type => 'string' );
     }
@@ -227,7 +237,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

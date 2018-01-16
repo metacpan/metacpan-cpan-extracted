@@ -32,7 +32,7 @@ use CallBackery::Config;
 use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 
-our $VERSION = '0.12.0';
+our $VERSION = '0.12.1';
 
 use Mojo::Base 'Mojolicious';
 
@@ -151,6 +151,8 @@ sub startup {
         for my $header ( keys %$securityHeaders){
             $c->res->headers->header($header,$securityHeaders->{$header});
         }
+        $c->res->headers->cache_control('no-cache, no-store, must-revalidate')
+            unless $c->req->url->path =~ m{/resource/.+};
     });
 
     # on initial startup lets get all the 'stuff' into place

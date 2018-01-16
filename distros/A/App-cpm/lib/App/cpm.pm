@@ -12,13 +12,13 @@ use App::cpm::Resolver::Cascade;
 use Parallel::Pipes;
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
 use List::Util ();
-use Pod::Usage ();
+use Pod::Text ();
 use File::Spec;
 use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.955';
+our $VERSION = '0.957';
 our $GIT_DESCRIBE;
 our $GIT_URL;
 
@@ -132,7 +132,7 @@ sub parse_options {
     if ($self->{sudo}) {
         !system "sudo", $^X, "-e1" or exit 1;
     }
-    if ($self->{sudo} or $self->{man_pages} or $] < 5.012) {
+    if ($self->{sudo} or !$self->{notest} or $self->{man_pages} or $] < 5.012) {
         $self->{prebuilt} = 0;
     }
 
@@ -216,7 +216,11 @@ sub run {
 }
 
 sub cmd_help {
-    Pod::Usage::pod2usage(0);
+    open my $fh, ">", \my $out;
+    Pod::Text->new->parse_from_file($0, $fh);
+    $out =~ s/^[ ]{6}/    /mg;
+    print $out;
+    return 0;
 }
 
 sub cmd_version {

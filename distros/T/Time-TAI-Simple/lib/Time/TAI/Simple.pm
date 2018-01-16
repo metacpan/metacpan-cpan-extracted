@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 BEGIN {
     @Time::TAI::Simple::EXPORT = qw(tai tai10 tai35);
-    $Time::TAI::Simple::VERSION = '1.11';
+    $Time::TAI::Simple::VERSION = '1.13';
 }
 
 our @LEAPSECOND_UNIX_PATHNAME_LIST = (
@@ -239,7 +239,7 @@ sub _leapseconds_filename {
 
 =head1 VERSION
 
-    1.11
+    1.13
 
 =head1 SYNOPSIS
 
@@ -720,7 +720,7 @@ access to a Windows environment in which to test it.  I doubt that the paths in
 C<@Time::TAI::Simple::LEAPSECOND_WINDOWS_PATHNAME_LIST> are sufficient for all
 environments.
 
-Also, some corners were cut in C<bin/tai>, particularly in the C<--iso8601> code,
+Also, some corners were cut in C<bin/tai>, particularly in the C<--iso> code,
 which means its output will not be precisely correct for locales with timezones
 whose time offsets are not whole hours.
 

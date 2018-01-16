@@ -1,5 +1,5 @@
 #
-# $Id: Windefend.pm,v 73751329deb1 2017/03/18 14:13:39 gomor $
+# $Id: Windefend.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # remote::windefend Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Remote::Winexe);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 73751329deb1 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -70,7 +70,7 @@ Metabrik::Remote::Windefend - remote::windefend Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

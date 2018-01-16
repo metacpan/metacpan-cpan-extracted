@@ -319,6 +319,10 @@ your local CPAN archive.
 
 =head1 AUTHORS
 
-Mark Overmeer E<lt>perl@overmeer.netE<gt>.
+Mark Overmeer E<lt>markov@cpan.org<gt>.
+
+This project is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See <http://dev.perl.org/licenses/>
 
 =cut

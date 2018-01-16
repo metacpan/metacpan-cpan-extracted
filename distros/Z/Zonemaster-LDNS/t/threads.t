@@ -5,7 +5,7 @@ use_ok('Zonemaster::LDNS');
 SKIP: {
     my $can_use_threads = eval 'use threads; 1';
 
-    skip 'no network or no threads', 4 if ( $ENV{TEST_NO_NETWORK} || !$can_use_threads );
+    skip 'no network or no threads', 4 unless $ENV{TEST_WITH_NETWORK} and $can_use_threads;
 
     my $resolver = Zonemaster::LDNS->new('8.8.8.8');
     isa_ok($resolver, 'Zonemaster::LDNS');

@@ -6,7 +6,7 @@
 package Syntax::Highlight::Engine::Kate;
 
 use 5.006;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use strict;
 use warnings;
 use Carp qw(carp croak);
@@ -742,9 +742,9 @@ Syntax::Highlight::Engine::Kate - a port to Perl of the syntax highlight engine 
 
 =head1 DESCRIPTION
 
-B<This module is now depricated>.
+B<This module is now deprecated>.
 
-It is superceded and replaced by B<Syntax::Kamelon>.
+It is superseded and replaced by B<Syntax::Kamelon>.
 Best use B<Syntax::Kamelon> for new projects.
 
 Syntax::Highlight::Engine::Kate is a port to Perl of the syntax highlight engine of the

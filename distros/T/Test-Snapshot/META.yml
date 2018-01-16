@@ -3,6 +3,7 @@ abstract: 'test against data stored in automatically-named file'
 author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
+  App::Prove: '0'
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   Test2::API: '0'
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/mohawk2/Test-Snapshot/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/Test-Snapshot
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

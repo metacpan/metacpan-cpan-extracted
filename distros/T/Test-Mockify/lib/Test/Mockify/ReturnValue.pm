@@ -36,7 +36,7 @@ The C<thenReturn> method set the return value of C<call>.
 sub thenReturn {
     my $self = shift;
     my ($Value) = @_;
-    die('Return value undefined. Use "thenReturnUndef" if you need to return undef.') unless($Value);
+    die('Return value undefined. Use "thenReturnUndef" if you need to return undef.') unless(defined $Value);
     $self->{'Value'} = $Value;
 }
 =pod
@@ -160,7 +160,7 @@ sub call {
     }elsif($self->{'FunctionPointer'}){
         return $self->{'FunctionPointer'}->(@Params);
 
-    }elsif($self->{'Value'}){
+    }elsif(defined $self->{'Value'}){
         return $self->{'Value'};
 
     }else{

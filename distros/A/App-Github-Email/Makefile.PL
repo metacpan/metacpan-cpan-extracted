@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,10 +17,12 @@ my %WriteMakefileArgs = (
     "Module::Build" => "0.28"
   },
   "DISTNAME" => "App-Github-Email",
-  "LICENSE" => "gpl",
+  "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "App::Github::Email",
   "PREREQ_PM" => {
     "Email::Address" => 0,
+    "Getopt::Long::Descriptive" => 0,
     "LWP::Online" => 0,
     "LWP::UserAgent" => 0,
     "List::MoreUtils" => 0,
@@ -28,10 +30,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0,
-    "lib" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.1.1",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,12 +41,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Email::Address" => 0,
+  "Getopt::Long::Descriptive" => 0,
   "LWP::Online" => 0,
   "LWP::UserAgent" => 0,
   "List::MoreUtils" => 0,
   "Module::Build" => "0.28",
   "Test::More" => 0,
-  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

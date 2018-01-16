@@ -3,7 +3,7 @@ Mail-DKIM
 
 [![Build Status](https://travis-ci.org/marcbradshaw/mail-dkim.svg?branch=master)](https://travis-ci.org/marcbradshaw/mail-dkim)
 
-Mail-DKIM version 0.50
+Mail-DKIM version 0.51
 ======================
 
 This module implements the various components of the DKIM, ARC, and DomainKeys

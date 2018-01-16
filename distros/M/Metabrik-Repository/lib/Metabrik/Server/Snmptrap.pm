@@ -1,5 +1,5 @@
 #
-# $Id: Snmptrap.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Snmptrap.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # server::snmptrap Brik
 #
@@ -12,7 +12,7 @@ use base qw(Metabrik::System::Package);
 # Default attribute values put here will BE inherited by subclasses
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable snmp trap trapd snmptrapd) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -63,7 +63,7 @@ sub start {
 
    # Son
    if (! $pid) {
-      $self->debug && $self->log->debug("start: son process started: $$");
+      $self->log->debug("start: son process started: $$");
 
       while (1) {
          my $trap = $proc->get_trap;
@@ -87,7 +87,7 @@ sub start {
          }
       }
 
-      $self->debug && $self->log->debug("start: son process exited: $$");
+      $self->log->debug("start: son process exited: $$");
 
       exit(0);
    }
@@ -122,7 +122,7 @@ Metabrik::Server::Snmptrap - server::snmptrap Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

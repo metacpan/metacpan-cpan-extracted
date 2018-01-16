@@ -23,6 +23,9 @@ lib/JMAP/Tester/Result/Failure.pm
 lib/JMAP/Tester/Result/Logout.pm
 lib/JMAP/Tester/Result/Upload.pm
 lib/JMAP/Tester/Role/Result.pm
+lib/JMAP/Tester/Role/SentenceBroker.pm
+lib/JMAP/Tester/Role/SentenceCollection.pm
+lib/JMAP/Tester/SentenceBroker.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t

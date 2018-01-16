@@ -1,0 +1,7 @@
+lib/CPP/catch/test.pm
+lib/CPP/catch/test.pod
+Makefile.PL
+MANIFEST			This list of files
+src/catch.hpp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

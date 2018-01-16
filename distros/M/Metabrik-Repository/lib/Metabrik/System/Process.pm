@@ -1,5 +1,5 @@
 #
-# $Id: Process.pm,v 50fa661db186 2017/02/25 18:06:07 gomor $
+# $Id: Process.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # system::process Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 50fa661db186 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -344,11 +344,11 @@ sub is_running_from_pidfile {
    }
 
    if (my $pid = Daemon::Daemonize->check_pidfile($pidfile)) {
-      $self->debug && $self->log->debug("is_running_from_pidfile: yes");
+      $self->log->debug("is_running_from_pidfile: yes");
       return 1;
    }
 
-   $self->debug && $self->log->debug("is_running_from_pidfile: no");
+   $self->log->debug("is_running_from_pidfile: no");
 
    return 0;
 }
@@ -527,7 +527,7 @@ Metabrik::System::Process - system::process Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

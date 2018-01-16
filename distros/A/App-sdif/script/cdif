@@ -18,7 +18,7 @@ use Encode;
 use Encode::Guess;
 
 use Pod::Usage;
-use List::Util qw(first sum);
+use List::Util qw(first sum pairmap);
 use Text::ParseWords qw(shellwords);
 use Text::VisualWidth::PP qw(vwidth);
 use Data::Dumper;
@@ -149,30 +149,35 @@ push(@sub_diffopts,
      $opt_w ? "-w" : (),
     );
 
-my %colormap = (
-    COMMAND => $opt_256 ? "555/222E" : "W/KE" ,
-    CMARK   => "GS" ,
-    OMARK   => "CS" ,
-    NMARK   => "MS" ,
-    MMARK   => "YS" ,
-    CTEXT   => "G"  ,
-    OTEXT   => "C"  ,
-    NTEXT   => "M"  ,
-    MTEXT   => "Y"  ,
-    OCHANGE => $opt_256 ? "K/445": "BD/W",
-    NCHANGE => $opt_256 ? "K/445": "BD/W",
-    DELETE  => $opt_256 ? "K/544": "RD/W",
-    APPEND  => $opt_256 ? "K/544": "RD/W",
+my %colormap = do {
+    my $col = $opt_256 ? 0 : 1;
+    pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
+	CMARK   =>   "GS" ,
+	OMARK   =>   "CS" ,
+	NMARK   =>   "MS" ,
+	MMARK   =>   "YS" ,
+	CTEXT   =>   "G"  ,
+	OTEXT   =>   "C"  ,
+	NTEXT   =>   "M"  ,
+	MTEXT   =>   "Y"  ,
+	COMMAND => [ "555/222E" , "W/KE" ] ,
+	OCHANGE => [ "K/445"    , "BD/W" ] ,
+	NCHANGE => [ "K/445"    , "BD/W" ] ,
+	DELETE  => [ "K/544"    , "RD/W" ] ,
+	APPEND  => [ "K/544"    , "RD/W" ] ,
     );
+};
 
 use Getopt::EX::Colormap;
 my $color_handler = new Getopt::EX::Colormap
     HASH => \%colormap;
 $color_handler->load_params(@opt_colormap);
 
-$opt_commandcolor or $colormap{COMMAND} = "";
-$opt_markcolor or map { $colormap{$_} = "" } grep /MARK$/, keys %colormap;
-$opt_textcolor or map { $colormap{$_} = "" } grep /TEXT$/, keys %colormap;
+map { $colormap{$_} = "" } (
+    $opt_commandcolor ? () : 'COMMAND',
+    $opt_markcolor    ? () : grep(/MARK$/, keys %colormap),
+    $opt_textcolor    ? () : grep(/TEXT$/, keys %colormap),
+);
 
 warn 'colormap = ', Dumper \%colormap if $opt_d{c};
 

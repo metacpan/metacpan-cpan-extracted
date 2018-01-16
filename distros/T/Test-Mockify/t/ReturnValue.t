@@ -24,17 +24,26 @@ sub testScalarReturnValue {
 
     my $ReturnValue = Test::Mockify::ReturnValue->new();
     $ReturnValue->thenReturn('AString');
-    is($ReturnValue->call(),'AString','ReturnValue scalar - is stored and transfered to call');
+    is($ReturnValue->call(), 'AString', 'ReturnValue scalar - is stored and transfered to call');
+
+    $ReturnValue->thenReturn(0);
+    is($ReturnValue->call(), 0,'ReturnValue scalar - number zero is possible');
+
+    $ReturnValue->thenReturn('0');
+    is($ReturnValue->call(), 0, 'ReturnValue scalar - string zero is possible, but since the String is interpreted as a number it will return it as a number');
+
+    $ReturnValue->thenReturn('');
+    is($ReturnValue->call(), '', 'ReturnValue scalar - empty string is possible');
 
     $ReturnValue->thenReturn(['AArray']);
-    is_deeply($ReturnValue->call(),['AArray'],'ReturnValue - array pointer is stored and transfered to call');
+    is_deeply($ReturnValue->call(), ['AArray'], 'ReturnValue - array pointer is stored and transfered to call');
 
     $ReturnValue->thenReturn({'A'=>'Array'});
-    is_deeply($ReturnValue->call(),{'A'=>'Array'},'ReturnValue - Hash pointer is stored and transfered to call');
+    is_deeply($ReturnValue->call(), {'A'=>'Array'}, 'ReturnValue - Hash pointer is stored and transfered to call');
 
     $ReturnValue->thenReturn(sub{return 'innerValue';});
-    is_deeply($ReturnValue->call()->(),'innerValue','ReturnValue - function pointer is stored and transfered to call');
-
+    is_deeply($ReturnValue->call()->(), 'innerValue','ReturnValue - function pointer is stored and transfered to call');
+ 
     return;
 }
 
@@ -43,8 +52,12 @@ sub test_thenReturnUndef{
     my $self = shift;
 
     my $ReturnValue = Test::Mockify::ReturnValue->new();
+    throws_ok( sub { $ReturnValue->thenReturn(); },
+       qr/Return value undefined. Use "thenReturnUndef" if you need to return undef/,
+       "proves that an Error is thrown if mockify is used wrongly"
+    );
     $ReturnValue->thenReturnUndef();
-    is($ReturnValue->call(),undef,'ReturnValue undef - undef is stored and transfered to call.');
+    is($ReturnValue->call(), undef,'ReturnValue undef - undef is stored and transfered to call.');
 }
 #------------------------------------------------------------------------
 sub test_thenThrowError{

@@ -1,16 +1,18 @@
 package Mail::AuthenticationResults::Header::Group;
+# ABSTRACT: Class modelling Groups of Authentication Results Header parts
+
 require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171230'; # VERSION
+our $VERSION = '1.20180113'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
 
-sub HAS_CHILDREN{ return 1; }
+sub _HAS_CHILDREN{ return 1; }
 
-sub ALLOWED_CHILDREN {
+sub _ALLOWED_CHILDREN {
     my ( $self, $child ) = @_;
     return 1 if ref $child eq 'Mail::AuthenticationResults::Header';
     return 1 if ref $child eq 'Mail::AuthenticationResults::Header::AuthServID';
@@ -24,7 +26,7 @@ sub ALLOWED_CHILDREN {
 
 sub add_child {
     my ( $self, $child ) = @_;
-    croak 'Cannot add child' if ! $self->ALLOWED_CHILDREN( $child );
+    croak 'Cannot add child' if ! $self->_ALLOWED_CHILDREN( $child );
     croak 'Cannot add a class as its own parent' if refaddr $self == refaddr $child;
 
     if ( ref $child eq 'Mail::AuthenticationResults::Header::Group' ) {
@@ -53,3 +55,29 @@ sub as_string {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::AuthenticationResults::Header::Group - Class modelling Groups of Authentication Results Header parts
+
+=head1 VERSION
+
+version 1.20180113
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

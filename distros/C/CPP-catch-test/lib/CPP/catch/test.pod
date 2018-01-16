@@ -1,0 +1,13 @@
+=head1 NAME
+
+CPP::catch:::test  Module for binary dependecy from Cpp::Catch library http://catch-lib.net
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

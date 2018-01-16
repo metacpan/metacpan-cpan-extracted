@@ -1,5 +1,8 @@
 Revision history for Perl extension Syntax::Highlight::Engine::Kate.
 
+0.14  2018-01-13 MANWAR
+      - Applied patch provided by @gregoa (RT #124073).
+
 0.13  2017-11-28 MANWAR
       - Applied the patch provided by the original author @HANJE.
 

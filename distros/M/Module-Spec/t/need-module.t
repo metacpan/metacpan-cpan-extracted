@@ -23,6 +23,18 @@ use lib qw(t/lib);
     is $m, 'Foo', 'need_module with version';
 }
 {
+    my $m = need_module('Foo~0');
+    is $m, 'Foo', 'need_module("M~0")';
+}
+{
+    my $m = need_module('NoVersion');
+    is $m, 'NoVersion', 'need_module("M") on module with no version';
+}
+{
+    my $m = need_module('NoVersion~0');
+    is $m, 'NoVersion', 'need_module("M~0") on module with no version';
+}
+{
     my ( $m, $v ) = need_module('Foo');
     is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
       'simple need_module in list context';
@@ -36,6 +48,11 @@ use lib qw(t/lib);
     my ( $m, $v ) = need_module('Foo~0.1.0');
     is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
       'need_module with version in list context';
+}
+{
+    my ( $m, $v ) = need_module('NoVersion');
+    is_deeply [ $m, $v ], [ 'NoVersion', NoVersion->VERSION ],
+      'need_module("M") on module with no version - list context';
 }
 {
     like exception { need_module('NonExisting') },
@@ -70,6 +87,13 @@ use lib qw(t/lib);
     my $m = need_module( 'FooFoo~3',
         { require => sub { !shift->can('do_foo') }, } );
     is $m, 'FooFoo', 'need_module with version + dynamic "require"';
+}
+{
+    like(
+        exception { need_module('NoVersion~1') },
+        qr/^NoVersion does not define \$NoVersion::VERSION\b/,
+        'need_module M~V rethrows on module with no version'
+    );
 }
 
 done_testing;

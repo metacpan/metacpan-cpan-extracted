@@ -83,8 +83,8 @@ define {DARK_BG2} L04
 expand	--dark-screen \
 	--cm    ?MARK=000/{DARK_BG1}	\
 	--cm    UMARK=			\
-	--cm    ?TEXT=555/{DARK_BG2}	\
-	--cm    UTEXT=444
+	--cm    ?TEXT=L23/{DARK_BG2}	\
+	--cm    UTEXT=L22
 
 option	--dark-green \
 	--dark-screen 			\

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::QueryRoary;
-$Bio::Roary::Main::QueryRoary::VERSION = '3.11.1';
+$Bio::Roary::Main::QueryRoary::VERSION = '3.11.3';
 # ABSTRACT: Take in a groups file and the protein fasta files and output selected data
 # PODNAME: query_pan_genome
 
@@ -25,7 +25,7 @@ query_pan_genome - Take in a groups file and the protein fasta files and output 
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

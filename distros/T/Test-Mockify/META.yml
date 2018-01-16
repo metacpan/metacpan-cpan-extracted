@@ -29,7 +29,7 @@ no_index:
 provides:
   Test::Mockify:
     file: lib/Test/Mockify.pm
-    version: '1.0'
+    version: '1.2'
   Test::Mockify::CompatibilityTools:
     file: lib/Test/Mockify/CompatibilityTools.pm
   Test::Mockify::Matcher:
@@ -65,7 +65,7 @@ resources:
   bugtracker: https://github.com/ePages-de/Mockify/issues
   homepage: https://github.com/ePages-de/Mockify
   repository: git://github.com/ePages-de/Mockify.git
-version: '1.0'
+version: '1.2'
 x_authority: cpan:CHRBR
 x_contributors:
   - 'Alexander Sandau <a.sandau@epages.com>'
@@ -74,4 +74,5 @@ x_contributors:
   - 'Christian Breitkreutz <cbreitkreutz@epages.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Oliver Trosien <otrosien@epages.com>'
+  - 'Unknown <dustin.buckenmeyer@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

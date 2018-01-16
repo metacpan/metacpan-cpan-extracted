@@ -1,3 +1,7 @@
+1.08
+ - Add new functions Rmpc_cmp_abs and Rmpc_rootofunity
+ - Create MPC.pod
+
 1.07
  - Fix typo in overload_add diagnostic message that was segfaulting on amd64-freebsd.
    Thanks to Slaven Rezic.

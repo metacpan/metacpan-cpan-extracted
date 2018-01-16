@@ -16,7 +16,7 @@ is $translator->translate([{type => 'expr', value => '$foo'}]),
   q/__print_escaped(do {$foo});/;
 
 $translator = Text::APL::Translator->new;
-is $translator->translate([{type => 'exec', value => 'foo()'}]), q{foo();};
+is $translator->translate([{type => 'exec', value => 'foo()'}]), qq{foo();\n};
 
 $translator = Text::APL::Translator->new;
 is $translator->translate([{type => 'text', value => 'hello'}]),

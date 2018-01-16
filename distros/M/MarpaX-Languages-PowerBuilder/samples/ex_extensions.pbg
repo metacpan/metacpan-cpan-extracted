@@ -1,0 +1,11 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "ex_extensions.pbl" "";
+@end;
+@begin Objects
+ "nv_extension_manager.sru" "ex_extensions.pbl";
+ "nv_extension_context.sru" "ex_extensions.pbl";
+ "w_fxconverter_eq.srw" "ex_extensions.pbl";
+ "nv_extension.sru" "ex_extensions.pbl";
+ "nv_fxconverter_extension.sru" "ex_extensions.pbl";
+@end;

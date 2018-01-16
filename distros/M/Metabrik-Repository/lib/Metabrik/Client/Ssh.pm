@@ -1,5 +1,5 @@
 #
-# $Id: Ssh.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ssh.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::ssh Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -148,7 +148,7 @@ sub execute {
    $self->brik_help_run_undef_arg('connect', $ssh2) or return;
    $self->brik_help_run_undef_arg('execute', $cmd) or return;
 
-   $self->debug && $self->log->debug("execute: cmd [$cmd]");
+   $self->log->debug("execute: cmd [$cmd]");
 
    my $channel = $self->create_channel or return;
 
@@ -203,7 +203,7 @@ sub execute_in_background {
    }
    $cmd .= " &";
 
-   $self->debug && $self->log->debug("execute_in_background: cmd [$cmd]");
+   $self->log->debug("execute_in_background: cmd [$cmd]");
 
    $channel->process('exec', $cmd)
       or return $self->log->error("execute_in_background: process failed: [$!]");
@@ -334,7 +334,7 @@ sub capture {
 
    my $channel = $self->create_channel or return;
 
-   $self->debug && $self->log->debug("capture: cmd [$cmd]");
+   $self->log->debug("capture: cmd [$cmd]");
 
    $channel->process('exec', $cmd)
       or return $self->log->error("capture: process failed: [$!]");
@@ -368,7 +368,7 @@ Metabrik::Client::Ssh - client::ssh Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

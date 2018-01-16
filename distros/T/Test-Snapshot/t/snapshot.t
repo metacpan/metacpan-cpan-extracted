@@ -2,6 +2,7 @@ use Test::More 0.96;
 use Test::Snapshot;
 use File::Temp qw/ tempfile tempdir /;
 use Capture::Tiny qw(capture);
+use App::Prove;
 
 sub tempcopy {
   my ($text, $dir) = @_;
@@ -27,25 +28,20 @@ is_deeply_snapshot { message => 'output' }, 'desc';
 done_testing;
 EOF
 
-my ($exit);
+sub do_test {
+  my ($filename, $update, $expect, $description) = @_;
+  my ($out, $err, $exit) = capture {
+    local $ENV{TEST_SNAPSHOT_UPDATE} = $update;
+    my $app = App::Prove->new;
+    $app->process_args(qw(-b), $filename);
+    $app->run ? 0 : 1;
+  };
+  is $exit, $expect, $description
+    or diag 'Output was: ', $out, 'Error was: ', $err;
+}
 
-(undef, undef, $exit) = capture {
-  system qw(prove -b), $filename;
-};
-isnt $exit, 0, 'fails first time';
-
-(undef, undef, $exit) = capture {
-  local $ENV{TEST_SNAPSHOT_UPDATE} = 1;
-  system $^X, qw(-S prove -b), $filename;
-};
-isnt $exit, 0, 'fails second time, snapshots were not created';
-
-my ($out, $err);
-($out, $err, $exit) = capture {
-  local $ENV{TEST_SNAPSHOT_UPDATE} = 1;
-  system qw(prove -b), $filename;
-};
-is $exit, 0, 'works third time, snapshots were created'
-  or diag 'Output was: ', $out, 'Error was: ', $err;
+do_test($filename, '', 1, 'fails first time');
+do_test($filename, 1, 1, 'fails second time, snapshots were not created');
+do_test($filename, 1, 0, 'works third time, snapshots were created');
 
 done_testing;

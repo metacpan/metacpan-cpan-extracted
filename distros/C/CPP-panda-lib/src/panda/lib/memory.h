@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#include <assert.h>
 
 namespace panda { namespace lib {
 
@@ -76,14 +77,7 @@ class ObjectAllocator {
 public:
     static ObjectAllocator* instance () { return &_inst; }
 
-    static ObjectAllocator* tls_instance () {
-        static thread_local ObjectAllocator* ptr;
-        if (!ptr) {
-            static thread_local ObjectAllocator inst;
-            ptr = &inst;
-        }
-        return ptr;
-    }
+    static ObjectAllocator* tls_instance ();
 
     ObjectAllocator ();
 
@@ -133,6 +127,7 @@ struct AllocatedObject {
     static void* operator new (size_t size) {
         if (size == sizeof(TARGET)) return StaticMemoryPool<sizeof(TARGET)>::tls_instance()->allocate();
         return ObjectAllocator::tls_instance()->allocate(size);
+
     }
 
     static void operator delete (void* p, size_t size) {

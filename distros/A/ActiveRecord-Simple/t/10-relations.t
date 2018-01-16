@@ -164,18 +164,18 @@ use Data::Dumper;
 use 5.010;
 
 
-ok my $customer = Customer->get(1);
+ok my $customer = Customer->objects->get(1);
 is $customer->first_name, 'Bob';
 
 my @purchases = $customer->purchases->fetch;
 is scalar @purchases, 2;
 
-my $purchase = Purchase->get(2);
+my $purchase = Purchase->objects->get(2);
 is $purchase->id, 2;
 is $purchase->title, 'The Order #2';
 is $purchase->customer->first_name, 'John';
 
-my $achievement = Achievement->get(1);
+my $achievement = Achievement->objects->get(1);
 is $achievement->title, 'Bronze';
 
 my @customers = $achievement->customers->fetch;
@@ -185,7 +185,7 @@ my @achievements = $customer->achievements->fetch;
 is scalar @achievements, 2;
 
 
-ok my $Bill = Customer->get(3), 'got Bill';
+ok my $Bill = Customer->objects->get(3), 'got Bill';
 ok $achievement = Achievement->new({ title => 'Bill Achievement', id => 4 })->save, 'create achievement';
 
 is $Bill->id, 3;
@@ -202,7 +202,7 @@ ok !$Bill->achievements({ title => 'Not Existing Achievement' })->exists;
 ok my @bills_orders = $Bill->purchases->fetch, 'got Bill\'s orders';
 
 is scalar @bills_orders, 1;
-ok my $order = Purchase->get(3), 'order';
+ok my $order = Purchase->objects->get(3), 'order';
 ok $order->customer, 'the order has a customer';
 is $order->customer->id, $bills_orders[0]->id;
 
@@ -211,7 +211,7 @@ ok @achievements = $Bill->achievements->fetch;#
 is @achievements, 4;
 isa_ok $achievements[0], 'Achievement';
 
-ok my $a = Achievement->get(1);
+ok my $a = Achievement->objects->get(1);
 ok @customers = $a->customers->order_by('id')->fetch;
 is @customers, 3;
 

@@ -1,5 +1,5 @@
 #
-# $Id: Device.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Device.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::device Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable interface) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -52,7 +52,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device,
+         device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -176,7 +176,7 @@ sub show {
    $devices ||= $self->list or return;
 
    for my $this (@$devices) {
-      $self->debug && $self->log->debug("show: found device [$this]");
+      $self->log->debug("show: found device [$this]");
       my $device = $self->get($this);
       if (! defined($device) || ! exists($device->{device})) {
          $self->enable_warnings
@@ -256,7 +256,7 @@ Metabrik::Network::Device - network::device Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

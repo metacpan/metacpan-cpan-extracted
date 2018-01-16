@@ -55,12 +55,19 @@ ok(!-e $filename, '... and it got deleted as expected!');
 
     is_deeply [ $ali->$_ ], [ $temp->$_ ],
         "got expected result from delegated method: $_"
-        for qw(count_comments all_comments
-            all_seq_ids has_uniq_ids is_protein
-            all_seqs count_seqs);
+            for qw(all_seq_ids has_uniq_ids is_protein all_seqs count_seqs);
 }
 ok(!-e $filename, '... and it got deleted as expected!');
 
 # TODO: expand this file to other coercions?
+
+{
+    my $filepath = file('test', 'ali_with_qm.ali');
+    my $temp = $class->new( seqs => $filepath, args => { degap => 0 } );
+    $filename = $temp->filename;
+    compare_ok($filename, file('test', 'ali_with_qm_temp_gaps.fasta'),
+        "wrote expected Ali::Temporary preserving gaps: $filename");
+}
+ok(!-e $filename, '... and it got deleted as expected!');
 
 done_testing;

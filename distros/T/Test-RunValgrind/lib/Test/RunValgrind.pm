@@ -1,5 +1,5 @@
 package Test::RunValgrind;
-$Test::RunValgrind::VERSION = '0.0.2';
+$Test::RunValgrind::VERSION = '0.0.3';
 use strict;
 use warnings;
 
@@ -101,7 +101,7 @@ Test::RunValgrind - tests that an external program is valgrind-clean.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ reuse by other projects, including fortune-mod
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 METHODS
 
@@ -194,7 +194,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/test-runvalgrind/issues>
+L<https://github.com/shlomif/perl-Test-RunValgrind/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -305,6 +305,6 @@ from your repository :)
 
 L<https://github.com/shlomif/perl-Test-RunValgrind>
 
-  git clone https://github.com/shlomif/perl-Test-RunValgrind.git
+  git clone git://github.com/shlomif/perl-Test-RunValgrind.git
 
 =cut

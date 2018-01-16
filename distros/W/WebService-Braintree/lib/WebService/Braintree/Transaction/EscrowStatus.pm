@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction::EscrowStatus;
-$WebService::Braintree::Transaction::EscrowStatus::VERSION = '0.94';
+$WebService::Braintree::Transaction::EscrowStatus::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

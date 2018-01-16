@@ -26,7 +26,7 @@ my $Input = [
 
 my $Output = [
   'iprev=fail policy.iprev=123.123.123.123 (NOT FOUND)',
-  'x-ptr=fail x-ptr-helo=bad.name.google.com x-ptr-lookup=',
+  'x-ptr=fail x-ptr-helo=bad.name.google.com x-ptr-lookup=""',
   'spf=fail smtp.mailfrom=test@goestheweasel.com smtp.helo=bad.name.google.com',
   'dkim=none (no signatures found)',
   'x-google-dkim=none (no signatures found)',

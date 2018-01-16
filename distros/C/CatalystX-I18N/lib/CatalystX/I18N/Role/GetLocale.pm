@@ -10,49 +10,49 @@ use List::Util qw(first shuffle);
 
 sub check_locale {
     my ($c,$locale) = @_;
-    
+
     return
         unless defined $locale
         && $locale =~ m/^([a-zA-Z]{2})(?:_([a-zA-Z]{2}))?$/;
-    
+
     $locale = lc($1);
     $locale .= '_'.uc($2)
         if defined $2;
-    
-    return 
+
+    return
         if ! exists $c->config->{I18N}{locales}{$locale}
         || $c->config->{I18N}{locales}{$locale}{inactive} == 1;
-    
+
     return $locale;
 }
 
 sub get_locale_from_session {
     my ($c) = @_;
-    
+
     if ($c->can('session')) {
         return $c->check_locale($c->session->{i18n_locale});
     }
-    
+
     return;
 }
 
 sub get_locale_from_user {
     my ($c) = @_;
-    
+
     if ($c->can('user')
         && defined $c->user
         && $c->user->can('locale')) {
         return $c->check_locale($c->user->locale);
     }
-    
+
     return;
 }
 
 sub get_locale_from_browser  {
     my ($c) = @_;
-    
+
     my ($languages,$territories) = ([],[]);
-    
+
     # Get Accept-Language
     if ($c->request->can('accept_language')) {
         my $locales = $c->request->accept_language;
@@ -68,34 +68,34 @@ sub get_locale_from_browser  {
             }
         }
     }
-    
+
     # Get browser language
-    if ($c->request->can('browser_language')) {
+    if ( $c->request->user_agent && $c->request->can('browser_language')) {
         my $language = $c->request->browser_language;
         if ($language) {
             unshift(@$languages,$language)
                 unless grep { $language eq $_ } @$languages
         }
     }
-    
+
     # Get client country
     if ($c->request->can('client_country')) {
         my $territory = $c->request->client_country;
         unshift(@$territories,uc($territory))
             if ($territory);
     }
-    
+
     # Get browser territory
     if ($c->request->can('browser_territory')) {
         my $territory = $c->request->browser_territory;
         unshift(@$territories,uc($territory))
             if ($territory);
     }
-    
+
     my $locale_config = $c->config->{I18N}{locales};
-    
+
     # TODO: Make behaviour/preferences customizeable
-    
+
     # Try to find best matching combination
     foreach my $territory (@$territories) {
         foreach my $language (@$languages) {
@@ -105,7 +105,7 @@ sub get_locale_from_browser  {
             }
         }
     }
-    
+
     # Try to find best matching country
     foreach my $locale (keys %$locale_config) {
         next
@@ -116,7 +116,7 @@ sub get_locale_from_browser  {
             }
         }
     }
-    
+
     # Try to find best matching language
     foreach my $locale (keys %$locale_config) {
         next
@@ -127,7 +127,7 @@ sub get_locale_from_browser  {
             }
         }
     }
-    
+
     # Try to find best matching language
     foreach my $locale (keys %$locale_config) {
         next
@@ -138,30 +138,30 @@ sub get_locale_from_browser  {
             }
         }
     }
-    
+
     return;
 }
 
 sub get_locale {
     my ($c) = @_;
-    
+
     my ($locale,$languages,$territory);
     my $locale_config = $c->config->{I18N}{locales};
-    
+
     $locale = $c->get_locale_from_session();
     $locale ||= $c->get_locale_from_user();
     $locale ||= $c->get_locale_from_browser();
-    
+
     # Default locale
     $locale ||= $c->config->{I18N}{default_locale};
-    
+
     # Random locale
     $locale ||= first { $locale_config->{$_}{inactive} == 0 } shuffle keys %$locale_config;
-    
+
     if ($c->can('locale')) {
         $c->locale($locale);
     }
-    
+
     return $locale;
 }
 
@@ -179,13 +179,13 @@ CatalystX::I18N::Role::GetLocale - Tries to determine the current users locale
  package MyApp::Catalyst;
  
  use CatalystX::RoleApplicator;
- use Catalyst qw/MyPlugins 
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base
     CatalystX::I18N::Role::GetLocale/;
  
  __PACKAGE__->apply_request_class_roles(qw/CatalystX::I18N::TraitFor::Request/);
  __PACKAGE__->setup();
-
+ 
  package MyApp::Catalyst::Controller::Main;
  use strict;
  use warnings;
@@ -221,13 +221,13 @@ Tries to determine the users locale in the given order
 
 =back
 
-Sets the winning locale (via C<$c-E<gt>locale()>) if the 
+Sets the winning locale (via C<$c-E<gt>locale()>) if the
 L<CatalystX::I18N::Role::Base> is loaded.
 
 =head3 get_locale_from_browser
 
-Tries to fetch the locale from the browser (via 
-L<$c-E<gt>request-E<gt>accept_language> and 
+Tries to fetch the locale from the browser (via
+L<$c-E<gt>request-E<gt>accept_language> and
 L<$c-E<gt>request-E<gt>browser_language>). L<CatalystX::I18N::TraitFor::Request>
 must be loaded.
 
@@ -237,7 +237,7 @@ Tries to fetch the locale from the current session.
 
 =head3 get_locale_from_user
 
-Tries to fetch the locale from the user object (via 
+Tries to fetch the locale from the user object (via
 L<$c-E<gt>user-E<gt>locale>).
 
 =head3 check_locale

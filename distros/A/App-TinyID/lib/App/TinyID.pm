@@ -1,8 +1,14 @@
+package App::TinyID;
+$App::TinyID::VERSION = '1.1.0';
+#ABSTRACT: Command line tool to encrypt and encrypt integer using Integer::Tiny
+
 use strict;
 use warnings;
-package App::TinyID;
-#ABSTRACT: Command line tool to encrypt and encrypt integer using Integer::Tiny
-our $VERSION = '0.1.1'; # VERSION
+use v5.10;
+
+1;
+
+__END__
 
 =pod
 
@@ -14,7 +20,21 @@ App::TinyID - Command line tool to encrypt and encrypt integer using Integer::Ti
 
 =head1 VERSION
 
-version 0.1.1
+version 1.1.0
+
+=head1 SYNOPSIS
+
+    # Encrypt number (using default key)
+    tinyid -t 82323723  # => EuEuE0ul0
+
+    # Decrypt encrypted value (using default key)
+    tinyid -t EuEuE0ul0 -d  # => 82323723
+    
+    # Encrypt with non-default key
+    tinyid -k uywn -e -t 90012  # => yyynnwynu
+
+    # Decrypt with non-default key
+    tinyid -k uywn -d -t yyynnwynu  # => 90012
 
 =head1 DESCRIPTION
 
@@ -22,49 +42,35 @@ Encrypts and decrypts numeric using Integer::Tiny.
 
 By default, the encryption key is: WEl0v3you
 
-=head1 SYNOPIS
+=head2 OPTIONS
 
-	# Encrypt number (default key)
-	tinyid -e -t 82323723		# => EuEuE0ul0
+=over 4
 
-	# Decrypt encrypted value (default key)
-	tinyid -d -t EuEuE0ul0		# => 82323723
-	
-	# Encrypt with non-default key
-	tinyid -k uywn -e -t 90012		# => yyynnwynu
+=item [-t|--text]
 
-	# Decrypt with non-default key
-	tinyid -k uywn -d -t yyynnwynu		# => 90012
+Text to encrypt and decrypt. You can only include integer values when encrypting.
 
-=head1 OPTIONS
+=item [-e|--encrypt]
 
-=head2 
-[-t|--text]
+This encrypts integer values. Note that --text/-t must be included too.
 
-Despite the name, you can only use numerals/numerical when -e or --encrypt option is defined. When decrypting, you can also include numbers.
+=item [-d|--decrypt]
 
-=head2 
-[-e|--encrypt]
+This decrypts the encrypted text. Note that --text/-t must be included too.
 
-This encrypts numerical value. Note that, [-t|--text] <TEXT/NUMERIC> must be defined too.
+=item [-k|--key]
 
-=head2 
-[-d|--encrypt]
-
-This decrypts string and numerical value. Note that, [-t|--text] <TEXT/NUMERIC/ must be defined too.
-
-=head2 
-[-k|--key]
-
-Overrides default key value: WEl0v3you".
+Overrides default key value: 'WEl0v3you'.
 
 Note, that you cannot have more than one same character in the key.
 
-	# Wrong
-	tinyid -k aw99 -e -t 0823
+    # Wrong
+    tinyid -k tangzotangzo2929 -t 98273 -e
 
-	# Right
-	tinyid -k tango29 -e -t 0823
+    # Right
+    tinyid -k tangzo29 -t 828273 -e
+
+=back
 
 =head1 SEE MORE
 
@@ -76,14 +82,10 @@ faraco <skelic3@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by faraco.
+This software is Copyright (c) 2017-2018 by faraco.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
-
-__END__
-
-
-1;

@@ -1,5 +1,6 @@
 # Load the Module::Install bundled in ./inc/
 use strict;
+use lib '.';
 use inc::Module::Install 1.05;
 
 my $from = 'lib/CatalystX/I18N.pm';
@@ -19,7 +20,7 @@ requires        'POSIX'                                 => 0;
 requires        'namespace::autoclean'                  => 0;
 
 requires        'Path::Class'                           => 0;
-requires        'MooseX::Types::Path::Class'            => 0; 
+requires        'MooseX::Types::Path::Class'            => 0;
 requires        'Clone'                                 => 0;
 
 requires        'Locale::Maketext::Lexicon'             => 0;

@@ -1,5 +1,8 @@
 Revision history for Parallel-Pipes
 
+0.004  2018-01-14 13:21:14 JST
+    - Call srand() after fork
+
 0.003  2017-05-04 23:57:20 JST
     - No functional change
 

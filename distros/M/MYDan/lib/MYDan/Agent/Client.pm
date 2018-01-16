@@ -31,6 +31,7 @@ use MYDan::API::Agent;
 use MYDan::Util::Percent;
 use MYDan::Agent::Proxy;
 use MYDan::Util::Hosts;
+use AnyEvent::Loop;
 
 our %RUN = ( user => 'root', max => 128, timeout => 300 );
 

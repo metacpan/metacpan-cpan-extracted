@@ -1,108 +1,111 @@
 Revision history for Struct-Path
 
+0.81    2018-01-10
+        - path(): resolve negative array indexes in paths
+
 0.80    2017-12-22
-        hash definition format changed, exported subs renamed to avoid ambigouseness
-        path() now works with scalars as is (ref not required)
-        both changes are breaking back compatibility, sorry
+        - hash definition format changed, exported subs renamed to avoid ambigouseness
+        - path() now works with scalars as is (ref not required)
+        - both changes are breaking back compatibility, sorry
 
 0.74    2017-11-20
-        entire thing replacement fixed in spath()
+        - entire thing replacement fixed in spath()
 
 0.73    2017-11-03
-        hooks supported in spath_delta()
-        hooks: set $_ to substructure pointed by current step
-        spelling corrected, cosmetics
+        - hooks supported in spath_delta()
+        - hooks: set $_ to substructure pointed by current step
+        - spelling corrected, cosmetics
 
 0.72    2017-10-15
-        spath(): sane errors for out of range negative array indexes
-        croak if empty path and delete opt passed to spath()
+        - spath(): sane errors for out of range negative array indexes
+        - croak if empty path and delete opt passed to spath()
 
 0.71    2017-06-27
-        'assign' opt to spath() added
-        grow arrays smoothly if 'append' for 'expand' specified in spath() (experimental)
+        - 'assign' opt to spath() added
+        - grow arrays smoothly if 'append' for 'expand' specified in spath() (experimental)
 
 0.70    2017-06-20
-        slist() now returns path-ref pairs in common list
-        spath w opt expand may overwrite existed values now if strict opt permit so
-        croak if nonref passed for structure in spath()
-        output format changed for spath w 'paths' opt
-        'stack' opt to spath() added
+        - slist() now returns path-ref pairs in common list
+        - spath w opt expand may overwrite existed values now if strict opt permit so
+        - croak if nonref passed for structure in spath()
+        - output format changed for spath w 'paths' opt
+        - 'stack' opt to spath() added
 
 0.65    2017-05-04
-        slist() now also returns references to values
-        refactoring
+        - slist() now also returns references to values
+        - refactoring
 
 0.64    2017-03-15
-        is_implicit_step() subroutine added
+        - is_implicit_step() subroutine added
 
 0.63    2017-02-22
-        docs improved
+        - docs improved
 
 0.62    2017-01-23
-        'paths' opt for spath() added (highly experimental)
+        - 'paths' opt for spath() added (highly experimental)
 
 0.61    2017-01-15
-        discard path if coderef returned false value
-        slist() refactored (~15% faster now)
+        - discard path if coderef returned false value
+        - slist() refactored (~15% faster now)
 
 0.60    2016-12-05
-        regexp match for hash keys specification supported
+        - regexp match for hash keys specification supported
 
 0.52    2016-11-28
-        Array's items removal fixed (don't fail on out of range indexes in nostrict mode)
+        - Array's items removal fixed (don't fail on out of range indexes in nostrict mode)
 
 0.51    2016-11-27
-        Array's items removal fixed (don't remove items from specified to the end)
+        - Array's items removal fixed (don't remove items from specified to the end)
 
 0.50    2016-08-30
-        Coderefs as path steps in spath() supported
+        - Coderefs as path steps in spath() supported
 
 0.41    2016-08-19
-        spath_delta(): don't return full second path if it's a subset of first one
+        - spath_delta(): don't return full second path if it's a subset of first one
 
 0.40    2016-08-18
-        spath_delta() appeared
+        - spath_delta() appeared
 
 0.33    2016-08-11
-        Dist corrected, tests refactored
+        - Dist corrected, tests refactored
 
 0.32    2016-08-05
-        Any thing as a structure accepted by spath() from now on
+        - Any thing as a structure accepted by spath() from now on
 
 0.31    2016-08-01
-        Pod corrected
+        - Pod corrected
 
 0.30    2016-07-30
-        slist() appeared
+        - slist() appeared
 
 0.21    2016-07-07
-        Addressing method in pod described
-        Unsignificant refactoring
+        - Addressing method in pod described
+        - Unsignificant refactoring
 
 0.20    2016-06-28
-        Path structure format changed (hashes definition)
+        - Path structure format changed (hashes definition)
 
 0.12    2016-06-13
-        Pod and dist corrected
+        - Pod and dist corrected
 
 0.11    2016-06-12
-        'expand' opt for spath() implemented
+        - 'expand' opt for spath() implemented
 
 0.10    2016-05-22
-        'delete' opt for spath() implemented
+        - 'delete' opt for spath() implemented
 
 0.09    2016-05-22
-        Pod and dist corrected, unused code removed
+        - Pod and dist corrected, unused code removed
 
 0.08    2016-05-16
-        'strict' opt appeared
-        tests and dist cleaned up
-        cosmetics
+        - 'strict' opt appeared
+        - tests and dist cleaned up
+        - cosmetics
 
 0.04    2016-04-29
-        'deref' opt for spath() added
+        - 'deref' opt for spath() added
 
 0.01    2016-04-27
-        spath() appeared.
-        Draft.
+        - spath() appeared.
+        - Draft.
 

@@ -1,5 +1,5 @@
 #
-# $Id: Arp.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Arp.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::arp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Frame Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable cache poison eui64 discover scan eui-64) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -65,7 +65,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device,
+         device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -236,7 +236,7 @@ sub scan {
    for my $t (1..$try) {
       # We send all frames
       for my $r (@frame_list) {
-         $self->debug && $self->log->debug($r->print);
+         $self->log->debug($r->print);
          my $dst_ip = $r->ref->{ARP}->dstIp;
          if (! exists($reply_cache->{$dst_ip})) {
             $nw->send($r->raw)
@@ -355,7 +355,7 @@ Metabrik::Network::Arp - network::arp Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

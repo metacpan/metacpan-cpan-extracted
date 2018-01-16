@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Log::Any qw< $log >;
+use Log::Any::Adapter;
+use Mojolicious::Lite;
+Log::Any::Adapter->set('Stderr');
+
+my $token   = $ENV{TOKEN};
+my $bot_url = $ENV{BOT_URL} || 'https://example.com/mybot';
+
+plugin 'Bot::ChatBots::Telegram' => instances => [
+   [
+      'WebHook',
+      processor  => \&processor,
+      register   => 1,
+      token      => $token,
+      unregister => 0,
+      url        => $bot_url,
+   ],
+];
+
+app->start;
+
+sub processor { # tube-compliant
+   my $record = shift;
+   my $text = $record->{payload}{text};
+   print "$text\n";
+   $record->{send_response} = "you said: '$text'";
+   return $record; # follow on..
+}

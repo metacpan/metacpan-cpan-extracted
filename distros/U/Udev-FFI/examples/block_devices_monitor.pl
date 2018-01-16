@@ -22,7 +22,7 @@ unless($monitor->filter_by_subsystem_devtype('block')) {
 }
 
 if($monitor->start()) {
-    #now insert you block device
+    #now insert your block device
 
     for(;;) {
         if(defined(my $device = $monitor->poll(0.5))) { #non-blocking read like can_read in IO::Select

@@ -3693,6 +3693,22 @@ SV * Rmpc_log10(pTHX_ mpc_t * rop, mpc_t *op, SV * round) {
 #endif
 }
 
+int Rmpc_cmp_abs(mpc_t * op1, mpc_t * op2) {
+#if (!defined(MPC_VERSION) || (MPC_VERSION<MPC_VERSION_NUM(1,1,0)))
+     croak("Rmpc_cmp_abs not available - need mpc-1.1.0 or later");
+#else
+     return mpc_cmp_abs(*op1, *op2);
+#endif
+}
+
+int Rmpc_rootofunity(pTHX_ mpc_t * rop, unsigned long n, unsigned long k, SV * round) {
+#if (!defined(MPC_VERSION) || (MPC_VERSION<MPC_VERSION_NUM(1,1,0)))
+     croak("Rmpc_rootofunity not available - need mpc-1.1.0 or later");
+#else
+    return mpc_rootofunity(*rop, n, k, (mpc_rnd_t)SvUV(round));
+#endif
+}
+
 int _can_pass_float128(void) {
 
 #ifdef MPC_CAN_PASS_FLOAT128
@@ -6270,6 +6286,21 @@ Rmpc_log10 (rop, op, round)
 	SV *	round
 CODE:
   RETVAL = Rmpc_log10 (aTHX_ rop, op, round);
+OUTPUT:  RETVAL
+
+int
+Rmpc_cmp_abs (op1, op2)
+	mpc_t *	op1
+	mpc_t *	op2
+
+int
+Rmpc_rootofunity (rop, n, k, round)
+	mpc_t *	rop
+	unsigned long	n
+	unsigned long	k
+	SV *	round
+CODE:
+  RETVAL = Rmpc_rootofunity (aTHX_ rop, n, k, round);
 OUTPUT:  RETVAL
 
 int

@@ -1,5 +1,5 @@
 #
-# $Id: Www.pm,v 15e7b76756a2 2017/10/24 09:10:27 gomor $
+# $Id: Www.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::www Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 15e7b76756a2 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable browser http javascript screenshot) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -30,7 +30,7 @@ sub brik_properties {
          do_redirects => [ qw(0|1) ],
          src_ip => [ qw(ip_address) ],
          max_redirects => [ qw(count) ],
-         _client => [ qw(object|INTERNAL) ],
+         client => [ qw(object) ],
          _last => [ qw(object|INTERNAL) ],
       },
       attributes_default => {
@@ -200,7 +200,7 @@ sub create_user_agent {
       $mech->credentials($username, $password);
    }
 
-   if ($self->debug) {
+   if ($self->log->level > 2) {
       $mech->add_handler("request_send",  sub { shift->dump; return });
       $mech->add_handler("response_done", sub { shift->dump; return });
    }
@@ -211,7 +211,7 @@ sub create_user_agent {
 sub reset_user_agent {
    my $self = shift;
 
-   $self->_client(undef);
+   $self->client(undef);
 
    return 1;
 }
@@ -227,10 +227,10 @@ sub _method {
 
    $username ||= $self->username;
    $password ||= $self->password;
-   my $client = $self->_client;
-   if (! defined($self->_client)) {
+   my $client = $self->client;
+   if (! defined($self->client)) {
       $client = $self->create_user_agent($uri, $username, $password) or return;
-      $self->_client($client);
+      $self->client($client);
    }
 
    my $add_headers = $self->add_headers;
@@ -392,7 +392,7 @@ sub content {
    if ($self->do_javascript) {
       # decoded_content method is available in WWW::Mechanize::PhantomJS
       # but is available in HTTP::Request response otherwise.
-      my $client = $self->_client;
+      my $client = $self->client;
       return $client->decoded_content;
    }
 
@@ -425,7 +425,7 @@ sub save_content {
    }
 
    eval {
-      $self->_client->save_content($output);
+      $self->client->save_content($output);
    };
    if ($@) {
       chomp($@);
@@ -515,7 +515,7 @@ sub links {
    }
 
    my @links = ();
-   for my $l ($self->_client->links) {
+   for my $l ($self->client->links) {
       push @links, $l->url;
       $self->log->verbose("links: found link [".$l->url."]");
    }
@@ -531,9 +531,9 @@ sub forms {
       return $self->log->error("forms: you have to execute a request first");
    }
 
-   my $client = $self->_client;
+   my $client = $self->client;
 
-   if ($self->debug) {
+   if ($self->log->level > 2) {
       print Data::Dumper::Dumper($last->headers)."\n";
    }
 
@@ -720,7 +720,7 @@ sub info {
       Via
    );
 
-   if ($self->debug) {
+   if ($self->log->level > 2) {
       print Data::Dumper::Dumper($headers)."\n";
    }
 
@@ -775,7 +775,7 @@ sub mirror {
          }
       }
 
-      $self->debug && $self->log->debug("mirror: url[$url] output[$output]");
+      $self->log->debug("mirror: url[$url] output[$output]");
 
       my $mech = $self->create_user_agent or return;
       LWP::UserAgent::ProgressAny::__add_handlers($mech);
@@ -830,7 +830,7 @@ Metabrik::Client::Www - client::www Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

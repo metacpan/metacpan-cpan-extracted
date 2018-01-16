@@ -3,7 +3,7 @@ use Test::More;
 use Zonemaster::LDNS;
 
 SKIP: {
-    skip 'no network', 20 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 20 unless $ENV{TEST_WITH_NETWORK};
 
     my $r = Zonemaster::LDNS->new( '8.8.8.8' );
 
@@ -59,7 +59,7 @@ SKIP: {
 
 subtest 'recursion' => sub {
     SKIP: {
-        skip 'no network', 3 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};
 
         my $r = Zonemaster::LDNS->new( '8.8.4.4' );
         my $p1 = $r->query( 'www.iis.se' );
@@ -73,7 +73,7 @@ subtest 'recursion' => sub {
 
 subtest 'global' => sub {
     SKIP: {
-        skip 'no network', 3 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};
 
         my $res = new_ok( 'Zonemaster::LDNS' );
         my $p = eval { $res->query( 'www.iis.se' ) } ;

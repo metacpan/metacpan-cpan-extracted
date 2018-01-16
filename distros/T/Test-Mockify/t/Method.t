@@ -26,6 +26,7 @@ sub testPlan{
     $self->_SignaturWithAnyMatcherAndExpectedMatcher();
     $self->_MultipleAnyMatcher();
     $self->_SingleExepctedMatcher();
+    $self->_NullProblems();
     $self->_MockifiedObjectCheck();
     $self->_AnyMatcher();
     $self->_AnyParameter();
@@ -117,6 +118,7 @@ sub _AnyParameter {
                'proves that it is not possible to use "whenAny" when "when" was used before.'
      );
 }
+
 #---------------------------------------------------------------------------------
 sub _SingleExepctedMatcher {
     my $self = shift;
@@ -128,6 +130,7 @@ sub _SingleExepctedMatcher {
     $Method->when(Object('Test::Package'))->thenReturn('Result for one object.');
     $Method->when(Function())->thenReturn('Result for one function pointer.');
     $Method->when(Undef())->thenReturn('Result for one undef.');
+    $Method->when()->thenReturn('Result for one real undef.');
 
     is($Method->call('OneString'), 'Result for one string.', 'single expected parameter type string');
     is($Method->call(123), 'Result for one number.', 'single expected parameter type number');
@@ -136,6 +139,25 @@ sub _SingleExepctedMatcher {
     is($Method->call(bless({},'Test::Package')), 'Result for one object.', 'single expected parameter type object');
     is($Method->call(sub{}), 'Result for one function pointer.', 'single expected parameter type sub');
     is($Method->call(undef), 'Result for one undef.', 'single expected parameter type undef');
+    is($Method->call(), 'Result for one real undef.', 'single expected parameter type real undef');
+}
+#---------------------------------------------------------------------------------
+sub _NullProblems {
+    # since 0 is "false" and the string '0' is interpreted as a number, also '0' is "false"
+    # there are some special cases
+    my $Method = Test::Mockify::Method->new();
+    $Method->when(Number(0))->thenReturn('Result for zero number.');
+
+    throws_ok( sub { $Method->when(String('0')) },
+       qr/Use the Matcher Number\(\) to Check for the string '0' \(perl cannot differ that\)/,
+       "proves that an Error is thrown if mockify is used wrongly"
+    );
+
+    $Method->when(String(''))->thenReturn('Result for empty string.');
+
+    is($Method->call(0), 'Result for zero number.', 'single expected parameter type number (0)');
+    is($Method->call('0'), 'Result for zero number.', 'single expected parameter type number, even though it is a String');
+    is($Method->call(''), 'Result for empty string.', 'expected return value for empty string signatur');
 }
 #---------------------------------------------------------------------------------
 sub _MockifiedObjectCheck {

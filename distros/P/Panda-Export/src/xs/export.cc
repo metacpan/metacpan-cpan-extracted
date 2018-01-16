@@ -102,7 +102,7 @@ void create_constants (pTHX_ HV* stash, constant_t* list, size_t items) {
 static inline void _export_sub (pTHX_ HV* from, HV* to, SV* name) {
     HE* symentry_ent = hv_fetch_ent(from, name, 0, 0);
     GV* symentry = symentry_ent ? (GV*)HeVAL(symentry_ent) : NULL;
-    if (!symentry || !GvCV(symentry)) EX_CROAK_NOSUB(HvNAME(from), SvPV_nolen(name));
+    if (!symentry || (isGV(symentry) && !GvCV(symentry))) EX_CROAK_NOSUB(HvNAME(from), SvPV_nolen(name));
     SvREFCNT_inc_simple_void_NN((SV*)symentry);
     hv_store_ent(to, name, (SV*)symentry, 0);
 }
@@ -111,7 +111,7 @@ static inline void _export_sub (pTHX_ HV* from, HV* to, const char* name) {
     size_t namelen = strlen(name);
     SV** symentry_ref = hv_fetch(from, name, namelen, 0);
     GV* symentry = symentry_ref ? (GV*)(*symentry_ref) : NULL;
-    if (!symentry || !GvCV(symentry)) EX_CROAK_NOSUB(HvNAME(from), name);
+    if (!symentry || (isGV(symentry) && !GvCV(symentry))) EX_CROAK_NOSUB(HvNAME(from), name);
     SvREFCNT_inc_simple_void_NN((SV*)symentry);
     hv_store(to, name, namelen, (SV*)symentry, 0);
 }

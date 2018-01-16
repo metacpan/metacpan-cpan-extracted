@@ -1,5 +1,5 @@
 package WebService::Braintree::Result;
-$WebService::Braintree::Result::VERSION = '0.94';
+$WebService::Braintree::Result::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -16,17 +16,23 @@ use WebService::Braintree::Nonce;
 my $meta = __PACKAGE__->meta;
 
 my $response_objects = {
+    add_on => "WebService::Braintree::AddOn",
     address => "WebService::Braintree::Address",
-    apple_pay => "WebService::Braintree::ApplePayCard",
+    apple_pay => "WebService::Braintree::ApplePay",
     apple_pay_card => "WebService::Braintree::ApplePayCard",
     credit_card => "WebService::Braintree::CreditCard",
     customer => "WebService::Braintree::Customer",
+    dispute => "WebService::Braintree::Dispute",
+    discount => "WebService::Braintree::Discount",
+    evidence => "WebService::Braintree::Dispute::Evidence",
+    merchant => "WebService::Braintree::Merchant",
     merchant_account => "WebService::Braintree::MerchantAccount",
     payment_method => {
         credit_card => "WebService::Braintree::CreditCard",
-        paypal_account => "WebService::Braintree::PayPalAccount"
+        paypal_account => "WebService::Braintree::PayPalAccount",
     },
     payment_method_nonce => 'WebService::Braintree::Nonce',
+    paypal_account => "WebService::Braintree::PayPalAccount",
     settlement_batch_summary => "WebService::Braintree::SettlementBatchSummary",
     subscription => "WebService::Braintree::Subscription",
     transaction => "WebService::Braintree::Transaction",
@@ -44,30 +50,30 @@ sub patch_in_response_accessors {
     while (my($key, $rule) = each(%$field_rules)) {
         if (is_hashref($rule)) {
             $meta->add_method($key, sub {
-                                  my $self = shift;
-                                  my $response = $self->_get_response();
-                                  while (my($subkey, $subrule) = each(%$rule)) {
-                                      my $field_value = $self->$subkey;
-                                      if ($field_value) {
-                                          keys %$rule;
-                                          return $field_value;
-                                      }
-                                  }
+                my $self = shift;
+                my $response = $self->_get_response();
+                while (my($subkey, $subrule) = each(%$rule)) {
+                    my $field_value = $self->$subkey;
+                    if ($field_value) {
+                        keys %$rule;
+                        return $field_value;
+                    }
+                }
 
-                                  return undef;
-                              });
+                return undef;
+            });
 
             patch_in_response_accessors($rule);
         } else {
             $meta->add_method($key, sub {
-                                  my $self = shift;
-                                  my $response = $self->_get_response();
-                                  if (!$response->{$key}) {
-                                      return undef;
-                                  }
+                my $self = shift;
+                my $response = $self->_get_response();
+                if (!$response->{$key}) {
+                    return undef;
+                }
 
-                                  return $rule->new($response->{$key});
-                              });
+                return $rule->new($response->{$key});
+            });
         }
     }
 }

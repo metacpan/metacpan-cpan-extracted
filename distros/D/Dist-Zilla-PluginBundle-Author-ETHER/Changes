@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.133     2018-01-14 08:25:00Z
+          - new 'plugin_prereq_phase' and 'plugin_prereq_relationship'
+            configuration options, which control whether and how to inject
+            plugins used by this bundle into distribution prerequisites
+          - plugins used in the distribution build are now injected into
+            x_Dist_Zilla/requires by default, rather than develop/suggests
+
 0.132     2017-12-13 07:15:09Z
           - fix test to work with [@Git::VersionManager] 0.003
 

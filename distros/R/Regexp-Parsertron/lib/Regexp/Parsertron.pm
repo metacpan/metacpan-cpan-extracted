@@ -1,6 +1,6 @@
 package Regexp::Parsertron;
 
-use re 'eval';
+use v5.10;
 use strict;
 use warnings;
 #use warnings qw(FATAL utf8); # Fatalize encoding glitches.
@@ -35,35 +35,11 @@ has current_node =>
 	required => 0,
 );
 
-has error_str =>
-(
-	default  => sub {return ''},
-	is       => 'rw',
-	isa      => Str,
-	required => 0,
-);
-
 has grammar =>
 (
 	default  => sub {return ''},
 	is       => 'rw',
 	isa      => Any,
-	required => 0,
-);
-
-has marpa_error_count =>
-(
-	default  => sub{return 0},
-	is       => 'rw',
-	isa      => Int,
-	required => 0,
-);
-
-has perl_error_count =>
-(
-	default  => sub{return 0},
-	is       => 'rw',
-	isa      => Int,
 	required => 0,
 );
 
@@ -115,7 +91,15 @@ has verbose =>
 	required => 0,
 );
 
-our $VERSION = '0.51';
+has warning_str =>
+(
+	default  => sub {return ''},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+our $VERSION = '0.81';
 
 # ------------------------------------------------
 
@@ -138,13 +122,13 @@ sub BUILD
 
 # ------------------------------------------------
 
-sub add
+sub append
 {
 	my($self, %opts) = @_;
 
 	for my $param (qw/text uid/)
 	{
-		die "Method add() takes a hash with these keys: text, uid\n" if (! defined($opts{$param}) );
+		die "Method append() takes a hash with these keys: text, uid\n" if (! defined($opts{$param}) );
 	}
 
 	my($meta);
@@ -163,7 +147,7 @@ sub add
 		}
 	}
 
-} # End of add.
+} # End of append.
 
 # ------------------------------------------------
 
@@ -175,7 +159,7 @@ sub _add_daughter
 
 	$node -> meta($attributes);
 
-	print "Adding $event_name to tree. \n" if ($self -> verbose > 1);
+	say "Adding $event_name to tree. " if ($self -> verbose > 1);
 
 	if ($event_name =~ /^close_(?:bracket|parenthesis)$/)
 	{
@@ -190,24 +174,6 @@ sub _add_daughter
 	}
 
 } # End of _add_daughter.
-
-# ------------------------------------------------
-
-sub as_re
-{
-	my($self)	= @_;
-	my($string)	= $self -> as_string;
-	my($index)	= index($string, '/');
-
-	if ($index >= 0)
-	{
-		$string				= substr($string, $index);
-		substr($string, -1)	= '';
-	}
-
-	return $string;
-
-} # End of as_re.
 
 # ------------------------------------------------
 
@@ -232,14 +198,13 @@ sub as_string
 
 # ------------------------------------------------
 
-sub cooked_tree
+sub find
 {
-	my($self)	= @_;
-	my($format)	= "%-30s  %3s  %s\n";
+	my($self, $target) = @_;
 
-	print sprintf($format, 'Name', 'Uid', 'Text');
-	print sprintf($format, '----', '---', '----');
+	die "Method find() takes a defined value as the parameter\n" if (! defined $target);
 
+	my(@found);
 	my($meta);
 
 	for my $node ($self -> tree -> traverse)
@@ -248,10 +213,48 @@ sub cooked_tree
 
 		$meta = $node -> meta;
 
-		print sprintf($format, $node -> value, $$meta{uid}, $$meta{text});
+		if (index($$meta{text}, $target) >= 0)
+		{
+			push @found, $$meta{uid};
+		}
 	}
 
-} # End of cooked_tree.
+	return [@found];
+
+} # End of find.
+
+# ------------------------------------------------
+
+sub get
+{
+	my($self, $wanted_uid)	= @_;
+	my($max_uid)			= $self -> uid;
+
+	if (! defined($wanted_uid) || ($wanted_uid < 1) || ($wanted_uid > $self -> uid) )
+	{
+		die "Method get() takes a uid parameter in the range 1 .. $max_uid\n";
+	}
+
+	my($meta);
+	my($text);
+	my($uid);
+
+	for my $node ($self -> tree -> traverse)
+	{
+		next if ($node -> is_root);
+
+		$meta	= $node -> meta;
+		$uid	= $$meta{uid};
+
+		if ($wanted_uid == $uid)
+		{
+			$text = $$meta{text};
+		}
+	}
+
+	return $text;
+
+} # End of get.
 
 # ------------------------------------------------
 
@@ -275,9 +278,9 @@ sub parse
 
 	# Emulate parts of new(), which makes things a bit earier for the caller.
 
-	$self -> error_str('');
 	$self -> re($opts{re})				if (defined $opts{re});
 	$self -> verbose($opts{verbose})	if (defined $opts{verbose});
+	$self -> warning_str('');
 
 	$self -> recce
 	(
@@ -299,25 +302,26 @@ sub parse
 	{
 		if (defined (my $value = $self -> _process) )
 		{
-			$self -> cooked_tree if ($self -> verbose > 1);
+			$self -> print_cooked_tree if ($self -> verbose > 1);
 		}
 		else
 		{
 			$result = 1;
 
-			$self -> error_str('Error: Parse failed') if (! $self -> error_str);
+			my($message) = "Error: Marpa parse failed. ";
 
-			print '1 Error str: ', $self -> error_str, "\n" if ($self -> verbose && $self -> error_str);
+			say $message if ($self -> verbose);
+
+			die $message;
 		}
 	}
 	catch
 	{
-		$result = 1;
+		my($message) = "Error: Marpa parse failed. $_";
 
-		$self -> marpa_error_count($self -> marpa_error_count + 1);
-		$self -> error_str("Error: Parse failed. $_");
+		say $message if ($self -> verbose);
 
-		print '2 Error str: ', $self -> error_str, "\n" if ($self -> verbose && $self -> error_str);
+		die $message;
 	};
 
 	# Return 0 for success and 1 for failure.
@@ -328,24 +332,55 @@ sub parse
 
 # ------------------------------------------------
 
+sub prepend
+{
+	my($self, %opts) = @_;
+
+	for my $param (qw/text uid/)
+	{
+		die "Method append() takes a hash with these keys: text, uid\n" if (! defined($opts{$param}) );
+	}
+
+	my($meta);
+	my($uid);
+
+	for my $node ($self -> tree -> traverse)
+	{
+		next if ($node -> is_root);
+
+		$meta	= $node -> meta;
+		$uid	= $$meta{uid};
+
+		if ($opts{uid} == $uid)
+		{
+			$$meta{text} = "$opts{text}$$meta{text}";
+		}
+	}
+
+} # End of prepend.
+
+# ------------------------------------------------
+
 sub _process
 {
 	my($self)		= @_;
 	my($raw_re)		= $self -> re;
 	my($test_count)	= $self -> test_count($self -> test_count + 1);
 
-	print "Test count: $test_count. Parsing '$raw_re' => (qr/.../) => " if ($self -> verbose);
+	# This line is 'print', not 'say'!
+
+	print "Test count: $test_count. Parsing (in qr/.../ form): " if ($self -> verbose);
 
 	my($string_re)	= $self -> _string2re($raw_re);
 
 	if ($string_re eq '')
 	{
-		print "\n" if ($self -> verbose);
+		say '' if ($self -> verbose);
 
 		return undef;
 	}
 
-	print "'$string_re'. \n" if ($self -> verbose);
+	say "'$string_re'. " if ($self -> verbose);
 
 	my($ref_re)		= \"$string_re"; # Use " in comment for UltraEdit.
 	my($length)		= length($string_re);
@@ -376,34 +411,37 @@ sub _process
 		$lexeme	= $self -> recce -> literal($start, $span);
 		$pos	= $self -> recce -> lexeme_read($event_name);
 
-		die "lexeme_read($event_name) rejected lexeme |$lexeme|\n" if (! defined $pos);
+		die "Marpa lexeme_read($event_name) rejected lexeme '$lexeme'\n" if (! defined $pos);
 
-		print "event_name: $event_name. lexeme: $lexeme. \n" if ($self -> verbose > 1);
+		say "event_name: $event_name. lexeme: $lexeme. " if ($self -> verbose > 1);
 
 		$self -> _add_daughter($event_name, {text => $lexeme});
    }
 
 	my($message);
 
-	if ($self -> recce -> exhausted)
+	if (my $status = $self -> recce -> ambiguous)
+	{
+		my($terminals)	= $self -> recce -> terminals_expected;
+		$terminals		= ['(None)'] if ($#$terminals < 0);
+		$message		= "Marpa warning. Parse ambiguous. Status: $status. Terminals expected: " . join(', ', @$terminals);
+	}
+	elsif ($self -> recce -> exhausted)
 	{
 		# See https://metacpan.org/pod/distribution/Marpa-R2/pod/Exhaustion.pod#Exhaustion
 		# for why this code is exhaustion-loving.
 
-		$message = 'Parse exhausted';
-
-		#print "Warning: $message\n";
+		$message = 'Marpa parse exhausted';
 	}
-	elsif (my $status = $self -> recce -> ambiguous)
+
+	if ($message)
 	{
-		my($terminals)	= $self -> recce -> terminals_expected;
-		$terminals		= ['(None)'] if ($#$terminals < 0);
-		$message		= "Ambiguous parse. Status: $status. Terminals expected: " . join(', ', @$terminals);
+		$self -> warning_str($message);
 
-		print "Warning: $message\n";
+		say $message if ($self -> verbose);
 	}
 
-	$self -> raw_tree if ($self -> verbose);
+	$self -> print_raw_tree if ($self -> verbose);
 
 	# Return a defined value for success and undef for failure.
 
@@ -413,13 +451,36 @@ sub _process
 
 # ------------------------------------------------
 
-sub raw_tree
+sub print_cooked_tree
+{
+	my($self)	= @_;
+	my($format)	= '%-30s  %3s  %s';
+
+	say sprintf($format, 'Name', 'Uid', 'Text');
+	say sprintf($format, '----', '---', '----');
+
+	my($meta);
+
+	for my $node ($self -> tree -> traverse)
+	{
+		next if ($node -> is_root);
+
+		$meta = $node -> meta;
+
+		say sprintf($format, $node -> value, $$meta{uid}, $$meta{text});
+	}
+
+} # End of print_cooked_tree.
+
+# ------------------------------------------------
+
+sub print_raw_tree
 {
 	my($self) = @_;
 
-	print map("$_\n", @{$self -> tree -> tree2string});
+	say map("$_\n", @{$self -> tree -> tree2string});
 
-} # End of raw_tree.
+} # End of print_raw_tree.
 
 # ------------------------------------------------
 
@@ -430,30 +491,59 @@ sub reset
 	$self -> tree(Tree -> new('Root') );
 	$self -> tree -> meta({text => 'Root', uid => 0});
 	$self -> current_node($self -> tree);
-	$self -> marpa_error_count(0);
-	$self -> perl_error_count(0);
 	$self -> uid(0);
+	$self -> warning_str('');
 
 } # End of reset.
 
 # ------------------------------------------------
 
+sub set
+{
+	my($self, %opts) = @_;
+
+	for my $param (qw/text uid/)
+	{
+		die "Method set() takes a hash with these keys: text, uid\n" if (! defined($opts{$param}) );
+	}
+
+	my($meta);
+	my($uid);
+
+	for my $node ($self -> tree -> traverse)
+	{
+		next if ($node -> is_root);
+
+		$meta	= $node -> meta;
+		$uid	= $$meta{uid};
+
+		if ($opts{uid} == $uid)
+		{
+			$$meta{text} = $opts{text};
+		}
+	}
+
+} # End of set.
+
+# ------------------------------------------------
+
 sub _string2re
 {
-	my($self, $candidate) = @_;
+	my($self, $raw_re) = @_;
 
 	my($re);
 
 	try
 	{
-		$re = does($candidate, 'Regexp') ? $candidate : qr/$candidate/;
+		$re = does($raw_re, 'Regexp') ? $raw_re : qr/$raw_re/;
 	}
 	catch
 	{
-		$re = '';
+		my($message) = "Error: Perl cannot convert $raw_re into qr/.../ form";
 
-		$self -> perl_error_count($self -> perl_error_count + 1);
-		$self -> error_str($self -> test_count . ": Perl cannot convert $candidate into qr/.../ form");
+		say $message if ($self -> verbose);
+
+		die $message;
 	};
 
 	return $re;
@@ -484,7 +574,7 @@ sub _validate_event
 	my($message)       = "Location: ($line, $column). Lexeme: |$lexeme|. Next few chars: |$literal|";
 	$message           = "$message. Events: $event_count. Names: ";
 
-	print $message, join(', ', @event_name), "\n" if ($self -> verbose > 1);
+	say $message, join(', ', @event_name) if ($self -> verbose > 1);
 
 	return ($event_name, $span, $pos);
 
@@ -508,6 +598,7 @@ This is scripts/synopsis.pl:
 
 	#!/usr/bin/env perl
 
+	use v5.10;
 	use strict;
 	use warnings;
 
@@ -522,35 +613,20 @@ This is scripts/synopsis.pl:
 
 	my($result) = $parser -> parse(re => $re);
 
-	print "Calling add(text => '|C++', uid => 6)\n";
+	say "Calling append(text => '|C++', uid => 6)";
 
-	$parser -> add(text => '|C++', uid => 6);
-	$parser -> raw_tree;
-	$parser -> cooked_tree;
+	$parser -> append(text => '|C++', uid => 6);
+	$parser -> print_raw_tree;
+	$parser -> print_cooked_tree;
 
-	my($as_string)	= $parser -> as_string;
-	my($as_re)		= $parser -> as_re;
+	my($as_string) = $parser -> as_string;
 
-	print "Original:  $re. Result: $result. (0 is success)\n";
-	print "as_string: $as_string\n";
-	print "as_re:     $as_re\n";
-	print 'Perl error count:  ', $parser -> perl_error_count, "\n";
-	print 'Marpa error count: ', $parser -> marpa_error_count, "\n";
-
-	my($target) = 'C++';
-
-	if ($target =~ $as_re)
-	{
-		print "Matches $target (without using \Q...\E)\n";
-	}
-	else
-	{
-		print "Doesn't match $target\n";
-	}
+	say "Original:  $re. Result: $result. (0 is success)";
+	say "as_string: $as_string";
 
 And its output:
 
-	Test count: 1. Parsing '(?^i:Perl|JavaScript)' => (qr/.../) => '(?^i:Perl|JavaScript)'.
+	Test count: 1. Parsing (in qr/.../ form): '(?^i:Perl|JavaScript)'.
 	Root. Attributes: {text => "Root", uid => "0"}
 	    |--- open_parenthesis. Attributes: {text => "(", uid => "1"}
 	    |    |--- question_mark. Attributes: {text => "?", uid => "2"}
@@ -559,7 +635,7 @@ And its output:
 	    |    |--- colon. Attributes: {text => ":", uid => "5"}
 	    |    |--- character_set. Attributes: {text => "Perl|JavaScript", uid => "6"}
 	    |--- close_parenthesis. Attributes: {text => ")", uid => "7"}
-	Calling add(text => '|C++', uid => 6)
+	Calling append(text => '|C++', uid => 6)
 	Root. Attributes: {text => "Root", uid => "0"}
 	    |--- open_parenthesis. Attributes: {text => "(", uid => "1"}
 	    |    |--- question_mark. Attributes: {text => "?", uid => "2"}
@@ -579,19 +655,34 @@ And its output:
 	close_parenthesis       7  )
 	Original:  (?^i:Perl|JavaScript). Result: 0. (0 is success)
 	as_string: (?^i:Perl|JavaScript|C++)
-	as_re:     (?^i:Perl|JavaScript|C++)
-	Perl error count:  0
-	Marpa error count: 0
-	Matches C++ (without using \Q...\E)
+
+Note: The 1st tree is printed due to verbose => 1 in the call to L</new([%opts])>, while the 2nd
+is due to the call to L</print_raw_tree()>. The columnar output is due to the call to
+L</print_cooked_tree()>.
+
+=head2 The Edit Methods
+
+The I<edit methods> simply means any one or more of these methods, which can all change the text of
+a node:
+
+=over 4
+
+=item o L</append(%opts)>
+
+=item o L</prepend(%opts)>
+
+=item o L</set(%opts)>
+
+=back
+
+The edit methods are exercised in t/get.set.t, as well as scripts/synopsis.pl (above).
 
 =head1 Description
 
 Parses a regexp into a tree object managed by the L<Tree> module, and provides various methods for
 updating and retrieving that tree's contents.
 
-Warning: Development version. See L</Version Numbers> for details.
-
-This module uses L<Moo>.
+This module uses L<Marpa::R2> and L<Moo>.
 
 =head1 Distributions
 
@@ -602,7 +693,7 @@ for help on unpacking and installing distros.
 
 =head1 Installation
 
-Install L<Regexp::Parsertron> as you would any C<Perl> module:
+Install C<Regexp::Parsertron> as you would any C<Perl> module:
 
 Run:
 
@@ -651,9 +742,9 @@ Default: 0 (print nothing).
 
 =head1 Methods
 
-=head2 add(%opts)
+=head2 append(%opts)
 
-Add a string to the text of a node.
+Append some text to the text of a node.
 
 %opts is a hash with these (key => value) pairs:
 
@@ -661,7 +752,7 @@ Add a string to the text of a node.
 
 =item o text => $string
 
-The text to add.
+The text to append.
 
 =item o uid => $uid
 
@@ -669,59 +760,45 @@ The uid of the node to update.
 
 =back
 
-See scripts/simple.pl for sample code.
+The code calls C<die()> if %opts does not have these 2 keys, or if either value is undef.
 
-Note: Calling C<add()> never changes the uids of nodes, so repeated calling of C<add()> with the
-same C<uid> will apply more and more updates to the same node.
+See scripts/synopsis.pl for sample code.
 
-=head2 as_re()
+Note: Calling C<append()> never changes the uids of nodes, so repeated calling of C<append()> with
+the same C<uid> will apply more and more updates to the same node.
 
-Returns the parsed regexp as a string matching what Perl would return from qr/.../.
+See also L</prepend(%opts)>, L</set(%opts)> and t/get.set.t.
 
 =head2 as_string()
 
-Returns the parsed regexp as a string.
+Returns the parsed regexp as a string. The string contains all edits applied with methods such as
+L</append(%opts)>.
 
-=head2 cooked_tree()
+=head2 find($string)
 
-Prints, in a pretty format, the tree built from parsing.
+Returns an arrayref of node uids whose text contains the given string.
 
-See also L</raw_tree>.
+The code calls C<die()> if $target is undef.
 
-=head2 error_str()
+If the arrayref is empty, there were no matches.
 
-Returns the last error, as a string.
+This method uses the Perl C<index()> function to test if $string is a substring of the text of each
+node. Regexps are not used by this method.
 
-Errors will be in 1 of 2 categories:
+See scripts/play.pl and t/get.set.t for sample usage of C<find()>.
 
-=over 4
+See also L</get($uid)>.
 
-=item o Perl errors
+=head2 get($uid)
 
-These arise when Perl cannot interpret the string form of the regexp supplied by you, when the code
-checks it using qr/$re/.
+Get the text of the node with the given $uid.
 
-=item o Marpa errors
+The code calls C<die()> if $uid is undef, or outside the range 1 .. $self -> uid. The latter value
+is the highest uid so far assigned to any node.
 
-These arise when the BNF within the module is such that the string form of the regexp cannot be
-parsed by Marpa.
+Returns undef if the given $uid is not found.
 
-
-If you can use the regexp in Perl code, then you should never get this error. In other words, if
-Perl accepts the regexp and the module does not, then the BNF in this module is wrong (barring bugs
-in Perl of course).
-
-=back
-
-See also L</marpa_error_count()> and L<perl_error_count()>.
-
-=head2 marpa_error_count()
-
-Returns an integer count of errors detected by Marpa. This value should always be 0.
-
-See also L</error_str()>.
-
-Used basically for debugging.
+See also L</find($string)>.
 
 =head2 new([%opts])
 
@@ -740,19 +817,46 @@ The hash C<%opts> takes the same (key => value) pairs as L</new()> does.
 
 See L</Constructor and Initialization> for details.
 
-=head2 perl_error_count()
+=head2 prepend(%opts)
 
-Returns an integer count of errors detected by perl. This value should always be 0.
+Prepend some text to the text of a node.
 
-See also L</error_str()>.
+%opts is a hash with these (key => value) pairs:
 
-Used basically for debugging.
+=over 4
 
-=head2 raw_tree()
+=item o text => $string
+
+The text to prepend.
+
+=item o uid => $uid
+
+The uid of the node to update.
+
+=back
+
+The code calls C<die()> if %opts does not have these 2 keys, or if either value is undef.
+
+Note: Calling C<prepend()> never changes the uids of nodes, so repeated calling of C<prepend()> with
+the same C<uid> will apply more and more updates to the same node.
+
+See also L</append(%opts)>, L</set(%opts)>, and t/get.set.t.
+
+=head2 print_cooked_tree()
+
+Prints, in a pretty format, the tree built from parsing.
+
+See the </Synopsis> for sample output.
+
+See also L</print_raw_tree>.
+
+=head2 print_raw_tree()
 
 Prints, in a simple format, the tree built from parsing.
 
-See also L</cooked_tree>.
+See the </Synopsis> for sample output.
+
+See also L</print_cooked_tree>.
 
 =head2 re([$regexp])
 
@@ -764,9 +868,31 @@ Note: C<re> is a parameter to L</new([%opts])>.
 
 =head2 reset()
 
-Resets various internal thingys, except test_count.
+Resets various internal things, except test_count.
 
 Used basically for debugging.
+
+=head2 set(%opts)
+
+Set the text of a node to $opt{text}.
+
+%opts is a hash with these (key => value) pairs:
+
+=over 4
+
+=item o text => $string
+
+The text to use to overwrite the text of the node.
+
+=item o uid => $uid
+
+The uid of the node to update.
+
+=back
+
+The code calls C<die()> if %opts does not have these 2 keys, or if either value is undef.
+
+See also L</append(%opts)> and L</prepend(%opts)>.
 
 =head2 tree()
 
@@ -775,14 +901,14 @@ Returns an object of type L<Tree>. Ignore the root node.
 Each node's C<meta> method returns a hashref of information about the node. See the L</FAQ> for
 details.
 
-See also the source code for L</cooked_tree()> and L</raw_tree()> for ideas on how to use this
-object.
+See also the source code for L</print_cooked_tree()> and L</print_raw_tree()> for ideas on how to
+use this object.
 
 =head2 uid()
 
 Returns the last-used uid.
 
-Each node in the tree is given a uid, which allows methods like L</add(%opts)> to work.
+Each node in the tree is given a uid, which allows methods like L</append(%opts)> to work.
 
 =head2 verbose([$integer])
 
@@ -795,29 +921,174 @@ Used basically for debugging.
 
 Note: C<verbose> is a parameter to L</new([%opts])>.
 
+=head2 warning_str()
+
+Returns the last Marpa warning.
+
+In short, Marpa will always report 'Marpa parse exhausted' in warning_str() if the parse is not
+ambiguous, but do not worry - I<this is not an error>.
+
+See L<After calling parse(), warning_str() contains the string '... Parse ambiguous ...'|/FAQ> and
+L<Is this a (Marpa) exhaustion-hating or exhaustion-loving app?|/FAQ>.
+
 =head1 FAQ
 
-=head2 What is the format of the nodes in the tree build by this module?
+=head2 How do I use this module?
 
-Each node's C<meta> method returns a hashref with these (key => value) pairs:
+Herewith a brief tutorial.
 
 =over 4
 
-=item o name => $string
+=item o Start with a simple program and a simple regexp
 
-This is the name of the Marpa-style event which was triggered by detection of some C<text> within
-the regexp.
+This code, scripts/tutorial.pl, is a cut-down version of scripts/synopsis.pl:
+
+	#!/usr/bin/env perl
+
+	use v5.10;
+	use strict;
+	use warnings;
+
+	use Regexp::Parsertron;
+
+	# ---------------------
+
+	my($re)		= qr/Perl|JavaScript/i;
+	my($parser)	= Regexp::Parsertron -> new(verbose => 1);
+
+	# Return 0 for success and 1 for failure.
+
+	my($result) = $parser -> parse(re => $re);
+
+	say "Original:  $re. Result: $result. (0 is success)";
+
+Running it outputs:
+
+	Test count: 1. Parsing (in qr/.../ form): '(?^i:Perl|JavaScript)'.
+	Root. Attributes: {text => "Root", uid => "0"}
+	    |--- open_parenthesis. Attributes: {text => "(", uid => "1"}
+	    |    |--- question_mark. Attributes: {text => "?", uid => "2"}
+	    |    |--- caret. Attributes: {text => "^", uid => "3"}
+	    |    |--- flag_set. Attributes: {text => "i", uid => "4"}
+	    |    |--- colon. Attributes: {text => ":", uid => "5"}
+	    |    |--- character_set. Attributes: {text => "Perl|JavaScript", uid => "6"}
+	    |--- close_parenthesis. Attributes: {text => ")", uid => "7"}
+
+	Original:  (?^i:Perl|JavaScript). Result: 0. (0 is success)
+
+=item o Examine the tree and determine which nodes you wish to edit
+
+The nodes are uniquely identified by their uids.
+
+=item o Proceed as does scripts/synopsis.pl
+
+Add these lines to the end of the tutorial code, and re-run:
+
+	$parser -> append(text => '|C++', uid => 6);
+	$parser -> print_raw_tree;
+
+The extra output, showing node uid == 6, is:
+
+	Root. Attributes: {text => "Root", uid => "0"}
+	    |--- open_parenthesis. Attributes: {text => "(", uid => "1"}
+	    |    |--- question_mark. Attributes: {text => "?", uid => "2"}
+	    |    |--- caret. Attributes: {text => "^", uid => "3"}
+	    |    |--- flag_set. Attributes: {text => "i", uid => "4"}
+	    |    |--- colon. Attributes: {text => ":", uid => "5"}
+	    |    |--- character_set. Attributes: {text => "Perl|JavaScript|C++", uid => "6"}
+	    |--- close_parenthesis. Attributes: {text => ")", uid => "7"}
+
+=item o Test also with L</prepend(%opts)> and L</set(%opts)>
+
+See t/get.set.t for sample code.
+
+=item o Since everything works, make a cup of tea
+
+=back
+
+=head2 Does this module ever use \Q...\E to quote regexp metacharacters?
+
+No.
+
+=head2 What is the format of the nodes in the tree build by this module?
+
+Each node's C<name> is the name of the Marpa-style event which was triggered by detection of
+some C<text> within the regexp.
+
+Each node's C<meta()> method returns a hashref with these (key => value) pairs:
+
+=over 4
 
 =item o text => $string
 
 This is the text within the regexp which triggered the event just mentioned.
 
+=item o uid => $integer
+
+This is the unqiue id of the 'current' node.
+
+This C<uid> is often used by you to specify which node to work on.
+
 =back
 
-See also the source code for L</cooked_tree()> and L</raw_tree()> for ideas on how to use this
-object.
+See also the source code for L</print_cooked_tree()> and L</print_raw_tree()> for ideas on how to
+use the tree.
 
 See the L</Synopsis> for sample code and a report after parsing a tiny regexp.
+
+=head2 Does the root node in the tree ever hold useful information?
+
+No. Always ignore it.
+
+=head2 Does this module interpret regexps in any way?
+
+No. You have to run your own Perl code to do that. This module just parses them into a data
+structure.
+
+And that really means this module does not match the regexp against anything. If I appear to do that
+while debugging new code, you can't rely on that appearing in production versions of the module.
+
+=head2 Does this module re-write regexps?
+
+No, unless you call one of L</The Edit Methods>.
+
+=head2 Does this module handle both Perl 5 and Perl 6?
+
+No. It will only handle Perl 5 syntax.
+
+=head2 Does this module handle regexps for various versions of Perl5?
+
+Not yet. Version-dependent regexp syntax will be supported for recent versions of Perl. This is
+done by having tokens within the BNF which are replaced at start-up time with version-dependent
+details.
+
+There are no such tokens at the moment.
+
+All debugging is done assuming the regexp syntax as documented online. See L</References> for the
+urls in question.
+
+=head2 So which version of Perl is supported?
+
+I'm (2018-01-14) using Perl V 5.20.2 and making the BNF match the Perl regexp docs listed in
+L</References> below.
+
+=head2 After calling parse(), warning_str() contains the string '... Parse ambiguous ...'
+
+This is almost certainly a error with the BNF, although of course it may be an error will an
+exceptionally-badly formed regexp.
+
+Report it via L<https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Parsertron>, and please
+ include the regexp in the report. Thanx!
+
+=head2 Is this a (Marpa) exhaustion-hating or exhaustion-loving app?
+
+Exhaustion-loving.
+
+See L<https://metacpan.org/pod/distribution/Marpa-R2/pod/Exhaustion.pod#Exhaustion>
+
+=head2 Will this code be modified to run under L<Marpa::R3> when the latter is stable?
+
+Yes.
 
 =head2 What is the purpose of this module?
 
@@ -831,44 +1102,54 @@ See the L</Synopsis> for sample code and a report after parsing a tiny regexp.
 
 =back
 
-=head2 Does this module interpret regexps in any way?
+=head1 Scripts
 
-No. You have to run your own Perl code to do that. This module just parses them into a data
-structure.
+This diagram indicates the flow of logic from script to script:
 
-And that really means this module does not match the regexp against anything. If I appear to do that
-while debugging new code, you can't rely on that appearing in production versions of the module.
+	xt/author/re_tests
+	|
+	V
+	xt/author/generate.tests.pl
+	|
+	V
+	xt/authors/perl-5.21.11.tests
+	|
+	V
+	perl -Ilib t/perl-5.21.11.t > xt/author/perl-5.21.11.log 2>&1
 
-=head2 Does this module re-write regexps?
+If xt/author/perl-5.21.11.log only contains lines starting with 'ok', then all Perl and Marpa
+errors have been hidden, so t/perl-5.21.11.t is ready to live in t/. Before that time it lives in
+xt/author/.
 
-Yes, on a small scale so far. See scripts/simple.pl for sample code. The source of this program
-and its output are given in the L</Synopsis>.
+=head1 TODO
 
-=head2 Does this module handle both Perl5 and Perl6?
+=over 4
 
-Initially, it will only handle Perl5 syntax.
+=item o How to best define 'code' in the BNF.
 
-=head2 Does this module handle various versions of regexps (i.e., of Perl5)?
+=item o Things to be aware of:
 
-Yes, version-dependent regexp syntax will be supported for recent versions of Perl. This is done by
-having tokens within the BNF which are replaced at start-up time with version-dependent details.
+=over 4
 
-There are no such tokens at the moment.
+=item o Regexps of the form: /.../aa
 
-All debugging is done assuming the regexp syntax as documented online. See L</References> for the
-urls in question.
+=item o Pragmas for the form: use re '/aa'; ...
 
-=head2 Is this an exhaustion-hating or exhaustion-loving app?
+=back
 
-Exhaustion-loving.
+=item o I could traverse the tree and store a pointer to each node in an array
 
-In short, Marpa will always report 'Parse exhausted', but I<this is not an error>.
+This would mean fast access to nodes in random order.
 
-See L<https://metacpan.org/pod/distribution/Marpa-R2/pod/Exhaustion.pod#Exhaustion>
+=back
 
 =head1 References
 
+L<http://www.pcre.org/>. PCRE - Perl Compatible Regular Expressions.
+
 L<http://perldoc.perl.org/perlre.html>. This is the definitive document.
+
+L<http://perldoc.perl.org/perlrecharclass.html#Extended-Bracketed-Character-Classes>.
 
 L<http://perldoc.perl.org/perlretut.html>. Samples with commentary.
 
@@ -880,11 +1161,17 @@ L<http://perldoc.perl.org/perlrebackslash.html>
 
 L<http://www.nntp.perl.org/group/perl.perl5.porters/2016/02/msg234642.html>
 
+L<https://code.activestate.com/lists/perl5-porters/209610/>
+
+L<https://stackoverflow.com/questions/46200305/a-strict-regular-expression-for-matching-chemical-formulae>
+
 =head1 See Also
 
 L<Graph::Regexp>
 
 L<Regexp::Assemble>
+
+L<Regexp::Debugger>
 
 L<Regexp::ERE>
 
@@ -930,7 +1217,7 @@ L<Regexp::Parsertron> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> i
 
 Marpa's homepage: L<http://savage.net.au/Marpa.html>.
 
-My homepage: L<http://savage.net.au/>.
+L<My homepage|http://savage.net.au/>.
 
 =head1 Copyright
 
@@ -945,125 +1232,219 @@ Australian copyright (c) 2016, Ron Savage.
 
 __DATA__
 @@ V 5.20
-:default		::= action => [values]
 
-lexeme default	= latm => 1
+:default						::= action => [values]
 
-:start			::= regexp
+lexeme default					= latm => 1
+
+:start							::= regexp
 
 # G1 stuff.
 
-regexp			::= open_parenthesis entire_pattern close_parenthesis
+regexp							::= open_parenthesis question_mark caret flag_sequence colon entire_pattern close_parenthesis
 
-entire_pattern	::= question_mark optional_caret positive_flags optional_pattern_set
-					| question_mark caret colon open_parenthesis comment close_parenthesis
-					| question_mark flag_sequence optional_pattern_set
-					| question_mark vertical_bar pattern_set
-					| question_mark equals pattern_set
-					| question_mark exclamation_mark pattern_set
-					| question_mark less_equals pattern_set
-					| escaped_K
-					| question_mark less_exclamation_mark pattern_set
-					| question_mark named_capture_group pattern_set
-					| named_backreference
-					| question_mark open_brace code close_brace
-					| question_mark question_mark open_brace code close_brace
-					| question_mark parameter_number
+flag_sequence					::= positive_flags negative_flag_set
 
-optional_caret				::=
-optional_caret				::= caret
+positive_flags					::=
+positive_flags					::= flag_set
 
-positive_flags				::=
-positive_flags				::= flag_set
+negative_flag_set				::=
+negative_flag_set				::= minus negative_flags
 
-optional_pattern_set		::= colon slash_pattern
-								| colon slashless_pattern
+negative_flags					::= flag_set
 
-# TODO: Let's hope users always use /.../ and not something like m|...|!
+# Extended patterns from http://perldoc.perl.org/perlre.html:
 
-slash_pattern				::=
-slash_pattern				::= slash optional_caret pattern_set optional_dollar slash optional_switches
+entire_pattern					::= comment_thingy					#  1.
+									| flag_thingy					#  2.
+									| colon_thingy					#  3.
+									| vertical_bar_thingy			#  4.
+									| equals_thingy					#  5.
+									| exclamation_mark_thingy		#  6.
+									| less_or_equals_thingy			#  7.
+									| less_exclamation_mark_thingy	#  8.
+									| named_capture_group_thingy	#  9.
+									| named_backreference_thingy	# 10.
+									| single_code_thingy			# 11.
+									| double_code_thingy			# 12.
+									| recursive_subpattern_thingy	# 13.
+									| recurse_thingy				# 14.
+									| conditional_thingy			# 15.
+									| greater_than_thingy			# 16.
+									| extended_bracketed_thingy		# 17.
+									| pattern_thingy				# 99.
 
-slashless_pattern			::= optional_caret pattern_set optional_dollar
+# 1: (?#text)
 
-pattern_set					::= pattern_sequence+
+comment_thingy					::= open_parenthesis question_mark hash comment close_parenthesis
 
-pattern_sequence			::= parenthesis_pattern
-								| bracket_pattern
-								| character_sequence
+comment							::= non_close_parenthesis*
 
-parenthesis_pattern			::= open_parenthesis pattern close_parenthesis
+# 2: (?adlupimnsx-imnsx)
+#  & (?^alupimnsx)
+
+flag_thingy						::= open_parenthesis question_mark flag_set_1
+									| open_parenthesis question_mark caret flag_set_2 close_parenthesis
+
+flag_set_1						::= flag_sequence
+
+flag_set_2						::= flag_sequence
+
+# 3: (?:pattern)	Eg: (?:(?<n>foo)|(?<n>bar))\k<n>
+#  & (?adluimnsx-imnsx:pattern)
+#  & (?^aluimnsx:pattern)
+
+colon_thingy					::= open_parenthesis question_mark colon pattern_sequence close_parenthesis
+
+pattern_sequence				::= pattern_set*
+
+pattern_set						::= pattern_item
+									| pattern_item '|'
+
+pattern_item					::= bracket_pattern
+									| parenthesis_pattern
+									| slash_pattern
+									| character_sequence
+
+bracket_pattern					::= open_bracket characters_in_set close_bracket
 
 # Perl accepts /()/.
-
-pattern						::=
-pattern						::= bracket_pattern
-								| non_close_parenthesis_set
-
-bracket_pattern				::= open_bracket optional_caret characters_in_set close_bracket set_modifiers
-
 # Perl does not accept /[]/.
 
-characters_in_set			::= character_in_set+
+characters_in_set				::= character_in_set+
 
-character_in_set			::= escaped_close_bracket
-								| non_close_bracket
+character_in_set				::= escaped_close_bracket
+									| non_close_bracket
 
-set_modifiers				::=
-set_modifiers				::= plus
-								| question_mark
-#								| TBA. E.g. {...}.
+character_sequence				::= simple_character_sequence+
 
-character_sequence			::= simple_character_sequence+
+simple_character_sequence		::= escaped_close_parenthesis
+									| escaped_open_parenthesis
+									| escaped_slash
+									| caret
+									| character_set
 
-simple_character_sequence	::= escaped_close_parenthesis
-								| escaped_open_parenthesis
-								| escaped_slash
-								| character_set
+parenthesis_pattern				::= open_parenthesis pattern_sequence close_parenthesis
 
-optional_dollar				::=
-optional_dollar				::= dollar
+slash_pattern					::= slash pattern_sequence slash
 
-optional_switches			::=
-optional_switches			::= flag_set
+# 4: (?|pattern)
 
-comment						::= question_mark hash non_close_parenthesis_set
+vertical_bar_thingy				::= open_parenthesis question_mark vertical_bar pattern_sequence close_parenthesis
 
-non_close_parenthesis_set	::= non_close_parenthesis*
+# 5: (?=pattern)
 
-flag_sequence				::= positive_flags negative_flag_set
+equals_thingy					::= open_parenthesis question_mark equals pattern_sequence close_parenthesis
 
-negative_flag_set			::=
-negative_flag_set			::= minus negative_flags
+# 6: (?!pattern)
 
-negative_flags				::= flag_set
+exclamation_mark_thingy			::= open_parenthesis question_mark exclamation_mark pattern_sequence close_parenthesis
 
-named_capture_group			::= single_quote capture_name single_quote
-								| less_than capture_name greater_than
+# 7: (?<=pattern
+#  & \K
 
-capture_name				::= word
+less_or_equals_thingy			::= open_parenthesis question_mark less_or_equals close_parenthesis
+									| escaped_K
 
-named_backreference			::= escaped_k single_quote capture_name single_quote
-								| escaped_k less_than capture_name greater_than
+# 8: (?<!pattern)
 
-code						::= [[:print:]]
+less_exclamation_mark_thingy	::= open_parenthesis question_mark less_exclamation_mark close_parenthesis
 
-positive_integer			::= non_zero_digit digit_sequence
-								| minus positive_integer
+# 9: (?<NAME>pattern)
+#  & (?'NAME'pattern)
 
-digit_sequence				::= digit_set*
+named_capture_group_thingy		::= open_parenthesis question_mark named_capture_group close_parenthesis
 
-parameter_number			::= positive_integer
-								| plus positive_integer
-								| minus positive_integer
-								| R
-								| zero
+named_capture_group				::= single_quote capture_name single_quote
+									| less_than capture_name greater_than
+
+capture_name					::= word
+
+# 10: \k<NAME>
+#  & \k'NAME'
+
+named_backreference_thingy		::= named_backreference
+
+named_backreference				::= escaped_k single_quote capture_name single_quote
+									| escaped_k less_than capture_name greater_than
+
+# 11: (?{ code })
+
+single_code_thingy				::= open_parenthesis question_mark open_brace code close_brace close_parenthesis
+
+code							::= [[:print:]] # TODO: ATM.
+
+# 12: (??{ code })
+
+double_code_thingy				::= open_parenthesis question_mark question_mark open_brace code close_brace close_parenthesis
+
+# 13: (?PARNO) || (?-PARNO) || (?+PARNO) || (?R) || (?0)
+
+recursive_subpattern_thingy		::= open_parenthesis question_mark parameter_number close_parenthesis
+
+parameter_number				::= natural_number # 1, 2, ...
+									| minus natural_number
+									| plus natural_number
+									| R
+									| zero
+
+natural_number					::= non_zero_digit digit_sequence
+
+digit_sequence					::= digit_set*
+
+# 14: (?&NAME)
+
+recurse_thingy					::= open_parenthesis question_mark ampersand capture_name close_parenthesis
+									| open_parenthesis question_mark P greater_than capture_name close_parenthesis
+
+# 15: (?(condition)yes-pattern|no-pattern)
+#  & (?(condition)yes-pattern)
+
+conditional_thingy				::= open_parenthesis question_mark condition close_parenthesis
+condition						::= open_parenthesis natural_number close_parenthesis
+									| open_parenthesis named_capture_group close_parenthesis
+									| equals_thingy
+									| exclamation_mark_thingy
+									| less_or_equals_thingy # Includes \K.
+									| less_exclamation_mark_thingy
+									| single_code_thingy
+									| an_R_sequence
+									| an_R_name
+									| DEFINE
+
+an_R_sequence					::= a_single_R
+									| open_parenthesis R_pattern close_parenthesis
+
+a_single_R						::= open_parenthesis R close_parenthesis
+
+R_pattern						::= R R_suffix
+
+R_suffix						::= natural_number
+
+an_R_name						::= open_parenthesis R ampersand capture_name close_parenthesis
+
+# 16: (?>pattern)
+
+greater_than_thingy				::= open_parenthesis question_mark greater_than close_parenthesis
+
+# 17: (?[ ])
+
+extended_bracketed_thingy		::= open_parenthesis question_mark open_bracket character_classes close_bracket close_parenthesis
+
+character_classes				::= [[:print:]]
+
+# 99.
+
+pattern_thingy					::= pattern_set*
 
 # L0 stuff, in alphabetical order.
 #
 # Policy: Event names are always the same as the name of the corresponding lexeme.
 #
 # Note:   Tokens of the form '_xxx_', if any, are replaced with version-dependent values.
+
+:lexeme						~ ampersand				pause => before		event => ampersand
+ampersand					~ '^'
 
 :lexeme						~ caret					pause => before		event => caret
 caret						~ '^'
@@ -1083,11 +1464,11 @@ close_parenthesis			~ ')'
 :lexeme						~ colon					pause => before		event => colon
 colon						~ ':'
 
+:lexeme						~ DEFINE				pause => before		event => DEFINE
+DEFINE						~ 'DEFINE'
+
 :lexeme						~ digit_set				pause => before		event => digit_set
 digit_set					~ [0-9] # We avoid \d to avoid Unicode digits.
-
-:lexeme						~ dollar				pause => before		event => dollar
-dollar						~ '$'
 
 :lexeme						~ equals				pause => before		event => equals
 equals						~ '='
@@ -1122,8 +1503,8 @@ greater_than				~ '>'
 :lexeme						~ hash					pause => before		event => hash
 hash						~ '#'
 
-:lexeme						~ less_equals			pause => before		event => less_equals
-less_equals					~ '<='
+:lexeme						~ less_or_equals		pause => before		event => less_or_equals
+less_or_equals				~ '<='
 
 :lexeme						~ less_exclamation_mark	pause => before		event => less_exclamation_mark
 less_exclamation_mark		~ '<!'
@@ -1138,7 +1519,7 @@ minus						~ '-'
 non_close_bracket			~ [^\]]+
 
 :lexeme						~ non_close_parenthesis	pause => before		event => non_close_parenthesis
-non_close_parenthesis		~ [^)]*
+non_close_parenthesis		~ [^)]
 
 :lexeme						~ non_zero_digit		pause => before		event => non_zero_digit
 non_zero_digit				~ [1-9]
@@ -1152,6 +1533,9 @@ open_bracket				~ '['
 :lexeme						~ open_parenthesis		pause => before		event => open_parenthesis
 open_parenthesis			~ '('
 
+:lexeme						~ P						pause => before		event => P
+P							~ 'P'
+
 :lexeme						~ plus					pause => before		event => plus
 plus						~ '+'
 
@@ -1159,7 +1543,7 @@ plus						~ '+'
 question_mark				~ '?'
 
 :lexeme						~ R						pause => before		event => R
-R							~ '-'
+R							~ 'R'
 
 :lexeme						~ single_quote			pause => before		event => single_quote
 single_quote				~ [\'] # The '\' is for UltraEdit's syntax hiliter.
@@ -1174,4 +1558,4 @@ vertical_bar				~ '|'
 word						~ [\w]+
 
 :lexeme						~ zero					pause => before		event => zero
-zero						~ '-'
+zero						~ '0'

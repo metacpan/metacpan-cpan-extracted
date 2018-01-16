@@ -1,5 +1,5 @@
 package WebService::Braintree::Role::MakeRequest;
-$WebService::Braintree::Role::MakeRequest::VERSION = '0.94';
+$WebService::Braintree::Role::MakeRequest::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

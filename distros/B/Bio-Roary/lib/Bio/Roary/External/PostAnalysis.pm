@@ -1,5 +1,5 @@
 package Bio::Roary::External::PostAnalysis;
-$Bio::Roary::External::PostAnalysis::VERSION = '3.11.1';
+$Bio::Roary::External::PostAnalysis::VERSION = '3.11.3';
 # ABSTRACT: Perform the post analysis
 
 
@@ -190,7 +190,7 @@ Bio::Roary::External::PostAnalysis - Perform the post analysis
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

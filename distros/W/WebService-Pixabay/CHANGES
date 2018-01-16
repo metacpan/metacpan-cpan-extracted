@@ -1,10 +1,24 @@
 ==================================================
-Changes from 2016-12-17 00:00:00 +0000 to present.
+Changes from 2017-01-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.1.1 at 2017-12-17 10:41:04 +0000
+version 2.2.0 at 2018-01-15 02:41:35 +0000
 ------------------------------------------
+
+  Change: ca8da701bb8ca4fa7adb68c6f389fb810e6aa6b8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 10:40:48 +0000
+
+    Minor update.
+
+    - Improve doc. - Change LICENSE to MIT. - Tidy up. 
+
+  Change: 3b5fbbb73b29b97acbe89eb564258cf553873e4e
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-17 18:43:05 +0000
+
+    Update pod 
 
   Change: 09d05295274581d6902a9c935ea45f1558fdf0d4
   Author: faraco <skelic3@gmail.com>

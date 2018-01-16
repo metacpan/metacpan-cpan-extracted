@@ -18,6 +18,7 @@ t/lib/BadBadBadFoo.pm
 t/lib/BadBadFoo.pm
 t/lib/BadFoo.pm
 t/lib/Foo.pm
+t/lib/NoVersion.pm
 t/need-module.t
 t/try-module.t
 xt/author/pod-syntax.t

@@ -1,5 +1,5 @@
 #
-# $Id: Kibana.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
+# $Id: Kibana.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # server::kibana Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f421cd03e192 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable elk) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -126,7 +126,6 @@ sub install {
 
    my $datadir = $self->datadir;
    my $version = $self->version;
-   my $she = $self->shell;
 
    my $url = 'https://artifacts.elastic.co/downloads/kibana/kibana-5.5.2-linux-x86_64.tar.gz';
    if ($version eq '4.6.2') {
@@ -139,14 +138,24 @@ sub install {
    my $cw = Metabrik::Client::Www->new_from_brik_init($self) or return;
    $cw->mirror($url, "$datadir/kibana.tar.gz") or return;
 
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
-   $she->run_cd($datadir) or return;
+   if (defined($self->shell)) {
+      $self->shell->run_cd($datadir) or return;
+   }
+   else {
+      chdir($datadir) or return $self->log->error("install: chdir: $!");
+   }
 
    my $cmd = "tar zxvf kibana.tar.gz";
    my $r = $self->execute($cmd) or return;
 
-   $she->run_cd($cwd) or return;
+   if (defined($self->shell)) {
+      $self->shell->run_cd($cwd) or return;
+   }
+   else {
+      chdir($cwd) or return $self->log->error("install: chdir: $!");
+   }
 
    return 1;
 }
@@ -236,7 +245,7 @@ Template to write a new Metabrik Brik.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

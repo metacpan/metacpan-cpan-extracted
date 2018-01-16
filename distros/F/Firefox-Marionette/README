@@ -1,0 +1,485 @@
+NAME
+
+    Firefox::Marionette - Automate the Firefox browser with the Marionette
+    protocol
+
+VERSION
+
+    Version 0.09
+
+SYNOPSIS
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find_element('//input[@id="search-input"]')->send_keys('Test::More');
+    
+        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_element('//button[@name="lucky"]') ])
+    
+        $firefox->find_element('//button[@name="lucky"]')->click();
+    
+        say $firefox->page_source();
+
+DESCRIPTION
+
+    This is a client module to automate the Mozilla Firefox browser via the
+    Marionette protocol
+    <https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette/Protocol>
+
+SUBROUTINES/METHODS
+
+ new
+
+    accepts an optional hash as a parameter. Allowed keys are below;
+
+      * firefox_binary - use the specified path to the Firefox
+      <https://firefox.org/> binary, rather than the default path.
+
+      * capabilities - use the supplied capabilities object, for example to
+      set whether the browser should accept insecure certs
+
+      * profile_name - pick a specific existing profile to automate, rather
+      than creating a new profile. Note that firefox <https://firefox.com>
+      refuses to allow more than one instance of a profile to run at the
+      same time.
+
+    This method returns a new Firefox::Marionette object, connected to an
+    instance of firefox <https://firefox.com>
+
+ go
+
+    Navigates the current browsing context to the given URI and waits for
+    the document to load or the session's page timeout duration to elapse
+    before returning. This method returns itself to aid in chaining methods
+
+ uri
+
+    returns the current URI of current top level browsing context for
+    Desktop. It is equivalent to the javascript 'document.location.href'
+
+ title
+
+    returns the current title of the window.
+
+ find_element
+
+    returns the first element in the current browsing context that matches
+    the search parameters supplied;
+
+      * the first parameter is a scalar search value. This can be an xpath
+      <https://en.wikipedia.org/wiki/XPath> expression such as
+      //button[@name="foo"] to find all button elements that have a 'name'
+      of 'foo'.
+
+      * the second optional parameter is a scalar search strategy. This
+      defaults to 'xpath'
+
+      This method is subject to the implicit timeout.
+
+ find_elements
+
+    returns the elements in the current browsing context that match the
+    search parameters supplied;
+
+      * the first parameter is a scalar search value. This can be an xpath
+      <https://en.wikipedia.org/wiki/XPath> expression such as
+      //button[@name="foo"] to find all button elements that have a 'name'
+      of 'foo'.
+
+      * the second optional parameter is a scalar search strategy. This
+      defaults to 'xpath'
+
+    This method is subject to the implicit timeout.
+
+ css
+
+    accepts an element as the first parameter and a scalar CSS property
+    name as the second parameter. It returns the value of the computed
+    style for that property.
+
+ attribute
+
+    accepts an element as the first parameter and a scalar attribute name
+    as the second parameter. It returns the value of the attribute with the
+    supplied name.
+
+ script
+
+    accepts a scalar containing a javascript function that is executed in
+    the browser. Returns the result of the javascript function.
+
+    The executing javascript is subject to the scripts timeout.
+
+ async_script
+
+    accepts a scalar containing a javascript function that is executed in
+    the browser. This method returns itself to aid in chaining methods.
+
+    The executing javascript is subject to the scripts timeout.
+
+ page_source
+
+    returns the page source of the content document.
+
+ context
+
+    returns the context type that is Marionette's current target for
+    browsing context scoped commands.
+
+ add_cookie
+
+    accepts a single cookie object as the first parameter and adds it to
+    the current cookie jar. This method returns itself to aid in chaining
+    methods.
+
+ delete_cookie
+
+    deletes a single cookie by name. Accepts a scalar containing the cookie
+    name as a parameter. This method returns itself to aid in chaining
+    methods.
+
+ delete_cookies
+
+    here be cookie monsters! This method returns itself to aid in chaining
+    methods.
+
+ cookies
+
+    returns the contents of the cookie jar in scalar or list context.
+
+ send_keys
+
+    accepts an element as the first parameter and a string as the second
+    parameter. It sends the string to the specified element in the current
+    page, such as filling out a text box. This method returns itself to aid
+    in chaining methods.
+
+ is_displayed
+
+    accepts an element as the first parameter. This method returns true or
+    false depending on if the element is displayed.
+
+ is_enabled
+
+    accepts an element as the first parameter. This method returns true or
+    false depending on if the element is enabled.
+
+ is_selected
+
+    accepts an element as the first parameter. This method returns true or
+    false depending on if the element is selected.
+
+ active_element
+
+    returns the active element of the current browsing context's document
+    element, if the document element is non-null.
+
+ back
+
+    causes the browser to traverse one step backward in the joint history
+    of the current browsing context. The browser will wait for the one step
+    backward to complete or the session's page timeout duration to elapse
+    before returning. This method returns itself to aid in chaining
+    methods.
+
+ forward
+
+    causes the browser to traverse one step forward in the joint history of
+    the current browsing context. The browser will wait for the one step
+    forward to complete or the session's page timeout duration to elapse
+    before returning. This method returns itself to aid in chaining
+    methods.
+
+ active_frame
+
+    returns the current active frame if there is one in the current
+    browsing context. Otherwise, this method returns undef.
+
+ switch_to_frame
+
+    accepts a frame as a parameter and switches to it within the current
+    window.
+
+ switch_to_parent_frame
+
+    set the current browsing context for future commands to the parent of
+    the current browsing context
+
+ full_screen
+
+    full screens the firefox window. This method returns itself to aid in
+    chaining methods.
+
+ minimise
+
+    minimises the firefox window. This method returns itself to aid in
+    chaining methods.
+
+ maximise
+
+    maximises the firefox window. This method returns itself to aid in
+    chaining methods.
+
+ refresh
+
+    refreshes the current page. The browser will wait for the page to
+    completely refresh or the session's page timeout duration to elapse
+    before returning. This method returns itself to aid in chaining
+    methods.
+
+ alert_text
+
+    Returns the message shown in a currently displayed modal message box
+
+ dismiss_alert
+
+    dismisses a currently displayed modal message box
+
+ accept_dialog
+
+    accepts a currently displayed modal message box
+
+ send_alert_text
+
+    sends keys to the input field of a currently displayed modal message
+    box
+
+ capabilities
+
+    returns the capabilities of the current firefox binary
+
+ screen_orientation
+
+    returns the current browser orientation. This will be one of the valid
+    primary orientation values 'portrait-primary', 'landscape-primary',
+    'portrait-secondary', or 'landscape-secondary'.
+
+ selfie
+
+    returns a File::Temp object containing a lossless PNG image screenshot.
+    If an element is passed as a parameter, the screenshot will be
+    restricted to the element.
+
+    If an element is not passed as a parameter and the current context is
+    'chrome', a screenshot of the current viewport will be returned.
+
+    If an element is not passed as a parameter and the current context is
+    'content', a screenshot of the current frame will be returned.
+
+    The parameters after the element parameter are taken to be a optional
+    hash with the following allowed keys;
+
+      * hash - return a SHA256 hex encoded digest of the PNG image rather
+      than the image itself
+
+      * full - take a screenshot of the whole document unless the first
+      element parameter has been supplied.
+
+      * scroll - scroll to the element supplied
+
+      * highlights - a reference to a list containing elements to draw a
+      highlight around
+
+ tag_name
+
+    accepts a Firefox::Marionette::Element object as the first parameter
+    and returns the relevant tag name. For example 'a' or 'input'.
+
+ window_rect
+
+    accepts an optional <position and
+    size|Firefox::Marionette::Window::Rect> as a parameter, sets the
+    current browser window to that position and size and returns the
+    previous position, size and state of the browser window. If no
+    parameter is supplied, it returns the current position, size and state
+    of the browser window.
+
+ rect
+
+    accepts a element as the first parameter and returns the current
+    position and size of the element
+
+ text
+
+    accepts a element as the first parameter and returns the text that is
+    contained by that element (if any)
+
+ clear
+
+    accepts a element as the first parameter and clears any user supplied
+    input
+
+ click
+
+    accepts a element as the first parameter and sends a 'click' to it. The
+    browser will wait for any page load to complete or the session's page
+    timeout duration to elapse before returning.
+
+ timeouts
+
+    returns the current timeouts for page loading, searching, and scripts.
+
+ new_session
+
+    creates a new WebDriver session. It is expected that the caller
+    performs the necessary checks on the requested capabilities to be
+    WebDriver conforming. The WebDriver service offered by Marionette does
+    not match or negotiate capabilities beyond type and bounds checks.
+
+ window_type
+
+    returns the current window's type. This should be 'navigator:browser'.
+
+ window_handle
+
+    returns the current window's handle. On desktop this typically
+    corresponds to the currently selected tab. returns an opaque
+    server-assigned identifier to this window that uniquely identifies it
+    within this Marionette instance. This can be used to switch to this
+    window at a later point.
+
+ window_handles
+
+    returns a list of top-level browsing contexts. On desktop this
+    typically corresponds to the set of open tabs for browser windows, or
+    the window itself for non-browser chrome windows. Each window handle is
+    assigned by the server and is guaranteed unique, however the return
+    array does not have a specified ordering.
+
+ accept_connections
+
+    Enables or disables accepting new socket connections. By calling this
+    method with `false` the server will not accept any further connections,
+    but existing connections will not be forcible closed. Use `true` to
+    re-enable accepting connections.
+
+    Please note that when closing the connection via the client you can
+    end-up in a non-recoverable state if it hasn't been enabled before.
+
+ current_chrome_window_handle
+
+    see chrome_window_handle.
+
+ chrome_window_handle
+
+    returns an server-assigned integer identifiers for the current chrome
+    window that uniquely identifies it within this Marionette instance.
+    This can be used to switch to this window at a later point. This
+    corresponds to a window that may itself contain tabs.
+
+ chrome_window_handles
+
+    returns identifiers for each open chrome window for tests interested in
+    managing a set of chrome windows and tabs separately.
+
+ application_type
+
+    returns the application type for the Marionette protocol. Should be
+    'gecko'.
+
+ marionette_protocol
+
+    returns the version for the Marionette protocol. Current most recent
+    version is '3'.
+
+ quit
+
+    Marionette will stop accepting new connections before ending the
+    current session, and finally attempting to quit the application
+
+DIAGNOSTICS
+
+    Failed to create a socket: %s
+
+      The module was unable to even create a socket. Something is seriously
+      wrong with your environment
+
+    Failed to send request to firefox: %s
+
+      The module was unable to perform a syswrite on the socket connected
+      to firefox.
+
+    Failed to correctly determined the Firefox process id through the
+    initial connection capabilities
+
+      The module was found that firefox is reporting through it's
+      Capabilities object a different process id than this module was
+      using. This is probably a bug in this module's logic. Please report
+      as described in the BUGS AND LIMITATIONS section below.
+
+CONFIGURATION AND ENVIRONMENT
+
+    Firefox::Marionette requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+
+    None.
+
+INCOMPATIBILITIES
+
+    None reported.
+
+BUGS AND LIMITATIONS
+
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    bug-firefox-marionette@rt.cpan.org, or through the web interface at
+    http://rt.cpan.org.
+
+AUTHOR
+
+    David Dick <ddick@cpan.org>
+
+ACKNOWLEDGEMENTS
+
+    Thanks to the entire Mozilla organisation for a great browser and to
+    the team behind Marionette for providing a great interface for
+    automation.
+
+    Thanks also to the authors of the documentation in the following
+    sources;
+
+      * Marionette Protocol
+      <https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
+
+      * Marionette Documentation
+      <https://firefox-source-docs.mozilla.org/testing/marionette/marionette/index.html>
+
+      * Marionette driver.js at github
+      <https://github.com/mozilla/gecko-dev/blob/master/testing/marionette/driver.js>
+
+LICENSE AND COPYRIGHT
+
+    Copyright (c) 2018, David Dick <ddick@cpan.org>. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See "perlartistic" in
+    perlartistic.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

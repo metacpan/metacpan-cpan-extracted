@@ -4,9 +4,9 @@
       "faraco <skelic3@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -36,7 +36,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Dumper" : "0",
             "Function::Parameters" : "0",
             "LWP::Online" : "0",
             "Moo" : "0",
@@ -48,24 +47,23 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
-            "lib" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/faraco/WebService-Pixabay/issues"
+         "web" : "https://github.com/faraco/WebService-Gitter/issues"
       },
-      "homepage" : "https://github.com/faraco/WebService-Gitter",
+      "homepage" : "https://github.com/faraco/Webservice-gitter",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/faraco/WebService-Gitter.git",
-         "web" : "https://github.com/faraco/WebService-Gitter"
+         "url" : "https://github.com/faraco/Webservice-gitter.git",
+         "web" : "https://github.com/faraco/Webservice-gitter"
       }
    },
-   "version" : "1.1.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "2.1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

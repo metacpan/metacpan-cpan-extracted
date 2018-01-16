@@ -30,7 +30,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Julian::Simple' => { file => 'lib/Date/Julian/Simple.pm', version => '0.02' },
+            'Date::Julian::Simple' => { file => 'lib/Date/Julian/Simple.pm', version => '0.03' },
         },
         resources => {
             repository => {

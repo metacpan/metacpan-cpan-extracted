@@ -1,0 +1,4 @@
+--lib=../../CPAN
+--lib=../../lib
+--addfile=../../res;res
+--cachedeps=pdflink.pp.deps

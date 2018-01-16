@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Mail/AuthenticationResults.pm
 lib/Mail/AuthenticationResults/Header.pm
@@ -23,11 +24,14 @@ lib/Mail/AuthenticationResults/Token/Separator.pm
 lib/Mail/AuthenticationResults/Token/String.pm
 t/02-children.t
 t/02-comment.t
+t/02-get.t
 t/02-none.t
 t/02-parser-quoted.t
 t/02-parser.t
+t/02-safe_set.t
 t/02-set.t
 t/02-tokens.t
+t/03-parser-bogus.t
 t/03-parser.t
 t/03-search.t
 t/04-aol.t
@@ -40,4 +44,5 @@ t/04-yahoo.t
 t/04-yandex.t
 t/05-parser-comment-heavy.t
 t/author-critic.t
+t/author-pod-coverage.t
 t/author-pod-syntax.t

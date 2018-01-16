@@ -7,19 +7,19 @@ use Moose;
 extends 'Catalyst::Model';
 
 has '_app' => (
-    is          => 'rw', 
+    is          => 'rw',
     isa         => 'Str',
     required    => 1,
 );
 
 has 'class' => (
-    is          => 'rw', 
+    is          => 'rw',
     isa         => 'Str',
     lazy_build  => 1,
 );
 
 has 'directories' => (
-    is          => 'rw', 
+    is          => 'rw',
     isa         => 'CatalystX::I18N::Type::DirList',
     coerce      => 1,
     lazy_build  => 1,
@@ -28,10 +28,10 @@ has 'directories' => (
 around BUILDARGS => sub {
     my $orig  = shift;
     my ( $self,$app,$config ) = @_;
-    
+
     # Set _app class
     $config->{_app} = $app;
-    
+
     # Call original BUILDARGS
     return $self->$orig($app,$config);
 };
@@ -51,15 +51,15 @@ sub class_name {
 
 sub _build_directories {
     my ($self) = @_;
-    
+
     my $class_name = class_name($self->class);
     my $calldir = $self->_app;
     $calldir =~ s{::}{/}g;
-    
+
     my $file = $calldir.".pm";
     my $path = $INC{$file};
     $path =~ s{\.pm$}{/$class_name};
-    
+
     return [ Path::Class::Dir->new($path) ];
 }
 

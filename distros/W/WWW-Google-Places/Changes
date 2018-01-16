@@ -1,5 +1,8 @@
 Revision history for WWW::Google::Places
 
+0.33   Sun Jan 14 12:35:00 2018
+       - Improved method exporting.
+
 0.32   Sat May 06 11:30:00 2017
        - Fixed issue #2 with regard to parameter 'types' having multiple values.
 

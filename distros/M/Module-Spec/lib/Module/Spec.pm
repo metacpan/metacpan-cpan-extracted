@@ -1,10 +1,9 @@
 
 package Module::Spec;
-$Module::Spec::VERSION = '0.5.1';
+$Module::Spec::VERSION = '0.6.0';
 # ABSTRACT: Load modules based on specifications
-use 5.010;
+use 5.012;
 
-# use strict;
 # use warnings;
 
 BEGIN {
@@ -56,7 +55,7 @@ Module::Spec - Load modules based on specifications
 
 =head1 VERSION
 
-version 0.5.1
+version 0.6.0
 
 =head1 SYNOPSIS
 

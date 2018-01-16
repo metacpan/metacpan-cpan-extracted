@@ -2,22 +2,25 @@
 
 use strict;
 use warnings;
+our $VERSION = '0.005'; # VERSION
+
 use Env '@PATH';
 push @PATH, qw(/sbin /usr/sbin /usr/local/sbin);
 use Getopt::Std;
-getopts 'v', \our %opts;
+getopts 'ev', \our %opts;
 
-sub run { print "\$ $_[0]\n" if $opts{v}; `$_[0]` }
+sub run { print "\$ $_[0]\n" if $opts{e}; `$_[0]` }
 
+if ($opts{v}) { print "App::lsnic v$VERSION\n"; exit 0 }
 die "ERROR: lsnic must be run as super user.\n" if $<;
 
 my ($i, @hw) = (-1);
 my @moreinfo = run 'lshw -c network -numeric';
 my ($indent) = $moreinfo[0] =~ /^(\s*)/;
 for (@moreinfo) {
-    /^$indent(\S*)\sDISABLED$/ and $hw[++$i]{STATE} = '[DISABLED]' or
-    /^$indent(\S*)$/           and ++$i or
-    /^\s*(.*?):\s*(.*)$/       and $hw[$i]{$1} = $2;
+    /^$indent\S*\s(\w+)$/ and $hw[++$i]{STATE} = "[$1]" or
+    /^$indent\S*$/        and ++$i or
+    /^\s*(.*?):\s*(.*)$/  and $hw[$i]{$1} = $2;
 }
 
 sub lspci_serial {
@@ -32,27 +35,32 @@ sub lspci_serial {
 }
 
 sub max { my $x = shift // 0; my $y = shift // 0; $x > $y ? $x : $y }
-
 my @nics = ([qw(Bus Interface Serial Driver Description)]);
 my @offsets = map { length } @{$nics[0]};
+sub add {
+    my ($nic, $i, $val) = @_;
+    $nic->[$i] = $val;
+    $offsets[$i] = max($offsets[$i], length $nic->[-1]);
+}
 for (@hw) {
-    my ($i, @nic) = (0);
-    push @nic, $_->{'bus info'};
-    $offsets[$i] = max($offsets[$i], length $nic[-1]);
-    $i++;
-    push @nic, $_->{'logical name'};
-    $offsets[$i] = max($offsets[$i], length $nic[-1]);
-    $i++;
-    push @nic, $_->{serial} // lspci_serial($nic[0]);
-    $offsets[$i] = max($offsets[$i], length $nic[-1]);
-    $i++;
-    push @nic, ($_->{configuration} =~ /driver=(\S+)/);
-    $offsets[$i] = max($offsets[$i], length $nic[-1]);
-    $i++;
-    my @descr = grep defined, $_->{product}, $_->{STATE};
-    push @nic, "@descr";
-    $offsets[$i] = max($offsets[$i], length $nic[-1]);
-    $i++;
+    $_->{STATE} = $_->{STATE} // '';
+
+    my ($i, @nic) = (0, ('' x 5));
+    add(\@nic, $i++, $_->{'bus info'});
+    add(\@nic, $i++, $_->{'logical name'});
+    add(\@nic, $i++, $_->{serial} // lspci_serial($nic[0]));
+
+    if (not defined $_->{configuration}) {
+        add(\@nic, $i++, $_->{STATE})
+    } else {
+        my ($driver) = $_->{configuration} =~ /driver=(\S+)/;
+        add(\@nic, $i++, $driver // '')
+    }
+
+    my @descr = $_->{product};
+    push @descr, $_->{STATE} if $_->{STATE} ne '[UNCLAIMED]';
+    @descr = grep defined, @descr;
+    add(\@nic, $i++, "@descr");
 
     push @nics, \@nic;
 }
@@ -74,7 +82,7 @@ lsnic - Display table of network controllers
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -87,7 +95,7 @@ version 0.003
 
 =head1 INSTALLATION
 
-    # cpan App::lsionic
+    # cpan App::lsnic
 
 =head1 DESCRIPTION
 

@@ -4,13 +4,13 @@
       "Sawyer X <xsawyerx@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-xkcd",
    "no_index" : {
@@ -37,8 +37,7 @@
          "requires" : {
             "Carp" : "0",
             "HTTP::Tiny" : "0",
-            "JSON" : "0",
-            "Try::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -50,7 +49,6 @@
             "IPC::Open3" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.006"
          }
       }
@@ -64,7 +62,7 @@
          "url" : "http://github.com/xsawyerx/www-xkcd"
       }
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "0.008",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

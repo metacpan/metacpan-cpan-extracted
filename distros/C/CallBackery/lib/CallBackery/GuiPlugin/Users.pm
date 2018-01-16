@@ -64,6 +64,7 @@ has tableCfg => sub {
         {
             label => trm('Rights'),
             type => 'string',
+            sortable => $self->false,
             width => '8*',
             key => 'cbuser_cbrights',
         },

@@ -19,19 +19,19 @@ sub load_lexicon {
     my $directories = $params{directories};
     my $gettext_style = defined $params{gettext_style} ? $params{gettext_style} : 1;
     my $inheritance = $params{inheritance} || {};
-    
+
     $directories = [ $directories ]
         if defined $directories
         && ref $directories ne 'ARRAY';
     $directories ||= [];
     $locales = [ $locales ]
         unless ref $locales eq 'ARRAY';
-    
+
     die "Invalid locales"
         unless defined $locales
         && scalar @$locales > 0
         && ! grep {  $_ !~ $CatalystX::I18N::TypeConstraints::LOCALE_RE } @$locales;
-    
+
     {
         no strict 'refs';
         my $lexicon_loaded = ${$class.'::LEXICON_LOADED'};
@@ -41,28 +41,28 @@ sub load_lexicon {
             return;
         }
     }
-    
+
     my $lexicondata = {
         _decode => 1,
     };
     $lexicondata->{_style} = 'gettext'
         if $gettext_style;
-    
+
     my %locale_loaded;
-    
+
     # Loop all directories
     foreach my $directory (@$directories) {
-        next 
+        next
             unless defined $directory;
-        
+
         $directory = Path::Class::Dir->new($directory)
             unless ref $directory eq 'Path::Class::Dir';
-        
+
         next
             unless -d $directory->stringify && -e _ && -r _;
-        
+
         my @directory_content =  $directory->children();
-        
+
         # Load all avaliable message files
         foreach my $locale (@$locales) {
             my $lc_locale = lc($locale);
@@ -92,7 +92,7 @@ sub load_lexicon {
                 if scalar @locale_lexicon;
         }
     }
-    
+
     # Fallback lexicon
     foreach my $locale (@$locales) {
         next
@@ -101,13 +101,13 @@ sub load_lexicon {
             if exists $locale_loaded{$locale};
         $lexicondata->{$locale} ||= ['Auto'];
     }
-    
+
     eval qq[
         package $class;
         our \$LEXICON_LOADED = 1;
         Locale::Maketext::Lexicon->import(\$lexicondata)
     ];
-    
+
     while (my ($locale,$inherit) = each %$inheritance) {
         my $locale_class = lc($locale);
         my $inherit_class = lc($inherit);
@@ -118,17 +118,17 @@ sub load_lexicon {
         no strict 'refs';
         push(@{$locale_class.'::ISA'},$inherit_class);
     }
-    
+
     die("Could not load Locale::Maketext::Lexicon") if $@;
     return;
 }
 
 #sub set_lexicon {
 #    my ( $class, $locale, $lexicon ) = @_;
-#    
+#
 #    $locale = lc($locale);
 #    $locale =~ s/-/_/g;
-#        
+#
 #    no strict 'refs';
 #    %{$class .'::'.$locale.'::Lexicon'} = %{$lexicon};
 #    return;
@@ -179,7 +179,7 @@ via L<Locale::Maketext::Lexicon::Gettext>
 
 =item * *.db
 
-via L<Locale::Maketext::Lexicon::Tie> The files will be tied to you Maketext 
+via L<Locale::Maketext::Lexicon::Tie> The files will be tied to you Maketext
 class, thus you need to implement the necessary tie methods in your class.
 
 =item * *.m
@@ -192,12 +192,12 @@ via L<Locale::Maketext::Lexicon::Slurp>
 
 =item * Perl Packages
 
-Will be loaded (only lowercase locale names e.g. locale 'de_AT' will only 
-load 'de_at.pm'). The packages must have a C<%Lexion> variable. 
+Will be loaded (only lowercase locale names e.g. locale 'de_AT' will only
+load 'de_at.pm'). The packages must have a C<%Lexion> variable.
 
 =back
 
-If no translation files can be found for a given locale then 
+If no translation files can be found for a given locale then
 L<Locale::Maketext::Lexicon::Auto> will be loaded.
 
 The following parameters are recognized/required
@@ -219,7 +219,7 @@ Required
 
 =item * gettext_style
 
-Enable gettext style. C<%quant(%1,document,documents)> instead of 
+Enable gettext style. C<%quant(%1,document,documents)> instead of
 C<[quant,_1,document,documents]>
 
 Optional, Default TRUE
@@ -243,4 +243,4 @@ L<Locale::Maketext> and L<Locale::Maketext::Lexicon>
     maros [at] k-1.com
     
     L<http://www.k-1.com>
-
+Í

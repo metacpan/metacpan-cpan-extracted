@@ -1,7 +1,11 @@
 NAME
 
     Mail::AuthenticationResults - Object Oriented Authentication-Results
-    header class
+    Headers
+
+VERSION
+
+    version 1.20180113
 
 DESCRIPTION
 
@@ -20,27 +24,16 @@ DESCRIPTION
 
     It is a work in progress..
 
-SYNOPSIS
+METHODS
 
-        use Mail::AuthenticationResults;
+ new()
 
-CONSTRUCTOR
+    Return a new Mail::AuthenticationResults object
 
-    new()
+ parser()
 
-      Return a new Mail::AuthenticationResults object
-
-PUBLIC METHODS
-
-    parser( $auth_results )
-
-      Returns a new Mail::AuthenticationResults::Parser object for the
-      supplied $auth_results header
-
-DEPENDENCIES
-
-      Carp
-      Scalar::Util
+    Returns a new Mail::AuthenticationResults::Parser object for the
+    supplied $auth_results header
 
 BUGS
 
@@ -48,16 +41,14 @@ BUGS
 
     https://github.com/marcbradshaw/Mail-AuthenticationResults/issues
 
-AUTHORS
+AUTHOR
 
-    Marc Bradshaw, <marc@marcbradshaw.net>
+    Marc Bradshaw <marc@marcbradshaw.net>
 
-COPYRIGHT
+COPYRIGHT AND LICENSE
 
-    Copyright (c) 2017, Marc Bradshaw.
+    This software is copyright (c) 2018 by Marc Bradshaw.
 
-LICENCE
-
-    This library is free software; you may redistribute it and/or modify it
-    under the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

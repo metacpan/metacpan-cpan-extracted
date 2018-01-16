@@ -1,5 +1,5 @@
 package Bio::Roary::PrepareInputFiles;
-$Bio::Roary::PrepareInputFiles::VERSION = '3.11.1';
+$Bio::Roary::PrepareInputFiles::VERSION = '3.11.3';
 # ABSTRACT: Take in a mixture of FASTA and GFF input files and output FASTA proteomes only
 
 
@@ -149,7 +149,7 @@ Bio::Roary::PrepareInputFiles - Take in a mixture of FASTA and GFF input files a
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

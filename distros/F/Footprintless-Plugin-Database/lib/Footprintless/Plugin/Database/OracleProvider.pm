@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::OracleProvider;
-$Footprintless::Plugin::Database::OracleProvider::VERSION = '1.03';
+$Footprintless::Plugin::Database::OracleProvider::VERSION = '1.04';
 # ABSTRACT: A Oracle provider implementation
 # PODNAME: Footprintless::Plugin::Database::OracleProvider
 
@@ -121,7 +121,7 @@ Footprintless::Plugin::Database::OracleProvider - A Oracle provider implementati
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

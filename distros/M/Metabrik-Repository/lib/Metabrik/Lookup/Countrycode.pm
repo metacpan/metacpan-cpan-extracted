@@ -1,5 +1,5 @@
 #
-# $Id: Countrycode.pm,v d7c4ded19eca 2017/05/13 11:36:37 gomor $
+# $Id: Countrycode.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # lookup::countrycode Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: d7c4ded19eca $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable iana cc tld) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -126,7 +126,7 @@ sub update {
 
       $this =~ s/\n//g;
 
-      $self->debug && $self->log->debug("update: this[$this]");
+      $self->log->debug("update: this[$this]");
 
       # <tr>
       #  <td>
@@ -228,7 +228,7 @@ Metabrik::Lookup::Countrycode - lookup::countrycode Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

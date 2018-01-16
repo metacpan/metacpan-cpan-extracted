@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Ethereum::Swarm.
+
+0.01  Mon Jan 15 10:42:50 2018
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::Ethereum::Swarm
+

@@ -1,0 +1,38 @@
+---
+abstract: "Dropbox's password estimation logic"
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  Data::Visitor::Callback: '0'
+  Moose: '0'
+  Scalar::Util: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Password-zxcvbn
+no_index:
+  directory:
+    - t/lib
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  JSON::MaybeXS: '0'
+  List::AllUtils: '0.14'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-data-password-zxcvbn.git
+version: 1.0.2
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -41,7 +41,7 @@ SKIP: {
     }
 
     my $spewage = sub {
-        t::basic::get_spewage('arg1', 424, [], {});
+        t::basic::get_spewage('arg1', 424, "qu'ote", undef, [], {});
     }->();
 
     like(
@@ -58,7 +58,7 @@ SKIP: {
 
     like(
         $spewage,
-        qr<arg1.+424.+ARRAY.+HASH>,
+        qr<arg1.+'424'.+'qu\\'ote'.+undef.+ARRAY.+HASH>,
         'arguments list is in spew',
     );
 

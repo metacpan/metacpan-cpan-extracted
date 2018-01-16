@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+ntfs_readlink.c
+ntfs_symlink.c
+README
+Symlink.xs
+include/ioctlcmd.h
+include/ntfs_readlink.h
+include/ntfs_symlink.h
+include/ppport.h
+lib/Win32/NTFS/Symlink.pm
+t/01-junction.t
+t/02-symlink-file.t
+t/03-symlink-directory.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

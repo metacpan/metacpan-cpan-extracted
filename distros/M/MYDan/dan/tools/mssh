@@ -20,7 +20,7 @@ $MYDan::Util::OptConf::THIS = 'util';
 
  $0 -r range [--sudo sudoer] [--noop][--verbose] cmd ..
 
-    [--user user (default `logname`)] 
+    [--user user (default `id -un`)] 
 
     [--timeout seconds (default 500)] 
     [--max number (default 128)] \

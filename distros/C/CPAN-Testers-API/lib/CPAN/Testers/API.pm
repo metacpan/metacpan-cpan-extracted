@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -43,10 +43,12 @@ our $VERSION = '0.021';
 
 use Mojo::Base 'Mojolicious';
 use CPAN::Testers::API::Base;
+use Scalar::Util qw( blessed );
 use File::Share qw( dist_dir dist_file );
 use Log::Any::Adapter;
 use Alien::SwaggerUI;
 use File::Spec::Functions qw( catdir catfile );
+use JSON::MaybeXS qw( encode_json );
 
 #pod =method schema
 #pod
@@ -98,6 +100,17 @@ sub startup ( $app ) {
     $r->get( '/docs/*path' => { path => 'index.html' } )->to(
         cb => sub {
             my ( $c ) = @_;
+            # Redirect so that trailing / helps browser build URLs and
+            # we have our spec loaded. Can't make its own route because
+            # the trailing `/` is optional in the Mojolicious route
+            # since we declared a default `path`. Must pass in
+            # a Mojo::URL object to redirect_to() so that the trailing
+            # slash is maintained.
+            if ( !$c->req->url->path->trailing_slash && $c->req->url->path eq '/docs' ) {
+                $c->req->url->path->trailing_slash(1);
+                $c->req->url->query( url => '/v3' );
+                return $c->redirect_to( $c->req->url );
+            }
             my $path = catfile( Alien::SwaggerUI->root_dir, $c->stash( 'path' ) );
             my $file = Mojo::Asset::File->new( path => $path );
             $c->reply->asset( $file );
@@ -112,13 +125,22 @@ sub startup ( $app ) {
     $r->websocket( '/v3/upload/dist/:dist' )->to( 'Upload#feed' );
     $r->websocket( '/v3/upload/author/:author' )->to( 'Upload#feed' );
 
+    my $render_fast_json = sub( $c, $data ) {
+        if ( blessed $data || ( ref $data eq 'HASH' && $data->{errors} ) ) {
+            return Mojo::JSON::encode_json( $data );
+        }
+        return encode_json( $data );
+    };
+
     $app->plugin( OpenAPI => {
         url => dist_file( 'CPAN-Testers-API' => 'v1.json' ),
         allow_invalid_ref => 1,
+        renderer => $render_fast_json,
     } );
     $app->plugin( OpenAPI => {
         url => dist_file( 'CPAN-Testers-API' => 'v3.json' ),
         allow_invalid_ref => 1,
+        renderer => $render_fast_json,
     } );
     $app->helper( schema => sub { shift->app->schema } );
     $app->helper( render_error => \&render_error );
@@ -184,7 +206,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

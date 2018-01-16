@@ -35,13 +35,13 @@ static inline bool _elem_cmp (pTHX_ SV* f, SV* s) {
         case SVt_PVNV:
         case SVt_NULL:
         case SVt_PVMG:
-            if (SvOK(f) & SvOK(s)) { // both are not undefs
+            if (SvOK(f) && SvOK(s)) { // both are not undefs
                 if (SvTYPE(s) > SVt_PVMG) return false; // wrong type
                 if (SvPOK(f) | SvPOK(s)) return strEQ(SvPV_nolen(f), SvPV_nolen(s)); // both strings
                 if (SvNOK(f) | SvNOK(s)) return SvNV(f) == SvNV(s); // natural values
                 return SvIVX(f) == SvIVX(s); // compare as integers
             }
-            return !(SvOK(f) | SvOK(s));
+            return !(SvOK(f) || SvOK(s));
         case SVt_PVHV:
             return SvTYPE(s) == SVt_PVHV && hv_compare(aTHX_ (HV*)f, (HV*)s);
         case SVt_PVAV:

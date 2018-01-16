@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 DESCRIPTION
@@ -48,10 +48,9 @@ our $VERSION = '0.009';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Controller';
-use v5.24;
-use experimental qw( signatures postderef );
 
-sub _build_tenant_filter( $c, $coll ) {
+sub _build_tenant_filter {
+    my ( $c, $coll ) = @_;
     my $filter = $c->yancy->config->{collections}{$coll}{'x-stash-filter'} || {};
     #; use Data::Dumper; say "Filter: " . Dumper $filter;
     my %query = (
@@ -62,7 +61,8 @@ sub _build_tenant_filter( $c, $coll ) {
     return %query;
 }
 
-sub _fetch_authorized_item( $c, $coll, $id ) {
+sub _fetch_authorized_item {
+    my ( $c, $coll, $id ) = @_;
     my $item = $c->yancy->backend->get( $coll, $id );
     my %filter = $c->_build_tenant_filter( $coll );
     if ( grep { $item->{ $_ } ne $filter{ $_ } } keys %filter ) {
@@ -78,7 +78,8 @@ sub _fetch_authorized_item( $c, $coll, $id ) {
 #pod
 #pod =cut
 
-sub list_items( $c ) {
+sub list_items {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my %query = $c->_build_tenant_filter( $c->stash( 'collection' ) );
     my $args = $c->validation->output;
@@ -106,11 +107,12 @@ sub list_items( $c ) {
 #pod
 #pod =cut
 
-sub add_item( $c ) {
+sub add_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $coll = $c->stash( 'collection' );
     my $item = {
-        $c->yancy->filter->apply( $coll, $c->validation->param( 'newItem' ) )->%*,
+        %{ $c->yancy->filter->apply( $coll, $c->validation->param( 'newItem' ) ) },
         $c->_build_tenant_filter( $coll ),
     };
     return $c->render(
@@ -126,7 +128,8 @@ sub add_item( $c ) {
 #pod
 #pod =cut
 
-sub get_item( $c ) {
+sub get_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
@@ -152,14 +155,15 @@ sub get_item( $c ) {
 #pod
 #pod =cut
 
-sub set_item( $c ) {
+sub set_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
     my $coll = $c->stash( 'collection' );
     if ( $c->_fetch_authorized_item( $coll, $id ) ) {
         my $new_item = {
-            $c->yancy->filter->apply( $coll, $args->{ newItem } )->%*,
+            %{ $c->yancy->filter->apply( $coll, $args->{ newItem } ) },
             $c->_build_tenant_filter( $coll ),
         };
         $c->yancy->backend->set( $coll, $id, $new_item );
@@ -182,7 +186,8 @@ sub set_item( $c ) {
 #pod
 #pod =cut
 
-sub delete_item( $c ) {
+sub delete_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
@@ -210,7 +215,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 DESCRIPTION
 

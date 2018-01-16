@@ -1,5 +1,5 @@
 package Net::Async::Ping::TCP;
-$Net::Async::Ping::TCP::VERSION = '0.003000';
+$Net::Async::Ping::TCP::VERSION = '0.003001';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -90,7 +90,7 @@ Net::Async::Ping::TCP
 
 =head1 VERSION
 
-version 0.003000
+version 0.003001
 
 =head1 DESCRIPTION
 
@@ -117,13 +117,23 @@ connection to the selected port (7 by default.)
 
 Net::Async::Ping::TCP
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCardVerification;
-$WebService::Braintree::CreditCardVerification::VERSION = '0.94';
+$WebService::Braintree::CreditCardVerification::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -58,6 +58,18 @@ that token.
 sub find {
     my ($class, $token) = @_;
     $class->gateway->credit_card_verification->find($token);
+}
+
+=head2 create()
+
+This takes a hashref of parameters and returns the credit card verification
+created.
+
+=cut
+
+sub create {
+    my ($class, $params) = @_;
+    $class->gateway->credit_card_verification->create($params);
 }
 
 sub gateway {

@@ -18,14 +18,14 @@ sub mk_compclass {
 
     my @path = split (/\:\:/,$datalocalize_module);
     my $file = pop @path;
-    
+
     my $datalocalize_dir = $basedir->subdir( join '/', @path );
     my $datalocalize_file = $datalocalize_dir->file($file.'.pm');
     $datalocalize_dir->mkpath();
-    
+
     $helper->render_file('datalocalizeclass', $datalocalize_file->stringify, \%args);
     $helper->render_file('modelclass', $helper->{file}, \%args);
-    
+
     return 1;
 }
 
@@ -64,7 +64,7 @@ You need to sepecify the C<model_name> (the name of the model).
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under 
+This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

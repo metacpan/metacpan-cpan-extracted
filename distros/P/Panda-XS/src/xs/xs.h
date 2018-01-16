@@ -260,6 +260,69 @@ inline std::string_view sv2string_view (pTHX_ SV* svstr) {
     return std::string_view(ptr, len);
 }
 
+struct SvIntrPtr {
+    SvIntrPtr() : sv(NULL) {}
+
+    static const bool INCREMENT = true;
+    static const bool NONE = false;
+
+    SvIntrPtr(SV* sv, bool policy = INCREMENT) : sv(sv) {
+        if (policy == INCREMENT) {
+            SvREFCNT_inc_simple_void(sv);
+        }
+    }
+
+    SvIntrPtr(AV* sv, bool policy = INCREMENT) : SvIntrPtr(reinterpret_cast<SV*>(sv), policy) {}
+    SvIntrPtr(HV* sv, bool policy = INCREMENT) : SvIntrPtr(reinterpret_cast<SV*>(sv), policy) {}
+    SvIntrPtr(CV* sv, bool policy = INCREMENT) : SvIntrPtr(reinterpret_cast<SV*>(sv), policy) {}
+
+    SvIntrPtr(const SvIntrPtr& oth) : SvIntrPtr(oth.sv){}
+
+    SvIntrPtr(SvIntrPtr&& oth) : sv(oth.sv) {
+        oth.sv = NULL;
+    }
+
+    SvIntrPtr& operator=(const SvIntrPtr& oth) {
+        SvREFCNT_dec(sv);
+        sv = oth.sv;
+        SvREFCNT_inc_simple_void(sv);
+        return *this;
+    }
+
+    SvIntrPtr& operator=(SvIntrPtr&& oth) {
+        sv = oth.sv;
+        oth.sv = NULL;
+        return *this;
+    }
+
+    ~SvIntrPtr () {
+        SvREFCNT_dec(sv);
+    }
+
+    operator SV*() {
+        return sv;
+    }
+
+    SV* operator -> () {
+        return sv;
+    }
+
+    SV& operator* () {
+        return *sv;
+    }
+
+    template <class T>
+    T* get () const { return reinterpret_cast<T*>(sv); }
+
+private:
+    SV* sv;
+};
+
+struct SvMortalPtr : public SvIntrPtr {
+    template <typename T>
+    SvMortalPtr(T val) : SvIntrPtr(val, false) {}
+};
+
 }
 
 #include <xs/xs-private.h>

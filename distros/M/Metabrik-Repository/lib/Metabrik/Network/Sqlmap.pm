@@ -1,5 +1,5 @@
 #
-# $Id: Sqlmap.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Sqlmap.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::sqlmap Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable security scan vulnerability vuln scanner sql injection blind) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -72,7 +72,7 @@ Metabrik::Network::Sqlmap - network::sqlmap Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

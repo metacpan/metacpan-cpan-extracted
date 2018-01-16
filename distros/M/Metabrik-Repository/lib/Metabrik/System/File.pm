@@ -1,5 +1,5 @@
 #
-# $Id: File.pm,v 5051a354bfa9 2017/10/28 08:17:02 gomor $
+# $Id: File.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # system::file Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 5051a354bfa9 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable chmod chgrp cp copy move rm mv remove mkdir mkd) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -175,6 +175,18 @@ sub remove {
 }
 
 sub rename {
+   my $self = shift;
+   my ($source, $destination) = @_;
+
+   $self->brik_help_run_undef_arg('rename', $source) or return;
+   $self->brik_help_run_undef_arg('rename', $destination) or return;
+
+   my $r = File::Copy::mv($source, $destination);
+   if (! $r) {
+      return $self->log->error("rename: failed rename [$source] to [$destination]: error [$!]");
+   }
+
+   return $destination;
 }
 
 sub cat {
@@ -370,7 +382,7 @@ Metabrik::System::File - system::file Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

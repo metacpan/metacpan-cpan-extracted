@@ -3,6 +3,7 @@ lib/ActiveRecord/Simple.pm
 lib/ActiveRecord/Simple/Connect.pm
 lib/ActiveRecord/Simple/Find.pm
 lib/ActiveRecord/Simple/Utils.pm
+lib/ActiveRecord/Simple/QueryManager.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md

@@ -1,5 +1,21 @@
 Revision history for Perl extension Regexp::Parserton.
 
+0.81  2018-01-15T10:08:00
+	- Add, document and test the new find($string) function.
+
+0.80  2018-01-14T15:08:00
+	- Expand the BNF to cover all the major items in http://perldoc.perl.org/perlre.html.
+	- Add a brief tutorial to the FAQ.
+	- Running 'prove -lv t' currently passes 955 tests.
+
+0.52  2018-01-05T10:59:00
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+		This includes switching from the Artistic V 1.0 licence to the Perl licence.
+	- Clean up code.
+	- Expand bnf, so t/test.t, scripts/test.pl and scripts/synopsis.pl work with new bnf.
+	- Add pre-req Perl V 5.20.2 to avoid regexp syntax issues until I'm ready.
+
 0.51  2016-04-01T13:01:00
 	- Fix pre-reqs.
 	- Rename perl-5.21.11/regexp.t perl-5.21.11/regexp.txt so my make file 'validator' ignores it.

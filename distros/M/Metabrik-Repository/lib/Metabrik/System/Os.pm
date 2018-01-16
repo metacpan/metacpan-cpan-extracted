@@ -1,5 +1,5 @@
 #
-# $Id: Os.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Os.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # system::os brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable uname linux freebsd distribution) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -302,7 +302,7 @@ Metabrik::System::os - system::os Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

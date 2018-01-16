@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Load::XS" : "0",
             "Data::GUID" : "0",
             "DateTime" : "0",
             "DateTime::Format::Atom" : "0",
@@ -54,6 +55,8 @@
       },
       "test" : {
          "requires" : {
+            "Data::Printer" : "0",
+            "String::CamelCase" : "0",
             "Test::Deep" : "0",
             "Test::Moose" : "0",
             "Test::More" : "0.98",
@@ -75,7 +78,7 @@
          "web" : "https://github.com/singingfish/braintree_perl"
       }
    },
-   "version" : "0.94",
+   "version" : "1.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

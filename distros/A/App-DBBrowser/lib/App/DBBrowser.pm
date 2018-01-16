@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.055';
+our $VERSION = '1.056';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -626,7 +626,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 1.055
+Version 1.056
 
 =head1 DESCRIPTION
 
@@ -638,7 +638,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017 Matthäus Kiem.
+Copyright (C) 2012-2018 Matthäus Kiem.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

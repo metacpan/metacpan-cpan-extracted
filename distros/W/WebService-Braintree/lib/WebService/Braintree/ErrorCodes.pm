@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes;
-$WebService::Braintree::ErrorCodes::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -9,6 +9,7 @@ use WebService::Braintree::ErrorCodes::CreditCard;
 use WebService::Braintree::ErrorCodes::CreditCard::Options;
 use WebService::Braintree::ErrorCodes::Customer;
 use WebService::Braintree::ErrorCodes::Descriptor;
+use WebService::Braintree::ErrorCodes::Dispute;
 use WebService::Braintree::ErrorCodes::MerchantAccount;
 use WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails;
 use WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address;

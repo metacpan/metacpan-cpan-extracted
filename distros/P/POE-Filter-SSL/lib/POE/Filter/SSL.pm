@@ -8,7 +8,7 @@ use Carp qw(carp confess);
 use POE;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.38';
+$VERSION = '0.39';
 sub DOSENDBACK () { 1 }
 
 our $globalinfos;
@@ -390,11 +390,13 @@ sub new {
          if $self->{debug};
       Net::SSLeay::RSA_free($rsa);
    }
-   my $orfilter = &Net::SSLeay::VERIFY_PEER;
-   $orfilter |=   &Net::SSLeay::VERIFY_CLIENT_ONCE
+   my $orfilter = 0;
+   $orfilter |= &Net::SSLeay::VERIFY_PEER |
+                &Net::SSLeay::VERIFY_CLIENT_ONCE
       if $params->{clientcert};
-   $orfilter |=   &Net::SSLeay::VERIFY_FAIL_IF_NO_PEER_CERT
-      if $params->{blockbadclientcert};
+   $orfilter |= &Net::SSLeay::VERIFY_FAIL_IF_NO_PEER_CERT
+      if $params->{clientcert} &&
+         $params->{blockbadclientcert};
    # TODO:XXX:FIXME: Errorchecking!
    #Net::SSLeay::CTX_set_verify($self->{context}, $orfilter, \&VERIFY);
    Net::SSLeay::set_verify($self->{ssl}, $orfilter, \&VERIFY);
@@ -696,7 +698,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 DESCRIPTION
 
@@ -844,7 +846,7 @@ By default I<POE::Filter::SSL> acts as a SSL server. To use it in client mode yo
 =item Advanced Example
 
 This example is an IMAP-Relay which forwards the connections to a IMAP server
-by username. It allows one the uncrypted transfer on port 143, with the option
+by username. It allows one the unencrypted transfer on port 143, with the option
 of SSL on the established connection (STARTTLS). On port 993 it allows one to do
 direct SSL.
 
@@ -1153,7 +1155,7 @@ B<WARNING:> If the client provides an untrusted or no client certificate, the co
 
 =item sni
 
-Allows to set the SNI hostname indication in first packet of handshake. See https://de.wikipedia.org/wiki/Server_Name_Indication
+Allows one to set the SNI hostname indication in first packet of handshake. See https://de.wikipedia.org/wiki/Server_Name_Indication
 
 =item tls
 

@@ -16,8 +16,7 @@ use WebService::Braintree::Nonce;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree;
 use WebService::Braintree::ErrorCodes::Descriptor;
-
-require 't/lib/WebService/Braintree/Nonce.pm';
+use WebService::Braintree::SandboxValues::Nonce;
 
 WebService::Braintree::TestHelper->verify_sandbox
     || BAIL_OUT 'Sandbox is not prepared properly. Please read xt/README.';
@@ -26,11 +25,9 @@ my $customer = WebService::Braintree::Customer->create({
     first_name => "Fred",
     last_name => "Fredson",
 });
-my $card = WebService::Braintree::CreditCard->create({
-    number => "5431111111111111",
-    expiration_date => "05/12",
+my $card = WebService::Braintree::CreditCard->create(credit_card({
     customer_id => $customer->customer->id,
-});
+}));
 
 # TODO Add a BAIL_OUT if the above fail for any reason
 
@@ -39,7 +36,8 @@ subtest "create without trial" => sub {
         payment_method_token => $card->credit_card->token,
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
     });
-    ok $result->is_success;
+    validate_result($result) or return;
+
     like $result->subscription->id, qr/^\w{6}$/;
     is $result->subscription->status, 'Active';
     is $result->subscription->plan_id, WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID;
@@ -69,8 +67,6 @@ subtest "create without trial" => sub {
 };
 
 subtest "create with descriptors" => sub {
-    plan skip_all => "descriptors don't work";
-
     my $result = WebService::Braintree::Subscription->create({
         payment_method_token => $card->credit_card->token,
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
@@ -80,7 +76,8 @@ subtest "create with descriptors" => sub {
             url => "ebay.com",
         },
     });
-    ok $result->is_success;
+    validate_result($result) or return;
+
     my $transaction = $result->subscription->transactions->[0];
     is $transaction->descriptor->name, "abc*def";
     is $transaction->descriptor->phone, "1234567890";
@@ -88,8 +85,6 @@ subtest "create with descriptors" => sub {
 };
 
 subtest "create with descriptor validations" => sub {
-    plan skip_all => "descriptors don't work";
-
     my $result = WebService::Braintree::Subscription->create({
         payment_method_token => $card->credit_card->token,
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
@@ -99,7 +94,8 @@ subtest "create with descriptor validations" => sub {
             url => "12345678901234",
         },
     });
-    not_ok $result->is_success;
+    invalidate_result($result) or return;
+
     is($result->errors->for("subscription")->for("descriptor")->on("name")->[0]->code, WebService::Braintree::ErrorCodes::Descriptor::NameFormatIsInvalid);
     is($result->errors->for("subscription")->for("descriptor")->on("phone")->[0]->code, WebService::Braintree::ErrorCodes::Descriptor::PhoneFormatIsInvalid);
     is($result->errors->for("subscription")->for("descriptor")->on("url")->[0]->code, WebService::Braintree::ErrorCodes::Descriptor::UrlFormatIsInvalid);
@@ -123,8 +119,7 @@ subtest "create with trial, add-ons, discounts" => sub {
             do_not_inherit_add_ons_or_discounts => 'true',
         },
     });
-
-    ok $result->is_success;
+    validate_result($result) or return;
 
     is $result->subscription->add_ons->[0]->id, "increase_30";
     is $result->subscription->add_ons->[0]->amount, '30.00';
@@ -142,21 +137,21 @@ subtest "create with trial, add-ons, discounts" => sub {
 };
 
 subtest "create with payment method nonce" => sub {
-    my $nonce = WebService::Braintree::TestHelper::get_nonce_for_new_card("4111111111111111", $customer->customer->id);
+    my $cc_number = cc_number();
+    my $nonce = WebService::Braintree::TestHelper::get_nonce_for_new_card($cc_number, $customer->customer->id);
     my $subscription_params = {
         payment_method_nonce => $nonce,
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
     };
     my $result = WebService::Braintree::Subscription->create($subscription_params);
-
-    ok $result->is_success;
+    validate_result($result) or return;
 
     my $credit_card = WebService::Braintree::CreditCard->find($result->subscription->payment_method_token);
-    is $credit_card->masked_number, "411111******1111";
+    is $credit_card->masked_number, cc_masked($cc_number);
 };
 
 subtest "create with a paypal account" => sub {
-    my $nonce = WebService::Braintree::Nonce->paypal_future_payment;
+    my $nonce = WebService::Braintree::SandboxValues::Nonce->PAYPAL_FUTURE_PAYMENT;
     my $customer_result = WebService::Braintree::Customer->create({
         payment_method_nonce => $nonce
     });
@@ -166,8 +161,8 @@ subtest "create with a paypal account" => sub {
         payment_method_token => $customer->paypal_accounts->[0]->token,
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
     });
+    validate_result($subscription_result) or return;
 
-    ok $subscription_result->is_success;
     my $subscription = $subscription_result->subscription;
     ok($subscription->payment_method_token eq $customer->paypal_accounts->[0]->token);
 };
@@ -183,8 +178,8 @@ subtest "retry charge" => sub {
     make_subscription_past_due($subscription->id);
 
     my $retry = WebService::Braintree::Subscription->retry_charge($subscription->id);
+    validate_result($retry) or return;
 
-    ok $retry->is_success;
     is $retry->transaction->amount, $subscription->price;
 };
 
@@ -194,8 +189,8 @@ subtest "if transaction fails, no subscription gets returned" => sub {
         plan_id => WebService::Braintree::TestHelper->TRIALLESS_PLAN_ID,
         price => "2000.00",
     });
+    invalidate_result($result) or return;
 
-    not_ok $result->is_success;
     is $result->message, "Do Not Honor";
 };
 
@@ -217,14 +212,17 @@ subtest "With a specific subscription" => sub {
     };
 
     subtest "update" => sub {
-        my $result = WebService::Braintree::Subscription->update($create->subscription->id, {price => "50.00"});
+        my $amount = amount(40, 60);
+        my $result = WebService::Braintree::Subscription->update(
+            $create->subscription->id, {price => $amount},
+        );
+        validate_result($result) or return;
 
-        ok $result->is_success;
-        is $result->subscription->price, "50.00";
+        cmp_ok $result->subscription->price, '==', $amount;
 
         should_throw("NotFoundError", sub {
             WebService::Braintree::Subscription->update("asdlkfj", {
-                price => "50.00",
+                price => $amount,
             });
         });
     };
@@ -234,8 +232,7 @@ subtest "With a specific subscription" => sub {
         my $subscription_params = {payment_method_nonce => $nonce};
 
         my $result = WebService::Braintree::Subscription->update($create->subscription->id, $subscription_params);
-
-        ok $result->is_success;
+        validate_result($result) or return;
 
         my $credit_card = WebService::Braintree::CreditCard->find($result->subscription->payment_method_token);
         is $credit_card->masked_number, "424242******4242";
@@ -243,10 +240,11 @@ subtest "With a specific subscription" => sub {
 
     subtest "cancel" => sub {
         my $result = WebService::Braintree::Subscription->cancel($create->subscription->id);
-        ok $result->is_success;
+        validate_result($result) or return;
 
         $result = WebService::Braintree::Subscription->cancel($create->subscription->id);
-        not_ok $result->is_success;
+        invalidate_result($result) or return;
+
         is $result->message, "Subscription has already been canceled."
     };
 };

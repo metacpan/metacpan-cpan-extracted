@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+use v5.10;
 use strict;
 use warnings;
 
@@ -14,28 +15,15 @@ my($parser)	= Regexp::Parsertron -> new(verbose => 1);
 
 my($result) = $parser -> parse(re => $re);
 
-print "Calling add(text => '|C++', uid => 6)\n";
+say "Calling append(text => '|C++', uid => 6)";
 
-$parser -> add(text => '|C++', uid => 6);
-$parser -> raw_tree;
-$parser -> cooked_tree;
+$parser -> append(text => '|C++', uid => 6);
+$parser -> print_raw_tree;
+$parser -> print_cooked_tree;
 
-my($as_string)	= $parser -> as_string;
-my($as_re)		= $parser -> as_re;
+my($as_string) = $parser -> as_string;
 
-print "Original:  $re. Result: $result. (0 is success)\n";
-print "as_string: $as_string\n";
-print "as_re:     $as_re\n";
-print 'Perl error count:  ', $parser -> perl_error_count, "\n";
-print 'Marpa error count: ', $parser -> marpa_error_count, "\n";
+say "Original:  $re. Result: $result. (0 is success)";
+say "as_string: $as_string";
 
-my($target) = 'C++';
-
-if ($target =~ $as_re)
-{
-	print "Matches $target (without using \\Q...\\E)\n";
-}
-else
-{
-	print "Doesn't match $target\n";
-}
+say 'Warning: ', $parser -> warning_str;

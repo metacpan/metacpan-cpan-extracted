@@ -1,0 +1,36 @@
+NAME
+    Perinci::Sub::XCompletionBundle::CryptoCurrency - Completion routines
+    related to cryptocurrency
+
+VERSION
+    This document describes version 0.001 of
+    Perinci::Sub::XCompletionBundle::CryptoCurrency (from Perl distribution
+    Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-01-12.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-XCompletionBundle-CryptoCurren
+    cy>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-CryptoC
+    urrency>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompleti
+    onBundle-CryptoCurrency>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

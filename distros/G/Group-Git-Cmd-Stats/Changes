@@ -1,5 +1,16 @@
 Revision history for Group-Git-Cmd-Stats
 
+0.0.3   2018-01-14
+        Updating for release of version 0.0.3
+        Added latest perl version (Ivan Wills)
+        Updating license date (Ivan Wills)
+        Added TODO to manifest (Ivan Wills)
+        Spelling (Ivan Wills)
+        Working on stats quality and performance (Ivan Wills)
+        Updated dates (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Removed old unsupported perl version from travis config (Ivan Wills)
+
 0.0.2   2016-05-08
         Updating for release of version 0.0.2
         Added ability to give stats for repositories them selves (Ivan Wills)

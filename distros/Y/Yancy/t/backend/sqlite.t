@@ -15,8 +15,7 @@ C<t/lib/Local/Test.pm>, L<Mojo::SQLite>, L<Yancy>
 
 =cut
 
-use v5.24;
-use experimental qw( signatures postderef );
+use Mojo::Base '-strict';
 use Test::More;
 use FindBin qw( $Bin );
 use File::Spec::Functions qw( catdir );
@@ -77,12 +76,20 @@ subtest 'new' => sub {
     isa_ok $be, 'Yancy::Backend::Sqlite';
     isa_ok $be->sqlite, 'Mojo::SQLite';
     is_deeply $be->collections, $collections;
+
+    subtest 'new with connection' => sub {
+        $be = Yancy::Backend::Sqlite->new( $sqlite, $collections );
+        isa_ok $be, 'Yancy::Backend::Sqlite';
+        isa_ok $be->sqlite, 'Mojo::SQLite';
+        is_deeply $be->collections, $collections;
+    };
 };
 
 # Override sqlite attribute with reference to instantiated db object from above
 $be->sqlite( $sqlite );
 
-sub insert_item( $coll, %item ) {
+sub insert_item {
+    my ( $coll, %item ) = @_;
     my $id_field = $collections->{ $coll }{ 'x-id-field' } || 'id';
     my $inserted_id = $sqlite->db->insert( $coll => \%item )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume ID is stored

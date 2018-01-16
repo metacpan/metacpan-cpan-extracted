@@ -1,5 +1,5 @@
 #
-# $Id: Number.pm,v 8b4aa80c4281 2017/01/10 15:06:17 gomor $
+# $Id: Number.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # format::number Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 8b4aa80c4281 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -92,7 +92,7 @@ Metabrik::Format::Number - format::number Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

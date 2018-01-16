@@ -1,5 +1,5 @@
 package Bio::Roary::Output::NumberOfGroups;
-$Bio::Roary::Output::NumberOfGroups::VERSION = '3.11.1';
+$Bio::Roary::Output::NumberOfGroups::VERSION = '3.11.3';
 # ABSTRACT: Create raw output files of group counts for turning into plots
 
 
@@ -120,7 +120,7 @@ Bio::Roary::Output::NumberOfGroups - Create raw output files of group counts for
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

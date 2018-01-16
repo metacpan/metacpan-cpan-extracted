@@ -1,5 +1,5 @@
 package WebService::Braintree::Customer;
-$WebService::Braintree::Customer::VERSION = '0.94';
+$WebService::Braintree::Customer::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -64,7 +64,7 @@ sub delete {
 =head2 search()
 
 This takes a subref which is used to set the search parameters and returns a
-customer object.
+collection of Customer objects.
 
 Please see L<Searching|WebService::Braintree/SEARCHING> for more information on
 the subref and how it works.
@@ -85,6 +85,47 @@ This returns all the customers.
 sub all {
     my ($class) = @_;
     $class->gateway->customer->all;
+}
+
+=head2 transactions()
+
+This takes a customer_id. It returns all the transactions for that customer.
+
+=cut
+
+sub transactions {
+    my ($class, $id) = @_;
+    $class->gateway->customer->transactions($id);
+}
+
+=head2 credit()
+
+This takes a customer_id and a hashref of parameters. It will create a credit
+transaction for the corresponding customer and return it;
+
+=cut
+
+sub credit {
+    my ($class, $id, $params) = @_;
+    WebService::Braintree::Transaction->credit({
+        %{$params // {}},
+        customer_id => $id,
+    });
+}
+
+=head2 sale()
+
+This takes a customer_id and a hashref of parameters. It will create a sale
+transaction for the corresponding customer and return it;
+
+=cut
+
+sub sale {
+    my ($class, $id, $params) = @_;
+    WebService::Braintree::Transaction->sale({
+        %{$params // {}},
+        customer_id => $id,
+    });
 }
 
 sub gateway {

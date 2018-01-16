@@ -60,22 +60,22 @@
    "provides" : {
       "Test::RunValgrind" : {
          "file" : "lib/Test/RunValgrind.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/test-runvalgrind/issues"
+         "web" : "https://github.com/shlomif/perl-Test-RunValgrind/issues"
       },
       "homepage" : "http://metacpan.org/release/Test-RunValgrind",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shlomif/perl-Test-RunValgrind.git",
+         "url" : "git://github.com/shlomif/perl-Test-RunValgrind.git",
          "web" : "https://github.com/shlomif/perl-Test-RunValgrind"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

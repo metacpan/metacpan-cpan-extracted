@@ -68,7 +68,7 @@
    "provides" : {
       "App::lsnic" : {
          "file" : "lib/App/lsnic.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/athreef/App-lsnic"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -352,7 +352,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.003",
+                  "tag" : "v0.005",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

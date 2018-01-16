@@ -275,9 +275,19 @@ sub __spew {
     my $spew = $self->to_string();
 
     if ( rindex($spew, $/) != (length($spew) - length($/)) ) {
-        my $args;
+        my ($args, @printable);
         $spew .= $/ . join( q<>, map {
-            $args = join(', ', @{ $_->[3] } );
+
+            #Oof. In order to avoid warn()ing on undefined values
+            #(and to distinguish '' from undef) we now quote scalars.
+            @printable = map {
+                ref() ? $_ : !defined() ? 'undef' : do {
+                    s<'><\\'>g;
+                    "'$_'"
+                }
+            } @{ $_->[3] };
+
+            $args = join(', ', @printable );
             "\t==> $_->[0]($args) (called in $_->[1] at line $_->[2])$/"
         } @{ $CALL_STACK{$self->_get_strval()} } );
     }

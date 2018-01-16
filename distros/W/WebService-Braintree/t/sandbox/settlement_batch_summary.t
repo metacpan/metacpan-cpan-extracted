@@ -18,55 +18,46 @@ use WebService::Braintree::TestHelper qw(sandbox);
 subtest "returns an empty collection if there is no data" => sub {
     my $settlement_date = '2011-01-01';
     my $result = WebService::Braintree::SettlementBatchSummary->generate($settlement_date);
+    validate_result($result) or return;
 
-    is($result->is_success, 1);
     is(scalar @{$result->settlement_batch_summary->records}, 0);
 };
 
 subtest "returns an error if the result cannot be parsed" => sub {
     my $settlement_date = 'NOT A DATE';
     my $result = WebService::Braintree::SettlementBatchSummary->generate($settlement_date);
+    invalidate_result($result) or return;
 
-    ok(!$result->is_success);
     is($result->message, 'Settlement Date is invalid');
 };
 
 subtest "returns transactions settled on a given day" => sub {
-    plan skip_all => "Unclear why this isn't working anymore.";
-
     my $transaction_params = {
-        amount => "54.12",
-        credit_card => {
-            number => "5431111111111111",
-            expiration_date => "05/12",
-        },
+        amount => amount(40, 60),
+        credit_card => credit_card({
+            number => cc_number('mastercard'),
+        }),
     };
 
-    my $settlement_date = WebService::Braintree::TestHelper::now_in_eastern;
-    my $transaction = create_settled_transaction($transaction_params);
+    my $txn_result = create_settled_transaction($transaction_params);
+    my $settlement_date = (split('_', $txn_result->transaction->settlement_batch_id))[0];
 
     my $result = WebService::Braintree::SettlementBatchSummary->generate($settlement_date);
-
-    is($result->is_success, 1);
+    validate_result($result) or return;
 
     my @mastercard_records = grep {
         $_->{card_type} eq 'MasterCard'
     } @{$result->settlement_batch_summary->records};
 
-    ok($mastercard_records[0]->{count} >= 1);
-    ok($mastercard_records[0]->{amount_settled} >= $transaction_params->{amount});
+    ok grep { $_->count >= 1 } @mastercard_records;
+    ok grep { $_->amount_settled >= $txn_result->transaction->amount } @mastercard_records;
 };
 
 # This looks like it depends on other tests being successful?
 subtest "returns transactions grouped by custom field" => sub {
-    plan skip_all => "Still not working, even with custom field added";
-
     my $transaction_params = {
-        amount => "50.00",
-        credit_card => {
-            number => "5431111111111111",
-            expiration_date => "05/12"
-        },
+        amount => amount(40, 60),
+        credit_card => credit_card(),
         custom_fields => {
             store_me => "custom_value",
         },
@@ -76,8 +67,7 @@ subtest "returns transactions grouped by custom field" => sub {
     my $transaction = create_settled_transaction($transaction_params);
 
     my $result = WebService::Braintree::SettlementBatchSummary->generate($settlement_date, "store_me");
-
-    is($result->is_success, 1);
+    validate_result($result) or return;
 
     my @mastercard_records = grep {
         $_->{store_me} eq 'custom_value' && $_->{card_type} eq 'MasterCard'

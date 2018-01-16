@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -12,8 +12,10 @@ our $VERSION = '0.009';
 #pod
 #pod     ## With custom auth routine
 #pod     use Mojo::Base 'Mojolicious';
-#pod     sub startup( $app ) {
-#pod         my $auth_route = $app->routes->under( '/yancy', sub( $c ) {
+#pod     sub startup {
+#pod         my ( $app ) = @_;
+#pod         my $auth_route = $app->routes->under( '/yancy', sub {
+#pod             my ( $c ) = @_;
 #pod             # ... Validate user
 #pod             return 1;
 #pod         } );
@@ -39,6 +41,17 @@ our $VERSION = '0.009';
 #pod Additional configuration keys accepted by the plugin are:
 #pod
 #pod =over
+#pod
+#pod =item backend
+#pod
+#pod In addition to specifying the backend as a single URL (see L<"Database
+#pod Backend"|Yancy/Database Backend>), you can specify it as a hashref of
+#pod C<< class => $db >>. This allows you to share database connections.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     use Mojo::Pg;
+#pod     helper pg => sub { state $pg = Mojo::Pg->new( 'postgres:///myapp' ) };
+#pod     plugin Yancy => { backend => { Pg => app->pg } };
 #pod
 #pod =item route
 #pod
@@ -183,7 +196,7 @@ our $VERSION = '0.009';
 #pod
 #pod =head2 yancy.filter.add
 #pod
-#pod     my $filter_sub = sub( $field_name, $field_value, $field_conf ) { ... }
+#pod     my $filter_sub = sub { my ( $field_name, $field_value, $field_conf ) = @_; ... }
 #pod     $c->yancy->filter->add( $name => $filter_sub );
 #pod
 #pod Create a new filter. C<$name> is the name of the filter to give in the
@@ -204,7 +217,8 @@ our $VERSION = '0.009';
 #pod digest:
 #pod
 #pod     use Digest;
-#pod     my $digest = sub( $field_name, $field_value, $field_conf ) {
+#pod     my $digest = sub {
+#pod         my ( $field_name, $field_value, $field_conf ) = @_;
 #pod         my $type = $field_conf->{ 'x-digest' }{ type };
 #pod         Digest->new( $type )->add( $field_value )->b64digest;
 #pod     };
@@ -280,12 +294,10 @@ our $VERSION = '0.009';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
-use v5.24;
-use experimental qw( signatures postderef );
+use Yancy;
 use Mojo::JSON qw( true false );
-use File::Share qw( dist_dir );
 use Mojo::File qw( path );
-use Module::Runtime qw( use_module );
+use Mojo::Loader qw( load_class );
 use Sys::Hostname qw( hostname );
 
 #pod =method register
@@ -294,14 +306,15 @@ use Sys::Hostname qw( hostname );
 #pod
 #pod =cut
 
-sub register( $self, $app, $config ) {
+sub register {
+    my ( $self, $app, $config ) = @_;
     my $route = $config->{route} // $app->routes->any( '/yancy' );
     $config->{controller_class} //= 'Yancy';
 
     # Resources and templates
-    my $share = path( dist_dir( 'Yancy' ) );
+    my $share = path( __FILE__ )->sibling( 'Yancy' )->child( 'resources' );
     push @{ $app->static->paths }, $share->child( 'public' )->to_string;
-    push @{ $app->renderer->paths}, $share->child( 'templates' )->to_string;
+    push @{ $app->renderer->paths }, $share->child( 'templates' )->to_string;
     push @{$app->routes->namespaces}, 'Yancy::Controller';
 
     # Helpers
@@ -310,13 +323,23 @@ sub register( $self, $app, $config ) {
     $app->helper( 'yancy.backend' => sub {
         state $backend;
         if ( !$backend ) {
-            my ( $type ) = $config->{backend} =~ m{^([^:]+)};
+            my ( $type, $arg );
+            if ( !ref $config->{backend} ) {
+                ( $type ) = $config->{backend} =~ m{^([^:]+)};
+                $arg = $config->{backend};
+            }
+            else {
+                ( $type, $arg ) = %{ $config->{backend} };
+            }
             my $class = 'Yancy::Backend::' . ucfirst $type;
-            use_module( $class );
-            $backend = $class->new( $config->{backend}, $config->{collections} );
+            if ( my $e = load_class( $class ) ) {
+                die ref $e ? "Could not load class $class: $e" : "Could not find class $class";
+            }
+            $backend = $class->new( $arg, $config->{collections} );
         }
         return $backend;
     } );
+
     $app->helper( 'yancy.list' => sub {
         my ( $c, @args ) = @_;
         return @{ $c->yancy->backend->list( @args )->{rows} };
@@ -328,21 +351,24 @@ sub register( $self, $app, $config ) {
         } );
     }
     my %validator;
-    $app->helper( 'yancy.validate' => sub( $c, $coll, $item ) {
+    $app->helper( 'yancy.validate' => sub {
+        my ( $c, $coll, $item ) = @_;
         my $v = $validator{ $coll } ||= JSON::Validator->new->schema(
             $config->{collections}{ $coll }
         );
         my @errors = $v->validate( $item );
         return @errors;
     } );
-    $app->helper( 'yancy.set' => sub( $c, $coll, $id, $item ) {
+    $app->helper( 'yancy.set' => sub {
+        my ( $c, $coll, $id, $item ) = @_;
         if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
             die \@errors;
         }
         $item = $c->yancy->filter->apply( $coll, $item );
         return $c->yancy->backend->set( $coll, $id, $item );
     } );
-    $app->helper( 'yancy.create' => sub( $c, $coll, $item ) {
+    $app->helper( 'yancy.create' => sub {
+        my ( $c, $coll, $item ) = @_;
         if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
             die \@errors;
         }
@@ -351,14 +377,16 @@ sub register( $self, $app, $config ) {
     } );
 
     $config->{filters} ||= {};
-    $app->helper( 'yancy.filter.add' => sub( $c, $name, $sub ) {
+    $app->helper( 'yancy.filter.add' => sub {
+        my ( $c, $name, $sub ) = @_;
         $config->{filters}{ $name } = $sub;
     } );
-    $app->helper( 'yancy.filter.apply' => sub( $c, $coll_name, $item ) {
+    $app->helper( 'yancy.filter.apply' => sub {
+        my ( $c, $coll_name, $item ) = @_;
         my $coll = $config->{collections}{$coll_name};
-        for my $key ( keys $coll->{properties}->%* ) {
+        for my $key ( keys %{ $coll->{properties} } ) {
             next unless $coll->{properties}{ $key }{ 'x-filter' };
-            for my $filter ( $coll->{properties}{ $key }{ 'x-filter' }->@* ) {
+            for my $filter ( @{ $coll->{properties}{ $key }{ 'x-filter' } } ) {
                 die "Unknown filter: $filter (collection: $coll_name, field: $key)"
                     unless $config->{filters}{ $filter };
                 $item->{ $key } = $config->{filters}{ $filter }->(
@@ -384,10 +412,10 @@ sub register( $self, $app, $config ) {
             my $coll = $config->{collections}{ $c } ||= {};
             my $conf_props = $coll->{properties};
             my $schema_props = delete $schema->{ $c }{properties};
-            for my $k ( keys $schema->{ $c }->%* ) {
+            for my $k ( keys %{ $schema->{ $c } } ) {
                 $coll->{ $k } ||= $schema->{ $c }{ $k };
             }
-            for my $p ( keys $schema_props->%* ) {
+            for my $p ( keys %{ $schema_props } ) {
                 my $conf_prop = $conf_props->{ $p } ||= {};
                 my $schema_prop = $schema_props->{ $p };
                 for my $k ( keys %$schema_prop ) {
@@ -408,9 +436,10 @@ sub register( $self, $app, $config ) {
 
 }
 
-sub _build_openapi_spec( $self, $config ) {
+sub _build_openapi_spec {
+    my ( $self, $config ) = @_;
     my ( %definitions, %paths );
-    for my $name ( keys $config->{collections}->%* ) {
+    for my $name ( keys %{ $config->{collections} } ) {
         # Set some defaults so users don't have to type as much
         my $collection = $config->{collections}{ $name };
         $collection->{ type } //= 'object';
@@ -646,7 +675,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -658,8 +687,10 @@ version 0.009
 
     ## With custom auth routine
     use Mojo::Base 'Mojolicious';
-    sub startup( $app ) {
-        my $auth_route = $app->routes->under( '/yancy', sub( $c ) {
+    sub startup {
+        my ( $app ) = @_;
+        my $auth_route = $app->routes->under( '/yancy', sub {
+            my ( $c ) = @_;
             # ... Validate user
             return 1;
         } );
@@ -691,6 +722,17 @@ L<Yancy/CONFIGURATION>.
 Additional configuration keys accepted by the plugin are:
 
 =over
+
+=item backend
+
+In addition to specifying the backend as a single URL (see L<"Database
+Backend"|Yancy/Database Backend>), you can specify it as a hashref of
+C<< class => $db >>. This allows you to share database connections.
+
+    use Mojolicious::Lite;
+    use Mojo::Pg;
+    helper pg => sub { state $pg = Mojo::Pg->new( 'postgres:///myapp' ) };
+    plugin Yancy => { backend => { Pg => app->pg } };
 
 =item route
 
@@ -835,7 +877,7 @@ objects. See L<JSON::Validator/validate> for more details.
 
 =head2 yancy.filter.add
 
-    my $filter_sub = sub( $field_name, $field_value, $field_conf ) { ... }
+    my $filter_sub = sub { my ( $field_name, $field_value, $field_conf ) = @_; ... }
     $c->yancy->filter->add( $name => $filter_sub );
 
 Create a new filter. C<$name> is the name of the filter to give in the
@@ -856,7 +898,8 @@ For example, here is a filter that will run a password through a one-way hash
 digest:
 
     use Digest;
-    my $digest = sub( $field_name, $field_value, $field_conf ) {
+    my $digest = sub {
+        my ( $field_name, $field_value, $field_conf ) = @_;
         my $type = $field_conf->{ 'x-digest' }{ type };
         Digest->new( $type )->add( $field_value )->b64digest;
     };

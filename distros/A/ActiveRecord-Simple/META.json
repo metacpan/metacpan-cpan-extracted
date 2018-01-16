@@ -47,6 +47,6 @@
          "url" : "https://github.com/shootnix/activerecord-simple"
       }
    },
-   "version" : "1.04",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

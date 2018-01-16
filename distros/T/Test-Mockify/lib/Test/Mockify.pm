@@ -48,7 +48,7 @@ use experimental 'switch';
 
 use strict;
 
-our $VERSION = '1.0';
+our $VERSION = '1.2';
 
 sub new {
     my $class = shift;
@@ -57,8 +57,8 @@ sub new {
     my $self = bless {}, $class;
 
     LoadPackage( $FakeModulePath );
-    my $FakeClass = $FakeModulePath->new( @{$aFakeParams} );
-    $self->_mockedModulPath($FakeModulePath);
+    my $FakeClass = $FakeModulePath->can('new') ? $FakeModulePath->new( @{$aFakeParams} ) : $FakeModulePath;
+    $self->_mockedModulePath($FakeModulePath);
     $self->_mockedSelf(Test::MockObject::Extends->new( $FakeClass ));
     $self->_initMockedModule();
 
@@ -66,7 +66,7 @@ sub new {
 
 }
 #----------------------------------------------------------------------------------------
-sub _mockedModulPath {
+sub _mockedModulePath {
     my $self = shift;
     my ($ModulPath) = @_;
     return $self->{'MockedModulePath'} unless ($ModulPath);
@@ -199,7 +199,7 @@ It is not possible to mix C<whenAny> and C<when> for the same method.
 sub spy {
     my $self = shift;
     my ($MethodName) = @_;
-    my $PointerOriginalMethod = \&{$self->_mockedModulPath().'::'.$MethodName};
+    my $PointerOriginalMethod = \&{$self->_mockedModulePath().'::'.$MethodName};
     #In order to have the current object available in the parameter list, it has to be injected here.
     return $self->_addMockWithMethodSpy($MethodName, sub {
         return $PointerOriginalMethod->($self->_mockedSelf(), @_);
@@ -295,7 +295,7 @@ sub _addMock {
     my $self = shift;
     my ( $MethodName, $Method) = @_;
 
-    ExistsMethod( $self->_mockedModulPath(), $MethodName );
+    ExistsMethod( $self->_mockedModulePath(), $MethodName );
     $self->_mockedSelf()->{'__MethodCallCounter'}->addMethod( $MethodName );
     if(not $self->{'MethodStore'}{$MethodName}){
         $self->{'MethodStore'}{$MethodName} //= $Method;
@@ -358,7 +358,7 @@ sub addMockWithReturnValueAndParameterCheck {
     }
     if ( not IsArrayReference( $aParameterTypes ) ){
         Error( 'ParameterTypesNotProvided', {
-            'Method' => $self->_mockedModulPath()."->$MethodName",
+            'Method' => $self->_mockedModulePath()."->$MethodName",
             'ParameterList' => $aParameterTypes,
         } );
     }

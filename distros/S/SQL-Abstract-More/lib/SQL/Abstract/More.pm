@@ -15,10 +15,10 @@ use Carp;
 # import the "puke" function from SQL::Abstract (kind of "die")
 BEGIN {*puke = \&SQL::Abstract::puke;}
 
-# remove all previously defined functions
+# remove all previously defined or imported functions
 use namespace::clean;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 
 #----------------------------------------------------------------------
@@ -31,12 +31,15 @@ my %meth_for = (
   CODE   => '&{}',
  );
 
-sub does ($$) { # after namespace::clean because also used from DBIx::DataModel
+sub does ($$) {
   my ($data, $type) = @_;
   my $reft = reftype $data;
   return defined $reft && $reft eq $type
       || blessed $data && overload::Method($data, $meth_for{$type});
 }
+# Note : this is a utility function, not a method; but it is declared
+# _after_ namespace::clean so that it can remain visible by external
+# modules. In particular, DBIx::DataModel imports this function.
 
 
 #----------------------------------------------------------------------
@@ -93,7 +96,6 @@ my %params_for_new = (
   join_syntax          => {type => HASHREF,          default  =>
                                                         \%common_join_syntax},
   join_assoc_right     => {type => BOOLEAN,          default  => 0},
-  join_with_USING      => {type => BOOLEAN,          default  => 0},
   max_members_IN       => {type => SCALAR,           optional => 1},
   multicols_sep        => {type => SCALAR|SCALARREF, optional => 1},
   has_multicols_in_SQL => {type => BOOLEAN,          optional => 1},
@@ -684,27 +686,33 @@ sub _parse_join_spec {
 
   # accumulate conditions as pairs ($left => \"$op $right")
   my @conditions;
-  foreach my $cond (split /,/, $cond_list) {
+  my @using;
+  foreach my $cond (split /,\s*/, $cond_list) {
     # parse the condition (left and right operands + comparison operator)
-    my ($left, $cmp, $right) = split /([<>=!^]{1,2})/, $cond
-      or croak "can't parse join condition: $cond";
+    my ($left, $cmp, $right) = split /([<>=!^]{1,2})/, $cond;
+    if ($cmp && $right) {
+      # if operands are not qualified by table/alias name, add sprintf hooks
+      $left  = '%1$s.' . $left   unless $left  =~ /\./;
+      $right = '%2$s.' . $right  unless $right =~ /\./ or $right eq $placeholder;
 
-    # if operands are not qualified by table/alias name, add sprintf hooks
-    $left  = '%1$s.' . $left   unless $left  =~ /\./;
-    $right = '%2$s.' . $right  unless $right =~ /\./ or $right eq $placeholder;
-
-    # add this pair into the list; right operand is either a bind value
-    # or an identifier within the right table
-    $right = $right eq $placeholder ? shift @constants : {-ident => $right};
-    push @conditions, $left, {$cmp => $right};
+      # add this pair into the list; right operand is either a bind value
+      # or an identifier within the right table
+      $right = $right eq $placeholder ? shift @constants : {-ident => $right};
+      push @conditions, $left, {$cmp => $right};
+    }
+    elsif ($cond =~ /^\w+$/) {
+      push @using, $cond;
+    }
+    else {puke "can't parse join condition: $cond"}
   }
 
-  # list becomes an arrayref or hashref (for SQLA->where())
-  my $join_on = $bracket eq '[' ? [@conditions] : {@conditions};
+  # build join hashref
+  my $join_hash = {operator  => $op};
+  $join_hash->{using} = \@using                        if @using;
+  $join_hash->{condition}
+    = $bracket eq '[' ? [@conditions] : {@conditions}  if @conditions;
 
-  # return a new join spec
-  return {operator  => $op,
-          condition => $join_on};
+  return $join_hash;
 }
 
 sub _single_join {
@@ -714,21 +722,32 @@ sub _single_join {
   @_ = reverse @_ if $self->{join_assoc_right};
   my ($left, $join_spec, $right) = @_;
 
-  # compute the "ON" clause
-  my ($sql, @bind) = $self->where($join_spec->{condition});
-  $sql =~ s/^\s*WHERE\s+//;
-
   # syntax for assembling all elements
   my $syntax = $self->{join_syntax}{$join_spec->{operator}};
 
-  # $sql may _intentionally_ omit %.. parameters, so disable warnings
+  my ($sql, @bind);
+
   { no if $] ge '5.022000', warnings => 'redundant';
+    # because sprintf instructions  may _intentionally_ omit %.. parameters
 
-    # substitute left/right tables names for '%1$s', '%2$s'
-    $sql = sprintf $sql, $left->{name}, $right->{name};
+    if ($join_spec->{using}) {
+      not $join_spec->{condition}
+        or croak "join specification has both {condition} and {using} fields";
 
-    # replace the ON clause by a USING clause, if so desired
-    $self->_try_replace_ON_by_USING($syntax, $sql) if $self->{join_with_USING};
+      $syntax =~ s/\bON\s+%s/USING (%s)/;
+      $sql = CORE::join ",", @{$join_spec->{using}};
+    }
+    elsif ($join_spec->{condition}) {
+      not $join_spec->{using}
+        or croak "join specification has both {condition} and {using} fields";
+
+      # compute the "ON" clause
+      ($sql, @bind) = $self->where($join_spec->{condition});
+      $sql =~ s/^\s*WHERE\s+//;
+
+      # substitute left/right tables names for '%1$s', '%2$s'
+      $sql = sprintf $sql, $left->{name}, $right->{name};
+    }
 
     # build the final sql
     $sql = sprintf $syntax, $left->{sql}, $right->{sql}, $sql;
@@ -750,27 +769,27 @@ sub _single_join {
 
 
 
-sub _try_replace_ON_by_USING {
-  my ($self, $syntax, $sql) = @_;
+# sub _try_replace_ON_by_USING {
+#   my ($self, $syntax, $sql) = @_;
 
-  # if there is an ON clause, replace it by a USING clause
-  $syntax =~ s/\bON\s+%s/USING (%s)/ or return;
+#   # if there is an ON clause, replace it by a USING clause
+#   $syntax =~ s/\bON\s+%s/USING (%s)/ or return;
 
-  # if there are equality conditions like Table1.col=Table2.col, just keep col
-  my $n_cond = $sql =~ s/\w+\.(\w+)\s*=\s*\w+\.\1\b/$1/g or return;
+#   # if there are equality conditions like Table1.col=Table2.col, just keep col
+#   my $n_cond = $sql =~ s/\w+\.(\w+)\s*=\s*\w+\.\1\b/$1/g or return;
 
-  # if there were several equalities, replace the AND's by commas
-  my $n_and  = $sql =~ s/\s+\bAND\b/,/g;
+#   # if there were several equalities, replace the AND's by commas
+#   my $n_and  = $sql =~ s/\s+\bAND\b/,/g;
 
-  # the number of equalities must match the number of AND's minus 1
-  $n_cond == $n_and + 1 or return;
+#   # the number of equalities must match the number of AND's minus 1
+#   $n_cond == $n_and + 1 or return;
 
-  # remove unnecessary parentheses
-  $sql =~ s/^(\(\s*)+// and $sql =~ s/(\)\s*)+$//;
+#   # remove unnecessary parentheses
+#   $sql =~ s/^(\(\s*)+// and $sql =~ s/(\)\s*)+$//;
 
-  # all criteria are good, let's replace strings in the caller (call-by-name)
-  @_[1, 2] = ($syntax, $sql);
-}
+#   # all criteria are good, let's replace strings in the caller (call-by-name)
+#   @_[1, 2] = ($syntax, $sql);
+# }
 
 
 
@@ -1313,24 +1332,6 @@ values are associated SQL clauses with placeholders
 in C<sprintf> format. The default is described
 below under the L</join> method.
 
-=item join_with_USING
-
-A boolean instructing to replace "ON" clauses by "USING" clauses
-in SQL joins. If this option is true, SQL like this:
-
-  .. FROM T1 JOIN T2 ON (T1.A=T2.A AND T1.B=T2.B) JOIN T3 ON (T2.C=T3.C)
-
-will be replaced by :
-
-  .. FROM T1 JOIN T2 USING (A, B) JOIN T3 USING (C)
-
-The substitution only occurs if the join is on equality operators with
-identical column names on both sides. The advantage of using this option
-is that the joined columns will appear only once in the results, and
-they do not need to be prefixed by a table name if they are needed
-in the select list or in the WHERE part of the SQL.
-
-Caveat : this feature does not work with option C<quote_char>.
 
 =item join_assoc_right
 
@@ -1946,9 +1947,49 @@ is parsed into
     'Table2',
   ]
 
-
 Hashrefs for join specifications as shown above can be passed directly
 as arguments, instead of the simple string representation.
+For example the L<DBIx::DataModel> ORM uses hashrefs for communicating
+with C<SQL::Abstract::More>.
+
+=head3 joins with USING clause instead of ON
+
+In most DBMS, when column names on both sides of a join are identical, the join
+can be expressed as
+
+  SELECT * FROM T1 INNER JOIN T2 USING (A, B)
+
+instead of
+
+  SELECT * FROM T1 INNER JOIN T2 ON T1.A=T2.A AND T1.B=T2.B
+
+The advantage of this syntax with a USING clause is that the joined
+columns will appear only once in the results, and they do not need to
+be prefixed by a table name if they are needed in the select list or
+in the WHERE part of the SQL.
+
+To express joins with the USING syntax in C<SQL::Abstract::More>, just
+mention the column names within curly braces, without any equality
+operator. For example
+
+  ->join(qw/Table1 {a,b} Table2 {c} Table3/)
+
+will generate
+
+  SELECT * FROM Table1 INNER JOIN Table2 USING (a,b)
+                       INNER JOIN Table3 USING (c)
+
+In this case the internal hashref representation has the following shape :
+
+  {
+    operator  => '<=>',
+    using     => [ 'a', 'b'],
+  }
+
+When they are generated directy by the client code, internal hashrefs
+must have I<either> a C<condition> field I<or> a C<using> field; it is
+an error to have both.
+
 
 =head3 Return value
 

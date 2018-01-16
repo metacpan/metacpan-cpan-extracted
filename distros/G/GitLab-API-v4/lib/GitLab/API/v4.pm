@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-$GitLab::API::v4::VERSION = '0.02';
+$GitLab::API::v4::VERSION = '0.03';
 =encoding utf8
 
 =head1 NAME
@@ -91,7 +91,6 @@ use GitLab::API::v4::Paginator;
 use Types::Standard -types;
 use Types::Common::String -types;
 use Types::Common::Numeric -types;
-use Class::Method::Modifiers qw( fresh );
 use URI::Escape;
 use Carp qw( croak );
 use Log::Any qw( $log );
@@ -171,7 +170,7 @@ sub _call_rest_method {
 =head2 url
 
 The URL to your v4 API endpoint.  Typically this will be something
-like C<http://git.example.com/api/v4>.
+like C<https://git.example.com/api/v4>.
 
 =cut
 
@@ -5429,7 +5428,7 @@ sub edit_project {
         \%params,
     );
 
-Sends a C<POST> request to C</pojects/fork/:project_id>.
+Sends a C<POST> request to C</projects/:project_id/fork>.
 
 =cut
 
@@ -5439,7 +5438,7 @@ sub fork_project {
     croak 'The #1 argument ($project_id) to fork_project must be a scalar' if ref($_[0]) or (!defined $_[0]);
     croak 'The last argument (\%params) to fork_project must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
     my $params = (@_ == 2) ? pop() : undef;
-    my $path = sprintf('pojects/fork/%s', (map { uri_escape($_) } @_));
+    my $path = sprintf('projects/%s/fork', (map { uri_escape($_) } @_));
     $self->_call_rest_method( 'post', $path, ( defined($params) ? $params : () ) );
     return;
 }

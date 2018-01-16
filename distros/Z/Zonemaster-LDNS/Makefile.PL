@@ -38,6 +38,8 @@ license 'bsd';
 author 'Calle Dybedahl <calle@init.se>';
 author 'Mattias P <mattias.paivarinta@iis.se>';
 abstract 'Perl wrapper for the ldns DNS library.';
+repository 'https://github.com/dotse/zonemaster-ldns';
+bugtracker 'https://github.com/dotse/zonemaster-ldns/issues';
 
 configure_requires 'Devel::CheckLib';
 requires 'MIME::Base64';

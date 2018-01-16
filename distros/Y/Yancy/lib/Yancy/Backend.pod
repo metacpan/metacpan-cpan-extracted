@@ -10,7 +10,7 @@ Yancy::Backend
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

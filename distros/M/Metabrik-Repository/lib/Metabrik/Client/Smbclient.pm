@@ -1,5 +1,5 @@
 #
-# $Id: Smbclient.pm,v 246044148483 2017/03/18 14:13:18 gomor $
+# $Id: Smbclient.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::smbclient Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 246044148483 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -111,7 +111,7 @@ sub download {
    my $self = shift;
    my ($files, $output_dir, $share) = @_;
 
-   $output_dir ||= $self->shell->full_pwd;
+   $output_dir ||= defined($self->shell) && $self->shell->full_pwd || '/tmp';
    $share ||= $self->share;
    $self->brik_help_run_undef_arg('download', $files) or return;
    my $ref = $self->brik_help_run_invalid_arg('download', $files, 'ARRAY', 'SCALAR')
@@ -167,7 +167,7 @@ sub download_in_background {
    my $self = shift;
    my ($files, $output_dir, $share) = @_;
 
-   $output_dir = $self->shell->full_pwd;
+   $output_dir ||= defined($self->shell) && $self->shell->full_pwd || '/tmp';
    $share ||= $self->share;
    $self->brik_help_run_undef_arg('download_in_background', $files) or return;
    my $ref = $self->brik_help_run_invalid_arg('download_in_background', $files,
@@ -209,7 +209,7 @@ Metabrik::Client::Smbclient - client::smbclient Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

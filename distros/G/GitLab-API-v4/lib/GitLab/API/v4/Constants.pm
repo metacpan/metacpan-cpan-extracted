@@ -1,5 +1,5 @@
 package GitLab::API::v4::Constants;
-$GitLab::API::v4::Constants::VERSION = '0.02';
+$GitLab::API::v4::Constants::VERSION = '0.03';
 =head1 NAME
 
 GitLab::API::v4::Constants - GitLab API v4 constants.
@@ -14,7 +14,7 @@ GitLab::API::v4::Constants - GitLab API v4 constants.
 
 use Const::Fast;
 
-use strictures 1;
+use strictures 2;
 use namespace::clean;
 
 use Exporter qw( import );
@@ -88,9 +88,9 @@ push @EXPORT_OK, '@GITLAB_ACCESS_LEVELS';
 1;
 __END__
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+See L<GitLab::API::v4/AUTHOR> and L<GitLab::API::v4/CONTRIBUTORS>.
 
 =head1 LICENSE
 

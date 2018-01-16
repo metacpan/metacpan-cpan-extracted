@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::DefaultCommandHelper;
-$Footprintless::Plugin::Database::DefaultCommandHelper::VERSION = '1.03';
+$Footprintless::Plugin::Database::DefaultCommandHelper::VERSION = '1.04';
 # ABSTRACT: The default implementation of command helper for db
 # PODNAME: Footprintless::Plugin::Database::DefaultCommandHelper
 
@@ -48,7 +48,7 @@ Footprintless::Plugin::Database::DefaultCommandHelper - The default implementati
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 CONSTRUCTORS
 

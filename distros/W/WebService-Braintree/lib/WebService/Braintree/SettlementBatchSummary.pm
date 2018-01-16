@@ -1,5 +1,5 @@
 package WebService::Braintree::SettlementBatchSummary;
-$WebService::Braintree::SettlementBatchSummary::VERSION = '0.94';
+$WebService::Braintree::SettlementBatchSummary::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

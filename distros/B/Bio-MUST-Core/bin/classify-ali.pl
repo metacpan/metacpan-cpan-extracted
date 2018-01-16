@@ -79,7 +79,7 @@ classify-ali.pl - Classify ALI files according to multiple (taxonomic) criteria
 
 =head1 VERSION
 
-version 0.173620
+version 0.180140
 
 =head1 USAGE
 

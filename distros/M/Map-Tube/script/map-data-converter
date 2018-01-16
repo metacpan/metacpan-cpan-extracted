@@ -2,7 +2,7 @@
 
 #
 # Author: Mohammad S Anwar (mohammad.anwar@yahoo.com)
-# Distribution: Map::Tube v3.36.
+# Distribution: Map::Tube v3.44.
 
 package MapDataConverter;
 
@@ -13,7 +13,7 @@ use Map::Tube::Utils qw(to_perl);
 use Map::Tube::Exception::FoundUnsupportedMapDataFormat;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 use MooX::Options;
 
 has 'IN'  => (is => 'rw');

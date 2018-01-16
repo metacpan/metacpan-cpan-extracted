@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.024;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -24,18 +24,14 @@ my %WriteMakefileArgs = (
     "bin/yancy"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.024",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Yancy",
   "PREREQ_PM" => {
-    "File::Share" => 0,
     "File::Spec::Functions" => 0,
     "FindBin" => 0,
-    "Module::Runtime" => 0,
     "Mojolicious" => "7.15",
-    "Mojolicious::Plugin::AssetPack" => 0,
     "Mojolicious::Plugin::OpenAPI" => "1.22",
-    "Sys::Hostname" => 0,
-    "experimental" => 0
+    "Sys::Hostname" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -44,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t t/backend/*.t t/controller/*.t t/plugin/auth/*.t"
   }
@@ -53,19 +49,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
-  "File::Share" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Runtime" => 0,
   "Mojolicious" => "7.15",
-  "Mojolicious::Plugin::AssetPack" => 0,
   "Mojolicious::Plugin::OpenAPI" => "1.22",
   "Sys::Hostname" => 0,
-  "Test::More" => "1.001005",
-  "experimental" => 0
+  "Test::More" => "1.001005"
 );
 
 

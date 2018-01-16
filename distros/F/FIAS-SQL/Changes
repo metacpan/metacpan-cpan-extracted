@@ -1,5 +1,8 @@
 Revision history for Perl module FIAS::SQL.
 
+0.05  Jan 01 2017 Daniil Popov
+    - fix POD
+
 0.04  Dec 29 2017 Daniil Popov
     - fix premises level value
 

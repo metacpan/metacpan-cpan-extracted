@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.131-8-g2a0015d
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.132-16-g73ecf21
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use Moose;
 with
@@ -19,6 +19,7 @@ use List::Util 1.45 qw(first any uniq none);
 use Module::Runtime qw(require_module use_module);
 use Devel::CheckBin 'can_run';
 use Path::Tiny;
+use CPAN::Meta 2.150006;    # for x_* preservation
 use CPAN::Meta::Requirements;
 use Term::ANSIColor 'colored';
 eval { +require Win32::Console::ANSI } if $^O eq 'MSWin32';
@@ -131,6 +132,20 @@ has fake_release => (
     default => sub { $ENV{FAKE_RELEASE} || $_[0]->payload->{fake_release} // 0 },
 );
 
+has plugin_prereq_phase => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { $_[0]->payload->{plugin_prereq_phase} // 'x_Dist_Zilla' },
+);
+
+has plugin_prereq_relationship => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { $_[0]->payload->{plugin_prereq_relationship} // 'requires' },
+);
+
 # configs are applied when plugins match ->isa($key) or ->does($key)
 my %extra_args = (
     'Dist::Zilla::Plugin::MakeMaker' => { 'eumm_version' => '0' },
@@ -183,13 +198,13 @@ has _removed_plugins => (
 
 # this attribute and its supporting code is a candidate to be extracted out into its own role,
 # for re-use in other bundles
-has _develop_suggests => (
+has _plugin_requirements => (
     isa => class_type('CPAN::Meta::Requirements'),
     lazy => 1,
     default => sub { CPAN::Meta::Requirements->new },
     handles => {
-        _add_minimum_develop_suggests => 'add_minimum',
-        _develop_suggests_as_string_hash => 'as_string_hash',
+        _add_minimum_plugin_requirement => 'add_minimum',
+        _plugin_requirements_as_string_hash => 'as_string_hash',
     },
 );
 
@@ -262,8 +277,14 @@ sub configure
             . $self->server . ' with a read-only mirror', 'yellow'), "\n"
         if $self->server ne 'github' and $self->server ne 'none';
 
-    # method modifier will also apply default configs, compile develop prereqs
+    # method modifier will also apply default configs, compile plugin prereqs
     $self->add_plugins(
+        # adding this first indicates the start of the bundle in x_Dist_Zilla metadata
+        [ 'Prereqs' => 'pluginbundle version' => {
+                '-phase' => 'develop', '-relationship' => 'recommends',
+                $self->meta->name => $self->VERSION,
+            } ],
+
         # VersionProvider
         # see [@Git::VersionManager]
 
@@ -340,14 +361,11 @@ sub configure
         # Register Prereqs
         # (MakeMaker or other installer)
         [ 'AutoPrereqs'         => { ':version' => '5.038' } ],
-        [ 'Prereqs::AuthorDeps' => { ':version' => '0.006', relation => 'suggests' } ],
+        [ 'Prereqs::AuthorDeps' => { ':version' => '0.006', phase => $self->plugin_prereq_phase, relation => $self->plugin_prereq_relationship } ],
         [ 'MinimumPerl'         => { ':version' => '1.006', configure_finder => ':NoFiles' } ],
-        [ 'Prereqs' => pluginbundle_version => {
-                '-phase' => 'develop', '-relationship' => 'recommends',
-                $self->meta->name => $self->VERSION,
-            } ],
         ($self->surgical_podweaver ? [ 'Prereqs' => pod_weaving => {
-                '-phase' => 'develop', '-relationship' => 'suggests',
+                '-phase' => $self->plugin_prereq_phase,
+                '-relationship' => $self->plugin_prereq_relationship,
                 'Dist::Zilla::Plugin::SurgicalPodWeaver' => 0
             } ] : ()),
 
@@ -431,6 +449,11 @@ sub configure
         'NextRelease.:version' => '5.033',
         'NextRelease.time_zone' => 'UTC',
         'NextRelease.format' => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
+
+        # 0.003 and earlier uses develop-suggests unconditionally, so we need not specify a minimum version
+        # for the default case here.
+        plugin_prereq_phase => $self->plugin_prereq_phase,
+        plugin_prereq_relationship => $self->plugin_prereq_relationship,
     });
 
     $self->add_plugins(
@@ -465,12 +488,13 @@ sub configure
         $mbt_spec->[-1]{static} = 'no';
     }
 
-    # ensure that additional optional plugins are declared in prereqs
+    # add used plugins to desired prereq section
     $self->add_plugins(
-        [ 'Prereqs' => 'prereqs for @Author::ETHER' =>
-        { '-phase' => 'develop', '-relationship' => 'suggests',
-          %{ $self->_develop_suggests_as_string_hash } } ]
-    );
+        [ 'Prereqs' => 'prereqs for @Author::ETHER' => {
+                '-phase' => $self->plugin_prereq_phase,
+                '-relationship' => $self->plugin_prereq_relationship,
+              %{ $self->_plugin_requirements_as_string_hash } } ]
+    ) if $self->plugin_prereq_phase and $self->plugin_prereq_relationship;
 
     # listed last, to be sure we run at the very end of each phase
     $self->add_plugins(
@@ -478,7 +502,7 @@ sub configure
     ) if ($ENV{USER} // '') eq 'ether';
 }
 
-# determine develop prereqs, and apply default configs (respecting superclasses, roles)
+# determine plugin prereqs, and apply default configs (respecting superclasses, roles)
 around add_plugins => sub
 {
     my ($orig, $self, @plugins) = @_;
@@ -494,7 +518,7 @@ around add_plugins => sub
 
     foreach my $plugin_spec (@plugins)
     {
-        # these should never be added to develop prereqs
+        # these should never be added as plugin prereqs
         next if $plugin_spec->[0] eq 'BlockRelease'     # temporary use during development
             or $plugin_spec->[0] eq 'VerifyPhases';     # only used by ether, not others
 
@@ -509,7 +533,7 @@ around add_plugins => sub
             my %configs = %{ $extra_args{$module} };    # copy, not reference!
 
             # don't keep :version unless it matches the package exactly, but still respect the prereq
-            $self->_add_minimum_develop_suggests($module => delete $configs{':version'})
+            $self->_add_minimum_plugin_requirement($module => delete $configs{':version'})
                 if exists $configs{':version'} and $module ne $plugin;
 
             # we don't need to worry about overwriting the payload with defaults, as
@@ -517,8 +541,8 @@ around add_plugins => sub
             @{$payload}{keys %configs} = values %configs;
         }
 
-        # record develop prereq
-        $self->_add_minimum_develop_suggests($plugin => $payload->{':version'} // 0);
+        # record prereq (and version) for later possible injection
+        $self->_add_minimum_plugin_requirement($plugin => $payload->{':version'} // 0);
     }
 
     return $self->$orig(@plugins);
@@ -538,8 +562,8 @@ around add_bundle => sub
 
     # default configs can be passed in directly - no need to consult %extra_args
 
-    # record develop prereq of bundle only, not its components (it should do that itself)
-    $self->_add_minimum_develop_suggests($package => $payload->{':version'} // 0);
+    # record plugin prereq of bundle only, not its components (it should do that itself)
+    $self->_add_minimum_plugin_requirement($package => $payload->{':version'} // 0);
 
     # allow config slices to propagate down from the user
     $payload = {
@@ -583,7 +607,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.132
+version 0.133
 
 =head1 SYNOPSIS
 
@@ -597,6 +621,11 @@ In your F<dist.ini>:
 
 This is a L<Dist::Zilla> plugin bundle. It is I<very approximately> equal to the
 following F<dist.ini> (following the preamble), minus some optimizations:
+
+    [Prereqs / pluginbundle version]
+    -phase = develop
+    -relationship = recommends
+    Dist::Zilla::PluginBundle::Author::ETHER = <current installed version>
 
     ;;; BeforeBuild
     [PromptIfStale / stale modules, build]
@@ -777,20 +806,16 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [AutoPrereqs]
     :version = 5.038
     [Prereqs::AuthorDeps]
-    relation = suggests
+    phase = x_Dist_Zilla        ; (or whatever 'plugin_prereq_phase' is set to)
+    relation = requires         ; (or whatever 'plugin_prereq_relationship' is set to)
     [MinimumPerl]
     :version = 1.006
     configure_finder = :NoFiles
 
     [Prereqs / prereqs for @Author::ETHER]
-    -phase = develop
-    -relationship = suggests
+    -phase = x_Dist_Zilla       ; (or whatever 'plugin_prereq_phase' is set to)
+    -relationship = requires    ; (or whatever 'plugin_prereq_relationship' is set to)
     ...all the plugins this bundle uses...
-
-    [Prereqs / pluginbundle_version]
-    -phase = develop
-    -relationship = recommends
-    Dist::Zilla::PluginBundle::Author::ETHER = <current installed version>
 
 
     ;;; Install Tool
@@ -999,7 +1024,7 @@ See also L<[Test::PodSpelling]|Dist::Zilla::Plugin::Test::PodSpelling/stopwords>
 
 =for stopwords ModuleBuildTiny
 
-Available since 0.007.
+Available since version 0.007.
 
 The installer back-end(s) to use (can be specified more than once); defaults
 to L<C<ModuleBuildTiny::Fallback>|Dist::Zilla::Plugin::ModuleBuildTiny::Fallback>
@@ -1040,7 +1065,7 @@ C<< installer = none >> (if you are providing your own elsewhere in the file, wi
 
 =head2 server
 
-Available since 0.019.
+Available since version 0.019.
 
 If provided, must be one of:
 
@@ -1085,7 +1110,7 @@ you'll need to provide this yourself.
 
 =head2 airplane
 
-Available since 0.053.
+Available since version 0.053.
 
 A boolean option that, when set, removes the use of all plugins that use the
 network (generally for comparing metadata against PAUSE, and querying the
@@ -1094,7 +1119,7 @@ Defaults to false; can also be set with the environment variable C<DZIL_AIRPLANE
 
 =head2 copy_file_from_release
 
-Available in this form since 0.076.
+Available in this form since version 0.076.
 
 A file, to be present in the build, which is copied back to the source
 repository at release time and committed to git. Can be used more than
@@ -1106,7 +1131,7 @@ defaults are appended to, rather than overwritten.
 
 =for stopwords PodWeaver SurgicalPodWeaver
 
-Available since 0.051.
+Available since version 0.051.
 
 A boolean option that, when set, uses
 L<[SurgicalPodWeaver]|Dist::Zilla::Plugin::SurgicalPodWeaver> instead of
@@ -1115,14 +1140,14 @@ options. Defaults to false.
 
 =head2 changes_version_columns
 
-Available since 0.076.
+Available since version 0.076.
 
 An integer that specifies how many columns (right-padded with whitespace) are
 allocated in F<Changes> entries to the version string. Defaults to 10.
 
 =head2 licence (or license)
 
-Available since 0.101.
+Available since version 0.101.
 
 A string that specifies the name to use for the licence file.  Defaults to
 C<LICENCE> for distributions where I (ETHER) or any other known non-Americans
@@ -1131,7 +1156,7 @@ have first-come permissions, or C<LICENSE> otherwise.
 
 =head2 authority
 
-Available since 0.117.
+Available since version 0.117.
 
 A string of the form C<cpan:PAUSEID> that references the PAUSE ID of the user who has primary ("first-come")
 authority over the distribution and main module namespace. If not provided, it is extracted from the configuration
@@ -1143,13 +1168,24 @@ file (if the C<licence> configuration is not provided).
 
 =for stopwords UploadToCPAN FakeRelease
 
-Available since 0.122.
+Available since version 0.122.
 
 A boolean option that, when set, removes L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> from the plugin list
 and replaces it with L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>.
 Defaults to false; can also be set with the environment variable C<FAKE_RELEASE>.
 
 =for stopwords customizations
+
+=head2 plugin_prereq_phase, plugin_prereq_relationship
+
+If these are set, then plugins used by the bundle (with minimum version requirements) are injected into the
+distribution's prerequisites at the specified phase and relationship. Defaults to C<x_Dist_Zilla> and C<requires>.
+Disable with:
+
+    plugin_prereq_phase =
+    plugin_prereq_relationship =
+
+Available since version 0.133.
 
 =head2 other customizations
 

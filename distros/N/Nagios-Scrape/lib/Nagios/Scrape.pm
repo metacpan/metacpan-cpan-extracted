@@ -13,11 +13,11 @@ Nagios::Scrape - Scrapes and Parses the status.cgi page of a Nagios installation
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ sub get_service_status {
     my $ua   = LWP::UserAgent->new;
     my $req =
       HTTP::Request->new( GET => $self->{url}
-          . '?host=all&noheader=yes&servicestatustypes='
+          . '?host=all&noheader=yes&limit=0&servicestatustypes='
           . $self->{service_state} );
     $req->authorization_basic( $self->{username}, $self->{password} );
     my $response = $ua->request($req);
@@ -142,8 +142,8 @@ sub get_host_status {
     my $ua   = LWP::UserAgent->new;
     my $req =
       HTTP::Request->new( GET => $self->{url}
-          . '?hostgroup=all&noheader=yes&style=hostdetail&hoststatustypes='
-          . $self->{host_state} );
+          . '?hostgroup=all&noheader=yes&limit=0&style=hostdetail'
+          . '&hoststatustypes=' . $self->{host_state} );
     $req->authorization_basic( $self->{username}, $self->{password} );
     my $response = $ua->request($req);
 
@@ -282,14 +282,16 @@ sub decode_html {
 
 =head1 AUTHOR
 
-Joe Topjian, C<< <joe at terrarum.net> >>
+Original author: Joe Topjian, C<< <joe at terrarum.net> >>
+
+Maintainership since 2018: David Precious (BIGPRESH) C<< davidp@preshweb.co.uk >>
+
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-nagios-scrape at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Nagios-Scrape>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on GitHub:
 
+L<https://github.com/bigpresh/Nagios-Scrape/issues>
 
 
 

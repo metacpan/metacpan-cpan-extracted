@@ -64,7 +64,7 @@ isa_ok($nsec3, 'Zonemaster::LDNS::RR::NSEC3');
 ok($nsec3->covers('xx-example.com'), 'Covers xx-example.com');
 
 SKIP: {
-    skip 'no network', 3 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};
 
     $res = Zonemaster::LDNS->new( '212.247.7.228' );
     $res->dnssec( 1 );

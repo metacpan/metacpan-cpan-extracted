@@ -1,5 +1,5 @@
 package XS::Tutorial;
-BEGIN { our $VERSION = 0.01 }
+BEGIN { our $VERSION = 0.02 }
 1;
 
 =encoding utf8
@@ -11,6 +11,8 @@ XS::Tutorial - documentation with examples for learning Perl XS
 =over 4
 
 =item * L<XS::Tutorial::One> - how to pass to and return basic values from C functions
+
+=item * L<XS::Tutorial::Two> - working with more than one value at a time
 
 =back
 

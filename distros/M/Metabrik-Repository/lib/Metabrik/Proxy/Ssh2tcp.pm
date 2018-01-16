@@ -1,5 +1,5 @@
 #
-# $Id: Ssh2tcp.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ssh2tcp.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # proxy::ssh2tcp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable ssh tcp socket netcat) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -49,7 +49,7 @@ sub _handle_sigint {
    my $restore = $SIG{INT};
 
    $SIG{INT} = sub {
-      $self->debug && $self->log->debug("brik_init: INT caught");
+      $self->log->debug("brik_init: INT caught");
       $SIG{INT} = $restore;
       $self->stop;
       return 1;
@@ -340,7 +340,7 @@ Metabrik::Proxy::Ssh2tcp - proxy::ssh2tcp Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -1,5 +1,9 @@
 Revision history for Net-Async-Ping
 
+0.003001  2018-01-10 16:01:34+01:00 Europe/Vienna
+  - use ICMP and ICMPv6 protocol constants from Socket
+    instead of a getprotobyname lookup per ping
+
 0.003000  2018-01-06 10:00:12-08:00 America/Los_Angeles
   - Add ICMPv6 support
     (Thanks Alexander Hartmaier!)

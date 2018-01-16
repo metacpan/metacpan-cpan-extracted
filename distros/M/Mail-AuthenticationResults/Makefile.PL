@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Object Oriented Authentication-Results header class",
+  "ABSTRACT" => "Object Oriented Authentication-Results Headers",
   "AUTHOR" => "Marc Bradshaw <marc\@marcbradshaw.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20171230",
+  "VERSION" => "1.20180113",
   "test" => {
     "TESTS" => "t/*.t"
   }

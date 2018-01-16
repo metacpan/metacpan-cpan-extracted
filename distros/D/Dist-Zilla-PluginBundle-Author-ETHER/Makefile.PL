@@ -95,6 +95,7 @@ my %WriteMakefileArgs = (
   "PL_FILES" => {},
   "PREREQ_PM" => {
     "CPAN::Changes" => "0.23",
+    "CPAN::Meta" => "2.150006",
     "CPAN::Meta::Requirements" => 0,
     "Carp" => 0,
     "Devel::CheckBin" => 0,
@@ -235,7 +236,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.132",
+  "VERSION" => "0.133",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -243,6 +244,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CPAN::Changes" => "0.23",
+  "CPAN::Meta" => "2.150006",
   "CPAN::Meta::Requirements" => 0,
   "Carp" => 0,
   "Devel::CheckBin" => 0,

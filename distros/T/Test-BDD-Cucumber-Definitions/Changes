@@ -1,5 +1,8 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.06    2018-01-13
+        - The definition "http response content must be" and the function "content_eq" was added
+
 0.05    2018-01-09
         - Support for the environment variable BDD_HTTP_HOST has been added
 

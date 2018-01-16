@@ -1,5 +1,10 @@
 Revision history for Map::Tube
 
+3.44  2018-01-12T19:45:00+00:00
+      - Improved method exporting.
+      - Tidied up map-data-converter script.
+      - Updated "Map Leader Board" section in the pod.
+
 3.43  2017-12-26T10:30:00+00:00
       - Used 3 argument open() now.
       - Stopped using bareword for file handle.

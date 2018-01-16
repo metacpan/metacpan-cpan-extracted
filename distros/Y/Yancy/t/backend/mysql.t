@@ -26,8 +26,7 @@ C<t/lib/Local/Test.pm>, L<Mojo::mysql>, L<Yancy>
 
 =cut
 
-use v5.24;
-use experimental qw( signatures postderef );
+use Mojo::Base '-strict';
 use Test::More;
 use FindBin qw( $Bin );
 use File::Spec::Functions qw( catdir );
@@ -91,11 +90,17 @@ subtest 'new' => sub {
     isa_ok $be, 'Yancy::Backend::Mysql';
     isa_ok $be->mysql, 'Mojo::mysql';
     is_deeply $be->collections, $collections;
+
+    subtest 'new with connection' => sub {
+        $be = Yancy::Backend::Mysql->new( $mysql, $collections );
+        isa_ok $be, 'Yancy::Backend::Mysql';
+        isa_ok $be->mysql, 'Mojo::mysql';
+        is_deeply $be->collections, $collections;
+    };
 };
 
-$be->mysql( $mysql );
-
-sub insert_item( $coll, %item ) {
+sub insert_item {
+    my ( $coll, %item ) = @_;
     my $id_field = $collections->{ $coll }{ 'x-id-field' } || 'id';
     my $id = $mysql->db->insert( $coll => \%item )->last_insert_id;
     $item{ $id_field } ||= $id;

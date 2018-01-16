@@ -1,5 +1,5 @@
 #
-# $Id: Universal.pm,v 28a22d60af64 2017/10/19 08:44:25 gomor $
+# $Id: Universal.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # time::universal Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 28a22d60af64 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable timezone) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -349,6 +349,20 @@ sub to_timestamp {
          $timestamp .= sprintf(".%03d", $msec);
       }
    }
+   # 2000-10-20T00:00:00.000-04:00
+   elsif ($string =~ m{^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})}) {
+      my $mon = $2 - 1;
+      my $mday = $3;
+      my $hour = $4;
+      my $min = $5;
+      my $sec = $6;
+      my $year = $1;
+      my $msec = $7;
+      $timestamp = Time::Local::timelocal($sec, $min, $hour, $mday, $mon, $year);
+      if ($self->use_hires) {
+         $timestamp .= sprintf(".%03d", $msec);
+      }
+   }
    else {
       return $self->log->error("to_timestamp: string [$string] not a valid date format");
    }
@@ -366,7 +380,7 @@ Metabrik::Time::Universal - time::universal Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

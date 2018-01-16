@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.053   2018-01-11
+        - Modified prompt lines
+        - "Term::Choose": minimum version is "1.509".
+
 0.052   2016-08-09
         - Update "get_a_file".
         - Update documentation.

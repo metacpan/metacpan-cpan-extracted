@@ -1,8 +1,10 @@
 package Mail::AuthenticationResults::Token::QuotedString;
+# ABSTRACT: Class for modelling AuthenticationResults Header parts detected as quoted strings
+
 require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171230'; # VERSION
+our $VERSION = '1.20180113'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -43,3 +45,29 @@ sub parse {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::AuthenticationResults::Token::QuotedString - Class for modelling AuthenticationResults Header parts detected as quoted strings
+
+=head1 VERSION
+
+version 1.20180113
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

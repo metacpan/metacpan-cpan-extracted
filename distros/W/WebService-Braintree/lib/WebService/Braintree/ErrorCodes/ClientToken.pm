@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::ClientToken;
-$WebService::Braintree::ErrorCodes::ClientToken::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::ClientToken::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

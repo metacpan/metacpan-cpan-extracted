@@ -19,8 +19,8 @@ my %module_build_args = (
     "faraco <skelic3\@gmail.com>"
   ],
   "dist_name" => "WebService-Pixabay",
-  "dist_version" => "2.1.1",
-  "license" => "gpl",
+  "dist_version" => "2.2.0",
+  "license" => "mit",
   "module_name" => "WebService::Pixabay",
   "recursive_test_files" => 1,
   "requires" => {
@@ -28,19 +28,20 @@ my %module_build_args = (
     "Function::Parameters" => 0,
     "LWP::Online" => 0,
     "Moo" => 0,
-    "WebService::Client" => 0
+    "WebService::Client" => 0,
+    "perl" => "v5.10.0",
+    "strict" => 0,
+    "warnings" => 0
   },
   "test_requires" => {
-    "Test::More" => 0,
-    "lib" => 0
+    "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
-  "Test::More" => 0,
-  "lib" => 0
+  "Test::More" => 0
 );
 
 

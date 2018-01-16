@@ -4,6 +4,7 @@ App::cdif::colors
 
 =head1 SYNOPSIS
 
+  cdif -Mcolors --light
   cdif -Mcolors --green
   cdif -Mcolors --cmy
   cdif -Mcolors --mono
@@ -15,7 +16,7 @@ App::cdif::colors
 
 =head1 SEE ALSO
 
-L<App::sdif::colors>
+L<App::cdif::colors>
 
 =cut
 
@@ -35,7 +36,7 @@ option --dark	--cm APPEND=DELETE=w/311,*CHANGE=w/112 \
 		--cm OMARK=244S,NMARK=424S \
 		--cm COMMAND=K/WE
 
-option --dark-cmy --dark
+option --dark-cmy   --dark
 option --dark-green --dark
 
 option --mono	--cm APPEND=DELETE=555/333,*CHANGE=000/444 \

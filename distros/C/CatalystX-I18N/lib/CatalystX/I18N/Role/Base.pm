@@ -21,7 +21,7 @@ has 'locale' => (
 
 sub _build_default_locale {
     my ($c) = @_;
-    
+
     my $locale = $c->config->{I18N}{default_locale};
     $c->set_locale($locale);
     return $locale;
@@ -29,114 +29,114 @@ sub _build_default_locale {
 
 sub i18n_config {
     my ($c) = @_;
-    
+
     return {}
         unless defined $c->config->{I18N}{locales}{$c->locale};
-    
+
     my $config = Clone::clone($c->config->{I18N}{locales}{$c->locale});
     $config->{locale} = $c->locale;
-    
+
     return $config;
 }
 
 sub i18n_geocode {
     my ($c) = @_;
-    
+
     my $territory = $c->territory;
-    
-    return 
+
+    return
         unless $territory;
-    
+
     Class::Load::load_class('Locale::Geocode');
-    
+
     my $lc = Locale::Geocode->new();
     return $lc->lookup($territory);
-} 
+}
 
 sub language {
     my ($self) = @_;
-    
-    return 
+
+    return
         unless $self->locale =~ $CatalystX::I18N::TypeConstraints::LOCALE_RE;
-    
+
     return lc($1);
 }
 
 sub territory {
     my ($self) = @_;
-    
-    return 
+
+    return
         unless $self->locale =~ $CatalystX::I18N::TypeConstraints::LOCALE_RE;
-    
+
     return
         unless $2;
-    
+
     return lc($2);
 }
 
 sub set_locale {
     my ($c,$value) = @_;
-    
+
     return
         unless $value =~ $CatalystX::I18N::TypeConstraints::LOCALE_RE;
-    
+
     my $meta_attribute = $c->meta->get_attribute('locale');
-    
+
     my $language = $1;
     my $territory = $2;
     my $locale = lc($language);
     $locale .= '_'.uc($territory)
         if defined $territory && $territory ne '';
-    
+
     # Check for valid locale
     if (! exists $c->config->{I18N}{locales}{$locale}
         || $c->config->{I18N}{locales}{$locale}{inactive} == 1) {
         $meta_attribute->clear_value($c);
         return;
     }
-    
+
     # Set content language header
     $c->response->content_language($language)
         if $c->response->can('content_language');
-    
+
     # Save locale in session
     if ($c->can('session')) {
         $c->session->{i18n_locale} = $locale
     }
-    
+
     # Set locale
     $meta_attribute->set_raw_value($c,$locale)
         if ! $meta_attribute->has_value($c)
         || $meta_attribute->get_raw_value($c) ne $locale;
-    
+
     return $locale;
 }
 
 
 after setup_finalize => sub {
     my ($app) = @_;
-    
+
     $app->config->{I18N} ||= {};
     my $config = $app->config->{I18N};
     my $locales = $config->{locales} ||= {};
-    
+
     my $locale_type_constraint = $app
         ->meta
         ->get_attribute('locale')
         ->type_constraint;
-    
+
     my $default_locale = $config->{default_locale};
     if (defined $default_locale
         && ! $locale_type_constraint->check($default_locale)) {
         Catalyst::Exception->throw(sprintf("Default locale '%s' does not match %s",$default_locale,$CatalystX::I18N::TypeConstraints::LOCALE_RE));
     }
-    
+
     # Default locale fallback
     $default_locale ||= 'en';
-    
+
     # Enable default locale
     $locales->{$default_locale} ||= {};
-    
+
     # Build inheritance tree
     my (%tree,$changed);
     $changed = 1;
@@ -154,7 +154,7 @@ after setup_finalize => sub {
                 $app->log->warn(sprintf("Locale '%s' has been set inactive because it does not match %s",$locale,$CatalystX::I18N::TypeConstraints::LOCALE_RE));
                 $locale_config->{inactive} = 1;
             }
-            
+
             unless (exists $locale_config->{inherits}) {
                 $locale_config->{_inherits} = [];
                 $tree{$locale} = $locale_config;
@@ -191,9 +191,9 @@ CatalystX::I18N::Role::Base - Basic catalyst I18N support
 
  package MyApp::Catalyst;
  
- use Catalyst qw/MyPlugins 
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base/;
-
+ 
  package MyApp::Catalyst::Controller::Main;
  use strict;
  use warnings;
@@ -201,7 +201,7 @@ CatalystX::I18N::Role::Base - Basic catalyst I18N support
  
  sub action : Local {
      my ($self,$c) = @_;
-     
+      
      $c->locale('de_AT');
  }
 

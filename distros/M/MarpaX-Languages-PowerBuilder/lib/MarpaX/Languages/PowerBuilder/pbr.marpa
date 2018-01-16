@@ -1,0 +1,13 @@
+:default            ::= action => [name,values]
+:start              ::= <pbr>
+lexeme default = latm => 1
+
+<pbr>               ::= <resources>                    action => ::first
+<resources>         ::= <resource>+                    action => resources
+<resource>          ::= <string> ('(') <string>	(')')  action => lib_entry
+				      | <string>                       action => file
+
+<string>             ~ [^()\x{D}\x{A}]+
+
+:discard              ~ crlf
+crlf                  ~ [\x{D}\x{A}]+

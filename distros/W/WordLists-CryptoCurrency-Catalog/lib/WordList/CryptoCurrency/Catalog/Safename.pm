@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::Safename;
 
-our $DATE = '2018-01-07'; # DATE
-our $VERSION = '20180106'; # VERSION
+our $DATE = '2018-01-12'; # DATE
+our $VERSION = '20180109'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contains_nonword_chars",264,"num_words_contains_unicode",0,"longest_word_len",31,"num_words_contains_whitespace",0,"avg_word_len",8.69364161849711,"num_words",1384,"shortest_word_len",2); # STATS
+our %STATS = ("avg_word_len",8.69142033165105,"num_words_contains_whitespace",0,"longest_word_len",31,"num_words_contains_nonword_chars",264,"num_words_contains_unicode",0,"shortest_word_len",2,"num_words",1387); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency safenames (a.k.a. slugs)
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::Safename - List of cryptocurrency safenames (
 
 =head1 VERSION
 
-This document describes version 20180106 of WordList::CryptoCurrency::Catalog::Safename (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-07.
+This document describes version 20180109 of WordList::CryptoCurrency::Catalog::Safename (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
 
 =head1 SYNOPSIS
 
@@ -47,9 +47,9 @@ This document describes version 20180106 of WordList::CryptoCurrency::Catalog::S
  +----------------------------------+------------------+
  | key                              | value            |
  +----------------------------------+------------------+
- | avg_word_len                     | 8.69364161849711 |
+ | avg_word_len                     | 8.69142033165105 |
  | longest_word_len                 | 31               |
- | num_words                        | 1384             |
+ | num_words                        | 1387             |
  | num_words_contains_nonword_chars | 264              |
  | num_words_contains_unicode       | 0                |
  | num_words_contains_whitespace    | 0                |
@@ -143,6 +143,7 @@ anryze
 antibitcoin
 antilitecoin
 antimatter
+appcoins
 applecoin-apw
 apx
 aquariuscoin
@@ -329,6 +330,7 @@ canada-ecoin
 cannabiscoin
 cannacoin
 cannation
+canyacoin
 cappasity
 capricoin
 carboncoin
@@ -814,6 +816,7 @@ kucoin-shares
 kurrent
 kushcoin
 kyber-network
+lamden
 lampix
 lanacoin
 landcoin

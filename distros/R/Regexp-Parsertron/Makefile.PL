@@ -24,31 +24,35 @@ my(%params) =
 		COMPRESS => 'gzip',
 		SUFFIX   => 'gz'
 	},
-	DISTNAME  => 'Regexp-Parsertron',
-	NAME      => 'Regexp::Parsertron',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME			=> 'Regexp-Parsertron',
+	MIN_PERL_VERSION	=> 5.20.2,
+	NAME				=> 'Regexp::Parsertron',
+	PL_FILES 			=> {},
+	PREREQ_PM			=>
 	{
+		'Capture::Tiny'			=> 0.46,
 		'Data::Section::Simple'	=> 0.07,
-		'File::Slurper'			=> 0.008,
-		'Marpa::R2'				=> 3.000000,
-		'Moo'					=> 2.001001,
-		're'					=> 0,
-		'Scalar::Does'			=> 0.202,
+		'File::Slurper'			=> 0.011,
+		'Marpa::R2'				=> 4.000000,
+		'Moo'					=> 2.003004,
+		'Scalar::Does'			=> 0.203,
 		'strict'				=> 0,
-		'Test::More'			=> 1.001014,
-		'Test::Pod'				=> 1.48,
-		'Tree'					=> 1.07,
-		'Try::Tiny'				=> 0.24,
-		'Types::Standard'		=> 1.000005,
+		'Tree'					=> 1.10,
+		'Try::Tiny'				=> 0.30,
+		'Types::Standard'		=> 1.002001,
 		'warnings'				=> 0,
+	},
+	TEST_REQUIRES =>
+	{
+		'Test::More'	=> 1.001002,
+		'Test::Pod'		=> 1.48,
 	},
 	VERSION_FROM => 'lib/Regexp/Parsertron.pm',
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
 {
-	$params{LICENSE} = 'artistic_2';
+	$params{LICENSE} = 'perl';
 }
 
 if ($ExtUtils::MakeMaker::VERSION ge '6.46')
@@ -57,17 +61,17 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 	{
 		'meta-spec' =>
 		{
-		'version' => 2,
+			version => 2,
 		},
-		resources   =>
+		resources =>
 		{
-		'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Parsertron',
-		'license' => 'http://opensource.org/licenses/Artistic-2.0',
-			repository =>
+			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Parsertron',
+			license		=> 'http://opensource.org/licenses/Artistic-2.0',
+			repository	=>
 			{
-		'type' => 'git',
-		'url' => 'https://github.com/ronsavage/Regexp-Parsertron.git',
-		'web' => 'https://github.com/ronsavage/Regexp-Parsertron',
+				type	=> 'git',
+				url		=> 'https://github.com/ronsavage/Regexp-Parsertron.git',
+				web		=> 'https://github.com/ronsavage/Regexp-Parsertron',
 			},
 		},
 	};

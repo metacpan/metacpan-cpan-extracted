@@ -42,7 +42,7 @@ my @cmd =
     [ 'alarm', '设置超时闹钟运行命令.', 'dan/tools/alarm' ],
     [ 'bigest', '查找大文件.', 'dan/tools/bigest' ],
     [ 'expect', '自动应答.', 'dan/tools/expect' ],
-    [ 'release', '发布${name}.', 'dan/tools/release' ],
+    [ 'release', "发布${name}.", 'dan/tools/release' ],
     [ 'tai64nlocal', '查看tai64格式日志.', 'dan/tools/tai64nlocal' ],
     [ 'tcpserver', "脚本提供tcp服务.\n", 'dan/tools/tcpserver' ],
 

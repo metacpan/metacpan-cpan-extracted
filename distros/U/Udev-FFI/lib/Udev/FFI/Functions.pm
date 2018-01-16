@@ -446,8 +446,10 @@ sub udev_version {
 
 
 my $_function_not_attach = sub {
+    my $udev_version = udev_version();
+
     die "Function '".$_[0]."' not attached from udev library\n".
-        "`udevadm` version: ".(defined(udev_version()) ?udev_version() :'unknown')."\n";
+        "`udevadm` version: ".(defined($udev_version) ?$udev_version :'unknown')."\n";
 };
 
 
@@ -458,9 +460,9 @@ sub get_entries {
     if(wantarray) {
         my @a = ();
 
-        if(defined($entry)) {
-            push @a, udev_list_entry_get_name($entry)
-                while defined($entry = udev_list_entry_get_next($entry));
+        while(defined($entry)) {
+            push @a, udev_list_entry_get_name($entry);
+            $entry = udev_list_entry_get_next($entry);
         }
 
         return @a;
@@ -469,9 +471,9 @@ sub get_entries {
 
     my %h = ();
 
-    if(defined($entry)) {
-        $h{ udev_list_entry_get_name($entry) } = udev_list_entry_get_value($entry)
-            while defined($entry = udev_list_entry_get_next($entry));
+    while(defined($entry)) {
+        $h{ udev_list_entry_get_name($entry) } = udev_list_entry_get_value($entry);
+        $entry = udev_list_entry_get_next($entry);
     }
 
     return \%h;

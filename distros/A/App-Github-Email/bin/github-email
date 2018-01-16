@@ -1,37 +1,35 @@
 #!perl
 
+# ABSTRACT: A command line tool to get a list of email addresses from particular Github account.
+
 use strict;
 use warnings;
+use v5.10;
+
 use App::Github::Email;
-use Getopt::Long 'GetOptions';
+use Getopt::Long::Descriptive;
 
-# ABSTRACT: A command line tool to get a list of email addresses from particular Github account.
-our $VERSION = '0.1.1';    # VERSION
+my ( $opt, $usage ) = describe_options(
+    'github-email %o <github username>',
+    [ 'username|u=s', 'Github username.',             { required     => 1 } ],
+    [ 'help|h',       'Print this message and exit.', { shortcircuit => 1 } ]
+);
 
-my $username;
+print( $usage->text ), exit 0 if $opt->help;
 
-GetOptions("name=s" => \$username) or die "Error.";
+my @addresses = App::Github::Email::get_user( $opt->username );
 
-if (not defined $username)
-{
-    die
-        "Error. Username is not defined. Please try again with: 'github-email -n username'.\n";
-}
-
-my @addresses = App::Github::Email::get_user($username);
-
-for my $address (@addresses)
-{
-    print $address . "\n";
+for my $address (@addresses) {
+    say $address;
 }
 
 =head1 SYNOPSIS
 
-    github-email --name <github username>
+    github-email --username <github username>
 
     # Examples
 
-    github-email --name faraco
-    github-email -n faraco
+    github-email --username faraco
+    github-email -u faraco
 =cut
 

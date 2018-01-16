@@ -2,6 +2,7 @@ MANIFEST
 Makefile.PL
 math_mpc_include.h
 MPC.pm
+MPC.pod
 MPC.xs
 README
 CHANGES
@@ -27,6 +28,7 @@ t/mpc_set.t
 t/Rmpc_set_NV.t
 t/mpc_swap.t
 t/mpc_trig.t
+t/new_in_1.1.0.t
 t/NOK_and_POK.t
 t/out_str1.t
 t/out_str2.t

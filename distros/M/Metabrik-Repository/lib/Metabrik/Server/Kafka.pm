@@ -1,5 +1,5 @@
 #
-# $Id: Kafka.pm,v 07eaa8bc26b2 2017/09/24 12:18:36 gomor $
+# $Id: Kafka.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # server::kafka Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 07eaa8bc26b2 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -283,7 +283,7 @@ Metabrik::Server::Kafka - server::kafka Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

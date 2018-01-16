@@ -73,4 +73,4 @@ SKIP: {
         qr/^\QAnyEvent and AnyEvent::HTTP are required for async mode\E/,
         'Failed in async as well',
     );
-};
+}

@@ -7,7 +7,7 @@ my $rrl = Zonemaster::LDNS::Packet->new( 'foo.com', 'SOA', 'IN' )->all;
 $rrl->pop;
 
 SKIP: {
-    skip 'no network', 3 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};
 
     my $s = Zonemaster::LDNS->new( '8.8.8.8' );
     my $p = $s->query( 'iis.se', 'SOA' );

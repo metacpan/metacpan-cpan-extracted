@@ -24,11 +24,9 @@ my $customer = WebService::Braintree::Customer->create({
     last_name => "Fredson",
 });
 
-my $card = WebService::Braintree::CreditCard->create({
-    number => "5431111111111111",
-    expiration_date => "05/12",
+my $card = WebService::Braintree::CreditCard->create(credit_card({
     customer_id => $customer->customer->id,
-});
+}));
 
 subtest "id (equality)" => sub {
     my $id = generate_unique_integer() . "123";

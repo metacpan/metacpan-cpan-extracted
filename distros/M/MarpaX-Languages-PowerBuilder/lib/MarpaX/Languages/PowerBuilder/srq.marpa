@@ -1,0 +1,65 @@
+:default            ::= action => [name,values]
+:start              ::= query
+lexeme default = latm => 1
+
+Header                ~ Encoding 'PBExportHeader$':i rest_of_line
+Comment               ~ 'PBExportComments$' rest_of_line
+rest_of_line          ~ comment_char*
+comment_char          ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Encoding              ~ 'HA$':i
+                      | '$'
+pbheader            ::= Header Comment
+                      | Header
+                      | Comment
+pbheader            ::=
+
+query               ::= (pbheader) pbselect orders arguments action => query
+pbselect            ::= ('PBSELECT' '(') version distinct tables selection joins wheres groups havings (')') unions action => pbselect
+version             ::= 'VERSION' '(' number ')' action => version
+distinct            ::= 'DISTINCT' '(' ')' action => distinct
+distinct            ::=                    action => ::undef
+tables              ::= table+ action => tables
+table               ::= 'TABLE' '(' 'NAME' '=' <db identifier> ')' action => table
+selection           ::= <selection item>+ action => selection
+<selection item>    ::= column  action => selection_item
+                      | compute action => selection_item
+column              ::= 'COLUMN' '(' 'NAME' '=' <db identifier> ')' action => column
+compute             ::= 'COMPUTE' '(' 'NAME' '=' string ')' action => compute
+joins               ::= join* action => joins
+join                ::= 'JOIN' '(' 'LEFT' '=' <db identifier> 'OP' '=' string 'RIGHT' '=' <db identifier> ')' action => join
+wheres              ::= where* action => wheres
+where               ::= 'WHERE' '(' 'EXP1' '=' string 'OP' '=' string where_exp2 'LOGIC' '=' string ')' action => where_logic
+                      | 'WHERE' '(' 'EXP1' '=' string 'OP' '=' string where_exp2 ')' action => where
+where_exp2          ::= 'EXP2' '=' string action => where_exp2
+                      | 'NEST' '=' pbselect action => where_nest
+groups              ::= group* action => groups
+group               ::= 'GROUP' '(' 'NAME' '=' string ')' action => group
+havings             ::= having* action => havings
+having              ::= 'HAVING' '(' 'EXP1' '=' string 'OP' '=' string where_exp2 'LOGIC' '=' string ')' action => having_logic
+orders              ::= order* action => orders
+order               ::= 'ORDER' '(' 'NAME' '=' <db identifier> 'ASC' '=' boolean ')' action => order
+arguments           ::= argument* action => arguments
+argument            ::= 'ARG' '(' 'NAME' '=' string 'TYPE' '=' identifier ')' action => argument
+
+boolean               ~ 'yes':i | 'no':i
+<db identifier>     ::= ('"') identifier ('"') action => quoted_db_identifier
+                      | identifier
+unions              ::= union*                   action => unions
+union               ::= 'UNION' '(' pbselect ')' action => union
+identifier            ~ [_a-zA-Z.] rest_id
+rest_id               ~ [_0-9a-zA-Z.]*
+number                ~ [\d]+
+
+string              ::= <string lexeme> action => string
+<string lexeme>       ~ quote <string contents> quote
+# This cheats -- it recognizers a superset of legal JSON strings.
+# The bad ones can sorted out later, as desired
+quote                 ~ ["]
+<string contents>     ~ <string char>*
+<string char>         ~ [^"~] | '~' <any char>
+<any char>            ~ [\d\D]
+
+:discard              ~ crlf
+crlf                  ~ [\x{D}\x{A}]+
+:discard              ~ whitespace
+whitespace            ~ [\s]+

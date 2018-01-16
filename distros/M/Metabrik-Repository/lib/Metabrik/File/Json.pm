@@ -1,5 +1,5 @@
 #
-# $Id: Json.pm,v 5a8528c3a0ac 2017/02/14 18:47:11 gomor $
+# $Id: Json.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # file::json Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 5a8528c3a0ac $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -41,7 +41,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         encoding => $self->global->encoding || 'utf8',
+         encoding => defined($self->global) && $self->global->encoding || 'utf8',
       },
    };
 }
@@ -100,7 +100,7 @@ Metabrik::File::Json - file::json Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

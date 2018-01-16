@@ -1,5 +1,5 @@
 #
-# $Id: Smtp.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Smtp.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # audit::smtp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -44,7 +44,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         hostname => $self->global->hostname,
+         hostname => defined($self->global) && $self->global->hostname || 'hostname',
       },
    };
 }
@@ -60,7 +60,7 @@ sub connect {
    $self->brik_help_run_undef_arg('connect', $port) or return;
    $self->brik_help_run_undef_arg('connect', $domainname) or return;
 
-   my $timeout = $self->global->ctimeout;
+   my $timeout = defined($self->global) && $self->global->ctimeout || 3;
 
    my $smtp = Net::SMTP->new(
       $hostname,
@@ -220,7 +220,7 @@ Metabrik::Audit::Smtp - audit::smtp Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -3,7 +3,7 @@ use Test::More;
 BEGIN { use_ok( 'Zonemaster::LDNS' ) }
 
 SKIP: {
-    skip 'no network', 5 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 5 unless $ENV{TEST_WITH_NETWORK};
 
     my $res = new_ok( 'Zonemaster::LDNS', ['8.8.4.4'] );
 

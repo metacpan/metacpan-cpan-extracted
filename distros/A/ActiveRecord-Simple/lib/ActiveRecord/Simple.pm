@@ -4,18 +4,23 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.10';
 
 use utf8;
 use Carp;
 use Module::Load;
 use Scalar::Util qw/blessed/;
 
-use ActiveRecord::Simple::Find;
+use ActiveRecord::Simple::QueryManager;
 use ActiveRecord::Simple::Utils qw/all_blessed class_to_table_name/;
 use ActiveRecord::Simple::Connect;
 
 our $connector;
+my $qm = ActiveRecord::Simple::QueryManager->new();
+my @RESERVED_WORDS = qw/
+    foo 
+    bar
+/;
 
 
 sub new {
@@ -52,30 +57,6 @@ sub auto_load {
     $class->table_name($table_name) if $table_name;
     $class->primary_key($primary_key) if $primary_key;
     $class->columns(@columns) if @columns;
-}
-
-sub sql_fetch_all {
-    my ($class, $sql, @bind) = @_;
-
-    my $data = $class->dbh->selectall_arrayref($sql, { Slice => {} }, @bind);
-    my @list;
-    for my $row (@$data) {
-        $class->_mk_ro_accessors([keys %$row]);
-        bless $row, $class;
-        push @list, $row;
-    }
-
-    return \@list;
-}
-
-sub sql_fetch_row {
-    my ($class, $sql, @bind) = @_;
-
-    my $row = $class->dbh->selectrow_hashref($sql, undef, @bind);
-    $class->_mk_ro_accessors([keys %$row]);
-    bless $row, $class;
-
-    return $row;
 }
 
 sub connect {
@@ -260,6 +241,11 @@ sub dbh {
     return $connector->dbh;
 }
 
+sub objects {
+    $qm->{caller} = shift;
+    return $qm;
+}
+
 sub save {
     my ($self) = @_;
 
@@ -410,10 +396,29 @@ sub decrement {
 
 #### Find ####
 
-sub find   { ActiveRecord::Simple::Find->new(shift, @_) }
-sub all    { shift->find() }
-sub get    { shift->find(@_)->fetch } ### TODO: move to Finder
-sub count  { ActiveRecord::Simple::Find->count(shift, @_) }
+sub find { 
+    $qm->{caller} = shift;
+    carp 
+        q/[DEPRECATED] This method is DEPRECATED since version 1.10. '/ . 
+        q/Please, use "find" via "objects" method: / . $qm->{caller} . q/->objects->find/; 
+    $qm->find(@_);
+}
+
+sub all { 
+    $qm->{caller} = shift;
+     carp 
+        q/[DEPRECATED] This method is DEPRECATED since version 1.10. '/ . 
+        q/Please, use "all" via "objects" method: / . $qm->{caller} . q/->objects->all/; 
+    $qm->all();
+}
+
+sub get {   
+    $qm->{caller} = shift;
+     carp 
+        q/[DEPRECATED] This method is DEPRECATED since version 1.10. '/ . 
+        q/Please, use "get" via "objects" method: / . $qm->{caller} . q/->objects->get/; 
+    $qm->get(@_);
+} 
 
 sub exists {
     my $first_arg = shift;
@@ -745,7 +750,7 @@ sub _init_relations {
                 }
                 # else
                 if (!$self->{$instance_name}) {
-                    $self->{$instance_name} = $related_class->get($self->{$fk}) // $related_class;
+                    $self->{$instance_name} = $related_class->objects->get($self->{$fk}) // $related_class;
                 }
 
                 return $self->{$instance_name};
@@ -787,7 +792,7 @@ sub _init_relations {
                 return $related_class->new() if not $self->can('_get_primary_key');
 
                 if (!$self->{$instance_name}) {
-                    $self->{$instance_name} = $related_class->find("$fk = ?", $self->{$pk});
+                    $self->{$instance_name} = $related_class->objects->find("$fk = ?", $self->{$pk});
                 }
 
                 return $self->{$instance_name};
@@ -959,17 +964,17 @@ pattern. It's fast, very simple and very light.
     package main;
 
     # get customer with id = 1:
-    my $customer = Customer->find({ id => 1 })->fetch(); 
+    my $customer = Customer->objects->find({ id => 1 })->fetch(); 
 
     # or (the same):
-    my $customer = Customer->get(1);
+    my $customer = Customer->objects->get(1);
 
     print $customer->first_name; # print first name
     $customer->last_login(\'NOW()'); # to use built-in database function just send it as a SCALAR ref
     $customer->save(); # save in the database
 
     # get all purchases of $customer:
-    my @purchases = Purchase->find(customer => $customer)->fetch();
+    my @purchases = Purchase->objects->find(customer => $customer)->fetch();
 
     # or (the same):
     my @purchases = $customer->purchases->fetch();
@@ -1092,24 +1097,11 @@ Create calculated fields
 
 Make a relation. The method is aoutdated.
 
+=head2 objects
 
-=head2 sql_fetch_all
+Returns instance of L<ActiveRecord::Simple::QueryManager>.
 
-Execute any SQL code and fetch data. Returns list of objects. Accessors for all not specified fields
-will be created as read-only.
-
-    my @values = Purchase->sql_fetch_all('SELECT id, amount FROM purchase WHERE amount > ?', 100);
-    print $_->id, " ", $_->amount for, "\n" @values;
-
-
-=head2 sql_fetch_row
-
-Execute any SQL and fetch data. Returns an object.
-
-    my $customer = Customer->sql_fetch_row('SELECT id, name FORM customer WHERE id = ?', 1);
-    print $customer->name, "\n";
-
-=head2 find
+=head2 find [DEPRECATED]
 
 Returns L<ActiveRecord::Simple::Find> object.
 
@@ -1118,18 +1110,17 @@ Returns L<ActiveRecord::Simple::Find> object.
     my @customers = $finder->fetch;
 
 
-=head2 all
+=head2 all [DEPRECATED]
 
 Same as __PACKAGE__->find->fetch;
 
 
-=head2 get
+=head2 get [DEPRECATED]
 
 Get object by primary_key
 
     my $customer = Customer->get(1);
     # same as Customer->find({ id => 1 })->fetch;
-
 
 =head2 count
 

@@ -1,5 +1,5 @@
 package Bio::Roary::IterativeCdhit;
-$Bio::Roary::IterativeCdhit::VERSION = '3.11.1';
+$Bio::Roary::IterativeCdhit::VERSION = '3.11.3';
 # ABSTRACT:  Run CDhit iteratively with reducing thresholds, removing full clusters each time
 
 
@@ -111,7 +111,7 @@ Bio::Roary::IterativeCdhit - Run CDhit iteratively with reducing thresholds, rem
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

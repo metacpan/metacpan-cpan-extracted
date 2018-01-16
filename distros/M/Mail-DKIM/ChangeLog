@@ -1,3 +1,16 @@
+ -- VERSION 0.52 --
+
+2018-01-12: Marc Bradshaw <marc@marcbradshaw.net>
+
+ * Internet connection tests were declared in the wrong order
+
+ -- VERSION 0.51 --
+
+2018-01-12: Marc Bradshaw <marc@marcbradshaw.net>
+
+ * Fix for older versions of perl
+ * Tests no longer fail with no internet connection
+
  -- VERSION 0.50 --
 
 2017-12-16: Marc Bradshaw <marc@marcbradshaw.net>

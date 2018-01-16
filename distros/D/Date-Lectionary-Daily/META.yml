@@ -19,7 +19,7 @@ keywords:
   - readings
   - christian
   - liturgical
-license: perl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -31,18 +31,19 @@ no_index:
 provides:
   Date::Lectionary::Daily:
     file: lib/Date/Lectionary/Daily.pm
-    version: '1.20171127'
+    version: '1.20180114'
 requires:
   Carp: '1.38'
   Date::Advent: '1.20160727'
   Date::Easter: '1.22'
-  Date::Lectionary: '1.20170809'
-  Date::Lectionary::Day: '1.20170809'
+  Date::Lectionary: '1.20180109'
+  Date::Lectionary::Day: '1.20180109'
   Date::Lectionary::Time: '1.20170311'
   File::Share: '0.25'
   Moose: '2.1804'
   Moose::Util::TypeConstraints: '2.1804'
   MooseX::Aliases: '0.11'
+  MooseX::StrictConstructor: '0.21'
   Time::Piece: '1.31'
   Time::Seconds: '1.31'
   Try::Tiny: '0.24'
@@ -51,6 +52,6 @@ requires:
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Lectionary-Daily.git
-version: '1.20171127'
+version: '1.20180114'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

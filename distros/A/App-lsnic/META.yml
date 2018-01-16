@@ -26,7 +26,7 @@ no_index:
 provides:
   App::lsnic:
     file: lib/App/lsnic.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Env: '0'
   Getopt::Std: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/athreef/App-lsnic/issues
   homepage: https://github.com/athreef/App-lsnic
   repository: https://github.com/athreef/App-lsnic.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -244,7 +244,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -1,0 +1,30 @@
+Revision history for Firefox-Marionette
+
+0.09  Mon Jan 15 21:30:00 2018
+       Improved handling of 'X_GetImage: BadMatch' exceptions in test suite
+
+0.08  Mon Jan 15 21:02:00 2018
+       Cleaned up documentation. Added support for is_displayed, is_enabled, is_selected, window_rect
+       Removed locally patched Test::NeedsDisplay.  Added TODO support in tests for 'X_GetImage: BadMatch' exceptions for screenshots.  Thanks to SREZIC for assistance in RT#12407
+
+0.07  Sun Jan 14 20:43:00 2018
+       Included locally patched Test::NeedsDisplay in MANIFEST
+
+0.06  Sun Jan 14 17:59:00 2018
+       Adding support for MacOS (darwin) and custom firefox binaries
+
+0.05  Sun Jan 14 09:15:00 2018
+       Adding locally patched Test::NeedsDisplay to get around screenshot test failures
+
+0.04  Sat Jan 13 19:50:00 2018
+       Adding Test::NeedsDisplay as a build pre-requisite for non Win32 platforms
+
+0.03  Sat Jan 13 18:04:00 2018
+       Added element and css methods
+
+0.02  Sat Jan 13 16:48:00 2018
+       Updated documentation, removed Build.PL, added LICENSE key to Makefile.PL
+
+0.01  Sat Jan  6 17:28:44 2018
+       Initial release.
+

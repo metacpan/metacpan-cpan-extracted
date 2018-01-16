@@ -1,5 +1,5 @@
 #
-# $Id: Iplocation.pm,v ffeabf04f880 2017/10/21 11:57:26 gomor $
+# $Id: Iplocation.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # lookup::iplocation Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: ffeabf04f880 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable location ipv4 ipv6 ip geo geolocation) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -333,7 +333,7 @@ Metabrik::Lookup::Iplocation - lookup::iplocation Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

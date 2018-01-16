@@ -12,6 +12,7 @@ use JSON;
 use LWP::UserAgent;
 use Moose;
 use Carp qw(confess);
+use DDP;
 
 has 'config' => (is => 'ro', default => sub {WebService::Braintree->configuration });
 has 'fingerprint' => (is => 'rw');
@@ -88,9 +89,8 @@ sub get_future_payment_nonce_for_paypal {
     );
 
     my $json = decode_json($response->content);
-    my @paypalAccounts = @{$json->{'paypalAccounts'}};
-
-    return $paypalAccounts[0]->{'nonce'};
+    confess("Cannot create Future Payment Nonce:\n" . np($json)) unless $json->{paypalAccounts};
+    return $json->{paypalAccounts}[0]{nonce};
 }
 
 sub get_nonce_for_new_card {

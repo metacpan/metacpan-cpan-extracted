@@ -62,7 +62,7 @@ running (self)
 	PREINIT:
 		zmq_raw_timer *timer;
 
-	CODE:
+	PPCODE:
 		timer = ZMQ_SV_TO_PTR (Timer, self);
 		if (zmq_raw_timer_is_running (timer))
 			XSRETURN_YES;
@@ -74,7 +74,6 @@ _cancel (self)
 	SV *self
 
 	PREINIT:
-		int rc;
 		zmq_raw_timer *timer;
 
 	CODE:
@@ -87,7 +86,6 @@ expire (self)
 	SV *self
 
 	PREINIT:
-		int rc;
 		zmq_raw_timer *timer;
 
 	CODE:
@@ -100,7 +98,6 @@ _reset (self)
 	SV *self
 
 	PREINIT:
-		int rc;
 		zmq_raw_timer *timer;
 
 	CODE:

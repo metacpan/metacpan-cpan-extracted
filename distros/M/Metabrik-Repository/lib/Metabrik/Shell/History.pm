@@ -1,5 +1,5 @@
 #
-# $Id: History.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: History.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # shell::history Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(command) ],
       attributes => {
          history_file => [ qw(file) ],
@@ -33,13 +33,19 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         history_file => $self->global->homedir.'/.metabrik_history',
+         history_file => defined($self->global) && $self->global->homedir.'/.metabrik_history'
+            || defined($ENV{HOME}) && $ENV{HOME}.'/.metabrik_history'
+            || '/tmp/.metabrik_history',
       },
    };
 }
 
 sub load {
    my $self = shift;
+
+   if (! defined($self->shell)) {
+      return $self->log->error("load: no core::shell Brik");
+   }
 
    my $shell = $self->shell;
    my $history_file = $self->history_file;
@@ -52,7 +58,7 @@ sub load {
       $shell->term->ReadHistory($history_file)
          or return $self->log->error("load: can't ReadHistory file [$history_file]: $!");
 
-      $self->debug && $self->log->debug("load: success");
+      $self->log->debug("load: success");
    }
    else {
       $self->log->warning("load: cannot ReadHistory");
@@ -64,13 +70,17 @@ sub load {
 sub write {
    my $self = shift;
 
+   if (! defined($self->shell)) {
+      return $self->log->error("write: no core::shell Brik");
+   }
+
    my $shell = $self->shell;
    my $history_file = $self->history_file;
 
    if ($shell->term->can('WriteHistory')) {
       $shell->term->WriteHistory($history_file)
          or return $self->log->error("load: can't WriteHistory file [$history_file]: $!");
-      $self->debug && $self->log->debug("write: success");
+      $self->log->debug("write: success");
    }
    else {
       $self->log->warning("load: cannot WriteHistory");
@@ -82,13 +92,17 @@ sub write {
 sub get {
    my $self = shift;
 
+   if (! defined($self->shell)) {
+      return $self->log->error("get: no core::shell Brik");
+   }
+
    my $shell = $self->shell;
 
    my @history = ();
    if ($shell->term->can('GetHistory')) {
       @history = $shell->term->GetHistory;
 
-      $self->debug && $self->log->debug("get: success");
+      $self->log->debug("get: success");
    }
    else {
       $self->log->warning("load: cannot GetHistory");
@@ -100,6 +114,10 @@ sub get {
 sub get_one {
    my $self = shift;
    my ($number) = @_;
+
+   if (! defined($self->shell)) {
+      return $self->log->error("get_one: no core::shell Brik");
+   }
 
    $self->brik_help_run_undef_arg('get_one', $number) or return;
    if ($number !~ /^\d+$/) {
@@ -114,7 +132,7 @@ sub get_one {
       @history = $shell->term->GetHistory;
       $history = $history[$number];
 
-      $self->debug && $self->log->debug("get_one: success");
+      $self->log->debug("get_one: success");
    }
    else {
       $self->log->warning("load: cannot GetHistory");
@@ -126,6 +144,10 @@ sub get_one {
 sub get_range {
    my $self = shift;
    my ($range) = @_;
+
+   if (! defined($self->shell)) {
+      return $self->log->error("get_range: no core::shell Brik");
+   }
 
    $self->brik_help_run_undef_arg('get_range', $range) or return;
    if ($range !~ /^\d+\.\.\d+$/) {
@@ -139,7 +161,7 @@ sub get_range {
       @history = $shell->term->GetHistory;
       @history = @history[eval($range)];
 
-      $self->debug && $self->log->debug("get_range: success");
+      $self->log->debug("get_range: success");
    }
    else {
       $self->log->warning("load: cannot GetHistory");
@@ -165,6 +187,10 @@ sub show {
 sub execute {
    my $self = shift;
    my ($numbers) = @_;
+
+   if (! defined($self->shell)) {
+      return $self->log->error("execute: no core::shell Brik");
+   }
 
    $self->brik_help_run_undef_arg('execute', $numbers) or return;
 
@@ -194,7 +220,7 @@ Metabrik::Shell::History - shell::history Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

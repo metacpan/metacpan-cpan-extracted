@@ -1,0 +1,5 @@
+% my $a = shift;
+%% layout 'blog', title => 'Edit <%= $a->{t} %>';
+<h2>Edit <%= $a->{t} %></h2>
+%%= include '<%= $a->{t} %>/_form', caption => 'Update', target => 'update_<%= $a->{t} %>'
+%%= button_to Remove => remove_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

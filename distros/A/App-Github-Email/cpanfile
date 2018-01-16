@@ -1,7 +1,9 @@
 requires "Email::Address" => "0";
+requires "Getopt::Long::Descriptive" => "0";
 requires "LWP::Online" => "0";
 requires "LWP::UserAgent" => "0";
 requires "List::MoreUtils" => "0";
+requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -11,7 +13,6 @@ on 'build' => sub {
 
 on 'test' => sub {
   requires "Test::More" => "0";
-  requires "lib" => "0";
 };
 
 on 'configure' => sub {

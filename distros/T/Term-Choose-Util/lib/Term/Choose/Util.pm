@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu choose_multi
                      insert_sep length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -31,7 +31,7 @@ sub choose_multi {
 }
 
 
-sub stringify_array { join( ', ', map { "\"$_\"" } @_ ) }
+sub _stringify_array { join( ', ', map { "\"$_\"" } @_ ) }
 
 sub choose_dirs {
     my ( $opt ) = @_;
@@ -65,14 +65,14 @@ sub choose_dirs {
         my $len_key;
         if ( defined $o->{current} ) {
             $len_key = 9;
-            $prompt .= sprintf "Current: %s\n",   stringify_array( @{$o->{current}} );
-            $prompt .= sprintf "    New: %s\n", stringify_array( @$new );
+            $prompt .= sprintf "Current: %s\n", _stringify_array( @{$o->{current}} );
+            $prompt .= sprintf "    New: %s\n", _stringify_array( @$new );
         }
         else {
             $len_key = 5;
-            $prompt .= sprintf "New: %s\n", stringify_array( @$new );
+            $prompt .= sprintf "New: %s\n", _stringify_array( @$new );
         }
-        my $key_cwd = '>';
+        my $key_cwd = '=> ';
         $prompt  = line_fold( $prompt,                                     term_width(), '' , ' ' x $len_key );
         $prompt .= "\n";
         $prompt .= line_fold( $key_cwd . decode( 'locale_fs', $previous ), term_width(), '' , ' ' x length $key_cwd );
@@ -149,7 +149,7 @@ sub _prepare_opt_choose_path {
 }
 
 
-sub prepare_string { '"' . decode( 'locale_fs', shift ) . '"' }
+sub _prepare_string { '"' . decode( 'locale_fs', shift ) . '"' }
 
 
 sub choose_a_dir {
@@ -169,7 +169,7 @@ sub _choose_a_path {
     my $default_idx = $o->{enchanted}  ? 2 : 0;
     my $curr     = encode 'locale_fs', $o->{current};
     my $previous = $dir;
-    my $wildcard = '*';
+    my $wildcard = ' ? ';
 
     while ( 1 ) {
         my ( $dh, @dirs );
@@ -191,20 +191,20 @@ sub _choose_a_path {
         my $prompt = '';
         if ( $a_file ) {
             if ( $curr ) {
-                $prompt .= sprintf "Current file: %s\n", prepare_string( $curr );
-                $prompt .= sprintf "    New file: %s\n", prepare_string( catfile $dir, $wildcard );
+                $prompt .= sprintf "Current file: %s\n", _prepare_string( $curr );
+                $prompt .= sprintf "    New file: %s\n", _prepare_string( catfile $dir, $wildcard );
             }
             else {
-                $prompt .= sprintf "New file: %s\n", prepare_string( catfile $dir, $wildcard );
+                $prompt .= sprintf "New file: %s\n", _prepare_string( catfile $dir, $wildcard );
             }
         }
         else {
             if ( $curr ) {
-                $prompt .= sprintf "Current dir: %s\n", prepare_string( $curr );
-                $prompt .= sprintf "    New dir: %s\n", prepare_string( $dir );
+                $prompt .= sprintf "Current dir: %s\n", _prepare_string( $curr );
+                $prompt .= sprintf "    New dir: %s\n", _prepare_string( $dir );
             }
             else {
-                $prompt .= sprintf "New dir: %s\n", prepare_string( $dir );
+                $prompt .= sprintf "New dir: %s\n", _prepare_string( $dir );
             }
         }
         $prompt .= $o->{prompt} if $o->{prompt};
@@ -264,17 +264,17 @@ sub _a_file {
         }
         closedir $dh;
         if ( ! @files ) {
-            my $prompt =  sprintf "No files in %s.", prepare_string( $dir );
+            my $prompt =  sprintf "No files in %s.", _prepare_string( $dir );
             choose( [ ' < ' ], { prompt => $prompt } );
             return;
         }
         my $prompt = '';
         if ( $curr ) {
-            $prompt .= sprintf "Current file: %s\n", prepare_string( $curr );
-            $prompt .= sprintf "    New file: %s\n", prepare_string( catfile $dir, $previous // $wildcard );
+            $prompt .= sprintf "Current file: %s\n", _prepare_string( $curr );
+            $prompt .= sprintf "    New file: %s\n", _prepare_string( catfile $dir, $previous // $wildcard );
         }
         else {
-            $prompt .= sprintf "New file: %s\n", prepare_string( catfile $dir, $previous // $wildcard );
+            $prompt .= sprintf "New file: %s\n", _prepare_string( catfile $dir, $previous // $wildcard );
         }
         $prompt .= "\n" . $o->{prompt} if $o->{prompt};
         my @pre = ( undef, $o->{confirm} );
@@ -419,7 +419,7 @@ sub choose_a_subset {
     my $back    = defined $opt->{back}         ? $opt->{back}         : 'BACK';
     my $key_cur = defined $opt->{p_curr}       ? $opt->{p_curr}       : 'Current > ';
     my $key_new = defined $opt->{p_new}        ? $opt->{p_new}        : '    New > ';
-    if ( $prefix ) {
+    if ( $layout == 3 && $prefix ) {
         my $len_prefix = print_columns( "$prefix" );
         $confirm = ( ' ' x $len_prefix ) . $confirm;
         $back    = ( ' ' x $len_prefix ) . $back;
@@ -670,7 +670,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.052
+Version 0.053
 
 =cut
 
@@ -1266,7 +1266,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016 Matthäus Kiem.
+Copyright 2014-2018 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

@@ -18,20 +18,22 @@ subtest "multiple errors" => sub {
     };
 
     my $result = WebService::Braintree::Result->new(response => $response);
-    not_ok $result->is_success;
+    invalidate_result($result) or return;
+
     is ($result->message, "Customer ID is invalid.\nCredit card number is invalid.");
 };
 
 subtest "allow access to relevant objects on response" => sub {
+    my $amount = amount(40, 50);
     my $response = {
         transaction => {
-            amount => "44.00",
+            amount => $amount,
             type => "sale"
         }
     };
 
     my $result = WebService::Braintree::Result->new(response => $response);
-    is($result->transaction->amount, "44.00");
+    is($result->transaction->amount, $amount);
     is($result->customer, undef);
 };
 

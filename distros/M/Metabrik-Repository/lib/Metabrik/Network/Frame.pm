@@ -1,5 +1,5 @@
 #
-# $Id: Frame.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Frame.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::frame Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable packet ip tcp udp icmp eth ethernet arp) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -60,7 +60,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device || 'eth0',
+         device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -84,7 +84,7 @@ sub get_device_info {
 
    my $device_info = $nd->get($device) or return;
 
-   $self->debug && $self->log->debug("get_device_info: got info from device [$device]");
+   $self->log->debug("get_device_info: got info from device [$device]");
 
    return $device_info;
 }
@@ -407,7 +407,7 @@ Metabrik::Network::Frame - network::frame Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

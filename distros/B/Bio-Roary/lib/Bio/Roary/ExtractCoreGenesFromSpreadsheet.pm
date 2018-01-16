@@ -1,5 +1,5 @@
 package Bio::Roary::ExtractCoreGenesFromSpreadsheet;
-$Bio::Roary::ExtractCoreGenesFromSpreadsheet::VERSION = '3.11.1';
+$Bio::Roary::ExtractCoreGenesFromSpreadsheet::VERSION = '3.11.3';
 # ABSTRACT: Take in a spreadsheet produced by the pipeline and identify the core genes.
 
 
@@ -167,7 +167,7 @@ Bio::Roary::ExtractCoreGenesFromSpreadsheet - Take in a spreadsheet produced by 
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

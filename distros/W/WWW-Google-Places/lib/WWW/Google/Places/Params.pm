@@ -1,6 +1,6 @@
 package WWW::Google::Places::Params;
 
-$WWW::Google::Places::Params::VERSION   = '0.32';
+$WWW::Google::Places::Params::VERSION   = '0.33';
 $WWW::Google::Places::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::Params - Placeholder for parameters for WWW::Google::Places
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =head1 DESCRIPTION
 
@@ -24,11 +24,8 @@ use Data::Dumper;
 use File::Share ':all';
 use Method::ParamValidator;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(get_validator);
+use parent 'Exporter';
+our @EXPORT_OK = qw(get_validator);
 
 sub get_validator {
     my $validator = Method::ParamValidator->new( config => dist_file('WWW-Google-Places', 'method-config.json') );

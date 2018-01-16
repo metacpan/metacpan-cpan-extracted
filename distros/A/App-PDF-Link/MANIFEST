@@ -12,6 +12,14 @@ lib/App/PDF/Link/Icons/MuseScore.pm
 lib/App/PDF/Link/Icons/PDF.pm
 lib/App/PDF/Link/Icons/PNG.pm
 lib/App/PDF/Link/Icons/iRealPro.pm
+res/pod/pdflink.pod
+pp/common/pdflink.pp
+pp/linux/GNUmakefile
+pp/linux/pdflink.pp
+pp/Makefile
+pp/README
+pp/windows/GNUmakefile
+pp/windows/pdflink.pp
 script/pdflink.pl
 script/pp.PL
 t/00-load.t

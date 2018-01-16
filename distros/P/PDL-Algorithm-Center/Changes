@@ -1,5 +1,12 @@
 Revision history for PDL-Algorithm-Center
 
+0.07      2018-01-10 14:47:37-05:00 America/New_York
+
+  [DISTRIBUTION FIX]
+
+    * bump Hash::Wrap dependency to 0.03 [RT#124043] ++SREZIC
+
+
 0.06      2018-01-08 16:52:33-05:00 America/New_York
 
   [ENHANCEMENT]

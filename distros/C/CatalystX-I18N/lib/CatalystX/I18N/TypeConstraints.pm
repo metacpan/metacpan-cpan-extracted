@@ -34,19 +34,19 @@ coerce  'CatalystX::I18N::Type::Locales'
 
 subtype 'CatalystX::I18N::Type::DirList'
     => as 'ArrayRef[Path::Class::Dir]';
-    
+
 coerce 'CatalystX::I18N::Type::DirList'
     => from 'Path::Class::Dir'
-    => via { 
+    => via {
         [ $_ ]
     }
     => from 'Str'
-    => via { 
+    => via {
         [ Path::Class::Dir->new($_) ]
     }
     => from 'ArrayRef[Str]'
-    => via { 
-        [ 
+    => via {
+        [
             map { Path::Class::Dir->new($_) } @{$_}
         ]
     };

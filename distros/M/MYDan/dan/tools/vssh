@@ -27,7 +27,7 @@ $option->assert( 'range' );
 
 exit unless my @node = $range->load( delete $o{range} )->list;
 
-$o{user} = `logname` and chop $o{user} unless $o{user};
+$o{user} = `id -un` and chop $o{user} unless $o{user};
 
 MYDan::VSSH->new( node => \@node )->run( %o );
 

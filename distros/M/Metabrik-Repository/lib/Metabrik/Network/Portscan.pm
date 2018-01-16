@@ -1,5 +1,5 @@
 #
-# $Id: Portscan.pm,v 34a2bdfafce0 2017/06/11 16:06:22 gomor $
+# $Id: Portscan.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # network::portscan Brik
 #
@@ -7,11 +7,11 @@ package Metabrik::Network::Portscan;
 use strict;
 use warnings;
 
-use base qw(Metabrik::Network::Address Metabrik::Network::Device);
+use base qw(Metabrik::Network::Device);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 34a2bdfafce0 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable scan syn port synscan tcpscan) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -143,6 +143,7 @@ sub brik_properties {
          'Net::Write::Fast' => [ ],
          'Net::Frame::Simple' => [ ],
          'POSIX' => [ qw(ceil) ],
+         'Metabrik::Network::Address' => [ ],
          'Metabrik::Network::Read' => [ ],
          'Metabrik::System::Process' => [ ],
          'Metabrik::Worker::Fork' => [ ],
@@ -155,8 +156,8 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device,
-         listen_device => $self->global->device,
+         device => defined($self->global) && $self->global->device || 'eth0',
+         listen_device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -254,6 +255,8 @@ sub tcp_syn_sender {
    my $device = $self->device;
    my $use_ipv6 = $self->use_ipv6;
 
+   my $na = Metabrik::Network::Address->new_from_brik_init($self) or return;
+
    # Set source IP address.
    my $ip4;
    my $ip6;
@@ -272,14 +275,14 @@ sub tcp_syn_sender {
 
    my $ip = $ip_list->[0];
    if ($self->use_ipv6) {
-      if (! $self->is_ipv6($ip)) {
-         return $self->log->error("tcp_syn_sender: address is not IPv6 in ip_list");
+      if (! $na->is_ipv6($ip)) {
+         return $self->log->error("tcp_syn_sender: address [$ip] is not IPv6 in ip_list");
       }
       $self->log->verbose("tcp_syn_sender: using source IPv6 [$ip6]");
    }
    else {
-      if (! $self->is_ipv4($ip)) {
-         return $self->log->error("tcp_syn_sender: address is not IPv4 in ip_list");
+      if (! $na->is_ipv4($ip)) {
+         return $self->log->error("tcp_syn_sender: address [$ip] is not IPv4 in ip_list");
       }
       $self->log->verbose("tcp_syn_sender: using source IPv4 [$ip4]");
    }
@@ -421,9 +424,9 @@ sub tcp_syn_receive_until_sender_exit {
    while (! $nr->has_timeout) {
       # We blocking until X frames are read or a Y second timeout has occured
       # X is calcluted as a ratio of the pps rate.
-      $self->debug && $self->log->debug("tcp_syn_receive_until_sender_exit: waiting stuff");
+      $self->log->debug("tcp_syn_receive_until_sender_exit: waiting stuff");
       if (my $next = $nr->read_until_timeout($pps / 30, $wait)) {  
-         $self->debug && $self->log->debug("tcp_syn_receive_until_sender_exit: read_until_timeout has stuff");
+         $self->log->debug("tcp_syn_receive_until_sender_exit: read_until_timeout has stuff");
          for my $f (@$next) {
             my $s = Net::Frame::Simple->newFromDump($f);
             if ($s->ref->{TCP}) {
@@ -465,12 +468,12 @@ sub tcp_syn_receive_until_sender_exit {
             }
          }
          if ($nr->has_timeout) {
-            $self->debug && $self->log->debug("tcp_syn_receive_until_sender_exit: has_timeout");
+            $self->log->debug("tcp_syn_receive_until_sender_exit: has_timeout");
             if (! $sp->is_running($pid)) {
                $self->log->verbose("tcp_syn_receive_until_sender_exit: no more sender, stopping loop");
                last;
             }
-            $self->debug && $self->log->debug("tcp_syn_receive_until_sender_exit: reset_timeout");
+            $self->log->debug("tcp_syn_receive_until_sender_exit: reset_timeout");
             $nr->reset_timeout;
          }
       }
@@ -503,6 +506,8 @@ sub tcp_syn_scan {
 
    my $wait = $self->wait;
 
+   my $na = Metabrik::Network::Address->new_from_brik_init($self) or return;
+
    my $nr = $self->tcp_syn_start_receiver($port_list) or return;
 
    my $estimate = $self->estimate_runtime($ip_list, $port_list, $pps, $try);
@@ -525,18 +530,18 @@ sub tcp_syn_scan {
    defined(my $pid = $wf->start) or return $self->log->error("tcp_syn_scan: start failed");
 
    if (! $pid) { # Son
-      $self->debug && $self->log->debug("tcp_syn_scan: son starts its task...");
+      $self->log->debug("tcp_syn_scan: son starts its task...");
       $self->tcp_syn_sender($ip_list, $port_list, $pps, $try);
-      $self->debug && $self->log->debug("tcp_syn_scan: son finished its task, exiting");
+      $self->log->debug("tcp_syn_scan: son finished its task, exiting");
       exit(0);
    }
 
-   my $use_ipv6 = $self->is_ipv6($ip_list->[0]) ? 1 : 0;
+   my $use_ipv6 = $na->is_ipv6($ip_list->[0]) ? 1 : 0;
 
    # Father: analyse received frames
-   $self->debug && $self->log->debug("tcp_syn_scan: father starts");
+   $self->log->debug("tcp_syn_scan: father starts");
    my $r = $self->tcp_syn_receive_until_sender_exit($pid, $pps, $wait, $use_ipv6);
-   $self->debug && $self->log->debug("tcp_syn_scan: father finished");
+   $self->log->debug("tcp_syn_scan: father finished");
    
    $self->tcp_syn_stop_receiver($nr);
 
@@ -555,7 +560,7 @@ Metabrik::Network::Portscan - network::portscan Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

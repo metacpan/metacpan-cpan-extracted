@@ -7,6 +7,7 @@ use Test::NoWarnings;
 
 use lib qw(t/);
 use testlib;
+use utf8;
 
 
 my $mech = init();
@@ -17,7 +18,6 @@ $mech->{catalyst_debug} = 1;
     my $response = request($mech,'/base/test1');
     is($response->{default_locale},'de_AT','Default locale');
     is($response->{locale},'de_CH','Current locale');
-    
 }
 
 # Test 2 - get locale

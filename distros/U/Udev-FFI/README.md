@@ -253,6 +253,8 @@ directory.
 
 libudev
 
+eudev
+
 [FFI::Platypus](https://metacpan.org/pod/FFI::Platypus) (Write Perl bindings to non-Perl libraries without C or XS)
 
 [FFI::CheckLib](https://metacpan.org/pod/FFI::CheckLib) (Check that a library is available for FFI)
@@ -276,7 +278,7 @@ Mohammad S Anwar
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Ilya Pavlov
+Copyright (C) 2017-2018 by Ilya Pavlov
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
 

@@ -33,9 +33,9 @@ char* crypt_xor (const char* source, size_t slen, const char* key, size_t klen, 
         buf = (unsigned char*) std::malloc(slen+1); // space for '0'
         if (!buf) throw std::bad_alloc();
     }
-    for (size_t i = 0; i < slen; ++i) dest[i] = ((unsigned char) source[i]) ^ ((unsigned char) key[i % klen]);
-    dest[slen] = 0;
-    return (char*) dest;
+    for (size_t i = 0; i < slen; ++i) buf[i] = ((unsigned char) source[i]) ^ ((unsigned char) key[i % klen]);
+    buf[slen] = 0;
+    return (char*) buf;
 }
 
 }}

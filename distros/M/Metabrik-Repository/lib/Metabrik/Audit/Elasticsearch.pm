@@ -1,5 +1,5 @@
 #
-# $Id: Elasticsearch.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Elasticsearch.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # audit::elasticsearch Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -54,7 +54,7 @@ sub check_cve_2015_1427_rce {
 
    my $url = $uri.'/_search/?pretty';
 
-   $self->debug && $self->log->debug("check_cve_2015_1427_rce: POSTing to ".
+   $self->log->debug("check_cve_2015_1427_rce: POSTing to ".
       "url [$url] with data [$check]");
 
    my $reply = $self->post($check, $url) or return;
@@ -109,7 +109,7 @@ sub exploit_cve_2015_1427_rce {
 
    my $url = $uri.'/_search/?pretty';
 
-   $self->debug && $self->log->debug("exploit_cve_2015_1427_rce: POSTing to ".
+   $self->log->debug("exploit_cve_2015_1427_rce: POSTing to ".
       "url [$url] with data [$check]");
 
    my $reply = $self->post($check, $url) or return;
@@ -158,7 +158,7 @@ Metabrik::Audit::Elasticsearch - audit::elasticsearch Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

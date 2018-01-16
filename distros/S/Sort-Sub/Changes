@@ -1,4 +1,9 @@
-Revision history for Sort-Sub
+0.110   2018-01-15 (PERLANCAR)
+
+	- naturally: Use Sort::Naturally instead of using our own algorithm
+	  (better handles more cases). As a consequence, we are now always
+	  case-insensitive since Sort::Naturally is.
+
 
 0.10    2016-12-18 (PERLANCAR)
 

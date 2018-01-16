@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::xkcd.
 
+0.008   2018-01-09
+        * No functional changes, just cleanups.
+
 0.007   2016-10-14
         * Provide a META.json file.
 

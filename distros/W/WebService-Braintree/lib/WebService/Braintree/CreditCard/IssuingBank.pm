@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard::IssuingBank;
-$WebService::Braintree::CreditCard::IssuingBank::VERSION = '0.94';
+$WebService::Braintree::CreditCard::IssuingBank::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

@@ -1,5 +1,5 @@
 package Bio::Roary::External::CheckTools;
-$Bio::Roary::External::CheckTools::VERSION = '3.11.1';
+$Bio::Roary::External::CheckTools::VERSION = '3.11.3';
 # ABSTRACT: Check external executables are available and are the correct version
 
 
@@ -47,28 +47,30 @@ my %tools = (
     },
     'mafft' => {
         GETVER => "mafft --version < /dev/null 2>&1",
-        REGEXP => qr/(\d+\.\d+) /,
+        REGEXP => qr/(\d+\.\d+)/,
         NEEDED => 1,
     },
     'kraken' => {
-        GETVER => "kraken --version | head -n 1",
-        REGEXP => qr/(\d+\.\d+\.\d+.*)/,
+        GETVER => "kraken -v | head -n 1",
+        REGEXP => qr/(\d+\.\d+\.*\d*.*)/,
         NEEDED => 0,
     },
     'kraken-report' => {
-        GETVER => "kraken-report --version | head -n 1",
-        REGEXP => qr/(\d+\.\d+\.\d+.*)/,
+        GETVER => "kraken-report -v | head -n 1",
+        REGEXP => qr/(\d+\.\d+\.*\d*.*)/,
         NEEDED => 0,
-    },
+    },	
 	'Rscript'  => {
         GETVER => "Rscript --version 2>&1 | head -n 1",
         REGEXP => qr/R scripting front-end version ($BIDEC)/,
 		MINVER => "3",
         NEEDED => 0,
     },
-
-    # prank version also performs an update check so cant use it
-    'prank' => { NEEDED => 0 },
+    'prank' => {
+        GETVER => "prank | grep -m 1 ^prank",
+        REGEXP => qr/prank v.(\d+)/,
+        NEEDED => 0,
+    },
 
     # now just the standard unix tools we need
     'grep' => { NEEDED => 1 },
@@ -191,7 +193,7 @@ Bio::Roary::External::CheckTools - Check external executables are available and 
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 Functionality borrowed from PROKKA by Torsten Seemann.

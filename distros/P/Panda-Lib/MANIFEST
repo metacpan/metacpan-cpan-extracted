@@ -1,5 +1,4 @@
 Changes
-CMakeLists.txt
 Lib.xs
 lib/Panda/Lib.pm
 lib/Panda/Lib.pod
@@ -7,7 +6,6 @@ Makefile.PL
 MANIFEST			This list of files
 misc/mytest.plx
 Panda-Lib.pro
-src/xs/lib.o
 src/xs/lib/clone.cc
 src/xs/lib/clone.h
 src/xs/lib/cmp.cc

@@ -11,7 +11,7 @@ sub process {
 
     $c->response->content_type('application/json; charset=utf-8');
     $c->response->body(encode_json($response || $c->stash));
-    
+
     return;
 }
 

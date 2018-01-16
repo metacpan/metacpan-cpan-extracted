@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.056';
+our $VERSION = '0.059';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -45,7 +45,7 @@ sub __validate_options {
         binary_filter   => '[ 0 1 ]',
         grid            => '[ 0 1 ]',
         keep_header     => '[ 0 1 ]',
-        choose_columns  => '[ 0 1 2 ]',
+        choose_columns  => '[ 0 1 2 ]', # '[ 0 1 ]',
         table_expand    => '[ 0 1 2 ]',
         mouse           => '[ 0 1 2 3 4 ]',
         binary_string   => '',
@@ -56,9 +56,7 @@ sub __validate_options {
     };
     for my $key ( keys %$opt ) {
         if ( ! exists $valid->{$key} ) {
-            carp "print_table: '$key' is not a valid option name.";
-            choose( [ 'Press ENTER to continue' ], { prompt => '' } );
-            next;
+            croak "print_table: '$key' is not a valid option name.";
         }
         next if ! defined $opt->{$key};
         if ( $valid->{$key} eq '' ) {
@@ -72,7 +70,6 @@ sub __validate_options {
         }
     }
 }
-
 
 sub __set_defaults {
     my ( $self ) = @_;
@@ -97,64 +94,6 @@ sub __set_defaults {
 }
 
 
-sub __choose_columns_with_order {
-    my ( $self, $avail_cols ) = @_;
-    my $col_idxs = [];
-    my $ok = '-ok-';
-    my @pre = ( $ok );
-    my $init_prompt = 'Columns: ';
-    my $s_tab = print_columns( $init_prompt );
-
-    while ( 1 ) {
-        my @chosen_cols = @$col_idxs ?  @{$avail_cols}[@$col_idxs] : '*';
-        my $prompt = $init_prompt . join ', ', @chosen_cols;
-        my $choices = [ @pre, @$avail_cols ];
-        # Choose
-        my @idx = choose(
-            $choices,
-            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1,
-              no_spacebar => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse} }
-        );
-        if ( ! @idx || ! defined $choices->[$idx[0]] ) { #
-            if ( @$col_idxs ) {
-                $col_idxs = [];
-                next;
-            }
-            else {
-                return;
-            }
-        }
-        elsif ( $choices->[$idx[0]] eq $ok ) {
-            shift @idx;
-            push @$col_idxs, map { $_ -= @pre; $_ } @idx;
-            return $col_idxs;
-        }
-        else {
-            push @$col_idxs, map { $_ -= @pre; $_ } @idx;
-        }
-    }
-}
-
-
-sub __choose_columns_simple {
-    my ( $self, $avail_cols ) = @_;
-    my $all = '-*-';
-    my @pre = ( $all );
-    my $choices = [ @pre, @$avail_cols ];
-    my @idx = choose(
-        $choices,
-        { prompt => 'Choose: ', no_spacebar => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse} }
-    );
-    if ( ! @idx ) {
-        return;
-    }
-    if ( $choices->[$idx[0]] eq $all ) {
-        return [];
-    }
-    return [ map { $_ -= @pre; $_ } @idx ];
-}
-
-
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
         return Term::TablePrint->new( $_[1] )->print_table( $_[0] );
@@ -163,21 +102,30 @@ sub print_table {
     my ( $table_ref, $opt ) = @_;
     croak "print_table: called with " . @_ . " arguments - 1 or 2 arguments expected." if @_ < 1 || @_ > 2;
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
-    croak "print_table: empty table without header row!"                               if ! @$table_ref;
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
         $self->{backup_opt} = { map{ $_ => $self->{$_} } keys %$opt };
         $self->__validate_options( $opt );
     }
+    if ( ! @$table_ref ) {
+        choose( [ 'Close with ENTER' ], { prompt => "print_table: empty table without header row!" } );
+        return;
+    }
     $self->__set_defaults();
+
+    # ### remove
+    if ( $self->{choose_columns} == 2 ) {
+        choose( [ 'Close with ENTER' ], { prompt => "print_table option \"choose-columns\": 2 is no longer a valid value!" } );
+    }
+    # ###
+
     if ( $self->{add_header} ) {
         unshift @$table_ref, [ map { $_ . '_' . $self->{no_col} } 1 .. @{$table_ref->[0]} ];
     }
     my $last_row_idx = $self->{max_rows} && $self->{max_rows} < @$table_ref ? $self->{max_rows} : $#$table_ref;
     my $col_idxs = [];
     if ( $self->{choose_columns}  ) {
-        $col_idxs = $self->__choose_columns_simple( $table_ref->[0] )     if $self->{choose_columns} == 1;
-        $col_idxs = $self->__choose_columns_with_order( $table_ref->[0] ) if $self->{choose_columns} == 2;
+        $col_idxs = $self->__choose_columns( $table_ref->[0] ) if $self->{choose_columns};
         return if ! defined $col_idxs;
     }
     my $a_ref = [];
@@ -196,7 +144,7 @@ sub print_table {
         $self->{show_progress} = int @$a_ref * @{$a_ref->[0]} / $self->{progress_bar};
     }
     $self->__calc_col_width( $a_ref );
-    $self->__inner_print_tbl( $a_ref );
+    $self->__win_size_dependet_code( $a_ref );
     if ( $self->{backup_opt} ) {
         my $backup_opt = delete $self->{backup_opt};
         for my $key ( keys %$backup_opt ) {
@@ -207,30 +155,16 @@ sub print_table {
 }
 
 
-sub __inner_print_tbl {
+sub __win_size_dependet_code {
     my ( $self, $a_ref ) = @_;
-    my ( $term_width ) = term_size();
-    my $width_cols = $self->__calc_avail_width( $a_ref, $term_width );
-    if ( ! defined $width_cols ) {
+    my ( $term_w ) = term_size();
+    my $w_cols = $self->__calc_avail_col_width( $a_ref, $term_w );
+    if ( ! defined $w_cols ) {
         return;
     }
-    my ( $list, $len ) = $self->__trunk_col_to_avail_width( $a_ref, $width_cols );
+    my ( $list, $table_w ) = $self->_col_to_avail_col_width( $a_ref, $w_cols );
     if ( $self->{max_rows} && @$list - 1 >= $self->{max_rows} ) {
-        my $limit = insert_sep( $self->{max_rows}, $self->{thsd_sep} );
-        my $reached_limit = 'REACHED LIMIT "MAX_ROWS": ' . $limit;
-        if ( print_columns( $reached_limit ) > $len ) {
-            $reached_limit = '=LIMIT= ' . $limit;
-            $reached_limit = cut_to_printwidth( $reached_limit, $len );
-        }
-        push @$list, unicode_sprintf( $reached_limit, $len, 0 );
-    }
-    my $header_sep = '';
-    if ( $self->{grid} ) {
-        my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
-        for my $i ( 0 .. $#$width_cols ) {
-            $header_sep .= '-' x $width_cols->[$i];
-            $header_sep .= $tab if $i != $#$width_cols;
-        }
+        push @$list, $self->__reached_limit_message( $table_w );
     }
     my @header;
     if ( length $self->{prompt} ) {
@@ -239,34 +173,34 @@ sub __inner_print_tbl {
     if ( $self->{keep_header} ) {
         my $col_names = shift @$list;
         push @header, $col_names;
-        push @header, $header_sep if $self->{grid};
+        push @header, $self->__header_sep( $w_cols ) if $self->{grid};
     }
     else {
-        splice( @$list, 1, 0, $header_sep ) if $self->{grid};
+        splice( @$list, 1, 0, $self->__header_sep( $w_cols ) ) if $self->{grid};
     }
     my $prompt = join( "\n", @header );
     my $old_row = 0;
     my $auto_jumped_to_first_row = 2;
-    my $expanded = 0;
-    my ( $width ) = term_size();
+    my $row_is_expanded = 0;
+
     while ( 1 ) {
-        if ( ( term_size() )[0] != $width ) {
-            ( $width ) = term_size();
-            $self->__inner_print_tbl( $a_ref );
+        if ( ( term_size() )[0] != $term_w ) {
+            ( $term_w ) = term_size();
+            $self->__win_size_dependet_code( $a_ref );
             return;
         }
         if ( ( $self->{keep_header} && ! @$list ) || ( @$list == 1 ) ) {
             # Choose
             choose(
                 [ undef, @{$a_ref->[0]} ],
-                { prompt => 'EMPTY table!', layout => 0, clear_screen => 1, mouse => $self->{mouse}, undef => '<<' }
+                { prompt => 'EMPTY!', layout => 0, clear_screen => 1, mouse => $self->{mouse}, undef => '<<' }
             );
             return;
         }
         # Choose
         my $row = choose(
             $list,
-            { prompt => $prompt, index => 1, default => $old_row, ll => $len, layout => 3,
+            { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
               clear_screen => 1, mouse => $self->{mouse} }
         );
         if ( ! defined $row ) {
@@ -277,6 +211,7 @@ sub __inner_print_tbl {
         }
         if ( ! $self->{table_expand} ) {
             return if $row == 0;
+            next;
         }
         else {
             if ( $old_row == $row ) {
@@ -285,18 +220,18 @@ sub __inner_print_tbl {
                         return;
                     }
                     elsif ( $self->{table_expand} == 1 ) {
-                        return if $expanded;
+                        return if $row_is_expanded;
                         return if $auto_jumped_to_first_row == 1;
                     }
                     elsif ( $self->{table_expand} == 2 ) {
-                        return if $expanded;
+                        return if $row_is_expanded;
                     }
                     $auto_jumped_to_first_row = 0;
                 }
                 else {
                     $old_row = 0;
                     $auto_jumped_to_first_row = 1;
-                    $expanded = 0;
+                    $row_is_expanded = 0;
                     next;
                 }
             }
@@ -310,7 +245,7 @@ sub __inner_print_tbl {
                     $row-- if $row > 1;
                 }
             }
-            $expanded = 1;
+            $row_is_expanded = 1;
             $self->__print_single_row( $a_ref, $row, $self->{longest_col_name} + 1 );
         }
     }
@@ -319,11 +254,11 @@ sub __inner_print_tbl {
 
 sub __print_single_row {
     my ( $self, $a_ref, $row, $len_key ) = @_;
-    my ( $term_width ) = term_size();
-    $len_key = int( $term_width / 100 * 33 ) if $len_key > int( $term_width / 100 * 33 );
+    my ( $term_w ) = term_size();
+    $len_key = int( $term_w / 100 * 33 ) if $len_key > int( $term_w / 100 * 33 );
     my $separator = ' : ';
     my $len_sep = print_columns( $separator );
-    my $col_max = $term_width - ( $len_key + $len_sep + 1 );
+    my $col_max = $term_w - ( $len_key + $len_sep + 1 );
     my $row_data = [ ' Close with ENTER' ];
 
     for my $col ( 0 .. $#{$a_ref->[0]} ) {
@@ -348,6 +283,232 @@ sub __print_single_row {
     );
 }
 
+
+sub __calc_col_width {
+    my ( $self, $a_ref ) = @_;
+    my $show_progress = $self->{show_progress} >= 2 ? 1 : 0; #
+    my $total = @$a_ref;                      #
+    my $next_update = 0;                      #
+    my $c = 0;                                #
+    my $progress;                             #
+    if ( $show_progress ) {                   #
+        local $| = 1;                         #
+        print CLEAR_SCREEN;                   #
+        $progress = Term::ProgressBar->new( { #
+            name => 'Computing',              #
+            count => $total,                  #
+            remove => 1 } );                  #
+        $progress->minor( 0 );                #
+    }                                         #
+    $self->{longest_col_name} = 0;
+    $self->{w_cols} = [ ( 1 ) x @{$a_ref->[0]} ];
+    my $normal_row = 0;
+    my @col_idx = ( 0 .. $#{$a_ref->[0]} );
+
+    for my $row ( @$a_ref ) {
+        for my $i ( @col_idx ) {
+            my $width = print_columns( $self->__sanitize_string( $row->[$i] ) );
+            if ( $normal_row ) {
+                if ( $width > $self->{w_cols}[$i] ) {
+                    $self->{w_cols}[$i] = $width;
+                }
+                if ( $row->[$i] && ! looks_like_number $row->[$i] ) {
+                    ++$self->{not_a_number}[$i];
+                }
+            }
+            else {
+                # col name
+                $self->{w_head}[$i] = $width;
+                if ( $width > $self->{longest_col_name} ) {
+                    $self->{longest_col_name} = $width;
+                }
+                if ( $i == $#$row ) {
+                    $normal_row = 1;
+                }
+            }
+        }
+        if ( $show_progress ) {                                              #
+            $next_update = $progress->update( $c ) if $c >= $next_update;    #
+            ++$c;                                                            #
+        }                                                                    #
+    }
+    $progress->update( $total ) if $show_progress && $total >= $next_update; #
+}
+
+
+sub __calc_avail_col_width {
+    my ( $self, $a_ref, $term_w ) = @_;
+    my $w_head = [ @{$self->{w_head}} ];
+    my $w_cols = [ @{$self->{w_cols}} ];
+    my $avail_w = $term_w - $self->{tab_w} * $#$w_cols;
+    my $sum = sum( @$w_cols );
+    if ( $sum < $avail_w ) {
+        # auto cut
+        HEAD: while ( 1 ) {
+            my $count = 0;
+            for my $i ( 0 .. $#$w_head ) {
+                if ( $w_head->[$i] > $w_cols->[$i] ) {
+                    ++$w_cols->[$i];
+                    ++$count;
+                    last HEAD if ( $sum + $count ) == $avail_w;
+                }
+            }
+            last HEAD if $count == 0;
+            $sum += $count;
+        }
+        return $w_cols;
+    }
+    elsif ( $sum > $avail_w ) {
+        my $min_width = $self->{min_col_width} || 1;
+        if ( @$w_head > $avail_w ) {
+            $self->__print_term_not_wide_enough_message( $a_ref );
+            return;
+        }
+        my @w_cols_tmp = @$w_cols;
+        my $percent = 0;
+
+        MIN: while ( $sum > $avail_w ) {
+            ++$percent;
+            my $count = 0;
+            for my $i ( 0 .. $#w_cols_tmp ) {
+                if ( $min_width >= $w_cols_tmp[$i] ) {
+                    next;
+                }
+                if ( $min_width >= _minus_x_percent( $w_cols_tmp[$i], $percent ) ) {
+                    $w_cols_tmp[$i] = $min_width;
+                }
+                else {
+                    $w_cols_tmp[$i] = _minus_x_percent( $w_cols_tmp[$i], $percent );
+                }
+                ++$count;
+            }
+            $sum = sum( @w_cols_tmp );
+            $min_width-- if $count == 0;
+            #last MIN if $min_width == 0;
+        }
+        my $rest = $avail_w - $sum;
+        if ( $rest ) {
+
+            REST: while ( 1 ) {
+                my $count = 0;
+                for my $i ( 0 .. $#w_cols_tmp ) {
+                    if ( $w_cols_tmp[$i] < $w_cols->[$i] ) {
+                        $w_cols_tmp[$i]++;
+                        $rest--;
+                        $count++;
+                        last REST if $rest == 0;
+                    }
+                }
+                last REST if $count == 0;
+            }
+        }
+        $w_cols = [ @w_cols_tmp ] if @w_cols_tmp;
+    }
+    return $w_cols;
+}
+
+
+sub _col_to_avail_col_width {
+    my ( $self, $a_ref, $w_cols ) = @_;
+    my $total = @$a_ref;                      #
+    my $next_update = 0;                      #
+    my $c = 0;                                #
+    my $progress;                             #
+    if ( $self->{show_progress} ) {           #
+        local $| = 1;                         #
+        print CLEAR_SCREEN;                   #
+        $progress = Term::ProgressBar->new( { #
+            name => 'Computing',              #
+            count => $total,                  #
+            remove => 1 } );                  #
+        $progress->minor( 0 );                #
+    }
+    my $tab;
+    if ( $self->{grid} ) {
+        $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
+    }
+    else {
+        $tab = ' ' x $self->{tab_w};
+    }
+    my $list = [];
+    for my $row ( @$a_ref ) {
+        my $str = '';
+        for my $i ( 0 .. $#$w_cols ) {
+            $str .= unicode_sprintf(
+                $self-> __sanitize_string( $row->[$i] ),
+                $w_cols->[$i],
+                $self->{not_a_number}[$i] ? 0 : 1
+            );
+            $str .= $tab if $i != $#$w_cols;
+        }
+        push @$list, $str;
+        if ( $self->{show_progress} ) {                                      #
+            $next_update = $progress->update( $c ) if $c >= $next_update;    #
+            ++$c;                                                            #
+        }                                                                    #
+    }
+    $progress->update( $total ) if $self->{show_progress} && $total >= $next_update; #
+    my $table_w = sum( @$w_cols, $self->{tab_w} * $#{$w_cols} );
+    return $list, $table_w;
+}
+
+
+
+sub __choose_columns {
+    my ( $self, $avail_cols ) = @_;
+    my $col_idxs = [];
+    my $ok = '-ok-';
+    my @pre = ( $ok );
+    my $init_prompt = 'Columns: ';
+    my $s_tab = print_columns( $init_prompt );
+
+    while ( 1 ) {
+        my @chosen_cols = @$col_idxs ?  @{$avail_cols}[@$col_idxs] : '*';
+        my $prompt = $init_prompt . join( ', ', map { defined $_ ? $_ : $self->{undef} } @chosen_cols );
+        my $choices = [ @pre, @$avail_cols ];
+        # Choose
+        my @idx = choose(
+            $choices,
+            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1,
+              no_spacebar => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse} }
+        );
+        if ( ! @idx ) {
+            if ( @$col_idxs ) {
+                $col_idxs = [];
+                next;
+            }
+            return;
+        }
+        elsif ( defined $choices->[$idx[0]] && $choices->[$idx[0]] eq $ok ) {
+            shift @idx;
+            push @$col_idxs, map { $_ -= @pre; $_ } @idx;
+            return $col_idxs;
+        }
+        push @$col_idxs, map { $_ -= @pre; $_ } @idx;
+    }
+}
+
+sub __reached_limit_message {
+    my ( $self, $table_w ) = @_;
+    my $limit = insert_sep( $self->{max_rows}, $self->{thsd_sep} );
+    my $reached_limit = 'REACHED LIMIT "MAX_ROWS": ' . $limit;
+    if ( print_columns( $reached_limit ) > $table_w ) {
+        $reached_limit = '=LIMIT= ' . $limit;
+        $reached_limit = cut_to_printwidth( $reached_limit, $table_w );
+    }
+    return $reached_limit;
+}
+
+sub __header_sep {
+    my ( $self, $w_cols ) = @_;
+    my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
+    my $header_sep = '';
+    for my $i ( 0 .. $#$w_cols ) {
+        $header_sep .= '-' x $w_cols->[$i];
+        $header_sep .= $tab if $i != $#$w_cols;
+    }
+    return $header_sep;
+}
 
 sub __sanitize_string {
     my ( $self, $str ) = @_;
@@ -394,137 +555,18 @@ sub __handle_reference {
     }
 }
 
-
-sub __calc_col_width {
+sub __print_term_not_wide_enough_message {
     my ( $self, $a_ref ) = @_;
-    my $show_progress = $self->{show_progress} >= 2 ? 1 : 0; #
-    my $total = @$a_ref;                      #
-    my $next_update = 0;                      #
-    my $c = 0;                                #
-    my $progress;                             #
-    if ( $show_progress ) {                   #
-        local $| = 1;                         #
-        print CLEAR_SCREEN;                   #
-        $progress = Term::ProgressBar->new( { #
-            name => 'Computing',              #
-            count => $total,                  #
-            remove => 1 } );                  #
-        $progress->minor( 0 );                #
-    }                                         #
-    $self->{longest_col_name} = 0;
-    $self->{width_cols} = [ ( 1 ) x @{$a_ref->[0]} ];
-    my $normal_row = 0;
-    my @col_idx = ( 0 .. $#{$a_ref->[0]} );
-
-    for my $row ( @$a_ref ) {
-        for my $i ( @col_idx ) {
-            my $width = print_columns( $self->__sanitize_string( $row->[$i] ) );
-            if ( $normal_row ) {
-                if ( $width > $self->{width_cols}[$i] ) {
-                    $self->{width_cols}[$i] = $width;
-                }
-                if ( $row->[$i] && ! looks_like_number $row->[$i] ) {
-                    ++$self->{not_a_number}[$i];
-                }
-            }
-            else {
-                # col name
-                $self->{width_head}[$i] = $width;
-                if ( $width > $self->{longest_col_name} ) {
-                    $self->{longest_col_name} = $width;
-                }
-                if ( $i == $#$row ) {
-                    $normal_row = 1;
-                }
-            }
-        }
-        if ( $show_progress ) {                                              #
-            $next_update = $progress->update( $c ) if $c >= $next_update;    #
-            ++$c;                                                            #
-        }                                                                    #
-    }
-    $progress->update( $total ) if $show_progress && $total >= $next_update; #
-}
-
-
-sub __calc_avail_width {
-    my ( $self, $a_ref, $term_width ) = @_;
-    my $width_head = [ @{$self->{width_head}} ];
-    my $width_cols = [ @{$self->{width_cols}} ];
-    my $avail_width = $term_width - $self->{tab_w} * $#$width_cols;
-    my $sum = sum( @$width_cols );
-    if ( $sum < $avail_width ) {
-        # auto cut
-        HEAD: while ( 1 ) {
-            my $count = 0;
-            for my $i ( 0 .. $#$width_head ) {
-                if ( $width_head->[$i] > $width_cols->[$i] ) {
-                    ++$width_cols->[$i];
-                    ++$count;
-                    last HEAD if ( $sum + $count ) == $avail_width;
-                }
-            }
-            last HEAD if $count == 0;
-            $sum += $count;
-        }
-        return $width_cols;
-    }
-    elsif ( $sum > $avail_width ) {
-        my $minimum_with = $self->{min_col_width} || 1;
-        if ( @$width_head > $avail_width ) {
-            my $prompt_1 = 'To many columns - terminal window is not wide enough.';
-            choose(
-                [ 'Press ENTER to show the column names.' ],
-                { prompt => $prompt_1, clear_screen => 1, mouse => $self->{mouse} }
-            );
-            my $prompt_2 = 'Column names (close with ENTER).';
-            choose(
-                $a_ref->[0],
-                { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse} }
-            );
-            return;
-        }
-        my @width_cols_tmp = @$width_cols;
-        my $percent = 0;
-
-        MIN: while ( $sum > $avail_width ) {
-            ++$percent;
-            my $count = 0;
-            for my $i ( 0 .. $#width_cols_tmp ) {
-                if ( $minimum_with >= $width_cols_tmp[$i] ) {
-                    next;
-                }
-                if ( $minimum_with >= _minus_x_percent( $width_cols_tmp[$i], $percent ) ) {
-                    $width_cols_tmp[$i] = $minimum_with;
-                }
-                else {
-                    $width_cols_tmp[$i] = _minus_x_percent( $width_cols_tmp[$i], $percent );
-                }
-                ++$count;
-            }
-            $sum = sum( @width_cols_tmp );
-            $minimum_with-- if $count == 0;
-            #last MIN if $minimum_with == 0;
-        }
-        my $rest = $avail_width - $sum;
-        if ( $rest ) {
-
-            REST: while ( 1 ) {
-                my $count = 0;
-                for my $i ( 0 .. $#width_cols_tmp ) {
-                    if ( $width_cols_tmp[$i] < $width_cols->[$i] ) {
-                        $width_cols_tmp[$i]++;
-                        $rest--;
-                        $count++;
-                        last REST if $rest == 0;
-                    }
-                }
-                last REST if $count == 0;
-            }
-        }
-        $width_cols = [ @width_cols_tmp ] if @width_cols_tmp;
-    }
-    return $width_cols;
+    my $prompt_1 = 'To many columns - terminal window is not wide enough.';
+    choose(
+        [ 'Press ENTER to show the column names.' ],
+        { prompt => $prompt_1, clear_screen => 1, mouse => $self->{mouse} }
+    );
+    my $prompt_2 = 'Column names (close with ENTER).';
+    choose(
+        $a_ref->[0],
+        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse} }
+    );
 }
 
 sub _minus_x_percent {
@@ -534,49 +576,8 @@ sub _minus_x_percent {
 }
 
 
-sub __trunk_col_to_avail_width {
-    my ( $self, $a_ref, $width_cols ) = @_;
-    my $total = @$a_ref;                      #
-    my $next_update = 0;                      #
-    my $c = 0;                                #
-    my $progress;                             #
-    if ( $self->{show_progress} ) {           #
-        local $| = 1;                         #
-        print CLEAR_SCREEN;                   #
-        $progress = Term::ProgressBar->new( { #
-            name => 'Computing',              #
-            count => $total,                  #
-            remove => 1 } );                  #
-        $progress->minor( 0 );                #
-    }
-    my $tab;
-    if ( $self->{grid} ) {
-        $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
-    }
-    else {
-        $tab = ' ' x $self->{tab_w};
-    }
-    my $list = [];
-    for my $row ( @$a_ref ) {
-        my $str = '';
-        for my $i ( 0 .. $#$width_cols ) {
-            $str .= unicode_sprintf(
-                $self-> __sanitize_string( $row->[$i] ),
-                $width_cols->[$i],
-                $self->{not_a_number}[$i] ? 0 : 1
-            );
-            $str .= $tab if $i != $#$width_cols;
-        }
-        push @$list, $str;
-        if ( $self->{show_progress} ) {                                      #
-            $next_update = $progress->update( $c ) if $c >= $next_update;    #
-            ++$c;                                                            #
-        }                                                                    #
-    }
-    $progress->update( $total ) if $self->{show_progress} && $total >= $next_update; #
-    my $len = sum( @$width_cols, $self->{tab_w} * $#{$width_cols} );
-    return $list, $len;
-}
+
+
 
 
 
@@ -595,7 +596,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.056
+Version 0.059
 
 =cut
 
@@ -768,11 +769,8 @@ Default: 0
 
 =head3 choose_columns
 
-If I<choose_columns> is set to 1, the user can choose which columns to print. The columns can be marked with the
-C<SpaceBar>. The list of marked columns including the highlighted column are printed as soon as C<Return> is pressed.
-
-If I<choose_columns> is set to 2, it is possible to change the order of the columns. Columns can be added (with
-the C<SpaceBar> and the C<Return> key) until the user confirms with the I<-ok-> menu entry.
+If I<choose_columns> is set to 1, the user can choose which columns to print. Columns can be added (with the
+C<SpaceBar> and the C<Return> key) until the user confirms with the I<-ok-> menu entry.
 
 Default: 0
 
@@ -846,20 +844,6 @@ Default: "" (empty string)
 
 =head1 ERROR HANDLING
 
-=head2 Carp
-
-C<print_table> warns
-
-=over
-
-=item
-
-if an unknown option name is passed.
-
-=back
-
-=head2 Croak
-
 C<print_table> dies
 
 =over
@@ -874,11 +858,13 @@ if an invalid argument is passed.
 
 =item
 
+if an unknown option name is passed.
+
+=item
+
 if an invalid option value is passed.
 
 =back
-
-if the first argument refers to an empty array.
 
 =head1 REQUIREMENTS
 

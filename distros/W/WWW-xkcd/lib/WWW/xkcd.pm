@@ -1,21 +1,19 @@
-use strict;
-use warnings;
 package WWW::xkcd;
 # ABSTRACT: Synchronous and asynchronous interfaces to xkcd comics
-$WWW::xkcd::VERSION = '0.007';
+$WWW::xkcd::VERSION = '0.008';
+use strict;
+use warnings;
 use Carp;
-use JSON;
-use Try::Tiny;
+use JSON::MaybeXS;
 use HTTP::Tiny;
 
-my $can_async = try   { require AnyEvent; require AnyEvent::HTTP; 1 }
-                catch { 0 };
+my $can_async = eval { require AnyEvent; require AnyEvent::HTTP; 1 };
 
 sub new {
     my $class = shift;
     my %args  = (
-        baseurl  => 'http://xkcd.com',
-        infopath => 'info.0.json',
+        'baseurl'  => 'https://xkcd.com',
+        'infopath' => 'info.0.json',
         @_,
     );
 
@@ -32,8 +30,8 @@ sub fetch_metadata {
 
     if ($cb) {
         # this is async
-        croak 'AnyEvent and AnyEvent::HTTP are required for async mode'
-            unless $can_async;
+        $can_async
+            or croak 'AnyEvent and AnyEvent::HTTP are required for async mode';
 
         AnyEvent::HTTP::http_get( $url, sub {
             my $body = shift;
@@ -58,19 +56,19 @@ sub fetch_metadata {
 
 sub fetch_random {
     my $self           = shift;
-    my $callback       = shift if ref $_[0];
-    
-    if ($callback) {
+    my $callback       = shift;
+
+    if ( $callback && ref $callback ) {
         $self->fetch_metadata( sub {
             my $metadata = shift;
-            my $random   = int(rand($metadata->{num})) + 1;
+            my $random   = int(rand($metadata->{'num'})) + 1;
             return $self->fetch($random, $callback);
         } );
         return 0;
     }
 
     my $metadata       = $self->fetch_metadata;
-    my $random         = int(rand($metadata->{num})) + 1;
+    my $random         = int(rand($metadata->{'num'})) + 1;
     return $self->fetch($random);
 }
 
@@ -130,8 +128,14 @@ sub _parse_args {
 sub _decode_json {
     my $self = shift;
     my $json = shift;
-    my $data = try   { decode_json $json                }
-               catch { croak "Can't decode '$json': $_" };
+    my $data = {};
+
+    defined $json or $json = '';
+
+    eval { $data = decode_json $json; 1; } or do {
+        my $error = $@ || 'Zombie error';
+        croak "Can't decode JSON content '$json': $error";
+    };
 
     return $data;
 }
@@ -150,7 +154,7 @@ WWW::xkcd - Synchronous and asynchronous interfaces to xkcd comics
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -280,7 +284,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Sawyer X.
+This software is copyright (c) 2018 by Sawyer X.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

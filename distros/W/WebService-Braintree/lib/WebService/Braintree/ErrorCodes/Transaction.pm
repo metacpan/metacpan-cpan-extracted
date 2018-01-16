@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Transaction;
-$WebService::Braintree::ErrorCodes::Transaction::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::Transaction::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -25,6 +25,7 @@ use constant CannotRefundWithPendingMerchantAccount            => "91559";
 use constant CannotRefundWithSuspendedMerchantAccount          => "91538";
 use constant CannotReleaseFromEscrow                           => "91561";
 use constant CannotSubmitForSettlement                         => "91507";
+use constant CannotUpdateTransactionDetailsNotSubmittedForSettlement => '915129';
 use constant CannotSimulateSettlement                          => "91575";
 use constant ChannelIsTooLong                                  => "91550";
 use constant CreditCardIsRequired                              => "91508";

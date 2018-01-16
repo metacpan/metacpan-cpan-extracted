@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
+Bot::ChatBots::Telegram::WebHook - Telegram updates receiver, web hook
 
 =head1 SYNOPSIS
 
@@ -12,13 +12,13 @@ Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
    use Log::Any::Adapter;
    use Mojolicious::Lite;
    Log::Any::Adapter->set('Stderr');
-   plugin 'Bot::ChatBots::Telegram' => sources => [
+   plugin 'Bot::ChatBots::Telegram' => instances => [
       [
          'WebHook',
          processor  => \&processor,
          register   => 1,
          token      => $ENV{TOKEN},
-         unregister => 1,
+         unregister => 0,
          url        => 'https://example.com:8443/mybot',
       ],
       # more can follow here...
@@ -57,7 +57,6 @@ this can be).
 
 This class consumes the following roles, inheriting their accessors:
 
-
 =over
 
 =item *
@@ -69,6 +68,46 @@ L<Bot::ChatBots::Telegram::Role::Source>
 L<Bot::ChatBots::Role::WebHook>
 
 =back
+
+Additionally, it provides the following ones:
+
+=head2 B<< auto_register >>
+
+   my $boolean = $obj->auto_register;
+
+get the value of the automatic registration flag, which can be set upon
+construction via option C<register>. When set, the L</register> method
+will be called automatically upon construction.
+
+B<NOTE>: this parameters is initialized via the C<register> option in the
+constructor L</new>.
+
+=head2 B<< auto_unregister >>
+
+   my $boolean = $obj->auto_unregister;
+
+get the value of the automatic unregistration flag, which can be set upon
+construction via option C<unregister>. When set, the L</unregister> method
+will be called automatically upon destruction.
+
+Note that some PaaS environment (notably Dokku) might keep the "old"
+instance around while the new one is already up and running. In this case,
+it is suggested to keep this boolean value to its default false value and
+avoid unwanted unregistrations.
+
+B<NOTE>: this parameters is initialized via the C<unregister> option in
+the constructor L</new>.
+
+=head2 B<< certificate >>
+
+   $obj->certificate($certificate);
+   my $current = $obj->certificate;
+
+Set/get the currently installed certificate.
+
+It can be either a string or a hash with the key C<certificate> pointing
+to that string, see L<WWW::Telegram::BotAPI> for additional details, or
+Telegram's documentation.
 
 =head1 METHODS
 
@@ -92,7 +131,52 @@ The following sections describe the addiitonal ones.
 
 This method is called upon object construction. It takes care to call
 L</install_route> from L<Bot::ChatBots::Role::WebHook> so that you don't
-have to.
+have to. Additionally, if L</auto_register> is true, L</register> is
+called automatically.
+
+=head2 B<< DEMOLISH >>
+
+This method is called upon object destruction. It takes care to call
+L</unregister> if L</auto_unregister> is set to a true value.
+
+=head2 B<< new >>
+
+   my $obj = Bot::ChatBots::Telegram::WebHook->new(%args);
+
+   # mostly used in Mojolicious applications
+   plugin 'Bot::ChatBots::Telegram' => instances => [ [ 'WebHook', %args ] ];
+
+Create a new instance. Mostly used behind the scenes by
+L<Bot::ChatBots::MojoPlugin> as in the second example above.
+
+The arguments hash C<%hash> supports the following keys:
+
+=over
+
+=item C<***>
+
+all keys from L<Bot::ChatBots::Telegram::Role::Source> and
+L<Bot::ChatBots::Role::WebHook>
+
+=item C<certificate>
+
+in case a privately generated certificate has to be used, it can be set
+here or passed to the L</register> method. You don't need to set this if
+your certificate is publicly available and trusted (i.e. released by
+a recognised Certification Authority).
+
+=item C<register>
+
+if true, L</register> is called upon construction, without parameters.
+
+=item C<unregister>
+
+if true, L</unregister> is called upon destruction. Beware of setting this
+automation though, especially if your bot is installed through a platform
+as a service like Dokku, because this might interphere with your upgrade
+process.
+
+=back
 
 =head2 B<< parse_request >>
 
@@ -131,11 +215,48 @@ set to C<1> (a I<true> value) to signal that rendering already happened
    $obj->register(%args);
    $obj->register(\%args);
 
-Register the L</url> (possibly derived from L</path> if needed) as the
-webhook in Telegram.
+Register the C<url> (possibly derived from C<path> if needed) as the
+webhook in Telegram. Note that both C<url> and C<path> are inherited
+methods; you can override them in C<%args>. Same goes for C<token>.
 
-This operation requires a valid token, which can be either passed as one
-of the C<%args> or taken from the object (L</token> in particular).
+If you plan to use an auto-generated certificate, you will need to provide
+it either setting L</certificate> (possibly upon construction in L</new>)
+or via a parameter in C<%args>.
+
+Supported keys in C<%args>, all overriding values in the object when
+applicable:
+
+=over
+
+=item C<app>
+
+application object (defaults to value from inherited method C<app>)
+
+=item C<certificate>
+
+certificate in case it is auto-generated, defaults to value from object
+(see L</certificate> and L</new>).
+
+=item C<controller>
+
+controller object (defaults to value from inherited method C<app>)
+
+=item C<path>
+
+path value or object (defaults to value from inherited method C<app>).
+Used in case parameter C<url> below is not present or possibly derived
+from the object's C<url> method;
+
+=item C<token>
+
+token value (defaults to value from inherited method C<app>)
+
+=item C<url>
+
+webhook target URL value or object (defaults to value from inherited
+method C<app>)
+
+=back
 
 =head2 B<< token >>
 
@@ -159,7 +280,7 @@ Flavio Poletti <polettix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
 
 This module is free software. You can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

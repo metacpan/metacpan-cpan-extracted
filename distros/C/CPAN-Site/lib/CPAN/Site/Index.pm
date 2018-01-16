@@ -1,15 +1,18 @@
-# Copyrights 1998,2005-2017 by [Mark Overmeer].
+# Copyrights 1998,2005-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution CPAN::Site.
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package CPAN::Site::Index;
 use vars '$VERSION';
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 our @EXPORT_OK = qw/cpan_index cpan_mirror/;
 our $VERSION;  # required in test-env
@@ -182,8 +185,7 @@ sub package_on_usual_location($)
 
 sub inspect_archive
 {   my $fn = $File::Find::name;
-    return unless -f $fn
-               && ($fn =~ $tar_gz || $fn =~ $zip);
+    return unless -f $fn && ($fn =~ $tar_gz || $fn =~ $zip);
 
     (my $dist = $fn) =~ s!^\Q$topdir\E[\\/]!!;
 

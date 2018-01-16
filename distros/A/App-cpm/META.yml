@@ -40,8 +40,7 @@ requires:
   Menlo: '0'
   Module::CPANfile: '0'
   Module::Metadata: '0'
-  Parallel::Pipes: '0'
-  Pod::Usage: '1.33'
+  Parallel::Pipes: '0.004'
   local::lib: '2.000018'
   parent: '0'
   perl: '5.008001'
@@ -50,7 +49,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.955'
+version: '0.957'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

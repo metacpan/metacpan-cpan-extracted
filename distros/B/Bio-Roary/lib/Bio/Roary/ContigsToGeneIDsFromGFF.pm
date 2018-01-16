@@ -1,5 +1,5 @@
 package Bio::Roary::ContigsToGeneIDsFromGFF;
-$Bio::Roary::ContigsToGeneIDsFromGFF::VERSION = '3.11.1';
+$Bio::Roary::ContigsToGeneIDsFromGFF::VERSION = '3.11.3';
 # ABSTRACT: Parse a GFF and efficiently and extract ordered gene ids on each contig
 
 
@@ -145,7 +145,7 @@ Bio::Roary::ContigsToGeneIDsFromGFF - Parse a GFF and efficiently and extract or
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

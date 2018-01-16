@@ -5,7 +5,7 @@ package CatalystX::I18N;
 use strict;
 use warnings;
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 our $AUTHORITY = 'cpan:MAROS';
 
 1;
@@ -26,8 +26,8 @@ CatalystX::I18N - Catalyst internationalisation (I18N) framework
      +CatalystX::I18N::Role::GetLocale
      +CatalystX::I18N::Role::DateTime
      +CatalystX::I18N::Role::Maketext
- /; 
- # Choose only the roles you need 
+ /;
+ # Choose only the roles you need
  # CatalystX::I18N::Role::All is a convinient shortcut to load all available roles
  
  # Optionally also load request and response roles (also loaded by CatalystX::I18N::Role::All)
@@ -36,8 +36,8 @@ CatalystX::I18N - Catalyst internationalisation (I18N) framework
  __PACKAGE__->apply_response_class_roles(qw/CatalystX::I18N::TraitFor::Response/);
  
  # Add some I18N configuration
- __PACKAGE__->config( 
-     name    => 'MyApp', 
+ __PACKAGE__->config(
+     name    => 'MyApp',
      I18N    => {
          default_locale     => 'de_AT',
          locales            => {
@@ -67,7 +67,7 @@ Then in your controller classes
  
  sub auto : Private {
      my ($self,$c) = @_;
-     $c->get_locale(); 
+     $c->get_locale();
      # Tries to fetch the locale from the folloing sources in the given order
      # 1. Session
      # 2. User settings
@@ -85,7 +85,7 @@ Then in your controller classes
      $c->stash->{localtime} = $c->i18n_datetime_format_date->format_datetime(DateTime->now);
  }
 
-If you want to load all available roles and traits you can use 
+If you want to load all available roles and traits you can use
 L<CatalystX::I18N::Role::All> as a shortcut.
 
  package MyApp::Catalyst;
@@ -97,34 +97,34 @@ L<CatalystX::I18N::Role::All> as a shortcut.
 
 =head1 DESCRIPTION
 
-CatalystX::I18N provides a comprehensive toolset for internationalisation 
-(I18N) and localisation (L10N) of catalyst applications. This distribution 
+CatalystX::I18N provides a comprehensive toolset for internationalisation
+(I18N) and localisation (L10N) of catalyst applications. This distribution
 consists of several modules that are designed to integrate seamlessly, but
 can be run idependently or replaced easily if necessary.
 
 =over
 
-=item * L<CatalystX::I18N::Role::Base> 
+=item * L<CatalystX::I18N::Role::Base>
 
 Basic I18N role that glues everything toghether.
 
-=item * L<CatalystX::I18N::Role::Maketext> 
+=item * L<CatalystX::I18N::Role::Maketext>
 
-Localize text via L<Locale::Maketext>. Prefered over 
+Localize text via L<Locale::Maketext>. Prefered over
 L<CatalystX::I18N::Role::DataLocalize>
 
-=item * L<CatalystX::I18N::Role::DataLocalize> 
+=item * L<CatalystX::I18N::Role::DataLocalize>
 
-Localize text via L<Data::Localize>. Alternative to 
+Localize text via L<Data::Localize>. Alternative to
 L<CatalystX::I18N::Role::Maketext>
 
-=item * L<CatalystX::I18N::Role::PosixLocale> 
+=item * L<CatalystX::I18N::Role::PosixLocale>
 
 Sets the POSIX locale
 
 =item * L<CatalystX::I18N::Role::DateTime>
 
-Methods for localising date and time informations.
+Methods for localising date and time information.
 
 =item * L<CatalystX::I18N::Role::NumberFormat>
 
@@ -132,14 +132,14 @@ Methods for localising numbers.
 
 =item * L<CatalystX::I18N::TraitFor::Request>
 
-Extends L<Catalyst::Request> with usefull methods to help dealing with
+Extends L<Catalyst::Request> with useful methods to help dealing with
 various I18N related information in HTTP requests.
 
 =item * L<CatalystX::I18N::TraitFor::Response>
 
 Adds a C<Content-Language> header to the response.
 
-=item * L<CatalystX::I18N::Role::GetLocale> 
+=item * L<CatalystX::I18N::Role::GetLocale>
 
 Tries to determine the most appropriate locale for the current request.
 
@@ -153,12 +153,12 @@ Provides access to a L<Data::Localize> class via a Catalyst model.
 
 =item * L<CatalystX::I18N::Maketext>
 
-Helpful wrapper around L<Locale::Maketext>. Can also be used outside of 
+Helpful wrapper around L<Locale::Maketext>. Can also be used outside of
 Catalyst.
 
 =item * L<CatalystX::I18N::DataLocalize>
 
-Helpful wrapper around L<Data::Localize>. Can also be used outside of 
+Helpful wrapper around L<Data::Localize>. Can also be used outside of
 Catalyst.
 
 =back
@@ -168,8 +168,8 @@ Catalyst.
 In order to work properly, CatalystX::I18N will need some values in your
 Catalyst configuration
 
- __PACKAGE__->config( 
-     name    => 'MyApp', 
+ __PACKAGE__->config(
+     name    => 'MyApp',
      I18N    => {
          default_locale     => 'de_AT', # Fallback locale
          locales            => {
@@ -195,11 +195,11 @@ Locales can be marked as C<inactive>. Inactive locales will not be selected
 by the L<CatalystX::I18N::Role::GetLocale/get_locale> method.
 
 Locales can inherit from other locales (C<inherits>). All configuration values
-from inherited locales will be copied. If you use 
+from inherited locales will be copied. If you use
 L<CatalystX::I18N::Model::Maketext> together with L<CatalystX::I18N::Maketext>
 the generated lexicons will also inherit in the selected order.
 
-Additional configuration values are defined by the various 
+Additional configuration values are defined by the various
 CatalystX::I18N::Role::* plugins.
 
 =head1 EXTENDING
@@ -221,16 +221,16 @@ E.g. writing a new plugin that does some processing when the locale is set
 
 =head1 SEE ALSO
 
-L<Locale::Maketext>, <Locale::Maketext::Lexicon>, L<Data::Localize>, 
-L<Number::Format>, L<DateTime::Locale>, L<DateTime::Format::CLDR>, 
+L<Locale::Maketext>, <Locale::Maketext::Lexicon>, L<Data::Localize>,
+L<Number::Format>, L<DateTime::Locale>, L<DateTime::Format::CLDR>,
 L<DateTime::TimeZone>, L<HTTP::BrowserDetect> and L<Locale::Geocode>
 
 =head1 SUPPORT
 
-Please report any bugs or feature requests to 
+Please report any bugs or feature requests to
 C<catalystx-i18n@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/Public/Bug/Report.html?Queue=CatalystX::I18N>.
-I will be notified and then you'll automatically be notified of the progress 
+I will be notified and then you'll automatically be notified of the progress
 on your report as I make changes.
 
 =head1 AUTHOR
@@ -243,7 +243,7 @@ on your report as I make changes.
 
 =head1 COPYRIGHT
 
-CatalystX::I18N is Copyright (c) 2012 Maroš Kollár 
+CatalystX::I18N is Copyright (c) 2012 Maroš Kollár
 - L<http://www.k-1.com>
 
 =head1 LICENCE

@@ -47,43 +47,43 @@
    "provides" : {
       "WWW::Google::Places" : {
          "file" : "lib/WWW/Google/Places.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Address" : {
          "file" : "lib/WWW/Google/Places/Address.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::DetailResult" : {
          "file" : "lib/WWW/Google/Places/DetailResult.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Geometry" : {
          "file" : "lib/WWW/Google/Places/Geometry.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Location" : {
          "file" : "lib/WWW/Google/Places/Location.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Params" : {
          "file" : "lib/WWW/Google/Places/Params.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Photo" : {
          "file" : "lib/WWW/Google/Places/Photo.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Review" : {
          "file" : "lib/WWW/Google/Places/Review.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::Review::Aspect" : {
          "file" : "lib/WWW/Google/Places/Review/Aspect.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "WWW::Google::Places::SearchResult" : {
          "file" : "lib/WWW/Google/Places/SearchResult.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -94,6 +94,6 @@
          "web" : "https://github.com/manwar/WWW-Google-Places"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

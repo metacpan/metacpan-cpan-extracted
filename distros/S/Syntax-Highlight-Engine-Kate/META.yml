@@ -34,4 +34,4 @@ resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/szabgab/Syntax-Highlight-Engine-Kate
-version: 0.13
+version: 0.14

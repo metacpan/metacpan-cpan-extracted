@@ -9,9 +9,19 @@ new (class)
 
 	CODE:
 		Newxz (poller, 1, zmq_raw_poller);
-		Newxz (poller->items, 1, zmq_pollitem_t);
+		poller->poller = zmq_poller_new();
+		poller->events = zmq_raw_event_map_create();
+		poller->interested = zmq_raw_event_map_create();
+		if (poller->events == NULL || poller->interested == NULL || poller->poller == NULL)
+		{
+			zmq_raw_event_map_destroy (poller->events);
+			zmq_raw_event_map_destroy (poller->interested);
+			zmq_poller_destroy (&poller->poller);
+			Safefree (poller);
+			zmq_raw_check_error (-1);
+		}
+
 		ZMQ_NEW_OBJ (RETVAL, "ZMQ::Raw::Poller", poller);
-		poller->sockets = newAV();
 
 	OUTPUT: RETVAL
 
@@ -22,37 +32,53 @@ add (self, socket, events)
 	short events
 
 	PREINIT:
-		zmq_raw_poller *poller = NULL;
-		zmq_raw_socket *sock;
-		zmq_pollitem_t i;
-		SSize_t size;
+		zmq_raw_poller *poller;
+		int rc;
 		PerlIO *io;
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
 
-		i.events = events;
-		i.revents = 0;
-		i.fd = 0;
-		i.socket = NULL;
-
 		io = zmq_get_socket_io (socket);
 		if (io)
 		{
-			i.fd = zmq_get_native_socket (io);
+			if (zmq_raw_event_map_get (poller->interested, SvRV (socket)))
+				rc = zmq_poller_modify_fd (poller->poller, zmq_get_native_socket (io),
+					events);
+			else
+				rc = zmq_poller_add_fd (poller->poller, zmq_get_native_socket (io),
+					SvRV (socket), events);
+			zmq_raw_check_error (rc);
 		}
 		else
 		{
-			sock = ZMQ_SV_TO_PTR (Socket, socket);
-			i.socket = sock->socket;
+			zmq_raw_socket *sock = ZMQ_SV_TO_PTR (Socket, socket);
+
+			if (zmq_raw_event_map_get (poller->interested, SvRV (socket)))
+				rc = zmq_poller_modify (poller->poller, sock->socket,
+					events);
+			else
+				rc = zmq_poller_add (poller->poller, sock->socket,
+					SvRV (socket), events);
+			zmq_raw_check_error (rc);
 		}
 
-		size = av_len (poller->sockets)+1;
-		Renew (poller->items, size+1, zmq_pollitem_t);
-		Copy (&i, &poller->items[size], 1, zmq_pollitem_t);
+		if (!zmq_raw_event_map_get (poller->interested, SvRV (socket)))
+		{
+			zmq_raw_event_map_add (poller->interested, SvRV (socket), events);
+			SvREFCNT_inc (SvRV (socket));
+			++poller->size;
+		}
 
-		SvREFCNT_inc (SvRV (socket));
-		av_push (poller->sockets, SvRV (socket));
+		if (poller->size > poller->allocated)
+		{
+			if (poller->poller_events)
+				Safefree (poller->poller_events);
+
+			Newxz (poller->poller_events, poller->size, zmq_poller_event_t);
+			poller->allocated = poller->size;
+		}
+
 
 void
 remove(self, socket)
@@ -61,55 +87,34 @@ remove(self, socket)
 
 	PREINIT:
 		zmq_raw_poller *poller;
+		int rc;
 		PerlIO *io;
-		SSize_t index, size;
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
-		size = av_len (poller->sockets)+1;
+
 		io = zmq_get_socket_io (socket);
-
-		for (index = 0; index < size; ++index)
+		if (io)
 		{
-			if (io)
-			{
-				if (poller->items[index].fd == zmq_get_native_socket (io))
-					break;
-			}
-			else
-			{
-				zmq_raw_socket *sock = ZMQ_SV_TO_PTR (Socket, socket);
-				if (poller->items[index].socket == sock->socket)
-					break;
-			}
+			rc = zmq_poller_remove_fd (poller->poller, zmq_get_native_socket (io));
+			if (rc != 0)
+				XSRETURN_NO;
+		}
+		else
+		{
+			zmq_raw_socket *sock = ZMQ_SV_TO_PTR (Socket, socket);
+
+			rc = zmq_poller_remove (poller->poller, sock->socket);
+			if (rc != 0)
+				XSRETURN_NO;
 		}
 
-		if (index != size)
-		{
-			SSize_t i, count = size-index;
-			AV *tmp = newAV();
+		SvREFCNT_dec (SvRV (socket));
+		--poller->size;
 
-			if (size > 1)
-				Move (&poller->items[index+1], &poller->items[index], count, zmq_pollitem_t);
+		zmq_raw_event_map_remove (poller->interested, SvRV (socket));
 
-			for (i = 0; i < size; ++i)
-			{
-				SV *item;
-				if (i == index)
-					continue;
-
-				item = *av_fetch (poller->sockets, i, 0);
-				SvREFCNT_inc (item);
-				av_push (tmp, item);
-			}
-
-			av_undef (poller->sockets);
-			poller->sockets = tmp;
-
-			XSRETURN_YES;
-		}
-
-		XSRETURN_NO;
+		XSRETURN_YES;
 
 SV *
 size (self)
@@ -121,9 +126,7 @@ size (self)
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
-		size = av_len (poller->sockets)+1;
-
-		RETVAL = newSViv ((IV)size);
+		RETVAL = newSViv ((IV)poller->size);
 
 	OUTPUT: RETVAL
 
@@ -133,26 +136,46 @@ wait (self, timeout)
 	long timeout
 
 	PREINIT:
-		int rc, i, count = 0;
+		int i, count, rc;
 		zmq_raw_poller *poller = NULL;
 		SSize_t size;
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
 
-		size = av_len (poller->sockets)+1;
-		rc = zmq_poll (poller->items, (int)size, timeout);
-		zmq_raw_check_error (rc);
+		zmq_raw_event_map_clear (poller->events);
 
-		for (i = 0; i < size; ++i)
+		rc = zmq_poller_wait_all (poller->poller, poller->poller_events, poller->size, timeout);
+		if (rc < 0)
 		{
-			if (poller->items[i].revents)
-				++count;
+			if (zmq_errno() == EAGAIN)
+				XSRETURN_IV (0);
+
+			zmq_raw_check_error (rc);
+		}
+
+		count = 0;
+
+		for (i = 0; i < poller->size && rc; ++i)
+		{
+			zmq_poller_event_t *e = poller->poller_events+i;
+
+			if (e->events)
+			{
+				const short *events = zmq_raw_event_map_get (poller->interested, e->user_data);
+				assert (events);
+
+				if (e->events & *events)
+				{
+					zmq_raw_event_map_add (poller->events, e->user_data, e->events & *events);
+					++count;
+				}
+
+				--rc;
+			}
 		}
 
 		XSRETURN_IV (count);
-
-
 
 void
 events(self, socket)
@@ -161,24 +184,19 @@ events(self, socket)
 
 	PREINIT:
 		zmq_raw_poller *poller = NULL;
-		void *s = NULL;
-
-		SSize_t i, size;
+		const short *e;
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
-		size = av_len (poller->sockets)+1;
 
-		for (i = 0; i < size; ++i)
-		{
-			SV **item = av_fetch (poller->sockets, i, 0);
-			if (item && *item && SvRV (socket) == *item)
-			{
-				XSRETURN_IV (poller->items[i].revents);
-			}
-		}
+		if (!zmq_raw_event_map_get (poller->interested, SvRV (socket)))
+			XSRETURN_UNDEF;
 
-		XSRETURN_UNDEF;
+		e = zmq_raw_event_map_get (poller->events, SvRV (socket));
+		if (e == NULL)
+			XSRETURN_IV (0);
+
+		XSRETURN_IV (*e);
 
 void
 DESTROY (self)
@@ -186,10 +204,26 @@ DESTROY (self)
 
 	PREINIT:
 		zmq_raw_poller *poller;
+		zmq_raw_event_map_iterator *iterator;
 
 	CODE:
 		poller = ZMQ_SV_TO_PTR (Poller, self);
 
-		av_undef (poller->sockets);
+		/* cleanup */
+		iterator = zmq_raw_event_map_iterator_create (poller->interested);
+		if (iterator)
+		{
+			do
+			{
+				SvREFCNT_dec (zmq_raw_event_map_iterator_key (iterator));
+			}
+			while (zmq_raw_event_map_iterator_next (iterator));
+
+			zmq_raw_event_map_iterator_destroy (iterator);
+		}
+
+		zmq_raw_event_map_destroy (poller->interested);
+		zmq_raw_event_map_destroy (poller->events);
+		zmq_poller_destroy (&poller->poller);
 		Safefree (poller);
 

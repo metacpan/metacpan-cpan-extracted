@@ -1,3 +1,7 @@
+1.0.6    12.01.2018
+    - class panda::function - compareble version of std::function
+    - class CallbackDispatcher - implementation of observer pattern
+    - simple logger tools
 1.0.5    08.09.2017
     - string::append now can use COW in case of empty string
 1.0.4    07.05.2017

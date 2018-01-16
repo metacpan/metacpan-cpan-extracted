@@ -1,0 +1,14 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "rpt_s01.pbl" "";
+@end;
+@begin Objects
+ "dw_s01_p2.srd" "rpt_s01.pbl";
+ "vo_s01_commander.sru" "rpt_s01.pbl";
+ "nv_s01_verifier.sru" "rpt_s01.pbl";
+ "vo_s01_container.sru" "rpt_s01.pbl";
+ "w_s01.srw" "rpt_s01.pbl";
+ "nv_s01_importer.sru" "rpt_s01.pbl";
+ "nv_s01_exporter.sru" "rpt_s01.pbl";
+ "dddw_rubric_piped_splitted.srd" "rpt_s01.pbl";
+@end;

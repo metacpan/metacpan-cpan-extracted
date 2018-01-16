@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Upload;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: API for uploads to CPAN
 
 #pod =head1 DESCRIPTION
@@ -24,11 +24,11 @@ use Mojo::UserAgent;
 #pod
 #pod     ### Requests:
 #pod     GET /v1/upload
-#pod     GET /v1/upload?since=2016-01-01T12:34:00Z
+#pod     GET /v1/upload?since=2016-01-01T12:34:00
 #pod     GET /v1/upload/dist/My-Dist
-#pod     GET /v1/upload/dist/My-Dist?since=2016-01-01T12:34:00Z
+#pod     GET /v1/upload/dist/My-Dist?since=2016-01-01T12:34:00
 #pod     GET /v1/upload/author/PREACTION
-#pod     GET /v1/upload/author/PREACTION?since=2016-01-01T12:34:00Z
+#pod     GET /v1/upload/author/PREACTION?since=2016-01-01T12:34:00
 #pod
 #pod     ### Response:
 #pod     200 OK
@@ -151,7 +151,7 @@ CPAN::Testers::API::Controller::Upload - API for uploads to CPAN
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -161,11 +161,11 @@ version 0.021
 
     ### Requests:
     GET /v1/upload
-    GET /v1/upload?since=2016-01-01T12:34:00Z
+    GET /v1/upload?since=2016-01-01T12:34:00
     GET /v1/upload/dist/My-Dist
-    GET /v1/upload/dist/My-Dist?since=2016-01-01T12:34:00Z
+    GET /v1/upload/dist/My-Dist?since=2016-01-01T12:34:00
     GET /v1/upload/author/PREACTION
-    GET /v1/upload/author/PREACTION?since=2016-01-01T12:34:00Z
+    GET /v1/upload/author/PREACTION?since=2016-01-01T12:34:00
 
     ### Response:
     200 OK

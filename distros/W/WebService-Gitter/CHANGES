@@ -1,10 +1,133 @@
 ==================================================
-Changes from 2016-08-20 00:00:00 +0000 to present.
+Changes from 2017-01-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.1.2 at 2017-08-20 18:49:44 +0000
+version 2.1.0 at 2018-01-15 01:51:01 +0000
 ------------------------------------------
+
+  Change: d837d092ed53a562883b58031684d92f0a128996
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 09:50:04 +0000
+
+    Covered room resources. 
+
+  Change: cee01f7be44707dc798653e91ef838a07e0ff38b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 09:17:23 +0000
+
+    Change project license and add doc. 
+
+  Change: 72ce5f3e9a129d4344b543f5c6248238f72e0b1b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 02:33:30 +0000
+
+    Update doc. 
+
+  Change: ec5d1fc65f564655ee0af4cb2bc1b0310934a993
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 01:58:00 +0000
+
+    Tidy up. 
+
+  Change: 087015a0d4f3a0b90076fbbc1f37dc15eb9774d2
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 01:29:33 +0000
+
+    Fixed join_room and add room_from_uri. 
+
+  Change: b3d663faccb42bc61e12346217a2c60334e36f97
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 00:46:45 +0000
+
+    Add delete_room method. 
+
+  Change: df8bcfc8c19d8f369d301c121b9fff11f8723929
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 00:37:41 +0000
+
+    Add remove_user_from_room. 
+
+  Change: 96eca1adfec22ffee75c460be4716bb08c915ca8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 23:59:19 +0000
+
+    Add join_room. 
+
+  Change: d65741aaf58d56bcef100d77389d38ff938c37d4
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 23:35:01 +0000
+
+    Add delete_message method. 
+
+  Change: d18eec903535c9e884d8050bc96d9d676b1b0b4d
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 23:10:04 +0000
+
+    Update synopsis and methods doc. 
+
+  Change: b7855a5f2941af3b81933d920f1352b96bf64797
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 22:57:36 +0000
+
+    Update send_message. 
+
+  Change: 312ab5c925bdc11fb4373313548064d22ad71e2b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 22:36:45 +0000
+
+    Update single_message. 
+
+  Change: 314d92c0414a38a7a2765727aa0b7a2586e67338
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 22:25:28 +0000
+
+    Update list_messages. 
+
+  Change: 14a344f24819fe1dcb989fd9f6bd53e6864c3a25
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 21:18:54 +0000
+
+    Doc minor update. 
+
+  Change: 32679c93a2e609bf8cec9b9b7373494fec929dfa
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 21:01:19 +0000
+
+    Doc minor update. 
+
+  Change: bc50ba98ed2b32b2beb79bea633dfbe3d405cbdc
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-14 20:59:30 +0000
+
+    Update doc and behavior for room_users. 
+
+  Change: 3be313d533fa0ce9f9859c18800ed002eb6a5b12
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-11 16:33:19 +0000
+
+    Doc minor update. 
+
+  Change: 0c847d958027cd7d4b954ecd7370fd96e8701a87
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-11 16:32:24 +0000
+
+    Updade rooms_under_group method. 
+
+  Change: 25cc0975c80a83d7d0dcae70c4fc903f6768d545
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-10 23:01:09 +0000
+
+    Remove Function::Parameters from Makefile.PL 
+
+  Change: cabf4c73f10fc9d09378a070c73dca5b33fdb8ea
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-10 22:57:06 +0000
+
+    Add minor local update.
+
+    - Remove Function::Parameters as a dependency. - Improve get_me and
+    list_groups methods documentations. 
 
   Change: 62c7aa41345863a4cadd0c42936187305de219cc
   Author: faraco <skelic3@gmail.com>

@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -401,17 +401,41 @@ our $VERSION = '0.009';
 #pod can use the configuration to override information that Yancy gets
 #pod incorrect.
 #pod
+#pod B<NOTE:> This exposes all the data in your schema to Yancy's API, which allows
+#pod anyone to edit the data. If you do not want anyone to edit the data, use
+#pod L<the plugin's route configuration|Mojolicious::Plugin::Yancy/CONFIGURATION> to
+#pod add authentication to Yancy.
+#pod
+#pod =head1 BUNDLED PROJECTS
+#pod
+#pod This project bundles some other projects with the following licenses:
+#pod
+#pod =over
+#pod
+#pod =item * L<jQuery|http://jquery.com> Copyright JS Foundation and other contributors (MIT License)
+#pod
+#pod =item * L<Bootstrap|http://getbootstrap.com> Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+#pod
+#pod =item * L<Popper.js|https://popper.js.org> Copyright 2016 Federico Zivolo (MIT License)
+#pod
+#pod =item * L<FontAwesome|http://fontawesome.io> Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
+#pod
+#pod =item * L<Vue.js|http://vuejs.org> Copyright 2013-2018, Yuxi (Evan) You (MIT License)
+#pod
+#pod =item * L<marked|https://github.com/chjj/marked> Copyright 2011-2018, Christopher Jeffrey (MIT License)
+#pod
+#pod =back
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<JSON schema|http://json-schema.org>, L<Mojolicious>
 #pod
 #pod =cut
 
-use v5.24;
 use Mojo::Base 'Mojolicious';
-use experimental qw( signatures postderef );
 
-sub startup( $app ) {
+sub startup {
+    my ( $app ) = @_;
     $app->plugin( Config => { default => { } } );
     $app->plugin( 'Yancy', {
         %{ $app->config },
@@ -419,12 +443,13 @@ sub startup( $app ) {
     } );
 
     unshift @{$app->plugins->namespaces}, 'Yancy::Plugin';
-    for my $plugin ( $app->config->{plugins}->@* ) {
+    for my $plugin ( @{ $app->config->{plugins} } ) {
         $app->plugin( @$plugin );
     }
 
     $app->routes->get('/*path', { path => 'index' } )
-    ->to( cb => sub( $c ) {
+    ->to( cb => sub {
+        my ( $c ) = @_;
         my $path = $c->stash( 'path' );
         return if $c->render_maybe( $path );
         $path =~ s{(^|/)[^/]+$}{${1}index};
@@ -444,7 +469,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -840,6 +865,31 @@ you have available. Any collections and fields that you do not configure
 will be assigned default configuration from your database schema. You
 can use the configuration to override information that Yancy gets
 incorrect.
+
+B<NOTE:> This exposes all the data in your schema to Yancy's API, which allows
+anyone to edit the data. If you do not want anyone to edit the data, use
+L<the plugin's route configuration|Mojolicious::Plugin::Yancy/CONFIGURATION> to
+add authentication to Yancy.
+
+=head1 BUNDLED PROJECTS
+
+This project bundles some other projects with the following licenses:
+
+=over
+
+=item * L<jQuery|http://jquery.com> Copyright JS Foundation and other contributors (MIT License)
+
+=item * L<Bootstrap|http://getbootstrap.com> Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+
+=item * L<Popper.js|https://popper.js.org> Copyright 2016 Federico Zivolo (MIT License)
+
+=item * L<FontAwesome|http://fontawesome.io> Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
+
+=item * L<Vue.js|http://vuejs.org> Copyright 2013-2018, Yuxi (Evan) You (MIT License)
+
+=item * L<marked|https://github.com/chjj/marked> Copyright 2011-2018, Christopher Jeffrey (MIT License)
+
+=back
 
 =head1 SEE ALSO
 

@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '3.43';
+$Map::Tube::Utils::VERSION   = '3.44';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 3.43
+Version 3.44
 
 =cut
 
@@ -17,12 +17,9 @@ use 5.006;
 use strict; use warnings;
 use JSON;
 use File::Share ':all';
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT_OK);
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(to_perl is_same trim common_lines filter get_method_map is_valid_color);
-
+our @EXPORT_OK   = qw(to_perl is_same trim common_lines filter get_method_map is_valid_color);
 our @COLOR_NAMES = _color_names();
 
 =head1 DESCRIPTION

@@ -1,5 +1,5 @@
 #
-# $Id: Kafka.pm,v 28a22d60af64 2017/10/19 08:44:25 gomor $
+# $Id: Kafka.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::kafka Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 28a22d60af64 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -84,13 +84,8 @@ sub create_connection {
                defined($server)
                && defined(Kafka::Connection::_STRING($server))
                #&& !utf8::is_utf8($server)  # this sucks.
+               && $server =~ /^[^:]+:\d+$/
            ) {
-            return;
-         }
-
-         my ($host, $port) = Kafka::Connection::_split_host_port($server);
-
-         unless ((Kafka::Connection::is_hostname($host) || Kafka::Connection::is_ipv4($host) || Kafka::Connection::is_ipv6($host)) && $port) {
             return;
          }
 
@@ -416,7 +411,7 @@ Metabrik::Client::Kafka - client::kafka Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

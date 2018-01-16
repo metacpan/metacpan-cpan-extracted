@@ -1,6 +1,13 @@
 
 === version history for CPAN::Site
 
+version 1.15: Sat Jan 13 23:27:38 CET 2018
+
+	Improvements:
+	- add README.md for GitHUB
+	- clarify license
+	- update some references to newer preference.
+
 version 1.14: Thu 26 Jan 12:57:46 CET 2017
 
 	Fixes:

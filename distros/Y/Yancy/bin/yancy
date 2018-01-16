@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: yancy
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 
 #pod =head1 NAME
 #pod
@@ -42,7 +42,7 @@ yancy
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

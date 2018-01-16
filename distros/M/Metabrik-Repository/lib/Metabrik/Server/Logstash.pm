@@ -1,5 +1,5 @@
 #
-# $Id: Logstash.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
+# $Id: Logstash.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # server::logstash Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f421cd03e192 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable elk) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -167,7 +167,6 @@ sub install {
 
    my $datadir = $self->datadir;
    my $version = $self->version;
-   my $she = $self->shell;
 
    my $url = 'https://artifacts.elastic.co/downloads/logstash/logstash-5.5.2.tar.gz';
    if ($version eq '2.4.0') {
@@ -180,14 +179,24 @@ sub install {
    my $cw = Metabrik::Client::Www->new_from_brik_init($self) or return;
    $cw->mirror($url, "$datadir/logstash.tar.gz") or return;
 
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
-   $she->run_cd($datadir) or return;
+   if (defined($self->shell)) {
+      $self->shell->run_cd($datadir) or return;
+   }
+   else {
+      chdir($datadir) or return $self->log->error("install: chdir: $!");
+   }
 
    my $cmd = "tar zxvf logstash.tar.gz";
    my $r = $self->execute($cmd) or return;
 
-   $she->run_cd($cwd) or return;
+   if (defined($self->shell)) {
+      $self->shell->run_cd($cwd) or return;
+   }
+   else {
+      chdir($cwd) or return $self->log->error("install: chdir: $!");
+   }
 
    return 1;
 }
@@ -229,7 +238,7 @@ sub start {
 
    # Make if a full path file
    if ($conf_file !~ m{^/}) {
-      my $cwd = $self->shell->full_pwd;
+      my $cwd = define($self->shell) && $self->shell->full_pwd || '/tmp';
       $conf_file = $cwd.'/'.$conf_file;
    }
 
@@ -244,7 +253,7 @@ sub start {
       $self->log->verbose("Within daemon");
 
       my $cmd = "$binary -f $conf_file -l $log_file";
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          $cmd .= ' --debug';
       }
 
@@ -274,7 +283,7 @@ sub start_in_foreground {
    my $binary = $self->get_binary or return;
 
    my $cmd = "$binary -f $conf_file -l $log_file";
-   if ($self->debug) {
+   if ($self->log->level > 2) {
       $cmd .= ' --debug';
    }
 
@@ -325,7 +334,7 @@ Template to write a new Metabrik Brik.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

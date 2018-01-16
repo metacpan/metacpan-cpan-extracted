@@ -12,15 +12,15 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41'
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
                                       'Class::Method::Modifiers' => '1.05',
-                                      'perl' => '5.010001',
-                                      'strict' => '0',
+                                      'perl' => '5.012',
                                       'warnings' => '0'
                                     }
                     },
@@ -33,7 +33,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

@@ -18,15 +18,14 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Module-Spec",
-  "dist_version" => "0.5.1",
+  "dist_version" => "0.6.0",
   "license" => "perl",
   "module_name" => "Module::Spec",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "Class::Method::Modifiers" => "1.05",
-    "perl" => "5.010001",
-    "strict" => 0,
+    "perl" => "5.012",
     "warnings" => 0
   },
   "test_requires" => {
@@ -34,7 +33,8 @@ my %module_build_args = (
     "File::Spec" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.96",
-    "lib" => 0
+    "lib" => 0,
+    "strict" => 0
   }
 );
 
@@ -45,7 +45,8 @@ my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Test::Fatal" => 0,
   "Test::More" => "0.96",
-  "lib" => 0
+  "lib" => 0,
+  "strict" => 0
 );
 
 

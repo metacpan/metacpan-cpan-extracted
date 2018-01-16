@@ -1,5 +1,8 @@
 Revision history for Term::Screen::Lite
 
+0.06  Wed Jan 10 17:35:00 2018
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.05  Thu Oct 12 11:15:00 2017
       - Fixed inconsistent version as reported by CPANTS.
       - Added $AUTHORITY.

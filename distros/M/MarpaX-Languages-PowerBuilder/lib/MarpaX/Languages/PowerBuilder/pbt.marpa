@@ -1,0 +1,29 @@
+:default         	::= action => [name,values]
+:start            	::= Syntax
+
+Syntax 				::= Format ProjectList AppName AppLib LibList Type					action => syntax
+
+Format 				::= ('Save Format v') <format version> ('(') <format date> (')')	action => format
+ProjectList 		::= (<list start> 'Projects') IndexedItemList (<list end>)			action => deploy
+AppName				::= ('appname') String (';')										action => ::first
+AppLib				::= ('applib') String (';')											action => ::first
+LibList				::= ('LibList') String (';')										action => libList
+Type				::= ('type') String (';')											action => ::first
+
+IndexedItemList		::= IndexedItem*													action => indexedItems
+IndexedItem			::= <index> String (';')											action => [values]
+String				::= <string lex>													action => string
+
+index				~ [\d]+
+<format version>	~ [\d] '.' [\d]
+<format date>		~ [\d][\d][\d][\d][\d][\d][\d][\d]
+<list start> 		~ '@begin'
+<list end>			~ '@end;'
+
+<string lex>		~ quote <string contents> quote
+<string contents>	~ <string char>*
+<string char>		~ [^"]
+quote				~ ["]
+
+:discard 			~ whitespace
+whitespace			~ [\s]+

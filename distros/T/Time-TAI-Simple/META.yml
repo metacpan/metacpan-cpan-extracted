@@ -13,10 +13,10 @@ meta-spec:
   version: '1.4'
 name: Time-TAI-Simple
 requires:
-  HTTP::Tiny: '0.000'
+  HTTP::Tiny: '0'
   POSIX::RT::Clock: '0.015'
   Test::Differences: '0.60'
   Test::Most: '0.30'
   Time::HiRes: '1.9'
   perl: '5.010000'
-version: '1.11'
+version: '1.13'

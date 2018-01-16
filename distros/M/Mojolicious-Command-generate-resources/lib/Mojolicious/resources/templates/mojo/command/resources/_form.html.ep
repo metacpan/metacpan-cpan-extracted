@@ -1,0 +1,7 @@
+% my $a = shift;
+% # TODO: Loop trough all the columns and render appropriate input fields.
+%%= form_for $target => begin
+TODO: Loop trough all the columns and render appropriate input fields.
+  <br>
+  %%= submit_button $caption
+%% end

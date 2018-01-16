@@ -1,0 +1,34 @@
+---
+abstract: "Don't let your sodium levels get too high!"
+author:
+  - 'Brian Fraser (brian.fraser at booking.com)'
+  - 'Gonzalo Diethelm (gonzalo.diethelm at booking.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  Alien::Sodium: v1.0.8.0
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Sodium-Nitrate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Sodium: v1.0.8.0
+  Carp: '0'
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -131,6 +131,7 @@ test/PBP3_family_phylum.nex
 test/PBP3_phylum_4color.nex
 test/ali_with_qm.ali
 test/ali_with_qm_temp.fasta
+test/ali_with_qm_temp_gaps.fasta
 test/bacteria.cls
 test/bacteria.tax
 test/bacteria.taxids

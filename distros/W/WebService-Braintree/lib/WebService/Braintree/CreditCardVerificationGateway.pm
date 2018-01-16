@@ -1,11 +1,18 @@
 package WebService::Braintree::CreditCardVerificationGateway;
-$WebService::Braintree::CreditCardVerificationGateway::VERSION = '0.94';
+$WebService::Braintree::CreditCardVerificationGateway::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
 use Moose;
+with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
+
 use WebService::Braintree::CreditCardVerificationSearch;
-use WebService::Braintree::Util qw(validate_id to_instance_array);
+use WebService::Braintree::Util qw(validate_id);
+use WebService::Braintree::Validations qw(
+    verify_params
+    credit_card_verification_signature
+);
 use Carp qw(confess);
 
 has 'gateway' => (is => 'ro');
@@ -19,34 +26,29 @@ sub find {
 
 sub search {
     my ($self, $block) = @_;
-    my $search = WebService::Braintree::CreditCardVerificationSearch->new;
-    my $params = $block->($search)->to_hash;
-    my $response = $self->gateway->http->post("/verifications/advanced_search_ids", {search => $params});
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-                                                                      $self->fetch_verifications($search, shift);
-                                                                  });
+
+    return $self->resource_collection({
+        ids_url => "/verifications/advanced_search_ids",
+        obj_url => "/verifications/advanced_search/",
+        inflate => [qw/credit_card_verifications verification CreditCardVerification/],
+        search => $block->(WebService::Braintree::CreditCardVerificationSearch->new),
+    });
 }
 
 sub all {
     my $self = shift;
-    my $response = $self->gateway->http->post("/verifications/advanced_search_ids");
-    return WebService::Braintree::ResourceCollection->new->init($response, sub {
-        $self->fetch_verifications(
-            WebService::Braintree::CreditCardVerificationSearch->new, shift,
-        );
+
+    return $self->resource_collection({
+        ids_url => "/verifications/advanced_search_ids",
+        obj_url => "/verifications/advanced_search/",
+        inflate => [qw/credit_card_verifications verification CreditCardVerification/],
     });
 }
 
-sub fetch_verifications {
-    my ($self, $search, $ids) = @_;
-
-    return [] if scalar @{$ids} == 0;
-
-    $search->ids->in($ids);
-    my $response = $self->gateway->http->post("/verifications/advanced_search/", {search => $search->to_hash});
-
-    my $attrs = $response->{'credit_card_verifications'}->{'verification'};
-    return to_instance_array($attrs, "WebService::Braintree::CreditCardVerification");
+sub create {
+    my ($self, $params) = @_;
+    confess "ArgumentError" unless verify_params($params, credit_card_verification_signature);
+    $self->_make_request("/verifications", "post", {verification => $params});
 }
 
 __PACKAGE__->meta->make_immutable;

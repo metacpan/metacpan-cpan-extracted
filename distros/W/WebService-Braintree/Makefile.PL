@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WebService::Braintree",
   "PREREQ_PM" => {
+    "Class::Load::XS" => 0,
     "Data::GUID" => 0,
     "DateTime" => 0,
     "DateTime::Format::Atom" => 0,
@@ -47,6 +48,8 @@ my %WriteMakefileArgs = (
     "strictures" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Printer" => 0,
+    "String::CamelCase" => 0,
     "Test::Deep" => 0,
     "Test::Moose" => 0,
     "Test::More" => "0.98",
@@ -54,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.94",
+  "VERSION" => "1.0",
   "test" => {
     "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }
@@ -62,7 +65,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::Load::XS" => 0,
   "Data::GUID" => 0,
+  "Data::Printer" => 0,
   "DateTime" => 0,
   "DateTime::Format::Atom" => 0,
   "DateTime::Format::RFC3339" => 0,
@@ -83,6 +88,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Mozilla::CA" => 0,
   "Scalar::Util" => 0,
+  "String::CamelCase" => 0,
   "Test::Deep" => 0,
   "Test::Moose" => 0,
   "Test::More" => "0.98",

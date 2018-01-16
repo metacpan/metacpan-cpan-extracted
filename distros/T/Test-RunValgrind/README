@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Test-RunValgrind,
-version 0.0.2:
+version 0.0.3:
 
   tests that an external program is valgrind-clean.
 

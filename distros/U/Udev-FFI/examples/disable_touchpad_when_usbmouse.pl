@@ -48,9 +48,10 @@ my $enumerate = $udev->new_enumerate() or
     die "Can't create enumerate context: $@.\n";
 
 $enumerate->add_match_subsystem('usb');
-# some versions of libudev work incorrectly with $enumerate->add_match_sysattr('idVendor', $vid);
+
 $enumerate->add_match_sysattr('idVendor');
 $enumerate->add_match_sysattr('idProduct');
+
 $enumerate->scan_devices();
 
 my @inserted_devices = $enumerate->get_list_entries();

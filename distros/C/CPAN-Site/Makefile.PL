@@ -18,7 +18,7 @@ __WARN
 WriteMakefile
  ( NAME       => 'CPAN::Site'
  , ABSTRACT   => 'adding site local modules'
- , VERSION    => '1.14'
+ , VERSION    => '1.15'
 
  , EXE_FILES  => [ 'bin/cpansite' ]
 
@@ -36,6 +36,17 @@ WriteMakefile
    , version            => 0.76
    }
  , LICENSE    => 'perl'
+
+  , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-CPAN-Site.git'
+              , web  => 'https://github.com/markov2/perl5-CPAN-Site'
+              }
+          }
+      }
  );
 
 #### the next lines are added for OODoc, which generates the
@@ -45,14 +56,10 @@ sub MY::postamble { <<__POSTAMBLE }
 # for DIST
 RAWDIR          = ../public_html/cpan-site/raw
 DISTDIR         = ../public_html/cpan-site/source
-LICENSE         = artistic
+LICENSE         = perl
 
 # for POD
 FIRST_YEAR      = 1998,2005
-EMAIL           = perl\@overmeer.net
-WEBSITE         = http://perl.overmeer.net/cpan-site/
-
-# for HTML
-#HTML_OUTPUT	= ../public_html/cpan-site/html
-#HTML_DOCROOT	= /cpan-site/html
+EMAIL           = markov\@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 __POSTAMBLE

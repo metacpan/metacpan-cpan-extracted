@@ -1,14 +1,23 @@
 Things to do:
 
-   * Switch from LWP::Simple to HTTP::Tiny (qv /home/ttk/.irclog.freenode-perl 2016-09-28)
+   * Improve unit test coverage.
+     qv: http://cpancover.com/latest/Time-TAI-Simple-1.11/index.html
+
+   * Fix 000-time-tai-simple.t so it doesn't require hand-editing every time there's a new leapsecond.
+
+   * The dependency on POSIX::RT::Clock is preventing Windows testers from testing this module.
+     Figure out the Win32-land alternative and use that.
+     How to convey to CPAN testers that some dependencies are for specific platforms?
+     qv: irclog.freenode-cpantesters 2017-02-17 14:34:58
+     qv: https://metacpan.org/source/LEONT/POSIX-RT-Timer-0.017/Build.PL#L9-12
 
    * Instead of [Prereqs] in dist.ini, use [Prereqs::FromCPANfile] and don't list prereqs there.
      This means I can just maintain the prereqs in cpanfile and eliminate some redundancy.
      qv: .irclog.freenode-perl 2016-03-22 19:28:39
 
-   * Write a thinger that checks for leapsecond updates and emails me, so I can update this
-     module in a timely fashion.  Hasn't been necessary so far because I've noticed in advance 
-     when the IERS made rumblings about inserting a new leapsecond.
+   * I've subscribed to the IERS Bulletin C for advance notification of upcoming leapseconds,
+     but it's getting lost in the other mail traffic.  Need to rig something that gets my attention,
+     so I know to update the leapsecond list that ships with the module.
 
    * Add some smarts to occasionally check for clock skew and introduce creeping adjustments.
      Some clocks have a lot of skew.  Most generic motherboard crystals are rated to about

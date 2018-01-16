@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "gpl_3"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -37,17 +37,18 @@
       "runtime" : {
          "requires" : {
             "Email::Address" : "0",
+            "Getopt::Long::Descriptive" : "0",
             "LWP::Online" : "0",
             "LWP::UserAgent" : "0",
             "List::MoreUtils" : "0",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
-            "lib" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -63,7 +64,7 @@
          "web" : "https://github.com/faraco/App-Github-Email"
       }
    },
-   "version" : "0.1.1",
+   "version" : "0.2.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

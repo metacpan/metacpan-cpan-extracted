@@ -5,19 +5,17 @@ author:
 build_requires:
   Module::Build: '0.28'
   Test::More: '0'
-  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
-license: perl
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WebService-Gitter
 requires:
-  Data::Dumper: '0'
   Function::Parameters: '0'
   LWP::Online: '0'
   Moo: '0'
@@ -26,8 +24,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/faraco/WebService-Pixabay/issues
-  homepage: https://github.com/faraco/WebService-Gitter
-  repository: https://github.com/faraco/WebService-Gitter.git
-version: 1.1.2
+  bugtracker: https://github.com/faraco/WebService-Gitter/issues
+  homepage: https://github.com/faraco/Webservice-gitter
+  repository: https://github.com/faraco/Webservice-gitter.git
+version: 2.1.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

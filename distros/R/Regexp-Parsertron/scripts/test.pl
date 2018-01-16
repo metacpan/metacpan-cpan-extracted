@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+use v5.10;
 use strict;
 use warnings;
 
@@ -69,14 +70,31 @@ my(@test)	=
 	expected	=> '(?^i:Perl|JavaScript|C++)',
 	re			=> qr/Perl|JavaScript/i,
 },
+{
+	count		=> 13,
+	expected	=> '(?^:/ab+bc/)',
+	re			=> '/ab+bc/',
+},
+{
+	count		=> 14,
+	expected	=> '(?^:a)',
+	re			=> qr/a/,
+},
+{
+	count		=> 15,
+	expected	=> '(?^:(?:(?<n>foo)|(?<n>bar))\k<n>)',
+	re			=> qr/(?:(?<n>foo)|(?<n>bar))\k<n>/,
+},
 );
 
 my($limit)	= shift || 0;
-my($parser)	= Regexp::Parsertron -> new(verbose => 0);
+my($parser)	= Regexp::Parsertron -> new(verbose => 2);
+my(%stats)	= (success => 0, total => 0);
 
 my($expected);
 my($got);
 my($result);
+my($success);
 
 for my $test (@test)
 {
@@ -84,28 +102,38 @@ for my $test (@test)
 
 	next if ( ($limit > 0) && ($$test{count} != $limit) );
 
-	$result = $parser -> parse(re => $$test{re});
+	$stats{total}++;
 
-	print "$$test{count}. re: $$test{re}. result: $result\n";
+	$result		= $parser -> parse(re => $$test{re});
+	$success	= 1;
 
 	if ($$test{count} == 12)
 	{
-		$parser -> add(text => '|C++', uid => 6);
+		$parser -> append(text => '|C++', uid => 6);
 	}
 
 	if ($result == 0)
 	{
 		$got		= $parser -> as_string;
 		$expected	= $$test{expected};
+		$success	= 0 if ($got eq $expected);
 
-		print "$$test{count}: ", ( ("$got" eq $expected) ? 'OK' : 'Mismatch'), "\n";
+		$stats{success}++ if ($success == 0);
+
+		say "$$test{count}: got: $got. expected: $expected. outcome: $success (0 is success). ";
 	}
 	else
 	{
-		print "Test $$test{count} failed to return 0 from parse()\n";
+		say "Test $$test{count} failed to return 0 from parse(). ";
 	}
+
+	say '-' x 50;
 
 	# Reset for next test.
 
 	$parser -> reset;
 }
+
+print "Statistics: ";
+print "$_: $stats{$_}. " for (sort keys %stats);
+say '';

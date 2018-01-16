@@ -2,10 +2,14 @@ examples/bench-rand.pl
 lib/XS/Tutorial.pm
 lib/XS/Tutorial/One.pm
 lib/XS/Tutorial/One.xs
+lib/XS/Tutorial/Two.pm
+lib/XS/Tutorial/Two.xs
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 ppport.h
+README.pod
 t/one.t
+t/two.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

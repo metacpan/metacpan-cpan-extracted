@@ -1,5 +1,5 @@
 #
-# $Id: Cvesearch.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Cvesearch.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # database::cvesearch Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable cve cpe vfeed circl) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -50,8 +50,10 @@ sub brik_properties {
 sub brik_use_properties {
    my $self = shift;
 
-   my $global = $self->global;
-   my $repo = $global->datadir."/devel-git/cve-search";
+   my $global_datadir = defined($self->global) && $self->global->datadir
+      || defined($ENV{HOME}) && $ENV{HOME}."/metabrik"
+      || '/tmp/metabrik';
+   my $repo = $global_datadir."/devel-git/cve-search";
 
    return {
       attributes_default => {
@@ -69,9 +71,8 @@ sub install {
 
    my $dg = Metabrik::Devel::Git->new_from_brik_init($self) or return;
 
-   my $repo = '';
-   my $datadir = $self->global->datadir;
-   if (-d "$datadir/devel-git/cve-search") {
+   my $repo = $self->repo;
+   if (-d $repo) {
       $repo = $dg->update($url) or return;
    }
    else {
@@ -231,7 +232,7 @@ Metabrik::Database::Cvesearch - database::cvesearch Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+
+use Test::RequiresInternet;
 use Test::More tests => 19;
 
 use Mail::DKIM::DkPolicy;

@@ -140,7 +140,7 @@ __PACKAGE__->has_many(customers => 'Customer', { via => 'customer_achievement' }
 
 package main;
 
-ok my $one = Customer->sql_fetch_all('select 1 as one, 2 as two');
+ok my $one = Customer->objects->sql_fetch_all('select 1 as one, 2 as two');
 is ref $one, 'ARRAY';
 is scalar @$one, 1;
 
@@ -154,7 +154,7 @@ is $one1->two, 2;
 eval { $one1->foo };
 ok $@;
 
-ok my $two = Customer->sql_fetch_row('select 3 as three, 4 as four');
+ok my $two = Customer->objects->sql_fetch_row('select 3 as three, 4 as four');
 isa_ok $two, 'Customer';
 ok $two->three;
 is $two->three, 3;

@@ -46,58 +46,72 @@ test_value_dies_version( $Version );
 
 sub test_key_dies {
     my ( $class ) = @_;
-    return unless $class->HAS_KEY();
+
+    if ( ! $class->_HAS_KEY() ) {
+        dies_ok( sub{ $class->set_key() }, ( ref $class ) . ' set key' );
+        return;
+    }
+
     $class->set_value( 'test' );
     dies_ok( sub{ $class->set_key() }, ( ref $class ) . ' set null key' );
     dies_ok( sub{ $class->set_key( '' ) }, ( ref $class ) . ' set empty key' );
+    dies_ok( sub{ $class->set_key( '"' ) }, ( ref $class ) . ' set invalid " key' );
 
     lives_ok( sub{ $class->set_key( 'test key!' ) }, ( ref $class ) . ' set key spaces' );
-    is( $class->as_string(), '"test key!"=test', ( ref $class ) . ' stringifies spaces correfctly' );
+    is( $class->as_string(), '"test key!"=test', ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->set_key( 'test;' ) }, ( ref $class ) . ' set key semicolon' );
-    is( $class->as_string(), '"test;"=test', ( ref $class ) . ' stringifies semicolon correfctly' );
+    is( $class->as_string(), '"test;"=test', ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->set_key( 'test(test)' ) }, ( ref $class ) . ' set key parens' );
-    is( $class->as_string(), '"test(test)"=test', ( ref $class ) . ' stringifies parens correfctly' );
+    is( $class->as_string(), '"test(test)"=test', ( ref $class ) . ' stringifies parens correctly' );
 }
 
 sub test_value_dies {
     my ( $class ) = @_;
-    return unless $class->HAS_VALUE();
+
+    if ( ! $class->_HAS_VALUE() ) {
+        dies_ok( sub{ $class->set_value() }, ( ref $class ) . ' set value' );
+        return;
+    }
+
     my $expectkey = q{};
-    if ( $class->HAS_KEY() ) {
+    if ( $class->_HAS_KEY() ) {
         $class->set_key( 'test' );
         $expectkey = 'test=';
     }
     dies_ok( sub{ $class->set_value() }, ( ref $class ) . ' set null value' );
 
     lives_ok( sub{ $class->set_value( 'With space' ) }, ( ref $class ) . ' set invalid value spaces' );
-    is( $class->as_string(), $expectkey . '"With space"', ( ref $class ) . ' stringifies spaces correfctly' );
+    is( $class->as_string(), $expectkey . '"With space"', ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->set_value( 'pass;' ) }, ( ref $class ) . ' set invalid value semicolon' );
-    is( $class->as_string(), $expectkey . '"pass;"', ( ref $class ) . ' stringifies semicolon correfctly' );
+    is( $class->as_string(), $expectkey . '"pass;"', ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->set_value( 'with(parens)' ) }, ( ref $class ) . ' set invalid value comment' );
-    is( $class->as_string(), $expectkey . '"with(parens)"', ( ref $class ) . ' stringifies parens correfctly' );
+    is( $class->as_string(), $expectkey . '"with(parens)"', ( ref $class ) . ' stringifies parens correctly' );
 }
 
 sub test_value_dies_version {
     my ( $class ) = @_;
-    return unless $class->HAS_VALUE();
+    return unless $class->_HAS_VALUE();
     dies_ok( sub{ $class->set_value() }, ( ref $class ) . ' set null value' );
     dies_ok( sub{ $class->set_value( 'AString' ) }, ( ref $class ) . ' set invalid value non numeric' );
     dies_ok( sub{ $class->set_value( 'With space' ) }, ( ref $class ) . ' set invalid value spaces' );
 
     lives_ok( sub{ $class->set_value( '12345' ) }, ( ref $class ) . ' set valid value' );
+    is( $class->as_string(), '/ 12345', ( ref $class ) . ' stringifies version correctly' );
 }
 
 sub test_value_dies_header {
     my ( $class ) = @_;
-    return unless $class->HAS_VALUE();
+    return unless $class->_HAS_VALUE();
     dies_ok( sub{ $class->set_value() }, ( ref $class ) . ' set null value' );
 
+    dies_ok( sub{ $class->set_value( 'string' ) }, ( ref $class ) . ' set incorrect type value' );
+
     lives_ok( sub{ $class->set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'With space' ) ) }, ( ref $class ) . ' set invalid value spaces' );
-    is( $class->as_string(), '"With space";' . "\nnone", ( ref $class ) . ' stringifies spaces correfctly' );
+    is( $class->as_string(), '"With space";' . "\nnone", ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'pass;' ) ) }, ( ref $class ) . ' set invalid value semicolon' );
-    is( $class->as_string(), '"pass;";' . "\nnone", ( ref $class ) . ' stringifies semicolon correfctly' );
+    is( $class->as_string(), '"pass;";' . "\nnone", ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'with(parens)' ) ) }, ( ref $class ) . ' set invalid value comment' );
-    is( $class->as_string(), '"with(parens)";' . "\nnone", ( ref $class ) . ' stringifies parens correfctly' );
+    is( $class->as_string(), '"with(parens)";' . "\nnone", ( ref $class ) . ' stringifies parens correctly' );
 }
 
 done_testing();

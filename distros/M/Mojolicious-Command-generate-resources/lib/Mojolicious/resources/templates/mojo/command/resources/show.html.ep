@@ -1,0 +1,5 @@
+% my $a = shift;
+%% layout 'blog', title => $<%= $a->{t} %>->{title};
+<h2><%%= $<%= $a->{t} %>->{title} %></h2>
+<p><%%= $<%= $a->{t} %>->{body} %></p>
+%%= link_to 'Edit' => edit_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

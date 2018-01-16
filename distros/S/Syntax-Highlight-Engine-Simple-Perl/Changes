@@ -1,5 +1,8 @@
 Revision history for Syntax-Highlight-Engine-Simple-Perl
 
+v0.06  2018/01/13
+    - Packaging fixes
+
 v0.05  2017/11/13
     - Drop the encoding pragma in tests, no longer supported by Perl
 

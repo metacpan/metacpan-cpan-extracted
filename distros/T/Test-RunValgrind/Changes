@@ -1,5 +1,10 @@
 Revision history for Test-RunValgrind
 
+0.0.3       2018-01-12
+    - Fix a broken link to the GitHub issues and other links.
+    - https://github.com/shlomif/perl-Test-RunValgrind/issues/1
+    - Thanks to Reuben for the report.
+
 0.0.2       2017-12-20
     - Add supress_stderr.
 

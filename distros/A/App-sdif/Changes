@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.3.0 2018-01-11T23:27:51Z
+
+    - Update --color option to take "when" argument.
+    - Implement --column option to specify column order.
+
 4.2.0 2018-01-07T01:57:46Z
 
     - Remove unnecessarily indirect --{LIGHT,DARK}-SCREEN option.

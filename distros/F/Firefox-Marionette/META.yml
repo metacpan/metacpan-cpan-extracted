@@ -1,0 +1,35 @@
+---
+abstract: 'Automate the Firefox browser with the Marionette protocol'
+author:
+  - 'David Dick <ddick@cpan.org>'
+build_requires:
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Test::More: '0'
+  Test::NeedsDisplay: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Firefox-Marionette
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  English: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FileHandle: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  POSIX: '0'
+  Socket: '0'
+  URI: '0'
+  overload: '0'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

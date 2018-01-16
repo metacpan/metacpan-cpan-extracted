@@ -1,11 +1,17 @@
 Revision history for Perl module CatalystX::I18N
 
+1.14 Sun Jan 14 2018
+    - Fix leaking context (RT124055, Charlie Garrison)
+    - Fix warnings
+    - Remove MYMETA from dist
+    - Fix failing tests
+
 1.13 Tue Jan 28 2013
     - Fix deprecation warning with latest Moose
-    - Fix failing tests 
+    - Fix failing tests
 
 1.12 Sat Apr 07 2012
-    - Removed built in DateTime related type constraints in favour of global 
+    - Removed built in DateTime related type constraints in favour of global
       type constraints (MooseX::Types::DateTime) (moltar via github)
     - Fixed failing tests (moltar via github)
     - Fix dependencies

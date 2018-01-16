@@ -1,5 +1,5 @@
 package Bio::Roary::Output::GroupsMultifastaProtein;
-$Bio::Roary::Output::GroupsMultifastaProtein::VERSION = '3.11.1';
+$Bio::Roary::Output::GroupsMultifastaProtein::VERSION = '3.11.3';
 # ABSTRACT:  Take a multifasta nucleotide file and output it as proteins.
 
 
@@ -67,7 +67,7 @@ Bio::Roary::Output::GroupsMultifastaProtein - Take a multifasta nucleotide file 
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

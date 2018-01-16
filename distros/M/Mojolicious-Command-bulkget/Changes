@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Command-bulkget
 
+0.03	Thu Jan 11 02:02:48 GMT 2018
+ - zap pointless test that breaks without . in @INC
+
 0.02	Fri Dec 22 01:08:14 GMT 2017
  - update metadata including right dep for Mojo::Promise
 

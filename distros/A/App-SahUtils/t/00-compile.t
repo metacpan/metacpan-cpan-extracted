@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
 
 use Test::More;
 
@@ -13,35 +13,37 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/coerce-with-sah',
-    'bin/format-with-sah',
-    'bin/get-sah-type',
-    'bin/is-sah-builtin-type',
-    'bin/is-sah-collection-builtin-type',
-    'bin/is-sah-collection-type',
-    'bin/is-sah-numeric-builtin-type',
-    'bin/is-sah-numeric-type',
-    'bin/is-sah-ref-builtin-type',
-    'bin/is-sah-ref-type',
-    'bin/is-sah-simple-builtin-type',
-    'bin/is-sah-simple-type',
-    'bin/is-sah-type',
-    'bin/list-sah-clauses',
-    'bin/list-sah-coerce-rule-modules',
-    'bin/list-sah-schema-modules',
-    'bin/list-sah-schemas-modules',
-    'bin/list-sah-type-modules',
-    'bin/normalize-sah-schema',
-    'bin/resolve-sah-schema',
-    'bin/sah-to-human',
-    'bin/show-sah-coerce-module',
-    'bin/show-sah-schema-module',
-    'bin/validate-with-sah'
+    'script/coerce-with-sah',
+    'script/format-with-sah',
+    'script/get-sah-type',
+    'script/is-sah-builtin-type',
+    'script/is-sah-collection-builtin-type',
+    'script/is-sah-collection-type',
+    'script/is-sah-numeric-builtin-type',
+    'script/is-sah-numeric-type',
+    'script/is-sah-ref-builtin-type',
+    'script/is-sah-ref-type',
+    'script/is-sah-simple-builtin-type',
+    'script/is-sah-simple-type',
+    'script/is-sah-type',
+    'script/list-sah-clauses',
+    'script/list-sah-coerce-rule-modules',
+    'script/list-sah-schema-modules',
+    'script/list-sah-schemas-modules',
+    'script/list-sah-type-modules',
+    'script/normalize-sah-schema',
+    'script/resolve-sah-schema',
+    'script/sah-to-human',
+    'script/show-sah-coerce-module',
+    'script/show-sah-schema-module',
+    'script/validate-with-sah'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -55,14 +57,18 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -77,18 +83,22 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

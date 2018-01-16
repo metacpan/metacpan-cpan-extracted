@@ -1,7 +1,7 @@
 package Sah::Schema::riap::url;
 
-our $DATE = '2016-07-25'; # DATE
-our $VERSION = '1.2.4.1'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '1.2.4.2'; # VERSION
 
 our $schema = ['url', {
     summary => 'Riap URL',
@@ -23,7 +23,7 @@ Sah::Schema::riap::url - Riap URL
 
 =head1 VERSION
 
-This document describes version 1.2.4.1 of Sah::Schema::riap::url (from Perl distribution Sah-Schemas-Riap), released on 2016-07-25.
+This document describes version 1.2.4.2 of Sah::Schema::riap::url (from Perl distribution Sah-Schemas-Riap), released on 2018-01-14.
 
 =head1 HOMEPAGE
 
@@ -47,7 +47,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

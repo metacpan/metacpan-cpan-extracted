@@ -18,14 +18,14 @@ sub mk_compclass {
 
     my @path = split (/\:\:/,$maketext_module);
     my $file = pop @path;
-    
+
     my $maketext_dir = $basedir->subdir( join '/', @path );
     my $maketext_file = $maketext_dir->file($file.'.pm');
     $maketext_dir->mkpath();
-    
+
     $helper->render_file('maketextclass', $maketext_file->stringify, \%args);
     $helper->render_file('modelclass', $helper->{file}, \%args);
-    
+
     return 1;
 }
 
@@ -64,7 +64,7 @@ You need to sepecify the C<model_name> (the name of the model).
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it under 
+This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

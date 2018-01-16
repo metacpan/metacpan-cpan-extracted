@@ -20,7 +20,11 @@ sdif file_1 file_2
 
 diff ... | sdif
 
-    --number, -n	print line number
+    -b, --ignore-space-change
+    -w, --ignore-all-space
+    -B, --ignore-blank-lines
+
+    --[no]number, -n	print line number
     --digit=#		set the line number digits (default 4)
     --truncate, -t	truncate long line
     --[no]onword	fold line on word boundaries
@@ -28,11 +32,13 @@ diff ... | sdif
     --unified, -u, -U#	unified diff
 
     --width=#, -W#	specify width of output (default 80)
-    --[no]color		use color or not (default on)
+    --color=when	'always' (default), 'never' or 'auto'
+    --nocolor		--color=never
     --colormap, --cm	specify color map
     --colortable	show color table
     --[no]256		on/off ANSI 256 color mode (default on)
     --mark=position	mark position (right, left, center, side) or no
+    --column=order	set column order (default ONM)
     --view, -v		viewer mode
     --ambiguous=s       ambiguous character width (detect, wide, narrow)
 
@@ -52,7 +58,7 @@ use warnings;
 use utf8;
 use open IO => ':utf8';
 use Carp;
-use List::Util qw(min max reduce sum);
+use List::Util qw(min max reduce sum pairmap);
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
 use Data::Dumper;
@@ -86,13 +92,14 @@ my @opt_colormap;
 my @opt_diffopts;
 my $opt_diff = 'diff';
 my $opt_digit = 4;
+my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
 my $screen_width;
 my $column_width;
 my @column_width;
 
-my $opt_color = 1;
+my $opt_color = 'always';
 my $opt_256 = 1;
 my $opt_mark = "center";
 my $opt_W;
@@ -115,6 +122,7 @@ if ($opt_env and my $env = $ENV{'SDIFOPTS'}) {
 my @optargs = (
     "n|number!" => \$opt_n,
     "digit=i" => \$opt_digit,
+    "column=s" => \$opt_column,
     "truncate|t!" => \$opt_truncate,
     "onword!" => \$opt_onword,
     "mark=s" => \$opt_mark,
@@ -131,7 +139,8 @@ my @optargs = (
     "env!" => \$opt_env,
     "diff=s" => \$opt_diff,
     "diffopts=s" => \@opt_diffopts,
-    "color!" => \$opt_color,
+    "color=s" => \$opt_color,
+    "nocolor|no-color" => sub { $opt_color = 'never' },
     "colormap|cm=s" => \@opt_colormap,
     "256!" => \$opt_256,
     "b|ignore-space-change" => sub { push @opt_diffopts, '-b' },
@@ -165,46 +174,29 @@ if ($opt_ambiguous =~ /^(?:wide|full)/) {
     $Text::VisualWidth::PP::EastAsian = 1;
 }
 
-my %colormap =
-    $opt_256 ? (
-	OCOMMAND => "555/010",
-	NCOMMAND => "555/010",
-	MCOMMAND => "555/010",
-	OFILE => "555/010D",
-	NFILE => "555/010D",
-	MFILE => "555/010D",
-	OMARK => "010/444",
-	NMARK => "010/444",
-	MMARK => "010/444",
-	UMARK => "",
-	OLINE => "220",
-	NLINE => "220",
-	MLINE => "220",
-	ULINE => "",
-	OTEXT => "K/454",
-	NTEXT => "K/454",
-	MTEXT => "K/454",
-	UTEXT => "",
-    ) : (
-	OCOMMAND => "GS",
-	NCOMMAND => "GS",
-	MCOMMAND => "GS",
-	OFILE => "GDS",
-	NFILE => "GDS",
-	MFILE => "GDS",
-	OMARK => "G/W",
-	NMARK => "G/W",
-	MMARK => "G/W",
-	UMARK => "",
-	OLINE => "Y",
-	NLINE => "Y",
-	MLINE => "Y",
-	ULINE => "",
-	OTEXT => "G",
-	NTEXT => "G",
-	MTEXT => "G",
-	UTEXT => "",
+my %colormap = do {
+    my $col = $opt_256 ? 0 : 1;
+    pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
+	OCOMMAND =>  [ "555/010"  , "GS"  ],
+	NCOMMAND =>  [ "555/010"  , "GS"  ],
+	MCOMMAND =>  [ "555/010"  , "GS"  ],
+	OFILE    =>  [ "555/010D" , "GDS" ],
+	NFILE    =>  [ "555/010D" , "GDS" ],
+	MFILE    =>  [ "555/010D" , "GDS" ],
+	OMARK    =>  [ "010/444"  , "G/W" ],
+	NMARK    =>  [ "010/444"  , "G/W" ],
+	MMARK    =>  [ "010/444"  , "G/W" ],
+	UMARK    =>    ""         ,
+	OLINE    =>  [ "220"      , "Y"   ],
+	NLINE    =>  [ "220"      , "Y"   ],
+	MLINE    =>  [ "220"      , "Y"   ],
+	ULINE    =>    ""         ,
+	OTEXT    =>  [ "K/454"    , "G"   ],
+	NTEXT    =>  [ "K/454"    , "G"   ],
+	MTEXT    =>  [ "K/454"    , "G"   ],
+	UTEXT    =>    ""         ,
     );
+};
 
 use Getopt::EX::Colormap;
 use constant SGR_RESET => "\e[m";
@@ -212,18 +204,19 @@ my $color_handler = new Getopt::EX::Colormap
     HASH => \%colormap;
 $color_handler->load_params(@opt_colormap);
 
+$colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
+$colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
+$colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
+$colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
+
 my $painter = do {
-    if ($opt_color) {
+    if (($opt_color eq 'always')
+	or (($opt_color eq 'auto') and (-t STDOUT))) {
 	sub { $color_handler->color(@_) };
     } else {
 	sub { $_[1] } ;
     }
 };
-
-$colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
-$colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
-$colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
-$colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
 
 ##
 ## setup cdifopts
@@ -255,8 +248,8 @@ sub usage {
 
 use constant {
     RIGHT => 'right',
-    LEFT => 'left',
-    NO => 'no',
+    LEFT  => 'left',
+    NO    => 'no',
 };
 my %markpos = (
     center => [ RIGHT , LEFT  , LEFT  ],
@@ -284,14 +277,21 @@ sub column_width {
     };
 }
 
-my $oline = 1;
-my $nline = 1;
-my $mline = 1;
-
+##
+## --colortable
+##
 if ($opt_colortable) {
-    color_table();
+    color_table($screen_width);
     exit;
 }
+
+##
+## Column order
+##
+my @column = !$opt_column ? () : do {
+    my %column = (O => 0, N => 1, M => 2);
+    map { $column{$_} } $opt_column =~ /[ONM]/g;
+};
 
 if ($opt_d) {
     printf STDERR "\$OLD = %s\n", $OLD // "undef";
@@ -330,7 +330,9 @@ if ($opt_cdif) {
     open(DIFF, $DIFF) || die "cannot open diff: $!\n";
 }
 
-my $column = 2;
+my $oline = 1;
+my $nline = 1;
+my $mline = 1;
 
 while (<DIFF>) {
     my @old;
@@ -614,9 +616,9 @@ sub flush_buffer_3 {
 	    my $old = shift @{$d[0]};
 	    my $new = shift @{$d[1]};
 	    my $mrg = shift @{$d[2]};
-	    my $om = $old ? $old =~ s/^(.).// && $1  : ' ';
-	    my $nm = $new ? $new =~ s/^.(.)// && $1  : ' ';
-	    my $mm = $mrg ? $mrg =~ s/^..//   && '+' : ' ';
+	    my $om = $old ? $old =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
+	    my $nm = $new ? $new =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
+	    my $mm = $mrg ? $mrg =~ s/^(?|(\S).|\s(.))// && $1 : ' ';
 
 	    $om = $nm = $mm = ' ' if $opt_view;
 
@@ -751,6 +753,9 @@ sub print_command_n {
 }
 
 sub print_field_n {
+    if (@column >= @_) {
+	@_ = @_[ @column[ 0 .. $#_ ] ];
+    }
     for my $i (0 .. $#_) {
 	my $f = $_[$i];
 	my $markpos = $i < @markpos ? $markpos[$i] : $markpos[-1];
@@ -970,11 +975,12 @@ sub match_glob {
 }
 
 sub color_table {
+    my $width = shift || 80;
     for my $c (0..5) {
 	for my $b (0..5) {
 	    my @format =
 		("%d$b$c", "$c%d$b", "$b$c%d", "$b%d$c", "$c$b%d", "%d$c$b")
-		[0 .. min(5, $screen_width / (4 * 6) - 1)];
+		[0 .. min(5, $width / (4 * 6) - 1)];
 	    for my $format (@format) {
 		for my $a (0..5) {
 		    my $rgb = sprintf $format, $a;
@@ -1053,13 +1059,13 @@ Read `perldoc Getopt::EX::Module` for detail.
 =head2 COLOR
 
 Each lines are displayed in different colors by default.  Use
-B<no-color> option to disable it.  Each text segment has own labels,
+B<--no-color> option to disable it.  Each text segment has own labels,
 and color for them can be specified by B<--colormap> option.  Read
 `perldoc Getopt::EX::Colormap` for detail.
 
 Standard module B<-Mcolors> is loaded by default, and define several
-colormaps for light and dark screen.  If you want to use CMY colors in
-dark screen, place following line in your F<~/.sdifrc>.
+color maps for light and dark screen.  If you want to use CMY colors in
+dark screen, place next line in your F<~/.sdifrc>.
 
     option default --dark-cmy
 
@@ -1165,6 +1171,18 @@ Specify options for back-end B<diff> command.
 
 Specify the position for a mark.  Choose from I<left>, I<right>,
 I<center>, I<side> or I<no>.  Default is I<center>.
+
+=item B<--column>=I<order>
+
+Specify the order of each column by B<O> (old), B<N> (new) and B<M>
+(merge).  Default order is B<ONM>.  If you want to show new file on
+left side and old file in right side, use like:
+
+    $ sdif --column NO
+
+Next example show merged file on left-most column for diff3 data.
+
+    $ sdif --column MON
 
 =item B<-->[B<no>]B<color>
 

@@ -5,13 +5,12 @@ author:
 build_requires:
   Module::Build: '0.28'
   Test::More: '0'
-  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
-license: gpl
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,9 +21,12 @@ requires:
   LWP::Online: '0'
   Moo: '0'
   WebService::Client: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/faraco/WebService-Pixabay/issues
   homepage: https://github.com/faraco/WebService-Pixabay
   repository: https://github.com/faraco/WebService-Pixabay.git
-version: 2.1.1
+version: 2.2.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

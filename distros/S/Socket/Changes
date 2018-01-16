@@ -1,5 +1,18 @@
 Revision history for Socket
 
+2.027   2018-01-12 16:58:47
+        [BUGFIXES]
+         * Reimplement croak_sv (securely) for older perls (RT124063)
+
+2.026   2018-01-11 23:15:28
+        [CHANGES]
+         * Add TCP_USER_TIMEOUT (RT123253)
+
+        [BUGFIXES]
+         * Fix printf format specifier for STRLEN/sizeof (RT124044)
+         * Recognise %Config key for HAS_GAI_STRERROR (RT124044)
+         * Remove unused and insecure implementation of croak_sv (RT122830)
+
 2.025   2018-01-09 15:12:51
         [CHANGES]
          * Add IPPROTO_ICMPV6

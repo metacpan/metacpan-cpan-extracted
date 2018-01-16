@@ -1,3 +1,0 @@
-# no strict 'refs'
-[TestingAndDebugging::ProhibitNoStrict]
-allow = refs

@@ -1,3 +1,8 @@
+0.180140  2018-01-14 22:36:55+01:00 Europe/Brussels
+    - Additions
+        - Ali::Temporary: new args attribute (to fine-tune FASTA file creation)
+        - Ali::Temporary: improved documentation
+
 0.173620  2017-12-29 00:58:54+01:00 Europe/Brussels
     - Additions
       - Ali: new clone method
@@ -7,7 +12,7 @@
     - Fixes
       - Rates: tests should pass on more platforms
       - Taxonomy: GCA-based taxon ids now retain their true taxonomic rank
-    
+
 0.173500  2017-12-17 00:35:51+01:00 Europe/Brussels
     - Additions
       - binaries: new script split-matrix.pl (to extract genes from a supermatrix)

@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,10 +47,10 @@ resources:
   bugtracker: https://github.com/fastmail/JMAP-Tester/issues
   homepage: https://github.com/fastmail/JMAP-Tester
   repository: https://github.com/fastmail/JMAP-Tester.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -66,7 +66,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -160,13 +160,13 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::NextVersion:
           first_version: '0.001'
-          version_by_branch: 1
+          version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.14.2
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
@@ -186,7 +186,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@RJBS/Test::ChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@RJBS/PodSyntaxTests'
@@ -310,7 +310,7 @@ x_Dist_Zilla:
           git_version: 2.14.2
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -329,7 +329,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -337,7 +337,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.015'
+          tag: '0.016'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -346,20 +346,20 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
         Dist::Zilla::Plugin::Git::Push:
           push_to:
-            - 'rjbs :'
+            - 'origin :'
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.14.2
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -370,7 +370,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@RJBS/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

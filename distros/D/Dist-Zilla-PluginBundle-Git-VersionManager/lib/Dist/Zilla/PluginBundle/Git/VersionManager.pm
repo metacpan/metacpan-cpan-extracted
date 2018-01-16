@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.003-8-gc11004c
+package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.004-3-g00cb62d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle that manages your version in git
 # KEYWORDS: bundle distribution git version Changes increment
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Moose;
 with
@@ -97,6 +97,12 @@ sub configure
     }
 
     $self->add_plugins(
+        # adding this first indicates the start of the bundle in x_Dist_Zilla metadata
+        [ 'Prereqs' => 'pluginbundle version' => {
+                '-phase' => 'develop', '-relationship' => 'recommends',
+                $self->meta->name => $self->VERSION,
+            } ],
+
         # VersionProvider (and a file munger, for the transitional usecase)
         $self->bump_only_matching_versions
             ? [ 'VersionFromMainModule' ]
@@ -189,7 +195,7 @@ Dist::Zilla::PluginBundle::Git::VersionManager - A plugin bundle that manages yo
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -218,7 +224,12 @@ can be customized or overridden (see below).
 Modules without C<$VERSION> declarations will have them added for the release, with that change also committed
 back to the local repository.
 
-When no custom options are passed, is equivalent to the following configuration directly in a F<dist.ini>:
+When no custom options are passed, it is equivalent to the following configuration directly in a F<dist.ini>:
+
+    [Prereqs / pluginbundle version]
+    -phase = develop
+    -relationship = recommends
+    Dist::Zilla::PluginBundle::Git::NextVersion = <current installed version>
 
     [RewriteVersion::Transitional]
     :version = 0.004

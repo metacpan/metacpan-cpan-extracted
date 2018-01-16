@@ -13,10 +13,10 @@ use Test::BDD::Cucumber::StepFile qw();
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-our @EXPORT_OK = qw(S C request_send code_eq header_re header_set content_re content_set);
-our %EXPORT_TAGS = ( util => [qw(request_send code_eq header_re header_set content_re content_set)] );
+our @EXPORT_OK = qw(S C request_send code_eq header_re header_set content_eq content_re content_set);
+our %EXPORT_TAGS = ( util => [qw(request_send code_eq header_re header_set content_eq content_re content_set)] );
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
@@ -172,6 +172,26 @@ sub header_re {
     );
 
     diag( 'Http response headers = ' . np S->{http}->{response}->{headers} );
+
+    return;
+}
+
+my $validator_content_eq = validation_for(
+    params => [
+
+        # http response content
+        {   type => subtype(
+                as 'Str',
+                message {qq{"$_" is not a valid http response content}}
+            ),
+        }
+    ]
+);
+
+sub content_eq {
+    my ($content) = $validator_content_eq->(@_);
+
+    is( S->{http}->{response}->{content}, $content, qq{Http response content eq "$content"} );
 
     return;
 }

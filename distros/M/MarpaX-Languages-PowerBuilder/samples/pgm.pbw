@@ -1,0 +1,11 @@
+Save Format v3.0(19990112)
+@begin Unchecked
+ 0 "verinfo.pbt";
+ 1 "verinfo2.pbt";
+@end;
+@begin Targets
+ 0 "pgm_3.pbt";
+ 1 "verinfo.pbt";
+@end;
+DefaultTarget "pgm_3.pbt";
+DefaultRemoteTarget "pgm_3.pbt";

@@ -1,5 +1,5 @@
 #
-# $Id: Mysql.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Mysql.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::mysql Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Sqlite Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -208,7 +208,7 @@ sub create_user {
 
    my $cmd = "mysql -h $mysql_host --port=$mysql_port -u $mysql_username --password=$mysql_password --execute=\"create user $username\@'$ip' identified by '$password'\" mysql";
 
-   $self->debug && $self->log->debug("create_user: cmd [$cmd]");
+   $self->log->debug("create_user: cmd [$cmd]");
 
    return $sc->system($cmd);
 }
@@ -232,7 +232,7 @@ sub grant_all_privileges {
 
    my $cmd = "mysql -h $mysql_host --port=$mysql_port -u $mysql_username --password=$mysql_password --execute=\"grant all privileges on $db.* to $username\@'$ip' identified by '$password'\" mysql";
 
-   $self->debug && $self->log->debug("grant_all_privileges: cmd [$cmd]");
+   $self->log->debug("grant_all_privileges: cmd [$cmd]");
 
    return $sc->system($cmd);
 }
@@ -251,7 +251,7 @@ sub enter_shell {
 
    my $cmd = "mysql -h $mysql_host --port=$mysql_port -u $mysql_username --password=$mysql_password mysql";
 
-   $self->debug && $self->log->debug("shell: cmd [$cmd]");
+   $self->log->debug("shell: cmd [$cmd]");
 
    return $sc->system($cmd);
 }
@@ -266,7 +266,7 @@ Metabrik::Client::Mysql - client::mysql Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

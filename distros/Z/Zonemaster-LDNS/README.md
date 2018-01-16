@@ -20,6 +20,14 @@ If GNU libidn is installed when this module is compiled, it will be used to add 
 
 Installation
 ============
-Installation uses the normal `perl Makefile.PL && make && make test && make install` sequence. This assumes that OpenSSL can be found in one of the places where the C compiler looks by default (if it's somewhere else, try using the `--prefix` flag when running `Makefile.PL`). `make test` assumes that it can send queries to the outside world.
+Installation uses the normal `perl Makefile.PL && make && make test && make install` sequence. This assumes that OpenSSL
+can be found in one of the places where the C compiler looks by default (if it's somewhere else, try using the `--prefix`
+flag when running `Makefile.PL`). Some of the unit tests depend on data on Internet, which may change. To avoid false 
+fails, those unit tests are only run if the environment variable `TEST_WITH_NETWORK` is `true`. By default that variable
+is unset (those tests are not run). To run all tests, execute
+
+```
+TEST_WITH_NETWORK=1 make test
+```
 
 There is a small part in the code that may not be compatible with non-Unix operating systems, in that it assumes that the file /dev/null exists. If you try using this on Windows, VMS, z/OS or something else non-Unix, I'd love to hear from you so we can sort that bit out.

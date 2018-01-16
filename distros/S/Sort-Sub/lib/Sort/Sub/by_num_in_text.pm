@@ -1,7 +1,7 @@
 package Sort::Sub::by_num_in_text;
 
-our $DATE = '2016-12-18'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2018-01-15'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +60,7 @@ Sort::Sub::by_num_in_text - Sort by first number found in text or (if no number 
 
 =head1 VERSION
 
-This document describes version 0.10 of Sort::Sub::by_num_in_text (from Perl distribution Sort-Sub), released on 2016-12-18.
+This document describes version 0.110 of Sort::Sub::by_num_in_text (from Perl distribution Sort-Sub), released on 2018-01-15.
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

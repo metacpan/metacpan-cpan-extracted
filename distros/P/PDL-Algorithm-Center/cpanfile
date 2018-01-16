@@ -1,6 +1,6 @@
 requires "Carp" => "0";
 requires "Exporter" => "0";
-requires "Hash::Wrap" => "0.02";
+requires "Hash::Wrap" => "0.03";
 requires "PDL" => "0";
 requires "PDL::Image2D" => "0";
 requires "PDL::Lite" => "0";

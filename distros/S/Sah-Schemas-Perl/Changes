@@ -1,3 +1,9 @@
+0.010   2018-01-14 (PERLANCAR)
+
+        - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
+          Perinci::Sub::XCompletion::* modules.
+
+
 0.009   2017-02-08 (PERLANCAR)
 
 	- Fix tests for perl < 5.12 where invalid version only results in

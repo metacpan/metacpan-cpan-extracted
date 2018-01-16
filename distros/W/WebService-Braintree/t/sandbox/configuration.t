@@ -18,17 +18,14 @@ use WebService::Braintree::TestHelper qw(sandbox);
 subtest "default integration configuration" => sub {
     my $config = WebService::Braintree::TestHelper->config;
 
+    my $amount = amount(5, 15);
     my $result = WebService::Braintree::Transaction->sale({
-        amount => "10.00",
-        credit_card => {
-            number => "5431111111111111",
-            expiration_date => "05/12",
-        },
+        amount => $amount,
+        credit_card => credit_card(),
     });
+    validate_result($result) or return;
 
-    ok($result->is_success)
-        or diag $result->message;
-    is $result->transaction->amount, "10.00";
+    cmp_ok $result->transaction->amount, '==', $amount;
 };
 
 subtest "configuration two" => sub {
@@ -43,7 +40,7 @@ subtest "configuration two" => sub {
     should_throw("AuthenticationError", sub {
         $gateway->transaction->create({
             type => "sale",
-            amount => "10.00",
+            amount => amount(5, 15),
         });
     });
 };

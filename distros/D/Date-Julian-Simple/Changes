@@ -1,5 +1,8 @@
 Revision history for Date::Julian::Simple
 
+0.03  Thu Jan 11 18:20:00 2018
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.02  Tue Jan 09 12:20:00 2018
       - Added key 'provides' to the Makefile.PL script.
 

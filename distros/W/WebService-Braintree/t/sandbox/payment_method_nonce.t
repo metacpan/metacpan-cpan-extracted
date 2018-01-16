@@ -19,7 +19,7 @@ use WebService::Braintree::TestHelper qw(sandbox);
 subtest "creates a payment method nonce from a vaulted credit card" => sub {
     my $customer = WebService::Braintree::Customer->create->customer;
     isnt($customer->id, undef, '.. customer->id is defined');
-    my $test_cc_number = '4111111111111111';
+    my $test_cc_number = cc_number();
 
     my $nonce = WebService::Braintree::TestHelper::nonce_for_new_credit_card({
         number => $test_cc_number,
@@ -39,8 +39,7 @@ subtest "creates a payment method nonce from a vaulted credit card" => sub {
             street_address => "123 Abc Way",
         },
     });
-
-    ok($result->is_success, '.. result is successful');
+    validate_result($result) or return;
 
     isnt($result->payment_method, undef, '.. we have a payment method');
     my $token = $result->payment_method->token;
@@ -50,7 +49,8 @@ subtest "creates a payment method nonce from a vaulted credit card" => sub {
 
     {
         my $create_result = WebService::Braintree::PaymentMethodNonce->create($found_credit_card->token);
-        ok($create_result->is_success, '.. creating a nonce from a token is_success');
+        validate_result($create_result) or return;
+
         ok($create_result->{response}->{payment_method_nonce}->{nonce}, '.. we get a nonce');
         ok($create_result->payment_method_nonce->nonce, '.. we get a nonce object');
         is($create_result->{response}->{payment_method_nonce}->{nonce}, $create_result->payment_method_nonce->nonce, '.. nonce accessor created successfully');
@@ -69,10 +69,10 @@ subtest "finds (fake) valid nonce, returns it" => sub {
     my $token = 'fake-valid-nonce';
 
     my $result = WebService::Braintree::PaymentMethodNonce->find($token);
+    validate_result($result) or return;
 
     my $nonce = $result->payment_method_nonce;
 
-    ok($result->is_success, '.. result is successful');
     is($nonce->nonce, $token, '.. returns the correct nonce');
     is($nonce->type, 'CreditCard', '.. returns the correct type');
     is($nonce->details->last_two, '81', '.. details->last_two set correctly');
@@ -81,14 +81,15 @@ subtest "finds (fake) valid nonce, returns it" => sub {
 
 subtest "returns null 3ds_info if there isn't any" => sub {
     my $nonce = WebService::Braintree::TestHelper::nonce_for_new_credit_card({
-        number => '4111111111111111',
+        number => cc_number(),
         expirationMonth => "11",
         expirationYear => "2099",
     });
 
     my $result = WebService::Braintree::PaymentMethodNonce->find($nonce);
+    validate_result($result) or return;
+
     $nonce = $result->payment_method_nonce;
-    ok($result->is_success, '.. result is successful');
     is($nonce->three_d_secure_info, undef, '.. three_d_secure_info is null');
 };
 

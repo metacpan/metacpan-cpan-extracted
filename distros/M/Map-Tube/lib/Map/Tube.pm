@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.43';
+$Map::Tube::VERSION   = '3.44';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.43
+Version 3.44
 
 =cut
 
@@ -60,24 +60,30 @@ documented in L<Map::Tube::Cookbook>.
 
 =head1 MAP LEADER BOARD
 
-    +---------------------+--------+--------------------------------------------+
-    | Author              | PAUSE  | Map Count (City)                           |
-    |                     |  ID    |                                            |
-    +---------------------+--------+--------------------------------------------+
-    | Michal Josef Spacek | SKIM   | 22 (Bucharest, Budapest, Dnipropetrovsk,   |
-    |                     |        | Kazan, Kharkiv, Kiev, KualaLumpur, Malaga, |
-    |                     |        | Minsk, Moscow, Nanjing, NizhnyNovgorod,    |
-    |                     |        | Novosibirsk, Prague, SaintPetersburg,      |
-    |                     |        | Samara, Singapore, Sofia, Tbilisi, Vienna, |
-    |                     |        | Warsaw, Yekaterinburg)                     |
-    |                     |        |                                            |
-    | Mohammad S Anwar    | MANWAR | 6 (Barcelona, Delhi, Kolkatta, London, NYC,|
-    |                     |        | Tokyo)                                     |
-    |                     |        |                                            |
-    | Gisbert W Selke     | GWS    | 4 (Beijing, Glasgow, KoeinBonn, Lyon)      |
-    |                     |        |                                            |
-    | Slaven Rezic        | SREZIC | 1 (Berlin)                                 |
-    +---------------------+--------+--------------------------------------------+
+    +---------------------+----------+------------------------------------------+
+    | Author              | PAUSE ID | Map Count (City)                         |
+    +---------------------+----------+------------------------------------------+
+    | Michal Josef Spacek | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
+    |                     |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
+    |                     |          | Malaga, Minsk, Moscow, Nanjing,          |
+    |                     |          | NizhnyNovgorod, Novosibirsk, Prague,     |
+    |                     |          | SaintPetersburg, Samara, Singapore,      |
+    |                     |          | Sofia, Tbilisi, Vienna, Warsaw,          |
+    |                     |          | Yekaterinburg)                           |
+    |                     |          |                                          |
+    | Mohammad S Anwar    | MANWAR   | 6 (Barcelona, Delhi, Kolkatta, London,   |
+    |                     |          | NYC, Tokyo)                              |
+    |                     |          |                                          |
+    | Gisbert W Selke     | GWS      | 4 (Beijing, Glasgow, KoeinBonn, Lyon)    |
+    |                     |          |                                          |
+    | Slaven Rezic        | SREZIC   | 1 (Berlin)                               |
+    |                     |          |                                          |
+    | Errietta Kostala    | ERRIETTA | 1 (Athens)                               |
+    |                     |          |                                          |
+    | Marco Fontani       | MFONTANI | 1 (Milan)                                |
+    |                     |          |                                          |
+    | Soren Lund          | SLU      | 1 (Copenhagen)                           |
+    +---------------------+----------+------------------------------------------+
 
 =cut
 

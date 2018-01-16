@@ -1,14 +1,17 @@
 Changes
 lib/Panda/XS.pm
 lib/Panda/XS.pod
+main.cc
 Makefile.PL
 MANIFEST			This list of files
 misc/mytest.plx
+Panda-XS.pro
 src/algorithm_perlsafe
 src/xs/ppport.h
 src/xs/xs-private.h
 src/xs/xs.cc
 src/xs/xs.h
+src/xs/XSCallbackDispatcher.h
 t/00-Panda-XS.t
 t/01-payload.t
 t/02-upgrade.t
@@ -64,5 +67,6 @@ typemap
 typemap32
 typemap64
 XS.xs
+XSCallbackDispatcher.xsi
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

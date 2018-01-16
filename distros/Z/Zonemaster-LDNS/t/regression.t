@@ -7,7 +7,7 @@ use warnings;
 BEGIN { use_ok("Zonemaster::LDNS")}
 
 SKIP: {
-    skip 'no network', 2 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 2 unless $ENV{TEST_WITH_NETWORK};
 
     my $s = Zonemaster::LDNS->new( '8.8.8.8' );
     isa_ok( $s, 'Zonemaster::LDNS' );

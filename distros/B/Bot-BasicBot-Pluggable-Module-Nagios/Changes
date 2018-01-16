@@ -1,5 +1,17 @@
 Revision history for Bot-BasicBot-Pluggable-Module-Nagios
 
+0.05    2017-01-11
+        Report failure to poll Nagios - added UPDATE_FAIL to report_statuses
+        list to configure whether to report or not
+
+        Test that we can poll a new instance before adding it, if not, refuse
+        to store it, and return the error we got
+
+        New 'filter_services' option, to take a regex of services which should
+        be ignored.
+
+        Bugfix: don't say e.g. "OK, set report_statuses to 'ARRAY(0x2669fc8)"
+
 0.04    2011-10-21
         Configurable repeat_delay, poll_interval and report_statuses settings.
 

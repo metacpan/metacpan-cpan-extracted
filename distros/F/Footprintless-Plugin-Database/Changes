@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless::Plugin::Database
 
+1.04 2018-01-11
+
+    - Updated templates to skip over SQL comments (https://github.com/lucastheisen/footprintless-plugin-database/pull/3)
+
 1.03 2018-01-04
 
     - Added a prepared statement template

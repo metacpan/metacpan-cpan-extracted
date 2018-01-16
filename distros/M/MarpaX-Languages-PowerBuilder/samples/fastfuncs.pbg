@@ -1,0 +1,24 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "fastfuncs.pbl" "";
+ "fastfuncs2.pbl" "";
+@end;
+@begin Objects
+ "token.srf" "fastfuncs.pbl";
+ "split.srf" "fastfuncs.pbl";
+ "index.srf" "fastfuncs.pbl";
+ "sort.srf" "fastfuncs.pbl";
+ "bitwise_and.srf" "fastfuncs.pbl";
+ "replace_all.srf" "fastfuncs.pbl";
+ "call_dynamic.srf" "fastfuncs.pbl";
+ "stack_trace.srf" "fastfuncs.pbl";
+ "blob_extract.srf" "fastfuncs.pbl";
+ "blob_alloc.srf" "fastfuncs.pbl";
+ "bitwise_or.srf" "fastfuncs.pbl";
+ "next_tag.srf" "fastfuncs.pbl";
+ "blob_mid.srf" "fastfuncs.pbl";
+ "blob_import.srf" "fastfuncs.pbl";
+ "append.srf" "fastfuncs.pbl";
+ "fast_pos.srf" "fastfuncs.pbl";
+ "last_pos.srf" "fastfuncs.pbl";
+@end;

@@ -8,7 +8,7 @@ my $lib_v = version->parse(Zonemaster::LDNS::lib_version());
 ok( $lib_v >= v1.6.16, 'ldns version at least 1.6.16' );
 
 SKIP: {
-    skip 'no network', 59 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 59 unless $ENV{TEST_WITH_NETWORK};
 
     my $s = Zonemaster::LDNS->new( '8.8.8.8' );
     isa_ok( $s, 'Zonemaster::LDNS' );

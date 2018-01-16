@@ -1,0 +1,41 @@
+---
+abstract: 'L<IETF|https://www.ietf.org>-standard ACME client protocol in Perl'
+author:
+  - 'Felipe Gasper'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  Test::Deep: '0'
+  Test::Exception: '0.4'
+  Test::More: '1'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-ACME2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Call::Context: '0.02'
+  Crypt::Format: '0.06'
+  Crypt::Perl: '0.17'
+  HTTP::Tiny: '0.058'
+  HTTP::Tiny::UA::Response: '0.004'
+  JSON: '2.9'
+  MIME::Base64: '3.11'
+  X::Tiny: '0'
+  autodie: '0'
+  constant: '1.23'
+  parent: '0.225'
+  perl: '5.008009'
+resources:
+  repository: https://github.com/FGasper/p5-Net-ACME2.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -172,7 +172,7 @@ Revision history for Perl module ActiveRecord::Simple
         - Classes
         - SQL::Traslator things
 
-1.00    2018-XX-XX
+1.00    2018-01-02
         * New faster accessors
         * Improved tests
         * Updated sandbox
@@ -181,4 +181,12 @@ Revision history for Perl module ActiveRecord::Simple
         - "abstract" method
         - "select" method
         * Improved documentation
+
+1.05    2018-01-13
+        * Fixed bugs
+        + new class ActiveRecord::Simple::QueryManager
+        + new "objects" method
+        - method "find" [DEPRECATED]
+        - method "all" [DEPRECATED]
+        - method "get" [DEPRECATED]
 

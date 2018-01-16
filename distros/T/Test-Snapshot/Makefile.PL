@@ -17,6 +17,7 @@ WriteMakefile(
     'Test::More' => '0.96', # subtest does done_testing
     'Test2::API' => '0',
     'Capture::Tiny' => 0,
+    'App::Prove' => 0,
   },
   PREREQ_PM => {
     'Test::More' => '0.96', # subtest does done_testing

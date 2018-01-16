@@ -13,10 +13,9 @@ use DateTime;
 use DateTime::Format::CLDR;
 use DateTime::TimeZone;
 use DateTime::Locale;
-
-
+ 
 has 'i18n_datetime_timezone' => (
-    is      => 'rw', 
+    is      => 'rw',
     isa     => 'DateTime::TimeZone',
     lazy_build=> 1,
     builder => '_build_i18n_datetime_timezone',
@@ -76,37 +75,37 @@ after 'set_locale' => sub {
 
 sub _build_i18n_datetime_timezone {
     my ($c) = @_;
-    
+
     my $config = $c->i18n_config;
-    
+
     $c->_clear_i18n_datetime_format_date();
     $c->_clear_i18n_datetime_format_datetime();
-    
+
     return DateTime::TimeZone->new( name => $config->{timezone} || 'floating' );
 }
 
 sub _build_i18n_datetime_locale {
     my ($c) = @_;
-    
+
     $c->_clear_i18n_datetime_format_date();
     $c->_clear_i18n_datetime_format_datetime();
-    
+
     return DateTime::Locale->load( $c->locale );
 }
 
 sub _build_i18n_datetime_format_date {
     my ($c) = @_;
-    
+
     my $config = $c->i18n_config;
-    
+
     my $datetime_locale = $c->i18n_datetime_locale;
     my $datetime_timezone = $c->i18n_datetime_timezone;
-    
+
     # Set datetime_format_date
     my $datetime_format_date =
         $config->{format_date} ||
         $datetime_locale->date_format_medium;
-        
+
     return DateTime::Format::CLDR->new(
         locale      => $datetime_locale,
         time_zone   => $datetime_timezone,
@@ -116,17 +115,17 @@ sub _build_i18n_datetime_format_date {
 
 sub _build_i18n_datetime_format_datetime {
     my ($c) = @_;
-    
+
     my $config = $c->i18n_config;
-    
+
     my $datetime_locale = $c->i18n_datetime_locale;
     my $datetime_timezone = $c->i18n_datetime_timezone;
-    
+
     # Set datetime_format_date
     my $datetime_format_datetime =
         $config->{format_datetime} ||
         $datetime_locale->datetime_format_medium;
-        
+
     return DateTime::Format::CLDR->new(
         locale      => $datetime_locale,
         time_zone   => $datetime_timezone,
@@ -146,8 +145,8 @@ CatalystX::I18N::Role::DateTime - Support for I18N datetime
 =head1 SYNOPSIS
 
  package MyApp::Catalyst;
- 
- use Catalyst qw/MyPlugins 
+
+ use Catalyst qw/MyPlugins
     +CatalystX::I18N::Role::Base
     +CatalystX::I18N::Role::DateTime/;
 
@@ -155,10 +154,10 @@ CatalystX::I18N::Role::DateTime - Support for I18N datetime
  use strict;
  use warnings;
  use parent qw/Catalyst::Controller/;
- 
+
  sub action : Local {
      my ($self,$c) = @_;
-     
+      
      $c->stash->{timestamp} = $c->i18n_datetime_format_date->format_datetime($datetime);
  }
 
@@ -169,12 +168,12 @@ This role add support for localised datetime to your Catalyst application.
 Most methods are lazy. This means that the values will be only calculated
 upon the first call of the method.
 
-Most settings will be taken from L<DateTime::Locale> but 
+Most settings will be taken from L<DateTime::Locale> but
 can be overdriven in your Catalyst I18N configuration:
 
  # Add I18N configuration
- __PACKAGE__->config( 
-     name    => 'MyApp', 
+ __PACKAGE__->config(
+     name    => 'MyApp',
      I18N    => {
          default_locale          => 'de_AT',
          locales                 => {
@@ -194,15 +193,15 @@ can be overdriven in your Catalyst I18N configuration:
  my $dt = $c->i18n_datetime_today
  say $dt->dmy;
 
-Returns the current date as a L<DateTime> object with the current 
+Returns the current date as a L<DateTime> object with the current
 timezone and locale set.
 
 =head3 i18n_datetime_now
- 
+
  my $dt = $c->i18n_datetime_now
  say $dt->hms;
- 
-Returns the current timestamp as a L<DateTime> object with the current 
+
+Returns the current timestamp as a L<DateTime> object with the current
 timezone and locale set.
 
 =head3 i18n_datetime_timezone
@@ -220,22 +219,22 @@ Returns/sets the current datetime locale as a L<DateTime::Locale> object.
 
  my $date = $c->i18n_datetime_format_date->format_datetime($date);
 
-Returns a L<DateTime::Format::CLDR> object for parsing and printig 
+Returns a L<DateTime::Format::CLDR> object for parsing and printig
 localised date data.
 
 The format for each locale can either be set via the
-C<format_date> coniguration key, or will be taken from the 
+C<format_date> coniguration key, or will be taken from the
 C<date_format_medium> method in the current L<DateTime::Locale> object.
 
 =head3 i18n_datetime_format_datetime
 
  my $datetime = $c->i18n_datetime_format_datetime->format_datetime($datetime);
 
-Returns a L<DateTime::Format::CLDR> object for parsing and printig 
+Returns a L<DateTime::Format::CLDR> object for parsing and printig
 localised datetime data.
 
 The format for each locale can either be set via the
-C<format_datetime> coniguration key, or will be taken from the 
+C<format_datetime> coniguration key, or will be taken from the
 C<datetime_format_medium> method in the current L<DateTime::Locale> object.
 
 =head1 SEE ALSO

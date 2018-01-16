@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Release;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: API for test reports collected by CPAN release
 
 #pod =head1 DESCRIPTION
@@ -31,7 +31,7 @@ use CPAN::Testers::API::Base;
 #pod     GET /v3/release/author/PREACTION
 #pod
 #pod     ### Optional query parameters (may be combined):
-#pod     # ?since=2016-01-01T12:34:00Z
+#pod     # ?since=2016-01-01T12:34:00
 #pod     # ?maturity=stable
 #pod     # ?limit=2
 #pod
@@ -153,7 +153,7 @@ CPAN::Testers::API::Controller::Release - API for test reports collected by CPAN
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -171,7 +171,7 @@ has for each version released, this is the best API.
     GET /v3/release/author/PREACTION
 
     ### Optional query parameters (may be combined):
-    # ?since=2016-01-01T12:34:00Z
+    # ?since=2016-01-01T12:34:00
     # ?maturity=stable
     # ?limit=2
 

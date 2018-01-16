@@ -1,0 +1,29 @@
+:default         	::= action => [name,values]
+:start            	::= Syntax
+
+Syntax 				::= Format UncheckList TargetList DefaultTrg DefaultRmtTrg			action => syntax
+					|	Format TargetList DefaultTrg DefaultRmtTrg						action => syntax
+
+Format 				::= ('Save Format v') <format version> ('(') <format date> (')')	action => format
+UncheckList 		::= (<list start> 'Unchecked') IndexedItemList (<list end>)			action => ::first
+TargetList 			::= (<list start> 'Targets') IndexedItemList (<list end>)			action => ::first
+DefaultTrg			::= ('DefaultTarget') String (';')									action => ::first
+DefaultRmtTrg		::= ('DefaultRemoteTarget') String (';')							action => ::first
+
+IndexedItemList		::= IndexedItem*													action => indexedItems
+IndexedItem			::= <index> String (';')											action => [values]
+String				::= <string lex>													action => string
+
+index				~ [\d]+
+<format version>	~ [\d] '.' [\d]
+<format date>		~ [\d][\d][\d][\d][\d][\d][\d][\d]
+<list start> 		~ '@begin'
+<list end>			~ '@end;'
+
+<string lex>		~ quote <string contents> quote
+<string contents>	~ <string char>*
+<string char>		~ [^"]
+quote				~ ["]
+
+:discard 			~ whitespace
+whitespace			~ [\s]+

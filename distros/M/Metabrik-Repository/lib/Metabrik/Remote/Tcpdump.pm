@@ -1,5 +1,5 @@
 #
-# $Id: Tcpdump.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Tcpdump.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # remote::tcpdump Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Ssh);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -47,7 +47,7 @@ sub brik_use_properties {
 
    return {
       attributes_default => {
-         device => $self->global->device || 'eth0',
+         device => defined($self->global) && $self->global->device || 'eth0',
       },
    };
 }
@@ -65,7 +65,7 @@ sub start {
    my $dump = Net::Frame::Dump::Offline->new;
    $self->_dump($dump);
 
-   $self->debug && $self->log->debug("dump file[".$dump->file."]");
+   $self->log->debug("dump file[".$dump->file."]");
 
    open(my $out, '>', $dump->file)
       or return $self->log->error("cannot open file: $!");
@@ -78,7 +78,7 @@ sub start {
 
    my $channel = $self->exec("tcpdump -U -i $device -w - 2> /dev/null") or return;
 
-   $self->debug && $self->log->debug("tcpdump started");
+   $self->log->debug("tcpdump started");
 
    $self->_started(1);
 
@@ -184,7 +184,7 @@ Metabrik::Remote::Tcpdump - remote::tcpdump Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

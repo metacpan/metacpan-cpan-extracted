@@ -23,8 +23,8 @@ ok(CONST1 == 1 and CONST2 == 2);
 # exporting list
 package main2;
 use Test::More;
-use ExTest qw/CONST1 CONST3 pizda/;
-ok(CONST1 == 1 and CONST3 == 3);
+use ExTest qw/CONST1 CONST3 folded pizda/;
+ok(CONST1 == 1 and CONST3 == 3 and folded == 42);
 ok(!eval{CONST2()});
 ok(pizda() == 10 and pizda() == 11 and pizda() == 12);
 

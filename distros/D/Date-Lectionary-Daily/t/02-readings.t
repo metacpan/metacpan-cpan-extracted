@@ -111,8 +111,8 @@ $testReading = Date::Lectionary::Daily->new(
     'date' => Time::Piece->strptime( "2024-1-8", "%Y-%m-%d" ) );
 is(
     $testReading->readings->{evening}->{2},
-    '1 Thessalonians 4:1-12',
-	'The second reading for morning prayer on 2024-1-8 should be 1 Thessalonians 4:1-12'
+    'Galatians 1',
+	'The second reading for morning prayer on 2024-1-8 should be Galatians 1'
 );
 
 #Lectionary Week: Sunday Closest to August 3 -- Day: Tuesday
@@ -381,8 +381,8 @@ $testReading = Date::Lectionary::Daily->new(
     'date' => Time::Piece->strptime( "2019-2-11", "%Y-%m-%d" ) );
 is(
     $testReading->readings->{morning}->{1},
-    'Jeremiah 17:1-18',
-	'The second reading for morning prayer on 2019-2-11 should be Jeremiah 17:1-18'
+    'Tobit 4:5-19',
+	'The second reading for morning prayer on 2019-2-11 should be Tobit 4:5-19'
 );
 
 #Lectionary Week: Sunday Closest to August 24 -- Day: Wednesday
@@ -408,8 +408,8 @@ $testReading = Date::Lectionary::Daily->new(
     'date' => Time::Piece->strptime( "2019-1-25", "%Y-%m-%d" ) );
 is(
     $testReading->readings->{evening}->{2},
-    '1 Corinthians 4:18-5:end',
-	'The second reading for morning prayer on 2019-1-25 should be 1 Corinthians 4:18-5:end'
+    '1 Corinthians 15:1-34',
+	'The second reading for morning prayer on 2019-1-25 should be 1 Corinthians 15:1-34'
 );
 
 #Lectionary Week: Sunday Closest to July 20 -- Day: Friday

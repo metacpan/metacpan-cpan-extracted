@@ -5,6 +5,7 @@ requires 'Future';
 requires 'Time::HiRes' => 0;
 requires 'namespace::clean' => 0.23;
 requires 'Module::Runtime' => 0;
+requires 'Socket' => 2.025;
 requires 'Net::Frame::Layer::ICMPv6' => 1.10;
 requires 'Net::Frame::Layer::IPv6' => 1.08;
 requires 'Net::Frame::Simple' => 1.09;

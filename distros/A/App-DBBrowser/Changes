@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+1.056   2018-01-11
+        - Minimum version "Term::TablePrint" is "0.058".
+        - Minimum version "Term::Choose" is "1.509".
+        - Minimum version "Term::Choose::Util" is "0.053".
+
 1.055   2018-01-07
         - Update documentation.
 

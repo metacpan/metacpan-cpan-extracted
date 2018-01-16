@@ -1,0 +1,1034 @@
+#!perl
+
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.460'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+$SPEC{validate_with_sah} = {
+    v => 1.1,
+    summary => 'Validate data with Sah schema',
+    description => <<'_',
+
+This script is useful for testing Sah schemas. You can quickly specify from the
+CLI a schema with some data to validate it against. This script can also be used
+to just normalize a Sah schema and show it (`--show-schema`), or compile a
+schema and show the raw compilation result (`--show-raw-compile`), or generate
+validator code and show it (`--show-code`).
+
+_
+    args_rels => {
+        'choose_one&' => [
+            [qw/show_schema show_raw_compile show_code/],
+            [qw/data multiple_data data_file multiple_data_file/],
+        ],
+        'req_one&' => [
+            [qw/schema schema_file schema_module/],
+        ],
+        # XXX: data multiple_data data_file multiple_data_file only required if there are now show_* arguments
+        # doesn't work yet?
+        #'dep_any&' => [
+        #    ['linenum', [qw/show_code/]],
+        #    ['schema_file_type', [qw/schema_file/]],
+        #    ['data_file_type', [qw/data_file multiple_data_file/]],
+        #],
+    },
+    args => {
+        schema => {
+            schema=>'any*',
+            pos=>0,
+            tags => ['category:schema-specification'],
+        },
+        schema_file => {
+            schema=>'str*',
+            summary => 'Retrieve schema from file',
+            description => <<'_',
+
+JSON, YAML, and Perl formats are supported. File type will be guessed from
+filename, defaults to JSON.
+
+_
+            cmdline_aliases => {f=>{}},
+            'x.schema.entity' => 'filename',
+            tags => ['category:schema-specification'],
+        },
+        schema_file_type => {
+            schema=>['str*', in=>[qw/json yaml perl/]],
+            summary => 'Give hint for schema file type',
+            cmdline_aliases => {t=>{}},
+            tags => ['category:schema-specification'],
+        },
+        schema_module => {
+            schema => ['str*', match => qr/\A\w+(\::\w+)*\z/],
+            cmdline_aliases => {m=>{}},
+            tags => ['category:schema-specification'],
+            completion => sub {
+                require Complete::Module;
+                my %args = @_;
+                Complete::Module::complete_module(
+                    word => $args{word}, ns_prefix => 'Sah::Schema',
+                );
+            },
+        },
+
+        data => {
+            schema => ['any'],
+            pos => 1,
+            tags => ['category:data-specification'],
+        },
+        multiple_data => {
+            summary => 'Validate multiple data (array of data) against schema',
+            schema => ['array*', of=>'any'],
+            tags => ['category:data-specification'],
+        },
+        data_file => {
+            schema=>'str*',
+            summary => 'Retrieve data from file',
+            description => <<'_',
+
+JSON, YAML, and Perl formats are supported. File type will be guessed from
+filename, defaults to JSON.
+
+_
+            'x.schema.entity' => 'filename',
+            tags => ['category:data-specification'],
+        },
+        multiple_data_file => {
+            schema=>'str*',
+            summary => 'Retrieve multiple data from file',
+            description => <<'_',
+
+This is like `data_file` except that for multiple data. Data must be an array.
+
+_
+            'x.schema.entity' => 'filename',
+            tags => ['category:data-specification'],
+        },
+        data_file_type => {
+            schema=>['str*', in=>[qw/json yaml perl/]],
+            summary => 'Give hint for data file type',
+            tags => ['category:data-specification'],
+        },
+
+        return_type => {
+            schema=>['str*', in=>[qw/bool bool+val str str+val full/]],
+            default=>'str',
+            cmdline_aliases => {
+                r => {},
+                bool => {
+                    is_flag => 1,
+                    summary => 'Shortcut for --return-type bool',
+                    code => sub { $_[0]{return_type} = 'bool' },
+                },
+                bool_val => {
+                    is_flag => 1,
+                    summary => 'Shortcut for --return-type bool+val',
+                    code => sub { $_[0]{return_type} = 'bool+val' },
+                },
+                str_val => {
+                    is_flag => 1,
+                    summary => 'Shortcut for --return-type str+val',
+                    code => sub { $_[0]{return_type} = 'str+val' },
+                },
+                full => {
+                    is_flag => 1,
+                    summary => 'Shortcut for --return-type full',
+                    code => sub { $_[0]{return_type} = 'full' },
+                },
+            },
+            tags => ['category:validator-specification'],
+        },
+        show_schema => {
+            summary => "Don't validate data, show normalized schema only",
+            schema=>['bool', is=>1],
+            cmdline_aliases => {s=>{}},
+            tags => ['category:action-selection'],
+        },
+        show_raw_compile => {
+            summary => "Don't validate data, show raw compilation result only",
+            schema=>['bool', is=>1],
+            tags => ['category:action-selection'],
+        },
+        show_code => {
+            summary => "Don't validate data, show generated validator code only",
+            schema=>['bool', is=>1],
+            cmdline_aliases => {c=>{}},
+            tags => ['category:action-selection'],
+        },
+        data_with_result => {
+            summary => "Show data alongside with validation result",
+            description => <<'_',
+
+The default is to show the validation result only.
+
+_
+            schema=>['bool', is=>1],
+            cmdline_aliases => {d=>{}},
+            tags => ['category:output'],
+        },
+        with_debug => {
+            summary => 'Generate validator with debug on',
+            description => <<'_',
+
+This means e.g. to pepper the validator code with logging statements.
+
+_
+            schema => ['bool', is=>1],
+            tags => ['category:validator-specification'],
+        },
+        pp => {
+            summary => 'Generate Perl validator that avoids the use of XS modules',
+            schema => ['bool', is=>1],
+            tags => ['category:validator-specification'],
+            # XXX only relevant when compiler=perl
+        },
+        core => {
+            summary => 'Generate Perl validator that avoids the use of non-core modules',
+            schema => ['bool', is=>1],
+            tags => ['category:validator-specification'],
+            # XXX only relevant when compiler=perl
+        },
+        core_or_pp => {
+            summary => 'Generate Perl validator that only uses core or pure-perl modules',
+            schema => ['bool', is=>1],
+            tags => ['category:validator-specification'],
+            # XXX only relevant when compiler=perl
+        },
+        no_modules => {
+            summary => 'Generate Perl validator that does not use modules',
+            schema => ['bool', is=>1],
+            tags => ['category:validator-specification'],
+            # XXX only relevant when compiler=perl
+        },
+        compiler => {
+            summary => "Select compiler",
+            schema=>['str*', in=>[qw/perl js/]],
+            default => 'perl',
+            cmdline_aliases => {C=>{}},
+            tags => ['category:validator-specification'],
+        },
+        linenum => {
+            summary => 'When showing source code, add line numbers',
+            schema=>['bool', is=>1],
+            cmdline_aliases => {l=>{}},
+            tags => ['category:output'],
+        },
+    },
+    examples => [
+        {
+            src => q([[prog]] '"int*"' 42),
+            src_plang => 'bash',
+            summary => 'Should succeed and return empty string',
+        },
+        {
+            src => q([[prog]] '"int*"' '"x"'),
+            src_plang => 'bash',
+            summary => 'Should show an error message because "x" is not int',
+        },
+        {
+            src => q([[prog]] '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' --return-type bool),
+            src_plang => 'bash',
+            summary => 'Validate multiple data, should return "", 1, ""',
+        },
+        {
+            src => q([[prog]] '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' -d),
+            src_plang => 'bash',
+            summary => 'Show data alongside with result, in a table',
+        },
+        {
+            src => q([[prog]] '["int","min",1,"max",10]' -c -l),
+            src_plang => 'bash',
+            summary => 'Show validator Perl code only, with line number',
+        },
+        {
+            src => q([[prog]] '["int","min",1,"max",10]' -c -C js),
+            src_plang => 'bash',
+            summary => 'Show validator JavaScript code',
+        },
+        {
+            src => q([[prog]] '["int","min",1,"max",10]' -C js -c -l),
+            src_plang => 'bash',
+            summary => 'Show validator JS code only, with line number',
+        },
+        {
+            src => q{[[prog]] -f schema1.json '["data"]'},
+            src_plang => 'bash',
+            summary => 'Load schema from file',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            src => q{[[prog]] -f schema1.json --multiple-data-file datafile --data-file-type json},
+            src_plang => 'bash',
+            summary => 'Load schema and data from file',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+};
+sub validate_with_sah {
+    my %args = @_;
+
+    my $res;
+  GET_RESULT:
+    {
+        my $schema;
+        if (defined $args{schema}) {
+            if (defined $args{schema_file}) {
+                $res = [400, "Please specify either 'schema' or 'schema_file', not both"];
+                last GET_RESULT;
+            }
+            $schema = $args{schema};
+        } elsif (defined $args{schema_file}) {
+            my $path = $args{schema_file};
+            my $type = $args{schema_file_type};
+            if (!$type) {
+                if ($path =~ /\b(json)$/i) { $type = 'json' }
+                elsif ($path =~ /\b(yaml|yml)$/i) { $type = 'yaml' }
+                elsif ($path =~ /\b(perl|pl)$/i) { $type = 'perl' }
+                else { $type = 'json' }
+            }
+            if ($type eq 'json') {
+                require File::Slurper;
+                require JSON::MaybeXS;
+                my $ct = File::Slurper::read_text($path);
+                $schema = JSON::MaybeXS->new->allow_nonref->decode($ct);
+            } elsif ($type eq 'yaml') {
+                require YAML::XS;
+                $schema = YAML::XS::LoadFile($path);
+            } elsif ($type eq 'perl') {
+                require File::Slurper;
+                my $ct = File::Slurper::read_text($path);
+                $schema = eval $ct;
+                die if $@;
+            } else {
+                $res = [400, "Unknown schema file type '$type', please specify json/yaml"];
+                last GET_RESULT;
+            }
+        } elsif (defined $args{schema_module}) {
+            no strict 'refs';
+            my $mod = "Sah::Schema::$args{schema_module}";
+            (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+            require $mod_pm;
+            $schema = ${"$mod\::schema"}
+                or return [400, "No schema found in module '$mod'"];
+        } else {
+            $res = [400, "Please specify 'schema' or 'schema_file' or 'schema_module'"];
+            last GET_RESULT;
+        }
+
+        if ($args{show_schema}) {
+            require Data::Sah::Normalize;
+            $res = [200, "OK", Data::Sah::Normalize::normalize_schema($schema)];
+            last GET_RESULT;
+        }
+
+        my $func;
+        my $obj;
+        {
+            no strict 'refs';
+            my $c = $args{compiler};
+            if ($c eq 'perl') {
+                require Data::Sah;
+                if ($args{show_raw_compile}) {
+                    $obj = Data::Sah->new->get_compiler('perl');
+                } else {
+                    $func = \&{"Data::Sah::gen_validator"};
+                }
+            } elsif ($c eq 'js') {
+                if ($args{show_raw_compile}) {
+                    $obj = Data::Sah->new->get_compiler('js');
+                } else {
+                    require Data::Sah::JS;
+                    $func = \&{"Data::Sah::JS::gen_validator"};
+                }
+            } else {
+                $res = [400, "Unknown compiler '$c', please specify perl/js"];
+                last GET_RESULT;
+            }
+        }
+
+        my %gen_opts;
+        {
+            $gen_opts{source} = 1 if $args{show_code};
+            $gen_opts{return_type} = $args{return_type};
+            $gen_opts{debug} = 1 if $args{with_debug};
+            $gen_opts{pp} = 1 if $args{pp};
+            $gen_opts{core} = 1 if $args{core};
+            $gen_opts{core_or_pp} = 1 if $args{core_or_pp};
+            $gen_opts{no_modules} = 1 if $args{no_modules};
+        }
+
+        if ($args{show_raw_compile}) {
+            require Data::Dump;
+            my $cd = $obj->compile(%gen_opts, schema=>$schema);
+            $res = [200, "OK", Data::Dump::dump($cd), {'cmdline.skip_format'=>1}];
+            last GET_RESULT;
+        }
+
+        my $v = $func->($schema, \%gen_opts);
+
+        if ($args{show_code}) {
+            $v .= "\n" unless $v =~ /\R\z/;
+            if ($args{linenum}) {
+                require String::LineNumber;
+                $v = String::LineNumber::linenum($v);
+            }
+            $res = [200, "OK", $v, {'cmdline.skip_format'=>1}];
+            last GET_RESULT;
+        }
+
+        my $data;
+        my $multiple;
+        if (exists $args{data}) {
+            $data = $args{data};
+        } elsif ($args{multiple_data}) {
+            $data = $args{multiple_data};
+            $multiple = 1;
+        } elsif (defined($args{data_file}) || defined($args{multiple_data_file})) {
+            my $path;
+            if (defined $args{data_file}) {
+                $path = $args{data_file};
+            } else {
+                $path = $args{multiple_data_file};
+                $multiple = 1;
+            }
+            my $type = $args{data_file_type};
+            if (!$type) {
+                if ($path =~ /\b(json)$/i) { $type = 'json' }
+                elsif ($path =~ /\b(yaml|yml)$/i) { $type = 'yaml' }
+                elsif ($path =~ /\b(perl|pl)$/i) { $type = 'perl' }
+                else { $type = 'json' }
+            }
+            if ($type eq 'json') {
+                require File::Slurper;
+                require JSON::MaybeXS;
+                my $ct = File::Slurper::read_text($path);
+                $data = JSON::MaybeXS->new->allow_nonref->decode($ct);
+            } elsif ($type eq 'yaml') {
+                require YAML::XS;
+                $data = YAML::XS::LoadFile($path);
+            } elsif ($type eq 'perl') {
+                require File::Slurper;
+                my $ct = File::Slurper::read_text($path);
+                $data = eval $ct;
+                die if $@;
+            } else {
+                $res = [400, "Unknown data file type '$type', please specify json/yaml"];
+                last GET_RESULT;
+            }
+        } else {
+            $res = [400, "Please specify 'data' or 'multiple_data' or 'data_file' or 'multiple_data_file'"];
+            last GET_RESULT;
+        }
+        if ($multiple && ref($data) ne 'ARRAY') {
+            $res = [400, "Multiple data must be an array"];
+            last GET_RESULT;
+        }
+
+        if ($multiple) {
+            if ($args{data_with_result}) {
+                $res = [200, "OK", [map {{data=>$_, result=>$v->($_)}} @$data]];
+            } else {
+                $res = [200, "OK", [map {$v->($_)} @$data]];
+            }
+            last GET_RESULT;
+        } else {
+            if ($args{data_with_result}) {
+                $res = [200, "OK", {data=>$data, result=>$v->($data)}];
+            } else {
+                $res = [200, "OK", $v->($data)];
+            }
+            last GET_RESULT;
+        }
+
+        die "BUG: This should not be reached";
+    } # GET_RESULT
+
+    my $outputs_text = $args{-cmdline_r} &&
+        ($args{-cmdline_r}{format} // 'text') =~ /text/;
+    if ($outputs_text && $res->[0] == 200 && ref($res->[2])) {
+        require Data::Dump;
+        $res->[2] = Data::Dump::dump($res->[2]);
+    }
+    $res;
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/validate_with_sah',
+    pass_cmdline_object => 1,
+);
+$cli->{common_opts}{naked_res}{default} = 1;
+$cli->run;
+
+# ABSTRACT: Validate data with Sah schema
+# PODNAME: validate-with-sah
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+validate-with-sah - Validate data with Sah schema
+
+=head1 VERSION
+
+This document describes version 0.460 of validate-with-sah (from Perl distribution App-SahUtils), released on 2018-01-14.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % validate-with-sah [options] [schema] [data]
+
+Examples:
+
+Should succeed and return empty string:
+
+ % validate-with-sah '"int*"' 42
+ 
+Should show an error message because "x" is not int:
+
+ % validate-with-sah '"int*"' '"x"'
+ Not of type integer
+
+Validate multiple data, should return "", 1, "":
+
+ % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' --return-type bool
+ ["", 1, ""]
+
+Show data alongside with result, in a table:
+
+ % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' -d
+ [
+   { data => -4, result => "Must be at least 1" },
+   { data => 7, result => "" },
+   { data => 15, result => "Must be at most 10" },
+ ]
+
+Show validator Perl code only, with line number:
+
+ % validate-with-sah '["int","min",1,"max",10]' -c -l
+    1|do {
+    2|    no warnings ('void');
+    3|    require Scalar::Util::Numeric;
+    4|    sub {
+    5|        my ($data) = @_;
+    6|        my $err_data;
+    7|        my $_sahv_res = 
+     |        
+    9|            # skip if undef
+   10|            (!defined($data) ? 1 : 
+     |            
+   12|            (# check type 'int'
+   13|            ((Scalar::Util::Numeric::isint($data)) ? 1 : (($err_data //= "Not of type integer"),0))
+     |            
+   15|            &&
+     |            
+   17|            (# clause: min
+   18|            (($data >= 1) ? 1 : (($err_data //= "Must be at least 1"),0)))
+     |            
+   20|            &&
+     |            
+   22|            (# clause: max
+   23|            (($data <= 10) ? 1 : (($err_data //= "Must be at most 10"),0)))));
+     |        
+   25|        ($err_data //= "");
+     |        
+   27|        return($err_data);
+   28|    }}
+
+Show validator JavaScript code:
+
+ % validate-with-sah '["int","min",1,"max",10]' -c -C js
+ function(data) {
+     var err_data = null;
+     var tmp_data = [];
+     var _sahv_res = 
+     
+         // skip if undef
+         (!!(data === undefined || data === null) ? true : 
+         
+         (// check type 'int'
+         ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
+         
+         &&
+         
+         // set temporary data term
+         (tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data), true)
+         
+         &&
+         
+         (// clause: min
+         ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
+         
+         &&
+         
+         (// clause: max
+         ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
+         
+         &&
+         
+         // restore original data term
+         ((tmp_data).pop(), true)));
+     
+     err_data = !(err_data === undefined || err_data === null) ? err_data : "";
+     
+     return(err_data);
+ }
+
+Show validator JS code only, with line number:
+
+ % validate-with-sah '["int","min",1,"max",10]' -C js -c -l
+    1|function(data) {
+    2|    var err_data = null;
+    3|    var tmp_data = [];
+    4|    var _sahv_res = 
+     |    
+    6|        // skip if undef
+    7|        (!!(data === undefined || data === null) ? true : 
+     |        
+    9|        (// check type 'int'
+   10|        ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
+     |        
+   12|        &&
+     |        
+   14|        // set temporary data term
+   15|        (tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data), true)
+     |        
+   17|        &&
+     |        
+   19|        (// clause: min
+   20|        ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
+     |        
+   22|        &&
+     |        
+   24|        (// clause: max
+   25|        ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
+     |        
+   27|        &&
+     |        
+   29|        // restore original data term
+   30|        ((tmp_data).pop(), true)));
+     |    
+   32|    err_data = !(err_data === undefined || err_data === null) ? err_data : "";
+     |    
+   34|    return(err_data);
+   35|}
+
+Load schema from file:
+
+ % validate-with-sah -f schema1.json '["data"]'
+
+Load schema and data from file:
+
+ % validate-with-sah -f schema1.json --multiple-data-file datafile --data-file-type json
+
+=head1 DESCRIPTION
+
+This script is useful for testing Sah schemas. You can quickly specify from the
+CLI a schema with some data to validate it against. This script can also be used
+to just normalize a Sah schema and show it (C<--show-schema>), or compile a
+schema and show the raw compilation result (C<--show-raw-compile>), or generate
+validator code and show it (C<--show-code>).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Action selection options
+
+=over
+
+=item B<--show-code>, B<-c>
+
+Don't validate data, show generated validator code only.
+
+=item B<--show-raw-compile>
+
+Don't validate data, show raw compilation result only.
+
+=item B<--show-schema>, B<-s>
+
+Don't validate data, show normalized schema only.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Data specification options
+
+=over
+
+=item B<--data-file-type>=I<s>
+
+Give hint for data file type.
+
+Valid values:
+
+ ["json","yaml","perl"]
+
+=item B<--data-file>=I<filename>
+
+Retrieve data from file.
+
+JSON, YAML, and Perl formats are supported. File type will be guessed from
+filename, defaults to JSON.
+
+
+=item B<--data-json>=I<s>
+
+See C<--data>.
+
+=item B<--data>=I<s>
+
+=item B<--multiple-data-file>=I<filename>
+
+Retrieve multiple data from file.
+
+This is like `data_file` except that for multiple data. Data must be an array.
+
+
+=item B<--multiple-data-json>=I<s>
+
+Validate multiple data (array of data) against schema (JSON-encoded).
+
+See C<--multiple-data>.
+
+=item B<--multiple-data>=I<s>
+
+Validate multiple data (array of data) against schema.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--data-with-result>, B<-d>
+
+Show data alongside with validation result.
+
+The default is to show the validation result only.
+
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--linenum>, B<-l>
+
+When showing source code, add line numbers.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Schema specification options
+
+=over
+
+=item B<--schema-file-type>=I<s>, B<-t>
+
+Give hint for schema file type.
+
+Valid values:
+
+ ["json","yaml","perl"]
+
+=item B<--schema-file>=I<filename>, B<-f>
+
+Retrieve schema from file.
+
+JSON, YAML, and Perl formats are supported. File type will be guessed from
+filename, defaults to JSON.
+
+
+=item B<--schema-json>=I<s>
+
+See C<--schema>.
+
+=item B<--schema-module>=I<s>, B<-m>
+
+=item B<--schema>=I<s>
+
+=back
+
+=head2 Validator specification options
+
+=over
+
+=item B<--bool>
+
+Shortcut for --return-type bool.
+
+See C<--return-type>.
+
+=item B<--bool-val>
+
+Shortcut for --return-type bool+val.
+
+See C<--return-type>.
+
+=item B<--compiler>=I<s>, B<-C>
+
+Select compiler.
+
+Default value:
+
+ "perl"
+
+Valid values:
+
+ ["perl","js"]
+
+=item B<--core>
+
+Generate Perl validator that avoids the use of non-core modules.
+
+=item B<--core-or-pp>
+
+Generate Perl validator that only uses core or pure-perl modules.
+
+=item B<--full>
+
+Shortcut for --return-type full.
+
+See C<--return-type>.
+
+=item B<--no-modules>
+
+Generate Perl validator that does not use modules.
+
+=item B<--pp>
+
+Generate Perl validator that avoids the use of XS modules.
+
+=item B<--return-type>=I<s>, B<-r>
+
+Default value:
+
+ "str"
+
+Valid values:
+
+ ["bool","bool+val","str","str+val","full"]
+
+=item B<--str-val>
+
+Shortcut for --return-type str+val.
+
+See C<--return-type>.
+
+=item B<--with-debug>
+
+Generate validator with debug on.
+
+This means e.g. to pepper the validator code with logging statements.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C validate-with-sah validate-with-sah
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete validate-with-sah 'p/*/`validate-with-sah`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 FAQ
+
+=head2 When there is an error (e.g. in generating validator code, in validating) the program returns undef/null, how do I see the error message?
+
+Pass `--no-naked-res` to see the error code and error message. The default is
+naked for simpler output.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/validate-with-sah.conf>, F<~/validate-with-sah.conf>, or F</etc/validate-with-sah.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ compiler (see --compiler)
+ core (see --core)
+ core_or_pp (see --core-or-pp)
+ data (see --data)
+ data_file (see --data-file)
+ data_file_type (see --data-file-type)
+ data_with_result (see --data-with-result)
+ format (see --format)
+ linenum (see --linenum)
+ multiple_data (see --multiple-data)
+ multiple_data_file (see --multiple-data-file)
+ naked_res (see --naked-res)
+ no_modules (see --no-modules)
+ pp (see --pp)
+ return_type (see --return-type)
+ schema (see --schema)
+ schema_file (see --schema-file)
+ schema_file_type (see --schema-file-type)
+ schema_module (see --schema-module)
+ show_code (see --show-code)
+ show_raw_compile (see --show-raw-compile)
+ show_schema (see --show-schema)
+ with_debug (see --with-debug)
+
+=head1 ENVIRONMENT
+
+=head2 VALIDATE_WITH_SAH_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/validate-with-sah.conf>
+
+F<~/validate-with-sah.conf>
+
+F</etc/validate-with-sah.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SahUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+To normalize a schema, you can also use L<normalize-sah-schema>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

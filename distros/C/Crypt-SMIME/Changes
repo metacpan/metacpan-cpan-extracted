@@ -1,5 +1,10 @@
 Revision history for Crypt::SMIME
 
+0.21    Mon Jan 15 14:03:25 JST 2018
+        - Work around a problem in ExtUtils::Constant::ProxySubs which
+          generates code not working with perl<5.14:
+          https://rt.cpan.org/Public/Bug/Display.html?id=124074
+
 0.20    Wed Jan 10 14:32:56 JST 2018
         - Fix a bug in _getContentType, Patch by unrtstRMSPAM [...]
           cpan.org:

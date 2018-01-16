@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::pod_or_pm_filename;
 
-our $DATE = '2017-02-08'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nString containing filename of a Perl POD or module. For convenience, when value\nis in the form of:\n\n    Foo\n    Foo.pod\n    Foo.pm\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pod\n    Foo/Bar.pm\n\nand a matching .pod or .pm file is found in `\@INC`, then it will be coerced\n(converted) into the path of that .pod/.pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n    lib/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\nThis schema is like another schema `perl::filename` except that .pod is\nprioritized over .pm. If both `Foo.pm` and `Foo.pod` are found in `\@INC`, the\npath to `Foo.pod` will be returned.\n\n",summary=>"Filename (.pod or .pm file)","x.completion"=>sub{package Sah::Schema::perl::pod_or_pm_filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["str_convert_perl_pod_or_pm_to_path"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::pod_or_pm_filename - Filename (.pod or .pm file)
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2017-02-08.
+This document describes version 0.010 of Sah::SchemaR::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-01-14.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

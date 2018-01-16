@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::Symbol;
 
-our $DATE = '2018-01-07'; # DATE
-our $VERSION = '20180106'; # VERSION
+our $DATE = '2018-01-12'; # DATE
+our $VERSION = '20180109'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contains_unicode",0,"longest_word_len",13,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",2,"num_words",1384,"avg_word_len",3.60332369942197,"shortest_word_len",1); # STATS
+our %STATS = ("num_words",1387,"shortest_word_len",1,"num_words_contains_unicode",0,"longest_word_len",13,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",2,"avg_word_len",3.6027397260274); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency symbols
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::Symbol - List of cryptocurrency symbols
 
 =head1 VERSION
 
-This document describes version 20180106 of WordList::CryptoCurrency::Catalog::Symbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-07.
+This document describes version 20180109 of WordList::CryptoCurrency::Catalog::Symbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
 
 =head1 SYNOPSIS
 
@@ -44,17 +44,17 @@ This document describes version 20180106 of WordList::CryptoCurrency::Catalog::S
 
 =head1 STATISTICS
 
- +----------------------------------+------------------+
- | key                              | value            |
- +----------------------------------+------------------+
- | avg_word_len                     | 3.60332369942197 |
- | longest_word_len                 | 13               |
- | num_words                        | 1384             |
- | num_words_contains_nonword_chars | 2                |
- | num_words_contains_unicode       | 0                |
- | num_words_contains_whitespace    | 0                |
- | shortest_word_len                | 1                |
- +----------------------------------+------------------+
+ +----------------------------------+-----------------+
+ | key                              | value           |
+ +----------------------------------+-----------------+
+ | avg_word_len                     | 3.6027397260274 |
+ | longest_word_len                 | 13              |
+ | num_words                        | 1387            |
+ | num_words_contains_nonword_chars | 2               |
+ | num_words_contains_unicode       | 0               |
+ | num_words_contains_whitespace    | 0               |
+ | shortest_word_len                | 1               |
+ +----------------------------------+-----------------+
 
 The statistics is available in the C<%STATS> package variable.
 
@@ -152,6 +152,7 @@ ANT
 ANTI
 ANTX
 APC
+APPC
 APW
 APX
 ARB
@@ -320,6 +321,7 @@ CAB
 CACH
 CAG
 CALC
+CAN
 CANN
 CAPP
 CARBON
@@ -1226,6 +1228,7 @@ TAG
 TAGR
 TAJ
 TALK
+TAU
 TCC
 TCOIN
 TCR

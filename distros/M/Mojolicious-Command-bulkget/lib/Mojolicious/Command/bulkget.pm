@@ -5,7 +5,7 @@ use Mojo::Promise;
 use Mojo::File 'path';
 use Mojo::Util qw(getopt);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $MAXREQ = 20;
 

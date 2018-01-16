@@ -49,6 +49,18 @@ MemoryPool::~MemoryPool () {
     }
 }
 
+ObjectAllocator* ObjectAllocator::tls_instance()
+{
+    //std::cerr << "tls_instance for thread " << std::this_thread::get_id() << std::endl;
+    static thread_local ObjectAllocator* ptr;
+    if (!ptr) {
+        static thread_local ObjectAllocator inst;
+        ptr = &inst;
+    }
+    return ptr;
+
+}
+
 ObjectAllocator::ObjectAllocator () {
     memset(small_pools,  0, POOLS_CNT*sizeof(MemoryPool*));
     memset(medium_pools, 0, POOLS_CNT*sizeof(MemoryPool*));

@@ -130,7 +130,7 @@ diag 'got log messages: ', explain $tzil->log_messages
 
 # If we specified a :version in weaver configs,
 # - we want to see a runtime prereq in our own dist
-# - TODO: we want to see an injected 'develop' prereq on the target dist ([PodWeaver] should do this)
+# - TODO: we want to see an injected plugin_prereq on the target dist ([PodWeaver] should do this)
 # Many things come in via [@Default], so look in there as well.
 
 subtest 'all plugins in use are specified as required runtime prerequisites by the plugin bundle' => sub {

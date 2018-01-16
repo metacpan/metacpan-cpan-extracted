@@ -1,8 +1,7 @@
 
 package Module::Spec::OO;
-$Module::Spec::OO::VERSION = '0.5.1';
-use 5.010001;
-use strict;
+$Module::Spec::OO::VERSION = '0.6.0';
+use 5.012;
 use warnings;
 
 use Class::Method::Modifiers 1.05 ();    # install_modifier
@@ -52,7 +51,7 @@ Module::Spec::OO
 
 =head1 VERSION
 
-version 0.5.1
+version 0.6.0
 
 =head1 AUTHOR
 

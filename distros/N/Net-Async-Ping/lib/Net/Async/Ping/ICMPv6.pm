@@ -1,5 +1,5 @@
 package Net::Async::Ping::ICMPv6;
-$Net::Async::Ping::ICMPv6::VERSION = '0.003000';
+$Net::Async::Ping::ICMPv6::VERSION = '0.003001';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -10,7 +10,7 @@ use IO::Socket;
 use IO::Async::Socket;
 use Scalar::Util qw( blessed );
 use Socket qw(
-    SOCK_RAW SOCK_DGRAM AF_INET6
+    SOCK_RAW SOCK_DGRAM AF_INET6 IPPROTO_ICMPV6
     inet_pton pack_sockaddr_in6 unpack_sockaddr_in6 inet_ntop
 );
 use Net::Frame::Layer::ICMPv6 qw( :consts );
@@ -77,18 +77,16 @@ sub ping {
     my $t0 = [Time::HiRes::gettimeofday];
 
     my $fh = IO::Socket->new;
-    my $proto_num = getprotobyname('ipv6-icmp') ||
-        croak("Can't get ipv6-icmp protocol by name");
     # Let's try a ping socket (unprivileged ping) first. See
     # https://github.com/torvalds/linux/commit/6d0bfe22611602f36617bc7aa2ffa1bbb2f54c67
     my ($ping_socket, $ident);
     if ( $self->use_ping_socket
-         && $fh->socket(AF_INET6, SOCK_DGRAM, $proto_num) ) {
+         && $fh->socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6) ) {
         $ping_socket = 1;
         ($ident) = unpack_sockaddr_in6 getsockname($fh);
     }
     else {
-        $fh->socket(AF_INET6, SOCK_RAW, $proto_num) ||
+        $fh->socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6) ||
             croak("Unable to create ICMPv6 socket ($!). Are you running as root?"
               ." If not, and your system supports ping sockets, try setting"
               ." /proc/sys/net/ipv4/ping_group_range");
@@ -106,7 +104,7 @@ sub ping {
 
     $loop->resolver->getaddrinfo(
        host     => $host,
-       protocol => $proto_num,
+       protocol => IPPROTO_ICMPV6,
        family   => AF_INET6,
     )->then( sub {
         my $saddr = $_[0]->{addr};
@@ -223,7 +221,7 @@ Net::Async::Ping::ICMPv6
 
 =head1 VERSION
 
-version 0.003000
+version 0.003001
 
 =head1 DESCRIPTION
 
@@ -276,13 +274,23 @@ An error was received from L<IO::Async::Socket>.
 
 Net::Async::Ping::ICMPv6
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

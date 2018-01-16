@@ -1,18 +1,20 @@
 package Mail::AuthenticationResults::Header::Entry;
+# ABSTRACT: Class modelling Main Entry parts of the Authentication Results Header
+
 require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171230'; # VERSION
+our $VERSION = '1.20180113'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
 
-sub HAS_KEY{ return 1; }
-sub HAS_VALUE{ return 1; }
-sub HAS_CHILDREN{ return 1; }
+sub _HAS_KEY{ return 1; }
+sub _HAS_VALUE{ return 1; }
+sub _HAS_CHILDREN{ return 1; }
 
-sub ALLOWED_CHILDREN {
+sub _ALLOWED_CHILDREN {
     my ( $self, $child ) = @_;
     return 1 if ref $child eq 'Mail::AuthenticationResults::Header::Comment';
     return 1 if ref $child eq 'Mail::AuthenticationResults::Header::SubEntry';
@@ -20,9 +22,31 @@ sub ALLOWED_CHILDREN {
     return 0;
 }
 
-sub as_string {
-    my ( $self ) = @_;
-    return $self->SUPER::as_string();
-}
-
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::AuthenticationResults::Header::Entry - Class modelling Main Entry parts of the Authentication Results Header
+
+=head1 VERSION
+
+version 1.20180113
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

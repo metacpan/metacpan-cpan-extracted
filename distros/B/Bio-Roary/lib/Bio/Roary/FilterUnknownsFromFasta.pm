@@ -1,5 +1,5 @@
 package Bio::Roary::FilterUnknownsFromFasta;
-$Bio::Roary::FilterUnknownsFromFasta::VERSION = '3.11.1';
+$Bio::Roary::FilterUnknownsFromFasta::VERSION = '3.11.3';
 # ABSTRACT: Take in fasta files, remove sequences with too many unknowns and return a list of the new files
 
 
@@ -87,7 +87,7 @@ Bio::Roary::FilterUnknownsFromFasta - Take in fasta files, remove sequences with
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

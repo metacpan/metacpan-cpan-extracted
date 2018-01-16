@@ -1,5 +1,12 @@
 Revision history for time-tai-simple
 
+1.13 Fri Jan 12 14:29:00 PST 2018
+        - Updated documentation for tai (oops)
+
+1.12 Fri Jan 12 14:08:00 PST 2018
+        - Updated leap-seconds.list even though no new leap-second has been announced.
+        - Changed formatting options slightly for bin/tai.  Now: --iso --iso-ish --strict --rfc3339
+
 1.11 Sun Feb 19 13:56:00 PST 2017
         - Pruned false dependencies File::Slurp and Data::Dumper.
         - Replaced non-core dependency on LWP::Simple with in-core HTTP::Tiny.

@@ -1,5 +1,5 @@
 #
-# $Id: Mercurial.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Mercurial.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # devel::mercurial Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable hg) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -66,13 +66,17 @@ sub push {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('push', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("push: chdir: $!");
+      }
    }
 
    my $prev = $self->use_pager;
@@ -84,7 +88,12 @@ sub push {
    $self->use_pager($prev);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("push: chdir: $!");
+      }
    }
 
    return $r;
@@ -94,20 +103,29 @@ sub incoming {
    my $self = shift;
    my ($directory) = @_;
 
-   my $she = $self->shell;
-   my $cwd = $she->pwd;
+   my $cwd = defined($self->shell) && $self->shell->pwd || '/tmp';
 
    $directory ||= '';
    if (length($directory)) {
       $self->brik_help_run_directory_not_found('incoming', $directory) or return;
-      $she->run_cd($directory) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($directory) or return;
+      }
+      else {
+         chdir($directory) or return $self->log->error("incoming: chdir: $!");
+      }
    }
 
    my $cmd = "hg incoming";
    my $r = $self->execute($cmd);
 
    if (length($directory)) {
-      $she->run_cd($cwd) or return;
+      if (defined($self->shell)) {
+         $self->shell->run_cd($cwd) or return;
+      }
+      else {
+         chdir($cwd) or return $self->log->error("incoming: chdir: $!");
+      }
    }
 
    return $r;
@@ -238,7 +256,7 @@ Metabrik::Devel::Mercurial - devel::mercurial Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

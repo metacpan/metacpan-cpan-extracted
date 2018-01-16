@@ -1,0 +1,23 @@
+---
+abstract: 'PoweBuilder datawindows helpers and diagnostics in Perl, based on MarpaX::Languages::Powerbuilder Marpa parsers'
+author:
+  - 'SÃ©bastien Kirche <sebastien.kirche@free.fr>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PowerBuilder-DataWindow
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MarpaX::Languages::PowerBuilder: '0'
+  perl: '5.010000'
+version: '0.01'

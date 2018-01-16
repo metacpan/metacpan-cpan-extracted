@@ -24,12 +24,14 @@ sonar-project.properties
 t/00_compile.t
 t/CompatibilityTools.t
 t/FakeModuleForMockifyTest.pm
+t/FakeModuleWithoutNew.pm
 t/Matcher.t
 t/Method.t
 t/MethodSpy.t
 t/MockifyTest.t
 t/Mockify_Method.t
 t/Mockify_MethodSpy.t
+t/Mockify_OptionalNew.t
 t/Parameter.t
 t/ReturnValue.t
 t/TestBase.pm

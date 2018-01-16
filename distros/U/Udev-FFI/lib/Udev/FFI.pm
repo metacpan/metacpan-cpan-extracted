@@ -1,4 +1,4 @@
-# Udev::FFI - Copyright (C) 2017 Ilya Pavlov
+# Udev::FFI - Copyright (C) 2017-2018 Ilya Pavlov
 # Udev::FFI is licensed under the
 # GNU Lesser General Public License v2.1
 
@@ -15,7 +15,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.099006';
+$Udev::FFI::VERSION = '0.100000';
 
 
 
@@ -410,6 +410,8 @@ directory.
 
 libudev
 
+eudev
+
 L<FFI::Platypus> (Write Perl bindings to non-Perl libraries without C or XS)
 
 L<FFI::CheckLib> (Check that a library is available for FFI)
@@ -433,7 +435,7 @@ Mohammad S Anwar
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Ilya Pavlov
+Copyright (C) 2017-2018 by Ilya Pavlov
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
 

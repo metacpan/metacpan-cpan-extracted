@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::ApplePay;
-$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

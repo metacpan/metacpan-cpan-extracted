@@ -8,12 +8,11 @@ build_requires:
   IPC::Open3: '0'
   Test::Fatal: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,12 +27,11 @@ recommends:
 requires:
   Carp: '0'
   HTTP::Tiny: '0'
-  JSON: '0'
-  Try::Tiny: '0'
+  JSON::MaybeXS: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://github.com/xsawyerx/www-xkcd/issues
   repository: http://github.com/xsawyerx/www-xkcd
-version: '0.007'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.008'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 ---
-abstract: 'Object Oriented Authentication-Results header class'
+abstract: 'Object Oriented Authentication-Results Headers'
 author:
   - 'Marc Bradshaw <marc@marcbradshaw.net>'
 build_requires:
@@ -22,5 +22,5 @@ requires:
   perl: '5.010'
   strict: '0'
   warnings: '0'
-version: '1.20171230'
+version: '1.20180113'
 x_serialization_backend: 'YAML::Tiny version 1.70'

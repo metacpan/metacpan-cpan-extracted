@@ -1,11 +1,14 @@
 package Mail::AuthenticationResults;
+# ABSTRACT: Object Oriented Authentication-Results Headers
+
 require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171230'; # VERSION
+our $VERSION = '1.20180113'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Parser;
+
 
 sub new {
     my ( $class ) = @_;
@@ -13,6 +16,7 @@ sub new {
     bless $self, $class;
     return $self;
 }
+
 
 sub parser {
     my ( $self, $auth_headers ) = @_;
@@ -23,9 +27,17 @@ sub parser {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Mail::AuthenticationResults - Object Oriented Authentication-Results header class
+Mail::AuthenticationResults - Object Oriented Authentication-Results Headers
+
+=head1 VERSION
+
+version 1.20180113
 
 =head1 DESCRIPTION
 
@@ -39,49 +51,18 @@ key/value pairs are parsed when present in the authserv-id section, this is agai
 
 Comments added between key/value pairs will be added after them in the data structures and when stringified.
 
-
 It is a work in progress..
 
-=for markdown [![Code on GitHub](https://img.shields.io/badge/github-repo-blue.svg)](https://github.com/marcbradshaw/Mail-AuthenticationResults)
+=head1 METHODS
 
-=for markdown [![Build Status](https://travis-ci.org/marcbradshaw/Mail-AuthenticationResults.svg?branch=master)](https://travis-ci.org/marcbradshaw/Mail-AuthenticationResults)
-
-=for markdown [![Open Issues](https://img.shields.io/github/issues/marcbradshaw/Mail-AuthenticationResults.svg)](https://github.com/marcbradshaw/Mail-AuthenticationResults/issues)
-
-=for markdown [![Dist on CPAN](https://img.shields.io/cpan/v/Mail-AuthenticationResults.svg)](https://metacpan.org/release/Mail-AuthenticationResults)
-
-=for markdown [![CPANTS](https://img.shields.io/badge/cpants-kwalitee-blue.svg)](http://cpants.cpanauthors.org/dist/Mail-AuthenticationResults)
-
-
-=head1 SYNOPSIS
-
-    use Mail::AuthenticationResults;
-
-=head1 CONSTRUCTOR
-
-=over
-
-=item new()
+=head2 new()
 
 Return a new Mail::AuthenticationResults object
 
-=back
-
-=head1 PUBLIC METHODS
-
-=over
-
-=item parser( $auth_results )
+=head2 parser()
 
 Returns a new Mail::AuthenticationResults::Parser object
 for the supplied $auth_results header
-
-=back
-
-=head1 DEPENDENCIES
-
-  Carp
-  Scalar::Util
 
 =head1 BUGS
 
@@ -89,18 +70,15 @@ Please report bugs via the github tracker.
 
 https://github.com/marcbradshaw/Mail-AuthenticationResults/issues
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
+Marc Bradshaw <marc@marcbradshaw.net>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017, Marc Bradshaw.
+This software is copyright (c) 2018 by Marc Bradshaw.
 
-=head1 LICENCE
-
-This library is free software; you may redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

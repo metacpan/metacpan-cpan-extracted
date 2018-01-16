@@ -16,6 +16,9 @@ use WebService::Braintree;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
 
+WebService::Braintree::TestHelper->verify_sandbox
+    || BAIL_OUT 'Sandbox is not prepared properly. Please read xt/README.';
+
 my $disbursement_params = {
     id => "123456",
     merchant_account => {
@@ -27,7 +30,7 @@ my $disbursement_params = {
         status => "active"
     },
     transaction_ids => ["sub_merchant_transaction"],
-    amount => "100.00",
+    amount => amount(),
     disbursement_date => WebService::Braintree::TestHelper::parse_datetime("2014-04-10 00:00:00"),
     exception_message => "invalid_account_number",
     follow_up_action => "update",

@@ -72,7 +72,8 @@ sub finish_header {
     my $i = $self->{Signature}->identity();
     return unless $i =~ m{^\d+$};    # don't waste time if i= is bogus
 
-    my $chain = $args{Chain} // $self->{Signature}->chain();
+    my $chain = $args{Chain};
+    $chain = $self->{Signature}->chain() if ! defined $chain;
 
     # we include the seal for everything else
     # if the previous status was pass

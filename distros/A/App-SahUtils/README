@@ -1,11 +1,390 @@
-SYNOPSIS
+NAME
+    App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
+VERSION
+    This document describes version 0.460 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2018-01-14.
+
+SYNOPSIS
     This distribution provides the following command-line utilities related
     to Sah and Data::Sah:
 
-    #INSERT_EXECS_LIST
+    *   coerce-with-sah
+
+    *   format-with-sah
+
+    *   get-sah-type
+
+    *   is-sah-builtin-type
+
+    *   is-sah-collection-builtin-type
+
+    *   is-sah-collection-type
+
+    *   is-sah-numeric-builtin-type
+
+    *   is-sah-numeric-type
+
+    *   is-sah-ref-builtin-type
+
+    *   is-sah-ref-type
+
+    *   is-sah-simple-builtin-type
+
+    *   is-sah-simple-type
+
+    *   is-sah-type
+
+    *   list-sah-clauses
+
+    *   list-sah-coerce-rule-modules
+
+    *   list-sah-schema-modules
+
+    *   list-sah-schemas-modules
+
+    *   list-sah-type-modules
+
+    *   normalize-sah-schema
+
+    *   resolve-sah-schema
+
+    *   sah-to-human
+
+    *   show-sah-coerce-module
+
+    *   show-sah-schema-module
+
+    *   validate-with-sah
+
+FUNCTIONS
+  get_sah_type
+    Usage:
+
+     get_sah_type(%args) -> [status, msg, result, meta]
+
+    Extract type from a Sah string or array schema.
+
+    Uses Data::Sah::Util::Type's "get_type()" to extract the type name part
+    of the schema.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_builtin_type
+    Usage:
+
+     is_sah_builtin_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah builtin type.
+
+    Uses Data::Sah::Util::Type's "is_type()" to return the type of the
+    schema is the type is known builtin type, or undef if type is unknown.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_collection_builtin_type
+    Usage:
+
+     is_sah_collection_builtin_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah collection builtin type.
+
+    Uses Data::Sah::Util::Type's "is_collection()" to check whether the
+    schema is a collection Sah builtin type.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_collection_type
+    Usage:
+
+     is_sah_collection_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a collection Sah type.
+
+    The difference from this and "is_sah_collection_builtin_type" is: if
+    type is not a known builtin type, this routine will try to resolve the
+    schema using Data::Sah::Resolve then try again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_numeric_builtin_type
+    Usage:
+
+     is_sah_numeric_builtin_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah numeric builtin type.
+
+    Uses Data::Sah::Util::Type's "is_ref()" to check whether the schema is a
+    numeric Sah builtin type.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_numeric_type
+    Usage:
+
+     is_sah_numeric_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a numeric Sah type.
+
+    The difference from this and "is_sah_numeric_builtin_type" is: if type
+    is not a known builtin type, this routine will try to resolve the schema
+    using Data::Sah::Resolve then try again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_ref_builtin_type
+    Usage:
+
+     is_sah_ref_builtin_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah ref builtin type.
+
+    Uses Data::Sah::Util::Type's "is_ref()" to check whether the schema is a
+    ref Sah builtin type.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_ref_type
+    Usage:
+
+     is_sah_ref_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a ref Sah type.
+
+    The difference from this and "is_sah_ref_builtin_type" is: if type is
+    not a known builtin type, this routine will try to resolve the schema
+    using Data::Sah::Resolve then try again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_simple_builtin_type
+    Usage:
+
+     is_sah_simple_builtin_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah simple builtin type.
+
+    Uses Data::Sah::Util::Type's "is_simple()" to check whether the schema
+    is a simple Sah builtin type.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_simple_type
+    Usage:
+
+     is_sah_simple_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a simple Sah type.
+
+    The difference from this and "is_sah_simple_builtin_type" is: if type is
+    not a known builtin type, this routine will try to resolve the schema
+    using Data::Sah::Resolve then try again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_sah_type
+    Usage:
+
+     is_sah_type(%args) -> [status, msg, result, meta]
+
+    Check that a string or array schema is a Sah type.
+
+    The difference from this and "is_sah_builtin_type" is: if type is not a
+    known builtin type, this routine will try to resolve the schema using
+    Data::Sah::Resolve then try again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SahUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SahUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

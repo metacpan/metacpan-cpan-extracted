@@ -1,10 +1,9 @@
 
 package Module::Spec::V1;
-$Module::Spec::V1::VERSION = '0.5.1';
+$Module::Spec::V1::VERSION = '0.6.0';
 # ABSTRACT: Load modules based on specifications V1
-use 5.010001;
+use 5.012;
 
-# use strict;
 # use warnings;
 
 our @EXPORT_OK = qw(need_module try_module);
@@ -69,7 +68,7 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    _require_module($m) if $opts->{require}->( $m, @v );
+    _require_module($m) if $opts->{REQUIRE} // $opts->{require}->( $m, @v );
     $m->VERSION(@v) if @v;
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
@@ -107,9 +106,8 @@ sub generate_code {
 sub _opts {
     my %opts = ( require => 1, %{ shift // {} } );
 
-    my $v = $opts{require};
-    $opts{require} = sub {$v}
-      unless ref $v eq 'CODE';
+    $opts{REQUIRE} = !!delete $opts{require}
+      unless ref $opts{require} eq 'CODE';
 
     return \%opts;
 }
@@ -126,7 +124,7 @@ sub try_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    if ( $opts->{require}->( $m, @v ) ) {
+    if ( $opts->{REQUIRE} // $opts->{require}->( $m, @v ) ) {
         eval { _require_module($m) };
         if ($@) {
             my $err = $@;
@@ -135,9 +133,10 @@ sub try_module {
     }
     if (@v) {
         eval { $m->VERSION(@v) };
-        return if $@;
-
-        # FIXME might ignore and eat non-load/non-version-check errors
+        if ($@) {
+            my $err = $@;
+            $err =~ /\A\S+ version \S+ required\b/ ? return : die $err;
+        }
     }
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
@@ -295,6 +294,10 @@ sub croak {
 #pod
 #pod =back
 #pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Module::Runtime>
+#pod
 #pod =cut
 
 __END__
@@ -309,7 +312,7 @@ Module::Spec::V1 - Load modules based on specifications V1
 
 =head1 VERSION
 
-version 0.5.1
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -445,6 +448,10 @@ Single quotes (C<'>) are not accepted as package separators.
 Exceptions are not thrown from the perspective of the caller.
 
 =back
+
+=head1 SEE ALSO
+
+L<Module::Runtime>
 
 =head1 AUTHOR
 

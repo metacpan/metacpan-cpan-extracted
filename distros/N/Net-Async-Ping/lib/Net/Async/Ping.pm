@@ -1,5 +1,5 @@
 package Net::Async::Ping;
-$Net::Async::Ping::VERSION = '0.003000';
+$Net::Async::Ping::VERSION = '0.003001';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Net::Async::Ping - asyncronously check remote host for reachability
 
 =head1 VERSION
 
-version 0.003000
+version 0.003001
 
 =head1 SYNOPSIS
 
@@ -146,13 +146,23 @@ It's also possible to omit the $loop, and add the pinger to a loop afterwards:
 The return value of the future depends on the protocol. See
 L<Net::Async::Ping::TCP> and L<Net::Async::Ping::ICMP>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

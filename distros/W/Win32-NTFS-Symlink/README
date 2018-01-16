@@ -1,0 +1,42 @@
+Win32-NTFS-Symlink version 0.03
+===============================
+
+The purpose of this module is to provide proper support for NTFS junctions
+and symlinks on Windows, either with their own routine to create them, and a
+common readlink routine to read either one.
+
+Further more, multiple methods for either importing or overriding the built-in
+global function are provided, and nothing is imported or overridden by default.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+List::Util 1.45
+
+No non-core dependencies at this time.
+
+EXTERNAL FILES
+
+If you are using Windows XP, 2003 Server, and 2000 (any NT 5.x based Windows)
+then a driver is needed to properly expose NTFS symlink support, so that it
+can function in the same way as the natively exposed junctions do.
+
+The driver, as well as it's source code, can be found here:
+http://schinagl.priv.at/nt/ln/ln.html (at the bottom.)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Bayan Maxim
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>

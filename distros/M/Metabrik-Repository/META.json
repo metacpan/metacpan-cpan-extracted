@@ -48,6 +48,9 @@
       "Metabrik::Api::Cvesearch" : {
          "file" : "lib/Metabrik/Api/Cvesearch.pm"
       },
+      "Metabrik::Api::Onyphe" : {
+         "file" : "lib/Metabrik/Api/Onyphe.pm"
+      },
       "Metabrik::Api::Shodan" : {
          "file" : "lib/Metabrik/Api/Shodan.pm"
       },
@@ -56,6 +59,9 @@
       },
       "Metabrik::Api::Virustotal" : {
          "file" : "lib/Metabrik/Api/Virustotal.pm"
+      },
+      "Metabrik::Audio::Soundconverter" : {
+         "file" : "lib/Metabrik/Audio/Soundconverter.pm"
       },
       "Metabrik::Audit::Dns" : {
          "file" : "lib/Metabrik/Audit/Dns.pm"
@@ -509,7 +515,7 @@
       },
       "Metabrik::Repository" : {
          "file" : "lib/Metabrik/Repository.pm",
-         "version" : "1.27"
+         "version" : "1.30"
       },
       "Metabrik::Server::Dns" : {
          "file" : "lib/Metabrik/Server/Dns.pm"
@@ -779,6 +785,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.27",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.30",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

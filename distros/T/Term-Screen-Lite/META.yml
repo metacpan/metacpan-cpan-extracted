@@ -20,18 +20,18 @@ no_index:
 provides:
   Term::Screen::Lite:
     file: lib/Term/Screen/Lite.pm
-    version: '0.05'
+    version: '0.06'
   Term::Screen::Lite::Generic:
     file: lib/Term/Screen/Lite/Generic.pm
-    version: '0.05'
+    version: '0.06'
   Term::Screen::Lite::Win32:
     file: lib/Term/Screen/Lite/Win32.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Moo: '2.000000'
   namespace::clean: '0.24'
   perl: '5.006'
 resources:
   repository: https://github.com/Manwar/Term-Screen-Lite.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

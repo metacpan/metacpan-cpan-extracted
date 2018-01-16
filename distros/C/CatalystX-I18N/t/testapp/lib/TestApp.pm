@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Catalyst qw/
     Session
-    Session::Store::File 
+    Session::Store::File
     Session::State::Cookie
-    
+
     +CatalystX::I18N::Role::All
     +CatalystX::I18N::Role::DataLocalize
 /;
@@ -23,10 +23,12 @@ use Catalyst qw/
 
 our $VERSION = '0.01';
 
-__PACKAGE__->config( 
-    name                    => 'TestApp', 
+__PACKAGE__->config(
+    name                    => 'TestApp',
+    encoding                => 'utf-8',
     session                 => {},
     'View::TT'              => {
+        #ENCODING                => 'utf-8',
         INCLUDE_PATH            => [ __PACKAGE__->path_to('root','template') ]
     },
     'Model::Maketext'       => {},

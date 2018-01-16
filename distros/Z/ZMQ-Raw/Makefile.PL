@@ -198,7 +198,10 @@ print $fh q{
 
 close $fh;
 
-my @cpp_srcs = glob 'deps/libzmq/src/*.cpp';
+my @cc_srcs = (glob ('deps/libzmqraw/*.cc'));
+my @cc_objs = map { substr ($_, 0, -2) . 'o' } (@cc_srcs);
+
+my @cpp_srcs = (glob ('deps/libzmq/src/*.cpp'));
 my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
 
 my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'));
@@ -214,6 +217,9 @@ sub MY::c_o {
 	my $line = qq{
 .c\$(OBJ_EXT):
 	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.c $out_switch\$@
+
+.cc\$(OBJ_EXT):
+	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cc $out_switch\$@
 
 .cpp\$(OBJ_EXT):
 	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.cpp $out_switch\$@
@@ -259,7 +265,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -270,7 +276,7 @@ $WriteMakefileArgs{LIBS}    .= $lib;
 $WriteMakefileArgs{INC}     .= $inc;
 $WriteMakefileArgs{LD}      .= $ld;
 $WriteMakefileArgs{CCFLAGS} .= $Config{ccflags} . ' '. $ccflags;
-$WriteMakefileArgs{OBJECT}  .= ' ' . join ' ', (@cpp_objs, @c_objs);
+$WriteMakefileArgs{OBJECT}  .= ' ' . join ' ', (@cpp_objs, @cc_objs, @c_objs);
 $WriteMakefileArgs{dynamic_lib} = {
 	OTHERLDFLAGS => $otherldflags
 };

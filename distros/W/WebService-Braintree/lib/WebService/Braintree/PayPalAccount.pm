@@ -1,5 +1,5 @@
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '0.94';
+$WebService::Braintree::PayPalAccount::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -9,7 +9,7 @@ WebService::Braintree::PayPalAccount
 
 =head1 PURPOSE
 
-This class finds and updates PayPal accounts.
+This class finds, creates, updates, and deletes PayPal accounts.
 
 =cut
 
@@ -29,6 +29,17 @@ sub find {
     $class->gateway->paypal_account->find($token);
 }
 
+=head2 create()
+
+This takes a hashref of parameters. It will create a PayPal account.
+
+=cut
+
+sub create {
+    my ($class, $params) = @_;
+    $class->gateway->paypal_account->create($params);
+}
+
 =head2 update()
 
 This takes a token and a hashref of parameters. It will update the
@@ -39,6 +50,32 @@ corresponding PayPal account (if found) and returns the updated PayPal account.
 sub update {
     my ($class, $token, $params) = @_;
     $class->gateway->paypal_account->update($token, $params);
+}
+
+=head2 delete()
+
+This takes a token and deletes the corresponding PayPal account (if found).
+
+=cut
+
+sub delete {
+    my ($class, $token) = @_;
+    $class->gateway->paypal_account->delete($token);
+}
+
+=head2 sale()
+
+This takes a token and a hashref of transaction parameters and creates a sale
+with that token.
+
+=cut
+
+sub sale {
+    my ($class, $token, $params) = @_;
+    WebService::Braintree::Transaction->sale({
+        %{$params // {}},
+        payment_method_token => $token,
+    });
 }
 
 sub gateway {

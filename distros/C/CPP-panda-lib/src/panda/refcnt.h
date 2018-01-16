@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
+#include <atomic>
 #include <stdint.h>
 #include <stddef.h>
+#include <type_traits>
 #include <panda/cast.h>
 
 namespace panda {
@@ -45,19 +47,25 @@ namespace {
     };
 }
 
-class RefCounted {
+template <typename Storage>
+class RefCountedImpl {
 public:
     void    retain  () const { ++_refcnt; on_retain(); }
     void    release () const { bool delete_me = --_refcnt <= 0; on_release(); if (delete_me && _refcnt <= 0) delete this; }
     int32_t refcnt  () const { return _refcnt; }
 protected:
-    RefCounted () : _refcnt(0) {}
+    RefCountedImpl () : _refcnt(0) {}
     virtual void on_retain  () const {}
     virtual void on_release () const {}
-    virtual ~RefCounted () {}
+    virtual ~RefCountedImpl () {}
 private:
-    mutable int32_t _refcnt;
+    mutable Storage _refcnt;
 };
+
+using RefCounted = RefCountedImpl<int32_t>;
+
+template<bool SAFE = true>
+using RefCountedThreadSafe = RefCountedImpl< std::conditional_t<SAFE, std::atomic<int32_t>, int32_t> >;
 
 template <typename T, bool A = IsRefCounted<T>::value>
 class shared_ptr {};
@@ -128,6 +136,7 @@ public:
     shared_ptr () : ptr(NULL), refcnt(&void_refcnt) {
         refcnt_inc();
     }
+    shared_ptr (std::nullptr_t) : shared_ptr() {}
 
     explicit shared_ptr (T* pointer) {
         ptr = pointer;
@@ -248,6 +257,37 @@ inline std::shared_ptr<T1> const_pointer_cast (const std::shared_ptr<T2>& shptr)
 template <typename T1, typename T2>
 inline std::shared_ptr<T1> dynamic_pointer_cast (const std::shared_ptr<T2>& shptr) {
     return std::dynamic_pointer_cast<T1>(shptr);
+}
+
+namespace {
+    template <typename T, bool refcounted = IsRefCounted<T>::value>
+    struct make_shared_impl;
+
+    template <typename T>
+    struct make_shared_impl<T, true> {
+        template <typename... Args>
+        static shared_ptr<T, true> make_shared(Args&&... args) {
+            return new T(std::forward<Args>(args)...);
+        }
+    };
+
+    template <typename T>
+    struct make_shared_impl<T, false> {
+        template <typename... Args>
+        static shared_ptr<T, true> make_shared(Args&&... args) {
+            struct tmp : public T, public virtual RefCounted {
+                using T::T;
+            };
+
+            return new tmp(std::forward<Args>(args)...);
+        }
+    };
+}
+
+template <typename T, typename... Args>
+shared_ptr<T> make_shared(Args&&... args) {
+    //return make_shared_impl<T>::make_shared(std::forward<Args>(args)...);
+    return shared_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 }

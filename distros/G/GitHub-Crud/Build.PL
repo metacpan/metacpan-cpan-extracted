@@ -14,6 +14,7 @@ my $b = Module::Build->new
     Storable    =>0,
     Test::More  =>0,
     Test2::API  =>0,
+    Time::HiRes =>0,
    },
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,

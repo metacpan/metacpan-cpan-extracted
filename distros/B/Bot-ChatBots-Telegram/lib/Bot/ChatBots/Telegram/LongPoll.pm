@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::LongPoll;
 use strict;
 use warnings;
-{ our $VERSION = '0.006'; }
+{ our $VERSION = '0.010'; }
 
 use Ouch;
 use Try::Tiny;
@@ -81,7 +81,7 @@ sub poller {
    my $update_timeout = $self->update_timeout;
    my %query = (
       offset => 0,
-      telegram_method => 'sendUpdate',
+      telegram_method => 'getUpdates',
       timeout => $update_timeout,
    );
 
@@ -120,10 +120,19 @@ sub poller {
          %$args, # may override it all!
       );
 
+      for my $item (@retval) {
+         next unless defined $item;
+         defined(my $record = $item->{record})            or next;
+         defined(my $outcome = $item->{outcome})          or next;
+         defined(my $message = $outcome->{send_response}) or next;
+         $sender->send_message($message, record => $record);
+      }
+
       # if we get here, somehow me managed to get past this call... Get
       # ready for the next one. Just to be on the safe side, we will
       # advance $query{offset} anyway
-      $query{offset} = 1 + max map { $_->{update_id} } @updates;
+      $query{offset} = 1 + max map { $_->{update_id} } @updates
+         if @updates;
       $is_busy = 0;
    };
 

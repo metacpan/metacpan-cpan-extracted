@@ -2,7 +2,7 @@ package Syntax::Highlight::Engine::Simple::Perl;
 use strict;
 use warnings;
 use base qw(Syntax::Highlight::Engine::Simple);
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 ### ----------------------------------------------------------------------------
 ### set syntax
@@ -537,9 +537,8 @@ None reported.
 
 No bugs have been reported.
 
-Please report any bugs or feature requests to
-C<bug-syntax-highlight-engine-Simple@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/lab-measurement/Syntax-Highlight-Engine-Simple-Perl/issues>.
 
 =head1 SEE ALSO
 

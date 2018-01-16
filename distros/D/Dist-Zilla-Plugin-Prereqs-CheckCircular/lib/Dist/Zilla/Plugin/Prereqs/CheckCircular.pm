@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Prereqs::CheckCircular;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,6 +63,8 @@ sub after_build {
         unless $res->[0] == 200;
     my $mods = $res->[2];
 
+    return unless @$mods;
+
     $res = call_lcpan_script(argv=>["deps", "-R", @$mods]);
     $self->log_fatal(["Can't lcpan deps: %s - %s", $res->[0], $res->[1]])
         unless $res->[0] == 200;
@@ -94,7 +96,7 @@ Dist::Zilla::Plugin::Prereqs::CheckCircular - Check for circular/recursive depen
 
 =head1 VERSION
 
-This document describes version 0.005 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2017-07-07.
+This document describes version 0.006 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2018-01-14.
 
 =head1 SYNOPSIS
 
@@ -144,7 +146,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

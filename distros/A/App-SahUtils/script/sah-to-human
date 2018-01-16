@@ -1,0 +1,444 @@
+#!perl
+
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.460'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+$SPEC{sah_to_human} = {
+    v => 1.1,
+    summary => 'Convert Sah to human text',
+    args_rels => {
+        'choose_one&' => [
+            [qw/show_schema show_raw_compile/],
+        ],
+        'req_one&' => [
+            [qw/schema schema_file/],
+        ],
+        # doesn't work yet?
+        #'dep_any&' => [
+        #    ['schema_file_type', [qw/schema_file/]],
+        #],
+    },
+    args => {
+        schema => {
+            schema=>'any*',
+            pos=>0,
+            tags => ['category:schema-specification'],
+        },
+        schema_file => {
+            schema=>'str*',
+            summary => 'Retrieve schema from file',
+            description => <<'_',
+
+JSON and YAML formats are supported. File type will be guessed from filename,
+defaults to JSON.
+
+_
+            cmdline_aliases => {f=>{}},
+            'x.schema.entity' => 'filename',
+            tags => ['category:schema-specification'],
+        },
+        schema_file_type => {
+            schema=>['str*', in=>[qw/json yaml/]],
+            summary => 'Give hint for schema file type',
+            cmdline_aliases => {t=>{}},
+            tags => ['category:schema-specification'],
+        },
+
+        format => {
+            schema=>['str*', in=>[qw/inline_text inline_err_text markdown msg_catalog/]],
+            default=>'inline_text',
+            cmdline_aliases => {F=>{}},
+            tags => ['category:compilation'],
+        },
+        hash_values => {
+            summary => "To be passed during compilation",
+            schema=>['hash*'],
+            #cmdline_aliases => {H=>{}},
+            tags => ['category:compilation'],
+        },
+
+        show_schema => {
+            summary => "Don't convert schema, show normalized schema only",
+            schema=>['bool', is=>1],
+            cmdline_aliases => {s=>{}},
+            tags => ['category:action-selection'],
+        },
+        show_raw_compile => {
+            summary => "Don't format compilation result to final text, show raw result only",
+            schema=>['bool', is=>1],
+            tags => ['category:action-selection'],
+        },
+#        with_debug => {
+#            summary => 'Convert with debug on',
+#            description => <<'_',
+#
+#This means e.g. to pepper the validator code with logging statements.
+#
+#_
+#            schema => ['bool', is=>1],
+#            tags => ['category:validator-specification'],
+#        },
+    },
+    examples => [
+        {
+            args => {schema=>"int"},
+        },
+        {
+            args => {schema=>["int" => min=>1, max=>10]},
+        },
+    ],
+};
+sub sah_to_human {
+    my %args = @_;
+
+    my $schema;
+    if (defined $args{schema}) {
+        return [400, "Please specify either 'schema' or 'schema_file', not both"] if defined($args{schema_file});
+        $schema = $args{schema};
+    } elsif (defined $args{schema_file}) {
+        my $path = $args{schema_file};
+        my $type = $args{schema_file_type};
+        if (!$type) {
+            if ($path =~ /\b(json)$/i) { $type = 'json' }
+            elsif ($path =~ /\b(yaml|yml)$/i) { $type = 'yaml' }
+            else { $type = 'json' }
+        }
+        if ($type eq 'json') {
+            require File::Slurper;
+            require JSON::MaybeXS;
+            my $ct = File::Slurper::read_text($path);
+            $schema = JSON::MaybeXS->new->allow_nonref->decode($ct);
+        } elsif ($type eq 'yaml') {
+            require YAML::XS;
+            $schema = YAML::XS::LoadFile($path);
+        } else {
+            return [400, "Unknown schema file type '$type', please specify json/yaml"];
+        }
+    } else {
+        return [400, "Please specify 'schema' or 'schema_file'"];
+    }
+
+    if ($args{show_schema}) {
+        require Data::Sah::Normalize;
+        return [200, "OK", Data::Sah::Normalize::normalize_schema($schema)];
+    }
+
+    require Data::Sah;
+    my $sah = Data::Sah->new;
+    my $hc  = $sah->get_compiler('human');
+
+    my %compile_opts;
+    $compile_opts{schema} = $schema;
+    $compile_opts{format} = $args{format};
+    $compile_opts{hash_values} = $args{hash_values};
+    #$gen_opts{debug} = 1 if $args{with_debug};
+
+    my $cd = $hc->compile(%compile_opts);
+
+    if ($args{show_raw_compile}) {
+        require Data::Dump;
+        return [200, "OK", Data::Dump::dump($cd), {'cmdline.skip_format'=>1}];
+    }
+
+    return [200, "OK", $cd->{result}];
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/sah_to_human',
+);
+$cli->{common_opts}{naked_res}{default} = 1;
+$cli->run;
+
+# ABSTRACT: Convert Sah to human text
+# PODNAME: sah-to-human
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sah-to-human - Convert Sah to human text
+
+=head1 VERSION
+
+This document describes version 0.460 of sah-to-human (from Perl distribution App-SahUtils), released on 2018-01-14.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % sah-to-human [options] [schema]
+
+Examples:
+
+ % sah-to-human int
+ integer
+
+ % sah-to-human '["int","min",1,"max",10]'
+ integer, must be at least 1, must be at most 10
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Action selection options
+
+=over
+
+=item B<--show-raw-compile>
+
+Don't format compilation result to final text, show raw result only.
+
+=item B<--show-schema>, B<-s>
+
+Don't convert schema, show normalized schema only.
+
+=back
+
+=head2 Compilation options
+
+=over
+
+=item B<--format-arg>=I<s>, B<-F>
+
+Default value:
+
+ "inline_text"
+
+Valid values:
+
+ ["inline_text","inline_err_text","markdown","msg_catalog"]
+
+=item B<--hash-values-json>=I<s>
+
+To be passed during compilation (JSON-encoded).
+
+See C<--hash-values>.
+
+=item B<--hash-values>=I<s>
+
+To be passed during compilation.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Schema specification options
+
+=over
+
+=item B<--schema-file-type>=I<s>, B<-t>
+
+Give hint for schema file type.
+
+Valid values:
+
+ ["json","yaml"]
+
+=item B<--schema-file>=I<filename>, B<-f>
+
+Retrieve schema from file.
+
+JSON and YAML formats are supported. File type will be guessed from filename,
+defaults to JSON.
+
+
+=item B<--schema-json>=I<s>
+
+See C<--schema>.
+
+=item B<--schema>=I<s>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C sah-to-human sah-to-human
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete sah-to-human 'p/*/`sah-to-human`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/sah-to-human.conf>, F<~/sah-to-human.conf>, or F</etc/sah-to-human.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ format (see --format-arg)
+ hash_values (see --hash-values)
+ naked_res (see --naked-res)
+ schema (see --schema)
+ schema_file (see --schema-file)
+ schema_file_type (see --schema-file-type)
+ show_raw_compile (see --show-raw-compile)
+ show_schema (see --show-schema)
+
+=head1 ENVIRONMENT
+
+=head2 SAH_TO_HUMAN_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/sah-to-human.conf>
+
+F<~/sah-to-human.conf>
+
+F</etc/sah-to-human.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SahUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

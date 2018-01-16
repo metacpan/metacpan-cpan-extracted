@@ -48,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "App::Prove" : "0",
             "Capture::Tiny" : "0",
             "Test2::API" : "0",
             "Test::More" : "0.96"
@@ -68,6 +69,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

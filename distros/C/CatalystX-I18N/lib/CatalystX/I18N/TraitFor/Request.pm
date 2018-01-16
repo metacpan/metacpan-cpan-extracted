@@ -48,23 +48,23 @@ has 'browser_detect'   => (
 
 sub _build_accept_language {
     my ($self) = @_;
-    
+
     my $accept_language = $self->headers->header('Accept-Language');
-    
+
     return
         unless $accept_language;
-    
+
     # Extract priority
-    my @accepted_languages = 
+    my @accepted_languages =
         map {
             my @tmp = split( /;\s*q=/, $_ );
             $tmp[1] ||= 1;
             \@tmp;
         } split( /\s*,\s*/, $accept_language );
-    
+
     my @sorted_locales;
     my @super_languages;
-    
+
     # Convert language tags to locales
     foreach my $element (sort { $b->[1] <=> $a->[1] } @accepted_languages) {
         my ($language,$dialect) = split /[_-]/,$element->[0];
@@ -77,7 +77,7 @@ sub _build_accept_language {
             unless $locale =~ $CatalystX::I18N::TypeConstraints::LOCALE_RE;
         push(@sorted_locales,$locale);
     }
-    
+
     # Add super languages to locales
     foreach my $lanuage (@super_languages) {
         next
@@ -86,66 +86,72 @@ sub _build_accept_language {
             unless $lanuage =~ $CatalystX::I18N::TypeConstraints::LANGUAGE_RE;
         push(@sorted_locales,$lanuage);
     }
-    
+
     return \@sorted_locales;
 }
 
 sub _build_browser_language {
     my ($self) = @_;
-    
+
+    # browser_detect->language warns unless user_agent
+    return unless $self->user_agent;
+
     my $language = $self->browser_detect()->language();
-    
+
     return
         unless defined $language;
-    
+
     $language = lc($language);
-    
+
     my $constraint = Moose::Util::TypeConstraints::find_type_constraint('CatalystX::I18N::Type::Language');
-    
+
     return
         unless $constraint->check($language);
-    
-    
+
+
     return $language;
 }
 
 sub _build_browser_territory {
     my ($self) = @_;
-    
+
+    # browser_detect->country warns unless user_agent
+    return unless $self->user_agent;
+
     my $territory = $self->browser_detect()->country();
-    
+
     return
         if ! defined $territory || ! $territory || $territory eq '**';
-        
+
     my $constraint = Moose::Util::TypeConstraints::find_type_constraint('CatalystX::I18N::Type::Territory');
-    
+
     return
         unless $constraint->check($territory);
-    
+
     return uc($territory);
 }
 
 sub _build_browser_detect {
     my ($self) = @_;
-    
+
     return HTTP::BrowserDetect->new($self->user_agent);
 }
 
 sub _build_client_country {
     my ($self) = @_;
-    
+
     my $ip_address = $self->address;
-    
+
     return
         unless $ip_address;
-    
+
     my $ip_country = IP::Country::Fast->new();
 
     my $country = $ip_country->inet_atocc($ip_address);
-    
+
     return
         if ! $country || $country eq '**';
-    
+
     return $country;
 }
 
@@ -161,16 +167,16 @@ CatalystX::I18N::TraitFor::Request - Adds various I18N methods to a Catalyst::Re
 =head1 SYNOPSIS
 
  package MyApp::Catalyst;
- 
+  
  use CatalystX::RoleApplicator;
- use Catalyst qw/MyPlugins 
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base/;
  
  __PACKAGE__->apply_request_class_roles(qw/CatalystX::I18N::TraitFor::Request/);
 
 =head1 DESCRIPTION
 
-Adds several attributes to a L<Catalyst::Request> object that help you 
+Adds several attributes to a L<Catalyst::Request> object that help you
 determine a users language and locale.
 
 All attributes are lazy. This means that the values will be only calculated

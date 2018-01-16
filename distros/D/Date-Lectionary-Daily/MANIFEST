@@ -1,5 +1,6 @@
 INSTALL
 lib/Date/Lectionary/Daily.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README

@@ -1,3 +1,11 @@
+20171106
+   AFFECTS: ALL BRIKS
+
+   - debug base Attribute has been removed. Update all Briks by removing $self->debug.
+   - global, context, shell base Attributes are no more initialized with a default Brik,
+     they may now be undefined. Update all Briks by checking definedness when $self->global,
+     $self->context or $self->shell are used.
+
 20171024
    AFFECTS: client::elasticsearch
 

@@ -8,12 +8,12 @@ use File::ShareDir::Install;
 install_share dist => 'share';
 
 WriteMakefile(
-    NAME         => 'Date::Lectionary::Daily',
-    AUTHOR       => q{Michael Wayne Arnold <marmanold@cpan.org>},
-    VERSION_FROM => 'lib/Date/Lectionary/Daily.pm',
-    ABSTRACT     => 'Date::Lectionary::Daily - Daily Readings for the Christian Lectionary',
-    LICENSE      => 'perl_5',
-    PL_FILES     => {},
+    NAME               => 'Date::Lectionary::Daily',
+    AUTHOR             => q{Michael Wayne Arnold <marmanold@cpan.org>},
+    VERSION_FROM       => 'lib/Date/Lectionary/Daily.pm',
+    ABSTRACT           => 'Date::Lectionary::Daily - Daily Readings for the Christian Lectionary',
+    LICENSE            => 'freebsd',
+    PL_FILES           => {},
     MIN_PERL_VERSION   => 5.022000,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
@@ -23,7 +23,7 @@ WriteMakefile(
         'Test::More'          => '1.302040',
         'Test::CheckManifest' => '0.9',
         'Test::Exception'     => '0.43',
-        'Pod::Markdown'       => '3.005', 
+        'Pod::Markdown'       => '3.005',
     },
     PREREQ_PM => {
         'Carp'                         => '1.38',
@@ -36,11 +36,12 @@ WriteMakefile(
         'Date::Advent'                 => '1.20160727',
         'Date::Easter'                 => '1.22',
         'Date::Lectionary::Time'       => '1.20170311',
-        'Date::Lectionary'             => '1.20170809',
-        'Date::Lectionary::Day'        => '1.20170809',  
+        'Date::Lectionary'             => '1.20180109',
+        'Date::Lectionary::Day'        => '1.20180109',
         'namespace::autoclean'         => '0.28',
         'File::Share'                  => '0.25',
         'XML::LibXML'                  => '2.0128',
+        'MooseX::StrictConstructor'    => '0.21',
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },
@@ -54,7 +55,7 @@ WriteMakefile(
         provides => {
             'Date::Lectionary::Daily' => {
                 file    => 'lib/Date/Lectionary/Daily.pm',
-                version => '1.20171127',
+                version => '1.20180114',
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

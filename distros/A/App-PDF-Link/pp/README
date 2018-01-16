@@ -1,0 +1,28 @@
+Support for PAR packaging
+=========================
+
+For consistency, CitrusPerl is used. Currently 5.24.1.
+
+linux
+-----
+
+  GNUmakefile : Makefile
+
+  Targets: pdflink (standalone binary)
+
+windows
+-------
+
+  ** Note: Make must be run from a CitrusTerm window.
+
+  GNUmakefile : Makefile (gmake) for Microsoft Windows.
+
+  Targets: pdflink.exe (standalone binary)
+
+common
+------
+
+  pdflink.pp : pp options for pdflink (generic)
+
+
+

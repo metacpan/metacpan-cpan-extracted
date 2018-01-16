@@ -24,13 +24,23 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.01"
+         },
+         "x_spec" : {
+            "Rinci" : "v1.1.0"
          }
       },
       "runtime" : {
          "requires" : {
             "App::wordlist" : "0.261",
+            "Browser::Open" : "0",
+            "CryptoCurrency::Catalog" : "0",
+            "Data::Sah::Compiler::perl::TH::str" : "0",
+            "Perinci::CmdLine::Any" : "0",
+            "Perinci::CmdLine::Base" : "1.80",
             "Perinci::Result::Format::Lite" : "0.26",
+            "Sah::Schema::cryptocurrency::symbol_or_name" : "0",
             "WordList::CryptoCurrency::Catalog::NameSymbol" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -57,12 +67,17 @@
          "web" : "https://github.com/perlancar/perl-App-CryptoCurrencyUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript cmc-currency",
+            "version" : "0.420"
+         },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
             "name" : "InsertExecsList",
@@ -157,7 +172,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.590"
+            "version" : "0.591"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -454,9 +469,9 @@
             "version" : "0.03"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Acme::CPANLists::Blacklist",
-            "name" : "@Author::PERLANCAR/Acme::CPANLists::Blacklist",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
+            "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
@@ -493,6 +508,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "x_spec"
+               }
+            },
+            "name" : "DevelopX_spec",
             "version" : "6.010"
          },
          {

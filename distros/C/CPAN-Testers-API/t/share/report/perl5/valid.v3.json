@@ -40,7 +40,7 @@
     "skipped": 2,
     "todo": { "pass": 0, "fail": 0 },
     "warnings": 2,
-    "duration": 8,
+    "duration": 8.64,
     "output": {
       "configure": "Checking if your kit is complete...\n Looks good\n Generating a Unix-style Makefile\n Writing Makefile for Data::Printer\n Writing MYMETA.yml and MYMETA.json",
       "build": "cp lib/Data/Printer/Filter/DateTime.pm blib/lib/Data/Printer/Filter/DateTime.pm\n cp lib/Data/Printer/Filter/DB.pm blib/lib/Data/Printer/Filter/DB.pm\n cp lib/Data/Printer.pm blib/lib/Data/Printer.pm\n cp lib/Data/Printer/Filter/Digest.pm blib/lib/Data/Printer/Filter/Digest.pm\n cp lib/Data/Printer/Filter.pm blib/lib/Data/Printer/Filter.pm\n cp lib/DDP.pm blib/lib/DDP.pm\n Manifying 6 pod documents",

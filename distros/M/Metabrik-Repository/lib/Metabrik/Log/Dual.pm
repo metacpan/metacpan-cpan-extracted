@@ -1,5 +1,5 @@
 #
-# $Id: Dual.pm,v 014bf41a7d83 2017/01/21 11:08:30 gomor $
+# $Id: Dual.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # log::dual Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Core::Log);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 014bf41a7d83 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable logging) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -204,7 +204,7 @@ Metabrik::Log::Dual - log::dual Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -1,5 +1,5 @@
 #
-# $Id: Log.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
+# $Id: Log.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
 #
 # core::log Brik
 #
@@ -8,14 +8,14 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.27';
+our $VERSION = '1.30';
 our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: fa356d306156 $',
+      revision => '$Revision: 047dcc7d3c9d $',
       tags => [ qw(main core) ],
       attributes => {
          color => [ qw(0|1) ],
@@ -61,6 +61,7 @@ sub brik_preinit {
    $self->SUPER::brik_preinit(@_) or return;
 
    my $context = $self->context;
+   return $self if ! defined($context);  # No context, nothing to do.
 
    # We replace the current logging Brik by this one,
    # but only after core::context has been created and initialized.
@@ -125,6 +126,8 @@ sub warning {
    my $self = shift;
    my ($msg, $caller) = @_;
 
+   return 1 if ($self->level < 1);
+
    $self->_print_prefix("[!]", Term::ANSIColor::MAGENTA());
 
    if ($self->caller_warning_prefix) {
@@ -140,6 +143,8 @@ sub warning {
 sub error {
    my $self = shift;
    my ($msg, $caller) = @_;
+
+   return 1 if ($self->level < 1);
 
    $self->_print_prefix("[-]", Term::ANSIColor::RED());
 
@@ -159,6 +164,8 @@ sub fatal {
    my $self = shift;
    my ($msg, $caller) = @_;
 
+   # In log level 0, we print nothing except fatal errors.
+
    $self->_print_prefix("[F]", Term::ANSIColor::RED());
 
    if ($self->caller_fatal_prefix) {
@@ -173,7 +180,7 @@ sub info {
    my $self = shift;
    my ($msg, $caller) = @_;
 
-   return 1 unless $self->level > 0;
+   return 1 if ($self->level < 1);
 
    $self->_print_prefix("[+]", Term::ANSIColor::GREEN());
 
@@ -191,7 +198,7 @@ sub verbose {
    my $self = shift;
    my ($msg, $caller) = @_;
 
-   return 1 unless $self->level > 1;
+   return 1 if ($self->level < 2);
 
    $self->_print_prefix("[*]", Term::ANSIColor::YELLOW());
 
@@ -209,30 +216,15 @@ sub debug {
    my $self = shift;
    my ($msg, $caller) = @_;
 
-   # We have a conflict between the method and the accessor,
-   # we have to identify which one is accessed.
+   return 1 if ($self->level < 3);
 
-   # If no message defined, we want to access the Attribute
-   if (! defined($msg)) {
-      return $self->{debug};
+   $self->_print_prefix("[D]", Term::ANSIColor::CYAN());
+
+   if ($self->caller_debug_prefix) {
+      print $self->message($msg, ($caller) ||= caller());
    }
    else {
-      # If $msg is either 1 or 0, we want to set the Attribute
-      if ($msg =~ /^(?:1|0)$/) {
-         return $self->{debug} = $msg;
-      }
-      else {
-         return 1 unless $self->level > 2;
-
-         $self->_print_prefix("[D]", Term::ANSIColor::CYAN());
-
-         if ($self->caller_debug_prefix) {
-            print $self->message($msg, ($caller) ||= caller());
-         }
-         else {
-            print $self->message($msg);
-         }
-      }
+      print $self->message($msg);
    }
 
    return 1;
@@ -300,7 +292,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

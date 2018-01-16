@@ -1,5 +1,8 @@
 Revision history for BioX-Seq
 
+0.006005 2018-01-12
+         Fixed bug in ORF regex from Util module
+
 0.006004 2017-11-05
          Fixed memory leak caused by unnecessary binmode() and repeated
              BioX::Seq::Stream::new()

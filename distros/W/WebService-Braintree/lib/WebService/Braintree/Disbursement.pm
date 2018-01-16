@@ -1,5 +1,5 @@
 package WebService::Braintree::Disbursement;
-$WebService::Braintree::Disbursement::VERSION = '0.94';
+$WebService::Braintree::Disbursement::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

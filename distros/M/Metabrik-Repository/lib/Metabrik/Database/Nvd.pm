@@ -1,5 +1,5 @@
 #
-# $Id: Nvd.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Nvd.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # database::nvd Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable cve cpe nist) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -248,6 +248,9 @@ sub to_hash {
    my $published_datetime = $h->{'vuln:published-datetime'};
    my $last_modified_datetime = $h->{'vuln:last-modified-datetime'};
    my $summary = $h->{'vuln:summary'};
+   my $cvss = $h->{'vuln:cvss'}{'cvss:base_metrics'}{'cvss:score'};
+   my $vector = $h->{'vuln:cvss'}{'cvss:base_metrics'}{'cvss:access-vector'};
+   my $authentication = $h->{'vuln:cvss'}{'cvss:base_metrics'}{'cvss:authentication'};
    my $cwe_id = $h->{'vuln:cwe'}->{id} || '(undef)';
    $cwe_id =~ s/^CWE-//;
 
@@ -265,6 +268,9 @@ sub to_hash {
 
    return {
       cve_id => $cve,
+      cvss => $cvss,
+      access_vector => $vector,
+      authentication => $authentication,
       url => 'http://web.nvd.nist.gov/view/vuln/detail?vulnId='.$cve,
       published_datetime => $published_datetime,
       last_modified_datetime => $last_modified_datetime,
@@ -373,7 +379,7 @@ Metabrik::Database::Nvd - database::nvd Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

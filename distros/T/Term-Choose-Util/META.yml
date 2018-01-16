@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Cwd: '0'
   Encode: '0'
   Encode::Locale: '0'
   Exporter: '0'
@@ -25,14 +26,15 @@ requires:
   File::HomeDir: '0'
   File::Spec::Functions: '0'
   List::Util: '0'
-  Term::Choose: '1.500'
-  Term::Choose::LineFold: '1.500'
+  Term::Choose: '1.509'
+  Term::Choose::LineFold: '1.509'
   Term::ReadKey: '0'
   constant: '0'
+  if: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose-Util
-version: '0.052'
+version: '0.053'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

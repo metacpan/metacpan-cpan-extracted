@@ -1,0 +1,70 @@
+package WebService::Braintree::DisputeGateway;
+$WebService::Braintree::DisputeGateway::VERSION = '1.0';
+use 5.010_001;
+use strictures 1;
+
+use Moose;
+with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
+
+use WebService::Braintree::Util qw(validate_id);
+
+has 'gateway' => (is => 'ro');
+
+sub accept {
+    my $self = shift;
+    my ($id) = @_;
+    confess "ArgumentError" unless validate_id($id);
+
+    $self->_make_request("/disputes/${id}/accept", "put", undef);
+}
+
+sub finalize {
+    my $self = shift;
+    my ($id) = @_;
+    confess "ArgumentError" unless validate_id($id);
+
+    $self->_make_request("/disputes/${id}/finalize", "put", undef);
+}
+
+sub add_text_evidence {
+    my $self = shift;
+    my ($id, $content) = @_;
+    confess "ArgumentError" unless validate_id($id);
+    confess "ArgumentError" unless validate_id($content);
+
+    $self->_make_request("/disputes/${id}/evidence", "post", {comments => $content});
+}
+
+sub remove_evidence {
+    my $self = shift;
+    my ($id, $evidence_id) = @_;
+    confess "ArgumentError" unless validate_id($id);
+    confess "ArgumentError" unless validate_id($evidence_id);
+
+    $self->_make_request("/disputes/${id}/evidence/${evidence_id}", "delete", undef);
+}
+
+sub find {
+    my $self = shift;
+    my ($id) = @_;
+    confess "ArgumentError" unless validate_id($id);
+
+    $self->_make_request("/disputes/${id}", "get", undef);
+}
+
+sub search {
+    my ($self, $block) = @_;
+
+    return $self->paginated_collection({
+        method => 'post',
+        url => "/disputes/advanced_search",
+        inflate => [qw/disputes dispute Dispute/],
+        search => $block->(WebService::Braintree::DisputeSearch->new),
+    });
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+__END__

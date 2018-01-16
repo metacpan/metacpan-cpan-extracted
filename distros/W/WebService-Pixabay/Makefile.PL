@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,20 +17,22 @@ my %WriteMakefileArgs = (
     "Module::Build" => "0.28"
   },
   "DISTNAME" => "WebService-Pixabay",
-  "LICENSE" => "gpl",
+  "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "WebService::Pixabay",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
     "Function::Parameters" => 0,
     "LWP::Online" => 0,
     "Moo" => 0,
-    "WebService::Client" => 0
+    "WebService::Client" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0,
-    "lib" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "2.1.1",
+  "VERSION" => "2.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +47,8 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Test::More" => 0,
   "WebService::Client" => 0,
-  "lib" => 0
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

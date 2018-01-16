@@ -32,13 +32,13 @@ elsif ($OPT{'3'} ) { $tm = tai35(); }
 elsif ($OPT{'0'} ) { $tm = tai();   }
 else { $tm = tai10(); }
 
-if ($OPT{i}) { # Integer output
+if ($OPT{i} || $OPT{'strict'}) { # Integer output
     $tm  = int($tm);
     $fmt = '%d';
 }
 
 # ISO International standard time format:
-if ($OPT{iso} || $OPT{iso8601} || $OPT{zulu} || $OPT{'strict'}) {
+if ($OPT{iso} || $OPT{iso8601} || $OPT{zulu} || $OPT{'strict'} || $OPT{'iso-ish'} || $OPT{'iso8601-ish'} || $OPT{'ish'} || $OPT{'rfc3339'}) {
     my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst);
     my @gm_list = ();
     if ($OPT{gm} || $OPT{utc}) {
@@ -50,7 +50,7 @@ if ($OPT{iso} || $OPT{iso8601} || $OPT{zulu} || $OPT{'strict'}) {
     $sec += $tm - int($tm);
     my $pad = '';
     $pad = '0' if ($sec < 10);
-    if ($OPT{iso8601} || $OPT{'strict'}) {
+    unless ($OPT{'iso8601-ish'} || $OPT{'iso-ish'} || $OPT{'ish'}) {
         # Anally strictly correct format
         if ($OPT{gm} || $OPT{utc} || $OPT{zulu}) {
             printf('%04d-%02d-%02dT%02d:%02d:%s'.$fmt.'Z%s', $year+1900, $mon+1, $mday, $hour, $min, $pad, $sec, $nl);
@@ -61,7 +61,11 @@ if ($OPT{iso} || $OPT{iso8601} || $OPT{zulu} || $OPT{'strict'}) {
             $tz_delta = "+$tz_delta" unless ($tz_delta < 0);
             my $sign = substr($tz_delta, 0, 1);
             $tz_delta = $sign . sprintf('%02d',abs($tz_delta));
-            printf('%04d-%02d-%02dT%02d:%02d:%s'.$fmt.'%s00%s', $year+1900, $mon+1, $mday, $hour, $min, $pad, $sec, $tz_delta, $nl);
+            my $tz_separator = '';
+            $tz_separator = ':' if ($OPT{'rfc3339'});
+            my $annoying_separator = 'T';
+            $annoying_separator = ' ' if ($OPT{'rfc3339'});
+            printf('%04d-%02d-%02d%s%02d:%02d:%s'.$fmt.'%s%s00%s', $year+1900, $mon+1, $mday, $annoying_separator, $hour, $min, $pad, $sec, $tz_delta, $tz_separator, $nl);
         }
     } else {
         # Slightly friendlier format
@@ -91,17 +95,20 @@ exit(0);
 sub usage {
     print "Usage: $0 [options]\n" .
           "Options are:\n" .
-          "    -d       Display in human-readable date/time format\n" .
-          "    -h       Describe available options\n" .
-          "    -i       Display TAI time as integer, not floating point\n" .
-          "    --0      Display TAI time instead of TAI-10 time\n" .
-          "    --35     Display TAI-35 time instead of TAI-10 time\n" .
-          "    --gm     Do not adjust for timezone when -d or --iso\n" .
-          "    --help   Same as -h\n" .
-          "    --iso    Display in international standard time format\n" .
-          "    --iso8601  Like --iso, but more strictly correct.\n".
-          "    --neol   Do not print terminating EOL\n" .
-          "    --p=N    Show N digits of precision when displaying as float\n";
+          "    -d        Display in human-readable date/time format\n" .
+          "    -h        Describe available options\n" .
+          "    -i        Display TAI time as integer, not floating point\n" .
+          "    --0       Display TAI time instead of TAI-10 time\n" .
+          "    --35      Display TAI-35 time instead of TAI-10 time\n" .
+          "    --gm      Do not adjust for timezone when -d or --iso\n" .
+          "    --help    Same as -h\n" .
+          "    --iso     Display in ISO-8601 international standard time format\n" .
+          "    --strict  Like --iso, but implies -i.\n" .
+          "    --iso-ish Display in \"relaxed\" international standard time format\n" .
+          "    --ish     Synonym for --iso-ish\n" .
+          "    --rfc3339 Display in RFC3339 format\n" .
+          "    --neol    Do not print terminating EOL\n" .
+          "    --p=N     Show N digits of precision when displaying as float\n";
     return 1;
 }
 
@@ -128,8 +135,11 @@ Currently supported options:
     --35       Display TAI-35 time instead of TAI-10 time
     --gm       Do not adjust for timezone when -d or --iso
     --help     Same as -h
-    --iso      Display in international standard time format
-    --iso8601  Like --iso, but more strictly correct.
+    --iso      Display in ISO-8601 international standard time format
+    --strict   Like --iso, but implies -i
+    --iso-ish  Display in \"relaxed\" international standard time format
+    --ish      Synonym for --iso-ish
+    --rfc3339  Display in RFC3339 format
     --neol     Do not print terminating EOL
     --p=N      Show N digits of precision when displaying as float
                (default: 9)
@@ -151,15 +161,30 @@ Display TAI-10 as a human-readable date/time, adjusted for local timezone:
     $ tai -d
     Mon Jul 28 13:27:57 2014
 
-Display TAI-10 as a (relaxed) ISO-8601 date/time, B<unadjusted> for timezone:
+Display TAI-10 as a ISO-8601 date/time, B<unadjusted> for timezone:
 
     $ tai --iso --gm
-    2014-07-28 20:29:12.512542725
+    2014-07-28T20:29:12.512542725Z
 
 Display TAI-35 as a strict ISO-8601 date/time, adjusted for local timezone:
 
-    $ tai --iso8601 --35
-    2014-07-28T13:28:37.512542725-0700
+    $ tai --strict --35
+    2014-07-28T13:28:37-0700
+
+Display TAI-10 as an RFC3339 date/time:
+
+    $ tai --rfc3339
+    2014-07-28T20:29:12.512542725-07:00
+
+Display TAI-10 as an "iso'ish" date/time:
+
+    $ tai --iso-ish
+    2014-07-28 20:29:12.512542725
+
+Display TAI-10 as a low-resolution "iso'ish" date/time (most commonly used):
+
+    $ tai --iso-ish -i
+    2014-07-28 20:29:12
 
 =head1 SEE ALSO
 
@@ -171,7 +196,7 @@ TTK Ciar, <ttk[at]ciar[dot]org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014-2015 by TTK Ciar
+Copyright 2014-2018 by TTK Ciar
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

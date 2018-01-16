@@ -7,8 +7,19 @@ The file is formatted thusly:
   "private_key": "xxx"
 }
 
+Should you want to contribute to the development of Webservice::Braintree,
+please mail zarquon@cpan.org for the shared credentials used by the
+development team (however for casual development your own sandbox
+credentials should mostly be fine).
+
 You also need to have created elements in the control panel. These items are
 verified by test preambles, but the description of how to create them is here.
+
+Also, on a regular basis, you will need to purge your sandbox's data. Do this by
+going to Settings -> Purge sandbox data. This generally takes about 30 seconds
+and will delete everything that isn't described in this document below. If you
+don't purge, you will end up with test failures because these tests cannot
+clean up after themselves (many of the API endpoints do not allow deleting).
 
 Add-ons:
 Create these by going to Recurring Billing > Add-ons / Discounts (left-side)
@@ -53,16 +64,39 @@ Create these by going to Recurring Billing > Plans (left-side menu)
           * discount_15
 
 Merchant Accounts:
+If you are outside the US, follow these instructions:
 Create these by going to Settings > Processing (top-side menu). Scroll to the
 bottom to the "Merchant Accounts" section.
     * id=sandbox_master_merchant_account
       default=Yes
       accept_paypal=Yes
 
+If you are inside the US, follow these instructions:
+Go to Account > Merchant Account Info (top-side menu). Click on the green
+"New Sandbox Merchant Account".
+    * id=sandbox_master_merchant_account
+      marketplace_mster=Yes
+      default=Yes
+      accept_paypal=Yes
+      currency=USD
+    * id=sandbox_credit_card
+      marketplace_mster=No
+      default=No
+      accept_paypal=Yes
+      currency=USD
+    * id=three_d_secure_merchant_account
+      marketplace_mster=No
+      default=No
+      accept_paypal=Yes
+      currency=USD
+
 NOTE: You must have a Marketplace account. The Marketplace features are only
 enabled for US sandbox accounts. To have a Marketplace account, you have to have
 selected "United States" as your country when signing up for your account. Then,
 you can sign up for your sandbox with Marketplace features enabled.
+
+The necessary sub-merchant accounts are created (if necessary) by the
+verify_sandbox() function in t/lib/WebService/Braintree/TestHelper.pm
 
 Custom Fields:
 Create these by going to Settings > Processing (top-side menu). Scroll down to
@@ -70,12 +104,23 @@ Create these by going to Settings > Processing (top-side menu). Scroll down to
 text on the right), then click "+ Add" (tiny green text in the upper right).
     * id=store_me
       display_name="Store Me"
+      option=store_and_pass_back
 
 Unfortunately, there is no way to verify the custom fields have been created via
 the API, so TestHelper->verify_sandbox() cannot catch this error.
+
+#Linked Paypal App:
+#You'll need to follow the instructions at L<< https://developers.braintreepayments.com/guides/paypal/testing-go-live/ruby#linked-paypal-testing >>.
+#
+#There is no way to verify that this has occurred.
 
 Transaction Descriptors:
 You will need to have "dynamic descriptors" enabled for your account. There is
 currently no way to determine if dynamic descriptors are enabled for an account
 other than to ask Braintree support. To enable dynamic descriptors, you will
 need to contact Braintree support.
+
+Enable 3DSecure:
+You will have to contact support@getbraintree.com to enable 3DSecure for all
+tests that use the three_d_secure_merchant_account. I am currently in process
+of figuring out exactly what goes into that.

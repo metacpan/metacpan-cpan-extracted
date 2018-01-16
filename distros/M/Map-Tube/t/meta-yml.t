@@ -11,7 +11,7 @@ plan skip_all => "Test::CPAN::Meta required for testing MYMETA.yml" if $@;
 my $meta    = meta_spec_ok('MYMETA.yml');
 my $version = $Map::Tube::VERSION;
 
-is($meta->{version},$version, 'MYMETA.yml distribution version matches');
+is($meta->{version}, $version, 'MYMETA.yml distribution version matches');
 
 if ($meta->{provides}) {
     foreach my $mod (keys %{$meta->{provides}}) {

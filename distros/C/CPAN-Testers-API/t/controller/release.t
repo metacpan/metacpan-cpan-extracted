@@ -34,7 +34,7 @@ sub _test_api( $base ) {
           ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0..8] ] );
 
         subtest 'since (disabled until optimized)' => sub {
-            $t->get_ok( $base . '/release?since=2016-08-20T00:00:00Z' )
+            $t->get_ok( $base . '/release?since=2016-08-20T00:00:00' )
               ->status_is( 400 )
               ->json_has( '/errors' )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -70,7 +70,7 @@ sub _test_api( $base ) {
           ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0..4] ] );
 
         subtest 'since' => sub {
-            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00Z' )
+            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[1..4] ] )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -99,14 +99,14 @@ sub _test_api( $base ) {
         };
 
         subtest 'since and limit' => sub {
-            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00Z&limit=2' )
+            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00&limit=2' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[1,2] ] )
               ->or( sub { diag explain shift->tx->res->json } );
         };
 
         subtest 'since and maturity' => sub {
-            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00Z&maturity=stable' )
+            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00&maturity=stable' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[2,4] ] )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -120,7 +120,7 @@ sub _test_api( $base ) {
         };
 
         subtest 'limit and since and maturity' => sub {
-            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00Z&maturity=stable&limit=1' )
+            $t->get_ok( $base . '/release/dist/My-Dist?since=2016-08-20T00:00:00&maturity=stable&limit=1' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[2] ] )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -141,7 +141,7 @@ sub _test_api( $base ) {
           ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[0,2,5..8] ] );
 
         subtest 'since' => sub {
-            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00Z' )
+            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[2,5..8] ] )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -170,14 +170,14 @@ sub _test_api( $base ) {
         };
 
         subtest 'since and limit' => sub {
-            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00Z&limit=2' )
+            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00&limit=2' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[2,5] ] )
               ->or( sub { diag explain shift->tx->res->json } );
         };
 
         subtest 'since and maturity' => sub {
-            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00Z&maturity=stable' )
+            $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00&maturity=stable' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[2,6,8] ] )
               ->or( sub { diag explain shift->tx->res->json } );
@@ -191,7 +191,7 @@ sub _test_api( $base ) {
         };
 
         subtest 'limit and since and maturity' => sub {
-            $t->get_ok( $base . '/release/author/POSTACTION?since=2016-08-20T00:10:00Z&maturity=dev&limit=1' )
+            $t->get_ok( $base . '/release/author/POSTACTION?since=2016-08-20T00:10:00&maturity=dev&limit=1' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}[3] ] )
               ->or( sub { diag explain shift->tx->res->json } );

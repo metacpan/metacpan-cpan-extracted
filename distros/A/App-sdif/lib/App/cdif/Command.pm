@@ -10,8 +10,7 @@ use parent "App::cdif::Tmpfile";
 
 sub new {
     my $class = shift;
-    my $obj = new App::cdif::Tmpfile;
-    bless $obj, $class;
+    my $obj = SUPER::new $class;
     $obj->command(@_) if @_;
     $obj;
 }

@@ -1,5 +1,5 @@
 #
-# $Id: Winsvc.pm,v 42fc15910ea4 2017/02/22 17:44:29 gomor $
+# $Id: Winsvc.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # remote::winsvc Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Remote::Winexe Metabrik::Client::Smbclient);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 42fc15910ea4 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -82,7 +82,7 @@ Metabrik::Remote::Sysmon - remote::sysmon Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -11,7 +11,7 @@ use Mail::AuthenticationResults::Parser;
 
 my $Parsed = Mail::AuthenticationResults::Parser->new()->parse( ' test.example.com ; foo=bar;dkim=fail ;one=; two ;three;dmarc=pass' );
 my $Result = $Parsed->as_string();
-is( $Result, "test.example.com;\nfoo=bar;\ndkim=fail;\none=;\ntwo=;\nthree=;\ndmarc=pass", 'Result ok' );
+is( $Result, "test.example.com;\nfoo=bar;\ndkim=fail;\none=\"\";\ntwo=\"\";\nthree=\"\";\ndmarc=pass", 'Result ok' );
 
 my $Parsed2 = Mail::AuthenticationResults::Parser->new()->parse( 'Authentication-Results: test.example.com;one=two three=four (comment) five=six' );
 
@@ -44,6 +44,15 @@ is ( ref $AuthServIDValue->children()->[0], 'Mail::AuthenticationResults::Header
 is ( $AuthServIDValue->children()->[0]->value(), 'this has a version', 'Comment has correct value' );
 is ( $AuthServIDValue->as_string(), 'test.example.com (this has a version) 1', 'AuthServID as string is correct' );
 is ( $ParsedAuthServID->as_string(), "test.example.com (this has a version) 1;\nnone", 'Header as string is correct' );
+
+my $ParsedCommentFirst = Mail::AuthenticationResults::Parser->new()->parse( '(comment first) test.example.com;none' );
+is ( $ParsedCommentFirst->as_string(), "test.example.com (comment first);\nnone", 'Header as string is correct' );
+
+my $ParsedPostAssign;
+lives_ok( sub{ $ParsedPostAssign = Mail::AuthenticationResults::Parser->new()->parse( 'example.com; dkim=pass address=thisisa=test@example.com') }, 'Post Assign parse lives' );
+is( $ParsedPostAssign->children()->[0]->children->[0]->value(), 'thisisa=test@example.com', 'Post assign value correct' );
+
+dies_ok( sub{ Mail::AuthenticationResults::Parser->new()->parse( ';none' ) }, 'Missing AuthServ-ID dies' );
 
 done_testing();
 

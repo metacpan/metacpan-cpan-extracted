@@ -111,11 +111,15 @@ is_deeply(
 );
 
 # negative indexes
-@r = path($s_array, [ [3],[-2,-1,-3] ]);
+@r = path($s_array, [ [3],[-2,-1,-3] ], paths => 1);
 is_deeply(
     \@r,
-    [\[13], \7, \9],
-    "get [3],[-2,-1] from s_array"
+    [
+        [[3],[1]], \[13],
+        [[3],[2]], \7,
+        [[3],[0]], \9
+    ],
+    "get [3],[-2,-1,-3] from s_array, negative indexes should be resolved in paths"
 );
 
 # result must have right sequence

@@ -1,0 +1,62 @@
+:default            ::= action => [name,values]
+:start              ::= project
+lexeme default = latm => 1
+
+Header                ~ Encoding 'PBExportHeader$':i rest_of_line
+Comment               ~ '$PBExportComments$' rest_of_line
+rest_of_line          ~ comment_char*
+comment_char          ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+Encoding              ~ 'HA$':i
+                      | '$'
+pbheader            ::= Header Comment
+                      | Header
+                      | Comment
+pbheader            ::=
+
+project             ::= (pbheader) items    action => project
+items               ::= item*               action => [values]
+item                ::= exe                 action => [values]
+					  | cmp                 action => [values]
+					  | com                 action => [values]
+					  | des                 action => [values]
+					  | cpy                 action => [values]
+					  | prd                 action => [values]
+					  | pvs                 action => [values]
+					  | pvn                 action => [values]
+					  | fvs                 action => [values]
+					  | fvn                 action => [values]
+					  | man                 action => [values]
+					  | pbd                 action => [values]
+					  | obj                 action => [values]
+
+exe                 ::= ('EXE:') string_1 (',') string_1 (',') integer (',') integer (',') integer
+cmp                 ::= ('CMP:') integers				action => compiler
+com                 ::= ('COM:') string
+des                 ::= ('DES:') string
+cpy                 ::= ('CPY:') string
+prd                 ::= ('PRD:') string
+pvs                 ::= ('PVS:') string
+pvn                 ::= ('PVN:') integer (',')  integer (',')  integer (',')  integer
+fvs                 ::= ('FVS:') string
+fvn                 ::= ('FVN:') integer (',')  integer (',')  integer (',')  integer
+man                 ::= ('MAN:') integer (',')  string_1 (',')  integer
+pbd                 ::= ('PBD:') string_1 (',') string_1 (',') integer
+obj                 ::= ('OBJ:') string_1 (',') string_1 (',') string
+
+integers            ::= <integer sep>+		action => [values]
+<integer sep>       ::= integer (',')       action => ::first
+                      | integer             action => ::first
+integer             ::= [0-9]+				action => integer
+
+string_1            ::= <string 1 contents> action => string
+string_1            ::=                     action => string
+<string 1 contents>   ~ [^,\x{A}\x{D}]+
+
+string              ::= <string contents>	action => string
+string              ::=                     action => string
+<string contents>     ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]+
+
+:discard              ~ crlf
+crlf                  ~ [\x{D}\x{A}]+
+:discard              ~ whitespace
+whitespace            ~ [\s]+

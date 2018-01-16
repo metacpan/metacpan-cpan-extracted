@@ -1,5 +1,5 @@
 #
-# $Id: Shell.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
+# $Id: Shell.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
 #
 # core::shell Brik
 #
@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.27';
+our $VERSION = '1.30';
 our $FIX = '0';
 
 use base qw(Term::Shell Metabrik);
@@ -17,7 +17,7 @@ use IO::All;
 
 sub brik_properties {
    return {
-      revision => '$Revision: fa356d306156 $',
+      revision => '$Revision: 047dcc7d3c9d $',
       tags => [ qw(main core) ],
       attributes => {
          echo => [ qw(0|1) ],
@@ -139,7 +139,7 @@ sub brik_init {
    # Note: Gnu readline() is blocking SIGs, we have to hit enter so 
    #       Ctrl+C is executed.
    $SIG{INT} = sub {
-      $self->debug && $self->log->debug("SIGINT: captured for pid[$$] ".
+      $self->log->debug("SIGINT: captured for pid[$$] ".
          ($$ == $self->global->pid ? '(main process)' : '')
       );
       $self->_update_prompt;
@@ -159,7 +159,7 @@ sub brik_init {
       };
       if ($@) {
          chomp($@);
-         $self->debug && $self->log->debug("brik_init: $path: all_files: $@");
+         $self->log->debug("brik_init: $path: all_files: $@");
          next;
       };
       for my $file (@files) {
@@ -180,6 +180,11 @@ sub brik_init {
 
 sub splash {
    my $self = shift;
+
+   # No context, no splash screen cause nothing to show.
+   if (! defined($self->context)) {
+      return 1;
+   }
 
    my $con = $self->context;
 
@@ -237,6 +242,10 @@ sub full_pwd {
 sub get_available_help {
    my $self = shift;
 
+   if (! defined($self->context)) {
+      return $self->log->error("get_available_help: no core::context Brik");
+   }
+
    my @used = sort { $a cmp $b } keys %{$self->context->used};
    my @aliases = sort { $a cmp $b } keys %{$self->{_aliases}};
    my @commands = sort { $a cmp $b } keys %{$self->brik_commands};
@@ -261,7 +270,7 @@ sub AUTOLOAD {
    my $self = shift;
    my (@args) = @_;
 
-   $self->debug && $self->log->debug("autoload[$AUTOLOAD]");
+   #$self->log->debug("autoload[$AUTOLOAD]");
 
    if ($AUTOLOAD !~ /^Metabrik::Core::Shell::run_/) {
       return 1;
@@ -269,13 +278,17 @@ sub AUTOLOAD {
 
    (my $command = $AUTOLOAD) =~ s/^Metabrik::Core::Shell:://;
 
-   $self->debug && $self->log->debug("AUTOLOAD: command[$command] args[@args]");
+   #$self->log->debug("AUTOLOAD: command[$command] args[@args]");
 
    #my $aliases = $self->_aliases;
    my $aliases = $self->{_aliases};
    if (exists($aliases->{$command})) {
       my $cmd = $aliases->{$command};
       return $self->cmd(join(' ', $cmd, @args));
+   }
+
+   if (! defined($self->context)) {
+      return $self->log->error("AUTOLOAD: no core::context Brik");
    }
 
    my $context = $self->context;
@@ -296,19 +309,19 @@ sub AUTOLOAD {
    return 1;
 }
 
-sub _word_may_be_brik {
-   my $self = shift;
-   my ($word) = @_;
-
-   my $context = $self->context;
-   my $used = $context->used;
-
-   for (keys %$used) {
-      return $used if /^$word/;
-   }
-
-   return 0;
-}
+#sub _word_may_be_brik {
+#   my $self = shift;
+#   my ($word) = @_;
+#
+#   my $context = $self->context;
+#   my $used = $context->used;
+#
+#   for (keys %$used) {
+#      return $used if /^$word/;
+#   }
+#
+#   return 0;
+#}
 
 # We overwrite inherited Term::Shell rl_complete() sub to have control
 sub rl_complete {
@@ -321,15 +334,15 @@ sub rl_complete {
    # For that, command must not be blank and not start with '/'.
    if (($start == 0 || substr($line, 0, $start) =~ /^\s*$/)
    &&  ($word !~ m{/})) {
-      $self->debug && $self->log->debug("rl_complete: word[$word] start[$start] line[$line]");
+      $self->log->debug("rl_complete: word[$word] start[$start] line[$line]");
       @comp = $self->complete('', $word, $line, $start);
 
-      $self->debug && $self->log->debug("rl_complete: comp[@comp]");
+      $self->log->debug("rl_complete: comp[@comp]");
 
       # XXX: broken feature since Term::ReadLine::Gnu 1.27
       # If we found something and it's an alias, we complete with the original command
       #if (defined($comp[0]) && $self->comp_aliases && exists($self->{_aliases}{"run_".$comp[0]})) {
-         #$self->debug && $self->log->debug("rl_complete: original[".$self->{_aliases}{"run_$comp[0]"}."]");
+         #$self->log->debug("rl_complete: original[".$self->{_aliases}{"run_$comp[0]"}."]");
 
          #my @words = split(/\s+/, $self->{_aliases}{"run_$comp[0]"});
          #if (exists($self->{_aliases}{"run_$words[0]"})) {
@@ -350,11 +363,11 @@ sub rl_complete {
    # function:
    else {
       my $command = ($self->line_parsed($line))[0];
-      $self->debug && $self->log->debug("rl_complete: send to custom completion");
+      $self->log->debug("rl_complete: send to custom completion");
       @comp = $self->complete($command, $word, $line, $start);
    }
 
-   $self->debug && $self->log->debug("rl_complete: return comp[@comp] count[".scalar(@comp)."]");
+   $self->log->debug("rl_complete: return comp[@comp] count[".scalar(@comp)."]");
 
    return @comp;
 }
@@ -387,10 +400,10 @@ sub _update_path_cwd {
    my $self = shift;
 
    my $cwd = _convert_path(Cwd::getcwd() || '/tmp');
-   $self->debug && $self->log->debug("cwd [$cwd]");
+   #$self->log->debug("cwd [$cwd]");
    #my $home = $self->path_home;
    my $home = $self->{path_home} || '/tmp';
-   $self->debug && $self->log->debug("home [$home]");
+   #$self->log->debug("home [$home]");
    $cwd =~ s/^$home/~/;
 
    #$self->path_cwd($cwd);
@@ -482,16 +495,16 @@ sub cmd_to_code {
    #  'run shell::command system "echo $_"';
    #  $SHE->cmd("run shell::command system \"echo $_\"");
 
-   $self->debug && $self->log->debug("cmd_to_code: before: [$line]");
+   $self->log->debug("cmd_to_code: before: [$line]");
    if ($line =~ /^\s*'\s*((?:use|set|get|run)\s.*?)\s*'\s*;?\s*$/) {
       # We have to escape " chars
       (my $new = $1) =~ s{"}{\\"}g;
       # We have to escape $ variables too so they are completed
       $new =~ s{\$}{\\\$}g;
-      $self->debug && $self->log->debug("cmd_to_code: new: [$new]");
+      $self->log->debug("cmd_to_code: new: [$new]");
       $line = '$SHE->cmd("'.$new.'");';
    }
-   $self->debug && $self->log->debug("cmd_to_code: after: [$line]");
+   $self->log->debug("cmd_to_code: after: [$line]");
 
    return $line;
 }
@@ -514,7 +527,7 @@ sub process_line {
    my $self = shift;
    my ($line, $lines) = @_;
 
-   $self->debug && $self->log->debug("process_line: [$line]");
+   $self->log->debug("process_line: [$line]");
 
    # Skip comments
    if ($line =~ /^\s*#/) {
@@ -536,7 +549,7 @@ sub process_line {
       return 1;
    }
 
-   $self->debug && $self->log->debug("process_line: lines[@$lines]");
+   $self->log->debug("process_line: lines[@$lines]");
 
    my $cmd = join('', @$lines);
 
@@ -611,7 +624,7 @@ sub run_exit {
 sub comp_exit {
    my $self = shift;
 
-   $self->debug && $self->log->debug("comp_exit: true");
+   $self->log->debug("comp_exit: true");
 
    return ();
 }
@@ -655,7 +668,7 @@ sub run_alias {
 sub comp_alias {
    my $self = shift;
 
-   $self->debug && $self->log->debug("comp_alias: true");
+   $self->log->debug("comp_alias: true");
 
    return ();
 }
@@ -692,7 +705,7 @@ sub comp_cd {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_cd: true");
+   $self->log->debug("comp_cd: true");
 
    return $self->catch_comp_sub($word, $start, $line);
 }
@@ -709,15 +722,15 @@ sub run_code {
       return $self->log->info('code <code>');
    }
 
-   $self->debug && $self->log->debug("run_code: code[$line]");
+   $self->log->debug("run_code: code[$line]");
 
    my $r;
    eval {
       # So we can interrupt the do($line) execution
       local $SIG{INT} = sub {
-         $self->debug && $self->log->debug("run_code: SIG received");
+         $self->log->debug("run_code: SIG received");
          if ($self->global->exit_on_sigint) {
-            $self->debug && $self->log->debug("run_code: exiting");
+            $self->log->debug("run_code: exiting");
             $self->run_exit;
          }
          die("interrupted by user\n");
@@ -739,7 +752,7 @@ sub comp_code {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_code: true");
+   $self->log->debug("comp_code: true");
 
    return $self->catch_comp_sub($word, $start, $line);
 }
@@ -774,16 +787,14 @@ sub comp_use {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_use: true");
+   $self->log->debug("comp_use: true");
 
    my $context = $self->context;
 
    my @words = $self->line_parsed($line);
    my $count = scalar(@words);
 
-   if ($self->debug) {
-      $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
-   }
+   $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
 
    my @comp = ();
 
@@ -791,7 +802,7 @@ sub comp_use {
    if (($count == 1)
    ||  ($count == 2 && length($word) > 0)) {
       my $available = $context->available;
-      if ($self->debug && ! defined($available)) {
+      if ($self->log->level > 2 && ! defined($available)) {
          $self->log->debug("\ncomp_use: can't fetch available Briks");
          return ();
       }
@@ -1074,14 +1085,12 @@ sub comp_help {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_help: true");
+   $self->log->debug("comp_help: true");
 
    my @words = $self->line_parsed($line);
    my $count = scalar(@words);
 
-   if ($self->debug) {
-      $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
-   }
+   $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
 
    my @comp = ();
 
@@ -1127,23 +1136,21 @@ sub comp_set {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_set: true");
+   $self->log->debug("comp_set: true");
 
    my $context = $self->context;
 
    # Completion is for used Briks only
    my $used = $context->used;
    if (! defined($used)) {
-      $self->debug && $self->log->debug("comp_set: can't fetch used Briks");
+      $self->log->debug("comp_set: can't fetch used Briks");
       return ();
    }
 
    my @words = $self->line_parsed($line);
    my $count = scalar(@words);
 
-   if ($self->debug) {
-      $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
-   }
+   $self->log->debug("word[$word] line[$line] start[$start] count[$count]");
 
    my $brik = defined($words[1]) ? $words[1] : undef;
 
@@ -1158,11 +1165,9 @@ sub comp_set {
    }
    # We fetch Brik Attributes
    elsif ($count == 2 && length($word) == 0) {
-      if ($self->debug) {
-         if (! exists($used->{$brik})) {
-            $self->log->debug("comp_set: Brik [$brik] not used");
-            return ();
-         }
+      if ($self->log->level > 2 && ! exists($used->{$brik})) {
+         $self->log->debug("comp_set: Brik [$brik] not used");
+         return ();
       }
 
       my $attributes = $self->get_comp_attributes($brik);
@@ -1173,11 +1178,9 @@ sub comp_set {
    }
    # We want to complete entered Attribute
    elsif ($count == 3 && length($word) > 0) {
-      if ($self->debug) {
-         if (! exists($used->{$brik})) {
-            $self->log->debug("comp_set: Brik [$brik] not used");
-            return ();
-         }
+      if ($self->log->level > 2 && ! exists($used->{$brik})) {
+         $self->log->debug("comp_set: Brik [$brik] not used");
+         return ();
       }
 
       my $attributes = $self->get_comp_attributes($brik);
@@ -1249,7 +1252,7 @@ sub run_get {
 sub comp_get {
    my $self = shift;
 
-   $self->debug && $self->log->debug("comp_get: true");
+   $self->log->debug("comp_get: true");
 
    return $self->comp_set(@_);
 }
@@ -1267,15 +1270,15 @@ sub run_run {
    my $r;
    {
       local $SIG{INT} = sub {
-         $self->debug && $self->log->debug("run_run: SIG received");
+         $self->log->debug("run_run: SIG received");
          if ($self->global->exit_on_sigint) {
-            $self->debug && $self->log->debug("run_run: exiting");
+            $self->log->debug("run_run: exiting");
             $self->run_exit;
          }
          die("interrupted by user\n");
       };
 
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          my ($module, $file, $line) = caller();
          $self->log->debug("run_run: called by module [$module] from [$file] line[$line]");
       }
@@ -1303,7 +1306,7 @@ sub comp_run {
    my $self = shift;
    my ($word, $line, $start) = @_;
 
-   $self->debug && $self->log->debug("comp_run: true");
+   $self->log->debug("comp_run: true");
 
    my $context = $self->context;
 
@@ -1311,15 +1314,13 @@ sub comp_run {
    my $count = scalar(@words);
    my $last = $words[-1];
 
-   if ($self->debug) {
-      $self->log->debug("comp_run: words[@words] | word[$word] line[$line] ".
-         "start[$start] | last[$last]");
-   }
+   $self->log->debug("comp_run: words[@words] | word[$word] line[$line] ".
+      "start[$start] | last[$last]");
 
    # Completion is for used Briks only
    my $used = $context->used;
    if (! defined($used)) {
-      $self->debug && $self->log->debug("comp_run: can't fetch used Briks");
+      $self->log->debug("comp_run: can't fetch used Briks");
       return ();
    }
 
@@ -1336,7 +1337,7 @@ sub comp_run {
    }
    # We fetch Brik Commands
    elsif ($count == 2 && length($word) == 0) {
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          if (! exists($used->{$brik})) {
             $self->log->debug("comp_run: Brik [$brik] not used");
             return ();
@@ -1351,7 +1352,7 @@ sub comp_run {
    }
    # We want to complete entered Command and Attributes
    elsif ($count == 3 && length($word) > 0) {
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          if (! exists($used->{$brik})) {
             $self->log->debug("comp_run: Brik [$brik] not used");
             return ();
@@ -1383,7 +1384,7 @@ sub catch_run {
 
    my $context = $self->context;
 
-   $self->debug && $self->log->debug("catch_run: args [@args]");
+   $self->log->debug("catch_run: args [@args]");
 
    # If it starts with a '/', we really want to 'run shell::command system'
    if ($context->is_used('shell::command')) {
@@ -1415,7 +1416,7 @@ sub _file_find {
       @tmp_dirs = io($path)->all_dirs;
    };
    if ($@) {
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          chomp($@);
          $self->log->debug("all: $path: dirs: $@");
       }
@@ -1433,7 +1434,7 @@ sub _file_find {
       @tmp_files = io($path)->all_files;
    };
    if ($@) {
-      if ($self->debug) {
+      if ($self->log->level > 2) {
          chomp($@);
          $self->log->debug("all: $path: files: $@");
       }
@@ -1462,7 +1463,7 @@ sub catch_comp_sub {
    # Strange, we had to reverse order for $start and $line only for catch_comp() method.
    my ($word, $start, $line) = @_;
 
-   $self->debug && $self->log->debug("catch_comp_sub: true");
+   $self->log->debug("catch_comp_sub: true");
 
    my $context = $self->context;
 
@@ -1473,14 +1474,14 @@ sub catch_comp_sub {
    my $count = scalar(@words);
    my $last = $words[-1];
 
-   $self->debug && $self->log->debug("catch_comp_sub: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
+   $self->log->debug("catch_comp_sub: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
 
    # Be default, we will read the current directory
    if (! length($word)) {
       $word = '.';
    }
 
-   $self->debug && $self->log->debug("catch_comp_sub: DEFAULT: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
+   $self->log->debug("catch_comp_sub: DEFAULT: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
 
    my @comp = ();
 
@@ -1491,7 +1492,7 @@ sub catch_comp_sub {
 
       for my $this (@$variables) {
          $this =~ s/^\$//;
-         $self->debug && $self->log->debug("variable[$this] start[$start]");
+         $self->log->debug("variable[$this] start[$start]");
          if ($this =~ /^$word/) {
             push @comp, $this;
          }
@@ -1508,12 +1509,12 @@ sub catch_comp_sub {
          $path = $1 || '/';
       }
 
-      $self->debug && $self->log->debug("path[$path]");
+      $self->log->debug("path[$path]");
 
       my $found = $self->_file_find($path);
 
       for my $this (@{$found->{files}}, @{$found->{directories}}) {
-         $self->debug && $self->log->debug("check[$this]");
+         $self->log->debug("check[$this]");
          if ($this =~ /^$word/) {
             push @comp, $this;
          }
@@ -1542,7 +1543,7 @@ sub catch_comp {
    # Strange, we had to reverse order for $start and $line only for catch_comp() method.
    my ($word, $start, $line) = @_;
 
-   $self->debug && $self->log->debug("catch_comp: true");
+   $self->log->debug("catch_comp: true");
 
    my $context = $self->context;
 
@@ -1553,14 +1554,14 @@ sub catch_comp {
    my $count = scalar(@words);
    my $last = $words[-1];
 
-   $self->debug && $self->log->debug("catch_comp: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
+   $self->log->debug("catch_comp: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
 
    # Be default, we will read the current directory
    if (! length($start)) {
       $start = '.';
    }
 
-   $self->debug && $self->log->debug("catch_comp: DEFAULT: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
+   $self->log->debug("catch_comp: DEFAULT: words[@words] | word[$word] line[$line] start[$start] | last[$last]");
 
    my @comp = ();
 
@@ -1571,7 +1572,7 @@ sub catch_comp {
 
       for my $this (@$variables) {
          $this =~ s/^\$//;
-         $self->debug && $self->log->debug("variable[$this] start[$start]");
+         $self->log->debug("variable[$this] start[$start]");
          if ($this =~ /^$start/) {
             push @comp, $this;
          }
@@ -1593,12 +1594,12 @@ sub catch_comp {
       if ($start =~ /^(.*)\/.*$/) {
          $path = $1 || '/';
       }
-      $self->debug && $self->log->debug("path[$path]");
+      $self->log->debug("path[$path]");
 
       my $found = $self->_file_find($path);
 
       for my $this (@{$found->{files}}, @{$found->{directories}}) {
-         $self->debug && $self->log->debug("check[$this]");
+         $self->log->debug("check[$this]");
          if ($this =~ /^$start/) {
             push @comp, $this;
          }
@@ -1613,7 +1614,7 @@ sub catch_comp {
       }
    }
 
-   $self->debug && $self->log->debug("catch_comp: possible [@comp]");
+   $self->log->debug("catch_comp: possible [@comp]");
 
    return @comp;
 }
@@ -1746,7 +1747,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

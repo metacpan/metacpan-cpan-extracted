@@ -1,7 +1,7 @@
 package WordLists::CryptoCurrency::Catalog;
 
-our $DATE = '2018-01-07'; # DATE
-our $VERSION = '20180106'; # VERSION
+our $DATE = '2018-01-12'; # DATE
+our $VERSION = '20180109'; # VERSION
 
 1;
 # ABSTRACT: Wordlists from cryptocurrency catalog
@@ -18,7 +18,7 @@ WordLists::CryptoCurrency::Catalog - Wordlists from cryptocurrency catalog
 
 =head1 VERSION
 
-This document describes version 20180106 of WordLists::CryptoCurrency::Catalog (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-07.
+This document describes version 20180109 of WordLists::CryptoCurrency::Catalog (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
 
 =head1 DESCRIPTION
 

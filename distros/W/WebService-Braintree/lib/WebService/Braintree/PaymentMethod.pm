@@ -1,5 +1,5 @@
 package WebService::Braintree::PaymentMethod;
-$WebService::Braintree::PaymentMethod::VERSION = '0.94';
+$WebService::Braintree::PaymentMethod::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -50,6 +50,28 @@ This takes a token and deletes the corresponding payment method (if found).
 sub delete {
     my ($class, $token) = @_;
     $class->gateway->payment_method->delete($token);
+}
+
+=head2 grant()
+
+This takes a token and revokes the corresponding payment method (if found).
+
+=cut
+
+sub grant {
+    my ($class, $token, $params) = @_;
+    $class->gateway->payment_method->grant($token, ($params//{}));
+}
+
+=head2 revoke()
+
+This takes a token and revokes the corresponding payment method (if found).
+
+=cut
+
+sub revokes {
+    my ($class, $token) = @_;
+    $class->gateway->payment_method->revokes($token);
 }
 
 =head2 find()

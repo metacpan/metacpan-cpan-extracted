@@ -1,5 +1,10 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.30.0 Fri 12 Jan 10:14:40 CET 2018
+   - UPDATE: see UPDATING file.
+   - bugfix: audio::soundconverter added to dist
+   - new: api::onyphe Brik
+
 1.27.0 Thu  2 Nov 10:13:57 CET 2017
    - new: string::javascript Brik
    - new: forensic::sysmon Brik

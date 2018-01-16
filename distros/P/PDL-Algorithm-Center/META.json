@@ -97,7 +97,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Hash::Wrap" : "0.02",
+            "Hash::Wrap" : "0.03",
             "PDL" : "0",
             "PDL::Image2D" : "0",
             "PDL::Lite" : "0",
@@ -147,15 +147,15 @@
    "provides" : {
       "PDL::Algorithm::Center" : {
          "file" : "lib/PDL/Algorithm/Center.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "PDL::Algorithm::Center::Failure" : {
          "file" : "lib/PDL/Algorithm/Center/Failure.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "PDL::Algorithm::Center::Types" : {
          "file" : "lib/PDL/Algorithm/Center/Types.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -170,7 +170,7 @@
          "web" : "https://github.com/djerius/pdl-algorithm-center"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

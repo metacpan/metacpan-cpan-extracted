@@ -28,9 +28,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Term::Screen::Lite'          => { file => 'lib/Term/Screen/Lite.pm'         , version => '0.05' },
-            'Term::Screen::Lite::Generic' => { file => 'lib/Term/Screen/Lite/Generic.pm' , version => '0.05' },
-            'Term::Screen::Lite::Win32'   => { file => 'lib/Term/Screen/Lite/Win32.pm'   , version => '0.05' },
+            'Term::Screen::Lite'          => { file => 'lib/Term/Screen/Lite.pm'         , version => '0.06' },
+            'Term::Screen::Lite::Generic' => { file => 'lib/Term/Screen/Lite/Generic.pm' , version => '0.06' },
+            'Term::Screen::Lite::Win32'   => { file => 'lib/Term/Screen/Lite/Win32.pm'   , version => '0.06' },
         },
         resources => {
             repository => {

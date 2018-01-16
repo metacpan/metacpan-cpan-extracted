@@ -1,5 +1,5 @@
 #
-# $Id: Dump.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Dump.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # file::dump Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Write);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable read write) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -90,7 +90,7 @@ sub write {
    $self->brik_help_run_undef_arg('write', $data) or return;
    $self->brik_help_run_undef_arg('write', $output) or return;
 
-   $self->debug && $self->log->debug("write: data[$data]");
+   $self->log->debug("write: data[$data]");
 
    $self->open($output) or return;
 
@@ -124,7 +124,7 @@ Metabrik::File::Dump - file::dump Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

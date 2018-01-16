@@ -1,5 +1,5 @@
 #
-# $Id: Ssl.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ssl.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # client::ssl Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable tls) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -92,7 +92,7 @@ sub getcertificate {
       #ssl_opts => { verify_hostname => 0 }, # will do manual check
       ssl_opts => { SSL_verify_mode => 'SSL_VERIFY_NONE'},
    );
-   $ua->timeout($self->global->rtimeout);
+   $ua->timeout(defined($self->global) && $self->global->rtimeout || 3);
    $ua->max_redirect(0);
    $ua->env_proxy;
 
@@ -478,7 +478,7 @@ Metabrik::Client::Ssl - client::ssl Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

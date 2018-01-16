@@ -1,0 +1,9 @@
+% my $a = shift;
+
+  # Helper for Model <%= $a->{class} %>
+  use <%= $a->{class} %>;
+  $self->helper(<%= $a->{t} %> => sub {
+      state $<%= $a->{t} %> = <%= $a->{class}
+%>->new(<%= $a->{db_helper} %> => shift-><%= $a->{db_helper} %>);
+  });
+

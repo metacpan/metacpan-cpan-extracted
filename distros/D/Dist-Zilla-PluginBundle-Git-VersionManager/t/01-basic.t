@@ -3,11 +3,11 @@ use warnings;
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep '!none';
+use Test::Deep;
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
-use List::Util 1.33 'first', 'none';
+use List::Util 1.33 'first';
 
 use lib 't/lib';
 use Helper;
@@ -68,6 +68,7 @@ all_plugins_in_prereqs($tzil,
 cmp_deeply(
     $tzil->plugins,
     superbagof(
+        methods([ isa => 'Dist::Zilla::Plugin::Prereqs' ] => bool(1)),
         methods([ isa => 'Dist::Zilla::Plugin::GatherDir' ] => bool(1)),
         methods([ isa => 'Dist::Zilla::Plugin::RewriteVersion::Transitional' ] => bool(1)),
         methods([ isa => 'Dist::Zilla::Plugin::CopyFilesFromRelease' ] => bool(1)),
@@ -80,9 +81,18 @@ cmp_deeply(
     'all expected plugins make it into the build',
 );
 
-ok(
-    (none { $_->isa('Dist::Zilla::Plugin::Prereqs') } @{ $tzil->plugins }),
-    '[Prereqs] is not in the plugins list',
+cmp_deeply(
+    [ grep { $_->isa('Dist::Zilla::Plugin::Prereqs') } @{ $tzil->plugins } ],
+    all(
+        [ ignore ], # just one element in result list
+        array_each(
+            methods(
+                prereq_type => code(sub { $_[0] ne 'requires' or return 0, 'got requires' }),
+                plugin_name => re(qr/\/pluginbundle version$/),
+            ),
+        ),
+    ),
+    '[Prereqs] plugin(s) do not inject into requires relationship; no plugin prereqs by default',
 );
 
 my $rewrite_version_plugin = first { $_->isa('Dist::Zilla::Plugin::RewriteVersion::Transitional') } @{ $tzil->plugins };

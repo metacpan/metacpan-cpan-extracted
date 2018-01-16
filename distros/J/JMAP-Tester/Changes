@@ -1,5 +1,9 @@
 Revision history for JMAP-Tester
 
+0.016     2018-01-11 13:52:14-05:00 America/New_York
+        - SentenceCollection introduced to allow other implementations of
+          Response-like objects
+
 0.015     2017-10-20 15:05:13-04:00 America/New_York
         - avoid a memory cycle in the logging code
         - URI escape filename in download link generation

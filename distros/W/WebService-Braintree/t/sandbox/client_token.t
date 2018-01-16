@@ -35,7 +35,7 @@ subtest "Generate a fingerprint that the gateway accepts" => sub {
     );
 
     my $result = $http->get_cards();
-    ok $result->is_success, "result returns no errors";
+    validate_result($result) or return;
 };
 
 subtest "it allows a client token version to be specified" => sub {
@@ -100,9 +100,10 @@ subtest "it can pass make default" => sub {
         shared_customer_identifier_type => "testing",
     );
 
+    my $cc_number = cc_number();
     my $result = $http->add_card({
         credit_card => {
-            number => "4111111111111111",
+            number => $cc_number,
             expiration_date => "11/2098",
         },
     });
@@ -110,7 +111,7 @@ subtest "it can pass make default" => sub {
 
     $result = $http->add_card({
         credit_card => {
-            number => "4111111111111111",
+            number => $cc_number,
             expiration_date => "11/2099",
         },
     });
@@ -151,11 +152,10 @@ subtest "it can pass fail_on_duplicate_payment_method card" => sub {
         shared_customer_identifier_type => "testing",
     );
 
+    my $cc = credit_card();
+
     my $result = $http->add_card({
-        credit_card => {
-            number => "4111111111111111",
-            expiration_date => "11/2099",
-        },
+        credit_card => $cc,
     });
     ok $result->code == 201;
 
@@ -171,10 +171,7 @@ subtest "it can pass fail_on_duplicate_payment_method card" => sub {
     $http->fingerprint($authorization_fingerprint);
 
     $result = $http->add_card({
-        credit_card => {
-            number => "4111111111111111",
-            expiration_date => "11/2099",
-        },
+        credit_card => $cc,
     });
     ok $result->code == 422;
     my $response = from_json($result->content);

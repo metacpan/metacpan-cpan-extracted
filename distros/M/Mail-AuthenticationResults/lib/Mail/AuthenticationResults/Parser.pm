@@ -1,8 +1,10 @@
 package Mail::AuthenticationResults::Parser;
+# ABSTRACT: Class for parsing Authentication Results Headers
+
 require 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.20171230'; # VERSION
+our $VERSION = '1.20180113'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -18,6 +20,7 @@ use Mail::AuthenticationResults::Token::QuotedString;
 use Mail::AuthenticationResults::Token::Separator;
 use Mail::AuthenticationResults::Token::String;
 
+
 sub new {
     my ( $class, $auth_header ) = @_;
     my $self = {};
@@ -29,6 +32,7 @@ sub new {
 
     return $self;
 }
+
 
 sub parse {
     my ( $self, $header ) = @_;
@@ -48,7 +52,6 @@ sub parse {
 sub tokenise {
     my ( $self, $header ) = @_;
 
-    my $token;
     my @tokenised;
 
     $header =~ s/\n/ /g;
@@ -59,33 +62,41 @@ sub tokenise {
         $header =~ s/^Authentication-Results://i;
     }
 
+    my $args = {};
     while ( length($header) > 0 ) {
 
+        my $token;
         $header =~ s/^\s+//;
 
         if ( length( $header ) == 0 ) {
             last;
         }
         elsif ( $header =~ /^\(/ ) {
-            $token = Mail::AuthenticationResults::Token::Comment->new( $header );
+            $token = Mail::AuthenticationResults::Token::Comment->new( $header, $args );
         }
         elsif ( $header =~ /^;/ ) {
-            $token = Mail::AuthenticationResults::Token::Separator->new( $header );
+            $token = Mail::AuthenticationResults::Token::Separator->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
         elsif ( $header =~ /^"/ ) {
-            $token = Mail::AuthenticationResults::Token::QuotedString->new( $header );
+            $token = Mail::AuthenticationResults::Token::QuotedString->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
         elsif ( $header =~ /^\./ ) {
-            $token = Mail::AuthenticationResults::Token::Assignment->new( $header );
+            $token = Mail::AuthenticationResults::Token::Assignment->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
         elsif ( $header =~ /^\// ) {
-            $token = Mail::AuthenticationResults::Token::Assignment->new( $header );
+            $token = Mail::AuthenticationResults::Token::Assignment->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
         elsif ( $header =~ /^=/ ) {
-            $token = Mail::AuthenticationResults::Token::Assignment->new( $header );
+            $token = Mail::AuthenticationResults::Token::Assignment->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
         else {
-            $token = Mail::AuthenticationResults::Token::String->new( $header );
+            $token = Mail::AuthenticationResults::Token::String->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
         }
 
         $header = $token->remainder();
@@ -102,13 +113,29 @@ sub tokenise {
 sub _parse_authservid {
     my ( $self ) = @_;
     my $tokenised = $self->{ 'tokenised' };
+    my $token;
 
     my $authserv_id = Mail::AuthenticationResults::Header::AuthServID->new();
-    my $token = shift @$tokenised;
-    $authserv_id->set_value( $token->value() );
+
+    # Find the ServID
+    while ( @$tokenised ) {
+        $token = shift @$tokenised;
+        if ( $token->is() eq 'string' ) {
+            $authserv_id->set_value( $token->value() );
+            last;
+        }
+        elsif ( $token->is() eq 'comment' ) {
+            $authserv_id->add_child( Mail::AuthenticationResults::Header::Comment->new()->set_value( $token->value() ) );
+        }
+        else {
+            # assignment or separator, both are bogus
+            croak 'Invalid AuthServ-ID';
+        }
+    }
 
     my $expecting = 'key';
     my $key;
+
     TOKEN:
     while ( @$tokenised ) {
         $token = shift @$tokenised;
@@ -270,9 +297,57 @@ sub _parse_entry {
     return;
 }
 
+
 sub parsed {
     my ( $self ) = @_;
     return $self->{ 'header' };
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mail::AuthenticationResults::Parser - Class for parsing Authentication Results Headers
+
+=head1 VERSION
+
+version 1.20180113
+
+=head1 METHODS
+
+=head2 new( $header )
+
+Return a new Parser instance.
+
+If $header is supplied then parse it and return the parsed object.
+
+=head2 parse( $header )
+
+Parse $header and return the parsed object.
+
+=head2 tokenise( $header )
+
+Tokenise the given $header string
+
+=head2 parsed()
+
+Return the parsed object tree
+
+=head1 AUTHOR
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Marc Bradshaw.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

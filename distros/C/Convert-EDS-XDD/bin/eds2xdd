@@ -1,0 +1,69 @@
+#!perl
+use strict;
+use warnings;
+our $VERSION = '0.009'; # VERSION
+
+use Getopt::Std;
+use Convert::EDS::XDD qw(eds2xdd_string);
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+getopts '', \my %opts;
+
+local $/;
+while (<>) {
+    print eds2xdd_string $_;
+}
+
+sub VERSION_MESSAGE() { print "Convert::EDS::XDD v$Convert::EDS::XDD::VERSION\n"; }
+sub HELP_MESSAGE() {
+print <<"EOT"
+Usage: $0 [eds_file]
+       echo 'eds_content' | $0
+
+Opens files passed as arguments and writes them to stdout as XDD.
+If there are no arguments, stdin is read
+EOT
+}
+
+=pod
+
+=head1 NAME
+
+eds2xdd - Command-line utility for L<Convert::EDS::XDD>
+
+=head1 SYNOPSIS
+
+  $ cpan Convert::EDS::XDD # install from CPAN
+  $ eds2xdd profile.eds > profile.xdd # Convert with the eds2xdd script
+
+=head1 DESCRIPTION
+
+EDS is an L<ini|Config::Tiny> based format specified by the CiA e.V. in order to describe CANopen devices. The Ethernet POWERLINK Standardization Group specifies an EDS-based L<XML|XML::Writer> format for EPL devices.
+
+This module takes in an EDS file or a string with its content and returns a XDD string. An L<eds2xdd> script (this one here) is also installed into the C<PATH>.
+
+C<eds2xdd> is also available as a self-contained (fatpacked) script L<at the Github releases page|https://github.com/epl-viz/Convert-EDS-XDD/releases/latest>.
+
+=head1 LIMITATIONS
+
+May not handle all details of the EDS. Pull requests and reports (L<issues on Github|https://github.com/epl-viz/Convert-EDS-XDD/issues>) are welcome.
+
+=head1 GIT REPOSITORY
+
+L<http://github.com/epl-viz/Convert-EDS-XDD>
+
+=head1 SEE ALSO
+
+L<EPL-Viz - Visualization for Ethernet POWERLINK|http://github.com/epl-viz>
+
+=head1 AUTHOR
+
+Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017-2018 Ahmad Fatoum
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

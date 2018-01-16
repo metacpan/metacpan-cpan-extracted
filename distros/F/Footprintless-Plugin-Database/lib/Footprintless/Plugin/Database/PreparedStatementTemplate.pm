@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::PreparedStatementTemplate;
-$Footprintless::Plugin::Database::PreparedStatementTemplate::VERSION = '1.03';
+$Footprintless::Plugin::Database::PreparedStatementTemplate::VERSION = '1.04';
 use Carp;
 use Carp 'verbose';
 use Data::Dumper;
@@ -13,6 +13,113 @@ my $logger = Log::Any->get_logger();
 sub new {
     my $self = bless( {}, shift );
     $self->_init(@_);
+}
+
+sub _init {
+    my ( $self, $sql_template, %bindings ) = @_;
+    my @binding_keys =
+        sort { ( length($b) <=> length($a) ) || ( $a cmp $b ) }
+        keys(%bindings);
+    my @split_text;
+    my @index_to_key;
+    $self->{bindings} =
+        { map { $_ => _transform_binding( $_, $bindings{$_} ) } @binding_keys };
+    _dice( _remove_comments($sql_template), \@split_text, \@index_to_key, @binding_keys );
+    $self->{prepared_statement} = join( '?', @split_text );
+    $self->{parameter_bindings} =
+        [ map { $self->{bindings}->{$_} } @index_to_key ];
+
+    my %used_keys = map { $_ => 1 } @index_to_key;
+    foreach my $unused_key ( grep { !$used_keys{$_} } @binding_keys ) {
+        $logger->warn("Template var [$unused_key] is never used!");
+        delete( $self->{bindings}->{$unused_key} );
+    }
+    return $self;
+}
+
+sub _bind {
+    my ( $binding, $context ) = @_;
+    if ( defined( my $key = $binding->{key} ) ) {
+        eval { $binding->{value} = $context->$key() }
+            if ( !defined( $binding->{value} = $context->{$key} ) );
+        croak(
+            "Cannot bind template var [$binding->{template_key}] - property [$key] cannot be bound in context"
+        ) unless defined( $binding->{value} );
+    }
+    elsif ( defined( my $reference = $binding->{reference} ) ) {
+        croak("Cannot bind template var [$binding->{template_key}] - reference to undefined")
+            unless defined( $binding->{value} = $$reference );
+    }
+    elsif ( defined( my $code = $binding->{code} ) ) {
+        croak("Cannot bind template var [$binding->{template_key}] - code returns undefined")
+            unless defined( $binding->{value} = $code->() );
+    }
+}
+
+sub _dice {
+    my ( $text, $split_text, $index_to_key, $key, @keys ) = @_;
+    if ( !$key ) {
+        push( @$split_text, $text );
+    }
+    else {
+        my $add_ix = 0;
+
+        # We need at least one element with a blank string in split...
+        foreach ( $text ? split( /\Q$key\E/, $text, -1 ) : ('') ) {
+            push( @$index_to_key, $key ) if ( $add_ix++ );
+            _dice( $_, $split_text, $index_to_key, @keys );
+        }
+    }
+}
+
+sub query {
+    my ( $self, $context ) = @_;
+    my $query = { sql => $self->{prepared_statement} };
+    if ( %{ $self->{bindings} } ) {
+        foreach ( values( %{ $self->{bindings} } ) ) { _bind( $_, $context ) }
+        $query->{parameters} =
+            [ map { $_->{value} } @{ $self->{parameter_bindings} } ];
+        foreach ( values( %{ $self->{bindings} } ) ) { _unbind( $_, $context ) }
+    }
+    return $query;
+}
+
+sub _remove_comments {
+    my ($sql) = @_;
+    my $sql_out;
+    open( my $fh, '>', \$sql_out ) || croak("Cannot write to string!");
+    my ( $in_block_comment, $in_line_comment, $in_quote ) = ( 0, 0, 0 );
+    for ( my $ix = 0; $ix < length($sql); ++$ix ) {
+        if ($in_block_comment) {
+            if ( substr( $sql, $ix, 2 ) eq '*/' ) {
+                $in_block_comment = 0;
+                ++$ix;
+            }
+        }
+        elsif ($in_line_comment) {
+            if ( substr( $sql, $ix, 1 ) eq "\n" ) {
+                $in_line_comment = 0;
+                print $fh ("\n");
+            }
+        }
+        else {
+            my $char = substr( $sql, $ix, 1 );
+            if ( !$in_quote && $char eq '/' && substr( $sql, $ix + 1, 1 ) eq '*' ) {
+                $in_block_comment = 1;
+                ++$ix;
+            }
+            elsif ( !$in_quote && $char eq '-' && substr( $sql, $ix + 1, 1 ) eq '-' ) {
+                $in_line_comment = 1;
+                ++$ix;
+            }
+            else {
+                $in_quote = !$in_quote if ( $char eq "'" );
+                print $fh ($char);
+            }
+        }
+    }
+    close $fh;
+    return $sql_out;
 }
 
 sub _transform_binding {
@@ -48,25 +155,6 @@ sub _transform_binding {
     return $new_binding;
 }
 
-sub _bind {
-    my ( $binding, $context ) = @_;
-    if ( defined( my $key = $binding->{key} ) ) {
-        eval { $binding->{value} = $context->$key() }
-            if ( !defined( $binding->{value} = $context->{$key} ) );
-        croak(
-            "Cannot bind template var [$binding->{template_key}] - property [$key] cannot be bound in context"
-        ) unless defined( $binding->{value} );
-    }
-    elsif ( defined( my $reference = $binding->{reference} ) ) {
-        croak("Cannot bind template var [$binding->{template_key}] - reference to undefined")
-            unless defined( $binding->{value} = $$reference );
-    }
-    elsif ( defined( my $code = $binding->{code} ) ) {
-        croak("Cannot bind template var [$binding->{template_key}] - code returns undefined")
-            unless defined( $binding->{value} = $code->() );
-    }
-}
-
 sub _unbind {
     my ($binding) = @_;
     delete( $binding->{value} )
@@ -75,55 +163,6 @@ sub _unbind {
         || defined( $binding->{code} );
 }
 
-sub query {
-    my ( $self, $context ) = @_;
-    my $query = { sql => $self->{prepared_statement} };
-    if ( %{ $self->{bindings} } ) {
-        foreach ( values( %{ $self->{bindings} } ) ) { _bind( $_, $context ) }
-        $query->{parameters} =
-            [ map { $_->{value} } @{ $self->{parameter_bindings} } ];
-        foreach ( values( %{ $self->{bindings} } ) ) { _unbind( $_, $context ) }
-    }
-    return $query;
-}
-
-sub _dice {
-    my ( $text, $split_text, $index_to_key, $key, @keys ) = @_;
-    if ( !$key ) {
-        push( @$split_text, $text );
-    }
-    else {
-        my $add_ix = 0;
-
-        # We need at least one element with a blank string in split...
-        foreach ( $text ? split( /\Q$key\E/, $text, -1 ) : ('') ) {
-            push( @$index_to_key, $key ) if ( $add_ix++ );
-            _dice( $_, $split_text, $index_to_key, @keys );
-        }
-    }
-}
-
-sub _init {
-    my ( $self, $sql_template, %bindings ) = @_;
-    my @binding_keys =
-        sort { ( length($b) <=> length($a) ) || ( $a cmp $b ) }
-        keys(%bindings);
-    my @split_text;
-    my @index_to_key;
-    $self->{bindings} =
-        { map { $_ => _transform_binding( $_, $bindings{$_} ) } @binding_keys };
-    _dice( $sql_template, \@split_text, \@index_to_key, @binding_keys );
-    $self->{prepared_statement} = join( '?', @split_text );
-    $self->{parameter_bindings} =
-        [ map { $self->{bindings}->{$_} } @index_to_key ];
-
-    my %used_keys = map { $_ => 1 } @index_to_key;
-    foreach my $unused_key ( grep { !$used_keys{$_} } @binding_keys ) {
-        $logger->warn("Template var [$unused_key] is never used!");
-        delete( $self->{bindings}->{$unused_key} );
-    }
-    return $self;
-}
 1;
 
 __END__
@@ -136,7 +175,7 @@ Footprintless::Plugin::Database::PreparedStatementTemplate
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

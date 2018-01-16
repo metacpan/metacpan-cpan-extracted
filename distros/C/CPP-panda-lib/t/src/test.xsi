@@ -149,6 +149,10 @@ void test_rwlock () {
 
 #endif
 
+bool test_run_all_cpp_tests() {
+    RETVAL = run_all_cpp_tests();
+}
+
 INCLUDE: t/src/string.xsi
 
 INCLUDE: t/src/string_containers.xsi

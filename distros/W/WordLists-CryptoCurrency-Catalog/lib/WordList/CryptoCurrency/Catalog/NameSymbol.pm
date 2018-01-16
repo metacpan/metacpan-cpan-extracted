@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::NameSymbol;
 
-our $DATE = '2018-01-07'; # DATE
-our $VERSION = '20180106'; # VERSION
+our $DATE = '2018-01-12'; # DATE
+our $VERSION = '20180109'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words",1384,"avg_word_len",15.264450867052,"shortest_word_len",7,"longest_word_len",35,"num_words_contains_whitespace",1384,"num_words_contains_unicode",0,"num_words_contains_nonword_chars",1384); # STATS
+our %STATS = ("avg_word_len",15.2617159336698,"num_words_contains_nonword_chars",1387,"longest_word_len",35,"num_words_contains_whitespace",1387,"shortest_word_len",7,"num_words",1387,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency names (and their symbols)
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::NameSymbol - List of cryptocurrency names (an
 
 =head1 VERSION
 
-This document describes version 20180106 of WordList::CryptoCurrency::Catalog::NameSymbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-07.
+This document describes version 20180109 of WordList::CryptoCurrency::Catalog::NameSymbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
 
 =head1 SYNOPSIS
 
@@ -44,17 +44,17 @@ This document describes version 20180106 of WordList::CryptoCurrency::Catalog::N
 
 =head1 STATISTICS
 
- +----------------------------------+-----------------+
- | key                              | value           |
- +----------------------------------+-----------------+
- | avg_word_len                     | 15.264450867052 |
- | longest_word_len                 | 35              |
- | num_words                        | 1384            |
- | num_words_contains_nonword_chars | 1384            |
- | num_words_contains_unicode       | 0               |
- | num_words_contains_whitespace    | 1384            |
- | shortest_word_len                | 7               |
- +----------------------------------+-----------------+
+ +----------------------------------+------------------+
+ | key                              | value            |
+ +----------------------------------+------------------+
+ | avg_word_len                     | 15.2617159336698 |
+ | longest_word_len                 | 35               |
+ | num_words                        | 1387             |
+ | num_words_contains_nonword_chars | 1387             |
+ | num_words_contains_unicode       | 0                |
+ | num_words_contains_whitespace    | 1387             |
+ | shortest_word_len                | 7                |
+ +----------------------------------+------------------+
 
 The statistics is available in the C<%STATS> package variable.
 
@@ -147,6 +147,7 @@ Anoncoin (ANC)
 AntiBitcoin (ANTI)
 Antilitecoin (ALTC)
 Antimatter (ANTX)
+AppCoins (APPC)
 AppleCoin (APW)
 AquariusCoin (ARCO)
 Aragon (ANT)
@@ -327,6 +328,7 @@ CacheCoin (CACH)
 Californium (CF)
 CaliphCoin (CALC)
 CampusCoin (CMPCO)
+CanYaCoin (CAN)
 Canada eCoin (CDN)
 CannaCoin (CCN)
 CannabisCoin (CANN)
@@ -793,6 +795,7 @@ LEOcoin (LEO)
 LIFE (LIFE)
 LLToken (LLT)
 LUXCoin (LUX)
+Lamden (TAU)
 Lampix (PIX)
 LanaCoin (LANA)
 LandCoin (LDCN)

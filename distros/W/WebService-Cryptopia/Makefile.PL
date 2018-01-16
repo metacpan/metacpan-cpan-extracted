@@ -16,13 +16,17 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "WebService::Cryptopia",
   "PREREQ_PM" => {
+    "Digest::MD5" => 0,
+    "Digest::SHA" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "Log::Log4perl" => 0,
+    "MIME::Base64" => 0,
     "Moose" => 0,
     "MooseX::Log::Log4perl" => 0,
     "MooseX::Params::Validate" => 0,
     "Try::Tiny" => 0,
+    "URL::Encode" => 0,
     "YAML" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,16 +44,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Digest::MD5" => 0,
+  "Digest::SHA" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
   "Log::Log4perl" => 0,
+  "MIME::Base64" => 0,
   "Moose" => 0,
   "MooseX::Log::Log4perl" => 0,
   "MooseX::Params::Validate" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,
+  "URL::Encode" => 0,
   "YAML" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -1,0 +1,12 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "bob.pbl" "";
+@end;
+@begin Objects
+ "uo_log_entry.sru" "bob.pbl";
+ "uo_log.sru" "bob.pbl";
+ "uo_log_collection.sru" "bob.pbl";
+ "u_bank_ddlb.sru" "bob.pbl";
+ "uo_dw_log.sru" "bob.pbl";
+ "w_bop_print.srw" "bob.pbl";
+@end;

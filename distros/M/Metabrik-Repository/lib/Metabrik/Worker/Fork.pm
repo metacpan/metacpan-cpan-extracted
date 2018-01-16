@@ -1,5 +1,5 @@
 #
-# $Id: Fork.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Fork.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # worker::fork Brik
 #
@@ -12,7 +12,7 @@ use base qw(Metabrik);
 # Default attribute values put here will BE inherited by subclasses
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable process) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -41,7 +41,7 @@ sub start {
       $self->pid($pid);
 
       $SIG{INT} = sub {
-         $self->debug && $self->log->debug("SIGINT: caught, son [$pid] QUITs now");
+         $self->log->debug("SIGINT: caught, son [$pid] QUITs now");
          $self->stop;
          $SIG{INT} = $restore;
          return 1;
@@ -71,7 +71,7 @@ sub is_son_alive {
    if (defined($pid)) {
       waitpid($pid, POSIX::WNOHANG());  # Cleanup zombie state in case it is dead
       my $r = kill('ZERO', $pid);
-      $self->debug && $self->log->debug("is_son_alive: kill returned [$r] for pid [$pid]");
+      $self->log->debug("is_son_alive: kill returned [$r] for pid [$pid]");
       if ($r) { # Son still alive
          return 1;
       }
@@ -96,7 +96,7 @@ Metabrik::Worker::Fork - worker::fork Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

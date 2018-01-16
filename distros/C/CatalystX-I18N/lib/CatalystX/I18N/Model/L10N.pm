@@ -8,7 +8,7 @@ extends 'CatalystX::I18N::Model::Maketext';
 
 before 'BUILD' => sub {
     my ($self) = @_;
-    
+
     my $app = $self->_app;
     $app->log->warn('CatalystX::I18N::Model::L10N is deprecated, use CatalystX::I18N::Model::Maketext instead');
 };

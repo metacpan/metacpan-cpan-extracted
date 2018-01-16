@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::WebHook;
 use strict;
 use warnings;
-{ our $VERSION = '0.006'; }
+{ our $VERSION = '0.010'; }
 
 use Ouch;
 use Log::Any qw< $log >;
@@ -15,9 +15,19 @@ use namespace::clean;
 with 'Bot::ChatBots::Telegram::Role::Source';    # has normalize_record
 with 'Bot::ChatBots::Role::WebHook';
 
+has auto_register => (is => 'ro', default => 0, init_arg => 'register');
+has auto_unregister => (is => 'rw', default => 0, init_arg => 'unregister');
+has certificate => (is => 'rw', default => undef);
+
 sub BUILD {
    my $self = shift;
    $self->install_route;
+   $self->register if $self->auto_register;
+}
+
+sub DEMOLISH {
+   my $self = shift;
+   $self->unregister if $self->auto_unregister;
 }
 
 sub parse_request {
@@ -69,13 +79,15 @@ sub register {
       $wh_url = $c->url_for($path);
    } ## end else [ if (my $url = $args->{...})]
 
-   my $form = {url => $wh_url->to_abs->to_string};
-   if ($self->{certificate}) {
-      my $certificate = $args->{certificate};
+   my $wh_url_string = $wh_url->to_abs->to_string;
+   my $form = {url => $wh_url_string};
+
+   if (my $certificate = $args->{certificate} // $self->certificate) {
       $certificate = {content => $certificate} unless ref $certificate;
       $form->{certificate} = $certificate;
    }
 
+   $log->info("registering bot URI $wh_url_string");
    $self->_register($args->{token} // $self->token, $form);
 
    return $self;

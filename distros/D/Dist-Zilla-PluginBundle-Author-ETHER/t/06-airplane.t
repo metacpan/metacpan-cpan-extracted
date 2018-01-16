@@ -7,7 +7,7 @@ use Test::DZil;
 use Test::Deep '!any';
 use Test::Fatal;
 use Path::Tiny;
-use List::Util 1.33 'any';
+use List::Util 1.45 'any', 'uniq';
 use Term::ANSIColor 2.01 'colorstrip';
 use Moose::Util 'find_meta';
 
@@ -105,14 +105,20 @@ cmp_deeply(
     'no network-using plugins were actually added',
 );
 
-cmp_deeply(
-    $tzil->distmeta->{prereqs}{develop},
+# this is split up into separate tests with a loop because in each case
+# the (grand?)parent key may not even exist, and this is hard to express with
+# Test::Deep.
+foreach my $phase (uniq 'develop', $PREREQ_PHASE_DEFAULT)
+{
+    foreach my $relationship (qw(requires recommends suggests))
     {
-        map { $_ => notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')) }
-            qw(requires recommends suggests),
-    },
-    'no network-using plugins, nor BlockRelease, were added to develop prereqs',
-);
+        cmp_deeply(
+            (($tzil->distmeta->{prereqs}{$phase} // {})->{$relationship}) // {},
+            notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')),
+            "no network-using plugins, nor BlockRelease, were added to plugin prereqs ($phase-$relationship)",
+        );
+    }
+}
 
 like(
     colorstrip(exception { $tzil->release }),

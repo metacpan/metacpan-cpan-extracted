@@ -372,6 +372,8 @@ deps/libzmq/src/zap_client.hpp
 deps/libzmq/src/zmq.cpp
 deps/libzmq/src/zmq_draft.h
 deps/libzmq/src/zmq_utils.cpp
+deps/libzmqraw/eventmap.cc
+deps/libzmqraw/eventmap.h
 deps/libzmqraw/mutex.c
 deps/libzmqraw/mutex.h
 deps/libzmqraw/timers.c

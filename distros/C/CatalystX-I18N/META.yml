@@ -8,7 +8,7 @@ build_requires:
   Catalyst::Plugin::Session::Store::File: 0
   Catalyst::View::TT: 0
   ExtUtils::MakeMaker: 6.59
-  JSON: 2.17
+  JSON: '2.17'
   Template: 0
   Test::Most: 0
   Test::NoWarnings: 0
@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,15 @@ no_index:
     - t
     - xt
 requires:
-  Catalyst::Runtime: 5.80004
+  Catalyst::Runtime: '5.80004'
   Clone: 0
   Data::Localize: 0
   Data::Localize::Format::Gettext: 0
   DateTime: 0
   DateTime::Format::CLDR: 0
-  DateTime::Locale: 0.40
+  DateTime::Locale: '0.40'
   DateTime::TimeZone: 0
-  HTTP::BrowserDetect: 1.09
+  HTTP::BrowserDetect: '1.09'
   IP::Country: 0
   Locale::Geocode: 0
   Locale::Maketext: 0
@@ -55,4 +55,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/maros/CatalystX-I18N.git
-version: 1.13
+version: '1.13'

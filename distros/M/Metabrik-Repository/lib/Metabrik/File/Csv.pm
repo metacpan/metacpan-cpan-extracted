@@ -1,5 +1,5 @@
 #
-# $Id: Csv.pm,v e12400cdb4d3 2017/09/08 12:26:37 gomor $
+# $Id: Csv.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # file::csv Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: e12400cdb4d3 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -211,8 +211,6 @@ sub write {
    if (ref($csv_struct->[0]) ne 'HASH') {
       return $self->log->error("write: csv structure does not contain HASHes");
    }
-
-   my $context = $self->context;
 
    my $fw = Metabrik::File::Write->new_from_brik_init($self) or return;
    $fw->output($output);
@@ -421,7 +419,7 @@ sub read_next {
    my $csv = $self->_csv;
    my $fd = $self->_fd;
    if (! defined($csv)) {
-      $self->debug && $self->log->debug('read_next: first call, create _csv');
+      $self->log->debug('read_next: first call, create _csv');
       $csv = Text::CSV_XS->new({
          binary => 1,
          sep_char => $self->separator,
@@ -516,7 +514,7 @@ sub read_next {
    }
 
    if ($csv->eof) {
-      $self->debug && $self->log->debug('read_next: eof reached');
+      $self->log->debug('read_next: eof reached');
       $self->_fd(undef);
       $self->_csv(undef);
       return 0;
@@ -535,7 +533,7 @@ Metabrik::File::Csv - file::csv Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -138,7 +138,7 @@ subtest 'installer = MakeMaker, ModuleBuildTiny' => sub {
     is($tzil->distmeta->{x_static_install}, 1, 'build is marked as eligible for static install');
 
     cmp_deeply(
-        $tzil->distmeta->{prereqs}{develop}{suggests},
+        $tzil->distmeta->{prereqs}{$PREREQ_PHASE_DEFAULT}{$PREREQ_RELATIONSHIP_DEFAULT},
         superhashof({
             'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
         }),
@@ -280,7 +280,7 @@ subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
     is($tzil->distmeta->{x_static_install}, 0, 'build is marked as not eligible for static install (by explicit request)');
 
     cmp_deeply(
-        $tzil->distmeta->{prereqs}{develop}{suggests},
+        $tzil->distmeta->{prereqs}{$PREREQ_PHASE_DEFAULT}{$PREREQ_RELATIONSHIP_DEFAULT},
         superhashof({
             'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
         }),

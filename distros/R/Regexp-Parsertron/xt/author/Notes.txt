@@ -1,0 +1,13 @@
+Notes
+=====
+1. Run:
+	perl -Ilib xt/author/generate.tests.pl > xt/author/generate.tests.log
+	In this step, we only use the output file xt/author/generate.tests.log.
+2. Run:
+	perl scripts/extract.errors.pl > x
+3. Insert x into xt/author/generate.tests.txt
+4. Run:
+	perl -Ilib xt/author/generate.tests.pl > xt/author/generate.tests.log
+	In this step we only use the output file xt/author/perl-5.21.11.tests.
+5. Run:
+	perl -Ilib xt/author/perl-5.21.11.t

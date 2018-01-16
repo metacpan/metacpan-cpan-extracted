@@ -1,6 +1,6 @@
 package WWW::Google::Places::Address;
 
-$WWW::Google::Places::Address::VERSION   = '0.32';
+$WWW::Google::Places::Address::VERSION   = '0.33';
 $WWW::Google::Places::Address::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::Places::Address - Placeholder for 'address_components' of WWW::Goog
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 

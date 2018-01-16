@@ -1,5 +1,5 @@
 #
-# $Id: Javascript.pm,v 6af3d9cda2c3 2017/03/04 16:01:10 gomor $
+# $Id: Javascript.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # file::javascript Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::String::Javascript);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6af3d9cda2c3 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -62,7 +62,7 @@ Metabrik::File::Javascript - file::javascript Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

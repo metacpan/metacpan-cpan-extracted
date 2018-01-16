@@ -18,8 +18,8 @@ my $builder = Module::Build->new(
         'YAML::Syck'     => '1.29',
     },
     build_requires => {
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'Group-Git-Cmd-Stats-*' ],
     create_license     => 1,

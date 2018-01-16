@@ -138,6 +138,14 @@ sub _test_api( $base ) {
           ;
     };
 
+    subtest 'by grade' => sub {
+        $t->get_ok( $base . '/summary/My-Dist/1.001?grade=pass' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[0]{guid} )
+          ->json_hasnt( '/1' )
+          ;
+    };
+
     subtest 'dist not found' => sub {
         $t->get_ok( $base . '/summary/Not-Found/1.001' )
           ->status_is( 404 )

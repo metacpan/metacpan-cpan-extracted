@@ -3,7 +3,7 @@ package Text::APL;
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 use Text::APL::Core;
 use Text::APL::WithCaching;
@@ -188,7 +188,7 @@ Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012, Viacheslav Tykhanovskyi
+Copyright (C) 2012-2017, Viacheslav Tykhanovskyi
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

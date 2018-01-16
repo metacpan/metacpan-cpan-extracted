@@ -19,29 +19,29 @@ my %module_build_args = (
     "faraco <skelic3\@gmail.com>"
   ],
   "dist_name" => "App-Github-Email",
-  "dist_version" => "0.1.1",
-  "license" => "gpl",
+  "dist_version" => "0.2.0",
+  "license" => "mit",
   "module_name" => "App::Github::Email",
   "recursive_test_files" => 1,
   "requires" => {
     "Email::Address" => 0,
+    "Getopt::Long::Descriptive" => 0,
     "LWP::Online" => 0,
     "LWP::UserAgent" => 0,
     "List::MoreUtils" => 0,
+    "perl" => "v5.10.0",
     "strict" => 0,
     "warnings" => 0
   },
   "test_requires" => {
-    "Test::More" => 0,
-    "lib" => 0
+    "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
-  "Test::More" => 0,
-  "lib" => 0
+  "Test::More" => 0
 );
 
 

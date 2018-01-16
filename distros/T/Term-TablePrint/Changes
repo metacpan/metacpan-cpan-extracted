@@ -1,6 +1,18 @@
 Revision history for Term::TablePrint
 
 
+0.059   2018-01-11
+        - Bugfix: uninitialized value
+
+0.058   2018-01-11
+        - Bugfix: // not yet available in Perl 5.8.
+
+0.057   2018-01-10
+        - Code refactoring.
+        - Option "choose_columns" now is yes or no.
+        - Passing a reference to an empty array causes a "Emty table" message instead croaking.
+        - Bugfix option "table-expand".
+
 0.056   2018-01-04
         - Print the column names if the table is empty.
 

@@ -27,15 +27,15 @@
       "develop" : {
          "requires" : {
             "Test::More" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "strict" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Class::Method::Modifiers" : "1.05",
-            "perl" : "5.010001",
-            "strict" : "0",
+            "perl" : "5.012",
             "warnings" : "0"
          }
       },
@@ -48,22 +48,23 @@
             "File::Spec" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.96",
-            "lib" : "0"
+            "lib" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Module::Spec" : {
          "file" : "lib/Module/Spec.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.6.0"
       },
       "Module::Spec::OO" : {
          "file" : "lib/Module/Spec/OO.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.6.0"
       },
       "Module::Spec::V1" : {
          "file" : "lib/Module/Spec/V1.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/aferreira/cpan-Module-Spec"
       }
    },
-   "version" : "0.5.1",
+   "version" : "0.6.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

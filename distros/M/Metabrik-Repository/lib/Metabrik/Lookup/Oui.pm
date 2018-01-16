@@ -1,5 +1,5 @@
 #
-# $Id: Oui.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Oui.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # lookup::oui Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable ieee) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -123,7 +123,7 @@ sub from_string {
    for my $this (@$data) {
       $this =~ s/\r*$//;
       if ($this =~ /^\s*([0-9A-F]{2}\-[0-9A-F]{2}\-[0-9A-F]{2})\s+\(hex\)\s+(.*)$/i) {
-         $self->debug && $self->log->debug("from_string: this[$this]");
+         $self->log->debug("from_string: this[$this]");
          my $oui = $1;
          my $company = $2;
          if ($company =~ /$string/i) {
@@ -149,7 +149,7 @@ sub all {
    for my $this (@$data) {
       $this =~ s/\r*$//;
       if ($this =~ /^\s*([0-9A-F]{6})\s+\(base 16\)\s+(.*)$/i) {
-         $self->debug && $self->log->debug("from_hex: this[$this]");
+         $self->log->debug("from_hex: this[$this]");
          my $oui = lc($1);
          my $company = $2;
          $result{$oui} = $company;
@@ -169,7 +169,7 @@ Metabrik::Lookup::Oui - lookup::oui Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

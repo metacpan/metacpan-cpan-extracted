@@ -19,13 +19,17 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Digest::MD5' => '0',
+                                      'Digest::SHA' => '0',
                                       'JSON::MaybeXS' => '0',
                                       'LWP::UserAgent' => '0',
                                       'Log::Log4perl' => '0',
+                                      'MIME::Base64' => '0',
                                       'Moose' => '0',
                                       'MooseX::Log::Log4perl' => '0',
                                       'MooseX::Params::Validate' => '0',
                                       'Try::Tiny' => '0',
+                                      'URL::Encode' => '0',
                                       'YAML' => '0'
                                     }
                     },

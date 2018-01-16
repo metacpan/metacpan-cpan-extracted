@@ -20,10 +20,24 @@ dies_ok( sub{ $Comment->add_child( $Comment ) }, 'add_child() dies' );
 dies_ok( sub{ $Comment->children() }, 'children() dies' );
 
 dies_ok( sub{ $Comment->set_value( 'a(b' ) }, 'set_value("a(b") dies' );
+lives_ok( sub{ $Comment->safe_set_value( 'a(b' ) }, 'safe_set_value("a(b") lives' );
+is( $Comment->value(), 'a b', 'value() correct value returned' );
+
 dies_ok( sub{ $Comment->set_value( 'a)b' ) }, 'set_value("a)b") dies' );
+lives_ok( sub{ $Comment->safe_set_value( 'a)b' ) }, 'safe_set_value("a)b") lives' );
+is( $Comment->value(), 'a b', 'value() correct value returned' );
+
 dies_ok( sub{ $Comment->set_value( 'a((b)' ) }, 'set_value("a((b)") dies' );
+lives_ok( sub{ $Comment->safe_set_value( 'a((b)' ) }, 'safe_set_value("a((b)") lives' );
+is( $Comment->value(), 'a  b', 'value() correct value returned' );
+
 dies_ok( sub{ $Comment->set_value( '(b))a' ) }, 'set_value("(b))a") dies' );
+lives_ok( sub{ $Comment->safe_set_value( '(b))a' ) }, 'safe_set_value("(b))a") lives' );
+is( $Comment->value(), 'b  a', 'value() correct value returned' );
+
 dies_ok( sub{ $Comment->set_value( ')(' ) }, 'set_value(")(") dies' );
+lives_ok( sub{ $Comment->safe_set_value( ')(' ) }, 'safe_set_value(")(") lives' );
+is( $Comment->value(), '', 'value() correct value returned' );
 
 my $SetValue;
 lives_ok( sub{ $SetValue = $Comment->set_value( 'foo' ) }, 'set_value("foo") lives' );

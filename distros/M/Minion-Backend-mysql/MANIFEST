@@ -12,5 +12,5 @@ lib/Minion/Backend/mysql.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/Minion-Backend-mysql.t
+t/mysql.t
 weaver.ini

@@ -68,7 +68,7 @@ my ($call) = @fuas;
 is scalar(@$call), 3, 'call to sender had three parameters';
 
 my ($method, $query, $callback) = @$call;
-is $method, 'sendUpdate', 'call was to sendMessage';
+is $method, 'getUpdates', 'call was to getUpdates';
 is_deeply $query, {offset => 0, timeout => 300}, 'query parameters';
 is ref($callback), 'CODE', 'callback was set';
 

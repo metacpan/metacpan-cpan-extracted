@@ -21,24 +21,24 @@ has 'i18n_collator' => (
 
 sub _build_i18n_collator {
     my ($c) = @_;
-    
+
     my $language = $c->language;
     my $config = $c->i18n_config;
     $config->{collate} ||= {};
-    
+
     my $collator = Unicode::Collate::Locale->new( locale => $language, %{$config->{collate}} );
-    
+
     return $collator;
 }
 
 sub i18n_sort {
     my ($c,@arguments) = @_;
-    
+
     @arguments = @{$arguments[0]}
         if scalar(@arguments) == 0 && ref($arguments[0]) eq 'ARRAY';
-    
+
     my @results = $c->i18n_collator->sort(@arguments);
-    
+
     return wantarray ? @results : \@results;
 }
 
@@ -59,11 +59,11 @@ CatalystX::I18N::Role::Collate - Support for localised collation
 =head1 SYNOPSIS
 
  package MyApp::Catalyst;
- 
- use Catalyst qw/MyPlugins 
+
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base
     CatalystX::I18N::Role::Collate/;
-
+ 
  package MyApp::Catalyst::Controller::Main;
  use strict;
  use warnings;
@@ -101,7 +101,7 @@ upon the first call of the method.
  OR
  my $sorted = $c->i18n_sort(\@list);
 
-Sorts the given list or arrayref with the current locale and returns a 
+Sorts the given list or arrayref with the current locale and returns a
 list or arrayref.
 
 =head3 i18n_collator
@@ -109,12 +109,12 @@ list or arrayref.
   my $collator = $c->i18n_collator();
 
 Returns a L<Unicode::Collate::Locale> object with the current language used
-as the locale. The collator settings can be configured in your Catalyst I18N 
+as the locale. The collator settings can be configured in your Catalyst I18N
 configuration:
 
  # Add some I18N configuration
- __PACKAGE__->config( 
-     name    => 'MyApp', 
+ __PACKAGE__->config(
+     name    => 'MyApp',
      I18N    => {
          default_locale => 'de_AT',
          locales        => {
@@ -150,7 +150,7 @@ detailed documentation):
 
 =item * level
 
-=item * normalization
+=item * normalisation
 
 =item * overrideCJK
 

@@ -1,5 +1,15 @@
+
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
+
+Version 0.52
+
+ * Internet connection tests were declared in the wrong order
+
+Version 0.51
+
+ * Fix for older versions of perl
+ * Tests no longer fail with no internet connection
 
 Version 0.50
 

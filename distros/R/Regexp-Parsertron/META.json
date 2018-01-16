@@ -4,9 +4,9 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,19 +32,24 @@
       },
       "runtime" : {
          "requires" : {
+            "Capture::Tiny" : "0.46",
             "Data::Section::Simple" : "0.07",
-            "File::Slurper" : "0.008",
-            "Marpa::R2" : "3",
-            "Moo" : "2.001001",
-            "Scalar::Does" : "0.202",
-            "Test::More" : "1.001014",
-            "Test::Pod" : "1.48",
-            "Tree" : "1.07",
-            "Try::Tiny" : "0.24",
-            "Types::Standard" : "1.000005",
-            "re" : "0",
+            "File::Slurper" : "0.011",
+            "Marpa::R2" : "4",
+            "Moo" : "2.003004",
+            "Scalar::Does" : "0.203",
+            "Tree" : "1.1",
+            "Try::Tiny" : "0.3",
+            "Types::Standard" : "1.002001",
+            "perl" : "5.020002",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.48"
          }
       }
    },
@@ -59,6 +64,6 @@
          "web" : "https://github.com/ronsavage/Regexp-Parsertron"
       }
    },
-   "version" : "0.51"
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }
-

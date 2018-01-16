@@ -1,0 +1,914 @@
+#!perl
+
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.460'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+$SPEC{coerce_with_sah} = {
+    v => 1.1,
+    summary => 'Coerce data',
+    args_rels => {
+        'choose_one&' => [
+            [qw/show_code show_rules/],
+            [qw/data_as_json multiple_data_as_json
+                data_as_perl multiple_data_as_perl/],
+        ],
+    },
+    args => {
+        type => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+            tags => ['category:coercer-specification'],
+            'x.schema.entity' => 'sah::type_name',
+        },
+        coerce_to => {
+            schema => 'str*',
+            tags => ['category:coercer-specification'],
+        },
+        coerce_rules => {
+            'x.name.is_plural' => 1,
+            schema => ['array*', of=>'str*'],
+            tags => ['category:coercer-specification'],
+            element_completion => sub {
+                my %args = @_;
+                my $cmdline = $args{cmdline} or return undef;
+                my $r = $args{r};
+
+                $r->{read_config} = 1;
+                my $res = $cmdline->parse_argv($r);
+                my $type = $res->[2]{type} or return undef;
+                my $compiler = $res->[2]{compiler} // 'perl';
+
+                require Complete::Module;
+                Complete::Module::complete_module(
+                    word => $args{word},
+                    ns_prefix => "Data::Sah::Coerce::$compiler::$type",
+                );
+            },
+        },
+        return_type => {
+            schema => ['str*', in=>[qw/val str+val/]],
+            default => 'val',
+            cmdline_aliases => {r=>{}},
+            tags => ['category:coercer-specification'],
+        },
+
+        data_as_json => {
+            summary => 'Data as JSON',
+            schema => ['str*'],
+            tags => ['category:data-specification'],
+        },
+        multiple_data_as_json => {
+            summary => 'Multiple data as JSON code, JSON data must be an array',
+            schema => ['str*'],
+            tags => ['category:data-specification'],
+        },
+        data_as_perl => {
+            summary => 'Data as Perl code',
+            schema => ['str*'],
+            tags => ['category:data-specification'],
+        },
+        multiple_data_as_perl => {
+            summary => 'Multiple data as Perl code, perl code should return arrayref',
+            schema => ['str*'],
+            tags => ['category:data-specification'],
+        },
+
+        show_code => {
+            summary => "Don't coerce data, show generated coercer code only",
+            schema=>['bool', is=>1],
+            cmdline_aliases => {c=>{}},
+            tags => ['category:action-selection'],
+        },
+        show_rules => {
+            summary => "Don't coerce data, show coerce rules that will be used",
+            schema=>['bool', is=>1],
+            tags => ['category:action-selection'],
+        },
+        data_with_result => {
+            summary => "Show data alongside with coerced result",
+            description => <<'_',
+
+The default is to show the coerced result only.
+
+_
+            schema=>['bool', is=>1],
+            cmdline_aliases => {d=>{}},
+            tags => ['category:output'],
+        },
+#        with_debug => {
+#            summary => 'Generate coercer with debug on',
+#            description => <<'_',
+#
+#This means e.g. to pepper the coercer code with logging statements.
+#
+#_
+#            schema => ['bool', is=>1],
+#            tags => ['category:coercer-specification'],
+#        },
+#        pp => {
+#            summary => 'Generate coercer code that avoids the use of XS modules',
+#            schema => ['bool', is=>1],
+#            tags => ['category:coercer-specification'],
+#            # XXX only relevant when compiler=perl
+#        },
+#        core => {
+#            summary => 'Generate Perl coercer code that avoids the use of non-core modules',
+#            schema => ['bool', is=>1],
+#            tags => ['category:coercer-specification'],
+#            # XXX only relevant when compiler=perl
+#        },
+#        core_or_pp => {
+#            summary => 'Generate Perl coercer code that only uses core or pure-perl modules',
+#            schema => ['bool', is=>1],
+#            tags => ['category:coercer-specification'],
+#            # XXX only relevant when compiler=perl
+#        },
+#        no_modules => {
+#            summary => 'Generate Perl coercer code that does not use modules',
+#            schema => ['bool', is=>1],
+#            tags => ['category:coercer-specification'],
+#            # XXX only relevant when compiler=perl
+#        },
+        compiler => {
+            summary => "Select compiler",
+            schema=>['str*', in=>[qw/perl js/]],
+            default => 'perl',
+            cmdline_aliases => {C=>{}},
+            tags => ['category:coercer-specification'],
+        },
+        linenum => {
+            summary => 'When showing source code, add line numbers',
+            schema=>['bool', is=>1],
+            cmdline_aliases => {l=>{}},
+            tags => ['category:output'],
+        },
+    },
+    examples => [
+        {
+            src => q([[prog]] date --coerce-to DateTime --data-as-perl '"2016-05-22"'),
+            src_plang => 'bash',
+        },
+        {
+            src => q([[prog]] date --coerce-to 'float(epoch)' --multiple-data-as-perl '["2016-05-15", "1463328281"]'),
+            src_plang => 'bash',
+        },
+        {
+            summary => 'Show source code',
+            src => q([[prog]] duration --coerce-to 'float(secs)' -c),
+            src_plang => 'bash',
+        },
+        {
+            summary => 'Show source code, with line number',
+            src => q([[prog]] duration --coerce-to 'DateTime::Duration' -c -l),
+            src_plang => 'bash',
+        },
+        {
+            summary => 'Show source code (JavaScript)',
+            src => q([[prog]] date -C js -c),
+            src_plang => 'bash',
+        },
+    ],
+};
+sub coerce_with_sah {
+    my %args = @_;
+
+    my $c = $args{compiler};
+
+    my $res;
+  GET_RESULT:
+    {
+        if ($args{show_rules}) {
+            require Data::Sah::CoerceCommon;
+            my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
+                type => $args{type},
+                compiler => $c,
+                (coerce_to => $args{coerce_to}) x !!defined($args{coerce_to}),
+                (coerce_rules => $args{coerce_rules}) x !!defined($args{coerce_rules}),
+                data_term => ($c eq 'perl' ? '$data' : 'data'),
+            );
+            $res = [200, "OK", $rules];
+            last GET_RESULT;
+        }
+
+        my $gen_res;
+        {
+            no strict 'refs';
+            my %gen_args = (
+                type => $args{type},
+                return_type => $args{return_type},
+                (coerce_to => $args{coerce_to}) x !!defined($args{coerce_to}),
+                (coerce_rules => $args{coerce_rules}) x !!defined($args{coerce_rules}),
+            );
+            $gen_args{source} = 1 if $args{show_code};
+            #$gen_opts{debug} = 1 if $args{with_debug};
+            #$gen_opts{pp} = 1 if $args{pp};
+            #$gen_opts{core} = 1 if $args{core};
+            #$gen_opts{core_or_pp} = 1 if $args{core_or_pp};
+            #$gen_opts{no_modules} = 1 if $args{no_modules};
+            if ($c eq 'perl') {
+                require Data::Sah::Coerce;
+                $gen_res = Data::Sah::Coerce::gen_coercer(%gen_args);
+            } elsif ($c eq 'js') {
+                require Data::Sah::CoerceJS;
+                $gen_res = Data::Sah::CoerceJS::gen_coercer(%gen_args);
+            } else {
+                $res = [400, "Unknown compiler '$c', please specify perl/js"];
+                last GET_RESULT;
+            }
+        }
+
+        if ($args{show_code}) {
+            $gen_res .= "\n" unless $gen_res =~ /\R\z/;
+            if ($args{linenum}) {
+                require String::LineNumber;
+                $gen_res = String::LineNumber::linenum($gen_res);
+            }
+            $res = [200, "OK", $gen_res, {'cmdline.skip_format'=>1}];
+            last GET_RESULT;
+        }
+
+        my $data;
+        my $multiple;
+        if (defined $args{data_as_json}) {
+            require JSON::MaybeXS;
+            $data = JSON::MaybeXS->new->allow_nonref->decode($args{data_as_json});
+        } elsif (defined $args{multiple_data_as_json}) {
+            require JSON::MaybeXS;
+            $data = JSON::MaybeXS->new->allow_nonref->decode($args{multiple_data_as_json});
+            $multiple = 1;
+        } elsif (defined $args{data_as_perl}) {
+            $data = eval $args{data_as_perl};
+            die if $@;
+        } elsif (defined $args{multiple_data_as_perl}) {
+            $data = eval $args{multiple_data_as_perl};
+            die if $@;
+            $multiple = 1;
+        } else {
+            $res = [400, "Please specify 'data_as_json' or 'multiple_data_as_json' or 'data_as_perl' or 'multiple_data_as_perl'"];
+            last GET_RESULT;
+        }
+        if ($multiple && ref($data) ne 'ARRAY') {
+            $res = [400, "Multiple data must be an array"];
+            last GET_RESULT;
+        }
+
+        if ($multiple) {
+            if ($args{data_with_result}) {
+                $res = [200, "OK", [map {{data=>$_, result=>$gen_res->($_)}} @$data]];
+            } else {
+                $res = [200, "OK", [map {$gen_res->($_)} @$data]];
+            }
+            last GET_RESULT;
+        } else {
+            if ($args{data_with_result}) {
+                $res = [200, "OK", {data=>$data, result=>$gen_res->($data)}];
+            } else {
+                $res = [200, "OK", $gen_res->($data)];
+            }
+            last GET_RESULT;
+        }
+
+        die "BUG: This should not be reached";
+    } # GET_RESULT
+
+    my $outputs_text = $args{-cmdline_r} &&
+        ($args{-cmdline_r}{format} // 'text') =~ /text/;
+    if ($outputs_text && $res->[0] == 200 && ref($res->[2])) {
+        require Data::Dump;
+        $res->[2] = Data::Dump::dump($res->[2]);
+   }
+    $res;
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/coerce_with_sah',
+    pass_cmdline_object => 1,
+);
+$cli->{common_opts}{naked_res}{default} = 1;
+$cli->run;
+
+# ABSTRACT: Coerce data
+# PODNAME: coerce-with-sah
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+coerce-with-sah - Coerce data
+
+=head1 VERSION
+
+This document describes version 0.460 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2018-01-14.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % coerce-with-sah [options] <type>
+
+Examples:
+
+ % coerce-with-sah date --coerce-to DateTime --data-as-perl '"2016-05-22"'
+ bless({
+   formatter       => undef,
+   local_c         => {
+                        day => 22,
+                        day_of_quarter => 52,
+                        day_of_week => 7,
+                        day_of_year => 143,
+                        hour => 0,
+                        minute => 0,
+                        month => 5,
+                        quarter => 2,
+                        second => 0,
+                        year => 2016,
+                      },
+   local_rd_days   => 736106,
+   local_rd_secs   => 0,
+   locale          => bless({
+                        am_pm_abbreviated               => ["AM", "PM"],
+                        available_formats               => {
+                                                             "Bh"                => "h B",
+                                                             "Bhm"               => "h:mm B",
+                                                             "Bhms"              => "h:mm:ss B",
+                                                             "d"                 => "d",
+                                                             "E"                 => "ccc",
+                                                             "EBhm"              => "E h:mm B",
+                                                             "EBhms"             => "E h:mm:ss B",
+                                                             "Ed"                => "d E",
+                                                             "Ehm"               => "E h:mm a",
+                                                             "EHm"               => "E HH:mm",
+                                                             "Ehms"              => "E h:mm:ss a",
+                                                             "EHms"              => "E HH:mm:ss",
+                                                             "Gy"                => "y G",
+                                                             "GyMMM"             => "MMM y G",
+                                                             "GyMMMd"            => "MMM d, y G",
+                                                             "GyMMMEd"           => "E, MMM d, y G",
+                                                             "h"                 => "h a",
+                                                             "H"                 => "HH",
+                                                             "hm"                => "h:mm a",
+                                                             "Hm"                => "HH:mm",
+                                                             "hms"               => "h:mm:ss a",
+                                                             "Hms"               => "HH:mm:ss",
+                                                             "hmsv"              => "h:mm:ss a v",
+                                                             "Hmsv"              => "HH:mm:ss v",
+                                                             "Hmv"               => "HH:mm v",
+                                                             "hmv"               => "h:mm a v",
+                                                             "M"                 => "L",
+                                                             "Md"                => "M/d",
+                                                             "MEd"               => "E, M/d",
+                                                             "MMM"               => "LLL",
+                                                             "MMMd"              => "MMM d",
+                                                             "MMMEd"             => "E, MMM d",
+                                                             "MMMMd"             => "MMMM d",
+                                                             "MMMMW-count-one"   => "'week' W 'of' MMMM",
+                                                             "MMMMW-count-other" => "'week' W 'of' MMMM",
+                                                             "ms"                => "mm:ss",
+                                                             "y"                 => "y",
+                                                             "yM"                => "M/y",
+                                                             "yMd"               => "M/d/y",
+                                                             "yMEd"              => "E, M/d/y",
+                                                             "yMMM"              => "MMM y",
+                                                             "yMMMd"             => "MMM d, y",
+                                                             "yMMMEd"            => "E, MMM d, y",
+                                                             "yMMMM"             => "MMMM y",
+                                                             "yQQQ"              => "QQQ y",
+                                                             "yQQQQ"             => "QQQQ y",
+                                                             "yw-count-one"      => "'week' w 'of' Y",
+                                                             "yw-count-other"    => "'week' w 'of' Y",
+                                                           },
+                        code                            => "en-US",
+                        date_format_full                => "EEEE, MMMM d, y",
+                        date_format_long                => "MMMM d, y",
+                        date_format_medium              => "MMM d, y",
+                        date_format_short               => "M/d/yy",
+                        datetime_format_full            => "{1} 'at' {0}",
+                        datetime_format_long            => "{1} 'at' {0}",
+                        datetime_format_medium          => "{1}, {0}",
+                        datetime_format_short           => "{1}, {0}",
+                        day_format_abbreviated          => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                        day_format_narrow               => ["M", "T", "W", "T", "F", "S", "S"],
+                        day_format_wide                 => [
+                                                             "Monday",
+                                                             "Tuesday",
+                                                             "Wednesday",
+                                                             "Thursday",
+                                                             "Friday",
+                                                             "Saturday",
+                                                             "Sunday",
+                                                           ],
+                        day_stand_alone_abbreviated     => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                        day_stand_alone_narrow          => ["M", "T", "W", "T", "F", "S", "S"],
+                        day_stand_alone_wide            => [
+                                                             "Monday",
+                                                             "Tuesday",
+                                                             "Wednesday",
+                                                             "Thursday",
+                                                             "Friday",
+                                                             "Saturday",
+                                                             "Sunday",
+                                                           ],
+                        default_date_format_length      => "medium",
+                        default_time_format_length      => "medium",
+                        era_abbreviated                 => ["BC", "AD"],
+                        era_narrow                      => ["B", "A"],
+                        era_wide                        => ["Before Christ", "Anno Domini"],
+                        first_day_of_week               => 7,
+                        glibc_date_1_format             => "%a %b %e %H:%M:%S %Z %Y",
+                        glibc_date_format               => "%m/%d/%Y",
+                        glibc_datetime_format           => "%a %d %b %Y %r %Z",
+                        glibc_time_12_format            => "%I:%M:%S %p",
+                        glibc_time_format               => "%r",
+                        language                        => "English",
+                        month_format_abbreviated        => [
+                                                             "Jan",
+                                                             "Feb",
+                                                             "Mar",
+                                                             "Apr",
+                                                             "May",
+                                                             "Jun",
+                                                             "Jul",
+                                                             "Aug",
+                                                             "Sep",
+                                                             "Oct",
+                                                             "Nov",
+                                                             "Dec",
+                                                           ],
+                        month_format_narrow             => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+                        month_format_wide               => [
+                                                             "January",
+                                                             "February",
+                                                             "March",
+                                                             "April",
+                                                             "May",
+                                                             "June",
+                                                             "July",
+                                                             "August",
+                                                             "September",
+                                                             "October",
+                                                             "November",
+                                                             "December",
+                                                           ],
+                        month_stand_alone_abbreviated   => [
+                                                             "Jan",
+                                                             "Feb",
+                                                             "Mar",
+                                                             "Apr",
+                                                             "May",
+                                                             "Jun",
+                                                             "Jul",
+                                                             "Aug",
+                                                             "Sep",
+                                                             "Oct",
+                                                             "Nov",
+                                                             "Dec",
+                                                           ],
+                        month_stand_alone_narrow        => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+                        month_stand_alone_wide          => [
+                                                             "January",
+                                                             "February",
+                                                             "March",
+                                                             "April",
+                                                             "May",
+                                                             "June",
+                                                             "July",
+                                                             "August",
+                                                             "September",
+                                                             "October",
+                                                             "November",
+                                                             "December",
+                                                           ],
+                        name                            => "English United States",
+                        native_language                 => "English",
+                        native_name                     => "English United States",
+                        native_script                   => undef,
+                        native_territory                => "United States",
+                        native_variant                  => undef,
+                        quarter_format_abbreviated      => ["Q1" .. "Q4"],
+                        quarter_format_narrow           => [1 .. 4],
+                        quarter_format_wide             => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+                        quarter_stand_alone_abbreviated => ["Q1" .. "Q4"],
+                        quarter_stand_alone_narrow      => [1 .. 4],
+                        quarter_stand_alone_wide        => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+                        script                          => undef,
+                        territory                       => "United States",
+                        time_format_full                => "h:mm:ss a zzzz",
+                        time_format_long                => "h:mm:ss a z",
+                        time_format_medium              => "h:mm:ss a",
+                        time_format_short               => "h:mm a",
+                        variant                         => undef,
+                        version                         => 32,
+                      }, "DateTime::Locale::FromData"),
+   offset_modifier => 0,
+   rd_nanosecs     => 0,
+   tz              => bless({
+                        is_olson => 1,
+                        max_year => 2027,
+                        name => "Asia/Jakarta",
+                        spans => [
+                          [-Inf, 58904383968, -Inf, 58904409600, 25632, 0, "LMT"],
+                          [
+                            58904383968,
+                            60683964000,
+                            58904409600,
+                            60683989632,
+                            25632,
+                            0,
+                            "BMT",
+                          ],
+                          [
+                            60683964000,
+                            60962776800,
+                            60683990400,
+                            60962803200,
+                            26400,
+                            0,
+                            "+0720",
+                          ],
+                          [
+                            60962776800,
+                            61259041800,
+                            60962803800,
+                            61259068800,
+                            27000,
+                            0,
+                            "+0730",
+                          ],
+                          [
+                            61259041800,
+                            61369628400,
+                            61259074200,
+                            61369660800,
+                            32400,
+                            0,
+                            "+09",
+                          ],
+                          [
+                            61369628400,
+                            61451800200,
+                            61369655400,
+                            61451827200,
+                            27000,
+                            0,
+                            "+0730",
+                          ],
+                          [
+                            61451800200,
+                            61514870400,
+                            61451829000,
+                            61514899200,
+                            28800,
+                            0,
+                            "+08",
+                          ],
+                          [
+                            61514870400,
+                            61946267400,
+                            61514897400,
+                            61946294400,
+                            27000,
+                            0,
+                            "+0730",
+                          ],
+                          [61946267400, Inf, 61946292600, Inf, 25200, 0, "WIB"],
+                        ],
+                      }, "DateTime::TimeZone::Asia::Jakarta"),
+   utc_rd_days     => 736105,
+   utc_rd_secs     => 61200,
+   utc_year        => 2017,
+ }, "DateTime")
+
+ % coerce-with-sah date --coerce-to 'float(epoch)' --multiple-data-as-perl '["2016-05-15", "1463328281"]'
+ [1463245200, 1463328281]
+
+Show source code:
+
+ % coerce-with-sah duration --coerce-to 'float(secs)' -c
+ require Scalar::Util;
+ require Time::Duration::Parse::AsHash;
+ sub {
+     my $data = shift;
+     return undef unless defined($data);
+     (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? ((($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))) : ((Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? (($data->years * 365.25*86400 + $data->months * 30.4375*86400 + $data->weeks * 7*86400 + $data->days * 86400 + $data->hours * 3600 + $data->minutes * 60 + $data->seconds + $data->nanoseconds * 1e-9)) : ((!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? ($data) : ((!ref($data) && $data =~ /\d.*[a-z]/) ? (do { my $p = Time::Duration::Parse::AsHash::parse_duration($data); ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0) }) : $data)));
+ }
+
+Show source code, with line number:
+
+ % coerce-with-sah duration --coerce-to 'DateTime::Duration' -c -l
+    1|require DateTime::Duration;
+    2|require Scalar::Util;
+    3|require Time::Duration::Parse::AsHash;
+    4|sub {
+    5|    my $data = shift;
+    6|    return undef unless defined($data);
+    7|    (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? (DateTime::Duration->new( (years=>$1) x !!defined($1), (months=>$2) x !!defined($2), (weeks=>$3) x !!defined($3), (days=>$4) x !!defined($4), (hours=>$5) x !!defined($5), (minutes=>$6) x !!defined($6), (seconds=>$7) x !!defined($7))) : ((Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? ($data) : ((!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? (DateTime::Duration->new(seconds => $data)) : ((!ref($data) && $data =~ /\d.*[a-z]/) ? (do { my $p = Time::Duration::Parse::AsHash::parse_duration($data); DateTime::Duration->new( (years=>$p->{years}) x !!defined($p->{years}), (months=>$p->{months}) x !!defined($p->{months}), (weeks=>$p->{weeks}) x !!defined($p->{weeks}), (days=>$p->{days}) x !!defined($p->{days}), (hours=>$p->{hours}) x !!defined($p->{hours}), (minutes=>$p->{minutes}) x !!defined($p->{minutes}), (seconds=>$p->{seconds}) x !!defined($p->{seconds})) }) : $data)));
+    8|}
+
+Show source code (JavaScript):
+
+ % coerce-with-sah date -C js -c
+ function (data) {
+     if (data === undefined || data === null) return null;
+     return (((data instanceof Date)) ? (isNaN(data) ? (function(){throw new Error('Invalid date')})() : data) : ((typeof(data)=='string') ? ((function (_m) { _m = new Date(data); if (isNaN(_m)) throw new Error('Invalid date'); return _m })()) : ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : data)));
+ }
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Action selection options
+
+=over
+
+=item B<--show-code>, B<-c>
+
+Don't coerce data, show generated coercer code only.
+
+=item B<--show-rules>
+
+Don't coerce data, show coerce rules that will be used.
+
+=back
+
+=head2 Coercer specification options
+
+=over
+
+=item B<--coerce-rule>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--coerce-rules-json>=I<s>
+
+See C<--coerce-rule>.
+
+=item B<--coerce-to>=I<s>
+
+=item B<--compiler>=I<s>, B<-C>
+
+Select compiler.
+
+Default value:
+
+ "perl"
+
+Valid values:
+
+ ["perl","js"]
+
+=item B<--return-type>=I<s>, B<-r>
+
+Default value:
+
+ "val"
+
+Valid values:
+
+ ["val","str+val"]
+
+=item B<--type>=I<sah>::type_name*
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Data specification options
+
+=over
+
+=item B<--data-as-json>=I<s>
+
+Data as JSON.
+
+=item B<--data-as-perl>=I<s>
+
+Data as Perl code.
+
+=item B<--multiple-data-as-json>=I<s>
+
+Multiple data as JSON code, JSON data must be an array.
+
+=item B<--multiple-data-as-perl>=I<s>
+
+Multiple data as Perl code, perl code should return arrayref.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--data-with-result>, B<-d>
+
+Show data alongside with coerced result.
+
+The default is to show the coerced result only.
+
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--linenum>, B<-l>
+
+When showing source code, add line numbers.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C coerce-with-sah coerce-with-sah
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete coerce-with-sah 'p/*/`coerce-with-sah`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 FAQ
+
+=head2 When there is an error (e.g. in generating coercer code, in coercing) the program returns undef/null, how do I see the error message?
+
+Pass `--no-naked-res` to see the error code and error message. The default is
+naked for simpler output.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/coerce-with-sah.conf>, F<~/coerce-with-sah.conf>, or F</etc/coerce-with-sah.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ coerce_rules (see --coerce-rule)
+ coerce_to (see --coerce-to)
+ compiler (see --compiler)
+ data_as_json (see --data-as-json)
+ data_as_perl (see --data-as-perl)
+ data_with_result (see --data-with-result)
+ format (see --format)
+ linenum (see --linenum)
+ multiple_data_as_json (see --multiple-data-as-json)
+ multiple_data_as_perl (see --multiple-data-as-perl)
+ naked_res (see --naked-res)
+ return_type (see --return-type)
+ show_code (see --show-code)
+ show_rules (see --show-rules)
+ type (see --type)
+
+=head1 ENVIRONMENT
+
+=head2 COERCE_WITH_SAH_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/coerce-with-sah.conf>
+
+F<~/coerce-with-sah.conf>
+
+F</etc/coerce-with-sah.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SahUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

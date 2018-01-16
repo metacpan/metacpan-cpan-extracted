@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 # ABSTRACT: A simple REST controller for Mojolicious
 
 #pod =head1 DESCRIPTION
@@ -42,8 +42,6 @@ our $VERSION = '0.009';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Controller';
-use v5.24;
-use experimental qw( signatures postderef );
 
 #pod =method list_items
 #pod
@@ -53,7 +51,8 @@ use experimental qw( signatures postderef );
 #pod
 #pod =cut
 
-sub list_items( $c ) {
+sub list_items {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my %opt = (
@@ -80,7 +79,8 @@ sub list_items( $c ) {
 #pod
 #pod =cut
 
-sub add_item( $c ) {
+sub add_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $coll = $c->stash( 'collection' );
     my $item = $c->yancy->filter->apply( $coll, $c->validation->param( 'newItem' ) );
@@ -97,7 +97,8 @@ sub add_item( $c ) {
 #pod
 #pod =cut
 
-sub get_item( $c ) {
+sub get_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
@@ -115,7 +116,8 @@ sub get_item( $c ) {
 #pod
 #pod =cut
 
-sub set_item( $c ) {
+sub set_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
@@ -136,7 +138,8 @@ sub set_item( $c ) {
 #pod
 #pod =cut
 
-sub delete_item( $c ) {
+sub delete_item {
+    my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
     my $id = $args->{ $c->stash( 'id_field' ) };
@@ -156,7 +159,7 @@ Yancy::Controller::Yancy - A simple REST controller for Mojolicious
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 DESCRIPTION
 

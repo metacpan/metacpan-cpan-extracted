@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Descriptor;
-$WebService::Braintree::ErrorCodes::Descriptor::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::Descriptor::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

@@ -3,17 +3,28 @@ Changes
 lib/Regexp/Parsertron.pm
 LICENSE
 Makefile.PL
-MANIFEST
-META.json
-META.yml
-perl-5.21.11/re_tests
-perl-5.21.11/regexp.txt
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
+scripts/extract.errors.pl
+scripts/play.pl
 scripts/pod2html.sh
-scripts/re.pl
 scripts/synopsis.pl
 scripts/test.pl
 scripts/test.sh
-t/generate.tests.txt
+scripts/tutorial.pl
+t/00.versions.t
+t/00.versions.tx
+t/get.set.t
+t/perl-5.21.11.t
 t/test.t
+xt/author/generate.tests.pl
+xt/author/Notes.txt
+xt/author/perl-5.21.11.log
+xt/author/perl-5.21.11.tests
 xt/author/pod.t
+xt/author/re_tests
+xt/author/regexp.txt
+xt/author/test.qr.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

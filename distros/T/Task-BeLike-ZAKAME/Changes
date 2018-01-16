@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.13 2018-01-12T08:12:56Z
+
+    - Add Future and IO::Async
+    - Pull down minimum required Perl version to 5.14.2
+
 0.12 2017-08-24T13:25:51Z
 
     - Now require Perls from 5.14.4 up

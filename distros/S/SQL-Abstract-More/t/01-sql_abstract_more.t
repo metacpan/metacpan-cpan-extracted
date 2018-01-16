@@ -294,12 +294,14 @@ is_same_sql_bind(
 is_same_sql_bind(
   $$sql, \@bind,
   "Foo AS f", [],
+  "column alias",
 );
 
 ($sql, @bind) = $sqla->column_alias(qw/Foo/);
 is_same_sql_bind(
   $sql, \@bind,
   "Foo", [],
+  "column alias without alias",
 );
 
 
@@ -307,12 +309,14 @@ is_same_sql_bind(
 is_same_sql_bind(
   $sql, \@bind,
   "Foo AS f", [],
+  "table alias",
 );
 
 ($sql, @bind) = $sqla->limit_offset(123, 456);
 is_same_sql_bind(
   $sql, \@bind,
-  "LIMIT ? OFFSET ?", [123, 456]
+  "LIMIT ? OFFSET ?", [123, 456],
+  "limit offset",
 );
 
 
@@ -320,12 +324,14 @@ $join = $sqla->join(qw[Foo|f =>{fk_A=pk_A,fk_B=pk_B} Bar]);
 is_same_sql_bind(
   $join->{sql}, $join->{bind},
   "Foo AS f LEFT OUTER JOIN Bar ON f.fk_A = Bar.pk_A AND f.fk_B = Bar.pk_B", [],
+  "join syntax",
 );
 
 $join = $sqla->join(qw[Foo <=>[A<B,C<D] Bar]);
 is_same_sql_bind(
   $join->{sql}, $join->{bind},
   "Foo INNER JOIN Bar ON Foo.A < Bar.B OR Foo.C < Bar.D", [],
+  "join syntax with OR",
 );
 
 
@@ -333,6 +339,7 @@ $join = $sqla->join(qw[Foo == Bar]);
 is_same_sql_bind(
   $join->{sql}, $join->{bind},
   "Foo NATURAL JOIN Bar", [],
+  "natural join",
 );
 
 

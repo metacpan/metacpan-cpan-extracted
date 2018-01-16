@@ -11,18 +11,9 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(AUTHORIZE DECLINE FAILED);
 our @EXPORT_OK = qw();
 
-# XXX Why aren't these constants like WebService::Braintree::SandboxValues::CreditCardNumber?
-sub AUTHORIZE {
-    1000;
-}
-
-sub DECLINE {
-    2000;
-}
-
-sub FAILED {
-    3000;
-}
+use constant AUTHORIZE => 1000;
+use constant DECLINE   => 2000;
+use constant FAILED    => 3000;
 
 1;
 __END__

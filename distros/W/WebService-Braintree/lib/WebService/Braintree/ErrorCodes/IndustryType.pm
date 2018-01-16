@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::IndustryType;
-$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

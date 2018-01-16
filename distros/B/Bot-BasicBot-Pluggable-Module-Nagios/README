@@ -1,7 +1,9 @@
 NAME
+
     Bot::BasicBot::Pluggable::Module::Nagios - report Nagios alerts to IRC
 
 DESCRIPTION
+
     A module for IRC bots powered by Bot::BasicBot::Pluggable to monitor a
     Nagios install and report alerts to IRC.
 
@@ -10,19 +12,20 @@ DESCRIPTION
     credentials. As each configured instance can have specific target
     channels defined, this means you could have the bot check with the
     username "development" and report all visible problems to the
-    `#development' channel, then check again with the "sysad" username and
-    report problems visible to that user to the `#sysads' channel.
+    #development channel, then check again with the "sysad" username and
+    report problems visible to that user to the #sysads channel.
 
     Actual monitoring is done using Nagios::Scrape, which scrapes the
-    information from the `status.cgi' script which powers Nagios' web
+    information from the status.cgi script which powers Nagios' web
     interface. This means that, assuming your Nagios setup is configured to
     be viewable over the web, you need no further setup to allow the bot to
     monitor it.
 
 SYNOPSIS
+
     Load the module as you would any other Bot::BasicBot::Pluggable module,
     then configure it to watch a Nagios install and report problems to the
-    desired channel(s) with the `nagios add' command.
+    desired channel(s) with the nagios add command.
 
     In a direct message to the bot:
 
@@ -34,32 +37,50 @@ SYNOPSIS
         <user> nagios del 1
         <bot> OK, deleted instance 1
 
-    (You can supply a list of channel names separated by commas, if you want
-    reports from a given instance to be announced to more than one channel.)
+    (You can supply a list of channel names separated by commas, if you
+    want reports from a given instance to be announced to more than one
+    channel.)
 
 TODO
+
     Plenty of improvements are planned, including:
 
-    * Acknowledging problems
-        It should probably be possible to acknowledge a reported problem,
-        preventing repeated reports of the same service/host in the same
-        state.
+      * Better documentation
 
-    * Configurable reporting hours
-        It would make sense to be able to configure the bot to only report
-        problems during hours in which staff/volunteers are likely to be
-        awake and paying attention to the IRC channel.
+      I need to improve the module's documentation. For now, extra
+      information is available by saying <help nagios> to the bot on IRC,
+      or nagios set with no setting name for a list of valid settings with
+      descriptions.
 
-    * Configurable report templates
-        It would be nice to be able to configure the format used for report
-        messages - perhaps including colour codes to colourise elements of
-        the message, where the channel allows it and users clients support
-        it.
+      I'd rather work out a good way to auto-generate documentation from
+      the settings definitions in the code in order to make sure the docs
+      stay in sync.
+
+      * Acknowledging problems
+
+      It should probably be possible to acknowledge a reported problem,
+      preventing repeated reports of the same service/host in the same
+      state.
+
+      * Configurable reporting hours
+
+      It would make sense to be able to configure the bot to only report
+      problems during hours in which staff/volunteers are likely to be
+      awake and paying attention to the IRC channel.
+
+      * Configurable report templates
+
+      It would be nice to be able to configure the format used for report
+      messages - perhaps including colour codes to colourise elements of
+      the message, where the channel allows it and users clients support
+      it.
 
 AUTHOR
-    David Precious, `<davidp at preshweb.co.uk>'
+
+    David Precious, <davidp at preshweb.co.uk>
 
 CONTRIBUTING
+
     This module is developed on GitHub:
 
     https://github.com/bigpresh/Bot-BasicBot-Pluggable-Module-Nagios
@@ -67,42 +88,50 @@ CONTRIBUTING
     Pull requests / suggestions / bug reports are welcomed.
 
     If you feel like it, even a "I'm using this and find it useful" mail to
-    `davidp@preshweb.co.uk' would be appreciated - it's nice to know when
+    davidp@preshweb.co.uk would be appreciated - it's nice to know when
     people find your work useful.
 
     (Reviews on cpanratings and/or ++'s on MetaCPAN are also very welcome.)
 
 BUGS
+
     Please report any bugs or feature requests to
-    `bug-bot-basicbot-pluggable-module-nagios at rt.cpan.org', or through
-    the web interface at
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-Mo
-    dule-Nagios. I will be notified, and then you'll automatically be
+    bug-bot-basicbot-pluggable-module-nagios at rt.cpan.org, or through the
+    web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-M
+    odule-Nagios. I will be notified, and then you'll automatically be
     notified of progress on your bug as I make changes.
 
 SUPPORT
+
     You can find documentation for this module with the perldoc command.
 
         perldoc Bot::BasicBot::Pluggable::Module::Nagios
 
     You can also look for information at:
 
-    * RT: CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Modu
-        le-Nagios
+      * RT: CPAN's request tracker
 
-    * AnnoCPAN: Annotated CPAN documentation
-        http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Modul
+      e-Nagios
 
-    * CPAN Ratings
-        http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Nagios
+      * AnnoCPAN: Annotated CPAN documentation
 
-    * Search CPAN
-        http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios/
+      http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Nagios
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios/
 
 ACKNOWLEDGEMENTS
+
 LICENSE AND COPYRIGHT
-    Copyright 2011 David Precious.
+
+    Copyright 2011-2017 David Precious.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

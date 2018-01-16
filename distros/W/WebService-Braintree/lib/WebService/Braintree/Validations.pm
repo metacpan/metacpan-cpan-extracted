@@ -1,5 +1,5 @@
 package WebService::Braintree::Validations;
-$WebService::Braintree::Validations::VERSION = '0.94';
+$WebService::Braintree::Validations::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -15,6 +15,7 @@ our @EXPORT_OK = qw(
     client_token_signature_with_customer_id
     client_token_signature_without_customer_id
     credit_card_signature
+    credit_card_verification_signature
     customer_signature
     transaction_signature
     clone_transaction_signature
@@ -115,6 +116,24 @@ sub customer_signature {
 
 sub clone_transaction_signature {
     return { amount => ".", "channel" => ".", options => { submit_for_settlement => "." } };
+}
+
+sub credit_card_verification_signature {
+    return {
+        options => {
+            amount => '.',
+            merchant_account_id => '.',
+        },
+        credit_card => {
+            cardholder_name => ".",
+            cvv => ".",
+            expiration_date => ".",
+            expiration_month => ".",
+            expiration_year => ".",
+            number => ".",
+            billing_address => address_signature,
+        },
+    }
 }
 
 sub transaction_signature{

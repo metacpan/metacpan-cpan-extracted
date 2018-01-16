@@ -1,5 +1,9 @@
 Revision history for perl module Text::APL
 
+0.08 2018-01-10T19:11:43Z
+
+ - escape quotes and double quotes
+
 0.07 2014-12-15T15:54:55Z
 
  - version fixes

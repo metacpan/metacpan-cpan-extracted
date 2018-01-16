@@ -18,26 +18,26 @@ with qw(
 
 before 'setup' => sub {
     my ($class) = @_;
-    
+
     for my $type (qw(Response Request)) {
         my $accessor_method = lc($type).'_class';
         my $super_class = $class->$accessor_method();
-        
+
         # Get role
         my $role_class = 'CatalystX::I18N::TraitFor::'.$type;
         Class::Load::load_class($role_class);
-        
+
         # Check if role has already been applied
         next
             if grep { $_->meta->does_role($role_class) } $super_class->meta->linearized_isa;
-        
+
         # Build anon class with our roles
         my $meta = Moose::Meta::Class->create_anon_class(
             superclasses => [$super_class],
             roles        => [$role_class],
             cache        => 1,
         );
-        
+
         $class->$accessor_method($meta->name);
     }
 };
@@ -45,9 +45,9 @@ before 'setup' => sub {
 around 'setup_component' => sub {
     my $orig  = shift;
     my ($class,$component) = @_;
-    
+
     Class::Load::load_class($component);
-    
+
     # Load View::TT role
     if ($component->isa('Catalyst::View::TT')
         && $component->can('meta')) {
@@ -58,7 +58,7 @@ around 'setup_component' => sub {
             }
         }
     }
-    
+
     return $class->$orig($component);
 };
 
@@ -74,8 +74,8 @@ CatalystX::I18N::Role::All - Load all available roles
 =head1 SYNOPSIS
 
  package MyApp::Catalyst;
- 
- use Catalyst qw/MyPlugins 
+
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::All/;
 
 =head1 DESCRIPTION

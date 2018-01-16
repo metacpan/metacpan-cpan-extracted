@@ -1,6 +1,6 @@
 package Net::Ethereum;
 
-use 5.022000;
+use 5.020000;
 use strict;
 use warnings;
 
@@ -9,9 +9,10 @@ use LWP::UserAgent;
 use JSON;
 use Math::BigInt;
 use Math::BigFloat;
+use File::Slurper 'read_text';
 use Data::Dumper;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 
 =pod
@@ -753,9 +754,34 @@ sub eth_getTransactionCount()
   return $dec;
 }
 
+
 =pod
 
-=head2 eth_getTransactionCount
+=head2 eth_getTransactionByHash
+
+  Returns the information about a transaction requested by transaction hash.
+
+  $hash - hash of a block;
+
+  my $eth_getTransactionByHash = $node->eth_getBlockTransactionCountByHash('0xe79342277d7e95cedf0409e0887c2cddb3ebc5f0d952b9f7c1c1c5cef845cb97', "latest");
+
+=cut
+
+sub eth_getTransactionByHash()
+{
+  my ($this, $hash) = @_;
+  my $rq = { jsonrpc => "2.0", method => "eth_getTransactionByHash", params => [ $hash ], id => 1};
+  my $num = $this->_node_request($rq)-> { result };
+  ##my $dec = sprintf("%d", hex($num)) + 0;
+  return $num;
+}
+
+
+
+
+=pod
+
+=head2 eth_getBlockTransactionCountByHash
 
   Returns the number of transactions in a block from a block matching the given block hash.
 
@@ -950,7 +976,15 @@ sub eth_getTransactionReceipt()
 {
   my ($this, $transaction_hash) = @_;
   my $rq = { jsonrpc => "2.0", method => "eth_getTransactionReceipt", params => [ $transaction_hash ], id => 1 };
-  return $this->_node_request($rq);
+
+#print "eth_getTransactionReceipt: ", Dumper($rq);
+
+  my $rc = $this->_node_request($rq);
+
+#print "eth_getTransactionReceipt rc: ", Dumper($rc);
+
+  return $rc;
+#  return $this->_node_request($rq);
 }
 
 =pod
@@ -1124,16 +1158,23 @@ sub wait_for_contract()
   if($show_progress) { $| = 1; }
   for(my $i=0; $i<$iterations;$i++)
   {
-    $tr_status = $this->eth_getTransactionReceipt($contrarc_deploy_tr);
-    if($tr_status->{result})
+    my $rc = $this->eth_getTransactionByHash($contrarc_deploy_tr);
+    if($rc->{blockNumber}) # do not pending
     {
-      $new_contract_id = $tr_status->{result}->{contractAddress};
-      $this->set_contract_id($new_contract_id);
-      if($show_progress) { print "\n"; }
-      last;
+      $tr_status = $this->eth_getTransactionReceipt($contrarc_deploy_tr);
+      if($tr_status->{result})
+      {
+        $new_contract_id = $tr_status->{result}->{contractAddress};
+        $this->set_contract_id($new_contract_id);
+        if($show_progress) { print "\n"; }
+        last;
+      }
     }
-    sleep(5);
-    if($show_progress) { print '.'.$i; }
+    else
+    {
+      sleep(5);
+      if($show_progress) { print '.'.$i; }
+    }
   }
   return $tr_status->{result};
 }
@@ -1178,14 +1219,21 @@ sub wait_for_transaction()
   if($show_progress) { $| = 1; }
   for(my $i=0; $i<$iterations;$i++)
   {
-    $tr_status = $this->eth_getTransactionReceipt($contrarc_deploy_tr);
-    if($tr_status->{result})
+    my $rc = $this->eth_getTransactionByHash($contrarc_deploy_tr);
+    if($rc->{blockNumber}) # do not pending
     {
-      if($show_progress) { print "\n"; }
-      last;
+      $tr_status = $this->eth_getTransactionReceipt($contrarc_deploy_tr);
+      if($tr_status->{result})
+      {
+        if($show_progress) { print "\n"; }
+        last;
+      }
     }
-    sleep(5);
-    if($show_progress) { print '.'.$i; }
+    else
+    {
+      sleep(5);
+      if($show_progress) { print '.'.$i; }
+    }
   }
   return $tr_status->{result};
 }
@@ -1342,10 +1390,12 @@ sub compile_and_deploy_contract()
 sub _read_file()
 {
   my ($this, $file_path) = @_;
-  open my $FILE, "<", $file_path or die "Can't open file: $!\n";
-  local $/ = undef;
-  my $content = <$FILE>;
-  close $FILE;
+  my $content = read_text($file_path);
+
+  # open my $FILE, "<", $file_path or die "Can't open file: $!\n";
+  # local $/ = undef;
+  # my $content = <$FILE>;
+  # close $FILE;
   return $content;
 }
 
@@ -1807,12 +1857,18 @@ sub _string2hex()
 sub _node_request()
 {
   my ($this, $json_data) = @_;
+
   my $req = HTTP::Request->new(POST => $this->{api_url});
   $req->header('Content-Type' => 'application/json');
   my $ua = LWP::UserAgent->new;
   my $data = encode_json($json_data);
   $req->add_content_utf8($data);
+
+#print '_node_request req: ', Dumper($req);
+
   my $ua_rc = $ua->request($req)->{ _content };
+
+#print '_node_request ua_rc: ', Dumper($ua_rc);
 
   my $rc;
   if($ua_rc=~/"result":/)
@@ -1823,7 +1879,6 @@ sub _node_request()
   {
     die 'Died at Net::Ethereum _node_request() - '.$ua_rc;
   }
-  # my $rc = JSON::decode_json($ua->request($req)->{ _content });
   if($rc->{error}) { die $rc; }
   else { return $rc;  }
 }
@@ -1877,3 +1932,4 @@ L<https://habrahabr.ru/company/raiffeisenbank/blog/338172/>
 
 
 =cut
+

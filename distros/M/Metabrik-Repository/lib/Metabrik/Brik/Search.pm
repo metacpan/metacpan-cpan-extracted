@@ -1,5 +1,5 @@
 #
-# $Id: Search.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Search.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # brik::search Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       commands => {
          all => [ ],
@@ -31,6 +31,10 @@ sub brik_properties {
 sub all {
    my $self = shift;
 
+   if (! defined($self->context)) {
+      return $self->log->error("all: no core::context Brik");
+   }
+
    my $context = $self->context;
    my $status = $context->status;
 
@@ -38,6 +42,7 @@ sub all {
    my $count = 0;
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
+      next unless $context->used->{$brik}->can('brik_tags');
       my $tags = $context->used->{$brik}->brik_tags;
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
       $count++;
@@ -48,6 +53,7 @@ sub all {
    $count = 0;
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
+      next unless $context->not_used->{$brik}->can('brik_tags');
       my $tags = $context->not_used->{$brik}->brik_tags;
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
       $count++;
@@ -62,6 +68,10 @@ sub string {
    my $self = shift;
    my ($string) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("string: no core::context Brik");
+   }
+
    $self->brik_help_run_undef_arg('string', $string) or return;
 
    my $context = $self->context;
@@ -71,6 +81,7 @@ sub string {
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
       next unless $brik =~ /$string/;
+      next unless $context->used->{$brik}->can('brik_tags');
       my $tags = $context->used->{$brik}->brik_tags;
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
       $total++;
@@ -79,6 +90,7 @@ sub string {
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
       next unless $brik =~ /$string/;
+      next unless $context->not_used->{$brik}->can('brik_tags');
       my $tags = $context->not_used->{$brik}->brik_tags;
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
       $total++;
@@ -91,6 +103,10 @@ sub tag {
    my $self = shift;
    my ($tag) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("tag: no core::context Brik");
+   }
+
    $self->brik_help_run_undef_arg('tag', $tag) or return;
 
    my $context = $self->context;
@@ -99,6 +115,7 @@ sub tag {
    my $total = 0;
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
+      next unless $context->used->{$brik}->can('brik_tags');
       my $tags = $context->used->{$brik}->brik_tags;
       push @$tags, 'used';
       for my $this (@$tags) {
@@ -111,6 +128,7 @@ sub tag {
 
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
+      next unless $context->not_used->{$brik}->can('brik_tags');
       my $tags = $context->not_used->{$brik}->brik_tags;
       push @$tags, 'not_used';
       for my $this (@$tags) {
@@ -129,6 +147,10 @@ sub not_tag {
    my $self = shift;
    my ($tag) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("not_tag: no core::context Brik");
+   }
+
    $self->brik_help_run_undef_arg('not_tag', $tag) or return;
 
    my $context = $self->context;
@@ -137,6 +159,7 @@ sub not_tag {
    my $total = 0;
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
+      next unless $context->used->{$brik}->can('brik_tags');
       my $tags = $context->used->{$brik}->brik_tags;
       push @$tags, 'used';
       for my $this (@$tags) {
@@ -149,6 +172,7 @@ sub not_tag {
 
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
+      next unless $context->not_used->{$brik}->can('brik_tags');
       my $tags = $context->not_used->{$brik}->brik_tags;
       push @$tags, 'not_used';
       for my $this (@$tags) {
@@ -176,6 +200,10 @@ sub not_used {
 
 sub show_require_modules {
    my $self = shift;
+
+   if (! defined($self->context)) {
+      return $self->log->error("show_require_modules: no core::context Brik");
+   }
 
    my $context = $self->context;
    my $available = $context->available;
@@ -207,6 +235,10 @@ sub command {
    my $self = shift;
    my ($command) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("command: no core::context Brik");
+   }
+
    $self->brik_help_run_undef_arg('command', $command) or return;
 
    my $context = $self->context;
@@ -216,6 +248,7 @@ sub command {
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
       if (exists($context->used->{$brik}->brik_properties->{commands})) {
+         next unless $context->used->{$brik}->can('brik_tags');
          my $tags = $context->used->{$brik}->brik_tags;
          push @$tags, 'used';
          for my $key (keys %{$context->used->{$brik}->brik_properties->{commands}}) {
@@ -230,6 +263,7 @@ sub command {
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
       if (exists($context->not_used->{$brik}->brik_properties->{commands})) {
+         next unless $context->not_used->{$brik}->can('brik_tags');
          my $tags = $context->not_used->{$brik}->brik_tags;
          push @$tags, 'not_used';
          for my $key (keys %{$context->not_used->{$brik}->brik_properties->{commands}}) {
@@ -248,6 +282,10 @@ sub category {
    my $self = shift;
    my ($category) = @_;
 
+   if (! defined($self->context)) {
+      return $self->log->error("category: no core::context Brik");
+   }
+
    $self->brik_help_run_undef_arg('category', $category) or return;
 
    my $context = $self->context;
@@ -256,8 +294,11 @@ sub category {
    my $total = 0;
    $self->log->info("Used:");
    for my $brik (@{$status->{used}}) {
+      next unless defined($context->used->{$brik});
+      next unless $context->used->{$brik}->can('brik_category');
       my $brik_category = $context->used->{$brik}->brik_category;
       next unless $brik_category eq $category;
+      next unless $context->used->{$brik}->can('brik_tags');
       my $tags = $context->used->{$brik}->brik_tags;
       push @$tags, 'used';
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
@@ -266,8 +307,11 @@ sub category {
 
    $self->log->info("Not used:");
    for my $brik (@{$status->{not_used}}) {
+      next unless defined($context->not_used->{$brik});
+      next unless $context->not_used->{$brik}->can('brik_category');
       my $brik_category = $context->not_used->{$brik}->brik_category;
       next unless $brik_category eq $category;
+      next unless $context->not_used->{$brik}->can('brik_tags');
       my $tags = $context->not_used->{$brik}->brik_tags;
       push @$tags, 'not_used';
       $self->log->info(sprintf("   %-20s [%s]", $brik, join(', ', @$tags)));
@@ -279,6 +323,10 @@ sub category {
 
 sub list_categories {
    my $self = shift;
+
+   if (! defined($self->context)) {
+      return $self->log->error("list_categories: no core::context Brik");
+   }
 
    my $con = $self->context;
    my $available = $con->find_available;
@@ -311,7 +359,7 @@ Metabrik::Brik::Search - brik::search Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

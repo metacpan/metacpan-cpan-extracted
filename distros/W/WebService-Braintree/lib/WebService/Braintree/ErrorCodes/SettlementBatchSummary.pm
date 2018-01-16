@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::SettlementBatchSummary;
-$WebService::Braintree::ErrorCodes::SettlementBatchSummary::VERSION = '0.94';
+$WebService::Braintree::ErrorCodes::SettlementBatchSummary::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 

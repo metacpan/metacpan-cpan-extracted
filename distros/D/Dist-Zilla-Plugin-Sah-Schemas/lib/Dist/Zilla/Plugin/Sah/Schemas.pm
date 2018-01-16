@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $DATE = '2017-01-31'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -220,13 +220,29 @@ sub gather_files {
 }
 
 sub register_prereqs {
+    no strict 'refs';
+
     my $self = shift;
 
     #use DD; dd $self->{_used_schema_modules}; dd $self->{_our_schema_modules};
     for my $mod (sort keys %{$self->{_used_schema_modules} // {}}) {
         next if $self->{_our_schema_modules}{$mod};
         $self->log(["Adding prereq to %s", $mod]);
-        $self->zilla->register_prereqs({phase=>'runtime'}, $mod);
+        $self->zilla->register_prereqs({phase=>'runtime'}, $mod => 0);
+        # add prereq to XCompletion modules
+    }
+
+    for my $mod (sort keys %{$self->{_our_schema_modules} // {}}) {
+        my $nsch = ${"$mod\::schema"};
+        if (my $xc = $nsch->[1]{'x.completion'}) {
+            my @c = ref($xc) eq 'CODE' ? () :
+                ref($xc) eq 'ARRAY' ? @$xc : ($xc);
+            for my $c (@c) {
+                my $xcmod = "Perinci::Sub::XCompletion::$c";
+                $self->log(["Adding prereq to %s", $xcmod]);
+                $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => 0);
+            }
+        }
     }
 }
 
@@ -246,7 +262,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.008 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2017-01-31.
+This document describes version 0.010 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-01-14.
 
 =head1 SYNOPSIS
 
@@ -317,7 +333,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

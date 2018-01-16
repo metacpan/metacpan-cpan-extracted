@@ -143,11 +143,11 @@ __PACKAGE__->has_many(customers => 'Customer', { via => 'customer_achievement' }
 
 package main;
 
-ok my $Bill = Customer->get(3), 'got Bill';
+ok my $Bill = Customer->objects->get(3), 'got Bill';
 ok my @bills_orders = $Bill->orders->fetch, 'got Bill\'s orders';
 
 is scalar @bills_orders, 1;
-ok my $order = Order->get(3), 'order';
+ok my $order = Order->objects->get(3), 'order';
 ok $order->customer, 'the order has a customer';
 is $order->customer->id, $bills_orders[0]->id, 'id == id';
 
@@ -156,7 +156,7 @@ ok my @achievements = $Bill->achievements->fetch;
 is @achievements, 3;
 isa_ok $achievements[0], 'Achievement';
 
-ok my $a = Achievement->get(1);
+ok my $a = Achievement->objects->get(1);
 ok my @customers = $a->customers->fetch;
 is @customers, 3;
 

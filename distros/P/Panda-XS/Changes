@@ -1,3 +1,6 @@
+2.1.8  12.01.2018
+           - update installed ppport.h to 3.37 for bleadperl compability
+           - XS for CPP::panda::lib::CalbackDispatcher
 2.1.7  11.05.2017
            - move cast.h, refcnt.h to CPP::panda::lib, require CPP::panda::lib
            - add PXS_TRY, sv2string, sv2string_view from Panda::Lib

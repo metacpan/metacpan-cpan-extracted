@@ -8,7 +8,7 @@ requires qw(headers);
 
 sub content_language {
     my ($self,@languages) = @_;
-    
+
     if (scalar @languages) {
         my $language = join(', ',@languages);
         return $self->headers->header( 'Content-Language' => $language );
@@ -31,7 +31,7 @@ CatalystX::I18N::TraitFor::Response - Adds the Content-Language header to the Ca
  package MyApp::Catalyst;
  
  use CatalystX::RoleApplicator;
- use Catalyst qw/MyPlugins 
+ use Catalyst qw/MyPlugins
     CatalystX::I18N::Role::Base/;
  
  __PACKAGE__->apply_response_class_roles(qw/CatalystX::I18N::TraitFor::Response/);

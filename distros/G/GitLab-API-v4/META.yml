@@ -19,16 +19,17 @@ meta-spec:
 name: GitLab-API-v4
 requires:
   Carp: '0'
-  Class::Method::Modifiers: '2.05'
   Const::Fast: '0.014'
   Data::Dumper: '0'
-  Data::Serializer: '0.60'
   Exporter: '0'
   Getopt::Long: '0'
+  IO::Prompter: '0.004014'
+  JSON: '2.92'
   Log::Any: '1.703'
   Log::Any::Adapter: '1.703'
   Log::Any::Adapter::Screen: '0.13'
   Moo: '2.003000'
+  Path::Tiny: '0.079'
   Pod::Usage: '0'
   Role::REST::Client: '0.22'
   Try::Tiny: '0.28'
@@ -36,12 +37,11 @@ requires:
   Types::Common::String: '1.002001'
   Types::Standard: '1.002001'
   URI::Escape: '1.72'
-  YAML: '1.21'
   namespace::clean: '0.27'
   strictures: '2.000003'
 resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/GitLab-API-v4
   repository: https://github.com/bluefeet/GitLab-API-v4.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.69'

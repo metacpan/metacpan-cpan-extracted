@@ -28,19 +28,23 @@ no_index:
 provides:
   WebService::Cryptopia:
     file: lib/WebService/Cryptopia.pm
-    version: '0.016'
+    version: '0.018'
 requires:
+  Digest::MD5: '0'
+  Digest::SHA: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
   Log::Log4perl: '0'
+  MIME::Base64: '0'
   Moose: '0'
   MooseX::Log::Log4perl: '0'
   MooseX::Params::Validate: '0'
   Try::Tiny: '0'
+  URL::Encode: '0'
   YAML: '0'
 resources:
   repository: https://github.com/robin13/WebService-Cryptopia
-version: '0.016'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.022001'
@@ -223,7 +227,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.016
+          tag: v0.018
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

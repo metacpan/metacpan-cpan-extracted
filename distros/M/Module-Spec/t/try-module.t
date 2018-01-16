@@ -24,6 +24,18 @@ use lib qw(t/lib);
     is $m, 'Foo', 'try_module with version';
 }
 {
+    my $m = try_module('Foo~0');
+    is $m, 'Foo', 'try_module("M~0")';
+}
+{
+    my $m = try_module('NoVersion');
+    is $m, 'NoVersion', 'try_module("M") on module with no version';
+}
+{
+    my $m = try_module('NoVersion~0');
+    is $m, 'NoVersion', 'try_module("M~0") on module with no version';
+}
+{
     my ( $m, $v ) = try_module('Foo');
     is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
       'simple try_module in list context';
@@ -37,6 +49,11 @@ use lib qw(t/lib);
     my ( $m, $v ) = try_module('Foo~0.1.0');
     is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
       'try_module with version in list context';
+}
+{
+    my ( $m, $v ) = try_module('NoVersion');
+    is_deeply [ $m, $v ], [ 'NoVersion', NoVersion->VERSION ],
+      'try_module("M") on module with no version - list context';
 }
 
 # Sucessful loads - with {require => $r}
@@ -104,6 +121,13 @@ use lib qw(t/lib);
         exception { try_module('BadBadBadFoo') },
         qr/^Missing right curly or square bracket\b/,
         'try_module rethrows on failed compilation'
+    );
+}
+{
+    like(
+        exception { try_module('NoVersion~1') },
+        qr/^NoVersion does not define \$NoVersion::VERSION\b/,
+        'try_module M~V rethrows on module with no version'
     );
 }
 

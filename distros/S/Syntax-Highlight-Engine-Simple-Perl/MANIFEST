@@ -1,15 +1,11 @@
 Changes
+INSTALL.SKIP
 lib/Syntax/Highlight/Engine/Simple/Perl.pm
 Makefile.PL
 MANIFEST
-README
 README.pod
 t/00.load.t
 t/highlight.t
-t/perlcritic.t
-t/perlcriticrc
-t/pod-coverage.t
-t/pod.t
 xt/perlcritic.t
 xt/perlcriticrc
 xt/pod-coverage.t

@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::TransferAnnotationToGroups;
-$Bio::Roary::CommandLine::TransferAnnotationToGroups::VERSION = '3.11.1';
+$Bio::Roary::CommandLine::TransferAnnotationToGroups::VERSION = '3.11.3';
 # ABSTRACT: Take in a groups file and a set of GFF files and transfer the consensus annotation
 
 
@@ -114,7 +114,7 @@ Bio::Roary::CommandLine::TransferAnnotationToGroups - Take in a groups file and 
 
 =head1 VERSION
 
-version 3.11.1
+version 3.11.3
 
 =head1 SYNOPSIS
 

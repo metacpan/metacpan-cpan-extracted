@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '0.94';
+$WebService::Braintree::Transaction::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
@@ -48,7 +48,7 @@ sub credit {
     $class->create($params, 'credit');
 }
 
-=head2 credit()
+=head2 create()
 
 This takes a hashref of parameters and a type and returns the transaction
 created.
@@ -157,6 +157,31 @@ This takes an id and cancels the release of the transaction (if it exists).
 sub cancel_release {
     my ($class, $id) = @_;
     $class->gateway->transaction->cancel_release($id);
+}
+
+=head2 update_details()
+
+This takes an id and updates the transaction details with the provided
+parameters. This requires the transaction to be in submitted_for_settlement
+status.
+
+=cut
+
+sub update_details {
+    my ($class, $id, $params) = @_;
+    $class->gateway->transaction->update_details($id, ($params // {}));
+}
+
+=head2 submit_for_partial_settlement()
+
+This takes an id, amount, and optional parameters and submits the transaction
+for partial settlement.
+
+=cut
+
+sub submit_for_partial_settlement {
+    my ($class, $id, $amount, $params) = @_;
+    $class->gateway->transaction->submit_for_partial_settlement($id, $amount, ($params // {}));
 }
 
 =head2 search()

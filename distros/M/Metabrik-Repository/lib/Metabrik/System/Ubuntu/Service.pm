@@ -1,5 +1,5 @@
 #
-# $Id: Service.pm,v 94e85541d72a 2017/02/04 16:34:12 gomor $
+# $Id: Service.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # system::ubuntu::service Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 94e85541d72a $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -65,7 +65,7 @@ Metabrik::System::Ubuntu::Service - system::ubuntu::service Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

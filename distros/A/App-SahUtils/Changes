@@ -1,3 +1,11 @@
+0.460   2018-01-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild for coercion fixes (e.g. "show-sah-schema-modules
+          perl/modname" didn't work).
+
+
 0.45    2017-03-11 (PERLANCAR)
 
 	- list-sah-schemas-modules, list-sah-type-modules: Allow filtering etc

@@ -1,14 +1,15 @@
 package WebService::Braintree::CustomerGateway;
-$WebService::Braintree::CustomerGateway::VERSION = '0.94';
+$WebService::Braintree::CustomerGateway::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
 use WebService::Braintree::Validations qw(verify_params customer_signature);
-use WebService::Braintree::Util qw(to_instance_array validate_id);
+use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Result;
 
 has 'gateway' => (is => 'ro');
@@ -38,32 +39,33 @@ sub update {
 
 sub search {
     my ($self, $block) = @_;
-    my $search = WebService::Braintree::CustomerSearch->new;
-    my $params = $block->($search)->to_hash;
-    my $response = $self->gateway->http->post("/customers/advanced_search_ids", {search => $params});
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-        $self->fetch_customers($search, shift);
+
+    return $self->resource_collection({
+        ids_url => "/customers/advanced_search_ids",
+        obj_url => "/customers/advanced_search",
+        inflate => [qw/customers customer Customer/],
+        search => $block->(WebService::Braintree::CustomerSearch->new),
     });
 }
 
 sub all {
     my $self = shift;
-    my $response = $self->gateway->http->post("/customers/advanced_search_ids");
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-        $self->fetch_customers(
-            WebService::Braintree::CustomerSearch->new, shift,
-        );
+
+    return $self->resource_collection({
+        ids_url => "/customers/advanced_search_ids",
+        obj_url => "/customers/advanced_search",
+        inflate => [qw/customers customer Customer/],
     });
 }
 
-sub fetch_customers {
-    my ($self, $search, $ids) = @_;
-    $search->ids->in($ids);
-    my @result = ();
-    return [] if scalar @{$ids} == 0;
-    my $response = $self->gateway->http->post( "/customers/advanced_search/", {search => $search->to_hash});
-    my $attrs = $response->{'customers'}->{'customer'};
-    return to_instance_array($attrs, "WebService::Braintree::Customer");
+sub transactions {
+    my ($self, $customer_id) = @_;
+
+    return $self->resource_collection({
+        ids_url => "/customers/${customer_id}/transaction_ids",
+        obj_url => "/customers/${customer_id}/transactions",
+        inflate => [qw/credit_card_transactions transaction Transaction/],
+    });
 }
 
 __PACKAGE__->meta->make_immutable;

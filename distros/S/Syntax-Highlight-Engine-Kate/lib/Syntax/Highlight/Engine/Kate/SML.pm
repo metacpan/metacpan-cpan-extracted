@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::SML;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use warnings;

@@ -28,7 +28,7 @@ $| ++;
  $0 --host host --listen 9999
 
  $0 --host host --listen 9999 [--addr 10.10.10.1]\
-      [--user user(default `logname`)] [--sudo sudoer]
+      [--user user(default `id -un`)] [--sudo sudoer]
 
 =cut
 
@@ -55,7 +55,7 @@ my $socket = IO::Socket::INET->new (
     Listen    => 1
 ) or die "listen $listen: $!\n";
 
-$o{user} = `logname` and chop $o{user}  unless $o{user};
+$o{user} = `id -un` and chop $o{user}  unless $o{user};
 
 my $uuid = Data::UUID->new->create_str();
 

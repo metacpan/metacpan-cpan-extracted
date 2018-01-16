@@ -60,6 +60,7 @@ sub SupportedTypes{
 
 The C<String> method will create the matcher in the needed structure to match a string.
 If called with parameter, it will be proved that this value is actually a string. If not, it will create an error.
+Use the Matcher Number() to Check for the string '0' (perl cannot differ that)
 
   String();
   String('abc');
@@ -68,6 +69,7 @@ If called with parameter, it will be proved that this value is actually a string
 sub String(;$) {
     my ($Value) = @_;
     die('NotAString') if $Value && !IsString($Value);
+    die('Use the Matcher Number() to Check for the string \'0\' (perl cannot differ that)') if defined $Value && $Value eq '0';
     return _Type('string',$Value);
 }
 =pod

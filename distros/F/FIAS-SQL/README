@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution FIAS-SQL,
-version 0.04:
+version 0.05:
 
   Модуль для минимальной работы с данными из базы ФИАC https://fias.nalog.ru/FiasInfo.aspx
 
-This software is copyright (c) 2017 by Daniil Popov.
+This software is copyright (c) 2017-2018 by Daniil Popov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

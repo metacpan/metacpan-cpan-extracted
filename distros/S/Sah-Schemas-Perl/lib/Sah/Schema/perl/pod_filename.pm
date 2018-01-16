@@ -1,7 +1,7 @@
 package Sah::Schema::perl::pod_filename;
 
-our $DATE = '2017-02-08'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (.pod files)',
@@ -68,7 +68,7 @@ Sah::Schema::perl::pod_filename - Filename (.pod files)
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2017-02-08.
+This document describes version 0.010 of Sah::Schema::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-01-14.
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

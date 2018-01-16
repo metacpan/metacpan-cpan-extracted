@@ -1,0 +1,13 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "rpt_vs3.pbl" "";
+@end;
+@begin Objects
+ "nv_vs3_verifier.sru" "rpt_vs3.pbl";
+ "dw_iml_vs3_p1.srd" "rpt_vs3.pbl";
+ "dw_iml_vs3_p2.srd" "rpt_vs3.pbl";
+ "w_iml_vs3.srw" "rpt_vs3.pbl";
+ "nv_vs3_creator.sru" "rpt_vs3.pbl";
+ "nv_vs3_exporter.sru" "rpt_vs3.pbl";
+ "nv_vs3_importer.sru" "rpt_vs3.pbl";
+@end;

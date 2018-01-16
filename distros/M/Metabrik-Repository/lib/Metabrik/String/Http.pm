@@ -1,5 +1,5 @@
 #
-# $Id: Http.pm,v ce30ae8c77d9 2017/03/10 17:06:39 gomor $
+# $Id: Http.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # string::http Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: ce30ae8c77d9 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -109,7 +109,7 @@ Metabrik::String::Http - string::http Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -23,13 +23,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Time::TAI::Simple",
   "PREREQ_PM" => {
-    "HTTP::Tiny" => "0.000",
+    "HTTP::Tiny" => 0,
     "POSIX::RT::Clock" => "0.015",
     "Test::Differences" => "0.60",
     "Test::Most" => "0.30",
     "Time::HiRes" => "1.9"
   },
-  "VERSION" => "1.11",
+  "VERSION" => "1.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "HTTP::Tiny" => "0.000",
+  "HTTP::Tiny" => 0,
   "POSIX::RT::Clock" => "0.015",
   "Test::Differences" => "0.60",
   "Test::Most" => "0.30",

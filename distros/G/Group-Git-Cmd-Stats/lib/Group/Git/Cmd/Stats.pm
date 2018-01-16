@@ -18,7 +18,7 @@ use Path::Tiny;
 use Getopt::Alt;
 use YAML::Syck;
 
-our $VERSION = version->new('0.0.2');
+our $VERSION = version->new('0.0.3');
 
 my $opt = Getopt::Alt->new(
     {
@@ -51,7 +51,9 @@ sub stats {
 
     $opt->process if !%{ $opt->opt || {} };
 
-    my $dir = path($CWD);
+    my $dir      = path($CWD);
+    my $stats    = $dir->path('.stats');
+    my $log_file = $stats->path('error.log');
 
     local $CWD = $name;
 
@@ -74,11 +76,16 @@ sub stats {
         # dodgy date handling but hay
         $date =~ s/\s.+$//;
 
-        open my $show, '-|', qq{git show $id | grep -v '^[+][+][+]|^[-][-][-]' | grep -v '^[^-+]'};
-        my ($added, $removed) = (0, 0);
+        unlink $log_file if -f $log_file;
+        open my $show, '-|', qq{git show '$id' 2> $log | grep -Pv '^[+][+][+]|^[-][-][-]' | grep -Pv '^[^-+]'};
+        my ($added, $removed, $total, $lines) = (0, 0, 0, 0);
         while (my $change = <$show>) {
-            $added++   if $change =~ /^[+]/;
-            $removed++ if $change =~ /^[-]/;
+            $total = $change =~ /^[+]/ ? $added++ : $removed++;
+            $lines++;
+        }
+        if ( -s $log_file ) {
+            warn qq{git show $id 2> $log_file | grep -v '^[+][+][+]|^[-][-][-]' | grep -v '^[^-+]'\n};
+            return;
         }
 
         $stats{$id} = {
@@ -87,10 +94,10 @@ sub stats {
             date    => $date,
             added   => $added,
             removed => $removed,
+            lines   => $lines,
         };
     }
 
-    $cache = $dir->path('.stats', $name . '.yml');
     DumpFile($cache, \%stats);
 
     $collected->{$name} = \%stats;
@@ -137,11 +144,11 @@ __END__
 
 =head1 NAME
 
-Group::Git::Cmd::Stats - Group-Git tools to show statistics accross many repositories
+Group::Git::Cmd::Stats - Group-Git tools to show statistics across many repositories
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Stats version 0.0.2
+This documentation refers to Group::Git::Cmd::Stats version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -155,7 +162,7 @@ This documentation refers to Group::Git::Cmd::Stats version 0.0.2
 =head1 DESCRIPTION
 
 Adds the stats command to L<Group::Git> which allows you to collect statistics
-accross many repositories.
+across many repositories.
 
 =head1 SUBROUTINES/METHODS
 
@@ -165,7 +172,7 @@ Collects the stats for each repository.
 
 =head2 C<stats_start ()>
 
-Initialises stats
+Initializes stats
 
 =head2 C<stats_end ()>
 

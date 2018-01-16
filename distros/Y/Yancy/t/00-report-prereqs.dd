@@ -7,16 +7,12 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
-                                      'File::Share' => '0',
                                       'File::Spec::Functions' => '0',
                                       'FindBin' => '0',
-                                      'Module::Runtime' => '0',
                                       'Mojolicious' => '7.15',
-                                      'Mojolicious::Plugin::AssetPack' => '0',
                                       'Mojolicious::Plugin::OpenAPI' => '1.22',
                                       'Sys::Hostname' => '0',
-                                      'experimental' => '0',
-                                      'perl' => '5.024'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {

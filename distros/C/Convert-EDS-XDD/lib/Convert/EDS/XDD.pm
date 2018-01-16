@@ -5,7 +5,7 @@ package Convert::EDS::XDD;
 no warnings 'uninitialized';
 
 # ABSTRACT: Converts CANopen EDS format to Ethernet POWERLINK XDD
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Carp;
 use Config::Tiny;
@@ -26,17 +26,20 @@ Convert::EDS::XDD - Convert CANopen EDS to POWERLINK XDD
 
 =head1 SYNOPSIS
 
-  perl -MConvert::EDS::XDD=eds2xdd -e "print eds2xdd 'profile.eds'" > profile.xdd
+  $ cpan Convert::EDS::XDD # install from CPAN
+  $ eds2xdd profile.eds > profile.xdd # Convert with the eds2xdd script
 
 =head1 DESCRIPTION
 
 EDS is an L<ini|Config::Tiny> based format specified by the CiA e.V. in order to describe CANopen devices. The Ethernet POWERLINK Standardization Group specifies an EDS-based L<XML|XML::Writer> format for EPL devices.
 
-This module Takes in an EDS file or a string with its content and returns a XDD string. A self-contained (fatpacked) C<epl2xdd> script is available L<at the Github releases page|https://github.com/epl-viz/Convert-EDS-XDD/releases/latest>.
+This module takes in an EDS file or a string with its content and returns a XDD string. An L<eds2xdd> wrapper script is also installed into the C<PATH>.
+
+C<eds2xdd> is also available as a self-contained (fatpacked) script L<at the Github releases page|https://github.com/epl-viz/Convert-EDS-XDD/releases/latest>.
 
 =head1 LIMITATIONS
 
-May not handle all details of the EDS. Pull requests and reports (issues on Github) welcome.
+May not handle all details of the EDS. Pull requests and reports (L<issues on Github|https://github.com/epl-viz/Convert-EDS-XDD/issues>) are welcome.
 
 =cut
 
@@ -82,16 +85,16 @@ sub _extract {
 
 =item eds2xdd($filename, [$encoding])
 
-Here, the [] indicate an optional parameter.
+Here, the C<[]> indicate an optional parameter.
 
 Returns the EDS' content as XML string on success or undef on error in file contents.
 
 Function croaks if opening file fails.
 
-$encoding may be used to indicate the encoding of the file, e.g. 'utf8' or
-'encoding(iso-8859-1)'.
+C<$encoding> may be used to indicate the encoding of the file, e.g. C<'utf8'> or
+C<'encoding(iso-8859-1)'>.
 
-Do not add a prefix to $encoding, such as '<' or '<:'.
+Do not add a prefix to C<$encoding>, such as C<< '<' >> or C<< '<:' >>.
 
 =cut
 
@@ -108,7 +111,7 @@ sub eds2xdd {
     close($eds);
 
     croak "Reading from '$file' returned undef" unless defined $contents;
-    eds2xdd_string($contents) or return undef;
+    eds2xdd_string($contents) or return;
 };
 
 my $template = do {
@@ -285,7 +288,7 @@ Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 Ahmad Fatoum
+Copyright (C) 2017-2018 Ahmad Fatoum
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

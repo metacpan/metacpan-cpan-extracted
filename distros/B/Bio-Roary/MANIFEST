@@ -34,7 +34,6 @@ contrib/roary_plots/roary_files/jquery.min.js
 contrib/roary_plots/roary_files/require.min.js
 contrib/roary_plots/roary_plots.ipynb
 contrib/roary_plots/roary_plots.py
-core_alignment_header.embl
 deployment_process
 dist.ini
 install_dependencies.sh

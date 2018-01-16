@@ -6,15 +6,12 @@ use ZMQ::Raw;
 my $ctx = ZMQ::Raw::Context->new;
 my $loop = ZMQ::Raw::Loop->new ($ctx);
 
-sub trigger
-{
-	my $sock = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DEALER);
-	$sock->connect ('tcp://localhost:5559');
-	$sock->send ('hello');
-}
-
 my $sock = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DEALER);
 $sock->bind ('tcp://*:5559');
+
+my $sender = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DEALER);
+$sender->connect ('tcp://localhost:5559');
+
 
 my $readable = 0;
 my $handle;
@@ -37,7 +34,7 @@ $handle = ZMQ::Raw::Loop::Handle->new (
 		{
 			$loop->add ($handle);
 
-			trigger;
+			$sender->send ('hello');
 		}
 
 	}
@@ -51,7 +48,7 @@ ok (!eval {ZMQ::Raw::Loop::Handle->new (handle => $sock, on_writable => 'blah')}
 ok (!eval {ZMQ::Raw::Loop::Handle->new (handle => $sock, on_readable => sub {}, on_timeout => 'blah')});
 ok (!eval {ZMQ::Raw::Loop::Handle->new (handle => $sock, on_readable => sub {}, on_timeout => sub {})});
 
-trigger;
+$sender->send ('hello');
 $loop->add ($handle);
 $loop->run;
 is $readable, 2;

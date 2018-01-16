@@ -3,59 +3,54 @@
 #PODNAME: tinyid
 use strict;
 use warnings;
-use Getopt::Long qw(GetOptions);
+
+use Getopt::Long::Descriptive;
 use Integer::Tiny;
-use Scalar::Util qw(looks_like_number);
+use v5.10;
 
-my ($text, $decode, $encode);
+my $key = 'Wel0v3you';
+my ( $opt, $usage ) = describe_options(
+    "tinyid %o",
+    [ 'text|t=s', 'Text to be encrypted.', { required => 1 } ],
+    [
+        'key|k=s',
+'Overrides default key value "WEl0v3you" with your key of choice. Note that you cannot include duplicated characters, but only single unique character per text.',
+        { default => 'WEl0v3you' }
+    ],
+    [
+        'encrypt|e',
+        'This encrypts numerical value. You must include --text or -t too.'
+    ],
+    [
+        'decrypt|d',
+        'This decrypts the text. You must include --text or -t too.'
+    ],
+    [ 'help|h', 'Print this message and exit.', { shortcircuit => 1 } ]
+);
 
-# note, that you cannot have duplicate characters. Only single unique char.
-my $key = "WEl0v3you";
+say( $usage->text ), exit 0 if $opt->help;
 
-GetOptions('text=s' => \$text,
-		   'key=s' => \$key,
-		   'decode' => \$decode,
-		   'encode' => \$encode
-) or die 'Error in command line arguments';
+my $intiny = Integer::Tiny->new( $opt->key );
 
-my $it = Integer::Tiny->new($key);
-
-if (defined ($encode) && looks_like_number($encode)) {
-	print $it->encrypt($text) . "\n";
+if ( not $opt->text ) {
+    warn '--text/-t cannot be empty. Try again.';
 }
 
-elsif (defined($decode)) {
-	print $it->decrypt($text) . "\n";
+if ( $opt->encrypt and ( $opt->text =~ /^[0-9]+$/ ) ) {
+    say $intiny->encrypt( $opt->text );
+}
+
+elsif ( $opt->encrypt and ( $opt->text !~ /^[0-9]+$/ ) ) {
+    warn 'You can only encrypt integer values!. Please try again.';
+    exit 1;
+}
+
+elsif ( $opt->decrypt ) {
+    say $intiny->decrypt( $opt->text );
 }
 
 else {
-	die "Error occured. The program is not supplied with -e or -d arguments.";
-	exit 1;
+    warn
+'Error occured. The program is not supplied with --encrypt/-e or --decrypt/-d argument.';
+    exit 1;
 }
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-tinyid
-
-=head1 VERSION
-
-version 0.1.1
-
-=head1 AUTHOR
-
-faraco <skelic3@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by faraco.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

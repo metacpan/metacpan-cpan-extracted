@@ -4,7 +4,7 @@ use Test::Fatal;
 BEGIN { use_ok( 'Zonemaster::LDNS' ) }
 
 SKIP: {
-    skip 'no network', 3 if $ENV{TEST_NO_NETWORK};
+    skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};
 
     my $res = Zonemaster::LDNS->new( '46.21.106.227' );
     my $res2 = Zonemaster::LDNS->new( '192.36.144.107' );

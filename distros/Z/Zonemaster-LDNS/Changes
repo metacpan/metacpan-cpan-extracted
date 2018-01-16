@@ -1,5 +1,10 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+1.0.2 2018-01-12
+ - Fixed
+   - Skip unit tests that depend on the Internet by default (#26)
+   - Update unit test assumptions to match contemporary Internet (#26)
+
 1.0.1 2017-11-02
  - Fixed
    - Fixed licensing discrepancy (#20, #21)

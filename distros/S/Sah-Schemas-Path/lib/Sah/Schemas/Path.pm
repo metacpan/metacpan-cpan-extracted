@@ -1,7 +1,7 @@
 package Sah::Schemas::Path;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-01-14'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -18,7 +18,7 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2016-07-22.
+This document describes version 0.004 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2018-01-14.
 
 =head1 SAH SCHEMAS
 
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

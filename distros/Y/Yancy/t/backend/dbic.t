@@ -23,8 +23,7 @@ C<t/lib/Local/Test.pm>
 
 =cut
 
-use v5.24;
-use experimental qw( signatures postderef );
+use Mojo::Base '-strict';
 use Test::More;
 use FindBin qw( $Bin );
 use File::Spec::Functions qw( catdir );
@@ -69,6 +68,9 @@ my $collections = {
     },
 };
 
+use Local::Schema;
+my $dbic = Local::Schema->connect( 'dbi:SQLite::memory:' );
+$dbic->deploy;
 my $be;
 
 subtest 'new' => sub {
@@ -76,12 +78,17 @@ subtest 'new' => sub {
     isa_ok $be, 'Yancy::Backend::Dbic';
     isa_ok $be->dbic, 'Local::Schema';
     is_deeply $be->collections, $collections;
+
+    subtest 'new with connection' => sub {
+        $be = Yancy::Backend::Dbic->new( $dbic, $collections );
+        isa_ok $be, 'Yancy::Backend::Dbic';
+        isa_ok $be->dbic, 'Local::Schema';
+        is_deeply $be->collections, $collections;
+    };
 };
 
-my $dbic = $be->dbic;
-$dbic->deploy;
-
-sub insert_item( $coll, %item ) {
+sub insert_item {
+    my ( $coll, %item ) = @_;
     my $id_field = $collections->{ $coll }{ 'x-id-field' } || 'id';
     my $row = $dbic->resultset( $coll )->create( \%item );
     $item{ $id_field } ||= $row->$id_field;

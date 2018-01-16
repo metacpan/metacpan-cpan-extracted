@@ -1,5 +1,5 @@
 #
-# $Id: Write.pm,v 1e1671f227f5 2017/01/05 17:29:15 gomor $
+# $Id: Write.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
 #
 # file::write Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 1e1671f227f5 $',
+      revision => '$Revision: 6fa51436f298 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -49,7 +49,7 @@ sub brik_use_properties {
    # encoding: see `perldoc Encode::Supported' for other types
    return {
       attributes_default => {
-         encoding => $self->global->encoding || 'utf8',
+         encoding => defined($self->global) && $self->global->encoding || 'utf8',
       },
    };
 }
@@ -91,7 +91,7 @@ sub open {
       select($previous_default);          
    }
 
-   $self->debug && $self->log->debug("open: fd [$out]");
+   $self->log->debug("open: fd [$out]");
 
    return $self->fd($out);
 }
@@ -154,7 +154,7 @@ sub write {
       $self->lock or return;
    }
 
-   $self->debug && $self->log->debug("write: data[$data]");
+   $self->log->debug("write: data[$data]");
 
    if (ref($data) eq 'ARRAY') {
       for my $this (@$data) {
@@ -182,7 +182,7 @@ Metabrik::File::Write - file::write Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

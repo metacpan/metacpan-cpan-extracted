@@ -1,13 +1,18 @@
 package WebService::Braintree::TransactionGateway;
-$WebService::Braintree::TransactionGateway::VERSION = '0.94';
+$WebService::Braintree::TransactionGateway::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
+
 use Carp qw(confess);
-use WebService::Braintree::Util qw(validate_id to_instance_array);
-use WebService::Braintree::Validations qw(verify_params transaction_signature clone_transaction_signature transaction_search_results_signature);
+use WebService::Braintree::Util qw(validate_id);
+use WebService::Braintree::Validations qw(
+    verify_params transaction_signature clone_transaction_signature
+    transaction_search_results_signature
+);
 
 has 'gateway' => (is => 'ro');
 
@@ -57,12 +62,17 @@ sub clone_transaction {
 
 sub search {
     my ($self, $block) = @_;
-    my $search = WebService::Braintree::TransactionSearch->new;
-    my $params = $block->($search)->to_hash;
-    my $response = $self->gateway->http->post("/transactions/advanced_search_ids", {search => $params});
-    confess "DownForMaintenanceError" unless (verify_params($response, transaction_search_results_signature));
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-        $self->fetch_transactions($search, shift);
+
+    return $self->resource_collection({
+        ids_url => "/transactions/advanced_search_ids",
+        post_ids => sub {
+            my $response = shift;
+            confess "DownForMaintenanceError" unless
+                verify_params($response, transaction_search_results_signature);
+        },
+        obj_url => "/transactions/advanced_search",
+        inflate => [qw/credit_card_transactions transaction Transaction/],
+        search => $block->(WebService::Braintree::TransactionSearch->new),
     });
 }
 
@@ -81,24 +91,24 @@ sub cancel_release {
     $self->_make_request("/transactions/$id/cancel_release", "put", undef);
 }
 
-sub all {
-    my $self = shift;
-    my $response = $self->gateway->http->post("/transactions/advanced_search_ids");
-    return WebService::Braintree::ResourceCollection->new->init($response, sub {
-        $self->fetch_transactions(WebService::Braintree::TransactionSearch->new, shift);
-    });
+sub update_details {
+    my ($self, $id, $params) = @_;
+    $self->_make_request("/transactions/$id/update_details", "put", { transaction => $params });
 }
 
-sub fetch_transactions {
-    my ($self, $search, $ids) = @_;
+sub submit_for_partial_settlement {
+    my ($self, $id, $amount, $params) = @_;
+    $self->_make_request("/transactions/$id/submit_for_partial_settlement", "post", { transaction => {%$params, amount => $amount}});
+}
 
-    return [] if scalar @{$ids} == 0;
+sub all {
+    my $self = shift;
 
-    $search->ids->in($ids);
-
-    my $response = $self->gateway->http->post("/transactions/advanced_search/", {search => $search->to_hash});
-    my $attrs = $response->{'credit_card_transactions'}->{'transaction'};
-    return to_instance_array($attrs, "WebService::Braintree::Transaction");
+    return $self->resource_collection({
+        ids_url => "/transactions/advanced_search_ids",
+        obj_url => "/transactions/advanced_search",
+        inflate => [qw/credit_card_transactions transaction Transaction/],
+    });
 }
 
 __PACKAGE__->meta->make_immutable;

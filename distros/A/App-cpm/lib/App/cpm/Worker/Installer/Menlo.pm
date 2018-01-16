@@ -6,7 +6,7 @@ use parent 'Menlo::CLI::Compat';
 use App::cpm::Logger::File;
 use Menlo::Builder::Static;
 
-our $VERSION = '0.955';
+our $VERSION = '0.957';
 
 use constant WIN32 => Menlo::CLI::Compat::WIN32();
 
@@ -239,11 +239,11 @@ sub run_timeout {
             $sub->(@line);
         }
         close $_ for $select->handles;
-        if ($INT && kill 0 => $pid) {
+        if ($INT) {
             my $target = $Config::Config{d_setpgrp} ? -$pid : $pid;
             kill INT => $target;
         }
-        if ($is_timeout && kill 0 => $pid) {
+        if ($is_timeout) {
             if (my $on_timeout = $self->{on}{timeout}) {
                 $on_timeout->($pid);
             }

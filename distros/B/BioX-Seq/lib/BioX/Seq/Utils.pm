@@ -26,7 +26,7 @@ sub build_ORF_regex {
 
 
     my $aasize = int($min_len/3);
-    my $tail_size = $aasize - 1 - ($mode & 0x2);
+    my $tail_size = $aasize - 1 - ($mode & 0x2 ? 1 : 0);
     my $codon = ".{3}";
     my $first_codon = $mode & 0x2 ? 'A[TU]G' : '';
     my $stop_codon = "[TU](?:AA|AG|GA|AR|RA)";

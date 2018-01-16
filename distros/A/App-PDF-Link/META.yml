@@ -23,15 +23,15 @@ no_index:
 provides:
   App::PDF::Link:
     file: lib/App/PDF/Link.pm
-    version: '0.19'
+    version: '0.20'
   pdflink:
     file: script/pdflink
-    version: '0.19'
+    version: '0.20'
 requires:
   PDF::API2: '2.029'
   Text::CSV_XS: '0'
   perl: '5.010000'
 resources:
   repository: git://github.com/sciurius/pdflink
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

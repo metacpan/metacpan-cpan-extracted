@@ -1,19 +1,12 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 
-use Data::Dumper;
 use lib 't/lib';
-use Test::More tests => 12;
+use Test::More tests => 17;
 use File::Basename;
 use File::Spec;
 use Footprintless;
-use Footprintless::Util qw(
-    dumper
-    factory
-    slurp
-    spurt
-    temp_dir
-);
 
 BEGIN {
 
@@ -232,6 +225,126 @@ my $logger = Log::Any->get_logger();
             parameters => [ 'BBB', 'AAA', 'BBB', 'AAA', 'BBB', 'AAA' ]
         },
         'dangerous naming 3'
+    );
+}
+
+# Test SQL comments
+{
+    my $statement = Footprintless::Plugin::Database::PreparedStatementTemplate->new(
+        <<'>>SQL_TEMPLATE',
+SELECT * FROM fishes WHERE name == '--' -- FIRST "--" is not a comment!
+AND dorsal_fin /* MORE _BIND_TWO_
+COMMENTS _BIND_ONE_
+HERE */ = _BIND_ONE_
+AND /* IGNORE */ row_count < 10 -- NORMAL COMMENT>
+>>SQL_TEMPLATE
+        _BIND_ONE_ => { value => 'bind_1' },
+        _BIND_TWO_ => { value => 'bind_2' }
+    );
+    is_deeply(
+        $statement->query(),
+        {   sql => <<'>>SQL',
+SELECT * FROM fishes WHERE name == '--' 
+AND dorsal_fin  = ?
+AND  row_count < 10 
+>>SQL
+            parameters => ['bind_1']
+        },
+        'Line comment in string'
+    );
+
+    $statement = Footprintless::Plugin::Database::PreparedStatementTemplate->new(
+        <<'>>SQL_TEMPLATE',
+SELECT * FROM fishes WHERE name == '/* WOW! */' -- FIRST "--" is not a comment!
+AND dorsal_fin /* MORE _BIND_TWO_
+COMMENTS _BIND_ONE_
+HERE */ = _BIND_ONE_
+AND /* IGNORE */ row_count < 10 -- NORMAL COMMENT>
+>>SQL_TEMPLATE
+        _BIND_ONE_ => { value => 'bind_1' },
+        _BIND_TWO_ => { value => 'bind_2' }
+    );
+    is_deeply(
+        $statement->query(),
+        {   sql => <<'>>SQL',
+SELECT * FROM fishes WHERE name == '/* WOW! */' 
+AND dorsal_fin  = ?
+AND  row_count < 10 
+>>SQL
+            parameters => ['bind_1']
+        },
+        'Block comment in string'
+    );
+
+    $statement = Footprintless::Plugin::Database::PreparedStatementTemplate->new(
+        <<'>>SQL_TEMPLATE',
+SELECT * FROM fishes WHERE name == '/* WOW! */' -- FIRST "--" /* is not a comment!
+AND dorsal_fin /* MORE _BIND_TWO_
+COMMENTS _BIND_ONE_
+HERE */ = _BIND_ONE_
+AND /* IGNORE */ row_count < 10 -- NORMAL COMMENT */>
+>>SQL_TEMPLATE
+        _BIND_ONE_ => { value => 'bind_1' },
+        _BIND_TWO_ => { value => 'bind_2' }
+    );
+    is_deeply(
+        $statement->query(),
+        {   sql => <<'>>SQL',
+SELECT * FROM fishes WHERE name == '/* WOW! */' 
+AND dorsal_fin  = ?
+AND  row_count < 10 
+>>SQL
+            parameters => ['bind_1']
+        },
+        'Block comment in line comments'
+    );
+
+    $statement = Footprintless::Plugin::Database::PreparedStatementTemplate->new(
+        <<'>>SQL_TEMPLATE',
+SELECT * FROM fishes WHERE name == '/* WOW! */' -- FIRST "--" /* is not a comment!
+AND dorsal_fin /* MORE _BIND_TWO_
+COMMENTS _BIND_ONE_
+HERE 
+-- */ = _BIND_ONE_
+AND /* IGNORE */ row_count < 10 -- NORMAL COMMENT */>
+>>SQL_TEMPLATE
+        _BIND_ONE_ => { value => 'bind_1' },
+        _BIND_TWO_ => { value => 'bind_2' }
+    );
+    is_deeply(
+        $statement->query(),
+        {   sql => <<'>>SQL',
+SELECT * FROM fishes WHERE name == '/* WOW! */' 
+AND dorsal_fin  = ?
+AND  row_count < 10 
+>>SQL
+            parameters => ['bind_1']
+        },
+        'Line comments in block comments'
+    );
+
+    $statement = Footprintless::Plugin::Database::PreparedStatementTemplate->new(
+        <<'>>SQL_TEMPLATE',
+SELECT * FROM fishes WHERE name == /*'/* WOW! */'NOT WOW!' -- FIRST "--" /* is not a comment!
+AND dorsal_fin /* MORE _BIND_TWO_
+COMMENTS _BIND_ONE_
+HERE 
+-- */ = _BIND_ONE_
+AND /* IGNORE */ row_count < 10 -- NORMAL COMMENT */>
+>>SQL_TEMPLATE
+        _BIND_ONE_ => { value => 'bind_1' },
+        _BIND_TWO_ => { value => 'bind_2' }
+    );
+    is_deeply(
+        $statement->query(),
+        {   sql => <<'>>SQL',
+SELECT * FROM fishes WHERE name == 'NOT WOW!' 
+AND dorsal_fin  = ?
+AND  row_count < 10 
+>>SQL
+            parameters => ['bind_1']
+        },
+        'End block comment in string'
     );
 
 }

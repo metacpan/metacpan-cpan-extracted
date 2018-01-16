@@ -4,9 +4,9 @@
       "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Text::APL" : {
          "file" : "lib/Text/APL.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Text::APL::Base" : {
          "file" : "lib/Text/APL/Base.pm"
@@ -57,7 +57,7 @@
       },
       "Text::APL::Core" : {
          "file" : "lib/Text/APL/Core.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Text::APL::Parser" : {
          "file" : "lib/Text/APL/Parser.pm"
@@ -85,12 +85,13 @@
       },
       "homepage" : "https://github.com/vti/text-apl",
       "repository" : {
-         "url" : "git://github.com/vti/text-apl",
+         "url" : "git://github.com/vti/text-apl.git",
          "web" : "https://github.com/vti/text-apl"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "vti <viacheslav.t@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

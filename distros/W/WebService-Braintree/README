@@ -20,9 +20,12 @@ NAME
     You can also look over the test suite for guidance of usage, especially
     the xt/sandbox tests. Not all of these tests work (ones marked
     todo_skip. This is because they are an adaptation of code used against
-    Braintree's private integration server. Care has been taken that the
-    same sandbox tests that fail in this module also fail for
-    Net::Braintree, and in the same manner.
+    Braintree's private integration server.
+
+    As of version 0.94, with appropriate manual intervention for your
+    sandbox account (documented in t/sandbox/README), more of the sandbox
+    tests run/pass for this module than for the original module
+    Net::Braintree.
 
  GENERAL STYLE
 
@@ -58,12 +61,20 @@ NAME
 
  INTERFACE
 
-    There are twelve classes that you will interface with. Please see their
+    These are the classes that you will interface with. Please see their
     respective documentation for more detail on how to use them.
+
+  WebService::Braintree::AddOn
+
+    List all plan add-ons.
 
   WebService::Braintree::Address
 
     Create, update, delete, and find addresses.
+
+  WebService::Braintree::ApplePay
+
+    List, register, and unregister ApplePay domains.
 
   WebService::Braintree::ClientToken
 
@@ -81,6 +92,18 @@ NAME
   WebService::Braintree::Customer
 
     Create, update, delete, and find customers.
+
+  WebService::Braintree::Discount
+
+    List all plan discounts.
+
+  WebService::Braintree::Dispute
+
+    Accept, and find disputes.
+
+  WebService::Braintree::Merchant
+
+    Provision merchants from "raw ApplePay".
 
   WebService::Braintree::MerchantAccount
 

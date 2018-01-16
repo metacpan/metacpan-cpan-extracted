@@ -1,13 +1,55 @@
 Revision history for WebService-Braintree
+1.0    2018-01-13
+        Added new interfaces:
+            AddOn
+                ->all()
+            ApplePay
+                ->register_domain()
+                ->unregister_domain()
+                ->registered_domains()
+            Discount
+                ->all()
+            Dispute
+                ->accept()
+                ->add_text_evidence()
+                ->finalize()
+                ->find()
+                ->remove_evidence()
+                ->search()
+        Added new methods:
+            CreditCard
+                ->credit()
+                ->expired_cards() (->expired() in other SDKs)
+                ->expiring_between()
+            CreditCardVerification
+                ->create()
+            Customer
+                ->credit()
+                ->sale()
+                ->transactions()
+                ->transactions()
+            PaymentMethod
+                ->grant()
+            PayPalAccount
+                ->create()
+                ->delete()
+                ->sale()
+            Transaction
+                ->create()
+                ->update_details()
+                ->submit_for_partial_settlement()
+        Changed:
+            The following now return a ResourceCollection:
+                * MerchantAccount->all
 0.94    2017-10-16
         Big code cleanup and test refactor
         Make a bunch of sandbox tests run
         Comment out some low value sandbox tests that take excessively long PR # 12
         Does not support perl < 5.10.1
 0.93    2017-08-26
-        Fix sandbox test failures.  Thanks ROBK.
+        Fix sandbox test failures.  Thanks RKINYON.
 0.92    2017-08-12
-        Documentation.  Thanks ROBK.
+        Documentation.  Thanks RKINYON.
         Note:  sandbox tests currently failing.  To be repaired RSN
         Missing dependency DateTime::Format::RFC3339 thanks onlyjob.
 0.91    2016-07-09

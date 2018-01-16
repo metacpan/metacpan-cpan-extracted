@@ -8,9 +8,9 @@ build_requires:
   Test::More: '0.88'
   Test::Trap: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.007'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,6 +39,7 @@ resources:
   bugtracker: https://github.com/polettix/Bot-ChatBots-Telegram/issues
   homepage: https://github.com/polettix/Bot-ChatBots-Telegram
   repository: https://github.com/polettix/Bot-ChatBots-Telegram.git
-version: '0.006'
+version: '0.010'
 x_contributors:
+  - 'Flavio Poletti <flavio.poletti@ericsson.com>'
   - 'Flavio Poletti <flavio@polettix.it>'

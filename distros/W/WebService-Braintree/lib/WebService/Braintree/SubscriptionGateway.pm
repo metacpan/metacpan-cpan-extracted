@@ -1,13 +1,14 @@
 package WebService::Braintree::SubscriptionGateway;
-$WebService::Braintree::SubscriptionGateway::VERSION = '0.94';
+$WebService::Braintree::SubscriptionGateway::VERSION = '1.0';
 use 5.010_001;
 use strictures 1;
 
-use WebService::Braintree::Util qw(to_instance_array validate_id);
+use WebService::Braintree::Util qw(validate_id);
 use Carp qw(confess);
 
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
+with 'WebService::Braintree::Role::CollectionBuilder';
 
 has 'gateway' => (is => 'ro');
 
@@ -35,29 +36,23 @@ sub cancel {
 
 sub search {
     my ($self, $block) = @_;
-    my $search = WebService::Braintree::SubscriptionSearch->new;
-    my $params = $block->($search)->to_hash;
-    my $response = $self->gateway->http->post("/subscriptions/advanced_search_ids", {search => $params});
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-                                                                      $self->fetch_subscriptions($search, shift);
-                                                                  });
+
+    return $self->resource_collection({
+        ids_url => "/subscriptions/advanced_search_ids",
+        obj_url => "/subscriptions/advanced_search",
+        inflate => [qw/subscriptions subscription Subscription/],
+        search => $block->(WebService::Braintree::SubscriptionSearch->new),
+    });
 }
 
 sub all {
     my $self = shift;
-    my $response = $self->gateway->http->post("/subscriptions/advanced_search_ids");
-    return WebService::Braintree::ResourceCollection->new->init($response, sub {
-        $self->fetch_subscriptions(WebService::Braintree::SubscriptionSearch->new, shift);
-    });
-}
 
-sub fetch_subscriptions {
-    my ($self, $search, $ids) = @_;
-    $search->ids->in($ids);
-    return [] if scalar @{$ids} == 0;
-    my $response = $self->gateway->http->post("/subscriptions/advanced_search/", {search => $search->to_hash});
-    my $attrs = $response->{'subscriptions'}->{'subscription'};
-    return to_instance_array($attrs, "WebService::Braintree::Subscription");
+    return $self->resource_collection({
+        ids_url => "/subscriptions/advanced_search_ids",
+        obj_url => "/subscriptions/advanced_search",
+        inflate => [qw/subscriptions subscription Subscription/],
+    });
 }
 
 __PACKAGE__->meta->make_immutable;

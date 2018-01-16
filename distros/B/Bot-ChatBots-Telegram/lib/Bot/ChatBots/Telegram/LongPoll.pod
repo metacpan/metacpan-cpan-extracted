@@ -17,6 +17,8 @@ Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
    sub processor { # tube-compliant
       my $record = shift;
       # ... $record is normalized, by default
+      # quick response:
+      $record->{send_response} = 'Hello, world!';
       return $record; # follow on..
    }
 
@@ -179,7 +181,7 @@ Flavio Poletti <polettix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
 
 This module is free software. You can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

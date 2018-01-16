@@ -6,11 +6,11 @@ use MIME::Base64;
 BEGIN { use_ok( 'Zonemaster::LDNS' ) }
 
 my $s;
-$s = Zonemaster::LDNS->new( '8.8.8.8' ) unless $ENV{TEST_NO_NETWORK};
+$s = Zonemaster::LDNS->new( '8.8.8.8' ) if $ENV{TEST_WITH_NETWORK};
 
 subtest 'rdf' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $p = $s->query( 'iis.se', 'SOA' );
         plan skip_all => 'No response, cannot test' if not $p;
@@ -27,7 +27,7 @@ subtest 'rdf' => sub {
 
 subtest 'SOA' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $p = $s->query( 'iis.se', 'SOA' );
         plan skip_all => 'No response, cannot test' if not $p;
@@ -47,7 +47,7 @@ subtest 'SOA' => sub {
 
 subtest 'A' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $p = $s->query( 'a.ns.se' );
         plan skip_all => 'No response, cannot test' if not $p;
@@ -63,7 +63,7 @@ subtest 'A' => sub {
 
 subtest 'AAAA' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         $p = $s->query( 'a.ns.se', 'AAAA' );
         plan skip_all => 'No response, cannot test' if not $p;
@@ -78,7 +78,7 @@ subtest 'AAAA' => sub {
 
 subtest 'TXT' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $se = Zonemaster::LDNS->new( '192.36.144.107' );
         my $pt = $se->query( 'se', 'TXT' );
@@ -93,7 +93,7 @@ subtest 'TXT' => sub {
 
 subtest 'DNSKEY' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $se = Zonemaster::LDNS->new( '192.36.144.107' );
         my $pk = $se->query( 'se', 'DNSKEY' );
@@ -103,14 +103,15 @@ subtest 'DNSKEY' => sub {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::DNSKEY' );
             ok( $rr->flags == 256 or $rr->flags == 257 );
             is( $rr->protocol,  3 );
-            is( $rr->algorithm, 5 );
+            # Alg 8 will replace 5. Now (December 2017) both are used.
+            ok( $rr->algorithm == 5 or $rr->algorithm == 8 );
         }
     }
 };
 
 subtest 'RRSIG' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $se = Zonemaster::LDNS->new( '192.36.144.107' );
         my $pr = $se->query( 'se', 'RRSIG' );
@@ -121,7 +122,9 @@ subtest 'RRSIG' => sub {
             is( $rr->signer, 'se.' );
             is( $rr->labels, 1 );
             if ( $rr->typecovered eq 'DNSKEY' ) {
-                is( $rr->keytag, 59747 ); # .SE KSK should not change very often
+                # .SE KSK should not change very often. 59407 will replace 59747.
+                # Now (December 2017) both are used.
+                ok( $rr->keytag == 59747 or $rr->keytag == 59407 );
             }
         }
     }
@@ -129,7 +132,7 @@ subtest 'RRSIG' => sub {
 
 subtest 'NSEC' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $se = Zonemaster::LDNS->new( '192.36.144.107' );
         my $pn = $se->query( 'se', 'NSEC' );
@@ -163,7 +166,7 @@ subtest 'From string' => sub {
 
 subtest 'DS' => sub {
     SKIP: {
-        skip 'no network', 1 if $ENV{TEST_NO_NETWORK};
+        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
         my $se      = Zonemaster::LDNS->new( '192.36.144.107' );
         my $pd      = $se->query( 'nic.se', 'DS' );

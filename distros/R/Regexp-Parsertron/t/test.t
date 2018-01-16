@@ -73,10 +73,21 @@ my(@test)	=
 	expected	=> '(?^i:Perl|JavaScript|C++)',
 	re			=> qr/Perl|JavaScript/i,
 },
+{
+	count		=> 13,
+	expected	=> '(?^:/ab+bc/)',
+	re			=> '/ab+bc/',
+},
+{
+	count		=> 14,
+	expected	=> '(?^:^)',
+	re			=> qr/^/,
+},
 );
 
 my($parser)	= Regexp::Parsertron -> new;
 
+my($count);
 my($expected);
 my($got);
 my($message);
@@ -84,11 +95,12 @@ my($result);
 
 for my $test (@test)
 {
+	$count	= $$test{count}; # Used after the loop.
 	$result = $parser -> parse(re => $$test{re});
 
-	if ($$test{count} == 12)
+	if ($count == 12)
 	{
-		$parser -> add(text => '|C++', uid => 6);
+		$parser -> append(text => '|C++', uid => 6);
 	}
 
 	if ($result == 0)
@@ -96,18 +108,20 @@ for my $test (@test)
 		$got		= $parser -> as_string;
 		$expected	= $$test{expected};
 		$message	= "$$test{count}: re: $$test{re}. got: $got";
-		$message	.= ' (After calling add(...) )' if ($$test{count} == 12);
+		$message	.= ' (After calling append(...) )' if ($$test{count} == 12);
 
 		is_deeply("$got", $expected, $message);
 	}
 	else
 	{
-		BAIL_OUT("Test $$test{count} failed to return 0 from process()");
+		BAIL_OUT("Test $$test{count} failed to return 0 from parse()");
 	}
 
 	# Reset for next test.
 
 	$parser -> reset;
 }
+
+print "# Internal test count: $count\n";
 
 done_testing;

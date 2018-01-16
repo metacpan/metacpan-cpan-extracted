@@ -93,6 +93,7 @@ is compare($io1, $io3), "";
 
 # undefs
 is compare(undef, undef), 1;
+is compare(my $f = undef, my $s = undef), 1;
 is compare(undef, 0), "";
 is compare(undef, ""), "";
 is compare(0, undef), "";

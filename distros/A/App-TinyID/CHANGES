@@ -1,0 +1,57 @@
+==================================================
+Changes from 2017-01-15 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.1.0 at 2018-01-15 03:30:15 +0000
+------------------------------------------
+
+  Change: b1c6ea757138fa67ab6499344e1a2b4f0c9bd459
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 11:29:21 +0000
+
+    Minor update.
+
+    - Change project license to MIT. - Tidy up. 
+
+  Change: 07f22431e5b9ab8de91f9e2fa2a549627a07a952
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-11 10:49:51 +0000
+
+    Update doc. 
+
+  Change: e4d72cc5651f6f6a4e7d949ab110bfaa1d5f987f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-11 02:02:35 +0000
+
+    Updated tinyid.t. 
+
+  Change: 282e2f8f3af37245fc3955118d7d21621a9467e3
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-11 01:57:21 +0000
+
+    Major update.
+
+    - Descriptive options. - Improved conditionals handling. 
+
+  Change: 4f40ceaae5e4fc46a3a9545c2685e8d1bc76dbfb
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-20 01:52:05 +0000
+
+    v0.1.1 
+
+  Change: e010f2e20015f9b2519ac850f63efbcf146bd478
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-19 20:29:11 +0000
+
+    v0.1.0 
+
+  Change: 8f11d4cc2b2cf68f1c14647e935c26d65e5ea1c1
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-17 15:57:46 +0000
+
+    v0.0.1 
+
+================
+End of releases.
+================

@@ -44,10 +44,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MetaProvides::Update:
     file: lib/Dist/Zilla/Plugin/MetaProvides/Update.pm
-    version: '0.004'
+    version: '0.005'
   Dist::Zilla::PluginBundle::Git::VersionManager:
     file: lib/Dist/Zilla/PluginBundle/Git/VersionManager.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   CPAN::Meta::Requirements: '0'
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.016'
@@ -79,11 +79,19 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Git-VersionManager
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.027006'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/pluginbundle version'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -483,14 +491,6 @@ x_Dist_Zilla:
       name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: '@Author::ETHER/pluginbundle_version'
-      version: '6.010'
-    -
       class: Dist::Zilla::Plugin::MakeMaker::Fallback
       config:
         Dist::Zilla::Plugin::MakeMaker:
@@ -598,7 +598,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20171120'
+          Module::CoreList: '5.20171220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.006'
     -
@@ -686,6 +686,14 @@ x_Dist_Zilla:
       name: '@Author::ETHER/ReadmeAnyFromPod'
       version: '0.163250'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/@Git::VersionManager/pluginbundle version'
+      version: '6.010'
+    -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
         Dist::Zilla::Plugin::RewriteVersion:
@@ -701,7 +709,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -741,7 +749,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -788,6 +796,14 @@ x_Dist_Zilla:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
       version: '2.043'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: x_Dist_Zilla
+          type: requires
+      name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -837,8 +853,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: suggests
+          phase: x_Dist_Zilla
+          type: requires
       name: '@Author::ETHER/prereqs for @Author::ETHER'
       version: '6.010'
     -

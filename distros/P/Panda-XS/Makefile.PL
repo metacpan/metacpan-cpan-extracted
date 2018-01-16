@@ -42,5 +42,6 @@ write_makefile(
     MIN_PERL_VERSION => '5.18.0', # required for GV_SUPER
     CCFLAGS          => '-Wall -Wextra',
     OPTIMIZE         => '-g0 -O2',
+    XSOPT            => '-hiertype',
     #CC => 'clang++',
 );

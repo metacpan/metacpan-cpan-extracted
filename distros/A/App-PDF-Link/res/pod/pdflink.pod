@@ -1,0 +1,285 @@
+=head1 NAME
+
+pdflink - insert document links in PDF
+
+=head1 SYNOPSIS
+
+  pdflink [options] pdf-file [csv-file]
+
+  pdflink [options] --targets=file1;file2 pdf-file [pdf-file ...]
+
+Inserts document links in PDF
+
+ Options:
+    --output=XXX	name of the new PDF (default __new__.pdf)
+    --embed		embed the data files instead of linking
+    --attach		attach the data files instead of linking
+    --xpos=NN		X-position for links
+    --ypos=NN		Y-position for links relative to top
+    --iconsize=NN	size of the icons, default 50
+    --icons=type=XXX	add icon image XXX for this type
+    --padding=NN	padding between icons, default 0
+    --vertical		stacks icons vertically
+    --border		draws a border around the links
+    --gfunder		draws the images behind the page
+    --targets=XXX	specifies the target(s) to link to
+    --ident		shows identification
+    --help		shows a brief help message and exits
+    --man               shows full documentation and exits
+    --verbose		provides more verbose information
+
+=head1 DESCRIPTION
+
+When invoked without a B<--targets> option, this program will process
+the PDF document using the associated CSV as table of contents.
+
+For every item in the PDF that has one or more additional files (files
+with the same name as the title, but differing extensions), clickable
+icons are added to the first page of the item. When clicked in a
+suitable PDF viewing tool, the corrresponding file will be activated.
+
+For example, if the CSV contains
+
+  title;pages;
+  Blue Moon;24;
+
+And the following files are present in the current directory
+
+  Blue Moon.html
+  Blue Moon.mscz
+
+Then two clickable icons will be added to page 24 of the document,
+leading to these two files.
+
+Upon completion, the updated PDF is written out under the specified name.
+
+When invoked with the B<--targets> option, all specified PDF files get
+links inserted to the targets on the first page. If there is only one
+PDF file you can use the B<--pdf> option to designate the name of the
+new PDF document, otherwise all PDF files are updated (rewritten.
+
+=head1 OPTIONS
+
+Note that all sizes and dimensions are in I<points> (72 points per inch).
+
+=over 8
+
+=item B<--pdf=>I<XXX>
+
+Specifies the updated PDF to be written.
+
+=item B<--embed>
+
+Normally links are inserted into the PDF document that point to files
+on disk. To use the links from the PDF document, the target files must
+exist on disk.
+
+With B<--embed>, the target files are embedded (as file attachments)
+to the PDF document. The resultant PDF document will be usable on its
+own, no other files needed.
+
+=item B<--attach>
+
+Like B<--embed>, but no custom icon is supplied.
+
+=item B<--all>
+
+Normally, only files with known types (extensions) are taken into
+account. Currently, these are C<html> for iRealPro, C<mscz> for
+MuseScore and C<mgu> and similar for Band in a Box.
+
+With B<--all>, all files that have matching names will be processed.
+However, files with unknown extensions will get a neutral document
+icon.
+
+=item B<--xpos=>I<NN>
+
+Horizontal position of the icons.
+
+If the value is positive, icon placement starts relative to the left
+side of the page.
+
+If the value is negative, icon placement starts relative to the right
+side of the page.
+
+Default is 0 (zero); icon placement begins against the left side of
+the page.
+
+Icons are always placed from the outside of the page towards the
+inner side.
+
+An I<xpos> value may also be specified in the CSV file, in a column
+with title C<xpos>. If present, this value is added to position
+resulting from the command line / default values.
+
+=item B<--ypos=>I<NN>
+
+If the value is positive, icon placement starts relative to the top
+of the page.
+
+If the value is negative, icon placement starts relative to the bottom
+of the page.
+
+Default is 0 (zero); icon placement begins against the top of the
+page.
+
+Icons are always placed from the outside of the page towards the
+inner side.
+
+An I<ypos> offset value may also be specified in the CSV file, in a
+column with title C<ypos>. If present, this value is added to position
+resulting from the command line / default values. This is especially
+useful if there are songs in the PDF that do not start at the top of
+the page, e.g., when there are multiple songs on a single page.
+
+=item B<--iconsize=>I<NN>
+
+Desired size of the link icons. Default is 50.
+
+=item B<--padding=>I<NN>
+
+Space between icons. Default is to place the icons adjacent to each
+other.
+
+=item B<--vertical>
+
+Stacks the icons vertically.
+
+=item B<--border>
+
+Requests a border to be drawn around the links.
+
+Borders are always drawn for links without icons.
+
+=item B<--gfunder>
+
+Drawing the icon images uses the page transformations in effect at the
+end of the page. If these were not neatly restored, the graphics may
+be misplaced/scaled/flipped.
+
+By using B<--gfunder>, the images are placed behind the page
+but this only works for transparent pages.
+
+This option is only relevant when adding links to external files. With
+B<--embed> the problem does not occur.
+
+=item B<--targets=>I<FILE1> [ B<;> I<FILE2> ... ]
+
+Explicitly specifies the target files to link to. In this case no CSV
+is processed and the input PDF(s) are updated (rewritten) unless
+B<--pdf> is used to designate the output PDF name.
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--ident>
+
+Prints program identification.
+
+=item B<--verbose>
+
+Provides more verbose information.
+
+=item I<directory>
+
+The directory to process. Defaults to the current directory.
+
+=back
+
+=head1 ICONS
+
+B<pdflink> has a number of icons built-in for common file types.
+Associations between a filename extension and an icon can be made with
+the B<--icons> command line option.
+
+For example,
+
+  --icons=pdf=builtin:PDF
+
+This will associate the built-in icon PDF with filename extension C<pdf>.
+
+Alternatively, an image file may be specified to add user defined icons.
+
+  --icons=pdf=builtin:myicons/pdficon.png
+
+The following icons are built-in. By default, only MuseScore and
+iRealPro icons are associated and all other filename extensions will
+be skipped. When pdflink is run with command line option B<--all>, all
+built-in icons will be associated and all matching files will get
+linked.
+
+=over
+
+=item PDF
+
+Associated to filename extension C<pdf> (generic PDF document).
+
+=item PNG
+
+Associated to filename extension C<png> (PNG image).
+
+=item JPG
+
+Associated to filename extensions C<jpg> and C<jpeg> (JPG image).
+
+=item MuseScore
+
+Associated to filename extension C<mscz> (MuseScore document).
+
+=item iRealPro
+
+Associated to filename extension C<html> (iRealPro link in HTML document).
+
+While technically this is wrong, this is the way iRealPro data is
+handled on Android and iPad.
+
+=item BandInABox
+
+Associated to filename extensions C<mgu>, C<mg1> and so on (Band-In-A-Box document).
+
+=item Document
+
+Fallback icon for unknown filename extensions.
+
+=item Border
+
+Alternative fallback icon for unknown filename extensions.
+
+=back
+
+=head1 LIMITATIONS
+
+Some PDF files cannot be processed. If this happens, try converting
+the PDF to PDF-1.4 or PDF/A.
+
+Files with extension B<html> are assumed to be iRealPro files and will
+get the iRealPro icon.
+
+Unknown extensions will get an empty square box instead of an icon.
+
+Since colon C<:> and slash C</> are not allowed in file names, they
+are replaced with C<@> characters.
+
+If the icons come out at the wrong place or upside down, try
+B<--gfunder>.
+
+=head1 AUTHOR
+
+Johan Vromans E<lt>jvromans@squirrel.nlE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2016 Johan Vromans. All rights reserved.
+
+This module is free software. You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+

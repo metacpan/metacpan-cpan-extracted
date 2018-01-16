@@ -1,0 +1,83 @@
+% my $a = shift;
+package <%= $a->{class} %>;
+use Mojo::Base '<%= $a->{controller_namespace} %>', -signatures;
+
+
+# GET /<%= $a->{t} %>/create
+# Display form for creating resource in table <%= $a->{t} %>.
+sub create($c) {
+  $c->render(<%= $a->{t} %> => {})
+}
+
+# POST /<%= $a->{t} %>
+# Add a new record to table <%= $a->{t} %>.
+sub store($c) {
+
+  # 1. Validate input
+  my $validation = $c->_validation;
+  return $c->render(action => 'create', <%= $a->{t} %> => {})
+   if $validation->has_error;
+  # 2. Insert it into the database
+  my $id = $c-><%= $a->{t} %>->add($validation->output);
+  # 3. Prepare the response data or just return "201 Created"
+  # See https://developer.mozilla.org/docs/Web/HTTP/Status/201
+  $c->redirect_to('show_<%= $a->{t} %>', id => $id);
+}
+
+# GET /<%= $a->{t} %>/:id/edit 
+# Display form for edititing resource in table <%= $a->{t} %>.
+sub edit($c) {
+  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->find($c->param('id')));
+}
+
+# PUT /<%= $a->{t} %>/:id
+# Update the record in table <%= $a->{t} %>
+sub update($c) {
+
+  # 1. Validate input
+  my $validation = $c->_validation;
+  return $c->render(action => 'edit', <%= $a->{t} %> => {})
+    if $validation->has_error;
+
+  # 2. Update the record
+  my $id = $c->param('id');
+  $c-<%= $a->{t} %>->save($id, $validation->output);
+
+  # 4. Return the updated record or just send "204 No Content"
+  # See https://developer.mozilla.org/docs/Web/HTTP/Status/204
+  $c->redirect_to('show_<%= $a->{t} %>', id => $id);
+}
+
+# GET /<%= $a->{t} %>/:id
+# Display a record from table <%= $a->{t} %>.
+sub show($c) {
+  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->find($c->param('id')));
+}
+
+# GET /<%= $a->{t} %>
+# List resources from table <%= $a->{t} %>.
+sub index {
+  my $c = shift;
+  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->all);
+}
+
+# DELETE /<%= $a->{t} %>/:id
+sub remove {
+  my $c = shift;
+  $c-><%= $a->{t} %>->remove($c->param('id'));
+  $c->redirect_to('<%= $a->{t} %>');
+}
+
+
+# Validation for actions that store or update
+sub _validation($c) {
+  my $validation = $c->validation;
+  # Add validation rules for the record to be stored in the database
+  # $validation->required('title');
+  # $validation->required('body');
+
+  return $validation;
+}
+
+1;
+
